@@ -1,0 +1,114 @@
+{
+  "schema": "lingxi.r06.continuation-local-receipt.v1",
+  "status": "LOCAL_REPAIRS_VERIFIED_R06_NOT_ACCEPTED",
+  "supersedesLocalSummary": "CONTINUATION_RECEIPT.json",
+  "gitHead": "6f5c4b01d6805ac95fa03a35c2035ccb35f7b8f8",
+  "branch": "codex/rust-tauri-migration",
+  "worktreeChangesUncommitted": true,
+  "finalScopedExecution": {
+    "directory": "reviewed-execution-r3",
+    "sourceCandidateSha256": "f527009c2f3ebf4a8eaead2a42fbe715a21e5fa8a0d7e6e9b6613d71d735105f",
+    "sourceStable": true,
+    "registeredBindingsExecuted": 39,
+    "registeredBindingsPassed": 39,
+    "selectedOriginalRequirements": 15,
+    "selectedAssertions": 36,
+    "selectedAssertionsPassed": 36,
+    "rollup": "reviewed-execution-r3/R06_LEAVES/leaf-cases.json",
+    "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+    "excludedFromExecutionScope": 265,
+    "stageVerdict": "NOT_A_STAGE_VERDICT"
+  },
+  "originalRequirementRegistration": {
+    "total": 279,
+    "ready": 100,
+    "gap": 179,
+    "registrationIsNotStageAcceptance": true
+  },
+  "supportingLocalRuns": [
+    {
+      "log": "original-and-approval-regression-final-r4.log",
+      "passed": 72,
+      "failed": 0,
+      "scope": "Seven original proof suites plus the coupled R04 approval suite; enforced synthetic persona product/home/tmp layout."
+    },
+    {
+      "log": "stage-input-contract-tests-final.log",
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "log": "boundary-registry-selftest-final.log",
+      "negativeControlsPassed": 20,
+      "effectiveBoundaryPassed": true
+    },
+    {
+      "log": "runner-identity-final-r2.log",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "log": "check-contracts-r2.log",
+      "status": "PASS"
+    },
+    {
+      "log": "check-boundaries-final.log",
+      "status": "PASS"
+    },
+    {
+      "directory": "stage-input-after-output-contract",
+      "status": "INPUTS_MATCH_NOT_STAGE_VERDICT"
+    }
+  ],
+  "supportingRunsAreNotClaimedToShareTheFinalScopedExecutionWindow": true,
+  "preservedFailedOrInterruptedWindows": [
+    {
+      "directory": "reviewed-execution",
+      "status": "FAIL",
+      "reason": "37/39 bindings passed; real-wire approval fixture mismatch and missing frontend build prerequisite refused."
+    },
+    {
+      "directory": "reviewed-execution-r2",
+      "status": "FAIL",
+      "reason": "Native test and frontend preparation passed but candidate changed through 904 unignored native target/debug outputs; rollup correctly refused earlier-candidate receipts."
+    },
+    {
+      "directory": "formal-stage-attempt",
+      "status": "STOPPED_AFTER_STALE_INPUT_REJECTION",
+      "reason": "Not a completed formal stage verdict; later corrected input checks do not rewrite this failed execution window."
+    },
+    {
+      "log": "original-and-approval-regression-final.log",
+      "status": "NOT_EXECUTED_INVALID_SUITE_SELECTOR"
+    },
+    {
+      "log": "original-and-approval-regression-final-r2.log",
+      "status": "FAILED_SYNTHETIC_PERSONA_ENVIRONMENT_SETUP"
+    },
+    {
+      "log": "original-and-approval-regression-final-r3.log",
+      "status": "FAILED_SYNTHETIC_PERSONA_PRODUCT_LAYOUT_GUARD"
+    }
+  ],
+  "unresolved": {
+    "originalRequirementsWithGaps": 179,
+    "openArFindings": 14,
+    "extraObligations": 12,
+    "globalFormatting": "FAIL_PREEXISTING_DRIFT_REMAINS",
+    "fullR06ExecutionAndR05PredecessorClosure": "NOT_COMPLETED",
+    "requiredIndependentReviews": "BLOCKED_RECORDED_PLATFORM_INTERRUPTION_NOT_BYPASSED",
+    "realGuiValidation": "BLOCKED_MACOS_ASSISTIVE_ACCESS_DENIAL",
+    "guiEvidence": "gui-evidence-20261013/gui-observations.json",
+    "accessibilityPermissionHost": "NOT_CONCLUSIVELY_IDENTIFIED",
+    "originalExecutionPrompt20261008": "MISSING_USER_UNAVAILABLE_TO_PROVIDE"
+  },
+  "release": {
+    "r06Accepted": false,
+    "r07Ready": false,
+    "readinessFlagsChanged": false,
+    "commitCreated": false,
+    "pushed": false,
+    "auditSealAdvanced": false,
+    "userRequestedEndpointAchieved": false
+  }
+}

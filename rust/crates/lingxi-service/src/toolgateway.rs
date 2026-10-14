@@ -78,7 +78,8 @@ use std::sync::Arc;
 
 use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};
 use lingxi_kernel::toolcatalog::{
-    CatalogPin, EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId, ToolTargetRef,
+    CatalogPin, EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId,
+    ToolTargetRef,
 };
 use lingxi_kernel::{Principal, RunContext};
 use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId};
@@ -728,7 +729,8 @@ const CONSUMED_RING_CAP: usize = 4096;
 /// supervisor ([`crate::runs::RunSupervisor`]).
 pub struct ToolInvocationGateway {
     registry: Arc<ToolRegistry>,
-    catalog_definitions: std::sync::Mutex<Option<Arc<crate::toolcatalog_bridge::CatalogDefinitions>>>,
+    catalog_definitions:
+        std::sync::Mutex<Option<Arc<crate::toolcatalog_bridge::CatalogDefinitions>>>,
     budget: SchemaBudget,
     policy: Arc<dyn ToolPolicyPort>,
     executors: std::sync::Mutex<std::collections::BTreeMap<ToolTargetId, ExecutorBinding>>,
@@ -779,17 +781,45 @@ impl ToolInvocationGateway {
         }
     }
 
-    pub fn attach_catalog_definitions(&self, definitions: Arc<crate::toolcatalog_bridge::CatalogDefinitions>) {
-        *self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()) = Some(definitions);
+    pub fn attach_catalog_definitions(
+        &self,
+        definitions: Arc<crate::toolcatalog_bridge::CatalogDefinitions>,
+    ) {
+        *self
+            .catalog_definitions
+            .lock()
+            .unwrap_or_else(|p| p.into_inner()) = Some(definitions);
     }
     pub fn has_catalog_definitions(&self) -> bool {
-        self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).is_some()
+        self.catalog_definitions
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .is_some()
     }
-    pub fn catalog_run_lease(&self, ctx: &RunContext) -> Option<crate::toolcatalog_bridge::CatalogRunLease> {
-        self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).as_ref().map(|definitions| crate::toolcatalog_bridge::CatalogRunLease { definitions: Arc::clone(definitions), context: ctx.clone() })
+    pub fn catalog_run_lease(
+        &self,
+        ctx: &RunContext,
+    ) -> Option<crate::toolcatalog_bridge::CatalogRunLease> {
+        self.catalog_definitions
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .as_ref()
+            .map(|definitions| crate::toolcatalog_bridge::CatalogRunLease {
+                definitions: Arc::clone(definitions),
+                context: ctx.clone(),
+            })
     }
-    pub fn normalize_model_request(&self, ctx: &RunContext, request: &ToolRequest, pin: Option<CatalogPin>) -> Result<(ToolRequest, Option<CatalogPin>), GatewayRefusal> {
-        let definitions = self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).clone();
+    pub fn normalize_model_request(
+        &self,
+        ctx: &RunContext,
+        request: &ToolRequest,
+        pin: Option<CatalogPin>,
+    ) -> Result<(ToolRequest, Option<CatalogPin>), GatewayRefusal> {
+        let definitions = self
+            .catalog_definitions
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone();
         match definitions {
             Some(definitions) => definitions.normalize(&self.registry, ctx, request, pin),
             None => Ok((request.clone(), pin)),
@@ -951,6 +981,50 @@ impl ToolInvocationGateway {
     /// turn BEFORE the first side effect, then the per-request execution
     /// path re-runs the full `prepare` at its own moment (pre-validation
     /// never replaces the immediate authorization).
+    ///
+    /// Refusal honesty (R06-AR-F05): a stale-pin refusal whose reference
+    /// resolves at the CURRENT generation to a target that is no longer
+    /// callable surfaces that decisive fact instead. The kernel keeps its
+    /// stale-first prepare contract (R04-A02: the caller's whole view is
+    /// outdated); this only picks the model-facing refusal. For a
+    /// revoked/disabled tool the generic "re-describe and re-prepare"
+    /// advice would be a lie — no fresh snapshot makes it callable —
+    /// while a mere description/schema change still reports the
+    /// recoverable stale-catalog path. Uninstalled/renamed/ambiguous
+    /// references keep the stale-catalog refusal (a fresh snapshot
+    /// remains the caller's real next step there).
+    fn refuse_with_current_callability(
+        &self,
+        err: lingxi_kernel::toolcatalog::ToolCatalogError,
+        reference: &ToolTargetRef,
+    ) -> GatewayRefusal {
+        use lingxi_kernel::toolcatalog::ToolCatalogError;
+        let ToolCatalogError::StaleCatalog {
+            held_generation,
+            current_generation,
+            ..
+        } = err
+        else {
+            return map_catalog_error(err);
+        };
+        let revoked_now = self.registry.resolve(reference).ok().and_then(|target_id| {
+            let listing = self.registry.describe(&target_id).ok()?;
+            (!listing.availability.callable()).then(|| GatewayRefusal::TargetNotCallable {
+                target_id: target_id.as_str().to_string(),
+                availability: listing.availability.wire_name().to_string(),
+                // Keep BOTH facts in the refusal: the tool is not callable
+                // AND the caller's pinned catalog view is stale (the
+                // journal detail carries this Display verbatim).
+                reason: format!(
+                    "{}; the pinned catalog view is stale (held generation \
+                     {held_generation}, registry at {current_generation})",
+                    listing.availability.refusal_reason()
+                ),
+            })
+        });
+        revoked_now.unwrap_or_else(|| map_catalog_error(err))
+    }
+
     fn admission_checks(
         &self,
         request: &InvocationRequest,
@@ -971,7 +1045,7 @@ impl ToolInvocationGateway {
                 &request.raw_arguments,
                 &self.budget,
             )
-            .map_err(map_catalog_error)?;
+            .map_err(|err| self.refuse_with_current_callability(err, &request.reference))?;
         let entry = match request.surface {
             CallerSurface::DelegationDispatch => InvocationEntry::Delegation,
             CallerSurface::SubagentRun => InvocationEntry::Subagent,
@@ -1083,7 +1157,9 @@ impl ToolInvocationGateway {
         call_id: &ToolCallId,
         request: &ToolRequest,
     ) -> Result<(), GatewayRefusal> {
-        self.validate_from_request_pinned(ctx, surface, agent_id, permission, call_id, request, None)
+        self.validate_from_request_pinned(
+            ctx, surface, agent_id, permission, call_id, request, None,
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -1544,7 +1620,9 @@ fn digest_of_hex(hex: &str) -> lingxi_protocol::ArgsDigest {
     }
 }
 
-pub(crate) fn map_catalog_error(err: lingxi_kernel::toolcatalog::ToolCatalogError) -> GatewayRefusal {
+pub(crate) fn map_catalog_error(
+    err: lingxi_kernel::toolcatalog::ToolCatalogError,
+) -> GatewayRefusal {
     use lingxi_kernel::toolcatalog::ToolCatalogError as E;
     match err {
         E::TargetNotFound { reference } => GatewayRefusal::TargetNotRegistered { reference },

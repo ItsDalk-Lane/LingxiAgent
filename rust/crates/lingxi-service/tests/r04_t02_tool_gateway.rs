@@ -643,6 +643,30 @@ async fn subagent_run(harness: &Harness, session: &str, tier: ToolAccessTier) ->
         // inheritance semantics are the R04-T03 suite's subject.
         session_mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
     };
+    // 生产 SubagentRuntime 孵化链在驱动前经 task_supervisor 预登记会话准入
+    // 许可（F03 统一准入后 drive_run 拒绝未预登记的受限授权 run）。本 helper
+    // 走同一生产契约，而不是放松门禁。
+    let admission = {
+        let gate = harness.state.storage().session_admission().clone();
+        std::sync::Arc::new(
+            gate.try_acquire(&[session], usize::MAX)
+                .expect("child permit"),
+        )
+    };
+    // 登记守卫必须存活到驱动结束：RunPermitRegistration 的 Drop 会撤销登记。
+    let _child_registration = harness
+        .state
+        .runs()
+        .task_supervisor()
+        .retain_authorized_run_permit(
+            &run_id,
+            session,
+            "agent-default",
+            &lingxi_kernel::Principal::LocalUser,
+            &authorization,
+            admission,
+        )
+        .expect("pre-admit child run");
     harness
         .state
         .runs()
@@ -1924,6 +1948,27 @@ async fn subagent_run_legacy(
         // inheritance semantics are the R04-T03 suite's subject.
         session_mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
     };
+    // 同 subagent_run：生产孵化链先预登记准入，登记守卫存活到驱动结束。
+    let admission = {
+        let gate = legacy.state.storage().session_admission().clone();
+        std::sync::Arc::new(
+            gate.try_acquire(&[session], usize::MAX)
+                .expect("child permit"),
+        )
+    };
+    let _child_registration = legacy
+        .state
+        .runs()
+        .task_supervisor()
+        .retain_authorized_run_permit(
+            &run_id,
+            session,
+            "agent-default",
+            &lingxi_kernel::Principal::LocalUser,
+            &authorization,
+            admission,
+        )
+        .expect("pre-admit legacy child run");
     legacy
         .state
         .runs()

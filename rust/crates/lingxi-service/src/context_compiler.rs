@@ -908,6 +908,13 @@ impl ContextCompilerService {
         if cache.entries.contains_key(&key) {
             return;
         }
+        // A single view larger than the whole byte budget is refused
+        // BEFORE any eviction: rejecting an insert must never destroy
+        // already-committed call observations. The cache stays bounded
+        // either way; the refusal is observable via the surviving entries.
+        if size > CONTEXT_OBSERVATION_CACHE_BYTES {
+            return;
+        }
         while !cache.order.is_empty()
             && (cache.entries.len() >= CONTEXT_OBSERVATION_CACHE_CAP
                 || cache.bytes.saturating_add(size) > CONTEXT_OBSERVATION_CACHE_BYTES)
@@ -917,9 +924,6 @@ impl ContextCompilerService {
                 cache.bytes -= old.to_string().len();
                 cache.evictions += 1;
             }
-        }
-        if size > CONTEXT_OBSERVATION_CACHE_BYTES {
-            return;
         }
         cache.bytes += size;
         cache.order.push_back(key.clone());

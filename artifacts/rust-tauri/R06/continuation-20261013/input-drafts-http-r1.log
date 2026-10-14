@@ -1,0 +1,14 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 24.66s
+     Running tests/r06_original_session_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_session_proofs-f3b952d25d0e0041)
+
+running 2 tests
+{"emptyAndWhitespaceDeleteOnlyTarget":true,"exactSurfaceBuckets":true,"originalLeaves":["R00-T02-LA-081FACA79F2C","R00-T02-LA-1B712E189DDF","R00-T02-LA-F829AEA5931C"],"otherSessionSurfaceUnchanged":true,"readDoesNotWrite":true,"textDocUpdatedAt":true,"twoRealRestarts":true}
+test original_input_drafts_persist_home_and_sessions_per_surface_and_delete_only_target ... ok
+LINGXI_AUTH_REJECTED request_id="req-11c3b17bb3391a6925c0aa5351664a4d" method=GET path=/lingxi/v1/input-drafts status=401 Unauthorized reason=missing_credential remote=127.0.0.1:50769
+LINGXI_AUTH_REJECTED request_id="req-fd3c557127e5d83349d496f0d6096504" method=PUT path=/lingxi/v1/input-drafts status=401 Unauthorized reason=missing_credential remote=127.0.0.1:50770
+{"corruptAndActualUnwritableStorage":500,"foreignSession":403,"invalid":400,"missingAuth":401,"missingSession":404,"originalLeaves":["R00-T02-LA-081FACA79F2C","R00-T02-LA-1B712E189DDF","R00-T02-LA-F829AEA5931C"],"refusalsPreserveBytes":true,"repairedRetry":true,"unresolvedSessionPathNotClaimed":true}
+test original_input_drafts_reject_bad_scope_and_authorization_and_preserve_failed_storage ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 4.01s
+

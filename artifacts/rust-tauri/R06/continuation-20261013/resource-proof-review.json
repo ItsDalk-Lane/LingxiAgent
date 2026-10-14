@@ -1,0 +1,137 @@
+{
+  "status": "SEMANTIC_BINDINGS_REVIEWED_NOT_STAGE_ACCEPTANCE",
+  "executionLog": "resource-conflict-regression-r4.log",
+  "reviewed": [
+    {
+      "id": "R00-T02-LA-0CDC88FC0999",
+      "originalAssertions": [
+        "给定目标与相应权限，执行“写入资源”后核对：按编码解码后经资源权限写入，返回结果；冲突为 409",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+        "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+      ],
+      "previousGaps": [
+        {
+          "clause": "冲突为 409",
+          "kind": "IMPLEMENTATION_GAP",
+          "reason": "合法编码写入和不覆盖用户后改已有真实检查；当前普通write提交冲突映射400而原条款固定409，保留400+不覆盖的局部事实，不改原期待。",
+          "sourceLocations": [
+            {
+              "endLine": 2290,
+              "path": "rust/crates/lingxi-service/src/resourceio.rs",
+              "quote": "            safety.create(\n                &crate::file_safety::witness_scope(\n                    ctx.principal_kind,\n                    &ctx.principal_subject,\n                    &ctx.session_id,\n                ),\n                &file_path,\n                content,\n                authorize,\n            )\n        };\n        result.map_err(|err| ResourceIoError::io_bad_request(err.to_string()))?;\n        Ok(WorkspacePlane::mutation_result(\n            &file_path,\n            if existed { \"modified\" } else { \"created\" },\n        ))\n    }",
+              "reason": "普通write把安全写入错误统一io_bad_request(400)。",
+              "startLine": 2274
+            },
+            {
+              "endLine": 145,
+              "path": "rust/crates/lingxi-service/src/resourceio.rs",
+              "quote": "        Self::new(400, \"invalid_resource_ref\", message)\n    }\n\n    fn io_bad_request(message: impl Into<String>) -> Self {\n        // ResourceIOError 默认形态（errors.ts :5）：400 + resource_io_error。\n        Self::new(400, \"resource_io_error\", message)\n    }\n\n    fn capability_denied(capability: &str, provider_id: &str) -> Self {\n        Self::new(",
+              "reason": "io_bad_request状态400。",
+              "startLine": 136
+            }
+          ]
+        },
+        "冲突为409（当前提交边界FileSafety冲突经io_bad_request实际400）"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t05_resourceio",
+          "test": "resourceio_route_faces_and_error_vocabulary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t05_resourceio",
+          "test": "local_fs_stat_read_write_list_search_rename_move_trash_chain"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "resourceio_write_conflict_refuses_external_change_at_commit_boundary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "resourceio_operation_specific_provider_refusals_preserve_files_and_registrations"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "resourceio_operation_specific_provider_refusals_preserve_files_and_registrations"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t05_resourceio",
+          "test": "kernel_cross_provider_move_rejected_loudly"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-895DAC8DD5B7",
+      "originalAssertions": [
+        "执行“恢复文件历史版本”后核对：通过 ResourceIO 写回工作区文件、再记录恢复快照；返回路径或错误",
+        "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+      ],
+      "previousGaps": [
+        {
+          "clause": "通过 ResourceIO 写回工作区文件、再记录恢复快照；返回路径或错误",
+          "kind": "IMPLEMENTATION_GAP",
+          "reason": "正常恢复已受检，快照存储失败被吞掉时仍可能称成功；原Then的恢复快照完整性条件未实现。",
+          "sourceLocations": [
+            {
+              "endLine": 1021,
+              "path": "rust/crates/lingxi-service/src/resourceio.rs",
+              "quote": "        content: Vec<u8>,\n        ctx: &OpContext,\n    ) -> Result<Value, ResourceIoError> {\n        let reference = normalize_resource_ref(input)?;\n        Self::refuse_if_mount_or_url(&reference)?;\n        match &reference {\n            ResourceRef::LocalFile { .. } => {\n                let retained = self.blocking_permit(ctx)?;\n                let inner = self.inner.clone();\n                let ctx2 = ctx.clone();\n                let result = spawn_blocking_io(retained, move || {\n                    inner.local_write(&reference, &content, &ctx2)\n                })\n                .await?;\n                self.emit_changed(&result, ctx);\n                self.capture_history(&result, ctx).await;\n                Ok(result)\n            }\n            other => Err(ResourceIoError::capability_denied(\n                \"write\",\n                provider_id_for_ref(other),\n            )),\n        }\n    }",
+              "reason": "write替换成功后调用capture_history，没有检查快照记录结果。",
+              "startLine": 998
+            },
+            {
+              "endLine": 1228,
+              "path": "rust/crates/lingxi-service/src/resourceio.rs",
+              "quote": "    async fn capture_history(&self, result: &Value, ctx: &OpContext) {\n        if !ctx.emit {\n            return;\n        }\n        let Some(fh) = self.file_history() else {\n            return;\n        };\n        let resource = &result[\"resource\"];\n        let abs = resource[\"filePath\"]\n            .as_str()\n            .or_else(|| resource[\"path\"].as_str());\n        let Some(abs) = abs else { return };\n        let origin = ctx.capture_origin.as_deref().unwrap_or(\"event\");\n        fh.capture_from_disk(std::path::Path::new(abs), origin)\n            .await;\n    }",
+              "reason": "capture_history丢弃capture_from_disk的返回值。",
+              "startLine": 1213
+            },
+            {
+              "endLine": 390,
+              "path": "rust/crates/lingxi-service/src/filehistory.rs",
+              "quote": "        let outcome = self.capture_from_disk_inner(abs_path, origin).await;\n        if let Err(err) = &outcome {\n            tracing::warn!(\n                \"file-history capture error for {}: {err}\",\n                abs_path.display()\n            );\n        }\n        matches!(outcome, Ok(true))\n    }\n",
+              "reason": "历史存储错误仅warn并转换false。",
+              "startLine": 382
+            },
+            {
+              "endLine": 699,
+              "path": "rust/crates/lingxi-service/src/filehistory.rs",
+              "quote": "        .fold(root.to_path_buf(), |acc, seg| acc.join(seg));\n    let mut ctx = OpContext::local_owner(\"\");\n    ctx.capture_origin = Some(\"restore\".to_string());\n    let reference = json!({\"kind\": \"local-file\", \"path\": abs_path.to_string_lossy()});\n    match state\n        .resource_io()\n        .write(&reference, snapshot.content, &ctx)\n        .await\n    {\n        Ok(_) => (\n            StatusCode::OK,\n            Json(json!({ \"ok\": true, \"relPath\": rel_path })),\n        )\n            .into_response(),\n        Err(err) => json_error(StatusCode::INTERNAL_SERVER_ERROR, err.to_string()),",
+              "reason": "restore据write返回Ok给200，没有核实恢复快照。",
+              "startLine": 685
+            }
+          ]
+        },
+        "历史快照持久化失败时明确返回失败，并如实反映已写回文件/未记录快照的实际副作用"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t05_filehistory",
+          "test": "file_history_routes_full_chain_and_error_vocabulary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t05_filehistory",
+          "test": "file_history_routes_full_chain_and_error_vocabulary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t05_filehistory",
+          "test": "file_history_routes_workspace_not_tracked"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows"
+        }
+      ]
+    }
+  ]
+}

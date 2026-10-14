@@ -1,0 +1,19 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.61s
+     Running `rust/target-r06-continuation/debug/xtask check-boundaries`
+xtask: running [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] in /Users/study_superior/Desktop/Code/LingxiAgent
+PASS O1 OK: 736 features, exactly one assignment each
+PASS O3/O6 OK: every feature owner exists and is an authority kind
+PASS O2 OK: 69 stores, exactly one owner each
+PASS O8 OK: authoritative stores owned by authority kinds, written by rust-service only
+PASS O4/O5 OK: 11 critical facts, single authority-kind owner each
+PASS O7 OK: counts coherent
+PASS B1 OK: 74 service source files scanned; protected executor symbols (dispatch_executor, execute_prepared) appear only in their reasoned whitelists
+PASS O7-drift OK: OWNERSHIP_TARGET_UP_TO_DATE features=736 stores=69
+FAIL [D5] module tauri-host declared planned but desktop/src-tauri/Cargo.toml already exists; a materialized module must be re-registered as exists with its dependency rules made effective (deliberate registry update), not slipped in under planned status
+RESULT: FAIL (1 violation(s))
+xtask: [python3 -B docs/rust-tauri/R01/r01_t01_check_ownership.py] FAILED with 1

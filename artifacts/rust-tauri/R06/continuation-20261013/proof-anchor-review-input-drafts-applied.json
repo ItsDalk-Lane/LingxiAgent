@@ -1,0 +1,214 @@
+{
+  "scope": "Assertion location review only; no coverage or verdict promotion.",
+  "checked": [
+    {
+      "id": "R00-T02-LA-015A65726C05",
+      "test": "original_workspace_rollback_preference_persists_without_restoring_files_and_controls_real_gate",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 26
+    },
+    {
+      "id": "R00-T02-LA-015A65726C05",
+      "test": "original_workspace_rollback_preference_refusals_keep_saved_and_live_state_and_retry",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 21
+    },
+    {
+      "id": "R00-T02-LA-0D4F0EFC9DAE",
+      "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 19
+    },
+    {
+      "id": "R00-T02-LA-0D4F0EFC9DAE",
+      "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 19
+    },
+    {
+      "id": "R00-T02-LA-1AEDB2670EB9",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-1AEDB2670EB9",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-2ED065BED168",
+      "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 19
+    },
+    {
+      "id": "R00-T02-LA-2ED065BED168",
+      "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 19
+    },
+    {
+      "id": "R00-T02-LA-3F95164A488C",
+      "test": "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 26
+    },
+    {
+      "id": "R00-T02-LA-3F95164A488C",
+      "test": "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 26
+    },
+    {
+      "id": "R00-T02-LA-3FAFA387AD68",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-3FAFA387AD68",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-43FFB75F252C",
+      "test": "original_archived_list_aggregates_agents_and_projects_first_visible_user_text",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-43FFB75F252C",
+      "test": "original_archived_list_refusals_and_corrupt_history_do_not_return_empty_success",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 20
+    },
+    {
+      "id": "R00-T02-LA-477DA3D558B8",
+      "test": "original_rewind_preview_reports_anchor_and_files_without_writing_any_state",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-477DA3D558B8",
+      "test": "original_rewind_preview_reports_anchor_and_files_without_writing_any_state",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "original_retry_refusals_preserve_history_and_recover_after_actual_storage_failure",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 13
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "original_retry_refusals_preserve_history_and_recover_after_actual_storage_failure",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 13
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 31
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 31
+    },
+    {
+      "id": "R00-T02-LA-5235D8EDD673",
+      "test": "original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 31
+    },
+    {
+      "id": "R00-T02-LA-5235D8EDD673",
+      "test": "original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 31
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 16
+    },
+    {
+      "id": "R00-T02-LA-A18187567AF9",
+      "test": "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 23
+    },
+    {
+      "id": "R00-T02-LA-A18187567AF9",
+      "test": "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 23
+    },
+    {
+      "id": "R00-T02-LA-B0F05BC32D62",
+      "test": "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 30
+    },
+    {
+      "id": "R00-T02-LA-B0F05BC32D62",
+      "test": "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 30
+    },
+    {
+      "id": "R00-T02-LA-FDB0FE6528EE",
+      "test": "original_session_rename_preserves_title_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 15
+    },
+    {
+      "id": "R00-T02-LA-FDB0FE6528EE",
+      "test": "original_session_rename_preserves_title_after_invalid_foreign_and_storage_refusal",
+      "source": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+      "assertionsChecked": 15
+    }
+  ],
+  "changedAssertionsReviewedInTests": [
+    "a13_search_within_scope_returns_only_allowed_sources",
+    "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows",
+    "file_history_routes_full_chain_and_error_vocabulary",
+    "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+    "original_manage_refusals_and_no_write_authorization_preserve_facts",
+    "original_persona_reads_template_custom_alias_and_refusal",
+    "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+    "resourceio_write_conflict_refuses_external_change_at_commit_boundary",
+    "scope_violations_are_loud_not_fallback",
+    "stage_files_gateway_only_delivers_real_authorized_session_files",
+    "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+    "websocket_registration_and_foreign_messages_preserve_authorized_session_streams"
+  ],
+  "missing": [],
+  "eligibleAnchorUpdates": 32,
+  "applied": true
+}

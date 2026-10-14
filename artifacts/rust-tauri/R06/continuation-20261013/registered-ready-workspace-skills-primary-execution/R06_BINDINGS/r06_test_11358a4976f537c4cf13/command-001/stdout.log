@@ -1,0 +1,16 @@
+
+running 1 test
+test a06_ws_origin_and_host_matrix ... ok
+
+successes:
+
+---- a06_ws_origin_and_host_matrix stdout ----
+LINGXI_TRANSPORT_REJECTED request_id="req-0ad736b5d88ee73ed6c01ab4ab1b6449" method=GET path=/lingxi/v1/ws status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:64869 remote=127.0.0.1:64870
+LINGXI_TRANSPORT_REJECTED request_id="req-c04330a94fbd20a6c2a9088f9aa2d36c" method=GET path=/lingxi/v1/ws status=403 reason=loopback_host_mismatch origin=absent host=rebinder.example remote=127.0.0.1:64871
+
+
+successes:
+    a06_ws_origin_and_host_matrix
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 23 filtered out; finished in 0.14s
+

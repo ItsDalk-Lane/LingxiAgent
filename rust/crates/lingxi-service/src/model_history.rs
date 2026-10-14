@@ -1,19 +1,19 @@
 //! 模型历史是独立于展示正文的持久档案。专用树节点沿有效分支保留，
 //! fork复制完整内容而不持有源Run外键；恢复只读，永不重新执行工具。
 use lingxi_adapters::storage::{
-    RunDatabase, canonical_message_store as cms, session_tree as store,
+    canonical_message_store as cms, session_tree as store, RunDatabase,
 };
 use lingxi_kernel::{
-    Principal, RunContext,
     model_exchange::{ExchangeItem, RequestedToolCall, TurnOrigin},
     ports::{StorageError, StoragePort, ToolOutcome, ToolRunStatus, ToolSuccess},
     toolcatalog::{EffectiveArguments, SchemaBudget},
+    Principal, RunContext,
 };
 use lingxi_protocol::{
-    ArgsDigest, ContentBlock, ModelCallId, NormalizedMessage, ToolCallId, ToolResultStatus,
-    ToolResultWire, canon,
+    canon, ArgsDigest, ContentBlock, ModelCallId, NormalizedMessage, ToolCallId, ToolResultStatus,
+    ToolResultWire,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     collections::{HashMap, HashSet},
     sync::Arc,
@@ -1065,14 +1065,22 @@ pub(crate) fn decode_item(v: &Value) -> Result<ExchangeItem, StorageError> {
                     .map_err(|e| corrupt(e.to_string()))?;
                     let digest: ArgsDigest = decode(&c["digest"])?;
                     // 原声明摘要保留；拒绝记录须在完整请求/结果及真实journal配对后核准。
-                    let declaration_binding = decode_declaration_binding(&c["declarationBinding"])?;
-                    if declaration_binding.catalog_generation == 0
-                        || declaration_binding.declaration.target != str_field(c, "target")?
-                    {
-                        return Err(corrupt("历史声明来源与调用目标不一致"));
-                    }
+                    // 编码侧对无目录绑定的调用（工具直发/快照缺目标）写 null；解码对称
+                    // 还原为 None（消费方 historical_wire_name/投影核验均按 Option 容忍），
+                    // 仅对存在的绑定保持严格校验。
+                    let declaration_binding = if c["declarationBinding"].is_null() {
+                        None
+                    } else {
+                        let binding = decode_declaration_binding(&c["declarationBinding"])?;
+                        if binding.catalog_generation == 0
+                            || binding.declaration.target != str_field(c, "target")?
+                        {
+                            return Err(corrupt("历史声明来源与调用目标不一致"));
+                        }
+                        Some(binding)
+                    };
                     Ok(RequestedToolCall {
-                        declaration_binding: Some(declaration_binding),
+                        declaration_binding,
                         tool_call_id: ToolCallId::new(str_field(c, "id")?),
                         provider_call_id: decode(&c["providerId"])?,
                         target: str_field(c, "target")?.into(),
@@ -1388,12 +1396,10 @@ mod tests {
                 reason: "未确认副作用".into(),
             },
         };
-        assert!(
-            validate_pairs(&[item])
-                .unwrap_err()
-                .to_string()
-                .contains("orphan")
-        );
+        assert!(validate_pairs(&[item])
+            .unwrap_err()
+            .to_string()
+            .contains("orphan"));
     }
     #[test]
     fn current_submission_is_archived_exactly_once_at_its_position() {
@@ -1467,8 +1473,17 @@ mod tests {
     }
     #[test]
     fn adversarial_f07_missing_or_forged_historical_binding_is_loudly_rejected() {
+        // 调和契约：无目录定义的 run（无模型/无网关的宿主直发）合法归档无绑定，
+        // 解码对称还原为 None（消费方按 Option 容忍，wire 名缺席）；伪造绑定
+        // （存在但目标/代次不匹配）仍响亮拒绝。
         let base = json!({"kind":"assistant","call":"run-mc1","content":[],"origin":null,"calls":[{"id":"run-tc1","providerId":"p1","target":"tool:first-party:read","arguments":{"path":"synthetic"},"digest":EffectiveArguments::from_value(json!({"path":"synthetic"}),&SchemaBudget::default()).unwrap().digest(),"summary":null}]});
-        assert!(decode_item(&base).is_err());
+        let decoded = decode_item(&base).expect("missing binding decodes as unbound");
+        match decoded {
+            ExchangeItem::AssistantTurn { tool_calls, .. } => {
+                assert!(tool_calls[0].declaration_binding.is_none());
+            }
+            _ => panic!("assistant turn"),
+        }
         let mut forged = base.clone();
         forged["calls"][0]["declarationBinding"] = json!({"catalogGeneration":8,"declaration":{"target":"tool:first-party:other","wireName":"read","description":"伪造目标","inputSchema":{"dialect":"json-schema/2020-12","schema":{"type":"object"}}},"execution":null});
         assert!(decode_item(&forged).is_err());

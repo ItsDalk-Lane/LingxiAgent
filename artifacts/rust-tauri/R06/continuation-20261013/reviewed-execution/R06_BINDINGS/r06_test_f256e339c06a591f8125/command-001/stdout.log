@@ -1,0 +1,18 @@
+
+running 1 test
+test file_history_routes_full_chain_and_error_vocabulary ... ok
+
+successes:
+
+---- file_history_routes_full_chain_and_error_vocabulary stdout ----
+LINGXI_AUTH_REJECTED request_id="req-3257014aa7d87dfc343e43a308392aab" method=GET path=/lingxi/v1/file-history/files status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59186
+LINGXI_AUTH_REJECTED request_id="req-d4e35d0313ed1a661fa912dce18accb3" method=GET path=/lingxi/v1/file-history/versions status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59187
+LINGXI_AUTH_REJECTED request_id="req-2a288e3064a272a19b803cedb7d1bcc2" method=GET path=/lingxi/v1/file-history/snapshot status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59188
+LINGXI_AUTH_REJECTED request_id="req-dc334f60949709d21bd92aea9f6c06ac" method=POST path=/lingxi/v1/file-history/restore status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59189
+
+
+successes:
+    file_history_routes_full_chain_and_error_vocabulary
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.15s
+

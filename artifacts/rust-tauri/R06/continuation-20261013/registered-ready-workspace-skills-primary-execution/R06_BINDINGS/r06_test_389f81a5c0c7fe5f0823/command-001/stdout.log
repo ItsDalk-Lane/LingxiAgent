@@ -1,0 +1,15 @@
+
+running 1 test
+test original_tenet_http_states_duplicate_limits_and_pinned_visibility ... ok
+
+successes:
+
+---- original_tenet_http_states_duplicate_limits_and_pinned_visibility stdout ----
+LINGXI_AUTH_REJECTED request_id="req-18ea3bd778af55605a06c72e046b7d3f" method=POST path=/lingxi/v1/agents/agentA/tenets status=403 reason=local_owner_required remote=127.0.0.1:65416
+
+
+successes:
+    original_tenet_http_states_duplicate_limits_and_pinned_visibility
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 2.94s
+

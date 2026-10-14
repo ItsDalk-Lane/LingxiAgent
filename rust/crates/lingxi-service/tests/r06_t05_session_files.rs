@@ -603,6 +603,7 @@ struct TestServer {
     addr: SocketAddr,
     home: PathBuf,
     token: String,
+    state: ServiceState,
     stop: tokio::sync::oneshot::Sender<()>,
     handle: tokio::task::JoinHandle<Result<ServeOutcome, ServiceError>>,
 }
@@ -623,9 +624,10 @@ async fn start_server(tag: &str) -> TestServer {
     let token = state.auth().local_token();
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
+    let serve_state = state.clone();
     let handle = tokio::spawn(async move {
         run(
-            state,
+            serve_state,
             async {
                 let _ = stop_rx.await;
             },
@@ -644,6 +646,7 @@ async fn start_server(tag: &str) -> TestServer {
         addr,
         home,
         token,
+        state,
         stop: stop_tx,
         handle,
     }
@@ -925,4 +928,153 @@ async fn attachments_blob_route_enforces_whitelist_limits_and_registers_managed(
 fn base64_encode(bytes: &[u8]) -> String {
     use base64::Engine as _;
     base64::engine::general_purpose::STANDARD.encode(bytes)
+}
+
+/// R06-R2（55B24FEE5AFB）：attachments/local 的 snapshot 模式——复制快照
+/// 并登记附件（原 D09 ATTACHMENT-LOCAL-FILE-SNAPSHOT 桌面语义）：托管
+/// 副本字节 = 源字节；源文件后续外部修改不影响已复制快照；同一源重复
+/// 挂载去重到同一行；拒绝路径（非法 mode / 目录 / 越权）无错误持久化。
+#[tokio::test]
+async fn attachments_local_snapshot_mode_copies_bytes_and_dedupes() {
+    let server = start_server("snap-http").await;
+    create_session(&server, "s-snap").await;
+    let outside = std::env::temp_dir().join(format!("lingxi-r06r2-att-src-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&outside);
+    std::fs::create_dir_all(&outside).expect("mkdir src");
+    let src = outside.join("notes.txt");
+    std::fs::write(&src, b"snapshot bytes v1").expect("write src");
+
+    // 非法 mode → 400，无登记。
+    let before = server
+        .state
+        .session_files()
+        .list_files("s-snap")
+        .await
+        .unwrap()
+        .len();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-snap/attachments/local",
+            &serde_json::json!({ "path": src.to_str().unwrap(), "mode": "teleport" }).to_string(),
+        )
+        .await;
+    assert_eq!(status, 400, "非法 mode: {body}");
+    assert_eq!(
+        server
+            .state
+            .session_files()
+            .list_files("s-snap")
+            .await
+            .unwrap()
+            .len(),
+        before,
+        "拒绝不持久化"
+    );
+
+    // snapshot 模式 → 201 + managed_cache + 字节复制。
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-snap/attachments/local",
+            &serde_json::json!({ "path": src.to_str().unwrap(), "mode": "snapshot" }).to_string(),
+        )
+        .await;
+    assert_eq!(status, 201, "snapshot attach: {body}");
+    let file = serde_json::from_str::<serde_json::Value>(&body).unwrap()["file"].clone();
+    assert_eq!(file["storageKind"], "managed_cache", "托管副本");
+    let copied_path = std::path::PathBuf::from(file["realPath"].as_str().unwrap());
+    assert!(
+        copied_path.starts_with(server.home.join("session-files")),
+        "副本落在托管缓存: {}",
+        copied_path.display()
+    );
+    assert_eq!(std::fs::read(&copied_path).unwrap(), b"snapshot bytes v1");
+    assert_eq!(
+        file["sizeBytes"],
+        serde_json::json!(b"snapshot bytes v1".len())
+    );
+
+    // 源文件被外部修改 → 已复制快照不变（快照语义）。
+    std::fs::write(&src, b"externally rewritten").expect("external rewrite");
+    assert_eq!(
+        std::fs::read(&copied_path).unwrap(),
+        b"snapshot bytes v1",
+        "快照不受源后续变化影响"
+    );
+
+    // 同一源再挂载（mtime/size 已变 → 新快照行；source key 不同 → 新行，
+    // 旧行字节仍保留）——验证登记为真实副本而非外部引用。
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-snap/attachments/local",
+            &serde_json::json!({ "path": src.to_str().unwrap(), "mode": "snapshot" }).to_string(),
+        )
+        .await;
+    assert_eq!(status, 201, "second snapshot: {body}");
+    let second = serde_json::from_str::<serde_json::Value>(&body).unwrap()["file"].clone();
+    let second_path = std::path::PathBuf::from(second["realPath"].as_str().unwrap());
+    assert_eq!(
+        std::fs::read(&second_path).unwrap(),
+        b"externally rewritten"
+    );
+    assert_eq!(std::fs::read(&copied_path).unwrap(), b"snapshot bytes v1");
+    // reference 模式（缺省）仍走外部引用语义（回归保护；不同源文件）。
+    let src2 = outside.join("other.txt");
+    std::fs::write(&src2, b"reference only").expect("write src2");
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-snap/attachments/local",
+            &serde_json::json!({ "path": src2.to_str().unwrap(), "mode": "reference" }).to_string(),
+        )
+        .await;
+    assert_eq!(status, 201, "reference attach: {body}");
+    let reference = serde_json::from_str::<serde_json::Value>(&body).unwrap()["file"].clone();
+    assert_eq!(
+        reference["storageKind"], "external",
+        "引用模式保持 external"
+    );
+    // macOS /var → /private/var 宿主别名：realPath 按规范路径回读。
+    assert!(
+        std::path::Path::new(reference["realPath"].as_str().unwrap())
+            .starts_with(outside.canonicalize().unwrap()),
+        "引用登记指向源目录: {}",
+        reference["realPath"]
+    );
+
+    // 目录 snapshot → 安全闸显式拒绝（不复制目录），无新增登记。
+    let dir_before = server
+        .state
+        .session_files()
+        .list_files("s-snap")
+        .await
+        .unwrap()
+        .len();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-snap/attachments/local",
+            &serde_json::json!({ "path": outside.to_str().unwrap(), "mode": "snapshot" })
+                .to_string(),
+        )
+        .await;
+    assert!(
+        status == 400 || status == 403,
+        "目录显式拒绝（安全闸或 snapshot 分支）: {status} {body}"
+    );
+    assert!(
+        body.contains("PATH_") || body.contains("error"),
+        "错误对用户可见: {body}"
+    );
+    assert_eq!(
+        server
+            .state
+            .session_files()
+            .list_files("s-snap")
+            .await
+            .unwrap()
+            .len(),
+        dir_before,
+        "目录拒绝无登记"
+    );
+
+    server.stop_and_clean().await;
+    let _ = std::fs::remove_dir_all(&outside);
 }

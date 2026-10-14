@@ -1,0 +1,21 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.90s
+     Running tests/r06_original_session_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_session_proofs-f3b952d25d0e0041)
+
+running 1 test
+
+thread 'original_pin_deleted_agent_refuses_without_writes_and_allows_unpin' (915880) panicked at crates/lingxi-service/tests/r06_original_session_proofs.rs:1543:9:
+assertion `left == right` failed: {"sessionId":"deleted-agent-pin","pinnedAtUnixMs":1791876043830,"pinOrder":2}
+  left: 200
+ right: 409
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test original_pin_deleted_agent_refuses_without_writes_and_allows_unpin ... FAILED
+
+failures:
+
+failures:
+    original_pin_deleted_agent_refuses_without_writes_and_allows_unpin
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_session_proofs`

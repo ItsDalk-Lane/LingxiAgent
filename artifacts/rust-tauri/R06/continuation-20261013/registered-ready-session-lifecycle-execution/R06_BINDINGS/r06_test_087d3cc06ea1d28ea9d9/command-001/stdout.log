@@ -1,0 +1,15 @@
+
+running 1 test
+test original_skill_enable_disable_runtime_and_workspace_shadow_boundaries ... ok
+
+successes:
+
+---- original_skill_enable_disable_runtime_and_workspace_shadow_boundaries stdout ----
+LINGXI_AUTH_REJECTED request_id="req-e50fe5001e95667dae6138a170f4a853" method=PATCH [token] status=403 reason=insufficient_scope remote=127.0.0.1:60093
+
+
+successes:
+    original_skill_enable_disable_runtime_and_workspace_shadow_boundaries
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.66s
+

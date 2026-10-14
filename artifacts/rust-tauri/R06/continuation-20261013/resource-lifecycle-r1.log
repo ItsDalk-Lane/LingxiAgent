@@ -1,0 +1,31 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.28s
+     Running tests/r06_original_resource_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_resource_proofs-778be5097cbeaf4a)
+
+running 2 tests
+LINGXI_AUTH_REJECTED request_id="req-eca19f392e6da0b2dea3ecb51e547ca2" method=DELETE [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63597
+LINGXI_AUTH_REJECTED request_id="req-2922b8dbcd753f01a4d40da1ef5d37a1" method=DELETE [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63598
+
+thread 'original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations' (639344) panicked at crates/lingxi-service/tests/r06_original_resource_proofs.rs:368:13:
+assertion `left == right` failed: watch: {"code":"invalid_message","details":{"causeId":"resource.unsupported_provider","reason":"unsupported_provider","requestId":"req-93c9853668b94cb2cdecc4279c04f067"},"message":"ResourceIO provider is not supported by this build: mount (mount/url resources are explicitly refused, never silently resolved to a local path)","retryable":false}
+  left: 400
+ right: 501
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations ... FAILED
+LINGXI_TRANSPORT_REJECTED request_id="req-ae4052c0ffcdccac7d9be9b4f59c6b58" method=POST path=/lingxi/v1/resource-io/write status=429 reason=rate_limited origin=absent host=127.0.0.1:63588 remote=127.0.0.1:63856
+
+thread 'original_resource_events_since_and_stale_resync_follow_real_writes_without_read_side_effects' (639343) panicked at crates/lingxi-service/tests/r06_original_resource_proofs.rs:414:9:
+assertion `left == right` failed: write 238: {"code":"forbidden","details":{"causeId":"transport.rate_limited","reason":"rate_limited","requestId":"req-ae4052c0ffcdccac7d9be9b4f59c6b58"},"message":"rate limit exceeded","retryable":false}
+  left: 429
+ right: 200
+test original_resource_events_since_and_stale_resync_follow_real_writes_without_read_side_effects ... FAILED
+
+failures:
+
+failures:
+    original_resource_events_since_and_stale_resync_follow_real_writes_without_read_side_effects
+    original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 9 filtered out; finished in 5.40s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_resource_proofs`

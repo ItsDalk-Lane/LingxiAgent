@@ -1,0 +1,16 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.28s
+     Running tests/r06_original_session_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_session_proofs-f3b952d25d0e0041)
+
+running 2 tests
+{"agentAggregation":3,"archivedRows":4,"emptyPreview":"","firstUserNotLastOrAssistant":true,"historyUnchanged":true,"internalEnvelopesExcluded":true,"originalLeaf":"R00-T02-LA-43FFB75F252C","utf16Limit":100}
+test original_archived_list_aggregates_agents_and_projects_first_visible_user_text ... ok
+LINGXI_AUTH_REJECTED request_id="req-f300967feaa446e6f09c9b9ddee0fab2" method=GET path=/lingxi/v1/sessions/archived status=401 Unauthorized reason=missing_credential remote=127.0.0.1:59161
+LINGXI_AUTH_REJECTED request_id="req-b625042791348de6a34c75381866c888" method=GET path=/lingxi/v1/sessions/archived status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:59162
+LINGXI_AUTH_REJECTED request_id="req-3a59f98040a6d75761149abf9d3d5cc2" method=GET path=/lingxi/v1/sessions/archived status=403 reason=insufficient_scope remote=127.0.0.1:59163
+{"corruptHistory":500,"insufficientScope":403,"missingAndInvalidCredential":401,"missingHistoryTable":500,"notEmptySuccess":true,"originalLeaf":"R00-T02-LA-43FFB75F252C","ownerFiltering":true,"restoredReadUnchanged":true}
+test original_archived_list_refusals_and_corrupt_history_do_not_return_empty_success ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 7.41s
+

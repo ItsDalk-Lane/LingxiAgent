@@ -1,0 +1,59 @@
+{
+  "schema": "lingxi.r06.continuation-receipt.v1",
+  "baseHead": "6f5c4b01d6805ac95fa03a35c2035ccb35f7b8f8",
+  "status": "IMPLEMENTATION_PROGRESS_VERIFIED_R06_NOT_ACCEPTED",
+  "changes": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/subagent_threads.rs",
+      "detail": "Own thread identity fields before mutating the JSON state so reserve() compiles without borrowing state immutably across the label update."
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs",
+      "detail": "Wait for durable child-failure state rather than a potentially stale supervisor count; assert the stable model_call_child_panicked code is delivered without exposing the provider panic payload."
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filehistory.rs",
+      "detail": "Do not deduplicate restore-origin snapshots by content hash; a successful restore must create its explicit audit snapshot."
+    }
+  ],
+  "verification": {
+    "originalProofSuites": {
+      "status": "PASS",
+      "suiteCount": 7,
+      "testCount": 60,
+      "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --test r06_original_chat_proofs --test r06_original_knowledge_proofs --test r06_original_memory_skill_proofs --test r06_original_persona_proofs --test r06_original_resource_proofs --test r06_original_session_proofs --test r06_original_skills_bundle_proofs -- --test-threads=1",
+      "log": "all-original-proof-suites-final.log"
+    },
+    "stageInputPrecheck": {
+      "status": "BLOCKED",
+      "command": "python3 -B scripts/rust-tauri/r06_stage_inputs.py --check",
+      "reason": "The first reported stale/missing proof location or changed test-source digest is R00-T02-LA-00C88B996AA0; its mapping requires review before formal R06 checks. The precheck stopped at this first error, so additional mapping drift may remain."
+    },
+    "workspaceRustFormatCheck": {
+      "status": "FAIL_BASELINE_FORMAT_DRIFT",
+      "command": "cargo fmt --manifest-path rust/Cargo.toml --all -- --check",
+      "detail": "The workspace check reports existing formatting diffs across multiple unrelated Rust modules and pre-existing unformatted sections in touched files; no whole-workspace formatting was applied."
+    },
+    "diffCheck": "PASS"
+  },
+  "formalAcceptance": {
+    "r06": "NOT_ACCEPTED",
+    "r06AcceptanceChecks": "NOT_RUN_AS_FORMAL_STAGE_GATE",
+    "stageGate": "NOT_RUN",
+    "r07Ready": false,
+    "ledgerUpdated": false,
+    "commit": false,
+    "push": false
+  },
+  "remainingAuthoritativeBlockers": {
+    "originalArFindingsOpen": 14,
+    "extraObligationsOpen": 12,
+    "lastRecordedOriginalRequirementsNotPassed": 194,
+    "platformBlockedIndependentReviews": [
+      "PLATFORM-W02-INDEPENDENT-REVIEW",
+      "PLATFORM-W06-INDEPENDENT-REVIEW",
+      "PLATFORM-W09-INDEPENDENT-REVIEW",
+      "PLATFORM-W12-INDEPENDENT-REVIEW"
+    ]
+  }
+}

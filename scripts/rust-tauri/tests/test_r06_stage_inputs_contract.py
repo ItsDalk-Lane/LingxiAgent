@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.dont_write_bytecode = True
 
@@ -43,12 +44,11 @@ class R06StageInputsContract(unittest.TestCase):
         suites.update(pair for pairs in source.ISSUE_SUITES.values() for pair in pairs)
         suites.add(("lingxi-adapters", "r06_ar_f14_migration_receipts"))
         inventory = json.loads((REPOSITORY / source.ORIGINAL_PROOF_PATH).read_text())
-        suites.update((test["package"], test["suite"]) for row in inventory["items"]
-                      for group in row.get("groups", []) for test in group["tests"]
-                      if test.get("kind") != "rust_library_test")
-        paths.update(Path(test["sourcePath"]) for row in inventory["items"]
-                     for group in row.get("groups", []) for test in group["tests"]
-                     if test.get("kind") == "rust_library_test")
+        tests = [test for row in inventory["items"]
+                 for group in row.get("groups", []) for test in group["tests"]]
+        paths.update(source.proof_source_path(test) for test in tests)
+        if any(test.get("kind") == "rust_desktop_test" for test in tests):
+            paths.add(source.DESKTOP_MANIFEST)
         paths.update(Path("rust/crates") / package / "tests" / (suite + ".rs")
                      for package, suite in suites)
         paths.update(path.relative_to(REPOSITORY)
@@ -283,6 +283,40 @@ class R06StageInputsContract(unittest.TestCase):
         self.assertIn(f"v{removed['version']}", Path(negative["stderr"]).read_text())
         path.write_bytes(original)
         self.assertTrue(self.execute_registry("registry-restored-positive")["localPassed"])
+
+    def test_native_binding_requires_actual_frontend_preparation(self):
+        binding = next(binding for binding in self.inputs["executionBindings"].values()
+                       if binding["kind"] == "rust_desktop_test")
+        candidate = self.stage.candidate_snapshot(self.root, self.root / "artifacts")
+        command = {"binding": binding, "argv": binding["argv"]}
+        with self.assertRaisesRegex(ValueError, "缺少实际桌面前端构建前置命令"):
+            self.stage.validate_executed_command(self.root, command, binding, candidate, "native")
+        command["preparation"] = {"binding": self.registry_binding(),
+                                  "argv": self.registry_binding()["argv"]}
+        with self.assertRaisesRegex(ValueError, "实际执行命令与登记不一致"):
+            self.stage.validate_executed_command(self.root, command, binding, candidate, "native")
+
+    def test_failed_frontend_preparation_never_starts_native_test(self):
+        path = self.root / REGISTRY
+        original = path.read_bytes()
+        altered = json.loads(original)
+        altered["new_persistence_points"][0]["migrations"].pop()
+        self.stage.save(path, altered)
+        evidence = self.root / "artifacts" / "failed-frontend-preparation"
+        evidence.mkdir(parents=True)
+        candidate = self.stage.candidate_snapshot(self.root, evidence)
+        binding = next(binding for binding in self.inputs["executionBindings"].values()
+                       if binding["kind"] == "rust_desktop_test")
+        with patch.object(self.stage, "desktop_frontend_binding", return_value=self.registry_binding()):
+            actual = self.stage.execute_binding(self.root, evidence, binding, 1, 30, candidate)
+        self.assertFalse(actual["localPassed"], actual)
+        self.assertFalse(actual["preparation"]["localPassed"], actual)
+        self.assertIsInstance(actual["preparation"]["pid"], int)
+        self.assertNotIn("pid", actual, "前置命令失败后不得启动依赖旧产物的桌面检查")
+        self.assertIn("前端构建前置命令失败", actual["executionError"])
+        self.observations.append({"label": "failed-preparation-zero-native-dispatch", "record": actual})
+        path.write_bytes(original)
+        self.assertTrue(self.execute_registry("preparation-registry-restored")["localPassed"])
 
     def test_old_candidate_is_rejected_before_execution_and_restoration_passes(self):
         first = self.execute_registry("candidate-positive")

@@ -1,0 +1,16 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.85s
+     Running tests/r06_original_knowledge_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_knowledge_proofs-1036429c67ab903a)
+
+running 2 tests
+test original_model_file_registration_failure_reports_written_bytes_without_success ... ok
+test original_model_write_edit_register_real_session_products_and_update_metadata ... ok
+
+successes:
+
+successes:
+    original_model_file_registration_failure_reports_written_bytes_without_success
+    original_model_write_edit_register_real_session_products_and_update_metadata
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.47s
+

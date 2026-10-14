@@ -848,6 +848,12 @@ impl ResourceIoService {
     pub fn set_file_safety(&self, safety: Arc<crate::file_safety::FileSafety>) {
         *self.inner.file_safety.write().unwrap() = safety;
     }
+
+    /// 工作台根目录（现役 workbench default root 的候选人单根映射）；
+    /// 未配置工作区的实例返回 None（写面按 workspace 未跟踪拒绝）。
+    pub fn workspace_root(&self) -> Option<PathBuf> {
+        self.inner.workspace.as_ref().map(|plane| plane.cwd.clone())
+    }
     pub fn file_safety(&self) -> Arc<crate::file_safety::FileSafety> {
         self.inner.file_safety.read().unwrap().clone()
     }
@@ -1010,7 +1016,7 @@ impl ResourceIoService {
                 })
                 .await?;
                 self.emit_changed(&result, ctx);
-                self.capture_history(&result, ctx).await;
+                self.capture_history(&result, ctx).await?;
                 Ok(result)
             }
             other => Err(ResourceIoError::capability_denied(
@@ -1052,7 +1058,7 @@ impl ResourceIoService {
                 // 冲突是结果不是事件（resource-io.ts :79-84）。
                 if result["ok"] != Value::Bool(false) {
                     self.emit_changed(&result, ctx);
-                    self.capture_history(&result, ctx).await;
+                    self.capture_history(&result, ctx).await?;
                 }
                 Ok(result)
             }
@@ -1210,21 +1216,56 @@ impl ResourceIoService {
     /// FileHistoryService（150ms 防抖异步，file-history-service.ts
     /// :215-225）；候选人在写成功后同步捕获（净落库状态一致，台账
     /// 登记）。emit=false → 现役无事件 → 候选人不捕获。
-    async fn capture_history(&self, result: &Value, ctx: &OpContext) {
+    async fn capture_history(
+        &self,
+        result: &Value,
+        ctx: &OpContext,
+    ) -> Result<(), ResourceIoError> {
         if !ctx.emit {
-            return;
+            return Ok(());
         }
+        let origin = ctx.capture_origin.as_deref().unwrap_or("event");
+        let required = origin == "restore";
+        let failure = |message: String| {
+            tracing::warn!("file-history capture failed after write: {message}");
+            ResourceIoError::new(
+                500,
+                "file_history_capture_failed",
+                format!("file written but history snapshot not recorded: {message}"),
+            )
+        };
         let Some(fh) = self.file_history() else {
-            return;
+            return if required {
+                Err(failure("file history unavailable".to_string()))
+            } else {
+                Ok(())
+            };
         };
         let resource = &result["resource"];
         let abs = resource["filePath"]
             .as_str()
             .or_else(|| resource["path"].as_str());
-        let Some(abs) = abs else { return };
-        let origin = ctx.capture_origin.as_deref().unwrap_or("event");
-        fh.capture_from_disk(std::path::Path::new(abs), origin)
-            .await;
+        let Some(abs) = abs else {
+            return if required {
+                Err(failure("written resource path unavailable".to_string()))
+            } else {
+                Ok(())
+            };
+        };
+        if required {
+            match fh
+                .capture_from_disk_inner(std::path::Path::new(abs), origin)
+                .await
+            {
+                Ok(true) => Ok(()),
+                Ok(false) => Err(failure("written resource was not captured".to_string())),
+                Err(error) => Err(failure(error)),
+            }
+        } else {
+            fh.capture_from_disk(std::path::Path::new(abs), origin)
+                .await;
+            Ok(())
+        }
     }
 
     fn emit_deleted(&self, resource_key: &str, resource: Value, ctx: &OpContext) {
@@ -2282,7 +2323,12 @@ impl IoInner {
                 authorize,
             )
         };
-        result.map_err(|err| ResourceIoError::io_bad_request(err.to_string()))?;
+        result.map_err(|err| match err {
+            crate::file_safety::WriteError::Conflict => {
+                ResourceIoError::new(409, "resource_write_conflict", err.to_string())
+            }
+            _ => ResourceIoError::io_bad_request(err.to_string()),
+        })?;
         Ok(WorkspacePlane::mutation_result(
             &file_path,
             if existed { "modified" } else { "created" },
@@ -2936,6 +2982,161 @@ pub async fn write_expected_version_route(
         }
         Err(err) => error_response(err),
     }
+}
+
+// ── R06-R2：现役 workbench writeText 保存面（mount-aware-file-service.ts
+// :143-181 + server/routes/mobile-workbench.ts:99-100 的端口映射）──
+//
+// 留给主控的 lib.rs 注册片段（本文件不注册；测试内自行挂载）：
+//
+// ```text
+// .route(
+//     "/lingxi/v1/workbench/actions",
+//     post(resourceio::workbench_write_text_route),
+// )
+//
+// // 鉴权分类（auth.rs classify_route）：
+// if p == "/lingxi/v1/workbench/actions" && m == "POST" {
+//     return RoutePolicy::Scope("chat");
+// }
+// ```
+
+/// 现役 normalizePlainNameOrThrow（mount-aware-file-service.ts:649-656）：
+/// trim 后拒绝空名、含路径分隔符与 "." / ".."。
+fn normalize_plain_name(value: Option<&Value>) -> Result<String, ResourceIoError> {
+    let Some(raw) = value.and_then(Value::as_str) else {
+        return Err(ResourceIoError::io_bad_request("invalid name"));
+    };
+    let name = raw.trim();
+    if name.is_empty() || name.contains('/') || name.contains('\\') || name == "." || name == ".." {
+        return Err(ResourceIoError::io_bad_request("invalid name"));
+    }
+    Ok(name.to_string())
+}
+
+/// `POST /lingxi/v1/workbench/actions`（action=writeText）—— 同版本写入/
+/// 版本冲突保持外部内容并显式保存失败的现役保存语义：
+/// - 同版本（expectedVersion 与磁盘一致）→ `{ok:true, version:<新版本>}`，
+///   磁盘内容与新版本回读吻合；
+/// - 版本不同 → HTTP 200 + `{ok:false, conflict:true, version:<当前版本>}`，
+///   外部内容不被覆盖（冲突是结果不是异常，现役 :160-171）；
+/// - 非法名字/路径 → 400 `invalid name`，不呈现保存成功；
+/// - 未配置工作区 → 与现役一致显式失败（不猜造根）。
+///
+/// 「Markdown 封面冲突基于新快照最多再试」的编排（现役编辑器行为）由
+/// 调用方经 stat → 冲突 → 再 stat → 重试同一接口组合实现；本面保证
+/// 每次重试的真实版本判定与失败时的显式错误。
+pub async fn workbench_write_text_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<Value>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    principal_guard(&principal);
+    let Json(body) = match body {
+        Ok(body) => body,
+        Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
+    };
+    let action = body.get("action").and_then(Value::as_str).unwrap_or("");
+    if action != "writeText" && action != "create" {
+        return (
+            axum::http::StatusCode::BAD_REQUEST,
+            Json(serde_json::json!({ "error": "unknown_action" })),
+        )
+            .into_response();
+    }
+    let name = match normalize_plain_name(body.get("name")) {
+        Ok(name) => name,
+        Err(_) => {
+            // 现役 fileError("invalid name", "invalid_name", 400)：显式拒绝，
+            // 不呈现保存成功。
+            return (
+                axum::http::StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({ "error": "invalid_name" })),
+            )
+                .into_response();
+        }
+    };
+    let Some(root) = state.resource_io().workspace_root() else {
+        return (
+            axum::http::StatusCode::NOT_FOUND,
+            Json(serde_json::json!({ "error": "workspace_not_tracked" })),
+        )
+            .into_response();
+    };
+    let target = root.join(&name);
+    let target_ref = serde_json::json!({
+        "kind": "local-file",
+        "path": target.to_string_lossy(),
+    });
+    let ctx = ctx_from_body(&body);
+    let io = state.resource_io();
+    // 先 stat（现役 writeText :150 的目标存在性/版本读取）。
+    let stat = match io.stat(&target_ref, &ctx).await {
+        Ok(stat) => stat,
+        Err(err) => return error_response(err),
+    };
+    let content = match decode_write_content(&body) {
+        Ok(content) => content,
+        Err(err) => return error_response(err),
+    };
+    let expected = body.get("expectedVersion").cloned().unwrap_or(Value::Null);
+    let write_result = if expected.is_object() {
+        match io
+            .write_expected_version(&target_ref, content, &expected, &ctx)
+            .await
+        {
+            Ok(result) => result,
+            Err(err) => return error_response(err),
+        }
+    } else {
+        match io.write(&target_ref, content, &ctx).await {
+            Ok(result) => result,
+            Err(err) => return error_response(err),
+        }
+    };
+    // 目录清单（现役 filesForDirectory；io list 同字段投影）。
+    let dir_ref = serde_json::json!({
+        "kind": "local-file",
+        "path": root.to_string_lossy(),
+    });
+    let files = match io.list(&dir_ref, &ctx).await {
+        Ok(listed) => listed
+            .get("items")
+            .and_then(Value::as_array)
+            .cloned()
+            .unwrap_or_default(),
+        Err(_) => Vec::new(),
+    };
+    if write_result.get("conflict") == Some(&Value::Bool(true)) {
+        // 冲突是结果：HTTP 200 + ok:false + 当前版本；磁盘外部内容不动。
+        return (
+            axum::http::StatusCode::OK,
+            Json(serde_json::json!({
+                "ok": false,
+                "action": action,
+                "rootId": "default",
+                "mountId": "default",
+                "conflict": true,
+                "version": write_result.get("version").cloned()
+                    .or(stat.get("version").cloned())
+                    .unwrap_or(Value::Null),
+                "files": files,
+            })),
+        )
+            .into_response();
+    }
+    (
+        axum::http::StatusCode::OK,
+        Json(serde_json::json!({
+            "ok": true,
+            "action": action,
+            "rootId": "default",
+            "mountId": "default",
+            "version": write_result.get("version").cloned().unwrap_or(Value::Null),
+            "files": files,
+        })),
+    )
+        .into_response()
 }
 
 /// rename/move 共用的 from/to 提取（routes :100-116：from|oldResource、

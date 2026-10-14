@@ -24,7 +24,7 @@ use rusqlite::OptionalExtension;
 use lingxi_kernel::ports::StorageError;
 
 use super::migrations;
-use super::run_store::{RunDatabase, with_write_txn};
+use super::run_store::{with_write_txn, RunDatabase};
 
 fn map_err(err: rusqlite::Error) -> StorageError {
     migrations::map_rusqlite(err)
@@ -76,6 +76,12 @@ pub struct SessionSummaryRow {
     pub created_at_unix_ms: i64,
     pub archived_at_unix_ms: Option<i64>,
     pub last_activity_unix_ms: Option<i64>,
+    pub first_message: String,
+}
+
+#[derive(serde::Deserialize)]
+struct StoredUserInput {
+    text: String,
 }
 
 /// 创建一个新会话行（顶层：lineage_depth=0，lifecycle=active）。
@@ -225,10 +231,9 @@ pub async fn set_pinned(
 pub async fn set_pin_order(
     db: &RunDatabase,
     ordered_session_ids: &[String],
-    now_unix_ms: u64,
+    _now_unix_ms: u64,
 ) -> Result<(), StorageError> {
     let ids: Vec<String> = ordered_session_ids.to_vec();
-    let now = now_unix_ms as i64;
     let busy = db.options().busy_timeout_ms;
     db.queue()
         .submit(move |conn| {
@@ -236,15 +241,14 @@ pub async fn set_pin_order(
                 for (idx, sid) in ids.iter().enumerate() {
                     let n = conn
                         .execute(
-                            "UPDATE sessions SET pin_order=?2, \
-                             pinned_at_unix_ms=COALESCE(pinned_at_unix_ms,?3) \
-                             WHERE session_id=?1",
-                            rusqlite::params![sid, (idx + 1) as i64, now],
+                            "UPDATE sessions SET pin_order=?2 \
+                             WHERE session_id=?1 AND pinned_at_unix_ms IS NOT NULL",
+                            rusqlite::params![sid, (idx + 1) as i64],
                         )
                         .map_err(map_err)?;
                     if n == 0 {
                         return Err(StorageError::InvalidRequest {
-                            detail: format!("pin_order session {sid} not found"),
+                            detail: format!("pin_order session {sid} missing or not pinned"),
                         });
                     }
                 }
@@ -625,6 +629,21 @@ pub async fn list_archived_sessions(
     db: &RunDatabase,
     owner: Option<&str>,
 ) -> Result<Vec<SessionSummaryRow>, StorageError> {
+    read_archived_sessions(db, owner, false).await
+}
+
+pub async fn list_archived_sessions_with_preview(
+    db: &RunDatabase,
+    owner: Option<&str>,
+) -> Result<Vec<SessionSummaryRow>, StorageError> {
+    read_archived_sessions(db, owner, true).await
+}
+
+async fn read_archived_sessions(
+    db: &RunDatabase,
+    owner: Option<&str>,
+    include_preview: bool,
+) -> Result<Vec<SessionSummaryRow>, StorageError> {
     let owner: Option<String> = owner.map(str::to_string);
     db.queue()
         .submit(move |conn| {
@@ -648,16 +667,107 @@ pub async fn list_archived_sessions(
                         created_at_unix_ms: r.get(5)?,
                         archived_at_unix_ms: r.get(6)?,
                         last_activity_unix_ms: r.get(7)?,
+                        first_message: String::new(),
                     })
                 })
                 .map_err(map_err)?;
-            let mut out = Vec::new();
-            for r in rows {
-                out.push(r.map_err(map_err)?);
+            let mut out = rows.collect::<Result<Vec<_>, _>>().map_err(map_err)?;
+            if !include_preview {
+                return Ok(out);
+            }
+            let mut messages = conn
+                .prepare(
+                    "SELECT content_json FROM messages WHERE session_id=?1 \
+                     AND role='user' AND entry_type='message' ORDER BY seq",
+                )
+                .map_err(map_err)?;
+            for row in &mut out {
+                let contents = messages
+                    .query_map([&row.session_id], |r| r.get::<_, String>(0))
+                    .map_err(map_err)?;
+                for content in contents {
+                    let raw = content.map_err(map_err)?;
+                    let input: StoredUserInput =
+                        serde_json::from_str(&raw).map_err(|error| StorageError::Corrupted {
+                            detail: format!(
+                                "archived session {} has invalid message content: {error}",
+                                row.session_id
+                            ),
+                        })?;
+                    let visible = strip_preview_envelopes(&input.text);
+                    if !visible.is_empty() {
+                        // Match the original JS 100-unit limit without splitting a UTF-8 scalar.
+                        let mut units = 0;
+                        row.first_message = visible
+                            .chars()
+                            .take_while(|ch| {
+                                units += ch.len_utf16();
+                                units <= 100
+                            })
+                            .collect();
+                        break;
+                    }
+                }
             }
             Ok(out)
         })
         .await
+}
+
+fn strip_preview_envelopes(text: &str) -> String {
+    let mut visible = Vec::new();
+    let mut block_end = None;
+    let mut drop_separator = false;
+    for line in text
+        .split('\n')
+        .map(|line| line.strip_suffix('\r').unwrap_or(line))
+    {
+        if let Some(end) = block_end {
+            if line == end {
+                block_end = None;
+                drop_separator = true;
+            }
+            continue;
+        }
+        block_end = match line {
+            "[hana_reference]" => Some("[/hana_reference]"),
+            "[KnowledgeContext]" => Some("[/KnowledgeContext]"),
+            "[KnowledgeResearchContext]" => Some("[/KnowledgeResearchContext]"),
+            _ if is_preview_reminder_header(line) => Some("[/hana_reminder]"),
+            _ => None,
+        };
+        if block_end.is_some() || (drop_separator && line.is_empty()) {
+            continue;
+        }
+        drop_separator = false;
+        visible.push(line);
+    }
+    while visible.last() == Some(&"") {
+        visible.pop();
+    }
+    visible.join("\n")
+}
+
+fn is_preview_reminder_header(line: &str) -> bool {
+    if line == "[hana_reminder]" {
+        return true;
+    }
+    let Some(timestamp) = line
+        .strip_prefix("[hana_reminder at ")
+        .and_then(|value| value.strip_suffix(']'))
+    else {
+        return false;
+    };
+    timestamp.len() == 16
+        && timestamp
+            .bytes()
+            .enumerate()
+            .all(|(index, byte)| match index {
+                4 | 7 => byte == b'-',
+                10 => byte == b' ',
+                13 => byte == b':',
+                _ => byte.is_ascii_digit(),
+            })
 }
 
 /// 记忆开关（现役 memory GET/PATCH；inert 数据位，不构成安全边界）。
@@ -673,6 +783,23 @@ pub async fn set_memory_enabled(
     db.queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
+                let archived: Option<Option<i64>> = conn
+                    .query_row(
+                        "SELECT archived_at_unix_ms FROM sessions WHERE session_id=?1",
+                        [&sid],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .map_err(map_err)?;
+                match archived {
+                    None => return Ok(None),
+                    Some(Some(_)) => {
+                        return Err(StorageError::Conflict {
+                            detail: "session_memory_inactive".into(),
+                        })
+                    }
+                    Some(None) => {}
+                }
                 let n = conn
                     .execute(
                         "UPDATE sessions SET memory_enabled=?2 WHERE session_id=?1",
@@ -707,6 +834,279 @@ pub async fn touch_last_activity(
         })
         .await?;
     Ok(())
+}
+
+/// R06 项目删除：列出归属某项目的活动会话 id（会话改派用）。
+pub async fn session_ids_for_project(
+    db: &RunDatabase,
+    project_id: &str,
+) -> Result<Vec<String>, StorageError> {
+    let project = project_id.to_string();
+    db.queue()
+        .submit(move |conn| {
+            let mut statement = conn
+                .prepare(
+                    "SELECT session_id FROM sessions \
+                     WHERE project_id=?1 AND archived_at_unix_ms IS NULL \
+                     ORDER BY session_id",
+                )
+                .map_err(map_err)?;
+            let rows = statement
+                .query_map([&project], |row| row.get::<_, String>(0))
+                .map_err(map_err)?;
+            let mut out = Vec::new();
+            for row in rows {
+                out.push(row.map_err(map_err)?);
+            }
+            Ok(out)
+        })
+        .await
+}
+
+/// R06 轮换：按创建时间取指定助手最近一个活动会话 id（无则 None）。
+pub async fn latest_active_session_for_agent(
+    db: &RunDatabase,
+    agent_id: &str,
+) -> Result<Option<String>, StorageError> {
+    let agent = agent_id.to_string();
+    db.queue()
+        .submit(move |conn| {
+            conn.query_row(
+                "SELECT session_id FROM sessions \
+                 WHERE agent_id=?1 AND archived_at_unix_ms IS NULL \
+                 ORDER BY created_at_unix_ms DESC, session_id DESC LIMIT 1",
+                [&agent],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()
+            .map_err(map_err)
+        })
+        .await
+}
+
+/// R06 v12 会话项目归属写入（现役 setSessionProjectAssignment 的最小端口）：
+/// trim 后非空字符串为分配，空/None 为清除（NULL）。仅活动会话可改。
+/// 返回 None = 会话不存在；Some(新归属) = 已写入。
+pub async fn set_session_project(
+    db: &RunDatabase,
+    session_id: &str,
+    project_id: Option<&str>,
+) -> Result<Option<Option<String>>, StorageError> {
+    let sid = session_id.to_string();
+    let normalized = project_id
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string);
+    let owned = normalized.clone();
+    let busy = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                let archived: Option<Option<i64>> = conn
+                    .query_row(
+                        "SELECT archived_at_unix_ms FROM sessions WHERE session_id=?1",
+                        [&sid],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .map_err(map_err)?;
+                match archived {
+                    None => return Ok(None),
+                    Some(Some(_)) => {
+                        return Err(StorageError::Conflict {
+                            detail: "session_project_inactive".into(),
+                        })
+                    }
+                    Some(None) => {}
+                }
+                let n = conn
+                    .execute(
+                        "UPDATE sessions SET project_id=?2 WHERE session_id=?1",
+                        rusqlite::params![sid, owned],
+                    )
+                    .map_err(map_err)?;
+                Ok(if n > 0 { Some(normalized) } else { None })
+            })
+        })
+        .await
+}
+
+/// R06 v13 工作台身份投影行（disposal / sweep 的扫描面）。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SessionWorkspaceRow {
+    pub session_id: String,
+    pub owner_user_id: String,
+    /// studio 挂载 mountId（NULL = 历史 cwd 形态或无工作台会话）。
+    pub workspace_mount_id: Option<String>,
+    /// 会话工作目录（NULL = 未记录）。
+    pub cwd: Option<String>,
+}
+
+/// R06 v13 工作台身份写入（现役会话创建时携带 workspaceMountId/cwd 的
+/// 存储层端口）：trim 后非空字符串为赋值，空串/None 存 NULL（清除）。
+/// 仅活动会话可改（对照 set_session_project 的生命周期闸）；返回
+/// None = 会话不存在，Some((mount, cwd)) = 写入后的两列值。
+pub async fn set_session_workspace(
+    db: &RunDatabase,
+    session_id: &str,
+    workspace_mount_id: Option<&str>,
+    cwd: Option<&str>,
+) -> Result<Option<(Option<String>, Option<String>)>, StorageError> {
+    let sid = session_id.to_string();
+    let mount = workspace_mount_id
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string);
+    let owned_cwd = cwd
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string);
+    let busy = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                let archived: Option<Option<i64>> = conn
+                    .query_row(
+                        "SELECT archived_at_unix_ms FROM sessions WHERE session_id=?1",
+                        [&sid],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .map_err(map_err)?;
+                match archived {
+                    None => return Ok(None),
+                    Some(Some(_)) => {
+                        return Err(StorageError::Conflict {
+                            detail: "session_workspace_inactive".into(),
+                        })
+                    }
+                    Some(None) => {}
+                }
+                let n = conn
+                    .execute(
+                        "UPDATE sessions SET workspace_mount_id=?2, cwd=?3 WHERE session_id=?1",
+                        rusqlite::params![sid, mount, owned_cwd],
+                    )
+                    .map_err(map_err)?;
+                Ok(if n > 0 {
+                    Some((mount, owned_cwd))
+                } else {
+                    None
+                })
+            })
+        })
+        .await
+}
+
+/// R06 v13 工作台身份扫描：全部活动会话的 (session_id, owner, mount, cwd)
+/// （现役 disposal/sweep 前置的 engine.listSessions 投影；`owner = None`
+/// 不过滤——本地主人视野，`Some(uid)` 只看该用户，与归档列表同口径）。
+pub async fn list_active_session_workspaces(
+    db: &RunDatabase,
+    owner: Option<&str>,
+) -> Result<Vec<SessionWorkspaceRow>, StorageError> {
+    let owner: Option<String> = owner.map(str::to_string);
+    db.queue()
+        .submit(move |conn| {
+            let mut stmt = conn
+                .prepare(
+                    "SELECT session_id, owner_user_id, workspace_mount_id, cwd \
+                     FROM sessions WHERE lifecycle='active' \
+                     AND (?1 IS NULL OR owner_user_id=?1) \
+                     ORDER BY session_id",
+                )
+                .map_err(map_err)?;
+            let rows = stmt
+                .query_map([&owner], |r| {
+                    Ok(SessionWorkspaceRow {
+                        session_id: r.get(0)?,
+                        owner_user_id: r.get(1)?,
+                        workspace_mount_id: r.get(2)?,
+                        cwd: r.get(3)?,
+                    })
+                })
+                .map_err(map_err)?;
+            let mut out = Vec::new();
+            for row in rows {
+                out.push(row.map_err(map_err)?);
+            }
+            Ok(out)
+        })
+        .await
+}
+
+/// R06 独立会话的谱系锚点写入（new-detached 的 forkedFrom 线索）：
+/// 只写 parent_session_id / lineage_depth，不复制消息（区别于 fork）。
+pub async fn set_session_lineage(
+    db: &RunDatabase,
+    session_id: &str,
+    parent_session_id: &str,
+    lineage_depth: u32,
+) -> Result<bool, StorageError> {
+    let sid = session_id.to_string();
+    let parent = parent_session_id.to_string();
+    let depth = i64::from(lineage_depth);
+    let busy = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                let n = conn
+                    .execute(
+                        "UPDATE sessions SET parent_session_id=?2, lineage_depth=?3 \
+                         WHERE session_id=?1 AND lifecycle='active'",
+                        rusqlite::params![sid, parent, depth],
+                    )
+                    .map_err(map_err)?;
+                Ok(n > 0)
+            })
+        })
+        .await
+}
+
+/// R06 会话授权目录整体替换（现役 setSessionAuthorizedFolders 的存储层）：
+/// 仅活动会话可改；已归档 → 冲突，未知会话 → None。列表原样落盘
+/// （去重/存在性校验由调用方先行完成），返回替换后的列表。
+pub async fn set_authorized_folders(
+    db: &RunDatabase,
+    session_id: &str,
+    folders: &[String],
+) -> Result<Option<Vec<String>>, StorageError> {
+    let sid = session_id.to_string();
+    let owned = folders.to_vec();
+    let json = serde_json::to_string(&owned).map_err(|e| StorageError::Internal {
+        detail: e.to_string(),
+    })?;
+    let busy = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                let archived: Option<Option<i64>> = conn
+                    .query_row(
+                        "SELECT archived_at_unix_ms FROM sessions WHERE session_id=?1",
+                        [&sid],
+                        |row| row.get(0),
+                    )
+                    .optional()
+                    .map_err(map_err)?;
+                match archived {
+                    None => return Ok(None),
+                    Some(Some(_)) => {
+                        return Err(StorageError::Conflict {
+                            detail: "session_authorized_folders_inactive".into(),
+                        })
+                    }
+                    Some(None) => {}
+                }
+                let n = conn
+                    .execute(
+                        "UPDATE sessions SET authorized_folders_json=?2 WHERE session_id=?1",
+                        rusqlite::params![sid, json],
+                    )
+                    .map_err(map_err)?;
+                Ok(if n > 0 { Some(owned) } else { None })
+            })
+        })
+        .await
 }
 
 /// 一次搜索命中的投影（title 或 content 阶段）。

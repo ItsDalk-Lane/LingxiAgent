@@ -1,0 +1,370 @@
+{
+  "scope": "Assertion location review only; no coverage or verdict promotion.",
+  "checked": [
+    {
+      "id": "R00-T02-LA-01E1E3CF7FA8",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-062844EDA014",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 9
+    },
+    {
+      "id": "R00-T02-LA-062844EDA014",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-062844EDA014",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 9
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 23
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_refusals_and_no_write_authorization_preserve_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 25
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_refusals_and_no_write_authorization_preserve_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 25
+    },
+    {
+      "id": "R00-T02-LA-210C7965364E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-210C7965364E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-23AB8E0A2493",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-23AB8E0A2493",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-251147E586B2",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-251147E586B2",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-269958F82F8A",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-269958F82F8A",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-269958F82F8A",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-269958F82F8A",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 1
+    },
+    {
+      "id": "R00-T02-LA-3D99324D55C7",
+      "test": "original_directory_import_reports_each_effect_and_rejects_invalid_root",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-3D99324D55C7",
+      "test": "original_directory_import_reports_each_effect_and_rejects_invalid_root",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-5F5365322CFF",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-5F5365322CFF",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-6189780D7F52",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-6189780D7F52",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-66C538ED4733",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-66C538ED4733",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-763C552CB7DE",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-763C552CB7DE",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-76E2F5AAF035",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-76E2F5AAF035",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-8A62470CC75D",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-8A62470CC75D",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-9283371CDAD8",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-9283371CDAD8",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-9283371CDAD8",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-B0386DC9DED9",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-B0386DC9DED9",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-BB1F5E0DE88E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-BB1F5E0DE88E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-C12CD37BA4A3",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-C12CD37BA4A3",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-C12CD37BA4A3",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-DB95BAC2A204",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-DB95BAC2A204",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-E2AF86A962D0",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-E2AF86A962D0",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 9
+    },
+    {
+      "id": "R00-T02-LA-E84EEED44AC1",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-E84EEED44AC1",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-F49D5F80D234",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-F49D5F80D234",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-FBD4D4D29679",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-FBD4D4D29679",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-FBD4D4D29679",
+      "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
+      "source": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "assertionsChecked": 5
+    }
+  ],
+  "changedAssertionsReviewedInTests": [
+    "a13_search_within_scope_returns_only_allowed_sources",
+    "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows",
+    "file_history_routes_full_chain_and_error_vocabulary",
+    "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+    "original_manage_refusals_and_no_write_authorization_preserve_facts",
+    "original_persona_reads_template_custom_alias_and_refusal",
+    "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+    "resourceio_write_conflict_refuses_external_change_at_commit_boundary",
+    "scope_violations_are_loud_not_fallback",
+    "stage_files_gateway_only_delivers_real_authorized_session_files",
+    "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+    "websocket_registration_and_foreign_messages_preserve_authorized_session_streams"
+  ],
+  "missing": [],
+  "eligibleAnchorUpdates": 58,
+  "applied": true
+}

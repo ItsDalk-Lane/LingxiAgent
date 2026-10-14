@@ -396,10 +396,10 @@ def check_protected_executors(service_src: Path, whitelist=PROTECTED_EXECUTOR_SY
 # Dependency checks
 # ---------------------------------------------------------------------------
 
-def run_cargo_metadata() -> dict:
+def run_cargo_metadata(manifest: Path | None = None) -> dict:
     cmd = [
-        "cargo", "metadata", "--manifest-path", str(REPO_ROOT / "rust/Cargo.toml"),
-        "--format-version", "1", "--offline",
+        "cargo", "metadata", "--manifest-path", str(manifest or REPO_ROOT / "rust/Cargo.toml"),
+        "--format-version", "1", "--offline", "--locked",
     ]
     proc = subprocess.run(
         ["env", "-u", "all_proxy", "-u", "ALL_PROXY", "-u", "http_proxy", "-u",
@@ -408,6 +408,32 @@ def run_cargo_metadata() -> dict:
     if proc.returncode != 0:
         raise Violation("D1", f"cargo metadata failed: {proc.stderr.strip()[:500]}")
     return json.loads(proc.stdout)
+
+
+def run_registered_metadata(rules_doc: dict) -> dict:
+    metadata = run_cargo_metadata()
+    packages = {package["id"]: package for package in metadata["packages"]}
+    nodes = {node["id"]: node for node in metadata["resolve"]["nodes"]}
+    members = set(metadata["workspace_members"])
+    for module in rules_doc["module_registry"]:
+        scope = module.get("metadata_scope", "workspace")
+        if scope not in ("workspace", "independent"):
+            raise Violation("D5", f"unsupported metadata scope for {module['module']}: {scope}")
+        if module["status"] != "exists" or scope != "independent":
+            continue
+        extra = run_cargo_metadata(crate_dir_of(module) / "Cargo.toml")
+        for package in extra["packages"]:
+            packages.setdefault(package["id"], package)
+        for node in extra["resolve"]["nodes"]:
+            if node["id"] in nodes:
+                nodes[node["id"]]["deps"].extend(node["deps"])
+            else:
+                nodes[node["id"]] = node
+        members.update(extra["workspace_members"])
+    metadata["packages"] = list(packages.values())
+    metadata["resolve"]["nodes"] = list(nodes.values())
+    metadata["workspace_members"] = sorted(members)
+    return metadata
 
 
 def transitive_deps(metadata: dict) -> dict[str, set[str]]:
@@ -472,7 +498,16 @@ def check_dependencies(rules_doc: dict, metadata: dict) -> list[str]:
     findings: list[str] = []
     closure = transitive_deps(metadata)
     module_by_name = {m["module"]: m for m in rules_doc["module_registry"]}
-    workspace_names = set(closure.keys())
+    package_modules = {
+        m.get("cargo_package", m["module"]): m["module"]
+        for m in rules_doc["module_registry"]
+    }
+    if len(package_modules) != len(module_by_name):
+        raise Violation("D5", "multiple registered modules claim the same Cargo package")
+    if len({package_modules.get(name, name) for name in closure}) != len(closure):
+        raise Violation("D5", "distinct Cargo packages collide with a registered module alias")
+    closure = {package_modules.get(name, name): deps for name, deps in closure.items()}
+    workspace_names = set(closure)
     # Manifest-level view of each workspace member: packages[].dependencies
     # lists ALL declared dependencies (incl. optional/target-specific ones
     # that never enter the resolve graph), and dependencies[].name is the
@@ -480,7 +515,10 @@ def check_dependencies(rules_doc: dict, metadata: dict) -> list[str]:
     # field), so a declared forbidden dep cannot hide behind a rename or
     # behind not being activated.
     member_ids = set(metadata["workspace_members"])
-    pkg_of = {p["name"]: p for p in metadata["packages"] if p["id"] in member_ids}
+    pkg_of = {
+        package_modules.get(p["name"], p["name"]): p
+        for p in metadata["packages"] if p["id"] in member_ids
+    }
 
     # D5: module registry consistency, both directions
     for module in rules_doc["module_registry"]:
@@ -492,6 +530,9 @@ def check_dependencies(rules_doc: dict, metadata: dict) -> list[str]:
             if module["module"] not in workspace_names:
                 raise Violation("D5", f"module {module['module']} declared exists but "
                                       "absent from cargo metadata workspace")
+            package = pkg_of[module["module"]]
+            if Path(package["manifest_path"]).resolve() != (crate_dir / "Cargo.toml").resolve():
+                raise Violation("D5", f"module {module['module']} resolves to a different manifest")
         else:
             # Dual check: a module declared planned must NOT already exist.
             # A materialized "planned" module would silently bypass every
@@ -554,7 +595,7 @@ def check_dependencies(rules_doc: dict, metadata: dict) -> list[str]:
 
             # D2: allowed workspace-internal deps
             if "allowed_module_deps" in rule:
-                internal = deps & workspace_names
+                internal = {package_modules.get(dep, dep) for dep in deps} & workspace_names
                 extra = internal - set(rule["allowed_module_deps"]) - {module_name}
                 if extra:
                     raise Violation(
@@ -699,6 +740,7 @@ def negative_battery(base_doc: dict, features: list[dict], stores: list[dict],
     # N7: RunContext carrying an AppHandle (synthetic crate copy in a temp dir)
     def n7():
         fake_rules = copy.deepcopy(rules_doc)
+        fake_metadata = copy.deepcopy(metadata)
         with tempfile.TemporaryDirectory(prefix="r01-t01-neg7-") as td:
             crate = Path(td) / "lingxi-kernel"
             (crate / "src").mkdir(parents=True)
@@ -713,7 +755,10 @@ def negative_battery(base_doc: dict, features: list[dict], stores: list[dict],
             for module in fake_rules["module_registry"]:
                 if module["module"] == "lingxi-kernel":
                     module["crate_path"] = str(crate)  # absolute, outside the repo
-            check_dependencies(fake_rules, metadata)
+            for package in fake_metadata["packages"]:
+                if package["name"] == "lingxi-kernel":
+                    package["manifest_path"] = str(crate / "Cargo.toml")
+            check_dependencies(fake_rules, fake_metadata)
     # D3 (forbidden source token) fires before D4 here; both are valid
     # rejections of a host handle entering kernel sources.
     results.append(expect_rejection("N7 RunContext carries AppHandle", ("D3", "D4"), n7))
@@ -896,6 +941,37 @@ def negative_battery(base_doc: dict, features: list[dict], stores: list[dict],
     results.append(expect_rejection(
         "N17 protected-symbol whitelist entry without a reason", "B1", n17))
 
+    def n18():
+        fake = copy.deepcopy(metadata)
+        host = next(p for p in fake["packages"] if p["name"] == "lingxi-resource-desktop")
+        kernel = next(p for p in fake["packages"] if p["name"] == "lingxi-kernel")
+        for node in fake["resolve"]["nodes"]:
+            if node["id"] == host["id"]:
+                node["deps"].append({
+                    "name": "lingxi_kernel", "pkg": kernel["id"], "dep_kinds": [],
+                })
+        check_dependencies(rules_doc, fake)
+    results.append(expect_rejection(
+        "N18 independent desktop host cannot depend on business kernel", "D2", n18))
+
+    def n19():
+        fake = copy.deepcopy(metadata)
+        host = next(p for p in fake["packages"] if p["name"] == "lingxi-resource-desktop")
+        host["manifest_path"] = "/fake/desktop/Cargo.toml"
+        check_dependencies(rules_doc, fake)
+    results.append(expect_rejection(
+        "N19 independent desktop package must match registered manifest", "D5", n19))
+
+    def n20():
+        fake = copy.deepcopy(metadata)
+        shadow_id = "path+file:///fake/tauri-host#0.0.0"
+        fake["packages"].append({"id": shadow_id, "name": "tauri-host"})
+        fake["resolve"]["nodes"].append({"id": shadow_id, "deps": []})
+        fake["workspace_members"].append(shadow_id)
+        check_dependencies(rules_doc, fake)
+    results.append(expect_rejection(
+        "N20 unregistered package cannot hide behind a registered module alias", "D5", n20))
+
     return results
 
 
@@ -969,7 +1045,7 @@ def main() -> int:
     metadata = None
     if not args.skip_deps:
         try:
-            metadata = run_cargo_metadata()
+            metadata = run_registered_metadata(rules_doc)
             for line in check_dependencies(rules_doc, metadata):
                 print(f"PASS {line}")
         except Violation as v:
@@ -978,7 +1054,7 @@ def main() -> int:
 
     if args.self_test:
         if metadata is None:
-            metadata = run_cargo_metadata()
+            metadata = run_registered_metadata(rules_doc)
         try:
             for line in negative_battery(doc, features, stores, metadata, rules_doc):
                 print(f"PASS-NEG {line}")

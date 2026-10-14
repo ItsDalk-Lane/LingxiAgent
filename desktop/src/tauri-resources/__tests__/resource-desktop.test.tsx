@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { afterEach, expect, test, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ExcelJS from 'exceljs';
@@ -8,12 +9,15 @@ import { readPreview, retainResourceEvents, saveCover } from '../content';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 const snapshot = (text = '# 原文\n', hash = 'first'): Snapshot => ({ content: text, version: { size: text.length, mtimeMs: 1, sha256: hash } });
-function adapter(handler: (command: string, args: Record<string, unknown>) => unknown) {
+function adapter(
+  handler: (command: string, args: Record<string, unknown>) => unknown,
+  listen: (callback: (path: string) => void) => Promise<() => void> = async () => () => {},
+) {
   const calls: Array<{ command: string; args: Record<string, unknown> }> = [];
   const invoke: Invoke = async <T,>(command: string, args: Record<string, unknown> = {}) => {
     calls.push({ command, args }); return await handler(command, args) as T;
   };
-  return { calls, bridge: createResourceBridge(invoke) };
+  return { calls, bridge: createResourceBridge(invoke, listen) };
 }
 function readable(command: string) {
   if (command === 'file_info') return { path: '/proof/file.md', size: 20, isFile: true };
@@ -101,6 +105,37 @@ test('viewer_consumes_resource_events_and_is_independent_readonly', async () => 
   });
   const watch = retainResourceEvents('/proof/file.md', irrelevant.bridge, () => { refreshes += 1; }, e => { throw e; });
   await watch.ready; watch.release(); expect(refreshes).toBe(0);
+});
+
+test('legacy_file_watch_can_be_started_stopped_and_refreshes_matching_path', async () => {
+  let live = 'before';
+  let changed: ((path: string) => void) | undefined;
+  let unlistened = false;
+  const port = adapter((command) => {
+    if (command === 'file_info') return { path: '/proof/file.md', size: live.length, isFile: true };
+    if (command === 'read_file_snapshot') return snapshot(live, live);
+    if (command === 'resource_subscribe') return { subscriptionId: 's1', resourceKeys: ['local_fs:/proof/file.md'] };
+    if (command === 'resource_events') return { events: [], latestSequence: 0 };
+    if (command === 'watch_file' || command === 'unwatch_file') return true;
+    throw new Error(`测试没有配置该调用：${command}`);
+  }, async callback => {
+    changed = callback;
+    return () => { unlistened = true; };
+  });
+  render(<ResourceDesktop bridge={port.bridge} />);
+  fireEvent.change(screen.getByLabelText('本地文件路径'), { target: { value: '/proof/file.md' } });
+  fireEvent.click(screen.getByTestId('open-path'));
+  await waitFor(() => expect((screen.getByTestId('file-editor') as HTMLTextAreaElement).value).toBe('before'));
+  fireEvent.click(screen.getByTestId('legacy-watch-toggle'));
+  await screen.findByTestId('legacy-watch-status');
+  expect(port.calls.some(call => call.command === 'watch_file' && call.args.path === '/proof/file.md')).toBe(true);
+  live = 'after external change';
+  changed?.('/proof/file.md');
+  await waitFor(() => expect((screen.getByTestId('file-editor') as HTMLTextAreaElement).value).toBe(live));
+  fireEvent.click(screen.getByTestId('legacy-watch-toggle'));
+  await waitFor(() => expect(port.calls.some(call => call.command === 'unwatch_file' && call.args.path === '/proof/file.md')).toBe(true));
+  expect(unlistened).toBe(true);
+  expect(screen.queryByTestId('legacy-watch-status')).toBeNull();
 });
 
 test('saves_show_conflicts_and_cover_retries_only_once', async () => {

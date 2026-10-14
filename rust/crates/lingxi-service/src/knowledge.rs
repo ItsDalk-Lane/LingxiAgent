@@ -380,6 +380,18 @@ pub struct SearchRequest {
     pub limit: usize,
 }
 
+/// grep 请求（与 SearchRequest 同层）：source_ids 必须全为冻结子集；
+/// heading_filter 为可选标题前缀（空标题路径永不命中）。
+pub struct GrepRequest<'a> {
+    pub scope_id: &'a str,
+    pub session_id: &'a str,
+    pub pattern: &'a str,
+    pub source_ids: &'a [String],
+    pub heading_filter: Option<&'a str>,
+    pub use_regex: bool,
+    pub max_results: usize,
+}
+
 #[derive(Debug, Clone)]
 pub struct DegradedScope {
     pub reason: String,
@@ -758,6 +770,7 @@ impl KnowledgeService {
 
     /// 全量重建入队（变体以身份并建，旧变体不覆盖——任务书 §十）。
     pub fn rebuild_notebook(&self, notebook_id: &str) -> Result<(), KnowledgeError> {
+        self.facts.get_notebook(&self.studio_id, notebook_id)?;
         let (_, profile) = self.notebook_chunk_profile(notebook_id)?;
         for entry in self.facts.list_notebook_sources(notebook_id)? {
             let artifact_id = entry
@@ -1379,7 +1392,10 @@ impl KnowledgeService {
             generation: ctx.generation,
         };
         self.facts.advance_run_scope_attempt(
-            &self.studio_id, scope_id, &binding(previous), &binding(current),
+            &self.studio_id,
+            scope_id,
+            &binding(previous),
+            &binding(current),
         )
     }
 
@@ -1511,6 +1527,12 @@ impl KnowledgeService {
             ));
         }
         let fts_query = ks::build_fts_literal_query(query);
+        // 原 search 语义（knowledge-search-service.ts:142）：sourceIds 给出时
+        // 必须全在 scope 冻结集合内，任一越权整单 SCOPE_VIOLATION——与 grep
+        // 同口径，不做静默过滤的空命中。
+        for id in &request.source_ids {
+            self.require_scope_source(&scope, id)?;
+        }
 
         // scope 编译：冻结源 → ready 检索锚（(artifact, chunkProfileHash, fingerprint)）。
         #[derive(Clone)]
@@ -1931,20 +1953,26 @@ impl KnowledgeService {
     }
 
     /// grep：确定性原文扫描（literal / regexp），命中带 provenance。
-    pub fn grep_scope(
-        &self,
-        scope_id: &str,
-        session_id: &str,
-        pattern: &str,
-        source_ids: &[String],
-        use_regex: bool,
-        max_results: usize,
-    ) -> Result<Value, KnowledgeError> {
+    pub fn grep_scope(&self, request: GrepRequest<'_>) -> Result<Value, KnowledgeError> {
+        let GrepRequest {
+            scope_id,
+            session_id,
+            pattern,
+            source_ids,
+            heading_filter,
+            use_regex,
+            max_results,
+        } = request;
         let scope = self.resolve_turn_scope(scope_id, session_id)?;
         if pattern.is_empty() || pattern.chars().count() > 512 {
             return Err(KnowledgeError::invalid_argument(
                 "pattern must contain 1 to 512 characters",
             ));
+        }
+        // sourceIds 过滤必须全为冻结子集（原 grep 工具语义：任一越权整单
+        // 拒绝 KNOWLEDGE_SCOPE_VIOLATION，不部分放行，也不静默缩成空扫描）。
+        for source_id in source_ids {
+            self.require_scope_source(&scope, source_id)?;
         }
         let max_results = max_results.clamp(1, 200);
         let regex = if use_regex {
@@ -1972,6 +2000,16 @@ impl KnowledgeService {
                 .map(|source| source.display_name)
                 .unwrap_or_default();
             for block in blocks {
+                // headingFilter：标题路径以 " > " 连接后按前缀命中（空标题
+                // 路径永不命中；原工具语义，缺省不过滤）。
+                let heading_path = locator_heading_path(&block.locator);
+                if let Some(prefix) = heading_filter {
+                    let heading_matches =
+                        !heading_path.is_empty() && heading_path.join(" > ").starts_with(prefix);
+                    if !heading_matches {
+                        continue;
+                    }
+                }
                 let chars: Vec<char> = block.text.chars().collect();
                 let mut index = 0_usize;
                 while index < chars.len() {
@@ -1999,7 +2037,7 @@ impl KnowledgeService {
                             "startOffset": index,
                             "endOffset": index + length,
                             "lineNumber": block.locator.get("lineStart").and_then(|value| value.as_u64()),
-                            "headingPath": locator_heading_path(&block.locator),
+                            "headingPath": heading_path,
                             "snippet": snippet,
                         }));
                         if matches.len() >= max_results {
@@ -2517,11 +2555,16 @@ impl KnowledgeService {
             stats["pendingCallIntentCount"] = json!(0);
             let potentially_sent_count =
                 stats["requestCount"].as_u64().unwrap() - requests_before_call;
-            stats["unknownSentRequestCount"] = json!(
-                stats["unknownSentRequestCount"].as_u64().unwrap()
-                    + stats["pendingRequestCount"].as_u64().unwrap()
-            );
-            stats["pendingRequestCount"] = json!(0);
+            // 父取消（关停/作业撤销）落在飞行中：本方无法确认该请求的终局，
+            // 持久统计必须保留 pendingRequestCount，交给接管 attempt 归类为
+            // unknown；只有本进程得到确定性结算时才在本地收敛为 unknownSent。
+            if !batch_runtime.cancel.is_cancelled() {
+                stats["unknownSentRequestCount"] = json!(
+                    stats["unknownSentRequestCount"].as_u64().unwrap()
+                        + stats["pendingRequestCount"].as_u64().unwrap()
+                );
+                stats["pendingRequestCount"] = json!(0);
+            }
             let (served, vectors, accounting_error) = match result {
                 Ok(value) => {
                     if let Some(call_id) = &value.model_call_id {

@@ -1,0 +1,435 @@
+{
+  "status": "SEMANTIC_BINDINGS_REVIEWED_NOT_STAGE_ACCEPTANCE",
+  "executionLog": "all-original-proof-suites-final.log",
+  "reviewed": [
+    {
+      "id": "R00-T02-LA-00ECC9568490",
+      "originalAssertions": [
+        "父子任务关联",
+        "子任务权限为交集",
+        "结果/失败回到父会话",
+        "无候选、超并发、权限交集不满足或子任务失败如实返回；不升级权限。"
+      ],
+      "previousGaps": [
+        {
+          "clause": "list返回候选；launch建子任务/线程，父会话有taskId与进度/结果。",
+          "kind": "IMPLEMENTATION_GAP",
+          "reason": "现有dispatch只接受task建立child run/thread；没有原list候选入口，父回包只有child_run_id，无原taskId/进度面；异常子任务失败也未回父正文。",
+          "sourceLocations": [
+            {
+              "endLine": 459,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "dispatch只接受task创建child run，没有候选list分支。",
+              "path": "rust/crates/lingxi-service/src/subagents.rs",
+              "quote": "    pub async fn dispatch_child(\n        self: &Arc<Self>,\n        parent: ParentRunFacts,\n        request: DelegationRequest,\n    ) -> Result<LaunchedChild, SubagentDispatchError> {\n        if request.task.trim().is_empty() {\n            return Err(SubagentDispatchError::InvalidTarget(\n                \"subagent dispatch requires a non-empty task\".to_string(),\n            ));\n        }\n        let mode = self.sessions.permission_mode(&parent.session_id);\n        let tier = resolve_subagent_access(request.access, mode)\n            .map_err(SubagentDispatchError::AccessDenied)?;\n        self.spawn_child(parent, request, tier, mode, None).await\n    }\n\n    /// Continues an OPEN thread of the SAME session (`subagent_reply`\n    /// tool): validates the thread, resolves the tier (explicit access >\n    /// the thread's recorded tier > inherited parent mode — always\n    /// re-attenuated against the CURRENT parent mode) and dispatches a",
+              "startLine": 440
+            },
+            {
+              "endLine": 158,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "返回身份只有child_run_id/thread_id，没有原taskId/进度面。",
+              "path": "rust/crates/lingxi-service/src/subagents.rs",
+              "quote": "#[derive(Debug, Clone, PartialEq, Eq)]\npub struct LaunchedChild {\n    pub child_run_id: String,\n    pub thread_id: String,\n}\n\n/// Identity of one successfully closed thread.\n#[derive(Debug, Clone, PartialEq, Eq)]\npub struct ClosedThread {\n    pub thread_id: String,\n}\n\n/// Dispatch/reply/close refusal. Every variant is loud and maps onto a\n/// structured tool failure for the parent's model — none is a silent",
+              "startLine": 145
+            },
+            {
+              "endLine": 909,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "只有正常drive完成后进入父结果交付尾段。",
+              "path": "rust/crates/lingxi-service/src/subagents.rs",
+              "quote": "                // guard is disarmed by `complete`; a panic or drop before\n                // this point closes out abnormally instead (exactly-once\n                // either way).\n                closeout.complete(&finish);\n                if let Err(err) = sessions.deliver_retained(\n                    &session_id,\n                    &delivery_text(&thread_delivery, &child_run, &finish),\n                ) {\n                    // Loud, never silent: the run's own durable events\n                    // remain the authoritative record; the thread\n                    // snapshot keeps the outcome queryable.\n                    tracing::error!(\n                        session_id = %session_id,\n                        thread_id = %thread_delivery,\n                        run_id = %child_run,",
+              "startLine": 895
+            },
+            {
+              "endLine": 1110,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "panic/drop只登记failed并释放容量，没有向父deliver_retained异常失败正文。",
+              "path": "rust/crates/lingxi-service/src/subagents.rs",
+              "quote": "            tracing::error!(\n                session_id = %self.session_id,\n                thread_id = %self.thread_id,\n                child_run_id = %self.child_run_id,\n                \"subagent child ended WITHOUT delivering a result (dropped at a cancellation \\\n                 last resort, panicked, or never polled) — abnormal closeout: caps returned, \\\n                 busy cleared, honest failed status recorded\"\n            );\n            self.runtime.note_child_finished(\n                &self.session_id,\n                &self.thread_id,\n                &self.child_run_id,\n                &Err(DriveError::Internal(\n                    \"child run ended without delivering a result (dropped or panicked before \\\n                     its completion tail)\"\n                        .to_string(),\n                )),\n            );\n        }\n    }",
+              "startLine": 1091
+            }
+          ]
+        },
+        "异常panic/drop时子任务失败正文回到所属父会话；当前仅子run/线程登记failed。",
+        "list候选和无候选语义未实现。",
+        "运行超并发有实现，但本项引用尚无完整per-session/global真实矩阵。",
+        "异常失败回父会话未实现。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "dispatch_reply_close_round_trip_on_the_real_chain"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_list_launch_progress_and_permission_intersection_use_real_facts"
+        },
+        {
+          "package": "lingxi-kernel",
+          "suite": "lib",
+          "test": "subagent::tests::attenuation_matrix_matches_the_incumbent",
+          "kind": "rust_library_test",
+          "sourcePath": "rust/crates/lingxi-kernel/src/subagent.rs"
+        },
+        {
+          "package": "lingxi-kernel",
+          "suite": "lib",
+          "test": "subagent::tests::blocklisted_targets_are_denied_regardless_of_tier",
+          "kind": "rust_library_test",
+          "sourcePath": "rust/crates/lingxi-kernel/src/subagent.rs"
+        },
+        {
+          "package": "lingxi-kernel",
+          "suite": "lib",
+          "test": "subagent::tests::read_only_tier_denies_mutating_targets_and_fails_closed_on_unknowns",
+          "kind": "rust_library_test",
+          "sourcePath": "rust/crates/lingxi-kernel/src/subagent.rs"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "operate_parent_child_write_is_executed_once"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "readonly_parent_write_access_request_is_refused_at_dispatch"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "model_override_cannot_widen_the_readonly_grant"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r04_t03_approval_service",
+          "test": "sup01_ask_tier_subagent_matrix_on_the_real_chain"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_closeout",
+          "test": "child_provider_panic_closes_out_and_the_thread_continues"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_list_launch_progress_and_permission_intersection_use_real_facts"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "readonly_parent_write_access_request_is_refused_at_dispatch"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_closeout",
+          "test": "thread_registry_refusal_leaves_no_permanent_reservations"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_closeout",
+          "test": "child_provider_panic_closes_out_and_the_thread_continues"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_permission_inheritance",
+          "test": "model_override_cannot_widen_the_readonly_grant"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_session_and_global_caps_refuse_and_recover_without_ghost_children"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_list_launch_progress_and_permission_intersection_use_real_facts"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "originalAssertions": [
+        "成功：执行“恢复记忆修订”后，将所选修订内容恢复到当前记忆并返回结果",
+        "拒绝/边界：settings.write；revision 不存在 404；内容已变化/忙时冲突，失败 500；不应错误扩大写入或披露范围"
+      ],
+      "previousGaps": [
+        "实际HTTP恢复直接调用DreamRevisionStore.restore；当前没有原memory ticker每日维护/聚合编译忙状态或dream运行拒绝，也没有内容变化冲突判断。恢复只有当前快照/相同内容短路/pre_restore备份/文件写入；真实I/O失败500已补检查，不能以此替代原409忙/内容冲突。产品未修改，整叶保留GAP。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_restore_real_io_failure_is_500_and_keeps_all_agent_files"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_restore_detail_hash_refuses_concurrent_edits_and_preserves_agent_scope"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-1CD1C31CCF44",
+      "originalAssertions": [
+        "交付列表与实际文件一致",
+        "失效路径未显示成功",
+        "文件不存在、非绝对路径/无会话或无法登记时失败，不宣称已交付。"
+      ],
+      "previousGaps": [
+        {
+          "clause": "文件不存在、非绝对路径/无会话或无法登记时失败，不宣称已交付。",
+          "kind": "IMPLEMENTATION_GAP_SOURCE_REVIEW_RUNTIME_PENDING",
+          "reason": "原无会话失败条款未由当前入口实现；保留原正式期待，真正空ctx的Success+新增登记分支只是复现缺口。若本轮实际Failed且无副作用，须主审再核准后才能READY。",
+          "sourceLocations": [
+            {
+              "endLine": 114,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "实际工具以ctx.session_id登记，没有空会话闸。",
+              "path": "rust/crates/lingxi-service/src/stagefiles.rs",
+              "quote": "            let result = async {\n                // 查身份、授权、检查实际文件以及整批提交共享同一正式租约。\n                let lease = self.files.payload_lease().await;\n                let (ids, paths) = normalize(args)?;\n                let mut delivered = Vec::new();\n                for id in ids {\n                    let file = self\n                        .files\n                        .get_file(ctx.session_id.as_str(), &id)\n                        .await\n                        .map_err(|e| e.to_string())?\n                        .ok_or_else(|| format!(\"SessionFile not found: {id}\"))?;\n                    if file.status != \"available\" || !Path::new(&file.real_path).exists() {\n                        return Err(format!(\"SessionFile payload missing: {id}\"));\n                    }\n                    delivered.push(file);\n                }\n                for path in paths {\n                    let scope = self\n                        .access\n                        .authorize(\n                            ctx.principal.storage_kind(),\n                            &ctx.principal.storage_subject(),\n                            ctx.session_id.as_str(),\n                            Path::new(&path),\n                            &self.cwd,\n                            ResourceOp::Read,\n                        )\n                        .map_err(|e| e.to_string())?;",
+              "startLine": 86
+            },
+            {
+              "endLine": 584,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "register_file_inner先record_current_activity后再登记文件。",
+              "path": "rust/crates/lingxi-service/src/sessionfiles.rs",
+              "quote": "    async fn register_file_inner(\n        &self,\n        session_id: &str,\n        real_path: &Path,\n        source_key: Option<&str>,\n        label: Option<&str>,\n        origin: &str,\n    ) -> Result<SessionFileView, SessionFileError> {\n        let now = self.now_ms();\n        store::record_current_activity(&self.db, session_id, now).await?;\n        let canonical = std::fs::canonicalize(real_path).map_err(|_| {\n            SessionFileError::Io(std::io::Error::new(\n                std::io::ErrorKind::NotFound,\n                format!(\"file not found: {}\", real_path.display()),\n            ))",
+              "startLine": 570
+            },
+            {
+              "endLine": 1745,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "record_current_activity会UPSERT传入session_id，没有空身份拒绝。",
+              "path": "rust/crates/lingxi-adapters/src/storage/session_files.rs",
+              "quote": "\n/// 运行期的真实活动单调前进；历史导入的原 upsert 接口保留显式历史时刻。\npub async fn record_current_activity(\n    db: &RunDatabase,\n    session_id: &str,\n    now: u64,\n) -> Result<(), StorageError> {\n    let sid = session_id.to_string();\n    db.queue().submit(move|conn|{\n        conn.execute(\"INSERT INTO sessions (session_id,agent_id,owner_user_id,title,created_at_unix_ms,last_activity_unix_ms) VALUES (?1,'agent','user_local','',?2,?2) ON CONFLICT(session_id) DO UPDATE SET last_activity_unix_ms=MAX(COALESCE(sessions.last_activity_unix_ms,0),?2)\",rusqlite::params![sid,now as i64]).map_err(map_err)?;Ok(())\n    }).await\n}",
+              "startLine": 1734
+            }
+          ]
+        },
+        "真正无会话（空session_id）必须失败且不宣称已交付、不新增会话/SessionFile/引用；当前源码未拒绝，实际新检查待执行确认。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "stage_files_gateway_only_delivers_real_authorized_session_files"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "stage_files_gateway_only_delivers_real_authorized_session_files"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_resource_proofs",
+          "test": "stage_files_gateway_only_delivers_real_authorized_session_files"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-207DF594B497",
+      "originalAssertions": [
+        "只关闭指定子线程",
+        "状态回父会话",
+        "线程不存在、非当前父会话或已关闭不可误关另一线程。"
+      ],
+      "previousGaps": [
+        {
+          "clause": "关闭目标线程/任务并在父会话返回最终状态。",
+          "kind": "IMPLEMENTATION_GAP",
+          "reason": "目标线程确实关闭，父会话工具结果正文仅threadId，没有closed最终状态。",
+          "sourceLocations": [
+            {
+              "endLine": 158,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "ClosedThread仅带thread_id，无最终状态。",
+              "path": "rust/crates/lingxi-service/src/subagents.rs",
+              "quote": "/// Identity of one successfully closed thread.\n#[derive(Debug, Clone, PartialEq, Eq)]\npub struct ClosedThread {\n    pub thread_id: String,\n}\n\n/// Dispatch/reply/close refusal. Every variant is loud and maps onto a\n/// structured tool failure for the parent's model — none is a silent",
+              "startLine": 151
+            },
+            {
+              "endLine": 3750,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "close驱动只取closed.thread_id。",
+              "path": "rust/crates/lingxi-service/src/runs.rs",
+              "quote": "                                Option<String>,\n                                crate::subagents::SubagentDispatchError,\n                            > = if delegation_target == \"subagent_close\" && delegation_first_party {\n                                match launcher\n                                    .as_ref()\n                                    .map(|launcher| launcher.close(&parent, &delegation))\n                                {\n                                    Some(Ok(closed)) => Ok(Some(closed.thread_id)),\n                                    Some(Err(err)) => Err(err),\n                                    None => Err(crate::subagents::SubagentDispatchError::NotBound),\n                                }\n                            } else if delegation_first_party {\n                                let Some(launcher) = launcher else {\n                                    return Err(DriveError::Internal(\n                                        \"subagent launcher not bound in this supervisor\"\n                                            .to_string(),\n                                    ));\n                                };\n                                match delegation_target {\n                                    \"subagent\" => launcher\n                                        .dispatch(parent, delegation)\n                                        .await\n                                        .map(|child| Some(child.child_run_id)),\n                                    \"subagent_reply\" => launcher",
+              "startLine": 3727
+            },
+            {
+              "endLine": 3802,
+              "kind": "current_source_boundary_not_execution_proof",
+              "meaning": "成功结果success_text(identity)，未返回closed状态正文。",
+              "path": "rust/crates/lingxi-service/src/runs.rs",
+              "quote": "                                Err(err) => {\n                                    tracing::warn!(\n                                        run_id = %run_id,\n                                        tool_call = %call_id,\n                                        target = %request.target,\n                                        error = %err,\n                                        \"subagent delegation refused; recorded as a tool \\\n                                         failure (zero child runs created on refusal paths)\"\n                                    );\n                                    ToolOutcome::Failed {\n                                        error: err.tool_error(),\n                                    }\n                                }\n                            };\n                            let failed = matches!(outcome, ToolOutcome::Failed { .. });\n                            // R03 repair G03/F04 (same family): a delegation\n                            // REFUSAL is a known never-dispatched negative\n                            // fact — every `SubagentDispatchError` leaves\n                            // ZERO child runs created. The receipt keeps\n                            // `dispatched=false` so the three fact classes",
+              "startLine": 3783
+            }
+          ]
+        },
+        "父会话返回线程最终closed状态；实际成功正文只有threadId。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "dispatch_reply_close_round_trip_on_the_real_chain"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "dispatch_reply_close_round_trip_on_the_real_chain"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "reply_validations_refuse_unknown_threads_loudly"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-3F95164A488C",
+      "originalAssertions": [
+        "给定目标与相应权限，执行“连同子会话归档”后核对：主会话和非运行中的子孙会话移入可恢复归档，跳过项及错误计数返回",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "previousGaps": [
+        "已补真正运行子会话、两层后代可恢复归档与真实存储失败整批回滚检查；当前ArchiveView不返回原Then要求的错误计数，整条仍未通过。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_session_proofs",
+          "test": "original_archive_children_recurses_skips_running_and_preserves_failed_transaction"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_session_proofs",
+          "test": "original_archive_children_recurses_skips_running_and_preserves_failed_transaction"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-5F879158C679",
+      "originalAssertions": [
+        "相同threadId续接历史",
+        "跨父会话拒绝",
+        "线程不存在、已关闭或父子关系不符拒绝，不跨会话发消息。"
+      ],
+      "previousGaps": [
+        "同threadId旧子消息进入下一child模型输入；当前只传新request.task。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "dispatch_reply_close_round_trip_on_the_real_chain"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_reply_restores_actual_thread_history_and_returns_only_to_its_parent"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "reply_validations_refuse_unknown_threads_loudly"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "subagent_lifecycle",
+          "test": "busy_thread_refuses_reply_with_a_structured_conflict"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_chat_proofs",
+          "test": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-A18187567AF9",
+      "originalAssertions": [
+        "给定目标与相应权限，执行“跨会话搜索”后核对：按 q、phase、limit 返回标题或内容命中及片段；空查询为空结果",
+        "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+      ],
+      "previousGaps": [
+        "实际标题搜索命中返回snippet空串，原Then要求标题或内容命中及片段；原实现对标题也生成命中片段。已保留标题命中、真实内容片段、空查询、权限与真实读取失败证明，不把缺少片段说成完整通过。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_session_proofs",
+          "test": "original_session_search_returns_scoped_title_content_and_explicit_read_failures"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_session_proofs",
+          "test": "original_session_search_returns_scoped_title_content_and_explicit_read_failures"
+        }
+      ]
+    }
+  ]
+}

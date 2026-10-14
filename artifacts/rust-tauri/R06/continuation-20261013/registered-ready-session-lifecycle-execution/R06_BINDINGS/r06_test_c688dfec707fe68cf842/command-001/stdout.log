@@ -1,0 +1,17 @@
+
+running 1 test
+test original_desk_skills_refuses_invalid_outside_and_unreadable_targets_explicitly ... ok
+
+successes:
+
+---- original_desk_skills_refuses_invalid_outside_and_unreadable_targets_explicitly stdout ----
+LINGXI_AUTH_REJECTED request_id="req-91e0a70c6a8c952fcaaeb0da7da7c74b" method=GET path=/lingxi/v1/desk/skills status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:64824
+LINGXI_AUTH_REJECTED request_id="req-46dbe6bdeaacaf67c577cbb09392568f" method=GET path=/lingxi/v1/desk/skills status=403 reason=local_owner_required remote=127.0.0.1:64825
+{"invalidAndUnsupportedMount":400,"invalidAuth":401,"missingAgent":404,"nonownerAndOutsideRoot":403,"originalLeaf":"R00-T02-LA-B383AB7B553C","realUnreadableDocument":500,"refusalsNoWrites":true,"restoredRead":true,"rootAndDocumentSymlinksDenied":true}
+
+
+successes:
+    original_desk_skills_refuses_invalid_outside_and_unreadable_targets_explicitly
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.59s
+

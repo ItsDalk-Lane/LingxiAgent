@@ -1,0 +1,929 @@
+{
+  "refreshed": [
+    {
+      "id": "R00-T02-LA-01E1E3CF7FA8",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_refusals_and_no_write_authorization_preserve_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_refusals_and_no_write_authorization_preserve_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_interactive_unapproved_and_cancelled_leave_no_sources_or_jobs",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1AA3F1311F8A",
+      "test": "original_manage_add_preserves_source_and_reports_background_index_failure_separately",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-1BEA3A4B9CB0",
+      "test": "attachments_local_route_maps_security_gate_errors",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-20E9C8F26CEA",
+      "test": "focus_switch_detached_create_and_project_assignment",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-20E9C8F26CEA",
+      "test": "focus_switch_detached_create_and_project_assignment",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-210C7965364E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-210C7965364E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-23AB8E0A2493",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-23AB8E0A2493",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-251147E586B2",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-251147E586B2",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-2EB39AE34CB5",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-2EB39AE34CB5",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-31CDA283A11A",
+      "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-31CDA283A11A",
+      "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-3818ADEAFA7A",
+      "test": "rotate_continue_deleted_agent_and_draft_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-3818ADEAFA7A",
+      "test": "rotate_continue_deleted_agent_and_draft_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38667593C3E1",
+      "test": "current_status_list_get_and_readonly",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38667593C3E1",
+      "test": "current_status_list_get_and_readonly",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38667593C3E1",
+      "test": "current_status_list_get_and_readonly",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38667593C3E1",
+      "test": "current_status_list_get_and_readonly",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38A989948FDD",
+      "test": "put_config_provider_save_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38A989948FDD",
+      "test": "put_config_provider_save_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38A989948FDD",
+      "test": "put_config_provider_save_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38A989948FDD",
+      "test": "put_config_validation_and_auth",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-38A989948FDD",
+      "test": "put_config_validation_and_auth",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-3C8CE915255E",
+      "test": "cache_snapshot_observation_delete",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-3C8CE915255E",
+      "test": "cache_snapshot_observation_delete",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-3D99324D55C7",
+      "test": "original_directory_import_reports_each_effect_and_rejects_invalid_root",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-3D99324D55C7",
+      "test": "original_directory_import_reports_each_effect_and_rejects_invalid_root",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-43FFB75F252C",
+      "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-43FFB75F252C",
+      "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "test": "put_config_inline_credential_transfer_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "test": "put_config_inline_credential_transfer_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "test": "put_config_inline_credential_transfer_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "test": "put_config_validation_and_auth",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "test": "put_config_validation_and_auth",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "test": "put_config_inline_credential_transfer_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-478704C17551",
+      "test": "attachments_local_route_maps_security_gate_errors",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-485B2D0A8A02",
+      "test": "rotate_continue_deleted_agent_and_draft_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "retry_target_resolution_matches_incumbent",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "retry_file_rollback_contract_matches_incumbent",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "busy_session_refuses_fork_retry_rewind_409",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "cross_principal_tree_access_is_403",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "retry_target_resolution_matches_incumbent",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "retry_file_rollback_contract_matches_incumbent",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "busy_session_refuses_fork_retry_rewind_409",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4CEBEA945B7A",
+      "test": "cross_principal_tree_access_is_403",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4F0466F7C090",
+      "test": "original_model_write_edit_register_real_session_products_and_update_metadata",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-4F0466F7C090",
+      "test": "original_model_file_registration_failure_reports_written_bytes_without_success",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "f04_permanent_delete_removes_owned_cache_and_retains_other_branch",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "f04_delete_physical_failure_preserves_identity_until_restart_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "f04_permanent_delete_removes_owned_cache_and_retains_other_branch",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-52226FEA5997",
+      "test": "f04_delete_physical_failure_preserves_identity_until_restart_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-563F04AF5AD7",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-563F04AF5AD7",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-5FA75FC2FE4C",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-5FA75FC2FE4C",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6189780D7F52",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6189780D7F52",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "checkpoint_crud_matches_incumbent_shape",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "checkpoint_crud_matches_incumbent_shape",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "checkpoint_crud_matches_incumbent_shape",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6207F7E8C697",
+      "test": "checkpoint_crud_matches_incumbent_shape",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6658E9B80314",
+      "test": "rotate_continue_deleted_agent_and_draft_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6658E9B80314",
+      "test": "f04_permanent_delete_removes_owned_cache_and_retains_other_branch",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6658E9B80314",
+      "test": "rotate_continue_deleted_agent_and_draft_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-6658E9B80314",
+      "test": "f04_delete_physical_failure_preserves_identity_until_restart_cleanup",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-66C538ED4733",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-66C538ED4733",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-763C552CB7DE",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-763C552CB7DE",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-76E2F5AAF035",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-76E2F5AAF035",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-895DAC8DD5B7",
+      "test": "file_history_routes_full_chain_and_error_vocabulary",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_filehistory.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-895DAC8DD5B7",
+      "test": "file_history_routes_full_chain_and_error_vocabulary",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_filehistory.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-895DAC8DD5B7",
+      "test": "file_history_routes_workspace_not_tracked",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_filehistory.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-8A62470CC75D",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-8A62470CC75D",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9283371CDAD8",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9283371CDAD8",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9283371CDAD8",
+      "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9D9E72CB6051",
+      "test": "focus_switch_detached_create_and_project_assignment",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9D9E72CB6051",
+      "test": "focus_switch_detached_create_and_project_assignment",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9E3981A9BFCA",
+      "test": "put_config_provider_save_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9E3981A9BFCA",
+      "test": "put_config_provider_save_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9E3981A9BFCA",
+      "test": "put_config_provider_save_readback",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9E3981A9BFCA",
+      "test": "put_config_validation_and_auth",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-9E3981A9BFCA",
+      "test": "put_config_validation_and_auth",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-A5DE44FF584F",
+      "test": "experiments_read_and_write",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-A5DE44FF584F",
+      "test": "experiments_read_and_write",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-AD0384FBE1F2",
+      "test": "cache_snapshot_observation_read",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-AD0384FBE1F2",
+      "test": "cache_snapshot_observation_read",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-AD7FAE6288FA",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-AD7FAE6288FA",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-AD7FAE6288FA",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B0386DC9DED9",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B0386DC9DED9",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B97D0D4296FA",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B97D0D4296FA",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B97D0D4296FA",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B9DA1A584C6E",
+      "test": "duplicate_session_id_is_loud_409_on_fork_and_create",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-B9DA1A584C6E",
+      "test": "duplicate_session_id_is_loud_409_on_fork_and_create",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-BB1F5E0DE88E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-BB1F5E0DE88E",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C12CD37BA4A3",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C12CD37BA4A3",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C12CD37BA4A3",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C406F9A17A3E",
+      "test": "attachments_local_route_maps_security_gate_errors",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C4F6E3BFF341",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C4F6E3BFF341",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C6D338A24CF8",
+      "test": "original_model_write_edit_register_real_session_products_and_update_metadata",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C6D338A24CF8",
+      "test": "original_model_file_registration_failure_reports_written_bytes_without_success",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C99A4322D0C1",
+      "test": "experiments_read_and_write",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-C99A4322D0C1",
+      "test": "experiments_read_and_write",
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-DB95BAC2A204",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-DB95BAC2A204",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "busy_session_refuses_fork_retry_rewind_409",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "busy_session_refuses_fork_retry_rewind_409",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "busy_session_refuses_fork_retry_rewind_409",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "rewind_restores_content_with_per_file_verdicts_and_branch_rewinds",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E1625F70C7CC",
+      "test": "busy_session_refuses_fork_retry_rewind_409",
+      "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E2AF86A962D0",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E2AF86A962D0",
+      "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E7CC636A724C",
+      "test": "attachments_local_route_maps_security_gate_errors",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E84EEED44AC1",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-E84EEED44AC1",
+      "test": "original_notebook_source_routes_reject_without_changing_rows",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-EA3C6A0C5214",
+      "test": "register_file_dedups_by_source_key_and_real_path",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-EA3C6A0C5214",
+      "test": "attachments_local_route_maps_security_gate_errors",
+      "path": "rust/crates/lingxi-service/tests/r06_t05_session_files.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-EC77C2B04726",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-EC77C2B04726",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-EC77C2B04726",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-F49D5F80D234",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-F49D5F80D234",
+      "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-F88B0A969094",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-F88B0A969094",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-F88B0A969094",
+      "test": "f04_local_read_cancelled_future_requires_physical_lease",
+      "path": "rust/crates/lingxi-service/tests/r06_ar_f04_lifecycle.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-FBDEEDAC0B11",
+      "test": "focus_switch_detached_create_and_project_assignment",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    },
+    {
+      "id": "R00-T02-LA-FBDEEDAC0B11",
+      "test": "focus_switch_detached_create_and_project_assignment",
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_detached_project.rs",
+      "mode": "reanchored"
+    }
+  ],
+  "unchanged": 727
+}

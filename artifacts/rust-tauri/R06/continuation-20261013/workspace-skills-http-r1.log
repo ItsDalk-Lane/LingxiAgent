@@ -1,0 +1,132 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:216:23
+    |
+216 |     let before_home = snapshot(&server.home);
+    |                       ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:217:28
+    |
+217 |     let before_workspace = snapshot(&server.workspace);
+    |                            ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:244:16
+    |
+244 |     assert_eq!(snapshot(&server.home), before_home);
+    |                ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:245:16
+    |
+245 |     assert_eq!(snapshot(&server.workspace), before_workspace);
+    |                ^^^^^^^^ not found in this scope
+
+error[E0560]: struct `AgentConfigPatch` has no field named `discover_project_skills`
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:250:13
+    |
+250 |             discover_project_skills: Some(true),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^ `AgentConfigPatch` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0560]: struct `AgentConfigPatch` has no field named `discover_compatible_project_skills`
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:251:13
+    |
+251 |             discover_compatible_project_skills: Some(true),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `AgentConfigPatch` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0308]: mismatched types
+    --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:249:9
+     |
+ 247 |       let patched = lingxi_adapters::storage::agent_memory::AgentConfigPatch::write_flags(
+     |                     --------------------------------------------------------------------- arguments to this function are incorrect
+ 248 |           &text,
+ 249 | /         &lingxi_adapters::storage::agent_memory::AgentConfigPatch {
+ 250 | |             discover_project_skills: Some(true),
+ 251 | |             discover_compatible_project_skills: Some(true),
+ 252 | |             ..Default::default()
+ 253 | |         },
+     | |_________^ expected `&AgentConfigFlags`, found `&AgentConfigPatch`
+     |
+     = note: expected reference `&AgentConfigFlags`
+                found reference `&AgentConfigPatch`
+note: associated function defined here
+    --> crates/lingxi-adapters/src/storage/agent_memory.rs:2217:12
+     |
+2217 |     pub fn write_flags(text: &str, flags: &AgentConfigFlags) -> Result<String, MemoryError> {
+     |            ^^^^^^^^^^^
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:257:24
+    |
+257 |     let updated_home = snapshot(&server.home);
+    |                        ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:277:16
+    |
+277 |     assert_eq!(snapshot(&server.home), updated_home);
+    |                ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:278:16
+    |
+278 |     assert_eq!(snapshot(&server.workspace), before_workspace);
+    |                ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:290:23
+    |
+290 |     let before_home = snapshot(&server.home);
+    |                       ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:291:28
+    |
+291 |     let before_workspace = snapshot(&server.workspace);
+    |                            ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:305:20
+    |
+305 |         assert_eq!(snapshot(&server.home), before_home);
+    |                    ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:306:20
+    |
+306 |         assert_eq!(snapshot(&server.workspace), before_workspace);
+    |                    ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:359:30
+    |
+359 |         let outside_before = snapshot(&outside);
+    |                              ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:367:20
+    |
+367 |         assert_eq!(snapshot(&outside), outside_before);
+    |                    ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:379:20
+    |
+379 |         assert_eq!(snapshot(&outside), outside_before);
+    |                    ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `snapshot` in this scope
+   --> crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:388:16
+    |
+388 |     assert_eq!(snapshot(&server.workspace), before_workspace);
+    |                ^^^^^^^^ not found in this scope
+
+Some errors have detailed explanations: E0308, E0425, E0560.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `lingxi-service` (test "r06_original_skills_bundle_proofs") due to 18 previous errors
+warning: build failed, waiting for other jobs to finish...

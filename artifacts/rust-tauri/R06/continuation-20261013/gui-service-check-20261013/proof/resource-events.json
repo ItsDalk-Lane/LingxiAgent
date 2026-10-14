@@ -1,0 +1,114 @@
+[
+  {
+    "events": [
+      {
+        "changeType": "modified",
+        "occurredAt": "2026-10-13T08:50:32.359Z",
+        "resource": {
+          "filePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "isDirectory": false,
+          "kind": "local-file",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "provider": "local_fs"
+        },
+        "resourceKey": "local_fs:/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+        "sequence": 1,
+        "sessionPath": null,
+        "source": "provider_watch",
+        "type": "resource.changed",
+        "version": {
+          "mtimeMs": 1791881432194,
+          "size": 19
+        }
+      },
+      {
+        "changeType": "modified",
+        "occurredAt": "2026-10-13T08:50:32.608Z",
+        "resource": {
+          "filePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "isDirectory": false,
+          "kind": "local-file",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "provider": "local_fs"
+        },
+        "resourceKey": "local_fs:/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+        "sequence": 2,
+        "sessionPath": null,
+        "source": "provider_watch",
+        "type": "resource.changed",
+        "version": {
+          "mtimeMs": 1791881432405,
+          "size": 22
+        }
+      },
+      {
+        "changeType": "modified",
+        "occurredAt": "2026-10-13T08:50:32.857Z",
+        "resource": {
+          "filePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "isDirectory": false,
+          "kind": "local-file",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "provider": "local_fs"
+        },
+        "resourceKey": "local_fs:/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+        "sequence": 3,
+        "sessionPath": null,
+        "source": "provider_watch",
+        "type": "resource.changed",
+        "version": {
+          "mtimeMs": 1791881432732,
+          "size": 19
+        }
+      },
+      {
+        "changeType": "modified",
+        "occurredAt": "2026-10-13T08:54:21.110Z",
+        "resource": {
+          "filePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "isDirectory": false,
+          "kind": "local-file",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "provider": "local_fs"
+        },
+        "resourceKey": "local_fs:/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+        "sequence": 4,
+        "sessionPath": null,
+        "source": "provider_watch",
+        "type": "resource.changed",
+        "version": {
+          "mtimeMs": 1791881661008,
+          "size": 10
+        }
+      }
+    ],
+    "latestSequence": 4,
+    "stale": false
+  },
+  {
+    "events": [
+      {
+        "changeType": "modified",
+        "occurredAt": "2026-10-13T08:55:09.610Z",
+        "resource": {
+          "filePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "isDirectory": false,
+          "kind": "local-file",
+          "path": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+          "provider": "local_fs"
+        },
+        "resourceKey": "local_fs:/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/proof/live.md",
+        "sequence": 5,
+        "sessionPath": null,
+        "source": "provider_watch",
+        "type": "resource.changed",
+        "version": {
+          "mtimeMs": 1791881709457,
+          "size": 19
+        }
+      }
+    ],
+    "latestSequence": 5,
+    "stale": false
+  }
+]

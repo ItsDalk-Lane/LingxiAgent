@@ -5,10 +5,10 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_service::{
-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
-    prepare_layout, run,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
+    ServiceError, ServiceState,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
 
@@ -511,11 +511,9 @@ async fn original_artifact_citation_snapshot_boundaries_and_heading_fallback() {
     }));
     let block = &blocks["blocks"][0];
     let text = block["text"].as_str().unwrap();
-    assert!(
-        block["locator"]["headingPath"]
-            .as_array()
-            .is_none_or(Vec::is_empty)
-    );
+    assert!(block["locator"]["headingPath"]
+        .as_array()
+        .is_none_or(Vec::is_empty));
     let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
     index
         .replace_artifact_chunks(
@@ -727,13 +725,11 @@ async fn original_settings_refresh_remove_reingest_and_purge_use_real_facts() {
         .await;
     assert_eq!(status, 200, "{removed}");
     assert!(removed["membership"]["removedAt"].is_string());
-    assert!(
-        facts
-            .get_membership(second_id, source)
-            .unwrap()
-            .removed_at
-            .is_none()
-    );
+    assert!(facts
+        .get_membership(second_id, source)
+        .unwrap()
+        .removed_at
+        .is_none());
     assert_eq!(facts.get_source(source).unwrap().id, source);
     assert_eq!(
         facts.read_snapshot_bytes(&snap).unwrap(),
@@ -782,12 +778,10 @@ async fn original_settings_refresh_remove_reingest_and_purge_use_real_facts() {
     assert_ne!(refreshed["snapshot"]["id"], original["snapshot"]["id"]);
     assert_eq!(refreshed["parseArtifact"]["status"], "ready");
     let refreshed_source = refreshed["source"]["id"].as_str().unwrap();
-    assert!(
-        facts
-            .latest_job_for_source(second_id, refreshed_source)
-            .unwrap()
-            .is_some()
-    );
+    assert!(facts
+        .latest_job_for_source(second_id, refreshed_source)
+        .unwrap()
+        .is_some());
     let retained = facts.latest_snapshot_for_source(refreshed_source).unwrap();
     let credential = state
         .auth()
@@ -825,12 +819,10 @@ async fn original_settings_refresh_remove_reingest_and_purge_use_real_facts() {
     wait_until_job(&server, second_id, refreshed_source, "done").await;
     let artifact = refreshed["parseArtifact"]["id"].as_str().unwrap();
     let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
-    assert!(
-        !index
-            .list_ready_variant_metadata(artifact)
-            .unwrap()
-            .is_empty()
-    );
+    assert!(!index
+        .list_ready_variant_metadata(artifact)
+        .unwrap()
+        .is_empty());
     let (status, purge) = server
         .request(
             "DELETE",
@@ -844,12 +836,10 @@ async fn original_settings_refresh_remove_reingest_and_purge_use_real_facts() {
     assert_eq!(purge["purge"]["indexVariants"], true);
     assert!(facts.get_source(refreshed_source).is_err());
     assert!(!home.join("knowledge").join(&retained.storage_path).exists());
-    assert!(
-        index
-            .list_ready_variant_metadata(artifact)
-            .unwrap()
-            .is_empty()
-    );
+    assert!(index
+        .list_ready_variant_metadata(artifact)
+        .unwrap()
+        .is_empty());
     let (status, _) = server
         .request(
             "POST",
@@ -891,12 +881,10 @@ async fn original_failed_and_untracked_jobs_retry_and_delete_wins() {
         )
         .unwrap();
     facts.add_membership(id, &untracked.id).unwrap();
-    assert!(
-        facts
-            .latest_job_for_source(id, &untracked.id)
-            .unwrap()
-            .is_none()
-    );
+    assert!(facts
+        .latest_job_for_source(id, &untracked.id)
+        .unwrap()
+        .is_none());
     let server = serve(state.clone()).await;
     let (status, retried) = server
         .request(
@@ -989,13 +977,11 @@ async fn original_failed_and_untracked_jobs_retry_and_delete_wins() {
     );
     assert!(facts.get_source(&untracked.id).is_err());
     assert!(!home.join("knowledge").join(&snapshot.storage_path).exists());
-    assert!(
-        KnowledgeIndexStore::open(&home.join("knowledge"))
-            .unwrap()
-            .list_ready_variant_metadata(&artifact.id)
-            .unwrap()
-            .is_empty()
-    );
+    assert!(KnowledgeIndexStore::open(&home.join("knowledge"))
+        .unwrap()
+        .list_ready_variant_metadata(&artifact.id)
+        .unwrap()
+        .is_empty());
     let (status, _) = server
         .request(
             "POST",
@@ -1077,12 +1063,22 @@ async fn original_directory_import_reports_each_effect_and_rejects_invalid_root(
 }
 
 async fn boot_chat(home: &Path, endpoint: &str) -> ServiceState {
+    boot_chat_with_embedding(home, endpoint, false).await
+}
+
+async fn boot_chat_with_embedding(home: &Path, endpoint: &str, embedding: bool) -> ServiceState {
     let layout = prepare_layout(home).unwrap();
     let config_path = home.join("synthetic-service.json");
-    std::fs::write(
-        &config_path,
-        json!({"home":home,"providers":{"main":{"protocol":"openai-completions","endpoint":endpoint,"auth":{"kind":"apiKey","apiKey":"F13_SYNTHETIC_ONLY"}}},"models":{"chat":{"provider":"main","model":"synthetic","capabilities":{"tools":true},"compat":{"contextWindow":1000000}}}}).to_string(),
-    ).unwrap();
+    let mut configuration = json!({"home":home,"providers":{"main":{"protocol":"openai-completions","endpoint":endpoint,"auth":{"kind":"apiKey","apiKey":"F13_SYNTHETIC_ONLY"}}},"models":{"chat":{"provider":"main","model":"synthetic","capabilities":{"tools":true},"compat":{"contextWindow":1000000}}}});
+    if embedding {
+        configuration["providers"]["embed"] = json!({
+            "protocol":"openai-embeddings",
+            "endpoint":endpoint,
+            "auth":{"kind":"apiKey","apiKey":"F13_SYNTHETIC_EMBED_ONLY"}
+        });
+        configuration["models"]["embedding"] = json!({"provider":"embed","model":"synthetic"});
+    }
+    std::fs::write(&config_path, configuration.to_string()).unwrap();
     let (source, plane) =
         lingxi_service::config::resolve_model_plane(Some(&config_path), &layout.runtime_dir)
             .unwrap()
@@ -1111,6 +1107,12 @@ async fn boot_chat(home: &Path, endpoint: &str) -> ServiceState {
             model_plane_source: Some(source),
             credential_service: Some(credentials),
             workspace_root: Some(home.to_path_buf()),
+            // 本证明套件的单会话场景驱动 17+ 轮工具调用（原义务的逐案探针），
+            // 超过默认 32 轮预算：按场景显式放宽（预算语义本身不变，越界仍响亮失败）。
+            run_limits: lingxi_service::runs::RunDriveLimits {
+                max_model_turns: 64,
+                ..lingxi_service::runs::RunDriveLimits::default()
+            },
             ..ServiceDeps::default()
         },
     )
@@ -1341,6 +1343,30 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
             "knowledge_search".into(),
             json!({"scopeId":"runtime","query":"柠檬酸含量","channel":"fts"}),
         ),
+        (
+            "knowledge_grep".into(),
+            json!({"scopeId":"runtime","pattern":"柠檬酸含量","sourceIds":[foreign]}),
+        ),
+        (
+            "knowledge_grep".into(),
+            json!({"scopeId":"runtime","pattern":"柠檬酸含量","sourceIds":[src,foreign]}),
+        ),
+        (
+            "knowledge_grep".into(),
+            json!({"scopeId":"runtime","pattern":"柠檬酸含量","sourceIds":["missing-grep-source"]}),
+        ),
+        (
+            "knowledge_grep".into(),
+            json!({"scopeId":"runtime","pattern":"柠檬酸含量","sourceIds":[]}),
+        ),
+        (
+            "knowledge_grep".into(),
+            json!({"scopeId":"runtime","pattern":"柠檬酸含量","headingFilter":false}),
+        ),
+        (
+            "knowledge_grep".into(),
+            json!({"scopeId":"runtime","pattern":"柠檬酸含量","headingFilter":"HEADING_NEVER_MATCHES_ORIGINAL_PROOF"}),
+        ),
     ];
     wait_until_job(&server, other_id, foreign, "pending_embedding").await;
     let (status,executed)=server.request("POST","/lingxi/v1/sessions/sess_local_alpha/execute",Some(json!({"input":"核对只选甲来源的原义知识行为","knowledge":{"notebookIds":[id],"sourceIds":[src]}}))).await;
@@ -1357,7 +1383,7 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
         lingxi_protocol::RunStatus::Completed
     );
     let requests = script.lock().unwrap().requests.clone();
-    assert_eq!(requests.len(), 25);
+    assert_eq!(requests.len(), 37);
     let final_body = requests.last().unwrap();
     let result = |index: usize| {
         final_body["messages"]
@@ -1381,12 +1407,10 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
         .find(|hit| hit["kind"] == "original-text")
         .unwrap()["spans"][0];
     let citation = span["citationId"].as_str().unwrap();
-    assert!(
-        span["citationMarkdown"]
-            .as_str()
-            .unwrap()
-            .contains(citation)
-    );
+    assert!(span["citationMarkdown"]
+        .as_str()
+        .unwrap()
+        .contains(citation));
     let (status, resolved) = server
         .request(
             "GET",
@@ -1403,31 +1427,29 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
         !degraded["degraded"].as_array().unwrap().is_empty(),
         "无模型能力必须显式说明"
     );
-    assert!(
-        degraded["searchedVectorVariants"]
-            .as_array()
-            .unwrap()
-            .is_empty()
-    );
+    assert!(degraded["searchedVectorVariants"]
+        .as_array()
+        .unwrap()
+        .is_empty());
     let none: Value = serde_json::from_str(&result(2)).unwrap();
     assert!(
         none["hits"].as_array().unwrap().is_empty(),
         "真实无匹配词必须零命中，query={no_match_query}，result={none}"
     );
-    let scoped: Value = serde_json::from_str(&result(3)).unwrap();
+    // 原 search 语义（knowledge-search-service.ts:142）：sourceIds 含越权源时
+    // 整单 SCOPE_VIOLATION，不部分放行、不以空命中成功。
     assert!(
-        scoped["hits"].as_array().unwrap().is_empty(),
-        "只指定未授权乙时必须零命中：{scoped}"
+        result(3).contains("KNOWLEDGE_SCOPE_VIOLATION"),
+        "只指定未授权乙时必须整单范围违规：{}",
+        result(3)
     );
     let grep: Value = serde_json::from_str(&result(4)).unwrap();
     assert!(!grep["matches"].as_array().unwrap().is_empty());
-    assert!(
-        grep["matches"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .all(|hit| hit["sourceId"] == src)
-    );
+    assert!(grep["matches"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|hit| hit["sourceId"] == src));
     let matched = &grep["matches"][0];
     assert!(matched["snippet"].as_str().unwrap().contains("柠檬酸含量"));
     assert!(matched["blockId"].is_string());
@@ -1469,12 +1491,10 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
         1
     );
     assert_eq!(outline["notebooks"][0]["sources"][0]["sourceId"], src);
-    assert!(
-        !outline["notebooks"][0]["sources"][0]["sections"]
-            .as_array()
-            .unwrap()
-            .is_empty()
-    );
+    assert!(!outline["notebooks"][0]["sources"][0]["sections"]
+        .as_array()
+        .unwrap()
+        .is_empty());
     let read: Value = serde_json::from_str(&result(7)).unwrap();
     let text = read["spans"]
         .as_array()
@@ -1508,23 +1528,45 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
         no_index["hits"].as_array().unwrap().is_empty(),
         "索引缺失不得伪造命中"
     );
+    assert!(no_index["degraded"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|entry| entry["reason"] == "KNOWLEDGE_INDEX_BUILDING"));
+    for index in [12, 13, 14] {
+        assert!(
+            result(index).contains("KNOWLEDGE_SCOPE_VIOLATION"),
+            "{}",
+            result(index)
+        );
+        assert!(!result(index).contains("FOREIGN_B"));
+        assert!(!result(index).contains("\"matches\""));
+    }
     assert!(
-        no_index["degraded"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|entry| entry["reason"] == "KNOWLEDGE_INDEX_BUILDING")
+        result(15).contains("KNOWLEDGE_INVALID_ARGUMENT"),
+        "{}",
+        result(15)
     );
+    assert!(
+        result(16).contains("tool arguments violate the current schema"),
+        "{}",
+        result(16)
+    );
+    let heading_none: Value = serde_json::from_str(&result(17)).unwrap();
+    assert_eq!(heading_none["matches"], json!([]));
     server.stop().await;
     upstream.abort();
     let _ = upstream.await;
 }
 
+type ManageProofObserver = Arc<dyn Fn(usize, &Value) + Send + Sync>;
+
 #[derive(Default)]
 struct ManageProofScript {
     calls: Vec<Value>,
     requests: Vec<Value>,
-    observe: Option<Arc<dyn Fn(usize, &Value) + Send + Sync>>,
+    observe: Option<ManageProofObserver>,
+    tool: Option<String>,
 }
 
 fn manage_result(body: &Value, index: usize) -> String {
@@ -1532,6 +1574,7 @@ fn manage_result(body: &Value, index: usize) -> String {
         .as_array()
         .unwrap()
         .iter()
+        .rev()
         .find(|message| {
             message["role"] == "tool" && message["tool_call_id"] == format!("manage-result-{index}")
         })
@@ -1544,7 +1587,7 @@ async fn manage_proof_provider(
     axum::Json(body): axum::Json<Value>,
 ) -> axum::response::Response {
     use axum::response::IntoResponse;
-    let (step, call, observe) = {
+    let (step, call, observe, tool) = {
         let mut script = script.lock().unwrap();
         let step = script.requests.len();
         script.requests.push(body.clone());
@@ -1554,13 +1597,17 @@ async fn manage_proof_provider(
                 .and_then(|index| script.calls.get(index))
                 .cloned(),
             script.observe.clone(),
+            script
+                .tool
+                .clone()
+                .unwrap_or_else(|| "knowledge_manage".into()),
         )
     };
     if let Some(observe) = observe {
         observe(step, &body);
     }
     let delta = if step == 0 {
-        json!({"role":"assistant","tool_calls":[{"index":0,"id":"manage-description","type":"function","function":{"name":"mcp_describe_tool","arguments":json!({"name":"knowledge_manage"}).to_string()}}]})
+        json!({"role":"assistant","tool_calls":[{"index":0,"id":"manage-description","type":"function","function":{"name":"mcp_describe_tool","arguments":json!({"name":tool}).to_string()}}]})
     } else if let Some(mut call) = call {
         if call["sourceId"] == "from_actual_add_result" {
             let actual: Value = serde_json::from_str(&manage_result(&body, 0)).unwrap();
@@ -1570,7 +1617,7 @@ async fn manage_proof_provider(
             let actual: Value = serde_json::from_str(&manage_result(&body, 2)).unwrap();
             call["sourceId"] = actual["source"]["id"].clone();
         }
-        json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("manage-result-{}",step-1),"type":"function","function":{"name":"mcp_call","arguments":json!({"tool":"knowledge_manage","arguments":call}).to_string()}}]})
+        json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("manage-result-{}",step-1),"type":"function","function":{"name":"mcp_call","arguments":json!({"tool":tool,"arguments":call}).to_string()}}]})
     } else {
         json!({"role":"assistant","content":"管理原子行为证明完成"})
     };
@@ -1604,6 +1651,15 @@ async fn start_manage_model(
                 .route(
                     "/chat/completions",
                     axum::routing::post(manage_proof_provider),
+                )
+                .route(
+                    "/embeddings",
+                    axum::routing::post(|| async {
+                        (
+                            axum::http::StatusCode::BAD_GATEWAY,
+                            axum::Json(json!({"error":{"message":"SYNTHETIC_BACKGROUND_EMBEDDING_FAILURE"}})),
+                        )
+                    }),
                 )
                 .with_state(script),
         )
@@ -1666,12 +1722,10 @@ async fn original_manage_actual_authorized_actions_read_back_facts_and_jobs() {
                     std::fs::read(observe_home.join("knowledge").join(&snapshot.storage_path))
                         .unwrap();
                 assert_eq!(bytes, b"MANAGE_ACTUAL_ADDED_BODY");
-                assert!(
-                    observe_facts
-                        .latest_job_for_source(&observe_id, source)
-                        .unwrap()
-                        .is_some()
-                );
+                assert!(observe_facts
+                    .latest_job_for_source(&observe_id, source)
+                    .unwrap()
+                    .is_some());
                 // 只准备同studio共享引用；remove自身仍由真实工具执行。
                 observe_facts
                     .add_membership(&observe_shared, source)
@@ -1684,20 +1738,16 @@ async fn original_manage_actual_authorized_actions_read_back_facts_and_jobs() {
                 assert!(removed["membership"]["removedAt"].is_string());
                 let saved = saved_bytes.lock().unwrap();
                 let (source, bytes) = saved.as_ref().unwrap();
-                assert!(
-                    !observe_facts
-                        .list_notebook_sources(&observe_id)
-                        .unwrap()
-                        .iter()
-                        .any(|entry| entry.source.id == *source)
-                );
-                assert!(
-                    observe_facts
-                        .list_notebook_sources(&observe_shared)
-                        .unwrap()
-                        .iter()
-                        .any(|entry| entry.source.id == *source)
-                );
+                assert!(!observe_facts
+                    .list_notebook_sources(&observe_id)
+                    .unwrap()
+                    .iter()
+                    .any(|entry| entry.source.id == *source));
+                assert!(observe_facts
+                    .list_notebook_sources(&observe_shared)
+                    .unwrap()
+                    .iter()
+                    .any(|entry| entry.source.id == *source));
                 assert!(observe_facts.get_source(source).is_ok());
                 let snapshot = observe_facts.latest_snapshot_for_source(source).unwrap();
                 assert_eq!(
@@ -1720,12 +1770,10 @@ async fn original_manage_actual_authorized_actions_read_back_facts_and_jobs() {
                     "# 实际刷新章节\n\nREFRESH_ACTUAL_CHANGED".as_bytes()
                 );
                 assert_eq!(refreshed["parseArtifact"]["status"], "ready");
-                assert!(
-                    observe_facts
-                        .latest_job_for_source(&observe_id, source)
-                        .unwrap()
-                        .is_some()
-                );
+                assert!(observe_facts
+                    .latest_job_for_source(&observe_id, source)
+                    .unwrap()
+                    .is_some());
                 *saved_jobs.lock().unwrap() = observe_facts
                     .list_ingestion_jobs(Some(&observe_id), None, 200)
                     .unwrap()
@@ -1766,11 +1814,9 @@ async fn original_manage_actual_authorized_actions_read_back_facts_and_jobs() {
                 let current = observe_facts.list_notebook_sources(&observe_id).unwrap();
                 assert_eq!(new.len(), current.len());
                 assert!(!new.is_empty());
-                assert!(
-                    current
-                        .iter()
-                        .all(|source| new.iter().any(|job| job.source_id == source.source.id))
-                );
+                assert!(current
+                    .iter()
+                    .all(|source| new.iter().any(|job| job.source_id == source.source.id)));
             }
             _ => {}
         }
@@ -1884,6 +1930,7 @@ async fn original_manage_refusals_and_no_write_authorization_preserve_facts() {
         json!({"action":"add","notebookId":foreign_id,"kind":"pasted_text","text":"不得写外库"}),
         json!({"action":"remove","notebookId":foreign_id,"sourceId":source_id}),
         json!({"action":"refresh","notebookId":foreign_id,"sourceId":source_id}),
+        json!({"action":"reindex","notebookId":foreign_id}),
     ];
     create_manage_session(&server, "original-manage-refused", "operate").await;
     let (status, executed) = server
@@ -1899,7 +1946,7 @@ async fn original_manage_refusals_and_no_write_authorization_preserve_facts() {
     assert!(manage_result(&body, 0).contains("kind"));
     assert!(manage_result(&body, 1).contains("tool arguments violate the current schema"));
     assert!(manage_result(&body, 1).contains("action"));
-    for index in [2, 3, 4] {
+    for index in [2, 3, 4, 5] {
         assert!(manage_result(&body, index).contains("KNOWLEDGE_NOT_FOUND"));
     }
     assert!(source_ids(id).is_empty());
@@ -1941,6 +1988,405 @@ async fn original_manage_refusals_and_no_write_authorization_preserve_facts() {
         initial_jobs
     );
     assert_eq!(facts.get_source(source_id).unwrap(), foreign_before);
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn original_manage_interactive_unapproved_and_cancelled_leave_no_sources_or_jobs() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("original-manage-interactive");
+    let script = Arc::new(std::sync::Mutex::new(ManageProofScript::default()));
+    let (endpoint, upstream) = start_manage_model(script.clone()).await;
+    let state = boot_chat(&home, &endpoint).await;
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let notebook = state.knowledge().create_notebook("未批准不得写入").unwrap();
+    let id = notebook["id"].as_str().unwrap();
+    assert!(facts.list_notebook_sources(id).unwrap().is_empty());
+    let jobs_before = facts.list_ingestion_jobs(Some(id), None, 200).unwrap();
+    script.lock().unwrap().calls = vec![json!({
+        "action":"add","notebookId":id,"kind":"pasted_text","text":"UNAPPROVED_INTERACTIVE_BYTES"
+    })];
+    let server = serve(state.clone()).await;
+    let session = "original-manage-interactive";
+    create_manage_session(&server, session, "ask").await;
+    let path = format!("/lingxi/v1/sessions/{session}/execute");
+    {
+        let executing = server.request(
+            "POST",
+            &path,
+            Some(json!({"input":"管理工具必须等待批准，不能先写来源"})),
+        );
+        tokio::pin!(executing);
+        let waiting = async {
+            let deadline = std::time::Instant::now() + Duration::from_secs(10);
+            loop {
+                let run = state.storage().query_one_text(
+                "SELECT run_id FROM runs WHERE session_id=?1 AND status='waiting_approval' ORDER BY rowid DESC LIMIT 1",
+                vec![session.to_string()],
+            ).await.unwrap();
+                if let Some(run) = run {
+                    break run;
+                }
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "真实管理调用未进入持久审批等待"
+                );
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        };
+        let run_id = tokio::select! {
+            result = &mut executing => panic!("未经批准执行不应提前结束：{result:?}"),
+            run_id = waiting => run_id,
+        };
+        assert!(facts.list_notebook_sources(id).unwrap().is_empty());
+        assert_eq!(
+            facts.list_ingestion_jobs(Some(id), None, 200).unwrap(),
+            jobs_before
+        );
+        assert_eq!(
+            script.lock().unwrap().requests.len(),
+            2,
+            "描述后真实写调用等待审批，没有返回成功工具结果"
+        );
+        state.runs().cancel_run(&run_id, "取消尚未批准的知识写入");
+        let _ = tokio::time::timeout(Duration::from_secs(10), &mut executing)
+            .await
+            .unwrap();
+        assert_eq!(
+            state
+                .storage()
+                .query_one_text("SELECT status FROM runs WHERE run_id=?1", vec![run_id])
+                .await
+                .unwrap()
+                .as_deref(),
+            Some("cancelled")
+        );
+        assert!(facts.list_notebook_sources(id).unwrap().is_empty());
+        assert_eq!(
+            facts.list_ingestion_jobs(Some(id), None, 200).unwrap(),
+            jobs_before
+        );
+    }
+    script.lock().unwrap().requests.clear();
+    create_manage_session(&server, "original-manage-approved-control", "operate").await;
+    let (status, body) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/original-manage-approved-control/execute",
+            Some(json!({"input":"明确授权新增，同一管理参数作为批准正控"})),
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let recorded: Value = serde_json::from_str(&manage_result(
+        script.lock().unwrap().requests.last().unwrap(),
+        0,
+    ))
+    .unwrap();
+    assert_eq!(recorded["action"], "add");
+    assert_eq!(facts.list_notebook_sources(id).unwrap().len(), 1);
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(Some(id), None, 200)
+            .unwrap()
+            .len(),
+        1
+    );
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn original_manage_add_preserves_source_and_reports_background_index_failure_separately() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("original-manage-background-failure");
+    let script = Arc::new(std::sync::Mutex::new(ManageProofScript::default()));
+    let (endpoint, upstream) = start_manage_model(script.clone()).await;
+    let state = boot_chat_with_embedding(&home, &endpoint, true).await;
+    let notebook = state.knowledge().create_notebook("后台失败单列").unwrap();
+    let id = notebook["id"].as_str().unwrap();
+    script.lock().unwrap().calls = vec![json!({
+        "action":"add","notebookId":id,"kind":"pasted_text","text":"PERSISTED_DESPITE_INDEX_FAILURE"
+    })];
+    let server = serve(state).await;
+    create_manage_session(&server, "original-manage-background-failure", "operate").await;
+    let (status, body) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/original-manage-background-failure/execute",
+            Some(json!({"input":"导入原文，后台失败必须独立报告不能伪报索引完成"})),
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let imported: Value = serde_json::from_str(&manage_result(
+        script.lock().unwrap().requests.last().unwrap(),
+        0,
+    ))
+    .unwrap();
+    assert_eq!(imported["action"], "add");
+    let source_id = imported["sourceId"].as_str().unwrap();
+    assert_eq!(imported["source"]["parseArtifact"]["status"], "ready");
+    let failed = wait_until_job(&server, id, source_id, "failed").await;
+    assert_eq!(failed["sourceId"], source_id);
+    assert!(
+        failed
+            .to_string()
+            .contains("SYNTHETIC_BACKGROUND_EMBEDDING_FAILURE"),
+        "{failed}"
+    );
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    assert_eq!(facts.list_notebook_sources(id).unwrap().len(), 1);
+    let snapshot = facts.latest_snapshot_for_source(source_id).unwrap();
+    assert_eq!(
+        std::fs::read(home.join("knowledge").join(snapshot.storage_path)).unwrap(),
+        b"PERSISTED_DESPITE_INDEX_FAILURE"
+    );
+    let (status, listed) = server
+        .request("GET", "/lingxi/v1/knowledge/notebooks", None)
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    let reported = listed["notebooks"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["id"] == id)
+        .unwrap();
+    assert_eq!(reported["ingestion"]["failed"], 1);
+    assert_eq!(reported["ingestion"]["done"], 0);
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+async fn execute_file_product_tool(
+    server: &TestServer,
+    script: &Arc<std::sync::Mutex<ManageProofScript>>,
+    session: &str,
+    tool: &str,
+    arguments: Value,
+) -> String {
+    {
+        let mut script = script.lock().unwrap();
+        script.requests.clear();
+        script.tool = Some(tool.into());
+        script.calls = vec![arguments];
+    }
+    let (status, body) = server
+        .request(
+            "POST",
+            &format!("/lingxi/v1/sessions/{session}/execute"),
+            Some(json!({"input":"验证真实文件工具字节与会话文件登记，不伪报成功"})),
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    manage_result(script.lock().unwrap().requests.last().unwrap(), 0)
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn original_model_write_edit_register_real_session_products_and_update_metadata() {
+    let home = unique_dir("original-tool-file-products");
+    let script = Arc::new(std::sync::Mutex::new(ManageProofScript::default()));
+    let (endpoint, upstream) = start_manage_model(script.clone()).await;
+    let state = boot_chat(&home, &endpoint).await;
+    let server = serve(state.clone()).await;
+    let session = "original-tool-file-products";
+    create_manage_session(&server, session, "operate").await;
+    create_manage_session(&server, "other-tool-file-session", "operate").await;
+    let file = home.join("created-product.txt");
+    let written = execute_file_product_tool(
+        &server,
+        &script,
+        session,
+        "write",
+        json!({
+            "path":file, "content":"ORIGINAL_CHANGE"
+        }),
+    )
+    .await;
+    assert!(written.contains("Successfully wrote"), "{written}");
+    assert_eq!(std::fs::read(&file).unwrap(), b"ORIGINAL_CHANGE");
+    let files_path = format!("/lingxi/v1/sessions/{session}/files");
+    let (status, files) = server.request("GET", &files_path, None).await;
+    assert_eq!(status, 200, "{files}");
+    assert_eq!(files["files"].as_array().unwrap().len(), 1);
+    let registered = &files["files"][0];
+    assert_eq!(
+        registered["realPath"],
+        file.canonicalize().unwrap().to_str().unwrap()
+    );
+    assert_eq!(registered["sizeBytes"], 15);
+    assert_eq!(registered["origin"], "agent_artifact");
+    assert_eq!(registered["status"], "available");
+    let file_id = registered["fileId"].as_str().unwrap().to_string();
+    let (_, other) = server
+        .request(
+            "GET",
+            "/lingxi/v1/sessions/other-tool-file-session/files",
+            None,
+        )
+        .await;
+    assert!(other["files"].as_array().unwrap().is_empty());
+    let read =
+        execute_file_product_tool(&server, &script, session, "read", json!({"path":file})).await;
+    assert!(read.contains("ORIGINAL_CHANGE"), "{read}");
+    let edited = execute_file_product_tool(&server, &script, session, "edit", json!({
+        "path":file, "edits":[{"oldText":"ORIGINAL_CHANGE","newText":"REPLACED_WITH_LONGER_BODY"}]
+    })).await;
+    assert!(edited.contains("Successfully replaced"), "{edited}");
+    assert_eq!(std::fs::read(&file).unwrap(), b"REPLACED_WITH_LONGER_BODY");
+    let (_, after) = server.request("GET", &files_path, None).await;
+    assert_eq!(after["files"].as_array().unwrap().len(), 1);
+    assert_eq!(after["files"][0]["fileId"], file_id);
+    assert_eq!(after["files"][0]["sizeBytes"], 25);
+    let disk_mtime = std::fs::metadata(&file)
+        .unwrap()
+        .modified()
+        .unwrap()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as u64;
+    assert_eq!(after["files"][0]["mtimeMs"], disk_mtime);
+    let mismatch = execute_file_product_tool(
+        &server,
+        &script,
+        session,
+        "edit",
+        json!({
+            "path":file, "edits":[{"oldText":"MISSING_OLD_TEXT","newText":"MUST_NOT_WRITE"}]
+        }),
+    )
+    .await;
+    assert!(!mismatch.contains("Successfully replaced"), "{mismatch}");
+    assert_eq!(std::fs::read(&file).unwrap(), b"REPLACED_WITH_LONGER_BODY");
+    let (_, unchanged) = server.request("GET", &files_path, None).await;
+    assert_eq!(unchanged, after);
+    std::fs::write(&file, b"EXTERNAL_USER_CHANGE").unwrap();
+    let conflict = execute_file_product_tool(
+        &server,
+        &script,
+        session,
+        "write",
+        json!({
+            "path":file, "content":"MUST_NOT_OVERWRITE"
+        }),
+    )
+    .await;
+    assert!(!conflict.contains("Successfully wrote"), "{conflict}");
+    assert_eq!(std::fs::read(&file).unwrap(), b"EXTERNAL_USER_CHANGE");
+    let (_, refused) = server.request("GET", &files_path, None).await;
+    assert_eq!(refused, after);
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn original_model_file_registration_failure_reports_written_bytes_without_success() {
+    let home = unique_dir("original-tool-registration-failure");
+    let script = Arc::new(std::sync::Mutex::new(ManageProofScript::default()));
+    let (endpoint, upstream) = start_manage_model(script.clone()).await;
+    let state = boot_chat(&home, &endpoint).await;
+    let server = serve(state).await;
+    let session = "original-tool-registration-failure";
+    create_manage_session(&server, session, "operate").await;
+    let db = rusqlite::Connection::open(home.join("lingxi-service/data/runs.db")).unwrap();
+    db.execute_batch(
+        "CREATE TRIGGER r06_tool_file_registration_refused BEFORE INSERT ON session_files \
+         BEGIN SELECT RAISE(ABORT, 'actual_tool_registration_failure'); END;",
+    )
+    .unwrap();
+    let file = home.join("written-without-registration.txt");
+    let failed = execute_file_product_tool(
+        &server,
+        &script,
+        session,
+        "write",
+        json!({
+            "path":file, "content":"ACTUAL_WRITTEN_WITH_FAILED_REGISTRATION"
+        }),
+    )
+    .await;
+    assert!(
+        failed.contains("file write occurred but product registration failed"),
+        "{failed}"
+    );
+    assert!(
+        failed.contains("actual_tool_registration_failure"),
+        "{failed}"
+    );
+    assert!(!failed.contains("Successfully wrote"), "{failed}");
+    assert_eq!(
+        std::fs::read(&file).unwrap(),
+        b"ACTUAL_WRITTEN_WITH_FAILED_REGISTRATION"
+    );
+    let (_, files) = server
+        .request("GET", &format!("/lingxi/v1/sessions/{session}/files"), None)
+        .await;
+    assert!(files["files"].as_array().unwrap().is_empty());
+    db.execute_batch("DROP TRIGGER r06_tool_file_registration_refused")
+        .unwrap();
+    drop(db);
+    let read =
+        execute_file_product_tool(&server, &script, session, "read", json!({"path":file})).await;
+    assert!(
+        read.contains("ACTUAL_WRITTEN_WITH_FAILED_REGISTRATION"),
+        "{read}"
+    );
+    let retried = execute_file_product_tool(
+        &server,
+        &script,
+        session,
+        "write",
+        json!({
+            "path":file, "content":"RECOVERED_REGISTERED_CONTENT"
+        }),
+    )
+    .await;
+    assert!(retried.contains("Successfully wrote"), "{retried}");
+    assert_eq!(
+        std::fs::read(&file).unwrap(),
+        b"RECOVERED_REGISTERED_CONTENT"
+    );
+    let (_, files) = server
+        .request("GET", &format!("/lingxi/v1/sessions/{session}/files"), None)
+        .await;
+    assert_eq!(files["files"].as_array().unwrap().len(), 1);
+    assert_eq!(files["files"][0]["sizeBytes"], 28);
+    let registered_before = files.clone();
+    let db = rusqlite::Connection::open(home.join("lingxi-service/data/runs.db")).unwrap();
+    db.execute_batch(
+        "CREATE TRIGGER r06_tool_metadata_refused BEFORE UPDATE OF size_bytes ON session_files \
+         BEGIN SELECT RAISE(ABORT, 'actual_tool_metadata_failure'); END;",
+    )
+    .unwrap();
+    let failed_edit = execute_file_product_tool(&server, &script, session, "edit", json!({
+        "path":file, "edits":[{"oldText":"RECOVERED_REGISTERED_CONTENT","newText":"WRITTEN_EDIT_METADATA_FAILED"}]
+    })).await;
+    assert!(
+        failed_edit.contains("file write occurred but product registration failed"),
+        "{failed_edit}"
+    );
+    assert!(
+        failed_edit.contains("actual_tool_metadata_failure"),
+        "{failed_edit}"
+    );
+    assert!(
+        !failed_edit.contains("Successfully replaced"),
+        "{failed_edit}"
+    );
+    assert_eq!(
+        std::fs::read(&file).unwrap(),
+        b"WRITTEN_EDIT_METADATA_FAILED"
+    );
+    let (_, retained) = server
+        .request("GET", &format!("/lingxi/v1/sessions/{session}/files"), None)
+        .await;
+    assert_eq!(retained, registered_before);
+    db.execute_batch("DROP TRIGGER r06_tool_metadata_refused")
+        .unwrap();
+    drop(db);
     server.stop().await;
     upstream.abort();
     let _ = upstream.await;

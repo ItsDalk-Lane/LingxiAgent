@@ -1,5 +1,41 @@
 # R06-T03 会话树、重试、fork 与回退 — 实施报告
 
+> **现行会话生命周期补充（2026-10-13）**：置顶路由先检查会话归属，
+> 再读取该会话助手的原 `.deleted-agent.json` 标记；已删除助手置顶明确
+> 409 `agent_deleted`，取消置顶仍允许。标记存在即视为已删除，损坏标记
+> 不会重新启用助手；检查真实 IO 失败明确 500，不能当作未删除。
+> pin-order 只重排已置顶会话，不再通过 COALESCE 隐式创建置顶；
+> 混入未置顶会话返回 400，整个事务回滚，不能绕过已删助手限制。
+> 会话 memory GET/PATCH 同样拒绝已删除助手；归档会话返回 403，
+> 仅活动会话可读写开关。存储写事务内再次检查归档状态，不靠路由预检
+> 冒充原子生命周期保护。布尔保存、真实重启读回、跨主体拒绝、损坏标记、
+> 真正不可读目录/缺表及触发器写失败均由正式 HTTP 证明覆盖。
+> 实现见 [正式路由](../../../rust/crates/lingxi-service/src/lib.rs)、
+> [管理存储](../../../rust/crates/lingxi-adapters/src/storage/session_admin.rs)、
+> [原会话证明](../../../rust/crates/lingxi-service/tests/r06_original_session_proofs.rs)。
+> 此补充不宣称助手删除/恢复完整入口、UI 或阶段通过。
+
+> **现行输入框草稿补充（2026-10-13）**：正式
+> `GET /lingxi/v1/input-drafts?surface=electron|pwa` 及
+> `PUT /lingxi/v1/input-drafts` 使用原 `input-drafts.v1.json`
+> 格式。主页保持原已认证主体共享的实例级 surface 槽；会话草稿按稳定
+> `sessionId` 写入并额外遵循会话归属，GET 不披露其他主体会话。
+> 空白文本仅删除选中项，存储失败不更新内存缓存或伪报成功。
+> 并发写互斥，512K 文本/文档取舍和 200 会话淘汰显式回报；
+> 不允许借淘汰删除他人草稿。损坏/未知版本文件保留原字节并显式失败，
+> 不沿用旧实现的空重建；无效 text/doc 严格拒绝，不转换成删除。
+> `sessionPath` 缺少当前 Rust 路径身份登记，明确 400；该原叶保持 GAP。
+> 未宣告工作台永久删除、UI hydrate 或阶段通过。
+
+> **现行归档列表补充（2026-10-13）**：正式
+> `GET /lingxi/v1/sessions/archived` 返回各助手归档的 `firstMessage`，
+> 从真实最早可见用户输入读取，按 100 UTF16 单元截短且不拆 Unicode
+> 标量。内部 reminder/reference/knowledge 包裹不进入列表；读取不改历史。
+> 归属过滤保持原状，坏历史/存储错误显式失败，清理用的元数据读取不增加
+> 消息历史依赖。实际 HTTP 正反证明、42 项耦合服务及 18 项存储回归通过，
+> 证据见 [当前交接](repair-current/AR_HANDOFF.md)。此补充及下方历史数字
+> 均不构成当前完整 R06/R07 验收。
+
 - TASK_ID: R06-T03
 - TASK_BASE_SHA: `4920c59e38ddf69c8b846fb1aea896fca70d939d`（分支 `codex/rust-tauri-migration`）
 - 验收 ID: R06-A05（fork 不串写）、R06-A06（rewind 不覆盖外部修改）
@@ -101,6 +137,20 @@ D1-D6 + 附带显式新增（skippedBusy/childCount/LIKE 免疫），逐条现�
 ---
 
 ## 十四、REPAIR-R1（2026-10-09；R1 独立评审 FAIL 后的同根因修复）
+
+> 2026-10-13 继续修复补充：正式服务已提供
+> `GET/PUT /lingxi/v1/sessions/workspace-rollback`（原 `chat` scope），
+> 将严格布尔值保存到 `user/preferences.json` 的 `rollback_file_changes`；
+> 默认关闭，保留其他字段，并发写入串行，保存成功后才更新 retry/rewind 的实际开关，
+> 重启读取磁盘值。PUT 本身不恢复文件、不改分支或快照。无效输入返回 400，
+> 缺凭证/权限返回 401/403，存储损坏或失败返回 500；损坏配置启动明确失败。
+> 同时修复 rewind 输出及持久化收据丢失 `fileRestoreReason`：
+> 不确定写入保留 `write_may_have_occurred` 及恢复对象，并原样幂等重放。
+> 实现见 [服务路由](../../../rust/crates/lingxi-service/src/lib.rs)、
+> [偏好存储](../../../rust/crates/lingxi-service/src/memory.rs)、
+> [回退收据](../../../rust/crates/lingxi-service/src/session_tree.rs)；
+> 最新继续修复的状态及证据见 [交接记录](./repair-current/AR_HANDOFF.md)。
+> 本补充不提升 R06/R07 状态，也不将以下历史验收数字当成现行候选验收。
 
 > 本章为追加记录：第一至十三章为初版候选原样保留（其中 §十 D1 的 rewind 语义与
 > §十三「仅存哈希不存内容」风险行已被本章 D7 语义取代，原文不删、以本章为准）。

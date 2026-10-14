@@ -12,6 +12,13 @@
 //!   绝不静默当作首页。
 //! - `all=1`：服务端逐页遍历到底后一次返回（与客户端逐页前插装配逐项
 //!   一致——同一分页路径，`export_equals_paged_concat` 锁定）。
+//! - `reconciliation=1`（现役 sessions.ts:1405-1432 的端口映射）：严格证据
+//!   等级读取——内容读取前后采样活动运行，页尾附 `reconciliation`
+//!   证明块（runRevision / complete / runStatus：unknown|running|
+//!   reconciled_idle），不参与条件 GET（现役 E01 304 资格同口径）。
+//! - 每页附现役 `/sessions/messages` 契约的待办与修订投影：`todos` /
+//!   `todoPanel`（与 todos 面板读同一存储快照）与 `revision`（与 ETag
+//!   同源字符串）。
 //! - ETag `"r{headRevision}-e{eventRevision}"`：无游标请求携带匹配 If-None-Match → 304；
 //!   分支头或真实审计事件推进即失效。条件判定先于消息读取（索引定位）。
 //! - 归属闸与会话读相同：未知会话 404、跨主体 403（先于一切参数后的
@@ -24,6 +31,12 @@ use axum::extract::{Path, RawQuery, State};
 use axum::http::{HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+
+// R06 C2 块（会话历史与内容读取缺失路由）的实现模块。模块声明挂在这里
+// 而不是 lib.rs（沿用 agents_admin.rs 对 agent_config_readback.rs 的既有
+// #[path] 模式）：lib.rs 的路由注册由主控统一收口，本模块的处理器为 pub。
+#[path = "history_content.rs"]
+pub mod history_content;
 
 use lingxi_adapters::storage::canonical_message_store as cms;
 use lingxi_adapters::storage::session_tree::MessageRow;
@@ -62,6 +75,8 @@ pub async fn session_history_route(
     }
     let db = Arc::clone(state.storage());
     // ETag 条件请求（仅无游标入口；游标页是历史切片，不做条件化）。
+    // 现役 E01 304 资格：all / reconciliation 分支不参与条件 GET——它们
+    // 是严格证据等级读取（全量投影/协调证明），不是可复用缓存页。
     let head_revision = match cms::read_branch_head_revision(&db, &session_id).await {
         Ok(revision) => revision,
         Err(err) => return storage_error_response(&err),
@@ -71,9 +86,23 @@ pub async fn session_history_route(
         Err(err) => return storage_error_response(&err),
     };
     let etag = etag_of(head_revision, event_revision);
-    if params.before.is_none() && if_none_match_matches(&headers, &etag) {
+    if params.before.is_none()
+        && !params.all
+        && !params.reconciliation
+        && if_none_match_matches(&headers, &etag)
+    {
         return not_modified_response(&etag);
     }
+    // reconciliation=1 的前置运行快照（I12 严格证据等级：内容读取前采样
+    // 活动运行；与读取后的二次采样对比得出 runStatus）。
+    let runs_before = if params.reconciliation {
+        match sample_active_runs(&state, &session_id).await {
+            Ok(sample) => Some(sample),
+            Err(err) => return err,
+        }
+    } else {
+        None
+    };
     if params.all {
         let (messages, head_revision) =
             match cms::read_full_branch(&db, &session_id, MAX_HISTORY_LIMIT).await {
@@ -84,7 +113,8 @@ pub async fn session_history_route(
             Ok(items) => items,
             Err(err) => return storage_error_response(&err),
         };
-        return page_response(
+        return history_page_response(
+            &state,
             session_id,
             head_revision,
             items,
@@ -95,7 +125,9 @@ pub async fn session_history_route(
                 has_more: false,
                 next_before: None,
             },
-        );
+            runs_before.zip(Some(true)),
+        )
+        .await;
     }
     let page = match cms::read_branch_page(&db, &session_id, params.before, params.limit).await {
         Ok(page) => page,
@@ -106,7 +138,9 @@ pub async fn session_history_route(
         Ok(items) => items,
         Err(err) => return storage_error_response(&err),
     };
-    page_response(
+    let page_complete = !page.has_more;
+    history_page_response(
+        &state,
         session_id,
         head_revision,
         items,
@@ -116,7 +150,33 @@ pub async fn session_history_route(
             has_more: page.has_more,
             next_before: page.next_before.map(|cursor| cursor.encode()),
         },
+        runs_before.zip(Some(page_complete)),
     )
+    .await
+}
+
+/// reconciliation 采样的最小运行快照（内容读取前后各一次）。
+struct RunSample {
+    /// 该会话当前是否存在活动运行（queued/running/waiting_approval/
+    /// cancelling —— 与 run 库活动行同口径）。
+    active: bool,
+    /// 采样时的修订点（分支头 revision）。
+    revision: u64,
+}
+
+/// 读取该会话当前的活动运行 + 分支头修订（reconciliation 前后采样）。
+#[allow(clippy::result_large_err)] // 同 gate_session 的响应直携纪律。
+async fn sample_active_runs(state: &ServiceState, session_id: &str) -> Result<RunSample, Response> {
+    let runs = state
+        .storage()
+        .list_active_runs()
+        .await
+        .map_err(|err| EndpointError::storage(&err).into_response())?;
+    let active = runs.iter().any(|run| run.session_id == session_id);
+    let revision = cms::read_branch_head_revision(state.storage(), session_id)
+        .await
+        .map_err(|err| EndpointError::storage(&err).into_response())?;
+    Ok(RunSample { active, revision })
 }
 
 /// `GET /lingxi/v1/sessions/{session_id}/export` — 全量导出（全局链序
@@ -175,14 +235,18 @@ struct HistoryParams {
     before: Option<HistoryCursor>,
     limit: u32,
     all: bool,
+    /// 现役 `reconciliation=1`（sessions.ts:1405）：严格证据等级读取——
+    /// 前后采样活动运行并返回 reconciliation 证明块，不参与条件 GET。
+    reconciliation: bool,
 }
 
-/// 严格查询解析：只认 before/limit/all，重复或未知键一律 400
+/// 严格查询解析：只认 before/limit/all/reconciliation，重复或未知键一律 400
 /// （镜像 events 页的闭合查询纪律）。
 fn parse_history_query(query: &str) -> Result<HistoryParams, EndpointError> {
     let mut before: Option<HistoryCursor> = None;
     let mut limit: Option<u32> = None;
     let mut all = false;
+    let mut reconciliation = false;
     for (key, value) in parse_query_pairs(query) {
         match key.as_str() {
             "before" => {
@@ -221,6 +285,19 @@ fn parse_history_query(query: &str) -> Result<HistoryParams, EndpointError> {
                 }
                 all = true;
             }
+            "reconciliation" => {
+                if reconciliation {
+                    return Err(EndpointError::invalid_message(
+                        "duplicate reconciliation query parameter",
+                    ));
+                }
+                if value != "1" {
+                    return Err(EndpointError::invalid_message(
+                        "reconciliation accepts only the value 1",
+                    ));
+                }
+                reconciliation = true;
+            }
             other => {
                 return Err(EndpointError::invalid_message(format!(
                     "unknown query parameter {other:?}"
@@ -232,6 +309,7 @@ fn parse_history_query(query: &str) -> Result<HistoryParams, EndpointError> {
         before,
         limit: limit.unwrap_or(DEFAULT_HISTORY_LIMIT),
         all,
+        reconciliation,
     })
 }
 
@@ -353,21 +431,75 @@ fn not_modified_response(etag: &str) -> Response {
     response
 }
 
-fn page_response(
+/// 历史页响应构造：统一 `HistoryPage`（schema 化主体）+ 现役
+/// `/sessions/messages` 契约的补充投影字段（R06-R2 原义补全）——
+/// `revision`（修订点，与 ETag 同材料）、`todos` / `todoPanel`
+/// （待办投影，与 todos 面板读同一存储快照）、以及 `reconciliation=1`
+/// 时的协调证明块（runRevision / complete / runStatus）。
+///
+/// 这些字段是**附加键**：主体仍是 schema 化 HistoryPage（deny_unknown_fields
+/// 只约束反序列化路径，不影响本响应的 JSON 附加字段）；值断言经
+/// serde_json::Value 读取不受影响。
+async fn history_page_response(
+    state: &ServiceState,
     session_id: String,
     head_revision: u64,
     items: Vec<HistoryItem>,
     etag: &str,
     page: HistoryPageMeta,
+    reconciliation: Option<(RunSample, bool)>,
 ) -> Response {
     let body = HistoryPage {
         schema_version: CANONICAL_HISTORY_SCHEMA.to_string(),
-        session_id,
+        session_id: session_id.clone(),
         head_revision,
         items,
         page,
     };
-    let mut response = (StatusCode::OK, Json(body)).into_response();
+    let mut value = serde_json::to_value(&body).expect("HistoryPage serialization is infallible");
+    let object = value
+        .as_object_mut()
+        .expect("HistoryPage serializes to an object");
+    // 修订点（现役 revision：客户端缓存对比材料；这里 = ETag 同源字符串）。
+    object.insert(
+        "revision".into(),
+        serde_json::Value::String(etag.to_string()),
+    );
+    // 待办投影（与 GET /sessions/todos 同一存储读取，读取失败不静默降级）。
+    let todos_projection = match crate::todos::latest_todo_snapshot(state, &session_id).await {
+        Ok(snapshot) => snapshot,
+        Err(response) => return response,
+    };
+    let panel = crate::todos::panel_from_snapshot(todos_projection.as_ref());
+    let todos = panel.get("todos").cloned().unwrap_or(serde_json::json!([]));
+    object.insert("todoPanel".into(), panel);
+    object.insert("todos".into(), todos);
+    if let Some((before, page_complete)) = reconciliation {
+        let after = match sample_active_runs(state, &session_id).await {
+            Ok(sample) => sample,
+            Err(response) => return response,
+        };
+        // 现役 runStatus 口径（sessions.ts:1427-1432 的端口映射）：
+        // 页不完整或读取期间修订推进 → unknown（宁缺勿假）；任一采样见
+        // 活动运行 → running；前后均 idle 且修订稳定 → reconciled_idle。
+        let run_status = if !page_complete || before.revision != after.revision {
+            "unknown"
+        } else if before.active || after.active {
+            "running"
+        } else {
+            "reconciled_idle"
+        };
+        object.insert(
+            "reconciliation".into(),
+            serde_json::json!({
+                "sessionId": session_id,
+                "runRevision": after.revision.to_string(),
+                "complete": page_complete,
+                "runStatus": run_status,
+            }),
+        );
+    }
+    let mut response = (StatusCode::OK, Json(value)).into_response();
     set_etag(&mut response, etag);
     response
 }

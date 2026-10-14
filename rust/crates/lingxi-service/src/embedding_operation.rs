@@ -608,6 +608,15 @@ impl OperationService {
         receipt: &Value,
         runtime: Option<&EmbeddingCallRuntime>,
     ) -> Result<(), OperationFailure> {
+        // 取消发生在任何传输尝试之前：没有可能已付费的字节，也不写 unknown
+        // 费用行——等待真实发生、归属由调用方错误与作业统计保留（W09 C02
+        // 配额等待取消；真正上过线路的取消/中断仍如实记 unknown）。
+        if receipt["outcome"] == "cancelled"
+            && receipt["transportAttempts"].as_u64() == Some(0)
+            && receipt["knownNotSent"] == true
+        {
+            return Ok(());
+        }
         let Some(sink) = &self.usage_sink else {
             return Ok(());
         };
@@ -1152,6 +1161,15 @@ impl OperationService {
                     && !interrupted["responseStatus"]
                         .as_u64()
                         .is_some_and(|status| (300..=599).contains(&status)));
+            // 跨 claim 的旧 attempt 未确认调用：旧进程/旧驱动已经退出或被 join
+            // （claim 互斥同时保证旧物理 IO 已结束），迟到响应无法再提交，其
+            // unknown 账目已在下方结算并归档；新 attempt 以全新 call identity
+            // 补缺口，不是同一调用的自动重发。同 attempt 内仍拒绝自动重发。
+            let prior_attempt_closed = unconfirmed_paid
+                && runtime.ownership.attempt.is_some()
+                && interrupted["ownership"]["attempt"]
+                    .as_str()
+                    .is_some_and(|prior| Some(prior) != runtime.ownership.attempt.as_deref());
             if interrupted["state"] == "inflight" {
                 interrupted["state"] = json!("interrupted");
                 interrupted["outcome"] = json!("unknown");
@@ -1189,7 +1207,7 @@ impl OperationService {
                 .await?;
                 return Err(internal("embedding rejected response retained; a new explicitly authorized manual attempt is required"));
             }
-            if unconfirmed_paid {
+            if unconfirmed_paid && !prior_attempt_closed {
                 // 已发但无成功结果凭据，原计费不可确认，不能自动再付一次。
                 self.save_journal(
                     &path,

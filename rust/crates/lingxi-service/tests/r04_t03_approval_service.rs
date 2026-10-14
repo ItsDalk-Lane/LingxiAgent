@@ -43,7 +43,6 @@ use std::pin::Pin;
 use std::sync::Arc;
 
 use lingxi_kernel::model_exchange::ModelTurnInput;
-use lingxi_kernel::ports::DelegationRequest;
 use lingxi_kernel::ports::{
     ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolExecutionResult,
     ToolExecutorPort, ToolRequest, TurnDeltaSink, TurnProviderPort,
@@ -360,20 +359,13 @@ fn tool_request(target: &str, args: serde_json::Value) -> ProviderTurn {
 }
 
 fn delegation_request(task: &str, access: Option<&str>) -> ProviderTurn {
-    let mut request = ToolRequest::from_effective_arguments(
-        "tool:first-party:subagent",
-        json!({"task": task}),
-        &budget(),
-    )
-    .expect("delegation request builds");
-    request = request.with_delegation(DelegationRequest {
-        task: task.to_string(),
-        access: lingxi_kernel::subagent::AccessRequest::parse(access),
-        label: None,
-        agent_id: None,
-        model: None,
-        thread_id: None,
-    });
+    let mut arguments = json!({"task": task});
+    if let Some(access) = access {
+        arguments["access"] = json!(access);
+    }
+    let request =
+        ToolRequest::from_effective_arguments("tool:first-party:subagent", arguments, &budget())
+            .expect("delegation request builds");
     ProviderTurn::ToolRequests {
         content: Vec::new(),
         requests: vec![request],

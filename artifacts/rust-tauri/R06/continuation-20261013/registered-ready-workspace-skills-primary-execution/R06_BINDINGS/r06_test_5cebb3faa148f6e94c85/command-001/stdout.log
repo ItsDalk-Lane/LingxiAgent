@@ -1,0 +1,15 @@
+
+running 1 test
+test original_revision_detail_reads_current_live_and_restore_keeps_agent_scope ... ok
+
+successes:
+
+---- original_revision_detail_reads_current_live_and_restore_keeps_agent_scope stdout ----
+LINGXI_AUTH_REJECTED request_id="req-c2993711c4730f3207131df0670a9b1e" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:49516
+
+
+successes:
+    original_revision_detail_reads_current_live_and_restore_keeps_agent_scope
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 2.51s
+

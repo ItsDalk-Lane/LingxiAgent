@@ -1,0 +1,19 @@
+
+running 1 test
+test stage_files_gateway_only_delivers_real_authorized_session_files ... ok
+
+successes:
+
+---- stage_files_gateway_only_delivers_real_authorized_session_files stdout ----
+LINGXI_AUTH_REJECTED request_id="req-b4df2a6e518577f2989e6c30e1c3a3f0" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:51962
+LINGXI_AUTH_REJECTED request_id="req-982a26c31d3b2a55d06d37d29bfb06bb" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:51963
+LINGXI_AUTH_REJECTED request_id="req-58ddf11f21d61f690d5a3e83b6d1ac99" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:51965
+LINGXI_AUTH_REJECTED request_id="req-cdae5a4368f1569b3796d4492a311e22" method=HEAD [token] status=403 reason=insufficient_scope remote=127.0.0.1:51968
+LINGXI_AUTH_REJECTED request_id="req-cc5dc840aed489af7eeb2e36ef5c12ee" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:51969
+
+
+successes:
+    stage_files_gateway_only_delivers_real_authorized_session_files
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 6.23s
+

@@ -1,0 +1,64 @@
+{
+  "status": "EXECUTED_ORIGINAL_PROOFS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "review": [
+    {
+      "id": "R00-T02-LA-081FACA79F2C",
+      "original": {
+        "then": "text 为空使对应 home/session 草稿删除",
+        "assertions": [
+          "成功：清空草稿后，text 为空使对应 home/session 草稿删除",
+          "边界：清理仅限选定 surface 与作用域；拒绝时目标状态不变"
+        ],
+        "gaps": [
+          "text 为空使对应 home/session 草稿删除",
+          "清理仅限选定 surface 与作用域",
+          "拒绝时目标状态不变"
+        ]
+      },
+      "status": "READY"
+    },
+    {
+      "id": "R00-T02-LA-1B712E189DDF",
+      "original": {
+        "then": "返回指定 surface 的全部 home/会话草稿",
+        "assertions": [
+          "成功：执行“读取输入框草稿”后，返回指定 surface 的全部 home/会话草稿",
+          "拒绝/边界：query.surface 必须可规范化；不应错误扩大写入或披露范围"
+        ],
+        "gaps": [
+          "返回指定 surface 的全部 home/会话草稿",
+          "query.surface 必须可规范化",
+          "不应错误扩大写入或披露范围"
+        ]
+      },
+      "status": "READY"
+    },
+    {
+      "id": "R00-T02-LA-F829AEA5931C",
+      "original": {
+        "then": "在 surface 的 home 槽保存 text/doc/updatedAt",
+        "assertions": [
+          "成功：保存主页草稿后，在 surface 的 home 槽保存 text/doc/updatedAt",
+          "边界：scope=home 且 text 非空；拒绝时目标状态不变"
+        ],
+        "gaps": [
+          "在surface的home槽保存text/doc/updatedAt",
+          "scope=home且text非空",
+          "拒绝时目标状态不变"
+        ]
+      },
+      "status": "READY"
+    }
+  ],
+  "logs": [
+    "input-drafts-coupled-final-r2.log",
+    "input-drafts-route-policy.log",
+    "input-drafts-workspace-clippy-final.log"
+  ],
+  "coupledTestsPassed": 45,
+  "routePolicyTestsPassed": 1,
+  "intentionalExplicitFailures": "Corrupt/version/unreadable storage fails instead of silent rebuild; incompatible body fields reject400 rather than deleting on invalid input.",
+  "homeScope": "Preserves original authenticated instance-wide home per surface; session entries additionally honor current server ownership.",
+  "sessionPathLeaf": "GAP: no registered persistent path locator exists in current Rust session architecture.",
+  "stageAcceptance": false
+}

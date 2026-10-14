@@ -14,8 +14,8 @@ use lingxi_kernel::ports::{
 };
 use lingxi_protocol::{ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError};
 use lingxi_service::{
-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
-    prepare_layout, run,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
+    ServiceError, ServiceState,
 };
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
@@ -139,6 +139,10 @@ fn synthetic_home(tag: &str) -> PathBuf {
 
 async fn start_server(tag: &str, provider: Arc<ScriptedProvider>) -> TestServer {
     let home = synthetic_home(tag);
+    start_server_at(tag, home, provider).await
+}
+
+async fn start_server_at(tag: &str, home: PathBuf, provider: Arc<ScriptedProvider>) -> TestServer {
     let layout = prepare_layout(&home).expect("prepare layout");
     let home = home.canonicalize().unwrap();
     let workspace = home.join("workspace");
@@ -201,7 +205,7 @@ impl TestServer {
         format!("Bearer {}", self.token)
     }
 
-    async fn stop_and_clean(self) {
+    async fn stop_and_retain(self) -> PathBuf {
         self.stop.send(()).expect("server still listening");
         tokio::time::timeout(Duration::from_secs(10), self.handle)
             .await
@@ -211,8 +215,14 @@ impl TestServer {
         if let Ok(root) = std::env::var("LINGXI_W03_EVIDENCE") {
             std::fs::write(PathBuf::from(root).join(format!("original-t03-exit-{}.json",self.addr.port())),
                 serde_json::to_vec_pretty(&serde_json::json!({"actual_home":self.home,"actual_db":self.state.storage().db_path(),"actual_serve_task_exited":true,"home_retained_local_only":true})).unwrap()).unwrap();
-        } else {
-            let _ = std::fs::remove_dir_all(&self.home);
+        }
+        self.home
+    }
+
+    async fn stop_and_clean(self) {
+        let home = self.stop_and_retain().await;
+        if std::env::var("LINGXI_W03_EVIDENCE").is_err() {
+            let _ = std::fs::remove_dir_all(home);
         }
     }
 
@@ -722,6 +732,1163 @@ async fn original_rewind_preview_reports_anchor_and_files_without_writing_any_st
 }
 
 #[tokio::test]
+async fn original_input_drafts_concurrent_updates_and_actual_caps_preserve_other_owners() {
+    let server = start_server("original-input-drafts-caps", ScriptedProvider::new(vec![])).await;
+    for id in ["draft-concurrent-a", "draft-concurrent-b", "draft-cap-new"] {
+        create_session(&server, id, id).await;
+    }
+    let barrier = Arc::new(tokio::sync::Barrier::new(3));
+    let mut handles = Vec::new();
+    for id in ["draft-concurrent-a", "draft-concurrent-b"] {
+        let barrier = barrier.clone();
+        let addr = server.addr;
+        let bearer = server.bearer();
+        handles.push(tokio::spawn(async move {
+            barrier.wait().await;
+            http(
+                &addr,
+                "PUT",
+                "/lingxi/v1/input-drafts",
+                &[("Authorization", &bearer)],
+                Some(
+                    &serde_json::json!({"surface":"electron","sessionId":id,"text":id}).to_string(),
+                ),
+            )
+            .await
+        }));
+    }
+    barrier.wait().await;
+    for handle in handles {
+        let (status, body) = handle.await.unwrap();
+        assert_eq!(status, 200, "{body}");
+    }
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 200, "{body}");
+    let concurrent: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(
+        concurrent["sessions"]["draft-concurrent-a"]["text"],
+        "draft-concurrent-a"
+    );
+    assert_eq!(
+        concurrent["sessions"]["draft-concurrent-b"]["text"],
+        "draft-concurrent-b"
+    );
+    let big_doc = serde_json::json!({"surface":"pwa","scope":"home","text":"文本必须保留","doc":{"content":"d".repeat(512*1024)}});
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &server.bearer())],
+        Some(&big_doc.to_string()),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let adjusted: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(adjusted["docDropped"], true);
+    assert_eq!(adjusted["textTruncated"], false);
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=pwa").await;
+    assert_eq!(status, 200, "{body}");
+    let pwa: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(pwa["home"]["text"], "文本必须保留");
+    assert!(pwa["home"].get("doc").is_none());
+    let big_text = serde_json::json!({"surface":"pwa","scope":"home","text":format!("{}😀suffix","x".repeat(512*1024-1))});
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &server.bearer())],
+        Some(&big_text.to_string()),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["textTruncated"],
+        true
+    );
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=pwa").await;
+    assert_eq!(status, 200, "{body}");
+    let pwa: serde_json::Value = serde_json::from_str(&body).unwrap();
+    let truncated = pwa["home"]["text"].as_str().unwrap();
+    assert_eq!(truncated, "x".repeat(512 * 1024 - 1));
+    assert!(truncated.encode_utf16().count() <= 512 * 1024);
+    let path = server.home.join("input-drafts.v1.json");
+    let foreign = server.mint_device_token("draft-cap-foreign").await;
+    let foreign_bearer = format!("Bearer {foreign}");
+    let (status, body) = http(
+        &server.addr,
+        "POST",
+        "/lingxi/v1/sessions",
+        &[("Authorization", &foreign_bearer)],
+        Some(
+            r#"{"sessionId":"draft-foreign-new","agentId":"foreign-agent","title":"外国主体草稿"}"#,
+        ),
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    let mut slots = serde_json::Map::new();
+    // Prepare200 real stored sessions without spending the HTTP test's request budget.
+    for i in 0..200 {
+        let id = format!("draft-cap-{i:03}");
+        lingxi_adapters::storage::session_admin::create_session(
+            server.state.storage(),
+            &id,
+            "agent",
+            "draft-root-owner",
+            &id,
+            None,
+            &[],
+            true,
+            1,
+        )
+        .await
+        .unwrap();
+        slots.insert(
+            id,
+            serde_json::json!({"text":format!("已保存{i}"),"updatedAt":i+1}),
+        );
+    }
+    let seeded = serde_json::json!({"version":1,"surfaces":{"electron":{"home":null,"sessions":slots},"pwa":pwa}});
+    std::fs::write(&path, serde_json::to_vec(&seeded).unwrap()).unwrap();
+    let before = std::fs::read(&path).unwrap();
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &foreign_bearer)],
+        Some(r#"{"surface":"electron","sessionId":"draft-foreign-new","text":"不准淘汰他人"}"#),
+    )
+    .await;
+    assert_eq!(status, 400, "{body}");
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"surface":"electron","sessionId":"draft-cap-new","text":"新增并淘汰最旧"}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["evictedSessionIds"],
+        serde_json::json!(["draft-cap-000"])
+    );
+    let saved: serde_json::Value = serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+    assert_eq!(
+        saved["surfaces"]["electron"]["sessions"]
+            .as_object()
+            .unwrap()
+            .len(),
+        200
+    );
+    assert!(saved["surfaces"]["electron"]["sessions"]
+        .get("draft-cap-000")
+        .is_none());
+    assert_eq!(
+        saved["surfaces"]["electron"]["sessions"]["draft-cap-new"]["text"],
+        "新增并淘汰最旧"
+    );
+    assert_eq!(saved["surfaces"]["pwa"], pwa);
+    println!(
+        "{}",
+        serde_json::json!({"concurrentBarrierWritesPreserved":true,"actualEntryUnitLimit":512*1024,"explicitDocDropAndTextTruncation":true,"noSplitScalar":true,"actual200SlotLimit":true,"oldestOwnedEvicted":true,"foreignEvictionRejectedWithoutWrite":true,"otherSurfacePreserved":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_input_drafts_persist_home_and_sessions_per_surface_and_delete_only_target() {
+    let server = start_server("original-input-drafts", ScriptedProvider::new(vec![])).await;
+    for sid in ["draft-a", "draft-b"] {
+        create_session(&server, sid, sid).await;
+    }
+    let doc =
+        serde_json::json!({"type":"doc","content":[{"type":"paragraph","text":"富文本草稿"}]});
+    for body in [
+        serde_json::json!({"surface":"electron","scope":"home","text":"桌面主页","doc":doc}),
+        serde_json::json!({"surface":"pwa","scope":"home","text":"手机主页"}),
+        serde_json::json!({"surface":"electron","sessionId":"draft-a","text":"会话A"}),
+        serde_json::json!({"surface":"electron","sessionId":"draft-b","text":"会话B"}),
+        serde_json::json!({"surface":"pwa","sessionId":"draft-a","text":"手机会话A"}),
+    ] {
+        let (status, result) = http(
+            &server.addr,
+            "PUT",
+            "/lingxi/v1/input-drafts",
+            &[("Authorization", &server.bearer())],
+            Some(&body.to_string()),
+        )
+        .await;
+        assert_eq!(status, 200, "{result}");
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&result).unwrap()["ok"],
+            true
+        );
+    }
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 200, "{body}");
+    let before: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(before["home"]["text"], "桌面主页");
+    assert_eq!(before["home"]["doc"], doc);
+    assert!(before["home"]["updatedAt"].as_u64().unwrap() > 0);
+    assert_eq!(before["sessions"]["draft-a"]["text"], "会话A");
+    assert_eq!(before["sessions"]["draft-b"]["text"], "会话B");
+    assert_eq!(before["sessions"].as_object().unwrap().len(), 2);
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=%70wa").await;
+    assert_eq!(status, 200, "{body}");
+    let pwa: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(pwa["home"]["text"], "手机主页");
+    assert_eq!(pwa["sessions"]["draft-a"]["text"], "手机会话A");
+    assert_eq!(pwa["sessions"].as_object().unwrap().len(), 1);
+    let path = server.home.join("input-drafts.v1.json");
+    let disk = std::fs::read(&path).unwrap();
+    let disk_json: serde_json::Value = serde_json::from_slice(&disk).unwrap();
+    assert_eq!(disk_json["version"], 1);
+    assert_eq!(disk_json["surfaces"]["electron"], before);
+    assert_eq!(disk_json["surfaces"]["pwa"], pwa);
+    let home = server.stop_and_retain().await;
+    let server = start_server_at(
+        "original-input-drafts-restart",
+        home,
+        ScriptedProvider::new(vec![]),
+    )
+    .await;
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+        before
+    );
+    assert_eq!(std::fs::read(&path).unwrap(), disk, "读取/重启不重写草稿");
+    for body in [
+        serde_json::json!({"surface":"electron","scope":"home","text":""}),
+        serde_json::json!({"surface":"electron","sessionId":"draft-a","text":" \n\t"}),
+    ] {
+        let (status, response) = http(
+            &server.addr,
+            "PUT",
+            "/lingxi/v1/input-drafts",
+            &[("Authorization", &server.bearer())],
+            Some(&body.to_string()),
+        )
+        .await;
+        assert_eq!(status, 200, "{response}");
+    }
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 200, "{body}");
+    let cleared: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert!(cleared["home"].is_null());
+    assert!(cleared["sessions"].get("draft-a").is_none());
+    assert_eq!(
+        cleared["sessions"]["draft-b"],
+        before["sessions"]["draft-b"]
+    );
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=pwa").await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+        pwa
+    );
+    let cleared_disk = std::fs::read(&path).unwrap();
+    let home = server.stop_and_retain().await;
+    let server = start_server_at(
+        "original-input-drafts-cleared-restart",
+        home,
+        ScriptedProvider::new(vec![]),
+    )
+    .await;
+    let (status, body) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+        cleared
+    );
+    assert_eq!(std::fs::read(path).unwrap(), cleared_disk);
+    println!(
+        "{}",
+        serde_json::json!({"originalLeaves":["R00-T02-LA-081FACA79F2C","R00-T02-LA-1B712E189DDF","R00-T02-LA-F829AEA5931C"],"twoRealRestarts":true,"textDocUpdatedAt":true,"exactSurfaceBuckets":true,"readDoesNotWrite":true,"emptyAndWhitespaceDeleteOnlyTarget":true,"otherSessionSurfaceUnchanged":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_input_drafts_reject_bad_scope_and_authorization_and_preserve_failed_storage() {
+    let server = start_server(
+        "original-input-drafts-errors",
+        ScriptedProvider::new(vec![]),
+    )
+    .await;
+    create_session(&server, "draft-owned", "受保护草稿").await;
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"surface":"electron","sessionId":"draft-owned","text":"必须保留"}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let path = server.home.join("input-drafts.v1.json");
+    let before = std::fs::read(&path).unwrap();
+    for query in [
+        "",
+        "?surface=invalid",
+        "?surface=Electron",
+        "?surface=electron&surface=pwa",
+        "?surface=electron&unexpected=true",
+    ] {
+        let (status, body) = server.get(&format!("/lingxi/v1/input-drafts{query}")).await;
+        assert_eq!(status, 400, "{body}");
+        assert!(serde_json::from_str::<serde_json::Value>(&body)
+            .unwrap()
+            .get("home")
+            .is_none());
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+    for body in [
+        r#"{"surface":"invalid","scope":"home","text":""}"#,
+        r#"{"surface":"electron","scope":"other","text":""}"#,
+        r#"{"surface":"electron","text":""}"#,
+        r#"{"surface":"electron","scope":"home","sessionId":"draft-owned","text":""}"#,
+        r#"{"surface":"electron","sessionId":"draft-owned","text":null}"#,
+        r#"{"surface":"electron","sessionId":"draft-owned","text":5}"#,
+        r#"{"surface":"electron","sessionId":"draft-owned","text":"" ,"doc":[]}"#,
+        r#"{"surface":"electron","sessionPath":"/not/a/session","text":""}"#,
+        r#"{"surface":"electron","sessionId":"draft-owned","text":"","unknown":true}"#,
+    ] {
+        let (status, response) = http(
+            &server.addr,
+            "PUT",
+            "/lingxi/v1/input-drafts",
+            &[("Authorization", &server.bearer())],
+            Some(body),
+        )
+        .await;
+        assert_eq!(status, 400, "{response}");
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+    let foreign = server.mint_device_token("draft-foreign").await;
+    let foreign_bearer = format!("Bearer {foreign}");
+    for method in ["GET", "PUT"] {
+        let route = if method == "GET" {
+            "/lingxi/v1/input-drafts?surface=electron"
+        } else {
+            "/lingxi/v1/input-drafts"
+        };
+        let body =
+            (method == "PUT").then_some(r#"{"surface":"electron","scope":"home","text":""}"#);
+        let (status, response) = http(&server.addr, method, route, &[], body).await;
+        assert_eq!(status, 401, "{response}");
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+    let (status, response) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &foreign_bearer)],
+        Some(r#"{"surface":"electron","sessionId":"draft-owned","text":""}"#),
+    )
+    .await;
+    assert_eq!(status, 403, "{response}");
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+    let (status, response) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"surface":"electron","sessionId":"missing-draft-session","text":""}"#),
+    )
+    .await;
+    assert_eq!(status, 404, "{response}");
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+    let (status, response) = http(
+        &server.addr,
+        "GET",
+        "/lingxi/v1/input-drafts?surface=electron",
+        &[("Authorization", &foreign_bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "{response}");
+    let visible: serde_json::Value = serde_json::from_str(&response).unwrap();
+    assert_eq!(visible["sessions"], serde_json::json!({}));
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+    std::fs::write(&path, b"{broken").unwrap();
+    for method in ["GET", "PUT"] {
+        let route = if method == "GET" {
+            "/lingxi/v1/input-drafts?surface=electron"
+        } else {
+            "/lingxi/v1/input-drafts"
+        };
+        let body =
+            (method == "PUT").then_some(r#"{"surface":"electron","scope":"home","text":""}"#);
+        let (status, response) = http(
+            &server.addr,
+            method,
+            route,
+            &[("Authorization", &server.bearer())],
+            body,
+        )
+        .await;
+        assert_eq!(status, 500, "{response}");
+        assert!(serde_json::from_str::<serde_json::Value>(&response)
+            .unwrap()
+            .get("ok")
+            .is_none());
+        assert_eq!(std::fs::read(&path).unwrap(), b"{broken");
+    }
+    std::fs::write(&path, &before).unwrap();
+    let mut invalid_version: serde_json::Value = serde_json::from_slice(&before).unwrap();
+    invalid_version["version"] = serde_json::json!(2);
+    let invalid_bytes = serde_json::to_vec(&invalid_version).unwrap();
+    std::fs::write(&path, &invalid_bytes).unwrap();
+    let (status, response) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 500, "{response}");
+    assert_eq!(std::fs::read(&path).unwrap(), invalid_bytes);
+    std::fs::write(&path, &before).unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let file_mode = std::fs::metadata(&path).unwrap().permissions().mode();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o000)).unwrap();
+        let unreadable = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(file_mode)).unwrap();
+        assert_eq!(unreadable.0, 500, "{}", unreadable.1);
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+        let mode = std::fs::metadata(&server.home)
+            .unwrap()
+            .permissions()
+            .mode();
+        std::fs::set_permissions(&server.home, std::fs::Permissions::from_mode(0o555)).unwrap();
+        let mut failures = Vec::new();
+        for body in [
+            r#"{"surface":"electron","sessionId":"draft-owned","text":""}"#,
+            r#"{"surface":"electron","scope":"home","text":"写失败不能成功"}"#,
+        ] {
+            failures.push(
+                http(
+                    &server.addr,
+                    "PUT",
+                    "/lingxi/v1/input-drafts",
+                    &[("Authorization", &server.bearer())],
+                    Some(body),
+                )
+                .await,
+            );
+        }
+        std::fs::set_permissions(&server.home, std::fs::Permissions::from_mode(mode)).unwrap();
+        for result in failures {
+            assert_eq!(result.0, 500, "{}", result.1);
+            assert!(serde_json::from_str::<serde_json::Value>(&result.1)
+                .unwrap()
+                .get("ok")
+                .is_none());
+        }
+        assert_eq!(std::fs::read(&path).unwrap(), before);
+    }
+    let (status, response) = http(
+        &server.addr,
+        "PUT",
+        "/lingxi/v1/input-drafts",
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"surface":"electron","sessionId":"draft-owned","text":""}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{response}");
+    let (status, response) = server.get("/lingxi/v1/input-drafts?surface=electron").await;
+    assert_eq!(status, 200, "{response}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&response).unwrap()["sessions"],
+        serde_json::json!({})
+    );
+    println!(
+        "{}",
+        serde_json::json!({"originalLeaves":["R00-T02-LA-081FACA79F2C","R00-T02-LA-1B712E189DDF","R00-T02-LA-F829AEA5931C"],"invalid":400,"missingAuth":401,"foreignSession":403,"missingSession":404,"corruptAndActualUnwritableStorage":500,"refusalsPreserveBytes":true,"repairedRetry":true,"unresolvedSessionPathNotClaimed":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_archived_list_aggregates_agents_and_projects_first_visible_user_text() {
+    let server = start_server(
+        "original-archived-projection",
+        ScriptedProvider::new(
+            (0..6)
+                .map(|_| ScriptStep::Final("助手回复不是首条用户消息".into()))
+                .collect(),
+        ),
+    )
+    .await;
+    for (sid, agent) in [
+        ("archived-first", "agent-first"),
+        ("archived-second", "agent-second"),
+        ("archived-hidden", "agent-first"),
+        ("archived-empty", "agent-empty"),
+        ("archived-scalar-edge", "agent-second"),
+        ("still-active", "agent-second"),
+    ] {
+        let (status, body) = server
+            .post(
+                "/lingxi/v1/sessions",
+                &serde_json::json!({"sessionId":sid,"agentId":agent,"title":sid}).to_string(),
+            )
+            .await;
+        assert_eq!(status, 201, "{body}");
+    }
+    let long_first = "原首消息内容".repeat(30);
+    server.execute("archived-first", &long_first).await;
+    server
+        .execute("archived-first", "后来的用户消息不能替代首条")
+        .await;
+    let astral_first = "😀".repeat(70);
+    server.execute("archived-second", &astral_first).await;
+    server
+        .execute(
+            "archived-hidden",
+            "[hana_reference]\n内部参考不能成为列表文本\n[/hana_reference]\n\n[KnowledgeResearchContext]\n截断的内部研究包裹",
+        )
+        .await;
+    server
+        .execute(
+            "archived-hidden",
+            "[hana_reminder at 2026-10-08 10:30]\n内部提醒\n[/hana_reminder]\n\n[KnowledgeContext]\n内部证据\n[/KnowledgeContext]\n\n首条可见文本",
+        )
+        .await;
+    server
+        .execute("archived-scalar-edge", &format!("{}😀后文", "x".repeat(99)))
+        .await;
+    let raw_first = server
+        .state
+        .storage()
+        .query_one_text(
+            "SELECT content_json FROM messages WHERE session_id=?1 AND role='user' ORDER BY seq LIMIT 1",
+            vec!["archived-first".into()],
+        )
+        .await
+        .unwrap();
+    for sid in [
+        "archived-first",
+        "archived-second",
+        "archived-hidden",
+        "archived-empty",
+        "archived-scalar-edge",
+    ] {
+        let (status, body) = server
+            .post(
+                "/lingxi/v1/sessions/archive",
+                &serde_json::json!({"sessionId":sid}).to_string(),
+            )
+            .await;
+        assert_eq!(status, 200, "{body}");
+    }
+    let (status, body) = server.get("/lingxi/v1/sessions/archived").await;
+    assert_eq!(status, 200, "{body}");
+    let result: serde_json::Value = serde_json::from_str(&body).unwrap();
+    let sessions = result["sessions"].as_array().unwrap();
+    assert_eq!(sessions.len(), 5);
+    let first = sessions
+        .iter()
+        .find(|r| r["sessionId"] == "archived-first")
+        .unwrap();
+    assert_eq!(first["agentId"], "agent-first");
+    assert_eq!(
+        first["firstMessage"],
+        long_first.chars().take(100).collect::<String>()
+    );
+    assert_eq!(
+        first["firstMessage"]
+            .as_str()
+            .unwrap()
+            .encode_utf16()
+            .count(),
+        100
+    );
+    let second = sessions
+        .iter()
+        .find(|r| r["sessionId"] == "archived-second")
+        .unwrap();
+    assert_eq!(second["agentId"], "agent-second");
+    assert_eq!(second["firstMessage"], "😀".repeat(50));
+    assert_eq!(
+        second["firstMessage"]
+            .as_str()
+            .unwrap()
+            .encode_utf16()
+            .count(),
+        100
+    );
+    let hidden = sessions
+        .iter()
+        .find(|r| r["sessionId"] == "archived-hidden")
+        .unwrap();
+    assert_eq!(hidden["firstMessage"], "首条可见文本");
+    assert_eq!(
+        sessions
+            .iter()
+            .find(|r| r["sessionId"] == "archived-empty")
+            .unwrap()["firstMessage"],
+        ""
+    );
+    assert!(!sessions.iter().any(|r| r["sessionId"] == "still-active"));
+    let scalar_edge = sessions
+        .iter()
+        .find(|r| r["sessionId"] == "archived-scalar-edge")
+        .unwrap();
+    assert_eq!(scalar_edge["firstMessage"], "x".repeat(99));
+    assert!(
+        scalar_edge["firstMessage"]
+            .as_str()
+            .unwrap()
+            .encode_utf16()
+            .count()
+            <= 100
+    );
+    assert_eq!(
+        server
+            .state
+            .storage()
+            .query_one_text(
+                "SELECT content_json FROM messages WHERE session_id=?1 AND role='user' ORDER BY seq LIMIT 1",
+                vec!["archived-first".into()],
+            )
+            .await
+            .unwrap(),
+        raw_first,
+        "列表投影不得截断或重写原始模型历史"
+    );
+    println!(
+        "{}",
+        serde_json::json!({"originalLeaf":"R00-T02-LA-43FFB75F252C","agentAggregation":3,"archivedRows":5,"firstUserNotLastOrAssistant":true,"utf16Limit":100,"noSplitScalar":true,"internalEnvelopesExcluded":true,"emptyPreview":"","historyUnchanged":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_archived_list_refusals_and_corrupt_history_do_not_return_empty_success() {
+    let server = start_server(
+        "original-archived-refusals",
+        ScriptedProvider::new(vec![ScriptStep::Final("归档响应".into())]),
+    )
+    .await;
+    create_session(&server, "archived-owned", "本地主人的归档").await;
+    server.execute("archived-owned", "保留首条用户文本").await;
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/archive",
+            r#"{"sessionId":"archived-owned"}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let foreign = server.mint_device_token("archived-foreign-user").await;
+    let foreign_bearer = format!("Bearer {foreign}");
+    let (status, body) = http(
+        &server.addr,
+        "POST",
+        "/lingxi/v1/sessions",
+        &[("Authorization", &foreign_bearer)],
+        Some(r#"{"sessionId":"archived-foreign","agentId":"foreign-agent","title":"另一主体的归档"}"#),
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    let (status, body) = http(
+        &server.addr,
+        "POST",
+        "/lingxi/v1/sessions/archive",
+        &[("Authorization", &foreign_bearer)],
+        Some(r#"{"sessionId":"archived-foreign"}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = server.get("/lingxi/v1/sessions/archived").await;
+    assert_eq!(status, 200, "{body}");
+    let before: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(before["sessions"].as_array().unwrap().len(), 2);
+    let (status, body) = http(
+        &server.addr,
+        "GET",
+        "/lingxi/v1/sessions/archived",
+        &[("Authorization", &foreign_bearer)],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let scoped: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(scoped["sessions"].as_array().unwrap().len(), 1);
+    assert_eq!(scoped["sessions"][0]["sessionId"], "archived-foreign");
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/devices/credentials",
+            r#"{"userId":"archived-settings-only","scopes":["settings"]}"#,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let denied = format!(
+        "Bearer {}",
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
+            .as_str()
+            .unwrap()
+    );
+    for (headers, expected) in [
+        (vec![], 401),
+        (
+            vec![("Authorization", "Bearer invalid-archived-credential")],
+            401,
+        ),
+        (vec![("Authorization", denied.as_str())], 403),
+    ] {
+        let (status, body) = http(
+            &server.addr,
+            "GET",
+            "/lingxi/v1/sessions/archived",
+            &headers,
+            None,
+        )
+        .await;
+        assert_eq!(status, expected, "{body}");
+        assert!(serde_json::from_str::<serde_json::Value>(&body)
+            .unwrap()
+            .get("sessions")
+            .is_none());
+    }
+    let db = rusqlite::Connection::open(server.state.storage().db_path()).unwrap();
+    let original: String = db.query_row(
+        "SELECT content_json FROM messages WHERE session_id='archived-owned' AND role='user' ORDER BY seq LIMIT 1",
+        [], |r| r.get(0),
+    ).unwrap();
+    db.execute_batch("ALTER TABLE messages RENAME TO original_archived_hidden_messages")
+        .unwrap();
+    assert_eq!(
+        lingxi_adapters::storage::session_admin::list_archived_sessions(
+            server.state.storage(),
+            None
+        )
+        .await
+        .unwrap()
+        .len(),
+        2,
+        "清理所用元数据读取不应新增消息历史依赖"
+    );
+    let (status, body) = server.get("/lingxi/v1/sessions/archived").await;
+    assert_eq!(status, 500, "{body}");
+    assert!(serde_json::from_str::<serde_json::Value>(&body)
+        .unwrap()
+        .get("sessions")
+        .is_none());
+    db.execute_batch("ALTER TABLE original_archived_hidden_messages RENAME TO messages")
+        .unwrap();
+    db.execute(
+        "UPDATE messages SET content_json='{invalid' WHERE session_id='archived-owned' AND role='user'",
+        [],
+    ).unwrap();
+    let (status, body) = server.get("/lingxi/v1/sessions/archived").await;
+    assert_eq!(status, 500, "{body}");
+    assert!(serde_json::from_str::<serde_json::Value>(&body)
+        .unwrap()
+        .get("sessions")
+        .is_none());
+    db.execute(
+        "UPDATE messages SET content_json=?1 WHERE session_id='archived-owned' AND role='user'",
+        [&original],
+    )
+    .unwrap();
+    db.execute(
+        r#"UPDATE messages SET content_json='{"text":null}' WHERE session_id='archived-owned' AND role='user'"#,
+        [],
+    ).unwrap();
+    let (status, body) = server.get("/lingxi/v1/sessions/archived").await;
+    assert_eq!(status, 500, "{body}");
+    assert!(serde_json::from_str::<serde_json::Value>(&body)
+        .unwrap()
+        .get("sessions")
+        .is_none());
+    db.execute(
+        "UPDATE messages SET content_json=?1 WHERE session_id='archived-owned' AND role='user'",
+        [&original],
+    )
+    .unwrap();
+    let (status, body) = server.get("/lingxi/v1/sessions/archived").await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+        before
+    );
+    println!(
+        "{}",
+        serde_json::json!({"originalLeaf":"R00-T02-LA-43FFB75F252C","ownerFiltering":true,"missingAndInvalidCredential":401,"insufficientScope":403,"missingHistoryTable":500,"corruptHistory":500,"notEmptySuccess":true,"restoredReadUnchanged":true})
+    );
+    drop(db);
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_session_memory_only_active_live_agents_persist_and_refuse_explicitly() {
+    let server = start_server("original-memory-active", ScriptedProvider::new(vec![])).await;
+    create_session(&server, "memory-active", "活动会话").await;
+    create_session(&server, "memory-unrelated", "不受影响").await;
+    let path = "/lingxi/v1/sessions/memory-active/memory";
+    let (status, body) = server.get(path).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["memoryEnabled"],
+        true
+    );
+    let unrelated = read_session(&server, "memory-unrelated").await;
+    for enabled in [false, true, false] {
+        let (status, body) = http(
+            &server.addr,
+            "PATCH",
+            path,
+            &[("Authorization", &server.bearer())],
+            Some(&serde_json::json!({"memoryEnabled":enabled}).to_string()),
+        )
+        .await;
+        assert_eq!(status, 200, "{body}");
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&body).unwrap()["memoryEnabled"],
+            enabled
+        );
+        let (status, body) = server.get(path).await;
+        assert_eq!(status, 200, "{body}");
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&body).unwrap()["memoryEnabled"],
+            enabled
+        );
+        assert_eq!(read_session(&server, "memory-unrelated").await, unrelated);
+    }
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/archive",
+            r#"{"sessionId":"memory-active"}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let archived = read_session(&server, "memory-active").await;
+    let direct = lingxi_adapters::storage::session_admin::set_memory_enabled(
+        server.state.storage(),
+        "memory-active",
+        true,
+    )
+    .await;
+    assert!(
+        matches!(direct, Err(lingxi_kernel::ports::StorageError::Conflict { ref detail }) if detail == "session_memory_inactive")
+    );
+    assert_eq!(read_session(&server, "memory-active").await, archived);
+    for method in ["GET", "PATCH"] {
+        let (status, body) = http(
+            &server.addr,
+            method,
+            path,
+            &[("Authorization", &server.bearer())],
+            (method == "PATCH").then_some(r#"{"memoryEnabled":true}"#),
+        )
+        .await;
+        assert_eq!(status, 403, "{body}");
+        assert_eq!(read_session(&server, "memory-active").await, archived);
+    }
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/restore",
+            r#"{"sessionId":"memory-active"}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let restored = read_session(&server, "memory-active").await;
+    let dir = server.home.join("agents/agent");
+    std::fs::create_dir_all(&dir).unwrap();
+    let marker = dir.join(".deleted-agent.json");
+    std::fs::write(&marker, "{}").unwrap();
+    for method in ["GET", "PATCH"] {
+        let (status, body) = http(
+            &server.addr,
+            method,
+            path,
+            &[("Authorization", &server.bearer())],
+            (method == "PATCH").then_some(r#"{"memoryEnabled":true}"#),
+        )
+        .await;
+        assert_eq!(status, 409, "{body}");
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&body).unwrap()["reason"],
+            "agent_deleted"
+        );
+        assert_eq!(read_session(&server, "memory-active").await, restored);
+        assert_eq!(std::fs::read(&marker).unwrap(), b"{}");
+    }
+    std::fs::remove_file(&marker).unwrap();
+    let foreign = server.mint_device_token("foreign-memory-active").await;
+    for method in ["GET", "PATCH"] {
+        for (token, expected) in [
+            (&foreign, 403),
+            (&String::from("invalid-memory-token"), 401),
+        ] {
+            let (status, body) = http(
+                &server.addr,
+                method,
+                path,
+                &[("Authorization", &format!("Bearer {token}"))],
+                (method == "PATCH").then_some(r#"{"memoryEnabled":true}"#),
+            )
+            .await;
+            assert_eq!(status, expected, "{body}");
+        }
+    }
+    for invalid in [
+        r#"{}"#,
+        r#"{"memoryEnabled":"true"}"#,
+        r#"{"memoryEnabled":null}"#,
+        r#"{"memoryEnabled":false,"unexpected":true}"#,
+    ] {
+        let (status, body) = http(
+            &server.addr,
+            "PATCH",
+            path,
+            &[("Authorization", &server.bearer())],
+            Some(invalid),
+        )
+        .await;
+        assert_eq!(status, 400, "{body}");
+        assert_eq!(read_session(&server, "memory-active").await, restored);
+    }
+    for method in ["GET", "PATCH"] {
+        let (status, body) = http(
+            &server.addr,
+            method,
+            "/lingxi/v1/sessions/missing-memory/memory",
+            &[("Authorization", &server.bearer())],
+            (method == "PATCH").then_some(r#"{"memoryEnabled":true}"#),
+        )
+        .await;
+        assert_eq!(status, 404, "{body}");
+    }
+    let db = rusqlite::Connection::open(server.state.storage().db_path()).unwrap();
+    db.execute_batch("CREATE TRIGGER original_memory_abort BEFORE UPDATE OF memory_enabled ON sessions BEGIN SELECT RAISE(ABORT,'memory save failed'); END;").unwrap();
+    let (status, body) = http(
+        &server.addr,
+        "PATCH",
+        path,
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"memoryEnabled":true}"#),
+    )
+    .await;
+    assert_eq!(status, 500, "{body}");
+    assert_eq!(read_session(&server, "memory-active").await, restored);
+    db.execute_batch("DROP TRIGGER original_memory_abort")
+        .unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mode = std::fs::metadata(&dir).unwrap().permissions().mode();
+        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(0o000)).unwrap();
+        let result = server.get(path).await;
+        std::fs::set_permissions(&dir, std::fs::Permissions::from_mode(mode)).unwrap();
+        assert_eq!(result.0, 500, "{}", result.1);
+        assert!(!result.1.contains("memoryEnabled"));
+        assert_eq!(read_session(&server, "memory-active").await, restored);
+    }
+    db.execute_batch("ALTER TABLE sessions RENAME TO original_memory_unavailable")
+        .unwrap();
+    let result = server.get(path).await;
+    db.execute_batch("ALTER TABLE original_memory_unavailable RENAME TO sessions")
+        .unwrap();
+    assert_eq!(result.0, 500, "{}", result.1);
+    assert!(!result.1.contains("memoryEnabled"));
+    let (status, body) = server.get(path).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["memoryEnabled"],
+        false
+    );
+    assert_eq!(read_session(&server, "memory-unrelated").await, unrelated);
+    drop(db);
+    let home = server.stop_and_retain().await;
+    let server = start_server_at(
+        "original-memory-restarted",
+        home,
+        ScriptedProvider::new(vec![]),
+    )
+    .await;
+    let (status, body) = server.get(path).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["memoryEnabled"],
+        false
+    );
+    let (status, body) = http(
+        &server.addr,
+        "PATCH",
+        path,
+        &[("Authorization", &server.bearer())],
+        Some(r#"{"memoryEnabled":true}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        read_session(&server, "memory-active").await["memoryEnabled"],
+        true
+    );
+    println!(
+        "{}",
+        serde_json::json!({"originalLeaves":["R00-T02-LA-51905CECDD1B","R00-T02-LA-9616596B5720"],"actualBoolSaveRead":true,"archivedRefused":403,"deletedAgentRefused":409,"malformed":400,"foreign":403,"invalidAuth":401,"missing":404,"actualSaveReadFailures":500,"failedWritesUnchanged":true,"restoredRead":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_pin_deleted_agent_refuses_without_writes_and_allows_unpin() {
+    let server = start_server("original-pin-deleted-agent", ScriptedProvider::new(vec![])).await;
+    create_session(&server, "deleted-agent-pin", "保留已删助手的会话").await;
+    create_session(&server, "live-agent-pin", "未删助手").await;
+    let agent_dir = server.home.join("agents/agent");
+    std::fs::create_dir_all(&agent_dir).unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin",
+            r#"{"sessionId":"deleted-agent-pin","pinned":true}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let before = read_session(&server, "deleted-agent-pin").await;
+    let tombstone = agent_dir.join(".deleted-agent.json");
+    let bytes = br#"{"agentId":"agent","deletedAt":"2026-10-13T07:19:21Z"}"#;
+    std::fs::write(&tombstone, bytes).unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin-order",
+            r#"{"sessionIds":["deleted-agent-pin","live-agent-pin"]}"#,
+        )
+        .await;
+    assert_eq!(status, 400, "{body}");
+    assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    assert!(read_session(&server, "live-agent-pin").await["pinnedAtUnixMs"].is_null());
+    for sid in ["deleted-agent-pin", "live-agent-pin"] {
+        let snapshot = read_session(&server, sid).await;
+        let (status, body) = server
+            .post(
+                "/lingxi/v1/sessions/pin",
+                &serde_json::json!({"sessionId":sid,"pinned":true}).to_string(),
+            )
+            .await;
+        assert_eq!(status, 409, "{body}");
+        let error: serde_json::Value = serde_json::from_str(&body).unwrap();
+        assert_eq!(error["error"], "agent_deleted");
+        assert_eq!(error["reason"], "agent_deleted");
+        assert_eq!(read_session(&server, sid).await, snapshot);
+        assert_eq!(std::fs::read(&tombstone).unwrap(), bytes);
+    }
+    assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions",
+            r#"{"sessionId":"other-agent-pin","agentId":"other-agent","title":"独立助手"}"#,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin",
+            r#"{"sessionId":"other-agent-pin","pinned":true}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(read_session(&server, "other-agent-pin").await["pinnedAtUnixMs"].is_u64());
+    for input in [
+        r#"{"sessionId":"deleted-agent-pin","pinned":"true"}"#,
+        r#"{"sessionId":"deleted-agent-pin"}"#,
+        r#"{"sessionId":"deleted-agent-pin","pinned":null}"#,
+    ] {
+        let (status, body) = server.post("/lingxi/v1/sessions/pin", input).await;
+        assert_eq!(status, 400, "{body}");
+        assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    }
+    let foreign = server.mint_device_token("foreign-deleted-agent-pin").await;
+    let bearer = format!("Bearer {foreign}");
+    let (status, body) = http(
+        &server.addr,
+        "POST",
+        "/lingxi/v1/sessions/pin",
+        &[("Authorization", &bearer)],
+        Some(r#"{"sessionId":"deleted-agent-pin","pinned":true}"#),
+    )
+    .await;
+    assert_eq!(status, 403, "{body}");
+    assert!(!body.contains("agent_deleted"));
+    let (status, body) = http(
+        &server.addr,
+        "POST",
+        "/lingxi/v1/sessions/pin",
+        &[],
+        Some(r#"{"sessionId":"deleted-agent-pin","pinned":true}"#),
+    )
+    .await;
+    assert_eq!(status, 401, "{body}");
+    assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    std::fs::write(&tombstone, "{").unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin",
+            r#"{"sessionId":"deleted-agent-pin","pinned":true}"#,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(std::fs::read(&tombstone).unwrap(), b"{");
+    assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    std::fs::write(&tombstone, bytes).unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin",
+            r#"{"sessionId":"deleted-agent-pin","pinned":false}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let cleared = read_session(&server, "deleted-agent-pin").await;
+    assert!(cleared["pinnedAtUnixMs"].is_null() && cleared["pinOrder"].is_null());
+    assert_eq!(std::fs::read(&tombstone).unwrap(), bytes);
+    std::fs::remove_file(&tombstone).unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin",
+            r#"{"sessionId":"live-agent-pin","pinned":true}"#,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(read_session(&server, "live-agent-pin").await["pinnedAtUnixMs"].is_u64());
+    let before = read_session(&server, "deleted-agent-pin").await;
+    let db = rusqlite::Connection::open(server.state.storage().db_path()).unwrap();
+    db.execute_batch("CREATE TRIGGER original_pin_write_abort BEFORE UPDATE OF pinned_at_unix_ms ON sessions WHEN OLD.session_id='deleted-agent-pin' BEGIN SELECT RAISE(ABORT,'pin persistence failed'); END;").unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/pin",
+            r#"{"sessionId":"deleted-agent-pin","pinned":true}"#,
+        )
+        .await;
+    assert_eq!(status, 500, "{body}");
+    assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    db.execute_batch("DROP TRIGGER original_pin_write_abort")
+        .unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let before = read_session(&server, "deleted-agent-pin").await;
+        let mode = std::fs::metadata(&agent_dir).unwrap().permissions().mode();
+        std::fs::set_permissions(&agent_dir, std::fs::Permissions::from_mode(0o000)).unwrap();
+        let response = server
+            .post(
+                "/lingxi/v1/sessions/pin",
+                r#"{"sessionId":"deleted-agent-pin","pinned":true}"#,
+            )
+            .await;
+        std::fs::set_permissions(&agent_dir, std::fs::Permissions::from_mode(mode)).unwrap();
+        assert_eq!(response.0, 500, "{}", response.1);
+        assert_eq!(read_session(&server, "deleted-agent-pin").await, before);
+    }
+    println!(
+        "{}",
+        serde_json::json!({"originalLeaf":"R00-T02-LA-0D4F0EFC9DAE","deletedAgentPin":409,"unpinStillAllowed":true,"markerAndSessionUnchangedOnRefusal":true,"realUnreadableDeletionState":500,"restoredLiveAgentPin":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
 async fn original_pin_order_checks_each_owner_and_rolls_back_failed_reordering() {
     let server = start_server("original-pin-order", ScriptedProvider::new(vec![])).await;
     for sid in ["pin-a", "pin-b"] {
@@ -948,6 +2115,330 @@ async fn original_session_search_returns_scoped_title_content_and_explicit_read_
     server.stop_and_clean().await;
 }
 
+#[tokio::test]
+async fn original_workspace_rollback_preference_persists_without_restoring_files_and_controls_real_gate(
+) {
+    let server = start_server(
+        "original-rollback-preference",
+        ScriptedProvider::new(vec![ScriptStep::Final("checkpoint response".into())]),
+    )
+    .await;
+    let path = "/lingxi/v1/sessions/workspace-rollback";
+    let (status, body) = server.get(path).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+        serde_json::json!({"enabled": false})
+    );
+    let workspace = server.home.join("workspace");
+    let file = workspace.join("preference.txt");
+    std::fs::write(&file, "checkpoint contents").unwrap();
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions",
+            &serde_json::json!({
+                "sessionId": "rollback-preference", "agentId": "agent", "title": "preference",
+                "authorizedFolders": [workspace]
+            })
+            .to_string(),
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let run = server
+        .execute("rollback-preference", "create checkpoint")
+        .await;
+    let (status, body) = server.post("/lingxi/v1/sessions/rollback-preference/checkpoints", &serde_json::json!({
+        "name": "before-preference", "targetMessageId": format!("{run}-final"), "filePaths": [file]
+    }).to_string()).await;
+    assert_eq!(status, 200, "{body}");
+    std::fs::write(
+        &file,
+        "user changes must not be rolled back by a preference",
+    )
+    .unwrap();
+    let bytes = std::fs::read(&file).unwrap();
+    let modified = std::fs::metadata(&file).unwrap().modified().unwrap();
+    let branch = server.branch_ids("rollback-preference").await;
+    let snapshots = server
+        .state
+        .storage()
+        .query_one_text(
+            "SELECT CAST(COUNT(*) AS TEXT) FROM file_history_snapshots",
+            vec![],
+        )
+        .await
+        .unwrap();
+    let preferences = server.home.join("user/preferences.json");
+    std::fs::create_dir_all(preferences.parent().unwrap()).unwrap();
+    std::fs::write(&preferences, r#"{"locale":"ja","unrelated":{"keep":1}}"#).unwrap();
+    for enabled in [true, false, true] {
+        let request = serde_json::json!({"enabled": enabled}).to_string();
+        let (status, body) = http(
+            &server.addr,
+            "PUT",
+            path,
+            &[("Authorization", &server.bearer())],
+            Some(&request),
+        )
+        .await;
+        assert_eq!(status, 200, "{body}");
+        assert_eq!(
+            serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+            serde_json::json!({"ok": true, "enabled": enabled})
+        );
+        assert_eq!(server.state.rollback_file_changes_enabled(), enabled);
+        let saved: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&preferences).unwrap()).unwrap();
+        assert_eq!(
+            saved,
+            serde_json::json!({"locale":"ja","unrelated":{"keep":1},"rollback_file_changes":enabled})
+        );
+        assert_eq!(std::fs::read(&file).unwrap(), bytes);
+        assert_eq!(
+            std::fs::metadata(&file).unwrap().modified().unwrap(),
+            modified
+        );
+        assert_eq!(server.branch_ids("rollback-preference").await, branch);
+        assert_eq!(
+            server
+                .state
+                .storage()
+                .query_one_text(
+                    "SELECT CAST(COUNT(*) AS TEXT) FROM file_history_snapshots",
+                    vec![]
+                )
+                .await
+                .unwrap(),
+            snapshots
+        );
+    }
+    let home = server.stop_and_retain().await;
+    let restarted = start_server_at(
+        "original-rollback-preference-restart",
+        home,
+        ScriptedProvider::new(vec![]),
+    )
+    .await;
+    let (status, body) = restarted.get(path).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["enabled"],
+        true
+    );
+    let scoped_token = restarted
+        .mint_device_token("rollback-authorized-chat")
+        .await;
+    let scoped_auth = format!("Bearer {scoped_token}");
+    let (status, body) = http(
+        &restarted.addr,
+        "PUT",
+        path,
+        &[("Authorization", &scoped_auth)],
+        Some(r#"{"enabled":true}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    for _ in 0..5 {
+        let local_auth = restarted.bearer();
+        let local_headers = [("Authorization", local_auth.as_str())];
+        let scoped_headers = [("Authorization", scoped_auth.as_str())];
+        let (left, right) = tokio::join!(
+            http(
+                &restarted.addr,
+                "PUT",
+                path,
+                &local_headers,
+                Some(r#"{"enabled":true}"#)
+            ),
+            http(
+                &restarted.addr,
+                "PUT",
+                path,
+                &scoped_headers,
+                Some(r#"{"enabled":false}"#)
+            )
+        );
+        assert_eq!(left.0, 200, "{}", left.1);
+        assert_eq!(right.0, 200, "{}", right.1);
+        let saved: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&preferences).unwrap()).unwrap();
+        assert_eq!(
+            Some(restarted.state.rollback_file_changes_enabled()),
+            saved["rollback_file_changes"].as_bool()
+        );
+        assert_eq!(saved["unrelated"], serde_json::json!({"keep":1}));
+    }
+    let (status, body) = http(
+        &restarted.addr,
+        "PUT",
+        path,
+        &[("Authorization", &scoped_auth)],
+        Some(r#"{"enabled":true}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let preview = "/lingxi/v1/sessions/rollback-preference/rewind/preview";
+    let request = r#"{"checkpoint":"before-preference","restoreFiles":true}"#;
+    let (status, body) = restarted.post(preview, request).await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = http(
+        &restarted.addr,
+        "PUT",
+        path,
+        &[("Authorization", &restarted.bearer())],
+        Some(r#"{"enabled":false}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = restarted.post(preview, request).await;
+    assert_eq!(status, 403, "{body}");
+    assert!(body.contains("file_rollback_disabled"), "{body}");
+    assert_eq!(std::fs::read(&file).unwrap(), bytes);
+    assert_eq!(restarted.branch_ids("rollback-preference").await, branch);
+    restarted.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_workspace_rollback_preference_refusals_keep_saved_and_live_state_and_retry() {
+    let server = start_server(
+        "original-rollback-preference-errors",
+        ScriptedProvider::new(vec![]),
+    )
+    .await;
+    let path = "/lingxi/v1/sessions/workspace-rollback";
+    let auth = server.bearer();
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        path,
+        &[("Authorization", &auth)],
+        Some(r#"{"enabled":true}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    let preferences = server.home.join("user/preferences.json");
+    let saved = std::fs::read(&preferences).unwrap();
+    let file = server.home.join("workspace/refusal.txt");
+    std::fs::write(&file, "untouched").unwrap();
+    for request in [
+        "{}",
+        r#"{"enabled":"true"}"#,
+        r#"{"enabled":null}"#,
+        r#"{"enabled":0}"#,
+        "[]",
+        "null",
+        "{",
+    ] {
+        let (status, body) = http(
+            &server.addr,
+            "PUT",
+            path,
+            &[("Authorization", &auth)],
+            Some(request),
+        )
+        .await;
+        assert_eq!(status, 400, "{body}");
+        assert!(!body.contains(r#""ok":true"#), "{body}");
+        assert_eq!(std::fs::read(&preferences).unwrap(), saved);
+        assert!(server.state.rollback_file_changes_enabled());
+    }
+    let (status, body) = http(&server.addr, "PUT", path, &[], Some(r#"{"enabled":false}"#)).await;
+    assert_eq!(status, 401, "{body}");
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/devices/credentials",
+            r#"{"userId":"rollback-no-chat","scopes":["files.read"]}"#,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let secret = serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let denied_auth = format!("Bearer {secret}");
+    for method in ["GET", "PUT"] {
+        let (status, body) = http(
+            &server.addr,
+            method,
+            path,
+            &[("Authorization", &denied_auth)],
+            (method == "PUT").then_some(r#"{"enabled":false}"#),
+        )
+        .await;
+        assert_eq!(status, 403, "{body}");
+        assert_eq!(std::fs::read(&preferences).unwrap(), saved);
+        assert!(server.state.rollback_file_changes_enabled());
+    }
+    std::fs::remove_file(&preferences).unwrap();
+    std::fs::create_dir(&preferences).unwrap();
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        path,
+        &[("Authorization", &auth)],
+        Some(r#"{"enabled":false}"#),
+    )
+    .await;
+    assert_eq!(status, 500, "{body}");
+    assert!(body.contains("cannot read preferences.json"), "{body}");
+    assert!(preferences.is_dir());
+    assert!(server.state.rollback_file_changes_enabled());
+    std::fs::remove_dir(&preferences).unwrap();
+    for invalid in ["not JSON", "[]", r#"{"rollback_file_changes":"true"}"#] {
+        std::fs::write(&preferences, invalid).unwrap();
+        let (status, body) = http(
+            &server.addr,
+            "PUT",
+            path,
+            &[("Authorization", &auth)],
+            Some(r#"{"enabled":false}"#),
+        )
+        .await;
+        assert_eq!(status, 500, "{body}");
+        assert_eq!(std::fs::read_to_string(&preferences).unwrap(), invalid);
+        assert!(server.state.rollback_file_changes_enabled());
+    }
+    std::fs::write(&preferences, &saved).unwrap();
+    let (status, body) = http(
+        &server.addr,
+        "PUT",
+        path,
+        &[("Authorization", &auth)],
+        Some(r#"{"enabled":false}"#),
+    )
+    .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(!server.state.rollback_file_changes_enabled());
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "untouched");
+    std::fs::write(&preferences, "invalid startup preferences").unwrap();
+    let home = server.stop_and_retain().await;
+    let layout = prepare_layout(&home).unwrap();
+    let outcome = ServiceState::bootstrap(
+        ServiceConfig {
+            bind_addr: "127.0.0.1:0".parse().unwrap(),
+            data_home: home.clone(),
+            home_source: HomeSource::Cli,
+            network_mode: NetworkMode::Loopback,
+            shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
+        },
+        &layout,
+    )
+    .await;
+    let error = match outcome {
+        Ok(_) => panic!("corrupt saved preferences must not default to a successful bootstrap"),
+        Err(error) => error,
+    };
+    assert!(
+        error
+            .to_string()
+            .contains("cannot load workspace rollback preference"),
+        "{error}"
+    );
+    if std::env::var("LINGXI_W03_EVIDENCE").is_err() {
+        std::fs::remove_dir_all(home).unwrap();
+    }
+}
+
 // 原已有会话操作的拒绝链；只向独立合成数据库注入故障，不修改产品实现。
 #[tokio::test]
 async fn original_retry_refusals_preserve_history_and_recover_after_actual_storage_failure() {
@@ -1019,8 +2510,8 @@ async fn original_retry_refusals_preserve_history_and_recover_after_actual_stora
 }
 
 #[tokio::test]
-async fn original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session()
- {
+async fn original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session(
+) {
     let server = start_server(
         "original-archive-errors",
         ScriptedProvider::new(vec![ScriptStep::Final("原归档内容".into())]),
@@ -1088,20 +2579,16 @@ async fn original_detach_archive_and_permanent_delete_refuse_atomically_and_do_n
     let (status, body) = server.get("/lingxi/v1/sessions").await;
     assert_eq!(status, 200, "{body}");
     let list: serde_json::Value = serde_json::from_str(&body).unwrap();
-    assert!(
-        list["sessions"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|r| r["sessionId"] == "archive-child")
-    );
-    assert!(
-        !list["sessions"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|r| r["sessionId"] == "archive-parent")
-    );
+    assert!(list["sessions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r["sessionId"] == "archive-child"));
+    assert!(!list["sessions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|r| r["sessionId"] == "archive-parent"));
     let archived = read_session(&server, "archive-parent").await;
     for (body, expected) in [
         (r#"{"sessionId":false}"#, 400),

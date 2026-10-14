@@ -1,0 +1,70 @@
+{
+  "status": "SEMANTIC_BINDINGS_REVIEWED_NOT_STAGE_ACCEPTANCE",
+  "executionLogs": [
+    "skill-persona-regression-r2.log",
+    "skill-install-rejection-regression.log"
+  ],
+  "reviewed": [
+    {
+      "id": "R00-T02-LA-07A5CE3637C7",
+      "originalAssertions": [
+        "成功：执行“读取助手 AGENTS.md”后，返回正文与是否来自模板；/ishiki 为同 handler 兼容别名",
+        "拒绝/边界：文件存在/模板回退；无效 id 或无助手 404；不应错误扩大写入或披露范围"
+      ],
+      "previousGaps": [
+        {
+          "assertionIndex": 1,
+          "kind": "SEMANTIC_MISMATCH",
+          "reason": "SEMANTIC_MISMATCH: 原无效id或无助手404；当前无效id返回400。其他读取边界已补齐真实检查。"
+        },
+        "SEMANTIC_MISMATCH: 原无效id或无助手404；当前无效id返回400。其他读取边界已补齐真实检查。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_t06_memory",
+          "test": "persona_files_follow_fallback_chain_and_broadcast_writes"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_persona_proofs",
+          "test": "original_persona_reads_template_custom_alias_and_refusal"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_persona_proofs",
+          "test": "original_persona_reads_template_custom_alias_and_refusal"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-0F7D128E01B1",
+      "originalAssertions": [
+        "成功后指定助手 enabled 和运行时技能列表均含新技能",
+        "agentId 不存在或安装失败时不得误启用其他助手"
+      ],
+      "previousGaps": [
+        "手动安装忽略指定Agent，未更新所属enabled和运行时列表。",
+        "skills_install_route读取agentId但赋给_agent_id未使用，仅调用install_manual；带指定Agent的手动安装没有启用该助手/更新runtime。",
+        "未有指定助手安装不存在/失败的真实错误和其它Agent不误启用检查；生产手动入口不验证所传Agent。"
+      ],
+      "currentTests": [
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_skills_bundle_proofs",
+          "test": "original_global_manual_install_complete_package_without_agent_enable"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime"
+        },
+        {
+          "package": "lingxi-service",
+          "suite": "r06_original_memory_skill_proofs",
+          "test": "original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime"
+        }
+      ]
+    }
+  ]
+}

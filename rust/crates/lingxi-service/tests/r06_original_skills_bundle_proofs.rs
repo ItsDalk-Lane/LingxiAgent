@@ -4,10 +4,10 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use lingxi_service::{
-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
-    prepare_layout, run,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
+    ServiceError, ServiceState,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
 
@@ -148,6 +148,7 @@ impl TestServer {
             .expect("server task join")
             .expect("clean serve result");
         let _ = std::fs::remove_dir_all(&self.home);
+        std::fs::remove_dir_all(&self.workspace).expect("clean isolated test workspace");
     }
 }
 
@@ -205,6 +206,575 @@ async fn view(server: &TestServer, agent: &str, runtime: bool) -> Value {
 }
 
 #[tokio::test]
+async fn original_desk_skills_returns_actual_workspace_sources_and_agent_policy_without_writes() {
+    let server = start_server("original-desk-catalog").await;
+    write_package(&server.home.join("skills"), "not-a-workspace-skill");
+    let standard = write_package(&server.workspace.join(".agents/skills"), "workspace-winner");
+    write_package(&server.workspace.join(".claude/skills"), "workspace-winner");
+    write_package(&server.workspace.join(".codex/skills"), "compatible-only");
+    write_package(&server.workspace.join(".openclaw/skills"), "openclaw-only");
+    let empty_workspace = server.workspace.join("empty workspace");
+    std::fs::create_dir_all(&empty_workspace).unwrap();
+    let config = server.home.join("agents/agentA/config.yaml");
+    let before_home = file_snapshot(&server.home);
+    let before_workspace = file_snapshot(&server.workspace);
+    let (status, body) = server
+        .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        body["policy"],
+        json!({"discoverProjectSkills":true,"discoverCompatibleProjectSkills":false})
+    );
+    let rows = body["skills"].as_array().unwrap();
+    assert_eq!(rows.len(), 4);
+    assert!(!rows.iter().any(|r| r["name"] == "not-a-workspace-skill"));
+    let winner = &rows[0];
+    assert_eq!(winner["name"], "workspace-winner");
+    assert_eq!(winner["source"], "Agents");
+    assert_eq!(winner["sourceCategory"], "standard");
+    assert_eq!(winner["active"], true);
+    assert_eq!(winner["filePath"], json!(standard.join("SKILL.md")));
+    assert_eq!(winner["sourceIdentity"]["kind"], "skill_source");
+    assert_eq!(winner["sourceIdentity"]["owner"], "workspace");
+    assert_eq!(winner["sourceIdentity"]["editable"], true);
+    assert_eq!(winner["sourceIdentity"]["readonly"], false);
+    assert!(winner["workspaceMountId"].is_null());
+    for row in &rows[1..] {
+        assert_eq!(row["active"], false);
+        assert_eq!(row["inactiveReason"], "policy-disabled");
+    }
+    assert_eq!(file_snapshot(&server.home), before_home);
+    assert_eq!(file_snapshot(&server.workspace), before_workspace);
+    let text = std::fs::read_to_string(&config).unwrap();
+    let patched = lingxi_adapters::storage::agent_memory::AgentConfigPatch::write_flags(
+        &text,
+        &lingxi_adapters::storage::agent_memory::AgentConfigFlags {
+            discover_project_skills: Some(true),
+            discover_compatible_project_skills: Some(true),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    std::fs::write(&config, patched).unwrap();
+    let updated_home = file_snapshot(&server.home);
+    let (status, enabled) = server
+        .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+        .await;
+    assert_eq!(status, 200, "{enabled}");
+    assert_eq!(enabled["policy"]["discoverCompatibleProjectSkills"], true);
+    assert_eq!(enabled["skills"][1]["active"], false);
+    assert_eq!(enabled["skills"][1]["shadowed"], true);
+    assert_eq!(enabled["skills"][1]["inactiveReason"], "shadowed");
+    assert_eq!(
+        enabled["skills"][1]["shadowedBy"],
+        json!({"source":"Agents","sourceIdentity":winner["sourceIdentity"]})
+    );
+    assert_eq!(enabled["skills"][2]["active"], true);
+    assert_eq!(enabled["skills"][3]["active"], true);
+    let (status, other) = server
+        .request("GET", "/lingxi/v1/desk/skills?agentId=agentB", None)
+        .await;
+    assert_eq!(status, 200, "{other}");
+    assert_eq!(other["policy"]["discoverCompatibleProjectSkills"], false);
+    assert_eq!(file_snapshot(&server.home), updated_home);
+    assert_eq!(file_snapshot(&server.workspace), before_workspace);
+    let (status, empty) = server
+        .request(
+            "GET",
+            &format!(
+                "/lingxi/v1/desk/skills?agentId=agentA&dir={}",
+                empty_workspace.display().to_string().replace(' ', "%20")
+            ),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{empty}");
+    assert_eq!(empty["skills"], json!([]));
+    assert_eq!(empty["policy"], enabled["policy"]);
+    assert_eq!(file_snapshot(&server.home), updated_home);
+    assert_eq!(file_snapshot(&server.workspace), before_workspace);
+    let preferences = server.home.join("user/preferences.json");
+    std::fs::create_dir_all(preferences.parent().unwrap()).unwrap();
+    std::fs::write(&preferences, r#"{"primary_agent_id":"agentB"}"#).unwrap();
+    let primary_home = file_snapshot(&server.home);
+    let (status, primary) = server.request("GET", "/lingxi/v1/desk/skills", None).await;
+    assert_eq!(status, 200, "{primary}");
+    assert_eq!(primary["policy"], other["policy"]);
+    assert_eq!(file_snapshot(&server.home), primary_home);
+    assert_eq!(file_snapshot(&server.workspace), before_workspace);
+    println!(
+        "{}",
+        json!({"originalLeaf":"R00-T02-LA-B383AB7B553C","actualFourCatalogRoots":true,"actualPerAgentPolicy":true,"realSourceIdentityAndShadowWinner":true,"globalSkillExcluded":true,"readHasNoWrites":true,"mountSuccessNotClaimed":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_desk_skills_refuses_invalid_outside_and_unreadable_targets_explicitly() {
+    let server = start_server("original-desk-refusals").await;
+    let skill = write_package(&server.workspace.join(".agents/skills"), "read-protected");
+    let before_home = file_snapshot(&server.home);
+    let before_workspace = file_snapshot(&server.workspace);
+    for (query, expected) in [
+        ("?agentId=../outside", 400),
+        ("?agentId=missing-agent", 404),
+        ("?agentId=agentA&agentId=agentB", 400),
+        ("?agentId=agentA&dir=relative", 400),
+        ("?agentId=agentA&workspaceMountId=unsupported", 400),
+        ("?agentId=agentA&unknown=1", 400),
+    ] {
+        let (status, body) = server
+            .request("GET", &format!("/lingxi/v1/desk/skills{query}"), None)
+            .await;
+        assert_eq!(status, expected, "{body}");
+        assert!(body.get("skills").is_none());
+        assert_eq!(file_snapshot(&server.home), before_home);
+        assert_eq!(file_snapshot(&server.workspace), before_workspace);
+    }
+    let (status, body) = server
+        .request(
+            "GET",
+            &format!(
+                "/lingxi/v1/desk/skills?agentId=agentA&dir={}",
+                skill.join("SKILL.md").display()
+            ),
+            None,
+        )
+        .await;
+    assert_eq!(status, 400, "{body}");
+    assert!(body.get("skills").is_none());
+    let preferences = server.home.join("user/preferences.json");
+    let original_preferences = std::fs::read(&preferences).ok();
+    std::fs::create_dir_all(preferences.parent().unwrap()).unwrap();
+    for invalid in [
+        "{",
+        "[]",
+        r#"{"primary_agent_id":false}"#,
+        r#"{"primary_agent_id":"../outside"}"#,
+        r#"{"primary_agent_id":"missing-agent"}"#,
+    ] {
+        std::fs::write(&preferences, invalid).unwrap();
+        let (status, body) = server.request("GET", "/lingxi/v1/desk/skills", None).await;
+        assert_eq!(status, 500, "{body}");
+        assert!(body.get("skills").is_none());
+        assert_eq!(std::fs::read(&preferences).unwrap(), invalid.as_bytes());
+        let (status, body) = server
+            .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+            .await;
+        assert_eq!(status, 200, "{body}");
+        assert_eq!(std::fs::read(&preferences).unwrap(), invalid.as_bytes());
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::write(&preferences, r#"{"primary_agent_id":"agentA"}"#).unwrap();
+        let mode = std::fs::metadata(&preferences)
+            .unwrap()
+            .permissions()
+            .mode();
+        std::fs::set_permissions(&preferences, std::fs::Permissions::from_mode(0o000)).unwrap();
+        let unreadable = server.request("GET", "/lingxi/v1/desk/skills", None).await;
+        std::fs::set_permissions(&preferences, std::fs::Permissions::from_mode(mode)).unwrap();
+        assert_eq!(unreadable.0, 500, "{}", unreadable.1);
+        assert!(unreadable.1.get("skills").is_none());
+        assert_eq!(
+            std::fs::read(&preferences).unwrap(),
+            br#"{"primary_agent_id":"agentA"}"#
+        );
+    }
+    match original_preferences {
+        Some(bytes) => std::fs::write(&preferences, bytes).unwrap(),
+        None => std::fs::remove_file(&preferences).unwrap(),
+    }
+    let saved_workspace = server.home.join("saved-workspace");
+    std::fs::rename(&server.workspace, &saved_workspace).unwrap();
+    let missing_root = server
+        .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+        .await;
+    assert_eq!(missing_root.0, 404, "{}", missing_root.1);
+    assert!(missing_root.1.get("skills").is_none());
+    std::fs::write(&server.workspace, "not a workspace directory").unwrap();
+    let file_root = server
+        .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+        .await;
+    std::fs::remove_file(&server.workspace).unwrap();
+    std::fs::rename(&saved_workspace, &server.workspace).unwrap();
+    assert_eq!(file_root.0, 500, "{}", file_root.1);
+    assert!(file_root.1.get("skills").is_none());
+    let (status, body) = server
+        .request(
+            "GET",
+            &format!(
+                "/lingxi/v1/desk/skills?agentId=agentA&dir={}",
+                server.home.display()
+            ),
+            None,
+        )
+        .await;
+    assert_eq!(status, 403, "{body}");
+    assert!(body.get("skills").is_none());
+    for token in ["invalid-desk-token", server.readonly_token.as_str()] {
+        let (status, body) = server
+            .request_token("GET", "/lingxi/v1/desk/skills?agentId=agentA", None, token)
+            .await;
+        assert_eq!(
+            status,
+            if token == "invalid-desk-token" {
+                401
+            } else {
+                403
+            },
+            "{body}"
+        );
+        assert!(body.get("skills").is_none());
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::{symlink, PermissionsExt};
+        let mode = std::fs::metadata(skill.join("SKILL.md"))
+            .unwrap()
+            .permissions()
+            .mode();
+        std::fs::set_permissions(
+            skill.join("SKILL.md"),
+            std::fs::Permissions::from_mode(0o000),
+        )
+        .unwrap();
+        let unreadable = server
+            .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+            .await;
+        std::fs::set_permissions(
+            skill.join("SKILL.md"),
+            std::fs::Permissions::from_mode(mode),
+        )
+        .unwrap();
+        assert_eq!(unreadable.0, 500, "{}", unreadable.1);
+        assert!(unreadable.1.get("skills").is_none());
+        let outside = server.home.join("outside-root");
+        write_package(&outside, "outside-skill");
+        let outside_before = file_snapshot(&outside);
+        std::fs::create_dir_all(server.workspace.join(".claude")).unwrap();
+        symlink(&outside, server.workspace.join(".claude/skills")).unwrap();
+        let (status, body) = server
+            .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+            .await;
+        assert_eq!(status, 403, "{body}");
+        assert!(body.get("skills").is_none());
+        assert_eq!(file_snapshot(&outside), outside_before);
+        std::fs::remove_file(server.workspace.join(".claude/skills")).unwrap();
+        std::fs::remove_dir(server.workspace.join(".claude")).unwrap();
+        let raw = std::fs::read(skill.join("SKILL.md")).unwrap();
+        let outside_file = outside.join("outside-skill/SKILL.md");
+        std::fs::remove_file(skill.join("SKILL.md")).unwrap();
+        symlink(&outside_file, skill.join("SKILL.md")).unwrap();
+        let (status, body) = server
+            .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+            .await;
+        assert_eq!(status, 403, "{body}");
+        assert!(body.get("skills").is_none());
+        assert_eq!(file_snapshot(&outside), outside_before);
+        std::fs::remove_file(skill.join("SKILL.md")).unwrap();
+        std::fs::write(skill.join("SKILL.md"), raw).unwrap();
+    }
+    let (status, body) = server
+        .request("GET", "/lingxi/v1/desk/skills?agentId=agentA", None)
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["skills"].as_array().unwrap().len(), 1);
+    let (status, implicit) = server.request("GET", "/lingxi/v1/desk/skills", None).await;
+    assert_eq!(status, 200, "{implicit}");
+    assert_eq!(implicit["policy"], body["policy"]);
+    assert_eq!(file_snapshot(&server.workspace), before_workspace);
+    println!(
+        "{}",
+        json!({"originalLeaf":"R00-T02-LA-B383AB7B553C","invalidAndUnsupportedMount":400,"missingAgent":404,"invalidAuth":401,"nonownerAndOutsideRoot":403,"realUnreadableDocument":500,"rootAndDocumentSymlinksDenied":true,"refusalsNoWrites":true,"restoredRead":true})
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_bundle_enable_disable_apply_visible_delta_and_preserve_unrelated_selection() {
+    let server = start_server("bundle-delta").await;
+    for name in ["bundle-one", "bundle-two", "unrelated-selection"] {
+        write_package(&server.home.join("skills"), name);
+    }
+    let config = server.home.join("agents/agentA/config.yaml");
+    let text = std::fs::read_to_string(&config).unwrap();
+    let text = lingxi_adapters::storage::agent_memory::AgentConfigPatch::write_skill_lists(
+        &text,
+        &["unrelated-selection".into()],
+        &["workspace-opt-out".into()],
+    )
+    .unwrap();
+    std::fs::write(&config, text).unwrap();
+    let store = lingxi_adapters::storage::skill_library::BundlesStore::new(&server.home);
+    store.save(&[json!({"id":"delta","name":"Delta","skillNames":["bundle-two","missing-member","bundle-one","bundle-one"]})]).unwrap();
+    let bundle_bytes = std::fs::read(server.home.join("skill-bundles.json")).unwrap();
+    let other_config = std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap();
+    let path = "/lingxi/v1/agents/agentA/skill-bundles/delta";
+    for enabled in [true, true, false, false, true] {
+        let (status, result) = server
+            .request("PATCH", path, Some(json!({"enabled":enabled})))
+            .await;
+        assert_eq!(status, 200, "{result}");
+        assert_eq!(result["ok"], true);
+        assert_eq!(result["changed"], json!(["bundle-two", "bundle-one"]));
+        let (selected, disabled) = lists(&server, "agentA");
+        assert!(selected.contains(&"unrelated-selection".into()));
+        assert_eq!(selected.contains(&"bundle-one".into()), enabled);
+        assert_eq!(selected.contains(&"bundle-two".into()), enabled);
+        assert!(!selected.contains(&"missing-member".into()));
+        assert_eq!(selected.len(), if enabled { 3 } else { 1 });
+        assert_eq!(disabled, vec!["workspace-opt-out"]);
+        assert_eq!(result["enabled"], json!(selected));
+        assert_eq!(
+            std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+            other_config
+        );
+        assert_eq!(
+            std::fs::read(server.home.join("skill-bundles.json")).unwrap(),
+            bundle_bytes
+        );
+        let runtime = view(&server, "agentA", true).await;
+        let runtime_names: Vec<_> = runtime["skills"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|skill| skill["enabled"] == true)
+            .filter_map(|skill| skill["name"].as_str())
+            .collect();
+        assert!(runtime_names.contains(&"unrelated-selection"));
+        assert_eq!(runtime_names.contains(&"bundle-one"), enabled);
+        assert_eq!(runtime_names.contains(&"bundle-two"), enabled);
+        let projected = server
+            .request("GET", "/lingxi/v1/skills/bundles?agentId=agentA", None)
+            .await;
+        assert_eq!(projected.0, 200);
+        let members = projected.1["bundles"][0]["skills"].as_array().unwrap();
+        assert!(members.iter().any(|skill| skill["name"] == "missing-member"
+            && skill["missing"] == true
+            && skill["enabled"] == false));
+        assert!(members
+            .iter()
+            .any(|skill| skill["name"] == "bundle-one" && skill["enabled"] == enabled));
+    }
+    store
+        .save(&[json!({"id":"empty-visible","name":"No visible","skillNames":["missing-member"]})])
+        .unwrap();
+    let before = std::fs::read(&config).unwrap();
+    for enabled in [true, false] {
+        let (status, result) = server
+            .request(
+                "PATCH",
+                "/lingxi/v1/agents/agentA/skill-bundles/empty-visible",
+                Some(json!({"enabled":enabled})),
+            )
+            .await;
+        assert_eq!(status, 200, "{result}");
+        assert_eq!(result["changed"], json!([]));
+        assert_eq!(result["enabled"], json!(lists(&server, "agentA").0));
+        assert_eq!(std::fs::read(&config).unwrap(), before);
+    }
+    write_package(&server.home.join("skills"), "concurrent-member");
+    store
+        .save(&[
+            json!({"id":"delta","name":"Delta","skillNames":["bundle-one"]}),
+            json!({"id":"concurrent","name":"Concurrent","skillNames":["concurrent-member"]}),
+        ])
+        .unwrap();
+    let skills = std::sync::Arc::new(lingxi_service::skills::SkillService::new(
+        server.home.clone(),
+        server.home.join("synthetic-product"),
+    ));
+    for _ in 0..8 {
+        skills
+            .set_enabled_skills("agentA", &["unrelated-selection".into()], None)
+            .unwrap();
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(2));
+        let first = {
+            let skills = skills.clone();
+            let barrier = barrier.clone();
+            std::thread::spawn(move || {
+                barrier.wait();
+                skills
+                    .patch_bundle_enabled("agentA", "delta", true, None)
+                    .unwrap()
+            })
+        };
+        let second = {
+            let skills = skills.clone();
+            let barrier = barrier.clone();
+            std::thread::spawn(move || {
+                barrier.wait();
+                skills
+                    .patch_skill_enabled("agentA", "concurrent-member", true, None)
+                    .unwrap()
+            })
+        };
+        assert_eq!(first.join().unwrap()["changed"], json!(["bundle-one"]));
+        assert_eq!(second.join().unwrap()["enabled"], true);
+        let mut selected = lists(&server, "agentA").0;
+        selected.sort();
+        assert_eq!(
+            selected,
+            vec!["bundle-one", "concurrent-member", "unrelated-selection"]
+        );
+        let barrier = std::sync::Arc::new(std::sync::Barrier::new(2));
+        let first = {
+            let skills = skills.clone();
+            let barrier = barrier.clone();
+            std::thread::spawn(move || {
+                barrier.wait();
+                skills
+                    .patch_bundle_enabled("agentA", "delta", false, None)
+                    .unwrap()
+            })
+        };
+        let second = {
+            let skills = skills.clone();
+            let barrier = barrier.clone();
+            std::thread::spawn(move || {
+                barrier.wait();
+                skills
+                    .patch_bundle_enabled("agentA", "concurrent", false, None)
+                    .unwrap()
+            })
+        };
+        assert_eq!(first.join().unwrap()["changed"], json!(["bundle-one"]));
+        assert_eq!(
+            second.join().unwrap()["changed"],
+            json!(["concurrent-member"])
+        );
+        assert_eq!(lists(&server, "agentA").0, vec!["unrelated-selection"]);
+        assert_eq!(lists(&server, "agentA").1, vec!["workspace-opt-out"]);
+    }
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
+async fn original_bundle_toggle_refusals_and_backing_storage_failures_preserve_selection() {
+    let server = start_server("bundle-delta-errors").await;
+    write_package(&server.home.join("skills"), "bundle-one");
+    let store = lingxi_adapters::storage::skill_library::BundlesStore::new(&server.home);
+    store
+        .save(&[json!({"id":"delta","name":"Delta","skillNames":["bundle-one"]})])
+        .unwrap();
+    let path = "/lingxi/v1/agents/agentA/skill-bundles/delta";
+    let config = server.home.join("agents/agentA/config.yaml");
+    let before = std::fs::read(&config).unwrap();
+    let other = std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap();
+    let bundle_path = server.home.join("skill-bundles.json");
+    let bundle_bytes = std::fs::read(&bundle_path).unwrap();
+    for enabled in [true, false] {
+        let (status, result) = server
+            .request_token(
+                "PATCH",
+                path,
+                Some(json!({"enabled":enabled})),
+                &server.readonly_token,
+            )
+            .await;
+        assert_eq!(status, 403, "{result}");
+        for (target, body, expected) in [
+            (path, json!({}), 400),
+            (path, json!({"enabled":"true"}), 400),
+            (path, json!({"enabled":null}), 400),
+            (path, json!([]), 400),
+            (
+                "/lingxi/v1/agents/agentA/skill-bundles/missing",
+                json!({"enabled":enabled}),
+                404,
+            ),
+            (
+                "/lingxi/v1/agents/missing/skill-bundles/delta",
+                json!({"enabled":enabled}),
+                404,
+            ),
+        ] {
+            let (status, result) = server.request("PATCH", target, Some(body)).await;
+            assert_eq!(status, expected, "{result}");
+            assert_ne!(result["ok"], true);
+            assert_eq!(std::fs::read(&config).unwrap(), before);
+            assert_eq!(
+                std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+                other
+            );
+            assert_eq!(std::fs::read(&bundle_path).unwrap(), bundle_bytes);
+        }
+    }
+    std::fs::write(&bundle_path, "corrupt bundle input").unwrap();
+    let (status, result) = server
+        .request("PATCH", path, Some(json!({"enabled":true})))
+        .await;
+    assert_eq!(status, 400, "{result}");
+    assert!(result["error"]
+        .as_str()
+        .unwrap()
+        .contains("invalid skill bundles"));
+    assert_eq!(
+        std::fs::read_to_string(&bundle_path).unwrap(),
+        "corrupt bundle input"
+    );
+    assert_eq!(std::fs::read(&config).unwrap(), before);
+    std::fs::remove_file(&bundle_path).unwrap();
+    std::fs::create_dir(&bundle_path).unwrap();
+    let (status, result) = server
+        .request("PATCH", path, Some(json!({"enabled":false})))
+        .await;
+    assert_eq!(status, 500, "{result}");
+    assert!(result["error"]
+        .as_str()
+        .unwrap()
+        .contains("read skill bundles"));
+    assert_eq!(std::fs::read(&config).unwrap(), before);
+    std::fs::remove_dir(&bundle_path).unwrap();
+    std::fs::write(&bundle_path, &bundle_bytes).unwrap();
+    std::fs::remove_file(&config).unwrap();
+    std::fs::create_dir(&config).unwrap();
+    let (status, result) = server
+        .request("PATCH", path, Some(json!({"enabled":true})))
+        .await;
+    assert_eq!(status, 404, "{result}");
+    assert_ne!(result["ok"], true);
+    assert!(config.is_dir());
+    assert_eq!(std::fs::read(&bundle_path).unwrap(), bundle_bytes);
+    std::fs::remove_dir(&config).unwrap();
+    std::fs::write(&config, &before).unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let parent = config.parent().unwrap();
+        let original = std::fs::metadata(parent).unwrap().permissions();
+        std::fs::set_permissions(parent, std::fs::Permissions::from_mode(0o555)).unwrap();
+        let outcome = server
+            .request("PATCH", path, Some(json!({"enabled":true})))
+            .await;
+        std::fs::set_permissions(parent, original).unwrap();
+        assert_eq!(outcome.0, 500, "{:?}", outcome.1);
+        assert_ne!(outcome.1["ok"], true);
+        assert_eq!(std::fs::read(&config).unwrap(), before);
+    }
+    let (status, result) = server
+        .request("PATCH", path, Some(json!({"enabled":true})))
+        .await;
+    assert_eq!(status, 200, "{result}");
+    assert_eq!(result["changed"], json!(["bundle-one"]));
+    assert_eq!(lists(&server, "agentA").0, vec!["bundle-one"]);
+    let (status, result) = server
+        .request("PATCH", path, Some(json!({"enabled":false})))
+        .await;
+    assert_eq!(status, 200, "{result}");
+    assert_eq!(result["changed"], json!(["bundle-one"]));
+    assert!(lists(&server, "agentA").0.is_empty());
+    assert_eq!(
+        std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+        other
+    );
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
 async fn original_global_manual_install_complete_package_without_agent_enable() {
     let server = start_server("manual-original").await;
     let source = write_package(&server.home.join("incoming"), "global-original");
@@ -220,11 +790,9 @@ async fn original_global_manual_install_complete_package_without_agent_enable() 
     assert_eq!(status, 200);
     assert_eq!(result["skill"]["name"], "global-original");
     let installed = server.home.join("skills/global-original");
-    assert!(
-        std::fs::read_to_string(installed.join("SKILL.md"))
-            .unwrap()
-            .contains("完整正文")
-    );
+    assert!(std::fs::read_to_string(installed.join("SKILL.md"))
+        .unwrap()
+        .contains("完整正文"));
     assert_eq!(
         std::fs::read_to_string(installed.join("examples/example.txt")).unwrap(),
         "配套文件原文"
@@ -312,11 +880,9 @@ async fn original_skill_enable_disable_runtime_and_workspace_shadow_boundaries()
             .find(|s| s["name"] == "ordinary-original" && s["source"] == "user")
             .unwrap();
         assert_eq!(entry["enabled"], enable);
-        assert!(
-            !lists(&server, "agentB")
-                .0
-                .contains(&"ordinary-original".into())
-        );
+        assert!(!lists(&server, "agentB")
+            .0
+            .contains(&"ordinary-original".into()));
     }
     for enable in [false, true] {
         let (status, result) = server
@@ -342,11 +908,9 @@ async fn original_skill_enable_disable_runtime_and_workspace_shadow_boundaries()
             .find(|s| s["name"] == "workspace-original")
             .unwrap();
         assert_eq!(entry["enabled"], enable);
-        assert!(
-            !lists(&server, "agentB")
-                .1
-                .contains(&"workspace-original".into())
-        );
+        assert!(!lists(&server, "agentB")
+            .1
+            .contains(&"workspace-original".into()));
     }
     let before = file_snapshot(&server.home.join("agents"));
     let (status, error) = server
@@ -466,13 +1030,11 @@ async fn original_external_paths_persist_readback_and_rejections_without_mutatio
         .await;
     assert_eq!(status, 200);
     assert_eq!(result["configured"], json!([]));
-    assert!(
-        !view(&server, "agentA", false).await["skills"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|s| s["name"] == "external-original")
-    );
+    assert!(!view(&server, "agentA", false).await["skills"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|s| s["name"] == "external-original"));
     server.stop_and_clean().await;
 }
 
@@ -717,11 +1279,9 @@ async fn original_skill_patch_refreshes_same_compiler_and_frozen_previous_prompt
         .compiled_for_run("sess-original-skill-refresh", "agentA", false, 1)
         .unwrap();
     assert!(!before.render().contains("<name>prompt-original</name>"));
-    assert!(
-        before
-            .render()
-            .contains("<name>workspace-prompt-original</name>")
-    );
+    assert!(before
+        .render()
+        .contains("<name>workspace-prompt-original</name>"));
     let (status, _) = server
         .request(
             "PATCH",
@@ -756,35 +1316,27 @@ async fn original_skill_patch_refreshes_same_compiler_and_frozen_previous_prompt
         )
         .await;
     assert_eq!(status, 200);
-    assert!(
-        !skills
-            .runtime_skill_catalog("agentA")
-            .unwrap()
-            .iter()
-            .any(|s| s.name == "workspace-prompt-original")
-    );
+    assert!(!skills
+        .runtime_skill_catalog("agentA")
+        .unwrap()
+        .iter()
+        .any(|s| s.name == "workspace-prompt-original"));
     let workspace_disabled = compiler
         .compiled_for_run("sess-original-skill-refresh", "agentA", false, 1)
         .unwrap();
-    assert!(
-        !workspace_disabled
-            .render()
-            .contains("<name>workspace-prompt-original</name>")
-    );
-    assert!(
-        before
-            .render()
-            .contains("<name>workspace-prompt-original</name>")
-    );
+    assert!(!workspace_disabled
+        .render()
+        .contains("<name>workspace-prompt-original</name>"));
+    assert!(before
+        .render()
+        .contains("<name>workspace-prompt-original</name>"));
     let other = compiler
         .compiled_for_run("sess-original-skill-refresh-b", "agentB", false, 1)
         .unwrap();
     assert!(!other.render().contains("<name>prompt-original</name>"));
-    assert!(
-        other
-            .render()
-            .contains("<name>workspace-prompt-original</name>")
-    );
+    assert!(other
+        .render()
+        .contains("<name>workspace-prompt-original</name>"));
     server.stop_and_clean().await;
 }
 
@@ -892,19 +1444,15 @@ async fn original_nonempty_cleanup_preview_excludes_shared_and_readonly_sources(
     let catalog = skills
         .list_for_agent("agentA", true, Some(&server.workspace))
         .unwrap();
-    assert!(
-        catalog.iter().any(|s| s["name"] == "builtin-original"
-            && s["readonly"] == true
-            && s["enabled"] == true)
-    );
+    assert!(catalog
+        .iter()
+        .any(|s| s["name"] == "builtin-original" && s["readonly"] == true && s["enabled"] == true));
     assert!(catalog.iter().any(|s| s["name"] == "external-original"
         && s["readonly"] == true
         && s["enabled"] == true));
-    assert!(
-        catalog
-            .iter()
-            .any(|s| s["name"] == "workspace-preview-original" && s["source"] == "workspace")
-    );
+    assert!(catalog
+        .iter()
+        .any(|s| s["name"] == "workspace-preview-original" && s["source"] == "workspace"));
     let paths = [lingxi_adapters::storage::skill_library::ExternalSkillPath {
         dir_path: plugin.clone(),
         label: "plugin:original".into(),
@@ -1061,20 +1609,16 @@ async fn original_skill_delete_reads_every_agent_and_bundle_after_complete_or_pa
                 residual_agents.push(id.clone());
             }
             let live = view(&server, id, true).await;
-            assert!(
-                !live["skills"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .any(|s| s["name"] == "delete-all-original")
-            );
-            assert!(
-                live["skills"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .any(|s| s["name"] == "keep-all-original" && s["enabled"] == true)
-            );
+            assert!(!live["skills"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|s| s["name"] == "delete-all-original"));
+            assert!(live["skills"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|s| s["name"] == "keep-all-original" && s["enabled"] == true));
         }
         let bundles_after = store.load_checked().unwrap();
         assert_eq!(bundles_after.len(), if mode == "complete" { 2 } else { 3 });
@@ -1085,15 +1629,13 @@ async fn original_skill_delete_reads_every_agent_and_bundle_after_complete_or_pa
                 .find(|bundle| bundle["id"] == original["id"]);
             let mut expected = original.clone();
             if mode == "complete" {
-                expected["skillNames"] = json!(
-                    original["skillNames"]
-                        .as_array()
-                        .unwrap()
-                        .iter()
-                        .filter(|name| name.as_str() != Some("delete-all-original"))
-                        .cloned()
-                        .collect::<Vec<_>>()
-                );
+                expected["skillNames"] = json!(original["skillNames"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .filter(|name| name.as_str() != Some("delete-all-original"))
+                    .cloned()
+                    .collect::<Vec<_>>());
                 if expected["skillNames"].as_array().unwrap().is_empty() {
                     assert!(actual.is_none());
                     continue;

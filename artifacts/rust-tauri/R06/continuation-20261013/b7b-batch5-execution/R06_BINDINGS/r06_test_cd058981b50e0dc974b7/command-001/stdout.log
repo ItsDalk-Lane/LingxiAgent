@@ -1,0 +1,15 @@
+
+running 1 test
+test original_external_paths_persist_readback_and_rejections_without_mutation ... ok
+
+successes:
+
+---- original_external_paths_persist_readback_and_rejections_without_mutation stdout ----
+LINGXI_AUTH_REJECTED request_id="req-af8f7de928b1b97da6b67b1859dc6d8d" method=PUT path=/lingxi/v1/skills/external-paths status=403 reason=insufficient_scope remote=127.0.0.1:61586
+
+
+successes:
+    original_external_paths_persist_readback_and_rejections_without_mutation
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.78s
+

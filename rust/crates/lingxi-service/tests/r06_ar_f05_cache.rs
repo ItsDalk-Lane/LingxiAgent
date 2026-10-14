@@ -915,6 +915,206 @@ fn digest_text(text: &str) -> String {
         .collect()
 }
 
+// ── F05-D 重放探针：有界淘汰 + 可观察统计 + 会话删除/归档回收 ──
+
+/// 最小材料源替身：本探针只重放观测缓存原语（提交后缓存、有界淘汰、
+/// 统计可观察、超预算拒绝不清空）；材料采集与真实调用链由 c01/c02/c04
+/// 在完整生产链上覆盖。
+struct ProbeSource;
+impl lingxi_service::context_compiler::ContextMaterialSource for ProbeSource {
+    fn gather(
+        &self,
+        _query: &lingxi_service::context_compiler::MaterialQuery,
+    ) -> Result<
+        lingxi_kernel::context::ContextCompileInput,
+        lingxi_service::context_compiler::ContextMaterialError,
+    > {
+        Err(
+            lingxi_service::context_compiler::ContextMaterialError::SkillMaterial {
+                detail: "probe source never gathers".to_string(),
+            },
+        )
+    }
+}
+
+#[test]
+fn c03_observation_cache_is_bounded_and_evictions_are_observable() {
+    use lingxi_service::context_compiler::{
+        ContextCompilerService, CONTEXT_OBSERVATION_CACHE_BYTES, CONTEXT_OBSERVATION_CACHE_CAP,
+    };
+    let service = ContextCompilerService::new(Arc::new(ProbeSource));
+    let view = |session: &str, call: usize, pad: usize| {
+        serde_json::json!({
+            "snapshotId": format!("snap-{session}-{call}"),
+            "modelCallId": format!("call-{session}-{call}"),
+            "sessionId": session,
+            "forSubagent": false,
+            "pad": "x".repeat(pad),
+        })
+    };
+    // 条目上限：满 128 后按「最旧已提交调用优先」淘汰，统计端点可见。
+    for call in 0..CONTEXT_OBSERVATION_CACHE_CAP {
+        service.record_call_observation(view("sess-cap", call, 0));
+    }
+    let stats = service.cache_stats();
+    assert_eq!(
+        stats["entries"].as_u64().unwrap() as usize,
+        CONTEXT_OBSERVATION_CACHE_CAP
+    );
+    assert_eq!(stats["evictions"].as_u64().unwrap(), 0);
+    assert_eq!(stats["policy"], "oldest_committed_call_first");
+    service.record_call_observation(view("sess-cap", CONTEXT_OBSERVATION_CACHE_CAP, 0));
+    let stats = service.cache_stats();
+    assert_eq!(
+        stats["entries"].as_u64().unwrap() as usize,
+        CONTEXT_OBSERVATION_CACHE_CAP,
+        "缓存必须有界"
+    );
+    assert_eq!(stats["evictions"].as_u64().unwrap(), 1);
+    // 会话读面命中最新的已提交真实调用观测。
+    assert_eq!(
+        service.observation_for_session("sess-cap").unwrap()["modelCallId"],
+        serde_json::json!(format!("call-sess-cap-{CONTEXT_OBSERVATION_CACHE_CAP}")),
+    );
+    // 超出整个字节预算的单视图：拒绝插入，且不得淘汰任何已提交观测。
+    let before = service.cache_stats();
+    service.record_call_observation(view("sess-oversize", 0, CONTEXT_OBSERVATION_CACHE_BYTES));
+    let after = service.cache_stats();
+    assert_eq!(after["entries"], before["entries"], "拒绝插入不得清空缓存");
+    assert_eq!(after["evictions"], before["evictions"]);
+    // 字节预算：连续 ~1MiB 提交后总量仍受 8MiB 约束，淘汰可观察。
+    let byte_service = ContextCompilerService::new(Arc::new(ProbeSource));
+    for call in 0..9 {
+        byte_service.record_call_observation(view("sess-bytes", call, 1024 * 1024));
+    }
+    let stats = byte_service.cache_stats();
+    assert!(
+        stats["bytes"].as_u64().unwrap() <= CONTEXT_OBSERVATION_CACHE_BYTES as u64,
+        "字节预算必须生效：{stats}"
+    );
+    assert!(stats["evictions"].as_u64().unwrap() >= 1, "淘汰必须可观察");
+    assert_eq!(
+        byte_service.observation_for_session("sess-bytes").unwrap()["modelCallId"],
+        serde_json::json!("call-sess-bytes-8"),
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn c03_session_archive_and_delete_reclaim_the_context_observation_cache() {
+    let home = own_home("c03-reclaim");
+    write(
+        &home,
+        "agents/lingxi/config.yaml",
+        "locale: zh-CN\nagent:\n  name: 灵犀\n",
+    );
+    let w = WireState {
+        sent: Arc::new(Mutex::new(Vec::new())),
+        parent_release: Arc::new(tokio::sync::Notify::new()),
+        arrived: Arc::new(tokio::sync::Notify::new()),
+    };
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let server = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route("/chat/completions", post(provider))
+                .with_state(w.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot(&home, &endpoint).await;
+    state
+        .session_admin()
+        .create_session(
+            "f05-reclaim",
+            "lingxi",
+            "user_local",
+            "synthetic",
+            None,
+            &[],
+            true,
+            1790409600000,
+        )
+        .await
+        .unwrap();
+    state
+        .sessions()
+        .execute_for(
+            state.storage().as_ref(),
+            state.events(),
+            state.runs(),
+            &principal(),
+            "f05-reclaim",
+            "reclaim probe",
+            1790409600000,
+        )
+        .await
+        .unwrap();
+    // 真实调用把已提交观测写进缓存（runs.rs 与 HTTP 观测端点同一服务对象）。
+    let durable = tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            if let Some(view) = state
+                .storage()
+                .model_context_observation("f05-reclaim", None, None, None)
+                .await
+                .unwrap()
+            {
+                break view;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    let compiler = state.context_compiler().expect("生产编译器必须挂到状态");
+    assert!(compiler
+        .cached_session_ids()
+        .contains(&"f05-reclaim".to_string()));
+    // 归档会话：观测缓存按会话回收，可观察统计记录 reclaimed。
+    state
+        .session_admin()
+        .archive_session("f05-reclaim", None, 1790409600500)
+        .await
+        .unwrap();
+    assert!(
+        !compiler
+            .cached_session_ids()
+            .contains(&"f05-reclaim".to_string()),
+        "会话归档必须回收其观测缓存"
+    );
+    assert!(
+        compiler.cache_stats()["reclaimed"].as_u64().unwrap() >= 1,
+        "回收必须可观察"
+    );
+    // 缓存回收不销毁持久事实：实际 run/snapshot 的观测仍按身份回读。
+    assert_eq!(
+        state
+            .storage()
+            .model_context_observation(
+                "f05-reclaim",
+                durable["runId"].as_str(),
+                durable["modelCallId"].as_str(),
+                durable["snapshotId"].as_str(),
+            )
+            .await
+            .unwrap()
+            .unwrap(),
+        durable
+    );
+    // 永久删除后再回收一次（幂等、无残留）。
+    state
+        .session_admin()
+        .delete_archived_session("f05-reclaim")
+        .await
+        .unwrap();
+    assert!(compiler.cached_session_ids().is_empty());
+    state.storage().close().await.unwrap();
+    server.abort();
+    let _ = server.await;
+    std::fs::remove_dir_all(home).unwrap();
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn c02_actor_owner_and_reader_remain_distinct_on_the_same_session() {
     let home = own_home("actors");

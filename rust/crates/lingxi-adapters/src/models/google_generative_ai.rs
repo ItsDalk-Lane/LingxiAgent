@@ -486,7 +486,8 @@ pub fn render_generate_request(
                     if anchored {
                         continue;
                     }
-                    let wire_name = call.historical_wire_name()
+                    let wire_name = call
+                        .historical_wire_name()
                         .ok_or_else(|| {
                             invalid(format!(
                                 "exchange history names tool target {:?}, which the current \
@@ -518,7 +519,8 @@ pub fn render_generate_request(
                     if !anchored {
                         continue;
                     }
-                    let wire_name = call.historical_wire_name()
+                    let wire_name = call
+                        .historical_wire_name()
                         .ok_or_else(|| {
                             invalid(format!(
                                 "exchange history names tool target {:?}, which the current \

@@ -112,7 +112,11 @@ impl TaskScore {
         self.tool_selection && self.schema_valid && self.semantic_params && self.task_complete
     }
     fn overall(&self) -> &'static str {
-        if self.all_true() { "pass" } else { "fail" }
+        if self.all_true() {
+            "pass"
+        } else {
+            "fail"
+        }
     }
     fn to_json(self) -> serde_json::Value {
         serde_json::json!({
@@ -2377,7 +2381,11 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
     let (status, reason) = world.completed_with_diagnostics(&run_id).await;
     assert_eq!(status, "completed", "{reason}");
     let requests = world.stub_ref().requests();
-    assert_eq!(requests.len(), 2, "已授权资料按需激活检索，检索与最终回答各一次");
+    assert_eq!(
+        requests.len(),
+        2,
+        "已授权资料按需激活检索，检索与最终回答各一次"
+    );
     let selection = selection_of(&requests[0]);
     assert_eq!(selection["notebookIds"], serde_json::json!([notebook_a]));
     assert_eq!(selection["sources"].as_array().unwrap().len(), 1);
@@ -2387,12 +2395,24 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
         .as_str()
         .expect("服务注入范围")
         .to_string();
-    let described = requests[0]["tools"].as_array().unwrap().iter().find(|tool| tool["function"]["name"] == "knowledge_search").unwrap()["function"].clone();
+    let described = requests[0]["tools"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|tool| tool["function"]["name"] == "knowledge_search")
+        .unwrap()["function"]
+        .clone();
     assert_eq!(described["name"], "knowledge_search");
     assert!(described["description"].as_str().unwrap().len() > "knowledge_search".len());
-    assert_eq!(described["parameters"], serde_json::json!({"type":"object","properties":{"scopeId":{"type":"string"},"query":{"type":"string"},"channel":{"type":"string","enum":["fts","hybrid"]},"notebookIds":{"type":"array","items":{"type":"string"}},"sourceIds":{"type":"array","items":{"type":"string"}},"sectionKeys":{"type":"array","items":{"type":"string"}},"limit":{"type":"number"}},"required":["scopeId","query"],"additionalProperties":false}));
+    assert_eq!(
+        described["parameters"],
+        serde_json::json!({"type":"object","properties":{"scopeId":{"type":"string"},"query":{"type":"string"},"channel":{"type":"string","enum":["fts","hybrid"]},"notebookIds":{"type":"array","items":{"type":"string"}},"sourceIds":{"type":"array","items":{"type":"string"}},"sectionKeys":{"type":"array","items":{"type":"string"}},"limit":{"type":"number"}},"required":["scopeId","query"],"additionalProperties":false})
+    );
     assert!(
-        requests.iter().all(|request| request["tools"] == requests[0]["tools"] && request["tools"].as_array().unwrap().len() == 8),
+        requests
+            .iter()
+            .all(|request| request["tools"] == requests[0]["tools"]
+                && request["tools"].as_array().unwrap().len() == 8),
         "仅当前已授权选择激活检索，其余知识和记忆工具不追加"
     );
     let knowledge_db = rusqlite::Connection::open_with_flags(
@@ -2517,12 +2537,12 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
 
 // ═══ BE-08 子代理边界（S 层）：只读父 → 子代理越权写被真实边界拒绝 ══════════
 
-use lingxi_kernel::RunContext;
 use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
     ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
 };
+use lingxi_kernel::RunContext;
 use lingxi_protocol::{
     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
 };
@@ -2530,11 +2550,11 @@ use lingxi_service::context_compiler::{
     ContextCompilerService, FileContextMaterialSource, HostFacts,
 };
 use lingxi_service::filetools::{
-    CoreFileTools, FileChangeLog, NoopChangeLog, register_core_file_tools,
+    register_core_file_tools, CoreFileTools, FileChangeLog, NoopChangeLog,
 };
 use lingxi_service::toolgateway::ToolInvocationGateway;
 use lingxi_service::{
-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
+    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
 };
 
 fn owner_principal() -> lingxi_service::Principal {

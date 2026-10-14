@@ -1001,6 +1001,154 @@ async fn history_etag_conditional_get_and_limit_clamp() {
     server.stop_and_clean().await;
 }
 
+/// R06-R2（AA9EB3FD034D）：现役 `/sessions/messages` 契约的 before/limit/
+/// all/reconciliation 入口与待办/修订投影——`revision` 与 ETag 同源、
+/// `todos`/`todoPanel` 与面板读同一快照、`reconciliation=1` 附协调证明块
+/// （runRevision/complete/runStatus）且不参与 304（E01 资格）。
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn history_reconciliation_todos_and_revision_projection() {
+    let provider = ScriptedProvider::new(vec![
+        ScriptStep::Final("r1".to_string()),
+        ScriptStep::Final("r2".to_string()),
+        ScriptStep::Final("r3".to_string()),
+    ]);
+    let server = start_server("recon", provider, false).await;
+    create_session(&server, "s", "recon").await;
+    server.execute_wait("s", "q1").await;
+    server.execute_wait("s", "q2").await;
+
+    // 基线页：revision 与 ETag 同源；无 todo 条目 → removed 面板。
+    let first = server.get_full("/lingxi/v1/sessions/s/history", &[]).await;
+    assert_eq!(first.status, 200, "history: {}", first.body);
+    let etag = first.header("etag").expect("ETag header").to_string();
+    let parsed: serde_json::Value = serde_json::from_str(&first.body).unwrap();
+    assert_eq!(
+        parsed["revision"],
+        serde_json::json!(etag),
+        "revision = ETag 同源"
+    );
+    assert_eq!(
+        parsed["todoPanel"]["removed"], true,
+        "无 todo 条目 → removed"
+    );
+    assert_eq!(parsed["todos"], serde_json::json!([]));
+
+    // 写一条真实 todo 快照（run/工具侧同一 append_state_entry 入口）。
+    lingxi_service::todos::append_state_entry(
+        &server.state,
+        "s",
+        &lingxi_service::todos::TodoStateEntry {
+            version: "tv00000000".to_string(),
+            todos: vec![
+                lingxi_service::todos::TodoItem {
+                    id: "t1".to_string(),
+                    content: "整理历史分页".to_string(),
+                    status: "in_progress".to_string(),
+                },
+                lingxi_service::todos::TodoItem {
+                    id: "t2".to_string(),
+                    content: "核对修订点".to_string(),
+                    status: "pending".to_string(),
+                },
+            ],
+            removed: false,
+            action: "initialize".to_string(),
+        },
+        1_700_000_000_000,
+    )
+    .await
+    .expect("seed todo entry");
+    let with_todos = server.get("/lingxi/v1/sessions/s/history").await;
+    assert_eq!(with_todos.0, 200);
+    let parsed: serde_json::Value = serde_json::from_str(&with_todos.1).unwrap();
+    // 完整面板负载无 removed 键（现役 todoPanelPayloadFromSnapshot :169）。
+    assert!(
+        parsed["todoPanel"]["removed"].is_null(),
+        "todo 面板恢复（非 removed 负载）: {}",
+        parsed["todoPanel"]
+    );
+    assert_eq!(parsed["todos"].as_array().unwrap().len(), 2, "todos 投影");
+    assert!(parsed["todoPanel"]["version"].is_string(), "面板版本");
+
+    // reconciliation=1：空闲会话 + 完整页 → reconciled_idle 证明块。
+    let recon = server
+        .get("/lingxi/v1/sessions/s/history?reconciliation=1")
+        .await;
+    assert_eq!(recon.0, 200, "reconciliation: {}", recon.1);
+    let parsed: serde_json::Value = serde_json::from_str(&recon.1).unwrap();
+    let block = &parsed["reconciliation"];
+    assert_eq!(block["sessionId"], "s");
+    assert_eq!(block["runStatus"], "reconciled_idle", "空闲+完整页");
+    assert_eq!(block["complete"], true);
+    assert!(
+        block["runRevision"]
+            .as_str()
+            .unwrap()
+            .starts_with(|c: char| c.is_ascii_digit()),
+        "runRevision 是修订点字符串"
+    );
+
+    // E01：reconciliation 不参与 304——即使 If-None-Match 命中也回 200。
+    let conditional = server
+        .get_full(
+            "/lingxi/v1/sessions/s/history?reconciliation=1",
+            &[("If-None-Match", &etag)],
+        )
+        .await;
+    assert_eq!(conditional.status, 200, "reconciliation 不做条件 GET");
+
+    // 页不完整（limit=1 且还有更多）→ complete=false → runStatus unknown。
+    let partial = server
+        .get("/lingxi/v1/sessions/s/history?reconciliation=1&limit=1")
+        .await;
+    assert_eq!(partial.0, 200);
+    let parsed: serde_json::Value = serde_json::from_str(&partial.1).unwrap();
+    assert_eq!(parsed["page"]["hasMore"], true);
+    assert_eq!(
+        parsed["reconciliation"]["runStatus"], "unknown",
+        "页不完整 → 宁缺勿假 unknown"
+    );
+
+    // before 游标页同样携带投影字段（翻页不是降级路径）。
+    let next_before = parsed["page"]["nextBefore"].as_str().unwrap().to_string();
+    let paged = server
+        .get(&format!(
+            "/lingxi/v1/sessions/s/history?before={next_before}&reconciliation=1"
+        ))
+        .await;
+    assert_eq!(paged.0, 200, "before 页: {}", paged.1);
+    let parsed: serde_json::Value = serde_json::from_str(&paged.1).unwrap();
+    assert!(parsed["revision"].is_string(), "before 页带 revision");
+    assert_eq!(
+        parsed["todos"].as_array().unwrap().len(),
+        2,
+        "before 页带 todos"
+    );
+
+    // all=1 与 reconciliation 并用（流式恢复场景）：全量页 complete=true。
+    let all_recon = server
+        .get("/lingxi/v1/sessions/s/history?all=1&reconciliation=1")
+        .await;
+    assert_eq!(all_recon.0, 200, "all+reconciliation: {}", all_recon.1);
+    let parsed: serde_json::Value = serde_json::from_str(&all_recon.1).unwrap();
+    assert_eq!(parsed["reconciliation"]["complete"], true);
+    assert_eq!(parsed["reconciliation"]["runStatus"], "reconciled_idle");
+
+    // 非法 reconciliation 值 → 400（闭合查询纪律）。
+    for bad in [
+        "reconciliation=0",
+        "reconciliation=true",
+        "reconciliation=1&reconciliation=1",
+    ] {
+        let (status, body) = server
+            .get(&format!("/lingxi/v1/sessions/s/history?{bad}"))
+            .await;
+        assert_eq!(status, 400, "非法 reconciliation {bad} 必须 400: {body}");
+    }
+
+    server.stop_and_clean().await;
+}
+
 /// 游标校验与归属闸：伪造/畸形游标 400；跨主体 403；未知会话 404。
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn history_cursor_validation_and_owner_isolation() {

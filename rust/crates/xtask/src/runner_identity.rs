@@ -44,6 +44,14 @@ const EMBEDDED: &[(&str, &[u8])] = &[
         include_bytes!("stage_maps/R05.json"),
     ),
     (
+        "rust/crates/xtask/src/stage_maps/R06.json",
+        include_bytes!("stage_maps/R06.json"),
+    ),
+    (
+        "rust/crates/xtask/src/stage_maps/R06_INPUTS.json",
+        include_bytes!("stage_maps/R06_INPUTS.json"),
+    ),
+    (
         "rust/crates/xtask/Cargo.toml",
         include_bytes!("../Cargo.toml"),
     ),
@@ -64,6 +72,8 @@ const SOURCE_INVENTORY: &[&str] = &[
     "stage_maps/R03.json",
     "stage_maps/R04.json",
     "stage_maps/R05.json",
+    "stage_maps/R06.json",
+    "stage_maps/R06_INPUTS.json",
     "verify/runner_tests.rs",
     "candidate/tests.rs",
 ];
@@ -113,7 +123,7 @@ pub fn check(root: &Path) -> Result<serde_json::Value, String> {
         "status": "PASS",
         "compiledSourceFiles": records,
         "sourceInventory": actual,
-        "note": "The executable's embedded implementation and R02 stage map exactly match current disk bytes before any registered command runs.",
+        "note": "The executable's embedded implementation, R02-R06 stage maps and R06 inputs exactly match current disk bytes before any registered command runs.",
     }))
 }
 
@@ -179,16 +189,26 @@ mod tests {
         fs::write(&discovery_path, b"changed discovery implementation").unwrap();
         assert!(check(&root).unwrap_err().contains("run_output_sinks.py"));
         fs::write(discovery_path, discovery_bytes).unwrap();
+        for name in ["R02.json", "R06.json", "R06_INPUTS.json"] {
+            let path = root.join("rust/crates/xtask/src/stage_maps").join(name);
+            let original = fs::read(&path).unwrap();
+            fs::write(&path, b"{\"new\":true}").unwrap();
+            let err = check(&root).unwrap_err();
+            assert!(
+                err.contains("stale xtask binary") && err.contains(name),
+                "{err}"
+            );
+            fs::write(path, original).unwrap();
+            assert_eq!(check(&root).unwrap()["status"], "PASS");
+        }
         fs::write(
-            root.join("rust/crates/xtask/src/stage_maps/R02.json"),
-            b"{\"new\":true}",
+            root.join("rust/crates/xtask/src/stage_maps/unregistered.json"),
+            b"{}",
         )
         .unwrap();
-        let err = check(&root).unwrap_err();
-        assert!(
-            err.contains("stale xtask binary") && err.contains("R02.json"),
-            "{err}"
-        );
+        assert!(check(&root)
+            .unwrap_err()
+            .contains("source inventory differs"));
         fs::remove_dir_all(root).unwrap();
     }
 }

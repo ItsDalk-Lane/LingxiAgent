@@ -10,6 +10,7 @@ pub struct AgentConfigScan {
     pub agent_name: Option<String>,
     pub yuan: Option<String>,
     pub memory_enabled: Option<bool>,
+    pub desk_home_folder: Option<String>,
 }
 
 pub struct AgentConfigDocument {
@@ -186,6 +187,89 @@ fn is_timestamp(value: &str) -> bool {
         regex::Regex::new(r"^(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:[Tt]|[ \t]+)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]*)?(?:[ \t]*(?:Z|[-+][0-9]{1,2}(?::[0-9]{2})?))?)$").expect("固定现役时间戳模式")
     });
     RE.is_match(value)
+}
+
+// 现役 js-yaml 4.3.1 lib/type/int.js resolveYamlInteger 的词面等价：
+// 可选符号；裸 0；小写 0b/0o/0x 前缀（至少一位合法数位）；其余纯十进制数字（允许前导 0，
+// 017 现役按 parseInt(…,10)=17）。大写 0B/0O/0X 与下划线不是整数词法。
+fn is_incumbent_int_literal(value: &str) -> bool {
+    let body = value.strip_prefix(['-', '+']).unwrap_or(value);
+    let bytes = body.as_bytes();
+    if bytes.is_empty() {
+        return false;
+    }
+    if bytes[0] == b'0' {
+        if bytes.len() == 1 {
+            return true;
+        }
+        let radix_digits = match bytes[1] {
+            b'b' => Some((2u32, &body[2..])),
+            b'o' => Some((8, &body[2..])),
+            b'x' => Some((16, &body[2..])),
+            _ => None,
+        };
+        if let Some((radix, digits)) = radix_digits {
+            return !digits.is_empty()
+                && digits.bytes().all(|c| match radix {
+                    2 => matches!(c, b'0'..=b'1'),
+                    8 => matches!(c, b'0'..=b'7'),
+                    _ => c.is_ascii_hexdigit(),
+                });
+        }
+    }
+    body.bytes().all(|c| c.is_ascii_digit())
+}
+
+// 现役 parseYamlInteger + isFinite：先按 i64 精确解析（含符号与前导 0 十进制），
+// 基数形式溢出或十进制超出 i64 时降为有限 f64（与现役 JS Number 一致）；非有限视为词法失败。
+fn parse_incumbent_int(value: &str) -> Option<Value> {
+    if let Ok(n) = value.parse::<i64>() {
+        return Some(Value::Number(n.into()));
+    }
+    let (neg, body) = match value.as_bytes().first() {
+        Some(b'-') => (true, &value[1..]),
+        Some(b'+') => (false, &value[1..]),
+        _ => (false, value),
+    };
+    let (radix, digits) = [("0b", 2u32), ("0o", 8), ("0x", 16)]
+        .into_iter()
+        .find_map(|(prefix, radix)| body.strip_prefix(prefix).map(|d| (radix, d)))
+        .unwrap_or((10, body));
+    if let Ok(n) = i64::from_str_radix(digits, radix) {
+        let n = if neg { -n } else { n };
+        return Some(Value::Number(n.into()));
+    }
+    let mut acc = 0f64;
+    for b in digits.bytes() {
+        let d = match radix {
+            16 => match b {
+                b'a'..=b'f' => (b - b'a' + 10) as f64,
+                b'A'..=b'F' => (b - b'A' + 10) as f64,
+                _ => (b - b'0') as f64,
+            },
+            _ => (b - b'0') as f64,
+        };
+        acc = acc * f64::from(radix) + d;
+    }
+    let acc = if neg { -acc } else { acc };
+    acc.is_finite().then(|| Value::Number(acc.into()))
+}
+
+// 现役 lib/type/null.js resolveYamlNull：仅 ~ / null / Null / NULL / 空标量。
+fn is_incumbent_null_literal(value: &str) -> bool {
+    matches!(value, "" | "~" | "null" | "Null" | "NULL")
+}
+
+// 现役 lib/type/float.js YAML_FLOAT_PATTERN + isFinite(parseFloat) 或 inf/nan 特殊字面。
+fn is_incumbent_float_literal(value: &str) -> bool {
+    static RE: std::sync::LazyLock<regex::Regex> = std::sync::LazyLock::new(|| {
+        regex::Regex::new(
+            r"^(?:[-+]?(?:[0-9]+)(?:\.[0-9]*)?(?:[eE][-+]?[0-9]+)?|\.[0-9]+(?:[eE][-+]?[0-9]+)?|[-+]?\.(?:inf|Inf|INF)|\.(?:nan|NaN|NAN))$",
+        )
+        .expect("固定现役浮点模式")
+    });
+    RE.is_match(value)
+        && (value.parse::<f64>().is_ok_and(|n| n.is_finite()) || nonfinite_literal(value))
 }
 
 const OWNED_SECTIONS: [&str; 5] = [
@@ -518,6 +602,20 @@ fn scalar_value(
         Some("str") => Ok(Value::String(value.to_string())),
         Some("merge") if value == "<<" => Ok(Value::String(value.to_string())),
         Some("merge") => Err(invalid("invalid !!merge scalar")),
+        Some("null") => {
+            if is_incumbent_null_literal(value) {
+                Ok(Value::Null)
+            } else {
+                Err(invalid("invalid !!null under incumbent schema"))
+            }
+        }
+        Some("int") => {
+            if !is_incumbent_int_literal(value) {
+                return Err(invalid("invalid !!int under incumbent schema"));
+            }
+            parse_incumbent_int(value)
+                .ok_or_else(|| invalid("invalid !!int under incumbent schema"))
+        }
         Some("float") => {
             let yaml = serde_saphyr::to_string(&serde_saphyr::Tagged(
                 value,
@@ -531,9 +629,6 @@ fn scalar_value(
             Ok(Value::Number(number.into()))
         }
         Some(core) => {
-            if core == "int" && value.contains('_') {
-                return Err(invalid("invalid !!int under incumbent schema"));
-            }
             let yaml = serde_saphyr::to_string(&serde_saphyr::Tagged(
                 value,
                 Some(format!("tag:yaml.org,2002:{core}")),
@@ -560,6 +655,20 @@ fn scalar_value(
         }
         None => {
             let parsed=serde_saphyr::from_str_with_options::<Value>(value,serde_saphyr::options!{strict_booleans:true,reject_non_finite_typeless_float:false,}).map_err(invalid)?;
+            if matches!(&parsed, Value::Number(_)) {
+                // 库 resolver 与现役词法有已知分歧（大写 0B/0O/0X 前缀、1e999 溢出、前导 0 十进制）：
+                // 只有现役也判为数字的 plain 标量才保留 Number；整数词法以现役 parseInt 结果为准。
+                if is_incumbent_int_literal(value) {
+                    if let Some(number) = parse_incumbent_int(value) {
+                        return Ok(number);
+                    }
+                    return Ok(Value::String(value.to_string()));
+                }
+                if !is_incumbent_float_literal(value) {
+                    return Ok(Value::String(value.to_string()));
+                }
+                return Ok(parsed);
+            }
             // 库可能把数值溢出的 plain 标量规范成 "inf" 字符串；现役解析为原文字串。
             if matches!(parsed, Value::String(_)) {
                 return Ok(Value::String(value.to_string()));
@@ -674,7 +783,7 @@ impl AgentConfigDocument {
         }
     }
 
-    fn string(&self, section: &str, key: &str) -> Result<Option<String>, MemoryError> {
+    pub fn string(&self, section: &str, key: &str) -> Result<Option<String>, MemoryError> {
         self.field(section, key)
             .map(|value| {
                 value
@@ -684,6 +793,47 @@ impl AgentConfigDocument {
             })
             .transpose()
             .map(|value| value.filter(|s| !s.trim().is_empty()))
+    }
+
+    /// 读取 section.key 处的字符串序列；键缺失返回 None，类型不符显式报错。
+    pub fn string_list(
+        &self,
+        section: &str,
+        key: &str,
+    ) -> Result<Option<Vec<String>>, MemoryError> {
+        let Some(value) = self.field(section, key) else {
+            return Ok(None);
+        };
+        if value.core_type().is_some_and(|tag| tag != "seq") {
+            return Err(invalid(format!("{section}.{key} must be a string list")));
+        }
+        let NodeValue::Sequence(values) = &value.value else {
+            return Err(invalid(format!("{section}.{key} must be a string list")));
+        };
+        Ok(Some(
+            values
+                .iter()
+                .map(|value| {
+                    value.string().map(str::to_string).ok_or_else(|| {
+                        invalid(format!("{section}.{key} must contain only strings"))
+                    })
+                })
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
+    }
+
+    /// 写单个字符串字段（保留未知字段的同一渲染路径）。
+    pub fn set_string(&mut self, section: &str, key: &str, value: &str) {
+        self.set(section, key, Value::String(value.to_string()));
+    }
+
+    /// 写字符串序列字段。
+    pub fn set_string_list(&mut self, section: &str, key: &str, values: &[String]) {
+        self.set(
+            section,
+            key,
+            Value::Sequence(values.iter().cloned().map(Value::String).collect()),
+        );
     }
 
     fn boolean(&self, section: &str, key: &str) -> Result<Option<bool>, MemoryError> {
@@ -723,6 +873,7 @@ impl AgentConfigDocument {
             agent_name: self.string("agent", "name")?,
             yuan: self.string("agent", "yuan")?,
             memory_enabled: self.boolean("memory", "enabled")?,
+            desk_home_folder: self.string("desk", "home_folder")?,
         })
     }
 
@@ -771,6 +922,172 @@ impl AgentConfigDocument {
         Self::parse(&text)?;
         Ok(text)
     }
+
+    /// `lib/memory/config-loader.ts` deepMerge 的移植：partial 以 JSON 值树
+    /// 并入当前文档——纯对象递归合并，数组与标量直接覆盖，`null` 删除键
+    /// （供应商删除等场景）。键顺序保持原文档在前、新键追加；渲染路径与
+    /// 既有写入口一致（保留未知字段，重渲染后重新走全套类型校验）。
+    pub fn deep_merge(&mut self, partial: &serde_json::Value) -> Result<(), MemoryError> {
+        if !partial.is_object() {
+            return Err(invalid("config patch must be an object"));
+        }
+        let patch = json_to_node(partial);
+        let NodeValue::Mapping(_) = &patch.value else {
+            return Err(invalid("config patch must be an object"));
+        };
+        merge_node(&mut self.value, &patch);
+        Ok(())
+    }
+}
+
+fn json_number_to_yaml(value: &serde_json::Number) -> serde_yaml_ng::Value {
+    if let Some(n) = value.as_u64() {
+        serde_yaml_ng::Value::Number(n.into())
+    } else if let Some(n) = value.as_i64() {
+        serde_yaml_ng::Value::Number(n.into())
+    } else {
+        serde_yaml_ng::Value::Number(serde_yaml_ng::Number::from(
+            value.as_f64().unwrap_or(f64::NAN),
+        ))
+    }
+}
+
+fn json_to_node(value: &serde_json::Value) -> ConfigNode {
+    let node_value = match value {
+        serde_json::Value::Null => NodeValue::Scalar(serde_yaml_ng::Value::Null),
+        serde_json::Value::Bool(v) => NodeValue::Scalar(serde_yaml_ng::Value::Bool(*v)),
+        serde_json::Value::Number(v) => NodeValue::Scalar(json_number_to_yaml(v)),
+        serde_json::Value::String(v) => NodeValue::Scalar(serde_yaml_ng::Value::String(v.clone())),
+        serde_json::Value::Array(items) => {
+            NodeValue::Sequence(items.iter().map(json_to_node).collect())
+        }
+        serde_json::Value::Object(map) => NodeValue::Mapping(
+            map.iter()
+                .map(|(key, value)| {
+                    (
+                        ConfigNode {
+                            value: NodeValue::Scalar(serde_yaml_ng::Value::String(key.clone())),
+                            tag: None,
+                        },
+                        json_to_node(value),
+                    )
+                })
+                .collect(),
+        ),
+    };
+    ConfigNode {
+        value: node_value,
+        tag: None,
+    }
+}
+
+/// 非映射节点直接整体替换。
+fn merge_node(target: &mut ConfigNode, patch: &ConfigNode) {
+    let both_mappings = matches!(
+        (&target.value, &patch.value),
+        (NodeValue::Mapping(_), NodeValue::Mapping(_))
+    );
+    if !both_mappings {
+        *target = patch.clone();
+        return;
+    }
+    let NodeValue::Mapping(patch_entries) = &patch.value else {
+        unreachable!("已判双方均为映射");
+    };
+    for (key, patch_value) in patch_entries {
+        let key_text = key.string().map(str::to_string);
+        let NodeValue::Mapping(target_entries) = &mut target.value else {
+            unreachable!("已判双方均为映射");
+        };
+        // null = 删除这个键（deepMerge 的显式删除语义）。
+        if patch_value.tag.is_none()
+            && matches!(
+                &patch_value.value,
+                NodeValue::Scalar(serde_yaml_ng::Value::Null)
+            )
+        {
+            if let Some(key_text) = key_text.as_deref() {
+                target_entries.retain(|(k, _)| k.string() != Some(key_text));
+                continue;
+            }
+        }
+        match target_entries.iter_mut().find(|(k, _)| {
+            key_text
+                .as_deref()
+                .is_some_and(|key| k.string() == Some(key))
+        }) {
+            Some((_, existing)) => merge_node(existing, patch_value),
+            None => target_entries.push((key.clone(), patch_value.clone())),
+        }
+    }
+}
+
+fn node_to_json(node: &ConfigNode) -> serde_json::Value {
+    match &node.value {
+        NodeValue::Scalar(value) => match value {
+            serde_yaml_ng::Value::Null => serde_json::Value::Null,
+            serde_yaml_ng::Value::Bool(v) => serde_json::Value::Bool(*v),
+            serde_yaml_ng::Value::Number(v) => {
+                if let Some(n) = v.as_u64() {
+                    serde_json::Value::Number(n.into())
+                } else if let Some(n) = v.as_i64() {
+                    serde_json::Value::Number(n.into())
+                } else {
+                    v.as_f64()
+                        .and_then(serde_json::Number::from_f64)
+                        .map(serde_json::Value::Number)
+                        .unwrap_or(serde_json::Value::Null)
+                }
+            }
+            serde_yaml_ng::Value::String(v) => serde_json::Value::String(v.clone()),
+            serde_yaml_ng::Value::Tagged(tagged) => node_to_json(&ConfigNode {
+                value: NodeValue::Scalar(tagged.value.clone()),
+                tag: None,
+            }),
+            serde_yaml_ng::Value::Sequence(_) | serde_yaml_ng::Value::Mapping(_) => {
+                unreachable!("标量分支")
+            }
+        },
+        NodeValue::Sequence(values) => {
+            serde_json::Value::Array(values.iter().map(node_to_json).collect())
+        }
+        NodeValue::Mapping(entries) => {
+            let mut map = serde_json::Map::new();
+            for (key, value) in entries {
+                let key_text = match key.string() {
+                    Some(text) => text.to_string(),
+                    None => match node_to_json(key) {
+                        serde_json::Value::String(text) => text,
+                        other => other.to_string(),
+                    },
+                };
+                map.insert(key_text, node_to_json(value));
+            }
+            serde_json::Value::Object(map)
+        }
+    }
+}
+
+/// 读取任意 YAML 顶层映射并投影为 JSON（provider-catalog 遗留
+/// added-models.yaml 迁移专用）。文件缺失返回 `None`；根必须是映射。
+/// 解析走与助手配置相同的成熟解析器与预算。
+pub fn read_yaml_mapping_as_json(
+    path: &std::path::Path,
+) -> Result<Option<serde_json::Value>, MemoryError> {
+    let text = match read_config_text(path) {
+        Ok(text) => text,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(err) => return Err(MemoryError::Io(format!("read legacy catalog: {err}"))),
+    };
+    if text.trim().is_empty() {
+        return Ok(None);
+    }
+    let document = AgentConfigDocument::parse(&text)?;
+    let json = node_to_json(&document.value);
+    if !json.is_object() {
+        return Err(invalid("legacy catalog root must be a mapping"));
+    }
+    Ok(Some(json))
 }
 
 /// 文件缺失采用原默认，读取错误和损坏配置必须传给调用者。

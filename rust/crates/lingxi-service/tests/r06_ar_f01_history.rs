@@ -72,6 +72,14 @@ async fn f01_child_inherits_authorized_material_only() {
         "OTHER-AGENT-PRIVATE",
     )
     .unwrap();
+    // 真实 roster 要求 config.yaml（与 scan_roster/candidates 同口径）；缺它时
+    // 指定 Agent 的合法 override 会被当成伪 override 拒绝，测试无法覆盖
+    // 「受信任 override 允许、伪造 override 零 wire 拒绝」的两侧。
+    std::fs::write(
+        home.join("agents/other/config.yaml"),
+        "locale: zh-CN\nagent:\n  name: other\n",
+    )
+    .unwrap();
     std::fs::write(dir.join("parent-tool.txt"), "MIXED-REAL-READ-CONTENT").unwrap();
     std::fs::write(
         home.join("agents/other/identity.md"),

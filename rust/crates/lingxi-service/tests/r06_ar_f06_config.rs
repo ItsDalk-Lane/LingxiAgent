@@ -775,6 +775,13 @@ async fn p02_real_install_gateway_checks_config_before_install_and_enable() {
         "memory: !map {enabled: false}",
         "agent: {name: !!binary SGVsbG8=}",
         resource_depth.as_str(),
+        // R03-F01/R03-F02：非法显式整数与非法空值字面必须在安装副作用前拒绝。
+        "memory: {enabled: false}\nfuture: !!int 0B10",
+        "memory: {enabled: false}\nfuture: !!int 0Xff",
+        "memory: {enabled: false}\nfuture: !!null wrong",
+        "memory: {enabled: false}\nfuture: !!null false",
+        // 大写基数前缀是现役合法字符串，安装保存不得把它变成数字。
+        "memory: {enabled: false}\nfuture: 0B10",
     ].iter().enumerate() {
         let config = home.join("agents/lingxi/config.yaml");
         write(&config, yaml);
@@ -799,6 +806,19 @@ async fn p02_real_install_gateway_checks_config_before_install_and_enable() {
             lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&saved).unwrap().0 == vec![name.clone()] &&
             saved.contains("marker: keep") && saved.contains("must-not-enable") &&
             saved.contains("<<")
+        } else if *yaml == "memory: {enabled: false}\nfuture: 0B10" {
+            // 现役把大写基数前缀读为字符串：安装成功且保存后 future 仍是字符串值。
+            let future = lingxi_adapters::storage::agent_memory::config::read_yaml_mapping_as_json(
+                &config,
+            )
+            .unwrap()
+            .unwrap()
+            .get("future")
+            .cloned()
+            .unwrap();
+            matches!(result.outcome, ToolOutcome::Success {..}) && installed &&
+                future == serde_json::json!("0B10") &&
+                lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&saved).unwrap().0 == vec![name.clone()]
         } else {
             matches!(result.outcome, ToolOutcome::Failed {..}) && !installed && saved == *yaml
         };

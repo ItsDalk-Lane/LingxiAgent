@@ -1,0 +1,1929 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "producedBy": "r06_stage_inputs.py --leaf-evidence",
+  "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d",
+  "sourceStable": true,
+  "cases": [
+    {
+      "case": "R00-T02-LA-00ECC9568490-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-00ECC9568490",
+      "originalAssertion": "父子任务关联",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual parent launch returns taskId/threadId, persisted parent ownership and genuine run progress.",
+      "executions": [
+        {
+          "key": "r06_test_74fb12b039dc8325b38b",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_74fb12b039dc8325b38b/binding-result.json",
+          "resultSha256": "6cf89e71c7c514c14012efd54f6f8e3e0eed910fc66db1a40acf39a50e87a653",
+          "stdoutSha256": "c1c53ae992efab11d54d53d3536f10743c07c633d49939a5dda22f081a5bd223",
+          "stderrSha256": "3d6cdeffeec401ecc1fc46da0129f7a5a2aeec682514d8b845ac15a445afa651",
+          "observedTest": "dispatch_reply_close_round_trip_on_the_real_chain",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_9ed20ec83092150399e0",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_9ed20ec83092150399e0/binding-result.json",
+          "resultSha256": "ac8ec7243d63b1b795da6ae2664094a45d9126f15c5dec587364e6768b8d118b",
+          "stdoutSha256": "b3da21c18b7587dab08d9197b1bbb3eac3068c8b6c39b882812f0ed5071ef71c",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_list_launch_progress_and_permission_intersection_use_real_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_a874e2c60d311136b900",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_a874e2c60d311136b900/binding-result.json",
+          "resultSha256": "e50854c691d450a6c33a09bf5c40d0c7a5995e6b51670099fa09dee9e929a26e",
+          "stdoutSha256": "1fdc8efccc8cff865a25d5c00d6b0042add22e9099c51487ee433c77a3482552",
+          "stderrSha256": "31a16f0c2cffef42a160843eb73173b4307dcf193dcbca89828c145ac0ae657e",
+          "observedTest": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-00ECC9568490-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-00ECC9568490",
+      "originalAssertion": "子任务权限为交集",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "父模式×子请求全组合加真实读/写正反执行链，限制始终按父模式与子请求交集；禁止目标与未知工具仍拒绝。",
+      "executions": [
+        {
+          "key": "r06_test_17813002df9af4e92b62",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_17813002df9af4e92b62/binding-result.json",
+          "resultSha256": "98377bbbb3acdb23910a6b8d43fe095a8c1ac06bb9dae8a7166b60ac9cf2fe80",
+          "stdoutSha256": "94afe2d20c1cc0c10eb5fcdd2625f14a5dc9e435be7b334038d9758765dd1c8b",
+          "stderrSha256": "20b99f38034b751f5066a1a6320c130f3c2e1d3c3b322c7c6ec60bfb4ff01b5f",
+          "observedTest": "subagent::tests::blocklisted_targets_are_denied_regardless_of_tier",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_356d251c656c04bd7237",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_356d251c656c04bd7237/binding-result.json",
+          "resultSha256": "a9ce7a580c6bacd3a53bac241009bac7b1e1bb99bffffbb878cac0469c6189e5",
+          "stdoutSha256": "df677738df6018cd02ba939a450f9f5b8ce3d097a8913f6193f510a2541d851d",
+          "stderrSha256": "15a12fd15e37690400dc658eeb636e3ebd7d00987797ee553c849c1c00662dc3",
+          "observedTest": "subagent::tests::read_only_tier_denies_mutating_targets_and_fails_closed_on_unknowns",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_437ea6bb284c0ec53730",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_437ea6bb284c0ec53730/binding-result.json",
+          "resultSha256": "191ec7a1494315f7820ac5c54fd846c87bd5ae0e8cdd3732e9ec2fab75758f46",
+          "stdoutSha256": "86d833913016465bb320eaf5cd40ac0160afad55a9493b6db01393b64fdbfa1f",
+          "stderrSha256": "15a12fd15e37690400dc658eeb636e3ebd7d00987797ee553c849c1c00662dc3",
+          "observedTest": "subagent::tests::attenuation_matrix_matches_the_incumbent",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_454f8fb45eb2ce14e809",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_454f8fb45eb2ce14e809/binding-result.json",
+          "resultSha256": "f839818c1c78dcb6d7a64cba0998b817af6036bc0907f5aec79028863b38b670",
+          "stdoutSha256": "5737e9bec8e9926aa297ab9ec3ddf3a1f29aef308b1965d31d3f0075f4990626",
+          "stderrSha256": "8b8d1b937ee26b91a5e5d7f3112af720a8a0d6413daeb7d9e206e28b3725d68c",
+          "observedTest": "readonly_parent_write_access_request_is_refused_at_dispatch",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_49283e4bc5379944d138",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_49283e4bc5379944d138/binding-result.json",
+          "resultSha256": "fe392b38cb9282e30c8751114ee8a7b4948fed27aeae5a11d593562ac6066f70",
+          "stdoutSha256": "8f2388393289dffc6fe9fead73e369722079170207e2817d100fef6314a7a5f9",
+          "stderrSha256": "59b1f1bf8d5860f9527522a4e8c4743e3c57de8767dea6ead905b6b86f94786e",
+          "observedTest": "sup01_ask_tier_subagent_matrix_on_the_real_chain",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_a874e2c60d311136b900",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_a874e2c60d311136b900/binding-result.json",
+          "resultSha256": "e50854c691d450a6c33a09bf5c40d0c7a5995e6b51670099fa09dee9e929a26e",
+          "stdoutSha256": "1fdc8efccc8cff865a25d5c00d6b0042add22e9099c51487ee433c77a3482552",
+          "stderrSha256": "31a16f0c2cffef42a160843eb73173b4307dcf193dcbca89828c145ac0ae657e",
+          "observedTest": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_d0f7929339193e33b1c7",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_d0f7929339193e33b1c7/binding-result.json",
+          "resultSha256": "e14ae59482c55f132ce02c1911b66ca05ce5ecfff14a1a0503edb1008100ff80",
+          "stdoutSha256": "5c1cc372f2795c6b317e18a51491132f903369b972a211ecc14f0e522306c64d",
+          "stderrSha256": "31a16f0c2cffef42a160843eb73173b4307dcf193dcbca89828c145ac0ae657e",
+          "observedTest": "operate_parent_child_write_is_executed_once",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_d224f66131be572514b5",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_d224f66131be572514b5/binding-result.json",
+          "resultSha256": "2f49f068a31d47caacae68dcb2acec07d65ae3033c9eaf2f904e586b4351b840",
+          "stdoutSha256": "eeeaff0d811d2644c6688c3bdc5ba0e6232bd8102ac32136f529d8ce275e516d",
+          "stderrSha256": "0586174fa0b181a16a168c6285972ffe5fea718891778512f195b3d5135caa86",
+          "observedTest": "model_override_cannot_widen_the_readonly_grant",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-00ECC9568490-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-00ECC9568490",
+      "originalAssertion": "结果/失败回到父会话",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual provider panic yields its stable error code; provider failure reason and completed child results reach only the owning parent; capacity is reclaimed.",
+      "executions": [
+        {
+          "key": "r06_test_19c35cae6e126adce13f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_19c35cae6e126adce13f/binding-result.json",
+          "resultSha256": "0cc564f2c5f45b07d9a30a5f777910fd8343d51ff3730755d72fe91fe2ee152c",
+          "stdoutSha256": "631067f6f99d294de85e389cac5ab1b6322a3abad84f4768516a2616a7ef757d",
+          "stderrSha256": "a824ba35b657e8389daedd88e77e30ba32c3652b9dde16371309616b53d24874",
+          "observedTest": "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_9565a37716a538fd39d7",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_9565a37716a538fd39d7/binding-result.json",
+          "resultSha256": "a8915d8b16afffe5e0b8a133d80956bfd5246ba9fd3066cc994c2e72e5cdf243",
+          "stdoutSha256": "b69a8c30e24630bbf06a0fb87b59b41bf690948e1d95754b42c3d60834698d23",
+          "stderrSha256": "e0c1dfa7ca2efd8eb055edc2213bf76ab93fc6ff532e0a8fb2a01cd4f3b7fce7",
+          "observedTest": "child_provider_panic_closes_out_and_the_thread_continues",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_9ed20ec83092150399e0",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_9ed20ec83092150399e0/binding-result.json",
+          "resultSha256": "ac8ec7243d63b1b795da6ae2664094a45d9126f15c5dec587364e6768b8d118b",
+          "stdoutSha256": "b3da21c18b7587dab08d9197b1bbb3eac3068c8b6c39b882812f0ed5071ef71c",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_list_launch_progress_and_permission_intersection_use_real_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_a874e2c60d311136b900",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_a874e2c60d311136b900/binding-result.json",
+          "resultSha256": "e50854c691d450a6c33a09bf5c40d0c7a5995e6b51670099fa09dee9e929a26e",
+          "stdoutSha256": "1fdc8efccc8cff865a25d5c00d6b0042add22e9099c51487ee433c77a3482552",
+          "stderrSha256": "31a16f0c2cffef42a160843eb73173b4307dcf193dcbca89828c145ac0ae657e",
+          "observedTest": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ea163c3309f9fef557ae",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ea163c3309f9fef557ae/binding-result.json",
+          "resultSha256": "ba081adb7afcf273dc4b58b7c79212918fe7d29422c28e3bc3d37e8b32a66eb6",
+          "stdoutSha256": "db8f9655880db4425ce37f8abfd84e784a9a7cf3b05f975954946bb12eea388e",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-00ECC9568490-assertion-03",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-00ECC9568490",
+      "originalAssertion": "无候选、超并发、权限交集不满足或子任务失败如实返回；不升级权限。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Session/global caps reject excess work without ghost children and recover capacity; candidate-list and permission-intersection checks use actual agent/run facts.",
+      "executions": [
+        {
+          "key": "r06_test_454f8fb45eb2ce14e809",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_454f8fb45eb2ce14e809/binding-result.json",
+          "resultSha256": "f839818c1c78dcb6d7a64cba0998b817af6036bc0907f5aec79028863b38b670",
+          "stdoutSha256": "5737e9bec8e9926aa297ab9ec3ddf3a1f29aef308b1965d31d3f0075f4990626",
+          "stderrSha256": "8b8d1b937ee26b91a5e5d7f3112af720a8a0d6413daeb7d9e206e28b3725d68c",
+          "observedTest": "readonly_parent_write_access_request_is_refused_at_dispatch",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_8ed4e61d01cb5519a628",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_8ed4e61d01cb5519a628/binding-result.json",
+          "resultSha256": "e57360731bcc7b0747c893599eda7f775fe0f4bd2f47947111e78ebeb55a50c4",
+          "stdoutSha256": "697f14d16975bef5c95e8f7dc7b4a433ffcce3694cafe6eab02c3decb2d18062",
+          "stderrSha256": "468c8cc478aa673ffb456fc1aa5415543b51382acbb33e8129fe84d19039542b",
+          "observedTest": "thread_registry_refusal_leaves_no_permanent_reservations",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_9565a37716a538fd39d7",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_9565a37716a538fd39d7/binding-result.json",
+          "resultSha256": "a8915d8b16afffe5e0b8a133d80956bfd5246ba9fd3066cc994c2e72e5cdf243",
+          "stdoutSha256": "b69a8c30e24630bbf06a0fb87b59b41bf690948e1d95754b42c3d60834698d23",
+          "stderrSha256": "e0c1dfa7ca2efd8eb055edc2213bf76ab93fc6ff532e0a8fb2a01cd4f3b7fce7",
+          "observedTest": "child_provider_panic_closes_out_and_the_thread_continues",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_9ed20ec83092150399e0",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_9ed20ec83092150399e0/binding-result.json",
+          "resultSha256": "ac8ec7243d63b1b795da6ae2664094a45d9126f15c5dec587364e6768b8d118b",
+          "stdoutSha256": "b3da21c18b7587dab08d9197b1bbb3eac3068c8b6c39b882812f0ed5071ef71c",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_list_launch_progress_and_permission_intersection_use_real_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_c6df545db9cd0c28d635",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_c6df545db9cd0c28d635/binding-result.json",
+          "resultSha256": "f0a367b086397efb1cd2ff5920289328341e9cd8d50894f21ffd3b08ca2aee28",
+          "stdoutSha256": "ddba0c175b426b1328396cb6f0ac02cc23589f0807ad139fded70823023602fc",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_session_and_global_caps_refuse_and_recover_without_ghost_children",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_d224f66131be572514b5",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_d224f66131be572514b5/binding-result.json",
+          "resultSha256": "2f49f068a31d47caacae68dcb2acec07d65ae3033c9eaf2f904e586b4351b840",
+          "stdoutSha256": "eeeaff0d811d2644c6688c3bdc5ba0e6232bd8102ac32136f529d8ce275e516d",
+          "stderrSha256": "0586174fa0b181a16a168c6285972ffe5fea718891778512f195b3d5135caa86",
+          "observedTest": "model_override_cannot_widen_the_readonly_grant",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-015A65726C05-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-015A65726C05",
+      "originalAssertion": "执行“设置文件回退开关”后核对：将 enabled 布尔偏好写入并返回新状态；此接口本身不会回退文件",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Real GET/PUT persist strict boolean rollback_file_changes while preserving unrelated preferences. Writes do not alter checkpointed file bytes/mtime, branch state or snapshot rows. A real service restart loads the saved value; authorized chat scope and concurrent setters retain disk/live consistency. The HTTP switch directly controls the production rewind preview preference gate.",
+      "executions": [
+        {
+          "key": "r06_test_6fcf0e7a020bd2fc910c",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_6fcf0e7a020bd2fc910c/binding-result.json",
+          "resultSha256": "29634f084122306fb05c6167df6df62d68812136d23280b8947a569c956c477b",
+          "stdoutSha256": "a064e22a46a0459ea1d19789a002800a8bba7e262088ef0656354b38e35255a4",
+          "stderrSha256": "3bb9db8070fdb7eb412044b13f029bd06da9d107239fbc5295246d09d715417a",
+          "observedTest": "original_workspace_rollback_preference_persists_without_restoring_files_and_controls_real_gate",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-015A65726C05-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-015A65726C05",
+      "originalAssertion": "失败、冲突或拒绝时核对返回的状态与实际副作用一致",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Missing or invalid enabled and malformed bodies reject 400 without saved/live changes; no credential rejects 401 and a real device missing chat scope rejects 403. Actual filesystem read failure or corrupt saved JSON/type rejects 500 without claiming success or mutating the runtime preference. Repairing the backing file permits retry. Corrupt startup storage fails explicitly, not a successful bootstrap with a default preference.",
+      "executions": [
+        {
+          "key": "r06_test_f6364578fc2151c7976a",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f6364578fc2151c7976a/binding-result.json",
+          "resultSha256": "c440e0f3af199e918687e976d77ffb1dc788dc84940659dabb75ad38c95e1371",
+          "stdoutSha256": "7cb15c5b104a7b7de3385abd13543b473274a22145c76cebe353ad102ae4a46a",
+          "stderrSha256": "3bb9db8070fdb7eb412044b13f029bd06da9d107239fbc5295246d09d715417a",
+          "observedTest": "original_workspace_rollback_preference_refusals_keep_saved_and_live_state_and_retry",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-041F938C351F-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-041F938C351F",
+      "originalAssertion": "成功：执行“恢复记忆修订”后，将所选修订内容恢复到当前记忆并返回结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "真实restore响应给出所选修订，读回当前facts恢复且B不变",
+      "executions": [
+        {
+          "key": "r06_test_5cebb3faa148f6e94c85",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_5cebb3faa148f6e94c85/binding-result.json",
+          "resultSha256": "1f293383272c13c5aebcb0fff2c4642ab2c1465100259e576fd7f5837d5d7a7d",
+          "stdoutSha256": "c211e89c9151c6020a2f4ff83f8640b6f5cd87b7d3be6d81576d1fd13e520d6b",
+          "stderrSha256": "7e861ef0a8760a4487913577d9fa362143036dcd28b8a318f9e13fa904f5ca4c",
+          "observedTest": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-041F938C351F-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-041F938C351F",
+      "originalAssertion": "拒绝/边界：settings.write；revision 不存在 404；内容已变化/忙时冲突，失败 500；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "A changed confirmed snapshot returns 409 without writes; real compile/maintenance/dream/restore activity rejects restoration, with independent agent isolation.",
+      "executions": [
+        {
+          "key": "r06_test_4e40ae8d50678e42e032",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_4e40ae8d50678e42e032/binding-result.json",
+          "resultSha256": "cf8b8001a5a9e04a3e4c656d3dbbc5ee31d97fd934676a1e742bdf24cc658a1f",
+          "stdoutSha256": "ec6e11200aa5b8e5c64d813d4bd0e6d523dc3e628d7440cb83b99e3c5cb6c36b",
+          "stderrSha256": "78d49f4574053bef07da5e3e875f53c13188943323bb27278438161b693d345f",
+          "observedTest": "original_restore_detail_hash_refuses_concurrent_edits_and_preserves_agent_scope",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_55959514844e8d6cf8c0",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_55959514844e8d6cf8c0/binding-result.json",
+          "resultSha256": "cd474d5c35e4081e07f3628c2419f2b22fed2b92afbc8a319839b21833e365bf",
+          "stdoutSha256": "5c0d1265253de14b8f396fc7e3132ed4b20f89d3e07a35a13573d1dd04474e37",
+          "stderrSha256": "7e861ef0a8760a4487913577d9fa362143036dcd28b8a318f9e13fa904f5ca4c",
+          "observedTest": "original_restore_real_io_failure_is_500_and_keeps_all_agent_files",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_5cebb3faa148f6e94c85",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_5cebb3faa148f6e94c85/binding-result.json",
+          "resultSha256": "1f293383272c13c5aebcb0fff2c4642ab2c1465100259e576fd7f5837d5d7a7d",
+          "stdoutSha256": "c211e89c9151c6020a2f4ff83f8640b6f5cd87b7d3be6d81576d1fd13e520d6b",
+          "stderrSha256": "7e861ef0a8760a4487913577d9fa362143036dcd28b8a318f9e13fa904f5ca4c",
+          "observedTest": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_7badf69f6fff9c5f068a",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_7badf69f6fff9c5f068a/binding-result.json",
+          "resultSha256": "465688e23c500884e422c73db12082c7bcfbcb79a161594b0775656a9bbb1fa2",
+          "stdoutSha256": "3352951609981fc4642a6889b36d3d376a3bc471970f2a2c1ec321df4ca1cc57",
+          "stderrSha256": "52cc8fdcd3a82f43941c4f119ac31cd8a62e68c93a6393ab206adf7823379a78",
+          "observedTest": "original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-07A5CE3637C7-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-07A5CE3637C7",
+      "originalAssertion": "成功：执行“读取助手 AGENTS.md”后，返回正文与是否来自模板；/ishiki 为同 handler 兼容别名",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "真实认证HTTP：AGENTS/ishiki GET精确模板原文与fromTemplate=true、定制原文与false；读模板不生成定制文件",
+      "executions": [
+        {
+          "key": "r06_test_18cfd715d95a71851ab8",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_18cfd715d95a71851ab8/binding-result.json",
+          "resultSha256": "ace65b8da6dd09d2118732ec1283a688ab3e1d4dbaaefac6619645faa2a004b3",
+          "stdoutSha256": "a1fef511a6b393359934ed2062e5e7642288c653c8bca0532c050a95e851eae7",
+          "stderrSha256": "e65b4da3852e020e895d42f9f2a8d07b22319811476561a3f7681c06d16ee49a",
+          "observedTest": "persona_files_follow_fallback_chain_and_broadcast_writes",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_e282fbf62e7f21d8edbb",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_e282fbf62e7f21d8edbb/binding-result.json",
+          "resultSha256": "797b9c9ad59ba5dab45d16ab8dc9f0b4488337230cf300b92a84b89edba20f94",
+          "stdoutSha256": "028f4aec948c9347fccc6c962c9e39ae33fb0704356d543c8469454af9975cdf",
+          "stderrSha256": "73074d005f0541779a8b7e2a76ceb78cf34b2e87fa7bc4dcd03bcf111ef97ab5",
+          "observedTest": "original_persona_reads_template_custom_alias_and_refusal",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-07A5CE3637C7-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-07A5CE3637C7",
+      "originalAssertion": "拒绝/边界：文件存在/模板回退；无效 id 或无助手 404；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "AGENTS.md and its ishiki alias both reject invalid and missing assistant IDs with 404, without template/custom-file disclosure or writes.",
+      "executions": [
+        {
+          "key": "r06_test_e282fbf62e7f21d8edbb",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_e282fbf62e7f21d8edbb/binding-result.json",
+          "resultSha256": "797b9c9ad59ba5dab45d16ab8dc9f0b4488337230cf300b92a84b89edba20f94",
+          "stdoutSha256": "028f4aec948c9347fccc6c962c9e39ae33fb0704356d543c8469454af9975cdf",
+          "stderrSha256": "73074d005f0541779a8b7e2a76ceb78cf34b2e87fa7bc4dcd03bcf111ef97ab5",
+          "observedTest": "original_persona_reads_template_custom_alias_and_refusal",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-0CDC88FC0999-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-0CDC88FC0999",
+      "originalAssertion": "给定目标与相应权限，执行“写入资源”后核对：按编码解码后经资源权限写入，返回结果；冲突为 409",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Ordinary and expected-version writes return 409 for a genuine commit-boundary concurrent edit, preserve the user's bytes and leave registration/event state unchanged.",
+      "executions": [
+        {
+          "key": "r06_test_a197b90d8fb72b979aa8",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_a197b90d8fb72b979aa8/binding-result.json",
+          "resultSha256": "0e89f9939d51683b4bb326c77b6566e5431cc756be4a201dc94401da63d19664",
+          "stdoutSha256": "6867ffa76b20b1b1702d6a4bf7fec821364a9e9abd2c2ed0580a3b995d500d13",
+          "stderrSha256": "c02b7d928e72afec6574c7543e6ea6463a3ed6236cd2538c0cd1b2dc3b28229f",
+          "observedTest": "resourceio_route_faces_and_error_vocabulary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_e4d0a6bfa7c604b243c3",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_e4d0a6bfa7c604b243c3/binding-result.json",
+          "resultSha256": "8130e7c1356e449f70ba4e603abbb7de93e562ef25f102a87009cdedf426d8d7",
+          "stdoutSha256": "17e90cd51e5cfcbf80a998ad08dfff01a7ca0d7034a145144449f535d7dab305",
+          "stderrSha256": "471d89b32554ddd20645e5ab0a43e68ad857d347d671b340fe2e853c888b3af4",
+          "observedTest": "resourceio_write_conflict_refuses_external_change_at_commit_boundary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_fbc22687a171eb9ee34e",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_fbc22687a171eb9ee34e/binding-result.json",
+          "resultSha256": "64fbbedfd00f18202407cfe3811978a0535dcfd66236c95c9a2ecdfda5f9537e",
+          "stdoutSha256": "8814d605775d45023497b88a4dcaa2c0f0f3c3ae6c650449ce48059165c44874",
+          "stderrSha256": "c2292f2c02243e39729f2b455a1edb2217cf19e538b21770ad848e375a1aeeb7",
+          "observedTest": "local_fs_stat_read_write_list_search_rename_move_trash_chain",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-0CDC88FC0999-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-0CDC88FC0999",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "write自身真实缺输入、无凭证、能力/provider失败及拒绝后的磁盘/登记不变；读取族另有跨根拒绝及数据库零写证据。",
+      "executions": [
+        {
+          "key": "r06_test_ec23bfc163f9ccb80c2a",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ec23bfc163f9ccb80c2a/binding-result.json",
+          "resultSha256": "589bff9b3582fc94e260690d9607cc88a81e7b969606da79c4eb05e1569c3112",
+          "stdoutSha256": "3d33cb61c90121428b958bd3d55c36c722f986a837e098a74a62209905cd0c8a",
+          "stderrSha256": "471d89b32554ddd20645e5ab0a43e68ad857d347d671b340fe2e853c888b3af4",
+          "observedTest": "resourceio_operation_specific_provider_refusals_preserve_files_and_registrations",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-0CDC88FC0999-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-0CDC88FC0999",
+      "originalAssertion": "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "write自身分别实际调用mount/url/session_file的适用能力闸；正向local_fs和跨provider移动/重命名亦有精确证明。当前mount明确不支持，不伪报mount成功。",
+      "executions": [
+        {
+          "key": "r06_test_d617bfb6e14eeb7d8f27",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_d617bfb6e14eeb7d8f27/binding-result.json",
+          "resultSha256": "dda801b29ff09cbce639de118434aea22ad779b38ee89cc41809a2c8f7df704f",
+          "stdoutSha256": "1c54f3ec2c998dec51f30a4e34c46aa21263311f039b63512a3d30f0d4e9adf0",
+          "stderrSha256": "0d1ac341284c0331984602f306ed3d0009646e2ae89b96519fbf9a831fe43ac0",
+          "observedTest": "kernel_cross_provider_move_rejected_loudly",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ec23bfc163f9ccb80c2a",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ec23bfc163f9ccb80c2a/binding-result.json",
+          "resultSha256": "589bff9b3582fc94e260690d9607cc88a81e7b969606da79c4eb05e1569c3112",
+          "stdoutSha256": "3d33cb61c90121428b958bd3d55c36c722f986a837e098a74a62209905cd0c8a",
+          "stderrSha256": "471d89b32554ddd20645e5ab0a43e68ad857d347d671b340fe2e853c888b3af4",
+          "observedTest": "resourceio_operation_specific_provider_refusals_preserve_files_and_registrations",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-0F7D128E01B1-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-0F7D128E01B1",
+      "originalAssertion": "成功后指定助手 enabled 和运行时技能列表均含新技能",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Real manual HTTP install preserves package files, persists the requested assistant's enabled list, and immediately updates the existing runtime catalog and authenticated runtime list.",
+      "executions": [
+        {
+          "key": "r06_test_6d9fbb9ca13f13ee08f6",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_6d9fbb9ca13f13ee08f6/binding-result.json",
+          "resultSha256": "ed76f2a69f756fec72052b86a88233b9d132c44e9449ddf02dfdecf81fabcee7",
+          "stdoutSha256": "9c4fa0c39614ac49db18e43d3f0482adc78f936692eb91f0d2e9924a3bbc18c6",
+          "stderrSha256": "7e861ef0a8760a4487913577d9fa362143036dcd28b8a318f9e13fa904f5ca4c",
+          "observedTest": "original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_c8c412d92ef6844f9099",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_c8c412d92ef6844f9099/binding-result.json",
+          "resultSha256": "69a12e4ab4fe244e55ccb33da0e54c97b395580b6e516cbafb6ae400e9a41c8f",
+          "stdoutSha256": "0fa7652021daa5f0d71e72d80f41434a6b8240d6c6af1b602e4f8a9a6c7096f3",
+          "stderrSha256": "d3a1dd192fd2055541786c909de7fb845da677846ce2d01ec42e985a2c37295e",
+          "observedTest": "original_global_manual_install_complete_package_without_agent_enable",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-0F7D128E01B1-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-0F7D128E01B1",
+      "originalAssertion": "agentId 不存在或安装失败时不得误启用其他助手",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Missing/invalid/duplicate assistant IDs and actual missing/relative package failures reject without installing a refused package or changing either assistant's configuration.",
+      "executions": [
+        {
+          "key": "r06_test_6d9fbb9ca13f13ee08f6",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_6d9fbb9ca13f13ee08f6/binding-result.json",
+          "resultSha256": "ed76f2a69f756fec72052b86a88233b9d132c44e9449ddf02dfdecf81fabcee7",
+          "stdoutSha256": "9c4fa0c39614ac49db18e43d3f0482adc78f936692eb91f0d2e9924a3bbc18c6",
+          "stderrSha256": "7e861ef0a8760a4487913577d9fa362143036dcd28b8a318f9e13fa904f5ca4c",
+          "observedTest": "original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1AA3F1311F8A-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1AA3F1311F8A",
+      "originalAssertion": "每动作核实际来源或队列状态",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "真实认证operate会话授权，经真实目录声明/mcp_call逐动作；add实际字节与job/remove实际membership/refresh新snapshot解析物job且未变不新增/reindex全部来源新增job均读回",
+      "executions": [
+        {
+          "key": "r06_test_6fca23825c9543139c4f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_6fca23825c9543139c4f/binding-result.json",
+          "resultSha256": "bfdcb58482cb08134f9c3f839968d00666cc7db6d79e2335b01d7dab68957043",
+          "stdoutSha256": "eb4b44a38a3eb3391b2280dd3dc45f824e5b13846fbae62f78d42b62a00c33c7",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_abd0aa24f7a27f2633e6",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_abd0aa24f7a27f2633e6/binding-result.json",
+          "resultSha256": "c85c748f86b58e2a52383c9057509b9408a3d8c3e937ef2c56257a3982e54d37",
+          "stdoutSha256": "0d400993198ca81987eef7805b08ef7ed12ea85b19de170bea27b6ec6b06bdc3",
+          "stderrSha256": "8f58d76aa06f67251e5263a83b2b06799f005ffe674576be5c939e1b6eb0fa8f",
+          "observedTest": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1AA3F1311F8A-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1AA3F1311F8A",
+      "originalAssertion": "remove不直接删共享源",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "remove工具真实移除目标membership，另一notebook共享引用/事实source/原快照字节保持",
+      "executions": [
+        {
+          "key": "r06_test_6fca23825c9543139c4f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_6fca23825c9543139c4f/binding-result.json",
+          "resultSha256": "bfdcb58482cb08134f9c3f839968d00666cc7db6d79e2335b01d7dab68957043",
+          "stdoutSha256": "eb4b44a38a3eb3391b2280dd3dc45f824e5b13846fbae62f78d42b62a00c33c7",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_abd0aa24f7a27f2633e6",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_abd0aa24f7a27f2633e6/binding-result.json",
+          "resultSha256": "c85c748f86b58e2a52383c9057509b9408a3d8c3e937ef2c56257a3982e54d37",
+          "stdoutSha256": "0d400993198ca81987eef7805b08ef7ed12ea85b19de170bea27b6ec6b06bdc3",
+          "stderrSha256": "8f58d76aa06f67251e5263a83b2b06799f005ffe674576be5c939e1b6eb0fa8f",
+          "observedTest": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1AA3F1311F8A-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1AA3F1311F8A",
+      "originalAssertion": "越权/拒绝不改库",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Real model tool calls reject foreign-studio add/remove/refresh/reindex and malformed arguments; authenticated fact/source/job readback proves no foreign or own-library changes.",
+      "executions": [
+        {
+          "key": "r06_test_46d12e2526b5c58965c4",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_46d12e2526b5c58965c4/binding-result.json",
+          "resultSha256": "58c52147b6eb0e7d9e3a1bba6a980da1a99dd9b28cb0ec53b71e825eb0600a92",
+          "stdoutSha256": "c8d715701078be993c97085402d8df2639d0593eb5b32411b2af74bb341150ad",
+          "stderrSha256": "8f58d76aa06f67251e5263a83b2b06799f005ffe674576be5c939e1b6eb0fa8f",
+          "observedTest": "original_notebook_source_routes_reject_without_changing_rows",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_c4149c419ab158faf1b6",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_c4149c419ab158faf1b6/binding-result.json",
+          "resultSha256": "c3f0fdd86af806223bbbe44fb42c337484e4263d95d841fd3c3e952fb7400cfb",
+          "stdoutSha256": "e83c72412a645c675056f7c12e7ad1af5ac8957a5e5fe8e9946cca3437d11904",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_manage_refusals_and_no_write_authorization_preserve_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1AA3F1311F8A-assertion-03",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1AA3F1311F8A",
+      "originalAssertion": "无批准、跨studio ID、无效action/kind/路径报错，不变更他人库；后台索引失败要单列状态。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual model-directed knowledge_manage invocation in an ask session parks in durable waiting_approval with zero sources/jobs before approval and after cancellation; the same arguments in an operate session persist one source/job. Existing real calls prove input/path and foreign-studio refusals preserve facts. A configured embedding transport returning HTTP 502 after a real authorized management add yields a separate failed ingestion job with its explicit reason and failed=1/done=0 notebook status, while original bytes remain stored.",
+      "executions": [
+        {
+          "key": "r06_test_2cc533e8072f64abadcb",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_2cc533e8072f64abadcb/binding-result.json",
+          "resultSha256": "7fe14a548860e06a07057c1c1c562b6bb4ba6ed055c0c6bd48fbd6328d8db0c8",
+          "stdoutSha256": "1663a7e47e273e00d89341f5a2686f56a1ad9d2a34ac1aa1fc8618d4241df818",
+          "stderrSha256": "53a63ad7b89cfa790f2d7ee995c192a34968c1371d5f813578d8d3bd3557da64",
+          "observedTest": "original_manage_interactive_unapproved_and_cancelled_leave_no_sources_or_jobs",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_46d12e2526b5c58965c4",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_46d12e2526b5c58965c4/binding-result.json",
+          "resultSha256": "58c52147b6eb0e7d9e3a1bba6a980da1a99dd9b28cb0ec53b71e825eb0600a92",
+          "stdoutSha256": "c8d715701078be993c97085402d8df2639d0593eb5b32411b2af74bb341150ad",
+          "stderrSha256": "8f58d76aa06f67251e5263a83b2b06799f005ffe674576be5c939e1b6eb0fa8f",
+          "observedTest": "original_notebook_source_routes_reject_without_changing_rows",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_51953e4b6dd56e41f5c4",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_51953e4b6dd56e41f5c4/binding-result.json",
+          "resultSha256": "7d599b789bdb1c1ed8b377dd4961d94d5b963e92d47adba0e23cee33c93f8b6f",
+          "stdoutSha256": "a078d6f9c8d39df04e3f7c32df1af039a488e08109e7f5d770926a94b9615250",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_manage_add_preserves_source_and_reports_background_index_failure_separately",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_c4149c419ab158faf1b6",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_c4149c419ab158faf1b6/binding-result.json",
+          "resultSha256": "c3f0fdd86af806223bbbe44fb42c337484e4263d95d841fd3c3e952fb7400cfb",
+          "stdoutSha256": "e83c72412a645c675056f7c12e7ad1af5ac8957a5e5fe8e9946cca3437d11904",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_manage_refusals_and_no_write_authorization_preserve_facts",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_fa2083ba89be0ace2e15",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_fa2083ba89be0ace2e15/binding-result.json",
+          "resultSha256": "9e81464f8ad129b8cde529c634ebab44974433308a09ed8598b474cea883ba85",
+          "stdoutSha256": "4d9046e3af0e2db891aa9a8d6db48dd82ebfda9287f266a9291d6c18168da02f",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_failed_and_untracked_jobs_retry_and_delete_wins",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1CD1C31CCF44-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1CD1C31CCF44",
+      "originalAssertion": "交付列表与实际文件一致",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "原交付列表/展示字段/实际下载字节及权限矩阵已在verification-03实跑至通过位置；原失效/缺失/相对引用拒绝保留完整真实检查。当前只调整后段夹具，新候选待集中执行，不以旧候选局部成果替代本轮正式收据。",
+      "executions": [
+        {
+          "key": "r06_test_2bdab5e0926be37f6e35",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_2bdab5e0926be37f6e35/binding-result.json",
+          "resultSha256": "1bda5ca2d27a7658e6133ccd902f37c2ff474d2f899658bbe7e2da1628458bcd",
+          "stdoutSha256": "4eb0be55289af5442d05d172e30325252ffe9ba07036b2a82e0d0de933e9993a",
+          "stderrSha256": "8fd75192a986afd7ab2a25f35a7afa0d5991f2d64d0bd55c926d298d776e9093",
+          "observedTest": "stage_files_gateway_only_delivers_real_authorized_session_files",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1CD1C31CCF44-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1CD1C31CCF44",
+      "originalAssertion": "失效路径未显示成功",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "原交付列表/展示字段/实际下载字节及权限矩阵已在verification-03实跑至通过位置；原失效/缺失/相对引用拒绝保留完整真实检查。当前只调整后段夹具，新候选待集中执行，不以旧候选局部成果替代本轮正式收据。",
+      "executions": [
+        {
+          "key": "r06_test_2bdab5e0926be37f6e35",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_2bdab5e0926be37f6e35/binding-result.json",
+          "resultSha256": "1bda5ca2d27a7658e6133ccd902f37c2ff474d2f899658bbe7e2da1628458bcd",
+          "stdoutSha256": "4eb0be55289af5442d05d172e30325252ffe9ba07036b2a82e0d0de933e9993a",
+          "stderrSha256": "8fd75192a986afd7ab2a25f35a7afa0d5991f2d64d0bd55c926d298d776e9093",
+          "observedTest": "stage_files_gateway_only_delivers_real_authorized_session_files",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1CD1C31CCF44-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1CD1C31CCF44",
+      "originalAssertion": "文件不存在、非绝对路径/无会话或无法登记时失败，不宣称已交付。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Missing/empty/whitespace/foreign session identities, bad paths, expired payloads and actual SQLite registration failures refuse without new sessions/files/references.",
+      "executions": [
+        {
+          "key": "r06_test_2bdab5e0926be37f6e35",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_2bdab5e0926be37f6e35/binding-result.json",
+          "resultSha256": "1bda5ca2d27a7658e6133ccd902f37c2ff474d2f899658bbe7e2da1628458bcd",
+          "stdoutSha256": "4eb0be55289af5442d05d172e30325252ffe9ba07036b2a82e0d0de933e9993a",
+          "stderrSha256": "8fd75192a986afd7ab2a25f35a7afa0d5991f2d64d0bd55c926d298d776e9093",
+          "observedTest": "stage_files_gateway_only_delivers_real_authorized_session_files",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-207DF594B497-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-207DF594B497",
+      "originalAssertion": "只关闭指定子线程",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "两个真实子线程仅关闭A，B全字段保持不变，A保持同child身份并记录closed: close A only。",
+      "executions": [
+        {
+          "key": "r06_test_74fb12b039dc8325b38b",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_74fb12b039dc8325b38b/binding-result.json",
+          "resultSha256": "6cf89e71c7c514c14012efd54f6f8e3e0eed910fc66db1a40acf39a50e87a653",
+          "stdoutSha256": "c1c53ae992efab11d54d53d3536f10743c07c633d49939a5dda22f081a5bd223",
+          "stderrSha256": "3d6cdeffeec401ecc1fc46da0129f7a5a2aeec682514d8b845ac15a445afa651",
+          "observedTest": "dispatch_reply_close_round_trip_on_the_real_chain",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ea163c3309f9fef557ae",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ea163c3309f9fef557ae/binding-result.json",
+          "resultSha256": "ba081adb7afcf273dc4b58b7c79212918fe7d29422c28e3bc3d37e8b32a66eb6",
+          "stdoutSha256": "db8f9655880db4425ce37f8abfd84e784a9a7cf3b05f975954946bb12eea388e",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-207DF594B497-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-207DF594B497",
+      "originalAssertion": "状态回父会话",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Both durable thread state and the actual parent model tool result report streamStatus/status closed for only the requested thread.",
+      "executions": [
+        {
+          "key": "r06_test_74fb12b039dc8325b38b",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_74fb12b039dc8325b38b/binding-result.json",
+          "resultSha256": "6cf89e71c7c514c14012efd54f6f8e3e0eed910fc66db1a40acf39a50e87a653",
+          "stdoutSha256": "c1c53ae992efab11d54d53d3536f10743c07c633d49939a5dda22f081a5bd223",
+          "stderrSha256": "3d6cdeffeec401ecc1fc46da0129f7a5a2aeec682514d8b845ac15a445afa651",
+          "observedTest": "dispatch_reply_close_round_trip_on_the_real_chain",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ea163c3309f9fef557ae",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ea163c3309f9fef557ae/binding-result.json",
+          "resultSha256": "ba081adb7afcf273dc4b58b7c79212918fe7d29422c28e3bc3d37e8b32a66eb6",
+          "stdoutSha256": "db8f9655880db4425ce37f8abfd84e784a9a7cf3b05f975954946bb12eea388e",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-207DF594B497-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-207DF594B497",
+      "originalAssertion": "线程不存在、非当前父会话或已关闭不可误关另一线程。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "真实close分别执行unknown、跨父会话及repeat closed，精确NotFound/Forbidden/Conflict；不新建子run、不误关另一线程、不改旁观会话视图/完整事件。",
+      "executions": [
+        {
+          "key": "r06_test_0b9c15470fd9d70502ad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_0b9c15470fd9d70502ad/binding-result.json",
+          "resultSha256": "2622c41f0f1ca16320c719b82bc24f9da89ac2214cb171449427522a5e5dd2e7",
+          "stdoutSha256": "7fea75b2eb1eebd35c83e75b0404d5960f5a4932b9e25d50871711eb8b30f356",
+          "stderrSha256": "f4aab91e19054f00b3c39bafd68602746a37c14075113c65b585143e03acaac3",
+          "observedTest": "reply_validations_refuse_unknown_threads_loudly",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ea163c3309f9fef557ae",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ea163c3309f9fef557ae/binding-result.json",
+          "resultSha256": "ba081adb7afcf273dc4b58b7c79212918fe7d29422c28e3bc3d37e8b32a66eb6",
+          "stdoutSha256": "db8f9655880db4425ce37f8abfd84e784a9a7cf3b05f975954946bb12eea388e",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-3F95164A488C-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-3F95164A488C",
+      "originalAssertion": "给定目标与相应权限，执行“连同子会话归档”后核对：主会话和非运行中的子孙会话移入可恢复归档，跳过项及错误计数返回",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Real running child is skipped; parent and two descendant levels archive and restore; success counts and transaction-failure error/rollback counts are read from HTTP.",
+      "executions": [
+        {
+          "key": "r06_test_92bd8f3099dab10e2cc3",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_92bd8f3099dab10e2cc3/binding-result.json",
+          "resultSha256": "113724a3ace4e056ac6fc7c1ae2240396f34ff068b1d74fa40c3b77f67bc7b48",
+          "stdoutSha256": "33d1ef9d05a0b8269dae632aca2065faeb16c7f1135e4025a744a31caa72d874",
+          "stderrSha256": "281aea34dadb7c1e170950bf44e0d7db72ec90bd3e312fcacb68f6a3b7fc31ba",
+          "observedTest": "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-3F95164A488C-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-3F95164A488C",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "真实父与两层后代归档后恢复、真正运行子会话跳过计数，非法/缺项/越权/SQLite实际失败无错误副作用；原错误计数仍缺，不冒充完整通过",
+      "executions": [
+        {
+          "key": "r06_test_92bd8f3099dab10e2cc3",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_92bd8f3099dab10e2cc3/binding-result.json",
+          "resultSha256": "113724a3ace4e056ac6fc7c1ae2240396f34ff068b1d74fa40c3b77f67bc7b48",
+          "stdoutSha256": "33d1ef9d05a0b8269dae632aca2065faeb16c7f1135e4025a744a31caa72d874",
+          "stderrSha256": "281aea34dadb7c1e170950bf44e0d7db72ec90bd3e312fcacb68f6a3b7fc31ba",
+          "observedTest": "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-45627E4F8173-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-45627E4F8173",
+      "originalAssertion": "解码 base64 并写入目标文件；可展开 ~ 路径并创建父目录",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "在合成 home 下将 base64 解码为原始字节写入 ~/sub/data.bin，并验证父目录生成且磁盘字节与输入一致。",
+      "executions": [
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-45627E4F8173-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-45627E4F8173",
+      "originalAssertion": "无路径、非绝对路径或写失败返回 false；不能把失败回包当作有效附件",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Native calls return false for empty/relative/invalid-base64/directory destinations and do not create the invalid-base64 destination; the renderer failure-path test confirms a false copy/write result is shown as failure and does not register an attachment as a successful file.",
+      "executions": [
+        {
+          "key": "r06_test_86c67870c018c1637498",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_86c67870c018c1637498/binding-result.json",
+          "resultSha256": "c9f5254279c55467c5afb729c1883a9deb7db688e025cc1ff018e5e0a851fed0",
+          "stdoutSha256": "067587847f5053b2adfa9f0640ba32f3bd5efdb77fc6ce77a9ce9b9c5b4aa571",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "observedTest": "failure_results_never_register_copies_attachments_or_trash_success",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-5F879158C679-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-5F879158C679",
+      "originalAssertion": "相同threadId续接历史",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Same thread launches a fresh child with real prior user/assistant history and retained result; foreign parent never receives history or result.",
+      "executions": [
+        {
+          "key": "r06_test_74fb12b039dc8325b38b",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_74fb12b039dc8325b38b/binding-result.json",
+          "resultSha256": "6cf89e71c7c514c14012efd54f6f8e3e0eed910fc66db1a40acf39a50e87a653",
+          "stdoutSha256": "c1c53ae992efab11d54d53d3536f10743c07c633d49939a5dda22f081a5bd223",
+          "stderrSha256": "3d6cdeffeec401ecc1fc46da0129f7a5a2aeec682514d8b845ac15a445afa651",
+          "observedTest": "dispatch_reply_close_round_trip_on_the_real_chain",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_96a847f67dd149ccef54",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_96a847f67dd149ccef54/binding-result.json",
+          "resultSha256": "7efb6896b07eae484d6338301abc02ed660194a7937df55e199457339014ad8d",
+          "stdoutSha256": "8cf7fdd21eb0ca2d4f81d48f1a89ebe772bb2cc806388eea0b85d77265c5a9ff",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_reply_restores_actual_thread_history_and_returns_only_to_its_parent",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-5F879158C679-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-5F879158C679",
+      "originalAssertion": "跨父会话拒绝",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "同一新增真实HTTP/Registry/Gateway父run循环完整执行unknown reply、closed reply和跨父会话reply，精确NotFound/Conflict/Forbidden且不新建子run、不改其他线程/会话视图/完整事件，不跨会话交付子正文；不依赖legacy未知线程检查来补当前原句。",
+      "executions": [
+        {
+          "key": "r06_test_ea163c3309f9fef557ae",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ea163c3309f9fef557ae/binding-result.json",
+          "resultSha256": "ba081adb7afcf273dc4b58b7c79212918fe7d29422c28e3bc3d37e8b32a66eb6",
+          "stdoutSha256": "db8f9655880db4425ce37f8abfd84e784a9a7cf3b05f975954946bb12eea388e",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-5F879158C679-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-5F879158C679",
+      "originalAssertion": "线程不存在、已关闭或父子关系不符拒绝，不跨会话发消息。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "同一新增真实HTTP/Registry/Gateway父run循环完整执行unknown reply、closed reply和跨父会话reply，精确NotFound/Conflict/Forbidden且不新建子run、不改其他线程/会话视图/完整事件，不跨会话交付子正文；不依赖legacy未知线程检查来补当前原句。",
+      "executions": [
+        {
+          "key": "r06_test_0b9c15470fd9d70502ad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_0b9c15470fd9d70502ad/binding-result.json",
+          "resultSha256": "2622c41f0f1ca16320c719b82bc24f9da89ac2214cb171449427522a5e5dd2e7",
+          "stdoutSha256": "7fea75b2eb1eebd35c83e75b0404d5960f5a4932b9e25d50871711eb8b30f356",
+          "stderrSha256": "f4aab91e19054f00b3c39bafd68602746a37c14075113c65b585143e03acaac3",
+          "observedTest": "reply_validations_refuse_unknown_threads_loudly",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_e7df90764508f8e81c8a",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_e7df90764508f8e81c8a/binding-result.json",
+          "resultSha256": "5a15333f8bd0bc3aea96cdaaf993340783610ab8eb6ccea3dd4220f3ee7d5239",
+          "stdoutSha256": "1c68de3888b255b7a907b670aee5220bb6e6b35c73dc30b04f2bbd9286b3c362",
+          "stderrSha256": "3d6cdeffeec401ecc1fc46da0129f7a5a2aeec682514d8b845ac15a445afa651",
+          "observedTest": "busy_thread_refuses_reply_with_a_structured_conflict",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ea163c3309f9fef557ae",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ea163c3309f9fef557ae/binding-result.json",
+          "resultSha256": "ba081adb7afcf273dc4b58b7c79212918fe7d29422c28e3bc3d37e8b32a66eb6",
+          "stdoutSha256": "db8f9655880db4425ce37f8abfd84e784a9a7cf3b05f975954946bb12eea388e",
+          "stderrSha256": "915af81881e7deee550f4e9f7021ba54fd9369c70f12363801e067d4c02fad7d",
+          "observedTest": "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-895DAC8DD5B7-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-895DAC8DD5B7",
+      "originalAssertion": "执行“恢复文件历史版本”后核对：通过 ResourceIO 写回工作区文件、再记录恢复快照；返回路径或错误",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "restore真实ResourceIO写回磁盘original并新增restore快照，重复内容不加行。",
+      "executions": [
+        {
+          "key": "r06_test_f256e339c06a591f8125",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f256e339c06a591f8125/binding-result.json",
+          "resultSha256": "69826220a26ae8525f4628040492b63bda3c1567d06d7683a5984f1f01b47c89",
+          "stdoutSha256": "1b0cbfe382ed350b47cc84f2557537dc9076d02f13f488a986c0ee7b8ba65918",
+          "stderrSha256": "4c61054bd9136926262191c72d2a03583c33e9e140e6945945fcffeedfc7c4ad",
+          "observedTest": "file_history_routes_full_chain_and_error_vocabulary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-895DAC8DD5B7-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-895DAC8DD5B7",
+      "originalAssertion": "失败、冲突或拒绝时核对返回的状态与实际副作用一致",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Real restore write failure/conflict preserve files and snapshots; a SQLite snapshot-insert trigger failure returns 500 with fileWritten=true/snapshotRecorded=false, and successful retry plus repeated restore each persist a restore audit snapshot.",
+      "executions": [
+        {
+          "key": "r06_test_428b97d3005d469ac6d7",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_428b97d3005d469ac6d7/binding-result.json",
+          "resultSha256": "49d2f7732ecdb54da30ddcff30dbc12808fbea4938faae048c5c5919f2a5272d",
+          "stdoutSha256": "9ec4283fc4d44d60bc9b25c4e23791649a0e75fde516e09dc9a4c92a5ec1b36a",
+          "stderrSha256": "e905ae50407929c5c900da9a36a7bc8a9415cf1e20ecb7536a531b5abd49db2c",
+          "observedTest": "file_history_routes_workspace_not_tracked",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_ac6e21b981a75cd90d7d",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_ac6e21b981a75cd90d7d/binding-result.json",
+          "resultSha256": "3fc13b2c696ca1aa7e61194da73bc5aa8d2ba6f5e34886b85482140562ea828d",
+          "stdoutSha256": "12970f80d13f003db5480cea9c5d37d09953f31e9dfbc7a6571f2c55e31bc332",
+          "stderrSha256": "ddd5bece8c716e2d285eddbc563de51d0f2bdba78aa15a8609120e0c9e2b5e87",
+          "observedTest": "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_f256e339c06a591f8125",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f256e339c06a591f8125/binding-result.json",
+          "resultSha256": "69826220a26ae8525f4628040492b63bda3c1567d06d7683a5984f1f01b47c89",
+          "stdoutSha256": "1b0cbfe382ed350b47cc84f2557537dc9076d02f13f488a986c0ee7b8ba65918",
+          "stderrSha256": "4c61054bd9136926262191c72d2a03583c33e9e140e6945945fcffeedfc7c4ad",
+          "observedTest": "file_history_routes_full_chain_and_error_vocabulary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-A18187567AF9-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-A18187567AF9",
+      "originalAssertion": "给定目标与相应权限，执行“跨会话搜索”后核对：按 q、phase、limit 返回标题或内容命中及片段；空查询为空结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Authenticated title/content searches return matched snippets, including long multibyte titles; empty query, limits, foreign isolation and real read failure are checked.",
+      "executions": [
+        {
+          "key": "r06_test_74f43de0a7e9394b9c11",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_74f43de0a7e9394b9c11/binding-result.json",
+          "resultSha256": "6513b03ab6f1af1fe66d180ca6ffc47cba9cb745e97e30483d97036ff013baa0",
+          "stdoutSha256": "edc5cd4196c3553923df272061e10c2bd8559328866faaa55ea771ef471f6f4a",
+          "stderrSha256": "3bb9db8070fdb7eb412044b13f029bd06da9d107239fbc5295246d09d715417a",
+          "observedTest": "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-A18187567AF9-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-A18187567AF9",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "真实标题命中但片段为空的现状、内容命中和实际片段、空查询与非法输入/主体隔离/SQLite读取失败；缺原标题片段",
+      "executions": [
+        {
+          "key": "r06_test_74f43de0a7e9394b9c11",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_74f43de0a7e9394b9c11/binding-result.json",
+          "resultSha256": "6513b03ab6f1af1fe66d180ca6ffc47cba9cb745e97e30483d97036ff013baa0",
+          "stdoutSha256": "edc5cd4196c3553923df272061e10c2bd8559328866faaa55ea771ef471f6f4a",
+          "stderrSha256": "3bb9db8070fdb7eb412044b13f029bd06da9d107239fbc5295246d09d715417a",
+          "observedTest": "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-ADB6B0580864-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-ADB6B0580864",
+      "originalAssertion": "真实普通源文件复制到目标，源文件仍在",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "在真实临时文件系统中复制普通文件，比较源和目标字节并确认源仍是普通文件。",
+      "executions": [
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-ADB6B0580864-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-ADB6B0580864",
+      "originalAssertion": "相对路径、软链接、非普通文件或复制失败返回 false；目标不应伪称有效",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Native copy rejects relative source and destination paths, a directory destination/source, a missing source, and a symlink source; all operations return false, and the rejected symlink copy leaves no destination. The renderer failure-path test confirms a failed copy is not registered as a successful target.",
+      "executions": [
+        {
+          "key": "r06_test_86c67870c018c1637498",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_86c67870c018c1637498/binding-result.json",
+          "resultSha256": "c9f5254279c55467c5afb729c1883a9deb7db688e025cc1ff018e5e0a851fed0",
+          "stdoutSha256": "067587847f5053b2adfa9f0640ba32f3bd5efdb77fc6ce77a9ce9b9c5b4aa571",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "observedTest": "failure_results_never_register_copies_attachments_or_trash_success",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C6D338A24CF8-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C6D338A24CF8",
+      "originalAssertion": "只替换命中内容",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "edit唯一命中、多段、CRLF/BOM真实内容比较且未命中部分保留。",
+      "executions": [
+        {
+          "key": "r06_test_93e9a869e6ec7767b24e",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_93e9a869e6ec7767b24e/binding-result.json",
+          "resultSha256": "cc3861ab6893db23256c53e763d7cb0a3f89f04c38a69a54f235a71041734070",
+          "stdoutSha256": "c1388f95c8b90b15e2344b62d22c1e95d71020740c6ab6448d06dc22171880f0",
+          "stderrSha256": "422ec4235edd29f1468210c3fb01b3a5ebf475a18143940d04fa0fa9de3744b5",
+          "observedTest": "adversarial_read_pagination_truncation_and_edit_vocabulary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C6D338A24CF8-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C6D338A24CF8",
+      "originalAssertion": "并发改动时拒绝",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "实际用户v2变动使旧编辑冲突，重试在用户新内容上修改。",
+      "executions": [
+        {
+          "key": "r06_test_782fb50cd1feba7e2ca3",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_782fb50cd1feba7e2ca3/binding-result.json",
+          "resultSha256": "2fc240033e90b10618c3b46b05940b6a524e3456c839c21b3468a304ee8cf833",
+          "stdoutSha256": "24efd02a80897a108ecc3f4b5569e5cce33d1b857f33e01f1bd8349063aab4e5",
+          "stderrSha256": "2d9a903495461be653aa5cc0bd0a7afb1ee8b9c06d2ec76c073adc130266514a",
+          "observedTest": "r04_a07_concurrent_edit_never_overwrites_the_user_version",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C6D338A24CF8-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C6D338A24CF8",
+      "originalAssertion": "文件记录对应真实修改",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual model catalog/gateway write and edit use the production composition root and persist SessionFile in the correct existing session, preserving the same identity and refreshing real size/mtime; another session remains empty. Missing old text and an external user change refuse without product updates. Actual SQLite insert/update triggers yield explicit already-written/product-registration-failed tool errors, never successful results.",
+      "executions": [
+        {
+          "key": "r06_test_70578405dc8330f889a1",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_70578405dc8330f889a1/binding-result.json",
+          "resultSha256": "d7535319614992512479d90fcc1338a94f3e2eed2943bc588b0d8cecdd4b1498",
+          "stdoutSha256": "9f1c5e2b42d9ac2b83d768eae7643f28e5ca4aeba97b3f97553daf1e206d2550",
+          "stderrSha256": "912e316df9659b892151363e2cbd6d6a58eeb4de0dce1f70b9841efbacf2366a",
+          "observedTest": "original_model_file_registration_failure_reports_written_bytes_without_success",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_782fb50cd1feba7e2ca3",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_782fb50cd1feba7e2ca3/binding-result.json",
+          "resultSha256": "2fc240033e90b10618c3b46b05940b6a524e3456c839c21b3468a304ee8cf833",
+          "stdoutSha256": "24efd02a80897a108ecc3f4b5569e5cce33d1b857f33e01f1bd8349063aab4e5",
+          "stderrSha256": "2d9a903495461be653aa5cc0bd0a7afb1ee8b9c06d2ec76c073adc130266514a",
+          "observedTest": "r04_a07_concurrent_edit_never_overwrites_the_user_version",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_8e7e18c168dd14acdc13",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_8e7e18c168dd14acdc13/binding-result.json",
+          "resultSha256": "691ca2c414a43c28ffff5365cd094bb07562eaf3be97df42e2655aed6551e94c",
+          "stdoutSha256": "9d8b760cbb0d728090b8fe90c671683d036a0dbe0b66cd7ace5707c79642ec8c",
+          "stderrSha256": "5bf23c3be92b99d16e76b8acd9aac7ba629cd91e180ef5dc40e2068b92024681",
+          "observedTest": "adversarial_write_records_conflicts_and_atomicity",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_e9f2c7a4c09ead71e43b",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_e9f2c7a4c09ead71e43b/binding-result.json",
+          "resultSha256": "4614ec4a3273f5ef83c070d8f507e9bbadc6817d7bd4a52aff726a72ce64e82c",
+          "stdoutSha256": "044d1d6eda5ceed8ae36cbd046d87141d5169a95ca00be81e551aebed6095523",
+          "stderrSha256": "9f93674c5d37516746b12824b6c9aaeeda3660b148e12145cce7a147a1dd8f08",
+          "observedTest": "original_model_write_edit_register_real_session_products_and_update_metadata",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C6D338A24CF8-assertion-03",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C6D338A24CF8",
+      "originalAssertion": "旧文本不匹配、并发改动、符号链接逃逸拒绝，用户改动不得覆盖。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "旧文本不匹配、用户版本冲突和越界链接分别实际拒绝、保留原/用户内容。",
+      "executions": [
+        {
+          "key": "r06_test_782fb50cd1feba7e2ca3",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_782fb50cd1feba7e2ca3/binding-result.json",
+          "resultSha256": "2fc240033e90b10618c3b46b05940b6a524e3456c839c21b3468a304ee8cf833",
+          "stdoutSha256": "24efd02a80897a108ecc3f4b5569e5cce33d1b857f33e01f1bd8349063aab4e5",
+          "stderrSha256": "2d9a903495461be653aa5cc0bd0a7afb1ee8b9c06d2ec76c073adc130266514a",
+          "observedTest": "r04_a07_concurrent_edit_never_overwrites_the_user_version",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_93e9a869e6ec7767b24e",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_93e9a869e6ec7767b24e/binding-result.json",
+          "resultSha256": "cc3861ab6893db23256c53e763d7cb0a3f89f04c38a69a54f235a71041734070",
+          "stdoutSha256": "c1388f95c8b90b15e2344b62d22c1e95d71020740c6ab6448d06dc22171880f0",
+          "stderrSha256": "422ec4235edd29f1468210c3fb01b3a5ebf475a18143940d04fa0fa9de3744b5",
+          "observedTest": "adversarial_read_pagination_truncation_and_edit_vocabulary",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_e0e11a6f592749ae6f74",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_e0e11a6f592749ae6f74/binding-result.json",
+          "resultSha256": "9887a5f5677a6bcc60c96ac78dbfe39300ad4b68e922d371eaef4e51f1707150",
+          "stdoutSha256": "fbaca4b5fcd6574f2e474db40097349a5d85021698edbdb03cac326017862a8c",
+          "stderrSha256": "422ec4235edd29f1468210c3fb01b3a5ebf475a18143940d04fa0fa9de3744b5",
+          "observedTest": "r04_a08_symlinks_are_judged_by_their_real_targets",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-CC738012B6EE-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-CC738012B6EE",
+      "originalAssertion": "文本读取返回文本，快照含版本，base64 读取返回不超过 20MB 的真实文件字节",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "对真实文本文件验证读取文本、快照版本中的大小以及 base64 解码后的原始字节；对最大 20 MiB 文件验证完整读取成功。",
+      "executions": [
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-CC738012B6EE-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-CC738012B6EE",
+      "originalAssertion": "路径不是绝对路径、文件不存在或超出限制时返回 null/失败；只读操作不改磁盘",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Non-absolute, missing, and over-limit read requests return errors; the read-only sequence verifies the original on-disk bytes remain unchanged.",
+      "executions": [
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D6509017C382-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D6509017C382",
+      "originalAssertion": "有效绝对路径时 fs.writeFileSync 写入 UTF-8 内容并返回 true",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "普通 UTF-8 写入到真实有效绝对路径返回 true，并通过重新读取验证实际写入内容；外部内容可以被普通写入覆盖，这与旧桥语义一致。",
+      "executions": [
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D6509017C382-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D6509017C382",
+      "originalAssertion": "相对路径或写入失败返回 false；旧桥没有版本保护，外部改动可能被覆盖",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Relative and directory destinations return false. After an external write, the ordinary write API intentionally overwrites that content without version protection; separate version-aware save assertions reject stale edits.",
+      "executions": [
+        {
+          "key": "r06_test_86c67870c018c1637498",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_86c67870c018c1637498/binding-result.json",
+          "resultSha256": "c9f5254279c55467c5afb729c1883a9deb7db688e025cc1ff018e5e0a851fed0",
+          "stdoutSha256": "067587847f5053b2adfa9f0640ba32f3bd5efdb77fc6ce77a9ce9b9c5b4aa571",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "observedTest": "failure_results_never_register_copies_attachments_or_trash_success",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        },
+        {
+          "key": "r06_test_f75c0ca223d01cc09704",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/reviewed-execution-rollback/R06_BINDINGS/r06_test_f75c0ca223d01cc09704/binding-result.json",
+          "resultSha256": "a02f5e7af3d781f8d3f6c2e82b5fe8e06db19ddf3cccbe866f0fe94c9648dba7",
+          "stdoutSha256": "47412d891ff39431895df7ae09f61d7a0334cc3b3f6700876563a0213f6b5e55",
+          "stderrSha256": "097db70f436560c547cd8e1f5f804e4963571bf11ae53ee8167c1c3d5a3abf81",
+          "observedTest": "real_file_read_write_copy_and_version_boundaries",
+          "sourceCandidateSha256": "a53594bcdb05cc770c141ade954884f882c226c0b12d74503a5795bfbb2bee0d"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    }
+  ],
+  "partialProofs": [],
+  "executionErrors": {},
+  "unboundOriginalLeaves": [
+    "R00-T02-LA-00C88B996AA0",
+    "R00-T02-LA-01E1E3CF7FA8",
+    "R00-T02-LA-04EE57C5D2BF",
+    "R00-T02-LA-059066969D44",
+    "R00-T02-LA-0779DAF64B03",
+    "R00-T02-LA-081FACA79F2C",
+    "R00-T02-LA-0B483D7F6A43",
+    "R00-T02-LA-0D4F0EFC9DAE",
+    "R00-T02-LA-0DDB5AA05072",
+    "R00-T02-LA-0FE8BED686E2",
+    "R00-T02-LA-1685D5E08812",
+    "R00-T02-LA-17FCFE45576B",
+    "R00-T02-LA-1B712E189DDF",
+    "R00-T02-LA-1E0D477755CD",
+    "R00-T02-LA-206785535A40",
+    "R00-T02-LA-20E9C8F26CEA",
+    "R00-T02-LA-21A99DB98735",
+    "R00-T02-LA-22150190C7B1",
+    "R00-T02-LA-23172C8397F2",
+    "R00-T02-LA-238267978DDA",
+    "R00-T02-LA-24BC2E961E3E",
+    "R00-T02-LA-269958F82F8A",
+    "R00-T02-LA-26AE3688B8DE",
+    "R00-T02-LA-2D4EBE0FF3C2",
+    "R00-T02-LA-2F2B6E173C1B",
+    "R00-T02-LA-2FAA749DA790",
+    "R00-T02-LA-2FB382A137FC",
+    "R00-T02-LA-31CDA283A11A",
+    "R00-T02-LA-32E9930CF9D9",
+    "R00-T02-LA-337738D5D233",
+    "R00-T02-LA-3516A7326DD9",
+    "R00-T02-LA-3562B5D44C5E",
+    "R00-T02-LA-3617DF5B23D5",
+    "R00-T02-LA-3818ADEAFA7A",
+    "R00-T02-LA-38667593C3E1",
+    "R00-T02-LA-38A989948FDD",
+    "R00-T02-LA-38EEA99077E8",
+    "R00-T02-LA-396F817018F6",
+    "R00-T02-LA-3A50AD28E08E",
+    "R00-T02-LA-3C8CE915255E",
+    "R00-T02-LA-3CBCAE9AD914",
+    "R00-T02-LA-3ECCF7C95483",
+    "R00-T02-LA-3FCB259FF69C",
+    "R00-T02-LA-4173A08A51CC",
+    "R00-T02-LA-421EEA1AC8D5",
+    "R00-T02-LA-43FFB75F252C",
+    "R00-T02-LA-45C5CE361CCB",
+    "R00-T02-LA-464E58DEC9E2",
+    "R00-T02-LA-485B2D0A8A02",
+    "R00-T02-LA-4870805E3A3D",
+    "R00-T02-LA-4A56F26EDA32",
+    "R00-T02-LA-4DD3F71FA2CD",
+    "R00-T02-LA-4E8EDC4E25FC",
+    "R00-T02-LA-4EA88B5073E4",
+    "R00-T02-LA-4F0466F7C090",
+    "R00-T02-LA-4F1F69CCA760",
+    "R00-T02-LA-517E697740D9",
+    "R00-T02-LA-51905CECDD1B",
+    "R00-T02-LA-52055FF0CAC2",
+    "R00-T02-LA-5271217DB01B",
+    "R00-T02-LA-52A5D1660088",
+    "R00-T02-LA-5370DA3742CB",
+    "R00-T02-LA-53B672CBEA46",
+    "R00-T02-LA-55B24FEE5AFB",
+    "R00-T02-LA-5A6E0D526903",
+    "R00-T02-LA-5CD35D9EED20",
+    "R00-T02-LA-5DCB0352EB08",
+    "R00-T02-LA-5F5365322CFF",
+    "R00-T02-LA-604C64F4828A",
+    "R00-T02-LA-60A58027CCCE",
+    "R00-T02-LA-6207F7E8C697",
+    "R00-T02-LA-628005EDFF37",
+    "R00-T02-LA-6658E9B80314",
+    "R00-T02-LA-7244E7DCE678",
+    "R00-T02-LA-73B631D77531",
+    "R00-T02-LA-7432B00DEC94",
+    "R00-T02-LA-7563265D4241",
+    "R00-T02-LA-7570BE1F2527",
+    "R00-T02-LA-75753997F5C6",
+    "R00-T02-LA-76E2F5AAF035",
+    "R00-T02-LA-76EE734926B4",
+    "R00-T02-LA-771296A194E0",
+    "R00-T02-LA-7803B231FC36",
+    "R00-T02-LA-7C699FD2A740",
+    "R00-T02-LA-7C959E75B8C3",
+    "R00-T02-LA-7CBF6F4A6760",
+    "R00-T02-LA-7D05B144AE21",
+    "R00-T02-LA-7F0F3F76E38A",
+    "R00-T02-LA-81664285F927",
+    "R00-T02-LA-81B217A7E581",
+    "R00-T02-LA-84E22CD74BE1",
+    "R00-T02-LA-856B28902999",
+    "R00-T02-LA-857747F848F6",
+    "R00-T02-LA-8A62470CC75D",
+    "R00-T02-LA-8A69F0CFFFA1",
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-8C8083F2A5FC",
+    "R00-T02-LA-8D4356B7EC51",
+    "R00-T02-LA-8E2D44B48905",
+    "R00-T02-LA-92620BF2264F",
+    "R00-T02-LA-9283371CDAD8",
+    "R00-T02-LA-93D5237ADE81",
+    "R00-T02-LA-94B9BE3AA7A6",
+    "R00-T02-LA-94CB746D04B7",
+    "R00-T02-LA-9616596B5720",
+    "R00-T02-LA-980C099F356F",
+    "R00-T02-LA-98DDC94776F1",
+    "R00-T02-LA-99900EB5ACC9",
+    "R00-T02-LA-99F8CD228733",
+    "R00-T02-LA-9CA8A47BE208",
+    "R00-T02-LA-9CC1B13F1787",
+    "R00-T02-LA-9D9E72CB6051",
+    "R00-T02-LA-9E3981A9BFCA",
+    "R00-T02-LA-9FF4E1805297",
+    "R00-T02-LA-A02D8C572F5C",
+    "R00-T02-LA-A17D742E55B7",
+    "R00-T02-LA-A2C385A33493",
+    "R00-T02-LA-A5DE44FF584F",
+    "R00-T02-LA-A7B51C282C77",
+    "R00-T02-LA-A9AD4C7F76AE",
+    "R00-T02-LA-A9DAA48DC603",
+    "R00-T02-LA-AA9EB3FD034D",
+    "R00-T02-LA-AD0384FBE1F2",
+    "R00-T02-LA-AD7FAE6288FA",
+    "R00-T02-LA-AF18F5CEA14F",
+    "R00-T02-LA-AF8E24A2F524",
+    "R00-T02-LA-AFA7227BFB63",
+    "R00-T02-LA-B097BDDC1E10",
+    "R00-T02-LA-B09CC9536400",
+    "R00-T02-LA-B0D4073E6AEB",
+    "R00-T02-LA-B34F2B298BFA",
+    "R00-T02-LA-B383AB7B553C",
+    "R00-T02-LA-B45ECEC543C6",
+    "R00-T02-LA-B47CAC08F418",
+    "R00-T02-LA-B5CB2993A5C0",
+    "R00-T02-LA-B97D0D4296FA",
+    "R00-T02-LA-B9DA1A584C6E",
+    "R00-T02-LA-BA490D930CA9",
+    "R00-T02-LA-BB0A168006D7",
+    "R00-T02-LA-BB4CD1E4CD43",
+    "R00-T02-LA-BC675C664910",
+    "R00-T02-LA-BDE3AC44D79C",
+    "R00-T02-LA-BDEDEF118670",
+    "R00-T02-LA-C0ADBABE5E89",
+    "R00-T02-LA-C1FB9C92E813",
+    "R00-T02-LA-C3FB70F9925E",
+    "R00-T02-LA-C99A4322D0C1",
+    "R00-T02-LA-CAA876503B1B",
+    "R00-T02-LA-CDBFE6616EB9",
+    "R00-T02-LA-D43836A3A579",
+    "R00-T02-LA-D483E4CD0935",
+    "R00-T02-LA-D51B2A1FA68A",
+    "R00-T02-LA-D58B651BF099",
+    "R00-T02-LA-D62A81C2AEB2",
+    "R00-T02-LA-D8D47C4680C9",
+    "R00-T02-LA-D901852E1B1A",
+    "R00-T02-LA-D92CD567D6D6",
+    "R00-T02-LA-DCF0836C3A16",
+    "R00-T02-LA-E1625F70C7CC",
+    "R00-T02-LA-E167298FD87C",
+    "R00-T02-LA-E4BEE8E6974A",
+    "R00-T02-LA-EC77C2B04726",
+    "R00-T02-LA-ED089133C106",
+    "R00-T02-LA-EE18A57F7348",
+    "R00-T02-LA-EE2ACB390FCE",
+    "R00-T02-LA-EEDFB7AB889C",
+    "R00-T02-LA-EF5DD65C558E",
+    "R00-T02-LA-EFEEEFFCD60A",
+    "R00-T02-LA-F0319FC4F93D",
+    "R00-T02-LA-F28086B64522",
+    "R00-T02-LA-F6A1A50E97E4",
+    "R00-T02-LA-F829AEA5931C",
+    "R00-T02-LA-F88B0A969094",
+    "R00-T02-LA-FAE2BDEFDB04",
+    "R00-T02-LA-FBDEEDAC0B11",
+    "R00-T02-LA-FF4F06011B48"
+  ],
+  "stageVerdict": "NOT_A_STAGE_VERDICT",
+  "passedRegisteredAssertions": true,
+  "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+  "selectedOriginalLeaves": [
+    "R00-T02-LA-00ECC9568490",
+    "R00-T02-LA-015A65726C05",
+    "R00-T02-LA-041F938C351F",
+    "R00-T02-LA-07A5CE3637C7",
+    "R00-T02-LA-0CDC88FC0999",
+    "R00-T02-LA-0F7D128E01B1",
+    "R00-T02-LA-1AA3F1311F8A",
+    "R00-T02-LA-1CD1C31CCF44",
+    "R00-T02-LA-207DF594B497",
+    "R00-T02-LA-3F95164A488C",
+    "R00-T02-LA-45627E4F8173",
+    "R00-T02-LA-5F879158C679",
+    "R00-T02-LA-895DAC8DD5B7",
+    "R00-T02-LA-A18187567AF9",
+    "R00-T02-LA-ADB6B0580864",
+    "R00-T02-LA-C6D338A24CF8",
+    "R00-T02-LA-CC738012B6EE",
+    "R00-T02-LA-D6509017C382"
+  ],
+  "excludedFromExecutionScope": [
+    "R00-T02-LA-00C88B996AA0",
+    "R00-T02-LA-010BA6693880",
+    "R00-T02-LA-01E1E3CF7FA8",
+    "R00-T02-LA-04EE57C5D2BF",
+    "R00-T02-LA-04F4C81BCBB7",
+    "R00-T02-LA-059066969D44",
+    "R00-T02-LA-062844EDA014",
+    "R00-T02-LA-071B6E2C286A",
+    "R00-T02-LA-0779DAF64B03",
+    "R00-T02-LA-081FACA79F2C",
+    "R00-T02-LA-0B483D7F6A43",
+    "R00-T02-LA-0D4F0EFC9DAE",
+    "R00-T02-LA-0D8358645191",
+    "R00-T02-LA-0DDB5AA05072",
+    "R00-T02-LA-0EC4C0E2EB51",
+    "R00-T02-LA-0FE8BED686E2",
+    "R00-T02-LA-127373C72E30",
+    "R00-T02-LA-1418E279D6FE",
+    "R00-T02-LA-15D154AE53C8",
+    "R00-T02-LA-1685D5E08812",
+    "R00-T02-LA-17FCFE45576B",
+    "R00-T02-LA-1AEDB2670EB9",
+    "R00-T02-LA-1B712E189DDF",
+    "R00-T02-LA-1BEA3A4B9CB0",
+    "R00-T02-LA-1CE6A92200DB",
+    "R00-T02-LA-1CFB84CEB4F8",
+    "R00-T02-LA-1E0D477755CD",
+    "R00-T02-LA-206785535A40",
+    "R00-T02-LA-20DD2E4529D9",
+    "R00-T02-LA-20E9C8F26CEA",
+    "R00-T02-LA-210C7965364E",
+    "R00-T02-LA-21A99DB98735",
+    "R00-T02-LA-22150190C7B1",
+    "R00-T02-LA-23172C8397F2",
+    "R00-T02-LA-238267978DDA",
+    "R00-T02-LA-23AB8E0A2493",
+    "R00-T02-LA-245D72DD4CEA",
+    "R00-T02-LA-24BC2E961E3E",
+    "R00-T02-LA-251147E586B2",
+    "R00-T02-LA-268C221DAB82",
+    "R00-T02-LA-269958F82F8A",
+    "R00-T02-LA-26AE3688B8DE",
+    "R00-T02-LA-295F9F22981B",
+    "R00-T02-LA-2C28E576FC61",
+    "R00-T02-LA-2CAF7E2573D8",
+    "R00-T02-LA-2D4EBE0FF3C2",
+    "R00-T02-LA-2EB39AE34CB5",
+    "R00-T02-LA-2ED065BED168",
+    "R00-T02-LA-2F2B6E173C1B",
+    "R00-T02-LA-2FAA749DA790",
+    "R00-T02-LA-2FB382A137FC",
+    "R00-T02-LA-31CDA283A11A",
+    "R00-T02-LA-3236B05B284F",
+    "R00-T02-LA-32E9930CF9D9",
+    "R00-T02-LA-337738D5D233",
+    "R00-T02-LA-3516A7326DD9",
+    "R00-T02-LA-3562B5D44C5E",
+    "R00-T02-LA-3617DF5B23D5",
+    "R00-T02-LA-3818ADEAFA7A",
+    "R00-T02-LA-38667593C3E1",
+    "R00-T02-LA-38A989948FDD",
+    "R00-T02-LA-38AD68BFB5B3",
+    "R00-T02-LA-38EEA99077E8",
+    "R00-T02-LA-396F817018F6",
+    "R00-T02-LA-3A50AD28E08E",
+    "R00-T02-LA-3C8CE915255E",
+    "R00-T02-LA-3CBCAE9AD914",
+    "R00-T02-LA-3D7A957EF7FF",
+    "R00-T02-LA-3D99324D55C7",
+    "R00-T02-LA-3ECCF7C95483",
+    "R00-T02-LA-3FAFA387AD68",
+    "R00-T02-LA-3FCB259FF69C",
+    "R00-T02-LA-4173A08A51CC",
+    "R00-T02-LA-421EEA1AC8D5",
+    "R00-T02-LA-4338B197B6DF",
+    "R00-T02-LA-43FFB75F252C",
+    "R00-T02-LA-45C5CE361CCB",
+    "R00-T02-LA-464E58DEC9E2",
+    "R00-T02-LA-476AB8B09402",
+    "R00-T02-LA-477DA3D558B8",
+    "R00-T02-LA-478704C17551",
+    "R00-T02-LA-485B2D0A8A02",
+    "R00-T02-LA-4870805E3A3D",
+    "R00-T02-LA-4A56F26EDA32",
+    "R00-T02-LA-4CEBEA945B7A",
+    "R00-T02-LA-4DD3F71FA2CD",
+    "R00-T02-LA-4E8EDC4E25FC",
+    "R00-T02-LA-4EA88B5073E4",
+    "R00-T02-LA-4F0466F7C090",
+    "R00-T02-LA-4F1F69CCA760",
+    "R00-T02-LA-506A6F6005C1",
+    "R00-T02-LA-517E697740D9",
+    "R00-T02-LA-51905CECDD1B",
+    "R00-T02-LA-52055FF0CAC2",
+    "R00-T02-LA-52226FEA5997",
+    "R00-T02-LA-5235D8EDD673",
+    "R00-T02-LA-5271217DB01B",
+    "R00-T02-LA-52A5D1660088",
+    "R00-T02-LA-5370DA3742CB",
+    "R00-T02-LA-53B672CBEA46",
+    "R00-T02-LA-549AC6365C5D",
+    "R00-T02-LA-55B24FEE5AFB",
+    "R00-T02-LA-563F04AF5AD7",
+    "R00-T02-LA-5A6E0D526903",
+    "R00-T02-LA-5C043EAD2299",
+    "R00-T02-LA-5CD35D9EED20",
+    "R00-T02-LA-5DCB0352EB08",
+    "R00-T02-LA-5F5365322CFF",
+    "R00-T02-LA-5F5B67BC5748",
+    "R00-T02-LA-5FA75FC2FE4C",
+    "R00-T02-LA-5FEFBFCEBC04",
+    "R00-T02-LA-604C64F4828A",
+    "R00-T02-LA-60A58027CCCE",
+    "R00-T02-LA-6189780D7F52",
+    "R00-T02-LA-6207F7E8C697",
+    "R00-T02-LA-628005EDFF37",
+    "R00-T02-LA-6658E9B80314",
+    "R00-T02-LA-66C538ED4733",
+    "R00-T02-LA-6E205433F474",
+    "R00-T02-LA-6EA03AC48851",
+    "R00-T02-LA-7244E7DCE678",
+    "R00-T02-LA-730E5984212D",
+    "R00-T02-LA-73B631D77531",
+    "R00-T02-LA-7432B00DEC94",
+    "R00-T02-LA-7563265D4241",
+    "R00-T02-LA-7570BE1F2527",
+    "R00-T02-LA-75753997F5C6",
+    "R00-T02-LA-763C552CB7DE",
+    "R00-T02-LA-76E2F5AAF035",
+    "R00-T02-LA-76EE734926B4",
+    "R00-T02-LA-771296A194E0",
+    "R00-T02-LA-778CBDA01964",
+    "R00-T02-LA-7803B231FC36",
+    "R00-T02-LA-78B18101F37D",
+    "R00-T02-LA-7C699FD2A740",
+    "R00-T02-LA-7C959E75B8C3",
+    "R00-T02-LA-7CBF6F4A6760",
+    "R00-T02-LA-7D05B144AE21",
+    "R00-T02-LA-7F0F3F76E38A",
+    "R00-T02-LA-81664285F927",
+    "R00-T02-LA-81B217A7E581",
+    "R00-T02-LA-822AADC2B605",
+    "R00-T02-LA-84E22CD74BE1",
+    "R00-T02-LA-856B28902999",
+    "R00-T02-LA-857747F848F6",
+    "R00-T02-LA-865A9825A3EB",
+    "R00-T02-LA-89F253FD3567",
+    "R00-T02-LA-8A62470CC75D",
+    "R00-T02-LA-8A69F0CFFFA1",
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-8C8083F2A5FC",
+    "R00-T02-LA-8D4356B7EC51",
+    "R00-T02-LA-8E11FAF4CC01",
+    "R00-T02-LA-8E2D44B48905",
+    "R00-T02-LA-90975187F446",
+    "R00-T02-LA-92620BF2264F",
+    "R00-T02-LA-9283371CDAD8",
+    "R00-T02-LA-93D5237ADE81",
+    "R00-T02-LA-94B9BE3AA7A6",
+    "R00-T02-LA-94CB746D04B7",
+    "R00-T02-LA-960668141E07",
+    "R00-T02-LA-9616596B5720",
+    "R00-T02-LA-980C099F356F",
+    "R00-T02-LA-98DDC94776F1",
+    "R00-T02-LA-99900EB5ACC9",
+    "R00-T02-LA-99F8CD228733",
+    "R00-T02-LA-9A47666127D3",
+    "R00-T02-LA-9CA8A47BE208",
+    "R00-T02-LA-9CC1B13F1787",
+    "R00-T02-LA-9D9E72CB6051",
+    "R00-T02-LA-9E3981A9BFCA",
+    "R00-T02-LA-9FF4E1805297",
+    "R00-T02-LA-A02D8C572F5C",
+    "R00-T02-LA-A17D742E55B7",
+    "R00-T02-LA-A2C385A33493",
+    "R00-T02-LA-A3FE8FD26CB4",
+    "R00-T02-LA-A5DE44FF584F",
+    "R00-T02-LA-A7B51C282C77",
+    "R00-T02-LA-A9AD4C7F76AE",
+    "R00-T02-LA-A9B0BBAD449C",
+    "R00-T02-LA-A9DAA48DC603",
+    "R00-T02-LA-AA9EB3FD034D",
+    "R00-T02-LA-AD0384FBE1F2",
+    "R00-T02-LA-AD7FAE6288FA",
+    "R00-T02-LA-AF18F5CEA14F",
+    "R00-T02-LA-AF8E24A2F524",
+    "R00-T02-LA-AFA7227BFB63",
+    "R00-T02-LA-B0386DC9DED9",
+    "R00-T02-LA-B097BDDC1E10",
+    "R00-T02-LA-B09CC9536400",
+    "R00-T02-LA-B0D4073E6AEB",
+    "R00-T02-LA-B0F05BC32D62",
+    "R00-T02-LA-B34F2B298BFA",
+    "R00-T02-LA-B383AB7B553C",
+    "R00-T02-LA-B45ECEC543C6",
+    "R00-T02-LA-B47CAC08F418",
+    "R00-T02-LA-B5CB2993A5C0",
+    "R00-T02-LA-B97D0D4296FA",
+    "R00-T02-LA-B9DA1A584C6E",
+    "R00-T02-LA-BA490D930CA9",
+    "R00-T02-LA-BB0A168006D7",
+    "R00-T02-LA-BB1F5E0DE88E",
+    "R00-T02-LA-BB4CD1E4CD43",
+    "R00-T02-LA-BC244641BC1E",
+    "R00-T02-LA-BC675C664910",
+    "R00-T02-LA-BDE3AC44D79C",
+    "R00-T02-LA-BDEDEF118670",
+    "R00-T02-LA-C0ADBABE5E89",
+    "R00-T02-LA-C12CD37BA4A3",
+    "R00-T02-LA-C1FB9C92E813",
+    "R00-T02-LA-C3FB70F9925E",
+    "R00-T02-LA-C406F9A17A3E",
+    "R00-T02-LA-C4F6E3BFF341",
+    "R00-T02-LA-C75BF9A4D143",
+    "R00-T02-LA-C8380CD5D08B",
+    "R00-T02-LA-C99A4322D0C1",
+    "R00-T02-LA-CAA876503B1B",
+    "R00-T02-LA-CCDCE84E4378",
+    "R00-T02-LA-CDBFE6616EB9",
+    "R00-T02-LA-D38F6F02EDD7",
+    "R00-T02-LA-D43836A3A579",
+    "R00-T02-LA-D47D375E578B",
+    "R00-T02-LA-D483E4CD0935",
+    "R00-T02-LA-D5128ABAABCF",
+    "R00-T02-LA-D51B2A1FA68A",
+    "R00-T02-LA-D58B651BF099",
+    "R00-T02-LA-D62A81C2AEB2",
+    "R00-T02-LA-D8D47C4680C9",
+    "R00-T02-LA-D901852E1B1A",
+    "R00-T02-LA-D92CD567D6D6",
+    "R00-T02-LA-DB95BAC2A204",
+    "R00-T02-LA-DCF0836C3A16",
+    "R00-T02-LA-E1625F70C7CC",
+    "R00-T02-LA-E167298FD87C",
+    "R00-T02-LA-E2AF86A962D0",
+    "R00-T02-LA-E4BEE8E6974A",
+    "R00-T02-LA-E7CC636A724C",
+    "R00-T02-LA-E84EEED44AC1",
+    "R00-T02-LA-EA26288DA2DB",
+    "R00-T02-LA-EA3C6A0C5214",
+    "R00-T02-LA-EB9E56CF6007",
+    "R00-T02-LA-EC77C2B04726",
+    "R00-T02-LA-ED089133C106",
+    "R00-T02-LA-EE18A57F7348",
+    "R00-T02-LA-EE2ACB390FCE",
+    "R00-T02-LA-EEDFB7AB889C",
+    "R00-T02-LA-EF5DD65C558E",
+    "R00-T02-LA-EFEEEFFCD60A",
+    "R00-T02-LA-F0319FC4F93D",
+    "R00-T02-LA-F28086B64522",
+    "R00-T02-LA-F49D5F80D234",
+    "R00-T02-LA-F54ED990E939",
+    "R00-T02-LA-F6A1A50E97E4",
+    "R00-T02-LA-F829AEA5931C",
+    "R00-T02-LA-F88B0A969094",
+    "R00-T02-LA-F9277C29D570",
+    "R00-T02-LA-FAE2BDEFDB04",
+    "R00-T02-LA-FBD4D4D29679",
+    "R00-T02-LA-FBDEEDAC0B11",
+    "R00-T02-LA-FD94F19E734D",
+    "R00-T02-LA-FDB0FE6528EE",
+    "R00-T02-LA-FF4F06011B48"
+  ],
+  "note": "仅已审阅的逐断言证据由本轮原始日志重算；缺少映射的原义务仍由阶段门禁保持BLOCKED。"
+}

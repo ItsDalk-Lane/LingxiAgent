@@ -1,0 +1,16 @@
+
+running 1 test
+test resources_route_chain_ticket_range_etag ... ok
+
+successes:
+
+---- resources_route_chain_ticket_range_etag stdout ----
+LINGXI_AUTH_REJECTED request_id="req-c4370f7b7659f5502af24cbc2897424f" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:51525
+LINGXI_AUTH_REJECTED request_id="req-f2828199e1ae6a84d545d4ce8086159c" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:51526
+
+
+successes:
+    resources_route_chain_ticket_range_etag
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.13s
+

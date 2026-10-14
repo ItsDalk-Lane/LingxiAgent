@@ -224,7 +224,10 @@ async fn submit_fg(
     request_id: Option<&str>,
 ) -> Result<lingxi_service::ExecuteAccepted, SessionExecuteError> {
     let submission = ExecuteSubmission {
-    knowledge: None, input, request_id };
+        knowledge: None,
+        input,
+        request_id,
+    };
     let storage = Arc::clone(state.storage());
     state
         .sessions()

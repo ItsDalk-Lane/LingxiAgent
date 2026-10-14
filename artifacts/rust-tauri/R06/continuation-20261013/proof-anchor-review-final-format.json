@@ -1,0 +1,490 @@
+{
+  "scope": "Assertion location review only; no coverage or verdict promotion.",
+  "checked": [
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 12
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "original_restore_real_io_failure_is_500_and_keeps_all_agent_files",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "original_restore_detail_hash_refuses_concurrent_edits_and_preserves_agent_scope",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 19
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 14
+    },
+    {
+      "id": "R00-T02-LA-04EE57C5D2BF",
+      "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-04EE57C5D2BF",
+      "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-04F4C81BCBB7",
+      "test": "original_facts_v1_v2_import_export_and_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-04F4C81BCBB7",
+      "test": "original_facts_v1_v2_import_export_and_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-0779DAF64B03",
+      "test": "original_unpin_exact_and_multi_match_keep_other_agent_and_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 9
+    },
+    {
+      "id": "R00-T02-LA-0779DAF64B03",
+      "test": "original_unpin_exact_and_multi_match_keep_other_agent_and_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-0779DAF64B03",
+      "test": "original_unpin_exact_and_multi_match_keep_other_agent_and_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-0779DAF64B03",
+      "test": "original_unpin_exact_and_multi_match_keep_other_agent_and_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-0F7D128E01B1",
+      "test": "original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 20
+    },
+    {
+      "id": "R00-T02-LA-0F7D128E01B1",
+      "test": "original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 20
+    },
+    {
+      "id": "R00-T02-LA-1418E279D6FE",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-1418E279D6FE",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-1CE6A92200DB",
+      "test": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-1CE6A92200DB",
+      "test": "original_revision_detail_reads_current_live_and_restore_keeps_agent_scope",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-1CFB84CEB4F8",
+      "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-1CFB84CEB4F8",
+      "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-245D72DD4CEA",
+      "test": "original_feedback_paused_up_down_duplicate_excerpt_and_agent_isolation",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 13
+    },
+    {
+      "id": "R00-T02-LA-245D72DD4CEA",
+      "test": "original_feedback_paused_up_down_duplicate_excerpt_and_agent_isolation",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 11
+    },
+    {
+      "id": "R00-T02-LA-3236B05B284F",
+      "test": "original_install_tool_risk_token_complete_package_agent_enable_and_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-3236B05B284F",
+      "test": "original_install_tool_risk_token_complete_package_agent_enable_and_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-3236B05B284F",
+      "test": "original_install_tool_risk_token_complete_package_agent_enable_and_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-3236B05B284F",
+      "test": "original_install_tool_risk_token_complete_package_agent_enable_and_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-3236B05B284F",
+      "test": "original_install_tool_risk_token_complete_package_agent_enable_and_failures",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 12
+    },
+    {
+      "id": "R00-T02-LA-38AD68BFB5B3",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-38AD68BFB5B3",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-38AD68BFB5B3",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-38AD68BFB5B3",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 1
+    },
+    {
+      "id": "R00-T02-LA-38AD68BFB5B3",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-396F817018F6",
+      "test": "original_clear_compiled_retains_raw_and_all_clear_removes_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-396F817018F6",
+      "test": "original_clear_compiled_retains_raw_and_all_clear_removes_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 1
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-4338B197B6DF",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-476AB8B09402",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-476AB8B09402",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-506A6F6005C1",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 11
+    },
+    {
+      "id": "R00-T02-LA-506A6F6005C1",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 7
+    },
+    {
+      "id": "R00-T02-LA-53B672CBEA46",
+      "test": "original_clear_compiled_retains_raw_and_all_clear_removes_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-53B672CBEA46",
+      "test": "original_clear_compiled_retains_raw_and_all_clear_removes_facts",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-628005EDFF37",
+      "test": "original_context_notes_append_reopen_and_oversize_preserve_old_value",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-628005EDFF37",
+      "test": "original_context_notes_append_reopen_and_oversize_preserve_old_value",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-628005EDFF37",
+      "test": "original_context_notes_append_reopen_and_oversize_preserve_old_value",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-628005EDFF37",
+      "test": "original_context_notes_append_reopen_and_oversize_preserve_old_value",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-7563265D4241",
+      "test": "original_tenet_decisions_and_pinned_replacement_preserve_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-7563265D4241",
+      "test": "original_tenet_decisions_and_pinned_replacement_preserve_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 12
+    },
+    {
+      "id": "R00-T02-LA-76EE734926B4",
+      "test": "original_nonempty_revision_lists_are_agent_scoped_and_read_only",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 13
+    },
+    {
+      "id": "R00-T02-LA-822AADC2B605",
+      "test": "original_tenet_decisions_and_pinned_replacement_preserve_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-822AADC2B605",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-822AADC2B605",
+      "test": "original_tenet_decision_nonpending_capacity_errors_keep_store",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-89F253FD3567",
+      "test": "original_tenet_decisions_and_pinned_replacement_preserve_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-89F253FD3567",
+      "test": "original_pin_and_propose_tools_publish_context_and_preserve_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-89F253FD3567",
+      "test": "original_tenet_decision_nonpending_capacity_errors_keep_store",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-89F253FD3567",
+      "test": "original_tenet_decisions_and_pinned_replacement_preserve_nonactive",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-90975187F446",
+      "test": "original_week_days_list_edit_sync_and_rejected_dates",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-90975187F446",
+      "test": "original_week_days_list_edit_sync_and_rejected_dates",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-C75BF9A4D143",
+      "test": "original_facts_v1_v2_import_export_and_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 4
+    },
+    {
+      "id": "R00-T02-LA-C75BF9A4D143",
+      "test": "original_facts_v1_v2_import_export_and_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-C8380CD5D08B",
+      "test": "original_experience_read_sync_paused_and_invalid_preserve_state",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 12
+    },
+    {
+      "id": "R00-T02-LA-C8380CD5D08B",
+      "test": "original_experience_read_sync_paused_and_invalid_preserve_state",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 17
+    },
+    {
+      "id": "R00-T02-LA-D38F6F02EDD7",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-D38F6F02EDD7",
+      "test": "original_compiled_three_sections_live_legacy_and_invalid_no_write",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-D47D375E578B",
+      "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-D47D375E578B",
+      "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 5
+    },
+    {
+      "id": "R00-T02-LA-DCF0836C3A16",
+      "test": "original_experience_read_sync_paused_and_invalid_preserve_state",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 12
+    },
+    {
+      "id": "R00-T02-LA-DCF0836C3A16",
+      "test": "original_experience_read_sync_paused_and_invalid_preserve_state",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-EA26288DA2DB",
+      "test": "original_facts_v1_v2_import_export_and_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 10
+    },
+    {
+      "id": "R00-T02-LA-EA26288DA2DB",
+      "test": "original_facts_v1_v2_import_export_and_rejections",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 3
+    },
+    {
+      "id": "R00-T02-LA-FD94F19E734D",
+      "test": "original_week_days_list_edit_sync_and_rejected_dates",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 2
+    },
+    {
+      "id": "R00-T02-LA-FD94F19E734D",
+      "test": "original_week_days_list_edit_sync_and_rejected_dates",
+      "source": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+      "assertionsChecked": 5
+    }
+  ],
+  "changedAssertionsReviewedInTests": [
+    "a13_search_within_scope_returns_only_allowed_sources",
+    "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows",
+    "file_history_routes_full_chain_and_error_vocabulary",
+    "original_archive_children_recurses_skips_running_and_preserves_failed_transaction",
+    "original_manage_refusals_and_no_write_authorization_preserve_facts",
+    "original_persona_reads_template_custom_alias_and_refusal",
+    "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+    "resourceio_write_conflict_refuses_external_change_at_commit_boundary",
+    "scope_violations_are_loud_not_fallback",
+    "stage_files_gateway_only_delivers_real_authorized_session_files",
+    "subagent_close_and_reply_refusals_preserve_other_threads_and_sessions",
+    "websocket_registration_and_foreign_messages_preserve_authorized_session_streams"
+  ],
+  "missing": [],
+  "eligibleAnchorUpdates": 78,
+  "applied": true
+}

@@ -1,0 +1,29 @@
+{
+  "status": "EXECUTED_ORIGINAL_PROOFS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "id": "R00-T02-LA-43FFB75F252C",
+  "original": {
+    "then": "汇总各 Agent 的归档会话并截短首消息",
+    "assertions": [
+      "给定目标与相应权限，执行“查看归档会话”后核对：汇总各 Agent 的归档会话并截短首消息",
+      "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+    ],
+    "gaps": [
+      "归档列表已有生命周期/主体过滤，但未返回原各Agent首消息截断字段。"
+    ]
+  },
+  "logs": [
+    "archived-projection-coupled-final.log",
+    "archived-adapter-regression.log",
+    "workspace-clippy-archived-final.log"
+  ],
+  "coupledServiceTestsPassed": 42,
+  "adapterTestsPassed": 18,
+  "preservedFailures": [
+    "archived-projection-red.log",
+    "archived-projection-green-r1.log",
+    "archived-projection-green-r2.log"
+  ],
+  "storageShape": "Actual T03 user-message writer stores {text}, not an assistant NormalizedMessage or bare content-block array.",
+  "unicodeBoundary": "At most100 UTF16 units; a scalar crossing unit100 is omitted whole, rather than emitting invalid surrogate/UTF8.",
+  "stageAcceptance": false
+}

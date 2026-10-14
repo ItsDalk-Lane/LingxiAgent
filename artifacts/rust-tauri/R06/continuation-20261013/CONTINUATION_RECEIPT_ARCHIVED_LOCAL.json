@@ -1,0 +1,85 @@
+{
+  "schema": "lingxi.r06.continuation-local-receipt.v1",
+  "status": "ARCHIVED_FIRST_MESSAGE_AND_REGISTERED_READY_ORIGINALS_VERIFIED_R06_NOT_ACCEPTED",
+  "supersedesLocalSummary": "CONTINUATION_RECEIPT_RESOURCE_FORMAT_LOCAL.json",
+  "gitHead": "6f5c4b01d6805ac95fa03a35c2035ccb35f7b8f8",
+  "branch": "codex/rust-tauri-migration",
+  "worktreeChangesUncommitted": true,
+  "currentScopedExecution": {
+    "directory": "registered-ready-archived-execution",
+    "sourceCandidateSha256": "702a1baff72fc2d3efca3c158ff676af2ecd42fe388bb9226ab46151fb7a797a",
+    "sourceStable": true,
+    "registeredBindingsExecuted": 129,
+    "registeredBindingsPassed": 129,
+    "selectedOriginalRequirements": 110,
+    "selectedAssertions": 253,
+    "selectedAssertionsPassed": 253,
+    "executionErrors": {},
+    "rollup": "registered-ready-archived-execution/R06_LEAVES/leaf-cases.json",
+    "rawReceiptReadback": "registered-ready-archived-readback/leaf-cases.json",
+    "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+    "excludedOriginalRequirements": 169,
+    "additionalExcludedRequiredSupplementalLeaf": "R00-T02-LA-960668141E07",
+    "excludedRegisteredGraphLeaves": 170,
+    "stageVerdict": "NOT_A_STAGE_VERDICT"
+  },
+  "originalRequirementRegistration": {
+    "total": 279,
+    "ready": 110,
+    "gap": 169,
+    "registrationIsNotStageAcceptance": true
+  },
+  "newlyCompletedOriginalLeaves": ["R00-T02-LA-43FFB75F252C"],
+  "newProductRepair": [
+    "Formal archived HTTP list exposes firstMessage from actual earliest visible user{text} history across authorized agents, excluding active sessions.",
+    "Preview is limited to100 UTF16 units and does not split a Unicode scalar; at a100-unit crossing the entire scalar is omitted, avoiding invalid surrogate/UTF8 output.",
+    "Original reminder/reference/knowledge/research envelopes, including unterminated blocks, are removed from display without rewriting stored model history.",
+    "Empty sessions have empty previews; missing history storage, malformed stored JSON and invalid text types explicitly fail instead of returning success-shaped empty/default data.",
+    "Root and device owner filtering remain unchanged; cleanup retains its metadata-only dependency rather than inheriting preview decoding requirements."
+  ],
+  "supportingLocalRuns": [
+    {"log": "archived-projection-coupled-final.log", "passed": 42, "failed": 0, "scope": "Original sessions13 + actual file restoration16 + session tree13"},
+    {"log": "archived-adapter-regression.log", "passed": 18, "failed": 0},
+    {"log": "workspace-clippy-archived-final.log", "status": "PASS", "scope": "workspace --all-targets -- -D warnings"},
+    {"log": "workspace-format-archived-final.log", "status": "PASS"},
+    {"log": "stage-input-contract-tests-archived.log", "passed": 20, "failed": 0},
+    {"log": "runner-identity-archived.log", "passed": 1, "failed": 0},
+    {"log": "check-contracts-archived.log", "status": "PASS"},
+    {"log": "check-boundaries-archived.log", "status": "PASS", "negativeControlsPassed": 20},
+    {"directory": "stage-input-archived-final-check", "status": "INPUTS_MATCH_NOT_STAGE_VERDICT"},
+    {"report": "proof-anchor-review-archived-applied.json", "unchangedOriginalAnchorsRefreshed": 30, "missingAssertions": 0}
+  ],
+  "supportingRunsAreNotClaimedToShareFinalScopedExecutionWindow": true,
+  "preservedFailures": [
+    {"log": "archived-projection-red.log", "failed": 2, "reason": "Actual missing firstMessage and misleading success when messages table was unavailable."},
+    {"log": "archived-projection-green-r1.log", "failed": 2, "reason": "Observed actual user content is an object, not an assumed bare content-block array."},
+    {"log": "archived-projection-green-r2.log", "failed": 2, "reason": "Observed actual user writer stores{text}, not the assistant NormalizedMessage envelope; producer then read directly and decoding fixed to its actual shape."}
+  ],
+  "historicalScopedExecution": {
+    "receipt": "CONTINUATION_RECEIPT_RESOURCE_FORMAT_LOCAL.json",
+    "sourceCandidateSha256": "1d8f8225127e6eeada417a186381dd98112eb7022ddd20e0d47d59d6e343ef1d",
+    "selectedOriginalRequirements": 109,
+    "registeredBindingsPassed": 127,
+    "selectedAssertionsPassed": 251,
+    "notCurrentSourceAcceptance": true
+  },
+  "unresolved": {
+    "originalRequirementsWithGaps": 169,
+    "openArFindings": 14,
+    "extraObligationsNotFormallyClosed": 12,
+    "writeOsSandboxUnavailableRefusal": "UNIMPLEMENTED_NOT_WAIVED",
+    "skillsUiAndAppBroadcast": "NOT_PROVED_OR_IMPLEMENTED_BY_BACKEND_BUNDLE_DELTA",
+    "requiredIndependentReviews": "BLOCKED_BY_RECORDED_PLATFORM_INTERRUPTION",
+    "realGuiObservations": "BLOCKED_BY_ASSISTIVE_ACCESS_DENIAL_HOST_NOT_CONCLUSIVELY_IDENTIFIED",
+    "originalExecutionPrompt": "MISSING_2026_10_08_PROMPT_REQUESTED_AGAIN_USER_UNAVAILABLE",
+    "fullR05Closure": "NOT_COMPLETED",
+    "fullR06Acceptance": "NOT_COMPLETED"
+  },
+  "r06Accepted": false,
+  "r07Ready": false,
+  "userRequestedEndpointAchieved": false,
+  "taskMarkedComplete": false,
+  "committed": false,
+  "pushed": false,
+  "auditSealAdvanced": false
+}

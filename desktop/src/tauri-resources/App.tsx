@@ -10,6 +10,8 @@ export function ResourceDesktop({ bridge, viewer = false }: { bridge: ResourceBr
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [watchError, setWatchError] = useState('');
+  const [legacyWatchEnabled, setLegacyWatchEnabled] = useState(false);
+  const [legacyWatchActive, setLegacyWatchActive] = useState(false);
   const [destination, setDestination] = useState('');
   const [binaryData, setBinaryData] = useState('');
   const [cover, setCover] = useState('');
@@ -17,6 +19,7 @@ export function ResourceDesktop({ bridge, viewer = false }: { bridge: ResourceBr
   const dirty = useRef(false);
   const baseline = useRef<Snapshot | null>(null);
   const generation = useRef(0);
+  const reloadCurrent = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     if (!viewer) return;
@@ -43,11 +46,59 @@ export function ResourceDesktop({ bridge, viewer = false }: { bridge: ResourceBr
         } else setNotice('文件已被外部修改。尚未保存的编辑仍保留，保存时会核对版本。');
       } catch (e) { if (!disposed) setError(String(e)); }
     };
+    reloadCurrent.current = reload;
     void reload();
     const watch = retainResourceEvents(path, bridge, reload, e => { if (!disposed) setWatchError(String(e)); });
     watch.ready.catch(e => { if (!disposed) setWatchError(String(e)); });
-    return () => { disposed = true; watch.release(); };
+    return () => {
+      disposed = true;
+      if (reloadCurrent.current === reload) reloadCurrent.current = null;
+      watch.release();
+    };
   }, [path, bridge, viewer]);
+
+  useEffect(() => {
+    if (!legacyWatchEnabled || !path || viewer) return;
+    let disposed = false;
+    let unlisten: (() => void) | null = null;
+    let started = false;
+    const start = async () => {
+      try {
+        const stopListening = await bridge.listenFileChanged(changedPath => {
+          if (changedPath === path) void reloadCurrent.current?.();
+        });
+        if (disposed) {
+          stopListening();
+          return;
+        }
+        unlisten = stopListening;
+        started = await bridge.watchFile(path);
+        if (!started) throw new Error('旧版文件监听启动失败');
+        if (!disposed) setLegacyWatchActive(true);
+        else {
+          await bridge.unwatchFile(path);
+          unlisten?.();
+          unlisten = null;
+        }
+      } catch (e) {
+        unlisten?.();
+        unlisten = null;
+        if (!disposed) {
+          setWatchError(String(e));
+          setLegacyWatchEnabled(false);
+        }
+      }
+    };
+    void start();
+    return () => {
+      disposed = true;
+      setLegacyWatchActive(false);
+      const stopListening = unlisten;
+      unlisten = null;
+      if (started) void bridge.unwatchFile(path).finally(() => stopListening?.());
+      else stopListening?.();
+    };
+  }, [legacyWatchEnabled, path, bridge, viewer]);
 
   const action = async (operation: () => Promise<void>) => {
     setError(''); setNotice('');
@@ -87,8 +138,10 @@ export function ResourceDesktop({ bridge, viewer = false }: { bridge: ResourceBr
       })}>查看文件</button></div>}
       {error && <p role="alert" data-testid="operation-error">{error}</p>}
       {watchError && <p role="alert" data-testid="watch-error">自动刷新不可用：{watchError}</p>}
+      {legacyWatchActive && <p role="status" data-testid="legacy-watch-status">旧版文件变化监听已启用</p>}
       {notice && <p role="status">{notice}</p>}
       {!viewer && path && <nav aria-label="文件操作">
+        <button data-testid="legacy-watch-toggle" aria-pressed={legacyWatchEnabled} onClick={() => setLegacyWatchEnabled(enabled => !enabled)}>{legacyWatchEnabled ? '停止文件监听' : '启动文件监听'}</button>
         <button onClick={() => action(async () => { if (!await bridge.openFile(path)) throw new Error('系统打开失败'); setNotice('已交给系统默认程序打开'); })}>系统打开</button>
         <button data-testid="spawn-viewer" onClick={() => action(async () => { await bridge.spawnViewer(path); })}>只读新窗口</button>
         <button data-testid="trash-item" onClick={() => action(async () => {

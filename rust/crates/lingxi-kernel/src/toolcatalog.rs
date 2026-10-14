@@ -506,7 +506,10 @@ impl Availability {
         }
     }
 
-    fn refusal_reason(&self) -> String {
+    /// The honest refusal text for a non-callable availability (shared by
+    /// the kernel prepare refusal and the service gateway's stale-pin
+    /// enrichment — one vocabulary, never two).
+    pub fn refusal_reason(&self) -> String {
         match self {
             Availability::Disabled { reason } => format!("disabled: {reason}"),
             Availability::Future { reason } => format!("not implemented yet: {reason}"),
@@ -1705,10 +1708,24 @@ impl ToolRegistry {
     }
 
     /// 说明、参数和代次在同一次锁内读取，不能跨代次拼接。
-    pub fn describe_full_at_generation(&self, target: &ToolTargetId) -> Result<(u64, ToolFullDescription), ToolCatalogError> {
+    pub fn describe_full_at_generation(
+        &self,
+        target: &ToolTargetId,
+    ) -> Result<(u64, ToolFullDescription), ToolCatalogError> {
         let state = self.lock();
-        let tool = state.targets.get(target).ok_or_else(|| ToolCatalogError::TargetNotFound { reference: format!("target {target}") })?;
-        Ok((state.catalog_generation, ToolFullDescription { listing: description_of(target, tool), input_schema: tool.manifest.input_schema.clone() }))
+        let tool = state
+            .targets
+            .get(target)
+            .ok_or_else(|| ToolCatalogError::TargetNotFound {
+                reference: format!("target {target}"),
+            })?;
+        Ok((
+            state.catalog_generation,
+            ToolFullDescription {
+                listing: description_of(target, tool),
+                input_schema: tool.manifest.input_schema.clone(),
+            },
+        ))
     }
 
     /// 常驻策略只控制发送给模型的声明，不改变注册或执行授权。
@@ -1731,9 +1748,22 @@ impl ToolRegistry {
         activated: &std::collections::BTreeSet<ToolTargetId>,
     ) -> (u64, Vec<ToolFullDescription>) {
         let state = self.lock();
-        let tools = state.targets.iter().filter(|(id, tool)| {
-            tool.manifest.availability == Availability::Available && (activated.contains(*id) || state.model_residents.as_ref().is_none_or(|set| set.contains(*id)))
-        }).map(|(id, tool)| ToolFullDescription { listing: description_of(id, tool), input_schema: tool.manifest.input_schema.clone() }).collect();
+        let tools = state
+            .targets
+            .iter()
+            .filter(|(id, tool)| {
+                tool.manifest.availability == Availability::Available
+                    && (activated.contains(*id)
+                        || state
+                            .model_residents
+                            .as_ref()
+                            .is_none_or(|set| set.contains(*id)))
+            })
+            .map(|(id, tool)| ToolFullDescription {
+                listing: description_of(id, tool),
+                input_schema: tool.manifest.input_schema.clone(),
+            })
+            .collect();
         (state.catalog_generation, tools)
     }
 

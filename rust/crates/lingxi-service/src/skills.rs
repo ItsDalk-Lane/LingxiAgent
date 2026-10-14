@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
-use axum::extract::{Path as AxumPath, RawQuery, State};
+use axum::extract::{Path as AxumPath, Query, RawQuery, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -36,6 +36,12 @@ use lingxi_kernel::memory::{
 
 use crate::inject;
 use crate::ServiceState;
+
+// lib.rs 不动（R06 F 块叶子约束）：组合包导出作为 skills 的子模块挂载。
+// #[path] 基准是**所在文件的目录**（src/），不是隐式子模块目录
+// （src/skills/），故 "skill_export.rs" 即 src/skill_export.rs。
+#[path = "skill_export.rs"]
+pub mod skill_export;
 
 // ── guard port (audit layer) ────────────────────────────────────────────────
 
@@ -344,6 +350,119 @@ impl SkillService {
         sl::SkillCatalog::scan_external(&paths)
     }
 
+    fn workspace_catalog(
+        &self,
+        agent_id: Option<&str>,
+        root: Option<&Path>,
+    ) -> Result<Value, MemoryError> {
+        let policy = match agent_id {
+            Some(id) => self.read_agent_config(id)?.3,
+            None => lingxi_kernel::memory::DEFAULT_WORKSPACE_SKILL_POLICY,
+        };
+        let mut skills = Vec::new();
+        let mut candidates = Vec::new();
+        if let Some(root) = root {
+            for (sub, label, category) in lingxi_kernel::memory::WORKSPACE_SKILL_DIRS {
+                let directory = root.join(sub);
+                match std::fs::metadata(&directory) {
+                    Ok(metadata) if metadata.is_dir() => {}
+                    Ok(_) => {
+                        return Err(MemoryError::Io(format!(
+                            "workspace skill root is not a directory: {}",
+                            directory.display()
+                        )));
+                    }
+                    Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                    Err(error) => return Err(error.into()),
+                }
+                let canonical = directory.canonicalize()?;
+                if !canonical.starts_with(root) {
+                    return Err(MemoryError::Conflict {
+                        code: "WORKSPACE_SKILL_OUTSIDE_ROOT".into(),
+                        message:
+                            "workspace skill directory resolves outside the approved workspace"
+                                .into(),
+                    });
+                }
+                let mut entries = std::fs::read_dir(&directory)?.collect::<Result<Vec<_>, _>>()?;
+                entries.sort_by_key(|entry| entry.file_name());
+                for entry in entries {
+                    if !entry.file_type()?.is_dir() {
+                        continue;
+                    }
+                    let base = entry.path();
+                    let file = base.join("SKILL.md");
+                    match std::fs::metadata(&file) {
+                        Ok(metadata) if metadata.is_file() => {}
+                        Ok(_) => {
+                            return Err(MemoryError::Io(format!(
+                                "workspace skill document is not a file: {}",
+                                file.display()
+                            )));
+                        }
+                        Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                        Err(error) => return Err(error.into()),
+                    }
+                    if !file.canonicalize()?.starts_with(root) {
+                        return Err(MemoryError::Conflict {
+                            code: "WORKSPACE_SKILL_OUTSIDE_ROOT".into(),
+                            message:
+                                "workspace skill document resolves outside the approved workspace"
+                                    .into(),
+                        });
+                    }
+                    let content = std::fs::read_to_string(&file)?;
+                    let fallback = entry.file_name().to_string_lossy().into_owned();
+                    let meta = lingxi_kernel::memory::parse_skill_metadata(&content, &fallback);
+                    let name = meta.name.unwrap_or(fallback);
+                    let identity = json!({
+                        "kind":"skill_source","owner":"workspace","skillName":name,
+                        "filePath":file,"baseDir":base,"editable":true,"readonly":false,
+                    });
+                    skills.push(json!({
+                        "name":name,"description":meta.description,"source":label,
+                        "sourceCategory":category,"dirPath":directory,"filePath":file,
+                        "baseDir":base,"workspaceMountId":Value::Null,"sourceIdentity":identity,
+                    }));
+                    candidates.push(WorkspaceSkillCandidate {
+                        name,
+                        source_category: category.into(),
+                    });
+                }
+            }
+        }
+        let states = resolve_workspace_skill_candidate_states(
+            &candidates,
+            &policy,
+            &mut HashMap::new(),
+            &std::collections::HashSet::new(),
+        );
+        let mut winners = HashMap::new();
+        for (skill, state) in skills.iter_mut().zip(states) {
+            skill["active"] = json!(state.active);
+            skill["shadowed"] = json!(state.shadowed);
+            skill["inactiveReason"] = json!(state.inactive_reason);
+            skill["shadowedBy"] = if state.shadowed {
+                winners.get(&state.candidate.name).cloned().ok_or_else(|| {
+                    MemoryError::Store("workspace shadow winner is missing".into())
+                })?
+            } else {
+                Value::Null
+            };
+            if state.active {
+                winners.insert(
+                    state.candidate.name,
+                    json!({"source":skill["source"],"sourceIdentity":skill["sourceIdentity"]}),
+                );
+            }
+        }
+        Ok(json!({
+            "skills":skills,
+            "policy":{"discoverProjectSkills":policy.discover_project_skills,
+                "discoverCompatibleProjectSkills":policy.discover_compatible_project_skills},
+        }))
+    }
+
     fn read_agent_config(
         &self,
         agent_id: &str,
@@ -451,6 +570,7 @@ impl SkillService {
         requested: &[String],
         workspace_root: Option<&Path>,
     ) -> Result<Vec<String>, MemoryError> {
+        let _guard = self.mutation_lock.lock().unwrap();
         let _publication = am::ContextMaterialMutation::for_home(&self.home);
         let visible: std::collections::HashSet<String> = self
             .list_for_agent(agent_id, false, workspace_root)?
@@ -478,6 +598,7 @@ impl SkillService {
         enable: bool,
         workspace_root: Option<&Path>,
     ) -> Result<Value, MemoryError> {
+        let _guard = self.mutation_lock.lock().unwrap();
         let _publication = am::ContextMaterialMutation::for_home(&self.home);
         let (text, enabled, workspace_disabled, policy) = self.read_agent_config(agent_id)?;
         let workspace_skill = self
@@ -549,6 +670,60 @@ impl SkillService {
         };
         self.write_agent_config(agent_id, &text, &ordered, &workspace_disabled)?;
         Ok(json!({ "name": name, "enabled": enable }))
+    }
+
+    pub fn patch_bundle_enabled(
+        &self,
+        agent_id: &str,
+        bundle_id: &str,
+        enable: bool,
+        workspace_root: Option<&Path>,
+    ) -> Result<Value, MemoryError> {
+        let _guard = self.mutation_lock.lock().unwrap();
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
+        let (text, _, workspace_disabled, _) = self.read_agent_config(agent_id)?;
+        let bundle = self
+            .bundles_store()
+            .load_checked()?
+            .into_iter()
+            .find(|bundle| bundle["id"].as_str() == Some(bundle_id))
+            .ok_or_else(|| MemoryError::NotFound("skill bundle not found".into()))?;
+        let visible = self.list_for_agent(agent_id, false, workspace_root)?;
+        let visible_names: std::collections::HashSet<&str> = visible
+            .iter()
+            .filter_map(|skill| skill["name"].as_str())
+            .collect();
+        let names = bundle["skillNames"].as_array().ok_or_else(|| {
+            MemoryError::InvalidRequest("skill bundle members must be an array".into())
+        })?;
+        let mut changed = Vec::new();
+        for name in names.iter().filter_map(Value::as_str) {
+            if visible_names.contains(name) && !changed.iter().any(|prior| prior == name) {
+                changed.push(name.to_string());
+            }
+        }
+        let mut selection: std::collections::HashSet<String> = visible
+            .iter()
+            .filter(|skill| skill["enabled"].as_bool() == Some(true))
+            .filter_map(|skill| skill["name"].as_str().map(str::to_string))
+            .collect();
+        for name in &changed {
+            if enable {
+                selection.insert(name.clone());
+            } else {
+                selection.remove(name);
+            }
+        }
+        let enabled: Vec<String> = visible
+            .iter()
+            .filter_map(|skill| skill["name"].as_str())
+            .filter(|name| selection.contains(*name))
+            .map(str::to_string)
+            .collect();
+        if !changed.is_empty() {
+            self.write_agent_config(agent_id, &text, &enabled, &workspace_disabled)?;
+        }
+        Ok(json!({"enabled": enabled, "changed": changed}))
     }
 
     // ── install audit (install-skill.ts) ────────────────────────────────
@@ -724,9 +899,32 @@ impl SkillService {
     /// Manual (HTTP) install — structural checks only, NO LLM review
     /// (skills.ts:411-416). Returns the installed skill view.
     pub fn install_manual(&self, source_path: &Path) -> Result<sl::InstalledSkill, MemoryError> {
+        self.install_manual_for_agent(source_path, None)
+    }
+
+    pub fn install_manual_for_agent(
+        &self,
+        source_path: &Path,
+        agent_id: Option<&str>,
+    ) -> Result<sl::InstalledSkill, MemoryError> {
         let _guard = self.mutation_lock.lock().unwrap();
         let _publication = am::ContextMaterialMutation::for_home(&self.home);
-        sl::install_skill_package_from_path(source_path, &self.skills_dir(), None)
+        let config = agent_id.map(|id| self.read_agent_config(id)).transpose()?;
+        let installed = sl::install_skill_package_from_path(source_path, &self.skills_dir(), None)?;
+        if let (Some(id), Some((text, mut enabled, workspace_disabled, _))) = (agent_id, config) {
+            if !enabled.contains(&installed.name) {
+                enabled.push(installed.name.clone());
+                self.write_agent_config(id, &text, &enabled, &workspace_disabled)
+                    .map_err(|error| {
+                        tracing::warn!(agent_id = id, skill = installed.name, %error, "installed skill could not be enabled");
+                        MemoryError::Io(format!(
+                            "skill {} installed but could not be enabled for {id}: {error}",
+                            installed.name
+                        ))
+                    })?;
+            }
+        }
+        Ok(installed)
     }
 
     /// DELETE /skills/{name}?agentId= (skills.ts:498-545 + skill-removal.ts).
@@ -772,6 +970,124 @@ impl SkillService {
         Ok(json!({ "ok": true, "scrubbedAgents": scrubbed }))
     }
 
+    /// POST /desk/delete-skill (desk.ts:1383-1412) — delete a workspace
+    /// skill directory. Only directories that resolve (canonical, symlinks
+    /// followed — the original `isInsidePath` uses realpath on both sides)
+    /// into one of the four original workspace skill roots under the active
+    /// workspace are deletable; the recursive delete runs under the shared
+    /// install/delete mutation lock and is followed by the re-sync face
+    /// (`engine.syncWorkspaceSkillPaths(cwd, {reload:true, force:true})` —
+    /// the Rust catalog is rescanned under the same lock; the route emits
+    /// `skills-changed`).
+    ///
+    /// Strengthened vs the incumbent's `fs.rmSync(force:true)`: a missing
+    /// target is an explicit 404 and a non-directory target an explicit 400
+    /// instead of a silent `{ok:true}` — the R06 desk family's fail-loud
+    /// discipline (same strengthening as the `/desk/skills` scan port).
+    pub fn delete_workspace_skill_dir(
+        &self,
+        skill_dir: &str,
+        body_dir: Option<&Path>,
+    ) -> Result<(), MemoryError> {
+        let _guard = self.mutation_lock.lock().unwrap();
+        let _publication = am::ContextMaterialMutation::for_home(&self.home);
+
+        // Workspace root: the configured root is validated first (same as
+        // the /desk/skills GET face); body `dir` then overrides but must
+        // stay inside the approved root (desk.ts resolveWorkspaceRootFrom
+        // Request + the /desk/skills dir discipline). No root at all = the
+        // incumbent's "No active workspace" 400.
+        let configured_canonical = match self.workspace_root() {
+            Some(root) => {
+                let canonical = root.canonicalize().map_err(MemoryError::from)?;
+                match canonical.metadata() {
+                    Ok(metadata) if metadata.is_dir() => Some(canonical),
+                    Ok(_) => {
+                        return Err(MemoryError::Io(
+                            "configured workspace root is not a directory".into(),
+                        ));
+                    }
+                    Err(error) => return Err(MemoryError::from(error)),
+                }
+            }
+            None => None,
+        };
+        let root = match (body_dir, configured_canonical) {
+            (Some(dir), approved) => {
+                if !dir.is_absolute() {
+                    return Err(MemoryError::InvalidRequest(
+                        "workspace directory must be absolute".into(),
+                    ));
+                }
+                let canonical = dir.canonicalize().map_err(MemoryError::from)?;
+                let Some(approved) = approved else {
+                    return Err(MemoryError::Conflict {
+                        code: "WORKSPACE_SKILL_OUTSIDE_ROOT".into(),
+                        message: "workspace_not_approved".into(),
+                    });
+                };
+                if !canonical.starts_with(&approved) {
+                    return Err(MemoryError::Conflict {
+                        code: "WORKSPACE_SKILL_OUTSIDE_ROOT".into(),
+                        message: "workspace directory is outside the approved workspace".into(),
+                    });
+                }
+                match canonical.metadata() {
+                    Ok(metadata) if metadata.is_dir() => {}
+                    Ok(_) => {
+                        return Err(MemoryError::InvalidRequest(
+                            "workspace directory must be a directory".into(),
+                        ));
+                    }
+                    Err(error) => return Err(MemoryError::from(error)),
+                }
+                canonical
+            }
+            (None, Some(root)) => root,
+            (None, None) => return Err(MemoryError::InvalidRequest("No active workspace".into())),
+        };
+
+        // The target must exist (strengthened 404) and canonicalize inside
+        // one of the four workspace skill roots — `existingOnly:false` in the
+        // incumbent, but a root that cannot be resolved never contains the
+        // target (realPath(null) → isInsidePath false → 403), which
+        // canonicalize-then-skip reproduces.
+        let target = Path::new(skill_dir).canonicalize().map_err(|error| {
+            if error.kind() == std::io::ErrorKind::NotFound {
+                MemoryError::NotFound("skill directory not found".into())
+            } else {
+                MemoryError::Io(format!("resolve skill directory: {error}"))
+            }
+        })?;
+        let allowed =
+            lingxi_kernel::memory::WORKSPACE_SKILL_DIRS
+                .iter()
+                .any(|(sub, _label, _category)| {
+                    root.join(sub)
+                        .canonicalize()
+                        .is_ok_and(|root_dir| target.starts_with(&root_dir))
+                });
+        if !allowed {
+            return Err(MemoryError::Conflict {
+                code: "WORKSPACE_SKILL_OUTSIDE_ROOT".into(),
+                message: "Only skills in current workspace skill directories can be deleted".into(),
+            });
+        }
+        if !target.is_dir() {
+            return Err(MemoryError::InvalidRequest(
+                "skill directory is not a directory".into(),
+            ));
+        }
+        std::fs::remove_dir_all(&target).map_err(|error| {
+            MemoryError::Io(format!("failed to delete skill directory: {error}"))
+        })?;
+        // Re-sync face: the catalog is rescanned under the same mutation
+        // lock installs and deletes take (`reload:true`); the persisted view
+        // of the deleted tree is gone on the next scan.
+        let _scanned = self.scan_catalog().len();
+        Ok(())
+    }
+
     /// removeUserSkills reference scrub (skill-removal.ts:82-98 + bundles).
     fn prepare_skill_reference_scrub(
         &self,
@@ -784,7 +1100,7 @@ impl SkillService {
             Err(err) => {
                 return Err(MemoryError::Io(format!(
                     "read agents for skill cleanup: {err}"
-                )))
+                )));
             }
         };
         let mut plan = Vec::new();
@@ -807,7 +1123,7 @@ impl SkillService {
                 Err(err) => {
                     return Err(MemoryError::Io(format!(
                         "read agent config before skill cleanup: {err}"
-                    )))
+                    )));
                 }
             };
             let (enabled, disabled) = AgentConfigPatchAlias::read_skill_lists(&text)?;
@@ -1100,7 +1416,7 @@ fn error_response(err: &MemoryError) -> Response {
                 | "SKILL_INSTALL_TARGET_OUTSIDE_ROOT" => StatusCode::BAD_REQUEST,
                 // readonly 外部技能删除 → 403（skills.ts:521-523）；
                 // 遮蔽冲突 → 409（skills.ts:330-332）。
-                "SKILL_EXTERNAL_READONLY" => StatusCode::FORBIDDEN,
+                "SKILL_EXTERNAL_READONLY" | "WORKSPACE_SKILL_OUTSIDE_ROOT" => StatusCode::FORBIDDEN,
                 "WORKSPACE_SKILL_SHADOWED" => StatusCode::CONFLICT,
                 _ => StatusCode::INTERNAL_SERVER_ERROR,
             };
@@ -1148,6 +1464,147 @@ fn require_agent_id(query: Option<&str>) -> Result<String, Response> {
     }
 }
 
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct WorkspaceSkillsQuery {
+    agent_id: Option<String>,
+    dir: Option<PathBuf>,
+    workspace_mount_id: Option<String>,
+}
+
+pub async fn workspace_skills_route(
+    State(state): State<ServiceState>,
+    query: Result<Query<WorkspaceSkillsQuery>, axum::extract::rejection::QueryRejection>,
+) -> Response {
+    let Query(query) = match query {
+        Ok(query) => query,
+        Err(error) => {
+            return crate::EndpointError::invalid_message(format!(
+                "invalid workspace skills query: {error}"
+            ))
+            .into_response();
+        }
+    };
+    if query.workspace_mount_id.is_some() {
+        return crate::EndpointError::invalid_message(
+            "mount-backed workspace skills are not supported",
+        )
+        .into_response();
+    }
+    let configured_root = state.skills().workspace_root();
+    let root = match configured_root {
+        Some(root) => match root.canonicalize() {
+            Ok(root) => match root.metadata() {
+                Ok(metadata) if metadata.is_dir() => Some(root),
+                Ok(_) => {
+                    return error_response(&MemoryError::Io(
+                        "configured workspace root is not a directory".into(),
+                    ));
+                }
+                Err(error) => return error_response(&MemoryError::from(error)),
+            },
+            Err(error) => return error_response(&MemoryError::from(error)),
+        },
+        None => None,
+    };
+    let root = if let Some(dir) = query.dir {
+        if !dir.is_absolute() {
+            return crate::EndpointError::invalid_message("workspace directory must be absolute")
+                .into_response();
+        }
+        let Some(approved) = root else {
+            return crate::EndpointError::forbidden("workspace_not_approved").into_response();
+        };
+        let dir = match dir.canonicalize() {
+            Ok(dir) => dir,
+            Err(error) => return error_response(&MemoryError::from(error)),
+        };
+        if !dir.starts_with(&approved) {
+            return crate::EndpointError::forbidden("workspace_not_approved").into_response();
+        }
+        match dir.metadata() {
+            Ok(metadata) if metadata.is_dir() => {}
+            Ok(_) => {
+                return crate::EndpointError::invalid_message(
+                    "workspace directory must be a directory",
+                )
+                .into_response();
+            }
+            Err(error) => return error_response(&MemoryError::from(error)),
+        }
+        Some(dir)
+    } else {
+        root
+    };
+    let agent_id = match query.agent_id {
+        Some(id) => Some(id),
+        None => match state.memory().resolve_primary_agent_checked() {
+            Ok(id) => id,
+            Err(error) => return error_response(&error),
+        },
+    };
+    match state
+        .skills()
+        .workspace_catalog(agent_id.as_deref(), root.as_deref())
+    {
+        Ok(value) => Json(value).into_response(),
+        Err(error) => error_response(&error),
+    }
+}
+
+/// POST /lingxi/v1/desk/delete-skill — delete a workspace skill directory
+/// (desk.ts:1383-1412). Body: `{skillDir, agentId?, dir?}`. On success the
+/// workspace skill view is re-synced (catalog rescan under the shared
+/// mutation lock + a `skills-changed` app event, the
+/// `syncWorkspaceSkillPaths({reload:true, emitEvent:true, force:true})`
+/// port).
+pub async fn workspace_skill_delete_route(
+    State(state): State<ServiceState>,
+    body: axum::body::Bytes,
+) -> Response {
+    let payload = match serde_json::from_slice::<Value>(&body) {
+        Ok(value) => value,
+        Err(err) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({ "error": format!("invalid JSON body: {err}") })),
+            )
+                .into_response();
+        }
+    };
+    // skillDir: required, non-empty string (desk.ts:1387-1389).
+    let skill_dir = payload
+        .get("skillDir")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
+    let Some(skill_dir) = skill_dir else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "skillDir is required" })),
+        )
+            .into_response();
+    };
+    let body_dir = payload
+        .get("dir")
+        .and_then(Value::as_str)
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from);
+    match state
+        .skills()
+        .delete_workspace_skill_dir(skill_dir, body_dir.as_deref())
+    {
+        Ok(()) => {
+            let agent_id = payload.get("agentId").and_then(Value::as_str);
+            state
+                .app_events()
+                .publish("skills-changed", json!({ "agentId": agent_id }));
+            Json(json!({ "ok": true })).into_response()
+        }
+        Err(err) => error_response(&err),
+    }
+}
+
 /// GET /lingxi/v1/skills?agentId=&runtime=
 pub async fn skills_list_route(
     State(state): State<ServiceState>,
@@ -1185,7 +1642,7 @@ pub async fn agent_skills_put_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let Some(enabled) = payload.get("enabled").and_then(Value::as_array) else {
@@ -1205,7 +1662,13 @@ pub async fn agent_skills_put_route(
         &names,
         state.skills().workspace_root().as_deref(),
     ) {
-        Ok(persisted) => Json(json!({ "ok": true, "enabled": persisted })).into_response(),
+        Ok(persisted) => {
+            // skills.ts:303 — 名单落盘后广播 skills-changed（含空数组停用全部）。
+            state
+                .app_events()
+                .publish("skills-changed", json!({ "agentId": agent_id }));
+            Json(json!({ "ok": true, "enabled": persisted })).into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
@@ -1223,7 +1686,7 @@ pub async fn agent_skill_patch_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let Some(enable) = payload.get("enabled").and_then(Value::as_bool) else {
@@ -1255,9 +1718,10 @@ pub async fn skills_install_route(
     RawQuery(query): RawQuery,
     body: axum::body::Bytes,
 ) -> Response {
-    let _agent_id = match agent_query(query.as_deref(), "agentId").ok().flatten() {
-        Some(id) if !id.is_empty() => id.to_string(),
-        _ => String::new(),
+    let agent_id = match agent_query(query.as_deref(), "agentId") {
+        Ok(Some(id)) => Some(id.to_string()),
+        Ok(None) => None,
+        Err(response) => return response,
     };
     let payload = match serde_json::from_slice::<Value>(&body) {
         Ok(value) => value,
@@ -1266,7 +1730,7 @@ pub async fn skills_install_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let Some(src) = payload.get("path").and_then(Value::as_str) else {
@@ -1277,7 +1741,10 @@ pub async fn skills_install_route(
             .into_response();
     };
     let source_path = PathBuf::from(src);
-    match state.skills().install_manual(&source_path) {
+    match state
+        .skills()
+        .install_manual_for_agent(&source_path, agent_id.as_deref())
+    {
         Ok(installed) => Json(json!({
             "ok": true,
             "skill": { "name": installed.name, "type": "user" },
@@ -1311,6 +1778,11 @@ pub async fn skills_delete_route(
 /// the face exists for parity + events.
 pub async fn skills_reload_route(State(state): State<ServiceState>) -> Response {
     let count = state.skills().reload();
+    // skills.ts:548-559 — reload 后广播 skills-changed（agentId:null，全局面）；
+    // 不回传技能列表（无 agent 视角，前端按 agentId 另取）。
+    state
+        .app_events()
+        .publish("skills-changed", json!({ "agentId": Value::Null }));
     Json(json!({ "ok": true, "scanned": count })).into_response()
 }
 
@@ -1331,7 +1803,7 @@ pub async fn skills_external_paths_put_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let Some(paths) = payload.get("paths").and_then(Value::as_array) else {
@@ -1347,7 +1819,13 @@ pub async fn skills_external_paths_put_route(
         .map(str::to_string)
         .collect();
     match state.skills().set_external_paths(&paths) {
-        Ok(()) => Json(json!({ "ok": true })).into_response(),
+        Ok(()) => {
+            // skills.ts:490 — 外部路径保存并重载来源后广播 skills-changed。
+            state
+                .app_events()
+                .publish("skills-changed", json!({ "agentId": Value::Null }));
+            Json(json!({ "ok": true })).into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
@@ -1423,7 +1901,7 @@ pub async fn skills_bundles_create_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let name = payload
@@ -1459,11 +1937,17 @@ pub async fn skills_bundles_create_route(
         .bundles_store()
         .create(name, &skill_names, "user", None)
     {
-        Ok(bundle) => Json(json!({
-            "ok": true,
-            "bundle": sl::bundle_for_response(&bundle, &by_name),
-        }))
-        .into_response(),
+        Ok(bundle) => {
+            // skills.ts:198-206 — 组合持久化后广播 skills-changed（agentId:null）。
+            state
+                .app_events()
+                .publish("skills-changed", json!({ "agentId": Value::Null }));
+            Json(json!({
+                "ok": true,
+                "bundle": sl::bundle_for_response(&bundle, &by_name),
+            }))
+            .into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
@@ -1485,7 +1969,7 @@ pub async fn skills_bundles_order_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let Some(ids) = payload.get("bundleIds").and_then(Value::as_array) else {
@@ -1540,7 +2024,7 @@ pub async fn skills_bundle_update_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
     let by_name = skill_view_by_name(
@@ -1591,7 +2075,13 @@ pub async fn skills_bundle_delete_route(
     AxumPath(bundle_id): AxumPath<String>,
 ) -> Response {
     match state.skills().bundles_store().delete(&bundle_id) {
-        Ok(true) => Json(json!({ "ok": true })).into_response(),
+        Ok(true) => {
+            // skills.ts:244-253 — 删除组合定义后广播 skills-changed；成员技能保留。
+            state
+                .app_events()
+                .publish("skills-changed", json!({ "agentId": Value::Null }));
+            Json(json!({ "ok": true })).into_response()
+        }
         Ok(false) => (
             StatusCode::NOT_FOUND,
             Json(json!({ "error": "skill bundle not found" })),
@@ -1614,47 +2104,26 @@ pub async fn agent_skill_bundle_patch_route(
                 StatusCode::BAD_REQUEST,
                 Json(json!({ "error": format!("invalid JSON body: {err}") })),
             )
-                .into_response()
+                .into_response();
         }
     };
-    let Some(_enable) = payload.get("enabled").and_then(Value::as_bool) else {
+    let Some(enable) = payload.get("enabled").and_then(Value::as_bool) else {
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({ "error": "enabled must be a boolean" })),
         )
             .into_response();
     };
-    let bundle = match state
-        .skills()
-        .bundles_store()
-        .load()
-        .into_iter()
-        .find(|b| b.get("id").and_then(Value::as_str) == Some(bundle_id.as_str()))
-    {
-        Some(bundle) => bundle,
-        None => {
-            return (
-                StatusCode::NOT_FOUND,
-                Json(json!({ "error": "skill bundle not found" })),
-            )
-                .into_response()
-        }
-    };
-    let names: Vec<String> = bundle["skillNames"]
-        .as_array()
-        .map(|a| {
-            a.iter()
-                .filter_map(Value::as_str)
-                .map(str::to_string)
-                .collect()
-        })
-        .unwrap_or_default();
-    match state.skills().set_enabled_skills(
+    match state.skills().patch_bundle_enabled(
         &agent_id,
-        &names,
+        &bundle_id,
+        enable,
         state.skills().workspace_root().as_deref(),
     ) {
-        Ok(persisted) => Json(json!({ "ok": true, "enabled": persisted })).into_response(),
+        Ok(mut result) => {
+            result["ok"] = json!(true);
+            Json(result).into_response()
+        }
         Err(err) => error_response(&err),
     }
 }

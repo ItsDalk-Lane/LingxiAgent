@@ -285,6 +285,22 @@ fn names_model_call(events: &[KeyEvent], marker: &str) -> bool {
 }
 
 impl StoragePort for GatedStorage {
+    // F03 统一准入：真实持久化端口的包装必须转发同一数据根的准入
+    // 实例（StoragePort::session_admission 契约）——不转发的话，
+    // admit_submission / drive_run 在 record_run_started 之前就以
+    // session_storage_binding_mismatch / session_not_found 拒绝，边界
+    // 闸门永远等不到到达，测试悬挂。
+    fn session_admission(
+        &self,
+    ) -> Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>> {
+        lingxi_kernel::ports::StoragePort::session_admission(self.inner.as_ref())
+    }
+    async fn load_session_admission(
+        &self,
+        session_id: &str,
+    ) -> Result<Option<lingxi_kernel::ports::SessionAdmissionFacts>, StorageError> {
+        self.inner.load_session_admission(session_id).await
+    }
     fn record_run_started(
         &self,
         ctx: &RunContext,

@@ -1,0 +1,59 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.40s
+     Running tests/r06_original_chat_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_chat_proofs-d12e478ae24bf3f5)
+
+running 6 tests
+test subagent_reply_restores_actual_thread_history_and_returns_only_to_its_parent ... ok
+test subagent_session_and_global_caps_refuse_and_recover_without_ghost_children ... ok
+test subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity ... ok
+test subagent_close_and_reply_refusals_preserve_other_threads_and_sessions ... ok
+test subagent_list_launch_progress_and_permission_intersection_use_real_facts ... ok
+test websocket_registration_and_foreign_messages_preserve_authorized_session_streams ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.86s
+
+     Running tests/r06_original_knowledge_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_knowledge_proofs-1036429c67ab903a)
+
+running 12 tests
+test original_directory_import_reports_each_effect_and_rejects_invalid_root ... ok
+test original_notebook_source_routes_reject_without_changing_rows ... ok
+test original_failed_and_untracked_jobs_retry_and_delete_wins ... ok
+test original_artifact_citation_snapshot_boundaries_and_heading_fallback ... ok
+test original_manage_interactive_unapproved_and_cancelled_leave_no_sources_or_jobs ... ok
+test original_manage_actual_authorized_actions_read_back_facts_and_jobs ... ok
+test original_manage_add_preserves_source_and_reports_background_index_failure_separately ... ok
+test original_manage_refusals_and_no_write_authorization_preserve_facts ... ok
+test original_model_file_registration_failure_reports_written_bytes_without_success ... ok
+test original_model_write_edit_register_real_session_products_and_update_metadata ... ok
+test original_tools_use_authentic_run_scope_and_frozen_citable_source ... ok
+test original_settings_refresh_remove_reingest_and_purge_use_real_facts ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.84s
+
+     Running tests/r06_original_persona_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_persona_proofs-383d252c3a790c36)
+
+running 2 tests
+test original_persona_reads_template_custom_alias_and_refusal ... FAILED
+test original_avatar_read_prefers_all_formats_and_preserves_other_agent ... FAILED
+
+failures:
+
+---- original_persona_reads_template_custom_alias_and_refusal stdout ----
+
+thread 'original_persona_reads_template_custom_alias_and_refusal' (676732) panicked at crates/lingxi-service/tests/r06_original_persona_proofs.rs:26:45:
+本证明需要合成 LINGXI_PRODUCT_DIR: NotPresent
+
+---- original_avatar_read_prefers_all_formats_and_preserves_other_agent stdout ----
+
+thread 'original_avatar_read_prefers_all_formats_and_preserves_other_agent' (676731) panicked at crates/lingxi-service/tests/r06_original_persona_proofs.rs:26:45:
+本证明需要合成 LINGXI_PRODUCT_DIR: NotPresent
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_avatar_read_prefers_all_formats_and_preserves_other_agent
+    original_persona_reads_template_custom_alias_and_refusal
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_persona_proofs`

@@ -161,6 +161,13 @@ def command_argv(root: Path, binding):
             binding["package"], kind, binding["suite"], binding["test"], "--", "--exact", "--show-output"]
 
 
+def desktop_frontend_binding():
+    return {"kind": "script",
+            "argv": ["node", "node_modules/vite/bin/vite.js", "build",
+                     "--config", "desktop/vite.tauri-resources.config.ts"],
+            "stdoutPattern": r"built in \d", "timeoutSecs": 300}
+
+
 def special_bindings(identifier):
     if identifier == "R06-AR-F14-C01":
         return [{"kind": "script", "argv": ["python3", "-B", "scripts/rust-tauri/r02_registry_consistency.py", "--root", "."],
@@ -587,8 +594,16 @@ def inspect_output(binding, stdout: str, stderr: str):
 
 
 def execute_binding(root: Path, evidence: Path, binding, index: int, timeout: float, initial_candidate):
+    started = time.monotonic()
     command_dir = evidence / f"command-{index:03}"
     command_dir.mkdir()
+    preparation = None
+    if binding["kind"] == "rust_desktop_test":
+        preparation_dir = command_dir / "frontend-preparation"
+        preparation_dir.mkdir()
+        preparation_binding = desktop_frontend_binding()
+        preparation = execute_binding(root, preparation_dir, preparation_binding, 1,
+                                      min(timeout, preparation_binding["timeoutSecs"]), initial_candidate)
     env = synthetic_env(root, command_dir)
     if binding.get("suite") == "r06_original_persona_proofs":
         # 人格模板只在本检查的合成目录准备，不能写入仓库产品材料。
@@ -604,11 +619,17 @@ def execute_binding(root: Path, evidence: Path, binding, index: int, timeout: fl
                                                                  "W01_EVIDENCE", "W09_EVIDENCE", "W10_EVIDENCE", "W11_EVIDENCE",
                                                                  "LINGXI_W03_EVIDENCE", "LINGXI_F05_EVIDENCE", "LINGXI_F08_EVIDENCE",
                                                                  "R06_T08_RAW_OUT", "R06_T08_EVAL_OUT")}}
-    started = time.monotonic()
+    if preparation is not None:
+        record["preparation"] = preparation
     with stdout_path.open("xb") as stdout, stderr_path.open("xb") as stderr:
         try:
+            if preparation is not None and not preparation["localPassed"]:
+                raise ValueError("真实桌面前端构建前置命令失败；不执行依赖旧产物的桌面测试")
             if before["digestSha256"] != initial_candidate["digestSha256"]:
                 raise ValueError("开始下一命令前源码已改变")
+            remaining = timeout - (time.monotonic() - started)
+            if remaining <= 0:
+                raise ValueError("前置命令后执行预算耗尽；不启动下一命令")
             executable = shutil.which(binding["argv"][0], path=env.get("PATH"))
             if executable is None and binding["argv"][0] == "rustup":
                 bundled = Path.home() / ".cargo/bin/rustup"
@@ -622,7 +643,7 @@ def execute_binding(root: Path, evidence: Path, binding, index: int, timeout: fl
                                        start_new_session=os.name == "posix")
             record["pid"] = process.pid
             try:
-                record["exitCode"] = process.wait(timeout=timeout)
+                record["exitCode"] = process.wait(timeout=remaining)
             except subprocess.TimeoutExpired:
                 record["timedOut"] = True
                 stop_process_tree(process)
@@ -707,8 +728,25 @@ def read_executed_binding(root, binding_evidence, key, binding, candidate):
     if result.get("sourceCandidateSha256") != candidate["digestSha256"]:
         raise ValueError(key + " 不是当前候选的实际执行证据")
     command = result["command"]
+    if result.get("passed") is not True:
+        raise ValueError(key + " 没有同一候选的完整真实成功结算")
+    validate_executed_command(directory, command, binding, candidate, key)
+    return {"key": key, "resultPath": str(result_path), "resultSha256": file_sha(result_path),
+            "stdoutSha256": command["stdoutSha256"], "stderrSha256": command["stderrSha256"],
+            "observedTest": binding.get("test"), "sourceCandidateSha256": candidate["digestSha256"]}
+
+
+def validate_executed_command(directory, command, binding, candidate, key):
     if command.get("binding") != binding or command.get("argv") != binding["argv"]:
         raise ValueError(key + " 实际执行命令与登记不一致")
+    if binding["kind"] == "rust_desktop_test":
+        preparation = command.get("preparation")
+        if not isinstance(preparation, dict):
+            raise ValueError(key + " 缺少实际桌面前端构建前置命令")
+        validate_executed_command(directory, preparation, desktop_frontend_binding(), candidate,
+                                  key + " frontend preparation")
+    elif "preparation" in command:
+        raise ValueError(key + " 出现未登记的前置命令")
     logs = []
     for label in ("stdout", "stderr"):
         path = Path(command[label])
@@ -718,7 +756,7 @@ def read_executed_binding(root, binding_evidence, key, binding, candidate):
             raise ValueError(key + " 原始日志摘要改变")
         logs.append(path.read_text(errors="replace"))
     output = inspect_output(binding, *logs)
-    if (result.get("passed") is not True or command.get("localPassed") is not True
+    if (command.get("localPassed") is not True
             or command.get("exitCode") != 0 or command.get("timedOut") is not False
             or not isinstance(command.get("pid"), int) or command["pid"] <= 0
             or command.get("sourceStable") is not True
@@ -726,9 +764,6 @@ def read_executed_binding(root, binding_evidence, key, binding, candidate):
             or command.get("sourceAfterSha256") != candidate["digestSha256"]
             or not output["valid"] or sha(output) != sha(command.get("outputCheck"))):
         raise ValueError(key + " 没有同一候选的完整真实成功结算")
-    return {"key": key, "resultPath": str(result_path), "resultSha256": file_sha(result_path),
-            "stdoutSha256": command["stdoutSha256"], "stderrSha256": command["stderrSha256"],
-            "observedTest": binding.get("test"), "sourceCandidateSha256": candidate["digestSha256"]}
 
 
 def produce_leaf_evidence(root, evidence, binding_evidence, inputs, proof_leaf_ids=None):

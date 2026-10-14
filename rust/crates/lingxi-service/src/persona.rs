@@ -98,6 +98,10 @@ macro_rules! persona_get_route {
             AxumPath(agent_id): AxumPath<String>,
         ) -> Response {
             if let Err(err) = validate_agent_id(&agent_id) {
+                if matches!($kind, am::PersonaKind::Agents) {
+                    return (StatusCode::NOT_FOUND, Json(json!({ "error": err.to_string() })))
+                        .into_response();
+                }
                 return error_response(&err);
             }
             let locale = match locale_of(&state, &agent_id) { Ok(value) => value, Err(err) => return error_response(&err) };

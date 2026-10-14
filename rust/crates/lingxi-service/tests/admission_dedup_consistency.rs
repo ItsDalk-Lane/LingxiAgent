@@ -213,6 +213,22 @@ struct ParkingStartPort {
 macro_rules! delegate_storage_port {
     ($ty:ty) => {
         impl StoragePort for $ty {
+            // F03 统一准入：真实持久化端口的包装必须转发同一数据根的准入
+            // 实例（StoragePort::session_admission 契约）——不转发的话，
+            // admit_submission / drive_run 在 record_run_started 之前就以
+            // session_storage_binding_mismatch / session_not_found 拒绝，
+            // 本套件的 durable-start 挂点/故障注入永远不会到达。
+            fn session_admission(
+                &self,
+            ) -> Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>> {
+                lingxi_kernel::ports::StoragePort::session_admission(self.inner.as_ref())
+            }
+            async fn load_session_admission(
+                &self,
+                session_id: &str,
+            ) -> Result<Option<lingxi_kernel::ports::SessionAdmissionFacts>, StorageError> {
+                self.inner.load_session_admission(session_id).await
+            }
             async fn record_run_started(
                 &self,
                 ctx: &RunContext,

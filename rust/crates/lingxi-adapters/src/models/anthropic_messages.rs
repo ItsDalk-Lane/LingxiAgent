@@ -461,16 +461,14 @@ pub fn render_messages_request(
                 }
                 let mut blocks = render_assistant_blocks(content);
                 for call in tool_calls {
-                    let wire_name =
-                        call.historical_wire_name()
-                            .ok_or_else(|| {
-                                invalid(format!(
-                                    "exchange history names tool target {:?}, which the current \
+                    let wire_name = call.historical_wire_name().ok_or_else(|| {
+                        invalid(format!(
+                            "exchange history names tool target {:?}, which the current \
                                  declaration snapshot does not contain (the registry moved \
                                  mid-run); cannot faithfully re-render the transcript",
-                                    call.target
-                                ))
-                            })?;
+                            call.target
+                        ))
+                    })?;
                     let provider_call_id = call.provider_call_id.clone().ok_or_else(|| {
                         invalid(format!(
                             "exchange history tool call {} ({}) carries no provider \

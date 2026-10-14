@@ -1,0 +1,19 @@
+
+running 1 test
+test original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy ... ok
+
+successes:
+
+---- original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy stdout ----
+LINGXI_AUTH_REJECTED request_id="req-7d98490bed7e708d30f38195057cc3e7" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:62693
+LINGXI_AUTH_REJECTED request_id="req-39e885f6171b14b4867aac7b5ffc6f41" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:62699
+LINGXI_AUTH_REJECTED request_id="req-b2e71668934d8501d93e467f7304ce53" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:62705
+LINGXI_AUTH_REJECTED request_id="req-1966f571e3d823c8780c306821c240c9" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:62711
+LINGXI_AUTH_REJECTED request_id="req-25573ba3a2732ebba40f84eb9baf395a" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:62717
+
+
+successes:
+    original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 7.44s
+

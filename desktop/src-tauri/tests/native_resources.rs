@@ -10,11 +10,13 @@ static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Scratch(PathBuf);
 impl Scratch {
     fn new() -> Self {
-        let path = std::env::temp_dir().join(format!(
-            "lingxi-desktop-files-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("target/r06-native-resource-test")
+            .join(format!(
+                "lingxi-desktop-files-{}-{}",
+                std::process::id(),
+                NEXT.fetch_add(1, Ordering::Relaxed)
+            ));
         fs::create_dir_all(&path).unwrap();
         Self(path)
     }
@@ -48,6 +50,13 @@ fn real_file_read_write_copy_and_version_boundaries() {
     assert_eq!(updated.version, Some(next.version.clone()));
     assert_eq!(fs::read_to_string(&path).unwrap(), "# 新内容\n");
     assert_ne!(first.version.sha256, next.version.sha256);
+    let stale_mtime = files::FileVersion {
+        mtime_ms: next.version.mtime_ms.saturating_add(1),
+        ..next.version.clone()
+    };
+    let rejected = files::save(&path, "版本已过期", Some(&stale_mtime));
+    assert!(!rejected.ok && rejected.conflict);
+    assert_eq!(fs::read_to_string(&path).unwrap(), "# 新内容\n");
     fs::write(&path, "外部内容，不得覆盖").unwrap();
     let rejected = files::save(&path, "旧编辑", Some(&next.version));
     assert!(!rejected.ok && rejected.conflict);

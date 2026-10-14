@@ -727,12 +727,23 @@ async fn c03_credential_and_quota_wait_cancel_and_deadline_are_real_and_not_sent
                 }
             );
             assert!(elapsed < 1000);
-            assert_eq!(usage.as_array().unwrap().len(), 1);
-            assert_eq!(usage[0]["transport_attempts"], 0);
-            assert_eq!(usage[0]["usage_state"], "unknown");
-            assert!(usage[0]["input_tokens"].is_null());
-            assert!(usage[0]["session_id"].is_null());
-            assert_eq!(usage[0]["cause_ref"], runtime.ownership.cause_ref);
+            if cancelled {
+                // 取消发生在任何传输尝试之前（凭证/配额等待中）：没有可能已
+                // 付费的字节，费用台账不写 unknown 行——等待真实、响亮退出、
+                // 零线路请求即为本次结算（与 W09 配额等待取消同语义，跨套件
+                // 统一）。期限耗尽（未取消）仍保留 failed/unknown 行归属。
+                assert!(
+                    usage.as_array().unwrap().is_empty(),
+                    "pre-send cancel must not fabricate a usage row: {usage}"
+                );
+            } else {
+                assert_eq!(usage.as_array().unwrap().len(), 1);
+                assert_eq!(usage[0]["transport_attempts"], 0);
+                assert_eq!(usage[0]["usage_state"], "unknown");
+                assert!(usage[0]["input_tokens"].is_null());
+                assert!(usage[0]["session_id"].is_null());
+                assert_eq!(usage[0]["cause_ref"], runtime.ownership.cause_ref);
+            }
             assert!(!stub
                 .capture()
                 .iter()

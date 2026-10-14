@@ -499,6 +499,72 @@ pub async fn read_unmessaged_terminal_anchors(
     }).await
 }
 
+/// 按 entry_type 在**当前分支**上收集条目（分支序：新→旧）。
+///
+/// R06 G 块（todo-state-v1 等非消息快照条目）的读取原语。与
+/// `read_branch_page` 同一 I/O 纪律：从当前分支头（无头行回退
+/// legacy_tail：seq 最大的真实 message）沿 parent 链逐步主键回溯，
+/// 每步 O(1) 查找，与历史总长线性相关但绝不全表扫描；根重置标记
+/// （parent NULL 的非 message 条目）是分支清空边界，绝不 seq 穿透——
+/// 对照现役 `extractLatestTodoSnapshot` 只扫 `buildSessionContext`
+/// 当前分支消息、被抛弃分支上的同型条目不可见的语义。
+/// 服务层按新→旧取第一个合法快照即可复刻"坏快照跳过继续向前"的口径。
+pub async fn read_branch_entries_by_type(
+    db: &RunDatabase,
+    session_id: &str,
+    entry_type: &str,
+) -> Result<Vec<MessageRow>, StorageError> {
+    let sid = session_id.to_string();
+    let entry_type = entry_type.to_string();
+    db.queue()
+        .submit(move |conn| {
+            // 分支头解析与 read_branch_page 同源：头行优先，无头行回退
+            // legacy_tail（seq 最大的真实 message）。
+            let head_id: Option<String> = conn
+                .query_row(
+                    "SELECT head_message_id FROM session_branch_heads WHERE session_id=?1",
+                    [&sid],
+                    |r| r.get::<_, Option<String>>(0),
+                )
+                .optional()
+                .map_err(map_err)?
+                .flatten();
+            let head_id = match head_id {
+                Some(h) => Some(h),
+                None => conn
+                    .query_row(
+                        "SELECT message_id FROM messages WHERE session_id=?1 \
+                         AND entry_type='message' ORDER BY seq DESC LIMIT 1",
+                        [&sid],
+                        |r| r.get(0),
+                    )
+                    .optional()
+                    .map_err(map_err)?,
+            };
+            let mut out: Vec<MessageRow> = Vec::new();
+            let mut current = match head_id {
+                Some(id) => read_message(conn, &sid, &id)?,
+                None => None,
+            };
+            let mut seen = std::collections::HashSet::new();
+            let mut stats = PageStats::default();
+            while let Some(row) = current {
+                if !seen.insert(row.message_id.clone()) {
+                    return Err(StorageError::Corrupted {
+                        detail: format!("cycle in branch {sid} at {}", row.message_id),
+                    });
+                }
+                let walked = row;
+                current = predecessor(conn, &sid, &walked, &mut stats)?;
+                if walked.entry_type == entry_type {
+                    out.push(walked);
+                }
+            }
+            Ok(out)
+        })
+        .await
+}
+
 /// 历史条件读取也受真实审计事件推进；终态无消息时不沿用旧的空历史 ETag。
 pub async fn read_history_event_revision(
     db: &RunDatabase,

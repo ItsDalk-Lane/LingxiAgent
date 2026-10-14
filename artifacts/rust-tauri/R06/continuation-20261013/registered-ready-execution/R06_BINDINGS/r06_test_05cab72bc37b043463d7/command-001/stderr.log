@@ -1,0 +1,34 @@
+   Compiling serde_core v1.0.229
+   Compiling tracing-core v0.1.36
+   Compiling rustls v0.23.45
+   Compiling futures-task v0.3.34
+   Compiling indexmap v2.14.2
+   Compiling futures-channel v0.3.34
+   Compiling aho-corasick v1.1.5
+   Compiling tokio v1.53.1
+   Compiling log v0.4.34
+   Compiling futures-util v0.3.34
+   Compiling tracing v0.1.44
+   Compiling regex-automata v0.4.18
+   Compiling regex v1.13.1
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling serde-saphyr v1.3.0
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tower-http v0.6.11
+   Compiling serde_urlencoded v0.7.1
+   Compiling serde_yaml_ng v0.10.0
+   Compiling h2 v0.4.19
+   Compiling schemars v1.2.2
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling hyper v1.11.1
+   Compiling hyper-util v0.1.21
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.67s
+     Running tests/agent_memory_r06t06.rs (rust/target-r06-continuation/debug/deps/agent_memory_r06t06-ec85cf183f34a000)

@@ -1,0 +1,15 @@
+
+running 1 test
+test preview_route_faces_and_public_token_gate ... ok
+
+successes:
+
+---- preview_route_faces_and_public_token_gate stdout ----
+LINGXI_AUTH_REJECTED request_id="req-4b3ee8290f46d928656be37fed6dbcb1" method=POST path=/lingxi/v1/preview/html status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57281
+
+
+successes:
+    preview_route_faces_and_public_token_gate
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.10s
+

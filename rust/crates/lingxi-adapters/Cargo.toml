@@ -82,3 +82,7 @@ libc = "0.2.189"
 # pre-main hook into all of them (unit tests + tests/*.rs). Never active
 # for `cargo build` / release (dev-dependencies only).
 lingxi-kernel = { path = "../lingxi-kernel", features = ["test-guard"] }
+# R06 收口：tests/r06_ar_w09_vector_integrity.rs 的 close/register 竞态
+# 证明需要真并发 runtime（multi_thread）。只在测试构建并入该 feature，
+# 正式构建仍只有上方主依赖的 feature 集。
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros"] }

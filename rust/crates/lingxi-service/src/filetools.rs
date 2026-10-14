@@ -376,11 +376,10 @@ pub struct FileModificationRecord {
     pub at_unix_ms: u64,
 }
 
-/// Receives one record per SUCCESSFUL mutation (failed/interrupted
-/// mutations produce nothing — a write that did not land is not a
-/// product).
+/// Records a landed mutation under the runtime identity. Registration failure
+/// must report the already-written bytes rather than mint a success product.
 pub trait FileChangeLog: Send + Sync {
-    fn record(&self, record: FileModificationRecord);
+    fn record(&self, ctx: &RunContext, record: FileModificationRecord) -> Result<(), String>;
 }
 
 /// The default no-op log (no product integration before R06).
@@ -388,7 +387,9 @@ pub trait FileChangeLog: Send + Sync {
 pub struct NoopChangeLog;
 
 impl FileChangeLog for NoopChangeLog {
-    fn record(&self, _record: FileModificationRecord) {}
+    fn record(&self, _ctx: &RunContext, _record: FileModificationRecord) -> Result<(), String> {
+        Ok(())
+    }
 }
 
 // ── mutation serialization (per canonical path) ─────────────────────────────
@@ -1521,6 +1522,7 @@ impl FileTools {
     /// 组合根共享应用写入的来源证明。
     pub fn set_file_safety(&self, safety: Arc<crate::file_safety::FileSafety>) {
         let _ = self.file_safety.set(safety);
+        self.propagate_mutation_hook_to_safety();
     }
 
     /// Installs the test-only mutation seam (see [`MutationTestHook`]).
@@ -1531,6 +1533,33 @@ impl FileTools {
             .mutation_hook
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner()) = hook;
+        self.propagate_mutation_hook_to_safety();
+    }
+
+    /// R06-AR-F02 之后生产写路径一律走 FileSafety 安全变更（temp 写 + 原子
+    /// 替换），旧裸路径里的测试屏障成了死码。这里把同一 seam 桥接进安全变更
+    /// 的真实突变窗口：`before_replace` 步（temp 写完成之后、身份复验与原子
+    /// 替换之前）——与原裸路径 seam 的窗口语义一致，屏障挂起时原文件保持。
+    fn propagate_mutation_hook_to_safety(&self) {
+        let Some(safety) = self.file_safety.get() else {
+            return;
+        };
+        let hook = self
+            .mutation_hook
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .clone();
+        let bridge = hook.map(|hook| {
+            let bridge: crate::file_safety::TestHook =
+                Arc::new(move |path: &std::path::Path, step: &str| {
+                    if step == "before_replace" {
+                        hook(path);
+                    }
+                    Ok(())
+                });
+            bridge
+        });
+        safety.set_test_hook(bridge);
     }
 
     /// The resource-scope derivation the gateway binds at prepare and
@@ -2073,21 +2102,30 @@ impl FileTools {
             sha256_hex: Some(hex(&Sha256::digest(new_bytes))),
             mtime_unix_ms: system_time_ms(after.modified),
         };
-        self.changes.record(FileModificationRecord {
-            path: scope.path.clone(),
-            operation: if existed {
-                FileChangeOperation::Modified
-            } else {
-                FileChangeOperation::Created
+        if let Err(error) = self.changes.record(
+            ctx,
+            FileModificationRecord {
+                path: scope.path.clone(),
+                operation: if existed {
+                    FileChangeOperation::Modified
+                } else {
+                    FileChangeOperation::Created
+                },
+                before: before.map(|(identity, digest)| FileVersion {
+                    size_bytes: identity.size,
+                    sha256_hex: digest,
+                    mtime_unix_ms: system_time_ms(identity.modified),
+                }),
+                after: after_version.clone(),
+                at_unix_ms: self.clock.now_unix_ms(),
             },
-            before: before.map(|(identity, digest)| FileVersion {
-                size_bytes: identity.size,
-                sha256_hex: digest,
-                mtime_unix_ms: system_time_ms(identity.modified),
-            }),
-            after: after_version.clone(),
-            at_unix_ms: self.clock.now_unix_ms(),
-        });
+        ) {
+            tracing::warn!(%error, "file write occurred but product registration failed");
+            return failed(
+                ErrorCode::Internal,
+                format!("file write occurred but product registration failed: {error}"),
+            );
+        }
         self.freshness
             .observe_mutation(&session, &scope.path, after);
         let resource_ref = ResourceRef {
@@ -2322,21 +2360,30 @@ impl FileTools {
                 );
             }
         }
-        self.changes.record(FileModificationRecord {
-            path: scope.path.clone(),
-            operation: if existed_now {
-                FileChangeOperation::Modified
-            } else {
-                FileChangeOperation::Created
+        if let Err(error) = self.changes.record(
+            ctx,
+            FileModificationRecord {
+                path: scope.path.clone(),
+                operation: if existed_now {
+                    FileChangeOperation::Modified
+                } else {
+                    FileChangeOperation::Created
+                },
+                before: before.map(|(identity, digest)| FileVersion {
+                    size_bytes: identity.size,
+                    sha256_hex: digest,
+                    mtime_unix_ms: system_time_ms(identity.modified),
+                }),
+                after: after_version.clone(),
+                at_unix_ms: self.clock.now_unix_ms(),
             },
-            before: before.map(|(identity, digest)| FileVersion {
-                size_bytes: identity.size,
-                sha256_hex: digest,
-                mtime_unix_ms: system_time_ms(identity.modified),
-            }),
-            after: after_version.clone(),
-            at_unix_ms: self.clock.now_unix_ms(),
-        });
+        ) {
+            tracing::warn!(%error, "file write occurred but product registration failed");
+            return failed(
+                ErrorCode::Internal,
+                format!("file write occurred but product registration failed: {error}"),
+            );
+        }
         self.freshness
             .observe_mutation(&session, &scope.path, after);
         let resource_ref = ResourceRef {

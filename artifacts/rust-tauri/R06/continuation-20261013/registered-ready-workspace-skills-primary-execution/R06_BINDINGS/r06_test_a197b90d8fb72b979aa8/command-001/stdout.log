@@ -1,0 +1,15 @@
+
+running 1 test
+test resourceio_route_faces_and_error_vocabulary ... ok
+
+successes:
+
+---- resourceio_route_faces_and_error_vocabulary stdout ----
+LINGXI_AUTH_REJECTED request_id="req-ea34c527cffe34f42e7b670b61adf2e2" method=POST path=/lingxi/v1/resource-io/stat status=401 Unauthorized reason=missing_credential remote=127.0.0.1:51657
+
+
+successes:
+    resourceio_route_faces_and_error_vocabulary
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.17s
+

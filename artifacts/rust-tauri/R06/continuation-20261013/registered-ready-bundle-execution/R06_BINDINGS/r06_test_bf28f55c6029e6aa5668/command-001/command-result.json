@@ -1,0 +1,110 @@
+{
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_ar_f06_binary",
+    "test": "p03_delete_receipts_match_real_files_and_preflight",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_ar_f06_binary",
+      "p03_delete_receipts_match_real_files_and_preflight",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "argv": [
+    "rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_ar_f06_binary",
+    "p03_delete_receipts_match_real_files_and_preflight",
+    "--",
+    "--exact",
+    "--show-output"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBeforeSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+  "exitCode": 0,
+  "timedOut": false,
+  "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/stdout.log",
+  "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/stderr.log",
+  "timeoutSecs": 900,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/runtime/home",
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/w01_evidence",
+    "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/w09_evidence",
+    "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/w10_evidence",
+    "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/t08",
+    "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_bf28f55c6029e6aa5668/command-001/raw/t08-evaluations.jsonl"
+  },
+  "actualArgv": [
+    "/Users/study_superior/.cargo/bin/rustup",
+    "run",
+    "1.98.1",
+    "cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r06_ar_f06_binary",
+    "p03_delete_receipts_match_real_files_and_preflight",
+    "--",
+    "--exact",
+    "--show-output"
+  ],
+  "pid": 91652,
+  "elapsedSecs": 4.601,
+  "outputCheck": {
+    "valid": true,
+    "expectedTest": "p03_delete_receipts_match_real_files_and_preflight",
+    "runningCounts": [
+      "1"
+    ],
+    "resultSummaries": [
+      [
+        "ok",
+        "1",
+        "0",
+        "0"
+      ]
+    ],
+    "passedTestNames": [
+      "p03_delete_receipts_match_real_files_and_preflight"
+    ],
+    "reason": ""
+  },
+  "stdoutSha256": "de2f2fcd7978f9cc0b007aebeaa741619169cae6da365c00ed9c41845c4d6e29",
+  "stderrSha256": "47c93697220ed93e596c9d33fca385377ebb1c40ac160c19e37132db499a5e5d",
+  "sourceAfterSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+  "sourceStable": true,
+  "localPassed": true
+}

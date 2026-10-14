@@ -1540,6 +1540,9 @@ async fn panicking_tool_child_is_supervised_and_the_run_settles_loudly() {
             "model_call_completed",
             "tool_call_started",
             "tool_call_completed",
+            // AR-F08 工具结果投影：历史解码对称化（无目录绑定的调用合法还原
+            // None）后真实落盘并发出事件。
+            "tool_result_model_projection",
             "model_call_started",
             "model_call_completed",
             "run_state_changed",
@@ -1786,6 +1789,8 @@ async fn approval_wait_round_trips_approve_and_reject_legs() {
             "run_state_changed", // running -> waiting_approval
             "run_state_changed", // waiting_approval -> running
             "tool_call_completed",
+            // AR-F08 工具结果投影（见 panic supervision 用例同因）。
+            "tool_result_model_projection",
             "model_call_started", // final turn
             "model_call_completed",
             "run_state_changed", // running -> completed

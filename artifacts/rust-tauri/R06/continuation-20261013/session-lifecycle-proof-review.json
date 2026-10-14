@@ -1,0 +1,993 @@
+{
+  "status": "ACTUAL_SESSION_LIFECYCLE_BOUND_NOT_STAGE_ACCEPTANCE",
+  "review": [
+    {
+      "id": "R00-T02-LA-0D4F0EFC9DAE",
+      "original": {
+        "then": "pinned true 写置顶时间与顺序，false 清除；已删 Agent 会话禁止置顶",
+        "assertions": [
+          "给定目标与相应权限，执行“设置会话置顶”后核对：pinned true 写置顶时间与顺序，false 清除；已删 Agent 会话禁止置顶",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [
+          {
+            "index": 0,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_original_session_proofs",
+                "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering"
+              }
+            ],
+            "meaning": "真实pin布尔正向写时间/顺序，unpin清除，混合拥有者403；不覆盖已删Agent禁止置顶",
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+                "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering",
+                "sourceSHA256": "9e385d62cb39f6ee6627bc82efa5d207fe3d658e0b9136f316045170169f02d4",
+                "testStartLine": 1524,
+                "testEndLine": 1632,
+                "assertions": [
+                  {
+                    "line": 1534,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n        let row = read_session(&server, sid).await;\n        assert!(row[\"pinnedAtUnixMs\"].is_u64());\n        assert!(row[\"pinOrder\"].is_i64());"
+                  },
+                  {
+                    "line": 1536,
+                    "quote": "assert!(row[\"pinnedAtUnixMs\"].is_u64());\n        assert!(row[\"pinOrder\"].is_i64());\n    }\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1537,
+                    "quote": "assert!(row[\"pinOrder\"].is_i64());\n    }\n    let (status, body) = server\n        .post("
+                  },
+                  {
+                    "line": 1545,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n    let before_a = read_session(&server, \"pin-a\").await;\n    let before_b = read_session(&server, \"pin-b\").await;\n    assert!(before_b[\"pinOrder\"].as_i64().unwrap() < before_a[\"pinOrder\"].as_i64().unwrap());"
+                  },
+                  {
+                    "line": 1548,
+                    "quote": "assert!(before_b[\"pinOrder\"].as_i64().unwrap() < before_a[\"pinOrder\"].as_i64().unwrap());\n    for (body, expected) in [\n        (r#\"{\"sessionIds\":[\"pin-a\",\"pin-a\"]}\"#, 400),\n        (r#\"{\"sessionIds\":[\"pin-a\",\"missing\"]}\"#, 404),"
+                  },
+                  {
+                    "line": 1554,
+                    "quote": "assert_eq!(status, expected, \"{response}\");\n        assert_eq!(read_session(&server, \"pin-a\").await, before_a);\n        assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    }"
+                  },
+                  {
+                    "line": 1555,
+                    "quote": "assert_eq!(read_session(&server, \"pin-a\").await, before_a);\n        assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    }\n    let foreign = server.mint_device_token(\"foreign-pin-order\").await;"
+                  },
+                  {
+                    "line": 1556,
+                    "quote": "assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    }\n    let foreign = server.mint_device_token(\"foreign-pin-order\").await;\n    let bearer = format!(\"Bearer {foreign}\");"
+                  },
+                  {
+                    "line": 1568,
+                    "quote": "assert_eq!(status, 201, \"{body}\");\n    let (status, body) = http(\n        &server.addr,\n        \"POST\","
+                  },
+                  {
+                    "line": 1577,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n    let foreign_before = read_session(&server, \"foreign-pin-own\").await;\n    let (status, body) = http(\n        &server.addr,"
+                  },
+                  {
+                    "line": 1587,
+                    "quote": "assert_eq!(status, 403, \"逐项检查不能只验证第一项：{body}\");\n    assert_eq!(\n        read_session(&server, \"foreign-pin-own\").await,\n        foreign_before"
+                  },
+                  {
+                    "line": 1588,
+                    "quote": "assert_eq!(\n        read_session(&server, \"foreign-pin-own\").await,\n        foreign_before\n    );"
+                  },
+                  {
+                    "line": 1592,
+                    "quote": "assert_eq!(read_session(&server, \"pin-a\").await, before_a);\n    let db = rusqlite::Connection::open(server.state.storage().db_path()).unwrap();\n    db.execute_batch(\"CREATE TRIGGER original_pin_order_abort BEFORE UPDATE OF pin_order ON sessions WHEN OLD.session_id='pin-b' BEGIN SELECT RAISE(ABORT,'原验收第二项更新失败'); END;\").unwrap();\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1601,
+                    "quote": "assert_eq!(status, 500, \"{body}\");\n    assert_eq!(\n        read_session(&server, \"pin-a\").await,\n        before_a,"
+                  },
+                  {
+                    "line": 1602,
+                    "quote": "assert_eq!(\n        read_session(&server, \"pin-a\").await,\n        before_a,\n        \"第二项失败时不得只改第一项\""
+                  },
+                  {
+                    "line": 1607,
+                    "quote": "assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    db.execute_batch(\"DROP TRIGGER original_pin_order_abort\")\n        .unwrap();\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1616,
+                    "quote": "assert_eq!(status, 200);\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/pin\","
+                  },
+                  {
+                    "line": 1623,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n    let unpinned = read_session(&server, \"pin-a\").await;\n    assert!(unpinned[\"pinnedAtUnixMs\"].is_null() && unpinned[\"pinOrder\"].is_null());\n    println!("
+                  },
+                  {
+                    "line": 1625,
+                    "quote": "assert!(unpinned[\"pinnedAtUnixMs\"].is_null() && unpinned[\"pinOrder\"].is_null());\n    println!(\n        \"{}\",\n        serde_json::json!({\"originalLeaf\":\"R00-T02-LA-2ED065BED168\",\"duplicate\":400,\"missing\":404,\"mixedOwners\":403,\"secondUpdateFailure\":500,\"failedReordersUnchanged\":true,\"restoredPositive\":true,\"unpinClearsTimeAndOrder\":true})"
+                  }
+                ]
+              }
+            ],
+            "coverage": "PARTIAL",
+            "missingClauses": [
+              "置顶的布尔保存、顺序、拒绝及存储失败可证明，但当前置顶路由未验证Agent删除状态，缺原已删Agent禁止置顶条件。"
+            ]
+          },
+          {
+            "index": 1,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_original_session_proofs",
+                "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering"
+              }
+            ],
+            "meaning": "真实pin布尔正向写时间/顺序，unpin清除，混合拥有者403；不覆盖已删Agent禁止置顶",
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_original_session_proofs.rs",
+                "test": "original_pin_order_checks_each_owner_and_rolls_back_failed_reordering",
+                "sourceSHA256": "9e385d62cb39f6ee6627bc82efa5d207fe3d658e0b9136f316045170169f02d4",
+                "testStartLine": 1524,
+                "testEndLine": 1632,
+                "assertions": [
+                  {
+                    "line": 1534,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n        let row = read_session(&server, sid).await;\n        assert!(row[\"pinnedAtUnixMs\"].is_u64());\n        assert!(row[\"pinOrder\"].is_i64());"
+                  },
+                  {
+                    "line": 1536,
+                    "quote": "assert!(row[\"pinnedAtUnixMs\"].is_u64());\n        assert!(row[\"pinOrder\"].is_i64());\n    }\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1537,
+                    "quote": "assert!(row[\"pinOrder\"].is_i64());\n    }\n    let (status, body) = server\n        .post("
+                  },
+                  {
+                    "line": 1545,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n    let before_a = read_session(&server, \"pin-a\").await;\n    let before_b = read_session(&server, \"pin-b\").await;\n    assert!(before_b[\"pinOrder\"].as_i64().unwrap() < before_a[\"pinOrder\"].as_i64().unwrap());"
+                  },
+                  {
+                    "line": 1548,
+                    "quote": "assert!(before_b[\"pinOrder\"].as_i64().unwrap() < before_a[\"pinOrder\"].as_i64().unwrap());\n    for (body, expected) in [\n        (r#\"{\"sessionIds\":[\"pin-a\",\"pin-a\"]}\"#, 400),\n        (r#\"{\"sessionIds\":[\"pin-a\",\"missing\"]}\"#, 404),"
+                  },
+                  {
+                    "line": 1554,
+                    "quote": "assert_eq!(status, expected, \"{response}\");\n        assert_eq!(read_session(&server, \"pin-a\").await, before_a);\n        assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    }"
+                  },
+                  {
+                    "line": 1555,
+                    "quote": "assert_eq!(read_session(&server, \"pin-a\").await, before_a);\n        assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    }\n    let foreign = server.mint_device_token(\"foreign-pin-order\").await;"
+                  },
+                  {
+                    "line": 1556,
+                    "quote": "assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    }\n    let foreign = server.mint_device_token(\"foreign-pin-order\").await;\n    let bearer = format!(\"Bearer {foreign}\");"
+                  },
+                  {
+                    "line": 1568,
+                    "quote": "assert_eq!(status, 201, \"{body}\");\n    let (status, body) = http(\n        &server.addr,\n        \"POST\","
+                  },
+                  {
+                    "line": 1577,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n    let foreign_before = read_session(&server, \"foreign-pin-own\").await;\n    let (status, body) = http(\n        &server.addr,"
+                  },
+                  {
+                    "line": 1587,
+                    "quote": "assert_eq!(status, 403, \"逐项检查不能只验证第一项：{body}\");\n    assert_eq!(\n        read_session(&server, \"foreign-pin-own\").await,\n        foreign_before"
+                  },
+                  {
+                    "line": 1588,
+                    "quote": "assert_eq!(\n        read_session(&server, \"foreign-pin-own\").await,\n        foreign_before\n    );"
+                  },
+                  {
+                    "line": 1592,
+                    "quote": "assert_eq!(read_session(&server, \"pin-a\").await, before_a);\n    let db = rusqlite::Connection::open(server.state.storage().db_path()).unwrap();\n    db.execute_batch(\"CREATE TRIGGER original_pin_order_abort BEFORE UPDATE OF pin_order ON sessions WHEN OLD.session_id='pin-b' BEGIN SELECT RAISE(ABORT,'原验收第二项更新失败'); END;\").unwrap();\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1601,
+                    "quote": "assert_eq!(status, 500, \"{body}\");\n    assert_eq!(\n        read_session(&server, \"pin-a\").await,\n        before_a,"
+                  },
+                  {
+                    "line": 1602,
+                    "quote": "assert_eq!(\n        read_session(&server, \"pin-a\").await,\n        before_a,\n        \"第二项失败时不得只改第一项\""
+                  },
+                  {
+                    "line": 1607,
+                    "quote": "assert_eq!(read_session(&server, \"pin-b\").await, before_b);\n    db.execute_batch(\"DROP TRIGGER original_pin_order_abort\")\n        .unwrap();\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1616,
+                    "quote": "assert_eq!(status, 200);\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/pin\","
+                  },
+                  {
+                    "line": 1623,
+                    "quote": "assert_eq!(status, 200, \"{body}\");\n    let unpinned = read_session(&server, \"pin-a\").await;\n    assert!(unpinned[\"pinnedAtUnixMs\"].is_null() && unpinned[\"pinOrder\"].is_null());\n    println!("
+                  },
+                  {
+                    "line": 1625,
+                    "quote": "assert!(unpinned[\"pinnedAtUnixMs\"].is_null() && unpinned[\"pinOrder\"].is_null());\n    println!(\n        \"{}\",\n        serde_json::json!({\"originalLeaf\":\"R00-T02-LA-2ED065BED168\",\"duplicate\":400,\"missing\":404,\"mixedOwners\":403,\"secondUpdateFailure\":500,\"failedReordersUnchanged\":true,\"restoredPositive\":true,\"unpinClearsTimeAndOrder\":true})"
+                  }
+                ]
+              }
+            ],
+            "coverage": "PARTIAL",
+            "missingClauses": [
+              "置顶的布尔保存、顺序、拒绝及存储失败可证明，但当前置顶路由未验证Agent删除状态，缺原已删Agent禁止置顶条件。"
+            ]
+          }
+        ],
+        "gaps": [
+          "置顶的布尔保存、顺序、拒绝及存储失败可证明，但当前置顶路由未验证Agent删除状态，缺原已删Agent禁止置顶条件。"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-51905CECDD1B",
+      "original": {
+        "then": "返回该活动会话的 memoryEnabled，已删 Agent 会话拒绝",
+        "assertions": [
+          "给定目标与相应权限，执行“查看会话记忆开关”后核对：返回该活动会话的 memoryEnabled，已删 Agent 会话拒绝",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [
+          {
+            "index": 0,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_t03_session_tree",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_t03_session_tree",
+                "test": "cross_principal_tree_access_is_403"
+              }
+            ],
+            "meaning": "真实memory GET默认true/PATCH false后GET false；memory GET他人会话403",
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+                "sourceSHA256": "9b12c9dcf4f8b717ab6b7f70bc8bc7e43b59000af296f8c7751f8ad871ced293",
+                "testStartLine": 1466,
+                "testEndLine": 1673,
+                "assertions": [
+                  {
+                    "line": 1479,
+                    "quote": "    assert_eq!(status, 200, \"rename: {body}\");\n    let (status, body) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1483,
+                    "quote": "    assert_eq!(status, 200, \"find: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\""
+                  },
+                  {
+                    "line": 1484,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\"\n    );"
+                  },
+                  {
+                    "line": 1496,
+                    "quote": "    assert_eq!(status, 200, \"pin: {body}\");\n    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\""
+                  },
+                  {
+                    "line": 1497,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\"\n    );"
+                  },
+                  {
+                    "line": 1507,
+                    "quote": "    assert_eq!(status, 200, \"pin-order: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/pin-order\","
+                  },
+                  {
+                    "line": 1514,
+                    "quote": "    assert_eq!(status, 400, \"重复 id → 400: {body}\");\n\n    // memory GET/PATCH\n    let (status, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;"
+                  },
+                  {
+                    "line": 1518,
+                    "quote": "    assert_eq!(status, 200, \"memory get: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true"
+                  },
+                  {
+                    "line": 1519,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true\n    );"
+                  },
+                  {
+                    "line": 1531,
+                    "quote": "    assert_eq!(status, 200, \"memory patch: {body}\");\n    let (_, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],"
+                  },
+                  {
+                    "line": 1533,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        false\n    );"
+                  },
+                  {
+                    "line": 1549,
+                    "quote": "    assert_eq!(status, 200, \"fork child: {body}\");\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/archive\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1553,
+                    "quote": "    assert_eq!(status, 409, \"有子对话无 childMode → 409: {body}\");\n    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。"
+                  },
+                  {
+                    "line": 1554,
+                    "quote": "    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1563,
+                    "quote": "    assert_eq!(status, 200, \"archive detach: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1"
+                  },
+                  {
+                    "line": 1564,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1\n    );"
+                  },
+                  {
+                    "line": 1569,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"parentSessionId\"].is_null(),\n        \"detach 后子对话释放到顶层\"\n    );"
+                  },
+                  {
+                    "line": 1577,
+                    "quote": "    assert_eq!(status, 200, \"main list: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1585,
+                    "quote": "    assert!(!ids.contains(&\"parent\"), \"归档会话不进主列表: {ids:?}\");\n    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。"
+                  },
+                  {
+                    "line": 1586,
+                    "quote": "    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1592,
+                    "quote": "    assert_eq!(status, 409, \"归档会话 execute → 409: {body}\");\n    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。"
+                  },
+                  {
+                    "line": 1593,
+                    "quote": "    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。\n    let (status, body) = server.get(\"/lingxi/v1/sessions/archived\").await;"
+                  },
+                  {
+                    "line": 1597,
+                    "quote": "    assert_eq!(status, 200, \"archived list: {body}\");\n    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)"
+                  },
+                  {
+                    "line": 1598,
+                    "quote": "    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1602,
+                    "quote": "    assert_eq!(status, 200, \"restore: {body}\");\n    // restore 后回到主列表（FINDING-03 的对偶断言）。\n    let (status, body) = server.get(\"/lingxi/v1/sessions\").await;\n    assert_eq!(status, 200, \"main list after restore: {body}\");"
+                  },
+                  {
+                    "line": 1605,
+                    "quote": "    assert_eq!(status, 200, \"main list after restore: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1613,
+                    "quote": "    assert!(ids.contains(&\"parent\"), \"restore 后回到主列表: {ids:?}\");\n\n    // 再归档后永久删除；删除后 find → 404；未归档会话不可永久删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1619,
+                    "quote": "    assert_eq!(status, 200, \"re-archive\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1626,
+                    "quote": "    assert_eq!(status, 409, \"未归档会话永久删除 → 409: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1633,
+                    "quote": "    assert_eq!(status, 200, \"archived delete: {body}\");\n    let (status, _) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1637,
+                    "quote": "    assert_eq!(status, 404, \"删除后 find → 404\");\n\n    // cleanup：归档 child 后 maxAgeDays=0 清理 → 全部过期归档删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1643,
+                    "quote": "    assert_eq!(status, 200, \"archive child\");\n    // 现役语义是严格小于截止线（mtime < cutoff）；让真实时钟越过归档毫秒。\n    tokio::time::sleep(Duration::from_millis(50)).await;\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1649,
+                    "quote": "    assert_eq!(status, 200, \"cleanup: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,"
+                  },
+                  {
+                    "line": 1650,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,\n        \"maxAgeDays=0 → 刚归档的也过期\""
+                  },
+                  {
+                    "line": 1661,
+                    "quote": "    assert_eq!(status, 200, \"search title: {body}\");\n    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1662,
+                    "quote": "    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server\n        .get(&format!(\"/lingxi/v1/sessions/search?q={long_query}\"))"
+                  },
+                  {
+                    "line": 1667,
+                    "quote": "    assert_eq!(status, 400, \"超长查询 → 400: {body}\");\n    server.stop_and_clean().await;\n}"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+                "test": "cross_principal_tree_access_is_403",
+                "sourceSHA256": "9b12c9dcf4f8b717ab6b7f70bc8bc7e43b59000af296f8c7751f8ad871ced293",
+                "testStartLine": 1674,
+                "testEndLine": 1720,
+                "assertions": [
+                  {
+                    "line": 1712,
+                    "quote": "        assert_eq!(\n            status, 403,\n            \"设备主体访问他人会话 {method} {path} → 403: {body}\"\n        );"
+                  }
+                ]
+              }
+            ],
+            "coverage": "PARTIAL",
+            "missingClauses": [
+              "现有memory GET能读布尔值并拒绝越权；当前未验证已删Agent拒绝，缺原活动会话条件与真实读取失败专属检查。"
+            ]
+          },
+          {
+            "index": 1,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_t03_session_tree",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_t03_session_tree",
+                "test": "cross_principal_tree_access_is_403"
+              }
+            ],
+            "meaning": "真实memory GET默认true/PATCH false后GET false；memory GET他人会话403",
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+                "sourceSHA256": "9b12c9dcf4f8b717ab6b7f70bc8bc7e43b59000af296f8c7751f8ad871ced293",
+                "testStartLine": 1466,
+                "testEndLine": 1673,
+                "assertions": [
+                  {
+                    "line": 1479,
+                    "quote": "    assert_eq!(status, 200, \"rename: {body}\");\n    let (status, body) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1483,
+                    "quote": "    assert_eq!(status, 200, \"find: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\""
+                  },
+                  {
+                    "line": 1484,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\"\n    );"
+                  },
+                  {
+                    "line": 1496,
+                    "quote": "    assert_eq!(status, 200, \"pin: {body}\");\n    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\""
+                  },
+                  {
+                    "line": 1497,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\"\n    );"
+                  },
+                  {
+                    "line": 1507,
+                    "quote": "    assert_eq!(status, 200, \"pin-order: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/pin-order\","
+                  },
+                  {
+                    "line": 1514,
+                    "quote": "    assert_eq!(status, 400, \"重复 id → 400: {body}\");\n\n    // memory GET/PATCH\n    let (status, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;"
+                  },
+                  {
+                    "line": 1518,
+                    "quote": "    assert_eq!(status, 200, \"memory get: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true"
+                  },
+                  {
+                    "line": 1519,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true\n    );"
+                  },
+                  {
+                    "line": 1531,
+                    "quote": "    assert_eq!(status, 200, \"memory patch: {body}\");\n    let (_, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],"
+                  },
+                  {
+                    "line": 1533,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        false\n    );"
+                  },
+                  {
+                    "line": 1549,
+                    "quote": "    assert_eq!(status, 200, \"fork child: {body}\");\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/archive\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1553,
+                    "quote": "    assert_eq!(status, 409, \"有子对话无 childMode → 409: {body}\");\n    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。"
+                  },
+                  {
+                    "line": 1554,
+                    "quote": "    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1563,
+                    "quote": "    assert_eq!(status, 200, \"archive detach: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1"
+                  },
+                  {
+                    "line": 1564,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1\n    );"
+                  },
+                  {
+                    "line": 1569,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"parentSessionId\"].is_null(),\n        \"detach 后子对话释放到顶层\"\n    );"
+                  },
+                  {
+                    "line": 1577,
+                    "quote": "    assert_eq!(status, 200, \"main list: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1585,
+                    "quote": "    assert!(!ids.contains(&\"parent\"), \"归档会话不进主列表: {ids:?}\");\n    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。"
+                  },
+                  {
+                    "line": 1586,
+                    "quote": "    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1592,
+                    "quote": "    assert_eq!(status, 409, \"归档会话 execute → 409: {body}\");\n    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。"
+                  },
+                  {
+                    "line": 1593,
+                    "quote": "    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。\n    let (status, body) = server.get(\"/lingxi/v1/sessions/archived\").await;"
+                  },
+                  {
+                    "line": 1597,
+                    "quote": "    assert_eq!(status, 200, \"archived list: {body}\");\n    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)"
+                  },
+                  {
+                    "line": 1598,
+                    "quote": "    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1602,
+                    "quote": "    assert_eq!(status, 200, \"restore: {body}\");\n    // restore 后回到主列表（FINDING-03 的对偶断言）。\n    let (status, body) = server.get(\"/lingxi/v1/sessions\").await;\n    assert_eq!(status, 200, \"main list after restore: {body}\");"
+                  },
+                  {
+                    "line": 1605,
+                    "quote": "    assert_eq!(status, 200, \"main list after restore: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1613,
+                    "quote": "    assert!(ids.contains(&\"parent\"), \"restore 后回到主列表: {ids:?}\");\n\n    // 再归档后永久删除；删除后 find → 404；未归档会话不可永久删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1619,
+                    "quote": "    assert_eq!(status, 200, \"re-archive\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1626,
+                    "quote": "    assert_eq!(status, 409, \"未归档会话永久删除 → 409: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1633,
+                    "quote": "    assert_eq!(status, 200, \"archived delete: {body}\");\n    let (status, _) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1637,
+                    "quote": "    assert_eq!(status, 404, \"删除后 find → 404\");\n\n    // cleanup：归档 child 后 maxAgeDays=0 清理 → 全部过期归档删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1643,
+                    "quote": "    assert_eq!(status, 200, \"archive child\");\n    // 现役语义是严格小于截止线（mtime < cutoff）；让真实时钟越过归档毫秒。\n    tokio::time::sleep(Duration::from_millis(50)).await;\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1649,
+                    "quote": "    assert_eq!(status, 200, \"cleanup: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,"
+                  },
+                  {
+                    "line": 1650,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,\n        \"maxAgeDays=0 → 刚归档的也过期\""
+                  },
+                  {
+                    "line": 1661,
+                    "quote": "    assert_eq!(status, 200, \"search title: {body}\");\n    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1662,
+                    "quote": "    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server\n        .get(&format!(\"/lingxi/v1/sessions/search?q={long_query}\"))"
+                  },
+                  {
+                    "line": 1667,
+                    "quote": "    assert_eq!(status, 400, \"超长查询 → 400: {body}\");\n    server.stop_and_clean().await;\n}"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+                "test": "cross_principal_tree_access_is_403",
+                "sourceSHA256": "9b12c9dcf4f8b717ab6b7f70bc8bc7e43b59000af296f8c7751f8ad871ced293",
+                "testStartLine": 1674,
+                "testEndLine": 1720,
+                "assertions": [
+                  {
+                    "line": 1712,
+                    "quote": "        assert_eq!(\n            status, 403,\n            \"设备主体访问他人会话 {method} {path} → 403: {body}\"\n        );"
+                  }
+                ]
+              }
+            ],
+            "coverage": "PARTIAL",
+            "missingClauses": [
+              "现有memory GET能读布尔值并拒绝越权；当前未验证已删Agent拒绝，缺原活动会话条件与真实读取失败专属检查。"
+            ]
+          }
+        ],
+        "gaps": [
+          "现有memory GET能读布尔值并拒绝越权；当前未验证已删Agent拒绝，缺原活动会话条件与真实读取失败专属检查。"
+        ]
+      }
+    },
+    {
+      "id": "R00-T02-LA-9616596B5720",
+      "original": {
+        "then": "按布尔值开启或关闭指定活动会话记忆，并返回保存状态",
+        "assertions": [
+          "给定目标与相应权限，执行“设置会话记忆开关”后核对：按布尔值开启或关闭指定活动会话记忆，并返回保存状态",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [
+          {
+            "index": 0,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_t03_session_tree",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup"
+              }
+            ],
+            "meaning": "真实指定会话memory布尔false保存并回读，尚无活动/失败整套证明",
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+                "sourceSHA256": "9b12c9dcf4f8b717ab6b7f70bc8bc7e43b59000af296f8c7751f8ad871ced293",
+                "testStartLine": 1466,
+                "testEndLine": 1673,
+                "assertions": [
+                  {
+                    "line": 1479,
+                    "quote": "    assert_eq!(status, 200, \"rename: {body}\");\n    let (status, body) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1483,
+                    "quote": "    assert_eq!(status, 200, \"find: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\""
+                  },
+                  {
+                    "line": 1484,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\"\n    );"
+                  },
+                  {
+                    "line": 1496,
+                    "quote": "    assert_eq!(status, 200, \"pin: {body}\");\n    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\""
+                  },
+                  {
+                    "line": 1497,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\"\n    );"
+                  },
+                  {
+                    "line": 1507,
+                    "quote": "    assert_eq!(status, 200, \"pin-order: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/pin-order\","
+                  },
+                  {
+                    "line": 1514,
+                    "quote": "    assert_eq!(status, 400, \"重复 id → 400: {body}\");\n\n    // memory GET/PATCH\n    let (status, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;"
+                  },
+                  {
+                    "line": 1518,
+                    "quote": "    assert_eq!(status, 200, \"memory get: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true"
+                  },
+                  {
+                    "line": 1519,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true\n    );"
+                  },
+                  {
+                    "line": 1531,
+                    "quote": "    assert_eq!(status, 200, \"memory patch: {body}\");\n    let (_, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],"
+                  },
+                  {
+                    "line": 1533,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        false\n    );"
+                  },
+                  {
+                    "line": 1549,
+                    "quote": "    assert_eq!(status, 200, \"fork child: {body}\");\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/archive\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1553,
+                    "quote": "    assert_eq!(status, 409, \"有子对话无 childMode → 409: {body}\");\n    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。"
+                  },
+                  {
+                    "line": 1554,
+                    "quote": "    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1563,
+                    "quote": "    assert_eq!(status, 200, \"archive detach: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1"
+                  },
+                  {
+                    "line": 1564,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1\n    );"
+                  },
+                  {
+                    "line": 1569,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"parentSessionId\"].is_null(),\n        \"detach 后子对话释放到顶层\"\n    );"
+                  },
+                  {
+                    "line": 1577,
+                    "quote": "    assert_eq!(status, 200, \"main list: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1585,
+                    "quote": "    assert!(!ids.contains(&\"parent\"), \"归档会话不进主列表: {ids:?}\");\n    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。"
+                  },
+                  {
+                    "line": 1586,
+                    "quote": "    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1592,
+                    "quote": "    assert_eq!(status, 409, \"归档会话 execute → 409: {body}\");\n    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。"
+                  },
+                  {
+                    "line": 1593,
+                    "quote": "    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。\n    let (status, body) = server.get(\"/lingxi/v1/sessions/archived\").await;"
+                  },
+                  {
+                    "line": 1597,
+                    "quote": "    assert_eq!(status, 200, \"archived list: {body}\");\n    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)"
+                  },
+                  {
+                    "line": 1598,
+                    "quote": "    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1602,
+                    "quote": "    assert_eq!(status, 200, \"restore: {body}\");\n    // restore 后回到主列表（FINDING-03 的对偶断言）。\n    let (status, body) = server.get(\"/lingxi/v1/sessions\").await;\n    assert_eq!(status, 200, \"main list after restore: {body}\");"
+                  },
+                  {
+                    "line": 1605,
+                    "quote": "    assert_eq!(status, 200, \"main list after restore: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1613,
+                    "quote": "    assert!(ids.contains(&\"parent\"), \"restore 后回到主列表: {ids:?}\");\n\n    // 再归档后永久删除；删除后 find → 404；未归档会话不可永久删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1619,
+                    "quote": "    assert_eq!(status, 200, \"re-archive\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1626,
+                    "quote": "    assert_eq!(status, 409, \"未归档会话永久删除 → 409: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1633,
+                    "quote": "    assert_eq!(status, 200, \"archived delete: {body}\");\n    let (status, _) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1637,
+                    "quote": "    assert_eq!(status, 404, \"删除后 find → 404\");\n\n    // cleanup：归档 child 后 maxAgeDays=0 清理 → 全部过期归档删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1643,
+                    "quote": "    assert_eq!(status, 200, \"archive child\");\n    // 现役语义是严格小于截止线（mtime < cutoff）；让真实时钟越过归档毫秒。\n    tokio::time::sleep(Duration::from_millis(50)).await;\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1649,
+                    "quote": "    assert_eq!(status, 200, \"cleanup: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,"
+                  },
+                  {
+                    "line": 1650,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,\n        \"maxAgeDays=0 → 刚归档的也过期\""
+                  },
+                  {
+                    "line": 1661,
+                    "quote": "    assert_eq!(status, 200, \"search title: {body}\");\n    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1662,
+                    "quote": "    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server\n        .get(&format!(\"/lingxi/v1/sessions/search?q={long_query}\"))"
+                  },
+                  {
+                    "line": 1667,
+                    "quote": "    assert_eq!(status, 400, \"超长查询 → 400: {body}\");\n    server.stop_and_clean().await;\n}"
+                  }
+                ]
+              }
+            ],
+            "coverage": "PARTIAL",
+            "missingClauses": [
+              "布尔开关已能保存回读；当前服务未验证活动生命周期，缺原仅活动会话写入以及同入口真实失败完整检查。"
+            ]
+          },
+          {
+            "index": 1,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_t03_session_tree",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup"
+              }
+            ],
+            "meaning": "真实指定会话memory布尔false保存并回读，尚无活动/失败整套证明",
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+                "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup",
+                "sourceSHA256": "9b12c9dcf4f8b717ab6b7f70bc8bc7e43b59000af296f8c7751f8ad871ced293",
+                "testStartLine": 1466,
+                "testEndLine": 1673,
+                "assertions": [
+                  {
+                    "line": 1479,
+                    "quote": "    assert_eq!(status, 200, \"rename: {body}\");\n    let (status, body) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1483,
+                    "quote": "    assert_eq!(status, 200, \"find: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\""
+                  },
+                  {
+                    "line": 1484,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"title\"],\n        \"renamed\"\n    );"
+                  },
+                  {
+                    "line": 1496,
+                    "quote": "    assert_eq!(status, 200, \"pin: {body}\");\n    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\""
+                  },
+                  {
+                    "line": 1497,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"pinOrder\"].is_i64(),\n        \"置顶后排到置顶区尾\"\n    );"
+                  },
+                  {
+                    "line": 1507,
+                    "quote": "    assert_eq!(status, 200, \"pin-order: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/pin-order\","
+                  },
+                  {
+                    "line": 1514,
+                    "quote": "    assert_eq!(status, 400, \"重复 id → 400: {body}\");\n\n    // memory GET/PATCH\n    let (status, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;"
+                  },
+                  {
+                    "line": 1518,
+                    "quote": "    assert_eq!(status, 200, \"memory get: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true"
+                  },
+                  {
+                    "line": 1519,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        true\n    );"
+                  },
+                  {
+                    "line": 1531,
+                    "quote": "    assert_eq!(status, 200, \"memory patch: {body}\");\n    let (_, body) = server.get(\"/lingxi/v1/sessions/parent/memory\").await;\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],"
+                  },
+                  {
+                    "line": 1533,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"memoryEnabled\"],\n        false\n    );"
+                  },
+                  {
+                    "line": 1549,
+                    "quote": "    assert_eq!(status, 200, \"fork child: {body}\");\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/archive\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1553,
+                    "quote": "    assert_eq!(status, 409, \"有子对话无 childMode → 409: {body}\");\n    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。"
+                  },
+                  {
+                    "line": 1554,
+                    "quote": "    assert!(body.contains(\"child_sessions_present\"), \"body: {body}\");\n\n    // detach_children 归档：子对话谱系指针清空、父归档。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1563,
+                    "quote": "    assert_eq!(status, 200, \"archive detach: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1"
+                  },
+                  {
+                    "line": 1564,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"detachedChildren\"],\n        1\n    );"
+                  },
+                  {
+                    "line": 1569,
+                    "quote": "    assert!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"parentSessionId\"].is_null(),\n        \"detach 后子对话释放到顶层\"\n    );"
+                  },
+                  {
+                    "line": 1577,
+                    "quote": "    assert_eq!(status, 200, \"main list: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1585,
+                    "quote": "    assert!(!ids.contains(&\"parent\"), \"归档会话不进主列表: {ids:?}\");\n    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。"
+                  },
+                  {
+                    "line": 1586,
+                    "quote": "    assert!(ids.contains(&\"child\"), \"active 会话在主列表: {ids:?}\");\n\n    // 归档会话拒绝 execute（生命周期闸）。\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1592,
+                    "quote": "    assert_eq!(status, 409, \"归档会话 execute → 409: {body}\");\n    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。"
+                  },
+                  {
+                    "line": 1593,
+                    "quote": "    assert!(body.contains(\"session_not_active\"), \"body: {body}\");\n\n    // archived 列表可见；restore 回 active。\n    let (status, body) = server.get(\"/lingxi/v1/sessions/archived\").await;"
+                  },
+                  {
+                    "line": 1597,
+                    "quote": "    assert_eq!(status, 200, \"archived list: {body}\");\n    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)"
+                  },
+                  {
+                    "line": 1598,
+                    "quote": "    assert!(body.contains(\"parent\"));\n    let (status, body) = server\n        .post(\"/lingxi/v1/sessions/restore\", r#\"{\"sessionId\":\"parent\"}\"#)\n        .await;"
+                  },
+                  {
+                    "line": 1602,
+                    "quote": "    assert_eq!(status, 200, \"restore: {body}\");\n    // restore 后回到主列表（FINDING-03 的对偶断言）。\n    let (status, body) = server.get(\"/lingxi/v1/sessions\").await;\n    assert_eq!(status, 200, \"main list after restore: {body}\");"
+                  },
+                  {
+                    "line": 1605,
+                    "quote": "    assert_eq!(status, 200, \"main list after restore: {body}\");\n    let parsed = serde_json::from_str::<serde_json::Value>(&body).unwrap();\n    let ids: Vec<&str> = parsed[\"sessions\"]\n        .as_array()"
+                  },
+                  {
+                    "line": 1613,
+                    "quote": "    assert!(ids.contains(&\"parent\"), \"restore 后回到主列表: {ids:?}\");\n\n    // 再归档后永久删除；删除后 find → 404；未归档会话不可永久删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1619,
+                    "quote": "    assert_eq!(status, 200, \"re-archive\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1626,
+                    "quote": "    assert_eq!(status, 409, \"未归档会话永久删除 → 409: {body}\");\n    let (status, body) = server\n        .post(\n            \"/lingxi/v1/sessions/archived/delete\","
+                  },
+                  {
+                    "line": 1633,
+                    "quote": "    assert_eq!(status, 200, \"archived delete: {body}\");\n    let (status, _) = server\n        .get(\"/lingxi/v1/sessions/find?sessionId=parent\")\n        .await;"
+                  },
+                  {
+                    "line": 1637,
+                    "quote": "    assert_eq!(status, 404, \"删除后 find → 404\");\n\n    // cleanup：归档 child 后 maxAgeDays=0 清理 → 全部过期归档删除。\n    let (status, _) = server"
+                  },
+                  {
+                    "line": 1643,
+                    "quote": "    assert_eq!(status, 200, \"archive child\");\n    // 现役语义是严格小于截止线（mtime < cutoff）；让真实时钟越过归档毫秒。\n    tokio::time::sleep(Duration::from_millis(50)).await;\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1649,
+                    "quote": "    assert_eq!(status, 200, \"cleanup: {body}\");\n    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,"
+                  },
+                  {
+                    "line": 1650,
+                    "quote": "    assert_eq!(\n        serde_json::from_str::<serde_json::Value>(&body).unwrap()[\"deleted\"],\n        1,\n        \"maxAgeDays=0 → 刚归档的也过期\""
+                  },
+                  {
+                    "line": 1661,
+                    "quote": "    assert_eq!(status, 200, \"search title: {body}\");\n    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server"
+                  },
+                  {
+                    "line": 1662,
+                    "quote": "    assert!(body.contains(\"searchable\"));\n    let long_query = \"x\".repeat(600);\n    let (status, body) = server\n        .get(&format!(\"/lingxi/v1/sessions/search?q={long_query}\"))"
+                  },
+                  {
+                    "line": 1667,
+                    "quote": "    assert_eq!(status, 400, \"超长查询 → 400: {body}\");\n    server.stop_and_clean().await;\n}"
+                  }
+                ]
+              }
+            ],
+            "coverage": "PARTIAL",
+            "missingClauses": [
+              "布尔开关已能保存回读；当前服务未验证活动生命周期，缺原仅活动会话写入以及同入口真实失败完整检查。"
+            ]
+          }
+        ],
+        "gaps": [
+          "布尔开关已能保存回读；当前服务未验证活动生命周期，缺原仅活动会话写入以及同入口真实失败完整检查。"
+        ]
+      }
+    }
+  ],
+  "redLogs": [
+    "session-pin-deleted-agent-red.log",
+    "session-memory-lifecycle-red.log",
+    "session-pin-order-bypass-red.log"
+  ],
+  "coupledLog": "session-lifecycle-coupled-final.log",
+  "stageAcceptance": false
+}

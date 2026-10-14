@@ -1,0 +1,48 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused import: `json`
+  --> crates/lingxi-service/tests/r06_original_persona_proofs.rs:10:25
+   |
+10 | use serde_json::{Value, json};
+   |                         ^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `DelegationRequest`
+  --> crates/lingxi-service/tests/r06_original_chat_proofs.rs:13:5
+   |
+13 |     DelegationRequest, EventStorePort, ProviderDescriptor, ProviderTurn, ProviderTurnResult,
+   |     ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r06_original_persona_proofs") generated 1 warning (run `cargo fix --test "r06_original_persona_proofs" -p lingxi-service` to apply 1 suggestion)
+warning: `lingxi-service` (test "r06_original_chat_proofs") generated 1 warning (run `cargo fix --test "r06_original_chat_proofs" -p lingxi-service` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.76s
+     Running tests/r06_original_chat_proofs.rs (rust/target-r06-gap-validation/debug/deps/r06_original_chat_proofs-d12e478ae24bf3f5)
+
+running 6 tests
+test subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity ... FAILED
+test subagent_reply_restores_actual_thread_history_and_returns_only_to_its_parent ... ok
+test subagent_session_and_global_caps_refuse_and_recover_without_ghost_children ... ok
+test subagent_close_and_reply_refusals_preserve_other_threads_and_sessions ... ok
+test subagent_list_launch_progress_and_permission_intersection_use_real_facts ... ok
+test websocket_registration_and_foreign_messages_preserve_authorized_session_streams ... ok
+
+failures:
+
+---- subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity stdout ----
+
+thread 'subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity' (167475) panicked at crates/lingxi-service/tests/r06_original_chat_proofs.rs:446:38:
+ACTUAL_CHILD_PANIC_REASON_941
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity' (167475) panicked at crates/lingxi-service/tests/r06_original_chat_proofs.rs:972:9:
+assertion failed: record["error"].as_str().unwrap().contains(reason)
+
+
+failures:
+    subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.59s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_chat_proofs`

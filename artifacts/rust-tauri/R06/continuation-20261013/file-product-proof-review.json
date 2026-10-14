@@ -1,0 +1,89 @@
+{
+  "status": "EXECUTED_PROOFS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "review": [
+    {
+      "id": "R00-T02-LA-4F0466F7C090",
+      "original": {
+        "then": "文件字节改变并登记会话文件产物。",
+        "assertions": [
+          "磁盘内容与请求一致",
+          "冲突/越权不写",
+          "并发版本冲突、路径越权/符号链接逃逸或沙盒不可用时拒绝，不覆盖用户后改。"
+        ],
+        "gaps": [
+          {
+            "clause": "文件字节改变并登记会话文件产物。",
+            "kind": "IMPLEMENTATION_GAP",
+            "reason": "write原Then的会话文件产物登记未接；正式注册只持有FileChangeLog，组合根传FileHistoryChangeLog，仅捕获历史快照，没有SessionFile登记。",
+            "sourceLocations": [
+              {
+                "endLine": 1318,
+                "path": "rust/crates/lingxi-service/src/lib.rs",
+                "quote": "            if let Some((access, workspace)) = workspace_access.clone() {\n                let core_file_tools = filetools::register_core_file_tools(\n                    &registry,\n                    gateway.as_ref(),\n                    Arc::clone(&access),\n                    workspace.clone(),\n                    Arc::clone(&deps.clock),\n                    Arc::new(filehistory::FileHistoryChangeLog::new(file_history.clone())),\n                    &budget,\n                );\n                stagefiles::register_stage_files(\n                    &registry,\n                    gateway.as_ref(),\n                    session_files.clone(),\n                    access.clone(),\n                    workspace.clone(),\n                    &budget,\n                );",
+                "reason": "write/edit正式组合根的修改回调只有FileHistoryChangeLog。",
+                "startLine": 1301
+              },
+              {
+                "endLine": 721,
+                "path": "rust/crates/lingxi-service/src/filehistory.rs",
+                "quote": "pub struct FileHistoryChangeLog {\n    history: Arc<FileHistoryService>,\n    runtime: tokio::runtime::Handle,\n}\nimpl FileHistoryChangeLog {\n    pub fn new(history: Arc<FileHistoryService>) -> Self {\n        Self {\n            history,\n            runtime: tokio::runtime::Handle::current(),\n        }\n    }\n}\nimpl crate::filetools::FileChangeLog for FileHistoryChangeLog {\n    fn record(&self, record: crate::filetools::FileModificationRecord) {\n        self.runtime\n            .block_on(self.history.capture_from_disk(&record.path, \"tool\"));\n    }\n}",
+                "reason": "FileHistoryChangeLog只写文件历史，不登记SessionFile。",
+                "startLine": 704
+              }
+            ]
+          },
+          "沙盒不可用时拒绝，不覆盖用户后改"
+        ]
+      },
+      "status": "GAP",
+      "remainingGaps": [
+        {
+          "assertionIndex": 2,
+          "kind": "UNIMPLEMENTED",
+          "reason": "SessionFile登记已真实接入并验证；仍缺原断言的OS沙盒不可用时拒绝证明，当前native文件链未绑定OS沙盒可用性。"
+        },
+        "SessionFile登记已真实接入并验证；仍缺原断言的OS沙盒不可用时拒绝证明，当前native文件链未绑定OS沙盒可用性。"
+      ]
+    },
+    {
+      "id": "R00-T02-LA-C6D338A24CF8",
+      "original": {
+        "then": "目标文件相应内容改变，并登记SessionFile；读后版本新鲜度受检查。",
+        "assertions": [
+          "只替换命中内容",
+          "并发改动时拒绝",
+          "文件记录对应真实修改",
+          "旧文本不匹配、并发改动、符号链接逃逸拒绝，用户改动不得覆盖。"
+        ],
+        "gaps": [
+          {
+            "clause": "目标文件相应内容改变，并登记SessionFile；读后版本新鲜度受检查。",
+            "kind": "IMPLEMENTATION_GAP",
+            "reason": "修改字节和新鲜度受检，但SessionFile登记未接入；不能用FileModificationRecord或FileHistory快照替代原会话文件登记。",
+            "sourceLocations": [
+              {
+                "endLine": 1318,
+                "path": "rust/crates/lingxi-service/src/lib.rs",
+                "quote": "            if let Some((access, workspace)) = workspace_access.clone() {\n                let core_file_tools = filetools::register_core_file_tools(\n                    &registry,\n                    gateway.as_ref(),\n                    Arc::clone(&access),\n                    workspace.clone(),\n                    Arc::clone(&deps.clock),\n                    Arc::new(filehistory::FileHistoryChangeLog::new(file_history.clone())),\n                    &budget,\n                );\n                stagefiles::register_stage_files(\n                    &registry,\n                    gateway.as_ref(),\n                    session_files.clone(),\n                    access.clone(),\n                    workspace.clone(),\n                    &budget,\n                );",
+                "reason": "真实write/edit组合根回调无SessionFile登记。",
+                "startLine": 1301
+              },
+              {
+                "endLine": 721,
+                "path": "rust/crates/lingxi-service/src/filehistory.rs",
+                "quote": "pub struct FileHistoryChangeLog {\n    history: Arc<FileHistoryService>,\n    runtime: tokio::runtime::Handle,\n}\nimpl FileHistoryChangeLog {\n    pub fn new(history: Arc<FileHistoryService>) -> Self {\n        Self {\n            history,\n            runtime: tokio::runtime::Handle::current(),\n        }\n    }\n}\nimpl crate::filetools::FileChangeLog for FileHistoryChangeLog {\n    fn record(&self, record: crate::filetools::FileModificationRecord) {\n        self.runtime\n            .block_on(self.history.capture_from_disk(&record.path, \"tool\"));\n    }\n}",
+                "reason": "修改回调实际仅捕获历史。",
+                "startLine": 704
+              }
+            ]
+          },
+          "原Then：登记SessionFile，且文件记录对应真实修改"
+        ]
+      },
+      "status": "READY",
+      "remainingGaps": []
+    }
+  ],
+  "executionLog": "file-product-coupled-regression.log",
+  "sandboxGapNotWaived": true
+}

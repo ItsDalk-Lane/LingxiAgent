@@ -1,0 +1,26 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.40s
+     Running tests/session_tree_r06t03.rs (rust/target-r06-continuation/debug/deps/session_tree_r06t03-9913a179149f80e4)
+
+running 18 tests
+test fork_preserves_message_fields_verbatim ... ok
+test named_checkpoint_latest_overwrites_others_conflict ... ok
+test fork_copies_shared_history_with_stable_ids_and_independent_writes ... ok
+test branch_reset_to_null_head_leaves_only_the_marker ... ok
+test admin_rename_pin_order_and_memory_roundtrip ... ok
+test delete_checkpoint_removes_file_versions_first ... ok
+test latest_overwrite_with_file_paths_replaces_versions_and_contents_atomically ... ok
+test fork_does_not_widen_authorizations ... ok
+test rewind_detects_external_modification_and_refuses_to_overwrite ... ok
+test ghost_run_id_is_rejected_by_foreign_key ... ok
+test admin_search_title_content_owner_and_like_escape ... ok
+test duplicate_session_id_is_loud_conflict_on_fork_and_create ... ok
+test admin_archive_restore_delete_lifecycle_gates ... ok
+test fork_rejects_depth_beyond_two ... ok
+test branch_reset_moves_head_and_appends_marker_without_deleting_history ... ok
+test archive_children_counts_only_actual_flips ... ok
+test checkpoint_eviction_with_file_versions_is_fk_safe ... ok
+test checkpoint_window_evicts_oldest_non_latest_at_201 ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+

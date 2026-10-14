@@ -1,0 +1,3955 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/models/anthropic_messages.rs:461:
+                 }
+                 let mut blocks = render_assistant_blocks(content);
+                 for call in tool_calls {
+-                    let wire_name =
+-                        call.historical_wire_name()
+-                            .ok_or_else(|| {
+-                                invalid(format!(
+-                                    "exchange history names tool target {:?}, which the current \
++                    let wire_name = call.historical_wire_name().ok_or_else(|| {
++                        invalid(format!(
++                            "exchange history names tool target {:?}, which the current \
+                                  declaration snapshot does not contain (the registry moved \
+                                  mid-run); cannot faithfully re-render the transcript",
+-                                    call.target
+-                                ))
+-                            })?;
++                            call.target
++                        ))
++                    })?;
+                     let provider_call_id = call.provider_call_id.clone().ok_or_else(|| {
+                         invalid(format!(
+                             "exchange history tool call {} ({}) carries no provider \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/models/google_generative_ai.rs:486:
+                     if anchored {
+                         continue;
+                     }
+-                    let wire_name = call.historical_wire_name()
++                    let wire_name = call
++                        .historical_wire_name()
+                         .ok_or_else(|| {
+                             invalid(format!(
+                                 "exchange history names tool target {:?}, which the current \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/models/google_generative_ai.rs:518:
+                     if !anchored {
+                         continue;
+                     }
+-                    let wire_name = call.historical_wire_name()
++                    let wire_name = call
++                        .historical_wire_name()
+                         .ok_or_else(|| {
+                             invalid(format!(
+                                 "exchange history names tool target {:?}, which the current \
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/models/openai_completions.rs:473:
+                 }
+                 let mut rendered_calls = Vec::with_capacity(tool_calls.len());
+                 for call in tool_calls {
+-                    let wire_name =
+-                        call.historical_wire_name()
+-                            .ok_or_else(|| {
+-                                ProtocolError::new(
+-                                    ErrorCode::InvalidMessage,
+-                                    format!(
+-                                    "exchange history names tool target {:?}, which the current \
++                    let wire_name = call.historical_wire_name().ok_or_else(|| {
++                        ProtocolError::new(
++                            ErrorCode::InvalidMessage,
++                            format!(
++                                "exchange history names tool target {:?}, which the current \
+                                      declaration snapshot does not contain (the registry moved \
+                                      mid-run); cannot faithfully re-render the transcript",
+-                                    call.target
+-                                ),
+-                                    false,
+-                                )
+-                            })?;
++                                call.target
++                            ),
++                            false,
++                        )
++                    })?;
+                     let provider_call_id = call.provider_call_id.clone().ok_or_else(|| {
+                         ProtocolError::new(
+                             ErrorCode::InvalidMessage,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/agent_memory.rs:27:
+ use std::path::{Path, PathBuf};
+ 
+ use rusqlite::Connection;
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ 
+ use lingxi_kernel::memory::{
+-    NewTenetInput, TENETS_SCHEMA_VERSION, Tenet, TenetErrorCode, TenetStatus, TenetsFile,
+-    ZERO_RESULT_DIAGNOSTIC_MAX_TERMS, build_compiled_memory_markdown, build_fact_search_text,
+-    build_fts_query, has_cjk, normalize_compiled_section_body,
+-    normalize_compiled_week_section_body, normalize_experience_category, sort_tenets,
+-    tenets_add_direct, tenets_add_proposal, tenets_decide, tenets_remove, tenets_replace_pinned,
+-    validate_tenets_strict, zero_result_diagnostic_terms,
++    build_compiled_memory_markdown, build_fact_search_text, build_fts_query, has_cjk,
++    normalize_compiled_section_body, normalize_compiled_week_section_body,
++    normalize_experience_category, sort_tenets, tenets_add_direct, tenets_add_proposal,
++    tenets_decide, tenets_remove, tenets_replace_pinned, validate_tenets_strict,
++    zero_result_diagnostic_terms, NewTenetInput, Tenet, TenetErrorCode, TenetStatus, TenetsFile,
++    TENETS_SCHEMA_VERSION, ZERO_RESULT_DIAGNOSTIC_MAX_TERMS,
+ };
+ 
+ /// 单个资料根的发布栅栏，嵌套和并行写者均计数；不保存历史代次。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2174:
+         next: &RunScopeBinding,
+     ) -> Result<TurnScopeRow, KnowledgeError> {
+         let prefix = format!("{}#a", expected.run_id);
+-        let sequence = expected.attempt.strip_prefix(&prefix)
++        let sequence = expected
++            .attempt
++            .strip_prefix(&prefix)
+             .and_then(|value| value.parse::<u32>().ok())
+             .filter(|sequence| *sequence > 0 && expected.attempt == format!("{prefix}{sequence}"))
+             .and_then(|sequence| sequence.checked_add(1))
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2188:
+         }
+         let id = new_id("kts");
+         let mut conn = lock_conn(&self.conn);
+-        let tx = conn.transaction()
++        let tx = conn
++            .transaction()
+             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+         let selection: Option<String> = tx.query_row(
+             "SELECT notebook_ids_json FROM knowledge_turn_scopes WHERE id=?1 AND studio_id=?2 AND session_id=?3 AND turn_id=?4 AND status='active'",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2195:
+             params![scope_id, studio_id, expected.session_id, expected.run_id],
+             |row| row.get(0),
+         ).optional().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+-        let mut selection: serde_json::Value = serde_json::from_str(
+-            &selection.ok_or_else(|| KnowledgeError::scope_violation("Knowledge retry scope is closed or missing"))?
+-        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        let mut selection: serde_json::Value =
++            serde_json::from_str(&selection.ok_or_else(|| {
++                KnowledgeError::scope_violation("Knowledge retry scope is closed or missing")
++            })?)
++            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+         let binding: RunScopeBinding = serde_json::from_value(selection["binding"].clone())
+             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+         if selection["schema"] != "lingxi.run-knowledge-scope.v1" || &binding != expected {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2204:
+-            return Err(KnowledgeError::scope_violation("Knowledge retry scope binding changed"));
++            return Err(KnowledgeError::scope_violation(
++                "Knowledge retry scope binding changed",
++            ));
+         }
+         selection["binding"] = serde_json::to_value(next)
+             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2208:
+-        tx.execute("UPDATE knowledge_turn_scopes SET status='closed' WHERE id=?1", params![scope_id])
+-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+         tx.execute(
++            "UPDATE knowledge_turn_scopes SET status='closed' WHERE id=?1",
++            params![scope_id],
++        )
++        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        tx.execute(
+             "INSERT INTO knowledge_turn_scopes (id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'active', ?6)",
+             params![id, next.run_id, next.session_id, studio_id, selection.to_string(), now_iso(&*self.clock)],
+         ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/knowledge.rs:2216:
+             "INSERT INTO knowledge_turn_scope_sources (scope_id, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json) SELECT ?1, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json FROM knowledge_turn_scope_sources WHERE scope_id=?2",
+             params![id, scope_id],
+         ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+-        tx.commit().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
++        tx.commit()
++            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+         drop(conn);
+-        self.get_turn_scope(&id)?.ok_or_else(|| KnowledgeError::storage_invalid("retry scope vanished"))
++        self.get_turn_scope(&id)?
++            .ok_or_else(|| KnowledgeError::storage_invalid("retry scope vanished"))
+     }
+ 
+     fn create_turn_scope_selection(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/session_admin.rs:24:
+ use lingxi_kernel::ports::StorageError;
+ 
+ use super::migrations;
+-use super::run_store::{RunDatabase, with_write_txn};
++use super::run_store::{with_write_txn, RunDatabase};
+ 
+ fn map_err(err: rusqlite::Error) -> StorageError {
+     migrations::map_rusqlite(err)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/subagent_threads.rs:1:
+ //! 子线程与模型历史使用现有单写队列；线程归属、当前任务和关闭状态均为持久事实。
+ use super::{
+     migrations::map_rusqlite,
+-    run_store::{RunDatabase, with_write_txn},
++    run_store::{with_write_txn, RunDatabase},
+ };
+-use lingxi_kernel::{RunContext, ports::StorageError};
++use lingxi_kernel::{ports::StorageError, RunContext};
+ use lingxi_protocol::canon;
+-use rusqlite::{OptionalExtension, params};
+-use serde_json::{Value, json};
++use rusqlite::{params, OptionalExtension};
++use serde_json::{json, Value};
+ 
+ fn invalid(detail: impl Into<String>) -> StorageError {
+     StorageError::InvalidRequest {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/subagent_threads.rs:309:
+     }).await
+ }
+ 
+-pub async fn record_failure(db: &RunDatabase, ctx: &RunContext, agent: &str, detail: &str) -> Result<(),StorageError> {
+-    let ctx=ctx.clone();let agent=agent.to_string();let detail=detail.to_string();let busy=db.options().busy_timeout_ms;
+-    db.queue().submit(move|conn|with_write_txn(conn,busy,|conn|{
+-        let thread=context_thread(conn,&ctx,&agent)?;
+-        let raw:String=conn.query_row("SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",[&thread],|r|r.get(0)).map_err(map_rusqlite)?;
+-        let mut state=decode(&raw)?;state["error"]=json!(detail);
+-        conn.execute("UPDATE subagent_threads_v1 SET state_json=?2 WHERE thread_id=?1",params![thread,state.to_string()]).map_err(map_rusqlite)?;
+-        Ok(())
+-    })).await
++pub async fn record_failure(
++    db: &RunDatabase,
++    ctx: &RunContext,
++    agent: &str,
++    detail: &str,
++) -> Result<(), StorageError> {
++    let ctx = ctx.clone();
++    let agent = agent.to_string();
++    let detail = detail.to_string();
++    let busy = db.options().busy_timeout_ms;
++    db.queue()
++        .submit(move |conn| {
++            with_write_txn(conn, busy, |conn| {
++                let thread = context_thread(conn, &ctx, &agent)?;
++                let raw: String = conn
++                    .query_row(
++                        "SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",
++                        [&thread],
++                        |r| r.get(0),
++                    )
++                    .map_err(map_rusqlite)?;
++                let mut state = decode(&raw)?;
++                state["error"] = json!(detail);
++                conn.execute(
++                    "UPDATE subagent_threads_v1 SET state_json=?2 WHERE thread_id=?1",
++                    params![thread, state.to_string()],
++                )
++                .map_err(map_rusqlite)?;
++                Ok(())
++            })
++        })
++        .await
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/model_exchange.rs:122:
+         registry: &ToolRegistry,
+         activated: &std::collections::BTreeSet<crate::toolcatalog::ToolTargetId>,
+     ) -> Result<Self, ToolDeclarationError> {
+-        let (catalog_generation, tools) = registry.model_declaration_snapshot_with_activated_targets(activated);
++        let (catalog_generation, tools) =
++            registry.model_declaration_snapshot_with_activated_targets(activated);
+         let mut declarations = Vec::new();
+         for full in tools {
+             let tool = full.listing;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/model_exchange.rs:179:
+ 
+     /// 宿主根据实际发出的声明铸造历史绑定；模型不能自报。
+     pub fn bind_target(&self, target: &str) -> Option<HistoricalToolDeclaration> {
+-        self.declarations.iter().find(|d| d.target == target).map(|declaration| HistoricalToolDeclaration { execution: None, catalog_generation: self.catalog_generation, declaration: declaration.clone() })
++        self.declarations
++            .iter()
++            .find(|d| d.target == target)
++            .map(|declaration| HistoricalToolDeclaration {
++                execution: None,
++                catalog_generation: self.catalog_generation,
++                declaration: declaration.clone(),
++            })
+     }
+ 
+     /// Reverse lookup: the host target id a provider-facing wire name maps
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/model_exchange.rs:264:
+ 
+ impl RequestedToolCall {
+     pub fn historical_wire_name(&self) -> Option<&str> {
+-        self.declaration_binding.as_ref().filter(|binding| binding.catalog_generation > 0 && binding.declaration.target == self.target).map(|binding| binding.declaration.wire_name.as_str())
++        self.declaration_binding
++            .as_ref()
++            .filter(|binding| {
++                binding.catalog_generation > 0 && binding.declaration.target == self.target
++            })
++            .map(|binding| binding.declaration.wire_name.as_str())
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/toolcatalog.rs:1705:
+     }
+ 
+     /// 说明、参数和代次在同一次锁内读取，不能跨代次拼接。
+-    pub fn describe_full_at_generation(&self, target: &ToolTargetId) -> Result<(u64, ToolFullDescription), ToolCatalogError> {
++    pub fn describe_full_at_generation(
++        &self,
++        target: &ToolTargetId,
++    ) -> Result<(u64, ToolFullDescription), ToolCatalogError> {
+         let state = self.lock();
+-        let tool = state.targets.get(target).ok_or_else(|| ToolCatalogError::TargetNotFound { reference: format!("target {target}") })?;
+-        Ok((state.catalog_generation, ToolFullDescription { listing: description_of(target, tool), input_schema: tool.manifest.input_schema.clone() }))
++        let tool = state
++            .targets
++            .get(target)
++            .ok_or_else(|| ToolCatalogError::TargetNotFound {
++                reference: format!("target {target}"),
++            })?;
++        Ok((
++            state.catalog_generation,
++            ToolFullDescription {
++                listing: description_of(target, tool),
++                input_schema: tool.manifest.input_schema.clone(),
++            },
++        ))
+     }
+ 
+     /// 常驻策略只控制发送给模型的声明，不改变注册或执行授权。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel/src/toolcatalog.rs:1731:
+         activated: &std::collections::BTreeSet<ToolTargetId>,
+     ) -> (u64, Vec<ToolFullDescription>) {
+         let state = self.lock();
+-        let tools = state.targets.iter().filter(|(id, tool)| {
+-            tool.manifest.availability == Availability::Available && (activated.contains(*id) || state.model_residents.as_ref().is_none_or(|set| set.contains(*id)))
+-        }).map(|(id, tool)| ToolFullDescription { listing: description_of(id, tool), input_schema: tool.manifest.input_schema.clone() }).collect();
++        let tools = state
++            .targets
++            .iter()
++            .filter(|(id, tool)| {
++                tool.manifest.availability == Availability::Available
++                    && (activated.contains(*id)
++                        || state
++                            .model_residents
++                            .as_ref()
++                            .is_none_or(|set| set.contains(*id)))
++            })
++            .map(|(id, tool)| ToolFullDescription {
++                listing: description_of(id, tool),
++                input_schema: tool.manifest.input_schema.clone(),
++            })
++            .collect();
+         (state.catalog_generation, tools)
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/knowledge.rs:1380:
+             generation: ctx.generation,
+         };
+         self.facts.advance_run_scope_attempt(
+-            &self.studio_id, scope_id, &binding(previous), &binding(current),
++            &self.studio_id,
++            scope_id,
++            &binding(previous),
++            &binding(current),
+         )
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/memory.rs:18:
+ 
+ use std::path::{Path, PathBuf};
+ 
+-use axum::Json;
+ use axum::extract::{Path as AxumPath, RawQuery, State};
+ use axum::http::StatusCode;
+ use axum::response::{IntoResponse, Response};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/memory.rs:25:
+-use serde_json::{Value, json};
++use axum::Json;
++use serde_json::{json, Value};
+ 
+ use lingxi_adapters::storage::agent_memory as am;
+ use lingxi_adapters::storage::agent_memory::{
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/memory.rs:29:
+-    AgentConfigFlags, AgentConfigPatch, CompiledMemoryStore, ContextNotesStore, DreamRevisionStore,
+-    ExperienceStore, FactStore, MemoryError, TenetsStore, resolve_agent_roots, validate_agent_id,
++    resolve_agent_roots, validate_agent_id, AgentConfigFlags, AgentConfigPatch,
++    CompiledMemoryStore, ContextNotesStore, DreamRevisionStore, ExperienceStore, FactStore,
++    MemoryError, TenetsStore,
+ };
+ 
+-use crate::ServiceState;
+ use crate::context_compiler::scan_preferences;
++use crate::ServiceState;
+ 
+ pub struct MemoryService {
+     home: PathBuf,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/model_history.rs:1:
+ //! 模型历史是独立于展示正文的持久档案。专用树节点沿有效分支保留，
+ //! fork复制完整内容而不持有源Run外键；恢复只读，永不重新执行工具。
+ use lingxi_adapters::storage::{
+-    RunDatabase, canonical_message_store as cms, session_tree as store,
++    canonical_message_store as cms, session_tree as store, RunDatabase,
+ };
+ use lingxi_kernel::{
+-    Principal, RunContext,
+     model_exchange::{ExchangeItem, RequestedToolCall, TurnOrigin},
+     ports::{StorageError, StoragePort, ToolOutcome, ToolRunStatus, ToolSuccess},
+     toolcatalog::{EffectiveArguments, SchemaBudget},
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/model_history.rs:11:
++    Principal, RunContext,
+ };
+ use lingxi_protocol::{
+-    ArgsDigest, ContentBlock, ModelCallId, NormalizedMessage, ToolCallId, ToolResultStatus,
+-    ToolResultWire, canon,
++    canon, ArgsDigest, ContentBlock, ModelCallId, NormalizedMessage, ToolCallId, ToolResultStatus,
++    ToolResultWire,
+ };
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use std::{
+     collections::{HashMap, HashSet},
+     sync::Arc,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/model_history.rs:1388:
+                 reason: "未确认副作用".into(),
+             },
+         };
+-        assert!(
+-            validate_pairs(&[item])
+-                .unwrap_err()
+-                .to_string()
+-                .contains("orphan")
+-        );
++        assert!(validate_pairs(&[item])
++            .unwrap_err()
++            .to_string()
++            .contains("orphan"));
+     }
+     #[test]
+     fn current_submission_is_archived_exactly_once_at_its_position() {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/resourceio.rs:1256:
+                 Err(error) => Err(failure(error)),
+             }
+         } else {
+-            fh.capture_from_disk(std::path::Path::new(abs), origin).await;
++            fh.capture_from_disk(std::path::Path::new(abs), origin)
++                .await;
+             Ok(())
+         }
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:53:
+     TurnDeltaSinkClosed, TurnProviderPort,
+ };
+ use lingxi_kernel::subagent::{
+-    RunLineage, RunOrigin, ToolAccessTier, ToolAuthorization, authorize_child_tool,
+-    authorize_child_tool_with_registry_id,
++    authorize_child_tool, authorize_child_tool_with_registry_id, RunLineage, RunOrigin,
++    ToolAccessTier, ToolAuthorization,
+ };
+ use lingxi_kernel::{
+-    FailureCause, NoFinalCause, QuotaResource, RunFinish, RunStateMachine, attempt_id,
+-    model_call_id, tool_call_id,
++    attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
++    RunStateMachine,
+ };
+ use lingxi_protocol::{
+     AssistantSegmentDeltaPayload, AssistantSegmentEndPayload, AssistantSegmentStartPayload,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:903:
+         self.subagents.is_some()
+     }
+ 
+-    pub async fn flush_subagent_closeouts(&self) -> Result<(),StorageError> {
+-        if let Some(launcher)=self.subagents.as_ref().and_then(std::sync::Weak::upgrade) {
++    pub async fn flush_subagent_closeouts(&self) -> Result<(), StorageError> {
++        if let Some(launcher) = self.subagents.as_ref().and_then(std::sync::Weak::upgrade) {
+             launcher.flush_closeouts().await?;
+         }
+         Ok(())
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:4212:
+                     break finish_no_final(saw_tool_failure, saw_process_content);
+                 }
+                 lingxi_kernel::ports::ProviderTurn::Failed { error, retryable } => {
+-                    if let Some(child)=&child_history {
+-                        child.record_failure(&ctx,agent_id,&error).await.map_err(DriveError::Storage)?;
++                    if let Some(child) = &child_history {
++                        child
++                            .record_failure(&ctx, agent_id, &error)
++                            .await
++                            .map_err(DriveError::Storage)?;
+                     }
+                     self.persist_model_call_completed(
+                         port,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/session_admin.rs:15:
+ 
+ use serde::Serialize;
+ 
+-use lingxi_adapters::storage::RunDatabase;
+ use lingxi_adapters::storage::session_admin as store;
+ use lingxi_adapters::storage::session_tree::SessionTreeRow;
++use lingxi_adapters::storage::RunDatabase;
+ use lingxi_kernel::ports::StorageError;
+ 
+ /// 管理面错误：每一支都映射到响亮的 HTTP 结局。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessionfiles.rs:24:
+ 
+ use sha2::{Digest, Sha256};
+ 
+-use lingxi_adapters::storage::RunDatabase;
+ use lingxi_adapters::storage::session_files as store;
+ use lingxi_adapters::storage::session_files::{
+     FileKind, RefKind, SessionFileOrigin, SessionFileRow, SessionFileStatus, StorageKind,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessionfiles.rs:31:
+ };
++use lingxi_adapters::storage::RunDatabase;
+ use lingxi_kernel::ports::StorageError;
+ 
+ use crate::filemeta;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessionfiles.rs:1524:
+ 
+ // ── 路由 handler（history.rs 模式：归属闸先于一切实体读取） ──
+ 
+-use axum::Json;
+ use axum::extract::{Path as AxumPath, State};
+ use axum::response::{IntoResponse, Response};
++use axum::Json;
+ 
+ use crate::{EndpointError, Principal, ServiceState};
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/stagefiles.rs:10:
+     ToolManifest, ToolOrigin, ToolRegistry,
+ };
+ use lingxi_protocol::{ContentBlock, ErrorCode, ProtocolError, ToolCallId, ToolSchemaDocument};
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use std::path::{Path, PathBuf};
+ use std::sync::Arc;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:57:
+ use std::time::Duration;
+ 
+ use lingxi_adapters::storage::subagent_threads as thread_store;
+-use lingxi_kernel::RunContext;
+ use lingxi_kernel::model_exchange::ExchangeItem;
+ use lingxi_kernel::ports::{DelegationRequest, StorageError};
+ use lingxi_kernel::subagent::{
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:64:
+-    AccessRequest, RunLineage, RunOrigin, SubagentAccessDenied, SubagentPolicy, ToolAccessTier,
+-    resolve_subagent_access,
++    resolve_subagent_access, AccessRequest, RunLineage, RunOrigin, SubagentAccessDenied,
++    SubagentPolicy, ToolAccessTier,
+ };
++use lingxi_kernel::RunContext;
+ use lingxi_protocol::{ErrorCode, ModelCallId, ProtocolError, RunId, ToolCallId};
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ 
+ use crate::cancel::CancelScope;
+ use crate::events::EventService;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:82:
+ /// reports exactly that); the trait object's declared `Send + Sync`
+ /// breaks the propagation without any unsafe impl.
+ pub trait SubagentLauncher: Send + Sync {
+-    fn flush_closeouts<'a>(&'a self) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
+-        Box::pin(async {Ok(())})
++    fn flush_closeouts<'a>(
++        &'a self,
++    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
++        Box::pin(async { Ok(()) })
+     }
+     /// Fresh dispatch (`subagent` target).
+     fn dispatch(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:112:
+         ctx: &'a RunContext,
+         agent: &'a str,
+     ) -> Pin<Box<dyn Future<Output = Result<Vec<ExchangeItem>, StorageError>> + Send + 'a>>;
+-    fn record_failure<'a>(&'a self, ctx: &'a RunContext, agent: &'a str, error: &'a ProtocolError) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>>;
++    fn record_failure<'a>(
++        &'a self,
++        ctx: &'a RunContext,
++        agent: &'a str,
++        error: &'a ProtocolError,
++    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>>;
+     fn record_history<'a>(
+         &'a self,
+         ctx: &'a RunContext,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:123:
+ }
+ 
+ impl SubagentLauncher for SubagentRuntime {
+-    fn flush_closeouts<'a>(&'a self) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
+-        Box::pin(async move {SubagentRuntime::flush_closeouts(self).await})
++    fn flush_closeouts<'a>(
++        &'a self,
++    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
++        Box::pin(async move { SubagentRuntime::flush_closeouts(self).await })
+     }
+     fn dispatch(
+         self: Arc<Self>,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:172:
+                 .collect::<Result<Vec<_>, _>>()?;
+             // 工具正文必须与原Run正式模型投影一致；不把界面卡片或任意档案当成历史。
+             for item in &history {
+-                if let ExchangeItem::ToolResult { tool_call_id, .. }=item {
++                if let ExchangeItem::ToolResult { tool_call_id, .. } = item {
+                     let projection=self.storage.query_one_text(
+                         "SELECT e.payload_json FROM key_events e JOIN subagent_history_v1 h ON h.run_id=e.run_id WHERE e.event_type='tool_result_model_projection' AND json_extract(e.payload_json,'$.toolCallId')=?1 AND h.thread_id=(SELECT thread_id FROM subagent_history_v1 WHERE run_id=?2)",
+                         vec![tool_call_id.to_string(),ctx.run_id.to_string()],
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:179:
+                     ).await?.ok_or_else(||StorageError::Corrupted{detail:"subagent tool history missing authoritative projection".into()})?;
+-                    let projection:Value=serde_json::from_str(&projection).map_err(|e|StorageError::Corrupted{detail:e.to_string()})?;
+-                    if crate::model_history::projected_tool_item(&projection)?!=*item {
+-                        return Err(StorageError::Corrupted{detail:"subagent tool history differs from authoritative projection".into()});
++                    let projection: Value =
++                        serde_json::from_str(&projection).map_err(|e| StorageError::Corrupted {
++                            detail: e.to_string(),
++                        })?;
++                    if crate::model_history::projected_tool_item(&projection)? != *item {
++                        return Err(StorageError::Corrupted {
++                            detail: "subagent tool history differs from authoritative projection"
++                                .into(),
++                        });
+                     }
+                 }
+-                if let ExchangeItem::AssistantTurn {tool_calls,..}=item {
++                if let ExchangeItem::AssistantTurn { tool_calls, .. } = item {
+                     for call in tool_calls {
+-                        let binding=call.declaration_binding.as_ref().ok_or_else(||StorageError::Corrupted{detail:"subagent history missing declaration".into()})?;
+-                        let target=binding.execution.as_ref().map(|e|e.target.as_str()).unwrap_or(call.target.as_str());
+-                        let digest=binding.execution.as_ref().map(|e|e.args_digest.hex.as_str()).unwrap_or(call.args_digest.hex.as_str());
++                        let binding = call.declaration_binding.as_ref().ok_or_else(|| {
++                            StorageError::Corrupted {
++                                detail: "subagent history missing declaration".into(),
++                            }
++                        })?;
++                        let target = binding
++                            .execution
++                            .as_ref()
++                            .map(|e| e.target.as_str())
++                            .unwrap_or(call.target.as_str());
++                        let digest = binding
++                            .execution
++                            .as_ref()
++                            .map(|e| e.args_digest.hex.as_str())
++                            .unwrap_or(call.args_digest.hex.as_str());
+                         let fact=self.storage.query_one_text(
+                             "SELECT j.journal_id FROM invocation_journal j JOIN subagent_history_v1 h ON h.run_id=j.run_id WHERE j.journal_id=?1 AND j.target=?2 AND j.args_digest=?3 AND h.thread_id=(SELECT thread_id FROM subagent_history_v1 WHERE run_id=?4)",
+                             vec![call.tool_call_id.to_string(),target.into(),digest.into(),ctx.run_id.to_string()],
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:193:
+                         ).await?;
+-                        if fact.is_none(){return Err(StorageError::Corrupted{detail:"subagent request history differs from original journal".into()});}
++                        if fact.is_none() {
++                            return Err(StorageError::Corrupted {
++                                detail: "subagent request history differs from original journal"
++                                    .into(),
++                            });
++                        }
+                     }
+                 }
+             }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:199:
+             Ok(history)
+         })
+     }
+-    fn record_failure<'a>(&'a self, ctx: &'a RunContext, agent: &'a str, error: &'a ProtocolError) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
++    fn record_failure<'a>(
++        &'a self,
++        ctx: &'a RunContext,
++        agent: &'a str,
++        error: &'a ProtocolError,
++    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
+         Box::pin(async move {
+-            if !thread_store::has_history(&self.storage,ctx.run_id.as_str()).await? {return Ok(());}
+-            thread_store::record_failure(&self.storage,ctx,agent,&format!("{}: {}",error.code.wire_name(),error.message)).await
++            if !thread_store::has_history(&self.storage, ctx.run_id.as_str()).await? {
++                return Ok(());
++            }
++            thread_store::record_failure(
++                &self.storage,
++                ctx,
++                agent,
++                &format!("{}: {}", error.code.wire_name(), error.message),
++            )
++            .await
+         })
+     }
+     fn record_history<'a>(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:684:
+     }
+ 
+     pub async fn initialize(&self) -> Result<(), StorageError> {
+-        self.storage_ready.get_or_try_init(||thread_store::initialize(&self.storage)).await?;
++        self.storage_ready
++            .get_or_try_init(|| thread_store::initialize(&self.storage))
++            .await?;
+         flush_abnormal_closeouts(&self.storage, &self.pending_closeouts).await
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:723:
+                 });
+             }
+         };
+-        let canonical_root=std::fs::canonicalize(root).map_err(|e|SubagentDispatchError::AgentUnavailable{agent:"list".into(),detail:e.to_string()})?;
++        let canonical_root =
++            std::fs::canonicalize(root).map_err(|e| SubagentDispatchError::AgentUnavailable {
++                agent: "list".into(),
++                detail: e.to_string(),
++            })?;
+         for entry in entries {
+             let entry = entry.map_err(|e| SubagentDispatchError::AgentUnavailable {
+                 agent: "list".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:739:
+                     agent: id.clone(),
+                     detail: e.to_string(),
+                 })?;
+-            let config_path=std::fs::canonicalize(roots.agent_dir.join("config.yaml")).map_err(|e|SubagentDispatchError::AgentUnavailable{agent:id.clone(),detail:e.to_string()})?;
++            let config_path =
++                std::fs::canonicalize(roots.agent_dir.join("config.yaml")).map_err(|e| {
++                    SubagentDispatchError::AgentUnavailable {
++                        agent: id.clone(),
++                        detail: e.to_string(),
++                    }
++                })?;
+             if !config_path.starts_with(&canonical_root) {
+-                return Err(SubagentDispatchError::AgentUnavailable{agent:id.clone(),detail:"agent config escapes actual roster root".into()});
++                return Err(SubagentDispatchError::AgentUnavailable {
++                    agent: id.clone(),
++                    detail: "agent config escapes actual roster root".into(),
++                });
+             }
+-            let scan = lingxi_adapters::storage::agent_memory::config::read_agent_config(
+-                &config_path,
+-            )
+-            .and_then(|doc| doc.scan())
+-            .map_err(|e| SubagentDispatchError::AgentUnavailable {
+-                agent: id.clone(),
+-                detail: e.to_string(),
+-            })?;
++            let scan =
++                lingxi_adapters::storage::agent_memory::config::read_agent_config(&config_path)
++                    .and_then(|doc| doc.scan())
++                    .map_err(|e| SubagentDispatchError::AgentUnavailable {
++                        agent: id.clone(),
++                        detail: e.to_string(),
++                    })?;
+             candidates.push(json!({"id":id,"name":scan.agent_name.unwrap_or_else(||id.clone())}));
+         }
+         candidates.sort_by(|a, b| a["id"].as_str().cmp(&b["id"].as_str()));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:1428:
+             }
+         }
+         // 已成功派发后，状态读取失败不能谎报“零子任务”；明确保留已接受身份与观测失败。
+-        let (status,progress_error)=match self.storage.query_one_text("SELECT status FROM runs WHERE run_id=?1",vec![child_run_id.clone()]).await {
+-            Ok(Some(status))=>(status,None),
+-            Ok(None)=>("queued".into(),None),
+-            Err(error)=>("unknown".into(),Some(error.to_string())),
++        let (status, progress_error) = match self
++            .storage
++            .query_one_text(
++                "SELECT status FROM runs WHERE run_id=?1",
++                vec![child_run_id.clone()],
++            )
++            .await
++        {
++            Ok(Some(status)) => (status, None),
++            Ok(None) => ("queued".into(), None),
++            Err(error) => ("unknown".into(), Some(error.to_string())),
+         };
+         Ok(LaunchedChild {
+             child_run_id,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/subagents.rs:1583:
+     }
+ 
+     async fn complete_and_deliver(&self, finish: &Result<RunFinish, DriveError>) {
+-        let status=match finish {Ok(f)=>f.status().wire_name(),Err(_)=>"failed"};
+-        let prior=thread_store::read_thread(&self.runtime.storage,&self.thread_id).await;
+-        let error=match finish {
+-            Ok(RunFinish::Failed {cause})=>Some(prior.ok().flatten().and_then(|r|r["error"].as_str().map(str::to_string)).unwrap_or_else(||format!("{cause:?}"))),
+-            Err(e)=>Some(format!("{e:?}")),_=>None,
++        let status = match finish {
++            Ok(f) => f.status().wire_name(),
++            Err(_) => "failed",
+         };
+-        let text=match error.as_deref() {
+-            Some(error)=>format!("[subagent-result thread={} run={}] failed: {error}",self.thread_id,self.child_run_id),
+-            None=>delivery_text(&self.thread_id,&self.child_run_id,finish),
++        let prior = thread_store::read_thread(&self.runtime.storage, &self.thread_id).await;
++        let error = match finish {
++            Ok(RunFinish::Failed { cause }) => Some(
++                prior
++                    .ok()
++                    .flatten()
++                    .and_then(|r| r["error"].as_str().map(str::to_string))
++                    .unwrap_or_else(|| format!("{cause:?}")),
++            ),
++            Err(e) => Some(format!("{e:?}")),
++            _ => None,
++        };
++        let text = match error.as_deref() {
++            Some(error) => format!(
++                "[subagent-result thread={} run={}] failed: {error}",
++                self.thread_id, self.child_run_id
++            ),
++            None => delivery_text(&self.thread_id, &self.child_run_id, finish),
+         };
+         match thread_store::finish(
+             &self.runtime.storage,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:78:
+ 
+ use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};
+ use lingxi_kernel::toolcatalog::{
+-    CatalogPin, EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId, ToolTargetRef,
++    CatalogPin, EffectiveArguments, PermissionKind, SchemaBudget, ToolRegistry, ToolTargetId,
++    ToolTargetRef,
+ };
+ use lingxi_kernel::{Principal, RunContext};
+ use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:728:
+ /// supervisor ([`crate::runs::RunSupervisor`]).
+ pub struct ToolInvocationGateway {
+     registry: Arc<ToolRegistry>,
+-    catalog_definitions: std::sync::Mutex<Option<Arc<crate::toolcatalog_bridge::CatalogDefinitions>>>,
++    catalog_definitions:
++        std::sync::Mutex<Option<Arc<crate::toolcatalog_bridge::CatalogDefinitions>>>,
+     budget: SchemaBudget,
+     policy: Arc<dyn ToolPolicyPort>,
+     executors: std::sync::Mutex<std::collections::BTreeMap<ToolTargetId, ExecutorBinding>>,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:779:
+         }
+     }
+ 
+-    pub fn attach_catalog_definitions(&self, definitions: Arc<crate::toolcatalog_bridge::CatalogDefinitions>) {
+-        *self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()) = Some(definitions);
++    pub fn attach_catalog_definitions(
++        &self,
++        definitions: Arc<crate::toolcatalog_bridge::CatalogDefinitions>,
++    ) {
++        *self
++            .catalog_definitions
++            .lock()
++            .unwrap_or_else(|p| p.into_inner()) = Some(definitions);
+     }
+     pub fn has_catalog_definitions(&self) -> bool {
+-        self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).is_some()
++        self.catalog_definitions
++            .lock()
++            .unwrap_or_else(|p| p.into_inner())
++            .is_some()
+     }
+-    pub fn catalog_run_lease(&self, ctx: &RunContext) -> Option<crate::toolcatalog_bridge::CatalogRunLease> {
+-        self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).as_ref().map(|definitions| crate::toolcatalog_bridge::CatalogRunLease { definitions: Arc::clone(definitions), context: ctx.clone() })
++    pub fn catalog_run_lease(
++        &self,
++        ctx: &RunContext,
++    ) -> Option<crate::toolcatalog_bridge::CatalogRunLease> {
++        self.catalog_definitions
++            .lock()
++            .unwrap_or_else(|p| p.into_inner())
++            .as_ref()
++            .map(|definitions| crate::toolcatalog_bridge::CatalogRunLease {
++                definitions: Arc::clone(definitions),
++                context: ctx.clone(),
++            })
+     }
+-    pub fn normalize_model_request(&self, ctx: &RunContext, request: &ToolRequest, pin: Option<CatalogPin>) -> Result<(ToolRequest, Option<CatalogPin>), GatewayRefusal> {
+-        let definitions = self.catalog_definitions.lock().unwrap_or_else(|p| p.into_inner()).clone();
++    pub fn normalize_model_request(
++        &self,
++        ctx: &RunContext,
++        request: &ToolRequest,
++        pin: Option<CatalogPin>,
++    ) -> Result<(ToolRequest, Option<CatalogPin>), GatewayRefusal> {
++        let definitions = self
++            .catalog_definitions
++            .lock()
++            .unwrap_or_else(|p| p.into_inner())
++            .clone();
+         match definitions {
+             Some(definitions) => definitions.normalize(&self.registry, ctx, request, pin),
+             None => Ok((request.clone(), pin)),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:1083:
+         call_id: &ToolCallId,
+         request: &ToolRequest,
+     ) -> Result<(), GatewayRefusal> {
+-        self.validate_from_request_pinned(ctx, surface, agent_id, permission, call_id, request, None)
++        self.validate_from_request_pinned(
++            ctx, surface, agent_id, permission, call_id, request, None,
++        )
+     }
+ 
+     #[allow(clippy::too_many_arguments)]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:1544:
+     }
+ }
+ 
+-pub(crate) fn map_catalog_error(err: lingxi_kernel::toolcatalog::ToolCatalogError) -> GatewayRefusal {
++pub(crate) fn map_catalog_error(
++    err: lingxi_kernel::toolcatalog::ToolCatalogError,
++) -> GatewayRefusal {
+     use lingxi_kernel::toolcatalog::ToolCatalogError as E;
+     match err {
+         E::TargetNotFound { reference } => GatewayRefusal::TargetNotRegistered { reference },
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/input_budget_refusal.rs:224:
+     request_id: Option<&str>,
+ ) -> Result<lingxi_service::ExecuteAccepted, SessionExecuteError> {
+     let submission = ExecuteSubmission {
+-    knowledge: None, input, request_id };
++        knowledge: None,
++        input,
++        request_id,
++    };
+     let storage = Arc::clone(state.storage());
+     state
+         .sessions()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/input_payload_fidelity.rs:226:
+     request_id: Option<&str>,
+ ) -> Result<ExecuteAccepted, SessionExecuteError> {
+     let submission = ExecuteSubmission {
+-    knowledge: None, input, request_id };
++        knowledge: None,
++        input,
++        request_id,
++    };
+     state
+         .sessions()
+         .execute_submission_for(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:537:
+     assert_eq!(replay, first, "同请求重放必须保留完整首次收据");
+     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-rewind");
+     assert_eq!(std::fs::read(&retained).unwrap(), b"B");
+-    assert_eq!(std::fs::read_dir(&journal).unwrap().count(), journal_before.len());
++    assert_eq!(
++        std::fs::read_dir(&journal).unwrap().count(),
++        journal_before.len()
++    );
+     for (path, bytes) in &journal_before {
+         assert_eq!(&std::fs::read(path).unwrap(), bytes);
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f02_file_restore.rs:563:
+     assert_eq!(after_restart, first, "重启重放必须保留完整首次收据");
+     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-rewind");
+     assert_eq!(std::fs::read(&retained).unwrap(), b"B");
+-    assert_eq!(std::fs::read_dir(&journal).unwrap().count(), journal_before.len());
++    assert_eq!(
++        std::fs::read_dir(&journal).unwrap().count(),
++        journal_before.len()
++    );
+     for (path, bytes) in &journal_before {
+         assert_eq!(&std::fs::read(path).unwrap(), bytes);
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f07_catalog.rs:61:
+ #[test]
+ fn run_activation_does_not_change_shared_residents_or_enable_disabled_tools() {
+     let registry = ToolRegistry::new();
+-    let receipt = registry.register(manifest(), &SchemaBudget::default()).unwrap();
++    let receipt = registry
++        .register(manifest(), &SchemaBudget::default())
++        .unwrap();
+     registry.configure_model_residents(std::collections::BTreeSet::new());
+     let generation = registry.catalog_generation();
+     let activated = std::collections::BTreeSet::from([receipt.target_id.clone()]);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f07_catalog.rs:68:
+-    assert!(ToolDeclarationSnapshot::from_registry(&registry).unwrap().declarations.is_empty());
+-    let snapshot = ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated).unwrap();
++    assert!(ToolDeclarationSnapshot::from_registry(&registry)
++        .unwrap()
++        .declarations
++        .is_empty());
++    let snapshot =
++        ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated)
++            .unwrap();
+     assert_eq!(snapshot.declarations.len(), 1);
+     assert_eq!(snapshot.declarations[0].description, manifest().description);
+-    assert_eq!(snapshot.declarations[0].input_schema, manifest().input_schema);
++    assert_eq!(
++        snapshot.declarations[0].input_schema,
++        manifest().input_schema
++    );
+     assert_eq!(snapshot.catalog_generation, generation);
+     assert_eq!(registry.catalog_generation(), generation);
+-    assert!(ToolDeclarationSnapshot::from_registry(&registry).unwrap().declarations.is_empty());
++    assert!(ToolDeclarationSnapshot::from_registry(&registry)
++        .unwrap()
++        .declarations
++        .is_empty());
+     let mut disabled = manifest();
+-    disabled.availability = Availability::Disabled { reason: "用户禁用".into() };
+-    registry.update(&receipt.target_id, disabled, &SchemaBudget::default()).unwrap();
+-    assert!(ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated).unwrap().declarations.is_empty());
+-    assert_eq!(snapshot.declarations.len(), 1, "已发送历史声明保持冻结，后续授权仍由执行入口复核");
++    disabled.availability = Availability::Disabled {
++        reason: "用户禁用".into(),
++    };
++    registry
++        .update(&receipt.target_id, disabled, &SchemaBudget::default())
++        .unwrap();
++    assert!(
++        ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated)
++            .unwrap()
++            .declarations
++            .is_empty()
++    );
++    assert_eq!(
++        snapshot.declarations.len(),
++        1,
++        "已发送历史声明保持冻结，后续授权仍由执行入口复核"
++    );
+ }
+ 
+ use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs:630:
+         openai_tool_call("budget-refusal", "read", r#"{"path":"fixture.txt"}"#, 10, 3),
+         openai_final("明确处理超限错误后完成"),
+         openai_final("下一轮读取历史后完成"),
+-    ]).await;
++    ])
++    .await;
+     let boot = boot("budget-refusal", &stub).await;
+     std::fs::write(boot.workspace.join("fixture.txt"), "合法合成文件").unwrap();
+     // 复用worker多文件结果形状：每个名称在系统路径长度内，累计固定资料超过32KiB。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs:637:
+     let artifacts_dir = boot.workspace.join("a".repeat(190)).join("b".repeat(190));
+     std::fs::create_dir_all(&artifacts_dir).unwrap();
+-    let paths = (0..100).map(|i| artifacts_dir.join(format!("f{i}.txt")).to_string_lossy().into_owned()).collect::<Vec<_>>();
++    let paths = (0..100)
++        .map(|i| {
++            artifacts_dir
++                .join(format!("f{i}.txt"))
++                .to_string_lossy()
++                .into_owned()
++        })
++        .collect::<Vec<_>>();
+     for path in &paths {
+         std::fs::write(path, b"x").unwrap();
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs:643:
+-    let worker_line = serde_json::json!({"kind":"result","id":"synthetic","ok":true,"claimed_files":paths});
++    let worker_line =
++        serde_json::json!({"kind":"result","id":"synthetic","ok":true,"claimed_files":paths});
+     assert!(worker_line.to_string().len() < lingxi_service::workerrpc::WORKER_MAX_LINE_BYTES);
+-    let mut original = ToolSuccess::from_content(vec![ContentBlock::Text { text: "RAW-SUCCESS-KEPT".into() }]);
+-    original.resource_refs = paths.iter().map(|path| lingxi_protocol::ResourceRef {
+-        resource_id: lingxi_protocol::ResourceId::new(format!("worker:synthetic:{path}")),
+-        kind: lingxi_protocol::ResourceKind::Artifact,
+-        display_name: Some(path.clone()),
+-        uri: Some(format!("file://{path}")),
+-        digest: None,
+-        size_bytes: Some(1),
+-    }).collect();
++    let mut original = ToolSuccess::from_content(vec![ContentBlock::Text {
++        text: "RAW-SUCCESS-KEPT".into(),
++    }]);
++    original.resource_refs = paths
++        .iter()
++        .map(|path| lingxi_protocol::ResourceRef {
++            resource_id: lingxi_protocol::ResourceId::new(format!("worker:synthetic:{path}")),
++            kind: lingxi_protocol::ResourceKind::Artifact,
++            display_name: Some(path.clone()),
++            uri: Some(format!("file://{path}")),
++            digest: None,
++            size_bytes: Some(1),
++        })
++        .collect();
+     boot.state.tool_gateway().unwrap().bind_executor(
+         lingxi_kernel::toolcatalog::ToolTargetId::parse("tool:first-party:read"),
+-        Arc::new(ExternalOutcome(ToolOutcome::Success { result: original.clone() })),
++        Arc::new(ExternalOutcome(ToolOutcome::Success {
++            result: original.clone(),
++        })),
+         "仅合成外部工具应答，真实网关、投影、档案和历史继续运行",
+     );
+     let run = execute(&boot.state, "处理超限的多文件结果").await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs:664:
+     let tools = tool_messages(&requests[1].body);
+     assert_eq!(tools.len(), 1);
+     let error = tools[0]["content"].as_str().unwrap();
+-    assert!(error.contains("Tool success model projection exceeds the 32KiB budget"), "必须实际到达预算拒绝分支：{error}");
++    assert!(
++        error.contains("Tool success model projection exceeds the 32KiB budget"),
++        "必须实际到达预算拒绝分支：{error}"
++    );
+     assert!(!error.contains("RAW-SUCCESS-KEPT"));
+-    let raw = events.iter().find_map(|event| match &event.payload {
+-        EventPayload::Known(KnownEventPayload::ToolCallCompleted(p)) => Some(&p.result),
+-        _ => None,
+-    }).unwrap();
++    let raw = events
++        .iter()
++        .find_map(|event| match &event.payload {
++            EventPayload::Known(KnownEventPayload::ToolCallCompleted(p)) => Some(&p.result),
++            _ => None,
++        })
++        .unwrap();
+     assert_eq!(raw.status, lingxi_protocol::ToolResultStatus::Success);
+     assert_eq!(raw.content, original.content);
+     assert_eq!(raw.resource_refs, original.resource_refs);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs:676:
+     assert!(!raw.truncated);
+-    let projection = events.iter().find_map(|event| match &event.payload {
+-        EventPayload::Unknown(p) if p.event_type == "tool_result_model_projection" => Some(serde_json::Value::Object(p.raw.clone())),
+-        _ => None,
+-    }).unwrap();
++    let projection = events
++        .iter()
++        .find_map(|event| match &event.payload {
++            EventPayload::Unknown(p) if p.event_type == "tool_result_model_projection" => {
++                Some(serde_json::Value::Object(p.raw.clone()))
++            }
++            _ => None,
++        })
++        .unwrap();
+     assert_eq!(projection["result"]["status"], "failed");
+     assert!(projection["rawContentDigest"].is_null());
+     assert!(projection["projectionContentDigest"].is_null());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs:693:
+     let historical = tool_messages(&requests[2].body);
+     assert_eq!(historical.len(), 1);
+     assert_eq!(historical[0]["content"], tools[0]["content"]);
+-    save_evidence("budget-refusal-history", &serde_json::json!({"firstRun":run,"nextRun":next,"wire":requests.iter().map(|r|&r.body).collect::<Vec<_>>(),"projection":projection,"raw":raw}));
++    save_evidence(
++        "budget-refusal-history",
++        &serde_json::json!({"firstRun":run,"nextRun":next,"wire":requests.iter().map(|r|&r.body).collect::<Vec<_>>(),"projection":projection,"raw":raw}),
++    );
+     stub.stop().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:350:
+         "非法选择必须回滚，不能破坏上一份已授权范围"
+     );
+     // 同一会话后续未选资料不继承检索声明；显式空选择仍按原合同在发请求前拒绝。
+-    for (input, knowledge) in [("F13_NONE", None), ("F13_EMPTY", Some(json!({"notebookIds":[],"sourceIds":[]})))] {
++    for (input, knowledge) in [
++        ("F13_NONE", None),
++        ("F13_EMPTY", Some(json!({"notebookIds":[],"sourceIds":[]}))),
++    ] {
+         let mut body = json!({"input":input});
+-        if let Some(selection) = knowledge { body["knowledge"] = selection; }
++        if let Some(selection) = knowledge {
++            body["knowledge"] = selection;
++        }
+         let next = execute(&endpoint, &token, body).await;
+-        let next_run = state.storage().load_run(&RunId::new(next["runId"].as_str().unwrap())).await.unwrap().unwrap();
++        let next_run = state
++            .storage()
++            .load_run(&RunId::new(next["runId"].as_str().unwrap()))
++            .await
++            .unwrap()
++            .unwrap();
+         if input == "F13_EMPTY" {
+             assert_eq!(next_run.status, RunStatus::Failed);
+-            assert_eq!(captures.lock().unwrap().requests.len(), 7, "空选择拒绝必须零模型请求");
++            assert_eq!(
++                captures.lock().unwrap().requests.len(),
++                7,
++                "空选择拒绝必须零模型请求"
++            );
+             continue;
+         }
+         assert_eq!(next_run.status, RunStatus::Completed);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:364:
+         let capture = captures.lock().unwrap().requests.last().unwrap().clone();
+         let declarations = capture["body"]["tools"].as_array().unwrap();
+         assert_eq!(declarations.len(), 7);
+-        assert!(!declarations.iter().any(|tool| tool["function"]["name"] == "knowledge_search"));
+-        let system = capture["body"]["messages"].as_array().unwrap().iter().filter(|message| message["role"] == "system").map(|message| content_text(&message["content"])).collect::<Vec<_>>().join("\n");
++        assert!(!declarations
++            .iter()
++            .any(|tool| tool["function"]["name"] == "knowledge_search"));
++        let system = capture["body"]["messages"]
++            .as_array()
++            .unwrap()
++            .iter()
++            .filter(|message| message["role"] == "system")
++            .map(|message| content_text(&message["content"]))
++            .collect::<Vec<_>>()
++            .join("\n");
+         assert!(!system.contains("本轮知识资料范围："));
+     }
+     shutdown_tx.send(()).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:388:
+     State(captures): State<Arc<Mutex<RetryCaptures>>>,
+     Json(body): Json<Value>,
+ ) -> axum::response::Response {
+-    let input = body["messages"].as_array().unwrap().iter().rev()
++    let input = body["messages"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .rev()
+         .find(|message| message["role"] == "user")
+-        .map(|message| content_text(&message["content"])).unwrap();
+-    let mode = if input.contains("F13_RETRY") { "retry" } else { "control" };
++        .map(|message| content_text(&message["content"]))
++        .unwrap();
++    let mode = if input.contains("F13_RETRY") {
++        "retry"
++    } else {
++        "control"
++    };
+     let selection = wire_selection(&body);
+     let (step, old_scope, on_failure) = {
+         let mut captures = captures.lock().unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:398:
+         let step = *captures.steps.get(mode).unwrap_or(&0);
+         captures.steps.insert(mode.into(), step + 1);
+-        let old_scope = captures.requests.iter().find(|request| request["mode"] == mode)
+-            .map(|request| request["selection"]["scopeId"].as_str().unwrap().to_string());
+-        captures.requests.push(json!({"mode":mode,"selection":selection,"body":body}));
++        let old_scope = captures
++            .requests
++            .iter()
++            .find(|request| request["mode"] == mode)
++            .map(|request| {
++                request["selection"]["scopeId"]
++                    .as_str()
++                    .unwrap()
++                    .to_string()
++            });
++        captures
++            .requests
++            .push(json!({"mode":mode,"selection":selection,"body":body}));
+         (step, old_scope, captures.on_failure.clone())
+     };
+     if mode == "retry" && step == 0 {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:406:
+         on_failure.expect("合成失败时修改当前资料集合")();
+-        return (axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+-            Json(json!({"error":{"message":"合成供应商暂时失败"}}))).into_response();
++        return (
++            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
++            Json(json!({"error":{"message":"合成供应商暂时失败"}})),
++        )
++            .into_response();
+     }
+     let logical = step - usize::from(mode == "retry");
+     let delta = match logical {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:412:
+-        0 => json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("{mode}-describe"),"type":"function","function":{"name":"mcp_describe_tool","arguments":json!({"name":"knowledge_outline"}).to_string()}}]}),
++        0 => {
++            json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("{mode}-describe"),"type":"function","function":{"name":"mcp_describe_tool","arguments":json!({"name":"knowledge_outline"}).to_string()}}]})
++        }
+         1 | 2 if logical == 1 || mode == "retry" => {
+-            let scope = if logical == 2 { old_scope.unwrap() } else { selection["scopeId"].as_str().unwrap().to_string() };
++            let scope = if logical == 2 {
++                old_scope.unwrap()
++            } else {
++                selection["scopeId"].as_str().unwrap().to_string()
++            };
+             json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("{mode}-outline-{logical}"),"type":"function","function":{"name":"mcp_call","arguments":json!({"tool":"knowledge_outline","arguments":{"scopeId":scope}}).to_string()}}]})
+         }
+         _ => json!({"role":"assistant","content":"明确处理知识范围后完成"}),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:422:
+         json!({"id":format!("{mode}-{step}"),"choices":[{"index":0,"delta":{},"finish_reason":if tool_call { "tool_calls" } else { "stop" }}]}),
+         json!({"choices":[],"usage":{"prompt_tokens":20,"completion_tokens":4}}),
+     ];
+-    let stream = frames.iter().map(|frame| format!("data: {frame}\n\n")).collect::<String>() + "data: [DONE]\n\n";
++    let stream = frames
++        .iter()
++        .map(|frame| format!("data: {frame}\n\n"))
++        .collect::<String>()
++        + "data: [DONE]\n\n";
+     ([(header::CONTENT_TYPE, "text/event-stream")], stream).into_response()
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:429:
+ #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+ async fn real_http_500_retry_advances_only_attempt_and_preserves_frozen_sources() {
+-    let home = PathBuf::from(std::env::var_os("LINGXI_HOME").expect("仅使用专项合成HOME"))
+-        .join(format!("f13-retry-{}-{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
++    let home =
++        PathBuf::from(std::env::var_os("LINGXI_HOME").expect("仅使用专项合成HOME")).join(format!(
++            "f13-retry-{}-{}",
++            std::process::id(),
++            std::time::SystemTime::now()
++                .duration_since(std::time::UNIX_EPOCH)
++                .unwrap()
++                .as_nanos()
++        ));
+     std::fs::create_dir_all(&home).unwrap();
+     let captures = Arc::new(Mutex::new(RetryCaptures::default()));
+     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:436:
+     let provider_endpoint = format!("http://{}", listener.local_addr().unwrap());
+-    let upstream = tokio::spawn(axum::serve(listener,
+-        axum::Router::new().route("/chat/completions", post(retry_provider)).with_state(captures.clone())).into_future());
++    let upstream = tokio::spawn(
++        axum::serve(
++            listener,
++            axum::Router::new()
++                .route("/chat/completions", post(retry_provider))
++                .with_state(captures.clone()),
++        )
++        .into_future(),
++    );
+     let state = boot(&home, &provider_endpoint).await;
+-    let (notebook, source_id) = source(&state, "冻结资料", "# 原内容\n\nF13已授权且必须冻结的来源。");
++    let (notebook, source_id) = source(
++        &state,
++        "冻结资料",
++        "# 原内容\n\nF13已授权且必须冻结的来源。",
++    );
+     let knowledge = state.knowledge().clone();
+-    let (mutation_home, mutation_notebook, mutation_source) = (home.clone(), notebook.clone(), source_id.clone());
++    let (mutation_home, mutation_notebook, mutation_source) =
++        (home.clone(), notebook.clone(), source_id.clone());
+     captures.lock().unwrap().on_failure = Some(Arc::new(move || {
+         // 失败期间模拟用户资料更新；重试不得重选新来源或丢掉原冻结来源。
+         let facts = KnowledgeFactStore::open(&mutation_home.join("knowledge")).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:446:
+-        facts.remove_source_from_notebook(&mutation_notebook, &mutation_source).unwrap();
+-        knowledge.import_pasted_text(&mutation_notebook, "# 新内容\n\n本轮未授权的新来源。", Some("新来源")).unwrap();
++        facts
++            .remove_source_from_notebook(&mutation_notebook, &mutation_source)
++            .unwrap();
++        knowledge
++            .import_pasted_text(
++                &mutation_notebook,
++                "# 新内容\n\n本轮未授权的新来源。",
++                Some("新来源"),
++            )
++            .unwrap();
+     }));
+     let token = state.auth().local_token();
+     let serving_state = state.clone();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:451:
+     let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel();
+-    let service = tokio::spawn(async move { run(serving_state,
+-        async { let _ = shutdown_rx.await; }, |addr| { let _ = ready_tx.send(addr); }, None).await });
++    let service = tokio::spawn(async move {
++        run(
++            serving_state,
++            async {
++                let _ = shutdown_rx.await;
++            },
++            |addr| {
++                let _ = ready_tx.send(addr);
++            },
++            None,
++        )
++        .await
++    });
+     let endpoint = format!("http://{}", ready_rx.await.unwrap());
+     let submission = |input| json!({"input":input,"knowledge":{"notebookIds":[notebook],"sourceIds":[source_id]}});
+     let control = execute(&endpoint, &token, submission("F13_CONTROL")).await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:458:
+-    let control_journal = state.storage().load_invocation_journal(&RunId::new(control["runId"].as_str().unwrap())).await.unwrap();
+-    assert_eq!(control_journal.iter().find(|entry| entry.target.ends_with("knowledge_outline")).unwrap().receipt.as_ref().unwrap().outcome, ReceiptOutcome::Succeeded);
++    let control_journal = state
++        .storage()
++        .load_invocation_journal(&RunId::new(control["runId"].as_str().unwrap()))
++        .await
++        .unwrap();
++    assert_eq!(
++        control_journal
++            .iter()
++            .find(|entry| entry.target.ends_with("knowledge_outline"))
++            .unwrap()
++            .receipt
++            .as_ref()
++            .unwrap()
++            .outcome,
++        ReceiptOutcome::Succeeded
++    );
+     let retried = execute(&endpoint, &token, submission("F13_RETRY")).await;
+     let run_id = retried["runId"].as_str().unwrap();
+-    assert_eq!(state.storage().load_run(&RunId::new(run_id)).await.unwrap().unwrap().status, RunStatus::Completed);
++    assert_eq!(
++        state
++            .storage()
++            .load_run(&RunId::new(run_id))
++            .await
++            .unwrap()
++            .unwrap()
++            .status,
++        RunStatus::Completed
++    );
+     let requests = captures.lock().unwrap().requests.clone();
+-    let retry_requests = requests.iter().filter(|request| request["mode"] == "retry").collect::<Vec<_>>();
++    let retry_requests = requests
++        .iter()
++        .filter(|request| request["mode"] == "retry")
++        .collect::<Vec<_>>();
+     assert_eq!(retry_requests.len(), 5);
+     let old_id = retry_requests[0]["selection"]["scopeId"].as_str().unwrap();
+     let current_id = retry_requests[1]["selection"]["scopeId"].as_str().unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:468:
+     assert_ne!(old_id, current_id, "旧attempt句柄不能成为新attempt授权");
+     for request in &retry_requests[1..] {
+         assert_eq!(request["selection"], retry_requests[1]["selection"]);
+-        assert_eq!(request["selection"]["sources"], retry_requests[0]["selection"]["sources"]);
++        assert_eq!(
++            request["selection"]["sources"],
++            retry_requests[0]["selection"]["sources"]
++        );
+     }
+     let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+     let old = facts.get_turn_scope(old_id).unwrap().unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:477:
+     assert_eq!(current.status, "active");
+     assert_eq!(current.notebook_ids, old.notebook_ids);
+     assert_eq!(current.sources[0].source_id, source_id);
+-    assert_eq!(current.sources[0].content_snapshot_id, old.sources[0].content_snapshot_id);
+-    assert_eq!(current.sources[0].parse_artifact_id, old.sources[0].parse_artifact_id);
++    assert_eq!(
++        current.sources[0].content_snapshot_id,
++        old.sources[0].content_snapshot_id
++    );
++    assert_eq!(
++        current.sources[0].parse_artifact_id,
++        old.sources[0].parse_artifact_id
++    );
+     let previous = old.run_binding.as_ref().unwrap();
+     let binding = current.run_binding.as_ref().unwrap();
+     let mut expected = previous.clone();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:485:
+     expected.attempt = format!("{run_id}#a2");
+     assert_eq!(binding, &expected);
+-    let journal = state.storage().load_invocation_journal(&RunId::new(run_id)).await.unwrap();
+-    let outlines = journal.iter().filter(|entry| entry.target.ends_with("knowledge_outline")).collect::<Vec<_>>();
++    let journal = state
++        .storage()
++        .load_invocation_journal(&RunId::new(run_id))
++        .await
++        .unwrap();
++    let outlines = journal
++        .iter()
++        .filter(|entry| entry.target.ends_with("knowledge_outline"))
++        .collect::<Vec<_>>();
+     assert_eq!(outlines.len(), 2);
+-    assert_eq!(outlines[0].receipt.as_ref().unwrap().outcome, ReceiptOutcome::Succeeded);
+-    assert_eq!(outlines[1].receipt.as_ref().unwrap().outcome, ReceiptOutcome::Failed);
+-    assert!(outlines.iter().all(|entry| entry.attempt == binding.attempt));
+-    assert!(retry_requests[4]["body"].to_string().contains("KNOWLEDGE_SCOPE_VIOLATION"));
++    assert_eq!(
++        outlines[0].receipt.as_ref().unwrap().outcome,
++        ReceiptOutcome::Succeeded
++    );
++    assert_eq!(
++        outlines[1].receipt.as_ref().unwrap().outcome,
++        ReceiptOutcome::Failed
++    );
++    assert!(outlines
++        .iter()
++        .all(|entry| entry.attempt == binding.attempt));
++    assert!(retry_requests[4]["body"]
++        .to_string()
++        .contains("KNOWLEDGE_SCOPE_VIOLATION"));
+     // 被跳过的attempt与身份变化不能使用重试接口；每次拒绝均不破坏当前范围。
+     let mut valid_next = binding.clone();
+     valid_next.attempt = format!("{run_id}#a3");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:497:
+     let mut denied = Vec::new();
+-    for field in ["principal_kind", "principal_subject", "agent_id", "session_id", "run_id", "generation", "attempt"] {
++    for field in [
++        "principal_kind",
++        "principal_subject",
++        "agent_id",
++        "session_id",
++        "run_id",
++        "generation",
++        "attempt",
++    ] {
+         let mut next = valid_next.clone();
+         match field {
+             "principal_kind" => next.principal_kind = "web_session".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:506:
+             "generation" => next.generation += 1,
+             _ => next.attempt = format!("{run_id}#a4"),
+         }
+-        assert!(facts.advance_run_scope_attempt(&current.studio_id, current_id, binding, &next).is_err(), "{field}");
++        assert!(
++            facts
++                .advance_run_scope_attempt(&current.studio_id, current_id, binding, &next)
++                .is_err(),
++            "{field}"
++        );
+         denied.push(field);
+     }
+-    assert!(facts.advance_run_scope_attempt(&old.studio_id, old_id, previous, binding).is_err());
++    assert!(facts
++        .advance_run_scope_attempt(&old.studio_id, old_id, previous, binding)
++        .is_err());
+     assert_eq!(facts.get_turn_scope(current_id).unwrap().unwrap(), current);
+     if let Ok(out) = std::env::var("LINGXI_F13_EVIDENCE") {
+-        let out = PathBuf::from(out); std::fs::create_dir_all(&out).unwrap();
++        let out = PathBuf::from(out);
++        std::fs::create_dir_all(&out).unwrap();
+         std::fs::write(out.join("retry-scope.json"), serde_json::to_vec_pretty(&json!({"control":control,"retried":retried,"wire":requests,"oldScope":state.knowledge().get_turn_scope(old_id).unwrap(),"currentScope":state.knowledge().get_turn_scope(current_id).unwrap(),"deniedBindingChanges":denied})).unwrap()).unwrap();
+     }
+     shutdown_tx.send(()).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs:519:
+     service.await.unwrap().unwrap();
+     state.storage().close().await.unwrap();
+     drop(facts);
+-    upstream.abort(); let _ = upstream.await;
++    upstream.abort();
++    let _ = upstream.await;
+     std::fs::remove_dir_all(home).unwrap();
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:387:
+ 
+ enum Step {
+     Final(&'static str),
+-    Call { target: &'static str, arguments: Value },
++    Call {
++        target: &'static str,
++        arguments: Value,
++    },
+     Panic(&'static str),
+     Failed(&'static str),
+     Delegate {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:443:
+                         model_call_id: None,
+                     },
+                 },
+-                Step::Panic(reason)=>panic!("{reason}"),
+-                Step::Failed(reason)=>ProviderTurn::Failed {error:lingxi_protocol::ProtocolError::new(ErrorCode::UpstreamUnavailable,reason,false),retryable:false},
+-                Step::Call {target,arguments}=>{
+-                    let declaration=input.tools.declarations.iter().find(|d|d.wire_name==target).expect("正式工具须在当轮实际发送声明中");
+-                    assert!(input.tools.catalog_generation>0);
+-                    ProviderTurn::ToolRequests {content:Vec::new(),requests:vec![ToolRequest::from_effective_arguments(&declaration.target,arguments,&SchemaBudget::default()).unwrap()]}
++                Step::Panic(reason) => panic!("{reason}"),
++                Step::Failed(reason) => ProviderTurn::Failed {
++                    error: lingxi_protocol::ProtocolError::new(
++                        ErrorCode::UpstreamUnavailable,
++                        reason,
++                        false,
++                    ),
++                    retryable: false,
++                },
++                Step::Call { target, arguments } => {
++                    let declaration = input
++                        .tools
++                        .declarations
++                        .iter()
++                        .find(|d| d.wire_name == target)
++                        .expect("正式工具须在当轮实际发送声明中");
++                    assert!(input.tools.catalog_generation > 0);
++                    ProviderTurn::ToolRequests {
++                        content: Vec::new(),
++                        requests: vec![ToolRequest::from_effective_arguments(
++                            &declaration.target,
++                            arguments,
++                            &SchemaBudget::default(),
++                        )
++                        .unwrap()],
++                    }
+                 }
+                 Step::Delegate {
+                     target,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:465:
+                         .expect("实际发送目录须包含原子代理入口");
+                     assert!(input.tools.catalog_generation > 0);
+                     let mut arguments = match target {
+-                        "subagent_close"=>json!({"reason":task}),
+-                        "subagent_reply"=>json!({"task":task}),
+-                        _=>json!({"task":task,"label":task}),
++                        "subagent_close" => json!({"reason":task}),
++                        "subagent_reply" => json!({"task":task}),
++                        _ => json!({"task":task,"label":task}),
+                     };
+                     if let Some(thread_id) = &thread_id {
+                         arguments["threadId"] = json!(thread_id);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:489:
+     }
+ }
+ 
+-fn registered_delegation_gateway() -> (Arc<ToolInvocationGateway>,Arc<ToolRegistry>) {
+-    let registry=Arc::new(ToolRegistry::new());
+-    let clock=Arc::new(lingxi_service::inject::SystemClock);
+-    let approvals=Arc::new(lingxi_service::approval_service::ApprovalService::new(clock.clone()));
+-    let gateway=Arc::new(ToolInvocationGateway::new(registry.clone(),approvals,clock,SchemaBudget::default(),lingxi_service::toolgateway::DEFAULT_PREPARED_TTL_MS,lingxi_service::toolgateway::DEFAULT_LIVE_PREPARED_CAP));
+-    lingxi_service::subagents::register_tools(&registry,&gateway,&SchemaBudget::default());
+-    (gateway,registry)
++fn registered_delegation_gateway() -> (Arc<ToolInvocationGateway>, Arc<ToolRegistry>) {
++    let registry = Arc::new(ToolRegistry::new());
++    let clock = Arc::new(lingxi_service::inject::SystemClock);
++    let approvals = Arc::new(lingxi_service::approval_service::ApprovalService::new(
++        clock.clone(),
++    ));
++    let gateway = Arc::new(ToolInvocationGateway::new(
++        registry.clone(),
++        approvals,
++        clock,
++        SchemaBudget::default(),
++        lingxi_service::toolgateway::DEFAULT_PREPARED_TTL_MS,
++        lingxi_service::toolgateway::DEFAULT_LIVE_PREPARED_CAP,
++    ));
++    lingxi_service::subagents::register_tools(&registry, &gateway, &SchemaBudget::default());
++    (gateway, registry)
+ }
+ 
+-fn delegation_gateway() -> Arc<ToolInvocationGateway> {registered_delegation_gateway().0}
++fn delegation_gateway() -> Arc<ToolInvocationGateway> {
++    registered_delegation_gateway().0
++}
+ 
+-fn scripted(scripts:Vec<(&str,Vec<Step>)>,gates:Vec<((&str,u32),Arc<tokio::sync::Semaphore>)>) -> Arc<ScriptedProvider> {
++fn scripted(
++    scripts: Vec<(&str, Vec<Step>)>,
++    gates: Vec<((&str, u32), Arc<tokio::sync::Semaphore>)>,
++) -> Arc<ScriptedProvider> {
+     Arc::new(ScriptedProvider {
+-        scripts:Mutex::new(scripts.into_iter().map(|(key,steps)|(key.into(),steps.into())).collect()),
+-        threads:Mutex::new(HashMap::new()),calls:Mutex::new(Vec::new()),
+-        gates:gates.into_iter().map(|((marker,turn),gate)|((marker.into(),turn),gate)).collect(),
++        scripts: Mutex::new(
++            scripts
++                .into_iter()
++                .map(|(key, steps)| (key.into(), steps.into()))
++                .collect(),
++        ),
++        threads: Mutex::new(HashMap::new()),
++        calls: Mutex::new(Vec::new()),
++        gates: gates
++            .into_iter()
++            .map(|((marker, turn), gate)| ((marker.into(), turn), gate))
++            .collect(),
+     })
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:511:
+-fn outcome_json(outcome:&ToolOutcome)->Value {
++fn outcome_json(outcome: &ToolOutcome) -> Value {
+     match outcome {
+-        ToolOutcome::Success {result}=>{
+-            let text=result.content.iter().filter_map(|c|match c{ContentBlock::Text{text}=>Some(text.as_str()),_=>None}).collect::<String>();
++        ToolOutcome::Success { result } => {
++            let text = result
++                .content
++                .iter()
++                .filter_map(|c| match c {
++                    ContentBlock::Text { text } => Some(text.as_str()),
++                    _ => None,
++                })
++                .collect::<String>();
+             serde_json::from_str(&text).unwrap()
+         }
+-        other=>panic!("须返回真实成功正文：{other:?}"),
++        other => panic!("须返回真实成功正文：{other:?}"),
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:758:
+     let results = tool_results(&fx.events("sess_local_alpha").await, &closed_run);
+     assert_eq!(results.len(), 5);
+     assert_eq!(results[0].status, ToolResultStatus::Success);
+-    let closed_text=match &results[0].content[0] {ContentBlock::Text{text}=>text,other=>panic!("closed正文：{other:?}")};
+-    let closed_ack:Value=serde_json::from_str(closed_text).unwrap();
+-    assert_eq!(closed_ack["threadId"],a.thread_id);
+-    assert_eq!(closed_ack["streamStatus"],"closed");
+-    assert_eq!(closed_ack["status"],"closed");
+-    let persisted=fx.state.storage().query_one_text("SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",vec![a.thread_id.clone()]).await.unwrap().unwrap();
+-    assert_eq!(serde_json::from_str::<Value>(&persisted).unwrap()["streamStatus"],"closed");
++    let closed_text = match &results[0].content[0] {
++        ContentBlock::Text { text } => text,
++        other => panic!("closed正文：{other:?}"),
++    };
++    let closed_ack: Value = serde_json::from_str(closed_text).unwrap();
++    assert_eq!(closed_ack["threadId"], a.thread_id);
++    assert_eq!(closed_ack["streamStatus"], "closed");
++    assert_eq!(closed_ack["status"], "closed");
++    let persisted = fx
++        .state
++        .storage()
++        .query_one_text(
++            "SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",
++            vec![a.thread_id.clone()],
++        )
++        .await
++        .unwrap()
++        .unwrap();
++    assert_eq!(
++        serde_json::from_str::<Value>(&persisted).unwrap()["streamStatus"],
++        "closed"
++    );
+     for (index, code, id) in [
+         (1, ErrorCode::NotFound, "thread-does-not-exist"),
+         (2, ErrorCode::Conflict, a.thread_id.as_str()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:777:
+         assert!(error.message.contains(id));
+     }
+     // 父模型收到与正式事件相同的最终closed状态，不只收到线程身份。
+-    let parent_results=parent_tool_outcomes(&provider,"CLOSE",&closed_run);
+-    assert_eq!(parent_results.len(),5);
+-    assert_eq!(outcome_json(&parent_results[0]),closed_ack);
++    let parent_results = parent_tool_outcomes(&provider, "CLOSE", &closed_run);
++    assert_eq!(parent_results.len(), 5);
++    assert_eq!(outcome_json(&parent_results[0]), closed_ack);
+     assert!(
+         matches!(&parent_results[1], ToolOutcome::Failed { error } if error.code == ErrorCode::NotFound)
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:809:
+ 
+ struct CountWrite(Arc<std::sync::atomic::AtomicUsize>);
+ impl ToolExecutorPort for CountWrite {
+-    fn execute<'a>(&'a self,ctx:&'a RunContext,_call:&'a ToolCallId,_request:&'a ToolRequest)->Pin<Box<dyn std::future::Future<Output=ToolExecutionResult>+Send+'a>> {
+-        self.0.fetch_add(1,std::sync::atomic::Ordering::SeqCst);
+-        Box::pin(async move {ToolExecutionResult::of_ctx(ctx,ToolOutcome::success_text("真实外部执行替身"))})
++    fn execute<'a>(
++        &'a self,
++        ctx: &'a RunContext,
++        _call: &'a ToolCallId,
++        _request: &'a ToolRequest,
++    ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
++        self.0.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
++        Box::pin(async move {
++            ToolExecutionResult::of_ctx(ctx, ToolOutcome::success_text("真实外部执行替身"))
++        })
+     }
+ }
+-fn gateway_with_write(count:Arc<std::sync::atomic::AtomicUsize>)->Arc<ToolInvocationGateway> {
+-    let (gateway,registry)=registered_delegation_gateway();
++fn gateway_with_write(count: Arc<std::sync::atomic::AtomicUsize>) -> Arc<ToolInvocationGateway> {
++    let (gateway, registry) = registered_delegation_gateway();
+     let receipt=registry.register(ToolManifest {
+         origin:ToolOrigin::FirstParty,local_name:"write".into(),display_name:"write".into(),aliases:Vec::new(),version:"1.0.0".into(),description:"原权限交集检查的写工具".into(),
+         input_schema:ToolSchemaDocument{dialect:"json-schema/2020-12".into(),schema:json!({"type":"object","properties":{"path":{"type":"string"},"content":{"type":"string"}},"required":["path","content"],"additionalProperties":false})},output_schema:None,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:822:
+         permission:PermissionContract{kind:PermissionKind::Execute,capability_base:"write.capability".into()},availability:Availability::Available,timeout_ms:Some(30_000),max_concurrency:Some(4),declared_permission:DeclaredPermission::None,recovery:lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE,
+     },&SchemaBudget::default()).unwrap();
+-    gateway.bind_executor(receipt.target_id,Arc::new(CountWrite(count)),"真实写入边界计数器");
++    gateway.bind_executor(
++        receipt.target_id,
++        Arc::new(CountWrite(count)),
++        "真实写入边界计数器",
++    );
+     gateway
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:828:
+-fn call(target:&'static str,arguments:Value)->Step {Step::Call {target,arguments}}
+-fn submission_has(provider:&ScriptedProvider,marker:&str,part:&str)->bool {
+-    provider.calls.lock().unwrap().iter().filter(|(key,_)|key==marker).any(|(_,input)|input.submission.contains(part))
++fn call(target: &'static str, arguments: Value) -> Step {
++    Step::Call { target, arguments }
+ }
+-async fn create_owned_session(fx:&Fixture,id:&str,mode:&str) {
+-    let row=fx.state.storage().get_session("sess_local_alpha").await.unwrap().unwrap();
+-    let (status,body)=fx.http("POST","/lingxi/v1/sessions",Some(json!({"sessionId":id,"agentId":row.agent_id,"title":id,"permissionMode":mode})),&fx.state.auth().local_token()).await;
+-    assert_eq!(status,201,"{body}");
++fn submission_has(provider: &ScriptedProvider, marker: &str, part: &str) -> bool {
++    provider
++        .calls
++        .lock()
++        .unwrap()
++        .iter()
++        .filter(|(key, _)| key == marker)
++        .any(|(_, input)| input.submission.contains(part))
+ }
++async fn create_owned_session(fx: &Fixture, id: &str, mode: &str) {
++    let row = fx
++        .state
++        .storage()
++        .get_session("sess_local_alpha")
++        .await
++        .unwrap()
++        .unwrap();
++    let (status, body) = fx
++        .http(
++            "POST",
++            "/lingxi/v1/sessions",
++            Some(json!({"sessionId":id,"agentId":row.agent_id,"title":id,"permissionMode":mode})),
++            &fx.state.auth().local_token(),
++        )
++        .await;
++    assert_eq!(status, 201, "{body}");
++}
+ 
+ #[tokio::test]
+ async fn subagent_list_launch_progress_and_permission_intersection_use_real_facts() {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:840:
+-    let parent_gate=Arc::new(tokio::sync::Semaphore::new(0));
+-    let child_gate=Arc::new(tokio::sync::Semaphore::new(0));
+-    let writes=Arc::new(std::sync::atomic::AtomicUsize::new(0));
+-    let provider=scripted(vec![
+-        ("EMPTY",vec![call("subagent",json!({"agent":"?","task":""})),Step::Final("候选为空已如实说明")]),
+-        ("LIST",vec![call("subagent",json!({"agent":"list","task":""})),Step::Final("读到真实候选")]),
+-        ("LAUNCH",vec![call("subagent",json!({"agent":"worker","task":"CHILD-SCOPED: research","access":"read","label":"research"})),call("subagent",json!({"agent":"?","task":""})),Step::Final("父继续")]),
+-        ("CHILD-SCOPED",vec![call("write",json!({"path":"/tmp/original-subagent-write","content":"must be refused"})),Step::Final("REAL_CHILD_SCOPED_RESULT")]),
+-        ("RESULT",vec![Step::Final("父已接收真实结果")]),
+-        ("FOREIGN",vec![Step::Final("另一父会话")]),
+-        ("DENY",vec![call("subagent",json!({"agent":"worker","task":"CHILD-DENIED: must not start","access":"write"})),Step::Final("父看到权限拒绝")]),
+-        ("MISSING",vec![call("subagent",json!({"agent":"not-a-real-agent","task":"CHILD-MISSING: must not start"})),Step::Final("父看到无候选拒绝")]),
+-    ],vec![(("LAUNCH",2),parent_gate.clone()),(("CHILD-SCOPED",1),child_gate.clone())]);
+-    let fx=Fixture::start("subagent-list-launch",ServiceDeps{turn_provider:Some(provider.clone()),tool_gateway:Some(gateway_with_write(writes.clone())),..ServiceDeps::default()}).await;
+-    let token=fx.state.auth().local_token();
+-    let empty=execute_actual(fx.addr,&token,"sess_local_alpha","EMPTY: truthful empty roster").await;
+-    let no_candidates=outcome_json(&parent_tool_outcomes(&provider,"EMPTY",&empty)[0]);
+-    assert_eq!(no_candidates["agents"],json!([]));assert_eq!(no_candidates["noCandidates"],true);
+-    assert!(no_candidates["reason"].as_str().unwrap().contains("No other available agents"));
+-    assert_eq!(fx.child_count("sess_local_alpha").await,"0");
+-    let worker=fx.home.join("agents/worker");std::fs::create_dir_all(&worker).unwrap();
+-    std::fs::write(worker.join("config.yaml"),"agent:\n  name: 真实研究助手\n").unwrap();
+-    let list=execute_actual(fx.addr,&token,"sess_local_alpha","LIST: actual roster").await;
+-    let roster=outcome_json(&parent_tool_outcomes(&provider,"LIST",&list)[0]);
+-    assert_eq!(roster["agents"],json!([{"id":"worker","name":"真实研究助手"}]));
+-    assert_eq!(roster["noCandidates"],false);assert_eq!(fx.child_count("sess_local_alpha").await,"0");
+-    let addr=fx.addr;let auth=token.clone();
+-    let launched=tokio::spawn(async move {execute_actual(addr,&auth,"sess_local_alpha","LAUNCH: delegate read-only work").await});
+-    wait_until(||provider.calls.lock().unwrap().iter().any(|(key,_)|key=="CHILD-SCOPED")).await;
++    let parent_gate = Arc::new(tokio::sync::Semaphore::new(0));
++    let child_gate = Arc::new(tokio::sync::Semaphore::new(0));
++    let writes = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++    let provider = scripted(
++        vec![
++            (
++                "EMPTY",
++                vec![
++                    call("subagent", json!({"agent":"?","task":""})),
++                    Step::Final("候选为空已如实说明"),
++                ],
++            ),
++            (
++                "LIST",
++                vec![
++                    call("subagent", json!({"agent":"list","task":""})),
++                    Step::Final("读到真实候选"),
++                ],
++            ),
++            (
++                "LAUNCH",
++                vec![
++                    call(
++                        "subagent",
++                        json!({"agent":"worker","task":"CHILD-SCOPED: research","access":"read","label":"research"}),
++                    ),
++                    call("subagent", json!({"agent":"?","task":""})),
++                    Step::Final("父继续"),
++                ],
++            ),
++            (
++                "CHILD-SCOPED",
++                vec![
++                    call(
++                        "write",
++                        json!({"path":"/tmp/original-subagent-write","content":"must be refused"}),
++                    ),
++                    Step::Final("REAL_CHILD_SCOPED_RESULT"),
++                ],
++            ),
++            ("RESULT", vec![Step::Final("父已接收真实结果")]),
++            ("FOREIGN", vec![Step::Final("另一父会话")]),
++            (
++                "DENY",
++                vec![
++                    call(
++                        "subagent",
++                        json!({"agent":"worker","task":"CHILD-DENIED: must not start","access":"write"}),
++                    ),
++                    Step::Final("父看到权限拒绝"),
++                ],
++            ),
++            (
++                "MISSING",
++                vec![
++                    call(
++                        "subagent",
++                        json!({"agent":"not-a-real-agent","task":"CHILD-MISSING: must not start"}),
++                    ),
++                    Step::Final("父看到无候选拒绝"),
++                ],
++            ),
++        ],
++        vec![
++            (("LAUNCH", 2), parent_gate.clone()),
++            (("CHILD-SCOPED", 1), child_gate.clone()),
++        ],
++    );
++    let fx = Fixture::start(
++        "subagent-list-launch",
++        ServiceDeps {
++            turn_provider: Some(provider.clone()),
++            tool_gateway: Some(gateway_with_write(writes.clone())),
++            ..ServiceDeps::default()
++        },
++    )
++    .await;
++    let token = fx.state.auth().local_token();
++    let empty = execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_alpha",
++        "EMPTY: truthful empty roster",
++    )
++    .await;
++    let no_candidates = outcome_json(&parent_tool_outcomes(&provider, "EMPTY", &empty)[0]);
++    assert_eq!(no_candidates["agents"], json!([]));
++    assert_eq!(no_candidates["noCandidates"], true);
++    assert!(no_candidates["reason"]
++        .as_str()
++        .unwrap()
++        .contains("No other available agents"));
++    assert_eq!(fx.child_count("sess_local_alpha").await, "0");
++    let worker = fx.home.join("agents/worker");
++    std::fs::create_dir_all(&worker).unwrap();
++    std::fs::write(worker.join("config.yaml"), "agent:\n  name: 真实研究助手\n").unwrap();
++    let list = execute_actual(fx.addr, &token, "sess_local_alpha", "LIST: actual roster").await;
++    let roster = outcome_json(&parent_tool_outcomes(&provider, "LIST", &list)[0]);
++    assert_eq!(
++        roster["agents"],
++        json!([{"id":"worker","name":"真实研究助手"}])
++    );
++    assert_eq!(roster["noCandidates"], false);
++    assert_eq!(fx.child_count("sess_local_alpha").await, "0");
++    let addr = fx.addr;
++    let auth = token.clone();
++    let launched = tokio::spawn(async move {
++        execute_actual(
++            addr,
++            &auth,
++            "sess_local_alpha",
++            "LAUNCH: delegate read-only work",
++        )
++        .await
++    });
++    wait_until(|| {
++        provider
++            .calls
++            .lock()
++            .unwrap()
++            .iter()
++            .any(|(key, _)| key == "CHILD-SCOPED")
++    })
++    .await;
+     parent_gate.add_permits(1);
+-    let parent=launched.await.unwrap();
+-    let outcomes=parent_tool_outcomes(&provider,"LAUNCH",&parent);
+-    assert_eq!(outcomes.len(),2);
+-    let launch=outcome_json(&outcomes[0]);let thread=fx.state.subagents().threads_of("sess_local_alpha").pop().unwrap();
+-    assert_eq!(launch["taskId"],thread.child_run_id.as_deref().unwrap());
+-    assert_eq!(launch["threadId"],thread.thread_id);assert_eq!(launch["childRunId"],launch["taskId"]);
+-    assert!(matches!(launch["status"].as_str(),Some("queued"|"running")));assert!(launch["progressError"].is_null());assert_eq!(thread.tier,lingxi_kernel::subagent::ToolAccessTier::ReadOnly);
+-    let progress=outcome_json(&outcomes[1]);let task=&progress["tasks"][0];
+-    assert_eq!(task["taskId"],launch["taskId"]);assert_eq!(task["threadId"],launch["threadId"]);
+-    assert_eq!(task["status"],"running");assert_eq!(task["modelCallsCompleted"],0);assert_eq!(task["toolCallsCompleted"],0);
+-    let child=thread.child_run_id.clone().unwrap();
+-    let lineage=fx.state.storage().query_one_text("SELECT parent_run_id FROM run_lineage WHERE run_id=?1",vec![child.clone()]).await.unwrap().unwrap();
+-    assert_eq!(lineage,parent);
++    let parent = launched.await.unwrap();
++    let outcomes = parent_tool_outcomes(&provider, "LAUNCH", &parent);
++    assert_eq!(outcomes.len(), 2);
++    let launch = outcome_json(&outcomes[0]);
++    let thread = fx
++        .state
++        .subagents()
++        .threads_of("sess_local_alpha")
++        .pop()
++        .unwrap();
++    assert_eq!(launch["taskId"], thread.child_run_id.as_deref().unwrap());
++    assert_eq!(launch["threadId"], thread.thread_id);
++    assert_eq!(launch["childRunId"], launch["taskId"]);
++    assert!(matches!(
++        launch["status"].as_str(),
++        Some("queued" | "running")
++    ));
++    assert!(launch["progressError"].is_null());
++    assert_eq!(
++        thread.tier,
++        lingxi_kernel::subagent::ToolAccessTier::ReadOnly
++    );
++    let progress = outcome_json(&outcomes[1]);
++    let task = &progress["tasks"][0];
++    assert_eq!(task["taskId"], launch["taskId"]);
++    assert_eq!(task["threadId"], launch["threadId"]);
++    assert_eq!(task["status"], "running");
++    assert_eq!(task["modelCallsCompleted"], 0);
++    assert_eq!(task["toolCallsCompleted"], 0);
++    let child = thread.child_run_id.clone().unwrap();
++    let lineage = fx
++        .state
++        .storage()
++        .query_one_text(
++            "SELECT parent_run_id FROM run_lineage WHERE run_id=?1",
++            vec![child.clone()],
++        )
++        .await
++        .unwrap()
++        .unwrap();
++    assert_eq!(lineage, parent);
+     child_gate.add_permits(1);
+-    wait_until(||fx.state.subagents().active_counts("sess_local_alpha")== (0,0) && fx.state.sessions().session_supervisor().steering_pending("sess_local_alpha")>0).await;
+-    assert_eq!(writes.load(std::sync::atomic::Ordering::SeqCst),0,"只读交集必须在正式边界阻止真实外部执行");
+-    let child_tools=tool_results(&fx.events("sess_local_alpha").await,&child);assert_eq!(child_tools.len(),1);
+-    assert!(child_tools[0].error.as_ref().unwrap().message.contains("ACTION_BLOCKED_BY_READ_ONLY"));
+-    let final_parent=execute_actual(fx.addr,&token,"sess_local_alpha","RESULT: consume retained child").await;
+-    assert!(!final_parent.is_empty());assert!(submission_has(&provider,"RESULT","REAL_CHILD_SCOPED_RESULT"));
+-    assert!(submission_has(&provider,"RESULT",&thread.thread_id));
+-    execute_actual(fx.addr,&token,"sess_local_beta","FOREIGN: separate parent").await;
+-    assert!(!submission_has(&provider,"FOREIGN","REAL_CHILD_SCOPED_RESULT"));
+-    create_owned_session(&fx,"readonly-launch","read_only").await;
+-    let denial=execute_actual(fx.addr,&token,"readonly-launch","DENY: refuse escalation").await;
+-    let denied=parent_tool_outcomes(&provider,"DENY",&denial);
+-    assert!(matches!(&denied[0],ToolOutcome::Failed{error} if error.message.contains("SUBAGENT_WRITE_DENIED_BY_PARENT_READ_ONLY")));
+-    assert_eq!(fx.child_count("readonly-launch").await,"0");
+-    let missing=execute_actual(fx.addr,&token,"sess_local_alpha","MISSING: refuse unavailable candidate").await;
+-    assert!(matches!(&parent_tool_outcomes(&provider,"MISSING",&missing)[0],ToolOutcome::Failed{error} if error.code==ErrorCode::NotFound && error.message.contains("not-a-real-agent")));
+-    assert_eq!(fx.child_count("sess_local_alpha").await,"1");assert_eq!(fx.state.subagents().active_counts("sess_local_alpha"),(0,0));
+-    assert!(!provider.calls.lock().unwrap().iter().any(|(key,_)|matches!(key.as_str(),"CHILD-DENIED"|"CHILD-MISSING")));
++    wait_until(|| {
++        fx.state.subagents().active_counts("sess_local_alpha") == (0, 0)
++            && fx
++                .state
++                .sessions()
++                .session_supervisor()
++                .steering_pending("sess_local_alpha")
++                > 0
++    })
++    .await;
++    assert_eq!(
++        writes.load(std::sync::atomic::Ordering::SeqCst),
++        0,
++        "只读交集必须在正式边界阻止真实外部执行"
++    );
++    let child_tools = tool_results(&fx.events("sess_local_alpha").await, &child);
++    assert_eq!(child_tools.len(), 1);
++    assert!(child_tools[0]
++        .error
++        .as_ref()
++        .unwrap()
++        .message
++        .contains("ACTION_BLOCKED_BY_READ_ONLY"));
++    let final_parent = execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_alpha",
++        "RESULT: consume retained child",
++    )
++    .await;
++    assert!(!final_parent.is_empty());
++    assert!(submission_has(
++        &provider,
++        "RESULT",
++        "REAL_CHILD_SCOPED_RESULT"
++    ));
++    assert!(submission_has(&provider, "RESULT", &thread.thread_id));
++    execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_beta",
++        "FOREIGN: separate parent",
++    )
++    .await;
++    assert!(!submission_has(
++        &provider,
++        "FOREIGN",
++        "REAL_CHILD_SCOPED_RESULT"
++    ));
++    create_owned_session(&fx, "readonly-launch", "read_only").await;
++    let denial = execute_actual(
++        fx.addr,
++        &token,
++        "readonly-launch",
++        "DENY: refuse escalation",
++    )
++    .await;
++    let denied = parent_tool_outcomes(&provider, "DENY", &denial);
++    assert!(
++        matches!(&denied[0],ToolOutcome::Failed{error} if error.message.contains("SUBAGENT_WRITE_DENIED_BY_PARENT_READ_ONLY"))
++    );
++    assert_eq!(fx.child_count("readonly-launch").await, "0");
++    let missing = execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_alpha",
++        "MISSING: refuse unavailable candidate",
++    )
++    .await;
++    assert!(
++        matches!(&parent_tool_outcomes(&provider,"MISSING",&missing)[0],ToolOutcome::Failed{error} if error.code==ErrorCode::NotFound && error.message.contains("not-a-real-agent"))
++    );
++    assert_eq!(fx.child_count("sess_local_alpha").await, "1");
++    assert_eq!(
++        fx.state.subagents().active_counts("sess_local_alpha"),
++        (0, 0)
++    );
++    assert!(!provider
++        .calls
++        .lock()
++        .unwrap()
++        .iter()
++        .any(|(key, _)| matches!(key.as_str(), "CHILD-DENIED" | "CHILD-MISSING")));
+     fx.finish().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:905:
+ #[tokio::test]
+ async fn subagent_reply_restores_actual_thread_history_and_returns_only_to_its_parent() {
+-    let provider=scripted(vec![
+-        ("START",vec![Step::Delegate{target:"subagent",task:"CHILD-OLD: first private task",thread_key:None},Step::Final("PARENT_PRIVATE_CONTEXT_MARKER")]),
+-        ("CHILD-OLD",vec![Step::Final("ACTUAL_CHILD_PRIOR_SECRET")]),
+-        ("REPLY",vec![Step::Delegate{target:"subagent_reply",task:"CHILD-NEXT: continue using prior result",thread_key:Some("T")},Step::Final("父继续处理")]),
+-        ("CHILD-NEXT",vec![Step::Final("ACTUAL_CHILD_CONTINUATION_RESULT")]),
+-        ("CONSUME",vec![Step::Final("父接到续接结果")]),
+-        ("FOREIGN-HISTORY",vec![Step::Delegate{target:"subagent_reply",task:"CHILD-FOREIGN: forbidden",thread_key:Some("T")},Step::Final("foreign rejected")]),
+-    ],vec![]);
+-    let fx=Fixture::start("subagent-real-history",ServiceDeps{turn_provider:Some(provider.clone()),tool_gateway:Some(delegation_gateway()),..ServiceDeps::default()}).await;
+-    let token=fx.state.auth().local_token();
+-    let start=execute_actual(fx.addr,&token,"sess_local_alpha","START: PARENT_PRIVATE_CONTEXT_MARKER").await;
+-    wait_until(||fx.state.subagents().active_counts("sess_local_alpha")== (0,0) && !fx.state.subagents().threads_of("sess_local_alpha").is_empty()).await;
+-    let first=fx.state.subagents().threads_of("sess_local_alpha").pop().unwrap();
+-    let first_child=first.child_run_id.clone().unwrap();
+-    let ack=outcome_json(&parent_tool_outcomes(&provider,"START",&start)[0]);assert_eq!(ack["threadId"],first.thread_id);assert_eq!(ack["taskId"],first_child);
+-    provider.threads.lock().unwrap().insert("T".into(),first.thread_id.clone());
+-    let foreign_before=fx.events("sess_local_beta").await;
+-    let reply=execute_actual(fx.addr,&token,"sess_local_alpha","REPLY: append a task").await;
+-    wait_until(||fx.state.subagents().active_counts("sess_local_alpha")== (0,0)).await;
+-    let continued=fx.state.subagents().threads_of("sess_local_alpha").pop().unwrap();
+-    assert_eq!(continued.thread_id,first.thread_id);assert_ne!(continued.child_run_id,first.child_run_id);
+-    let continued_ack=outcome_json(&parent_tool_outcomes(&provider,"REPLY",&reply)[0]);assert_eq!(continued_ack["threadId"],first.thread_id);assert_eq!(continued_ack["taskId"],continued.child_run_id.as_deref().unwrap());
+-    let calls=provider.calls.lock().unwrap().clone();
+-    let old=&calls.iter().find(|(m,_)|m=="CHILD-OLD").unwrap().1;
+-    assert!(old.prior.is_empty());assert!(!old.submission.contains("PARENT_PRIVATE_CONTEXT_MARKER"));
+-    let next=&calls.iter().find(|(m,_)|m=="CHILD-NEXT").unwrap().1;
+-    assert!(next.prior.iter().any(|i|matches!(i,ExchangeItem::UserTurn{text} if text=="CHILD-OLD: first private task")));
++    let provider = scripted(
++        vec![
++            (
++                "START",
++                vec![
++                    Step::Delegate {
++                        target: "subagent",
++                        task: "CHILD-OLD: first private task",
++                        thread_key: None,
++                    },
++                    Step::Final("PARENT_PRIVATE_CONTEXT_MARKER"),
++                ],
++            ),
++            ("CHILD-OLD", vec![Step::Final("ACTUAL_CHILD_PRIOR_SECRET")]),
++            (
++                "REPLY",
++                vec![
++                    Step::Delegate {
++                        target: "subagent_reply",
++                        task: "CHILD-NEXT: continue using prior result",
++                        thread_key: Some("T"),
++                    },
++                    Step::Final("父继续处理"),
++                ],
++            ),
++            (
++                "CHILD-NEXT",
++                vec![Step::Final("ACTUAL_CHILD_CONTINUATION_RESULT")],
++            ),
++            ("CONSUME", vec![Step::Final("父接到续接结果")]),
++            (
++                "FOREIGN-HISTORY",
++                vec![
++                    Step::Delegate {
++                        target: "subagent_reply",
++                        task: "CHILD-FOREIGN: forbidden",
++                        thread_key: Some("T"),
++                    },
++                    Step::Final("foreign rejected"),
++                ],
++            ),
++        ],
++        vec![],
++    );
++    let fx = Fixture::start(
++        "subagent-real-history",
++        ServiceDeps {
++            turn_provider: Some(provider.clone()),
++            tool_gateway: Some(delegation_gateway()),
++            ..ServiceDeps::default()
++        },
++    )
++    .await;
++    let token = fx.state.auth().local_token();
++    let start = execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_alpha",
++        "START: PARENT_PRIVATE_CONTEXT_MARKER",
++    )
++    .await;
++    wait_until(|| {
++        fx.state.subagents().active_counts("sess_local_alpha") == (0, 0)
++            && !fx
++                .state
++                .subagents()
++                .threads_of("sess_local_alpha")
++                .is_empty()
++    })
++    .await;
++    let first = fx
++        .state
++        .subagents()
++        .threads_of("sess_local_alpha")
++        .pop()
++        .unwrap();
++    let first_child = first.child_run_id.clone().unwrap();
++    let ack = outcome_json(&parent_tool_outcomes(&provider, "START", &start)[0]);
++    assert_eq!(ack["threadId"], first.thread_id);
++    assert_eq!(ack["taskId"], first_child);
++    provider
++        .threads
++        .lock()
++        .unwrap()
++        .insert("T".into(), first.thread_id.clone());
++    let foreign_before = fx.events("sess_local_beta").await;
++    let reply = execute_actual(fx.addr, &token, "sess_local_alpha", "REPLY: append a task").await;
++    wait_until(|| fx.state.subagents().active_counts("sess_local_alpha") == (0, 0)).await;
++    let continued = fx
++        .state
++        .subagents()
++        .threads_of("sess_local_alpha")
++        .pop()
++        .unwrap();
++    assert_eq!(continued.thread_id, first.thread_id);
++    assert_ne!(continued.child_run_id, first.child_run_id);
++    let continued_ack = outcome_json(&parent_tool_outcomes(&provider, "REPLY", &reply)[0]);
++    assert_eq!(continued_ack["threadId"], first.thread_id);
++    assert_eq!(
++        continued_ack["taskId"],
++        continued.child_run_id.as_deref().unwrap()
++    );
++    let calls = provider.calls.lock().unwrap().clone();
++    let old = &calls.iter().find(|(m, _)| m == "CHILD-OLD").unwrap().1;
++    assert!(old.prior.is_empty());
++    assert!(!old.submission.contains("PARENT_PRIVATE_CONTEXT_MARKER"));
++    let next = &calls.iter().find(|(m, _)| m == "CHILD-NEXT").unwrap().1;
++    assert!(next.prior.iter().any(
++        |i| matches!(i,ExchangeItem::UserTurn{text} if text=="CHILD-OLD: first private task")
++    ));
+     assert!(next.prior.iter().any(|i|matches!(i,ExchangeItem::AssistantTurn{content,..} if content.iter().any(|b|matches!(b,ContentBlock::Text{text} if text=="ACTUAL_CHILD_PRIOR_SECRET")))));
+-    assert!(!format!("{:?}",next.prior).contains("PARENT_PRIVATE_CONTEXT_MARKER"));
+-    let durable=fx.state.storage().query_one_text("SELECT history_json FROM subagent_history_v1 WHERE run_id=?1",vec![first_child.clone()]).await.unwrap().unwrap();
+-    assert!(durable.contains("ACTUAL_CHILD_PRIOR_SECRET"));assert!(durable.contains("CHILD-OLD: first private task"));
+-    execute_actual(fx.addr,&token,"sess_local_alpha","CONSUME: real continuation delivered").await;
+-    assert!(["REPLY","CONSUME"].iter().any(|marker|submission_has(&provider,marker,"ACTUAL_CHILD_CONTINUATION_RESULT")));
+-    assert!(["REPLY","CONSUME"].iter().any(|marker|submission_has(&provider,marker,continued.child_run_id.as_deref().unwrap())));
+-    assert_eq!(fx.events("sess_local_beta").await,foreign_before);
+-    let before=fx.state.subagents().threads_of("sess_local_alpha");
+-    let foreign=execute_actual(fx.addr,&token,"sess_local_beta","FOREIGN-HISTORY: reject other parent").await;
+-    assert!(matches!(&parent_tool_outcomes(&provider,"FOREIGN-HISTORY",&foreign)[0],ToolOutcome::Failed{error} if error.code==ErrorCode::Forbidden));
+-    assert_eq!(fx.state.subagents().threads_of("sess_local_alpha"),before);assert_eq!(fx.child_count("sess_local_beta").await,"0");
+-    assert!(!submission_has(&provider,"FOREIGN-HISTORY","ACTUAL_CHILD_PRIOR_SECRET"));
+-    assert!(!submission_has(&provider,"FOREIGN-HISTORY","ACTUAL_CHILD_CONTINUATION_RESULT"));
+-    assert!(!provider.calls.lock().unwrap().iter().any(|(key,_)|key=="CHILD-FOREIGN"));
++    assert!(!format!("{:?}", next.prior).contains("PARENT_PRIVATE_CONTEXT_MARKER"));
++    let durable = fx
++        .state
++        .storage()
++        .query_one_text(
++            "SELECT history_json FROM subagent_history_v1 WHERE run_id=?1",
++            vec![first_child.clone()],
++        )
++        .await
++        .unwrap()
++        .unwrap();
++    assert!(durable.contains("ACTUAL_CHILD_PRIOR_SECRET"));
++    assert!(durable.contains("CHILD-OLD: first private task"));
++    execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_alpha",
++        "CONSUME: real continuation delivered",
++    )
++    .await;
++    assert!(["REPLY", "CONSUME"].iter().any(|marker| submission_has(
++        &provider,
++        marker,
++        "ACTUAL_CHILD_CONTINUATION_RESULT"
++    )));
++    assert!(["REPLY", "CONSUME"].iter().any(|marker| submission_has(
++        &provider,
++        marker,
++        continued.child_run_id.as_deref().unwrap()
++    )));
++    assert_eq!(fx.events("sess_local_beta").await, foreign_before);
++    let before = fx.state.subagents().threads_of("sess_local_alpha");
++    let foreign = execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_beta",
++        "FOREIGN-HISTORY: reject other parent",
++    )
++    .await;
++    assert!(
++        matches!(&parent_tool_outcomes(&provider,"FOREIGN-HISTORY",&foreign)[0],ToolOutcome::Failed{error} if error.code==ErrorCode::Forbidden)
++    );
++    assert_eq!(fx.state.subagents().threads_of("sess_local_alpha"), before);
++    assert_eq!(fx.child_count("sess_local_beta").await, "0");
++    assert!(!submission_has(
++        &provider,
++        "FOREIGN-HISTORY",
++        "ACTUAL_CHILD_PRIOR_SECRET"
++    ));
++    assert!(!submission_has(
++        &provider,
++        "FOREIGN-HISTORY",
++        "ACTUAL_CHILD_CONTINUATION_RESULT"
++    ));
++    assert!(!provider
++        .calls
++        .lock()
++        .unwrap()
++        .iter()
++        .any(|(key, _)| key == "CHILD-FOREIGN"));
+     fx.finish().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:1098:
+             "真实失败正文必须进入所属父模型输入：{visible_error}"
+         );
+     }
+-    assert!(
+-        !["PANIC-PARENT", "FAIL-PARENT", "CONSUME-FAILURE"]
+-            .iter()
+-            .any(|marker| submission_has(&provider, marker, "ACTUAL_CHILD_PANIC_REASON_941"))
+-    );
++    assert!(!["PANIC-PARENT", "FAIL-PARENT", "CONSUME-FAILURE"]
++        .iter()
++        .any(|marker| submission_has(&provider, marker, "ACTUAL_CHILD_PANIC_REASON_941")));
+     execute_actual(
+         fx.addr,
+         &token,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_chat_proofs.rs:1135:
+ 
+ #[tokio::test]
+ async fn subagent_session_and_global_caps_refuse_and_recover_without_ghost_children() {
+-    let child_gate=Arc::new(tokio::sync::Semaphore::new(0));
+-    let provider=scripted(vec![
+-        ("CAP-A",vec![call("subagent",json!({"task":"HELD-A: first"})),call("subagent",json!({"task":"SHOULD-NOT-A: session cap"})),Step::Final("session cap refusal")]),
+-        ("HELD-A",vec![Step::Final("real result A")]),
+-        ("CAP-B",vec![call("subagent",json!({"task":"HELD-B: second"})),Step::Final("launched B")]),
+-        ("HELD-B",vec![Step::Final("real result B")]),
+-        ("CAP-GLOBAL-REFUSE",vec![call("subagent",json!({"task":"SHOULD-NOT-GLOBAL: global cap"})),Step::Final("global cap refusal")]),
+-        ("CAP-RECOVER",vec![call("subagent",json!({"task":"RECOVERED-CHILD: actual accepted"})),Step::Final("recovered")]),
+-        ("RECOVERED-CHILD",vec![Step::Final("true recovered result")]),
+-    ],vec![(("HELD-A",1),child_gate.clone()),(("HELD-B",1),child_gate.clone())]);
+-    let fx=Fixture::start("subagent-cap-matrix",ServiceDeps{turn_provider:Some(provider.clone()),tool_gateway:Some(delegation_gateway()),subagent_policy:lingxi_kernel::subagent::SubagentPolicy{per_session_limit:1,global_limit:2,..Default::default()},..ServiceDeps::default()}).await;
+-    let token=fx.state.auth().local_token();create_owned_session(&fx,"cap-third-parent","operate").await;
+-    let cap_parent=execute_actual(fx.addr,&token,"sess_local_alpha","CAP-A: launch then refuse second in same parent").await;
+-    wait_until(||provider.calls.lock().unwrap().iter().any(|(m,_)|m=="HELD-A")).await;
+-    let cap_outcomes=parent_tool_outcomes(&provider,"CAP-A",&cap_parent);
+-    assert_eq!(cap_outcomes.len(),2);
+-    assert!(matches!(&cap_outcomes[0],ToolOutcome::Success{..}));
+-    assert!(matches!(&cap_outcomes[1],ToolOutcome::Failed{error} if error.code==ErrorCode::BudgetExceeded && error.message.contains("per-session")));
+-    assert_eq!(fx.child_count("sess_local_alpha").await,"1");assert_eq!(fx.state.subagents().active_counts("sess_local_alpha"),(1,1));
+-    execute_actual(fx.addr,&token,"sess_local_beta","CAP-B: launch second").await;
+-    wait_until(||provider.calls.lock().unwrap().iter().any(|(m,_)|m=="HELD-B")).await;
+-    let global_refused=execute_actual(fx.addr,&token,"cap-third-parent","CAP-GLOBAL-REFUSE: no third child").await;
+-    assert!(matches!(&parent_tool_outcomes(&provider,"CAP-GLOBAL-REFUSE",&global_refused)[0],ToolOutcome::Failed{error} if error.code==ErrorCode::BudgetExceeded && error.message.contains("global")));
+-    assert_eq!(fx.child_count("cap-third-parent").await,"0");assert_eq!(fx.state.subagents().active_counts("cap-third-parent"),(0,2));
+-    assert!(!provider.calls.lock().unwrap().iter().any(|(m,_)|matches!(m.as_str(),"SHOULD-NOT-A"|"SHOULD-NOT-GLOBAL")));
+-    child_gate.add_permits(2);wait_until(||fx.state.subagents().active_counts("sess_local_alpha")== (0,0)).await;
+-    execute_actual(fx.addr,&token,"cap-third-parent","CAP-RECOVER: capacity reusable").await;
+-    wait_until(||fx.state.subagents().active_counts("cap-third-parent")== (0,0)).await;
+-    assert_eq!(fx.child_count("cap-third-parent").await,"1");
+-    assert_eq!(fx.child_count("sess_local_alpha").await,"1");assert_eq!(fx.child_count("sess_local_beta").await,"1");
++    let child_gate = Arc::new(tokio::sync::Semaphore::new(0));
++    let provider = scripted(
++        vec![
++            (
++                "CAP-A",
++                vec![
++                    call("subagent", json!({"task":"HELD-A: first"})),
++                    call("subagent", json!({"task":"SHOULD-NOT-A: session cap"})),
++                    Step::Final("session cap refusal"),
++                ],
++            ),
++            ("HELD-A", vec![Step::Final("real result A")]),
++            (
++                "CAP-B",
++                vec![
++                    call("subagent", json!({"task":"HELD-B: second"})),
++                    Step::Final("launched B"),
++                ],
++            ),
++            ("HELD-B", vec![Step::Final("real result B")]),
++            (
++                "CAP-GLOBAL-REFUSE",
++                vec![
++                    call("subagent", json!({"task":"SHOULD-NOT-GLOBAL: global cap"})),
++                    Step::Final("global cap refusal"),
++                ],
++            ),
++            (
++                "CAP-RECOVER",
++                vec![
++                    call(
++                        "subagent",
++                        json!({"task":"RECOVERED-CHILD: actual accepted"}),
++                    ),
++                    Step::Final("recovered"),
++                ],
++            ),
++            (
++                "RECOVERED-CHILD",
++                vec![Step::Final("true recovered result")],
++            ),
++        ],
++        vec![
++            (("HELD-A", 1), child_gate.clone()),
++            (("HELD-B", 1), child_gate.clone()),
++        ],
++    );
++    let fx = Fixture::start(
++        "subagent-cap-matrix",
++        ServiceDeps {
++            turn_provider: Some(provider.clone()),
++            tool_gateway: Some(delegation_gateway()),
++            subagent_policy: lingxi_kernel::subagent::SubagentPolicy {
++                per_session_limit: 1,
++                global_limit: 2,
++                ..Default::default()
++            },
++            ..ServiceDeps::default()
++        },
++    )
++    .await;
++    let token = fx.state.auth().local_token();
++    create_owned_session(&fx, "cap-third-parent", "operate").await;
++    let cap_parent = execute_actual(
++        fx.addr,
++        &token,
++        "sess_local_alpha",
++        "CAP-A: launch then refuse second in same parent",
++    )
++    .await;
++    wait_until(|| {
++        provider
++            .calls
++            .lock()
++            .unwrap()
++            .iter()
++            .any(|(m, _)| m == "HELD-A")
++    })
++    .await;
++    let cap_outcomes = parent_tool_outcomes(&provider, "CAP-A", &cap_parent);
++    assert_eq!(cap_outcomes.len(), 2);
++    assert!(matches!(&cap_outcomes[0], ToolOutcome::Success { .. }));
++    assert!(
++        matches!(&cap_outcomes[1],ToolOutcome::Failed{error} if error.code==ErrorCode::BudgetExceeded && error.message.contains("per-session"))
++    );
++    assert_eq!(fx.child_count("sess_local_alpha").await, "1");
++    assert_eq!(
++        fx.state.subagents().active_counts("sess_local_alpha"),
++        (1, 1)
++    );
++    execute_actual(fx.addr, &token, "sess_local_beta", "CAP-B: launch second").await;
++    wait_until(|| {
++        provider
++            .calls
++            .lock()
++            .unwrap()
++            .iter()
++            .any(|(m, _)| m == "HELD-B")
++    })
++    .await;
++    let global_refused = execute_actual(
++        fx.addr,
++        &token,
++        "cap-third-parent",
++        "CAP-GLOBAL-REFUSE: no third child",
++    )
++    .await;
++    assert!(
++        matches!(&parent_tool_outcomes(&provider,"CAP-GLOBAL-REFUSE",&global_refused)[0],ToolOutcome::Failed{error} if error.code==ErrorCode::BudgetExceeded && error.message.contains("global"))
++    );
++    assert_eq!(fx.child_count("cap-third-parent").await, "0");
++    assert_eq!(
++        fx.state.subagents().active_counts("cap-third-parent"),
++        (0, 2)
++    );
++    assert!(!provider
++        .calls
++        .lock()
++        .unwrap()
++        .iter()
++        .any(|(m, _)| matches!(m.as_str(), "SHOULD-NOT-A" | "SHOULD-NOT-GLOBAL")));
++    child_gate.add_permits(2);
++    wait_until(|| fx.state.subagents().active_counts("sess_local_alpha") == (0, 0)).await;
++    execute_actual(
++        fx.addr,
++        &token,
++        "cap-third-parent",
++        "CAP-RECOVER: capacity reusable",
++    )
++    .await;
++    wait_until(|| fx.state.subagents().active_counts("cap-third-parent") == (0, 0)).await;
++    assert_eq!(fx.child_count("cap-third-parent").await, "1");
++    assert_eq!(fx.child_count("sess_local_alpha").await, "1");
++    assert_eq!(fx.child_count("sess_local_beta").await, "1");
+     fx.finish().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:5:
+ use std::time::Duration;
+ 
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
+-    prepare_layout, run,
++    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
++    ServiceError, ServiceState,
+ };
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+ use tokio::net::TcpStream;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:511:
+     }));
+     let block = &blocks["blocks"][0];
+     let text = block["text"].as_str().unwrap();
+-    assert!(
+-        block["locator"]["headingPath"]
+-            .as_array()
+-            .is_none_or(Vec::is_empty)
+-    );
++    assert!(block["locator"]["headingPath"]
++        .as_array()
++        .is_none_or(Vec::is_empty));
+     let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
+     index
+         .replace_artifact_chunks(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:727:
+         .await;
+     assert_eq!(status, 200, "{removed}");
+     assert!(removed["membership"]["removedAt"].is_string());
+-    assert!(
+-        facts
+-            .get_membership(second_id, source)
+-            .unwrap()
+-            .removed_at
+-            .is_none()
+-    );
++    assert!(facts
++        .get_membership(second_id, source)
++        .unwrap()
++        .removed_at
++        .is_none());
+     assert_eq!(facts.get_source(source).unwrap().id, source);
+     assert_eq!(
+         facts.read_snapshot_bytes(&snap).unwrap(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:782:
+     assert_ne!(refreshed["snapshot"]["id"], original["snapshot"]["id"]);
+     assert_eq!(refreshed["parseArtifact"]["status"], "ready");
+     let refreshed_source = refreshed["source"]["id"].as_str().unwrap();
+-    assert!(
+-        facts
+-            .latest_job_for_source(second_id, refreshed_source)
+-            .unwrap()
+-            .is_some()
+-    );
++    assert!(facts
++        .latest_job_for_source(second_id, refreshed_source)
++        .unwrap()
++        .is_some());
+     let retained = facts.latest_snapshot_for_source(refreshed_source).unwrap();
+     let credential = state
+         .auth()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:825:
+     wait_until_job(&server, second_id, refreshed_source, "done").await;
+     let artifact = refreshed["parseArtifact"]["id"].as_str().unwrap();
+     let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
+-    assert!(
+-        !index
+-            .list_ready_variant_metadata(artifact)
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(!index
++        .list_ready_variant_metadata(artifact)
++        .unwrap()
++        .is_empty());
+     let (status, purge) = server
+         .request(
+             "DELETE",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:844:
+     assert_eq!(purge["purge"]["indexVariants"], true);
+     assert!(facts.get_source(refreshed_source).is_err());
+     assert!(!home.join("knowledge").join(&retained.storage_path).exists());
+-    assert!(
+-        index
+-            .list_ready_variant_metadata(artifact)
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(index
++        .list_ready_variant_metadata(artifact)
++        .unwrap()
++        .is_empty());
+     let (status, _) = server
+         .request(
+             "POST",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:891:
+         )
+         .unwrap();
+     facts.add_membership(id, &untracked.id).unwrap();
+-    assert!(
+-        facts
+-            .latest_job_for_source(id, &untracked.id)
+-            .unwrap()
+-            .is_none()
+-    );
++    assert!(facts
++        .latest_job_for_source(id, &untracked.id)
++        .unwrap()
++        .is_none());
+     let server = serve(state.clone()).await;
+     let (status, retried) = server
+         .request(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:989:
+     );
+     assert!(facts.get_source(&untracked.id).is_err());
+     assert!(!home.join("knowledge").join(&snapshot.storage_path).exists());
+-    assert!(
+-        KnowledgeIndexStore::open(&home.join("knowledge"))
+-            .unwrap()
+-            .list_ready_variant_metadata(&artifact.id)
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(KnowledgeIndexStore::open(&home.join("knowledge"))
++        .unwrap()
++        .list_ready_variant_metadata(&artifact.id)
++        .unwrap()
++        .is_empty());
+     let (status, _) = server
+         .request(
+             "POST",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1381:
+         .find(|hit| hit["kind"] == "original-text")
+         .unwrap()["spans"][0];
+     let citation = span["citationId"].as_str().unwrap();
+-    assert!(
+-        span["citationMarkdown"]
+-            .as_str()
+-            .unwrap()
+-            .contains(citation)
+-    );
++    assert!(span["citationMarkdown"]
++        .as_str()
++        .unwrap()
++        .contains(citation));
+     let (status, resolved) = server
+         .request(
+             "GET",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1403:
+         !degraded["degraded"].as_array().unwrap().is_empty(),
+         "无模型能力必须显式说明"
+     );
+-    assert!(
+-        degraded["searchedVectorVariants"]
+-            .as_array()
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(degraded["searchedVectorVariants"]
++        .as_array()
++        .unwrap()
++        .is_empty());
+     let none: Value = serde_json::from_str(&result(2)).unwrap();
+     assert!(
+         none["hits"].as_array().unwrap().is_empty(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1421:
+     );
+     let grep: Value = serde_json::from_str(&result(4)).unwrap();
+     assert!(!grep["matches"].as_array().unwrap().is_empty());
+-    assert!(
+-        grep["matches"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .all(|hit| hit["sourceId"] == src)
+-    );
++    assert!(grep["matches"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .all(|hit| hit["sourceId"] == src));
+     let matched = &grep["matches"][0];
+     assert!(matched["snippet"].as_str().unwrap().contains("柠檬酸含量"));
+     assert!(matched["blockId"].is_string());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1469:
+         1
+     );
+     assert_eq!(outline["notebooks"][0]["sources"][0]["sourceId"], src);
+-    assert!(
+-        !outline["notebooks"][0]["sources"][0]["sections"]
+-            .as_array()
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(!outline["notebooks"][0]["sources"][0]["sections"]
++        .as_array()
++        .unwrap()
++        .is_empty());
+     let read: Value = serde_json::from_str(&result(7)).unwrap();
+     let text = read["spans"]
+         .as_array()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1508:
+         no_index["hits"].as_array().unwrap().is_empty(),
+         "索引缺失不得伪造命中"
+     );
+-    assert!(
+-        no_index["degraded"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .any(|entry| entry["reason"] == "KNOWLEDGE_INDEX_BUILDING")
+-    );
++    assert!(no_index["degraded"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|entry| entry["reason"] == "KNOWLEDGE_INDEX_BUILDING"));
+     server.stop().await;
+     upstream.abort();
+     let _ = upstream.await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1666:
+                     std::fs::read(observe_home.join("knowledge").join(&snapshot.storage_path))
+                         .unwrap();
+                 assert_eq!(bytes, b"MANAGE_ACTUAL_ADDED_BODY");
+-                assert!(
+-                    observe_facts
+-                        .latest_job_for_source(&observe_id, source)
+-                        .unwrap()
+-                        .is_some()
+-                );
++                assert!(observe_facts
++                    .latest_job_for_source(&observe_id, source)
++                    .unwrap()
++                    .is_some());
+                 // 只准备同studio共享引用；remove自身仍由真实工具执行。
+                 observe_facts
+                     .add_membership(&observe_shared, source)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1684:
+                 assert!(removed["membership"]["removedAt"].is_string());
+                 let saved = saved_bytes.lock().unwrap();
+                 let (source, bytes) = saved.as_ref().unwrap();
+-                assert!(
+-                    !observe_facts
+-                        .list_notebook_sources(&observe_id)
+-                        .unwrap()
+-                        .iter()
+-                        .any(|entry| entry.source.id == *source)
+-                );
+-                assert!(
+-                    observe_facts
+-                        .list_notebook_sources(&observe_shared)
+-                        .unwrap()
+-                        .iter()
+-                        .any(|entry| entry.source.id == *source)
+-                );
++                assert!(!observe_facts
++                    .list_notebook_sources(&observe_id)
++                    .unwrap()
++                    .iter()
++                    .any(|entry| entry.source.id == *source));
++                assert!(observe_facts
++                    .list_notebook_sources(&observe_shared)
++                    .unwrap()
++                    .iter()
++                    .any(|entry| entry.source.id == *source));
+                 assert!(observe_facts.get_source(source).is_ok());
+                 let snapshot = observe_facts.latest_snapshot_for_source(source).unwrap();
+                 assert_eq!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1720:
+                     "# 实际刷新章节\n\nREFRESH_ACTUAL_CHANGED".as_bytes()
+                 );
+                 assert_eq!(refreshed["parseArtifact"]["status"], "ready");
+-                assert!(
+-                    observe_facts
+-                        .latest_job_for_source(&observe_id, source)
+-                        .unwrap()
+-                        .is_some()
+-                );
++                assert!(observe_facts
++                    .latest_job_for_source(&observe_id, source)
++                    .unwrap()
++                    .is_some());
+                 *saved_jobs.lock().unwrap() = observe_facts
+                     .list_ingestion_jobs(Some(&observe_id), None, 200)
+                     .unwrap()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:1766:
+                 let current = observe_facts.list_notebook_sources(&observe_id).unwrap();
+                 assert_eq!(new.len(), current.len());
+                 assert!(!new.is_empty());
+-                assert!(
+-                    current
+-                        .iter()
+-                        .all(|source| new.iter().any(|job| job.source_id == source.source.id))
+-                );
++                assert!(current
++                    .iter()
++                    .all(|source| new.iter().any(|job| job.source_id == source.source.id)));
+             }
+             _ => {}
+         }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:4:
+ use std::time::Duration;
+ 
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
+-    prepare_layout, run,
++    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
++    ServiceError, ServiceState,
+ };
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+ use tokio::net::TcpStream;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:223:
+     assert!(stored.iter().any(|r| r.fact == "旧版事实甲"
+         && r.time.as_deref() == Some("2026-01-01")
+         && r.tags == ["旧版"]));
++    assert!(stored
++        .iter()
++        .any(|r| r.fact == "新版事实乙" && r.session_id.as_deref() == Some("原会话")));
+     assert!(
+-        stored
+-            .iter()
+-            .any(|r| r.fact == "新版事实乙" && r.session_id.as_deref() == Some("原会话"))
+-    );
+-    assert!(
+         facts(&server, "agentB").is_empty(),
+         "其他 Agent 不被导入污染"
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:388:
+         std::fs::read_to_string(dir.join("daily/2026-01-02.md")).unwrap(),
+         "第二日保留\n"
+     );
+-    assert!(
+-        std::fs::read_to_string(dir.join("week.md"))
+-            .unwrap()
+-            .contains("新日正文")
+-    );
+-    assert!(
+-        std::fs::read_to_string(dir.join("memory.md"))
+-            .unwrap()
+-            .contains("新日正文")
+-    );
++    assert!(std::fs::read_to_string(dir.join("week.md"))
++        .unwrap()
++        .contains("新日正文"));
++    assert!(std::fs::read_to_string(dir.join("memory.md"))
++        .unwrap()
++        .contains("新日正文"));
+     let before = file_snapshot(&dir);
+     for (date, payload, want) in [
+         ("2026-01-03", json!({"body":"不存在"}), 404),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:543:
+         .await;
+     assert_eq!(status, 200);
+     assert_eq!(list["tenets"].as_array().unwrap().len(), 3);
+-    assert!(
+-        list["tenets"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .any(|t| t["id"] == pending.id && t["status"] == "pending")
+-    );
+-    assert!(
+-        list["tenets"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .any(|t| t["id"] == rejected.id && t["status"] == "rejected")
+-    );
++    assert!(list["tenets"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|t| t["id"] == pending.id && t["status"] == "pending"));
++    assert!(list["tenets"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|t| t["id"] == rejected.id && t["status"] == "rejected"));
+     let (status, pins) = server
+         .request("GET", "/lingxi/v1/agents/agentA/pinned", None)
+         .await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:679:
+     assert_eq!(result["pins"], json!(["新原则"]));
+     assert_eq!(store.pending().len(), 1);
+     assert_eq!(store.pending()[0].id, pending.id);
+-    assert!(
+-        store
+-            .list()
+-            .tenets
+-            .iter()
+-            .any(|t| t.id == no.id && t.status.as_str() == "rejected")
+-    );
++    assert!(store
++        .list()
++        .tenets
++        .iter()
++        .any(|t| t.id == no.id && t.status.as_str() == "rejected"));
+     assert!(!store.list().tenets.iter().any(|t| t.id == yes.id));
+     assert_eq!(store.active()[0].source.as_str(), "user_direct");
+     let (status, result) = server
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1260:
+         assert_eq!(error["code"], code);
+         assert_eq!(std::fs::read(store.file_path()).unwrap(), before);
+     }
+-    assert!(
+-        service
+-            .tenets_store("agentB")
+-            .unwrap()
+-            .list()
+-            .tenets
+-            .is_empty()
+-    );
++    assert!(service
++        .tenets_store("agentB")
++        .unwrap()
++        .list()
++        .tenets
++        .is_empty());
+     server.stop_and_clean().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1362:
+         server.home.join("proof-product"),
+     );
+     let b_before = std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap();
+-    assert!(
+-        !skills
+-            .runtime_skill_catalog("agentA")
+-            .unwrap()
+-            .iter()
+-            .any(|skill| skill.name == "manual-original")
+-    );
++    assert!(!skills
++        .runtime_skill_catalog("agentA")
++        .unwrap()
++        .iter()
++        .any(|skill| skill.name == "manual-original"));
+     let package = original_install_package(&server.home, "manual-original");
+     let installed = server
+         .request(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1381:
+     assert_eq!(installed.1["ok"], true);
+     assert_eq!(installed.1["skill"]["name"], "manual-original");
+     assert_eq!(
+-        std::fs::read(server.home.join("skills/manual-original/examples/guide.txt")).unwrap(),
++        std::fs::read(
++            server
++                .home
++                .join("skills/manual-original/examples/guide.txt")
++        )
++        .unwrap(),
+         std::fs::read(package.join("examples/guide.txt")).unwrap()
+     );
+     let a_config = std::fs::read_to_string(server.home.join("agents/agentA/config.yaml")).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1388:
+     let (enabled, _) =
+-        lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&a_config).unwrap();
++        lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&a_config)
++            .unwrap();
+     assert!(enabled.contains(&"manual-original".to_string()));
+-    assert!(
+-        skills
+-            .runtime_skill_catalog("agentA")
+-            .unwrap()
+-            .iter()
+-            .any(|skill| skill.name == "manual-original")
+-    );
+-    assert!(
+-        !skills
+-            .runtime_skill_catalog("agentB")
+-            .unwrap()
+-            .iter()
+-            .any(|skill| skill.name == "manual-original")
+-    );
++    assert!(skills
++        .runtime_skill_catalog("agentA")
++        .unwrap()
++        .iter()
++        .any(|skill| skill.name == "manual-original"));
++    assert!(!skills
++        .runtime_skill_catalog("agentB")
++        .unwrap()
++        .iter()
++        .any(|skill| skill.name == "manual-original"));
+     let runtime = server
+         .request("GET", "/lingxi/v1/skills?agentId=agentA&runtime=1", None)
+         .await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1408:
+     assert_eq!(runtime.0, 200, "{runtime:?}");
+-    assert!(runtime.1["skills"].as_array().unwrap().iter().any(|skill| {
+-        skill["name"] == "manual-original" && skill["enabled"] == true
+-    }));
++    assert!(runtime.1["skills"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|skill| { skill["name"] == "manual-original" && skill["enabled"] == true }));
+     assert_eq!(
+         std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+         b_before
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1525:
+     );
+     assert!(accepted.contains("Skill installed: review-original"));
+     assert!(accepted.contains("after explicit user confirmation"));
+-    assert!(
+-        std::fs::read_to_string(installed.join("SKILL.md"))
+-            .unwrap()
+-            .contains("完整技能正文")
+-    );
++    assert!(std::fs::read_to_string(installed.join("SKILL.md"))
++        .unwrap()
++        .contains("完整技能正文"));
+     assert_eq!(
+         std::fs::read_to_string(installed.join("examples/guide.txt")).unwrap(),
+         "必须一同安装的原始配套文件"
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1540:
+     .unwrap()
+     .0;
+     assert!(enabled.contains(&"review-original".into()));
+-    assert!(
+-        skills
+-            .runtime_skill_catalog("agentA")
+-            .unwrap()
+-            .iter()
+-            .any(|s| s.name == "review-original")
+-    );
+-    assert!(
+-        !skills
+-            .runtime_skill_catalog("agentB")
+-            .unwrap()
+-            .iter()
+-            .any(|s| s.name == "review-original")
+-    );
++    assert!(skills
++        .runtime_skill_catalog("agentA")
++        .unwrap()
++        .iter()
++        .any(|s| s.name == "review-original"));
++    assert!(!skills
++        .runtime_skill_catalog("agentB")
++        .unwrap()
++        .iter()
++        .any(|s| s.name == "review-original"));
+     assert_eq!(file_snapshot(&memory_dir(&server, "agentB")), b_before);
+     let pool_before = file_snapshot(&server.home.join("skills"));
+     let config_before = std::fs::read(&a_config).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1621:
+         result.outcome,
+         lingxi_kernel::ports::ToolOutcome::Failed { .. }
+     ));
+-    assert!(
+-        !server
+-            .home
+-            .join("skills/failed-original/SKILL.md")
+-            .is_file()
+-    );
++    assert!(!server
++        .home
++        .join("skills/failed-original/SKILL.md")
++        .is_file());
+     assert_eq!(file_snapshot(&server.home.join("skills")), pool_before);
+     assert_eq!(std::fs::read(&a_config).unwrap(), config_before);
+     assert_eq!(file_snapshot(&memory_dir(&server, "agentB")), b_before);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:1858:
+     assert_eq!(result["agentId"], "agentA");
+     let actual = result["revisions"].as_array().unwrap();
+     assert_eq!(actual.len(), 2);
+-    assert!(
+-        actual
+-            .iter()
+-            .any(|r| r["revisionId"] == first["revisionId"])
+-    );
+-    assert!(
+-        actual
+-            .iter()
+-            .any(|r| r["revisionId"] == second["revisionId"])
+-    );
+-    assert!(
+-        !actual
+-            .iter()
+-            .any(|r| r["revisionId"] == other["revisionId"])
+-    );
+-    assert!(
+-        actual
+-            .iter()
+-            .all(|r| r.get("before").is_none() && r["sectionChars"]["facts"].as_u64().unwrap() > 0)
+-    );
++    assert!(actual
++        .iter()
++        .any(|r| r["revisionId"] == first["revisionId"]));
++    assert!(actual
++        .iter()
++        .any(|r| r["revisionId"] == second["revisionId"]));
++    assert!(!actual
++        .iter()
++        .any(|r| r["revisionId"] == other["revisionId"]));
++    assert!(actual
++        .iter()
++        .all(|r| r.get("before").is_none() && r["sectionChars"]["facts"].as_u64().unwrap() > 0));
+     let (status, result) = server
+         .request(
+             "GET",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs:2046:
+ #[tokio::test]
+ async fn original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy() {
+     use lingxi_adapters::storage::agent_memory::{
+-        CompiledMemoryStore, DreamRevisionStore, MemoryOperationKind, TenetsStore,
+-        memory_operation_test_hook,
++        memory_operation_test_hook, CompiledMemoryStore, DreamRevisionStore, MemoryOperationKind,
++        TenetsStore,
+     };
+     let server = start_server("restore-busy-original").await;
+     let memory = lingxi_service::memory::MemoryService::new(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_persona_proofs.rs:4:
+ use std::time::Duration;
+ 
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
+-    prepare_layout, run,
++    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
++    ServiceError, ServiceState,
+ };
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+ use tokio::net::TcpStream;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_persona_proofs.rs:32:
+     assert!(synthetic_home.starts_with(synthetic_runtime));
+     assert_eq!(product, synthetic_runtime.join("persona-product"));
+     assert!(product.is_absolute());
+-    assert!(
+-        !product
+-            .components()
+-            .any(|c| matches!(c, std::path::Component::ParentDir))
+-    );
++    assert!(!product
++        .components()
++        .any(|c| matches!(c, std::path::Component::ParentDir)));
+     std::fs::create_dir_all(&product).unwrap();
+     assert_eq!(
+         product.canonicalize().unwrap().parent().unwrap(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:6:
+ use std::time::Duration;
+ 
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout, run,
++    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+ };
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use tokio::io::{AsyncReadExt, AsyncWriteExt};
+ 
+ struct Fixture {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:915:
+         assert_eq!(response.0, 409, "{operation}: {response:?}");
+         if operation == "write" {
+             assert_eq!(response.1["code"], "conflict");
+-            assert!(
+-                response
+-                    .1
+-                    .to_string()
+-                    .contains("file_changed_or_not_authorized")
+-            );
++            assert!(response
++                .1
++                .to_string()
++                .contains("file_changed_or_not_authorized"));
+         } else {
+             assert_eq!(response.1["ok"], false);
+             assert_eq!(response.1["conflict"], true);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1058:
+     );
+     assert_eq!(std::fs::read(&undecodable).unwrap(), undecodable_bytes);
+     assert!(!fx.workspace.join("missing.txt").exists());
+-    assert!(
+-        fx.state
+-            .session_files()
+-            .list_files("s-proof")
+-            .await
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(fx
++        .state
++        .session_files()
++        .list_files("s-proof")
++        .await
++        .unwrap()
++        .is_empty());
+     fx.finish().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1183:
+         )
+         .await;
+     assert_eq!(failed.0, 500, "{failed:?}");
+-    assert!(
+-        failed.1["error"]
+-            .as_str()
+-            .unwrap()
+-            .contains("proof storage write failure")
+-    );
++    assert!(failed.1["error"]
++        .as_str()
++        .unwrap()
++        .contains("proof storage write failure"));
+     assert_eq!(std::fs::read(&file).unwrap(), b"current user bytes");
+     assert_eq!(history.list_files().await.unwrap(), files_before);
+     assert_eq!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1219:
+         )
+         .await;
+     assert_eq!(conflict.0, 500, "{conflict:?}");
+-    assert!(
+-        conflict.1["error"]
+-            .as_str()
+-            .unwrap()
+-            .contains("file_changed_or_not_authorized")
+-    );
++    assert!(conflict.1["error"]
++        .as_str()
++        .unwrap()
++        .contains("file_changed_or_not_authorized"));
+     assert_eq!(
+         std::fs::read(&file).unwrap(),
+         b"actual concurrent user edit"
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1262:
+         )
+         .await;
+     assert_eq!(capture_failed.0, 500, "{capture_failed:?}");
+-    assert!(
+-        capture_failed.1["error"]
+-            .as_str()
+-            .unwrap()
+-            .contains("proof restore snapshot storage failure")
+-    );
++    assert!(capture_failed.1["error"]
++        .as_str()
++        .unwrap()
++        .contains("proof restore snapshot storage failure"));
+     assert_eq!(capture_failed.1["fileWritten"], true);
+     assert_eq!(capture_failed.1["snapshotRecorded"], false);
+     assert_eq!(capture_failed.1["relPath"], "restore.txt");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1336:
+         std::fs::read(&private).unwrap(),
+         b"private bytes stay outside workspace"
+     );
+-    assert!(
+-        fx.state
+-            .session_files()
+-            .list_files("s-proof")
+-            .await
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(fx
++        .state
++        .session_files()
++        .list_files("s-proof")
++        .await
++        .unwrap()
++        .is_empty());
+     fx.finish().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1355:
+     std::fs::write(&watched, b"existing watched bytes").unwrap();
+     let events_before = fx.state.resource_io().events_since(0);
+     assert_eq!(fx.state.resource_io().diagnostics()["subscriptions"], 0);
+-    assert!(
+-        fx.state.resource_io().diagnostics()["watches"]
+-            .as_array()
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(fx.state.resource_io().diagnostics()["watches"]
++        .as_array()
++        .unwrap()
++        .is_empty());
+     let response = fx
+         .post(
+             "/lingxi/v1/resource-io/subscribe",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs:1376:
+     assert!(diagnostics["watches"].as_array().unwrap().is_empty());
+     assert_eq!(fx.state.resource_io().events_since(0), events_before);
+     assert_eq!(std::fs::read(&watched).unwrap(), b"existing watched bytes");
+-    assert!(
+-        fx.state
+-            .session_files()
+-            .list_files("s-proof")
+-            .await
+-            .unwrap()
+-            .is_empty()
+-    );
++    assert!(fx
++        .state
++        .session_files()
++        .list_files("s-proof")
++        .await
++        .unwrap()
++        .is_empty());
+     fx.finish().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_session_proofs.rs:14:
+ };
+ use lingxi_protocol::{ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError};
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
+-    prepare_layout, run,
++    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
++    ServiceError, ServiceState,
+ };
+ use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+ use tokio::net::TcpStream;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_session_proofs.rs:1019:
+ }
+ 
+ #[tokio::test]
+-async fn original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session()
+- {
++async fn original_detach_archive_and_permanent_delete_refuse_atomically_and_do_not_restore_deleted_session(
++) {
+     let server = start_server(
+         "original-archive-errors",
+         ScriptedProvider::new(vec![ScriptStep::Final("原归档内容".into())]),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_session_proofs.rs:1088:
+     let (status, body) = server.get("/lingxi/v1/sessions").await;
+     assert_eq!(status, 200, "{body}");
+     let list: serde_json::Value = serde_json::from_str(&body).unwrap();
+-    assert!(
+-        list["sessions"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .any(|r| r["sessionId"] == "archive-child")
+-    );
+-    assert!(
+-        !list["sessions"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .any(|r| r["sessionId"] == "archive-parent")
+-    );
++    assert!(list["sessions"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|r| r["sessionId"] == "archive-child"));
++    assert!(!list["sessions"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|r| r["sessionId"] == "archive-parent"));
+     let archived = read_session(&server, "archive-parent").await;
+     for (body, expected) in [
+         (r#"{"sessionId":false}"#, 400),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:4:
+ use std::time::Duration;
+ 
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
+-    prepare_layout, run,
++    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
++    ServiceError, ServiceState,
+ };
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+ use tokio::net::TcpStream;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:220:
+     assert_eq!(status, 200);
+     assert_eq!(result["skill"]["name"], "global-original");
+     let installed = server.home.join("skills/global-original");
+-    assert!(
+-        std::fs::read_to_string(installed.join("SKILL.md"))
+-            .unwrap()
+-            .contains("完整正文")
+-    );
++    assert!(std::fs::read_to_string(installed.join("SKILL.md"))
++        .unwrap()
++        .contains("完整正文"));
+     assert_eq!(
+         std::fs::read_to_string(installed.join("examples/example.txt")).unwrap(),
+         "配套文件原文"
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:312:
+             .find(|s| s["name"] == "ordinary-original" && s["source"] == "user")
+             .unwrap();
+         assert_eq!(entry["enabled"], enable);
+-        assert!(
+-            !lists(&server, "agentB")
+-                .0
+-                .contains(&"ordinary-original".into())
+-        );
++        assert!(!lists(&server, "agentB")
++            .0
++            .contains(&"ordinary-original".into()));
+     }
+     for enable in [false, true] {
+         let (status, result) = server
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:342:
+             .find(|s| s["name"] == "workspace-original")
+             .unwrap();
+         assert_eq!(entry["enabled"], enable);
+-        assert!(
+-            !lists(&server, "agentB")
+-                .1
+-                .contains(&"workspace-original".into())
+-        );
++        assert!(!lists(&server, "agentB")
++            .1
++            .contains(&"workspace-original".into()));
+     }
+     let before = file_snapshot(&server.home.join("agents"));
+     let (status, error) = server
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:466:
+         .await;
+     assert_eq!(status, 200);
+     assert_eq!(result["configured"], json!([]));
+-    assert!(
+-        !view(&server, "agentA", false).await["skills"]
+-            .as_array()
+-            .unwrap()
+-            .iter()
+-            .any(|s| s["name"] == "external-original")
+-    );
++    assert!(!view(&server, "agentA", false).await["skills"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .any(|s| s["name"] == "external-original"));
+     server.stop_and_clean().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:717:
+         .compiled_for_run("sess-original-skill-refresh", "agentA", false, 1)
+         .unwrap();
+     assert!(!before.render().contains("<name>prompt-original</name>"));
+-    assert!(
+-        before
+-            .render()
+-            .contains("<name>workspace-prompt-original</name>")
+-    );
++    assert!(before
++        .render()
++        .contains("<name>workspace-prompt-original</name>"));
+     let (status, _) = server
+         .request(
+             "PATCH",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:756:
+         )
+         .await;
+     assert_eq!(status, 200);
+-    assert!(
+-        !skills
+-            .runtime_skill_catalog("agentA")
+-            .unwrap()
+-            .iter()
+-            .any(|s| s.name == "workspace-prompt-original")
+-    );
++    assert!(!skills
++        .runtime_skill_catalog("agentA")
++        .unwrap()
++        .iter()
++        .any(|s| s.name == "workspace-prompt-original"));
+     let workspace_disabled = compiler
+         .compiled_for_run("sess-original-skill-refresh", "agentA", false, 1)
+         .unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:769:
+-    assert!(
+-        !workspace_disabled
+-            .render()
+-            .contains("<name>workspace-prompt-original</name>")
+-    );
+-    assert!(
+-        before
+-            .render()
+-            .contains("<name>workspace-prompt-original</name>")
+-    );
++    assert!(!workspace_disabled
++        .render()
++        .contains("<name>workspace-prompt-original</name>"));
++    assert!(before
++        .render()
++        .contains("<name>workspace-prompt-original</name>"));
+     let other = compiler
+         .compiled_for_run("sess-original-skill-refresh-b", "agentB", false, 1)
+         .unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:782:
+     assert!(!other.render().contains("<name>prompt-original</name>"));
+-    assert!(
+-        other
+-            .render()
+-            .contains("<name>workspace-prompt-original</name>")
+-    );
++    assert!(other
++        .render()
++        .contains("<name>workspace-prompt-original</name>"));
+     server.stop_and_clean().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:892:
+     let catalog = skills
+         .list_for_agent("agentA", true, Some(&server.workspace))
+         .unwrap();
+-    assert!(
+-        catalog.iter().any(|s| s["name"] == "builtin-original"
+-            && s["readonly"] == true
+-            && s["enabled"] == true)
+-    );
++    assert!(catalog
++        .iter()
++        .any(|s| s["name"] == "builtin-original" && s["readonly"] == true && s["enabled"] == true));
+     assert!(catalog.iter().any(|s| s["name"] == "external-original"
+         && s["readonly"] == true
+         && s["enabled"] == true));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:903:
+-    assert!(
+-        catalog
+-            .iter()
+-            .any(|s| s["name"] == "workspace-preview-original" && s["source"] == "workspace")
+-    );
++    assert!(catalog
++        .iter()
++        .any(|s| s["name"] == "workspace-preview-original" && s["source"] == "workspace"));
+     let paths = [lingxi_adapters::storage::skill_library::ExternalSkillPath {
+         dir_path: plugin.clone(),
+         label: "plugin:original".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:1061:
+                 residual_agents.push(id.clone());
+             }
+             let live = view(&server, id, true).await;
+-            assert!(
+-                !live["skills"]
+-                    .as_array()
+-                    .unwrap()
+-                    .iter()
+-                    .any(|s| s["name"] == "delete-all-original")
+-            );
+-            assert!(
+-                live["skills"]
+-                    .as_array()
+-                    .unwrap()
+-                    .iter()
+-                    .any(|s| s["name"] == "keep-all-original" && s["enabled"] == true)
+-            );
++            assert!(!live["skills"]
++                .as_array()
++                .unwrap()
++                .iter()
++                .any(|s| s["name"] == "delete-all-original"));
++            assert!(live["skills"]
++                .as_array()
++                .unwrap()
++                .iter()
++                .any(|s| s["name"] == "keep-all-original" && s["enabled"] == true));
+         }
+         let bundles_after = store.load_checked().unwrap();
+         assert_eq!(bundles_after.len(), if mode == "complete" { 2 } else { 3 });
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:1085:
+                 .find(|bundle| bundle["id"] == original["id"]);
+             let mut expected = original.clone();
+             if mode == "complete" {
+-                expected["skillNames"] = json!(
+-                    original["skillNames"]
+-                        .as_array()
+-                        .unwrap()
+-                        .iter()
+-                        .filter(|name| name.as_str() != Some("delete-all-original"))
+-                        .cloned()
+-                        .collect::<Vec<_>>()
+-                );
++                expected["skillNames"] = json!(original["skillNames"]
++                    .as_array()
++                    .unwrap()
++                    .iter()
++                    .filter(|name| name.as_str() != Some("delete-all-original"))
++                    .cloned()
++                    .collect::<Vec<_>>());
+                 if expected["skillNames"].as_array().unwrap().is_empty() {
+                     assert!(actual.is_none());
+                     continue;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t07_knowledge_tools.rs:399:
+ 
+     let scope_id = server_state
+         .knowledge()
+-        .freeze_run_scope(&run_context("sess-a"), "agent-default", &[notebook_a.clone()], &[])
++        .freeze_run_scope(
++            &run_context("sess-a"),
++            "agent-default",
++            &[notebook_a.clone()],
++            &[],
++        )
+         .expect("trusted gateway fixture freezes notebook A for this run")
+         .id;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t07_knowledge_tools.rs:604:
+     )
+     .await;
+     let text = outcome_text(&outcome);
+-    assert!(text.contains("Knowledge scope was not minted for a trusted run"), "{text}");
++    assert!(
++        text.contains("Knowledge scope was not minted for a trusted run"),
++        "{text}"
++    );
+     assert!(!text.contains("甲空间"), "{text}");
+ 
+     // 未知 scopeId。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:112:
+         self.tool_selection && self.schema_valid && self.semantic_params && self.task_complete
+     }
+     fn overall(&self) -> &'static str {
+-        if self.all_true() { "pass" } else { "fail" }
++        if self.all_true() {
++            "pass"
++        } else {
++            "fail"
++        }
+     }
+     fn to_json(self) -> serde_json::Value {
+         serde_json::json!({
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2377:
+     let (status, reason) = world.completed_with_diagnostics(&run_id).await;
+     assert_eq!(status, "completed", "{reason}");
+     let requests = world.stub_ref().requests();
+-    assert_eq!(requests.len(), 2, "已授权资料按需激活检索，检索与最终回答各一次");
++    assert_eq!(
++        requests.len(),
++        2,
++        "已授权资料按需激活检索，检索与最终回答各一次"
++    );
+     let selection = selection_of(&requests[0]);
+     assert_eq!(selection["notebookIds"], serde_json::json!([notebook_a]));
+     assert_eq!(selection["sources"].as_array().unwrap().len(), 1);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2387:
+         .as_str()
+         .expect("服务注入范围")
+         .to_string();
+-    let described = requests[0]["tools"].as_array().unwrap().iter().find(|tool| tool["function"]["name"] == "knowledge_search").unwrap()["function"].clone();
++    let described = requests[0]["tools"]
++        .as_array()
++        .unwrap()
++        .iter()
++        .find(|tool| tool["function"]["name"] == "knowledge_search")
++        .unwrap()["function"]
++        .clone();
+     assert_eq!(described["name"], "knowledge_search");
+     assert!(described["description"].as_str().unwrap().len() > "knowledge_search".len());
+-    assert_eq!(described["parameters"], serde_json::json!({"type":"object","properties":{"scopeId":{"type":"string"},"query":{"type":"string"},"channel":{"type":"string","enum":["fts","hybrid"]},"notebookIds":{"type":"array","items":{"type":"string"}},"sourceIds":{"type":"array","items":{"type":"string"}},"sectionKeys":{"type":"array","items":{"type":"string"}},"limit":{"type":"number"}},"required":["scopeId","query"],"additionalProperties":false}));
++    assert_eq!(
++        described["parameters"],
++        serde_json::json!({"type":"object","properties":{"scopeId":{"type":"string"},"query":{"type":"string"},"channel":{"type":"string","enum":["fts","hybrid"]},"notebookIds":{"type":"array","items":{"type":"string"}},"sourceIds":{"type":"array","items":{"type":"string"}},"sectionKeys":{"type":"array","items":{"type":"string"}},"limit":{"type":"number"}},"required":["scopeId","query"],"additionalProperties":false})
++    );
+     assert!(
+-        requests.iter().all(|request| request["tools"] == requests[0]["tools"] && request["tools"].as_array().unwrap().len() == 8),
++        requests
++            .iter()
++            .all(|request| request["tools"] == requests[0]["tools"]
++                && request["tools"].as_array().unwrap().len() == 8),
+         "仅当前已授权选择激活检索，其余知识和记忆工具不追加"
+     );
+     let knowledge_db = rusqlite::Connection::open_with_flags(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2517:
+ 
+ // ═══ BE-08 子代理边界（S 层）：只读父 → 子代理越权写被真实边界拒绝 ══════════
+ 
+-use lingxi_kernel::RunContext;
+ use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2524:
+     ToolExecutorPort, ToolOutcome, ToolRequest, TurnDeltaSink, TurnProviderPort,
+ };
++use lingxi_kernel::RunContext;
+ use lingxi_protocol::{
+     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
+ };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2530:
+     ContextCompilerService, FileContextMaterialSource, HostFacts,
+ };
+ use lingxi_service::filetools::{
+-    CoreFileTools, FileChangeLog, NoopChangeLog, register_core_file_tools,
++    register_core_file_tools, CoreFileTools, FileChangeLog, NoopChangeLog,
+ };
+ use lingxi_service::toolgateway::ToolInvocationGateway;
+ use lingxi_service::{
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r06_t08_behavior_eval.rs:2537:
+-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
++    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+ };
+ 
+ fn owner_principal() -> lingxi_service::Principal {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/request_dedup.rs:121:
+             principal,
+             session,
+             &ExecuteSubmission {
+-    knowledge: None, input, request_id },
++                knowledge: None,
++                input,
++                request_id,
++            },
+             1_790_409_600_000,
+         )
+         .await
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_lifecycle.rs:15:
+ use std::pin::Pin;
+ use std::sync::{Arc, Mutex};
+ 
+-use lingxi_kernel::RunContext;
+ use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_lifecycle.rs:25:
+     Availability, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
+     ToolManifest, ToolOrigin, ToolRegistry,
+ };
++use lingxi_kernel::RunContext;
+ use lingxi_protocol::{
+     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
+ };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_lifecycle.rs:31:
+ use lingxi_service::toolgateway::ToolInvocationGateway;
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
++    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+ };
+ 
+ const PARENT_INPUT: &str = "LIFE: parent run";
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_lifecycle.rs:206:
+     }
+     ProviderTurn::ToolRequests {
+         content: Vec::new(),
+-        requests: vec![
+-            ToolRequest::from_effective_arguments(
+-                &declaration.target,
+-                arguments,
+-                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+-            )
+-            .expect("effective tool request")
+-            .with_summary(format!("{name}: {task}"))
+-            .with_delegation(DelegationRequest {
+-                task: task.to_string(),
+-                access: None,
+-                label: None,
+-                agent_id: None,
+-                model: None,
+-                thread_id,
+-            }),
+-        ],
++        requests: vec![ToolRequest::from_effective_arguments(
++            &declaration.target,
++            arguments,
++            &lingxi_kernel::toolcatalog::SchemaBudget::default(),
++        )
++        .expect("effective tool request")
++        .with_summary(format!("{name}: {task}"))
++        .with_delegation(DelegationRequest {
++            task: task.to_string(),
++            access: None,
++            label: None,
++            agent_id: None,
++            model: None,
++            thread_id,
++        })],
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs:34:
+ use std::pin::Pin;
+ use std::sync::Arc;
+ 
+-use lingxi_kernel::RunContext;
+ use lingxi_kernel::model_exchange::ModelTurnInput;
+ use lingxi_kernel::ports::{
+     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs:45:
+     Availability, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
+     ToolManifest, ToolOrigin, ToolRegistry,
+ };
++use lingxi_kernel::RunContext;
+ use lingxi_protocol::{
+     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
+ };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs:51:
+ use lingxi_service::toolgateway::ToolInvocationGateway;
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
++    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+ };
+ 
+ /// The parent's user submission (marker = everything before ':').
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/runner_identity.rs:206:
+             b"{}",
+         )
+         .unwrap();
+-        assert!(
+-            check(&root)
+-                .unwrap_err()
+-                .contains("source inventory differs")
+-        );
++        assert!(check(&root)
++            .unwrap_err()
++            .contains("source inventory differs"));
+         fs::remove_dir_all(root).unwrap();
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:505:
+                          (known kinds: {SUPPLEMENTAL_BASIS_KINDS:?})"
+                     )));
+                 }
+-                let (r02_share, r07_share, stage_share, later_share) =
+-                    if basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR
+-                        || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
+-                    {
+-                        // R05 RR1 F25: a FULL leaf owns its original behavior
+-                        // in THIS stage — there is no share split at all, so
+-                        // none of the four share texts is required; the
+-                        // evidence is the per-assertion case coverage
+-                        // (originalAssertionCases, validated below).
+-                        (String::new(), String::new(), String::new(), String::new())
+-                    } else if is_stage_neutral_kind(&basis_kind) {
+-                        let stage_share = non_empty_string(
+-                            entry.get("stageShare").ok_or_else(|| {
+-                                err(&format!(
++                let (r02_share, r07_share, stage_share, later_share) = if basis_kind
++                    == BASIS_FULL_ORIGINAL_BEHAVIOR
++                    || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
++                {
++                    // R05 RR1 F25: a FULL leaf owns its original behavior
++                    // in THIS stage — there is no share split at all, so
++                    // none of the four share texts is required; the
++                    // evidence is the per-assertion case coverage
++                    // (originalAssertionCases, validated below).
++                    (String::new(), String::new(), String::new(), String::new())
++                } else if is_stage_neutral_kind(&basis_kind) {
++                    let stage_share = non_empty_string(
++                        entry.get("stageShare").ok_or_else(|| {
++                            err(&format!(
+                                 "supplemental leaf {id:?} missing stageShare (the stage-neutral \
+                                  share kinds declare their share here, not r02Share)"
+                             ))
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:525:
+-                            })?,
+-                            &format!("supplemental leaf {id:?} stageShare"),
+-                        )?;
+-                        let later_share = non_empty_string(
+-                            entry.get("laterShare").ok_or_else(|| {
+-                                err(&format!("supplemental leaf {id:?} missing laterShare"))
+-                            })?,
+-                            &format!("supplemental leaf {id:?} laterShare"),
+-                        )?;
+-                        (String::new(), String::new(), stage_share, later_share)
+-                    } else {
+-                        let r02_share = non_empty_string(
+-                            entry.get("r02Share").ok_or_else(|| {
+-                                err(&format!("supplemental leaf {id:?} missing r02Share"))
+-                            })?,
+-                            &format!("supplemental leaf {id:?} r02Share"),
+-                        )?;
+-                        let r07_share = non_empty_string(
+-                            entry.get("r07Share").ok_or_else(|| {
+-                                err(&format!("supplemental leaf {id:?} missing r07Share"))
+-                            })?,
+-                            &format!("supplemental leaf {id:?} r07Share"),
+-                        )?;
+-                        (r02_share, r07_share, String::new(), String::new())
+-                    };
++                        })?,
++                        &format!("supplemental leaf {id:?} stageShare"),
++                    )?;
++                    let later_share = non_empty_string(
++                        entry.get("laterShare").ok_or_else(|| {
++                            err(&format!("supplemental leaf {id:?} missing laterShare"))
++                        })?,
++                        &format!("supplemental leaf {id:?} laterShare"),
++                    )?;
++                    (String::new(), String::new(), stage_share, later_share)
++                } else {
++                    let r02_share = non_empty_string(
++                        entry.get("r02Share").ok_or_else(|| {
++                            err(&format!("supplemental leaf {id:?} missing r02Share"))
++                        })?,
++                        &format!("supplemental leaf {id:?} r02Share"),
++                    )?;
++                    let r07_share = non_empty_string(
++                        entry.get("r07Share").ok_or_else(|| {
++                            err(&format!("supplemental leaf {id:?} missing r07Share"))
++                        })?,
++                        &format!("supplemental leaf {id:?} r07Share"),
++                    )?;
++                    (r02_share, r07_share, String::new(), String::new())
++                };
+                 let evidence_required = non_empty_string(
+                     entry.get("evidenceRequired").ok_or_else(|| {
+                         err(&format!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1189:
+ 
+     #[test]
+     fn r06_registered_map_executes_checks_without_releasing_unproved_obligations() {
+-        let map = parse_stage_map(include_str!("stage_maps/R06.json")).expect("真实R06阶段图可解析");
+-        assert_eq!(map.scenarios.len(), 77, "16项原验收、60项修复检查及前序闭包均保留");
++        let map =
++            parse_stage_map(include_str!("stage_maps/R06.json")).expect("真实R06阶段图可解析");
++        assert_eq!(
++            map.scenarios.len(),
++            77,
++            "16项原验收、60项修复检查及前序闭包均保留"
++        );
+         assert_eq!(map.supplemental_leaves.len(), 280, "原始到期条款不能丢失");
+-        assert!(map.scenarios.iter().all(|row| row.requirement == "REQUIRED"));
+-        let aggregate = map.scenarios.iter().find(|row| row.id == "R06-AR-F14-C02").unwrap();
++        assert!(map
++            .scenarios
++            .iter()
++            .all(|row| row.requirement == "REQUIRED"));
++        let aggregate = map
++            .scenarios
++            .iter()
++            .find(|row| row.id == "R06-AR-F14-C02")
++            .unwrap();
+         for command in &map.commands {
+             if command.key.starts_with("r06_test_") {
+                 assert!(aggregate.command_refs.contains(&command.key));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1201:
+                 assert!(!command.evidence_paths.is_empty());
+             }
+         }
+-        let upstream = map.scenarios.iter().find(|row| row.id == "R06-AR-F14-C03").unwrap();
++        let upstream = map
++            .scenarios
++            .iter()
++            .find(|row| row.id == "R06-AR-F14-C03")
++            .unwrap();
+         assert_eq!(upstream.command_refs, vec!["r05_regression_gate"]);
+-        let fork = map.supplemental_leaves.iter().find(|leaf| leaf.id == "R00-T02-LA-960668141E07").unwrap();
++        let fork = map
++            .supplemental_leaves
++            .iter()
++            .find(|leaf| leaf.id == "R00-T02-LA-960668141E07")
++            .unwrap();
+         assert_eq!(fork.basis_kind, BASIS_FULL_ORIGINAL_BEHAVIOR);
+-        assert_eq!(fork.original_assertion_cases.len(), fork.r00_assertions.len());
+-        for leaf in map.supplemental_leaves.iter().filter(|leaf| leaf.id != fork.id) {
++        assert_eq!(
++            fork.original_assertion_cases.len(),
++            fork.r00_assertions.len()
++        );
++        for leaf in map
++            .supplemental_leaves
++            .iter()
++            .filter(|leaf| leaf.id != fork.id)
++        {
+             match leaf.basis_kind.as_str() {
+                 BASIS_FULL_ORIGINAL_BEHAVIOR => {
+-                    assert_eq!(leaf.original_assertion_cases.len(), leaf.r00_assertions.len());
+-                    assert!(leaf.original_assertion_cases.iter().all(|cases| cases.len() == 1));
++                    assert_eq!(
++                        leaf.original_assertion_cases.len(),
++                        leaf.r00_assertions.len()
++                    );
++                    assert!(leaf
++                        .original_assertion_cases
++                        .iter()
++                        .all(|cases| cases.len() == 1));
+                     assert!(leaf.assertion_contract.is_some());
+                     assert!(!leaf.evidence_command_refs.is_empty());
+                 }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/stage_map.rs:1217:
+                 BASIS_REQUIRED_BEHAVIOR_PENDING => {
+                     assert!(leaf.evidence_command_refs.is_empty());
+-                    assert!(leaf.assertion_contract.is_none(), "缺失行为证据不能借用局部成功收据");
++                    assert!(
++                        leaf.assertion_contract.is_none(),
++                        "缺失行为证据不能借用局部成功收据"
++                    );
+                 }
+                 other => panic!("原279项不得更改期限或豁免验收：{other}"),
+             }

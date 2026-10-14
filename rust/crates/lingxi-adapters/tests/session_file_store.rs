@@ -71,19 +71,23 @@ fn row(file_id: &str, owner_session_id: &str, source_key: Option<&str>) -> sf::S
     }
 }
 
-// ── v9 迁移链保真 ──
+// ── 迁移链保真（v7 旧库升级到当前顶端）──
 
 #[test]
-fn v9_is_the_supported_tip_with_expected_name() {
-    assert_eq!(supported_version(), 9);
+fn supported_tip_matches_the_current_migration_registry() {
+    // v9 之后 C1 批二等修复继续加列（v10..=v13），顶端随实际登记推进；
+    // 历史名保持不变，防迁移被静默改名。
+    assert_eq!(supported_version(), 13);
+    let tip = MIGRATIONS.iter().last().expect("tip");
+    assert_eq!(tip.name, "r06_session_workspace_identity");
     let v9 = MIGRATIONS.iter().find(|m| m.version == 9).expect("v9");
     assert_eq!(v9.name, "r06_t05_session_files_resources");
 }
 
 #[test]
-fn v7_to_v9_chain_preserves_prior_data_and_creates_new_tables() {
+fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     // 造一个停在 v7 的库：手工顺序执行 V1..=V7 SQL + 收据 + user_version，
-    // 塞入旧表数据，再交给 apply_all 补 v8、v9。
+    // 塞入旧表数据，再交给 apply_all 补 v8..=v12。
     let conn = rusqlite::Connection::open_in_memory().expect("mem db");
     for m in MIGRATIONS.iter().filter(|m| m.version <= 7) {
         conn.execute_batch(m.sql).expect("apply old sql");
@@ -115,9 +119,9 @@ fn v7_to_v9_chain_preserves_prior_data_and_creates_new_tables() {
     )
     .expect("seed session");
 
-    let out = apply_all(&conn, "test", 2_000).expect("apply v8+v9");
-    assert_eq!(out.applied, vec![8, 9]);
-    assert_eq!(out.current_version, 9);
+    let out = apply_all(&conn, "test", 2_000).expect("apply v8..=v13");
+    assert_eq!(out.applied, vec![8, 9, 10, 11, 12, 13]);
+    assert_eq!(out.current_version, 13);
 
     // 旧数据零损耗。
     let title: String = conn
@@ -156,7 +160,7 @@ fn v7_to_v9_chain_preserves_prior_data_and_creates_new_tables() {
     let user_version: i64 = conn
         .pragma_query_value(None, "user_version", |r| r.get(0))
         .expect("user_version");
-    assert_eq!(user_version, 9);
+    assert_eq!(user_version, 13);
 }
 
 // ── SessionFileStore CRUD / 去重 / alias / refs ──

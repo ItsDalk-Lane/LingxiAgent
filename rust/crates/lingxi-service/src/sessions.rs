@@ -1863,6 +1863,167 @@ pub(crate) fn kernel_principal_of(principal: &Principal) -> KernelPrincipal {
     }
 }
 
+// ── R06-R2：现役 GET /sessions 的 Studio 列表投影（sessions.ts:773-853）──
+//
+// 留给主控的 lib.rs 注册片段（本文件不注册；测试内自行挂载）：
+//
+// ```text
+// .route(
+//     "/lingxi/v1/sessions/studio-list",
+//     get(sessions::sessions_studio_list_route),
+// )
+//
+// // 鉴权分类（auth.rs classify_route 的 /lingxi/v1/sessions 静态名段）：
+// if rest == "studio-list" && (m == "GET" || m == "HEAD") {
+//     return RoutePolicy::Scope("chat");
+// }
+// ```
+
+/// `GET /lingxi/v1/sessions/studio-list` — 经 `sessions.read` scope 与
+/// Studio 身份限制的可见会话列表投影（现役 sessions.ts:773-853 的端口
+/// 映射）：
+/// - 身份闸：scope 不足 → 403 `insufficient_scope`；主体 Studio 与本
+///   server Studio 不一致 → 403 `studio_scope_mismatch`（现役 same-Studio
+///   projection v0；本地主人无 Studio 声明时不触发）。
+/// - 归属闸：与 identity 投影同一 `can_access`（本地主人全见，设备主体
+///   仅本人）。
+/// - 每会话投影：摘要（title / hasSummary，与 `GET /sessions/{id}/summary`
+///   同一落盘契约）、修订点（`r{head}-e{event}`，与 /history ETag 同源）、
+///   归属（agentId/agentName/ownerUserId/projectId/parentSessionId）、
+///   运行徽章（running + activeRuns，来自 run 库活动行）。
+pub async fn sessions_studio_list_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    axum::extract::State(state): axum::extract::State<crate::ServiceState>,
+) -> axum::response::Response {
+    use axum::response::IntoResponse;
+    if !principal.has_scope("sessions.read") {
+        return (
+            axum::http::StatusCode::FORBIDDEN,
+            axum::Json(serde_json::json!({
+                "error": "insufficient_scope",
+                "reason": "sessions.read",
+            })),
+        )
+            .into_response();
+    }
+    let (_, server_studio_id) = state.management.identity_ids();
+    if let Some(principal_studio) = principal.studio_id.as_deref() {
+        if principal_studio != server_studio_id {
+            return (
+                axum::http::StatusCode::FORBIDDEN,
+                axum::Json(serde_json::json!({
+                    "error": "studio_scope_mismatch",
+                    "detail": "authenticated Studio does not match this server Studio",
+                })),
+            )
+                .into_response();
+        }
+    }
+    // 活动运行徽章材料：一次读取 run 库全部活动行，按会话分组。
+    let active_runs = match state.storage().list_active_runs().await {
+        Ok(runs) => runs,
+        Err(err) => return crate::EndpointError::storage(&err).into_response(),
+    };
+    let mut active_by_session: std::collections::HashMap<String, Vec<String>> =
+        std::collections::HashMap::new();
+    for run in &active_runs {
+        active_by_session
+            .entry(run.session_id.clone())
+            .or_default()
+            .push(run.run_id.clone());
+    }
+    // 归属名称投影（现役 agentName；与 /agents 列表同一 config.yaml 扫描）。
+    let agent_names: std::collections::HashMap<String, String> = state
+        .memory()
+        .list_agent_summaries()
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|summary| {
+            let id = summary.get("id")?.as_str()?.to_string();
+            let name = summary.get("name")?.as_str()?.to_string();
+            Some((id, name))
+        })
+        .collect();
+    // 可见会话（identity 投影的 list_for：active + 归属闸）。
+    let views = match state.sessions().list_for(&principal).await {
+        Ok(views) => views,
+        Err(err) => return crate::EndpointError::storage(&err).into_response(),
+    };
+    let mut sessions = Vec::with_capacity(views.len());
+    for view in views {
+        let tree = match lingxi_adapters::storage::session_tree::get_session_row(
+            state.storage(),
+            &view.session_id,
+        )
+        .await
+        {
+            Ok(tree) => tree,
+            Err(err) => return crate::EndpointError::storage(&err).into_response(),
+        };
+        let revision = match (
+            lingxi_adapters::storage::canonical_message_store::read_branch_head_revision(
+                state.storage(),
+                &view.session_id,
+            )
+            .await,
+            lingxi_adapters::storage::canonical_message_store::read_history_event_revision(
+                state.storage(),
+                &view.session_id,
+            )
+            .await,
+        ) {
+            (Ok(head), Ok(event)) => format!("r{head}-e{event}"),
+            (Err(err), _) | (_, Err(err)) => {
+                return crate::EndpointError::storage(&err).into_response();
+            }
+        };
+        let has_summary = crate::history::history_content::read_session_summary_record(
+            state.config().data_home.as_path(),
+            &view.agent_id,
+            &view.session_id,
+        )
+        .and_then(|record| {
+            record
+                .get("summary")
+                .and_then(serde_json::Value::as_str)
+                .map(|summary| !summary.trim().is_empty())
+        })
+        .unwrap_or(false);
+        let active_run_ids = active_by_session
+            .get(&view.session_id)
+            .cloned()
+            .unwrap_or_default();
+        let running = !active_run_ids.is_empty();
+        sessions.push(serde_json::json!({
+            "sessionId": view.session_id,
+            "title": view.title,
+            "agentId": view.agent_id,
+            "agentName": agent_names.get(&view.agent_id).cloned()
+                .unwrap_or_else(|| view.agent_id.clone()),
+            "ownerUserId": view.owner_user_id,
+            "projectId": tree.as_ref().and_then(|row| row.project_id.clone()),
+            "parentSessionId": tree.as_ref().and_then(|row| row.parent_session_id.clone()),
+            "pinnedAt": tree.as_ref().and_then(|row| row.pinned_at_unix_ms),
+            "pinOrder": tree.as_ref().and_then(|row| row.pin_order),
+            "modified": tree.as_ref().and_then(|row| row.last_activity_unix_ms),
+            "runCount": view.run_count,
+            // 修订点：与 /history 的 ETag 同源字符串（web/mobile 缓存对比材料）。
+            "revision": revision,
+            // 摘要在场标志（滚动摘要记录，摘要 ticker 未移植时如实为 false）。
+            "hasSummary": has_summary,
+            // 运行徽章：当前是否存在活动运行（queued/running/waiting_approval/
+            // cancelling 同口径），附活动 run id 清单。
+            "running": running,
+            "activeRuns": active_run_ids,
+        }));
+    }
+    (
+        axum::http::StatusCode::OK,
+        axum::Json(serde_json::json!({ "sessions": sessions })),
+    )
+        .into_response()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

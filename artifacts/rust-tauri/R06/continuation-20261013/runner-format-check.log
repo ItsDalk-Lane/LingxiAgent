@@ -1,0 +1,25 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/runner_identity.rs:194:
+             let original = fs::read(&path).unwrap();
+             fs::write(&path, b"{\"new\":true}").unwrap();
+             let err = check(&root).unwrap_err();
+-            assert!(err.contains("stale xtask binary") && err.contains(name), "{err}");
++            assert!(
++                err.contains("stale xtask binary") && err.contains(name),
++                "{err}"
++            );
+             fs::write(path, original).unwrap();
+             assert_eq!(check(&root).unwrap()["status"], "PASS");
+         }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask/src/runner_identity.rs:203:
+             b"{}",
+         )
+         .unwrap();
+-        assert!(check(&root).unwrap_err().contains("source inventory differs"));
++        assert!(
++            check(&root)
++                .unwrap_err()
++                .contains("source inventory differs")
++        );
+         fs::remove_dir_all(root).unwrap();
+     }
+ }

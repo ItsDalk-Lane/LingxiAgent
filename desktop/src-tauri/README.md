@@ -8,7 +8,7 @@ cargo build --manifest-path desktop/src-tauri/Cargo.toml
 LINGXI_RESOURCE_SERVICE_HOME=/absolute/service-home desktop/src-tauri/target/debug/lingxi-resource-desktop
 ```
 
-界面可通过原生文件选择器加入文件，也可由用户明确输入绝对路径查看。原生选取的结果只是路径，不触发读取和写入。查看文件后自动订阅 Rust ResourceIO 的真实事件并重读。文件选择器取消返回空数组。独立窗口的写操作在宿主能力表与执行口都拒绝，读取也只允许其自己的文件。
+界面可通过原生文件选择器加入文件，也可由用户明确输入绝对路径查看。原生选取的结果只是路径，不触发读取和写入。查看文件后自动订阅 Rust ResourceIO 的真实事件并重读；“启动文件监听/停止文件监听”另行启停兼容的原生 `file-changed` 事件，并在事件路径匹配时重读当前文件。离开文件或关闭页面时会释放该监听。文件选择器取消返回空数组。独立窗口的写操作在宿主能力表与执行口都拒绝，读取也只允许其自己的文件。
 
 文本读取上限 5 MiB，base64/Office 字节读取上限 20 MiB；二进制及较大文件显示信息卡。Markdown 与 Office 预览放在无脚本权限的隔离 iframe。DOCX 使用浏览器版 mammoth，XLSX 使用现有 ExcelJS 的实际转换。保存核对实际字节版本；封面变化遇冲突会重新读取，只再试一次。这里保留先读后写的原约定，不提供跨进程原子性的承诺。
 

@@ -1,0 +1,10 @@
+   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.79s
+     Running tests/native_resources.rs (desktop/src-tauri/target/debug/deps/native_resources-a28319590daba2c0)
+
+running 2 tests
+test edit_allowlist_refuses_system_commands ... ok
+test real_file_read_write_copy_and_version_boundaries ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+

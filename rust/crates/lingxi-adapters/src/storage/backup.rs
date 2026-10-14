@@ -44,7 +44,7 @@ use sha2::{Digest, Sha256};
 use lingxi_kernel::ports::StorageError;
 
 use super::migrations::map_rusqlite;
-use super::queue::checkpoint_truncate;
+use super::queue::checkpoint_truncate_with_grace;
 use super::run_store::RUNS_DB_FILE_NAME;
 
 /// Manifest schema version (bump on incompatible manifest changes).
@@ -238,12 +238,15 @@ fn validate_stem(file_stem: &str) -> Result<(), StorageError> {
 /// interleave: the snapshot is taken with writers quiesced AND through the
 /// backup API. `wal_bytes_before` is informational (recorded in the
 /// manifest); the caller stats it before submitting the job.
+/// `checkpoint_grace_ms` bounds busy retries of the pre-backup
+/// TRUNCATE checkpoint (0 = strict single-shot).
 pub fn backup_database(
     source: &rusqlite::Connection,
     dest_dir: &Path,
     file_stem: &str,
     wal_bytes_before: u64,
     options: BackupOptions,
+    checkpoint_grace_ms: u64,
 ) -> Result<BackupOutcome, StorageError> {
     validate_stem(file_stem)?;
     #[cfg(windows)]
@@ -284,7 +287,9 @@ pub fn backup_database(
         // The frozen quiescence point: push the WAL into the main file and
         // truncate it. A failed checkpoint aborts the backup BEFORE any
         // destination artifact exists (fail loud, nothing published).
-        checkpoint_truncate(source)?;
+        // Busy is transient (concurrent reader pin) and gets the caller's
+        // grace budget; every other failure aborts on the first attempt.
+        checkpoint_truncate_with_grace(source, checkpoint_grace_ms)?;
     }
 
     let nanos = std::time::SystemTime::now()

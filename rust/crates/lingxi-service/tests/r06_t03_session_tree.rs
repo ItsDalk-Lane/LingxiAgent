@@ -238,6 +238,17 @@ impl TestServer {
         .await
     }
 
+    async fn patch(&self, path: &str, body: &str) -> (u16, String) {
+        http(
+            &self.addr,
+            "PATCH",
+            path,
+            &[("Authorization", &self.bearer())],
+            Some(body),
+        )
+        .await
+    }
+
     /// 执行一轮并等待 run 终态（scripted Final 即时完成）。
     async fn execute(&self, session_id: &str, input: &str) -> String {
         let (status, body) = self
@@ -1721,4 +1732,129 @@ async fn cross_principal_tree_access_is_403() {
 async fn app_write(server: &TestServer, session: &str, path: &std::path::Path, content: &str) {
     let(status,body)=server.post("/lingxi/v1/resource-io/write",&serde_json::json!({"sessionId":session,"resource":{"kind":"local-file","path":path},"content":content}).to_string()).await;
     assert_eq!(status, 200, "app write: {body}");
+}
+
+/// R06-R2（604C64F4828A）：追加授权目录——验证真实目录后扩大会话文件
+/// 访问范围。同一文件在追加前 checkpoint 403（越出授权目录），PATCH
+/// add 真实目录后同一文件被接受并登记文件版本；拒绝矩阵（未知会话
+/// 404 / 非目录 400 / 无凭证 401）不改变既有范围。
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn authorized_folder_add_expands_checkpoint_file_scope() {
+    let provider = ScriptedProvider::new(vec![ScriptStep::Final("a1".into())]);
+    let server = start_server("folder-add", provider).await;
+    let allowed = server.home.join("workspace").join("fold-base");
+    let extra = server.home.join("workspace").join("fold-extra");
+    std::fs::create_dir_all(&allowed).unwrap();
+    std::fs::create_dir_all(&extra).unwrap();
+    let extra_canon = std::fs::canonicalize(&extra).unwrap();
+    let target_file = extra_canon.join("extra-notes.txt");
+    std::fs::write(&target_file, "target").unwrap();
+    let plain_file = extra_canon.join("not-a-dir.txt");
+
+    // 建会话只带初始目录 allowed。
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions",
+            &serde_json::json!({
+                "sessionId": "s-fold",
+                "agentId": "agent",
+                "title": "s-fold",
+                "authorizedFolders": [std::fs::canonicalize(&allowed).unwrap().to_string_lossy()],
+            })
+            .to_string(),
+        )
+        .await;
+    assert_eq!(status, 201, "create: {body}");
+    let run1 = server.execute("s-fold", "q1").await;
+
+    // 追加前：extra 下文件 checkpoint → 403（范围未扩大）。
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-fold/checkpoints",
+            &serde_json::json!({
+                "name": "cp-before",
+                "targetMessageId": format!("{run1}-final"),
+                "filePaths": [target_file.to_string_lossy()],
+            })
+            .to_string(),
+        )
+        .await;
+    assert_eq!(status, 403, "追加前越出目录 → 403: {body}");
+
+    // PATCH add 真实目录 → 200，范围扩大。
+    let (status, body) = server
+        .patch(
+            "/lingxi/v1/sessions/s-fold/authorized-folders",
+            &serde_json::json!({"action": "add", "folder": extra_canon.to_string_lossy()})
+                .to_string(),
+        )
+        .await;
+    assert_eq!(status, 200, "add folder: {body}");
+    let base_canon = std::fs::canonicalize(&allowed).unwrap();
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["authorizedFolders"],
+        serde_json::json!([base_canon.to_string_lossy(), extra_canon.to_string_lossy()]),
+        "追加后的范围（初始 + 追加）"
+    );
+
+    // 追加后：同一文件 checkpoint → 200（会话文件访问范围真实扩大）。
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/sessions/s-fold/checkpoints",
+            &serde_json::json!({
+                "name": "cp-after",
+                "targetMessageId": format!("{run1}-final"),
+                "filePaths": [target_file.to_string_lossy()],
+            })
+            .to_string(),
+        )
+        .await;
+    assert_eq!(status, 200, "追加后同文件被接受: {body}");
+    assert!(body.contains("cp-after"), "检查点登记: {body}");
+
+    // 拒绝矩阵：未知会话 404 / 非目录 400 / 无凭证 401，范围不变。
+    let (status, body) = server
+        .patch(
+            "/lingxi/v1/sessions/no-such/authorized-folders",
+            &serde_json::json!({"action": "add", "folder": extra_canon.to_string_lossy()})
+                .to_string(),
+        )
+        .await;
+    assert_eq!(status, 404, "未知会话: {body}");
+    let (status, body) = server
+        .patch(
+            "/lingxi/v1/sessions/s-fold/authorized-folders",
+            &serde_json::json!({"action": "add", "folder": plain_file.to_string_lossy()})
+                .to_string(),
+        )
+        .await;
+    assert_eq!(status, 400, "普通文件不是目录: {body}");
+    let (status, _body) = http(
+        &server.addr,
+        "PATCH",
+        "/lingxi/v1/sessions/s-fold/authorized-folders",
+        &[],
+        Some(
+            &serde_json::json!({"action": "add", "folder": extra_canon.to_string_lossy()})
+                .to_string(),
+        ),
+    )
+    .await;
+    assert_eq!(status, 401, "无凭证 401");
+    // 范围不变（拒绝不扩大）。
+    let (status, body) = server
+        .get("/lingxi/v1/sessions/s-fold/authorized-folders")
+        .await;
+    assert_eq!(status, 200, "read scope: {body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap()["authorizedFolders"],
+        serde_json::json!([base_canon.to_string_lossy(), extra_canon.to_string_lossy()]),
+        "拒绝路径不改变范围"
+    );
+
+    if std::env::var_os("LINGXI_W03_EVIDENCE").is_none() {
+        let _ = std::fs::remove_dir_all(&allowed);
+        let _ = std::fs::remove_dir_all(&extra);
+    }
+    server.stop_and_clean().await;
 }

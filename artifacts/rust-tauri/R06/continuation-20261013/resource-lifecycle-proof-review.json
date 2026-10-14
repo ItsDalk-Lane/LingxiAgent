@@ -1,0 +1,74 @@
+{
+  "status": "EXECUTED_PROOFS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "review": [
+    {
+      "id": "R00-T02-LA-00C88B996AA0",
+      "original": {
+        "then": "释放指定订阅并返回 released 真值",
+        "assertions": [
+          "给定目标与相应权限，执行“取消资源事件订阅”后核对：释放指定订阅并返回 released 真值",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "gaps": [
+          "该原操作本身以获授权local_fs/mount引用及url/session_file引用核对成功或明确拒绝"
+        ]
+      },
+      "status": "READY"
+    },
+    {
+      "id": "R00-T02-LA-4E8EDC4E25FC",
+      "original": {
+        "then": "按 since 游标返回事件；游标过期提示重新 stat",
+        "assertions": [
+          "给定目标与相应权限，执行“读取资源变更事件”后核对：按 since 游标返回事件；游标过期提示重新 stat",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "gaps": [
+          "该原操作本身以获授权local_fs/mount引用及url/session_file引用核对成功或明确拒绝"
+        ]
+      },
+      "status": "READY"
+    },
+    {
+      "id": "R00-T02-LA-75753997F5C6",
+      "original": {
+        "then": "释放句柄，重复结束返回 released false",
+        "assertions": [
+          "给定目标与相应权限，执行“结束资源监听”后核对：释放句柄，重复结束返回 released false",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "gaps": [
+          "该原操作本身以获授权local_fs/mount引用及url/session_file引用核对成功或明确拒绝"
+        ]
+      },
+      "status": "READY"
+    },
+    {
+      "id": "R00-T02-LA-9FF4E1805297",
+      "original": {
+        "then": "返回活跃订阅数量与监听清单，不更改资源",
+        "assertions": [
+          "给定目标与相应权限，执行“查看资源监听诊断”后核对：返回活跃订阅数量与监听清单，不更改资源",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+          "分别用获授权 local_fs/mount 引用和不支持该操作的 url/session_file 引用核对成功或明确拒绝；跨 provider 移动必须拒绝。"
+        ],
+        "gaps": [
+          "该原操作本身以获授权local_fs/mount引用及url/session_file引用核对成功或明确拒绝"
+        ]
+      },
+      "status": "READY"
+    }
+  ],
+  "executionLog": "resource-lifecycle-coupled-final.log",
+  "testsPassed": 23,
+  "rateLimit": "Only isolated retention fixture injects2048 requests/window; production default and other fixtures unchanged.",
+  "mountAndUrlSuccessNotClaimed": true,
+  "providerRefusalNotBypassed": true,
+  "preservedAttempts": [
+    "resource-lifecycle-r1.log",
+    "resource-lifecycle-r2.log"
+  ]
+}

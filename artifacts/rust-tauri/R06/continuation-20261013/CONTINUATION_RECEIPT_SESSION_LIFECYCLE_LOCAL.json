@@ -1,0 +1,138 @@
+{
+  "schema": "lingxi.r06.continuation-local-receipt.v1",
+  "status": "FORMAL_PIN_AND_ACTIVE_MEMORY_LIFECYCLE_VERIFIED_R06_NOT_ACCEPTED",
+  "supersedesLocalSummary": "CONTINUATION_RECEIPT_WORKSPACE_SKILLS_LOCAL.json",
+  "gitHead": "6f5c4b01d6805ac95fa03a35c2035ccb35f7b8f8",
+  "branch": "codex/rust-tauri-migration",
+  "worktreeChangesUncommitted": true,
+  "currentScopedExecution": {
+    "directory": "registered-ready-session-lifecycle-execution",
+    "sourceCandidateSha256": "6bfa22547747f3dfd414eac1ab81f919c0c9308841d89020405ae8bbae9fad34",
+    "sourceStable": true,
+    "registeredBindingsExecuted": 136,
+    "registeredBindingsPassed": 136,
+    "selectedOriginalRequirements": 117,
+    "selectedAssertions": 267,
+    "selectedAssertionsPassed": 267,
+    "executionErrors": {},
+    "rollup": "registered-ready-session-lifecycle-execution/R06_LEAVES/leaf-cases.json",
+    "rawReceiptReadback": "registered-ready-session-lifecycle-readback/leaf-cases.json",
+    "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+    "excludedOriginalRequirements": 162,
+    "additionalExcludedRequiredSupplementalLeaf": "R00-T02-LA-960668141E07",
+    "excludedRegisteredGraphLeaves": 163,
+    "stageVerdict": "NOT_A_STAGE_VERDICT"
+  },
+  "originalRequirementRegistration": {
+    "total": 279,
+    "ready": 117,
+    "gap": 162,
+    "registrationIsNotStageAcceptance": true
+  },
+  "newlyCompletedOriginalLeaves": [
+    "R00-T02-LA-0D4F0EFC9DAE",
+    "R00-T02-LA-51905CECDD1B",
+    "R00-T02-LA-9616596B5720"
+  ],
+  "newProductRepair": [
+    "Formal authorized pin rejects409 agent_deleted for actual .deleted-agent.json marker; corrupted marker remains deleted. Unpin remains allowed and another agent is unaffected.",
+    "Checked deletion-state IO fails500 rather than enabling pin; invalid bool400, missing auth401 and foreign403 precede any state disclosure or write.",
+    "Pin-order only updates already-pinned sessions, cannot COALESCE an unpinned session into a pin; mixed list400 rolls back the transaction, closing actual same-family deleted-agent bypass.",
+    "Formal owned memory GET/PATCH require live agent and active session; deleted-agent409, archived403, invalid400, foreign403, invalid auth401 and missing404 remain explicit.",
+    "Memory write transaction checks archived state inside the same transaction; direct storage rejects archived session, not only route precheck.",
+    "True/false save/read cycles and genuine service restart preserve chosen session memory; unrelated sessions unchanged. Real triggers, directory permissions and missing sessions-table500 preserve original state, repairs restore same reads/writes."
+  ],
+  "supportingLocalRuns": [
+    {
+      "log": "session-lifecycle-coupled-final.log",
+      "passed": 44,
+      "failed": 0
+    },
+    {
+      "log": "session-lifecycle-route-policy.log",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "log": "session-lifecycle-clippy-final.log",
+      "status": "PASS",
+      "scope": "workspace --all-targets -- -D warnings"
+    },
+    {
+      "log": "workspace-format-session-lifecycle-final.log",
+      "status": "PASS"
+    },
+    {
+      "log": "check-contracts-session-lifecycle.log",
+      "status": "PASS"
+    },
+    {
+      "log": "check-boundaries-session-lifecycle.log",
+      "status": "PASS"
+    },
+    {
+      "log": "stage-input-contract-tests-session-lifecycle.log",
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "log": "runner-identity-session-lifecycle.log",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "directory": "stage-input-session-lifecycle-final-check",
+      "status": "INPUTS_MATCH_NOT_STAGE_VERDICT"
+    },
+    {
+      "report": "proof-anchor-review-session-lifecycle-applied.json",
+      "unchangedOriginalAnchorsRefreshed": 48,
+      "missingAssertions": 0
+    }
+  ],
+  "supportingRunsAreNotClaimedToShareFinalScopedExecutionWindow": true,
+  "preservedFailures": [
+    {
+      "log": "session-pin-deleted-agent-red.log",
+      "reason": "Deleted-agent pin incorrectly succeeded200 and changed time/order; fixed at authorized official route."
+    },
+    {
+      "log": "session-memory-lifecycle-red.log",
+      "reason": "Archived-session memory GET incorrectly succeeded200; active-only GET/PATCH and transaction-local state check now enforced."
+    },
+    {
+      "log": "session-pin-order-bypass-red.log",
+      "reason": "Pin-order wrongly created unpinned deleted-agent pins; storage updates only already-pinned rows, rolling back whole list on refusal."
+    },
+    {
+      "log": "session-lifecycle-coupled-r2.log",
+      "reason": "Wrong SessionView vs actual SessionFacts helper type and wrong error-match insertion; actual compiler facts corrected, no unsafe casts or wildcard errors."
+    }
+  ],
+  "intentionalBehaviorDifferences": [
+    "Deleted-agent pin now refuses explicitly; unpin keeps original permissive semantics and no marker JSON parse can revive the agent.",
+    "Memory GET/PATCH refuse nonactive or deleted-agent session instead of success-shaped reads/writes.",
+    "Pin-order reorders existing pins only, rather than silently creating new pins through COALESCE."
+  ],
+  "unresolved": {
+    "originalRequirementsWithGaps": 162,
+    "openArFindings": 14,
+    "extraObligationsNotFormallyClosed": 12,
+    "saveSessionDraftPathLeaf": "R00-T02-LA-D901852E1B1A remains GAP; unregistered sessionPath rejects400, is never used as a persistent identity",
+    "inputDraftUiHydrationAndDeskDeletion": "NOT_IMPLEMENTED_OR_PROVED_BY_BACKEND_DRAFT_ROUTES",
+    "writeOsSandboxUnavailableRefusal": "UNIMPLEMENTED_NOT_WAIVED",
+    "skillsUiAndAppBroadcast": "NOT_PROVED_OR_IMPLEMENTED_BY_BACKEND_BUNDLE_DELTA",
+    "requiredIndependentReviews": "BLOCKED_BY_RECORDED_PLATFORM_INTERRUPTION",
+    "realGuiObservations": "BLOCKED_BY_ASSISTIVE_ACCESS_DENIAL_HOST_NOT_CONCLUSIVELY_IDENTIFIED",
+    "originalExecutionPrompt": "MISSING_2026_10_08_PROMPT_USER_UNAVAILABLE",
+    "fullR05Closure": "NOT_COMPLETED",
+    "fullR06Acceptance": "NOT_COMPLETED"
+  },
+  "r06Accepted": false,
+  "r07Ready": false,
+  "userRequestedEndpointAchieved": false,
+  "taskMarkedComplete": false,
+  "committed": false,
+  "pushed": false,
+  "auditSealAdvanced": false
+}

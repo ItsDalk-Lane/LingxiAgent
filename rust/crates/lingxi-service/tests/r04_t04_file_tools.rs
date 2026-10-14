@@ -162,8 +162,13 @@ struct ChangeLogCapture {
 }
 
 impl FileChangeLog for ChangeLogCapture {
-    fn record(&self, record: FileModificationRecord) {
+    fn record(
+        &self,
+        _ctx: &lingxi_kernel::RunContext,
+        record: FileModificationRecord,
+    ) -> Result<(), String> {
         self.records.lock().unwrap().push(record);
+        Ok(())
     }
 }
 

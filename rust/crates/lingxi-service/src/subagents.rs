@@ -57,15 +57,15 @@ use std::sync::{Arc, Mutex, OnceLock, Weak};
 use std::time::Duration;
 
 use lingxi_adapters::storage::subagent_threads as thread_store;
-use lingxi_kernel::RunContext;
 use lingxi_kernel::model_exchange::ExchangeItem;
 use lingxi_kernel::ports::{DelegationRequest, StorageError};
 use lingxi_kernel::subagent::{
-    AccessRequest, RunLineage, RunOrigin, SubagentAccessDenied, SubagentPolicy, ToolAccessTier,
-    resolve_subagent_access,
+    resolve_subagent_access, AccessRequest, RunLineage, RunOrigin, SubagentAccessDenied,
+    SubagentPolicy, ToolAccessTier,
 };
+use lingxi_kernel::RunContext;
 use lingxi_protocol::{ErrorCode, ModelCallId, ProtocolError, RunId, ToolCallId};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 use crate::cancel::CancelScope;
 use crate::events::EventService;
@@ -82,8 +82,10 @@ use lingxi_kernel::RunFinish;
 /// reports exactly that); the trait object's declared `Send + Sync`
 /// breaks the propagation without any unsafe impl.
 pub trait SubagentLauncher: Send + Sync {
-    fn flush_closeouts<'a>(&'a self) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
-        Box::pin(async {Ok(())})
+    fn flush_closeouts<'a>(
+        &'a self,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
+        Box::pin(async { Ok(()) })
     }
     /// Fresh dispatch (`subagent` target).
     fn dispatch(
@@ -112,7 +114,12 @@ pub trait SubagentLauncher: Send + Sync {
         ctx: &'a RunContext,
         agent: &'a str,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<ExchangeItem>, StorageError>> + Send + 'a>>;
-    fn record_failure<'a>(&'a self, ctx: &'a RunContext, agent: &'a str, error: &'a ProtocolError) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>>;
+    fn record_failure<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        agent: &'a str,
+        error: &'a ProtocolError,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>>;
     fn record_history<'a>(
         &'a self,
         ctx: &'a RunContext,
@@ -123,8 +130,10 @@ pub trait SubagentLauncher: Send + Sync {
 }
 
 impl SubagentLauncher for SubagentRuntime {
-    fn flush_closeouts<'a>(&'a self) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
-        Box::pin(async move {SubagentRuntime::flush_closeouts(self).await})
+    fn flush_closeouts<'a>(
+        &'a self,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
+        Box::pin(async move { SubagentRuntime::flush_closeouts(self).await })
     }
     fn dispatch(
         self: Arc<Self>,
@@ -172,26 +181,49 @@ impl SubagentLauncher for SubagentRuntime {
                 .collect::<Result<Vec<_>, _>>()?;
             // 工具正文必须与原Run正式模型投影一致；不把界面卡片或任意档案当成历史。
             for item in &history {
-                if let ExchangeItem::ToolResult { tool_call_id, .. }=item {
+                if let ExchangeItem::ToolResult { tool_call_id, .. } = item {
                     let projection=self.storage.query_one_text(
                         "SELECT e.payload_json FROM key_events e JOIN subagent_history_v1 h ON h.run_id=e.run_id WHERE e.event_type='tool_result_model_projection' AND json_extract(e.payload_json,'$.toolCallId')=?1 AND h.thread_id=(SELECT thread_id FROM subagent_history_v1 WHERE run_id=?2)",
                         vec![tool_call_id.to_string(),ctx.run_id.to_string()],
                     ).await?.ok_or_else(||StorageError::Corrupted{detail:"subagent tool history missing authoritative projection".into()})?;
-                    let projection:Value=serde_json::from_str(&projection).map_err(|e|StorageError::Corrupted{detail:e.to_string()})?;
-                    if crate::model_history::projected_tool_item(&projection)?!=*item {
-                        return Err(StorageError::Corrupted{detail:"subagent tool history differs from authoritative projection".into()});
+                    let projection: Value =
+                        serde_json::from_str(&projection).map_err(|e| StorageError::Corrupted {
+                            detail: e.to_string(),
+                        })?;
+                    if crate::model_history::projected_tool_item(&projection)? != *item {
+                        return Err(StorageError::Corrupted {
+                            detail: "subagent tool history differs from authoritative projection"
+                                .into(),
+                        });
                     }
                 }
-                if let ExchangeItem::AssistantTurn {tool_calls,..}=item {
+                if let ExchangeItem::AssistantTurn { tool_calls, .. } = item {
                     for call in tool_calls {
-                        let binding=call.declaration_binding.as_ref().ok_or_else(||StorageError::Corrupted{detail:"subagent history missing declaration".into()})?;
-                        let target=binding.execution.as_ref().map(|e|e.target.as_str()).unwrap_or(call.target.as_str());
-                        let digest=binding.execution.as_ref().map(|e|e.args_digest.hex.as_str()).unwrap_or(call.args_digest.hex.as_str());
+                        let binding = call.declaration_binding.as_ref().ok_or_else(|| {
+                            StorageError::Corrupted {
+                                detail: "subagent history missing declaration".into(),
+                            }
+                        })?;
+                        let target = binding
+                            .execution
+                            .as_ref()
+                            .map(|e| e.target.as_str())
+                            .unwrap_or(call.target.as_str());
+                        let digest = binding
+                            .execution
+                            .as_ref()
+                            .map(|e| e.args_digest.hex.as_str())
+                            .unwrap_or(call.args_digest.hex.as_str());
                         let fact=self.storage.query_one_text(
                             "SELECT j.journal_id FROM invocation_journal j JOIN subagent_history_v1 h ON h.run_id=j.run_id WHERE j.journal_id=?1 AND j.target=?2 AND j.args_digest=?3 AND h.thread_id=(SELECT thread_id FROM subagent_history_v1 WHERE run_id=?4)",
                             vec![call.tool_call_id.to_string(),target.into(),digest.into(),ctx.run_id.to_string()],
                         ).await?;
-                        if fact.is_none(){return Err(StorageError::Corrupted{detail:"subagent request history differs from original journal".into()});}
+                        if fact.is_none() {
+                            return Err(StorageError::Corrupted {
+                                detail: "subagent request history differs from original journal"
+                                    .into(),
+                            });
+                        }
                     }
                 }
             }
@@ -199,10 +231,23 @@ impl SubagentLauncher for SubagentRuntime {
             Ok(history)
         })
     }
-    fn record_failure<'a>(&'a self, ctx: &'a RunContext, agent: &'a str, error: &'a ProtocolError) -> Pin<Box<dyn Future<Output=Result<(),StorageError>>+Send+'a>> {
+    fn record_failure<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        agent: &'a str,
+        error: &'a ProtocolError,
+    ) -> Pin<Box<dyn Future<Output = Result<(), StorageError>> + Send + 'a>> {
         Box::pin(async move {
-            if !thread_store::has_history(&self.storage,ctx.run_id.as_str()).await? {return Ok(());}
-            thread_store::record_failure(&self.storage,ctx,agent,&format!("{}: {}",error.code.wire_name(),error.message)).await
+            if !thread_store::has_history(&self.storage, ctx.run_id.as_str()).await? {
+                return Ok(());
+            }
+            thread_store::record_failure(
+                &self.storage,
+                ctx,
+                agent,
+                &format!("{}: {}", error.code.wire_name(), error.message),
+            )
+            .await
         })
     }
     fn record_history<'a>(
@@ -684,7 +729,9 @@ impl SubagentRuntime {
     }
 
     pub async fn initialize(&self) -> Result<(), StorageError> {
-        self.storage_ready.get_or_try_init(||thread_store::initialize(&self.storage)).await?;
+        self.storage_ready
+            .get_or_try_init(|| thread_store::initialize(&self.storage))
+            .await?;
         flush_abnormal_closeouts(&self.storage, &self.pending_closeouts).await
     }
 
@@ -700,7 +747,7 @@ impl SubagentRuntime {
         if actual.is_none() {
             return Err(SubagentDispatchError::Storage(
                 StorageError::InvalidRequest {
-                    detail: "subagent parent ownership mismatch".into(),
+                    detail: "subagent_parent_ownership_mismatch".into(),
                 },
             ));
         }
@@ -723,7 +770,11 @@ impl SubagentRuntime {
                 });
             }
         };
-        let canonical_root=std::fs::canonicalize(root).map_err(|e|SubagentDispatchError::AgentUnavailable{agent:"list".into(),detail:e.to_string()})?;
+        let canonical_root =
+            std::fs::canonicalize(root).map_err(|e| SubagentDispatchError::AgentUnavailable {
+                agent: "list".into(),
+                detail: e.to_string(),
+            })?;
         for entry in entries {
             let entry = entry.map_err(|e| SubagentDispatchError::AgentUnavailable {
                 agent: "list".into(),
@@ -739,18 +790,26 @@ impl SubagentRuntime {
                     agent: id.clone(),
                     detail: e.to_string(),
                 })?;
-            let config_path=std::fs::canonicalize(roots.agent_dir.join("config.yaml")).map_err(|e|SubagentDispatchError::AgentUnavailable{agent:id.clone(),detail:e.to_string()})?;
+            let config_path =
+                std::fs::canonicalize(roots.agent_dir.join("config.yaml")).map_err(|e| {
+                    SubagentDispatchError::AgentUnavailable {
+                        agent: id.clone(),
+                        detail: e.to_string(),
+                    }
+                })?;
             if !config_path.starts_with(&canonical_root) {
-                return Err(SubagentDispatchError::AgentUnavailable{agent:id.clone(),detail:"agent config escapes actual roster root".into()});
+                return Err(SubagentDispatchError::AgentUnavailable {
+                    agent: id.clone(),
+                    detail: "agent config escapes actual roster root".into(),
+                });
             }
-            let scan = lingxi_adapters::storage::agent_memory::config::read_agent_config(
-                &config_path,
-            )
-            .and_then(|doc| doc.scan())
-            .map_err(|e| SubagentDispatchError::AgentUnavailable {
-                agent: id.clone(),
-                detail: e.to_string(),
-            })?;
+            let scan =
+                lingxi_adapters::storage::agent_memory::config::read_agent_config(&config_path)
+                    .and_then(|doc| doc.scan())
+                    .map_err(|e| SubagentDispatchError::AgentUnavailable {
+                        agent: id.clone(),
+                        detail: e.to_string(),
+                    })?;
             candidates.push(json!({"id":id,"name":scan.agent_name.unwrap_or_else(||id.clone())}));
         }
         candidates.sort_by(|a, b| a["id"].as_str().cmp(&b["id"].as_str()));
@@ -1428,10 +1487,17 @@ impl SubagentRuntime {
             }
         }
         // 已成功派发后，状态读取失败不能谎报“零子任务”；明确保留已接受身份与观测失败。
-        let (status,progress_error)=match self.storage.query_one_text("SELECT status FROM runs WHERE run_id=?1",vec![child_run_id.clone()]).await {
-            Ok(Some(status))=>(status,None),
-            Ok(None)=>("queued".into(),None),
-            Err(error)=>("unknown".into(),Some(error.to_string())),
+        let (status, progress_error) = match self
+            .storage
+            .query_one_text(
+                "SELECT status FROM runs WHERE run_id=?1",
+                vec![child_run_id.clone()],
+            )
+            .await
+        {
+            Ok(Some(status)) => (status, None),
+            Ok(None) => ("queued".into(), None),
+            Err(error) => ("unknown".into(), Some(error.to_string())),
         };
         Ok(LaunchedChild {
             child_run_id,
@@ -1583,15 +1649,28 @@ impl ChildCloseout {
     }
 
     async fn complete_and_deliver(&self, finish: &Result<RunFinish, DriveError>) {
-        let status=match finish {Ok(f)=>f.status().wire_name(),Err(_)=>"failed"};
-        let prior=thread_store::read_thread(&self.runtime.storage,&self.thread_id).await;
-        let error=match finish {
-            Ok(RunFinish::Failed {cause})=>Some(prior.ok().flatten().and_then(|r|r["error"].as_str().map(str::to_string)).unwrap_or_else(||format!("{cause:?}"))),
-            Err(e)=>Some(format!("{e:?}")),_=>None,
+        let status = match finish {
+            Ok(f) => f.status().wire_name(),
+            Err(_) => "failed",
         };
-        let text=match error.as_deref() {
-            Some(error)=>format!("[subagent-result thread={} run={}] failed: {error}",self.thread_id,self.child_run_id),
-            None=>delivery_text(&self.thread_id,&self.child_run_id,finish),
+        let prior = thread_store::read_thread(&self.runtime.storage, &self.thread_id).await;
+        let error = match finish {
+            Ok(RunFinish::Failed { cause }) => Some(
+                prior
+                    .ok()
+                    .flatten()
+                    .and_then(|r| r["error"].as_str().map(str::to_string))
+                    .unwrap_or_else(|| format!("{cause:?}")),
+            ),
+            Err(e) => Some(format!("{e:?}")),
+            _ => None,
+        };
+        let text = match error.as_deref() {
+            Some(error) => format!(
+                "[subagent-result thread={} run={}] failed: {error}",
+                self.thread_id, self.child_run_id
+            ),
+            None => delivery_text(&self.thread_id, &self.child_run_id, finish),
         };
         match thread_store::finish(
             &self.runtime.storage,

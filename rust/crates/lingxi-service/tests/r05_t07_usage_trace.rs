@@ -800,6 +800,29 @@ async fn c02_background_subagent_and_worker_rows_carry_true_parentage() {
         },
         session_mode: SessionPermissionMode::Operate,
     };
+    // 生产 SubagentRuntime 孵化链在驱动前经 task_supervisor 预登记会话准入
+    // 许可（F03 统一准入后 drive_run 拒绝未预登记的受限授权 run）。这里走
+    // 同一生产契约，而不是放松门禁（r04_t02 的先例）。
+    let admission = {
+        let gate = storage.session_admission().clone();
+        std::sync::Arc::new(
+            gate.try_acquire(&["sess_local_alpha"], usize::MAX)
+                .expect("child permit"),
+        )
+    };
+    // 登记守卫必须存活到驱动结束：RunPermitRegistration 的 Drop 会撤销登记。
+    let _child_registration = state
+        .runs()
+        .task_supervisor()
+        .retain_authorized_run_permit(
+            child_run.as_str(),
+            "sess_local_alpha",
+            "lingxi",
+            &KernelPrincipal::LocalUser,
+            &authorization,
+            admission,
+        )
+        .expect("pre-admit child run");
     let finish = state
         .runs()
         .drive_run(

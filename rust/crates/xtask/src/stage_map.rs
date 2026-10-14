@@ -505,48 +505,48 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                          (known kinds: {SUPPLEMENTAL_BASIS_KINDS:?})"
                     )));
                 }
-                let (r02_share, r07_share, stage_share, later_share) =
-                    if basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR
-                        || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
-                    {
-                        // R05 RR1 F25: a FULL leaf owns its original behavior
-                        // in THIS stage — there is no share split at all, so
-                        // none of the four share texts is required; the
-                        // evidence is the per-assertion case coverage
-                        // (originalAssertionCases, validated below).
-                        (String::new(), String::new(), String::new(), String::new())
-                    } else if is_stage_neutral_kind(&basis_kind) {
-                        let stage_share = non_empty_string(
-                            entry.get("stageShare").ok_or_else(|| {
-                                err(&format!(
+                let (r02_share, r07_share, stage_share, later_share) = if basis_kind
+                    == BASIS_FULL_ORIGINAL_BEHAVIOR
+                    || basis_kind == BASIS_REQUIRED_BEHAVIOR_PENDING
+                {
+                    // R05 RR1 F25: a FULL leaf owns its original behavior
+                    // in THIS stage — there is no share split at all, so
+                    // none of the four share texts is required; the
+                    // evidence is the per-assertion case coverage
+                    // (originalAssertionCases, validated below).
+                    (String::new(), String::new(), String::new(), String::new())
+                } else if is_stage_neutral_kind(&basis_kind) {
+                    let stage_share = non_empty_string(
+                        entry.get("stageShare").ok_or_else(|| {
+                            err(&format!(
                                 "supplemental leaf {id:?} missing stageShare (the stage-neutral \
                                  share kinds declare their share here, not r02Share)"
                             ))
-                            })?,
-                            &format!("supplemental leaf {id:?} stageShare"),
-                        )?;
-                        let later_share = non_empty_string(
-                            entry.get("laterShare").ok_or_else(|| {
-                                err(&format!("supplemental leaf {id:?} missing laterShare"))
-                            })?,
-                            &format!("supplemental leaf {id:?} laterShare"),
-                        )?;
-                        (String::new(), String::new(), stage_share, later_share)
-                    } else {
-                        let r02_share = non_empty_string(
-                            entry.get("r02Share").ok_or_else(|| {
-                                err(&format!("supplemental leaf {id:?} missing r02Share"))
-                            })?,
-                            &format!("supplemental leaf {id:?} r02Share"),
-                        )?;
-                        let r07_share = non_empty_string(
-                            entry.get("r07Share").ok_or_else(|| {
-                                err(&format!("supplemental leaf {id:?} missing r07Share"))
-                            })?,
-                            &format!("supplemental leaf {id:?} r07Share"),
-                        )?;
-                        (r02_share, r07_share, String::new(), String::new())
-                    };
+                        })?,
+                        &format!("supplemental leaf {id:?} stageShare"),
+                    )?;
+                    let later_share = non_empty_string(
+                        entry.get("laterShare").ok_or_else(|| {
+                            err(&format!("supplemental leaf {id:?} missing laterShare"))
+                        })?,
+                        &format!("supplemental leaf {id:?} laterShare"),
+                    )?;
+                    (String::new(), String::new(), stage_share, later_share)
+                } else {
+                    let r02_share = non_empty_string(
+                        entry.get("r02Share").ok_or_else(|| {
+                            err(&format!("supplemental leaf {id:?} missing r02Share"))
+                        })?,
+                        &format!("supplemental leaf {id:?} r02Share"),
+                    )?;
+                    let r07_share = non_empty_string(
+                        entry.get("r07Share").ok_or_else(|| {
+                            err(&format!("supplemental leaf {id:?} missing r07Share"))
+                        })?,
+                        &format!("supplemental leaf {id:?} r07Share"),
+                    )?;
+                    (r02_share, r07_share, String::new(), String::new())
+                };
                 let evidence_required = non_empty_string(
                     entry.get("evidenceRequired").ok_or_else(|| {
                         err(&format!(
@@ -1189,11 +1189,23 @@ mod map_tests {
 
     #[test]
     fn r06_registered_map_executes_checks_without_releasing_unproved_obligations() {
-        let map = parse_stage_map(include_str!("stage_maps/R06.json")).expect("真实R06阶段图可解析");
-        assert_eq!(map.scenarios.len(), 77, "16项原验收、60项修复检查及前序闭包均保留");
+        let map =
+            parse_stage_map(include_str!("stage_maps/R06.json")).expect("真实R06阶段图可解析");
+        assert_eq!(
+            map.scenarios.len(),
+            77,
+            "16项原验收、60项修复检查及前序闭包均保留"
+        );
         assert_eq!(map.supplemental_leaves.len(), 280, "原始到期条款不能丢失");
-        assert!(map.scenarios.iter().all(|row| row.requirement == "REQUIRED"));
-        let aggregate = map.scenarios.iter().find(|row| row.id == "R06-AR-F14-C02").unwrap();
+        assert!(map
+            .scenarios
+            .iter()
+            .all(|row| row.requirement == "REQUIRED"));
+        let aggregate = map
+            .scenarios
+            .iter()
+            .find(|row| row.id == "R06-AR-F14-C02")
+            .unwrap();
         for command in &map.commands {
             if command.key.starts_with("r06_test_") {
                 assert!(aggregate.command_refs.contains(&command.key));
@@ -1201,22 +1213,46 @@ mod map_tests {
                 assert!(!command.evidence_paths.is_empty());
             }
         }
-        let upstream = map.scenarios.iter().find(|row| row.id == "R06-AR-F14-C03").unwrap();
+        let upstream = map
+            .scenarios
+            .iter()
+            .find(|row| row.id == "R06-AR-F14-C03")
+            .unwrap();
         assert_eq!(upstream.command_refs, vec!["r05_regression_gate"]);
-        let fork = map.supplemental_leaves.iter().find(|leaf| leaf.id == "R00-T02-LA-960668141E07").unwrap();
+        let fork = map
+            .supplemental_leaves
+            .iter()
+            .find(|leaf| leaf.id == "R00-T02-LA-960668141E07")
+            .unwrap();
         assert_eq!(fork.basis_kind, BASIS_FULL_ORIGINAL_BEHAVIOR);
-        assert_eq!(fork.original_assertion_cases.len(), fork.r00_assertions.len());
-        for leaf in map.supplemental_leaves.iter().filter(|leaf| leaf.id != fork.id) {
+        assert_eq!(
+            fork.original_assertion_cases.len(),
+            fork.r00_assertions.len()
+        );
+        for leaf in map
+            .supplemental_leaves
+            .iter()
+            .filter(|leaf| leaf.id != fork.id)
+        {
             match leaf.basis_kind.as_str() {
                 BASIS_FULL_ORIGINAL_BEHAVIOR => {
-                    assert_eq!(leaf.original_assertion_cases.len(), leaf.r00_assertions.len());
-                    assert!(leaf.original_assertion_cases.iter().all(|cases| cases.len() == 1));
+                    assert_eq!(
+                        leaf.original_assertion_cases.len(),
+                        leaf.r00_assertions.len()
+                    );
+                    assert!(leaf
+                        .original_assertion_cases
+                        .iter()
+                        .all(|cases| cases.len() == 1));
                     assert!(leaf.assertion_contract.is_some());
                     assert!(!leaf.evidence_command_refs.is_empty());
                 }
                 BASIS_REQUIRED_BEHAVIOR_PENDING => {
                     assert!(leaf.evidence_command_refs.is_empty());
-                    assert!(leaf.assertion_contract.is_none(), "缺失行为证据不能借用局部成功收据");
+                    assert!(
+                        leaf.assertion_contract.is_none(),
+                        "缺失行为证据不能借用局部成功收据"
+                    );
                 }
                 other => panic!("原279项不得更改期限或豁免验收：{other}"),
             }

@@ -18,7 +18,15 @@
 //! - C04: a REAL subagent child whose timeout fires while parked in a
 //!   provider wait / an approval wait / a quota-queue wait settles
 //!   `cancelled` in bounded time (the inner drive observes the timeout's
-//!   scope cancellation through the linked tree).
+//!   scope cancellation through the linked tree). The quota-queue case
+//!   was REBUILT on 2026-10-13: its original construction depended on the
+//!   parent's next admission winning an uncontrolled race against the
+//!   freshly spawned child's first admission (the model permit is
+//!   released BEFORE tool execution), and bc2ce51fd (R06-AR-F08, one more
+//!   storage write on the parent's tool-result path) flipped that race for
+//!   good. The rebuilt test orders the two runs through the runtime's own
+//!   synchronisation points (a parked tool + the lane's FIFO handoff), so
+//!   the same contract is proven deterministically — see the test's doc.
 //! - C05: isolation (an unrelated root keeps running; a child's
 //!   cancellation never ascends) and first-reason stability under
 //!   repeated and concurrent cancellations.
@@ -89,6 +97,15 @@ impl ScriptedProvider {
     fn marker_of(input: &str) -> String {
         input.split(':').next().unwrap_or(input).trim().to_string()
     }
+
+    /// How many times `next_turn` was ENTERED for `marker`. The counter is
+    /// bumped synchronously at entry — BEFORE any gate parks the call — and
+    /// the run driver acquires its model-admission permit BEFORE invoking
+    /// the provider, so `calls_of(m) == n` proves that run's n-th call is
+    /// admitted (it holds its permit) and has reached the provider.
+    fn calls_of(&self, marker: &str) -> usize {
+        self.calls.lock().unwrap().get(marker).copied().unwrap_or(0)
+    }
 }
 
 impl TurnProviderPort for ScriptedProvider {
@@ -136,23 +153,7 @@ impl TurnProviderPort for ScriptedProvider {
                 Some(Step::Turn(turn)) => turn,
                 Some(Step::Dispatch { task }) => ProviderTurn::ToolRequests {
                     content: Vec::new(),
-                    requests: vec![ToolRequest::from_effective_arguments(
-                        "subagent",
-                        serde_json::json!({
-                            "task": task,
-                        }),
-                        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
-                    )
-                    .expect("effective tool request")
-                    .with_summary(format!("subagent: {task}"))
-                    .with_delegation(DelegationRequest {
-                        task: task.to_string(),
-                        access: None,
-                        label: None,
-                        agent_id: None,
-                        model: None,
-                        thread_id: None,
-                    })],
+                    requests: vec![delegation_request(task)],
                 },
                 None => ProviderTurn::Failed {
                     error: ProtocolError::new(
@@ -278,6 +279,28 @@ fn read_tool_request() -> ToolRequest {
     )
     .expect("effective tool request")
     .with_summary("read /tmp/x")
+}
+
+/// The subagent-family dispatch request (the shape `Step::Dispatch`
+/// emits), reusable inside a multi-request tool turn.
+fn delegation_request(task: &str) -> ToolRequest {
+    ToolRequest::from_effective_arguments(
+        "subagent",
+        serde_json::json!({
+            "task": task,
+        }),
+        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+    )
+    .expect("effective tool request")
+    .with_summary(format!("subagent: {task}"))
+    .with_delegation(DelegationRequest {
+        task: task.to_string(),
+        access: None,
+        label: None,
+        agent_id: None,
+        model: None,
+        thread_id: None,
+    })
 }
 
 // ── harness ──────────────────────────────────────────────────────────────────
@@ -816,36 +839,96 @@ async fn subagent_timeout_settles_a_parked_approval_wait() {
     teardown(&state, &home).await;
 }
 
-/// Quota wait: the PARENT parks mid-stream on its SECOND turn holding the
-/// only global model permit (its first turn already dispatched the child);
-/// the child's first model call then parks in the bounded ADMISSION
-/// QUEUE. The child's OWN timeout fires while it queues: the queue wait
-/// must EXIT and the child settles `cancelled` with ZERO provider calls —
-/// while the parked parent (unrelated to the child's timeout) keeps
-/// holding its permit until released.
+/// Quota wait — REBUILT 2026-10-13 for the current production ordering.
+///
+/// CONTRACT (unchanged from the original test): a subagent child whose
+/// OWN timeout fires while it is parked in the bounded model-admission
+/// QUEUE exits the queue wait and settles `cancelled` honestly — the
+/// queue place is returned, the queued call never reaches the provider,
+/// the durable cancelling leg carries the timeout as its reason, the
+/// UNRELATED holder of the only global model permit (the parent) keeps
+/// its permit and later completes normally (a child timeout never
+/// ascends), and the subagent bookkeeping closes out.
+///
+/// WHY THE ORIGINAL CONSTRUCTION WAS RETIRED: it had the parent dispatch
+/// the child on turn 1 and park on turn 2, assuming the parent's turn-2
+/// admission would WIN the race against the child's first admission. That
+/// race was never test-controlled — the parent releases its model permit
+/// BEFORE tool execution (runs.rs `drop(model_permit)`), so both runs
+/// contend for the single permit on storage-queue timing alone. Since
+/// bc2ce51fd (R06-AR-F08 adds one storage write — one more yield — to the
+/// parent's tool-result path) the child wins deterministically: it
+/// completed before the parent ever parked, so the `in_use == 1 &&
+/// waiting == 1` probe could never hold.
+///
+/// THE REBUILT ORDER is forced through the runtime's own synchronisation
+/// points, never through storage timing:
+/// 1. The parent's dispatch turn requests `[subagent, read]`. Tool requests
+///    execute sequentially in request order, so the child is spawned
+///    (fire-and-forget) and then `read` PARKS the parent inside its tool
+///    phase — holding NO model permit, hence OUT of the race.
+/// 2. The child's first call acquires the permit uncontested and parks in
+///    the provider (gated): the child is the holder. Observed through the
+///    provider's entry counter (admission precedes the provider call).
+/// 3. Releasing the parent's tool makes its turn-2 admission QUEUE behind
+///    the child (`waiting == 1`).
+/// 4. Releasing the child's first call drops the child's permit: the lane
+///    hands the slot to the queue head (the parent) under the lane lock,
+///    so the parent's turn 2 enters the provider and PARKS holding the
+///    permit, while the child's SECOND call enqueues behind it
+///    (`in_use == 1 && waiting == 1`, with the parent provably the holder).
+/// 5. The child's own timeout fires while the child is QUEUED: the queue
+///    wait must EXIT and the child settles `cancelled`; the parent is
+///    untouched until the test releases it.
+///
+/// Every mis-ordering fails LOUDLY (a probe times out); none can pass by
+/// accident — the holder identity is pinned by the provider entry counts,
+/// not inferred from lane counters alone.
 #[tokio::test(flavor = "current_thread")]
 async fn subagent_timeout_settles_a_parked_quota_wait() {
     let parent_turn2_gate = Arc::new(tokio::sync::Semaphore::new(0));
+    let child_call1_gate = Arc::new(tokio::sync::Semaphore::new(0));
     let provider = ScriptedProvider::new(
         vec![
             (
                 "P",
                 vec![
-                    Step::Dispatch {
-                        task: "KID: queue for the model lane",
-                    },
+                    // Turn 1: dispatch the child AND park in a tool (tools
+                    // run sequentially in request order).
+                    Step::Turn(ProviderTurn::ToolRequests {
+                        content: Vec::new(),
+                        requests: vec![
+                            delegation_request("KID: hold the lane once, then queue"),
+                            read_tool_request(),
+                        ],
+                    }),
+                    // Turn 2: parks HOLDING the only model permit.
                     Step::Turn(ProviderTurn::Continue {
                         process_note: "parent parks holding the model lane".to_string(),
                     }),
                     Step::Turn(final_turn("parent finishes after release")),
                 ],
             ),
-            ("KID", vec![Step::Turn(final_turn("child never runs"))]),
+            (
+                "KID",
+                vec![
+                    // Call 1: holds the permit (gated) until released.
+                    Step::Turn(ProviderTurn::Continue {
+                        process_note: "child holds the lane once".to_string(),
+                    }),
+                    // Call 2: queued behind the parent; never reached.
+                    Step::Turn(final_turn("child never reaches its second call")),
+                ],
+            ),
         ],
-        vec![(("P", 2), Arc::clone(&parent_turn2_gate))],
+        vec![
+            (("P", 2), Arc::clone(&parent_turn2_gate)),
+            (("KID", 1), Arc::clone(&child_call1_gate)),
+        ],
     );
+    let parent_tool_gate = Arc::new(tokio::sync::Semaphore::new(0));
     let tools = Arc::new(ParkingTool {
-        gate: Arc::new(tokio::sync::Semaphore::new(0)),
+        gate: Arc::clone(&parent_tool_gate),
         arrivals: Mutex::new(Vec::new()),
     });
     let policy = lingxi_kernel::subagent::SubagentPolicy {
@@ -872,6 +955,18 @@ async fn subagent_timeout_settles_a_parked_quota_wait() {
         ),
     )
     .await;
+    let model_in_use = || {
+        state
+            .runs()
+            .quotas()
+            .in_use(lingxi_service::QuotaResource::Model)
+    };
+    let model_waiting = || {
+        state
+            .runs()
+            .quotas()
+            .waiting(lingxi_service::QuotaResource::Model)
+    };
 
     let state_for_task = state.clone();
     let parent = tokio::spawn(async move {
@@ -891,27 +986,83 @@ async fn subagent_timeout_settles_a_parked_quota_wait() {
             .expect("parent settles")
             .run_id
     });
-    // Turn 1 dispatches the child; turn 2 parks HOLDING the only model
-    // permit; the child's first model call parks in the admission queue.
-    wait_until("the child queues behind the parked parent turn", || {
-        state
-            .runs()
-            .quotas()
-            .in_use(lingxi_service::QuotaResource::Model)
-            == 1
-            && state
-                .runs()
-                .quotas()
-                .waiting(lingxi_service::QuotaResource::Model)
-                == 1
-    })
+
+    // (2) The child's first call holds the only permit; the parent is
+    // parked in its `read` tool with no model permit (its turn 1 released
+    // it). The two are independent storage-bound sequences, so BOTH facts
+    // are awaited (each is stable once reached: the gates hold them).
+    wait_until(
+        "the child's first call to hold the only model permit and the parent to park in its tool",
+        || {
+            provider.calls_of("KID") == 1
+                && model_in_use() == 1
+                && tools.arrivals.lock().unwrap().len() == 1
+        },
+    )
     .await;
+    assert_eq!(
+        model_waiting(),
+        0,
+        "nobody queues yet (the parent is parked in a tool)"
+    );
+    assert_eq!(
+        provider.calls_of("P"),
+        1,
+        "the parent has made exactly its dispatch turn"
+    );
     let child = latest_subagent_child_of(&state)
         .await
         .expect("the child run exists");
+    let parent_run = query_text(
+        &state,
+        "SELECT parent_run_id FROM run_lineage WHERE run_id = ?1",
+        &child,
+    )
+    .await
+    .expect("the child's lineage names its parent");
+    assert_eq!(
+        tools.arrivals.lock().unwrap().clone(),
+        vec![parent_run.clone()],
+        "the parent's `read` is the one tool execution: it parks the parent"
+    );
 
-    // The child's timeout fires while it queues: the queue wait must EXIT
-    // and the child settles cancelled — WITHOUT the parent being cancelled.
+    // (3) Release the parent's tool: its turn-2 admission queues behind
+    // the child's held permit.
+    parent_tool_gate.add_permits(1);
+    wait_until("the parent's turn 2 to queue behind the child", || {
+        model_waiting() == 1
+    })
+    .await;
+    assert_eq!(
+        model_in_use(),
+        1,
+        "the child still holds while the parent queues"
+    );
+    assert_eq!(
+        provider.calls_of("P"),
+        1,
+        "a queued admission never reaches the provider"
+    );
+
+    // (4) Release the child's first call: the lane hands the freed slot to
+    // the queue head (the parent, now parked on turn 2 holding it) and the
+    // child's SECOND call enqueues behind the parent.
+    child_call1_gate.add_permits(1);
+    wait_until(
+        "the parent's turn 2 to hold the permit and the child's second call to queue",
+        || provider.calls_of("P") == 2 && model_waiting() == 1,
+    )
+    .await;
+    assert_eq!(model_in_use(), 1, "exactly one permit: the parent's turn 2");
+    assert_eq!(
+        provider.calls_of("KID"),
+        1,
+        "the child's queued second call has not entered the provider"
+    );
+
+    // (5) The child's timeout fires while it queues: the queue wait must
+    // EXIT and the child settles cancelled — WITHOUT the parent being
+    // cancelled. Nothing is released by the test here.
     wait_status(
         &state,
         &child,
@@ -920,47 +1071,85 @@ async fn subagent_timeout_settles_a_parked_quota_wait() {
     )
     .await;
     wait_until("the thread frees", || !thread_busy(&state)).await;
+    assert_eq!(model_waiting(), 0, "the child's queue place was returned");
     assert_eq!(
-        state
-            .runs()
-            .quotas()
-            .waiting(lingxi_service::QuotaResource::Model),
-        0,
-        "the child's queue place was returned"
-    );
-    assert_eq!(
-        state
-            .runs()
-            .quotas()
-            .in_use(lingxi_service::QuotaResource::Model),
+        model_in_use(),
         1,
         "the parked parent still holds its permit (a child timeout never ascends)"
     );
-    let kid_events = query_text(
+    assert_eq!(
+        provider.calls_of("KID"),
+        1,
+        "the queued call never reached the provider, before or after the timeout"
+    );
+    let kid_calls_started = query_text(
         &state,
         "SELECT COUNT(*) FROM key_events WHERE run_id = ?1 AND event_type = \
-'model_call_started'",
+         'model_call_started'",
         &child,
     )
     .await
     .expect("child model events");
     assert_eq!(
-        kid_events.as_str(),
-        "0",
-        "the queued child never called the provider"
+        kid_calls_started.as_str(),
+        "1",
+        "exactly the first call started; the QUEUED second call never did"
+    );
+    let cancelling_leg = query_text(
+        &state,
+        "SELECT payload_json FROM key_events WHERE run_id = ?1 AND event_type = \
+         'run_state_changed' AND payload_json LIKE '%\"to\":\"cancelling\"%'",
+        &child,
+    )
+    .await
+    .expect("the durable cancelling leg exists");
+    assert!(
+        cancelling_leg.contains("\"reason\":\"cancelled:subagent timeout\""),
+        "the cancelling leg names the timeout honestly: {cancelling_leg}"
+    );
+    assert_eq!(
+        query_text(
+            &state,
+            "SELECT terminal_reason FROM runs WHERE run_id = ?1",
+            &child
+        )
+        .await
+        .as_deref(),
+        Some("cancelled.requested"),
+        "settled through the single cancel finalize path"
+    );
+    assert_eq!(
+        run_status(&state, &parent_run).await.as_deref(),
+        Some("running"),
+        "the parent is still live, parked on its turn 2"
+    );
+    assert_eq!(
+        state
+            .runs()
+            .run_scope(&parent_run)
+            .map(|scope| scope.is_cancelled()),
+        Some(false),
+        "the child's timeout never ascended into the parent's tree"
     );
     let (per_session, global) = state.subagents().active_counts("sess_local_alpha");
     assert_eq!((per_session, global), (0, 0));
+    assert_eq!(
+        tools.arrivals.lock().unwrap().clone(),
+        vec![parent_run.clone()],
+        "the child executed no tool"
+    );
 
     // The parked parent was untouched by the child's timeout; it completes
-    // normally once released.
+    // normally once released and the lane fully drains.
     parent_turn2_gate.add_permits(1);
-    let parent_run = parent.await.expect("parent settles");
+    let settled_parent = parent.await.expect("parent settles");
+    assert_eq!(settled_parent, parent_run);
     assert_eq!(
         run_status(&state, &parent_run).await.as_deref(),
         Some("completed")
     );
-    assert!(tools.arrivals.lock().unwrap().is_empty());
+    assert_eq!(provider.calls_of("P"), 3, "turn 2 resumed, turn 3 finished");
+    assert_eq!((model_in_use(), model_waiting()), (0, 0));
     teardown(&state, &home).await;
 }
 

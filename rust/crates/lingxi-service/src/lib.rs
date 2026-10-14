@@ -21,6 +21,8 @@
 //! - 版本事实单一来源：wire 协议版本与 data epoch 取自 lingxi-protocol
 //!   常量，本 crate 不复制第二份（实例记录快照同一来源）。
 
+pub mod agents_admin;
+pub mod appevents;
 pub mod approval;
 pub mod approval_service;
 pub mod artifactverify;
@@ -28,9 +30,12 @@ pub mod auth;
 pub mod background;
 pub mod bridgemedia;
 pub mod cancel;
+pub mod cardguide;
+pub mod checkpoint_store;
 pub mod compaction;
 pub mod config;
 pub mod context_compiler;
+pub mod conversation_map;
 pub mod credentials;
 pub mod dedup;
 pub mod epoch;
@@ -45,6 +50,7 @@ pub mod history;
 pub mod history_projection;
 pub mod hooks;
 pub mod inject;
+pub mod input_drafts;
 pub mod instance;
 pub mod invocations;
 pub mod knowledge;
@@ -61,6 +67,7 @@ pub mod paths;
 pub mod persona;
 pub mod preview;
 pub mod procsupervisor;
+pub mod projects;
 pub mod quotas;
 pub mod recovery;
 pub mod redaction;
@@ -83,9 +90,11 @@ mod static_web;
 pub mod streaming_norm;
 pub mod subagents;
 pub mod task_supervisor;
+pub mod todos;
 pub mod toolcatalog_bridge;
 pub mod toolgateway;
 pub mod transport;
+pub mod userprefs;
 pub mod workermodel;
 pub mod workerrpc;
 pub mod ws;
@@ -453,6 +462,8 @@ pub struct ServiceState {
     storage: Arc<RunDatabase>,
     sessions: Arc<sessions::SessionStore>,
     events: Arc<events::EventService>,
+    app_events: Arc<appevents::AppEventLog>,
+    session_projects: Arc<projects::SessionProjectsService>,
     rate: Arc<limits::RateLimiter>,
     ws_conns: Arc<limits::WsConnectionCounter>,
     /// HTTP admission gate (R02 stage-repair R1 / F07): hard in-flight cap
@@ -519,6 +530,8 @@ pub struct ServiceState {
     /// file restore while this is off is refused 403 `file_rollback_disabled`,
     /// never silently degraded to a no-restore rewind.
     rollback_file_changes: Arc<std::sync::atomic::AtomicBool>,
+    rollback_preferences_lock: Arc<tokio::sync::Mutex<()>>,
+    input_drafts: Arc<input_drafts::InputDraftsService>,
     /// Subagent runtime (R03-T06): child-run dispatch/reply/close through
     /// the same run supervisor.
     subagents: Arc<subagents::SubagentRuntime>,
@@ -566,6 +579,10 @@ pub struct ServiceState {
     /// AND the context-observation endpoint both read from it (one build
     /// result, R06-A01).
     context_compiler: Option<Arc<context_compiler::ContextCompilerService>>,
+    /// The mid-run compaction service handle (R06 C2 fresh-compact 端点)：
+    /// 与 runs supervisor 共享的同一实例；None = 未接真实模型链（pre-R06
+    /// 形态），fresh-compact 端点显式拒绝而非静默无压缩。
+    pub(crate) compaction: Option<Arc<compaction::CompactionService>>,
 }
 
 impl std::fmt::Debug for ServiceState {
@@ -1230,6 +1247,11 @@ impl ServiceState {
             t06_data_home.clone(),
             layout.runtime_dir.clone(),
         ));
+        let rollback_file_changes = memory_service.rollback_file_changes().map_err(|err| {
+            ServiceStartupError::Storage(StorageError::Io {
+                detail: format!("cannot load workspace rollback preference: {err}"),
+            })
+        })?;
         let skills_service = Arc::new(skills::SkillService::new(
             t06_data_home.clone(),
             t06_product_dir.clone(),
@@ -1300,6 +1322,10 @@ impl ServiceState {
             ));
             // 子任务与其他正式工具共用当轮声明、参数校验和权限判断。
             subagents::register_tools(&registry, gateway.as_ref(), &budget);
+            // R06 收口：hana_card_guide（Hana Interactive Card 设计手册，
+            // 现役 lib/tools/card-guide-tool.ts + core/agent.ts:973 工具面；
+            // 只读静态指南，无需 workspace，返回全册文本且不产卡片）。
+            cardguide::register_card_guide_tool(&registry, gateway.as_ref(), &budget);
             if let Some((access, workspace)) = workspace_access.clone() {
                 let core_file_tools = filetools::register_core_file_tools(
                     &registry,
@@ -1307,7 +1333,10 @@ impl ServiceState {
                     Arc::clone(&access),
                     workspace.clone(),
                     Arc::clone(&deps.clock),
-                    Arc::new(filehistory::FileHistoryChangeLog::new(file_history.clone())),
+                    Arc::new(filehistory::FileProductChangeLog::new(
+                        file_history.clone(),
+                        session_files.clone(),
+                    )),
                     &budget,
                 );
                 stagefiles::register_stage_files(
@@ -1520,7 +1549,7 @@ impl ServiceState {
             }
             None => None,
         };
-        let runs = runs.with_compaction(compaction_service);
+        let runs = runs.with_compaction(compaction_service.clone());
         // R06-T06: the skill install guard — the `guard` auxiliary slot over
         // the SAME gateway/credential/network plane (fail-closed when the
         // slot is unconfigured; install-skill.ts:96-107). Only wired when the
@@ -1981,6 +2010,9 @@ impl ServiceState {
             &data_home,
             workspace_access.as_ref().map(|(_, root)| root.as_path()),
         ));
+        // R06：输入草稿服务先建，供 session_admin 永久删除时同步清理草稿。
+        let input_drafts_handle = Arc::new(input_drafts::InputDraftsService::new(&data_home));
+        let session_projects_handle = Arc::new(projects::SessionProjectsService::new(&data_home));
         let state = Self {
             _knowledge_worker_owner: Arc::new(KnowledgeWorkerOwner(knowledge_service.clone())),
             config: Arc::new(config),
@@ -2007,7 +2039,8 @@ impl ServiceState {
             session_admin: Arc::new(
                 session_admin::SessionAdminService::new(Arc::clone(&storage))
                     .with_context_compiler(deps.context_compiler.clone())
-                    .with_session_files(session_files.clone()),
+                    .with_session_files(session_files.clone())
+                    .with_input_drafts(input_drafts_handle.clone()),
             ),
             session_files,
             // R06-T05: 资源面（res_ 信封 / 内容解析 / 票据）。
@@ -2029,8 +2062,14 @@ impl ServiceState {
             tool_gateway: deps.tool_gateway.clone(),
             skills: skills_service,
             persona: persona_service,
-            rollback_file_changes: Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            rollback_file_changes: Arc::new(std::sync::atomic::AtomicBool::new(
+                rollback_file_changes,
+            )),
+            rollback_preferences_lock: Arc::new(tokio::sync::Mutex::new(())),
+            input_drafts: input_drafts_handle,
             events: Arc::clone(&events),
+            app_events: Arc::new(appevents::AppEventLog::new()),
+            session_projects: session_projects_handle,
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(deps.ws_max_connections)),
             admission: Arc::new(limits::HttpAdmission::new(
@@ -2063,6 +2102,7 @@ impl ServiceState {
             operations: operations_entry,
             network_plane: deps.network_plane.clone(),
             context_compiler: deps.context_compiler.clone(),
+            compaction: compaction_service,
         };
         let knowledge_owner = Arc::downgrade(state.knowledge());
         state
@@ -2229,10 +2269,30 @@ impl ServiceState {
             .store(enabled, std::sync::atomic::Ordering::Relaxed);
     }
 
+    async fn save_rollback_file_changes(&self, enabled: bool) -> Result<(), String> {
+        let _guard = self.rollback_preferences_lock.lock().await;
+        self.memory
+            .save_rollback_file_changes(enabled)
+            .map_err(|err| err.to_string())?;
+        self.rollback_file_changes
+            .store(enabled, std::sync::atomic::Ordering::Relaxed);
+        Ok(())
+    }
+
     /// The injected event subscription service (R02-T05: snapshot/cursor
     /// protocol + post-commit publication hub).
     pub fn events(&self) -> &Arc<events::EventService> {
         &self.events
+    }
+
+    /// 进程内 app 级事件日志（agent-created/switched/deleted 等广播面）。
+    pub fn app_events(&self) -> &Arc<appevents::AppEventLog> {
+        &self.app_events
+    }
+
+    /// R06 会话项目/文件夹目录服务。
+    pub fn session_projects(&self) -> &Arc<projects::SessionProjectsService> {
+        &self.session_projects
     }
 
     /// The injected storage port implementation (composition root handle
@@ -2287,6 +2347,12 @@ impl ServiceState {
     /// from (one build result, R06-A01).
     pub fn context_compiler(&self) -> Option<&Arc<context_compiler::ContextCompilerService>> {
         self.context_compiler.as_ref()
+    }
+
+    /// The mid-run compaction service (R06 C2 fresh-compact)：与 runs
+    /// supervisor 共享的同一实例；None = 未接真实模型链。
+    pub fn compaction(&self) -> Option<&Arc<compaction::CompactionService>> {
+        self.compaction.as_ref()
     }
 
     /// The managed-task shutdown handle (R02-T06): the binary subscribes
@@ -3730,6 +3796,34 @@ struct RetryRequestBody {
     file_rollback: Option<String>,
 }
 
+async fn workspace_rollback_get_route(State(state): State<ServiceState>) -> Response {
+    Json(serde_json::json!({"enabled": state.rollback_file_changes_enabled()})).into_response()
+}
+
+#[derive(serde::Deserialize)]
+struct WorkspaceRollbackPreferenceBody {
+    enabled: bool,
+}
+
+async fn workspace_rollback_put_route(
+    State(state): State<ServiceState>,
+    body: Result<Json<WorkspaceRollbackPreferenceBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(request) = match body {
+        Ok(value) => value,
+        Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
+    };
+    match state.save_rollback_file_changes(request.enabled).await {
+        Ok(()) => Json(serde_json::json!({"ok": true, "enabled": request.enabled})).into_response(),
+        Err(err) => EndpointError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::Internal,
+            format!("cannot save workspace rollback preference: {err}"),
+        )
+        .into_response(),
+    }
+}
+
 /// `POST /lingxi/v1/sessions/{id}/turns/retry` — 服务端解析重置点 →
 /// 分支头回移 + reset 标记；回合输入随响应返回，客户端经 execute 提交为
 /// 全新 run（D6 两段式；旧结果永不覆盖）。fileRollback=workspace 时在分支
@@ -4007,6 +4101,9 @@ fn session_admin_error_response(err: session_admin::SessionAdminError) -> Respon
     use session_admin::SessionAdminError as E;
     match err {
         E::NotFound => EndpointError::not_found().into_response(),
+        E::InactiveMemorySession => {
+            EndpointError::forbidden("session_memory_inactive").into_response()
+        }
         E::WrongLifecycle { detail } => {
             EndpointError::new(StatusCode::CONFLICT, ErrorCode::Conflict, detail)
                 .with_reason("session_lifecycle_conflict")
@@ -4067,13 +4164,37 @@ async fn gate_session_owned(
     principal: &Principal,
     session_id: &str,
 ) -> Result<(), Response> {
+    get_session_owned(state, principal, session_id)
+        .await
+        .map(|_| ())
+}
+
+#[allow(clippy::result_large_err)]
+async fn get_session_owned(
+    state: &ServiceState,
+    principal: &Principal,
+    session_id: &str,
+) -> Result<sessions::SessionFacts, Response> {
     match state.sessions.get_for(principal, session_id).await {
-        Ok(sessions::SessionAccess::Ok(_)) => Ok(()),
+        Ok(sessions::SessionAccess::Ok(session)) => Ok(session),
         Ok(sessions::SessionAccess::NotFound) => Err(EndpointError::not_found().into_response()),
         Ok(sessions::SessionAccess::Forbidden) => {
             Err(EndpointError::forbidden("cross_principal_access").into_response())
         }
         Err(err) => Err(EndpointError::storage(&err).into_response()),
+    }
+}
+
+#[allow(clippy::result_large_err)]
+fn gate_agent_not_deleted(state: &ServiceState, agent_id: &str) -> Result<(), Response> {
+    match state.memory().is_agent_deleted_checked(agent_id) {
+        Ok(true) => Err((
+            StatusCode::CONFLICT,
+            Json(serde_json::json!({"error":"agent_deleted","reason":"agent_deleted"})),
+        )
+            .into_response()),
+        Ok(false) => Ok(()),
+        Err(error) => Err(memory::error_response(&error)),
     }
 }
 
@@ -4187,8 +4308,14 @@ async fn pin_session_route(
         Ok(j) => j,
         Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
     };
-    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
-        return resp;
+    let session = match get_session_owned(&state, &principal, &req.session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if req.pinned {
+        if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+            return response;
+        }
     }
     match state
         .session_admin
@@ -4393,6 +4520,7 @@ async fn list_archived_route(
                     "lifecycle": r.lifecycle,
                     "createdAtUnixMs": r.created_at_unix_ms,
                     "archivedAtUnixMs": r.archived_at_unix_ms,
+                    "firstMessage": r.first_message,
                 })).collect::<Vec<_>>(),
             })),
         )
@@ -4515,8 +4643,12 @@ async fn get_memory_route(
     State(state): State<ServiceState>,
     Path(session_id): Path<String>,
 ) -> Response {
-    if let Err(resp) = gate_session_owned(&state, &principal, &session_id).await {
-        return resp;
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
     }
     match state.session_admin.get_memory_enabled(&session_id).await {
         Ok(enabled) => (
@@ -4545,8 +4677,12 @@ async fn patch_memory_route(
         Ok(j) => j,
         Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
     };
-    if let Err(resp) = gate_session_owned(&state, &principal, &session_id).await {
-        return resp;
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
     }
     match state
         .session_admin
@@ -4560,6 +4696,752 @@ async fn patch_memory_route(
             .into_response(),
         Err(err) => session_admin_error_response(err),
     }
+}
+
+/// `GET /lingxi/v1/sessions/{id}/authorized-folders` — 授权目录读取
+/// （现役 :1178；cwd/workspaceFolders/sandboxFolders 本端口不由服务端
+/// 跟踪，固定返回 null/空数组，不猜造）。
+async fn get_authorized_folders_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
+    }
+    match state.session_admin.authorized_folders(&session_id).await {
+        Ok(folders) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "ok": true,
+                "sessionId": session_id,
+                "cwd": serde_json::Value::Null,
+                "workspaceFolders": [],
+                "authorizedFolders": folders,
+                "sandboxFolders": [],
+            })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AuthorizedFoldersPatchBody {
+    #[serde(default)]
+    action: Option<String>,
+    #[serde(default)]
+    folder: Option<String>,
+    #[serde(default)]
+    folders: Option<Vec<String>>,
+}
+
+/// 现役 validateAuthorizedFolder：必填 → 绝对化 → 必须存在且为目录；
+/// 全部按 400 家族显式拒绝。
+#[allow(clippy::result_large_err)]
+fn validate_authorized_folder(raw: Option<&str>) -> Result<String, Response> {
+    let Some(folder) = raw.map(str::trim).filter(|value| !value.is_empty()) else {
+        return Err(EndpointError::invalid_message("folder is required").into_response());
+    };
+    let absolute = std::path::absolute(folder)
+        .map_err(|err| EndpointError::invalid_message(format!("folder path invalid: {err}")))
+        .unwrap_or_else(|_| std::path::PathBuf::from(folder));
+    let metadata = match std::fs::metadata(&absolute) {
+        Ok(metadata) => metadata,
+        Err(_) => {
+            return Err(EndpointError::invalid_message("folder does not exist").into_response());
+        }
+    };
+    if !metadata.is_dir() {
+        return Err(EndpointError::invalid_message("folder must be a directory").into_response());
+    }
+    Ok(absolute
+        .canonicalize()
+        .unwrap_or(absolute)
+        .to_string_lossy()
+        .into_owned())
+}
+
+/// 现役 normalizeAuthorizedFolderPath：remove 分支只规范化，不要求存在。
+#[allow(clippy::result_large_err)]
+fn normalize_authorized_folder(raw: Option<&str>) -> Result<String, Response> {
+    let Some(folder) = raw.map(str::trim).filter(|value| !value.is_empty()) else {
+        return Err(EndpointError::invalid_message("folder is required").into_response());
+    };
+    let absolute = std::path::absolute(folder).unwrap_or_else(|_| std::path::PathBuf::from(folder));
+    Ok(absolute
+        .canonicalize()
+        .unwrap_or(absolute)
+        .to_string_lossy()
+        .into_owned())
+}
+
+/// `PATCH /lingxi/v1/sessions/{id}/authorized-folders` — add/remove/set
+/// （现役 :1206）。
+async fn patch_authorized_folders_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<AuthorizedFoldersPatchBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
+    }
+    let action = req.action.as_deref().map(str::trim).unwrap_or("set");
+    let mutation = match action {
+        "add" => match validate_authorized_folder(req.folder.as_deref()) {
+            Ok(folder) => session_admin::FolderAction::Add(folder),
+            Err(response) => return response,
+        },
+        "remove" => match normalize_authorized_folder(req.folder.as_deref()) {
+            Ok(folder) => session_admin::FolderAction::Remove(folder),
+            Err(response) => return response,
+        },
+        "set" => {
+            let Some(folders) = req.folders.as_ref() else {
+                return EndpointError::invalid_message("folders is required").into_response();
+            };
+            let mut normalized = Vec::with_capacity(folders.len());
+            for folder in folders {
+                match validate_authorized_folder(Some(folder)) {
+                    Ok(folder) => normalized.push(folder),
+                    Err(response) => return response,
+                }
+            }
+            session_admin::FolderAction::Set(normalized)
+        }
+        other => {
+            return EndpointError::invalid_message(format!(
+                "Invalid action {other} (add|remove|set)"
+            ))
+            .into_response();
+        }
+    };
+    match state
+        .session_admin
+        .mutate_authorized_folders(&session_id, mutation)
+        .await
+    {
+        Ok(folders) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "ok": true,
+                "sessionId": session_id,
+                "cwd": serde_json::Value::Null,
+                "workspaceFolders": [],
+                "authorizedFolders": folders,
+                "sandboxFolders": [],
+            })),
+        )
+            .into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// `POST /lingxi/v1/sessions/switch` — 焦点会话切换（现役 :2323）。
+/// 端口边界：浏览器恢复在无 browser host 的服务端按现役 server/PWA 分支
+/// 记录 typed skip，不猜造浏览器状态。
+async fn switch_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<SwitchSessionBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let session_id = {
+        let trimmed = req.session_id.trim();
+        if trimmed.is_empty() {
+            return EndpointError::invalid_message("sessionId is required").into_response();
+        }
+        trimmed.to_string()
+    };
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
+    }
+    let row =
+        match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), &session_id)
+            .await
+        {
+            Ok(Some(row)) => row,
+            Ok(None) => return EndpointError::not_found().into_response(),
+            Err(err) => return EndpointError::storage(&err).into_response(),
+        };
+    if row.archived_at_unix_ms.is_some() {
+        return EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            "archived session must be restored before switch",
+        )
+        .with_reason("session_lifecycle_conflict")
+        .into_response();
+    }
+    if let Err(err) = state.memory().set_current_session(&session_id) {
+        return EndpointError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::Internal,
+            err.message,
+        )
+        .into_response();
+    }
+    let agent_name = state
+        .memory()
+        .agent_display_name(&session.agent_id)
+        .unwrap_or_else(|| session.agent_id.clone());
+    state.app_events().publish(
+        "session-focus-changed",
+        serde_json::json!({ "sessionId": session_id, "agentId": session.agent_id }),
+    );
+    (
+        StatusCode::OK,
+        Json(serde_json::json!({
+            "ok": true,
+            "sessionId": session_id,
+            "agentId": session.agent_id,
+            "agentName": agent_name,
+            "memoryEnabled": row.memory_enabled,
+            "authorizedFolders": row.authorized_folders,
+            "workspaceFolders": [],
+            "cwd": serde_json::Value::Null,
+            "browserResume": { "status": "skipped", "reason": "no_browser_host" },
+        })),
+    )
+        .into_response()
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct SwitchSessionBody {
+    session_id: String,
+}
+
+/// `GET/PUT /lingxi/v1/sessions/{id}/project` — 项目归属读/写
+/// （现役 setSessionProjectAssignment 的最小端口：分配或 null 清除，
+/// 返回新分配；项目目录树属 E 块）。
+async fn get_session_project_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    let _ = session;
+    match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), &session_id)
+        .await
+    {
+        Ok(Some(row)) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "ok": true,
+                "sessionId": session_id,
+                "projectId": row.project_id,
+            })),
+        )
+            .into_response(),
+        Ok(None) => EndpointError::not_found().into_response(),
+        Err(err) => EndpointError::storage(&err).into_response(),
+    }
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct SessionProjectBody {
+    project_id: Option<String>,
+}
+
+async fn put_session_project_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: Result<Json<SessionProjectBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
+    }
+    match state
+        .session_admin
+        .set_session_project(&session_id, req.project_id.as_deref())
+        .await
+    {
+        Ok(Some(project)) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "ok": true,
+                "sessionId": session_id,
+                "projectId": project,
+            })),
+        )
+            .into_response(),
+        Ok(None) => EndpointError::not_found().into_response(),
+        Err(err) => session_admin_error_response(err),
+    }
+}
+
+/// R06 会话 id 生成：毫秒 + 进程级原子序号，同毫秒多次创建不碰撞
+/// （裸 `pid-ms` 在一毫秒内两次轮换会撞 session_exists）。
+fn fresh_session_id(now_unix_ms: u64) -> String {
+    static SEQUENCE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let seq = SEQUENCE.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    format!("sess-{}-{:x}-{seq}", std::process::id(), now_unix_ms)
+}
+
+/// `POST /lingxi/v1/sessions/rotate` — 轮换新会话（现役 POST /sessions/new
+/// 的引擎轮换语义端口）：归档该助手最近一个活动会话后新建并接管焦点；
+/// 无活动会话时仍创建。接管态（多客户端焦点抢占）本端口无此概念，
+/// 不以猜造的拒绝冒充。
+async fn rotate_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<RotateSessionBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let agent_id = match req
+        .agent_id
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
+        .or_else(|| state.memory().current_agent_preference().ok().flatten())
+    {
+        Some(agent) => agent,
+        None => {
+            return EndpointError::invalid_message(
+                "agentId is required when no current agent is set",
+            )
+            .into_response();
+        }
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &agent_id) {
+        return response;
+    }
+    let previous = match lingxi_adapters::storage::session_admin::latest_active_session_for_agent(
+        state.storage(),
+        &agent_id,
+    )
+    .await
+    {
+        Ok(value) => value,
+        Err(err) => return EndpointError::storage(&err).into_response(),
+    };
+    let mut archived_session_id = None;
+    if let Some(previous_id) = previous.as_deref() {
+        match get_session_owned(&state, &principal, previous_id).await {
+            Ok(_) => match state
+                .session_admin
+                .archive_session(previous_id, None, state.clock.now_unix_ms())
+                .await
+            {
+                Ok(_) => archived_session_id = Some(previous_id.to_string()),
+                Err(session_admin::SessionAdminError::Busy) => {
+                    return EndpointError::new(
+                        StatusCode::CONFLICT,
+                        ErrorCode::Conflict,
+                        "previous session is busy; retry after it settles",
+                    )
+                    .with_reason("session_busy")
+                    .into_response();
+                }
+                Err(err) => return session_admin_error_response(err),
+            },
+            Err(response) => return response,
+        }
+    }
+    let session_id = fresh_session_id(state.clock.now_unix_ms());
+    let owner = principal
+        .user_id
+        .clone()
+        .unwrap_or_else(|| crate::auth::LOCAL_OWNER_USER_ID.to_string());
+    let title = req
+        .title
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
+        .unwrap_or_else(|| "新会话".to_string());
+    if let Err(err) = state
+        .session_admin
+        .create_session(
+            &session_id,
+            &agent_id,
+            &owner,
+            &title,
+            None,
+            &[],
+            true,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        return session_admin_error_response(err);
+    }
+    let mut project_assigned: Option<Option<String>> = None;
+    if req.project_id.is_some() {
+        match state
+            .session_admin
+            .set_session_project(&session_id, req.project_id.as_deref())
+            .await
+        {
+            Ok(Some(value)) => project_assigned = Some(value),
+            Ok(None) => return EndpointError::not_found().into_response(),
+            Err(err) => return session_admin_error_response(err),
+        }
+    }
+    // 轮换接管焦点（区别于 new-detached）。
+    if let Err(err) = state.memory().set_current_session(&session_id) {
+        return EndpointError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::Internal,
+            err.message,
+        )
+        .into_response();
+    }
+    state.app_events().publish(
+        "session-created",
+        serde_json::json!({
+            "sessionId": session_id,
+            "agentId": agent_id,
+            "rotatedFrom": archived_session_id,
+        }),
+    );
+    if let Some(archived) = archived_session_id.as_deref() {
+        state.app_events().publish(
+            "session-archived",
+            serde_json::json!({ "sessionId": archived }),
+        );
+    }
+    (
+        StatusCode::CREATED,
+        Json(serde_json::json!({
+            "ok": true,
+            "sessionId": session_id,
+            "agentId": agent_id,
+            "archivedSessionId": archived_session_id,
+            "projectId": project_assigned.flatten(),
+        })),
+    )
+        .into_response()
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RotateSessionBody {
+    #[serde(default)]
+    agent_id: Option<String>,
+    #[serde(default)]
+    title: Option<String>,
+    #[serde(default)]
+    project_id: Option<String>,
+}
+
+/// `POST /lingxi/v1/sessions/continue-deleted-agent` — 续接已删 Agent 的
+/// 会话（现役 :2261 端口）：新助手 + 新会话身份，继承标题与授权目录；
+/// 助手未删除 → 400 agent_not_deleted；会话须存在且活动。
+async fn continue_deleted_agent_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<ContinueDeletedBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let session_id = {
+        let trimmed = req.session_id.trim();
+        if trimmed.is_empty() {
+            return EndpointError::invalid_message("sessionId is required").into_response();
+        }
+        trimmed.to_string()
+    };
+    let session = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(session) => session,
+        Err(response) => return response,
+    };
+    match state.memory().is_agent_deleted_checked(&session.agent_id) {
+        Ok(true) => {}
+        Ok(false) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({
+                    "error": "agent_not_deleted",
+                    "reason": "agent_not_deleted",
+                })),
+            )
+                .into_response();
+        }
+        Err(err) => return memory::error_response(&err),
+    }
+    let row =
+        match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), &session_id)
+            .await
+        {
+            Ok(Some(row)) => row,
+            Ok(None) => return EndpointError::not_found().into_response(),
+            Err(err) => return EndpointError::storage(&err).into_response(),
+        };
+    if row.archived_at_unix_ms.is_some() {
+        return EndpointError::new(
+            StatusCode::CONFLICT,
+            ErrorCode::Conflict,
+            "archived session must be restored before continue",
+        )
+        .with_reason("session_lifecycle_conflict")
+        .into_response();
+    }
+    // 新助手身份：优先沿用原助手显示名。
+    let previous_name = state.memory().agent_display_name(&session.agent_id);
+    let new_name = previous_name.unwrap_or_else(|| "续接助手".to_string());
+    let (new_agent_id, new_agent_name) = match state.memory().create_agent(&new_name, None, None) {
+        Ok(pair) => pair,
+        Err(err) => return err.response(),
+    };
+    let new_session_id = fresh_session_id(state.clock.now_unix_ms());
+    let title = format!("{} (续接)", row.title);
+    let owner = principal
+        .user_id
+        .clone()
+        .unwrap_or_else(|| crate::auth::LOCAL_OWNER_USER_ID.to_string());
+    if let Err(err) = state
+        .session_admin
+        .create_session(
+            &new_session_id,
+            &new_agent_id,
+            &owner,
+            &title,
+            None,
+            &row.authorized_folders,
+            true,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        return session_admin_error_response(err);
+    }
+    state.app_events().publish(
+        "session-created",
+        serde_json::json!({
+            "sessionId": new_session_id,
+            "agentId": new_agent_id,
+            "continuedFrom": session_id,
+        }),
+    );
+    (
+        StatusCode::CREATED,
+        Json(serde_json::json!({
+            "ok": true,
+            "sessionId": new_session_id,
+            "agentId": new_agent_id,
+            "agentName": new_agent_name,
+            "continuedFromSessionId": session_id,
+            "authorizedFolders": row.authorized_folders,
+            "workspaceFolders": [],
+            "cwd": serde_json::Value::Null,
+            "projectId": serde_json::Value::Null,
+            "compacted": false,
+            "compactionError": serde_json::Value::Null,
+        })),
+    )
+        .into_response()
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ContinueDeletedBody {
+    session_id: String,
+}
+
+/// `POST /lingxi/v1/sessions/new-detached` — 创建独立会话（现役 :2146）：
+/// 不改变当前焦点；可选谱系（forkedFromSessionId，深度过限 409）与项目归属。
+async fn new_detached_session_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<NewDetachedBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(req) = match body {
+        Ok(j) => j,
+        Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
+    };
+    let agent_id = match req
+        .agent_id
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
+        .or_else(|| state.memory().current_agent_preference().ok().flatten())
+    {
+        Some(agent) => agent,
+        None => {
+            return EndpointError::invalid_message(
+                "agentId is required when no current agent is set",
+            )
+            .into_response();
+        }
+    };
+    if let Err(response) = gate_agent_not_deleted(&state, &agent_id) {
+        return response;
+    }
+    let mut lineage: Option<(String, i64)> = None;
+    if let Some(parent_id) = req
+        .forked_from_session_id
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        let parent = match get_session_owned(&state, &principal, parent_id).await {
+            Ok(parent) => parent,
+            Err(response) => return response,
+        };
+        let _ = parent;
+        let row = match lingxi_adapters::storage::session_tree::get_session_row(
+            state.storage(),
+            parent_id,
+        )
+        .await
+        {
+            Ok(Some(row)) => row,
+            Ok(None) => return EndpointError::not_found().into_response(),
+            Err(err) => return EndpointError::storage(&err).into_response(),
+        };
+        let child_depth =
+            match lingxi_kernel::session_tree::check_fork_depth(row.lineage_depth as u32) {
+                Some(depth) => depth,
+                None => {
+                    return EndpointError::new(
+                        StatusCode::CONFLICT,
+                        ErrorCode::Conflict,
+                        format!(
+                            "fork lineage exceeds the max derivation depth of {}",
+                            lingxi_kernel::session_tree::MAX_FORK_LINEAGE_DEPTH
+                        ),
+                    )
+                    .with_reason("session_fork_depth_limit")
+                    .into_response();
+                }
+            };
+        lineage = Some((parent_id.to_string(), i64::from(child_depth)));
+    }
+    let session_id = req
+        .session_id
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
+        .unwrap_or_else(|| fresh_session_id(state.clock.now_unix_ms()));
+    let title = req
+        .title
+        .as_deref()
+        .map(str::trim)
+        .filter(|v| !v.is_empty());
+    let title = title
+        .map(str::to_string)
+        .unwrap_or_else(|| "独立会话".to_string());
+    let owner = principal
+        .user_id
+        .clone()
+        .unwrap_or_else(|| crate::auth::LOCAL_OWNER_USER_ID.to_string());
+    if let Err(err) = state
+        .session_admin
+        .create_session(
+            &session_id,
+            &agent_id,
+            &owner,
+            &title,
+            None,
+            &[],
+            true,
+            state.clock.now_unix_ms(),
+        )
+        .await
+    {
+        return session_admin_error_response(err);
+    }
+    if let Some((parent_id, depth)) = lineage.as_ref() {
+        if let Err(err) = state
+            .session_admin
+            .set_session_lineage(&session_id, parent_id, *depth as u32)
+            .await
+        {
+            return session_admin_error_response(err);
+        }
+    }
+    let mut project_assigned: Option<Option<String>> = None;
+    if req.project_id.is_some() {
+        match state
+            .session_admin
+            .set_session_project(&session_id, req.project_id.as_deref())
+            .await
+        {
+            Ok(Some(value)) => project_assigned = Some(value),
+            Ok(None) => return EndpointError::not_found().into_response(),
+            Err(err) => return session_admin_error_response(err),
+        }
+    }
+    // 独立会话不切走当前焦点：不写 current_session_id。
+    state.app_events().publish(
+        "session-created",
+        serde_json::json!({
+            "sessionId": session_id,
+            "agentId": agent_id,
+            "detached": true,
+        }),
+    );
+    (
+        StatusCode::CREATED,
+        Json(serde_json::json!({
+            "ok": true,
+            "sessionId": session_id,
+            "agentId": agent_id,
+            "forkedFromSessionId": lineage.as_ref().map(|(parent, _)| parent.clone()),
+            "lineageDepth": lineage.as_ref().map(|(_, depth)| *depth).unwrap_or(0),
+            "projectId": project_assigned.flatten(),
+        })),
+    )
+        .into_response()
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct NewDetachedBody {
+    #[serde(default)]
+    session_id: Option<String>,
+    #[serde(default)]
+    agent_id: Option<String>,
+    #[serde(default)]
+    title: Option<String>,
+    #[serde(default)]
+    forked_from_session_id: Option<String>,
+    #[serde(default)]
+    project_id: Option<String>,
 }
 
 /// `GET /lingxi/v1/sessions/{id}/branch` — 当前分支历史投影（含 reset 标记）。
@@ -5758,13 +6640,75 @@ pub fn build_router(state: ServiceState) -> Router {
         .route("/lingxi/v1/health", get(health))
         .route("/lingxi/v1/me", get(me))
         .route(
+            "/lingxi/v1/input-drafts",
+            get(input_drafts::get_route).put(input_drafts::put_route),
+        )
+        .route(
+            "/lingxi/v1/desk/skills",
+            get(skills::workspace_skills_route),
+        )
+        // R06 F 块：工作区技能目录删除（现役 desk 删除面，只允许已知工作区根）。
+        .route(
+            "/lingxi/v1/desk/delete-skill",
+            post(skills::workspace_skill_delete_route),
+        )
+        .route(
             "/lingxi/v1/sessions",
             get(list_sessions).post(create_session_route),
         )
         // R06-T03 管理面静态路由（axum 静态段优先于 {session_id} 参数段）。
         .route("/lingxi/v1/sessions/rename", post(rename_session_route))
+        // R06 焦点切换与独立会话创建（现役 /sessions/switch、/sessions/new-detached）
+        .route("/lingxi/v1/sessions/switch", post(switch_session_route))
+        .route("/lingxi/v1/sessions/rotate", post(rotate_session_route))
+        .route(
+            "/lingxi/v1/sessions/continue-deleted-agent",
+            post(continue_deleted_agent_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/new-detached",
+            post(new_detached_session_route),
+        )
         .route("/lingxi/v1/sessions/pin", post(pin_session_route))
         .route("/lingxi/v1/sessions/pin-order", post(pin_order_route))
+        .route(
+            "/lingxi/v1/sessions/workspace-rollback",
+            get(workspace_rollback_get_route).put(workspace_rollback_put_route),
+        )
+        // R06 G 块：计划/待办面板（todo-state-v1 快照 + 三动作 + 读面）。
+        .route(
+            "/lingxi/v1/sessions/todos/complete",
+            post(todos::complete_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/todos/cancel",
+            post(todos::cancel_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/todos/dismiss",
+            post(todos::dismiss_route),
+        )
+        .route("/lingxi/v1/sessions/todos", get(todos::panel_route))
+        // R06 R2：会话列表投影（sessions.read + Studio 身份闸，现役 studio-list 面）。
+        .route(
+            "/lingxi/v1/sessions/studio-list",
+            get(sessions::sessions_studio_list_route),
+        )
+        // R06 R2：工作台同版本写入/版本冲突（现役 mount-aware writeText 端口）。
+        .route(
+            "/lingxi/v1/workbench/actions",
+            post(resourceio::workbench_write_text_route),
+        )
+        // R06 C1 收尾：工作台处置与孤儿清扫（现役 workspace-disposal /
+        // sweep-orphaned-workspaces，sessions.write 口径）。
+        .route(
+            "/lingxi/v1/sessions/workspace-disposal",
+            post(session_admin::workspace_disposal_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/sweep-orphaned-workspaces",
+            post(session_admin::sweep_orphaned_route),
+        )
         .route(
             "/lingxi/v1/sessions/{id}/operations",
             get(session_operations_route),
@@ -5796,6 +6740,48 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/sessions/{session_id}/fork",
             post(fork_session_route),
         )
+        // R06 C1 收尾：会话工作台身份（workspaceMountId/cwd 落库，处置/清扫匹配面）。
+        .route(
+            "/lingxi/v1/sessions/{session_id}/workspace",
+            put(session_admin::put_session_workspace_route),
+        )
+        // R06 C2：会话历史与内容读取（现役 find / latest-user-message/replay /
+        // history-overview / content / summary / conversation-map / fresh-compact）。
+        .route(
+            "/lingxi/v1/sessions/{session_id}/find",
+            get(history::history_content::session_find_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/latest-user-message/replay",
+            post(history::history_content::latest_user_message_replay_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/history-overview",
+            get(history::history_content::session_history_overview_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/content/{content_id}",
+            get(history::history_content::session_content_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/summary",
+            get(history::history_content::session_summary_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/conversation-map/turns",
+            get(history::history_content::conversation_map_turns_route),
+        )
+        // R06 收口：会话地图画布布局（现役 conversation-map.ts 的 layout
+        // 叶——GET 持久化/默认空布局，PUT positions 合并/整体替换与
+        // collapsed 整体替换；归属闸在 handler 内逐请求复检）。
+        .route(
+            "/lingxi/v1/sessions/{session_id}/conversation-map/layout",
+            get(conversation_map::layout_get_route).put(conversation_map::layout_put_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/fresh-compact",
+            post(history::history_content::fresh_compact_route),
+        )
         .route(
             "/lingxi/v1/sessions/{session_id}/turns/retry",
             post(retry_turn_route),
@@ -5819,6 +6805,16 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/memory",
             get(get_memory_route).patch(patch_memory_route),
+        )
+        // R06 会话授权目录（现役 GET/PATCH /sessions/authorized-folders）
+        .route(
+            "/lingxi/v1/sessions/{session_id}/authorized-folders",
+            get(get_authorized_folders_route).patch(patch_authorized_folders_route),
+        )
+        // R06 v12 会话项目归属（现役 setSessionProjectAssignment 最小端口）
+        .route(
+            "/lingxi/v1/sessions/{session_id}/project",
+            get(get_session_project_route).put(put_session_project_route),
         )
         .route(
             "/lingxi/v1/sessions/{session_id}/branch",
@@ -5962,6 +6958,15 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/file-history/restore",
             post(filehistory::restore_route),
         )
+        // R06 收口：独立改前存档 restore（现役 /api/checkpoints/:id/restore，
+        // lib/checkpoint-store.ts 的落盘契约；区别于会话 rewind——不移动
+        // 分支头，只把存档字节写回存档记录的绝对路径并返回写回位置）。
+        // LocalOnly（auth.rs 分类：现役 /api/checkpoints/* 落 STUDIO_OWNER
+        // 兜底，Rust 侧按既有口径映射最严格档）。
+        .route(
+            "/lingxi/v1/checkpoints/{checkpoint_id}/restore",
+            post(checkpoint_store::restore_route),
+        )
         // R06-T05 Round 5 fs 直读面（server/routes/fs.ts :89-115，D5
         // 前缀）：LocalOnly，授权根 = data_home + workspace。
         .route("/lingxi/v1/fs/read", get(fsread::fs_read_route))
@@ -6033,6 +7038,66 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/memories/dream/revisions/{revision_id}/restore",
             post(memory::dream_revision_restore_route),
         )
+        // ── R06 助手生命周期集合面（列表/创建/切换/删除/主助手/排序）──
+        .route(
+            "/lingxi/v1/agents",
+            get(agents_admin::agents_list_route).post(agents_admin::agents_create_route),
+        )
+        .route(
+            "/lingxi/v1/agents/switch",
+            post(agents_admin::agents_switch_route),
+        )
+        .route(
+            "/lingxi/v1/agents/primary",
+            put(agents_admin::agents_primary_route),
+        )
+        .route(
+            "/lingxi/v1/agents/order",
+            put(agents_admin::agents_order_route),
+        )
+        .route(
+            "/lingxi/v1/agents/{agent_id}",
+            delete(agents_admin::agents_delete_route),
+        )
+        // R06 app 级事件广播检索面（LocalOnly：助手名册不向远端设备披露）
+        .route("/lingxi/v1/app-events", get(appevents::events_route))
+        // R06 用户偏好对（现役 /preferences/autolearn、/preferences/quick-chat）
+        .route(
+            "/lingxi/v1/preferences/autolearn",
+            get(userprefs::autolearn_get_route).put(userprefs::autolearn_put_route),
+        )
+        .route(
+            "/lingxi/v1/preferences/quick-chat",
+            get(userprefs::quick_chat_get_route).put(userprefs::quick_chat_put_route),
+        )
+        // R06 会话项目/文件夹目录（现役 /session-projects* 全量面）
+        .route("/lingxi/v1/session-projects", get(projects::catalog_route))
+        .route(
+            "/lingxi/v1/session-projects/projects",
+            post(projects::create_project_route),
+        )
+        .route(
+            "/lingxi/v1/session-projects/projects/reorder",
+            post(projects::reorder_projects_route),
+        )
+        .route(
+            "/lingxi/v1/session-projects/projects/{project_id}",
+            axum::routing::patch(projects::update_project_route)
+                .delete(projects::delete_project_route),
+        )
+        .route(
+            "/lingxi/v1/session-projects/folders",
+            post(projects::create_folder_route),
+        )
+        .route(
+            "/lingxi/v1/session-projects/folders/reorder",
+            post(projects::reorder_folders_route),
+        )
+        .route(
+            "/lingxi/v1/session-projects/folders/{folder_id}",
+            axum::routing::patch(projects::update_folder_route)
+                .delete(projects::delete_folder_route),
+        )
         // ── R06-T06 tenets/pinned/experience/config 人格面 ──
         .route(
             "/lingxi/v1/agents/{agent_id}/tenets",
@@ -6055,12 +7120,36 @@ pub fn build_router(state: ServiceState) -> Router {
             get(memory::experience_get_route).put(memory::experience_put_route),
         )
         .route(
+            "/lingxi/v1/agents/{agent_id}/experience/search",
+            get(memory::experience_search_route),
+        )
+        .route(
             "/lingxi/v1/agents/{agent_id}/experience/feedback",
             post(memory::experience_feedback_route),
         )
         .route(
             "/lingxi/v1/agents/{agent_id}/config",
-            patch(memory::agent_config_patch_route),
+            patch(memory::agent_config_patch_route)
+                .put(agents_admin::agent_config_readback::agent_config_put_route),
+        )
+        // R06 A 块读回叶：运行时状态键 / 实验读写 / 观察记录读面。
+        .route(
+            "/lingxi/v1/current-status",
+            get(agents_admin::agent_config_readback::current_status_route),
+        )
+        .route(
+            "/lingxi/v1/experiments",
+            get(agents_admin::agent_config_readback::experiments_list_route),
+        )
+        .route(
+            "/lingxi/v1/experiments/{experiment_id}",
+            patch(agents_admin::agent_config_readback::experiment_patch_route),
+        )
+        .route(
+            "/lingxi/v1/experiments/memory/cache-snapshot-reflection/observation",
+            get(agents_admin::agent_config_readback::cache_snapshot_observation_get_route).delete(
+                agents_admin::agent_config_readback::cache_snapshot_observation_delete_route,
+            ),
         )
         .route(
             "/lingxi/v1/agents/{agent_id}/config-flags",
@@ -6123,6 +7212,11 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/skills/bundles/{bundle_id}",
             put(skills::skills_bundle_update_route).delete(skills::skills_bundle_delete_route),
+        )
+        // R06 F 块：组合包导出（store-mode zip，现役 POST /skills/bundles/:id/export）。
+        .route(
+            "/lingxi/v1/skills/bundles/{bundle_id}/export",
+            post(skills::skill_export::skills_bundle_export_route),
         )
         .route(
             "/lingxi/v1/skills/{name}",

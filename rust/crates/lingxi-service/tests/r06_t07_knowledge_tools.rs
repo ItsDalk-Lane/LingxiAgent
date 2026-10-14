@@ -25,61 +25,46 @@ use tokio::net::TcpStream;
 mod embedding_stub {
     use super::*;
 
+    async fn respond(axum::Json(parsed): axum::Json<Value>) -> axum::Json<Value> {
+        let model = parsed["model"]
+            .as_str()
+            .unwrap_or("embed-model-a")
+            .to_string();
+        let inputs = parsed["input"].as_array().cloned().unwrap_or_default();
+        let data: Vec<Value> = inputs
+            .iter()
+            .enumerate()
+            .map(|(index, input)| {
+                let text = input.as_str().unwrap_or("");
+                let mut seed = {
+                    let mut acc = 0x811c9dc5_u32;
+                    for byte in text.bytes() {
+                        acc ^= byte as u32;
+                        acc = acc.wrapping_mul(0x01000193);
+                    }
+                    acc
+                };
+                let mut vector = Vec::new();
+                for _ in 0..2 {
+                    seed = seed.wrapping_mul(0x01000193).wrapping_add(1);
+                    vector.push(((seed % 2000) as f32 - 1000.0) / 1000.0);
+                }
+                json!({"index": index, "embedding": vector})
+            })
+            .collect();
+        axum::Json(json!({"data": data, "usage": {"total_tokens": 1}, "model": model}))
+    }
+
     pub async fn spawn() -> SocketAddr {
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
             .await
             .expect("stub bind");
         let addr = listener.local_addr().expect("stub addr");
+        let router = axum::Router::new().route("/v1/embeddings", axum::routing::post(respond));
         tokio::spawn(async move {
-            loop {
-                let Ok((mut socket, _)) = listener.accept().await else {
-                    break;
-                };
-                tokio::spawn(async move {
-                    let mut buf = Vec::new();
-                    let _ =
-                        tokio::time::timeout(Duration::from_secs(10), socket.read_to_end(&mut buf))
-                            .await;
-                    let raw = String::from_utf8_lossy(&buf);
-                    let body_start = raw.split("\r\n\r\n").nth(1).unwrap_or("");
-                    let parsed: Value = serde_json::from_str(body_start).unwrap_or(Value::Null);
-                    let model = parsed["model"]
-                        .as_str()
-                        .unwrap_or("embed-model-a")
-                        .to_string();
-                    let inputs = parsed["input"].as_array().cloned().unwrap_or_default();
-                    let data: Vec<Value> = inputs
-                        .iter()
-                        .enumerate()
-                        .map(|(index, input)| {
-                            let text = input.as_str().unwrap_or("");
-                            let mut seed = {
-                                let mut acc = 0x811c9dc5_u32;
-                                for byte in text.bytes() {
-                                    acc ^= byte as u32;
-                                    acc = acc.wrapping_mul(0x01000193);
-                                }
-                                acc
-                            };
-                            let mut vector = Vec::new();
-                            for _ in 0..2 {
-                                seed = seed.wrapping_mul(0x01000193).wrapping_add(1);
-                                vector.push(((seed % 2000) as f32 - 1000.0) / 1000.0);
-                            }
-                            json!({"index": index, "embedding": vector})
-                        })
-                        .collect();
-                    let body = json!({"data": data, "usage": {"total_tokens": 1}, "model": model})
-                        .to_string();
-                    let response = format!(
-                        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-                        body.len(),
-                        body
-                    );
-                    let _ = socket.write_all(response.as_bytes()).await;
-                    let _ = socket.shutdown().await;
-                });
-            }
+            axum::serve(listener, router)
+                .await
+                .expect("embedding stub serves complete requests");
         });
         addr
     }
@@ -314,7 +299,6 @@ fn outcome_text(outcome: &lingxi_kernel::ports::ToolOutcome) -> String {
 }
 
 struct World {
-    #[allow(dead_code)] // World 的状态句柄（其他用例直接持 server_state；此处留作扩展）
     state: ServiceState,
     gateway: Arc<lingxi_service::toolgateway::ToolInvocationGateway>,
     http: HttpFace,
@@ -413,18 +397,16 @@ async fn build_world(tag: &str) -> World {
     )
     .await;
 
-    // 仅选笔记本 A 的 turn scope（会话 sess-a）。
-    let (_, scope_res) = http
-        .request(
-            "POST",
-            &format!("{base}/turn-scopes"),
-            Some(json!({"notebookIds": [notebook_a], "sessionId": "sess-a", "turnId": "turn-1"})),
+    let scope_id = server_state
+        .knowledge()
+        .freeze_run_scope(
+            &run_context("sess-a"),
+            "agent-default",
+            std::slice::from_ref(&notebook_a),
+            &[],
         )
-        .await;
-    let scope_id = scope_res["scope"]["id"]
-        .as_str()
-        .expect("scope id")
-        .to_string();
+        .expect("trusted gateway fixture freezes notebook A for this run")
+        .id;
 
     World {
         state: server_state,
@@ -462,18 +444,17 @@ async fn a13_search_within_scope_returns_only_allowed_sources() {
     assert!(text.contains("\"mode\""), "{text}");
 
     // 对照组：B 的 scope 只见 B。
-    let (_, scope_b) = world
-        .http
-        .request(
-            "POST",
-            "/lingxi/v1/knowledge/turn-scopes",
-            Some(json!({"notebookIds": [world.notebook_b], "sessionId": "sess-a", "turnId": "turn-2"})),
+    let scope_b_id = world
+        .state
+        .knowledge()
+        .freeze_run_scope(
+            &ctx,
+            "agent-default",
+            std::slice::from_ref(&world.notebook_b),
+            &[],
         )
-        .await;
-    let scope_b_id = scope_b["scope"]["id"]
-        .as_str()
-        .expect("scope b")
-        .to_string();
+        .expect("trusted gateway fixture freezes notebook B for this run")
+        .id;
     let outcome = execute_tool(
         &world.gateway,
         &ctx,
@@ -615,6 +596,29 @@ async fn a13_untrusted_source_instructions_stay_material_not_privilege() {
 async fn scope_violations_are_loud_not_fallback() {
     let world = build_world("scopeviol").await;
     let ctx = run_context("sess-a");
+
+    let (status, legacy_scope) = world
+        .http
+        .request(
+            "POST",
+            "/lingxi/v1/knowledge/turn-scopes",
+            Some(json!({"notebookIds": [world.notebook_a], "sessionId": "sess-a", "turnId": "turn-ui"})),
+        )
+        .await;
+    assert_eq!(status, 201, "{legacy_scope}");
+    let outcome = execute_tool(
+        &world.gateway,
+        &ctx,
+        "knowledge_search",
+        json!({"scopeId": legacy_scope["scope"]["id"], "query": "柠檬酸"}),
+    )
+    .await;
+    let text = outcome_text(&outcome);
+    assert!(
+        text.contains("Knowledge scope was not minted for a trusted run"),
+        "{text}"
+    );
+    assert!(!text.contains("甲空间"), "{text}");
 
     // 未知 scopeId。
     let outcome = execute_tool(

@@ -1,0 +1,1823 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "producedBy": "r06_stage_inputs.py --leaf-evidence",
+  "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f",
+  "sourceStable": true,
+  "cases": [
+    {
+      "case": "R00-T02-LA-059066969D44-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-059066969D44",
+      "originalAssertion": "给定目标与相应权限，执行“修改项目文件夹”后核对：按所给字段更新文件夹并返回新状态",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Project patch renames and moves across folders; the move appends order at the destination tail.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-059066969D44-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-059066969D44",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown project 400.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1685D5E08812-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1685D5E08812",
+      "originalAssertion": "成功：执行“更新自动学习偏好”后，保存enabled 等自动学习开关并返回新状态",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT autolearn saves the enabled switch (wrapped and flat body forms), returns the new state and merges into preferences.json preserving other keys.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1685D5E08812-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1685D5E08812",
+      "originalAssertion": "拒绝/边界：engine.getAutolearnPreferences/setAutolearnPreferences；PUT 接受 autolearn 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Non-boolean 400 with the saved value unchanged; missing credential 401.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1E0D477755CD-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1E0D477755CD",
+      "originalAssertion": "给定目标与相应权限，执行“撤销会话授权目录”后核对：从会话授权范围移除指定目录",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual PATCH remove drops only the named directory from the owned session scope; absent entry removal is idempotent and the remaining scope stays.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-1E0D477755CD-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-1E0D477755CD",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Nonexistent target, plain file, missing folder, unknown action, unknown session 404, archived session 409 and missing credential 401 all fail explicitly; the pre-failure list is re-read unchanged after every rejection.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-20E9C8F26CEA-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-20E9C8F26CEA",
+      "originalAssertion": "给定目标与相应权限，执行“设置会话项目归属”后核对：把会话分配到项目或用 null 清除归属，返回新分配",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT assigns the trimmed project id, null/empty-string clears, GET reads the assignment back on the real sessions.project_id column.",
+      "executions": [
+        {
+          "key": "r06_test_82268c379bf9d83a71c2",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82268c379bf9d83a71c2/binding-result.json",
+          "resultSha256": "5cbe493309dcd4d65ded06c1e49b92a2c9684680320c2c3b4cd3fdbf19e9fe42",
+          "stdoutSha256": "d73037cee41310cb0061e411d11a08788220c8d31f09a3737f6a22fca7b8085e",
+          "stderrSha256": "d8a5cdfe39c646f18e52b7fd1498d067d6c8284c53a8780c8a31a7920e657f81",
+          "observedTest": "focus_switch_detached_create_and_project_assignment",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-20E9C8F26CEA-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-20E9C8F26CEA",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown session 404, archived session 409 reject without state change.",
+      "executions": [
+        {
+          "key": "r06_test_82268c379bf9d83a71c2",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82268c379bf9d83a71c2/binding-result.json",
+          "resultSha256": "5cbe493309dcd4d65ded06c1e49b92a2c9684680320c2c3b4cd3fdbf19e9fe42",
+          "stdoutSha256": "d73037cee41310cb0061e411d11a08788220c8d31f09a3737f6a22fca7b8085e",
+          "stderrSha256": "d8a5cdfe39c646f18e52b7fd1498d067d6c8284c53a8780c8a31a7920e657f81",
+          "observedTest": "focus_switch_detached_create_and_project_assignment",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-22150190C7B1-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-22150190C7B1",
+      "originalAssertion": "执行“查看文件回退开关”后核对：返回当前 enabled 状态；此读取不会回退文件",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "GET workspace-rollback returns the current enabled state (default false) and the read leaves the workspace files untouched.",
+      "executions": [
+        {
+          "key": "r06_test_6fcf0e7a020bd2fc910c",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_6fcf0e7a020bd2fc910c/binding-result.json",
+          "resultSha256": "c5b51cfead0d8fa99a95dafb98b9a4ebfa2d380e056b804270f6443c9e8cc88b",
+          "stdoutSha256": "28fd5241331d533eed8a431f56c95d68d8f1fb02f6bf23ec1a208ee644e42ede",
+          "stderrSha256": "4d01e4ed60fb579f2a43990207b68c7c4d9f75231bfe904af83c4cf114e793b5",
+          "observedTest": "original_workspace_rollback_preference_persists_without_restoring_files_and_controls_real_gate",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-22150190C7B1-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-22150190C7B1",
+      "originalAssertion": "失败、冲突或拒绝时核对返回的状态与实际副作用一致",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "The response state always mirrors the persisted/actual switch; failures return explicit errors, never a synthetic success.",
+      "executions": [
+        {
+          "key": "r06_test_6fcf0e7a020bd2fc910c",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_6fcf0e7a020bd2fc910c/binding-result.json",
+          "resultSha256": "c5b51cfead0d8fa99a95dafb98b9a4ebfa2d380e056b804270f6443c9e8cc88b",
+          "stdoutSha256": "28fd5241331d533eed8a431f56c95d68d8f1fb02f6bf23ec1a208ee644e42ede",
+          "stderrSha256": "4d01e4ed60fb579f2a43990207b68c7c4d9f75231bfe904af83c4cf114e793b5",
+          "observedTest": "original_workspace_rollback_preference_persists_without_restoring_files_and_controls_real_gate",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-26AE3688B8DE-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-26AE3688B8DE",
+      "originalAssertion": "成功：执行“列出助手”后，返回助手清单及有效主目录；fresh=1/true 使列表缓存失效，先清理工作区持久化残留",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "List returns ids/names/yuan/memoryEnabled/isPrimary plus homeFolder/effectiveHomeFolder per agent; configured home folders round-trip and unconfigured are explicit null; fresh=1 accepted.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-26AE3688B8DE-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-26AE3688B8DE",
+      "originalAssertion": "拒绝/边界：query.fresh=1/true 刷新缓存；否则复用缓存；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "fresh refresh accepted; unauthenticated 401; deleted-marker agents excluded.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-3818ADEAFA7A-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-3818ADEAFA7A",
+      "originalAssertion": "执行“续接已删除 Agent 的会话”后核对：校验会话范围后生成可续接的新会话身份并返回路径或错误",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Continue-deleted-agent gates on agent_not_deleted 400, then after the real deletion marker mints a new agent identity with the original display name, inherits the authorized folders and reports compacted=false honestly.",
+      "executions": [
+        {
+          "key": "r06_test_dcee1a3e3a8468eb5a82",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dcee1a3e3a8468eb5a82/binding-result.json",
+          "resultSha256": "70b208ada6a5907f8643783d2f2a4b1f36fc6db0cda24a4e60c784462beaffb6",
+          "stdoutSha256": "992afe935cfc9fd47752650ea3a77c5f03ebccd3bfb887f7f5452f36bfcd6fa6",
+          "stderrSha256": "9512bccc40f571865adfa788e0aba5eec68106b88b8ec8dbb57ffdd739c7c5c4",
+          "observedTest": "rotate_continue_deleted_agent_and_draft_cleanup",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-3818ADEAFA7A-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-3818ADEAFA7A",
+      "originalAssertion": "失败、冲突或拒绝时核对返回的状态与实际副作用一致",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown session 404 and blank id 400; the pre-gate refusal leaves the session and marker untouched.",
+      "executions": [
+        {
+          "key": "r06_test_dcee1a3e3a8468eb5a82",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dcee1a3e3a8468eb5a82/binding-result.json",
+          "resultSha256": "70b208ada6a5907f8643783d2f2a4b1f36fc6db0cda24a4e60c784462beaffb6",
+          "stdoutSha256": "992afe935cfc9fd47752650ea3a77c5f03ebccd3bfb887f7f5452f36bfcd6fa6",
+          "stderrSha256": "9512bccc40f571865adfa788e0aba5eec68106b88b8ec8dbb57ffdd739c7c5c4",
+          "observedTest": "rotate_continue_deleted_agent_and_draft_cleanup",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-3ECCF7C95483-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-3ECCF7C95483",
+      "originalAssertion": "删除项目后核对项目消失、原属活动会话的项目归属为未分类且会话内容仍在。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Project delete clears the live sessions' assignment (cwd: report, storage NULL, sessionIds listed) and the session content survives.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-3ECCF7C95483-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-3ECCF7C95483",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown project delete fails explicitly.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-517E697740D9-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-517E697740D9",
+      "originalAssertion": "成功：删除助手后，助手目录与登记消失；如当前助手被删，切到替代助手并发 agent-deleted/agent-switched",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Delete removes the directory and registration; deleting the current agent switches to the replacement in order and persists it; the app-event feed shows the replacement agent-switched BEFORE agent-deleted.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-517E697740D9-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-517E697740D9",
+      "originalAssertion": "边界：deleteSkills 缺省或 [] 时 skillsDeleted=[]，技能目录保留；拒绝时目标状态不变",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Default deleteSkills returns skillsDeleted=[]/skillsSkipped=[] with directories retained; cascade honors orphan/non-orphan/removal_failed semantics (LIFE2); last-agent delete 400 leaves the directory intact; unknown 404.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        },
+        {
+          "key": "r06_test_c00c78c3de0ff388e461",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c00c78c3de0ff388e461/binding-result.json",
+          "resultSha256": "12206b1b277d7722106ba35efd5dc38d054496818b3f8c397993fe35725b62f9",
+          "stdoutSha256": "13d37c5cba2791b8b7dc462066246c35bd4914c5a8c5d6c4559394870dbbbc0a",
+          "stderrSha256": "8753dd90730467e2439b53be56157a9321e61c4998eccf3907c0c999201310ca",
+          "observedTest": "delete_agent_cascades_orphan_skills",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-60A58027CCCE-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-60A58027CCCE",
+      "originalAssertion": "给定目标与相应权限，执行“创建项目文件夹”后核对：按名称创建文件夹并返回新项",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Folder create folds whitespace-only names and returns the new item.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-60A58027CCCE-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-60A58027CCCE",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Blank name 400.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-6658E9B80314-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-6658E9B80314",
+      "originalAssertion": "给定目标与相应权限，执行“永久删除工作台会话”后核对：符合工作台身份的会话归档后永久删除文件和草稿",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "After archive, real permanent delete removes the owned cached payload files (F04 suite) and clears the input-draft entries on both surfaces (draft file bytes re-read without the session).",
+      "executions": [
+        {
+          "key": "r06_test_22f609da55faca0dbedd",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_22f609da55faca0dbedd/binding-result.json",
+          "resultSha256": "adce72397a69e0301a7c88807eadd056bb226661bb1dcfeba55eded6027eea99",
+          "stdoutSha256": "8f74ad637064d9662c10c4396d04081380144557091e628ff52567cbec6497f9",
+          "stderrSha256": "7f7164b472a517c2e42d23defc2733fd7e31f5125c50ae8009c5f9afe97bd76b",
+          "observedTest": "f04_permanent_delete_removes_owned_cache_and_retains_other_branch",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        },
+        {
+          "key": "r06_test_dcee1a3e3a8468eb5a82",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dcee1a3e3a8468eb5a82/binding-result.json",
+          "resultSha256": "70b208ada6a5907f8643783d2f2a4b1f36fc6db0cda24a4e60c784462beaffb6",
+          "stdoutSha256": "992afe935cfc9fd47752650ea3a77c5f03ebccd3bfb887f7f5452f36bfcd6fa6",
+          "stderrSha256": "9512bccc40f571865adfa788e0aba5eec68106b88b8ec8dbb57ffdd739c7c5c4",
+          "observedTest": "rotate_continue_deleted_agent_and_draft_cleanup",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-6658E9B80314-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-6658E9B80314",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown/blank session and missing credential reject explicitly; a real physical delete failure keeps the durable identity until restart cleanup instead of reporting success.",
+      "executions": [
+        {
+          "key": "r06_test_107ff98999de19efbcef",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_107ff98999de19efbcef/binding-result.json",
+          "resultSha256": "dd2cdee63f807823e3775298d1b07219cf45a86ba8b53b684a8ac1df2523a3c3",
+          "stdoutSha256": "dd71aa7b1ff686d39c658e3ee6bb34a65622d99fc5514ab9e43acf48fb17e2f2",
+          "stderrSha256": "bdbb8d5585b12d7ae561cb7909dc170b7a2dd72891a9c47547087307c970e6f8",
+          "observedTest": "f04_delete_physical_failure_preserves_identity_until_restart_cleanup",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        },
+        {
+          "key": "r06_test_dcee1a3e3a8468eb5a82",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dcee1a3e3a8468eb5a82/binding-result.json",
+          "resultSha256": "70b208ada6a5907f8643783d2f2a4b1f36fc6db0cda24a4e60c784462beaffb6",
+          "stdoutSha256": "992afe935cfc9fd47752650ea3a77c5f03ebccd3bfb887f7f5452f36bfcd6fa6",
+          "stderrSha256": "9512bccc40f571865adfa788e0aba5eec68106b88b8ec8dbb57ffdd739c7c5c4",
+          "observedTest": "rotate_continue_deleted_agent_and_draft_cleanup",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-73B631D77531-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-73B631D77531",
+      "originalAssertion": "给定目标与相应权限，执行“替换会话授权目录”后核对：用新目录集合整体替换原授权范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual PATCH set replaces the whole scope with the new directory list atomically; a bad entry in the new list keeps the previous list.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-73B631D77531-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-73B631D77531",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Bad entry set, missing folders set, unknown action, archived session and missing credential reject explicitly without scope drift.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-7C959E75B8C3-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-7C959E75B8C3",
+      "originalAssertion": "批准后仅当前会话变化",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Approval (add) changes only the owning session scope; a fresh second session reads an empty scope before and after the first session's add.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-7C959E75B8C3-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-7C959E75B8C3",
+      "originalAssertion": "拒绝后范围不变",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "After every rejection the scope is re-read and equals the pre-request value.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-7C959E75B8C3-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-7C959E75B8C3",
+      "originalAssertion": "未批准、无会话、目录无效或撤权后拒绝；不扩大其他会话范围。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unauthenticated 401, unknown session 404, invalid directory/file/missing-field 400, archived 409, and cross-session isolation (s1 approval never widens s2) are all asserted.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-7D05B144AE21-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-7D05B144AE21",
+      "originalAssertion": "命中来自当前Agent",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Search hits carry the real file path of the CURRENT agent and excerpt.",
+      "executions": [
+        {
+          "key": "r06_test_a6cd1dd86837681076a5",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_a6cd1dd86837681076a5/binding-result.json",
+          "resultSha256": "9dd4735b82400a981a3f530082c861919005256df248c6747106c14a66023af3",
+          "stdoutSha256": "a749d28ccda1d00c4f10109a6b9994ea04291cde5f828413c7394ede871a48a8",
+          "stderrSha256": "03f0c990a5ad7d7d0d23bf751acd71c776b5e9b5a12907b71c774478c78541ed",
+          "observedTest": "experience_search_and_global_config_setter",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-7D05B144AE21-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-7D05B144AE21",
+      "originalAssertion": "无写入",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "File bytes before/after search are equal; the read path performs no memory writes.",
+      "executions": [
+        {
+          "key": "r06_test_a6cd1dd86837681076a5",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_a6cd1dd86837681076a5/binding-result.json",
+          "resultSha256": "9dd4735b82400a981a3f530082c861919005256df248c6747106c14a66023af3",
+          "stdoutSha256": "a749d28ccda1d00c4f10109a6b9994ea04291cde5f828413c7394ede871a48a8",
+          "stderrSha256": "03f0c990a5ad7d7d0d23bf751acd71c776b5e9b5a12907b71c774478c78541ed",
+          "observedTest": "experience_search_and_global_config_setter",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-7D05B144AE21-assertion-02",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-7D05B144AE21",
+      "originalAssertion": "无记录/跨Agent时为空，不泄露其他Agent经验。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "A second enabled agent with no experience gets count=0 for the same keyword (no cross-agent leak); no-match query returns 0; missing q is 400.",
+      "executions": [
+        {
+          "key": "r06_test_a6cd1dd86837681076a5",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_a6cd1dd86837681076a5/binding-result.json",
+          "resultSha256": "9dd4735b82400a981a3f530082c861919005256df248c6747106c14a66023af3",
+          "stdoutSha256": "a749d28ccda1d00c4f10109a6b9994ea04291cde5f828413c7394ede871a48a8",
+          "stderrSha256": "03f0c990a5ad7d7d0d23bf751acd71c776b5e9b5a12907b71c774478c78541ed",
+          "observedTest": "experience_search_and_global_config_setter",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-8B48FD65CAFB-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-8B48FD65CAFB",
+      "originalAssertion": "成功：执行“切换当前助手”后，切换会话与工作目录，更新 last_cwd/history，发 agent-switched，返回当前上下文",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Switch returns the context, persists current_agent_id, writes last_cwd/cwd_history into the agent config (dedup, move-to-tail) and broadcasts agent-switched with agentName/cwd.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-8B48FD65CAFB-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-8B48FD65CAFB",
+      "originalAssertion": "拒绝/边界：body.id 必须有效；切换失败按路由错误返回；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown 404, path-shaped 400, missing id 400; deleted-marker agents refuse switch 404.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-8D4356B7EC51-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-8D4356B7EC51",
+      "originalAssertion": "成功：执行“重排助手”后，保存顺序供助手列表显示",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT order persists the order and the next listing returns ids in that order.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-8D4356B7EC51-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-8D4356B7EC51",
+      "originalAssertion": "拒绝/边界：order 必须数组；每个 id 合法、存在且不重复；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Duplicate id, unknown id, non-array and missing order all 400.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-98DDC94776F1-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-98DDC94776F1",
+      "originalAssertion": "给定目标与相应权限，执行“查看会话授权目录”后核对：经 sessions.read 返回指定活动会话的目录授权范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Actual GET returns the owned active session scope plus fixed-null workspace/sandbox projections.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-98DDC94776F1-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-98DDC94776F1",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown session 404, archived session 409 and missing credential 401 are explicit; no success shape on failure.",
+      "executions": [
+        {
+          "key": "r06_test_dca6374d545e5c524dad",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_dca6374d545e5c524dad/binding-result.json",
+          "resultSha256": "983fe3b900caef46cd8da020bc716720b41118bac9798c1777ad184d4379fea8",
+          "stdoutSha256": "a7d8079d00261654f4e0a51b469eb48e99d75c68a2d5c7877e567b5965a2b893",
+          "stderrSha256": "296cd1f1c34f048a1e6ca0fe1db71983b49b50518b88c09b21f4e6bedb41dcb8",
+          "observedTest": "authorized_folders_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-99900EB5ACC9-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-99900EB5ACC9",
+      "originalAssertion": "成功：执行“删除原则”后，从 tenets 存储删除指定项并广播 tenets-changed",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Tenet delete removes the row and the app-event feed shows tenets-changed with agentId+tenetId.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-99900EB5ACC9-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-99900EB5ACC9",
+      "originalAssertion": "拒绝/边界：不存在 404；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Deleting a nonexistent tenet id is 404; no cross-agent disclosure.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-9CC1B13F1787-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-9CC1B13F1787",
+      "originalAssertion": "成功：执行“创建助手”后，新助手持久化并广播 agent-created，返回新 id/name",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Create persists agents/<id>/config.yaml, returns ok/id/name and broadcasts agent-created with the name payload.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-9CC1B13F1787-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-9CC1B13F1787",
+      "originalAssertion": "拒绝/边界：body.name 非空；可选 id 校验；重名 409；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Blank name 400, path-shaped id 400, duplicate 409, missing credential 401.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-9D9E72CB6051-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-9D9E72CB6051",
+      "originalAssertion": "给定目标与相应权限，执行“创建独立会话”后核对：创建不切走当前焦点的会话；可选谱系和项目归属，深度过限拒绝",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Detached create keeps the persisted focus untouched, records lineage anchors 1->2, rejects depth overrun with 409 and links the project assignment at creation.",
+      "executions": [
+        {
+          "key": "r06_test_82268c379bf9d83a71c2",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82268c379bf9d83a71c2/binding-result.json",
+          "resultSha256": "5cbe493309dcd4d65ded06c1e49b92a2c9684680320c2c3b4cd3fdbf19e9fe42",
+          "stdoutSha256": "d73037cee41310cb0061e411d11a08788220c8d31f09a3737f6a22fca7b8085e",
+          "stderrSha256": "d8a5cdfe39c646f18e52b7fd1498d067d6c8284c53a8780c8a31a7920e657f81",
+          "observedTest": "focus_switch_detached_create_and_project_assignment",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-9D9E72CB6051-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-9D9E72CB6051",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown lineage source 404, no resolvable agent 400, missing credential 401.",
+      "executions": [
+        {
+          "key": "r06_test_82268c379bf9d83a71c2",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82268c379bf9d83a71c2/binding-result.json",
+          "resultSha256": "5cbe493309dcd4d65ded06c1e49b92a2c9684680320c2c3b4cd3fdbf19e9fe42",
+          "stdoutSha256": "d73037cee41310cb0061e411d11a08788220c8d31f09a3737f6a22fca7b8085e",
+          "stderrSha256": "d8a5cdfe39c646f18e52b7fd1498d067d6c8284c53a8780c8a31a7920e657f81",
+          "observedTest": "focus_switch_detached_create_and_project_assignment",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-AFA7227BFB63-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-AFA7227BFB63",
+      "originalAssertion": "给定目标与相应权限，执行“查看会话项目目录”后核对：返回项目和文件夹目录",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "GET returns the real folders+projects catalog (empty first, populated later).",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-AFA7227BFB63-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-AFA7227BFB63",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Missing credential 401; malformed requests fail explicitly.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-B5CB2993A5C0-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-B5CB2993A5C0",
+      "originalAssertion": "成功：执行“读取快捷聊天偏好”后，返回快捷聊天窗口设置，不改动设置",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "GET quick-chat returns the settings (defaults first) and the preference file bytes are identical across the read.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-B5CB2993A5C0-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-B5CB2993A5C0",
+      "originalAssertion": "拒绝/边界：engine.getQuickChatPreferences/setQuickChatPreferences；PUT 接受 quickChat 包裹或扁平 patch；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT accepts wrapped and flat forms; invalid values reject without state drift.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C0ADBABE5E89-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C0ADBABE5E89",
+      "originalAssertion": "成功：执行“设置主助手”后，更新主助手 id，后续默认选择随之变化",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT primary persists primary_agent_id and the next listing marks exactly that agent isPrimary.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C0ADBABE5E89-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C0ADBABE5E89",
+      "originalAssertion": "拒绝/边界：body.id 必填且有效；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown id 404, path-shaped id 400.",
+      "executions": [
+        {
+          "key": "r06_test_82c8df08c2d4ad9e6a28",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_82c8df08c2d4ad9e6a28/binding-result.json",
+          "resultSha256": "726a4c8c73c36c815587d593c23e4fad6ca83d866742756ff78dc943df901a49",
+          "stdoutSha256": "3a1c595860c39860f0fc3fc62caa7e4a6eb5893b93614be1d8f9f5144a8bb89a",
+          "stderrSha256": "0de2b7d9a6ad373b00cf777afd1ef53c83225a0f0e925e7029e5847098462a00",
+          "observedTest": "agent_lifecycle_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C3FB70F9925E-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C3FB70F9925E",
+      "originalAssertion": "成功：执行“读取自动学习偏好”后，返回enabled 等自动学习开关，不改动设置",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "GET autolearn returns the switch (default enabled=true) and the read does not create or rewrite preferences.json.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-C3FB70F9925E-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-C3FB70F9925E",
+      "originalAssertion": "拒绝/边界：engine.getAutolearnPreferences/setAutolearnPreferences；PUT 接受 autolearn 包裹或扁平 patch；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT accepts wrapped and flat forms with strict boolean validation; 400 keeps the previous value; 401 unauthenticated.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D43836A3A579-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D43836A3A579",
+      "originalAssertion": "给定目标与相应权限，执行“修改会话项目”后核对：按所给字段更新项目并返回新状态",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Project patch returns the updated state (name/folder/order) on the real user/session-projects.json contract store.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D43836A3A579-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D43836A3A579",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown project id 400 keeps the catalog unchanged.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D58B651BF099-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D58B651BF099",
+      "originalAssertion": "给定目标与相应权限，执行“重排会话项目”后核对：按 folderId 与 projectIds 重排并返回目录",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Project reorder applies inside the folderId scope and returns the catalog.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D58B651BF099-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D58B651BF099",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Malformed bodies fail explicitly; out-of-scope ids cannot leak into other scopes.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D92CD567D6D6-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D92CD567D6D6",
+      "originalAssertion": "成功：执行“更新快捷聊天偏好”后，保存快捷聊天窗口设置并返回新状态",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "PUT quick-chat saves shortcut and reuse timeout (snake_case normalized, clamped to 120) into the quick_chat preferences key, returning the new state.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-D92CD567D6D6-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-D92CD567D6D6",
+      "originalAssertion": "拒绝/边界：engine.getQuickChatPreferences/setQuickChatPreferences；PUT 接受 quickChat 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Wrapped and flat forms both accepted; invalid input rejects without writing; missing credential 401.",
+      "executions": [
+        {
+          "key": "r06_test_0a37ce70ccb83ce7c544",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/binding-result.json",
+          "resultSha256": "596ef9406e6a6844c199029dad66b8e1a3fc9623887d5db6a7b6fddcdbafd011",
+          "stdoutSha256": "baa55d4fd40d6ce89803f2d09d9a33dee616c88830c8bc768a250fef8560c0e2",
+          "stderrSha256": "83b27c727539bc304e08d47a4523b3ec20653989083bc5546c108aa0e4a18c30",
+          "observedTest": "user_preference_pairs_and_tenets_broadcast",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-E167298FD87C-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-E167298FD87C",
+      "originalAssertion": "给定目标与相应权限，执行“创建会话项目”后核对：在指定文件夹或根目录创建项目并返回新项目",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Project create lands in the named folder or at root (folderId null) and returns the new project.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-E167298FD87C-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-E167298FD87C",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown folder 400.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-EEDFB7AB889C-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-EEDFB7AB889C",
+      "originalAssertion": "给定目标与相应权限，执行“重排项目文件夹”后核对：按 folderIds 重排并返回目录",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Folder reorder returns the catalog with the requested global order.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-EEDFB7AB889C-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-EEDFB7AB889C",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Malformed reorder bodies fail explicitly.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-EF5DD65C558E-assertion-00",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-EF5DD65C558E",
+      "originalAssertion": "删除文件夹后核对文件夹消失、其项目出现在根目录且会话仍在原项目。",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Folder delete moves its projects to root (folderId null) and reorders; projects and sessions are not deleted.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    },
+    {
+      "case": "R00-T02-LA-EF5DD65C558E-assertion-01",
+      "expect": 1,
+      "actual": 1,
+      "ok": true,
+      "leafId": "R00-T02-LA-EF5DD65C558E",
+      "originalAssertion": "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果",
+      "acceptanceScope": "COMPLETE_ORIGINAL_LEAF",
+      "evidenceMeaning": "Unknown folder delete fails explicitly.",
+      "executions": [
+        {
+          "key": "r06_test_c39b2981c83b1700407f",
+          "resultPath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/gap-blocks-batch1-execution/R06_BINDINGS/r06_test_c39b2981c83b1700407f/binding-result.json",
+          "resultSha256": "e7a163f72b1c5604e0a0de1dcefa5b2be4fa2e8d2ebc0ef02f62b284f36dcb64",
+          "stdoutSha256": "f88110f162821f53900462b0afb21973b16e848d64af628929e3085dc950148f",
+          "stderrSha256": "80a5116d495fc75d7047754b9e48126640b09ab5b6bcd595aa7005c1ff7919e8",
+          "observedTest": "project_folder_catalog_roundtrip_and_rejections",
+          "sourceCandidateSha256": "9ec324238ae7a9f0b9e1b5dde81052594dc8c0dd4f2d1ee1d31d0268bde4486f"
+        }
+      ],
+      "missingOrInvalidCommandRefs": []
+    }
+  ],
+  "partialProofs": [],
+  "executionErrors": {},
+  "unboundOriginalLeaves": [
+    "R00-T02-LA-01E1E3CF7FA8",
+    "R00-T02-LA-04EE57C5D2BF",
+    "R00-T02-LA-0779DAF64B03",
+    "R00-T02-LA-0B483D7F6A43",
+    "R00-T02-LA-0DDB5AA05072",
+    "R00-T02-LA-0FE8BED686E2",
+    "R00-T02-LA-17FCFE45576B",
+    "R00-T02-LA-206785535A40",
+    "R00-T02-LA-21A99DB98735",
+    "R00-T02-LA-23172C8397F2",
+    "R00-T02-LA-238267978DDA",
+    "R00-T02-LA-24BC2E961E3E",
+    "R00-T02-LA-269958F82F8A",
+    "R00-T02-LA-2D4EBE0FF3C2",
+    "R00-T02-LA-2F2B6E173C1B",
+    "R00-T02-LA-2FAA749DA790",
+    "R00-T02-LA-2FB382A137FC",
+    "R00-T02-LA-31CDA283A11A",
+    "R00-T02-LA-32E9930CF9D9",
+    "R00-T02-LA-337738D5D233",
+    "R00-T02-LA-3516A7326DD9",
+    "R00-T02-LA-3562B5D44C5E",
+    "R00-T02-LA-3617DF5B23D5",
+    "R00-T02-LA-38667593C3E1",
+    "R00-T02-LA-38A989948FDD",
+    "R00-T02-LA-38EEA99077E8",
+    "R00-T02-LA-396F817018F6",
+    "R00-T02-LA-3A50AD28E08E",
+    "R00-T02-LA-3C8CE915255E",
+    "R00-T02-LA-3CBCAE9AD914",
+    "R00-T02-LA-3FCB259FF69C",
+    "R00-T02-LA-4173A08A51CC",
+    "R00-T02-LA-421EEA1AC8D5",
+    "R00-T02-LA-45C5CE361CCB",
+    "R00-T02-LA-464E58DEC9E2",
+    "R00-T02-LA-485B2D0A8A02",
+    "R00-T02-LA-4870805E3A3D",
+    "R00-T02-LA-4A56F26EDA32",
+    "R00-T02-LA-4DD3F71FA2CD",
+    "R00-T02-LA-4EA88B5073E4",
+    "R00-T02-LA-4F0466F7C090",
+    "R00-T02-LA-4F1F69CCA760",
+    "R00-T02-LA-5271217DB01B",
+    "R00-T02-LA-52A5D1660088",
+    "R00-T02-LA-5370DA3742CB",
+    "R00-T02-LA-53B672CBEA46",
+    "R00-T02-LA-55B24FEE5AFB",
+    "R00-T02-LA-5A6E0D526903",
+    "R00-T02-LA-5CD35D9EED20",
+    "R00-T02-LA-5DCB0352EB08",
+    "R00-T02-LA-5F5365322CFF",
+    "R00-T02-LA-604C64F4828A",
+    "R00-T02-LA-6207F7E8C697",
+    "R00-T02-LA-628005EDFF37",
+    "R00-T02-LA-7244E7DCE678",
+    "R00-T02-LA-7432B00DEC94",
+    "R00-T02-LA-7563265D4241",
+    "R00-T02-LA-7570BE1F2527",
+    "R00-T02-LA-76E2F5AAF035",
+    "R00-T02-LA-76EE734926B4",
+    "R00-T02-LA-771296A194E0",
+    "R00-T02-LA-7803B231FC36",
+    "R00-T02-LA-7C699FD2A740",
+    "R00-T02-LA-7CBF6F4A6760",
+    "R00-T02-LA-7F0F3F76E38A",
+    "R00-T02-LA-81664285F927",
+    "R00-T02-LA-81B217A7E581",
+    "R00-T02-LA-84E22CD74BE1",
+    "R00-T02-LA-856B28902999",
+    "R00-T02-LA-857747F848F6",
+    "R00-T02-LA-8A62470CC75D",
+    "R00-T02-LA-8A69F0CFFFA1",
+    "R00-T02-LA-8C8083F2A5FC",
+    "R00-T02-LA-8E2D44B48905",
+    "R00-T02-LA-92620BF2264F",
+    "R00-T02-LA-9283371CDAD8",
+    "R00-T02-LA-93D5237ADE81",
+    "R00-T02-LA-94B9BE3AA7A6",
+    "R00-T02-LA-94CB746D04B7",
+    "R00-T02-LA-980C099F356F",
+    "R00-T02-LA-99F8CD228733",
+    "R00-T02-LA-9CA8A47BE208",
+    "R00-T02-LA-9E3981A9BFCA",
+    "R00-T02-LA-A02D8C572F5C",
+    "R00-T02-LA-A17D742E55B7",
+    "R00-T02-LA-A2C385A33493",
+    "R00-T02-LA-A5DE44FF584F",
+    "R00-T02-LA-A9AD4C7F76AE",
+    "R00-T02-LA-A9DAA48DC603",
+    "R00-T02-LA-AA9EB3FD034D",
+    "R00-T02-LA-AD0384FBE1F2",
+    "R00-T02-LA-AD7FAE6288FA",
+    "R00-T02-LA-AF18F5CEA14F",
+    "R00-T02-LA-AF8E24A2F524",
+    "R00-T02-LA-B097BDDC1E10",
+    "R00-T02-LA-B09CC9536400",
+    "R00-T02-LA-B0D4073E6AEB",
+    "R00-T02-LA-B34F2B298BFA",
+    "R00-T02-LA-B45ECEC543C6",
+    "R00-T02-LA-B47CAC08F418",
+    "R00-T02-LA-B97D0D4296FA",
+    "R00-T02-LA-B9DA1A584C6E",
+    "R00-T02-LA-BA490D930CA9",
+    "R00-T02-LA-BB0A168006D7",
+    "R00-T02-LA-BB4CD1E4CD43",
+    "R00-T02-LA-BC675C664910",
+    "R00-T02-LA-BDE3AC44D79C",
+    "R00-T02-LA-BDEDEF118670",
+    "R00-T02-LA-C1FB9C92E813",
+    "R00-T02-LA-C99A4322D0C1",
+    "R00-T02-LA-CAA876503B1B",
+    "R00-T02-LA-CDBFE6616EB9",
+    "R00-T02-LA-D483E4CD0935",
+    "R00-T02-LA-D51B2A1FA68A",
+    "R00-T02-LA-D62A81C2AEB2",
+    "R00-T02-LA-D8D47C4680C9",
+    "R00-T02-LA-D901852E1B1A",
+    "R00-T02-LA-DCF0836C3A16",
+    "R00-T02-LA-E1625F70C7CC",
+    "R00-T02-LA-E4BEE8E6974A",
+    "R00-T02-LA-EC77C2B04726",
+    "R00-T02-LA-ED089133C106",
+    "R00-T02-LA-EE18A57F7348",
+    "R00-T02-LA-EE2ACB390FCE",
+    "R00-T02-LA-EFEEEFFCD60A",
+    "R00-T02-LA-F0319FC4F93D",
+    "R00-T02-LA-F28086B64522",
+    "R00-T02-LA-F6A1A50E97E4",
+    "R00-T02-LA-F88B0A969094",
+    "R00-T02-LA-FAE2BDEFDB04",
+    "R00-T02-LA-FBDEEDAC0B11",
+    "R00-T02-LA-FF4F06011B48"
+  ],
+  "stageVerdict": "NOT_A_STAGE_VERDICT",
+  "passedRegisteredAssertions": true,
+  "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+  "selectedOriginalLeaves": [
+    "R00-T02-LA-059066969D44",
+    "R00-T02-LA-1685D5E08812",
+    "R00-T02-LA-1E0D477755CD",
+    "R00-T02-LA-20E9C8F26CEA",
+    "R00-T02-LA-22150190C7B1",
+    "R00-T02-LA-26AE3688B8DE",
+    "R00-T02-LA-3818ADEAFA7A",
+    "R00-T02-LA-3ECCF7C95483",
+    "R00-T02-LA-517E697740D9",
+    "R00-T02-LA-60A58027CCCE",
+    "R00-T02-LA-6658E9B80314",
+    "R00-T02-LA-73B631D77531",
+    "R00-T02-LA-7C959E75B8C3",
+    "R00-T02-LA-7D05B144AE21",
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-8D4356B7EC51",
+    "R00-T02-LA-98DDC94776F1",
+    "R00-T02-LA-99900EB5ACC9",
+    "R00-T02-LA-9CC1B13F1787",
+    "R00-T02-LA-9D9E72CB6051",
+    "R00-T02-LA-AFA7227BFB63",
+    "R00-T02-LA-B5CB2993A5C0",
+    "R00-T02-LA-C0ADBABE5E89",
+    "R00-T02-LA-C3FB70F9925E",
+    "R00-T02-LA-D43836A3A579",
+    "R00-T02-LA-D58B651BF099",
+    "R00-T02-LA-D92CD567D6D6",
+    "R00-T02-LA-E167298FD87C",
+    "R00-T02-LA-EEDFB7AB889C",
+    "R00-T02-LA-EF5DD65C558E"
+  ],
+  "excludedFromExecutionScope": [
+    "R00-T02-LA-00C88B996AA0",
+    "R00-T02-LA-00ECC9568490",
+    "R00-T02-LA-010BA6693880",
+    "R00-T02-LA-015A65726C05",
+    "R00-T02-LA-01E1E3CF7FA8",
+    "R00-T02-LA-041F938C351F",
+    "R00-T02-LA-04EE57C5D2BF",
+    "R00-T02-LA-04F4C81BCBB7",
+    "R00-T02-LA-062844EDA014",
+    "R00-T02-LA-071B6E2C286A",
+    "R00-T02-LA-0779DAF64B03",
+    "R00-T02-LA-07A5CE3637C7",
+    "R00-T02-LA-081FACA79F2C",
+    "R00-T02-LA-0B483D7F6A43",
+    "R00-T02-LA-0CDC88FC0999",
+    "R00-T02-LA-0D4F0EFC9DAE",
+    "R00-T02-LA-0D8358645191",
+    "R00-T02-LA-0DDB5AA05072",
+    "R00-T02-LA-0EC4C0E2EB51",
+    "R00-T02-LA-0F7D128E01B1",
+    "R00-T02-LA-0FE8BED686E2",
+    "R00-T02-LA-127373C72E30",
+    "R00-T02-LA-1418E279D6FE",
+    "R00-T02-LA-15D154AE53C8",
+    "R00-T02-LA-17FCFE45576B",
+    "R00-T02-LA-1AA3F1311F8A",
+    "R00-T02-LA-1AEDB2670EB9",
+    "R00-T02-LA-1B712E189DDF",
+    "R00-T02-LA-1BEA3A4B9CB0",
+    "R00-T02-LA-1CD1C31CCF44",
+    "R00-T02-LA-1CE6A92200DB",
+    "R00-T02-LA-1CFB84CEB4F8",
+    "R00-T02-LA-206785535A40",
+    "R00-T02-LA-207DF594B497",
+    "R00-T02-LA-20DD2E4529D9",
+    "R00-T02-LA-210C7965364E",
+    "R00-T02-LA-21A99DB98735",
+    "R00-T02-LA-23172C8397F2",
+    "R00-T02-LA-238267978DDA",
+    "R00-T02-LA-23AB8E0A2493",
+    "R00-T02-LA-245D72DD4CEA",
+    "R00-T02-LA-24BC2E961E3E",
+    "R00-T02-LA-251147E586B2",
+    "R00-T02-LA-268C221DAB82",
+    "R00-T02-LA-269958F82F8A",
+    "R00-T02-LA-295F9F22981B",
+    "R00-T02-LA-2C28E576FC61",
+    "R00-T02-LA-2CAF7E2573D8",
+    "R00-T02-LA-2D4EBE0FF3C2",
+    "R00-T02-LA-2EB39AE34CB5",
+    "R00-T02-LA-2ED065BED168",
+    "R00-T02-LA-2F2B6E173C1B",
+    "R00-T02-LA-2FAA749DA790",
+    "R00-T02-LA-2FB382A137FC",
+    "R00-T02-LA-31CDA283A11A",
+    "R00-T02-LA-3236B05B284F",
+    "R00-T02-LA-32E9930CF9D9",
+    "R00-T02-LA-337738D5D233",
+    "R00-T02-LA-3516A7326DD9",
+    "R00-T02-LA-3562B5D44C5E",
+    "R00-T02-LA-3617DF5B23D5",
+    "R00-T02-LA-38667593C3E1",
+    "R00-T02-LA-38A989948FDD",
+    "R00-T02-LA-38AD68BFB5B3",
+    "R00-T02-LA-38EEA99077E8",
+    "R00-T02-LA-396F817018F6",
+    "R00-T02-LA-3A50AD28E08E",
+    "R00-T02-LA-3C8CE915255E",
+    "R00-T02-LA-3CBCAE9AD914",
+    "R00-T02-LA-3D7A957EF7FF",
+    "R00-T02-LA-3D99324D55C7",
+    "R00-T02-LA-3F95164A488C",
+    "R00-T02-LA-3FAFA387AD68",
+    "R00-T02-LA-3FCB259FF69C",
+    "R00-T02-LA-4173A08A51CC",
+    "R00-T02-LA-421EEA1AC8D5",
+    "R00-T02-LA-4338B197B6DF",
+    "R00-T02-LA-43FFB75F252C",
+    "R00-T02-LA-45627E4F8173",
+    "R00-T02-LA-45C5CE361CCB",
+    "R00-T02-LA-464E58DEC9E2",
+    "R00-T02-LA-476AB8B09402",
+    "R00-T02-LA-477DA3D558B8",
+    "R00-T02-LA-478704C17551",
+    "R00-T02-LA-485B2D0A8A02",
+    "R00-T02-LA-4870805E3A3D",
+    "R00-T02-LA-4A56F26EDA32",
+    "R00-T02-LA-4CEBEA945B7A",
+    "R00-T02-LA-4DD3F71FA2CD",
+    "R00-T02-LA-4E8EDC4E25FC",
+    "R00-T02-LA-4EA88B5073E4",
+    "R00-T02-LA-4F0466F7C090",
+    "R00-T02-LA-4F1F69CCA760",
+    "R00-T02-LA-506A6F6005C1",
+    "R00-T02-LA-51905CECDD1B",
+    "R00-T02-LA-52055FF0CAC2",
+    "R00-T02-LA-52226FEA5997",
+    "R00-T02-LA-5235D8EDD673",
+    "R00-T02-LA-5271217DB01B",
+    "R00-T02-LA-52A5D1660088",
+    "R00-T02-LA-5370DA3742CB",
+    "R00-T02-LA-53B672CBEA46",
+    "R00-T02-LA-549AC6365C5D",
+    "R00-T02-LA-55B24FEE5AFB",
+    "R00-T02-LA-563F04AF5AD7",
+    "R00-T02-LA-5A6E0D526903",
+    "R00-T02-LA-5C043EAD2299",
+    "R00-T02-LA-5CD35D9EED20",
+    "R00-T02-LA-5DCB0352EB08",
+    "R00-T02-LA-5F5365322CFF",
+    "R00-T02-LA-5F5B67BC5748",
+    "R00-T02-LA-5F879158C679",
+    "R00-T02-LA-5FA75FC2FE4C",
+    "R00-T02-LA-5FEFBFCEBC04",
+    "R00-T02-LA-604C64F4828A",
+    "R00-T02-LA-6189780D7F52",
+    "R00-T02-LA-6207F7E8C697",
+    "R00-T02-LA-628005EDFF37",
+    "R00-T02-LA-66C538ED4733",
+    "R00-T02-LA-6E205433F474",
+    "R00-T02-LA-6EA03AC48851",
+    "R00-T02-LA-7244E7DCE678",
+    "R00-T02-LA-730E5984212D",
+    "R00-T02-LA-7432B00DEC94",
+    "R00-T02-LA-7563265D4241",
+    "R00-T02-LA-7570BE1F2527",
+    "R00-T02-LA-75753997F5C6",
+    "R00-T02-LA-763C552CB7DE",
+    "R00-T02-LA-76E2F5AAF035",
+    "R00-T02-LA-76EE734926B4",
+    "R00-T02-LA-771296A194E0",
+    "R00-T02-LA-778CBDA01964",
+    "R00-T02-LA-7803B231FC36",
+    "R00-T02-LA-78B18101F37D",
+    "R00-T02-LA-7C699FD2A740",
+    "R00-T02-LA-7CBF6F4A6760",
+    "R00-T02-LA-7F0F3F76E38A",
+    "R00-T02-LA-81664285F927",
+    "R00-T02-LA-81B217A7E581",
+    "R00-T02-LA-822AADC2B605",
+    "R00-T02-LA-84E22CD74BE1",
+    "R00-T02-LA-856B28902999",
+    "R00-T02-LA-857747F848F6",
+    "R00-T02-LA-865A9825A3EB",
+    "R00-T02-LA-895DAC8DD5B7",
+    "R00-T02-LA-89F253FD3567",
+    "R00-T02-LA-8A62470CC75D",
+    "R00-T02-LA-8A69F0CFFFA1",
+    "R00-T02-LA-8C8083F2A5FC",
+    "R00-T02-LA-8E11FAF4CC01",
+    "R00-T02-LA-8E2D44B48905",
+    "R00-T02-LA-90975187F446",
+    "R00-T02-LA-92620BF2264F",
+    "R00-T02-LA-9283371CDAD8",
+    "R00-T02-LA-93D5237ADE81",
+    "R00-T02-LA-94B9BE3AA7A6",
+    "R00-T02-LA-94CB746D04B7",
+    "R00-T02-LA-960668141E07",
+    "R00-T02-LA-9616596B5720",
+    "R00-T02-LA-980C099F356F",
+    "R00-T02-LA-99F8CD228733",
+    "R00-T02-LA-9A47666127D3",
+    "R00-T02-LA-9CA8A47BE208",
+    "R00-T02-LA-9E3981A9BFCA",
+    "R00-T02-LA-9FF4E1805297",
+    "R00-T02-LA-A02D8C572F5C",
+    "R00-T02-LA-A17D742E55B7",
+    "R00-T02-LA-A18187567AF9",
+    "R00-T02-LA-A2C385A33493",
+    "R00-T02-LA-A3FE8FD26CB4",
+    "R00-T02-LA-A5DE44FF584F",
+    "R00-T02-LA-A7B51C282C77",
+    "R00-T02-LA-A9AD4C7F76AE",
+    "R00-T02-LA-A9B0BBAD449C",
+    "R00-T02-LA-A9DAA48DC603",
+    "R00-T02-LA-AA9EB3FD034D",
+    "R00-T02-LA-AD0384FBE1F2",
+    "R00-T02-LA-AD7FAE6288FA",
+    "R00-T02-LA-ADB6B0580864",
+    "R00-T02-LA-AF18F5CEA14F",
+    "R00-T02-LA-AF8E24A2F524",
+    "R00-T02-LA-B0386DC9DED9",
+    "R00-T02-LA-B097BDDC1E10",
+    "R00-T02-LA-B09CC9536400",
+    "R00-T02-LA-B0D4073E6AEB",
+    "R00-T02-LA-B0F05BC32D62",
+    "R00-T02-LA-B34F2B298BFA",
+    "R00-T02-LA-B383AB7B553C",
+    "R00-T02-LA-B45ECEC543C6",
+    "R00-T02-LA-B47CAC08F418",
+    "R00-T02-LA-B97D0D4296FA",
+    "R00-T02-LA-B9DA1A584C6E",
+    "R00-T02-LA-BA490D930CA9",
+    "R00-T02-LA-BB0A168006D7",
+    "R00-T02-LA-BB1F5E0DE88E",
+    "R00-T02-LA-BB4CD1E4CD43",
+    "R00-T02-LA-BC244641BC1E",
+    "R00-T02-LA-BC675C664910",
+    "R00-T02-LA-BDE3AC44D79C",
+    "R00-T02-LA-BDEDEF118670",
+    "R00-T02-LA-C12CD37BA4A3",
+    "R00-T02-LA-C1FB9C92E813",
+    "R00-T02-LA-C406F9A17A3E",
+    "R00-T02-LA-C4F6E3BFF341",
+    "R00-T02-LA-C6D338A24CF8",
+    "R00-T02-LA-C75BF9A4D143",
+    "R00-T02-LA-C8380CD5D08B",
+    "R00-T02-LA-C99A4322D0C1",
+    "R00-T02-LA-CAA876503B1B",
+    "R00-T02-LA-CC738012B6EE",
+    "R00-T02-LA-CCDCE84E4378",
+    "R00-T02-LA-CDBFE6616EB9",
+    "R00-T02-LA-D38F6F02EDD7",
+    "R00-T02-LA-D47D375E578B",
+    "R00-T02-LA-D483E4CD0935",
+    "R00-T02-LA-D5128ABAABCF",
+    "R00-T02-LA-D51B2A1FA68A",
+    "R00-T02-LA-D62A81C2AEB2",
+    "R00-T02-LA-D6509017C382",
+    "R00-T02-LA-D8D47C4680C9",
+    "R00-T02-LA-D901852E1B1A",
+    "R00-T02-LA-DB95BAC2A204",
+    "R00-T02-LA-DCF0836C3A16",
+    "R00-T02-LA-E1625F70C7CC",
+    "R00-T02-LA-E2AF86A962D0",
+    "R00-T02-LA-E4BEE8E6974A",
+    "R00-T02-LA-E7CC636A724C",
+    "R00-T02-LA-E84EEED44AC1",
+    "R00-T02-LA-EA26288DA2DB",
+    "R00-T02-LA-EA3C6A0C5214",
+    "R00-T02-LA-EB9E56CF6007",
+    "R00-T02-LA-EC77C2B04726",
+    "R00-T02-LA-ED089133C106",
+    "R00-T02-LA-EE18A57F7348",
+    "R00-T02-LA-EE2ACB390FCE",
+    "R00-T02-LA-EFEEEFFCD60A",
+    "R00-T02-LA-F0319FC4F93D",
+    "R00-T02-LA-F28086B64522",
+    "R00-T02-LA-F49D5F80D234",
+    "R00-T02-LA-F54ED990E939",
+    "R00-T02-LA-F6A1A50E97E4",
+    "R00-T02-LA-F829AEA5931C",
+    "R00-T02-LA-F88B0A969094",
+    "R00-T02-LA-F9277C29D570",
+    "R00-T02-LA-FAE2BDEFDB04",
+    "R00-T02-LA-FBD4D4D29679",
+    "R00-T02-LA-FBDEEDAC0B11",
+    "R00-T02-LA-FD94F19E734D",
+    "R00-T02-LA-FDB0FE6528EE",
+    "R00-T02-LA-FF4F06011B48"
+  ],
+  "note": "仅已审阅的逐断言证据由本轮原始日志重算；缺少映射的原义务仍由阶段门禁保持BLOCKED。"
+}

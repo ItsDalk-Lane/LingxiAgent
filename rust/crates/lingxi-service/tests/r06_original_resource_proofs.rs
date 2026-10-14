@@ -6,9 +6,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use lingxi_service::{
-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout, run,
+    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 struct Fixture {
@@ -27,6 +27,10 @@ impl Fixture {
     }
 
     async fn start_with_workspace(tag: &str, with_workspace: bool) -> Self {
+        Self::start_with_request_limit(tag, with_workspace, ServiceDeps::default().rate_max).await
+    }
+
+    async fn start_with_request_limit(tag: &str, with_workspace: bool, rate_max: u32) -> Self {
         let root = std::env::temp_dir().join(format!(
             "lingxi-original-resource-{tag}-{}-{}",
             std::process::id(),
@@ -52,6 +56,7 @@ impl Fixture {
             &layout,
             ServiceDeps {
                 workspace_root: with_workspace.then_some(workspace.clone()),
+                rate_max,
                 ..ServiceDeps::default()
             },
         )
@@ -299,6 +304,329 @@ async fn resourceio_operation_specific_provider_refusals_preserve_files_and_regi
 }
 
 #[tokio::test]
+async fn original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations()
+{
+    let fx = Fixture::start("watch-handle-original").await;
+    let file = fx.workspace.join("watch-source.txt");
+    std::fs::write(&file, b"initial source").unwrap();
+    let metadata = std::fs::metadata(&file).unwrap().modified().unwrap();
+    let local = json!({"kind":"local-file","path":file});
+    let (status, attached) = fx
+        .post(
+            "/lingxi/v1/sessions/s-proof/attachments/local",
+            json!({"path":file}),
+        )
+        .await;
+    assert_eq!(status, 201, "{attached}");
+    let registered = stage_registration_counts(&fx).await;
+    let local_token = fx.state.auth().local_token();
+    let read_json = |bytes: &[u8]| serde_json::from_slice::<Value>(bytes).unwrap();
+    let (status, subscription) = fx
+        .post(
+            "/lingxi/v1/resource-io/subscribe",
+            json!({"resources":[local],"purpose":"original-lifecycle"}),
+        )
+        .await;
+    assert_eq!(status, 200, "{subscription}");
+    let subscription_id = subscription["subscriptionId"].as_str().unwrap();
+    let (status, watch) = fx
+        .post("/lingxi/v1/resource-io/watch", json!({"resource":local}))
+        .await;
+    assert_eq!(status, 200, "{watch}");
+    let watch_id = watch["watchId"].as_str().unwrap();
+    let (status, bytes, _) = fx
+        .request(
+            "GET",
+            "/lingxi/v1/resource-io/watch-diagnostics",
+            None,
+            Some(local_token.clone()),
+        )
+        .await;
+    assert_eq!(status, 200);
+    let diagnostics = read_json(&bytes);
+    assert_eq!(diagnostics["ok"], true);
+    assert_eq!(diagnostics["diagnostics"]["subscriptions"], 1);
+    assert_eq!(
+        diagnostics["diagnostics"]["watches"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(diagnostics["diagnostics"]["watches"][0]["refCount"], 2);
+    assert!(diagnostics["diagnostics"]["watches"][0]["resourceKey"]
+        .as_str()
+        .unwrap()
+        .starts_with("local_fs:"));
+    let watch_path = format!("/lingxi/v1/resource-io/watch/{watch_id}");
+    let subscription_path = format!("/lingxi/v1/resource-io/subscriptions/{subscription_id}");
+    for path in [&watch_path, &subscription_path] {
+        let (status, _, _) = fx.request("DELETE", path, None, None).await;
+        assert_eq!(status, 401);
+        assert_eq!(
+            fx.state.resource_io().diagnostics()["watches"][0]["refCount"],
+            2
+        );
+    }
+    for (path, released, count) in [
+        (watch_path.as_str(), true, 1),
+        (watch_path.as_str(), false, 1),
+        (subscription_path.as_str(), true, 0),
+        (subscription_path.as_str(), false, 0),
+    ] {
+        let (status, bytes, _) = fx
+            .request("DELETE", path, None, Some(local_token.clone()))
+            .await;
+        assert_eq!(status, 200);
+        assert_eq!(read_json(&bytes), json!({"ok":true,"released":released}));
+        assert_eq!(
+            fx.state.resource_io().diagnostics()["watches"]
+                .as_array()
+                .unwrap()
+                .len(),
+            count
+        );
+        assert_eq!(std::fs::read(&file).unwrap(), b"initial source");
+        assert_eq!(
+            std::fs::metadata(&file).unwrap().modified().unwrap(),
+            metadata
+        );
+        assert_eq!(stage_registration_counts(&fx).await, registered);
+    }
+    let (status, bytes, _) = fx
+        .request(
+            "GET",
+            "/lingxi/v1/resource-io/events?since=0",
+            None,
+            Some(local_token.clone()),
+        )
+        .await;
+    assert_eq!(status, 200);
+    let events_before = read_json(&bytes);
+    for reference in [
+        json!({"kind":"mount","mountId":"unsupported-original-mount","path":"watch-source.txt"}),
+        json!({"kind":"url","url":"https://example.invalid/watch-source.txt"}),
+        json!({"kind":"session-file","fileId":attached["file"]["fileId"]}),
+    ] {
+        let expected = if reference["kind"] == "session-file" {
+            403
+        } else {
+            400
+        };
+        for operation in ["watch", "subscribe"] {
+            let body = if operation == "watch" {
+                json!({"resource":reference})
+            } else {
+                json!({"resources":[local,reference]})
+            };
+            let (status, error) = fx
+                .post(&format!("/lingxi/v1/resource-io/{operation}"), body)
+                .await;
+            assert_eq!(status, expected, "{operation}: {error}");
+            assert_ne!(error["ok"], true);
+            assert!(
+                error.to_string().contains(if expected == 403 {
+                    "capability_denied"
+                } else {
+                    "unsupported_provider"
+                }),
+                "{error}"
+            );
+            let (status, bytes, _) = fx
+                .request(
+                    "GET",
+                    "/lingxi/v1/resource-io/watch-diagnostics",
+                    None,
+                    Some(local_token.clone()),
+                )
+                .await;
+            assert_eq!(status, 200);
+            let diagnostics = read_json(&bytes);
+            assert_eq!(diagnostics["diagnostics"]["subscriptions"], 0);
+            assert!(diagnostics["diagnostics"]["watches"]
+                .as_array()
+                .unwrap()
+                .is_empty());
+            let (status, bytes, _) = fx
+                .request(
+                    "GET",
+                    "/lingxi/v1/resource-io/events?since=0",
+                    None,
+                    Some(local_token.clone()),
+                )
+                .await;
+            assert_eq!(status, 200);
+            assert_eq!(read_json(&bytes), events_before);
+            assert_eq!(std::fs::read(&file).unwrap(), b"initial source");
+            assert_eq!(stage_registration_counts(&fx).await, registered);
+        }
+    }
+    let missing = json!({"kind":"local-file","path":fx.workspace.join("missing-watch")});
+    let (status, error) = fx
+        .post(
+            "/lingxi/v1/resource-io/subscribe",
+            json!({"resources":[local,missing]}),
+        )
+        .await;
+    assert_eq!(status, 400, "{error}");
+    assert!(fx.state.resource_io().diagnostics()["watches"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    assert_eq!(fx.state.resource_io().diagnostics()["subscriptions"], 0);
+    let unauthorized = json!({"kind":"local-file","path":fx.root.join("outside-workspace")});
+    std::fs::write(fx.root.join("outside-workspace"), b"outside sentinel").unwrap();
+    let (status, error) = fx
+        .post(
+            "/lingxi/v1/resource-io/watch",
+            json!({"resource":unauthorized}),
+        )
+        .await;
+    assert_eq!(status, 403, "{error}");
+    assert_eq!(
+        std::fs::read(fx.root.join("outside-workspace")).unwrap(),
+        b"outside sentinel"
+    );
+    fx.finish().await;
+}
+
+#[tokio::test]
+async fn original_resource_events_since_and_stale_resync_follow_real_writes_without_read_side_effects(
+) {
+    let fx = Fixture::start_with_request_limit("events-retention-original", true, 2048).await;
+    let file = fx.workspace.join("event-source.txt");
+    let local = json!({"kind":"local-file","path":file});
+    let token = fx.state.auth().local_token();
+    let read_json = |bytes: &[u8]| serde_json::from_slice::<Value>(bytes).unwrap();
+    let (status, result) = fx
+        .post(
+            "/lingxi/v1/resource-io/write",
+            json!({"resource":local,"content":"first","sessionId":"s-proof"}),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    let (status, bytes, _) = fx
+        .request(
+            "GET",
+            "/lingxi/v1/resource-io/events?since=0",
+            None,
+            Some(token.clone()),
+        )
+        .await;
+    assert_eq!(status, 200);
+    let first = read_json(&bytes);
+    assert_eq!(first["stale"], false);
+    let cursor = first["latestSequence"].as_u64().unwrap();
+    assert!(cursor > 0);
+    assert!(first["events"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|event| event["type"] == "resource.changed"
+            && event["resourceKey"]
+                .as_str()
+                .unwrap()
+                .starts_with("local_fs:")));
+    for size in 1..=1005 {
+        let (status, result) = fx
+            .post(
+                "/lingxi/v1/resource-io/write",
+                json!({"resource":local,"content":"x".repeat(size),"sessionId":"s-proof"}),
+            )
+            .await;
+        assert_eq!(status, 200, "write {size}: {result}");
+    }
+    let bytes_before = std::fs::read(&file).unwrap();
+    let modified = std::fs::metadata(&file).unwrap().modified().unwrap();
+    let counts = stage_registration_counts(&fx).await;
+    let events_before = fx.state.resource_io().events_since(0);
+    let (status, bytes, _) = fx
+        .request(
+            "GET",
+            &format!("/lingxi/v1/resource-io/events?since={cursor}"),
+            None,
+            Some(token.clone()),
+        )
+        .await;
+    assert_eq!(status, 200);
+    let stale = read_json(&bytes);
+    assert_eq!(stale["stale"], true);
+    assert_eq!(stale["resync"], "resource-stat-required");
+    assert!(stale["events"].as_array().unwrap().is_empty());
+    let latest = stale["latestSequence"].as_u64().unwrap();
+    assert!(latest >= cursor + 1005);
+    let (status, bytes, _) = fx
+        .request(
+            "GET",
+            &format!("/lingxi/v1/resource-io/events?since={}", latest - 3),
+            None,
+            Some(token.clone()),
+        )
+        .await;
+    assert_eq!(status, 200);
+    let recent = read_json(&bytes);
+    assert_eq!(recent["stale"], false);
+    assert_eq!(recent["latestSequence"], latest);
+    assert_eq!(recent["events"].as_array().unwrap().len(), 3);
+    for (offset, event) in recent["events"].as_array().unwrap().iter().enumerate() {
+        assert_eq!(event["sequence"], latest - 2 + offset as u64);
+        assert_eq!(event["type"], "resource.changed");
+    }
+    for path in [
+        "/lingxi/v1/resource-io/events?since=abc",
+        "/lingxi/v1/resource-io/events?since=-1",
+        "/lingxi/v1/resource-io/events?since=0&since=1",
+        "/lingxi/v1/resource-io/events?resource=unsupported",
+    ] {
+        assert_eq!(
+            fx.request("GET", path, None, Some(token.clone())).await.0,
+            400,
+            "{path}"
+        );
+    }
+    assert_eq!(
+        fx.request("GET", "/lingxi/v1/resource-io/events?since=0", None, None)
+            .await
+            .0,
+        401
+    );
+    assert_eq!(
+        fx.request(
+            "GET",
+            "/lingxi/v1/resource-io/watch-diagnostics",
+            None,
+            None
+        )
+        .await
+        .0,
+        401
+    );
+    let (status, bytes, _) = fx
+        .request(
+            "GET",
+            "/lingxi/v1/resource-io/watch-diagnostics",
+            None,
+            Some(token),
+        )
+        .await;
+    assert_eq!(status, 200);
+    let diagnostics = read_json(&bytes);
+    assert_eq!(diagnostics["diagnostics"]["subscriptions"], 0);
+    assert!(diagnostics["diagnostics"]["watches"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    assert_eq!(std::fs::read(&file).unwrap(), bytes_before);
+    assert_eq!(
+        std::fs::metadata(&file).unwrap().modified().unwrap(),
+        modified
+    );
+    assert_eq!(stage_registration_counts(&fx).await, counts);
+    assert_eq!(fx.state.resource_io().events_since(0), events_before);
+    fx.finish().await;
+}
+
+#[tokio::test]
 async fn attachment_blob_voice_reuse_and_directory_reference_preserve_actual_payloads() {
     use base64::Engine;
     let fx = Fixture::start("attachments").await;
@@ -503,7 +831,10 @@ async fn stage_files_gateway_only_delivers_real_authorized_session_files() {
         &gateway,
         fx.state.session_files().clone(),
         Arc::new(
-            lingxi_service::resourceaccess::ResourceAccess::new(&[fx.workspace.clone()]).unwrap(),
+            lingxi_service::resourceaccess::ResourceAccess::new(std::slice::from_ref(
+                &fx.workspace,
+            ))
+            .unwrap(),
         ),
         fx.workspace.clone(),
         &budget,
@@ -886,7 +1217,7 @@ async fn local_resource_rename_move_trash_and_conflicts_match_real_bytes() {
 #[tokio::test]
 async fn resourceio_write_conflict_refuses_external_change_at_commit_boundary() {
     let fx = Fixture::start("write-conflict").await;
-    for (operation, actual_status) in [("write", 400), ("write-expected-version", 409)] {
+    for operation in ["write", "write-expected-version"] {
         let file = fx.workspace.join(format!("contended-{operation}.txt"));
         std::fs::write(&file, b"original").unwrap();
         let reference = json!({"kind":"local-file","path":file});
@@ -912,16 +1243,13 @@ async fn resourceio_write_conflict_refuses_external_change_at_commit_boundary() 
                     "expectedVersion":stat.1["version"]}),
             )
             .await;
-        // 普通写实际返回400，仍不符合原409要求，只保存不覆盖的局部证明。
-        // 按版本写需在真实提交边界发生冲突，不能用预检版本不匹配替代。
-        assert_eq!(response.0, actual_status, "{operation}: {response:?}");
+        assert_eq!(response.0, 409, "{operation}: {response:?}");
         if operation == "write" {
-            assert!(
-                response
-                    .1
-                    .to_string()
-                    .contains("file_changed_or_not_authorized")
-            );
+            assert_eq!(response.1["code"], "conflict");
+            assert!(response
+                .1
+                .to_string()
+                .contains("file_changed_or_not_authorized"));
         } else {
             assert_eq!(response.1["ok"], false);
             assert_eq!(response.1["conflict"], true);
@@ -962,7 +1290,10 @@ async fn registered_read_reports_missing_and_decode_failure_without_foreign_cont
         &registry,
         &gateway,
         Arc::new(
-            lingxi_service::resourceaccess::ResourceAccess::new(&[fx.workspace.clone()]).unwrap(),
+            lingxi_service::resourceaccess::ResourceAccess::new(std::slice::from_ref(
+                &fx.workspace,
+            ))
+            .unwrap(),
         ),
         fx.workspace.clone(),
         clock,
@@ -1059,14 +1390,13 @@ async fn registered_read_reports_missing_and_decode_failure_without_foreign_cont
     );
     assert_eq!(std::fs::read(&undecodable).unwrap(), undecodable_bytes);
     assert!(!fx.workspace.join("missing.txt").exists());
-    assert!(
-        fx.state
-            .session_files()
-            .list_files("s-proof")
-            .await
-            .unwrap()
-            .is_empty()
-    );
+    assert!(fx
+        .state
+        .session_files()
+        .list_files("s-proof")
+        .await
+        .unwrap()
+        .is_empty());
     fx.finish().await;
 }
 
@@ -1184,12 +1514,10 @@ async fn file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_row
         )
         .await;
     assert_eq!(failed.0, 500, "{failed:?}");
-    assert!(
-        failed.1["error"]
-            .as_str()
-            .unwrap()
-            .contains("proof storage write failure")
-    );
+    assert!(failed.1["error"]
+        .as_str()
+        .unwrap()
+        .contains("proof storage write failure"));
     assert_eq!(std::fs::read(&file).unwrap(), b"current user bytes");
     assert_eq!(history.list_files().await.unwrap(), files_before);
     assert_eq!(
@@ -1220,12 +1548,10 @@ async fn file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_row
         )
         .await;
     assert_eq!(conflict.0, 500, "{conflict:?}");
-    assert!(
-        conflict.1["error"]
-            .as_str()
-            .unwrap()
-            .contains("file_changed_or_not_authorized")
-    );
+    assert!(conflict.1["error"]
+        .as_str()
+        .unwrap()
+        .contains("file_changed_or_not_authorized"));
     assert_eq!(
         std::fs::read(&file).unwrap(),
         b"actual concurrent user edit"
@@ -1250,6 +1576,44 @@ async fn file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_row
     assert_eq!(fx.state.resource_io().events_since(0), events_before);
     fx.state.resource_io().file_safety().set_test_hook(None);
 
+    let db = rusqlite::Connection::open(fx.root.join("home/lingxi-service/data/runs.db")).unwrap();
+    db.execute_batch(
+        "CREATE TRIGGER r06_restore_snapshot_refused BEFORE INSERT ON file_history_snapshots \
+         BEGIN SELECT RAISE(ABORT, 'proof restore snapshot storage failure'); END;",
+    )
+    .unwrap();
+    let capture_failed = fx
+        .post(
+            "/lingxi/v1/file-history/restore",
+            json!({"agentId":"agent","snapshotId":old_id}),
+        )
+        .await;
+    assert_eq!(capture_failed.0, 500, "{capture_failed:?}");
+    assert!(capture_failed.1["error"]
+        .as_str()
+        .unwrap()
+        .contains("proof restore snapshot storage failure"));
+    assert_eq!(capture_failed.1["fileWritten"], true);
+    assert_eq!(capture_failed.1["snapshotRecorded"], false);
+    assert_eq!(capture_failed.1["relPath"], "restore.txt");
+    assert_eq!(std::fs::read(&file).unwrap(), b"historic bytes");
+    assert_eq!(
+        history.list_versions("restore.txt").await.unwrap(),
+        versions_before
+    );
+    assert_eq!(
+        history.get_snapshot_content(old_id).await.unwrap(),
+        old_before
+    );
+    assert_eq!(
+        std::fs::read(&private).unwrap(),
+        b"private bytes stay outside workspace"
+    );
+    assert_ne!(fx.state.resource_io().events_since(0), events_before);
+    db.execute_batch("DROP TRIGGER r06_restore_snapshot_refused;")
+        .unwrap();
+    drop(db);
+
     // 移除失败条件后同一真实恢复入口成功，并且只新增一条恢复快照。
     let restored = fx
         .post(
@@ -1270,6 +1634,25 @@ async fn file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_row
         .unwrap()
         .unwrap();
     assert_eq!(snapshot.content, b"historic bytes");
+    let repeated = fx
+        .post(
+            "/lingxi/v1/file-history/restore",
+            json!({"agentId":"agent","snapshotId":old_id}),
+        )
+        .await;
+    assert_eq!(repeated.0, 200, "{repeated:?}");
+    let repeated_versions = history.list_versions("restore.txt").await.unwrap();
+    assert_eq!(repeated_versions.len(), versions.len() + 1);
+    assert_eq!(repeated_versions[0].origin, "restore");
+    assert_eq!(
+        history
+            .get_snapshot_content(repeated_versions[0].id)
+            .await
+            .unwrap()
+            .unwrap()
+            .content,
+        b"historic bytes"
+    );
     assert_eq!(
         history.get_snapshot_content(old_id).await.unwrap(),
         old_before
@@ -1278,14 +1661,13 @@ async fn file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_row
         std::fs::read(&private).unwrap(),
         b"private bytes stay outside workspace"
     );
-    assert!(
-        fx.state
-            .session_files()
-            .list_files("s-proof")
-            .await
-            .unwrap()
-            .is_empty()
-    );
+    assert!(fx
+        .state
+        .session_files()
+        .list_files("s-proof")
+        .await
+        .unwrap()
+        .is_empty());
     fx.finish().await;
 }
 
@@ -1297,12 +1679,10 @@ async fn subscribe_without_local_provider_refuses_on_its_real_entry_without_resi
     std::fs::write(&watched, b"existing watched bytes").unwrap();
     let events_before = fx.state.resource_io().events_since(0);
     assert_eq!(fx.state.resource_io().diagnostics()["subscriptions"], 0);
-    assert!(
-        fx.state.resource_io().diagnostics()["watches"]
-            .as_array()
-            .unwrap()
-            .is_empty()
-    );
+    assert!(fx.state.resource_io().diagnostics()["watches"]
+        .as_array()
+        .unwrap()
+        .is_empty());
     let response = fx
         .post(
             "/lingxi/v1/resource-io/subscribe",
@@ -1318,13 +1698,12 @@ async fn subscribe_without_local_provider_refuses_on_its_real_entry_without_resi
     assert!(diagnostics["watches"].as_array().unwrap().is_empty());
     assert_eq!(fx.state.resource_io().events_since(0), events_before);
     assert_eq!(std::fs::read(&watched).unwrap(), b"existing watched bytes");
-    assert!(
-        fx.state
-            .session_files()
-            .list_files("s-proof")
-            .await
-            .unwrap()
-            .is_empty()
-    );
+    assert!(fx
+        .state
+        .session_files()
+        .list_files("s-proof")
+        .await
+        .unwrap()
+        .is_empty());
     fx.finish().await;
 }

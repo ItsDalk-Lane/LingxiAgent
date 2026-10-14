@@ -336,7 +336,7 @@ impl Drop for DriverClaim {
             .remove(&self.run_id);
     }
 }
-pub(crate) struct RunPermitRegistration {
+pub struct RunPermitRegistration {
     supervisor: Weak<TaskSupervisor>,
     run_id: String,
     permit: Arc<lingxi_kernel::session_admission::SessionPermit>,
@@ -421,7 +421,10 @@ impl TaskSupervisor {
     }
 
     /// 只有真实受理路径可以发出继承证明，公开驱动参数不能伪造此登记。
-    pub(crate) fn retain_authorized_run_permit(
+    /// 子代理/后台孵化链在驱动前预登记受限授权 run 的会话准入许可。
+    /// pub 以便集成测试按生产契约模拟同一条链（drive_run 拒绝未预登记
+    /// 的受限授权 run——F03 统一准入）。
+    pub fn retain_authorized_run_permit(
         self: &Arc<Self>,
         run_id: &str,
         session_id: &str,

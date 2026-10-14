@@ -1,0 +1,66 @@
+{
+  "status": "ACTUAL_DESK_SCAN_BOUND_NOT_STAGE_ACCEPTANCE",
+  "id": "R00-T02-LA-B383AB7B553C",
+  "original": {
+    "then": "返回扫描出的技能及策略",
+    "assertions": [
+      "成功时核对：返回扫描出的技能及策略",
+      "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+    ],
+    "groups": [
+      {
+        "index": 0,
+        "tests": [
+          {
+            "package": "lingxi-service",
+            "suite": "r06_t06_skill_context",
+            "test": "runtime_skill_catalog_respects_whitelist_filter_and_workspace_shadow"
+          }
+        ],
+        "meaning": "已有真实runtime目录过滤/工作区来源断言，保留局部来源证明",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t06_skill_context.rs",
+            "test": "runtime_skill_catalog_respects_whitelist_filter_and_workspace_shadow",
+            "sourceSHA256": "20943a67268a74900da5fc766fd82d1a452a639e8654d273c488f1ffd771bd5d",
+            "testStartLine": 413,
+            "testEndLine": 483,
+            "assertions": [
+              {
+                "line": 456,
+                "quote": "    assert_eq!(\n        names,\n        vec![\"alpha\", \"delta\", \"ws-only\"],\n        \"目录 = 用户池白名单（catalog 序 = 用户覆盖顺序的载体）+ 未遮蔽 workspace 活跃技能；disable-model-invocation 的 gamma 被过滤: {catalog:?}\""
+              },
+              {
+                "line": 462,
+                "quote": "    assert!(\n        alpha.location.ends_with(\"skills/alpha/SKILL.md\"),\n        \"location 指向用户池来源（同名 workspace 副本被遮蔽）: {alpha:?}\"\n    );"
+              },
+              {
+                "line": 467,
+                "quote": "    assert!(ws.location.contains(\".agents/skills/ws-only\"));\n\n    // 缺 config.yaml 的 agent = 现役 `|| []` 空白名单形状（不响亮、不虚构）：\n    // 用户池技能全部缺席，但 workspace 活跃技能按默认 policy 仍解析"
+              },
+              {
+                "line": 475,
+                "quote": "    assert_eq!(\n        bare_names,\n        vec![\"ws-only\"],\n        \"空白名单 agent：用户池缺席、workspace 按 policy 活跃: {bare:?}\""
+              }
+            ]
+          }
+        ],
+        "coverage": "PARTIAL",
+        "missingClauses": [
+          "原desk/skills GET返回workspace扫描与策略的入口当前未迁移；skills?runtime=1仅目录投影，不是desk策略接口。"
+        ]
+      }
+    ],
+    "gaps": [
+      "返回工作区扫描及策略的原desk入口未迁移。",
+      "原desk/skills GET返回workspace扫描与策略的入口当前未迁移；skills?runtime=1仅目录投影，不是desk策略接口。",
+      "该原desk/skills入口无实际拒绝/无效输入证据，不能以普通目录GET替代。"
+    ]
+  },
+  "logs": [
+    "workspace-skills-http-r2.log",
+    "workspace-skills-coupled-final-r2.log"
+  ],
+  "coupledTestsPassed": 22,
+  "stageAcceptance": false
+}

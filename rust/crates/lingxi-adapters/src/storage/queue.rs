@@ -49,6 +49,14 @@ pub struct StoreOptions {
     /// [`StorageError::QueueFull`] (the job was never queued, so nothing
     /// is dropped silently) which the HTTP surface maps to 503.
     pub queue_wait_timeout_ms: u64,
+    /// Grace budget for `wal_checkpoint(TRUNCATE)` busy retries (R06
+    /// 收口修复线): busy=1 means a concurrent reader pinned the WAL —
+    /// a transient condition the previous hard `Busy{timeout_ms:0}`
+    /// fail turned into a parallel-load flake. Within this budget the
+    /// checkpoint is retried with short sleeps; on expiry the failure is
+    /// still loud `Busy` carrying the budget actually waited. 0 restores
+    /// the strict single-shot behavior.
+    pub checkpoint_grace_ms: u64,
 }
 
 /// Largest [`StoreOptions::queue_capacity`] the bounded channel can
@@ -104,6 +112,7 @@ impl Default for StoreOptions {
             busy_timeout_ms: 5_000,
             checkpoint_pages: 1_000,
             queue_wait_timeout_ms: 10_000,
+            checkpoint_grace_ms: 2_000,
         }
     }
 }
@@ -190,6 +199,20 @@ impl StoreOptions {
                      monotonic-clock arithmetic inside tokio::time::timeout), \
                      got {}",
                     self.queue_wait_timeout_ms
+                ),
+            });
+        }
+        if self.checkpoint_grace_ms > MAX_QUEUE_WAIT_TIMEOUT_MS {
+            // Same monotonic-deadline rationale as queue_wait_timeout_ms:
+            // the grace loop adds `Instant::now() + Duration::from_millis(..)`
+            // and platform clocks overflow on absurd deadlines. 0 stays
+            // valid — it is the documented strict single-shot setting.
+            return Err(StorageError::InvalidRequest {
+                detail: format!(
+                    "checkpoint_grace_ms must be <= {MAX_QUEUE_WAIT_TIMEOUT_MS} \
+                     (30 days — larger deadlines risk overflowing platform \
+                     monotonic-clock arithmetic in the retry loop), got {}",
+                    self.checkpoint_grace_ms
                 ),
             });
         }
@@ -387,9 +410,12 @@ impl DbQueue {
     pub async fn close(&self) -> Result<(), StorageError> {
         // 1. Ask the worker to checkpoint; the job itself runs only after
         //    everything queued ahead of it has finished (FIFO channel).
+        //    Busy gets the configured grace: a concurrent reader pinning
+        //    the WAL is transient and must not fail the shutdown.
+        let grace_ms = self.options.checkpoint_grace_ms;
         let checkpoint = self
-            .submit(|conn| {
-                checkpoint_truncate(conn)?;
+            .submit(move |conn| {
+                checkpoint_truncate_with_grace(conn, grace_ms)?;
                 Ok(())
             })
             .await;
@@ -705,6 +731,42 @@ pub fn checkpoint_truncate(conn: &rusqlite::Connection) -> Result<(), StorageErr
     Ok(())
 }
 
+/// Pause between checkpoint busy retries: short enough that a transient
+/// WAL reader pin clears within a couple of attempts, long enough not to
+/// spin the single db-worker thread.
+const CHECKPOINT_BUSY_RETRY_SLEEP: std::time::Duration = std::time::Duration::from_millis(25);
+
+/// `checkpoint_truncate` with a bounded busy grace: busy=1 is a concurrent
+/// reader pinning the WAL — transient under parallel load. Within
+/// `grace_ms` the checkpoint is retried; on expiry the failure is still
+/// the loud [`StorageError::Busy`] carrying the budget actually waited
+/// (never a silent skip). `grace_ms == 0` is the strict single-shot call.
+/// Non-busy failures (e.g. a read-only WAL from fault injection) pass
+/// through untouched on the FIRST attempt — the grace never masks them.
+pub fn checkpoint_truncate_with_grace(
+    conn: &rusqlite::Connection,
+    grace_ms: u64,
+) -> Result<(), StorageError> {
+    if grace_ms == 0 {
+        return checkpoint_truncate(conn);
+    }
+    let deadline = std::time::Instant::now() + std::time::Duration::from_millis(grace_ms);
+    loop {
+        match checkpoint_truncate(conn) {
+            Ok(()) => return Ok(()),
+            Err(StorageError::Busy { .. }) => {
+                if std::time::Instant::now() + CHECKPOINT_BUSY_RETRY_SLEEP > deadline {
+                    return Err(StorageError::Busy {
+                        timeout_ms: grace_ms,
+                    });
+                }
+                std::thread::sleep(CHECKPOINT_BUSY_RETRY_SLEEP);
+            }
+            Err(other) => return Err(other),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -965,6 +1027,7 @@ mod tests {
                     busy_timeout_ms: 1_000,
                     checkpoint_pages: 1_000,
                     queue_wait_timeout_ms: 150,
+                    checkpoint_grace_ms: 0,
                 },
             )
             .expect("open queue"),
@@ -1014,5 +1077,147 @@ mod tests {
         queued.wait().await.expect("queued job B ran");
         queue.close().await.expect("close");
         let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    /// Boots a WAL database with one committed frame and returns the
+    /// writer connection (checkpoint-busy tests need real WAL content).
+    fn wal_writer(path: &Path) -> rusqlite::Connection {
+        let conn = rusqlite::Connection::open(path).expect("open writer");
+        conn.pragma_update(None, "journal_mode", "WAL")
+            .expect("wal mode");
+        conn.execute("CREATE TABLE pin_probe (x INTEGER)", [])
+            .expect("create table");
+        conn.execute("INSERT INTO pin_probe VALUES (1)", [])
+            .expect("insert frame");
+        conn.pragma_update(None, "busy_timeout", 250_i64)
+            .expect("busy timeout");
+        conn
+    }
+
+    /// Opens a second connection and holds a read transaction that pins
+    /// the WAL (the exact busy=1 source the grace exists for). The pin
+    /// releases when the returned guard drops.
+    struct WalPin {
+        conn: rusqlite::Connection,
+    }
+    impl Drop for WalPin {
+        fn drop(&mut self) {
+            let _ = self.conn.execute_batch("COMMIT");
+        }
+    }
+    fn pin_wal(path: &Path) -> WalPin {
+        let conn = rusqlite::Connection::open(path).expect("open pin connection");
+        conn.pragma_update(None, "busy_timeout", 250_i64)
+            .expect("busy timeout");
+        conn.execute_batch("BEGIN DEFERRED")
+            .expect("begin read txn");
+        let _ = conn
+            .query_row("SELECT COUNT(*) FROM pin_probe", [], |row| {
+                row.get::<_, i64>(0)
+            })
+            .expect("read acquires the WAL snapshot");
+        WalPin { conn }
+    }
+
+    /// R06 收口修复线：checkpoint busy 来自并发读者对 WAL 的瞬时钉住。
+    /// 宽限预算内读者释放后 checkpoint 必须成功，不得把瞬时 pin 当持久故障。
+    #[test]
+    fn checkpoint_grace_recovers_after_transient_reader_pin() {
+        let path = temp_db_path("ckpt-grace-recover");
+        let writer = wal_writer(&path);
+
+        let pin_path = path.clone();
+        let (pinned_tx, pinned_rx) = std::sync::mpsc::channel::<()>();
+        let pinner = std::thread::spawn(move || {
+            let pin = pin_wal(&pin_path);
+            let _ = pinned_tx.send(());
+            std::thread::sleep(std::time::Duration::from_millis(60));
+            drop(pin);
+        });
+        pinned_rx
+            .recv()
+            .expect("pin thread signals the held snapshot");
+
+        checkpoint_truncate_with_grace(&writer, 5_000).expect("grace outlives the transient pin");
+
+        pinner.join().expect("pin thread");
+        let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    /// 预算用尽仍是响亮失败：Busy 携带实际等待预算，绝不静默跳过 checkpoint。
+    #[test]
+    fn checkpoint_grace_expires_loud_with_the_actual_budget() {
+        let path = temp_db_path("ckpt-grace-expire");
+        let writer = wal_writer(&path);
+        let pin = pin_wal(&path);
+
+        let started = std::time::Instant::now();
+        let err = checkpoint_truncate_with_grace(&writer, 120)
+            .expect_err("persistent pin must exhaust the budget");
+        let elapsed = started.elapsed();
+
+        assert!(
+            matches!(err, StorageError::Busy { timeout_ms: 120 }),
+            "budget-expiry must stay a loud Busy with the waited budget, got {err:?}"
+        );
+        assert!(
+            elapsed >= std::time::Duration::from_millis(120),
+            "the budget must actually be awaited (elapsed {elapsed:?})"
+        );
+        assert!(
+            elapsed < std::time::Duration::from_secs(5),
+            "the budget must bound the wait (elapsed {elapsed:?})"
+        );
+
+        drop(pin);
+        checkpoint_truncate(&writer).expect("pin released");
+        let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    /// grace=0 保持严格单发语义（显式配置回旧行为，非静默默认）。
+    #[test]
+    fn checkpoint_grace_zero_keeps_the_strict_single_shot() {
+        let path = temp_db_path("ckpt-grace-zero");
+        let writer = wal_writer(&path);
+        let pin = pin_wal(&path);
+
+        let started = std::time::Instant::now();
+        let err = checkpoint_truncate_with_grace(&writer, 0).expect_err("strict mode fails fast");
+        assert!(
+            matches!(err, StorageError::Busy { timeout_ms: 0 }),
+            "grace=0 is the strict single-shot failure, got {err:?}"
+        );
+        assert!(
+            // SQLite itself may block up to the connection busy_timeout
+            // (250ms here) before reporting busy — "single shot" means no
+            // grace-loop retries, not zero SQLite-internal waiting.
+            started.elapsed() < std::time::Duration::from_secs(1),
+            "no grace retries on top of SQLite's own busy wait (elapsed {:?})",
+            started.elapsed()
+        );
+
+        drop(pin);
+        checkpoint_truncate(&writer).expect("pin released");
+        let _ = std::fs::remove_dir_all(path.parent().unwrap());
+    }
+
+    /// 超出单调时钟安全上限的宽限预算在 validate 即被拒绝。
+    #[test]
+    fn checkpoint_grace_above_the_clock_bound_is_rejected_loudly() {
+        let options = StoreOptions {
+            checkpoint_grace_ms: MAX_QUEUE_WAIT_TIMEOUT_MS + 1,
+            ..StoreOptions::default()
+        };
+        let err = options.validate().expect_err("above the clock bound");
+        assert!(
+            matches!(err, StorageError::InvalidRequest { .. }),
+            "unexpected error: {err:?}"
+        );
+        StoreOptions {
+            checkpoint_grace_ms: 0,
+            ..StoreOptions::default()
+        }
+        .validate()
+        .expect("0 = documented strict setting is valid");
     }
 }

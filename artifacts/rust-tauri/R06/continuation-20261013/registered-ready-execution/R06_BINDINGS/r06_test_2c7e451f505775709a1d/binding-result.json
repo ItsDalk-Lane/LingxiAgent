@@ -1,0 +1,142 @@
+{
+  "schema": "lingxi.r06.executed-binding.v1",
+  "key": "r06_test_2c7e451f505775709a1d",
+  "sourceCandidateSha256": "d1743e735d69664a6a3b0f50f36eccc9eaa973aab3b3b7a8b355d7d2cf0349da",
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_original_session_proofs",
+    "test": "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_session_proofs",
+      "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "command": {
+    "binding": {
+      "package": "lingxi-service",
+      "suite": "r06_original_session_proofs",
+      "test": "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_original_session_proofs",
+        "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_session_proofs",
+      "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "sourceBeforeSha256": "d1743e735d69664a6a3b0f50f36eccc9eaa973aab3b3b7a8b355d7d2cf0349da",
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/stdout.log",
+    "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/stderr.log",
+    "timeoutSecs": 900,
+    "syntheticEnvironment": {
+      "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/runtime/home",
+      "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/runtime/tmp",
+      "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+      "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/w01_evidence",
+      "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/w09_evidence",
+      "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/w10_evidence",
+      "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/w11_evidence",
+      "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/lingxi_w03_evidence",
+      "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/lingxi_f05_evidence",
+      "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/lingxi_f08_evidence",
+      "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/t08",
+      "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-execution/R06_BINDINGS/r06_test_2c7e451f505775709a1d/command-001/raw/t08-evaluations.jsonl"
+    },
+    "actualArgv": [
+      "/Users/study_superior/.cargo/bin/rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_session_proofs",
+      "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "pid": 84605,
+    "elapsedSecs": 6.203,
+    "outputCheck": {
+      "valid": true,
+      "expectedTest": "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "original_cleanup_expired_archive_removes_bytes_title_and_lifecycle_with_honest_failures"
+      ],
+      "reason": ""
+    },
+    "stdoutSha256": "fe39c0f22350f7323c131c4bf000cd6fed7e1ecb21ced5b4981f41b33878df4c",
+    "stderrSha256": "3bb9db8070fdb7eb412044b13f029bd06da9d107239fbc5295246d09d715417a",
+    "sourceAfterSha256": "d1743e735d69664a6a3b0f50f36eccc9eaa973aab3b3b7a8b355d7d2cf0349da",
+    "sourceStable": true,
+    "localPassed": true
+  },
+  "passed": true,
+  "stageVerdict": "NOT_A_STAGE_VERDICT"
+}

@@ -1,0 +1,21 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.00s
+     Running tests/r06_original_session_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_session_proofs-f3b952d25d0e0041)
+
+running 1 test
+
+thread 'original_session_memory_only_active_live_agents_persist_and_refuse_explicitly' (927104) panicked at crates/lingxi-service/tests/r06_original_session_proofs.rs:1547:9:
+assertion `left == right` failed: {"memoryEnabled":false,"ok":true}
+  left: 200
+ right: 403
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test original_session_memory_only_active_live_agents_persist_and_refuse_explicitly ... FAILED
+
+failures:
+
+failures:
+    original_session_memory_only_active_live_agents_persist_and_refuse_explicitly
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.13s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_session_proofs`

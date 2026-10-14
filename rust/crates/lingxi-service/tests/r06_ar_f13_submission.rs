@@ -350,22 +350,45 @@ async fn real_submission_freezes_selected_sources_and_rejects_old_or_foreign_sco
         "非法选择必须回滚，不能破坏上一份已授权范围"
     );
     // 同一会话后续未选资料不继承检索声明；显式空选择仍按原合同在发请求前拒绝。
-    for (input, knowledge) in [("F13_NONE", None), ("F13_EMPTY", Some(json!({"notebookIds":[],"sourceIds":[]})))] {
+    for (input, knowledge) in [
+        ("F13_NONE", None),
+        ("F13_EMPTY", Some(json!({"notebookIds":[],"sourceIds":[]}))),
+    ] {
         let mut body = json!({"input":input});
-        if let Some(selection) = knowledge { body["knowledge"] = selection; }
+        if let Some(selection) = knowledge {
+            body["knowledge"] = selection;
+        }
         let next = execute(&endpoint, &token, body).await;
-        let next_run = state.storage().load_run(&RunId::new(next["runId"].as_str().unwrap())).await.unwrap().unwrap();
+        let next_run = state
+            .storage()
+            .load_run(&RunId::new(next["runId"].as_str().unwrap()))
+            .await
+            .unwrap()
+            .unwrap();
         if input == "F13_EMPTY" {
             assert_eq!(next_run.status, RunStatus::Failed);
-            assert_eq!(captures.lock().unwrap().requests.len(), 7, "空选择拒绝必须零模型请求");
+            assert_eq!(
+                captures.lock().unwrap().requests.len(),
+                7,
+                "空选择拒绝必须零模型请求"
+            );
             continue;
         }
         assert_eq!(next_run.status, RunStatus::Completed);
         let capture = captures.lock().unwrap().requests.last().unwrap().clone();
         let declarations = capture["body"]["tools"].as_array().unwrap();
         assert_eq!(declarations.len(), 7);
-        assert!(!declarations.iter().any(|tool| tool["function"]["name"] == "knowledge_search"));
-        let system = capture["body"]["messages"].as_array().unwrap().iter().filter(|message| message["role"] == "system").map(|message| content_text(&message["content"])).collect::<Vec<_>>().join("\n");
+        assert!(!declarations
+            .iter()
+            .any(|tool| tool["function"]["name"] == "knowledge_search"));
+        let system = capture["body"]["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|message| message["role"] == "system")
+            .map(|message| content_text(&message["content"]))
+            .collect::<Vec<_>>()
+            .join("\n");
         assert!(!system.contains("本轮知识资料范围："));
     }
     shutdown_tx.send(()).unwrap();
@@ -388,30 +411,58 @@ async fn retry_provider(
     State(captures): State<Arc<Mutex<RetryCaptures>>>,
     Json(body): Json<Value>,
 ) -> axum::response::Response {
-    let input = body["messages"].as_array().unwrap().iter().rev()
+    let input = body["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .rev()
         .find(|message| message["role"] == "user")
-        .map(|message| content_text(&message["content"])).unwrap();
-    let mode = if input.contains("F13_RETRY") { "retry" } else { "control" };
+        .map(|message| content_text(&message["content"]))
+        .unwrap();
+    let mode = if input.contains("F13_RETRY") {
+        "retry"
+    } else {
+        "control"
+    };
     let selection = wire_selection(&body);
     let (step, old_scope, on_failure) = {
         let mut captures = captures.lock().unwrap();
         let step = *captures.steps.get(mode).unwrap_or(&0);
         captures.steps.insert(mode.into(), step + 1);
-        let old_scope = captures.requests.iter().find(|request| request["mode"] == mode)
-            .map(|request| request["selection"]["scopeId"].as_str().unwrap().to_string());
-        captures.requests.push(json!({"mode":mode,"selection":selection,"body":body}));
+        let old_scope = captures
+            .requests
+            .iter()
+            .find(|request| request["mode"] == mode)
+            .map(|request| {
+                request["selection"]["scopeId"]
+                    .as_str()
+                    .unwrap()
+                    .to_string()
+            });
+        captures
+            .requests
+            .push(json!({"mode":mode,"selection":selection,"body":body}));
         (step, old_scope, captures.on_failure.clone())
     };
     if mode == "retry" && step == 0 {
         on_failure.expect("合成失败时修改当前资料集合")();
-        return (axum::http::StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"error":{"message":"合成供应商暂时失败"}}))).into_response();
+        return (
+            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"error":{"message":"合成供应商暂时失败"}})),
+        )
+            .into_response();
     }
     let logical = step - usize::from(mode == "retry");
     let delta = match logical {
-        0 => json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("{mode}-describe"),"type":"function","function":{"name":"mcp_describe_tool","arguments":json!({"name":"knowledge_outline"}).to_string()}}]}),
+        0 => {
+            json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("{mode}-describe"),"type":"function","function":{"name":"mcp_describe_tool","arguments":json!({"name":"knowledge_outline"}).to_string()}}]})
+        }
         1 | 2 if logical == 1 || mode == "retry" => {
-            let scope = if logical == 2 { old_scope.unwrap() } else { selection["scopeId"].as_str().unwrap().to_string() };
+            let scope = if logical == 2 {
+                old_scope.unwrap()
+            } else {
+                selection["scopeId"].as_str().unwrap().to_string()
+            };
             json!({"role":"assistant","tool_calls":[{"index":0,"id":format!("{mode}-outline-{logical}"),"type":"function","function":{"name":"mcp_call","arguments":json!({"tool":"knowledge_outline","arguments":{"scopeId":scope}}).to_string()}}]})
         }
         _ => json!({"role":"assistant","content":"明确处理知识范围后完成"}),
@@ -422,53 +473,124 @@ async fn retry_provider(
         json!({"id":format!("{mode}-{step}"),"choices":[{"index":0,"delta":{},"finish_reason":if tool_call { "tool_calls" } else { "stop" }}]}),
         json!({"choices":[],"usage":{"prompt_tokens":20,"completion_tokens":4}}),
     ];
-    let stream = frames.iter().map(|frame| format!("data: {frame}\n\n")).collect::<String>() + "data: [DONE]\n\n";
+    let stream = frames
+        .iter()
+        .map(|frame| format!("data: {frame}\n\n"))
+        .collect::<String>()
+        + "data: [DONE]\n\n";
     ([(header::CONTENT_TYPE, "text/event-stream")], stream).into_response()
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn real_http_500_retry_advances_only_attempt_and_preserves_frozen_sources() {
-    let home = PathBuf::from(std::env::var_os("LINGXI_HOME").expect("仅使用专项合成HOME"))
-        .join(format!("f13-retry-{}-{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    let home =
+        PathBuf::from(std::env::var_os("LINGXI_HOME").expect("仅使用专项合成HOME")).join(format!(
+            "f13-retry-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
     std::fs::create_dir_all(&home).unwrap();
     let captures = Arc::new(Mutex::new(RetryCaptures::default()));
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let provider_endpoint = format!("http://{}", listener.local_addr().unwrap());
-    let upstream = tokio::spawn(axum::serve(listener,
-        axum::Router::new().route("/chat/completions", post(retry_provider)).with_state(captures.clone())).into_future());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route("/chat/completions", post(retry_provider))
+                .with_state(captures.clone()),
+        )
+        .into_future(),
+    );
     let state = boot(&home, &provider_endpoint).await;
-    let (notebook, source_id) = source(&state, "冻结资料", "# 原内容\n\nF13已授权且必须冻结的来源。");
+    let (notebook, source_id) = source(
+        &state,
+        "冻结资料",
+        "# 原内容\n\nF13已授权且必须冻结的来源。",
+    );
     let knowledge = state.knowledge().clone();
-    let (mutation_home, mutation_notebook, mutation_source) = (home.clone(), notebook.clone(), source_id.clone());
+    let (mutation_home, mutation_notebook, mutation_source) =
+        (home.clone(), notebook.clone(), source_id.clone());
     captures.lock().unwrap().on_failure = Some(Arc::new(move || {
         // 失败期间模拟用户资料更新；重试不得重选新来源或丢掉原冻结来源。
         let facts = KnowledgeFactStore::open(&mutation_home.join("knowledge")).unwrap();
-        facts.remove_source_from_notebook(&mutation_notebook, &mutation_source).unwrap();
-        knowledge.import_pasted_text(&mutation_notebook, "# 新内容\n\n本轮未授权的新来源。", Some("新来源")).unwrap();
+        facts
+            .remove_source_from_notebook(&mutation_notebook, &mutation_source)
+            .unwrap();
+        knowledge
+            .import_pasted_text(
+                &mutation_notebook,
+                "# 新内容\n\n本轮未授权的新来源。",
+                Some("新来源"),
+            )
+            .unwrap();
     }));
     let token = state.auth().local_token();
     let serving_state = state.clone();
     let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel();
-    let service = tokio::spawn(async move { run(serving_state,
-        async { let _ = shutdown_rx.await; }, |addr| { let _ = ready_tx.send(addr); }, None).await });
+    let service = tokio::spawn(async move {
+        run(
+            serving_state,
+            async {
+                let _ = shutdown_rx.await;
+            },
+            |addr| {
+                let _ = ready_tx.send(addr);
+            },
+            None,
+        )
+        .await
+    });
     let endpoint = format!("http://{}", ready_rx.await.unwrap());
     let submission = |input| json!({"input":input,"knowledge":{"notebookIds":[notebook],"sourceIds":[source_id]}});
     let control = execute(&endpoint, &token, submission("F13_CONTROL")).await;
-    let control_journal = state.storage().load_invocation_journal(&RunId::new(control["runId"].as_str().unwrap())).await.unwrap();
-    assert_eq!(control_journal.iter().find(|entry| entry.target.ends_with("knowledge_outline")).unwrap().receipt.as_ref().unwrap().outcome, ReceiptOutcome::Succeeded);
+    let control_journal = state
+        .storage()
+        .load_invocation_journal(&RunId::new(control["runId"].as_str().unwrap()))
+        .await
+        .unwrap();
+    assert_eq!(
+        control_journal
+            .iter()
+            .find(|entry| entry.target.ends_with("knowledge_outline"))
+            .unwrap()
+            .receipt
+            .as_ref()
+            .unwrap()
+            .outcome,
+        ReceiptOutcome::Succeeded
+    );
     let retried = execute(&endpoint, &token, submission("F13_RETRY")).await;
     let run_id = retried["runId"].as_str().unwrap();
-    assert_eq!(state.storage().load_run(&RunId::new(run_id)).await.unwrap().unwrap().status, RunStatus::Completed);
+    assert_eq!(
+        state
+            .storage()
+            .load_run(&RunId::new(run_id))
+            .await
+            .unwrap()
+            .unwrap()
+            .status,
+        RunStatus::Completed
+    );
     let requests = captures.lock().unwrap().requests.clone();
-    let retry_requests = requests.iter().filter(|request| request["mode"] == "retry").collect::<Vec<_>>();
+    let retry_requests = requests
+        .iter()
+        .filter(|request| request["mode"] == "retry")
+        .collect::<Vec<_>>();
     assert_eq!(retry_requests.len(), 5);
     let old_id = retry_requests[0]["selection"]["scopeId"].as_str().unwrap();
     let current_id = retry_requests[1]["selection"]["scopeId"].as_str().unwrap();
     assert_ne!(old_id, current_id, "旧attempt句柄不能成为新attempt授权");
     for request in &retry_requests[1..] {
         assert_eq!(request["selection"], retry_requests[1]["selection"]);
-        assert_eq!(request["selection"]["sources"], retry_requests[0]["selection"]["sources"]);
+        assert_eq!(
+            request["selection"]["sources"],
+            retry_requests[0]["selection"]["sources"]
+        );
     }
     let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
     let old = facts.get_turn_scope(old_id).unwrap().unwrap();
@@ -477,25 +599,56 @@ async fn real_http_500_retry_advances_only_attempt_and_preserves_frozen_sources(
     assert_eq!(current.status, "active");
     assert_eq!(current.notebook_ids, old.notebook_ids);
     assert_eq!(current.sources[0].source_id, source_id);
-    assert_eq!(current.sources[0].content_snapshot_id, old.sources[0].content_snapshot_id);
-    assert_eq!(current.sources[0].parse_artifact_id, old.sources[0].parse_artifact_id);
+    assert_eq!(
+        current.sources[0].content_snapshot_id,
+        old.sources[0].content_snapshot_id
+    );
+    assert_eq!(
+        current.sources[0].parse_artifact_id,
+        old.sources[0].parse_artifact_id
+    );
     let previous = old.run_binding.as_ref().unwrap();
     let binding = current.run_binding.as_ref().unwrap();
     let mut expected = previous.clone();
     expected.attempt = format!("{run_id}#a2");
     assert_eq!(binding, &expected);
-    let journal = state.storage().load_invocation_journal(&RunId::new(run_id)).await.unwrap();
-    let outlines = journal.iter().filter(|entry| entry.target.ends_with("knowledge_outline")).collect::<Vec<_>>();
+    let journal = state
+        .storage()
+        .load_invocation_journal(&RunId::new(run_id))
+        .await
+        .unwrap();
+    let outlines = journal
+        .iter()
+        .filter(|entry| entry.target.ends_with("knowledge_outline"))
+        .collect::<Vec<_>>();
     assert_eq!(outlines.len(), 2);
-    assert_eq!(outlines[0].receipt.as_ref().unwrap().outcome, ReceiptOutcome::Succeeded);
-    assert_eq!(outlines[1].receipt.as_ref().unwrap().outcome, ReceiptOutcome::Failed);
-    assert!(outlines.iter().all(|entry| entry.attempt == binding.attempt));
-    assert!(retry_requests[4]["body"].to_string().contains("KNOWLEDGE_SCOPE_VIOLATION"));
+    assert_eq!(
+        outlines[0].receipt.as_ref().unwrap().outcome,
+        ReceiptOutcome::Succeeded
+    );
+    assert_eq!(
+        outlines[1].receipt.as_ref().unwrap().outcome,
+        ReceiptOutcome::Failed
+    );
+    assert!(outlines
+        .iter()
+        .all(|entry| entry.attempt == binding.attempt));
+    assert!(retry_requests[4]["body"]
+        .to_string()
+        .contains("KNOWLEDGE_SCOPE_VIOLATION"));
     // 被跳过的attempt与身份变化不能使用重试接口；每次拒绝均不破坏当前范围。
     let mut valid_next = binding.clone();
     valid_next.attempt = format!("{run_id}#a3");
     let mut denied = Vec::new();
-    for field in ["principal_kind", "principal_subject", "agent_id", "session_id", "run_id", "generation", "attempt"] {
+    for field in [
+        "principal_kind",
+        "principal_subject",
+        "agent_id",
+        "session_id",
+        "run_id",
+        "generation",
+        "attempt",
+    ] {
         let mut next = valid_next.clone();
         match field {
             "principal_kind" => next.principal_kind = "web_session".into(),
@@ -506,19 +659,28 @@ async fn real_http_500_retry_advances_only_attempt_and_preserves_frozen_sources(
             "generation" => next.generation += 1,
             _ => next.attempt = format!("{run_id}#a4"),
         }
-        assert!(facts.advance_run_scope_attempt(&current.studio_id, current_id, binding, &next).is_err(), "{field}");
+        assert!(
+            facts
+                .advance_run_scope_attempt(&current.studio_id, current_id, binding, &next)
+                .is_err(),
+            "{field}"
+        );
         denied.push(field);
     }
-    assert!(facts.advance_run_scope_attempt(&old.studio_id, old_id, previous, binding).is_err());
+    assert!(facts
+        .advance_run_scope_attempt(&old.studio_id, old_id, previous, binding)
+        .is_err());
     assert_eq!(facts.get_turn_scope(current_id).unwrap().unwrap(), current);
     if let Ok(out) = std::env::var("LINGXI_F13_EVIDENCE") {
-        let out = PathBuf::from(out); std::fs::create_dir_all(&out).unwrap();
+        let out = PathBuf::from(out);
+        std::fs::create_dir_all(&out).unwrap();
         std::fs::write(out.join("retry-scope.json"), serde_json::to_vec_pretty(&json!({"control":control,"retried":retried,"wire":requests,"oldScope":state.knowledge().get_turn_scope(old_id).unwrap(),"currentScope":state.knowledge().get_turn_scope(current_id).unwrap(),"deniedBindingChanges":denied})).unwrap()).unwrap();
     }
     shutdown_tx.send(()).unwrap();
     service.await.unwrap().unwrap();
     state.storage().close().await.unwrap();
     drop(facts);
-    upstream.abort(); let _ = upstream.await;
+    upstream.abort();
+    let _ = upstream.await;
     std::fs::remove_dir_all(home).unwrap();
 }

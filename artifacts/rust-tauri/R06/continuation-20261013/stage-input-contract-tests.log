@@ -1,0 +1,293 @@
+EEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_build_preserves_required_cases_and_shares_one_execution_binding (__main__.R06StageInputsContract.test_build_preserves_required_cases_and_shares_one_execution_binding)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_deleting_original_required_case_is_rejected_and_restoration_passes (__main__.R06StageInputsContract.test_deleting_original_required_case_is_rejected_and_restoration_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_deleting_required_scenario_is_rejected_and_restoration_passes (__main__.R06StageInputsContract.test_deleting_required_scenario_is_rejected_and_restoration_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_desktop_bindings_cannot_be_applied_to_unrelated_original_requirements (__main__.R06StageInputsContract.test_desktop_bindings_cannot_be_applied_to_unrelated_original_requirements)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_desktop_framework_requires_one_real_passed_target_and_file (__main__.R06StageInputsContract.test_desktop_framework_requires_one_real_passed_target_and_file)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_existing_evidence_is_rejected_and_fresh_evidence_passes (__main__.R06StageInputsContract.test_existing_evidence_is_rejected_and_fresh_evidence_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_missing_original_assertion_cannot_release_a_complete_requirement (__main__.R06StageInputsContract.test_missing_original_assertion_cannot_release_a_complete_requirement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_old_candidate_is_rejected_before_execution_and_restoration_passes (__main__.R06StageInputsContract.test_old_candidate_is_rejected_before_execution_and_restoration_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_original_proof_inventory_cannot_drop_or_rewrite_original_requirements (__main__.R06StageInputsContract.test_original_proof_inventory_cannot_drop_or_rewrite_original_requirements)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_partial_proof_cannot_release_a_complete_original_requirement (__main__.R06StageInputsContract.test_partial_proof_cannot_release_a_complete_original_requirement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_postponed_leaf_due_mirror_is_rejected_and_original_due_is_preserved (__main__.R06StageInputsContract.test_postponed_leaf_due_mirror_is_rejected_and_original_due_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_real_registry_missing_migration_fails_and_restoration_passes (__main__.R06StageInputsContract.test_real_registry_missing_migration_fails_and_restoration_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_scoped_proof_cannot_accept_missing_execution_or_release_other_leaves (__main__.R06StageInputsContract.test_scoped_proof_cannot_accept_missing_execution_or_release_other_leaves)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_scoped_proof_rejects_unknown_duplicate_and_empty_original_ids (__main__.R06StageInputsContract.test_scoped_proof_rejects_unknown_duplicate_and_empty_original_ids)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_snapshot_tracks_deleted_and_untracked_source_and_restoration (__main__.R06StageInputsContract.test_snapshot_tracks_deleted_and_untracked_source_and_restoration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_tampered_binding_log_is_rejected_and_restored_evidence_is_consumed (__main__.R06StageInputsContract.test_tampered_binding_log_is_rejected_and_restored_evidence_is_consumed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_wrong_test_binding_is_rejected_and_restoration_passes (__main__.R06StageInputsContract.test_wrong_test_binding_is_rejected_and_restoration_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+======================================================================
+ERROR: test_zero_match_wrong_name_and_ignored_output_cannot_pass (__main__.R06StageInputsContract.test_zero_match_wrong_name_and_ignored_output_cannot_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in setUp
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  for group in row.get("groups", []) for test in group["tests"]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  if test.get("kind") != "rust_library_test")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/tests/test_r06_stage_inputs_contract.py", line 46, in <genexpr>
+    suites.update((test["package"], test["suite"]) for row in inventory["items"]
+                                    ~~~~^^^^^^^^^
+KeyError: 'suite'
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.287s
+
+FAILED (errors=18)

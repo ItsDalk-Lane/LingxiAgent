@@ -1,0 +1,123 @@
+{
+  "schema": "lingxi.r06.continuation-local-receipt.v1",
+  "status": "BUNDLE_DELTAS_AND_REGISTERED_READY_ORIGINALS_VERIFIED_R06_NOT_ACCEPTED",
+  "supersedesLocalSummary": "CONTINUATION_RECEIPT_REGISTERED_READY_LOCAL.json",
+  "gitHead": "6f5c4b01d6805ac95fa03a35c2035ccb35f7b8f8",
+  "branch": "codex/rust-tauri-migration",
+  "worktreeChangesUncommitted": true,
+  "currentScopedExecution": {
+    "directory": "registered-ready-bundle-execution",
+    "sourceCandidateSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+    "sourceStable": true,
+    "registeredBindingsExecuted": 124,
+    "registeredBindingsPassed": 124,
+    "selectedOriginalRequirements": 105,
+    "selectedAssertions": 239,
+    "selectedAssertionsPassed": 239,
+    "executionErrors": {},
+    "rollup": "registered-ready-bundle-execution/R06_LEAVES/leaf-cases.json",
+    "rawReceiptReadback": "registered-ready-bundle-readback/leaf-cases.json",
+    "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+    "excludedOriginalRequirements": 174,
+    "additionalExcludedRequiredSupplementalLeaf": "R00-T02-LA-960668141E07",
+    "excludedRegisteredGraphLeaves": 175,
+    "stageVerdict": "NOT_A_STAGE_VERDICT"
+  },
+  "originalRequirementRegistration": {
+    "total": 279,
+    "ready": 105,
+    "gap": 174,
+    "registrationIsNotStageAcceptance": true
+  },
+  "newlyCompletedOriginalLeaves": [
+    "R00-T02-LA-52055FF0CAC2",
+    "R00-T02-LA-A7B51C282C77"
+  ],
+  "newProductRepairs": [
+    "Bundle enabled=false now actually removes visible members; true applies an additive delta rather than replacing the complete selection.",
+    "Both directions preserve unrelated enabled skills, workspace-disabled opt-outs, the other agent and the bundle definition.",
+    "The real response includes accurate bundle-order deduplicated changed and actual enabled selection.",
+    "Invisible members are filtered; an empty visible-member delta does not rewrite configuration.",
+    "Bundle toggle uses checked backing-store reads and explicitly reports corrupt or unreadable storage.",
+    "Bundle, single-skill, whitelist and existing manual-install mutation paths share the existing writer mutex; simultaneous barrier tests preserve updates."
+  ],
+  "supportingLocalRuns": [
+    {
+      "log": "bundle-toggle-coupled-final.log",
+      "originalSkillBundleTestsPassed": 10,
+      "skillContextTestsPassed": 4,
+      "skillsTestsPassed": 6,
+      "failed": 0,
+      "actualPermissionFailurePlatform": "macOS"
+    },
+    {
+      "log": "bundle-delta-clippy.log",
+      "status": "PASS",
+      "scope": "service library and original bundle integration test"
+    },
+    {
+      "log": "stage-input-contract-tests-bundle.log",
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "log": "runner-identity-bundle.log",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "log": "workspace-check-bundle.log",
+      "status": "PASS"
+    },
+    {
+      "log": "check-contracts-bundle.log",
+      "status": "PASS"
+    },
+    {
+      "log": "check-boundaries-bundle.log",
+      "status": "PASS",
+      "negativeControlsPassed": 20
+    },
+    {
+      "directory": "stage-input-bundle-final-check",
+      "status": "INPUTS_MATCH_NOT_STAGE_VERDICT"
+    }
+  ],
+  "supportingRunsAreNotClaimedToShareFinalScopedExecutionWindow": true,
+  "preservedFailures": [
+    {
+      "log": "bundle-toggle-red.log",
+      "failed": 2,
+      "reason": "Actual missing changed and corrupt bundle store misleading404 reproductions."
+    },
+    {
+      "log": "bundle-toggle-green-r1.log",
+      "failed": 2,
+      "reason": "Fixture treated runtime rows as active regardless of enabled and expected directory config to be a readable agent. Corrected to actual runtime enabled flags and existing agent-not-found behavior, then added a real unwritable-parent persistence failure."
+    }
+  ],
+  "unresolved": {
+    "originalRequirementsWithGaps": 174,
+    "openArFindings": 14,
+    "extraObligationsNotFormallyClosed": 12,
+    "skillsUiAndAppBroadcast": "NOT_PROVED_OR_IMPLEMENTED_BY_BACKEND_BUNDLE_DELTA",
+    "writeOsSandboxUnavailableRefusal": "UNIMPLEMENTED_NOT_WAIVED",
+    "globalRustFormatting": {
+      "log": "workspace-format-bundle.log",
+      "exitCode": 1,
+      "remainingFormattingHunks": 172
+    },
+    "requiredIndependentReviews": "BLOCKED_BY_RECORDED_PLATFORM_INTERRUPTION",
+    "realGuiObservations": "BLOCKED_BY_ASSISTIVE_ACCESS_DENIAL_HOST_NOT_CONCLUSIVELY_IDENTIFIED",
+    "originalExecutionPrompt": "MISSING_2026_10_08_PROMPT_USER_UNAVAILABLE",
+    "fullR05Closure": "NOT_COMPLETED",
+    "fullR06Acceptance": "NOT_COMPLETED"
+  },
+  "r06Accepted": false,
+  "r07Ready": false,
+  "userRequestedEndpointAchieved": false,
+  "taskMarkedComplete": false,
+  "committed": false,
+  "pushed": false,
+  "auditSealAdvanced": false
+}

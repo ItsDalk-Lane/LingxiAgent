@@ -1,0 +1,15 @@
+
+running 1 test
+test limits_body_size_and_rate_and_ws_ceiling ... ok
+
+successes:
+
+---- limits_body_size_and_rate_and_ws_ceiling stdout ----
+LINGXI_TRANSPORT_REJECTED request_id="req-a0141b4a2e9b6fd305a1bb7b9bfdb400" method=GET path=/lingxi/v1/health status=429 reason=rate_limited origin=absent host=127.0.0.1:61287 remote=127.0.0.1:61293
+
+
+successes:
+    limits_body_size_and_rate_and_ws_ceiling
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 23 filtered out; finished in 0.08s
+

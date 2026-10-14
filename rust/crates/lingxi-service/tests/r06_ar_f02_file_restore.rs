@@ -537,7 +537,10 @@ async fn rewind_recovery_records_survive_request_replay_and_service_restart() {
     assert_eq!(replay, first, "同请求重放必须保留完整首次收据");
     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-rewind");
     assert_eq!(std::fs::read(&retained).unwrap(), b"B");
-    assert_eq!(std::fs::read_dir(&journal).unwrap().count(), journal_before.len());
+    assert_eq!(
+        std::fs::read_dir(&journal).unwrap().count(),
+        journal_before.len()
+    );
     for (path, bytes) in &journal_before {
         assert_eq!(&std::fs::read(path).unwrap(), bytes);
     }
@@ -563,7 +566,10 @@ async fn rewind_recovery_records_survive_request_replay_and_service_restart() {
     assert_eq!(after_restart, first, "重启重放必须保留完整首次收据");
     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-rewind");
     assert_eq!(std::fs::read(&retained).unwrap(), b"B");
-    assert_eq!(std::fs::read_dir(&journal).unwrap().count(), journal_before.len());
+    assert_eq!(
+        std::fs::read_dir(&journal).unwrap().count(),
+        journal_before.len()
+    );
     for (path, bytes) in &journal_before {
         assert_eq!(&std::fs::read(path).unwrap(), bytes);
     }
@@ -762,11 +768,37 @@ async fn ar_f02_c03_second_competitor_preserves_both_external_objects() {
             }
             Ok(())
         })));
-    let receipt = rewind(&server).await;
+    let request = r#"{"checkpoint":"A","restoreFiles":true,"requestId":"ambiguous-rewind"}"#;
+    let (status, body) = server.post("/lingxi/v1/sessions/s/rewind", request).await;
+    assert_eq!(status, 200, "{body}");
+    let receipt: serde_json::Value = serde_json::from_str(&body).unwrap();
     assert_eq!(receipt["fileRestoreReason"], "write_may_have_occurred");
     assert_eq!(std::fs::read(&file).unwrap(), b"C");
     let record = &receipt["recoveryRecords"][0];
     assert_eq!(record["status"], "unknown_original_retained");
+    assert_eq!(
+        std::fs::read(record["retainedPath"].as_str().unwrap()).unwrap(),
+        b"D"
+    );
+    let durable = server.state.storage().query_one_text(
+        "SELECT receipt_json FROM session_operations WHERE session_id='s' AND operation_kind='rewind' AND state='completed'",
+        vec![],
+    ).await.unwrap().unwrap();
+    let durable: serde_json::Value = serde_json::from_str(&durable).unwrap();
+    assert_eq!(durable["fileRestoreReason"], "write_may_have_occurred");
+    assert_eq!(durable["recoveryRecords"], receipt["recoveryRecords"]);
+    let modified = std::fs::metadata(&file).unwrap().modified().unwrap();
+    let (status, body) = server.post("/lingxi/v1/sessions/s/rewind", request).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        serde_json::from_str::<serde_json::Value>(&body).unwrap(),
+        receipt
+    );
+    assert_eq!(std::fs::read(&file).unwrap(), b"C");
+    assert_eq!(
+        std::fs::metadata(&file).unwrap().modified().unwrap(),
+        modified
+    );
     assert_eq!(
         std::fs::read(record["retainedPath"].as_str().unwrap()).unwrap(),
         b"D"

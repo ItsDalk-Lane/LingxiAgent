@@ -18,20 +18,21 @@
 
 use std::path::{Path, PathBuf};
 
-use axum::Json;
 use axum::extract::{Path as AxumPath, RawQuery, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use serde_json::{Value, json};
+use axum::Json;
+use serde_json::{json, Value};
 
 use lingxi_adapters::storage::agent_memory as am;
 use lingxi_adapters::storage::agent_memory::{
-    AgentConfigFlags, AgentConfigPatch, CompiledMemoryStore, ContextNotesStore, DreamRevisionStore,
-    ExperienceStore, FactStore, MemoryError, TenetsStore, resolve_agent_roots, validate_agent_id,
+    resolve_agent_roots, validate_agent_id, AgentConfigFlags, AgentConfigPatch,
+    CompiledMemoryStore, ContextNotesStore, DreamRevisionStore, ExperienceStore, FactStore,
+    MemoryError, TenetsStore,
 };
 
-use crate::ServiceState;
 use crate::context_compiler::scan_preferences;
+use crate::ServiceState;
 
 pub struct MemoryService {
     home: PathBuf,
@@ -51,8 +52,64 @@ impl MemoryService {
         self.home.join("agents")
     }
 
+    pub fn is_agent_deleted_checked(&self, agent_id: &str) -> Result<bool, MemoryError> {
+        validate_agent_id(agent_id)?;
+        let marker = self
+            .agents_root()
+            .join(agent_id)
+            .join(".deleted-agent.json");
+        match std::fs::symlink_metadata(marker) {
+            Ok(_) => Ok(true),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
+            Err(error) => Err(error.into()),
+        }
+    }
+
     pub fn user_dir(&self) -> PathBuf {
         self.home.join("user")
+    }
+
+    fn rollback_preferences(&self) -> Result<Value, MemoryError> {
+        let path = self.user_dir().join("preferences.json");
+        let value = match std::fs::read(&path) {
+            Ok(bytes) => serde_json::from_slice::<Value>(&bytes)
+                .map_err(|err| MemoryError::Io(format!("invalid preferences.json: {err}")))?,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => json!({}),
+            Err(err) => {
+                return Err(MemoryError::Io(format!(
+                    "cannot read preferences.json: {err}"
+                )));
+            }
+        };
+        if !value.is_object() {
+            return Err(MemoryError::Io(
+                "preferences.json must contain an object".into(),
+            ));
+        }
+        if value
+            .get("rollback_file_changes")
+            .is_some_and(|enabled| !enabled.is_boolean())
+        {
+            return Err(MemoryError::Io(
+                "saved rollback_file_changes must be a boolean".into(),
+            ));
+        }
+        Ok(value)
+    }
+
+    pub fn rollback_file_changes(&self) -> Result<bool, MemoryError> {
+        Ok(self.rollback_preferences()?["rollback_file_changes"]
+            .as_bool()
+            .unwrap_or(false))
+    }
+
+    pub fn save_rollback_file_changes(&self, enabled: bool) -> Result<(), MemoryError> {
+        let mut preferences = self.rollback_preferences()?;
+        preferences["rollback_file_changes"] = json!(enabled);
+        let text = serde_json::to_string_pretty(&preferences)
+            .map_err(|err| MemoryError::Io(format!("cannot encode preferences.json: {err}")))?;
+        am::atomic_write(&self.user_dir().join("preferences.json"), &text)
+            .map_err(|err| MemoryError::Io(format!("cannot save preferences.json: {err}")))
     }
 
     /// Locale chain (persona-source.ts:124-130 + agent.ts resolveLocale):
@@ -127,6 +184,67 @@ impl MemoryService {
         am::patch_agent_config(&path, |text| AgentConfigPatch::write_flags(text, &patch))
     }
 
+    pub fn resolve_primary_agent_checked(&self) -> Result<Option<String>, MemoryError> {
+        let path = self.user_dir().join("preferences.json");
+        let preferences: Value = match std::fs::read_to_string(path) {
+            Ok(text) => serde_json::from_str(&text)
+                .map_err(|error| MemoryError::Store(format!("invalid preferences: {error}")))?,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => serde_json::json!({}),
+            Err(error) => return Err(error.into()),
+        };
+        let object = preferences
+            .as_object()
+            .ok_or_else(|| MemoryError::Store("preferences must be an object".into()))?;
+        if let Some(value) = object.get("primary_agent_id") {
+            let id = value
+                .as_str()
+                .ok_or_else(|| MemoryError::Store("primary_agent_id must be a string".into()))?;
+            validate_agent_id(id)
+                .map_err(|_| MemoryError::Store("stored primary_agent_id is invalid".into()))?;
+            let config = self.agents_root().join(id).join("config.yaml");
+            match std::fs::metadata(config) {
+                Ok(metadata) if metadata.is_file() => return Ok(Some(id.to_string())),
+                Ok(_) => {
+                    return Err(MemoryError::Store(
+                        "stored primary agent configuration is not a file".into(),
+                    ));
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                    return Err(MemoryError::Store("stored primary agent is missing".into()));
+                }
+                Err(error) => return Err(error.into()),
+            }
+        }
+        let entries = match std::fs::read_dir(self.agents_root()) {
+            Ok(entries) => entries,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(error) => return Err(error.into()),
+        };
+        let mut candidates = Vec::new();
+        for entry in entries {
+            let entry = entry?;
+            if !entry.file_type()?.is_dir() {
+                continue;
+            }
+            let id = entry.file_name().to_string_lossy().into_owned();
+            if validate_agent_id(&id).is_err() {
+                continue;
+            }
+            match std::fs::metadata(entry.path().join("config.yaml")) {
+                Ok(metadata) if metadata.is_file() => candidates.push(id),
+                Ok(_) => {
+                    return Err(MemoryError::Store(
+                        "agent configuration is not a file".into(),
+                    ));
+                }
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                Err(error) => return Err(error.into()),
+            }
+        }
+        candidates.sort();
+        Ok(candidates.into_iter().next())
+    }
+
     /// Primary agent id for tool binding: preferences `primary_agent_id` →
     /// first id-sorted agent dir with a config.yaml (deterministic).
     pub fn resolve_primary_agent(&self) -> Option<String> {
@@ -156,7 +274,7 @@ impl MemoryService {
 }
 
 /// MemoryError → HTTP response with the incumbent error vocabulary.
-fn error_response(err: &MemoryError) -> Response {
+pub(crate) fn error_response(err: &MemoryError) -> Response {
     let (status, body): (StatusCode, Value) = match err {
         MemoryError::InvalidRequest(msg) => (StatusCode::BAD_REQUEST, json!({ "error": msg })),
         MemoryError::AgentNotFound(msg) | MemoryError::NotFound(msg) => {
@@ -981,7 +1099,14 @@ pub async fn tenets_delete_route(
         .tenets_store(&agent_id)
         .and_then(|store| store.remove(&tenet_id))
     {
-        Ok(true) => Json(json!({ "ok": true })).into_response(),
+        Ok(true) => {
+            // 现役 removeTenet 成功后广播 tenets-changed。
+            state.app_events().publish(
+                "tenets-changed",
+                json!({ "agentId": agent_id, "tenetId": tenet_id }),
+            );
+            Json(json!({ "ok": true })).into_response()
+        }
         Ok(false) => (
             StatusCode::NOT_FOUND,
             Json(json!({ "error": "tenet not found" })),
@@ -1076,6 +1201,60 @@ pub async fn experience_get_route(
     };
     let (merged, _files) = store.read_merged();
     Json(json!({ "content": merged })).into_response()
+}
+
+/// GET /lingxi/v1/agents/{id}/experience/search?q= — 匹配经验与来源路径，
+/// 不修改任何记忆文件；命中只来自当前 Agent 的经验目录。
+pub async fn experience_search_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+    axum::extract::Query(query): axum::extract::Query<std::collections::HashMap<String, String>>,
+) -> Response {
+    let service = state.memory();
+    let Some(needle) = query
+        .get("q")
+        .map(|q| q.trim().to_lowercase())
+        .filter(|q| !q.is_empty())
+    else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({ "error": "q is required" })),
+        )
+            .into_response();
+    };
+    let flags = match service.read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    if !experience_enabled(&flags) {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(json!({ "error": "experience is paused" })),
+        )
+            .into_response();
+    }
+    let store = match service.experience_store(&agent_id) {
+        Ok(store) => store,
+        Err(err) => return error_response(&err),
+    };
+    let dir = match service.roots(&agent_id) {
+        Ok(roots) => roots.agent_dir.join("experience"),
+        Err(err) => return error_response(&err),
+    };
+    let mut matches = Vec::new();
+    for doc in store.list_documents() {
+        for (index, line) in doc.body.lines().enumerate() {
+            if line.to_lowercase().contains(&needle) {
+                matches.push(json!({
+                    "path": dir.join(&doc.file).to_string_lossy(),
+                    "title": doc.title,
+                    "line": index + 1,
+                    "excerpt": line.trim().chars().take(120).collect::<String>(),
+                }));
+            }
+        }
+    }
+    Json(json!({ "ok": true, "count": matches.len(), "matches": matches })).into_response()
 }
 
 /// PUT /lingxi/v1/agents/{id}/experience — whole-document sync by `#` headings.
@@ -1274,36 +1453,116 @@ pub async fn agent_config_patch_route(
         flags.discover_compatible_project_skills = Some(v);
         known = true;
     }
+    // R06 splitByScope 全局 setter：全局字段经 setter 写 preferences.json，
+    // 纯全局 patch（agentPartial 为空）不触碰助手 config.yaml。
+    let mut global_applied: Vec<&str> = Vec::new();
+    let mut global_bad: Option<String> = None;
+    for (key, kind) in [
+        ("locale", "string"),
+        ("keep_awake", "bool"),
+        ("editor", "object"),
+        ("network_proxy", "object"),
+    ] {
+        let Some(value) = payload.get(key) else {
+            continue;
+        };
+        let valid = match kind {
+            "string" => value.is_string(),
+            "bool" => value.is_boolean(),
+            _ => value.is_object(),
+        };
+        if !valid {
+            global_bad = Some(format!("{key} has invalid type"));
+            break;
+        }
+        let mut root = match state.memory().read_preferences_root() {
+            Ok(root) => root,
+            Err(message) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({ "error": message })),
+                )
+                    .into_response();
+            }
+        };
+        root[key] = value.clone();
+        if let Err(message) = state.memory().write_preferences_root(&root) {
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": message })),
+            )
+                .into_response();
+        }
+        global_applied.push(key);
+    }
+    if let Some(detail) = global_bad {
+        return (StatusCode::BAD_REQUEST, Json(json!({ "error": detail }))).into_response();
+    }
     if !known {
-        return (
-            StatusCode::BAD_REQUEST,
-            Json(json!({ "error": "no T06-owned config key in patch (memory.enabled / experience.enabled / workspace_context.*)"})),
-        )
-            .into_response();
+        if global_applied.is_empty() {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({ "error": "no T06-owned config key in patch (memory.enabled / experience.enabled / workspace_context.*)" })),
+            )
+                .into_response();
+        }
+        // 纯全局 patch：agentPartial 为空，直接返回已应用的全局键。
+        return Json(json!({ "ok": true, "globalApplied": global_applied })).into_response();
     }
     match state.memory().patch_flags(&agent_id, flags) {
-        Ok(_text) => Json(json!({ "ok": true })).into_response(),
+        Ok(_text) => {
+            // 工作区技能策略变化 → 通知运行时重筛（agents.ts PUT config 的
+            // skills-changed 端口；T06 拆出的 flag 面保持同一通知语义）。
+            if payload
+                .get("workspace_context")
+                .and_then(Value::as_object)
+                .is_some_and(|map| {
+                    map.contains_key("discover_project_skills")
+                        || map.contains_key("discover_compatible_project_skills")
+                })
+            {
+                state
+                    .app_events()
+                    .publish("skills-changed", json!({ "agentId": agent_id }));
+            }
+            Json(json!({ "ok": true, "globalApplied": global_applied })).into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
 
 /// GET /lingxi/v1/agents/{id}/config-flags — read side of the T06-owned keys.
+/// 附带最小全局偏好读回面：splitByScope 全局键在 preferences.json 的当前值
+/// （原 GET /agents/:id/config 的 injectGlobalFields 跨助手注入的最小端口；
+/// 任一助手读到的都是同一份全局值，未写盘的键为 null）。
 pub async fn agent_config_flags_route(
     State(state): State<ServiceState>,
     AxumPath(agent_id): AxumPath<String>,
 ) -> Response {
-    match state.memory().read_flags(&agent_id) {
-        Ok(flags) => Json(json!({
-            "memoryEnabled": flags.memory_enabled.unwrap_or(true),
-            "experienceEnabled": flags.experience_enabled.unwrap_or(false),
-            "workspaceContext": {
-                "discoverProjectSkills": flags.discover_project_skills.unwrap_or(true),
-                "discoverCompatibleProjectSkills": flags.discover_compatible_project_skills.unwrap_or(false),
-            },
-        }))
-        .into_response(),
-        Err(err) => error_response(&err),
-    }
+    let flags = match state.memory().read_flags(&agent_id) {
+        Ok(flags) => flags,
+        Err(err) => return error_response(&err),
+    };
+    let preferences = state
+        .memory()
+        .read_preferences_root()
+        .unwrap_or_else(|_| json!({}));
+    let preference = |key: &str| preferences.get(key).cloned().unwrap_or(Value::Null);
+    Json(json!({
+        "memoryEnabled": flags.memory_enabled.unwrap_or(true),
+        "experienceEnabled": flags.experience_enabled.unwrap_or(false),
+        "workspaceContext": {
+            "discoverProjectSkills": flags.discover_project_skills.unwrap_or(true),
+            "discoverCompatibleProjectSkills": flags.discover_compatible_project_skills.unwrap_or(false),
+        },
+        "preferences": {
+            "locale": preference("locale"),
+            "keep_awake": preference("keep_awake"),
+            "editor": preference("editor"),
+            "network_proxy": preference("network_proxy"),
+        },
+    }))
+    .into_response()
 }
 
 // ── context notes (session-scoped; the tool's storage face) ─────────────────

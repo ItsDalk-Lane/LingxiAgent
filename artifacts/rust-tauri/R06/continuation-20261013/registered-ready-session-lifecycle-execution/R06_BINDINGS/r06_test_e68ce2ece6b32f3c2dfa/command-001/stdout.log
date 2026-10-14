@@ -1,0 +1,17 @@
+
+running 1 test
+test original_session_memory_only_active_live_agents_persist_and_refuse_explicitly ... ok
+
+successes:
+
+---- original_session_memory_only_active_live_agents_persist_and_refuse_explicitly stdout ----
+LINGXI_AUTH_REJECTED request_id="req-4412e9508b75727ea6ceedcaee5cdec3" method=GET [token] status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:49193
+LINGXI_AUTH_REJECTED request_id="req-fabc503eaac198713005a3a3a8c10e40" method=PATCH [token] status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:49195
+{"actualBoolSaveRead":true,"actualSaveReadFailures":500,"archivedRefused":403,"deletedAgentRefused":409,"failedWritesUnchanged":true,"foreign":403,"invalidAuth":401,"malformed":400,"missing":404,"originalLeaves":["R00-T02-LA-51905CECDD1B","R00-T02-LA-9616596B5720"],"restoredRead":true}
+
+
+successes:
+    original_session_memory_only_active_live_agents_persist_and_refuse_explicitly
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 3.92s
+

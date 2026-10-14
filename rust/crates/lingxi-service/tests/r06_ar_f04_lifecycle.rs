@@ -390,6 +390,12 @@ async fn start_server_at_scoped(
     workspace_root: Option<PathBuf>,
 ) -> TestServer {
     let layout = prepare_layout(&home).expect("prepare layout");
+    // macOS 宿主别名（/tmp → /private/tmp、/var → /private/var）：与 t03/
+    // f02/session_proofs 同一约定，home/workspace 按真实路径运行，登记的
+    // realPath 与 ResourceIO 解析结果保持同一物理身份。
+    let home = home.canonicalize().expect("real home");
+    let workspace_root =
+        workspace_root.map(|root| root.canonicalize().expect("real workspace root"));
     let config = ServiceConfig {
         bind_addr: "127.0.0.1:0".parse().expect("static loopback addr"),
         data_home: home.clone(),

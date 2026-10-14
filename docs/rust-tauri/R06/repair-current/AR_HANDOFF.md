@@ -2,6 +2,26 @@
 
 当前 R06_NOT_ACCEPTED。仅修复 R06，禁止进入 R07。
 
+2026-10-13 会话生命周期续作：正式 pin 对已删助手标记返回 409，仍允许 unpin；
+memory GET/PATCH 拒绝已删助手与归档会话，存储事务内校验 active，归属在状态披露前校验。
+真实 deleted-agent pin 200、归档 memory GET 200 和 pin-order 隐式创建置顶三个 RED 已保留，
+按实际根因修复；pin-order 仅更新已置顶行，未置顶项 400 并事务回滚。
+真实标记/目录 IO 失败与读写存储故障明确错误，失败前后数据不变；重启读回开关保持。
+三个原叶（pin、memory read、memory save）待本次完整绑定执行，新编辑使先前 114 收据成为
+历史候选。不得用该收据替当前代码验收，不宣称完整助手删除、UI、R06 或 R07。
+
+2026-10-13 工作区扫描续作：真实 `/lingxi/v1/desk/skills` 已接四原工作区技能根、
+每助手策略、源身份及对象形状的遮蔽赢家，不再用普通 runtime 技能目录代替。
+原扫描叶 `R00-T02-LA-B383AB7B553C` 的成功/拒绝要求由两项实际 HTTP 证明覆盖；
+相关技能/组合/上下文 22 项回归通过。目录必须在已批准根内且确为目录；
+无效查询、非 owner、文件/目录越界及真实不可读均显式失败，读取/拒绝无持久化写入。
+mount 明确不支持，不宣称安装、删除、UI、广播或 R06/R07 通过。
+登记将增至 114 READY / 165 GAP，登记不是执行裁决；先前 113 项收据只对应编辑前历史候选。
+当前候选完整执行与读回须看本次新证据，不能沿用旧坐标。
+初次完整执行窗口因发现 implicit primary 使用旧静默解析器而主动中止，保留为历史部分证据，
+不记通过。真实损坏 preferences 导致 HTTP 200 的反例已留存；新入口改用 checked primary，
+损坏/非法/缺失已存助手明确失败，显式 agentId 不读取无关偏好。须以修复后的新窗口为准。
+
 实际分支 codex/rust-tauri-migration，audited base2e1933d8…；现HEAD/远端bc2ce51fd005ea75b9949156974e15d2761eb734仅含F08独立接受的四源码/测试及必要证据。其它Task产品仍未提交，不强制回退。用户原有 .vscode/settings.json 只读保护，不暂存。工具链必须通过 /Users/study_superior/.cargo/bin/cargo 使用锁定 1.98.1；默认 PATH 的 Homebrew 工具链不适用。
 
 完整规格、原8Task/37Step/24交付/16A/281独立到期叶及687断言已归档；12额外根因簇待真实生产实验与范围裁决，不能拿登记当完成。ENTRY-01 登记迁移v8/v9基线门禁真实失败。原报告保留历史，当前放行以 AR_PROGRESS 和最终独立验收为准。
@@ -188,3 +208,498 @@ W09正式56启动后发现旧私有生成target未被标准Git忽略，正在监
 
 
 2026-10-12T03:49:52.620583+00:00：真实派发全新空历史W07 Executor02，39唯一角色；独占已准备基线副本/own Node，25原W01完整字节仅只读依赖线索，不继承原绿，不代替平台阻断验收。集中动态目录/五协议/撤权旧工具历史共同根因；共享registry/精确消费者/quota另由单一W14，终态共享合并由新Integration，不多处重修。主产品无覆盖；启动后只sidecar登记，不改该演员收到的历史输入。执行者尚无验收，Stage NOT_RUN，R07未启动。
+
+### 2026-10-13 G 块侦察与批计划（未写码，不是阶段通过）
+
+G 计划面板 6 项调研结论：Rust 侧**无任何待办基础设施**（kernel 内 todo 字样与
+session todos 无关）。原始语义（sessions.ts:1852-2044）：待办面板状态以自定义消息条目
+（TODO_STATE_CUSTOM_TYPE）追加进会话日志，快照带 version；complete/cancel/dismiss 三路由
+均按 归属→活动→存在→**流式中 409**→**版本不匹配 409(todo_version_mismatch)** 闸序，
+仅"有未完成项"时追加 complete/cancel 记录（completedTodos 快照化）并经会话流广播新清单，
+已完结/已收纳（removed）时返回当前面板不重复写；dismiss 仅"已结束且未收纳"追加收纳记录，
+历史保留。可执行批计划（存储原语已备）：(1) 适配层新增"按 entry_type 读会话最新条目"
+查询；(2) 服务层以 entry_type=`todo-state-v1` 落快照 {version, todos:[{id,content,status}],
+removed, action}；(3) 三路由 POST /lingxi/v1/sessions/todos/{complete|cancel|dismiss}
+（body {sessionId, version?}）+ GET 面板读，闸序照抄，完成/取消成功发 app 事件
+todos-changed；(4) 测试：版本冲突 409、流式 409（可先以并发闸桩验证）、幂等不重复写、
+收纳后 dismiss 再操作直接返回。B34F2B298BFA（run 发出完整清单事件）依赖 run 集成，
+**显式排除在本批外**；2FAA749DA790（slash dispatcher）为独立批。
+
+### 2026-10-13 F 块批一：deleteSkills 连带清理落地（不是阶段通过）
+
+实现助手删除的 deleteSkills 连带清理（现役 agents.ts DELETE /agents/:id 语义），
+替换此前的 not_implemented_in_port 降级：请求名单先与孤儿集求交——其他存活助手
+（新增 other_live_agent_ids + agent_enabled_skills 原语，读各助手 config.yaml 的
+skills.enabled）均未启用者才可删，非孤儿跳过并回报 not_orphan；助手删除成功后才动
+技能，逐项复用 skills_service.delete_skill（调用视图取任一其他存活助手，端口适配：
+原实现用引擎级用户技能模型），单项失败记 removal_failed 不让整单失败；有删除时广播
+skills-changed(agentId:null)。
+
+集成证明扩展 `delete_agent_cascades_orphan_skills` 全绿（真实技能目录 + 四助手矩阵：
+非孤儿跳过且目录保留 / 孤儿连带删除 / 不存在技能 removal_failed / 广播可见）；原
+lifecycle 测试的降级断言同步改为 removal_failed 口径。auth_matrix 24 项、clippy
+-D warnings、rustfmt 干净。F 块剩 6 项（导出待依赖决策，查看器/翻译/课程/目录删除
+见前段侦察）；叶子关闭仍按现行流程重放登记。
+
+### 2026-10-13 F 块开工侦察（未写码，不是阶段通过）
+
+F 技能块 7 项的可实施性侦察结论：**组合包导出**（FAE2BDEFDB04，现役 POST
+/skills/bundles/:id/export → lib/skill-bundles/package-service.ts）产出 zip
+（skills/<name>/ 目录复制 + bundle.json 清单 + writeZipFromDirectory，缺技能降级为
+warnings、零可导出 400、目标目录唯一化文件名 <slug>-skillbundle.zip）——工作区无
+zip/flate2/tar 任何归档 crate，新增依赖须走 R01 依赖治理（DEPENDENCY_DECISIONS/
+RULES），或自写 store-mode zip（CRC32/局部头，需专批实现+测试），不在批尾仓促动。
+**deleteSkills 连带清理**（3516A7326DD9）：现役语义为"助手删除成功后才动技能，名单与
+删除前孤儿集求交，非孤儿跳过并回报"；Rust 侧已有 skills_service.delete_skill(agent_id,
+name, workspace_root) 与逐助手 enabled 列表，可实施路径 = 删除前计算独占集（其他存活
+助手均未启用）∩ 请求名单，但 delete_skill 以 agent_id 为参、调用时助手目录已删，需
+专批定调用语义与测试。**技能查看器**（9CA8A47BE208）为独立窗口 UI；**翻译技能名**
+（7803B231FC36）需工具模型调用；**课程文档写入技能区**（771296A194E0）依赖审核流；
+**工作区技能目录删除**（337738D5D233）挂在四原工作区技能根上。以上结论供下批直接开工。
+
+### 2026-10-13 B 块批二：经验检索 + splitByScope 全局 setter（不是阶段通过）
+
+B 块收尾两项：`GET /lingxi/v1/agents/{id}/experience/search?q=`（命中行+真实文件路径+
+标题+摘录，只读当前 Agent 经验文档，不改任何记忆文件；缺 q 400、经验停用 403 沿用；
+ExperienceDoc.list_documents 提为 pub）；`PATCH /agents/{id}/config` 扩展全局 setter——
+locale/keep_awake/editor/network_proxy 四个全局键经严格类型校验后写 preferences.json
+并回报 globalApplied，纯全局 patch（agentPartial 空）不触碰助手 config.yaml，混合
+patch 同时生效，类型错误 400 且偏好不变。B 块剩删除观察记录一项：原始面在现役代码中
+未定位到明确路由，留待下一批专项取证后再动，不猜造。
+
+集成证明扩展后 2 项全绿（新增约 18 断言：检索命中/路径归属/无命中/缺 q、纯全局/
+混合/失败不变/助手配置不被污染）。auth_matrix 24 项、两 crate clippy -D warnings、
+rustfmt 干净。叶子关闭仍按现行流程重放登记。
+
+### 2026-10-13 B 块批一：偏好读写对 + tenets 删除广播（不是阶段通过）
+
+新增 `rust/crates/lingxi-service/src/userprefs.rs`（server/routes/preferences.ts 的两对
+端口）：`GET/PUT /lingxi/v1/preferences/autolearn`（默认 enabled=true，合并写保留其他键，
+非布尔 400 且失败不变，读取不写盘）与 `GET/PUT /lingxi/v1/preferences/quick-chat`
+（默认 Alt+Space / 10 分钟；snake_case 输入归一，reuseTimeoutMinutes 0..120 钳制，规范
+化输出 camelCase，落盘键 quick_chat）。agents_admin 暴露 read/write_preferences_root
+（pub(crate)，严格口径复用）。tenets 删除（既有 tenets_delete_route）成功后补发
+`tenets-changed` app 广播（agentId+tenetId）。回退开关读取叶（22150190C7B1）为此前
+workspace-rollback GET 已覆盖，无需新码。
+
+集成证明 `tests/r06_user_preferences.rs` 全绿（约 20 断言）：默认值/读取不落盘/合并写/
+失败不变/键保留/上限钳制/401/tenets 写入-删除-广播闭环。auth_matrix 24 项、clippy
+-D warnings、rustfmt 干净。B 块剩余：splitByScope 全局 setter、删除观察记录、经验检索
+三项待下批；叶子关闭仍按现行流程重放登记。
+
+### 2026-10-13 E 块：会话项目/文件夹目录全量落地（不是阶段通过）
+
+新增 `rust/crates/lingxi-service/src/projects.rs`（server/routes/session-projects.ts +
+core/session-project-catalog-store.ts 的全量端口，9 项面）：GET `/lingxi/v1/session-projects`
+目录树、文件夹/项目的创建（空白折叠/80 字符上限/未知文件夹 400）、修改（改名、跨文件夹
+移动 order 接尾、auto `cwd:` id 按 upsert 创建）、删除（项目删除联动活动会话归属清空并
+回报 sessionIds——现役 `"cwd:"` 报告值保留、存储映射 NULL；文件夹删除其下项目移根且项目
+与会话不删）、重排（文件夹全局 / 项目按 folderId 作用域，未知项跳过、剩余项按现有排序
+追加，作用域内 order 重编）。存储镜像现役 `user/session-projects.json` 契约格式（v1 +
+camelCase，原子写，损坏显式拒绝），适配层新增 session_ids_for_project 查询，auth 分类
+读 settings.read / 写 settings.write。归属端点 `/sessions/{id}/project`（C1 批二）与
+本目录共用同一 project_id 列。
+
+集成证明 `tests/r06_session_project_catalog.rs` 全绿（约 25 断言，覆盖上述全部正反路径，
+含重排次序、auto id 两态、项目删除的会话改派回报与 NULL 读回）。auth_matrix 24 项、
+clippy -D warnings、rustfmt 干净；并行多套件下仍观察已知 wal_checkpoint 抖动（前段已
+上报），单套件稳定。E 块 9 项后端全部就绪；叶子关闭仍按现行流程重放登记。
+
+### 2026-10-13 C1 尾批：轮换/续接已删 Agent/永久删除草稿清理（不是阶段通过）
+
+C1 会话块收尾：`POST /lingxi/v1/sessions/rotate`（现役 POST /sessions/new 的引擎轮换
+语义端口——归档该助手最近活动会话（新增 latest_active_session_for_agent 查询）后新建
+并接管焦点，无活动会话仍创建，前会话 Busy → 409 session_busy；接管态无端口概念不以
+猜造拒绝冒充）；`POST /lingxi/v1/sessions/continue-deleted-agent`（现役 :2261 端口——
+助手未删 400 agent_not_deleted 反向闸，删除标记后新助手+新会话身份，沿用原助手显示名、
+标题带"(续接)"、授权目录继承，compacted=false 不冒充压缩）。永久删除补齐草稿清理缺口：
+InputDraftsService 新增 remove_session_entries（双 surface 移除+落盘），session_admin
+经 with_input_drafts 接入，失败不回滚行删除、显式报"草稿清理待完成"。
+
+修复实测发现的真 bug：会话 id 裸 `pid-毫秒` 同毫秒两次轮换必撞 session_exists（409），
+改为毫秒+进程级原子序号（fresh_session_id）。集成证明扩展至 2 项约 70 断言全绿：轮换
+归档最新会话/焦点接管/连续轮换/无历史仍建/无可解析助手 400/401；续接三态与继承；草稿
+写入-归档-永久删除后 input-drafts.v1.json 条目消失。两处如实上报的边界：(1) 清扫孤儿
+工作台会话（sweep-orphaned-workspaces）判定依赖工作台挂载注册表与会话 cwd，两者均未
+移植，按"不猜造语义"显式挂起，原叶保持开放；(2) **新发现既有地雷**：queue.rs:703
+wal_checkpoint busy=1 被硬抛 StorageError::Busy{timeout_ms:0}，并行负载下 bootstrap
+偶发（观察约 1/4 概率，单跑稳定），与本次改动无关，建议修复线评估 checkpoint 重试/
+宽限策略。auth_matrix 24 项、clippy -D warnings、rustfmt 干净；叶子关闭仍按现行流程
+重放登记。
+
+### 2026-10-13 C1 批二：焦点切换/独立创建/项目归属落地（不是阶段通过）
+
+C1 会话生命周期第二批三项：`POST /lingxi/v1/sessions/switch`（现役 :2323 端口——归属
++已删助手闸+活动校验后持久化 preferences current_session_id，响应带冻结 memoryEnabled 与
+授权目录；浏览器恢复按现役 server/PWA 分支返回 typed skip {status:skipped,
+reason:no_browser_host}，不猜造浏览器态）；`POST /lingxi/v1/sessions/new-detached`
+（现役 :2146 端口——不写 current_session_id 即"不切走焦点"，forkedFromSessionId 经
+kernel check_fork_depth(源深度) 复用全局上限 2，过限 409 session_fork_depth_limit，
+新增适配层 set_session_lineage 只写谱系锚点不复制消息）；`GET/PUT /lingxi/v1/sessions/
+{id}/project`（现役 setSessionProjectAssignment 最小端口——v12 迁移新增 sessions.
+project_id 可空列，分配 trim 生效、null/空串清除、返回新分配；项目目录树属 E 块不冒充）。
+两项配套广播入 app 事件面：session-focus-changed / session-created(detached)。
+
+集成证明 `tests/r06_session_focus_detached_project.rs` 全绿（约 30 断言）：焦点切换成功/
+持久化/未知 404/空 id 400/归档 409 且焦点不动；项目分配 trim/清除/null 读回/未知 404/归档
+409；独立创建不挪焦点/谱系 1→2→过限 409/未知源 404/无助手缺省 400/无凭证 401；两类广播
+在事件面可见。v12 迁移、授权目录/agent 生命周期/auth_matrix 回归全部通过，两 crate
+clippy -D warnings 与 rustfmt 干净。C1 剩余：轮换新会话、续接已删 Agent 会话，及归档/
+永久删除/清扫孤儿三项既有面的对照核对；叶子关闭仍按现行流程重放登记。
+
+### 2026-10-13 会话授权目录四项落地（不是阶段通过）
+
+按 GAP_DISPATCH_PLAN 的 C1 块推进首批：`GET/PATCH /lingxi/v1/sessions/{session_id}/authorized-folders`
+（现役 GET/PATCH /sessions/authorized-folders 的端口，会话身份由 sessionPath 换为
+session_id，scope 归入会话面 chat，归属逐请求复检 + 已删助手闸）。动作 add/remove/set：
+add 校验必填/存在/为目录并规范化（canonical）后去重保位；remove 只规范化、容忍缺席、
+幂等；set 逐条校验、任一坏条目 400 且旧列表保持不变。存储复用 v8 迁移已有的
+sessions.authorized_folders_json 列，新增适配层 `set_authorized_folders`（仅活动会话可改，
+已归档 → 冲突）。响应含 ok/sessionId/authorizedFolders；cwd/workspaceFolders/sandboxFolders
+本端口不由服务端跟踪，固定 null/空数组，不猜造。
+
+集成证明 `tests/r06_session_authorized_folders.rs` 全绿（约 25 断言）：初始空、add 成功/
+规范化/重复幂等、不存在/文件/缺 folder 400 且列表不变、set 替换与坏条目拒绝、remove 命中
+与缺席幂等、未知 action/未知会话/归档后 409/无凭证 401。agent 生命周期与 auth_matrix 回归
+通过，两 crate clippy -D warnings 与 rustfmt 干净。C1 剩余 8 项（轮换/焦点切换/独立创建/
+续接已删 Agent/项目归属/清扫孤儿核对）未动；叶子正式关闭仍按现行流程重放登记。
+
+### 2026-10-13 app 事件广播面落地（不是阶段通过）
+
+补上助手生命周期广播的缺口：新增 `rust/crates/lingxi-service/src/appevents.rs`
+（server/app-events.ts emitAppEvent 的端口）。设计取舍：现役事件中枢以会话为流
+边界（"a stream id IS a session id"），app 级事件无会话归属，不借流伪装；改为
+进程内环形日志（保留 1000 条，与 resource 事件窗口同量级）+ `GET /lingxi/v1/app-events?since=<seq>`
+检索面，游标语义与 resource-io 事件面一致（游标 < 最旧-1 → stale + 空事件），auth
+分类 LocalOnly（助手名册不向远端设备披露）。agents_admin 六项操作接入广播：
+create → agent-created；switch → agent-switched（agentId/agentName/cwd/homeFolder/
+memoryMasterEnabled）；delete → 替代切换 agent-switched 先于 agent-deleted（原实现
+顺序）。非对象载荷与空类型被 publish 拒绝，不猜造包装。
+
+集成证明扩展后仍全绿（1 项约 40 断言）：广播序列与操作历史逐条一致（含三次切换的
+cwd 变化与删除替代顺序）、source=server、seq/atUnixMs 单调合法、追平游标返回空、
+尾部游标恰好 1 条、负数/非数字游标 400、无凭证 401。auth_matrix 24 项、两 crate
+clippy -D warnings、rustfmt 干净。边界：日志不持久化（重启重新计序，与原进程内
+广播对齐），WS 桥接未接（HTTP 轮询先行）；A 块叶子仍待正式流程重放登记，不宣称
+关闭。
+
+### 2026-10-13 助手生命周期集合面后端落地（不是阶段通过）
+
+按 GAP_DISPATCH_PLAN 的 A 块推进：新增 `rust/crates/lingxi-service/src/agents_admin.rs`
+（server/routes/agents.ts 集合面核心子集端口）：GET/POST `/lingxi/v1/agents`、
+POST `/agents/switch`、DELETE `/agents/{id}`、PUT `/agents/primary`、PUT `/agents/order`，
+路由与 auth.rs 鉴权分类（读 settings.read / 写 settings.write）同步登记。存储层落到
+agents 目录 + config.yaml + user/preferences.json（current_agent_id/primary_agent_id/
+agent_order），切换可选 cwd 写入 desk.last_cwd 并去重合并 desk.cwd_history；
+lingxi-adapters 的 AgentConfigScan 增补 desk.home_folder 并新增
+string_list/set_string/set_string_list 配置助手。
+
+集成证明 `tests/r06_agent_admin_lifecycle.rs` 全绿：创建（重名 409/空名 400/非法 id 400）、
+列表（字段/排序/fresh）、排序（重复/未知/非数组拒绝）、主助手（持久化/404/400）、切换
+（上下文/cwd 持久化/历史去重/404/400）、删除（当前助手按序替代并落盘/最后一个 400/
+deleteSkills 显式降级 skillsSkipped=not_implemented_in_port）、已删标记排除、无凭证 401。
+auth_matrix 24 项与 persona 证明（合成 LINGXI_PRODUCT_DIR 环境下 2 项）回归通过；
+两 crate clippy -D warnings 与 rustfmt 干净。
+
+显式未完成：agent-created/switched/deleted 广播（Rust 服务无 app 事件面，原叶保持开放）、
+deleteSkills 连带清理、切换的 sessionPath/workspaceFolders（服务端不跟踪）、A 块其余
+7 项（配置读回 3 项/运行时状态键/实验读写/按助手 observation）与 UI 2 项（情绪展示/
+MOOD 轨迹）。本段不构成叶子登记、独立评审或 R06/R07 通过；正式收口须按现行流程重放。
+
+### 2026-10-13 真实 GUI 通道打通（不是阶段通过）
+
+此前记为 BLOCKED 的真实 GUI 观察已实际打通：`native_desktop_resource_roundtrip_real_gui`
+全量实跑通过（`test result: ok. 1 passed`，进程退出码 0）。原"picker 阶段辅助访问拒绝"的
+根因是双重的：(1) 原生选择框无自动点选脚本，需人工或 CUA 在真实弹窗操作，本轮由用户本人
+完成选文件与取消两次交互；(2) 桌面壳的资源订阅链需要本机 lingxi-service，而工作区此前
+没有独立服务启动器。新增测试编排专用 example `rust/crates/lingxi-service/examples/r06_gui_service_runner.rs`
+（非产品入口）：以 `bootstrap_with_locked_instance` 引导真实服务并发布 instance.json 与
+local-token.json（两份凭证 instanceId 必须同源，bootstrap_with_deps 会身份错配被桌面拒绝）。
+另修 `desktop_host.rs` invoke 辅助的键名撞车：拒绝包装的 `error` 字段会被 request() 的
+WebDriver 协议断言误杀，改为 `invokeError`，行为断言不变。
+
+OS_OPEN_WINDOW 阶段由编排方以真实观察收口：TextEdit 实际窗口截图（内容经独立视觉核验为
+"原生选择不修改文件"）、窗口标题与程序名回执；VERIFY_SYSTEM_TRASH 以 `~/.Trash` 内真实
+文件字节读回收口。证据在 `artifacts/rust-tauri/R06/continuation-20261013/gui-service-check-20261013/`。
+两处待查：服务 example 进程被 test-guard 内存上限（TEST_MEM_LIMIT_MB=16384）终止的原因；
+`~/.Trash` 目录枚举受 TCC 限制，需经 Finder AppleScript 定位后按精确路径读回。本段不宣称
+GUI 叶正式绑定、独立评审或 R06/R07 通过；正式收口须按现行流程在新窗口重放并登记。
+
+### 2026-10-13 继续修复（不是阶段通过）
+
+本轮修复实际编译阻塞、子代理失败证明的同步条件、普通 ResourceIO 提交冲突状态（409）及恢复历史持久化失败的成功伪报。恢复已写文件但快照插入失败时返回 500，并显式报告 `fileWritten=true`、`snapshotRecorded=false`；每次成功恢复留下 `origin=restore` 审计快照，普通事件捕获仍按相同内容去重。
+
+手动技能安装带 `agentId` 时保存该助手的 enabled 列表并立即更新其运行时目录，未知/无效/重复助手参数在安装前拒绝；AGENTS.md/ishiki 无效助手读取按原合同返回 404。知识 reindex 增加真实 studio 归属检查，越权模型工具调用后来源、快照和队列均不变。知识工具测试的 HTTP 替身改为完整请求体到达即响应；正控使用正式冻结运行范围接口，另保留 UI 范围不能冒充可信运行范围的负控，没有放松生产校验。
+
+门禁 runner 补齐 R06 图与输入的内嵌源码身份绑定，仍拒绝旧字节及未登记文件；独立资源桌面宿主的实际依赖纳入有效边界检查，未将独立 manifest 排除或绕过。契约检查、有效边界及 20 项边界负控实跑通过，其中新增不同 Cargo 包不能借注册别名折叠逃逸的负控。具体日志及逐叶绑定审阅在 `artifacts/rust-tauri/R06/continuation-20261013/`。
+
+本次 15 项修复范围的首轮 39 个正式绑定命令有 37 个通过、2 个失败，失败窗口保留而不重用：R04 审批证明的旧替身只把 `access` 放在非权威 delegation 元数据，改为正式工具参数后完整六腿实跑通过；native 编译依赖真实前端产物，`--no-default-features` 也不能消除此前置条件。执行器现先实际构建配置的资源前端，并核验前置命令的来源、退出码、原始日志和摘要；前置失败不得启动 native 测试，也不得用旧构建产物顶替。新增负控及原有反假绿契约共 20 项通过。最终逐叶证据必须在新目录按当前候选重跑，不能沿用首轮失败结果或 standalone native 缓存通过记录。
+
+第二个窗口的 native 具名测试及前端前置均实际通过，但 Cargo 产物被误收为未忽略源码，候选稳定性及整轮回执因此拒绝，未当作成功。逐文件比较确认变动仅为 `desktop/src-tauri/target/debug/` 内 904 个构建文件。现按既有 Rust 构建产物约定忽略该独立 target、资源前端 dist、Tauri 生成 schemas 和 autogenerated permissions；不忽略手工 capability/ACL，也不改源码摘要或稳定性校验规则。完整原证明及相邻审批回归使用正确合成目录实跑共 72 项通过；该回归仍不代表全部原要求已满足。
+
+桌面 native/renderer/构建/类型检查有局部通过证据，但真实 GUI harness 在 picker 阶段遭 macOS 辅助访问拒绝；测试专属 PID 和端口已清理，没有改系统隐私权限，也没有把 IPC 回包伪报成真实窗口观察。原实现/证明缺口、额外义务及受平台中断影响的独立验收仍保留。上述局部结果不替代 FINAL-R06、R05 回归、全部原始逐叶证明或独立验收；`R07_READY` 不改为 true。
+
+### 后续：知识管理审批及 native 文件工具产物登记
+
+用户要求继续至 R07，本轮没有以局部收据收尾。新增真实模型管理调用证明：`ask` 会话持久进入 `waiting_approval` 时来源和队列均为空；未批准取消后仍无副作用，同参数在 `operate` 会话的正控真实新增来源和任务。配置真实 embedding transport 返回合成 502 后，管理 add 的原文字节仍可回读，摄入任务单独持久为 `failed` 并返回明确原因，笔记本状态 `failed=1/done=0`；没有用手填失败状态替代后台执行。
+
+正式文件工具组合根已将 write/edit 修改回调接入 `SessionFileService`，携带真实 RunContext 并复核现有会话归属；不是只记录 FileHistory。重复修改复用同一 fileId 并刷新真实 size/mtime/MIME 元数据，不改变其他会话登记。真实 SQLite 插入或元数据更新触发器失败时，工具显式报告“文件已写但产物登记失败”，不返回成功也不宣称回滚外部字节。旧文本不匹配及用户外部改动仍拒绝而不登记新成功。write 的原 OS 沙盒不可用要求尚未闭合，不因此提升该叶；edit 的原登记缺口与知识管理剩余证明分别补齐。
+
+现行全量验收仍为 `R06_NOT_ACCEPTED`；原始条款没有改写，局部 READY 登记不是阶段 PASS。新候选必须在新的执行目录绑定，前一轮 `CONTINUATION_RECEIPT_FINAL_LOCAL.json` 的候选结论保留为历史，不冒充后续修改后的来源验收。
+
+### 后续：持久化文件回退偏好及不确定写入收据
+
+前述 17 项原要求的新窗口实际执行 52 个绑定命令、44 个断言组，全部通过且来源稳定；另一个新目录重新消费原始日志与回执也通过。该候选摘要为 `1cfa56ac0800ba433a997b6ad5058efd32a5a8e78e9cb6aa0eb275820f8ad13e`，只属于该历史窗口，不冒充以下继续修改后的源码。窗口仍明确不是 R06/R07 阶段验收。
+
+新增正式 `GET/PUT /lingxi/v1/sessions/workspace-rollback`，按原 `chat` scope 保存 `user/preferences.json` 的 `rollback_file_changes`。默认关闭，严格校验布尔输入，保存成功后才更新真实 retry/rewind 使用的运行时开关；保留其他偏好，串行处理并发保存，服务重启读取真实磁盘值。保存接口本身不恢复文件。缺凭证/缺 scope、无效输入、损坏配置或实际文件系统失败均明确拒绝；失败不回写运行时成功值，修复文件后可重试，损坏启动配置不能静默变成默认成功。
+
+扩大相邻文件恢复回归时真实发现两条失败：底层已报告不确定写入，但 rewind 的 HTTP 与持久化收据遗漏 `fileRestoreReason`。现两处均保留 `write_may_have_occurred`，不再把已发生或不能确定的文件写入隐去；真实第二竞争者场景验证最终文件 C、保留对象 D、持久化收据与幂等重放均一致。首个失败日志保留。修复后原会话、会话树和文件恢复三套回归分别 11、13、16 项通过；路由策略表另 1 项通过。新原始偏好叶绑定仍不是独立评审或全阶段验收。
+
+### 后续：组合技能真正增量启停
+
+103 项 READY 原要求在来源 `d1743e735d69664a6a3b0f50f36eccc9eaa973aab3b3b7a8b355d7d2cf0349da` 实际执行 122 个命令、235 个断言组并重新消费原始回执，全通过但不是阶段结论。该候选现为历史。补充 fork 的 7 个命令实际通过，但 original-only 范围消费者拒绝 supplemental id，失败窗口保留，未替换消费者或放宽范围以制造额外验收。原提示词再次检索仍无来源、用户不可应答；GUI 权限及独立评审中断仍阻塞。
+
+继续修复原组合启用和停用：先实跑捕获 `changed` 缺失及损坏组合被伪装成 404 两个反例。生产不再忽略 false，也不全量替换名单；按原 bundle 顺序对可见成员去重增量增删，保留无关已启用技能及 workspace-disabled，只修改指定助手，返回 `{ok, enabled, changed}`。空可见集合不写配置。使用 checked 组合读，磁盘失败明确报错；多个技能配置写入口共享既有 mutation lock，真实 barrier 并发验证不丢更新。后端 enabled 投影不被误当作运行时列表排除逻辑；测试按实际 enabled 字段核对。
+
+新原断言证明涵盖重复 true/false、未知成员过滤、空可见组合、跨助手不变、只读凭证、坏输入、缺身份/组合、实际损坏/不可读组合文件及 macOS 配置父目录不可写后的失败/恢复重试；技能与上下文耦合回归共 20 项通过。UI 和广播、组合导出等原缺口仍保留，没有由后端通过推导页面或广播已完成。
+
+### 后续：资源句柄生命周期与真实游标保留窗口
+
+新增原资源缺口专属证明：以真实获授权 local_fs 引用建立 watch 和 subscription，同目标 refCount=2；用实际返回句柄执行 release=true、重复 release=false，HTTP diagnostics 对应数量精确变化，文件字节/mtime 和附件登记行不变。句柄释放、诊断和游标入口本来不接受 resource 参数，没有伪加 provider 参数来制造覆盖：mount/URL 在真实建立入口明确 400 unsupported_provider，真实 SessionFile 引用 403 capability_denied；混合 local+不支持引用或缺失路径失败时全部 retain 回退，随后诊断/事件读回无幽灵登记或事件。缺凭证不释放句柄，越界 local 文件原字节保留。
+
+游标用 1005 次真实 ResourceIO HTTP 写入形成事件并越过原 1000 保留窗口；真实 HTTP 旧 since 返回 stale/resource-stat-required，最近 since 恰好返回连续三项，无效/重复/负数游标及未知参数 400、未鉴权 401。读事件/诊断均不改文件、元数据、登记和事件总线。首轮真实 429 保留，后仅该合成保留窗口 fixture 注入 rate_max=2048，未改生产默认或其他夹具；provider 状态按实际 400 校准，未虚报 mount 已实现。完整原资源与 ResourceIO 回归 11+12=23 项通过。
+
+### 后续：实际格式与全量静态门禁修复
+
+针对 R07 前置仍为红的 workspace 格式门禁，执行仓库锁定 rustfmt，172 处格式差异修复后实际 `cargo fmt --all -- --check` 通过，没有修改门禁或压制结果。格式变化的 341 个已有原断言锚点逐 token 回查，缺失数为 0；刷新来源摘要和行号，不改变原断言或覆盖等级。
+
+随后实跑 `cargo clippy --locked -j 8 --workspace --all-targets -- -D warnings` 暴露测试代码实际告警，逐项修复而非 allow：移除未使用 DelegationRequest/json import，最新 provider 调用查找使用等价 rfind，管理证明 observer 用正式类型别名，单引用切片使用 from_ref。失败窗口 r1–r5 保留，第六次全量 clippy 实际通过。上述只闭合格式/静态前置，仍不构成全量 R06、独立评审或 R07 通过；后续候选必须重新执行实际行为证据。
+
+格式/静态修复候选的 109 READY 原要求已全部实跑：127/127 精确绑定命令、251/251 原断言组通过，新目录重新消费原始日志/回执、input freshness 也通过。实际来源与失败原件登记在 `CONTINUATION_RECEIPT_RESOURCE_FORMAT_LOCAL.json`；随后归档投影的源码修改使其成为历史候选，不能冒称覆盖更新后的源码。
+
+### 后续：归档列表原首消息投影
+
+实际 RED 证明 `sessions/archived` 缺少 `firstMessage`，并在真实 messages 表不可读时仍返回成功列表。正式列表现在从同一 DB 队列读取归档状态与真实最早可见 user 输入，聚合各助手；只返回当前主体可见的归档项，排除活跃项。首消息按原 100 UTF16 单元上限截短，跨界 emoji 整体省略而不输出断裂代理项；空会话返回空字符串。对照现役投影剥离 reminder/reference/knowledge/research 模型内部包裹，未闭合包裹直到文本结尾隐藏，原始模型历史不被改写。
+
+第一、二次 GREEN 分别暴露实际存储不是裸 content-block 数组、也不是 assistant NormalizedMessage；保留失败，核对生产 user 写入为 `{text}` 后按真实严格字符串结构读取。表不可读、坏 JSON 和 text:null 均显式 500，不呈现空列表成功。缺/坏凭证 401、settings-only 凭证 403，真实设备只见本主体归档；修复存储后恢复相同列表。原清理动作继续使用仅元数据的读取，不新增历史依赖。
+
+完整会话/回退耦合回归 16+13+13=42 项及存储会话树回归 18 项通过，实际 workspace all-targets clippy 仍通过。绑定完整原归档叶后登记为 110 READY /169 GAP；本补充不宣告全阶段、GUI、评审或 R07 通过。
+
+### 后续：正式输入框草稿持久化
+
+接通原 GET/PUT input-drafts 到正式 Rust HTTP/auth 路由，保持 electron/pwa 白名单及 `input-drafts.v1.json` v1 surface/home/sessions 格式。主页仍为原已认证主体可访问的实例级 surface 槽；会话按稳定 sessionId，写入前核对归属且 GET 仅返回当前主体可见会话。未注册路径定位器的 sessionPath 明确拒绝，不把路径当身份键，也不提升独立保存会话原叶。
+
+正式保存/删除采用同一 mutation mutex 的读改写，成功落盘才返回；无全局内存草稿缓存。坏 text/doc/scope/query（含重复及未知项）、未鉴权、其他主体或未知会话在写前显式拒绝。坏 JSON、未知版本、真实不可读文件和真实只读父目录均保持原字节并 500，不沿用旧空重建或“成功”内存回退。两次实际服务重启亲读同一保存/删除结果；空白文本只删除选中 home/session，其他项和 surface 字节语义保留，GET 不写。
+
+实际线程 barrier HTTP 双写保留两会话更新；真实 512K UTF16 文档丢弃/文本截断和 200 会话上限均精确测试。调整通过 docDropped/textTruncated/evictedSessionIds 显式回报，Unicode 标量不拆，淘汰只触及当前主体有权操作的最旧项；外国主体无可淘汰项时拒绝并保留整个文件。没有降低生产请求预算或扩大 surface 白名单。
+
+本窗口仅补齐原读取/主页保存/清空三个完整叶，登记 113 READY /166 GAP；UI hydrate、sessionPath、工作台永久删除及全部原要求仍未宣告完成。现行行为证明与门禁需绑定最终候选重跑；此前 110/129/253 收据作为历史候选保留。
+
+### 2026-10-13 R06 收口 A 段：既有改动验证 + 地雷修复 + C1/E/A/B 批一登记（不是阶段通过）
+
+按已批准收口计划执行 A 段。A1 验证 10-13 工作区：cargo check、5 新套件、auth_matrix 24、
+两 crate clippy -D warnings、rustfmt 全绿。验证中实测发现并修复真问题：
+(1) 5 个新套件 boot() 以 pid+nanos 生成临时 home，同二进制并行测试在时钟粒度内可重合，
+两个测试引导同一 runs.db 在迁移窗口互撞（"table sessions already exists"），并发 5 套件
+复现率约 1/4-1/2；修复=boot() 加进程级原子序号（与 sessions.rs:1890 单元测试同口径），
+并发 8 轮全绿。(2) wal_checkpoint busy 地雷（queue.rs checkpoint_truncate）：新增
+StoreOptions.checkpoint_grace_ms（默认 2000，0=严格单发，validate 上限同单调时钟理由），
+checkpoint_truncate_with_grace 预算内 25ms 步进重试、预算尽仍响亮 Busy 带真实预算；
+close() 与 backup_database（签名加 grace 参数）接入；4 项新单测（瞬时 pin 恢复/预算尽
+响亮/0 严格/上限拒绝）全绿。(3) 既有 HEAD 批量提交内嵌的失败修复：w09 vector_integrity
+编译缺 rt-multi-thread（dev-deps 补齐，仅测试构建生效）；knowledge_store_r06t07 的
+mark_job_pending_embedding 测试漏 claim（生产语义=running 闸正确，测试补 claim）；
+F12 complete_build 把 schema 过新误分类为 INDEX_INVALID（schema 闸提前，22/22 全绿）；
+F14 登记表缺 v12（R00-T02 R02-T04_STORAGE_REGISTRY.json 补 r06_session_project_assignment，
+指纹按 SQL 字节 sha256，3/3 过）；session_file_store 顶端断言 9→12。adapters 全量 433/0
+（F12/F13 需合成 LINGXI_HOME 属绑定执行器环境约定，裸跑失败为预期）。
+
+A2：Tauri 2.11.6→2.12.1 升级在 D-13 决策记录有据（锁树 runtime/runtime-wry 2.12.1 与旧
+API 实际编译不兼容），保留。A4 登记：为诚实覆盖先补测试断言（授权目录跨会话隔离 s1
+不扩 s2；清单 homeFolder/effectiveHomeFolder 回传与未配置显式 null；缺省 deleteSkills
+skillsDeleted=[]/[]；autolearn/quick-chat 扁平 patch 两形态；检索不改文件字节+跨助手不
+泄露+缺 q 400；tenets 重复删除 404；快捷聊天读取前后偏好字节一致；永久删除 ghost 404/
+空 id 404/无凭证 401）。bind-gap-blocks-c1eab-batch1.py：30 叶翻 READY（C1×8、E×9、A×6、
+B×7）+3 叶 PARTIAL 显式 missingClauses（FBDEEDAC0B11 浏览器宿主行为、485B2D0A8A02
+busy 轮换 409、24BC2E961E3E editor/chat 布局控件与部分成功读回），登记 147 READY/132 GAP。
+refresh-drifted-anchors.py：10-13 格式化造成的 64 个漂移锚点逐 token 复核旧引用仍在源中
+后重锚，721 本就有效。--generate 刷新 R06_INPUTS.json+R06.json，Python 契约测试 20/20。
+新窗口 gap-blocks-batch1-execution：30 叶 11 条绑定命令全 PASS，leaf-cases 汇总 PASS。
+本段不构成独立评审、阶段门禁或 R06/R07 通过；R06_NOT_ACCEPTED 不变。
+
+### 2026-10-13 R06 收口 B 段：五块并行实现 + 中央集成 + 批二登记（不是阶段通过）
+
+按 GAP_DISPATCH_PLAN B1/B2/B3/B4/B6 并行派发实现（文件面零交集、专用 CARGO_TARGET_DIR、
+均不碰 lib.rs 由主控统一收口），B5 由主控随 B4 成果落地。期间两个执行代理撞 5 小时
+使用上限中止（C2 实现者死于测试未写阶段；F 块死于验证阶段），其落盘成果由主控接管
+收尾：history_content.rs 的 7 处 clippy 修复（useless into_iter×2/压缩 match/div_ceil/
+useless format/result_large_err×2 按仓库先例 allow）；F 块测试修复 connect_info 包装、
+断言顺序笔误（损坏存储保留断言的对照值取错）与本地路由重复挂载（改走生产注册面）。
+
+中央集成（主控）：lib.rs 注册 21 条新路由（todos×4、workspace-disposal、
+sweep-orphaned-workspaces、{id}/workspace PUT、C2 历史内容面 7 条、PUT agents config、
+current-status、experiments×2、observation GET+DELETE、desk/delete-skill、bundles export）；
+auth.rs classify_route 同步（sessions 静态名+split_once 子面、experiments 家族、
+observation 按 TS 口径 GET=Authenticated/DELETE=settings.write、PUT config=settings.write）；
+todos.rs 的 lingxi_service:: 路径改 crate::（模块入 crate 后外部路径不成立）；
+ServiceState 新增 compaction 共享句柄（fresh-compact 从 Extension 注入改为 state 取用，
+None=未接真实模型链时显式 503 不静默）。B5 观察 DELETE 按取证语义实现
+（experiments.ts:62-69：unlink latest.json、ENOENT→deleted:false、400/401 反例）。
+
+实现语义要点：todos 面板闸序照 TS（dismiss 无流式闸以源码为准）；处置/清扫按
+sessions.ts:2670/2762（v13 迁移 sessions.workspace_mount_id/cwd 两列，挂载注册表读
+{home}/studio-mounts.json，损坏回落仅 default 宁可不清扫；子对话冲突进 errors 不静默
+孤儿化）；A 块读回（供应商目录/插件/投影/YAML/preferences 逐处读回+部分成功、
+current-status 9 键、实验注册表读写、observation 读）；F 块（工作区技能目录删除
+canonical 防越界、组合包导出自写 store-mode zip 经 unzip 实证，依赖决策已记 D-14 系列）。
+C2 的 3FCB259FF69C（/reset 清历史）与 FF4F06011B48（sidecar 冻结提示词）两叶按实现
+模块头显式挂起（TS 自身拒绝 desktop kind / Rust 无会话级 sidecar 数据源），不猜造。
+
+验证（原位实跑，cargo 1.98.1）：10 套件 59/0（todo_panel 5、workspace_disposal 9、
+agent_config_readback 7、skill_dir_delete_and_export 6、authorized_folders 1、
+focus_detached 2、agent_admin_lifecycle 2、user_preferences 2、project_catalog 1、
+auth_matrix 24）；lingxi-adapters 433/0（含 f14 登记 v13 3/3）；两 crate clippy
+-D warnings 与 fmt 全净。登记：批二 14 叶翻 READY（G×3、C1×2、A×6、B5×1、F×2），
+2 叶 PARTIAL 显式 missingClauses（7244E7DCE678 无 store 子句端口无概念、
+464E58DEC9E2 运行时回退分支结构性不存在）；161 READY / 118 GAP；--generate 刷新
++契约 20/20；新窗口 gap-blocks-batch2-execution 14 叶 21 绑定全 PASS。
+已知未完：C2 的 8 叶实现已注册生产路由但测试套件未写（限时代理中止遗留），
+绑定待测试补齐；C2 两挂起叶待评审裁定。本段不构成独立评审、阶段门禁或 R06/R07 通过。
+
+### 2026-10-13 R06 收口 C2 收尾：测试补齐、两实现 bug 修复、既有 t04 红修（不是阶段通过）
+
+C2 测试代理交付 tests/r06_session_history_content.rs（2368 行 12 测试，全走生产 router +
+真实 SQLite + 真实鉴权；历史数据经 POST execute 真实 run 写 canonical store；collab 面
+直调 pub 工具）。抓到并修复实现两处真 bug（均在 history_content.rs，原实现的模块内单测
+一直静默失败）：(1) 回合折叠 UserMessage 臂只设 question_entry_id 未推进 entryIds，
+conversation_map 实测 entryIds 长度不符抓到，修为 entry_ids 含 user message_id；
+(2) Bridge 时间标签正则未 trim 标签体（TS \s* 口径），修为匹配前 trim。fresh-compact
+三段证明：默认 deps 显式 503（不静默降级）；注入真实压缩服务后 5×40k 轮真实压缩
+（tokens≈51k→21k、摘要辅助恰 1 次、台账 1 行）+ 提示词工件重建；运行中 409。
+
+既有红修复（HEAD 批量提交内嵌，与当日改动无关）：r06_t04_history 两例
+（tool_only_run_projects_terminal_honestly / a07_realtime_reopen_reconnect_export_agree）
+死于「model_history: 可信历史声明代次缺失」——编码侧对无目录绑定的工具调用写
+declarationBinding:null（bind_target None，工具直发路径合法），解码侧却把 null 一律当
+损坏致整库 500。修复=解码对称还原 null→None（消费方 historical_wire_name/投影核验
+均按 Option 容忍），存在时严格校验保持。t04 6/6、相邻 input_payload_fidelity/
+request_dedup/original_session_proofs 27/0。
+
+登记：批三 C2 八叶翻 READY（find/replay/overview/content/summary/turns/fresh-compact/
+collab，169 READY / 110 GAP）；两挂起叶（3FCB259FF69C 清除历史——TS 自身拒绝 desktop
+kind；FF4F06011B48 sidecar 冻结提示词——Rust 无会话级 sidecar 数据源）理由入
+c2-leaves-batch3-proof-review.json 待评审裁定。--generate+契约 OK；新窗口
+c2-batch3-execution 12 绑定全 PASS。本段不构成独立评审、阶段门禁或 R06/R07 通过。
+
+### 2026-10-14 R06 收口 B7b+D3b 批：语义缺口簇与嵌入/提交簇重放（不是阶段通过）
+
+B7b（记忆/技能/压缩/偏好簇）：15+2 叶判定——6 叶翻 READY（技能四路由成功广播
+skills-changed（PUT skills/删除组合/外部路径/创建组合，空数组停用全部、逐臂拒绝零
+广播）；工作区技能策略 PUT config 后即时重筛经现役服务证明；splitByScope 三组断言
+经 config-flags 新增全局偏好读回面+editor/chat 双请求各归其叶+真 mixed 部分成功
+读回全覆盖，24BC2E961E3E 翻绿；另主控复用同锚点翻绿 8C8083F2A5FC（chat 布局叶，
+agentB YAML 字节不变即跨助手不串锚点））；0B483D7F6A43 G1 翻 FULL、G0 保持
+PARTIAL（ticker 宿主 R07 未移植，如实）；12 叶按语义宿主归属（R07 ticker/R08
+slash-WS/R09 watch）保留 PARTIAL。登记 182 READY / 97 GAP。
+
+D3b（F09/F10/F11/F13 重放）：F10 上轮正式 FAIL 四条（C01-C04）当前全部重放绿
+（C04 恢复缺口由 F09 面 SIGKILL 续跑补证关闭）；F13 全 PASS；F09/F11 修三真缺陷：
+(1) 跨 attempt 恢复被 unconfirmed_paid 守卫误杀（同身份接管以 attempt+1 续跑必然
+命中旧凭据被拒，修=prior_attempt_closed 后新身份补缺口、同 attempt 内仍拒）；
+(2) 预发送取消写虚构 0-token 费用行（W09 冻结证据语义：cancelled&&transportAttempts==0
+&&knownNotSent 跳过费用行；上过线的取消/中断仍如实 unknown——与 W11 c03 原断言
+互斥，按有冻结证据方统一，提请评审确认）；(3) 父取消落在飞行中时持久统计误把
+pending 折进 unknown（修=保留 pending 交接管归类）。w09 16/16（修前 12/16）、
+w11 11/11、f13 2/2、t07 6/6、w10 9/9。遗留两相邻红（stash 对照证为在飞/既有）：
+cancel_link_inheritance parked 超时（属在飞 subagents.rs，F14 已登记）、
+original_knowledge_proofs 因测试扩到 18 调用超 DEFAULT_MAX_MODEL_TURNS=32（待对齐）。
+
+主控红修（本轮）：f04_lifecycle macOS /var→/private/var 规范化断言（期望侧取
+canonicalize；同套件身份恢复回归转 D3a）；r04_t02 七例 admission——F03 统一准入后
+drive_run 拒未预登记受限授权 run，测试 helper 改按生产契约经 task_supervisor 预登记
+并持守卫（守卫 Drop 撤销登记），retain_authorized_run_permit 提 pub；子代理族四套件
+31/0。批五窗口（B7b 7 叶）因 D3a 并发在飞编辑出现 1 瞬态绑定失败（直跑即绿），
+按不复用窗口规则整窗留待树稳定后重放；批一至批四窗口证据不受影响。
+
+### 2026-10-14 凌晨 主控接管记录（D3a 限额中止后的树状态）
+
+D3a（F01+F03+F04 会话簇）撞 5 小时限额中止（02:53 重置），遗留由主控接管盘点：
+树 cargo check 0 错、clippy 全净（修掉 D3a 在飞 lint 1 处：f03_operations 3152
+取引用右操作数）；r06_original_session_proofs 18/18 绿；r06_ar_f03_operations
+带全合成环境（LINGXI_HOME+LINGXI_W03_EVIDENCE+TMPDIR）19 过 2 红——
+unknown_file_effect_survives_storage_failure_restart_and_replay（execute 403，
+D3a 半成品）与 actual_resourceio_owned_write_cancel_retains_until_fifo_exit，
+连同转交的 f04 身份恢复回归（get_file 返回新铸 id）一并归入重置后接力批。
+批五窗口已在稳定树重放：7 绑定全 PASS，182 READY / 97 GAP 落实。
+知识 proofs 预算红已修：run_limits 显式 max_model_turns=64（场景 17+ 轮探针；
+默认 32 不动，预算语义不变）；余下 probe 12-14（旧 scope 应报
+KNOWLEDGE_SCOPE_VIOLATION 却返回空命中成功）为 10-13 扩展遗留语义问题，
+归入接力批（F13 冻结面）。剩余 97 GAP 分布：后端可收口 44、GUI/界面 23、
+语义宿主（R07 ticker/R08 slash/R09 watch）18、模型通道 6、其他 6。
+
+### 2026-10-14 R1 会话簇接力收口（不是阶段通过）
+
+三个红修定论：(a/b) f03 两红均为测试 harness 的 macOS 路径缺口——ar_f03/ar_f04
+的 home/workspace 根未 canonicalize（/tmp→/private/tmp），被 current_file_access
+的「授权根自等」安全闸正确拒绝（其余套件 harness 均已 canonicalize），修 harness
+对齐既有约定，生产代码零改动，f03 21/21；(c) f04 身份回归经复跑确认已被前任代理
+半成品实际修好（主控盘点信息过时），全套 15/15。知识探针坐实实现真缺陷并修复：
+grep 的 sourceIds 越权被静默过滤为空命中（原语义整单 KNOWLEDGE_SCOPE_VIOLATION）
++ headingFilter 参数被接受但完全未实现——修 grep_scope 逐 id 校验+前缀过滤实现，
+knowledge proofs 12/12。主控随后对齐同口径：search_in_scope 补同样的越权整单
+违规（probe 3 期望从空命中改为 SCOPE_VIOLATION，对齐 knowledge-search-service
+.ts:142），12/12+6/6 复验绿。
+
+F01/F03/F04 remaining_scope 逐条重放全部 PASS（锚点实跑）：F01 5/5（统一历史
+入口/协议角色配对/有效分支/压缩恢复/子代理裁剪材料——f01 套件 8/8）；F03 4/4
+（统一准入/持锁到收据/无锁序死锁/复检幂等/状态事件一致——21/21）；F04 5/5（真实
+活动时间/fork 继承/引用闭包/清理真实事实/NoopChangeLog 已接生产——15/15）。
+观察项（记录非缺陷）：current_file_access 拒符号链接成分授权根为安全意图，
+产品若要接受需会话创建时规范化并重审该闸，另立任务。
+
+### 2026-10-14 R2 后端第二轮收口 + 主控集成（不是阶段通过）
+
+R2：10 叶翻 READY（192 READY / 87 GAP）——四个 GUI 族服务端叶全翻（studio-list
+会话列表投影含 sessions.read+Studio 双闸+运行徽章；/history 补 reconciliation
+证明块+todos/revision 投影（E01 不参与 304）；workbench 同版本写/冲突面
+（conflict:true+外部内容不动）；464E 运行时回退分支按端口结构翻 FULL）；六后端叶
+（file-history 按助手 desk.home_folder 根隔离三叶、attachments/local 快照复制、
+轮换 busy 409 真实 admission 证明、追加授权目录真实扩大 checkpoint 范围）。
+3 叶核查后保持 GAP（断言未全覆盖不硬翻）；31CDA283A11A 保持 PARTIAL（DB 承载
+会话无文件布局）。宿主归属清单 A-L 类产出供评审裁定（模型工具注册/WS 流/slash/
+dream ticker/summary store/watch/GUI 族/记忆遗留/知识面/Office 桥/文件布局）。
+
+主控集成：studio-list 与 workbench/actions 两路由注册进生产 router+classify；
+model_history 单测契约调和（缺失绑定=宿主直发轮次合法还原 None、伪造仍响亮拒绝，
+与 t04 集成行为一致的显式契约，adversarial_f07 更新并绿）；probe3 重锚（12 处，
+search 整单违规语义修复的故意变更已注记）。最终集成扫描：19 套件 179/0，
+三 crate clippy -D warnings 与 fmt 全净；批六窗口 15 绑定全 PASS。
+记录：B9DA1A584C6E 实为「带设置的焦点会话创建」叶（切换广播已有），可在 R06
+内补，未阻塞。
+
+### 2026-10-14 R2 后集成终态与冻结前扫描（不是阶段通过）
+
+R2 批六链完成（刷新 154 漂移锚点 + probe3 故意变更 12 处显式重锚 + --generate +
+契约 20/20 + 新窗口 15 绑定全 PASS）。studio-list / workbench/actions 两路由经主控
+注册进生产面。model_history 单测契约调和（adversarial_f07：缺失=宿主直发合法
+None、伪造仍拒）。终态扫描：19 套件 179/0、三 crate clippy/fmt 全净、lingxi-kernel
+全量 187/0。冻结前全量 lingxi-service 扫描 404 过 3 败——admission_dedup_
+adversarial 三例（提交到不了注入的 durable-start 挂点，确定性），已派专项修复
+代理（含 cancel_link_inheritance 同族 parked 超时核查）；修复后冻结。GUI 段
+（23+ 叶需用户点选/通道）等用户窗口；期间先启动 E 段审查准备。
+
+### 2026-10-14 冻结前最后红修：admission/dedup/cancel 六套件 + AR-F08 时序裁决（不是阶段通过）
+
+admission 专项修复完成（全测试侧，零生产改动）：(1) F03 给 StoragePort 新增的
+session_admission/load_session_admission 带 trait 契约「包装端口必须转发」，测试
+委托宏未转发 → 提交在 record_run_started 前被 session_storage_binding_mismatch
+拒绝、挂点不可达——宏补转发后 admission_dedup_adversarial 5/5、consistency 5/5、
+recovery_crash_points 2/2、request_id_canonicalization 7/7、cancel_terminal_race
+13/13（原悬挂 SIGABRT）；(2) RunDatabase 进程内按 canonical 路径共享 SessionAdmission
+后，「进程死亡」模拟须彻底 abort 驱动任务（否则内存持有者不放许可，新 key 诚实
+Busy）；(3) r05_t07_usage_trace 9/9（预登记先例沿用）。全量 lingxi-service
+扫描 453 过 1 败——唯一剩红 cancel_link_inheritance::subagent_timeout_settles_
+a_parked_quota_wait 经 bisect 实证源于 bc2ce51fd（AR-F08 工具结果投影存储写）
+的时序演进：原测试期望的「父停驻+子等待」交错在现行语义下不可确定性构造
+（子 run 在队列饥饿窗口内先完成）。已派专项按诊断重设计该测试（保留「配额
+等待中被停驻任务的超时结算诚实」契约证明），完成后冻结候选。

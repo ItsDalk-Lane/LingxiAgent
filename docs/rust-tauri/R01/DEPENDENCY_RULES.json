@@ -86,8 +86,11 @@
    "module": "tauri-host",
    "kind": "desktop-host",
    "crate_path": "desktop/src-tauri",
-   "status": "planned",
-   "establish_stage": "R09",
+   "status": "exists",
+   "cargo_package": "lingxi-resource-desktop",
+   "metadata_scope": "independent",
+   "establish_stage": "R06",
+   "established_by": "R06 continuation: existing resource desktop host registered with independent Cargo metadata; DEP-05 applies to its actual declared and transitive dependencies",
    "responsibility": "独立桌面构建；依赖协议，不嵌入业务内核",
    "note": "独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖"
   }
@@ -187,8 +190,8 @@
     "electron"
    ],
    "forbidden_source_tokens": [],
-   "enforcement": "cargo-metadata-transitive (在 tauri-host 建立后生效)",
-   "effective_from_stage": "R09",
+   "enforcement": "cargo-metadata-transitive + manifest-declaration-scan (independent desktop manifest included)",
+   "effective_from_stage": "R06",
    "rationale": "宿主和传输只能依赖内核公开接口；Tauri 不拥有 Agent 业务执行权"
   },
   {

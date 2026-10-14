@@ -1,0 +1,41 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.26s
+     Running tests/r06_original_knowledge_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_knowledge_proofs-1036429c67ab903a)
+
+running 8 tests
+test original_artifact_citation_snapshot_boundaries_and_heading_fallback ... ok
+test original_directory_import_reports_each_effect_and_rejects_invalid_root ... ok
+test original_failed_and_untracked_jobs_retry_and_delete_wins ... ok
+test original_manage_actual_authorized_actions_read_back_facts_and_jobs ... ok
+test original_manage_refusals_and_no_write_authorization_preserve_facts ... ok
+test original_notebook_source_routes_reject_without_changing_rows ... ok
+test original_settings_refresh_remove_reingest_and_purge_use_real_facts ... ok
+test original_tools_use_authentic_run_scope_and_frozen_citable_source ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.49s
+
+     Running tests/r06_t07_knowledge.rs (rust/target-r06-continuation/debug/deps/r06_t07_knowledge-1f7802174f55b5f5)
+
+running 11 tests
+test a14_switching_to_incompatible_embedding_dimension_refuses_vector_channel_until_rebuild ... ok
+test citation_resolution_returns_block_snapshot_source_and_viewer ... ok
+test file_import_security_rules ... ok
+test import_pasted_text_parses_chunks_and_ingests_with_stub_embeddings ... ok
+test ingestion_without_model_lands_pending_embedding_then_completes_after_reboot ... ok
+test notebook_crud_settings_and_ingestion_summary ... ok
+test reingest_membership_and_delete_semantics ... ok
+test research_engine_tables_are_not_restored ... ok
+test settings_change_triggers_rebuild_and_variants_coexist ... ok
+test snapshot_content_serves_bytes_with_security_headers ... ok
+test source_delete_is_blocked_while_turn_scope_freezes_it ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 81.93s
+
+     Running tests/r06_t07_knowledge_tools.rs (rust/target-r06-continuation/debug/deps/r06_t07_knowledge_tools-2eaee07f8ee981be)
+
+running 6 tests
+test a13_citation_markdown_resolves_to_actual_text ... FAILED
+test a13_search_within_scope_returns_only_allowed_sources ... FAILED
+test a13_untrusted_source_instructions_stay_material_not_privilege ... FAILED
+test knowledge_manage_actions_and_gates ... ok
+test knowledge_read_pagination_and_grep_outline ... 

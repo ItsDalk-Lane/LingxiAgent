@@ -1,0 +1,14 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.03s
+     Running tests/r06_t07_knowledge_tools.rs (rust/target-r06-continuation/debug/deps/r06_t07_knowledge_tools-2eaee07f8ee981be)
+
+running 6 tests
+test a13_citation_markdown_resolves_to_actual_text ... ok
+test a13_search_within_scope_returns_only_allowed_sources ... ok
+test a13_untrusted_source_instructions_stay_material_not_privilege ... ok
+test knowledge_manage_actions_and_gates ... ok
+test knowledge_read_pagination_and_grep_outline ... ok
+test scope_violations_are_loud_not_fallback ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.69s
+

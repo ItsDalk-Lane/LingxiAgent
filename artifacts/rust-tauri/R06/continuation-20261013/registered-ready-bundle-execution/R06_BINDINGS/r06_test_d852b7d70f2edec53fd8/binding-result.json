@@ -1,0 +1,142 @@
+{
+  "schema": "lingxi.r06.executed-binding.v1",
+  "key": "r06_test_d852b7d70f2edec53fd8",
+  "sourceCandidateSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_original_skills_bundle_proofs",
+    "test": "original_bundles_agent_projection_update_order_delete_and_rejections",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_skills_bundle_proofs",
+      "original_bundles_agent_projection_update_order_delete_and_rejections",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "command": {
+    "binding": {
+      "package": "lingxi-service",
+      "suite": "r06_original_skills_bundle_proofs",
+      "test": "original_bundles_agent_projection_update_order_delete_and_rejections",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_original_skills_bundle_proofs",
+        "original_bundles_agent_projection_update_order_delete_and_rejections",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_skills_bundle_proofs",
+      "original_bundles_agent_projection_update_order_delete_and_rejections",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "sourceBeforeSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/stdout.log",
+    "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/stderr.log",
+    "timeoutSecs": 900,
+    "syntheticEnvironment": {
+      "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/runtime/home",
+      "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/runtime/tmp",
+      "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+      "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/w01_evidence",
+      "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/w09_evidence",
+      "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/w10_evidence",
+      "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/w11_evidence",
+      "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/lingxi_w03_evidence",
+      "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/lingxi_f05_evidence",
+      "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/lingxi_f08_evidence",
+      "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/t08",
+      "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_d852b7d70f2edec53fd8/command-001/raw/t08-evaluations.jsonl"
+    },
+    "actualArgv": [
+      "/Users/study_superior/.cargo/bin/rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_skills_bundle_proofs",
+      "original_bundles_agent_projection_update_order_delete_and_rejections",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "pid": 91926,
+    "elapsedSecs": 3.801,
+    "outputCheck": {
+      "valid": true,
+      "expectedTest": "original_bundles_agent_projection_update_order_delete_and_rejections",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "original_bundles_agent_projection_update_order_delete_and_rejections"
+      ],
+      "reason": ""
+    },
+    "stdoutSha256": "368cd97b6eda4f757911dae2b398f6b9387293e04204b9de4a9ff369d5cf4a8a",
+    "stderrSha256": "d6b9e0c445b30dd0eee767db678cad77ce02114653706cee736ae5fd8f21962b",
+    "sourceAfterSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+    "sourceStable": true,
+    "localPassed": true
+  },
+  "passed": true,
+  "stageVerdict": "NOT_A_STAGE_VERDICT"
+}

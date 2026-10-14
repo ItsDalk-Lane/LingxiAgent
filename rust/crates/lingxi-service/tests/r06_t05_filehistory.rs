@@ -869,7 +869,7 @@ async fn file_history_routes_full_chain_and_error_vocabulary() {
     assert_eq!(versions.len(), 3);
     assert_eq!(versions[0]["origin"], "restore");
 
-    // 再 restore 同一快照：内容未变 → unchanged，不增生行（:91-94）。
+    // 重复恢复仍需显式审计快照；只有普通事件捕获按同内容去重。
     let (status, _body) = server
         .post(
             "/lingxi/v1/file-history/restore",
@@ -881,7 +881,8 @@ async fn file_history_routes_full_chain_and_error_vocabulary() {
         .get("/lingxi/v1/file-history/versions?agentId=a&relPath=doc.txt")
         .await;
     let versions = serde_json::from_str::<serde_json::Value>(&body).unwrap();
-    assert_eq!(versions["versions"].as_array().unwrap().len(), 3);
+    assert_eq!(versions["versions"].as_array().unwrap().len(), 4);
+    assert_eq!(versions["versions"][0]["origin"], "restore");
 
     // invalid snapshotId → 400；不存在 → 404（:79/:91）。
     let (status, body) = server
@@ -939,4 +940,164 @@ fn json_err(body: &str) -> String {
         .as_str()
         .expect("error field")
         .to_string()
+}
+
+/// R06-R2（3A50AD28E08E / A9DAA48DC603 / AF8E24A2F524）：query.agentId
+/// 解析指定助手 home workspace 并保持助手间历史隔离——A/B 两个显式
+/// desk.home_folder，快照行按 workspace_hash 隔离；跨助手版本/快照/
+/// 恢复请求不扩大披露范围（现役 file-history.ts:5-9 resolveWorkspaceRoot
+/// + per-root entries 的端口映射）。
+#[tokio::test]
+async fn file_history_routes_scope_per_agent_workspace() {
+    let server = start_server("agent-scope", true).await;
+    let home = &server.home;
+    // 两个助手（显式 home folder 各异）。
+    let ws_a = std::env::temp_dir().join(format!("lingxi-r06r2-fh-a-{}", std::process::id()));
+    let ws_b = std::env::temp_dir().join(format!("lingxi-r06r2-fh-b-{}", std::process::id()));
+    for (agent, ws) in [("agent-a", &ws_a), ("agent-b", &ws_b)] {
+        std::fs::create_dir_all(ws).expect("mkdir agent ws");
+        let dir = home.join("agents").join(agent);
+        std::fs::create_dir_all(&dir).expect("mkdir agent dir");
+        std::fs::write(
+            dir.join("config.yaml"),
+            format!(
+                "agent:\n  name: {agent}\ndesk:\n  home_folder: {}\n",
+                ws.canonicalize().unwrap().to_string_lossy()
+            ),
+        )
+        .expect("写 agent config");
+    }
+    let ws_a = ws_a.canonicalize().expect("canonical a");
+    let ws_b = ws_b.canonicalize().expect("canonical b");
+    let hash_a = lingxi_service::filehistory::workspace_hash_for_root(&ws_a);
+    let hash_b = lingxi_service::filehistory::workspace_hash_for_root(&ws_b);
+    assert_ne!(hash_a, hash_b, "两个助手根必须不同 hash");
+
+    // 各自根下备料快照（同库不同 hash；backdate 避开合并窗语义不相关）。
+    let now_ms = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("clock")
+        .as_millis() as u64;
+    let a_id = lingxi_adapters::storage::session_files::insert_file_snapshot(
+        &server.storage,
+        &lingxi_adapters::storage::session_files::FileSnapshotInsert {
+            workspace_hash: &hash_a,
+            rel_path: "shared-name.txt",
+            captured_at_ms: now_ms - 60_000,
+            origin: "event",
+            content: b"agent-a-private".to_vec(),
+        },
+    )
+    .await
+    .expect("seed A snapshot");
+    let _b_id = lingxi_adapters::storage::session_files::insert_file_snapshot(
+        &server.storage,
+        &lingxi_adapters::storage::session_files::FileSnapshotInsert {
+            workspace_hash: &hash_b,
+            rel_path: "b-only.txt",
+            captured_at_ms: now_ms - 60_000,
+            origin: "event",
+            content: b"agent-b-private".to_vec(),
+        },
+    )
+    .await
+    .expect("seed B snapshot");
+
+    // ── files 面：各助手只见自己根的清单 ──
+    let (status, body) = server
+        .get("/lingxi/v1/file-history/files?agentId=agent-a")
+        .await;
+    assert_eq!(status, 200, "files a: {body}");
+    let files = serde_json::from_str::<serde_json::Value>(&body).unwrap();
+    let rels: Vec<&str> = files["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| entry["relPath"].as_str().unwrap())
+        .collect();
+    assert_eq!(rels, vec!["shared-name.txt"], "A 只见 A 根: {rels:?}");
+
+    let (status, body) = server
+        .get("/lingxi/v1/file-history/files?agentId=agent-b")
+        .await;
+    assert_eq!(status, 200, "files b: {body}");
+    let files = serde_json::from_str::<serde_json::Value>(&body).unwrap();
+    let rels: Vec<&str> = files["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| entry["relPath"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        rels,
+        vec!["b-only.txt"],
+        "B 只见 B 根（同名文件不串）: {rels:?}"
+    );
+
+    // ── versions 面：B 查 A 的 relPath → 空清单（不披露存在性）──
+    let (status, body) = server
+        .get("/lingxi/v1/file-history/versions?agentId=agent-b&relPath=shared-name.txt")
+        .await;
+    assert_eq!(status, 200, "versions b: {body}");
+    let versions = serde_json::from_str::<serde_json::Value>(&body).unwrap();
+    assert_eq!(
+        versions["versions"],
+        serde_json::json!([]),
+        "B 读不到 A 的同名文件版本"
+    );
+
+    // ── snapshot 面：B 用 A 的快照 id → 404（内容不泄露）──
+    let (status, body) = server
+        .get(&format!(
+            "/lingxi/v1/file-history/snapshot?agentId=agent-b&id={a_id}"
+        ))
+        .await;
+    assert_eq!(status, 404, "跨助手快照 404: {body}");
+
+    // ── restore 面：B 恢复 A 的快照 id → 404，A 的根文件不被写 ──
+    let (status, body) = server
+        .post(
+            "/lingxi/v1/file-history/restore",
+            &serde_json::json!({"agentId": "agent-b", "snapshotId": a_id}),
+        )
+        .await;
+    assert_eq!(status, 404, "跨助手恢复 404: {body}");
+
+    // ── 无显式根的助手：回落实例默认工作区（不从别的助手继承）──
+    let (status, body) = server
+        .get("/lingxi/v1/file-history/files?agentId=plain-agent")
+        .await;
+    assert_eq!(status, 200, "fallback 默认根: {body}");
+    let files = serde_json::from_str::<serde_json::Value>(&body).unwrap();
+    let rels: Vec<&str> = files["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| entry["relPath"].as_str().unwrap())
+        .collect();
+    assert!(
+        !rels.contains(&"shared-name.txt") && !rels.contains(&"b-only.txt"),
+        "默认根不串助手根: {rels:?}"
+    );
+
+    // ── 根不存在的显式配置 → workspace not tracked 404 ──
+    let ghost_dir = home.join("agents/agent-ghost");
+    std::fs::create_dir_all(&ghost_dir).expect("mkdir ghost");
+    std::fs::write(
+        ghost_dir.join("config.yaml"),
+        format!(
+            "agent:\n  name: ghost\ndesk:\n  home_folder: {}\n",
+            home.join("no-such-root").to_string_lossy()
+        ),
+    )
+    .expect("写 ghost config");
+    let (status, body) = server
+        .get("/lingxi/v1/file-history/files?agentId=agent-ghost")
+        .await;
+    assert_eq!(status, 404, "根不存在 → 未跟踪: {body}");
+    assert_eq!(json_err(&body), "workspace not tracked");
+
+    server.stop_and_clean().await;
+    let _ = std::fs::remove_dir_all(&ws_a);
+    let _ = std::fs::remove_dir_all(&ws_b);
 }

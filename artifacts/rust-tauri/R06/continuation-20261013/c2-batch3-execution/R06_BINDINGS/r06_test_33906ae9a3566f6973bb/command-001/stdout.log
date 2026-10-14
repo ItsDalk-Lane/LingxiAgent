@@ -1,0 +1,15 @@
+
+running 1 test
+test fresh_compact_compacts_and_rebuilds_prompt_through_real_service ... ok
+
+successes:
+
+---- fresh_compact_compacts_and_rebuilds_prompt_through_real_service stdout ----
+LINGXI_AUTH_REJECTED request_id="req-e2dd86a7d5457c1ec45a2246a7059f54" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64905
+
+
+successes:
+    fresh_compact_compacts_and_rebuilds_prompt_through_real_service
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.78s
+

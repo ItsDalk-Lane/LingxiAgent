@@ -24,11 +24,11 @@ use std::sync::Arc;
 
 use sha2::{Digest, Sha256};
 
-use lingxi_adapters::storage::RunDatabase;
 use lingxi_adapters::storage::session_files as store;
 use lingxi_adapters::storage::session_files::{
     FileKind, RefKind, SessionFileOrigin, SessionFileRow, SessionFileStatus, StorageKind,
 };
+use lingxi_adapters::storage::RunDatabase;
 use lingxi_kernel::ports::StorageError;
 
 use crate::filemeta;
@@ -154,6 +154,17 @@ pub fn canonical_identity_key(path: &Path) -> String {
     {
         text
     }
+}
+
+/// 登记行存储的 realPath 串与本次规范化路径是否指向同一物理文件。
+/// 字符串相等即相等；不等时对存储串再 canonical 一次（macOS /var 与
+/// /private/var 这类宿主别名、导入 sidecar 的原始串）。存储串已不可
+/// 解析（文件被移动）按不相等处理，走原有路径更新/守护分支。
+fn same_physical_path(stored: &str, canonical: &Path) -> bool {
+    if stored == canonical.to_string_lossy() {
+        return true;
+    }
+    std::fs::canonicalize(stored).is_ok_and(|resolved| resolved == canonical)
 }
 
 // ── 本地导入安全闸（file-import-security.ts + path-security.ts） ──
@@ -546,6 +557,86 @@ impl SessionFileService {
         home.join("session-files")
     }
 
+    /// R06-R2 复制快照并登记附件（原 D09 ATTACHMENT-LOCAL-FILE-SNAPSHOT
+    /// 的桌面语义）：inspect 安全闸已在调用方通过，这里把源字节复制进
+    /// 会话托管缓存（ManagedCache 副本），source key 仍按原路径 + kind +
+    /// size + mtime 铸（同一源重复挂载去重到同一行；源文件随后被外部
+    /// 修改/删除不影响已复制快照）。读取失败响亮报错，不登记半行。
+    pub async fn register_local_snapshot(
+        &self,
+        session_id: &str,
+        inspected: &InspectedPath,
+        label: Option<&str>,
+        origin: &str,
+    ) -> Result<SessionFileView, SessionFileError> {
+        if inspected.kind == "directory" {
+            return Err(SessionFileError::Inspect(InspectError::PathBlocked));
+        }
+        let bytes = std::fs::read(&inspected.real_path).map_err(SessionFileError::Io)?;
+        let source_key = build_session_file_source_key(
+            "upload:path:v1",
+            &[
+                &inspected.real_path.to_string_lossy(),
+                inspected.kind,
+                &inspected.size_bytes.to_string(),
+                &inspected.mtime_ms.to_string(),
+            ],
+        );
+        let now = self.now_ms();
+        let lease = self.payload_lease().await;
+        store::record_current_activity(&self.db, session_id, now).await?;
+        let filename = inspected
+            .real_path
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "attachment".to_string());
+        let ext = filemeta::ext_of_name(&filename);
+        let (base, ext_with_dot) = if ext.is_empty() {
+            (filename.as_str(), String::new())
+        } else {
+            let split = filename.len() - ext.len() - 1;
+            (&filename[..split], format!(".{ext}"))
+        };
+        let random = random_hex4()?;
+        let unique = filemeta::unique_upload_name(base, &ext_with_dot, now, &random);
+        let cache_dir = session_files_cache_dir(&self.home, Some(session_id), None);
+        let dest = cache_dir.join(&unique);
+        let stored_filename = dest
+            .file_name()
+            .expect("upload filename")
+            .to_string_lossy()
+            .into_owned();
+        let identity = canonical_identity_key(&dest);
+        let owner_key = session_file_owner_key(Some(session_id), None);
+        let mime = filemeta::detect_mime(&bytes, "application/octet-stream", &stored_filename);
+        let row = SessionFileRow {
+            file_id: build_session_file_id(&owner_key, Some(&source_key), &identity),
+            owner_session_id: session_id.into(),
+            owner_key,
+            source_key: Some(source_key),
+            identity_key: identity,
+            file_path: dest.to_string_lossy().into_owned(),
+            real_path: dest.to_string_lossy().into_owned(),
+            storage_kind: StorageKind::ManagedCache,
+            status: SessionFileStatus::Available,
+            label: Some(label.unwrap_or(&stored_filename).to_string()),
+            mime: mime.clone(),
+            filename: stored_filename,
+            size_bytes: bytes.len() as u64,
+            mtime_ms: now,
+            is_directory: false,
+            file_kind: parse_kind(filemeta::infer_file_kind(&mime, &ext, false)),
+            origin: parse_origin(origin),
+            registered_at_ms: now,
+            updated_at_ms: now,
+            expires_at_ms: None,
+            legacy_file_ids: vec![],
+            legacy_file_paths: vec![],
+        };
+        let stored = store::register_owned_blob(&self.db, row, bytes, lease).await?;
+        Ok(SessionFileView::from_row(&stored))
+    }
+
     /// 现役 registerFile（:74-165）：sourceKey 优先去重，realPath 兜底；
     /// 命中且 materialization 仍在时保留既有 filePath/realPath；新行
     /// 8KB 采样探测 mime。新登记的既有路径是外部引用；只有实际创建副本
@@ -619,46 +710,50 @@ impl SessionFileService {
         let identity = canonical_identity_key(&canonical);
         let owner_key = session_file_owner_key(Some(session_id), None);
 
+        // 规范化登记：登记行可能持有未规范化的旧 realPath 字符串（旧上传/
+        // sidecar 导入原样保留）。查找同时按原始串与规范串进行，命中后用
+        // 物理等价（双侧 canonical）比较，避免 /var 与 /private/var 这类
+        // 宿主别名把同一文件当成两个身份、重新铸造 sf_ id。
+        let raw_path = real_path.to_string_lossy().into_owned();
+        let canonical_path = canonical.to_string_lossy().into_owned();
+        let existing_by_path = || async {
+            let by_raw =
+                store::get_session_file_by_real_path(&self.db, session_id, &raw_path).await?;
+            if by_raw.is_some() {
+                return Ok(by_raw);
+            }
+            if raw_path == canonical_path {
+                return Ok(None);
+            }
+            store::get_session_file_by_real_path(&self.db, session_id, &canonical_path).await
+        };
+
         let existing = match source_key {
             Some(sk) => {
                 match store::get_session_file_by_source_key(&self.db, session_id, sk).await? {
                     Some(row) => Some(row),
-                    None => {
-                        store::get_session_file_by_real_path(
-                            &self.db,
-                            session_id,
-                            &canonical.to_string_lossy(),
-                        )
-                        .await?
-                    }
+                    None => existing_by_path().await?,
                 }
             }
-            None => {
-                store::get_session_file_by_real_path(
-                    &self.db,
-                    session_id,
-                    &canonical.to_string_lossy(),
-                )
-                .await?
-            }
+            None => existing_by_path().await?,
         };
 
         if let Some(existing) = existing {
             // 现役命中语义：保留既有 id；materialization 仍在且 sourceKey
             // 相同而 realPath 不同 → 保留既有路径；status 复活为 available。
+            let same_file = same_physical_path(&existing.real_path, &canonical);
             let keep = source_key.is_some()
                 && existing.source_key.as_deref() == source_key
-                && existing.real_path != canonical.to_string_lossy()
+                && !same_file
                 && Path::new(&existing.real_path).exists();
             if existing.storage_kind == StorageKind::ManagedCache
-                && (!keep && existing.real_path != canonical.to_string_lossy()
-                    || existing.status == SessionFileStatus::Expired)
+                && (!keep && !same_file || existing.status == SessionFileStatus::Expired)
             {
                 return Err(SessionFileError::Storage(StorageError::InvalidRequest {
                     detail: "managed_file_recovery_requires_owned_creation".into(),
                 }));
             }
-            if !keep && existing.real_path != canonical.to_string_lossy() {
+            if !keep && !same_file {
                 store::update_session_file_paths(
                     &self.db,
                     &existing.file_id,
@@ -678,6 +773,39 @@ impl SessionFileService {
                 )
                 .await?;
             }
+            let materialized = if keep {
+                Path::new(&existing.real_path)
+            } else {
+                &canonical
+            };
+            let meta = std::fs::metadata(materialized)?;
+            let is_directory = meta.is_dir();
+            let sample = if meta.is_file() {
+                read_sample(materialized)?
+            } else {
+                Vec::new()
+            };
+            let mime = if is_directory {
+                "inode/directory".to_string()
+            } else {
+                filemeta::detect_mime(&sample, "application/octet-stream", &existing.filename)
+            };
+            let mut refreshed = existing.clone();
+            refreshed.file_kind = parse_kind(filemeta::infer_file_kind(
+                &mime,
+                &filemeta::ext_of_name(&existing.filename),
+                is_directory,
+            ));
+            refreshed.mime = mime;
+            refreshed.size_bytes = if is_directory { 0 } else { meta.len() };
+            refreshed.mtime_ms = meta
+                .modified()?
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(|error| SessionFileError::Io(std::io::Error::other(error)))?
+                .as_millis() as u64;
+            refreshed.is_directory = is_directory;
+            refreshed.updated_at_ms = now;
+            store::update_session_file_metadata(&self.db, &refreshed).await?;
             let fresh = store::get_session_file(&self.db, &existing.file_id)
                 .await?
                 .ok_or_else(|| {
@@ -1524,9 +1652,9 @@ fn collect_from_text(text: &str, ordered: &mut Vec<String>, seen: &mut HashSet<S
 
 // ── 路由 handler（history.rs 模式：归属闸先于一切实体读取） ──
 
-use axum::Json;
 use axum::extract::{Path as AxumPath, State};
 use axum::response::{IntoResponse, Response};
+use axum::Json;
 
 use crate::{EndpointError, Principal, ServiceState};
 
@@ -1690,6 +1818,11 @@ pub struct AttachLocalBody {
     pub path: String,
     pub label: Option<String>,
     pub origin: Option<String>,
+    /// R06-R2 快照模式（原 D09 ATTACHMENT-LOCAL-FILE-SNAPSHOT）：`snapshot`
+    /// 复制源字节进托管缓存再登记（managed 副本，源文件后续变化不影响
+    /// 附件）；缺省（及 `reference`）保持原 external 引用语义。
+    #[serde(default)]
+    pub mode: Option<String>,
 }
 
 /// `POST /lingxi/v1/sessions/{session_id}/attachments/local` — 本地路径
@@ -1708,6 +1841,11 @@ pub async fn attach_local_route(
         Ok(body) => body,
         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
     };
+    let mode = body.mode.as_deref().unwrap_or("reference");
+    if mode != "reference" && mode != "snapshot" {
+        return EndpointError::invalid_message("mode must be reference or snapshot")
+            .into_response();
+    }
     let home = state.session_files().home().to_path_buf();
     let inspected = match state
         .session_files()
@@ -1716,6 +1854,27 @@ pub async fn attach_local_route(
         Ok(inspected) => inspected,
         Err(err) => return service_error_response(SessionFileError::Inspect(err)),
     };
+    if mode == "snapshot" {
+        // 复制快照并登记（原桌面语义）：读取失败/目录不复制，响亮拒绝，
+        // 不留下半行登记。
+        return match state
+            .session_files()
+            .register_local_snapshot(
+                &session_id,
+                &inspected,
+                body.label.as_deref(),
+                body.origin.as_deref().unwrap_or("user_upload"),
+            )
+            .await
+        {
+            Ok(file) => (
+                axum::http::StatusCode::CREATED,
+                Json(serde_json::json!({ "file": file })),
+            )
+                .into_response(),
+            Err(err) => service_error_response(err),
+        };
+    }
     // 现役 sourceKeyForUploadPath（upload.ts:226-233）。
     let source_key = build_session_file_source_key(
         "upload:path:v1",

@@ -1,0 +1,668 @@
+{
+  "status": "GAP_BLOCKS_C1EAB_BATCH1_BOUND_NOT_STAGE_ACCEPTANCE",
+  "ready": [
+    "R00-T02-LA-1E0D477755CD",
+    "R00-T02-LA-73B631D77531",
+    "R00-T02-LA-7C959E75B8C3",
+    "R00-T02-LA-98DDC94776F1",
+    "R00-T02-LA-9D9E72CB6051",
+    "R00-T02-LA-20E9C8F26CEA",
+    "R00-T02-LA-3818ADEAFA7A",
+    "R00-T02-LA-6658E9B80314",
+    "R00-T02-LA-AFA7227BFB63",
+    "R00-T02-LA-60A58027CCCE",
+    "R00-T02-LA-E167298FD87C",
+    "R00-T02-LA-059066969D44",
+    "R00-T02-LA-D43836A3A579",
+    "R00-T02-LA-EEDFB7AB889C",
+    "R00-T02-LA-D58B651BF099",
+    "R00-T02-LA-3ECCF7C95483",
+    "R00-T02-LA-EF5DD65C558E",
+    "R00-T02-LA-26AE3688B8DE",
+    "R00-T02-LA-9CC1B13F1787",
+    "R00-T02-LA-C0ADBABE5E89",
+    "R00-T02-LA-8D4356B7EC51",
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-517E697740D9",
+    "R00-T02-LA-1685D5E08812",
+    "R00-T02-LA-22150190C7B1",
+    "R00-T02-LA-7D05B144AE21",
+    "R00-T02-LA-99900EB5ACC9",
+    "R00-T02-LA-B5CB2993A5C0",
+    "R00-T02-LA-C3FB70F9925E",
+    "R00-T02-LA-D92CD567D6D6"
+  ],
+  "partial": [
+    "R00-T02-LA-FBDEEDAC0B11",
+    "R00-T02-LA-485B2D0A8A02",
+    "R00-T02-LA-24BC2E961E3E"
+  ],
+  "review": [
+    {
+      "id": "R00-T02-LA-1E0D477755CD",
+      "original": {
+        "then": "从会话授权范围移除指定目录",
+        "assertions": [
+          "给定目标与相应权限，执行“撤销会话授权目录”后核对：从会话授权范围移除指定目录",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "没有原撤销授权目录路由；创建会话时写初始目录或ResourceIO拒绝不能代替撤权并验证新范围。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-73B631D77531",
+      "original": {
+        "then": "用新目录集合整体替换原授权范围",
+        "assertions": [
+          "给定目标与相应权限，执行“替换会话授权目录”后核对：用新目录集合整体替换原授权范围",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "没有原整体替换授权目录路由；初始authorizedFolders不是替换旧范围。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-7C959E75B8C3",
+      "original": {
+        "then": "list返回范围；add/remove经许可后改变会话目录作用域并可再读。",
+        "assertions": [
+          "批准后仅当前会话变化",
+          "拒绝后范围不变",
+          "未批准、无会话、目录无效或撤权后拒绝；不扩大其他会话范围。"
+        ],
+        "groups": [],
+        "gaps": [
+          "未注册原session_folders批准/拒绝工具；初始目录与file.access扩大提示不代替用户批准后仅当前会话更改。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-98DDC94776F1",
+      "original": {
+        "then": "经 sessions.read 返回指定活动会话的目录授权范围",
+        "assertions": [
+          "给定目标与相应权限，执行“查看会话授权目录”后核对：经 sessions.read 返回指定活动会话的目录授权范围",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "sessions/find含初始authorizedFolders，但没有原活动会话授权目录专属GET路由及活动条件/完整失败检查。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-FBDEEDAC0B11",
+      "original": {
+        "then": "改变当前会话并尝试恢复该会话浏览器，旧会话浏览器不随切换挂起",
+        "assertions": [
+          "给定目标与相应权限，执行“切换焦点会话”后核对：改变当前会话并尝试恢复该会话浏览器，旧会话浏览器不随切换挂起",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "没有焦点会话切换及浏览器恢复流程；服务侧新建或读取不证明桌面焦点/浏览器状态。"
+        ]
+      },
+      "became": "GAP"
+    },
+    {
+      "id": "R00-T02-LA-9D9E72CB6051",
+      "original": {
+        "then": "创建不切走当前焦点的会话；可选谱系和项目归属，深度过限拒绝",
+        "assertions": [
+          "给定目标与相应权限，执行“创建独立会话”后核对：创建不切走当前焦点的会话；可选谱系和项目归属，深度过限拒绝",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "普通新建会话可指定ID与初始权限，原独立会话可选项目归属/谱系及不切焦点流程未接入。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-20E9C8F26CEA",
+      "original": {
+        "then": "把会话分配到项目或用 null 清除归属，返回新分配",
+        "assertions": [
+          "给定目标与相应权限，执行“设置会话项目归属”后核对：把会话分配到项目或用 null 清除归属，返回新分配",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-485B2D0A8A02",
+      "original": {
+        "then": "轮换为新会话，旧会话归档；无历史时仍创建新会话",
+        "assertions": [
+          "轮换为新会话，旧会话归档；无历史时仍创建新会话",
+          "接管态拒绝，未找到当前会话明确提示"
+        ],
+        "groups": [],
+        "gaps": [
+          "未注册原/new slash轮换、旧会话归档和接管态拒绝。"
+        ]
+      },
+      "became": "GAP"
+    },
+    {
+      "id": "R00-T02-LA-3818ADEAFA7A",
+      "original": {
+        "then": "校验会话范围后生成可续接的新会话身份并返回路径或错误",
+        "assertions": [
+          "执行“续接已删除 Agent 的会话”后核对：校验会话范围后生成可续接的新会话身份并返回路径或错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "groups": [],
+        "gaps": [
+          "没有续接已删除Agent会话的接口和新身份生成流程；普通新建或fork不能代替。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-6658E9B80314",
+      "original": {
+        "then": "符合工作台身份的会话归档后永久删除文件和草稿",
+        "assertions": [
+          "给定目标与相应权限，执行“永久删除工作台会话”后核对：符合工作台身份的会话归档后永久删除文件和草稿",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "未接入工作台专属永久删除动作及草稿清理，通用归档删除不证明工作台条件。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-AFA7227BFB63",
+      "original": {
+        "then": "返回项目和文件夹目录",
+        "assertions": [
+          "给定目标与相应权限，执行“查看会话项目目录”后核对：返回项目和文件夹目录",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-60A58027CCCE",
+      "original": {
+        "then": "按名称创建文件夹并返回新项",
+        "assertions": [
+          "给定目标与相应权限，执行“创建项目文件夹”后核对：按名称创建文件夹并返回新项",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-E167298FD87C",
+      "original": {
+        "then": "在指定文件夹或根目录创建项目并返回新项目",
+        "assertions": [
+          "给定目标与相应权限，执行“创建会话项目”后核对：在指定文件夹或根目录创建项目并返回新项目",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-059066969D44",
+      "original": {
+        "then": "按所给字段更新文件夹并返回新状态",
+        "assertions": [
+          "给定目标与相应权限，执行“修改项目文件夹”后核对：按所给字段更新文件夹并返回新状态",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-D43836A3A579",
+      "original": {
+        "then": "按所给字段更新项目并返回新状态",
+        "assertions": [
+          "给定目标与相应权限，执行“修改会话项目”后核对：按所给字段更新项目并返回新状态",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-EEDFB7AB889C",
+      "original": {
+        "then": "按 folderIds 重排并返回目录",
+        "assertions": [
+          "给定目标与相应权限，执行“重排项目文件夹”后核对：按 folderIds 重排并返回目录",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-D58B651BF099",
+      "original": {
+        "then": "按 folderId 与 projectIds 重排并返回目录",
+        "assertions": [
+          "给定目标与相应权限，执行“重排会话项目”后核对：按 folderId 与 projectIds 重排并返回目录",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-3ECCF7C95483",
+      "original": {
+        "then": "删除项目目录记录，原属该项目的活动会话写入未分类项目 ID；返回受影响会话路径",
+        "assertions": [
+          "删除项目后核对项目消失、原属活动会话的项目归属为未分类且会话内容仍在。",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-EF5DD65C558E",
+      "original": {
+        "then": "删除文件夹后，原文件夹下项目移到根目录并重新排序，返回新目录；项目与会话不删除",
+        "assertions": [
+          "删除文件夹后核对文件夹消失、其项目出现在根目录且会话仍在原项目。",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust未接入原session-projects项目/文件夹及会话归属管理路由和持久化，不能用普通sessions列表或标题证明项目动作。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-26AE3688B8DE",
+      "original": {
+        "then": "返回助手清单及有效主目录；fresh=1/true 使列表缓存失效，先清理工作区持久化残留",
+        "assertions": [
+          "成功：执行“列出助手”后，返回助手清单及有效主目录；fresh=1/true 使列表缓存失效，先清理工作区持久化残留",
+          "拒绝/边界：query.fresh=1/true 刷新缓存；否则复用缓存；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "当前Rust路由没有原助手列表/有效home/fresh清缓存与工作区GC完整入口"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "当前Rust无列表TTL/fresh路径，旧TS测试只保留基线"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的助手清单、有效主目录、fresh缓存清理和工作区GC入口未实现。"
+          },
+          "当前Rust路由没有原助手列表/有效home/fresh清缓存与工作区GC完整入口",
+          "当前Rust无列表TTL/fresh路径，旧TS测试只保留基线"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-9CC1B13F1787",
+      "original": {
+        "then": "新助手持久化并广播 agent-created，返回新 id/name",
+        "assertions": [
+          "成功：执行“创建助手”后，新助手持久化并广播 agent-created，返回新 id/name",
+          "拒绝/边界：body.name 非空；可选 id 校验；重名 409；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust没有原创建助手目录/登记/agent-created/new id/name完整入口"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust没有该name/id/重名409入口；旧TS检查未覆盖全部重名边界"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的新助手持久化与agent-created/new id/name入口未实现。"
+          },
+          "Rust没有原创建助手目录/登记/agent-created/new id/name完整入口",
+          "Rust没有该name/id/重名409入口；旧TS检查未覆盖全部重名边界"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-C0ADBABE5E89",
+      "original": {
+        "then": "更新主助手 id，后续默认选择随之变化",
+        "assertions": [
+          "成功：执行“设置主助手”后，更新主助手 id，后续默认选择随之变化",
+          "拒绝/边界：body.id 必填且有效；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust无原agents/primary保存及后续默认选择接口"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust无原primary body.id必填有效请求面"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的主助手id写入与后续默认选择入口未实现。"
+          },
+          "Rust无原agents/primary保存及后续默认选择接口",
+          "Rust无原primary body.id必填有效请求面"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-8D4356B7EC51",
+      "original": {
+        "then": "保存顺序供助手列表显示",
+        "assertions": [
+          "成功：执行“重排助手”后，保存顺序供助手列表显示",
+          "拒绝/边界：order 必须数组；每个 id 合法、存在且不重复；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust无原agents/order保存列表顺序入口"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust无order数组/非法/未知/重复id的原请求面"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的助手顺序保存及列表显示入口未实现。"
+          },
+          "Rust无原agents/order保存列表顺序入口",
+          "Rust无order数组/非法/未知/重复id的原请求面"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-8B48FD65CAFB",
+      "original": {
+        "then": "切换会话与工作目录，更新 last_cwd/history，发 agent-switched，返回当前上下文",
+        "assertions": [
+          "成功：执行“切换当前助手”后，切换会话与工作目录，更新 last_cwd/history，发 agent-switched，返回当前上下文",
+          "拒绝/边界：body.id 必须有效；切换失败按路由错误返回；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust路由没有原agents/switch焦点会话/last_cwd/history/事件链"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust没有该切换入口的body.id校验和路由错误传递"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的助手切换会话/cwd、last_cwd/history、事件及上下文入口未实现。"
+          },
+          "Rust路由没有原agents/switch焦点会话/last_cwd/history/事件链",
+          "Rust没有该切换入口的body.id校验和路由错误传递"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-517E697740D9",
+      "original": {
+        "then": "助手目录与登记消失；如当前助手被删，切到替代助手并发 agent-deleted/agent-switched",
+        "assertions": [
+          "成功：删除助手后，助手目录与登记消失；如当前助手被删，切到替代助手并发 agent-deleted/agent-switched",
+          "边界：deleteSkills 缺省或 [] 时 skillsDeleted=[]，技能目录保留；拒绝时目标状态不变"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "当前Rust无删除助手目录/登记并切替代助手与两个事件的完整入口"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust无助手删除deleteSkills缺省/空数组拒绝完整入口"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的助手目录/登记删除、替代助手切换和两个事件未实现。"
+          },
+          "当前Rust无删除助手目录/登记并切替代助手与两个事件的完整入口",
+          "Rust无助手删除deleteSkills缺省/空数组拒绝完整入口"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-1685D5E08812",
+      "original": {
+        "then": "保存enabled 等自动学习开关并返回新状态",
+        "assertions": [
+          "成功：执行“更新自动学习偏好”后，保存enabled 等自动学习开关并返回新状态",
+          "拒绝/边界：engine.getAutolearnPreferences/setAutolearnPreferences；PUT 接受 autolearn 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          "自动学习设置保存入口未迁移。",
+          "当前服务没有preferences/autolearn保存入口；原成功状态尚未实现。",
+          "包裹/扁平patch及无效body/平台拒绝均没有现行入口与专属行为证明。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-22150190C7B1",
+      "original": {
+        "then": "返回当前 enabled 状态；此读取不会回退文件",
+        "assertions": [
+          "执行“查看文件回退开关”后核对：返回当前 enabled 状态；此读取不会回退文件",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "groups": [],
+        "gaps": [
+          "Rust没有原文件回退偏好GET接口；内部原子布尔值读取不能代替带鉴权、拒绝和失败的读取路由。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-7D05B144AE21",
+      "original": {
+        "then": "返回匹配经验及路径，不改记忆文件。",
+        "assertions": [
+          "命中来自当前Agent",
+          "无写入",
+          "无记录/跨Agent时为空，不泄露其他Agent经验。"
+        ],
+        "groups": [],
+        "gaps": [
+          "recall_experience工具未注册。",
+          "recall_experience未注册为当前工具；只读经验HTTP不能替代该工具命中。",
+          "无真实recall工具前后文件不变证据。",
+          "无真实recall跨Agent/空结果专属证据。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-99900EB5ACC9",
+      "original": {
+        "then": "从 tenets 存储删除指定项并广播 tenets-changed",
+        "assertions": [
+          "成功：执行“删除原则”后，从 tenets 存储删除指定项并广播 tenets-changed",
+          "拒绝/边界：不存在 404；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          "原预期tenets-changed广播未实现，真实HTTP删除后存储回读仍缺。",
+          "当前tenets_delete_route不广播tenets-changed，原成功通知未实现；原具名测试也无HTTP删除后存储读回。",
+          "没有同一真实DELETE未知id404及越权零副作用专属检查。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-B5CB2993A5C0",
+      "original": {
+        "then": "返回快捷聊天窗口设置，不改动设置",
+        "assertions": [
+          "成功：执行“读取快捷聊天偏好”后，返回快捷聊天窗口设置，不改动设置",
+          "拒绝/边界：engine.getQuickChatPreferences/setQuickChatPreferences；PUT 接受 quickChat 包裹或扁平 patch；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          "返回快捷聊天窗口设置，不改动设置",
+          "engine.getQuickChatPreferences/setQuickChatPreferences",
+          "PUT接受quickChat包裹或扁平patch",
+          "不应错误扩大写入或披露范围"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-C3FB70F9925E",
+      "original": {
+        "then": "返回enabled 等自动学习开关，不改动设置",
+        "assertions": [
+          "成功：执行“读取自动学习偏好”后，返回enabled 等自动学习开关，不改动设置",
+          "拒绝/边界：engine.getAutolearnPreferences/setAutolearnPreferences；PUT 接受 autolearn 包裹或扁平 patch；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          "自动学习设置读取入口未迁移。",
+          "preferences/autolearn GET当前服务未实现。",
+          "原全局自动学习包裹/扁平接口没有对应生产/原副作用检查。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-D92CD567D6D6",
+      "original": {
+        "then": "保存快捷聊天窗口设置并返回新状态",
+        "assertions": [
+          "成功：执行“更新快捷聊天偏好”后，保存快捷聊天窗口设置并返回新状态",
+          "拒绝/边界：engine.getQuickChatPreferences/setQuickChatPreferences；PUT 接受 quickChat 包裹或扁平 patch；无效 body/平台拒绝；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          "保存快捷聊天窗口设置并返回新状态",
+          "engine.getQuickChatPreferences/setQuickChatPreferences",
+          "PUT接受quickChat包裹或扁平patch",
+          "无效body/平台拒绝",
+          "不应错误扩大写入或披露范围"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-24BC2E961E3E",
+      "original": {
+        "then": "splitByScope 的全局 setter 写 preferences.json，纯全局 patch 不写 agents/{id}/config.yaml；跨助手读取同一偏好",
+        "assertions": [
+          "纯全局 patch（如 keep_awake）只经 setter 写 preferences.json；agentPartial 为空时直接返回，且跨助手可读到相同偏好",
+          "分别核对 editor 排版与 chat 布局两处控件请求：前者全局叶、后者助手叶，不把两次请求说成单次 mixed patch",
+          "真正同一次 mixed patch（如 keep_awake + chat）同时覆盖全局与助手叶；后段失败时全局 setter 可能已经写入，读回两处并记录部分成功，不得宣称原子回滚"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust当前只有局部助手config PATCH/flags GET，无原splitByScope全局setter偏好写入面；无纯全局跨助手实际读回"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "PROOF_GAP",
+            "reason": "没有editor/chat两处真实控件请求检查；纯拆分检查不能替代前端动作"
+          },
+          {
+            "assertionIndex": 2,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust原同请求mixed patch及部分成功读回未实现"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then的splitByScope全局setter/preferences/不写助手/跨助手共享原设置入口未实现。"
+          },
+          "Rust当前只有局部助手config PATCH/flags GET，无原splitByScope全局setter偏好写入面；无纯全局跨助手实际读回",
+          "没有editor/chat两处真实控件请求检查；纯拆分检查不能替代前端动作",
+          "Rust原同请求mixed patch及部分成功读回未实现"
+        ]
+      },
+      "became": "GAP"
+    }
+  ],
+  "stageAcceptance": false
+}

@@ -146,7 +146,7 @@ pub enum FileRollbackMode {
 /// 内容级文件恢复报告（rewind 收据与 retry fileRollbackReport 共用形状——
 /// REPAIR-R1 FINDING-05/02 同一套恢复机制）。逐文件如实归档：
 /// restored=真实写回存档字节；conflicted=外部修改（含删除），保留用户文件；
-/// skipped=已是目标态无需写回；failed=写回/校验 IO 失败（未覆盖现状）。
+/// skipped=已是目标态无需写回；failed=写回/校验 IO 失败，reason 标明可能已写入。
 /// `ok` = 无冲突无失败且 reason 为空；`reason` 承载整体级说明
 /// （如 retry 锚点无检查点 → "no_checkpoint"，对照现役 restoreTurn 同款）。
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -211,8 +211,10 @@ pub struct RewindReceipt {
     pub conflicted: Vec<String>,
     /// 已在检查点状态、无需写回的文件。
     pub skipped: Vec<String>,
-    /// 写回/校验 IO 失败的文件（现状未被覆盖）。
+    /// 写回/校验 IO 失败的文件；可能已写入时保留明确原因和恢复记录。
     pub failed: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file_restore_reason: Option<String>,
     #[serde(default)]
     pub recovery_records: Vec<serde_json::Value>,
     /// 外部副作用（网络/bash）绝不回滚，也绝不伪称已回滚。
@@ -946,7 +948,7 @@ impl SessionService {
                 None => serde_json::Value::Null,
             },
         );
-        let receipt = serde_json::json!({"sessionId":session_id,"checkpoint":checkpoint_name,"turnInputMessageId":point.turn_input_message_id,"newHeadMessageId":point.new_head_message_id,"resetMarkerId":"","restored":file_report.restored,"conflicted":file_report.conflicted,"skipped":file_report.skipped,"failed":file_report.failed,"recoveryRecords":file_report.recovery_records,"externalEffects":"not_rolled_back"});
+        let receipt = serde_json::json!({"sessionId":session_id,"checkpoint":checkpoint_name,"turnInputMessageId":point.turn_input_message_id,"newHeadMessageId":point.new_head_message_id,"resetMarkerId":"","restored":file_report.restored,"conflicted":file_report.conflicted,"skipped":file_report.skipped,"failed":file_report.failed,"fileRestoreReason":file_report.reason,"recoveryRecords":file_report.recovery_records,"externalEffects":"not_rolled_back"});
         let (marker_id, envelope) = store::reset_branch_head_committed(
             &self.storage,
             store::ResetBranchHead {
@@ -973,6 +975,7 @@ impl SessionService {
             conflicted: file_report.conflicted,
             skipped: file_report.skipped,
             failed: file_report.failed,
+            file_restore_reason: file_report.reason,
             recovery_records: file_report.recovery_records,
             external_effects: "not_rolled_back".to_string(),
         })

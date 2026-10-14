@@ -1,0 +1,15 @@
+
+running 1 test
+test latest_user_message_replay_replays_by_version_with_optional_replacement ... ok
+
+successes:
+
+---- latest_user_message_replay_replays_by_version_with_optional_replacement stdout ----
+LINGXI_AUTH_REJECTED request_id="req-05de3c390ed4a66d070bba98d5a037e0" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64932
+
+
+successes:
+    latest_user_message_replay_replays_by_version_with_optional_replacement
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.61s
+

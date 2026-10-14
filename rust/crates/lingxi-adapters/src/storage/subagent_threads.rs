@@ -1,12 +1,12 @@
 //! 子线程与模型历史使用现有单写队列；线程归属、当前任务和关闭状态均为持久事实。
 use super::{
     migrations::map_rusqlite,
-    run_store::{RunDatabase, with_write_txn},
+    run_store::{with_write_txn, RunDatabase},
 };
-use lingxi_kernel::{RunContext, ports::StorageError};
+use lingxi_kernel::{ports::StorageError, RunContext};
 use lingxi_protocol::canon;
-use rusqlite::{OptionalExtension, params};
-use serde_json::{Value, json};
+use rusqlite::{params, OptionalExtension};
+use serde_json::{json, Value};
 
 fn invalid(detail: impl Into<String>) -> StorageError {
     StorageError::InvalidRequest {
@@ -69,12 +69,15 @@ pub async fn reserve(
     let input = input.to_string();
     let busy = db.options().busy_timeout_ms;
     db.queue().submit(move |conn| with_write_txn(conn,busy,|conn| {
-        let id=text(&state,"threadId")?; let session=text(&state,"parentSessionId")?;
-        let kind=text(&state,"ownerKind")?; let subject=text(&state,"ownerSubject")?;
-        let agent=text(&state,"agentId")?; let run=text(&state,"childRunId")?;
+        let id = text(&state, "threadId")?.to_string();
+        let session = text(&state, "parentSessionId")?.to_string();
+        let kind = text(&state, "ownerKind")?.to_string();
+        let subject = text(&state, "ownerSubject")?.to_string();
+        let agent = text(&state, "agentId")?.to_string();
+        let run = text(&state, "childRunId")?.to_string();
         let actual: Option<String>=conn.query_row("SELECT run_id FROM runs WHERE run_id=?1 AND session_id=?2 AND owner_kind=?3 AND owner_subject=?4",params![parent_run,session,kind,subject],|row|row.get(0)).optional().map_err(map_rusqlite)?;
         if actual.is_none(){return Err(invalid("parent ownership mismatch"));}
-        let old: Option<String>=conn.query_row("SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",[id],|row|row.get(0)).optional().map_err(map_rusqlite)?;
+        let old: Option<String>=conn.query_row("SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",[&id],|row|row.get(0)).optional().map_err(map_rusqlite)?;
         let old=old.map(|s|decode(&s)).transpose()?;
         if existing {
             let prior=old.as_ref().ok_or_else(||invalid("thread not found"))?;
@@ -306,13 +309,36 @@ pub async fn has_history(db: &RunDatabase, run: &str) -> Result<bool, StorageErr
     }).await
 }
 
-pub async fn record_failure(db: &RunDatabase, ctx: &RunContext, agent: &str, detail: &str) -> Result<(),StorageError> {
-    let ctx=ctx.clone();let agent=agent.to_string();let detail=detail.to_string();let busy=db.options().busy_timeout_ms;
-    db.queue().submit(move|conn|with_write_txn(conn,busy,|conn|{
-        let thread=context_thread(conn,&ctx,&agent)?;
-        let raw:String=conn.query_row("SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",[&thread],|r|r.get(0)).map_err(map_rusqlite)?;
-        let mut state=decode(&raw)?;state["error"]=json!(detail);
-        conn.execute("UPDATE subagent_threads_v1 SET state_json=?2 WHERE thread_id=?1",params![thread,state.to_string()]).map_err(map_rusqlite)?;
-        Ok(())
-    })).await
+pub async fn record_failure(
+    db: &RunDatabase,
+    ctx: &RunContext,
+    agent: &str,
+    detail: &str,
+) -> Result<(), StorageError> {
+    let ctx = ctx.clone();
+    let agent = agent.to_string();
+    let detail = detail.to_string();
+    let busy = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                let thread = context_thread(conn, &ctx, &agent)?;
+                let raw: String = conn
+                    .query_row(
+                        "SELECT state_json FROM subagent_threads_v1 WHERE thread_id=?1",
+                        [&thread],
+                        |r| r.get(0),
+                    )
+                    .map_err(map_rusqlite)?;
+                let mut state = decode(&raw)?;
+                state["error"] = json!(detail);
+                conn.execute(
+                    "UPDATE subagent_threads_v1 SET state_json=?2 WHERE thread_id=?1",
+                    params![thread, state.to_string()],
+                )
+                .map_err(map_rusqlite)?;
+                Ok(())
+            })
+        })
+        .await
 }

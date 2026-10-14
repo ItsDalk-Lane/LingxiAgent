@@ -30,7 +30,9 @@
 
 use std::path::PathBuf;
 
-use lingxi_adapters::storage::{backup_database, migrations, restore_backup, BackupOptions};
+use lingxi_adapters::storage::{
+    backup_database, migrations, restore_backup, BackupOptions, StoreOptions,
+};
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -96,6 +98,7 @@ fn main() {
                 &stem,
                 wal_bytes_before,
                 BackupOptions::default(),
+                StoreOptions::default().checkpoint_grace_ms,
             ) {
                 Ok(outcome) => {
                     println!(

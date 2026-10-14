@@ -46,6 +46,8 @@
 //! | POST /lingxi/v1/sessions/{id}/rewind[ /preview] | scope `chat` + owner check (R06-T03) |
 //! | GET  /lingxi/v1/sessions/{id}/branch       | scope `chat` + owner check (R06-T03) |
 //! | GET|POST /lingxi/v1/sessions/{id}/checkpoints[ /delete] | scope `chat` + owner check (R06-T03) |
+//! | GET|PUT /lingxi/v1/sessions/{id}/conversation-map/layout | scope `chat` + owner check (R06 收口) |
+//! | POST /lingxi/v1/checkpoints/{id}/restore   | local_only (R06 收口：现役 STUDIO_OWNER 兜底的最严格档) |
 //! | GET|PATCH /lingxi/v1/sessions/{id}/memory  | scope `chat` + owner check (R06-T03) |
 //! | POST /lingxi/v1/sessions/{rename,pin,pin-order,archive,restore,cleanup} | scope `chat` (R06-T03) |
 //! | GET  /lingxi/v1/sessions/archived          | scope `chat` (R06-T03) |
@@ -542,6 +544,13 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if (p == "/lingxi/v1/me" || p == "/lingxi/v1/server/identity") && m == "GET" {
         return RoutePolicy::Authenticated;
     }
+    if p == "/lingxi/v1/input-drafts" {
+        return if m == "GET" || m == "HEAD" || m == "PUT" {
+            RoutePolicy::Authenticated
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
     if p == "/lingxi/v1/session-thinking-level" && (m == "GET" || m == "POST") {
         return RoutePolicy::Scope("chat");
     }
@@ -565,18 +574,92 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         return RoutePolicy::Scope("chat");
     }
     if let Some(rest) = p.strip_prefix("/lingxi/v1/sessions/") {
+        if rest == "workspace-rollback" {
+            return if m == "GET" || m == "HEAD" || m == "PUT" {
+                RoutePolicy::Scope("chat")
+            } else {
+                RoutePolicy::LocalOnly
+            };
+        }
         // R06-T03 管理面静态名（先静态后参数，与 axum 静态优先同口径；
         // 误把静态名当会话 id 也只会落到同一 scope，区别只在归属校验）。
         if m == "POST"
             && matches!(
                 rest,
-                "rename" | "pin" | "pin-order" | "archive" | "restore" | "cleanup"
+                "rename"
+                    | "pin"
+                    | "pin-order"
+                    | "archive"
+                    | "restore"
+                    | "cleanup"
+                    | "switch"
+                    | "rotate"
+                    | "continue-deleted-agent"
+                    | "new-detached"
+                    | "todos/complete"
+                    | "todos/cancel"
+                    | "todos/dismiss"
+                    | "workspace-disposal"
+                    | "sweep-orphaned-workspaces"
             )
         {
             return RoutePolicy::Scope("chat");
         }
         if rest == "archived/delete" && m == "POST" {
             return RoutePolicy::Scope("chat");
+        }
+        // R06 G 块：todos 面板读面（同会话读 scope，归属逐请求复检）。
+        if rest == "todos" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("chat");
+        }
+        // R06 R2：会话列表投影（sessions.read 口径，Studio 身份闸在处理器内）。
+        if rest == "studio-list" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("chat");
+        }
+        // R06 R2：工作台同版本写入（chat 写面，归属/授权在处理器内复检）。
+        if p == "/lingxi/v1/workbench/actions" && m == "POST" {
+            return RoutePolicy::Scope("chat");
+        }
+        // R06 C1/C2：会话级子面的会话读/写 scope（与既有 suffix 规则同口径；
+        // workspace 是处置/清扫的身份写面，find/replay/overview/content/
+        // summary/turns/fresh-compact 是历史内容读写面）。
+        if let Some((id, tail)) = rest.split_once('/') {
+            let id_clean = !id.is_empty() && !id.contains('/');
+            match tail {
+                "workspace" if id_clean && m == "PUT" => return RoutePolicy::Scope("chat"),
+                "find" if id_clean && (m == "GET" || m == "HEAD") => {
+                    return RoutePolicy::Scope("chat")
+                }
+                "latest-user-message/replay" if id_clean && m == "POST" => {
+                    return RoutePolicy::Scope("chat")
+                }
+                "history-overview" if id_clean && (m == "GET" || m == "HEAD") => {
+                    return RoutePolicy::Scope("chat")
+                }
+                "summary" if id_clean && (m == "GET" || m == "HEAD") => {
+                    return RoutePolicy::Scope("chat")
+                }
+                "conversation-map/turns" if id_clean && (m == "GET" || m == "HEAD") => {
+                    return RoutePolicy::Scope("chat")
+                }
+                // R06 收口：会话地图布局读/写（现役 conversation-map.ts
+                // layout 叶；写面是 sessions.write 形状——fail-closed 同
+                // scope `chat` + handler 内归属逐请求复检）。
+                "conversation-map/layout"
+                    if id_clean && matches!(m.as_str(), "GET" | "HEAD" | "PUT") =>
+                {
+                    return RoutePolicy::Scope("chat")
+                }
+                "fresh-compact" if id_clean && m == "POST" => return RoutePolicy::Scope("chat"),
+                content
+                    if id_clean
+                        && content.starts_with("content/")
+                        && (m == "GET" || m == "HEAD") =>
+                {
+                    return RoutePolicy::Scope("chat")
+                }
+                _ => {}
+            }
         }
         if !rest.is_empty() && !rest.contains('/') && (m == "GET" || m == "HEAD") {
             return RoutePolicy::Scope("chat");
@@ -604,6 +687,19 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         // R06-T03: the session tree faces — fork / retry / rewind (write,
         // sessions.write-shaped; fail-closed scope `chat` + owner re-check)
         // and the branch-history read (read, same as the session read).
+        // R06 会话授权目录：读/写同会话面 scope，归属逐请求复检。
+        if let Some(id) = rest.strip_suffix("/authorized-folders") {
+            if !id.is_empty() && !id.contains('/') && matches!(m.as_str(), "GET" | "HEAD" | "PATCH")
+            {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+        // R06 v12 会话项目归属：读/写同会话面 scope。
+        if let Some(id) = rest.strip_suffix("/project") {
+            if !id.is_empty() && !id.contains('/') && matches!(m.as_str(), "GET" | "HEAD" | "PUT") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
         if let Some(id) = rest.strip_suffix("/fork") {
             if !id.is_empty() && !id.contains('/') && m == "POST" {
                 return RoutePolicy::Scope("chat");
@@ -772,6 +868,13 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if p == "/lingxi/v1/fs/read" || p == "/lingxi/v1/fs/read-base64" {
         return RoutePolicy::LocalOnly;
     }
+    // R06 收口：独立改前存档 restore 面（现役 /api/checkpoints/:id/restore
+    // 把存档字节写回存档记录的绝对路径；route-security 里该族落 /api/
+    // 兜底 STUDIO_OWNER——Rust 无 studio 面，按既有口径取最严格档
+    // LocalOnly；族内未列形状同样 fail closed）。
+    if p.starts_with("/lingxi/v1/checkpoints/") {
+        return RoutePolicy::LocalOnly;
+    }
     if p == "/lingxi/v1/devices/credentials" {
         // Management surface: local owner only, every verb (mirrors the
         // incumbent LOCAL_ONLY /api/devices/ family).
@@ -827,6 +930,41 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             return RoutePolicy::LocalOnly;
         }
     }
+    // R06 A 块读回叶：运行时状态键 / 实验读写 / 观察记录（现役
+    // experiments.ts：读无显式 scope 门（本地读面）、PATCH settings.write；
+    // observation 读写面按 settings 分类）。
+    if p == "/lingxi/v1/current-status" {
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("settings.read")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if p == "/lingxi/v1/experiments" {
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("settings.read")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if p == "/lingxi/v1/experiments/memory/cache-snapshot-reflection/observation" {
+        // TS experiments.ts：GET 无 scope 门（仅需鉴权），DELETE settings.write。
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Authenticated
+        } else if m == "DELETE" {
+            RoutePolicy::Scope("settings.write")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if let Some(rest) = p.strip_prefix("/lingxi/v1/experiments/") {
+        // 单段 experiment id 的 PATCH = settings.write；其余（含观察面
+        // 子路径）fail closed。
+        if !rest.is_empty() && !rest.contains('/') && m == "PATCH" {
+            return RoutePolicy::Scope("settings.write");
+        }
+        return RoutePolicy::LocalOnly;
+    }
     // R06-T07 知识库面（server/routes/knowledge.ts bindKnowledgeScope：
     // STUDIO_OWNER 归属 + studio 一致性）。候选单 studio（R10 单实例）→
     // studio owner 的等价承担是 LocalOnly（与 T06 D8 tenets 写面同口径）。
@@ -839,6 +977,56 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     // 写面现役落 STUDIO_OWNER 兜底 → 候选无 studio 面时取最严 LocalOnly，
     // 与 R02 以来未注册面语义一致）。
     {
+        // R06 app 级事件检索面：进程内广播日志，仅本机所有者可读。
+        if p == "/lingxi/v1/app-events" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::LocalOnly;
+        }
+        // R06 用户偏好对：读 settings.read / 写 settings.write。
+        if let Some(rest) = p.strip_prefix("/lingxi/v1/preferences/") {
+            if matches!(rest, "autolearn" | "quick-chat") {
+                return if m == "GET" || m == "HEAD" {
+                    RoutePolicy::Scope("settings.read")
+                } else {
+                    RoutePolicy::Scope("settings.write")
+                };
+            }
+        }
+        // R06 会话项目/文件夹目录（现役 /session-projects*）：读 settings.read，
+        // 写 settings.write。
+        if let Some(rest) = p.strip_prefix("/lingxi/v1/session-projects") {
+            if rest.is_empty() || rest == "/" {
+                return if m == "GET" || m == "HEAD" {
+                    RoutePolicy::Scope("settings.read")
+                } else {
+                    RoutePolicy::Scope("settings.write")
+                };
+            }
+            if m == "GET" || m == "HEAD" {
+                return RoutePolicy::Scope("settings.read");
+            }
+            return RoutePolicy::Scope("settings.write");
+        }
+        // R06 助手生命周期集合面：读 = settings.read；写 = settings.write
+        // （server/route-security.ts agents 集合路由同口径）。仅匹配无更深
+        // 路径段的形态，避免遮蔽下方按 face 分类的子路由。
+        if p == "/lingxi/v1/agents" {
+            if m == "GET" || m == "HEAD" {
+                return RoutePolicy::Scope("settings.read");
+            }
+            return RoutePolicy::Scope("settings.write");
+        }
+        if matches!(
+            p,
+            "/lingxi/v1/agents/switch" | "/lingxi/v1/agents/primary" | "/lingxi/v1/agents/order"
+        ) && matches!(m.as_str(), "POST" | "PUT")
+        {
+            return RoutePolicy::Scope("settings.write");
+        }
+        if let Some(rest) = p.strip_prefix("/lingxi/v1/agents/") {
+            if !rest.contains('/') && m == "DELETE" {
+                return RoutePolicy::Scope("settings.write");
+            }
+        }
         let agents_pattern = |rest: &str| -> Option<String> {
             p.strip_prefix("/lingxi/v1/agents/").and_then(|tail| {
                 let (id, remainder) = tail.split_once('/')?;
@@ -891,6 +1079,11 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         }
         if agents_pattern("config").is_some() && m == "PATCH" {
             return RoutePolicy::LocalOnly;
+        }
+        // R06 A 块读回叶：PUT config 供应商链（保存/删除/凭证转存——处理器内
+        // 按 settings.write / providers.manage / secrets.write 逐路径收紧）。
+        if agents_pattern("config").is_some() && m == "PUT" {
+            return RoutePolicy::Scope("settings.write");
         }
         if let Some(_agent) = agents_pattern("skills") {
             if m == "PUT" {
@@ -2830,6 +3023,36 @@ mod tests {
 
     #[test]
     fn route_policy_table() {
+        for method in ["GET", "HEAD", "PUT", "POST", "DELETE", "PATCH"] {
+            assert_eq!(
+                classify_route(method, "/lingxi/v1/desk/skills"),
+                RoutePolicy::LocalOnly
+            );
+        }
+        for method in ["GET", "HEAD", "PUT"] {
+            assert_eq!(
+                classify_route(method, "/lingxi/v1/input-drafts"),
+                RoutePolicy::Authenticated
+            );
+        }
+        for method in ["POST", "DELETE", "PATCH"] {
+            assert_eq!(
+                classify_route(method, "/lingxi/v1/input-drafts"),
+                RoutePolicy::LocalOnly
+            );
+        }
+        for method in ["GET", "HEAD", "PUT"] {
+            assert_eq!(
+                classify_route(method, "/lingxi/v1/sessions/workspace-rollback"),
+                RoutePolicy::Scope("chat")
+            );
+        }
+        for method in ["POST", "DELETE", "PATCH"] {
+            assert_eq!(
+                classify_route(method, "/lingxi/v1/sessions/workspace-rollback"),
+                RoutePolicy::LocalOnly
+            );
+        }
         use RoutePolicy::*;
         assert_eq!(classify_route("GET", "/lingxi/v1/health"), Public);
         assert_eq!(classify_route("HEAD", "/lingxi/v1/health"), Public);

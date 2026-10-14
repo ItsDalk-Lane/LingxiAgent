@@ -403,14 +403,70 @@ impl KnowledgeTools {
         let pattern = params["pattern"].as_str().unwrap_or_default().to_string();
         let use_regex = params["regex"].as_bool().unwrap_or(false);
         let max_results = params["maxResults"].as_u64().unwrap_or(50) as usize;
-        match self.knowledge.grep_scope(
-            &scope_id,
-            &ctx.session_id.to_string(),
-            &pattern,
-            &string_list(params, "sourceIds"),
+        // sourceIds 形态先行显式校验（原工具语义）：给出时必须是非空字符串
+        // 数组；空数组或非字符串项是参数错误，不得静默按"全量扫描"处理。
+        let source_ids: Vec<String> = match params.get("sourceIds") {
+            None | Some(Value::Null) => Vec::new(),
+            Some(Value::Array(entries)) => {
+                let parsed: Option<Vec<String>> = entries
+                    .iter()
+                    .map(|entry| entry.as_str().map(str::to_string))
+                    .collect();
+                match parsed {
+                    Some(ids) if !ids.is_empty() && ids.iter().all(|id| !id.trim().is_empty()) => {
+                        ids
+                    }
+                    _ => {
+                        return failed(
+                            ErrorCode::InvalidMessage,
+                            "KNOWLEDGE_INVALID_ARGUMENT: sourceIds must be a non-empty array of strings"
+                                .into(),
+                        )
+                    }
+                }
+            }
+            Some(_) => {
+                return failed(
+                    ErrorCode::InvalidMessage,
+                    "KNOWLEDGE_INVALID_ARGUMENT: sourceIds must be a non-empty array of strings"
+                        .into(),
+                )
+            }
+        };
+        // headingFilter：可选标题前缀（原工具语义）——字符串、trim 后至多
+        // 256 字符；空串不附加筛选；非字符串是参数错误。
+        let heading_filter: Option<String> = match params.get("headingFilter") {
+            None | Some(Value::Null) => None,
+            Some(Value::String(raw)) => {
+                let trimmed = raw.trim();
+                if trimmed.is_empty() {
+                    None
+                } else if trimmed.chars().count() > 256 {
+                    return failed(
+                        ErrorCode::InvalidMessage,
+                        "KNOWLEDGE_INVALID_ARGUMENT: headingFilter exceeds the 256 character limit"
+                            .into(),
+                    );
+                } else {
+                    Some(trimmed.to_string())
+                }
+            }
+            Some(_) => {
+                return failed(
+                    ErrorCode::InvalidMessage,
+                    "KNOWLEDGE_INVALID_ARGUMENT: headingFilter must be a string".into(),
+                )
+            }
+        };
+        match self.knowledge.grep_scope(crate::knowledge::GrepRequest {
+            scope_id: &scope_id,
+            session_id: ctx.session_id.as_str(),
+            pattern: &pattern,
+            source_ids: &source_ids,
+            heading_filter: heading_filter.as_deref(),
             use_regex,
             max_results,
-        ) {
+        }) {
             Ok(value) => text_success(value.to_string()),
             Err(error) => knowledge_failed(&error),
         }

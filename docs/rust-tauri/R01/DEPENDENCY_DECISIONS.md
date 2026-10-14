@@ -290,3 +290,11 @@ ADR 格式依据任务书 06 §1。本文件每条决策含：问题与用户目
 **退出条件：**若 Rust 未来提供稳定的 test-harness 级进程守卫（或 nextest 提供 in-process 资源限制），迁移并退役本 crate；退役须在 DEPENDENCY_RULES.json 同步登记。
 
 **受影响任务/测试：**全部 `cargo test` 面（kernel/adapters/service/protocol/spike/browser-spike/xtask 的测试二进制）；ownership 校验器（D5-reverse 新成员登记、DEP-07 生效）。
+
+## D-13 R06 资源桌面宿主依赖兼容与独立边界登记
+
+2026-10-13：已有 `desktop/src-tauri` 资源宿主使用独立 manifest 和锁树，不加入 headless workspace。将 Tauri 从 2.11.6 更新为 2.12.1、tauri-build 从 2.6.3 更新为 2.7.2，解决原锁树中 runtime/runtime-wry 2.12.1 与旧 Tauri API 不兼容的实际编译错误；dialog 2.7.3 不变。
+
+`DEPENDENCY_RULES.json` 现按实际包名 `lingxi-resource-desktop` 登记 `tauri-host` 为 exists。边界检查读取并合并独立 manifest 的锁定 Cargo metadata，立即执行 DEP-05 的依赖规则，同时保持 DEP-07 对 headless workspace 的桌面禁令。未忽略独立模块、未扩大其允许业务依赖；新增负控验证宿主直接依赖 kernel、包路径偏离登记均被拒绝。
+
+本机通过 native_resources 两项、renderer 六项、TypeScript 类型检查、独立前端及宿主构建。真实 GUI picker 流程受 macOS 辅助访问拒绝阻塞，未观察完成的窗口、默认程序或系统废纸篓行为不计通过。此登记只反映已存在的 R06 资源子集，不声明 R06/R09 或跨平台验收完成。证据见 `artifacts/rust-tauri/R06/continuation-20261013/desktop-handoff.json` 与 `boundary-registry-selftest-r2.log`。

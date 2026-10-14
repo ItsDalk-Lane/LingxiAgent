@@ -1,0 +1,43 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.64s
+     Running tests/r06_original_skills_bundle_proofs.rs (rust/target-r06-continuation/debug/deps/r06_original_skills_bundle_proofs-1c9e439745fde9b8)
+
+running 10 tests
+test original_bundle_edit_requires_agent_query_without_mutating ... ok
+test original_skill_patch_refreshes_same_compiler_and_frozen_previous_prompt ... ok
+test original_bundle_enable_disable_apply_visible_delta_and_preserve_unrelated_selection ... FAILED
+test original_nonempty_cleanup_preview_excludes_shared_and_readonly_sources ... ok
+test original_external_paths_persist_readback_and_rejections_without_mutation ... ok
+test original_global_manual_install_complete_package_without_agent_enable ... ok
+test original_skill_enable_disable_runtime_and_workspace_shadow_boundaries ... ok
+test original_bundles_agent_projection_update_order_delete_and_rejections ... ok
+test original_skill_delete_reads_every_agent_and_bundle_after_complete_or_partial_cleanup ... ok
+test original_bundle_toggle_refusals_and_backing_storage_failures_preserve_selection ... FAILED
+
+failures:
+
+---- original_bundle_enable_disable_apply_visible_delta_and_preserve_unrelated_selection stdout ----
+
+thread 'original_bundle_enable_disable_apply_visible_delta_and_preserve_unrelated_selection' (581286) panicked at crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:243:9:
+assertion `left == right` failed
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- original_bundle_toggle_refusals_and_backing_storage_failures_preserve_selection stdout ----
+LINGXI_AUTH_REJECTED request_id="req-3e366111ecebb3b77ea8c7375478138b" method=PATCH [token] status=403 reason=insufficient_scope remote=127.0.0.1:57462
+LINGXI_AUTH_REJECTED request_id="req-8908d2e7b964ffa4fa26de7f38ed04d0" method=PATCH [token] status=403 reason=insufficient_scope remote=127.0.0.1:57505
+
+thread 'original_bundle_toggle_refusals_and_backing_storage_failures_preserve_selection' (581287) panicked at crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs:311:5:
+assertion `left == right` failed: {"error":"agent not found: agentA"}
+  left: 404
+ right: 500
+
+
+failures:
+    original_bundle_enable_disable_apply_visible_delta_and_preserve_unrelated_selection
+    original_bundle_toggle_refusals_and_backing_storage_failures_preserve_selection
+
+test result: FAILED. 8 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.68s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_skills_bundle_proofs`

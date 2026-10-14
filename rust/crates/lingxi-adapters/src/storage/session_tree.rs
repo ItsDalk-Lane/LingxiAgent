@@ -289,6 +289,125 @@ pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<
     Ok(())
 }
 
+/// 在当前分支头原子追加一个**非消息**会话条目（R06 G 块 todo-state-v1
+/// 等快照条目的追加原语；普通消息仍走 `append_message`）。
+///
+/// parent 在事务内解析为追加时刻的分支头（无头行回退 legacy_tail：
+/// seq 最大的真实 message；两者皆无则 NULL——空分支的根），与 seq
+/// 分配同事务，杜绝"读到头之后头被移走"的窗口；随后把分支头推进到
+/// 新条目（revision+1）。
+///
+/// `message_id=None` 时在事务内按 `{entry_type}:{session_id}:{seq}` 铸造
+/// （单写者下 seq 会话内单调，天然唯一——与 reset 标记同一纪律）。
+pub struct AppendBranchEntry<'a> {
+    pub session_id: &'a str,
+    pub message_id: Option<&'a str>,
+    pub entry_type: &'a str,
+    /// 条目角色（现役 appendCustomMessageEntry 的 custom 消息 → "custom"）。
+    pub role: &'a str,
+    pub content_json: &'a str,
+    pub now_unix_ms: u64,
+}
+
+/// 追加并返回实际使用的 message_id。
+pub async fn append_branch_entry(
+    db: &RunDatabase,
+    req: AppendBranchEntry<'_>,
+) -> Result<String, StorageError> {
+    let session_id = req.session_id.to_string();
+    let requested_id = req.message_id.map(str::to_string);
+    let entry_type = req.entry_type.to_string();
+    let role = req.role.to_string();
+    let content = req.content_json.to_string();
+    let now = req.now_unix_ms as i64;
+    let busy = db.options().busy_timeout_ms;
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                // parent = 追加时刻的分支头；无头行回退 legacy_tail
+                // （seq 最大的真实 message，不含标记条目）。
+                let head_row: Option<String> = conn
+                    .query_row(
+                        "SELECT head_message_id FROM session_branch_heads WHERE session_id=?1",
+                        [&session_id],
+                        |r| r.get(0),
+                    )
+                    .optional()
+                    .map_err(map_err)?
+                    .flatten();
+                let parent = match head_row {
+                    Some(head) => {
+                        // 头行存在但指向的行缺失是存储损坏，响亮失败。
+                        let exists: Option<String> = conn
+                            .query_row(
+                                "SELECT message_id FROM messages WHERE session_id=?1 \
+                                 AND message_id=?2",
+                                rusqlite::params![session_id, head],
+                                |r| r.get(0),
+                            )
+                            .optional()
+                            .map_err(map_err)?;
+                        Some(exists.ok_or_else(|| StorageError::Corrupted {
+                            detail: format!(
+                                "branch head '{head}' of session {session_id} is missing"
+                            ),
+                        })?)
+                    }
+                    None => conn
+                        .query_row(
+                            "SELECT message_id FROM messages WHERE session_id=?1 \
+                             AND entry_type='message' ORDER BY seq DESC LIMIT 1",
+                            [&session_id],
+                            |r| r.get(0),
+                        )
+                        .optional()
+                        .map_err(map_err)?,
+                };
+                let seq: i64 = conn
+                    .query_row(
+                        "SELECT COALESCE(MAX(seq),0)+1 FROM messages WHERE session_id=?1",
+                        [&session_id],
+                        |r| r.get(0),
+                    )
+                    .map_err(map_err)?;
+                let message_id =
+                    requested_id.unwrap_or_else(|| format!("{entry_type}:{session_id}:{seq}"));
+                conn.execute(
+                    "INSERT INTO messages \
+                 (message_id, session_id, run_id, role, content_json, model_call_id, \
+                  committed_at_unix_ms, seq, parent_message_id, entry_type) \
+                 VALUES (?1,?2,NULL,?3,?4,NULL,?5,?6,?7,?8)",
+                    rusqlite::params![
+                        message_id, session_id, role, content, now, seq, parent, entry_type
+                    ],
+                )
+                .map_err(map_err)?;
+                super::session_files::sync_message_refs(
+                    conn,
+                    &session_id,
+                    &message_id,
+                    &content,
+                    now as u64,
+                )?;
+                conn.execute(
+                    "INSERT INTO session_branch_heads \
+                 (session_id, head_message_id, observed_tail_message_id, revision, \
+                  head_resolution, updated_at_unix_ms) \
+                 VALUES (?1,?2,?2,0,'persisted_head',?3) \
+                 ON CONFLICT(session_id) DO UPDATE SET \
+                   head_message_id=excluded.head_message_id, \
+                   revision=session_branch_heads.revision+1, \
+                   head_resolution='persisted_head', \
+                   updated_at_unix_ms=excluded.updated_at_unix_ms",
+                    rusqlite::params![session_id, message_id, now],
+                )
+                .map_err(map_err)?;
+                Ok(message_id)
+            })
+        })
+        .await
+}
+
 /// 当前分支的有序消息 id 链（root→…→head）。经 parent_message_id 从当前头回溯。
 /// `include_markers`：是否把 `hana-session-branch-reset` 标记条目纳入投影
 /// （分支历史投影 = true，reset 测试要看标记；fork 内容链 = false，fork 复制
@@ -1295,6 +1414,8 @@ pub struct SessionTreeRow {
     pub permission_mode: Option<String>,
     pub archived_at_unix_ms: Option<i64>,
     pub last_activity_unix_ms: Option<i64>,
+    /// R06 v12：项目归属（可空；null = 未分配/已清除）。
+    pub project_id: Option<String>,
 }
 
 /// 读取一个会话行的 v8 全列投影。
@@ -1309,7 +1430,7 @@ pub async fn get_session_row(
                 "SELECT session_id, agent_id, owner_user_id, title, created_at_unix_ms, \
                  parent_session_id, fork_point_message_id, lineage_depth, lifecycle, \
                  pinned_at_unix_ms, pin_order, memory_enabled, authorized_folders_json, \
-                 permission_mode, archived_at_unix_ms, last_activity_unix_ms \
+                 permission_mode, archived_at_unix_ms, last_activity_unix_ms, project_id \
                  FROM sessions WHERE session_id=?1",
                 [&sid],
                 |r| {
@@ -1333,6 +1454,7 @@ pub async fn get_session_row(
                         permission_mode: r.get(13)?,
                         archived_at_unix_ms: r.get(14)?,
                         last_activity_unix_ms: r.get(15)?,
+                        project_id: r.get(16)?,
                     })
                 },
             )

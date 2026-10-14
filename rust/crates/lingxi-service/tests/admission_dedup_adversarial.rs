@@ -235,6 +235,22 @@ impl ParkingStartPort {
 macro_rules! delegate_storage_port {
     ($ty:ty) => {
         impl StoragePort for $ty {
+            // F03 统一准入：真实持久化端口的包装必须转发同一数据根的准入
+            // 实例（StoragePort::session_admission 契约）——不转发的话，
+            // admit_submission / drive_run 在 record_run_started 之前就以
+            // session_storage_binding_mismatch / session_not_found 拒绝，
+            // 本套件的 durable-start 挂点永远不会到达。
+            fn session_admission(
+                &self,
+            ) -> Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>> {
+                lingxi_kernel::ports::StoragePort::session_admission(self.inner.as_ref())
+            }
+            async fn load_session_admission(
+                &self,
+                session_id: &str,
+            ) -> Result<Option<lingxi_kernel::ports::SessionAdmissionFacts>, StorageError> {
+                self.inner.load_session_admission(session_id).await
+            }
             async fn record_run_started(
                 &self,
                 ctx: &RunContext,
@@ -1055,9 +1071,15 @@ async fn adv_c05_restart_with_unknown_side_effects_refuses_explicitly() {
         run_status(&state_a, &run_id).await.as_deref(),
         Some("running")
     );
-    // 进程死亡：关闭存储（驱动任务永久停在外部等待上，不再产生写）。
+    // 进程死亡：关闭存储（驱动任务不再产生写），并终止驱动任务本身——
+    // 真实进程死亡不会留下任何内存持有者：它持有的会话准入许可
+    // （RunDatabase 按数据根共享的 session_admission 实例）必须随之释
+    // 放，否则同数据根重启后的新 key 受理会被诚实地 Busy 拒绝。
     state_a.storage().close().await.expect("close A");
     drop(state_a);
+    task.abort();
+    // 确定性等待 future 丢弃（许可 Drop 完成）再模拟进程 B。
+    let _ = task.await;
 
     // 进程 B：同一数据根上的全新服务（bootstrap 运行恢复扫描）。
     let provider_b = ScriptedProvider::new(vec![("ADV5", final_only())]);
@@ -1121,8 +1143,7 @@ async fn adv_c05_restart_with_unknown_side_effects_refuses_explicitly() {
         "the fresh post-restart run settles for real"
     );
 
-    // 悬挂的进程 A 驱动任务不再被 poll；清理。
-    task.abort();
+    // 进程 A 的驱动任务已在上文随「进程死亡」一并终止（无悬挂 poll）。
     teardown(&state_b, &home).await;
     let _ = std::fs::remove_file(&counter);
 }

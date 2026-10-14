@@ -409,10 +409,14 @@ fn ingestion_job_lifecycle_and_delete_wins() {
         .expect_err("done job is not requeueable");
     assert_eq!(err.code, "KNOWLEDGE_CONFLICT", "{err}");
 
-    // pending_embedding 显式终态 + 恢复重排。
+    // pending_embedding 显式终态 + 恢复重排。生产路径里该标记只发生在
+    // 已 claim（running）的作业上（engine 处理中发现 embedder 未就绪），
+    // 存储闸因此要求 running；这里照生产语义先 claim 再标记。
     let job2 = store
         .enqueue_source_ingestion(nb.id.as_str(), source.id.as_str(), None, "cfg")
         .expect("enqueue 2");
+    let claimed2 = store.claim_next_job().expect("claim 2").expect("job 2");
+    assert_eq!(claimed2.id, job2.id);
     store
         .mark_job_pending_embedding(job2.id.as_str())
         .expect("pending embedding");

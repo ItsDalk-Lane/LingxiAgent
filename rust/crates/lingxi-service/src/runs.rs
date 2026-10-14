@@ -53,12 +53,12 @@ use lingxi_kernel::ports::{
     TurnDeltaSinkClosed, TurnProviderPort,
 };
 use lingxi_kernel::subagent::{
-    RunLineage, RunOrigin, ToolAccessTier, ToolAuthorization, authorize_child_tool,
-    authorize_child_tool_with_registry_id,
+    authorize_child_tool, authorize_child_tool_with_registry_id, RunLineage, RunOrigin,
+    ToolAccessTier, ToolAuthorization,
 };
 use lingxi_kernel::{
-    FailureCause, NoFinalCause, QuotaResource, RunFinish, RunStateMachine, attempt_id,
-    model_call_id, tool_call_id,
+    attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
+    RunStateMachine,
 };
 use lingxi_protocol::{
     AssistantSegmentDeltaPayload, AssistantSegmentEndPayload, AssistantSegmentStartPayload,
@@ -903,8 +903,8 @@ impl RunSupervisor {
         self.subagents.is_some()
     }
 
-    pub async fn flush_subagent_closeouts(&self) -> Result<(),StorageError> {
-        if let Some(launcher)=self.subagents.as_ref().and_then(std::sync::Weak::upgrade) {
+    pub async fn flush_subagent_closeouts(&self) -> Result<(), StorageError> {
+        if let Some(launcher) = self.subagents.as_ref().and_then(std::sync::Weak::upgrade) {
             launcher.flush_closeouts().await?;
         }
         Ok(())
@@ -4212,8 +4212,11 @@ impl RunSupervisor {
                     break finish_no_final(saw_tool_failure, saw_process_content);
                 }
                 lingxi_kernel::ports::ProviderTurn::Failed { error, retryable } => {
-                    if let Some(child)=&child_history {
-                        child.record_failure(&ctx,agent_id,&error).await.map_err(DriveError::Storage)?;
+                    if let Some(child) = &child_history {
+                        child
+                            .record_failure(&ctx, agent_id, &error)
+                            .await
+                            .map_err(DriveError::Storage)?;
                     }
                     self.persist_model_call_completed(
                         port,

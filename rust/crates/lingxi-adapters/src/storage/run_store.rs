@@ -548,9 +548,17 @@ impl RunDatabase {
             .unwrap_or(0);
         let dest = dest_dir.to_path_buf();
         let stem = file_stem.to_string();
+        let checkpoint_grace_ms = self.queue.options().checkpoint_grace_ms;
         self.queue
             .submit(move |conn| {
-                super::backup::backup_database(conn, &dest, &stem, wal_bytes_before, options)
+                super::backup::backup_database(
+                    conn,
+                    &dest,
+                    &stem,
+                    wal_bytes_before,
+                    options,
+                    checkpoint_grace_ms,
+                )
             })
             .await
     }

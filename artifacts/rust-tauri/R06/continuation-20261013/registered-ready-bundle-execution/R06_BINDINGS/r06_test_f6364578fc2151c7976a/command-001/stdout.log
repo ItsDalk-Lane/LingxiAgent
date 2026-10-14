@@ -1,0 +1,17 @@
+
+running 1 test
+test original_workspace_rollback_preference_refusals_keep_saved_and_live_state_and_retry ... ok
+
+successes:
+
+---- original_workspace_rollback_preference_refusals_keep_saved_and_live_state_and_retry stdout ----
+LINGXI_AUTH_REJECTED request_id="req-527272a50a382dea1a4eee2b4adf758c" method=PUT [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62413
+LINGXI_AUTH_REJECTED request_id="req-60f5c3a619343d482414e2d4e60201b1" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:62415
+LINGXI_AUTH_REJECTED request_id="req-a43a36439f74101fb71277ffaa9a8bc6" method=PUT [token] status=403 reason=insufficient_scope remote=127.0.0.1:62416
+
+
+successes:
+    original_workspace_rollback_preference_refusals_keep_saved_and_live_state_and_retry
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 3.86s
+

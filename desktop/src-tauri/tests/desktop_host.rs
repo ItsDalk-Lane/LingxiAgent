@@ -67,7 +67,9 @@ impl Driver {
         .await
     }
     async fn invoke(&self, command: &str, args: Value) -> Value {
-        self.script("const done=arguments[arguments.length-1];window.__TAURI__.core.invoke(arguments[0],arguments[1]).then(value=>done({ok:true,value}),error=>done({ok:false,error:String(error)}));", json!([command,args]), true).await
+        // 拒绝结果用 invokeError 而非 error：request() 把响应里的 error 字段
+        // 视为 WebDriver 协议失败，键名撞车会把预期的应用层拒绝误判成框架故障。
+        self.script("const done=arguments[arguments.length-1];window.__TAURI__.core.invoke(arguments[0],arguments[1]).then(value=>done({ok:true,value}),error=>done({ok:false,invokeError:String(error)}));", json!([command,args]), true).await
     }
     async fn handles(&self) -> Vec<String> {
         self.request(
@@ -134,13 +136,13 @@ async fn native_desktop_resource_roundtrip_real_gui() {
     fs::write(&note, "# initial\n").unwrap();
     let port = std::env::var("TAURI_WEBDRIVER_PORT").expect("需要指定隔离驱动端口");
     let native_log = fs::File::create(root.join("native-app.log")).unwrap();
-    let _app = NativeApp(
-        Command::new(env!("CARGO_BIN_EXE_lingxi-resource-desktop"))
-            .stdout(native_log.try_clone().unwrap())
-            .stderr(native_log)
-            .spawn()
-            .unwrap(),
-    );
+    let app = Command::new(env!("CARGO_BIN_EXE_lingxi-resource-desktop"))
+        .stdout(native_log.try_clone().unwrap())
+        .stderr(native_log)
+        .spawn()
+        .unwrap();
+    fs::write(root.join("native-app-pid.txt"), app.id().to_string()).unwrap();
+    let _app = NativeApp(app);
     let base = format!("http://127.0.0.1:{port}");
     let client = reqwest::Client::builder()
         .timeout(Duration::from_secs(320))

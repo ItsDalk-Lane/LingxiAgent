@@ -61,23 +61,49 @@ fn declaration_keeps_full_formal_description() {
 #[test]
 fn run_activation_does_not_change_shared_residents_or_enable_disabled_tools() {
     let registry = ToolRegistry::new();
-    let receipt = registry.register(manifest(), &SchemaBudget::default()).unwrap();
+    let receipt = registry
+        .register(manifest(), &SchemaBudget::default())
+        .unwrap();
     registry.configure_model_residents(std::collections::BTreeSet::new());
     let generation = registry.catalog_generation();
     let activated = std::collections::BTreeSet::from([receipt.target_id.clone()]);
-    assert!(ToolDeclarationSnapshot::from_registry(&registry).unwrap().declarations.is_empty());
-    let snapshot = ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated).unwrap();
+    assert!(ToolDeclarationSnapshot::from_registry(&registry)
+        .unwrap()
+        .declarations
+        .is_empty());
+    let snapshot =
+        ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated)
+            .unwrap();
     assert_eq!(snapshot.declarations.len(), 1);
     assert_eq!(snapshot.declarations[0].description, manifest().description);
-    assert_eq!(snapshot.declarations[0].input_schema, manifest().input_schema);
+    assert_eq!(
+        snapshot.declarations[0].input_schema,
+        manifest().input_schema
+    );
     assert_eq!(snapshot.catalog_generation, generation);
     assert_eq!(registry.catalog_generation(), generation);
-    assert!(ToolDeclarationSnapshot::from_registry(&registry).unwrap().declarations.is_empty());
+    assert!(ToolDeclarationSnapshot::from_registry(&registry)
+        .unwrap()
+        .declarations
+        .is_empty());
     let mut disabled = manifest();
-    disabled.availability = Availability::Disabled { reason: "用户禁用".into() };
-    registry.update(&receipt.target_id, disabled, &SchemaBudget::default()).unwrap();
-    assert!(ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated).unwrap().declarations.is_empty());
-    assert_eq!(snapshot.declarations.len(), 1, "已发送历史声明保持冻结，后续授权仍由执行入口复核");
+    disabled.availability = Availability::Disabled {
+        reason: "用户禁用".into(),
+    };
+    registry
+        .update(&receipt.target_id, disabled, &SchemaBudget::default())
+        .unwrap();
+    assert!(
+        ToolDeclarationSnapshot::from_registry_with_activated_targets(&registry, &activated)
+            .unwrap()
+            .declarations
+            .is_empty()
+    );
+    assert_eq!(
+        snapshot.declarations.len(),
+        1,
+        "已发送历史声明保持冻结，后续授权仍由执行入口复核"
+    );
 }
 
 use lingxi_kernel::ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest};

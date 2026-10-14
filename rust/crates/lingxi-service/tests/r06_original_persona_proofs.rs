@@ -4,10 +4,10 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use lingxi_service::{
-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
-    prepare_layout, run,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
+    ServiceError, ServiceState,
 };
-use serde_json::{Value, json};
+use serde_json::Value;
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
 
@@ -32,11 +32,9 @@ async fn start_server(tag: &str) -> TestServer {
     assert!(synthetic_home.starts_with(synthetic_runtime));
     assert_eq!(product, synthetic_runtime.join("persona-product"));
     assert!(product.is_absolute());
-    assert!(
-        !product
-            .components()
-            .any(|c| matches!(c, std::path::Component::ParentDir))
-    );
+    assert!(!product
+        .components()
+        .any(|c| matches!(c, std::path::Component::ParentDir)));
     std::fs::create_dir_all(&product).unwrap();
     assert_eq!(
         product.canonicalize().unwrap().parent().unwrap(),
@@ -254,11 +252,14 @@ async fn original_persona_reads_template_custom_alias_and_refusal() {
         assert!(!body.to_string().contains("甲定制"));
         assert!(!body.to_string().contains("乙"));
     }
-    // 无效ID当前为400，原AGENTS要求404仍保留语义缺口，不将此检查说成原条款通过。
-    let (status, _) = server
-        .request("GET", "/lingxi/v1/agents/bad%2Fid/agents-md", None)
-        .await;
-    assert_eq!(status, 400);
+    for face in ["agents-md", "ishiki"] {
+        let (status, body) = server
+            .request("GET", &format!("/lingxi/v1/agents/bad%2Fid/{face}"), None)
+            .await;
+        assert_eq!(status, 404, "{body}");
+        assert!(!body.to_string().contains("甲定制"));
+        assert!(!body.to_string().contains("乙"));
+    }
     assert_eq!(std::fs::read(a.join("config.yaml")).unwrap(), config_before);
     assert_eq!(
         std::fs::read_to_string(a.join("identity.md")).unwrap(),

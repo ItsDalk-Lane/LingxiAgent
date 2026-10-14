@@ -2174,7 +2174,9 @@ impl KnowledgeFactStore {
         next: &RunScopeBinding,
     ) -> Result<TurnScopeRow, KnowledgeError> {
         let prefix = format!("{}#a", expected.run_id);
-        let sequence = expected.attempt.strip_prefix(&prefix)
+        let sequence = expected
+            .attempt
+            .strip_prefix(&prefix)
             .and_then(|value| value.parse::<u32>().ok())
             .filter(|sequence| *sequence > 0 && expected.attempt == format!("{prefix}{sequence}"))
             .and_then(|sequence| sequence.checked_add(1))
@@ -2188,25 +2190,33 @@ impl KnowledgeFactStore {
         }
         let id = new_id("kts");
         let mut conn = lock_conn(&self.conn);
-        let tx = conn.transaction()
+        let tx = conn
+            .transaction()
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         let selection: Option<String> = tx.query_row(
             "SELECT notebook_ids_json FROM knowledge_turn_scopes WHERE id=?1 AND studio_id=?2 AND session_id=?3 AND turn_id=?4 AND status='active'",
             params![scope_id, studio_id, expected.session_id, expected.run_id],
             |row| row.get(0),
         ).optional().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        let mut selection: serde_json::Value = serde_json::from_str(
-            &selection.ok_or_else(|| KnowledgeError::scope_violation("Knowledge retry scope is closed or missing"))?
-        ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let mut selection: serde_json::Value =
+            serde_json::from_str(&selection.ok_or_else(|| {
+                KnowledgeError::scope_violation("Knowledge retry scope is closed or missing")
+            })?)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         let binding: RunScopeBinding = serde_json::from_value(selection["binding"].clone())
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         if selection["schema"] != "lingxi.run-knowledge-scope.v1" || &binding != expected {
-            return Err(KnowledgeError::scope_violation("Knowledge retry scope binding changed"));
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge retry scope binding changed",
+            ));
         }
         selection["binding"] = serde_json::to_value(next)
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        tx.execute("UPDATE knowledge_turn_scopes SET status='closed' WHERE id=?1", params![scope_id])
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
+            "UPDATE knowledge_turn_scopes SET status='closed' WHERE id=?1",
+            params![scope_id],
+        )
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         tx.execute(
             "INSERT INTO knowledge_turn_scopes (id, turn_id, session_id, studio_id, notebook_ids_json, status, created_at) VALUES (?1, ?2, ?3, ?4, ?5, 'active', ?6)",
             params![id, next.run_id, next.session_id, studio_id, selection.to_string(), now_iso(&*self.clock)],
@@ -2216,9 +2226,11 @@ impl KnowledgeFactStore {
             "INSERT INTO knowledge_turn_scope_sources (scope_id, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json) SELECT ?1, source_id, content_snapshot_id, parse_artifact_id, notebook_ids_json FROM knowledge_turn_scope_sources WHERE scope_id=?2",
             params![id, scope_id],
         ).map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        tx.commit().map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         drop(conn);
-        self.get_turn_scope(&id)?.ok_or_else(|| KnowledgeError::storage_invalid("retry scope vanished"))
+        self.get_turn_scope(&id)?
+            .ok_or_else(|| KnowledgeError::storage_invalid("retry scope vanished"))
     }
 
     fn create_turn_scope_selection(
@@ -3219,6 +3231,14 @@ impl KnowledgeVectorStore {
         variant_id: &str,
         expected_count: usize,
     ) -> Result<(), KnowledgeError> {
+        // F12：这是写入路径，schema 过新的分类必须先于语义校验——
+        // checkpoint_entries 对缺失 variant 报 KNOWLEDGE_INDEX_INVALID，
+        // 会把“旧句柄不得写 future 库”伪装成索引语义错误。
+        // 后续 cache_write 在事务内重验，这里的预检只决定分类顺序。
+        {
+            let conn = lock_conn(&self.conn);
+            check_user_version(&conn, VECTOR_SCHEMA_VERSION)?;
+        }
         self.checkpoint_entries(variant_id)?;
         let mut connection = lock_conn(&self.conn);
         let conn = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;

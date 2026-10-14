@@ -1,0 +1,15 @@
+
+running 1 test
+test original_tenet_decisions_and_pinned_replacement_preserve_nonactive ... ok
+
+successes:
+
+---- original_tenet_decisions_and_pinned_replacement_preserve_nonactive stdout ----
+LINGXI_AUTH_REJECTED request_id="req-c4f398faf5446b10aa45a2cba91f5194" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:51797
+
+
+successes:
+    original_tenet_decisions_and_pinned_replacement_preserve_nonactive
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 2.62s
+

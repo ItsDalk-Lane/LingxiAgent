@@ -94,12 +94,16 @@ pub fn snapshot(path: &str) -> io::Result<TextSnapshot> {
         .modified()?
         .duration_since(UNIX_EPOCH)
         .map_err(io::Error::other)?;
+    let sha256 = Sha256::digest(&bytes)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
     Ok(TextSnapshot {
         content,
         version: FileVersion {
             mtime_ms: u64::try_from(modified.as_millis()).map_err(io::Error::other)?,
             size: bytes.len() as u64,
-            sha256: format!("{:x}", Sha256::digest(&bytes)),
+            sha256,
         },
     })
 }
@@ -181,10 +185,7 @@ pub fn save(path: &str, content: &str, expected: Option<&FileVersion>) -> SaveRe
     }
     if let Some(expected) = expected {
         let current = snapshot(path).ok();
-        if current
-            .as_ref()
-            .is_none_or(|s| s.version.sha256 != expected.sha256 || s.version.size != expected.size)
-        {
+        if current.as_ref().is_none_or(|s| s.version != *expected) {
             return SaveResult {
                 ok: false,
                 conflict: true,

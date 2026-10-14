@@ -596,6 +596,28 @@ CREATE TABLE run_history_anchors (
 CREATE INDEX idx_run_history_anchors_page ON run_history_anchors(session_id, anchor_message_id);
 "#;
 
+/// R06 会话项目归属（version 12）：sessions.project_id 可空列。
+/// 现役 setSessionProjectAssignment 的最小端口——只承载归属指向
+/// （分配 / null 清除 / 读回）；项目与文件夹目录树（session-projects.ts
+/// 全量 CRUD）属派发计划 E 块，另行落地，不在此迁移冒充完成。
+pub const V12_NAME: &str = "r06_session_project_assignment";
+pub const V12_SQL: &str = r#"
+ALTER TABLE sessions ADD COLUMN project_id TEXT;
+"#;
+
+/// R06 C1 收尾：工作台身份两列（version 13）。`workspace_mount_id` 是
+/// studio 挂载登记里的 mountId（会话经挂载创建时带上）；`cwd` 是历史
+/// cwd 形态会话的工作目录。工作台处置（archive/delete 名下全部会话）
+/// 与孤儿清扫（mount 被移除 / 目录被直接删除）按这两列识别归属，
+/// 现役锚点 `server/routes/sessions.ts:2670`（workspace-disposal）与
+/// `:2762`（sweep-orphaned-workspaces）。两列均可空：老会话与无工作台
+/// 会话两列皆 NULL，不参与任何匹配。
+pub const V13_NAME: &str = "r06_session_workspace_identity";
+pub const V13_SQL: &str = r#"
+ALTER TABLE sessions ADD COLUMN workspace_mount_id TEXT;
+ALTER TABLE sessions ADD COLUMN cwd TEXT;
+"#;
+
 pub const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 1,
@@ -651,6 +673,16 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 11,
         name: V11_NAME,
         sql: V11_SQL,
+    },
+    Migration {
+        version: 12,
+        name: V12_NAME,
+        sql: V12_SQL,
+    },
+    Migration {
+        version: 13,
+        name: V13_NAME,
+        sql: V13_SQL,
     },
 ];
 

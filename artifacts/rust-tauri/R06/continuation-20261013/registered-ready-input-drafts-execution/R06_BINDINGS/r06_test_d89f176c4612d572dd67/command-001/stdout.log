@@ -1,0 +1,17 @@
+
+running 1 test
+test original_compiled_three_sections_live_legacy_and_invalid_no_write ... ok
+
+successes:
+
+---- original_compiled_three_sections_live_legacy_and_invalid_no_write stdout ----
+LINGXI_AUTH_REJECTED request_id="req-792c6265cf5804c3f2c45b988683920f" method=PUT path=/lingxi/v1/memories/compiled/facts status=403 reason=insufficient_scope remote=127.0.0.1:57645
+LINGXI_AUTH_REJECTED request_id="req-e5a1db8e30f31fa603b518e268aea45c" method=PUT path=/lingxi/v1/memories/compiled/today status=403 reason=insufficient_scope remote=127.0.0.1:57649
+LINGXI_AUTH_REJECTED request_id="req-f955a11869b31683e425648bad0b4820" method=PUT [token] status=403 reason=insufficient_scope remote=127.0.0.1:57653
+
+
+successes:
+    original_compiled_three_sections_live_legacy_and_invalid_no_write
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 4.93s
+

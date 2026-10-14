@@ -495,6 +495,29 @@ pub async fn insert_session_file(
         .await
 }
 
+pub async fn update_session_file_metadata(
+    db: &RunDatabase,
+    row: &SessionFileRow,
+) -> Result<(), StorageError> {
+    let row = row.clone();
+    db.queue().submit(move |conn| {
+        let changed = conn.execute(
+            "UPDATE session_files SET mime=?1,size_bytes=?2,mtime_ms=?3,is_directory=?4,file_kind=?5,updated_at_ms=?6 WHERE file_id=?7 AND owner_session_id=?8",
+            rusqlite::params![
+                row.mime, row.size_bytes as i64, row.mtime_ms as i64,
+                if row.is_directory { 1i64 } else { 0i64 }, row.file_kind.wire(),
+                row.updated_at_ms as i64, row.file_id, row.owner_session_id,
+            ],
+        ).map_err(map_err)?;
+        if changed != 1 {
+            return Err(StorageError::InvalidRequest {
+                detail: "session file vanished while refreshing metadata".into(),
+            });
+        }
+        Ok(())
+    }).await
+}
+
 pub(crate) fn insert_file_on_connection(
     conn: &rusqlite::Connection,
     row: &SessionFileRow,

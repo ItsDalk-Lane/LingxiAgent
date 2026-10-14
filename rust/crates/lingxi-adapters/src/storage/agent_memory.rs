@@ -27,15 +27,15 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use rusqlite::Connection;
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 
 use lingxi_kernel::memory::{
-    NewTenetInput, TENETS_SCHEMA_VERSION, Tenet, TenetErrorCode, TenetStatus, TenetsFile,
-    ZERO_RESULT_DIAGNOSTIC_MAX_TERMS, build_compiled_memory_markdown, build_fact_search_text,
-    build_fts_query, has_cjk, normalize_compiled_section_body,
-    normalize_compiled_week_section_body, normalize_experience_category, sort_tenets,
-    tenets_add_direct, tenets_add_proposal, tenets_decide, tenets_remove, tenets_replace_pinned,
-    validate_tenets_strict, zero_result_diagnostic_terms,
+    build_compiled_memory_markdown, build_fact_search_text, build_fts_query, has_cjk,
+    normalize_compiled_section_body, normalize_compiled_week_section_body,
+    normalize_experience_category, sort_tenets, tenets_add_direct, tenets_add_proposal,
+    tenets_decide, tenets_remove, tenets_replace_pinned, validate_tenets_strict,
+    zero_result_diagnostic_terms, NewTenetInput, Tenet, TenetErrorCode, TenetStatus, TenetsFile,
+    TENETS_SCHEMA_VERSION, ZERO_RESULT_DIAGNOSTIC_MAX_TERMS,
 };
 
 /// 单个资料根的发布栅栏，嵌套和并行写者均计数；不保存历史代次。
@@ -1615,7 +1615,7 @@ impl ExperienceStore {
     /// listExperienceDocuments (experience.ts:375-391): title from the
     /// `<!-- experience-title: <base64url> -->` meta line, fallback = file
     /// stem; body = the remainder.
-    fn list_documents(&self) -> Vec<ExperienceDoc> {
+    pub fn list_documents(&self) -> Vec<ExperienceDoc> {
         let mut docs = Vec::new();
         let Ok(entries) = std::fs::read_dir(self.dir()) else {
             return docs;

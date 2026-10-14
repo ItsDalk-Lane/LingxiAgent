@@ -473,20 +473,18 @@ pub fn render_chat_request(
                 }
                 let mut rendered_calls = Vec::with_capacity(tool_calls.len());
                 for call in tool_calls {
-                    let wire_name =
-                        call.historical_wire_name()
-                            .ok_or_else(|| {
-                                ProtocolError::new(
-                                    ErrorCode::InvalidMessage,
-                                    format!(
-                                    "exchange history names tool target {:?}, which the current \
+                    let wire_name = call.historical_wire_name().ok_or_else(|| {
+                        ProtocolError::new(
+                            ErrorCode::InvalidMessage,
+                            format!(
+                                "exchange history names tool target {:?}, which the current \
                                      declaration snapshot does not contain (the registry moved \
                                      mid-run); cannot faithfully re-render the transcript",
-                                    call.target
-                                ),
-                                    false,
-                                )
-                            })?;
+                                call.target
+                            ),
+                            false,
+                        )
+                    })?;
                     let provider_call_id = call.provider_call_id.clone().ok_or_else(|| {
                         ProtocolError::new(
                             ErrorCode::InvalidMessage,

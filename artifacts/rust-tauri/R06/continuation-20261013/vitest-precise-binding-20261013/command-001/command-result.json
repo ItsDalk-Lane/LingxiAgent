@@ -1,0 +1,83 @@
+{
+  "binding": {
+    "kind": "vitest_test",
+    "package": "lingxi-resource-desktop",
+    "sourcePath": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
+    "test": "failure_results_never_register_copies_attachments_or_trash_success",
+    "sourceTestTitle": "failure_results_never_register_copies_attachments_or_trash_success",
+    "timeoutSecs": 300,
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
+      "--config",
+      "desktop/vite.tauri-resources.config.ts",
+      "--reporter=json",
+      "--no-file-parallelism",
+      "-t",
+      "^failure_results_never_register_copies_attachments_or_trash_success$"
+    ]
+  },
+  "argv": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
+    "--config",
+    "desktop/vite.tauri-resources.config.ts",
+    "--reporter=json",
+    "--no-file-parallelism",
+    "-t",
+    "^failure_results_never_register_copies_attachments_or_trash_success$"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceBeforeSha256": "c543914f308e9de5a66bf3f5bffc1864ca5e59a9bd553fcc49f00435d2450808",
+  "exitCode": 0,
+  "timedOut": false,
+  "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/stdout.log",
+  "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/stderr.log",
+  "timeoutSecs": 300,
+  "syntheticEnvironment": {
+    "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/runtime/home",
+    "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/runtime/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/w01_evidence",
+    "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/w09_evidence",
+    "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/w10_evidence",
+    "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/w11_evidence",
+    "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/lingxi_w03_evidence",
+    "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/lingxi_f05_evidence",
+    "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/lingxi_f08_evidence",
+    "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/t08",
+    "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/vitest-precise-binding-20261013/command-001/raw/t08-evaluations.jsonl"
+  },
+  "actualArgv": [
+    "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
+    "--config",
+    "desktop/vite.tauri-resources.config.ts",
+    "--reporter=json",
+    "--no-file-parallelism",
+    "-t",
+    "^failure_results_never_register_copies_attachments_or_trash_success$"
+  ],
+  "pid": 68246,
+  "elapsedSecs": 1.357,
+  "outputCheck": {
+    "valid": true,
+    "expectedTest": "failure_results_never_register_copies_attachments_or_trash_success",
+    "matchedExpectedSourceFile": true,
+    "passedTestNames": [
+      "failure_results_never_register_copies_attachments_or_trash_success"
+    ],
+    "reason": ""
+  },
+  "stdoutSha256": "0cf9e749b06fd71b9ca24eb0c7f2a67eebecd69f6d6b432423757aa42faa4576",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sourceAfterSha256": "c543914f308e9de5a66bf3f5bffc1864ca5e59a9bd553fcc49f00435d2450808",
+  "sourceStable": true,
+  "localPassed": true
+}

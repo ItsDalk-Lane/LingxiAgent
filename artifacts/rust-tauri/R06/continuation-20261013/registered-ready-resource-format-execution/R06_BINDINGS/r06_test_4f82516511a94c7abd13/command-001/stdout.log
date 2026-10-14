@@ -1,0 +1,16 @@
+
+running 1 test
+test original_skill_delete_reads_every_agent_and_bundle_after_complete_or_partial_cleanup ... ok
+
+successes:
+
+---- original_skill_delete_reads_every_agent_and_bundle_after_complete_or_partial_cleanup stdout ----
+原技能删除逐项回读 mode=complete status=200 residual_agents=[] residual_bundles=[]
+原技能删除逐项回读 mode=late-reference-write status=200 residual_agents=["agentA", "agentB", "agentC"] residual_bundles=["bundle", "bundle-9cb73e"]
+
+
+successes:
+    original_skill_delete_reads_every_agent_and_bundle_after_complete_or_partial_cleanup
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 2.66s
+

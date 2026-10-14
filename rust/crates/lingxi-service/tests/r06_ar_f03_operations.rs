@@ -43,6 +43,7 @@ struct RecordedRequest {
 struct StubServer {
     addr: SocketAddr,
     requests: Arc<Mutex<Vec<RecordedRequest>>>,
+    responses: Arc<Mutex<VecDeque<StubResponse>>>,
     slow_release: Arc<tokio::sync::Semaphore>,
     closed_slow: Arc<AtomicUsize>,
     shutdown: Option<tokio::sync::oneshot::Sender<()>>,
@@ -82,9 +83,21 @@ impl StubServer {
                 let slow = Arc::clone(&slow);
                 let closed = Arc::clone(&task_closed);
                 children.spawn(async move {
-                let recorded = read_request(&mut socket).await;
-                let is_slow=recorded.body.to_string().contains("W03_SLOW");
-                task_requests.lock().expect("requests").push(recorded);
+                    let recorded = read_request(&mut socket).await;
+                    // 慢判定只看当前输入（最后一条 user 消息）：F01 统一历史后，
+                    // 后续请求会合法携带先前被取消回合的 "W03_SLOW_*" 输入，
+                    // 按全正文子串匹配会把无辜的新回合误判成慢请求并永久门住。
+                    let is_slow = recorded.body["messages"]
+                        .as_array()
+                        .and_then(|messages| {
+                            messages
+                                .iter()
+                                .rev()
+                                .find(|m| m["role"] == "user")
+                        })
+                        .and_then(|m| m["content"].as_str())
+                        .is_some_and(|content| content.contains("W03_SLOW"));
+                    task_requests.lock().expect("requests").push(recorded);
                 let next = task_responses.lock().expect("responses").pop_front();
                 let response = match next {
                     Some(scripted) => scripted,
@@ -129,6 +142,7 @@ impl StubServer {
         Self {
             addr,
             requests,
+            responses,
             slow_release,
             closed_slow,
             shutdown: Some(shutdown),
@@ -155,6 +169,10 @@ impl StubServer {
                 body: r.body.clone(),
             })
             .collect()
+    }
+    /// 追加后段脚本（测试需要先拿到实际 workspace 路径再构造参数）。
+    fn extend(&self, more: Vec<StubResponse>) {
+        self.responses.lock().expect("responses").extend(more);
     }
 
     async fn stop(mut self) {
@@ -278,9 +296,20 @@ async fn boot_with_config_hook(
     plane_json: &str,
     hook: Option<lingxi_service::filetools::MutationTestHook>,
 ) -> PlaneBoot {
-    let home = unique_dir(&format!("{tag}-home"));
-    let workspace = unique_dir(&format!("{tag}-ws"));
-    let config_root = unique_dir(&format!("{tag}-cfg"));
+    // macOS 宿主别名（/tmp → /private/tmp、/var → /private/var）下，授权根
+    // 字符串必须与真实路径一致（t03/f02/session_proofs 同一约定：checkpoint
+    // 的授权目录闸拒绝"根自身是符号链接"的会话）。home/workspace/config 根
+    // 一律按真实路径登记，后续 authorizedFolders、checkpoint 文件闸、
+    // FileSafety 写屏障目标比较都落在同一物理身份上。
+    let home = unique_dir(&format!("{tag}-home"))
+        .canonicalize()
+        .expect("real home");
+    let workspace = unique_dir(&format!("{tag}-ws"))
+        .canonicalize()
+        .expect("real workspace");
+    let config_root = unique_dir(&format!("{tag}-cfg"))
+        .canonicalize()
+        .expect("real config root");
     let config_path = config_root.join("service.json");
     let config_json = format!(
         r#"{{"home": {}, "workspace": {}, {plane_json}}}"#,
@@ -408,9 +437,12 @@ struct HttpServer {
 impl HttpServer {
     async fn start(tag: &str, stub: &StubServer) -> Self {
         let boot = boot(tag, stub).await;
-        assert!(boot
-            .home
-            .starts_with(std::env::var("LINGXI_HOME").expect("独立home")));
+        // 独立 home 断言按真实路径比较（/tmp 与 /private/tmp 是同一物理根
+        // 的宿主别名；boot.home 已按真实路径登记）。
+        assert!(boot.home.starts_with(
+            std::fs::canonicalize(std::env::var("LINGXI_HOME").expect("独立home"))
+                .expect("real LINGXI_HOME")
+        ));
         Self::from_boot(boot).await
     }
     async fn from_boot(boot: PlaneBoot) -> Self {
@@ -1010,11 +1042,7 @@ async fn reopen(home: PathBuf, workspace: PathBuf, config_path: PathBuf) -> Plan
 }
 #[tokio::test]
 async fn unknown_file_effect_survives_storage_failure_restart_and_replay() {
-    let stub = StubServer::start(vec![
-        openai_final("original"),
-        openai_final("fresh identity"),
-    ])
-    .await;
+    let stub = StubServer::start(vec![openai_final("original")]).await;
     let svc = HttpServer::start("unknown", &stub).await;
     let file = svc.boot.workspace.join("sentinel.txt");
     std::fs::write(&file, b"checkpoint-original").unwrap();
@@ -1039,7 +1067,27 @@ async fn unknown_file_effect_survives_storage_failure_restart_and_replay() {
         .0,
         200
     );
-    std::fs::write(&file, b"witnessed-later").unwrap();
+    // F02 修复后的见证合同：只有应用写路径产生来源证明，外部 std::fs::write
+    // 属外部修改、回退时按 conflicted 保留。这里用真实 write 工具走应用写
+    // 路径产生 witnessed-later，使后续 rewind 的 Restore 判定有真实见证。
+    stub.extend(vec![
+        openai_sse(&[
+            serde_json::json!({"id":"chatcmpl-w03","choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":"call-witness","type":"function","function":{"name":"write","arguments":serde_json::json!({"path":file.to_string_lossy(),"content":"witnessed-later"}).to_string()}}]},"finish_reason":null}]}),
+            serde_json::json!({"id":"chatcmpl-w03","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}),
+        ]),
+        openai_final("settled"),
+        openai_final("fresh identity"),
+    ]);
+    assert_eq!(
+        svc.post(
+            "/lingxi/v1/sessions/w03-files/execute",
+            serde_json::json!({"input":"apply witnessed edit"})
+        )
+        .await
+        .0,
+        200
+    );
+    assert_eq!(std::fs::read(&file).unwrap(), b"witnessed-later");
     assert_eq!(
         svc.post(
             "/lingxi/v1/sessions/w03-files/checkpoints",
@@ -1154,7 +1202,7 @@ async fn unknown_file_effect_survives_storage_failure_restart_and_replay() {
     assert!(query.1.contains("prepared"));
     assert!(query.1.contains("\"fileEffects\":true"));
     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-failure");
-    assert_eq!(stub.requests().len(), 1);
+    assert_eq!(stub.requests().len(), 3);
     save(
         "unknown-restart",
         serde_json::json!({"busy_before_failure":busy,"same_request_replay":replay,"execute_after_restart":execute,"query":query,"file_sha":lingxi_kernel::session_tree::sha256_hex(&std::fs::read(&file).unwrap()),"head":format!("{before:?}"),"wire_count":stub.requests().len()}),
@@ -1240,7 +1288,7 @@ async fn unknown_file_effect_survives_storage_failure_restart_and_replay() {
     assert_eq!(no_journal.0, 404, "{}", no_journal.1);
     assert_eq!(replay_deleted.0, 404, "{}", replay_deleted.1);
     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-failure");
-    assert_eq!(stub.requests().len(), 1);
+    assert_eq!(stub.requests().len(), 3);
     assert!(recreate.1.contains("session_identity_retired"));
     let fresh=svc.post("/lingxi/v1/sessions",serde_json::json!({"sessionId":"w03-files-fresh","agentId":"lingxi","title":"fresh identity"})).await;
     assert_eq!(fresh.0, 201);
@@ -1251,7 +1299,7 @@ async fn unknown_file_effect_survives_storage_failure_restart_and_replay() {
         )
         .await;
     assert_eq!(execute_fresh.0, 200, "{}", execute_fresh.1);
-    assert_eq!(stub.requests().len(), 2);
+    assert_eq!(stub.requests().len(), 4);
     assert_eq!(std::fs::read(&file).unwrap(), b"external-after-failure");
     save(
         "retired-and-fresh-identities",
@@ -1808,6 +1856,14 @@ async fn public_borrowed_submission_rejects_mixed_real_database_before_effects()
 async fn actual_different_agent_child_keeps_exact_parent_permit() {
     let stub = StubServer::start(vec![openai_final("parent"), openai_final("child")]).await;
     let svc = HttpServer::start("other-agent-child-permit", &stub).await;
+    // 真实 roster 要求 agents/<id>/config.yaml；合法的跨 Agent child override
+    // 必须落在真实登记的 Agent 上（伪 override 仍由 roster 拒绝，零 wire）。
+    std::fs::create_dir_all(svc.boot.home.join("agents/other")).unwrap();
+    std::fs::write(
+        svc.boot.home.join("agents/other/config.yaml"),
+        "locale: zh-CN\nagent:\n  name: other\n",
+    )
+    .unwrap();
     let parent = tokio::spawn(post_at(
         svc.addr,
         svc.boot.state.auth().local_token(),
@@ -2156,6 +2212,14 @@ async fn subagent_exact_parent_scope_and_settled_parent_are_enforced() {
     ])
     .await;
     let svc = HttpServer::start("parent-authority", &stub).await;
+    // 真实 roster 要求 agents/<id>/config.yaml；本组 dispatch 均指定 Agent
+    // "other"，缺登记时 roster 错误会先于准入检查，掩盖 session_busy 等语义。
+    std::fs::create_dir_all(svc.boot.home.join("agents/other")).unwrap();
+    std::fs::write(
+        svc.boot.home.join("agents/other/config.yaml"),
+        "locale: zh-CN\nagent:\n  name: other\n",
+    )
+    .unwrap();
     assert_eq!(
         svc.post(
             "/lingxi/v1/sessions/sess_local_alpha/execute",
@@ -2508,6 +2572,13 @@ async fn local_owner_cross_session_owner_child_and_foreign_before_busy_are_prese
     ])
     .await;
     let svc = HttpServer::start("local-owner-contract", &stub).await;
+    // 真实 roster 要求 agents/<id>/config.yaml（跨 Agent 合法 child 的前提）。
+    std::fs::create_dir_all(svc.boot.home.join("agents/other")).unwrap();
+    std::fs::write(
+        svc.boot.home.join("agents/other/config.yaml"),
+        "locale: zh-CN\nagent:\n  name: other\n",
+    )
+    .unwrap();
     let issued = svc
         .post(
             "/lingxi/v1/devices/credentials",
@@ -2998,11 +3069,13 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
                     409
                 );
                 assert!(!self.foreign_path.exists());
+                // 真实 owned-run ResourceIO 写走 same 后端（同一真实存储对象
+                // 与准入 Arc）；生产实例留给手工 HTTP 与错误主体反例。
                 let result = self
-                    .io
+                    .same
                     .write(
                         &serde_json::json!({"kind":"local-file","path":self.path}),
-                        vec![b'x'; 1024 * 1024],
+                        b"late write".to_vec(),
                         &op,
                     )
                     .await;
@@ -3061,57 +3134,46 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
         lingxi_service::resourceio::DEFAULT_WATCH_POLL_MS,
         Arc::new(|| 1791700000000),
     ));
-    let fifo = svc.boot.workspace.join("actual-write.fifo");
-    let status = std::process::Command::new("/usr/bin/mkfifo")
-        .arg(&fifo)
-        .status()
-        .unwrap();
-    assert!(status.success());
+    // F02 安全变更后 ResourceIO 写不再直写目标文件（temp 写 + 原子替换），
+    // FIFO 管道已无法承载"真实物理写阻塞"场景（Snapshot::read 按合同拒绝
+    // 非常规文件）。同一物理阻塞窗口改由 FileSafety 的 before_replace 步
+    // 挂起真实 blocking 线程承载：temp 写完成后、身份复验与原子替换前，
+    // 原状态保持，取消等待不等于阻塞线程退出。
+    let parked_path = svc.boot.workspace.join("actual-write.parked.txt");
     let entered = Arc::new(std::sync::atomic::AtomicBool::new(false));
     let released = Arc::new((Mutex::new(false), std::sync::Condvar::new()));
-    struct FifoRelease {
-        fifo: PathBuf,
-        entered: Arc<std::sync::atomic::AtomicBool>,
+    struct ParkedRelease {
         released: Arc<(Mutex<bool>, std::sync::Condvar)>,
     }
-    impl Drop for FifoRelease {
+    impl Drop for ParkedRelease {
         fn drop(&mut self) {
-            if !self.entered.load(Ordering::SeqCst) {
-                use std::io::Write;
-                let mut dummy = std::fs::OpenOptions::new()
-                    .read(true)
-                    .write(true)
-                    .open(&self.fifo)
-                    .unwrap();
-                dummy.write_all(b"!").unwrap();
-            }
             *self.released.0.lock().unwrap() = true;
             self.released.1.notify_all();
         }
     }
-    let release = FifoRelease {
-        fifo: fifo.clone(),
-        entered: entered.clone(),
+    let release = ParkedRelease {
         released: released.clone(),
     };
-    let reader_path = fifo.clone();
-    let actual_entered = entered.clone();
-    let actual_released = released.clone();
-    let reader = std::thread::spawn(move || {
-        use std::io::Read;
-        let mut file = std::fs::File::open(reader_path).unwrap();
-        let mut first = [0u8; 1];
-        file.read_exact(&mut first).unwrap();
-        actual_entered.store(true, Ordering::SeqCst);
-        let mut done = actual_released.0.lock().unwrap();
-        while !*done {
-            done = actual_released.1.wait(done).unwrap();
-        }
-        drop(done);
-        let mut bytes = first.to_vec();
-        file.read_to_end(&mut bytes).unwrap();
-        bytes
-    });
+    {
+        let hook_entered = entered.clone();
+        let hook_released = released.clone();
+        let hook_target = parked_path.clone();
+        // 挂 same_io（同一真实存储/同一准入 Arc，独立 FileSafety 实例）：
+        // 生产 ResourceIO 的 FileSafety 变更锁保持空闲，手工 HTTP 写不被
+        // 本屏障串行阻塞（锚点另一侧断言：run 忙时手工编辑仍可用）。
+        same_io.file_safety().set_test_hook(Some(Arc::new(
+            move |path: &std::path::Path, step: &str| {
+                if step == "before_replace" && path == hook_target.as_path() {
+                    hook_entered.store(true, Ordering::SeqCst);
+                    let mut done = hook_released.0.lock().unwrap();
+                    while !*done {
+                        done = hook_released.1.wait(done).unwrap();
+                    }
+                }
+                Ok(())
+            },
+        )));
+    }
     let gateway = svc.boot.state.tool_gateway().unwrap();
     let budget = lingxi_kernel::toolcatalog::SchemaBudget::default();
     let target = gateway.registry().register(lingxi_kernel::toolcatalog::ToolManifest {
@@ -3119,6 +3181,22 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
         input_schema:lingxi_protocol::ToolSchemaDocument { dialect:"json-schema/2020-12".into(), schema:serde_json::json!({"type":"object","properties":{},"additionalProperties":false}) }, output_schema:None,
         permission:lingxi_kernel::toolcatalog::PermissionContract {kind:lingxi_kernel::toolcatalog::PermissionKind::Execute,capability_base:"resource_fifo_write.files".into()}, availability:lingxi_kernel::toolcatalog::Availability::Available, timeout_ms:Some(60000),max_concurrency:None,declared_permission:lingxi_kernel::toolcatalog::DeclaredPermission::Execute,recovery:lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE,
     }, &budget).unwrap().target_id;
+    // F07 目录策略后，模型只看见常驻声明 + 按需目录；测试新增的可信宿主
+    // 转发工具必须并入常驻集合，否则适配器按未声明名字丢弃模型请求
+    // （empty_tool_request_list），工具链根本不会被调度。
+    {
+        let mut residents: std::collections::BTreeSet<lingxi_kernel::toolcatalog::ToolTargetId> =
+            lingxi_service::toolcatalog_bridge::RESIDENT_NAMES
+                .iter()
+                .map(|name| {
+                    lingxi_kernel::toolcatalog::ToolTargetId::parse(&format!(
+                        "tool:first-party:{name}"
+                    ))
+                })
+                .collect();
+        residents.insert(target.clone());
+        gateway.registry().configure_model_residents(residents);
+    }
     gateway.bind_executor(
         target,
         Arc::new(IoForward {
@@ -3126,7 +3204,7 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
             same: same_io,
             foreign: foreign_boot.state.resource_io().clone(),
             foreign_path: foreign_boot.workspace.join("forbidden.txt"),
-            path: fifo.clone(),
+            path: parked_path.clone(),
         }),
         "可信宿主新增 owned-run 接口消费者，不替换原生工具",
     );
@@ -3242,7 +3320,6 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
         )
         .await;
     drop(release);
-    let bytes = reader.join().unwrap();
     while svc
         .boot
         .state
@@ -3253,6 +3330,7 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
         assert!(std::time::Instant::now() < deadline);
         tokio::time::sleep(std::time::Duration::from_millis(5)).await;
     }
+    let parked_after_release = std::fs::read_to_string(&parked_path).unwrap_or_default();
     let next = if archive.0 == 409 {
         Some(
             svc.post(
@@ -3266,7 +3344,7 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
     };
     save(
         "resourceio-blocking",
-        serde_json::json!({"run":run,"boundary":"trusted owned-run forwarding consumer; current native tools do not call ResourceIO","actual_fifo_first_byte_observed":actual_write_entered,"same_actual_db_two_storage_objects":actual_write_entered,"foreign_actual_backend_zero_files":actual_write_entered,"wrong_actor_and_session_zero_files":actual_write_entered,"wrong_scope_status":scope_probe.status,"manual_http":manual,"manual_file_content":std::fs::read_to_string(&manual_path).unwrap(),"empty_sid_content":std::fs::read_to_string(&empty_path).unwrap(),"cancel":completed,"busy_while_real_write_alive":busy,"archive":archive,"beta":beta,"bytes_after_actual_exit":bytes.len(),"next":next,"wire_count":stub.requests().len()}),
+        serde_json::json!({"run":run,"boundary":"trusted owned-run forwarding consumer; current native tools do not call ResourceIO","actual_blocking_entered":actual_write_entered,"same_actual_db_two_storage_objects":actual_write_entered,"foreign_actual_backend_zero_files":actual_write_entered,"wrong_actor_and_session_zero_files":actual_write_entered,"wrong_scope_status":scope_probe.status,"manual_http":manual,"manual_file_content":std::fs::read_to_string(&manual_path).unwrap(),"empty_sid_content":std::fs::read_to_string(&empty_path).unwrap(),"cancel":completed,"busy_while_real_write_alive":busy,"archive":archive,"beta":beta,"parked_content_after_release":parked_after_release,"next":next,"wire_count":stub.requests().len()}),
     );
     same_db.close().await.unwrap();
     foreign_boot.state.storage().close().await.unwrap();
@@ -3274,9 +3352,9 @@ async fn actual_resourceio_owned_write_cancel_retains_until_fifo_exit() {
     stub.stop().await;
     assert!(
         actual_write_entered,
-        "实际FIFO首字节证明真实写已进入且尚未结束"
+        "before_replace 步屏障证明真实物理写已进入且尚未结束"
     );
-    assert_eq!(bytes, vec![b'x'; 1024 * 1024]);
+    assert_eq!(parked_after_release, "late write");
     assert_eq!(completed.0, 200);
     assert!(busy, "ResourceIO blocking write 尚活不能释放同根准入");
     assert_eq!(archive.0, 409);

@@ -1,0 +1,15 @@
+
+running 1 test
+test original_global_manual_install_complete_package_without_agent_enable ... ok
+
+successes:
+
+---- original_global_manual_install_complete_package_without_agent_enable stdout ----
+LINGXI_AUTH_REJECTED request_id="req-ceac1c5d2848ab1d00d16faa536bd0d9" method=POST path=/lingxi/v1/skills/install status=403 reason=insufficient_scope remote=127.0.0.1:58832
+
+
+successes:
+    original_global_manual_install_complete_package_without_agent_enable
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 2.53s
+

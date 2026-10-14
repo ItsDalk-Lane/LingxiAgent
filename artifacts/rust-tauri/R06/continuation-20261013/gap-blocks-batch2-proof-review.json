@@ -1,0 +1,411 @@
+{
+  "status": "GAP_BLOCKS_BATCH2_BOUND_NOT_STAGE_ACCEPTANCE",
+  "ready": [
+    "R00-T02-LA-45C5CE361CCB",
+    "R00-T02-LA-5CD35D9EED20",
+    "R00-T02-LA-17FCFE45576B",
+    "R00-T02-LA-2D4EBE0FF3C2",
+    "R00-T02-LA-21A99DB98735",
+    "R00-T02-LA-9E3981A9BFCA",
+    "R00-T02-LA-38A989948FDD",
+    "R00-T02-LA-38667593C3E1",
+    "R00-T02-LA-A5DE44FF584F",
+    "R00-T02-LA-C99A4322D0C1",
+    "R00-T02-LA-AD0384FBE1F2",
+    "R00-T02-LA-3C8CE915255E",
+    "R00-T02-LA-337738D5D233",
+    "R00-T02-LA-FAE2BDEFDB04"
+  ],
+  "partial": [
+    "R00-T02-LA-7244E7DCE678",
+    "R00-T02-LA-464E58DEC9E2"
+  ],
+  "review": [
+    {
+      "id": "R00-T02-LA-45C5CE361CCB",
+      "original": {
+        "then": "有未完成项时追加完成记录并广播；已完成时返回当前面板不重复写",
+        "assertions": [
+          "给定目标与相应权限，执行“完成当前计划余项”后核对：有未完成项时追加完成记录并广播；已完成时返回当前面板不重复写",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "未接入计划complete路由和广播/追加完成记录的幂等面板行为。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-5CD35D9EED20",
+      "original": {
+        "then": "有未完成项时追加取消记录并广播，不终止其他后台任务",
+        "assertions": [
+          "给定目标与相应权限，执行“取消当前计划余项”后核对：有未完成项时追加取消记录并广播，不终止其他后台任务",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "未接入计划cancel路由、取消历史记录和专属广播；不能以Run取消代替余项取消。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-17FCFE45576B",
+      "original": {
+        "then": "仅已结束且未收纳的计划追加收纳记录，历史保留",
+        "assertions": [
+          "给定目标与相应权限，执行“收纳已结束计划”后核对：仅已结束且未收纳的计划追加收纳记录，历史保留",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "未接入原待办面板及历史收纳记录接口；没有仅对结束且未收纳计划追加记录的行为。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-7244E7DCE678",
+      "original": {
+        "then": "返回当前会话 pending/resolved/failed 项及结果，不跨会话。",
+        "assertions": [
+          "仅列当前会话任务",
+          "过滤结果和任务状态一致",
+          "无store/无会话显示不可用或空结果；不应以其他会话任务充数。"
+        ],
+        "groups": [],
+        "gaps": [
+          "仅列当前会话任务",
+          "过滤结果和任务状态一致",
+          "无store/无会话显示不可用或空结果",
+          "不应以其他会话任务充数"
+        ]
+      },
+      "became": "GAP"
+    },
+    {
+      "id": "R00-T02-LA-2D4EBE0FF3C2",
+      "original": {
+        "then": "符合工作台身份的会话移到可恢复归档",
+        "assertions": [
+          "给定目标与相应权限，执行“归档工作台会话”后核对：符合工作台身份的会话移到可恢复归档",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "未接入工作台身份和dispose归档路由；通用session archive不能代替工作台资格判定。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-21A99DB98735",
+      "original": {
+        "then": "把挂载已移除或实际目录不存在的会话归档，跳过运行中会话并上报错误",
+        "assertions": [
+          "给定目标与相应权限，执行“清扫孤儿工作台会话”后核对：把挂载已移除或实际目录不存在的会话归档，跳过运行中会话并上报错误",
+          "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
+        ],
+        "groups": [],
+        "gaps": [
+          "未接入工作台挂载/目录孤儿扫描路由，无法证明按挂载移除或目录丢失归档且跳过运行项。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-9E3981A9BFCA",
+      "original": {
+        "then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML、请求助手 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+        "assertions": [
+          "准备请求助手 A、焦点助手 B（A≠B）并执行 PUT /api/agents/:id/config 保存：读回 provider-catalog.json；纯供应商成功刷新可重写 B 的 config.yaml，但不经请求 A 的显式保存；A=B 时按同一焦点路径核对。",
+          "仅本地自定义或未注册插件保存才写 provider-plugins；内置供应商不因此写插件文件。",
+          "models.json 只是派生投影，内容不变且权限正确可不重写；供应商用户数据以 provider-catalog.json 为准。",
+          "onProviderChanged 或后续焦点刷新失败时，先前目录/插件文件可能已变而 HTTP 报错；无焦点时无 ID 刷新可失败，不宣称原子回滚，并逐处读回。",
+          "同请求多供应商项逐项处理，后项失败可保留前项；只有另含全局字段才写 preferences.json，不写人格或记忆文件。"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "Rust无原PUT供应商保存与请求A/焦点B多文件路径"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "此Rust配置入口无条件provider-plugins写入实现"
+          },
+          {
+            "assertionIndex": 2,
+            "kind": "UNIMPLEMENTED",
+            "reason": "此Rust配置入口无实际catalog/models投影写入证明"
+          },
+          {
+            "assertionIndex": 3,
+            "kind": "UNIMPLEMENTED",
+            "reason": "无焦点/onProviderChanged失败后部分成功实际读回链"
+          },
+          {
+            "assertionIndex": 4,
+            "kind": "UNIMPLEMENTED",
+            "reason": "无同请求多供应商顺序处理/条件preferences及不写人格记忆完整入口"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then要求同请求A/焦点B的catalog、条件plugin/models/YAML/preferences逐处读回和失败部分成功；Rust原配置供应商PUT入口未实现。"
+          },
+          "Rust无原PUT供应商保存与请求A/焦点B多文件路径",
+          "此Rust配置入口无条件provider-plugins写入实现",
+          "此Rust配置入口无实际catalog/models投影写入证明",
+          "无焦点/onProviderChanged失败后部分成功实际读回链",
+          "无同请求多供应商顺序处理/条件preferences及不写人格记忆完整入口"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-38A989948FDD",
+      "original": {
+        "then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML、请求助手 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+        "assertions": [
+          "准备请求助手 A、焦点助手 B（A≠B）并执行 PUT /api/agents/:id/config 删除：读回 provider-catalog.json；纯供应商成功刷新可重写 B 的 config.yaml，但不经请求 A 的显式保存；A=B 时按同一焦点路径核对。",
+          "仅本地自定义或未注册插件保存才写 provider-plugins；仅删除本地插件才删文件。内置覆盖项删除后内置声明仍在；不存在的条目删除可不改目录。",
+          "models.json 只是派生投影，内容不变且权限正确可不重写；供应商用户数据以 provider-catalog.json 为准。",
+          "onProviderChanged 或后续焦点刷新失败时，先前目录/插件文件可能已变而 HTTP 报错；无焦点时无 ID 刷新可失败，不宣称原子回滚，并逐处读回。",
+          "同请求多供应商项逐项处理，后项失败可保留前项；只有另含全局字段才写 preferences.json，不写人格或记忆文件。"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "当前Rust无原PUT供应商删除与请求A/焦点B双路径，未证明所有文件读回"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "当前Rust原配置删除供应商/插件分支未实现；注册表基线不能当此路由实现"
+          },
+          {
+            "assertionIndex": 2,
+            "kind": "UNIMPLEMENTED",
+            "reason": "无此Rust路由后的catalog/models投影实际读回"
+          },
+          {
+            "assertionIndex": 3,
+            "kind": "UNIMPLEMENTED",
+            "reason": "无供应商删除后续焦点刷新失败及部分成功逐处读回链"
+          },
+          {
+            "assertionIndex": 4,
+            "kind": "UNIMPLEMENTED",
+            "reason": "无同请求多个供应商删除+条件preferences/persona/memory副作用链"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then要求同请求A/焦点B的catalog、条件plugin/models/YAML/preferences逐处读回和失败部分成功；Rust原配置供应商PUT入口未实现。"
+          },
+          "当前Rust无原PUT供应商删除与请求A/焦点B双路径，未证明所有文件读回",
+          "当前Rust原配置删除供应商/插件分支未实现；注册表基线不能当此路由实现",
+          "无此Rust路由后的catalog/models投影实际读回",
+          "无供应商删除后续焦点刷新失败及部分成功逐处读回链",
+          "无同请求多个供应商删除+条件preferences/persona/memory副作用链"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-464E58DEC9E2",
+      "original": {
+        "then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML、请求助手 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+        "assertions": [
+          "准备请求助手 A、焦点助手 B（A≠B）转存 api/embedding_api 内联凭证：先读 provider-catalog.json，再核对 B 的刷新 YAML 与 A 的显式 YAML；A 内联秘密须清空且不得保留明文。",
+          "仅本地自定义或未注册插件保存才写 provider-plugins；内置供应商不因此写插件文件。",
+          "models.json 只是派生投影，内容不变且权限正确可不重写；供应商用户数据以 provider-catalog.json 为准。",
+          "onProviderChanged 或后续焦点刷新失败时，先前目录/插件文件可能已变而 HTTP 报错；无焦点时无 ID 刷新可失败，不宣称原子回滚，并逐处读回。",
+          "同请求多供应商项逐项处理，后项失败可保留前项；只有另含全局字段才写 preferences.json，不写人格或记忆文件。",
+          "provider 无法解析时先返回 400；成功转存后仍须检查请求助手 YAML 的清空字段，后段失败不可把目录中已存凭证当作回滚。",
+          "若请求助手 A 的运行时实例未加载，显式保存 A 后的 updateConfig({agentId:A}) 仍可能回退到焦点 B，分别核对磁盘和运行时。"
+        ],
+        "groups": [],
+        "gaps": [
+          {
+            "assertionIndex": 0,
+            "kind": "UNIMPLEMENTED",
+            "reason": "原api/embedding_api凭证转存及A/B显式/焦点YAML路径没有Rust设置入口"
+          },
+          {
+            "assertionIndex": 1,
+            "kind": "UNIMPLEMENTED",
+            "reason": "此Rust设置转存路径没有条件provider-plugins写入"
+          },
+          {
+            "assertionIndex": 2,
+            "kind": "UNIMPLEMENTED",
+            "reason": "此Rust设置转存路径没有catalog/models派生投影读回"
+          },
+          {
+            "assertionIndex": 3,
+            "kind": "UNIMPLEMENTED",
+            "reason": "此Rust转存后的焦点刷新失败部分成功链未实现"
+          },
+          {
+            "assertionIndex": 4,
+            "kind": "UNIMPLEMENTED",
+            "reason": "同请求多供应商转存/条件preferences及不碰人格记忆尚无Rust入口"
+          },
+          {
+            "assertionIndex": 5,
+            "kind": "UNIMPLEMENTED",
+            "reason": "provider解析失败400及转存后请求A YAML秘密清空链未实现"
+          },
+          {
+            "assertionIndex": 6,
+            "kind": "UNIMPLEMENTED",
+            "reason": "请求A运行时未加载回退焦点B的原更新路径没有Rust实现"
+          },
+          {
+            "kind": "UNIMPLEMENTED",
+            "reason": "原Then要求同请求A/焦点B的catalog、条件plugin/models/YAML/preferences逐处读回和失败部分成功；Rust原配置供应商PUT入口未实现。"
+          },
+          "原api/embedding_api凭证转存及A/B显式/焦点YAML路径没有Rust设置入口",
+          "此Rust设置转存路径没有条件provider-plugins写入",
+          "此Rust设置转存路径没有catalog/models派生投影读回",
+          "此Rust转存后的焦点刷新失败部分成功链未实现",
+          "同请求多供应商转存/条件preferences及不碰人格记忆尚无Rust入口",
+          "provider解析失败400及转存后请求A YAML秘密清空链未实现",
+          "请求A运行时未加载回退焦点B的原更新路径没有Rust实现"
+        ]
+      },
+      "became": "GAP"
+    },
+    {
+      "id": "R00-T02-LA-38667593C3E1",
+      "original": {
+        "then": "返回时间/会话/Agent/模型/文件/Bridge等当前值，不修改状态。",
+        "assertions": [
+          "键目录与get一致",
+          "模型/会话值与运行时一致",
+          "未知值标未知",
+          "未知key或依赖不可用返回明确状态/错误，不能猜造供应商结果。"
+        ],
+        "groups": [],
+        "gaps": [
+          "键目录与get一致",
+          "模型/会话值与运行时一致",
+          "未知值标未知",
+          "未知key明确状态/错误",
+          "依赖不可用明确状态/错误",
+          "不能猜造供应商结果"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-A5DE44FF584F",
+      "original": {
+        "then": "返回已解析实验与有效值",
+        "assertions": [
+          "成功时核对：返回已解析实验与有效值",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "groups": [],
+        "gaps": [
+          "返回已解析实验与有效值",
+          "无越权或错误持久化",
+          "错误对用户可见"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-C99A4322D0C1",
+      "original": {
+        "then": "保存已注册实验的 value 并返回生效值",
+        "assertions": [
+          "成功时核对：保存已注册实验的 value 并返回生效值",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "groups": [],
+        "gaps": [
+          "保存已注册实验的value并返回生效值",
+          "无越权或错误持久化",
+          "错误对用户可见"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-AD0384FBE1F2",
+      "original": {
+        "then": "返回指定智能体 observation",
+        "assertions": [
+          "成功时核对：返回指定智能体 observation",
+          "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
+        ],
+        "groups": [],
+        "gaps": [
+          "观察记录读取入口未迁移。",
+          "memory-cache observation读取入口未实现。",
+          "未有原观察记录范围/无效输入读回证据，不能借编译记忆GET替代。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-3C8CE915255E",
+      "original": {
+        "then": "校验 settings.write 范围后删除当前 Agent 观察记录，返回 deleted 状态",
+        "assertions": [
+          "执行“删除记忆缓存观察记录”后核对：校验 settings.write 范围后删除当前 Agent 观察记录，返回 deleted 状态",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "groups": [],
+        "gaps": [
+          "观察记录删除入口未迁移。",
+          "memory-cache observation删除入口当前服务未实现。",
+          "无真实删除或拒绝后的观察记录回读证明；不能用其它记忆删除替代。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-337738D5D233",
+      "original": {
+        "then": "只允许当前工作区已知技能目录；递归删除后重新同步目录，失败返回错误",
+        "assertions": [
+          "执行“删除工作区技能目录”后核对：只允许当前工作区已知技能目录；递归删除后重新同步目录，失败返回错误",
+          "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
+        ],
+        "groups": [],
+        "gaps": [
+          "原desk工作区技能删除及重新同步目录入口未迁移。",
+          "当前未注册desk/delete-skill工作区目录删除路由；普通user技能DELETE不能代替。",
+          "无原工作区已知目录约束、递归删除失败状态与副作用专属证据。"
+        ]
+      },
+      "became": "READY"
+    },
+    {
+      "id": "R00-T02-LA-FAE2BDEFDB04",
+      "original": {
+        "then": "构建可下载组合包及结果元数据",
+        "assertions": [
+          "成功：执行“导出技能组合包”后，构建可下载组合包及结果元数据",
+          "拒绝/边界：id 不存在/打包失败明确错误；不应错误扩大写入或披露范围"
+        ],
+        "groups": [],
+        "gaps": [
+          "组合打包下载及结果元数据入口未迁移。",
+          "当前未注册skills/bundles/{id}/export打包下载接口，无法构建原可下载包/元数据。",
+          "未知id/打包失败的明确错误没有该原导出入口实现和专属证据。"
+        ]
+      },
+      "became": "READY"
+    }
+  ],
+  "stageAcceptance": false
+}

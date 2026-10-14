@@ -9,6 +9,32 @@
 
 ## 一、已完成的 Steps（任务书步骤逐条核对）
 
+> 2026-10-13 工作区技能扫描后续修复：正式
+> `GET /lingxi/v1/desk/skills` 扫描 `.agents/.claude/.codex/.openclaw/skills`，
+> 返回原来源标签、类别、路径、sourceIdentity、每助手发现策略及真实遮蔽赢家对象。
+> 全局技能不混入该工作区列表；策略关闭项保留在列表并明确标注 inactive。
+> 查询目录须是已配置工作区内的绝对目录；目录/文档符号链接越界明确拒绝，
+> 真实读取失败不返回成功空列表。非法、重复、未知查询和暂不支持的 mount 返回 400；
+> 路由保持 LocalOnly，settings.read 设备不能借该入口访问工作区。
+> 未指定助手时使用 checked primary 解析：损坏偏好、非法或已不存在的已存 primary、
+> 真实读取失败均显式报告，不静默换助手；只有未配置 primary 时按合法助手 id 排序选取。
+> 真实 HTTP 正反证明、空目录/URL 解码、源身份、策略切换、磁盘不可读/修复重试、
+> 越界拒绝及无写入快照，连同现有技能/上下文回归共 22 项通过。证明见
+> [原始技能证明](../../../rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs)。
+> 此修复不证明 mount 支持、安装/删除、UI 或广播；原扫描叶登记 READY 也不是阶段通过。
+
+> 2026-10-13 后续修复：`PATCH /lingxi/v1/agents/{id}/skill-bundles/{bundleId}`
+> 不再忽略 `enabled=false` 或将组合成员替换整个名单。当前实现对组合内可见成员做
+> 去重增量启用/停用，保留其他已启用技能及 workspace opt-out，返回准确
+> `{ok, enabled, changed}`。不可见成员不计入 `changed`；空可见集合不写配置。
+> 技能名单、单技能、组合及手动安装共用既有 mutation lock，防止读改写互相丢失。
+> 组合读取使用 checked store，损坏/读取失败显式报告，不伪装成组合不存在。
+> 真实 HTTP、磁盘权限失败/修复重试、每助手投影及并发 barrier 证明，连同技能上下文
+> 回归共 20 项通过。实现及证明见
+> [SkillService](../../../rust/crates/lingxi-service/src/skills.rs)、
+> [原始组合证明](../../../rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs)。
+> 此局部修复不证明 UI、`skills-changed` 广播或 R06/R07 验收；以下数字为历史窗口。
+
 1. **记忆存储与路由面**（RED→GREEN）：per-agent 记忆五 store（facts.db SQLite v3 / tenets.json / compiled md 族 / experience / dream revisions，全部按 agent 目录物理隔离）→ `AgentMemoryStore`（adapters）+ `MemoryService`（service）+ HTTP 面（`/lingxi/v1/memories*`、`/lingxi/v1/agents/{id}/tenets|pinned|experience|config*`、`/lingxi/v1/sessions/{id}/context-notes`）；dream 存储面（revisions save/list/read/restore）真实迁移，ticker 调度缺席如实 503（台账 D3）。
 2. **技能/人格面**：`SkillLibraryStore`（adapters）+ `SkillService`（发现/白名单/启停/遮Shadow/删除 scrub/bundles）+ `PersonaService`（AGENTS.md/identity/public 别名/avatar 读写）+ `/lingxi/v1/skills*` 与 `/lingxi/v1/agents/{id}/agents-md|ishiki|public-*|identity|avatar*|skills*` 路由。
 3. **工具面与 hooks**：`memorytools.rs` 五个模型侧工具（search_memory/pin_memory/unpin_memory/tenet_propose/context_notes）经 bootstrap 真实链注册进 R04 网关，构造时绑定单一 primary agent；kernel `AgentLoopGuard` 纯状态机 + service `hooks.rs`（tool_result L1 截断 + 注入扫描 + 失败连击）经 `runs.rs` 两个注入点接入 agent loop（`with_extension_hooks(true)` 生产接线）。

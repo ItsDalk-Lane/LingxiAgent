@@ -1,0 +1,142 @@
+{
+  "schema": "lingxi.r06.executed-binding.v1",
+  "key": "r06_test_dace28f0c2d8a7530535",
+  "sourceCandidateSha256": "57678db228b18a8a70bf94f5f400a0e1094fdee190325efece34c0f2092e3c67",
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_original_persona_proofs",
+    "test": "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_persona_proofs",
+      "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "command": {
+    "binding": {
+      "package": "lingxi-service",
+      "suite": "r06_original_persona_proofs",
+      "test": "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_original_persona_proofs",
+        "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_persona_proofs",
+      "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "sourceBeforeSha256": "57678db228b18a8a70bf94f5f400a0e1094fdee190325efece34c0f2092e3c67",
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/stdout.log",
+    "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/stderr.log",
+    "timeoutSecs": 900,
+    "syntheticEnvironment": {
+      "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/runtime/home",
+      "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/runtime/tmp",
+      "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/runtime/persona-product",
+      "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/w01_evidence",
+      "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/w09_evidence",
+      "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/w10_evidence",
+      "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/w11_evidence",
+      "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/lingxi_w03_evidence",
+      "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/lingxi_f05_evidence",
+      "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/lingxi_f08_evidence",
+      "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/t08",
+      "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-input-drafts-execution/R06_BINDINGS/r06_test_dace28f0c2d8a7530535/command-001/raw/t08-evaluations.jsonl"
+    },
+    "actualArgv": [
+      "/Users/study_superior/.cargo/bin/rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_persona_proofs",
+      "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "pid": 7670,
+    "elapsedSecs": 6.392,
+    "outputCheck": {
+      "valid": true,
+      "expectedTest": "original_avatar_read_prefers_all_formats_and_preserves_other_agent",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "original_avatar_read_prefers_all_formats_and_preserves_other_agent"
+      ],
+      "reason": ""
+    },
+    "stdoutSha256": "31ec4d717af77ff0299f7567d0a77bad3b6fd1d03bf595426307cb31b263297c",
+    "stderrSha256": "096b6e0b9079a0554d0c9cdd2fef432c11e96dc31c0bd0f1d8236cb08650c2ea",
+    "sourceAfterSha256": "57678db228b18a8a70bf94f5f400a0e1094fdee190325efece34c0f2092e3c67",
+    "sourceStable": true,
+    "localPassed": true
+  },
+  "passed": true,
+  "stageVerdict": "NOT_A_STAGE_VERDICT"
+}

@@ -1,0 +1,19 @@
+
+running 1 test
+test original_persona_reads_template_custom_alias_and_refusal ... ok
+
+successes:
+
+---- original_persona_reads_template_custom_alias_and_refusal stdout ----
+LINGXI_AUTH_REJECTED request_id="req-494030ca544bf52f4e783564f67d46ac" method=GET path=/lingxi/v1/agents/agentA/identity status=403 reason=insufficient_scope remote=127.0.0.1:57700
+LINGXI_AUTH_REJECTED request_id="req-e6f8da27743b93962d1df508f21b73b1" method=GET path=/lingxi/v1/agents/agentA/agents-md status=403 reason=insufficient_scope remote=127.0.0.1:57703
+LINGXI_AUTH_REJECTED request_id="req-593a9fc8948e40d9b642ffd47bff0b72" method=GET path=/lingxi/v1/agents/agentA/ishiki status=403 reason=insufficient_scope remote=127.0.0.1:57706
+LINGXI_AUTH_REJECTED request_id="req-ae03f4f0bbec48df1aeeed44381cd7aa" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:57709
+LINGXI_AUTH_REJECTED request_id="req-2767553b8faf3dd6a13879abc1711368" method=GET [token] status=403 reason=insufficient_scope remote=127.0.0.1:57712
+
+
+successes:
+    original_persona_reads_template_custom_alias_and_refusal
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 7.41s
+

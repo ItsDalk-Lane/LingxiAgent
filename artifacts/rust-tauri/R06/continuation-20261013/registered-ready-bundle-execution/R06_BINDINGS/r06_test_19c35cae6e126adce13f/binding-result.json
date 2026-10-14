@@ -1,0 +1,142 @@
+{
+  "schema": "lingxi.r06.executed-binding.v1",
+  "key": "r06_test_19c35cae6e126adce13f",
+  "sourceCandidateSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_original_chat_proofs",
+    "test": "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_chat_proofs",
+      "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "command": {
+    "binding": {
+      "package": "lingxi-service",
+      "suite": "r06_original_chat_proofs",
+      "test": "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_original_chat_proofs",
+        "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_chat_proofs",
+      "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "sourceBeforeSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/stdout.log",
+    "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/stderr.log",
+    "timeoutSecs": 900,
+    "syntheticEnvironment": {
+      "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/runtime/home",
+      "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/runtime/tmp",
+      "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+      "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/w01_evidence",
+      "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/w09_evidence",
+      "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/w10_evidence",
+      "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/w11_evidence",
+      "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/lingxi_w03_evidence",
+      "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/lingxi_f05_evidence",
+      "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/lingxi_f08_evidence",
+      "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/t08",
+      "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/registered-ready-bundle-execution/R06_BINDINGS/r06_test_19c35cae6e126adce13f/command-001/raw/t08-evaluations.jsonl"
+    },
+    "actualArgv": [
+      "/Users/study_superior/.cargo/bin/rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_original_chat_proofs",
+      "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "pid": 89971,
+    "elapsedSecs": 3.403,
+    "outputCheck": {
+      "valid": true,
+      "expectedTest": "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity"
+      ],
+      "reason": ""
+    },
+    "stdoutSha256": "765f3e515d086fba77110b46a9c06d475531e3fa35512c6ba3c8e8ea03c0fba3",
+    "stderrSha256": "b5d1d1641dc77b69eb329f1bb67a9ace28be035d681d7a2e9b886faa9100cd5e",
+    "sourceAfterSha256": "9b32cc16b65ebba65cec8b55d974df698e118fc09128661e94fa7d1a3a173590",
+    "sourceStable": true,
+    "localPassed": true
+  },
+  "passed": true,
+  "stageVerdict": "NOT_A_STAGE_VERDICT"
+}

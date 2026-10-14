@@ -1,0 +1,10 @@
+    Blocking waiting for file lock on package cache
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling digest v0.11.3
+   Compiling sha2 v0.11.0
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.81s
+     Running `rust/target-r06-continuation/debug/xtask check-boundaries`
+error: stale xtask binary: source inventory differs; added=["stage_maps/R06.json", "stage_maps/R06_INPUTS.json"], missing=[]

@@ -15,7 +15,6 @@ use std::path::PathBuf;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
 
-use lingxi_kernel::RunContext;
 use lingxi_kernel::model_exchange::ModelTurnInput;
 use lingxi_kernel::ports::{
     DelegationRequest, ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolExecutionResult,
@@ -25,12 +24,13 @@ use lingxi_kernel::toolcatalog::{
     Availability, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
     ToolManifest, ToolOrigin, ToolRegistry,
 };
+use lingxi_kernel::RunContext;
 use lingxi_protocol::{
     ContentBlock, ErrorCode, ModelCallId, NormalizedMessage, ProtocolError, ToolCallId,
 };
 use lingxi_service::toolgateway::ToolInvocationGateway;
 use lingxi_service::{
-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
+    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
 };
 
 const PARENT_INPUT: &str = "LIFE: parent run";
@@ -206,23 +206,21 @@ fn delegation_step_static(
     }
     ProviderTurn::ToolRequests {
         content: Vec::new(),
-        requests: vec![
-            ToolRequest::from_effective_arguments(
-                &declaration.target,
-                arguments,
-                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
-            )
-            .expect("effective tool request")
-            .with_summary(format!("{name}: {task}"))
-            .with_delegation(DelegationRequest {
-                task: task.to_string(),
-                access: None,
-                label: None,
-                agent_id: None,
-                model: None,
-                thread_id,
-            }),
-        ],
+        requests: vec![ToolRequest::from_effective_arguments(
+            &declaration.target,
+            arguments,
+            &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+        )
+        .expect("effective tool request")
+        .with_summary(format!("{name}: {task}"))
+        .with_delegation(DelegationRequest {
+            task: task.to_string(),
+            access: None,
+            label: None,
+            agent_id: None,
+            model: None,
+            thread_id,
+        })],
     }
 }
 

@@ -4,10 +4,10 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use lingxi_service::{
-    HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps, ServiceError, ServiceState,
-    prepare_layout, run,
+    prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
+    ServiceError, ServiceState,
 };
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::TcpStream;
 
@@ -223,11 +223,9 @@ async fn original_facts_v1_v2_import_export_and_rejections() {
     assert!(stored.iter().any(|r| r.fact == "旧版事实甲"
         && r.time.as_deref() == Some("2026-01-01")
         && r.tags == ["旧版"]));
-    assert!(
-        stored
-            .iter()
-            .any(|r| r.fact == "新版事实乙" && r.session_id.as_deref() == Some("原会话"))
-    );
+    assert!(stored
+        .iter()
+        .any(|r| r.fact == "新版事实乙" && r.session_id.as_deref() == Some("原会话")));
     assert!(
         facts(&server, "agentB").is_empty(),
         "其他 Agent 不被导入污染"
@@ -388,16 +386,12 @@ async fn original_week_days_list_edit_sync_and_rejected_dates() {
         std::fs::read_to_string(dir.join("daily/2026-01-02.md")).unwrap(),
         "第二日保留\n"
     );
-    assert!(
-        std::fs::read_to_string(dir.join("week.md"))
-            .unwrap()
-            .contains("新日正文")
-    );
-    assert!(
-        std::fs::read_to_string(dir.join("memory.md"))
-            .unwrap()
-            .contains("新日正文")
-    );
+    assert!(std::fs::read_to_string(dir.join("week.md"))
+        .unwrap()
+        .contains("新日正文"));
+    assert!(std::fs::read_to_string(dir.join("memory.md"))
+        .unwrap()
+        .contains("新日正文"));
     let before = file_snapshot(&dir);
     for (date, payload, want) in [
         ("2026-01-03", json!({"body":"不存在"}), 404),
@@ -543,20 +537,16 @@ async fn original_tenet_http_states_duplicate_limits_and_pinned_visibility() {
         .await;
     assert_eq!(status, 200);
     assert_eq!(list["tenets"].as_array().unwrap().len(), 3);
-    assert!(
-        list["tenets"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|t| t["id"] == pending.id && t["status"] == "pending")
-    );
-    assert!(
-        list["tenets"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|t| t["id"] == rejected.id && t["status"] == "rejected")
-    );
+    assert!(list["tenets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|t| t["id"] == pending.id && t["status"] == "pending"));
+    assert!(list["tenets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|t| t["id"] == rejected.id && t["status"] == "rejected"));
     let (status, pins) = server
         .request("GET", "/lingxi/v1/agents/agentA/pinned", None)
         .await;
@@ -679,13 +669,11 @@ async fn original_tenet_decisions_and_pinned_replacement_preserve_nonactive() {
     assert_eq!(result["pins"], json!(["新原则"]));
     assert_eq!(store.pending().len(), 1);
     assert_eq!(store.pending()[0].id, pending.id);
-    assert!(
-        store
-            .list()
-            .tenets
-            .iter()
-            .any(|t| t.id == no.id && t.status.as_str() == "rejected")
-    );
+    assert!(store
+        .list()
+        .tenets
+        .iter()
+        .any(|t| t.id == no.id && t.status.as_str() == "rejected"));
     assert!(!store.list().tenets.iter().any(|t| t.id == yes.id));
     assert_eq!(store.active()[0].source.as_str(), "user_direct");
     let (status, result) = server
@@ -1260,14 +1248,12 @@ async fn original_tenet_decision_nonpending_capacity_errors_keep_store() {
         assert_eq!(error["code"], code);
         assert_eq!(std::fs::read(store.file_path()).unwrap(), before);
     }
-    assert!(
-        service
-            .tenets_store("agentB")
-            .unwrap()
-            .list()
-            .tenets
-            .is_empty()
-    );
+    assert!(service
+        .tenets_store("agentB")
+        .unwrap()
+        .list()
+        .tenets
+        .is_empty());
     server.stop_and_clean().await;
 }
 
@@ -1355,6 +1341,119 @@ fn original_install_package(home: &std::path::Path, name: &str) -> PathBuf {
 }
 
 #[tokio::test]
+async fn original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime() {
+    let server = start_server("manual-install-agent").await;
+    let skills = lingxi_service::skills::SkillService::new(
+        server.home.clone(),
+        server.home.join("proof-product"),
+    );
+    let b_before = std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap();
+    assert!(!skills
+        .runtime_skill_catalog("agentA")
+        .unwrap()
+        .iter()
+        .any(|skill| skill.name == "manual-original"));
+    let package = original_install_package(&server.home, "manual-original");
+    let installed = server
+        .request(
+            "POST",
+            "/lingxi/v1/skills/install?agentId=agentA",
+            Some(json!({"path": package})),
+        )
+        .await;
+    assert_eq!(installed.0, 200, "{installed:?}");
+    assert_eq!(installed.1["ok"], true);
+    assert_eq!(installed.1["skill"]["name"], "manual-original");
+    assert_eq!(
+        std::fs::read(
+            server
+                .home
+                .join("skills/manual-original/examples/guide.txt")
+        )
+        .unwrap(),
+        std::fs::read(package.join("examples/guide.txt")).unwrap()
+    );
+    let a_config = std::fs::read_to_string(server.home.join("agents/agentA/config.yaml")).unwrap();
+    let (enabled, _) =
+        lingxi_adapters::storage::agent_memory::AgentConfigPatch::read_skill_lists(&a_config)
+            .unwrap();
+    assert!(enabled.contains(&"manual-original".to_string()));
+    assert!(skills
+        .runtime_skill_catalog("agentA")
+        .unwrap()
+        .iter()
+        .any(|skill| skill.name == "manual-original"));
+    assert!(!skills
+        .runtime_skill_catalog("agentB")
+        .unwrap()
+        .iter()
+        .any(|skill| skill.name == "manual-original"));
+    let runtime = server
+        .request("GET", "/lingxi/v1/skills?agentId=agentA&runtime=1", None)
+        .await;
+    assert_eq!(runtime.0, 200, "{runtime:?}");
+    assert!(runtime.1["skills"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|skill| { skill["name"] == "manual-original" && skill["enabled"] == true }));
+    assert_eq!(
+        std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+        b_before
+    );
+    let a_before = std::fs::read(server.home.join("agents/agentA/config.yaml")).unwrap();
+    for (query, status) in [
+        ("agentId=agentA&agentId=agentB", 400),
+        ("agentId=missing", 404),
+        ("agentId=bad%2Fid", 400),
+        ("agentId=", 400),
+    ] {
+        let refused_package = original_install_package(&server.home, "manual-refused");
+        let refused = server
+            .request(
+                "POST",
+                &format!("/lingxi/v1/skills/install?{query}"),
+                Some(json!({"path": refused_package})),
+            )
+            .await;
+        assert_eq!(refused.0, status, "{query}: {refused:?}");
+        assert!(refused.1.get("error").is_some());
+        assert!(!server.home.join("skills/manual-refused").exists());
+        assert_eq!(
+            std::fs::read(server.home.join("agents/agentA/config.yaml")).unwrap(),
+            a_before
+        );
+        assert_eq!(
+            std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+            b_before
+        );
+    }
+    for path in [
+        PathBuf::from("relative-skill-path"),
+        server.home.join("missing-skill-package"),
+    ] {
+        let refused = server
+            .request(
+                "POST",
+                "/lingxi/v1/skills/install?agentId=agentA",
+                Some(json!({"path": path})),
+            )
+            .await;
+        assert_eq!(refused.0, 400, "{refused:?}");
+        assert!(refused.1.get("error").is_some());
+        assert_eq!(
+            std::fs::read(server.home.join("agents/agentA/config.yaml")).unwrap(),
+            a_before
+        );
+        assert_eq!(
+            std::fs::read(server.home.join("agents/agentB/config.yaml")).unwrap(),
+            b_before
+        );
+    }
+    server.stop_and_clean().await;
+}
+
+#[tokio::test]
 async fn original_install_tool_risk_token_complete_package_agent_enable_and_failures() {
     let server = start_server("install-tool-original").await;
     std::fs::create_dir_all(server.home.join("user")).unwrap();
@@ -1414,11 +1513,9 @@ async fn original_install_tool_risk_token_complete_package_agent_enable_and_fail
     );
     assert!(accepted.contains("Skill installed: review-original"));
     assert!(accepted.contains("after explicit user confirmation"));
-    assert!(
-        std::fs::read_to_string(installed.join("SKILL.md"))
-            .unwrap()
-            .contains("完整技能正文")
-    );
+    assert!(std::fs::read_to_string(installed.join("SKILL.md"))
+        .unwrap()
+        .contains("完整技能正文"));
     assert_eq!(
         std::fs::read_to_string(installed.join("examples/guide.txt")).unwrap(),
         "必须一同安装的原始配套文件"
@@ -1429,20 +1526,16 @@ async fn original_install_tool_risk_token_complete_package_agent_enable_and_fail
     .unwrap()
     .0;
     assert!(enabled.contains(&"review-original".into()));
-    assert!(
-        skills
-            .runtime_skill_catalog("agentA")
-            .unwrap()
-            .iter()
-            .any(|s| s.name == "review-original")
-    );
-    assert!(
-        !skills
-            .runtime_skill_catalog("agentB")
-            .unwrap()
-            .iter()
-            .any(|s| s.name == "review-original")
-    );
+    assert!(skills
+        .runtime_skill_catalog("agentA")
+        .unwrap()
+        .iter()
+        .any(|s| s.name == "review-original"));
+    assert!(!skills
+        .runtime_skill_catalog("agentB")
+        .unwrap()
+        .iter()
+        .any(|s| s.name == "review-original"));
     assert_eq!(file_snapshot(&memory_dir(&server, "agentB")), b_before);
     let pool_before = file_snapshot(&server.home.join("skills"));
     let config_before = std::fs::read(&a_config).unwrap();
@@ -1510,12 +1603,10 @@ async fn original_install_tool_risk_token_complete_package_agent_enable_and_fail
         result.outcome,
         lingxi_kernel::ports::ToolOutcome::Failed { .. }
     ));
-    assert!(
-        !server
-            .home
-            .join("skills/failed-original/SKILL.md")
-            .is_file()
-    );
+    assert!(!server
+        .home
+        .join("skills/failed-original/SKILL.md")
+        .is_file());
     assert_eq!(file_snapshot(&server.home.join("skills")), pool_before);
     assert_eq!(std::fs::read(&a_config).unwrap(), config_before);
     assert_eq!(file_snapshot(&memory_dir(&server, "agentB")), b_before);
@@ -1747,26 +1838,18 @@ async fn original_nonempty_revision_lists_are_agent_scoped_and_read_only() {
     assert_eq!(result["agentId"], "agentA");
     let actual = result["revisions"].as_array().unwrap();
     assert_eq!(actual.len(), 2);
-    assert!(
-        actual
-            .iter()
-            .any(|r| r["revisionId"] == first["revisionId"])
-    );
-    assert!(
-        actual
-            .iter()
-            .any(|r| r["revisionId"] == second["revisionId"])
-    );
-    assert!(
-        !actual
-            .iter()
-            .any(|r| r["revisionId"] == other["revisionId"])
-    );
-    assert!(
-        actual
-            .iter()
-            .all(|r| r.get("before").is_none() && r["sectionChars"]["facts"].as_u64().unwrap() > 0)
-    );
+    assert!(actual
+        .iter()
+        .any(|r| r["revisionId"] == first["revisionId"]));
+    assert!(actual
+        .iter()
+        .any(|r| r["revisionId"] == second["revisionId"]));
+    assert!(!actual
+        .iter()
+        .any(|r| r["revisionId"] == other["revisionId"]));
+    assert!(actual
+        .iter()
+        .all(|r| r.get("before").is_none() && r["sectionChars"]["facts"].as_u64().unwrap() > 0));
     let (status, result) = server
         .request(
             "GET",
@@ -1935,8 +2018,8 @@ async fn original_restore_detail_hash_refuses_concurrent_edits_and_preserves_age
 #[tokio::test]
 async fn original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy() {
     use lingxi_adapters::storage::agent_memory::{
-        CompiledMemoryStore, DreamRevisionStore, MemoryOperationKind, TenetsStore,
-        memory_operation_test_hook,
+        memory_operation_test_hook, CompiledMemoryStore, DreamRevisionStore, MemoryOperationKind,
+        TenetsStore,
     };
     let server = start_server("restore-busy-original").await;
     let memory = lingxi_service::memory::MemoryService::new(

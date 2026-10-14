@@ -265,7 +265,7 @@ pub struct FileHistoryService {
     db: Arc<RunDatabase>,
     workspace: Option<PathBuf>,
     workspace_hash: Option<String>,
-    now: Box<dyn Fn() -> u64 + Send + Sync>,
+    now: Arc<dyn Fn() -> u64 + Send + Sync>,
     merge_window_ms: u64,
 }
 
@@ -293,8 +293,24 @@ impl FileHistoryService {
             db,
             workspace,
             workspace_hash,
-            now: Box::new(now),
+            now: Arc::new(now),
             merge_window_ms,
+        }
+    }
+
+    /// R06-R2：同库同时钟的按根视图（现役 engine 按根注册 workspace 条目
+    /// 的单服务形态 → 候选人共享 RunDatabase 的 scoped 实例）。快照行按
+    /// workspace_hash 隔离：一个根的视图读不到其他根的历史（现役按
+    /// root 键的 entries 隔离同口径）。根不可解析 → None（未跟踪）。
+    pub fn scoped_to_root(&self, root: Option<PathBuf>) -> Self {
+        let workspace = root.and_then(|root| std::fs::canonicalize(root).ok());
+        let workspace_hash = workspace.as_ref().map(|root| workspace_hash_for_root(root));
+        FileHistoryService {
+            db: Arc::clone(&self.db),
+            workspace,
+            workspace_hash,
+            now: Arc::clone(&self.now),
+            merge_window_ms: self.merge_window_ms,
         }
     }
 
@@ -338,8 +354,8 @@ impl FileHistoryService {
         let hash: String = digest.iter().map(|b| format!("{b:02x}")).collect();
         let latest = session_files::latest_file_snapshot_meta(&self.db, &ws, rel_path).await?;
         if let Some(latest) = &latest {
-            // 同 sha → unchanged（:91-94）。
-            if latest.sha256 == hash {
+            // 普通捕获同 sha → unchanged；每次恢复都须留下显式审计快照。
+            if latest.sha256 == hash && origin != "restore" {
                 return Ok(RecordOutcome::Unchanged(latest.id));
             }
             // withinWindow（:97-101）：窗内、非负、双侧非 restore。
@@ -389,7 +405,11 @@ impl FileHistoryService {
         matches!(outcome, Ok(true))
     }
 
-    async fn capture_from_disk_inner(&self, abs_path: &Path, origin: &str) -> Result<bool, String> {
+    pub(crate) async fn capture_from_disk_inner(
+        &self,
+        abs_path: &Path,
+        origin: &str,
+    ) -> Result<bool, String> {
         let Some(root) = self.workspace.as_deref() else {
             return Ok(false);
         };
@@ -508,18 +528,51 @@ fn query_value<'p>(pairs: &'p [(String, String)], key: &str) -> Option<&'p str> 
         .map(|(_, v)| v.as_str())
 }
 
-/// withWorkspace（file-history.ts :21-28）的单工作区映射：agentId 必填 +
-/// 已跟踪工作区（未配置工作区的实例一律 404）。
+/// withWorkspace（file-history.ts :21-28 + engine.getExplicitHomeCwd →
+/// getHomeCwd 的 resolveWorkspaceRoot :5-9）的按助手根解析：
+/// - agentId 必填（空 → 400）；
+/// - 显式根：该助手 `agents/{id}/config.yaml` 的 `desk.home_folder`
+///   （现役 getExplicitHomeCwd）；
+/// - 无显式根：回落实例默认工作区（现役 getHomeCwd → 默认工作区，不从
+///   其他助手继承——config-coordinator.ts:167-174 同口径）；
+/// - 根不可解析（磁盘上不存在 / 实例未配置）→ 404 workspace not tracked
+///   （现役 hasWorkspace(root) 假值分支）。
+///
+/// 返回同库同时钟的按根 scoped 视图：快照行按 workspace_hash 隔离，
+/// 一个助手的视图读不到其他助手根的历史（不扩大披露范围）。
 #[allow(clippy::result_large_err)] // 同 parse_strict_query 的响应直携纪律。
-fn require_workspace(state: &ServiceState, agent_id: Option<&str>) -> Result<(), Response> {
+fn resolve_scoped_history(
+    state: &ServiceState,
+    agent_id: Option<&str>,
+) -> Result<FileHistoryService, Response> {
     let agent_id = agent_id.unwrap_or("");
     if agent_id.is_empty() {
         return Err(json_error(StatusCode::BAD_REQUEST, "agentId required"));
     }
-    if !state.file_history().has_workspace() {
+    let explicit = std::fs::read_to_string(
+        state
+            .config()
+            .data_home
+            .join("agents")
+            .join(agent_id)
+            .join("config.yaml"),
+    )
+    .ok()
+    .and_then(|text| {
+        lingxi_adapters::storage::agent_memory::config::AgentConfigDocument::parse(&text).ok()
+    })
+    .and_then(|doc| doc.scan().ok())
+    .and_then(|scan| scan.desk_home_folder);
+    let root = match explicit {
+        Some(folder) => Some(PathBuf::from(folder)),
+        // 无显式根 → 实例默认工作区（None 时 scoped 视图未跟踪 → 404）。
+        None => state.file_history().workspace_root().map(Path::to_path_buf),
+    };
+    let scoped = state.file_history().scoped_to_root(root);
+    if !scoped.has_workspace() {
         return Err(json_error(StatusCode::NOT_FOUND, "workspace not tracked"));
     }
-    Ok(())
+    Ok(scoped)
 }
 
 /// GET /lingxi/v1/file-history/files（file-history.ts :30-38）。
@@ -531,10 +584,11 @@ pub async fn list_files_route(
         Ok(pairs) => pairs,
         Err(resp) => return resp,
     };
-    if let Err(resp) = require_workspace(&state, query_value(&pairs, "agentId")) {
-        return resp;
-    }
-    match state.file_history().list_files().await {
+    let scoped = match resolve_scoped_history(&state, query_value(&pairs, "agentId")) {
+        Ok(scoped) => scoped,
+        Err(resp) => return resp,
+    };
+    match scoped.list_files().await {
         Ok(files) => {
             let files: Vec<Value> = files
                 .into_iter()
@@ -563,13 +617,14 @@ pub async fn list_versions_route(
         Ok(pairs) => pairs,
         Err(resp) => return resp,
     };
-    if let Err(resp) = require_workspace(&state, query_value(&pairs, "agentId")) {
-        return resp;
-    }
+    let scoped = match resolve_scoped_history(&state, query_value(&pairs, "agentId")) {
+        Ok(scoped) => scoped,
+        Err(resp) => return resp,
+    };
     let Some(rel_path) = query_value(&pairs, "relPath").and_then(safe_rel_path) else {
         return json_error(StatusCode::BAD_REQUEST, "invalid relPath");
     };
-    match state.file_history().list_versions(rel_path).await {
+    match scoped.list_versions(rel_path).await {
         Ok(versions) => {
             let versions: Vec<Value> = versions
                 .into_iter()
@@ -601,8 +656,8 @@ fn parse_snapshot_id(raw: Option<&str>) -> Option<i64> {
 }
 
 #[allow(clippy::result_large_err)] // 同 parse_strict_query 的响应直携纪律。
-async fn snapshot_or_404(state: &ServiceState, id: i64) -> Result<SnapshotInfo, Response> {
-    match state.file_history().get_snapshot_content(id).await {
+async fn snapshot_or_404(scoped: &FileHistoryService, id: i64) -> Result<SnapshotInfo, Response> {
+    match scoped.get_snapshot_content(id).await {
         Ok(Some(snapshot)) => Ok(snapshot),
         Ok(None) => Err(json_error(
             StatusCode::NOT_FOUND,
@@ -624,13 +679,14 @@ pub async fn snapshot_route(
         Ok(pairs) => pairs,
         Err(resp) => return resp,
     };
-    if let Err(resp) = require_workspace(&state, query_value(&pairs, "agentId")) {
-        return resp;
-    }
+    let scoped = match resolve_scoped_history(&state, query_value(&pairs, "agentId")) {
+        Ok(scoped) => scoped,
+        Err(resp) => return resp,
+    };
     let Some(id) = parse_snapshot_id(query_value(&pairs, "id")) else {
         return json_error(StatusCode::BAD_REQUEST, "invalid id");
     };
-    match snapshot_or_404(&state, id).await {
+    match snapshot_or_404(&scoped, id).await {
         Ok(snapshot) => (
             StatusCode::OK,
             Json(json!({
@@ -660,9 +716,10 @@ pub async fn restore_route(
         }
     };
     let agent_id = body.get("agentId").and_then(Value::as_str).unwrap_or("");
-    if let Err(resp) = require_workspace(&state, Some(agent_id)) {
-        return resp;
-    }
+    let scoped = match resolve_scoped_history(&state, Some(agent_id)) {
+        Ok(scoped) => scoped,
+        Err(resp) => return resp,
+    };
     let snapshot_id = body
         .get("snapshotId")
         .and_then(Value::as_i64)
@@ -670,14 +727,14 @@ pub async fn restore_route(
     let Some(snapshot_id) = snapshot_id else {
         return json_error(StatusCode::BAD_REQUEST, "invalid snapshotId");
     };
-    let snapshot = match snapshot_or_404(&state, snapshot_id).await {
+    let snapshot = match snapshot_or_404(&scoped, snapshot_id).await {
         Ok(snapshot) => snapshot,
         Err(resp) => return resp,
     };
     let Some(rel_path) = safe_rel_path(&snapshot.rel_path) else {
         return json_error(StatusCode::INTERNAL_SERVER_ERROR, "corrupt snapshot path");
     };
-    let Some(root) = state.file_history().workspace_root() else {
+    let Some(root) = scoped.workspace_root() else {
         return json_error(StatusCode::NOT_FOUND, "workspace not tracked");
     };
     let abs_path = rel_path
@@ -696,26 +753,63 @@ pub async fn restore_route(
             Json(json!({ "ok": true, "relPath": rel_path })),
         )
             .into_response(),
+        Err(err) if err.code == "file_history_capture_failed" => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({
+                "error": err.to_string(),
+                "relPath": rel_path,
+                "fileWritten": true,
+                "snapshotRecorded": false,
+            })),
+        )
+            .into_response(),
         Err(err) => json_error(StatusCode::INTERNAL_SERVER_ERROR, err.to_string()),
     }
 }
 
-/// 基础 write/edit 与 ResourceIO 共用正式历史存储。回调在文件工具的物理线程执行。
-pub struct FileHistoryChangeLog {
+/// 基础 write/edit 捕获历史并登记当前会话产物；回调在文件工具的物理线程执行。
+pub struct FileProductChangeLog {
     history: Arc<FileHistoryService>,
+    files: Arc<crate::sessionfiles::SessionFileService>,
     runtime: tokio::runtime::Handle,
 }
-impl FileHistoryChangeLog {
-    pub fn new(history: Arc<FileHistoryService>) -> Self {
+impl FileProductChangeLog {
+    pub fn new(
+        history: Arc<FileHistoryService>,
+        files: Arc<crate::sessionfiles::SessionFileService>,
+    ) -> Self {
         Self {
             history,
+            files,
             runtime: tokio::runtime::Handle::current(),
         }
     }
 }
-impl crate::filetools::FileChangeLog for FileHistoryChangeLog {
-    fn record(&self, record: crate::filetools::FileModificationRecord) {
-        self.runtime
-            .block_on(self.history.capture_from_disk(&record.path, "tool"));
+impl crate::filetools::FileChangeLog for FileProductChangeLog {
+    fn record(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+        record: crate::filetools::FileModificationRecord,
+    ) -> Result<(), String> {
+        self.runtime.block_on(async {
+            self.history.capture_from_disk(&record.path, "tool").await;
+            let lease = self.files.payload_lease().await;
+            self.files
+                .ensure_stage_session(ctx)
+                .await
+                .map_err(|error| error.to_string())?;
+            self.files
+                .register_file_under_lease(
+                    ctx.session_id.as_str(),
+                    &record.path,
+                    None,
+                    None,
+                    "agent_artifact",
+                    &lease,
+                )
+                .await
+                .map_err(|error| error.to_string())?;
+            Ok(())
+        })
     }
 }

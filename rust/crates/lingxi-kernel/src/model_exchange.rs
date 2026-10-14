@@ -122,7 +122,8 @@ impl ToolDeclarationSnapshot {
         registry: &ToolRegistry,
         activated: &std::collections::BTreeSet<crate::toolcatalog::ToolTargetId>,
     ) -> Result<Self, ToolDeclarationError> {
-        let (catalog_generation, tools) = registry.model_declaration_snapshot_with_activated_targets(activated);
+        let (catalog_generation, tools) =
+            registry.model_declaration_snapshot_with_activated_targets(activated);
         let mut declarations = Vec::new();
         for full in tools {
             let tool = full.listing;
@@ -179,7 +180,14 @@ impl ToolDeclarationSnapshot {
 
     /// 宿主根据实际发出的声明铸造历史绑定；模型不能自报。
     pub fn bind_target(&self, target: &str) -> Option<HistoricalToolDeclaration> {
-        self.declarations.iter().find(|d| d.target == target).map(|declaration| HistoricalToolDeclaration { execution: None, catalog_generation: self.catalog_generation, declaration: declaration.clone() })
+        self.declarations
+            .iter()
+            .find(|d| d.target == target)
+            .map(|declaration| HistoricalToolDeclaration {
+                execution: None,
+                catalog_generation: self.catalog_generation,
+                declaration: declaration.clone(),
+            })
     }
 
     /// Reverse lookup: the host target id a provider-facing wire name maps
@@ -264,7 +272,12 @@ pub struct RequestedToolCall {
 
 impl RequestedToolCall {
     pub fn historical_wire_name(&self) -> Option<&str> {
-        self.declaration_binding.as_ref().filter(|binding| binding.catalog_generation > 0 && binding.declaration.target == self.target).map(|binding| binding.declaration.wire_name.as_str())
+        self.declaration_binding
+            .as_ref()
+            .filter(|binding| {
+                binding.catalog_generation > 0 && binding.declaration.target == self.target
+            })
+            .map(|binding| binding.declaration.wire_name.as_str())
     }
 }
 

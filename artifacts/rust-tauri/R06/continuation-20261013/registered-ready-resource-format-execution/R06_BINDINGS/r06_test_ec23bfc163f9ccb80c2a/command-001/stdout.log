@@ -1,0 +1,29 @@
+
+running 1 test
+test resourceio_operation_specific_provider_refusals_preserve_files_and_registrations ... ok
+
+successes:
+
+---- resourceio_operation_specific_provider_refusals_preserve_files_and_registrations stdout ----
+LINGXI_AUTH_REJECTED request_id="req-7035227a2e836419140ba09e5eca3057" method=POST path=/lingxi/v1/resource-io/stat status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57184
+LINGXI_AUTH_REJECTED request_id="req-6fa01890cba022f1d15651edc9010613" method=POST path=/lingxi/v1/resource-io/read status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57188
+LINGXI_AUTH_REJECTED request_id="req-a139d119ccbf18d50577ce1c23547294" method=POST path=/lingxi/v1/resource-io/write status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57193
+LINGXI_AUTH_REJECTED request_id="req-97294b3486d2ad43dce4c120692157eb" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57198
+LINGXI_AUTH_REJECTED request_id="req-aa44f9f0ee11a04d35e10373c9267a7e" method=POST path=/lingxi/v1/resource-io/list status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57203
+LINGXI_AUTH_REJECTED request_id="req-3a8320bcedfb04dbcdf345834d6195a3" method=POST path=/lingxi/v1/resource-io/search status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57208
+LINGXI_AUTH_REJECTED request_id="req-0517eff30390d0ca75be7760074ebeff" method=POST path=/lingxi/v1/resource-io/rename status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57213
+LINGXI_AUTH_REJECTED request_id="req-f5e2b89389a43811383cf690f106522e" method=POST path=/lingxi/v1/resource-io/move status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57218
+LINGXI_AUTH_REJECTED request_id="req-e4169ebc3cd57fe5cf90be0b387f182c" method=POST path=/lingxi/v1/resource-io/trash status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57223
+LINGXI_AUTH_REJECTED request_id="req-2ac4ab8004bdb518a55e5f74f62c22b6" method=POST path=/lingxi/v1/resource-io/watch status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57228
+LINGXI_AUTH_REJECTED request_id="req-6c103ba3ca5564c0f59d5a1308a716dd" method=POST path=/lingxi/v1/resource-io/subscribe status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57233
+LINGXI_AUTH_REJECTED request_id="req-ed4479a138047cf8ddcf59cc09d7be39" method=GET path=/lingxi/v1/resource-io/events status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57234
+LINGXI_AUTH_REJECTED request_id="req-d1c003cc5afd19e30baa55016dce8912" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57235
+LINGXI_AUTH_REJECTED request_id="req-466241e1189e77cc0c955e4eb9ba24ba" method=DELETE [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57236
+LINGXI_AUTH_REJECTED request_id="req-f768f82d1107e71881593ec3cef3ff5d" method=DELETE [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:57237
+
+
+successes:
+    resourceio_operation_specific_provider_refusals_preserve_files_and_registrations
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.11s
+

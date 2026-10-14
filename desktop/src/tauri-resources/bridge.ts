@@ -4,8 +4,9 @@ export type SaveResult = { ok: boolean; conflict: boolean; version: FileVersion 
 export type ResourceEvents = { events?: Array<Record<string, unknown>>; latestSequence?: number; stale?: boolean };
 export type ResourceBridge = ReturnType<typeof createResourceBridge>;
 export type Invoke = <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
+export type FileChangedListener = (callback: (path: string) => void) => Promise<() => void>;
 
-export function createResourceBridge(invoke: Invoke) {
+export function createResourceBridge(invoke: Invoke, listenForFileChanges: FileChangedListener) {
   return {
     selectFiles: (multiple = true) => invoke<string[]>('select_files', { multiple }),
     readFile: (path: string) => invoke<string | null>('read_file', { path }),
@@ -22,6 +23,7 @@ export function createResourceBridge(invoke: Invoke) {
     // 兼容注册口供宿主消费者使用；当前 viewer 的刷新走 ResourceIO，不用旧监听启停按钮。
     watchFile: (path: string) => invoke<boolean>('watch_file', { path }),
     unwatchFile: (path: string) => invoke<boolean>('unwatch_file', { path }),
+    listenFileChanged: (callback: (path: string) => void) => listenForFileChanges(callback),
     resourceSubscribe: (path: string) => invoke<{ subscriptionId: string; resourceKeys: string[] }>('resource_subscribe', { path }),
     resourceEvents: (since: number) => invoke<ResourceEvents>('resource_events', { since }),
     resourceUnsubscribe: (subscriptionId: string) => invoke<unknown>('resource_unsubscribe', { subscriptionId }),
@@ -32,13 +34,26 @@ export function createResourceBridge(invoke: Invoke) {
 }
 
 export function nativeBridge(): ResourceBridge {
-  const native = (window as unknown as { __TAURI__?: { core?: { invoke: Invoke } } }).__TAURI__;
+  const native = (window as unknown as {
+    __TAURI__?: {
+      core?: { invoke: Invoke };
+      event?: { listen: (event: string, handler: (event: { payload: { filePath?: string } }) => void) => Promise<() => void> };
+    };
+  }).__TAURI__;
   if (!native?.core?.invoke) throw new Error('此文件界面需要当前原生桌面宿主');
   const core = native.core;
-  return createResourceBridge(async <T,>(command: string, args?: Record<string, unknown>) => {
-    const result = await core.invoke<T>(command, args);
-    // 供窗口内资源消费者观察真实回包；不包含宿主凭证，也不替换原生执行。
-    if (command === 'select_files' || command === 'resource_events') window.dispatchEvent(new CustomEvent('lingxi-resource-response', { detail: { command, result } }));
-    return result;
-  });
+  return createResourceBridge(
+    async <T,>(command: string, args?: Record<string, unknown>) => {
+      const result = await core.invoke<T>(command, args);
+      // 供窗口内资源消费者观察真实回包；不包含宿主凭证，也不替换原生执行。
+      if (command === 'select_files' || command === 'resource_events') window.dispatchEvent(new CustomEvent('lingxi-resource-response', { detail: { command, result } }));
+      return result;
+    },
+    async callback => {
+      if (!native.event?.listen) throw new Error('原生文件事件监听不可用');
+      return native.event.listen('file-changed', event => {
+        if (typeof event.payload.filePath === 'string') callback(event.payload.filePath);
+      });
+    },
+  );
 }

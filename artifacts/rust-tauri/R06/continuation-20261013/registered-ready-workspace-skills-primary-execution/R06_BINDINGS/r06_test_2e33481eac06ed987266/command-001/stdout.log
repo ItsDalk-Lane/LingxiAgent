@@ -1,0 +1,15 @@
+
+running 1 test
+test original_experience_read_sync_paused_and_invalid_preserve_state ... ok
+
+successes:
+
+---- original_experience_read_sync_paused_and_invalid_preserve_state stdout ----
+LINGXI_AUTH_REJECTED request_id="req-c5498a289ef19a31f44eebe4d0d8973a" method=PUT [token] status=403 reason=insufficient_scope remote=127.0.0.1:65276
+
+
+successes:
+    original_experience_read_sync_paused_and_invalid_preserve_state
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 2.58s
+

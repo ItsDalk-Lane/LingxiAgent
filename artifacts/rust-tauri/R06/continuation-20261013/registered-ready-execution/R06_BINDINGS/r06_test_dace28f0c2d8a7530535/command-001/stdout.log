@@ -1,0 +1,15 @@
+
+running 1 test
+test original_avatar_read_prefers_all_formats_and_preserves_other_agent ... ok
+
+successes:
+
+---- original_avatar_read_prefers_all_formats_and_preserves_other_agent stdout ----
+LINGXI_AUTH_REJECTED request_id="req-e7c2f78011a2f0c6835ca04930645372" method=GET path=/lingxi/v1/agents/agentB/avatar status=403 reason=insufficient_scope remote=127.0.0.1:53636
+
+
+successes:
+    original_avatar_read_prefers_all_formats_and_preserves_other_agent
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 2.56s
+

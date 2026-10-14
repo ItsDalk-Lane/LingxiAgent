@@ -1,0 +1,15 @@
+
+running 1 test
+test original_input_drafts_persist_home_and_sessions_per_surface_and_delete_only_target ... ok
+
+successes:
+
+---- original_input_drafts_persist_home_and_sessions_per_surface_and_delete_only_target stdout ----
+{"emptyAndWhitespaceDeleteOnlyTarget":true,"exactSurfaceBuckets":true,"originalLeaves":["R00-T02-LA-081FACA79F2C","R00-T02-LA-1B712E189DDF","R00-T02-LA-F829AEA5931C"],"otherSessionSurfaceUnchanged":true,"readDoesNotWrite":true,"textDocUpdatedAt":true,"twoRealRestarts":true}
+
+
+successes:
+    original_input_drafts_persist_home_and_sessions_per_surface_and_delete_only_target
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.16s
+
