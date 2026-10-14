@@ -51,7 +51,27 @@ pub struct ProjectionInput<'a> {
 
 /// 统一投影入口。
 pub fn project_history(input: &ProjectionInput<'_>) -> Vec<HistoryItem> {
-    let runs = bucket_events(input.events);
+    project_history_impl(input, false)
+}
+
+/// 情绪面只读同一持久事实与分支锚，和原正文历史分开呈现。
+pub fn project_mood_history(input: &ProjectionInput<'_>) -> Vec<HistoryItem> {
+    project_history_impl(input, true)
+        .into_iter()
+        .filter(|item| {
+            matches!(
+                item,
+                HistoryItem::AssistantSegment {
+                    segment_kind: lingxi_protocol::SegmentKind::Mood,
+                    ..
+                }
+            )
+        })
+        .collect()
+}
+
+fn project_history_impl(input: &ProjectionInput<'_>, include_mood: bool) -> Vec<HistoryItem> {
+    let runs = bucket_events(input.events, include_mood);
     let anchors = resolve_anchors(input, &runs);
     let groups = build_groups(&runs, &anchors);
 
@@ -126,7 +146,7 @@ struct ToolAcc {
     result: Option<lingxi_protocol::ToolResultWire>,
 }
 
-fn bucket_events(events: &[StoredEventRow]) -> HashMap<String, RunBuckets> {
+fn bucket_events(events: &[StoredEventRow], include_mood: bool) -> HashMap<String, RunBuckets> {
     let mut runs: HashMap<String, RunBuckets> = HashMap::new();
     // 段/工具按 (run, id) 聚合，保序用 first_seq。
     let mut segment_index: HashMap<(String, String), usize> = HashMap::new();
@@ -136,9 +156,17 @@ fn bucket_events(events: &[StoredEventRow]) -> HashMap<String, RunBuckets> {
             continue; // 会话级事件（如 session_created）不属于任何 run 组
         };
         let buckets = runs.entry(run_id.clone()).or_default();
+        let mood_projection;
         let payload = match &event.payload {
             EventPayload::Known(known) => known,
-            EventPayload::Unknown(_) => continue, // 未知事件原样保留在事件面，不进历史项
+            EventPayload::Unknown(unknown) if include_mood => {
+                mood_projection = match crate::mood_trajectory::projection(unknown) {
+                    Some(payload) => payload,
+                    None => continue, // 其他未知事件原样保留，不伪造历史项。
+                };
+                &mood_projection
+            }
+            EventPayload::Unknown(_) => continue,
         };
         match payload {
             KnownEventPayload::AssistantSegmentStart(start) => {
@@ -168,7 +196,9 @@ fn bucket_events(events: &[StoredEventRow]) -> HashMap<String, RunBuckets> {
                         // 无 start 的 delta（断流恢复面）：如实聚合，不丢。
                         buckets.segments.push(SegmentAcc {
                             segment_id: delta.segment_id.clone(),
-                            kind: lingxi_protocol::SegmentKind::Text,
+                            kind: if matches!(&event.payload, EventPayload::Unknown(unknown) if unknown.event_type == "assistant_mood") {
+                                lingxi_protocol::SegmentKind::Mood
+                            } else { lingxi_protocol::SegmentKind::Text },
                             phase: delta.semantic_phase,
                             text: String::new(),
                             first_seq: event.seq,
@@ -702,7 +732,7 @@ pub fn project_history_with_audits(
             _ => None,
         }
     }
-    let buckets = bucket_events(input.events);
+    let buckets = bucket_events(input.events, false);
     let mut audits: HashMap<Option<String>, Vec<(u64, HistoryItem)>> = HashMap::new();
     for (run_id, anchor) in audit_anchors {
         let Some(bucket) = buckets.get(run_id) else {

@@ -1158,10 +1158,38 @@ impl EventService {
         stream_id: &str,
         cursor: Option<Cursor>,
     ) -> Result<SubscribeOutcome, SubscribeReject> {
+        if stream_id.starts_with(lingxi_adapters::storage::run_store::MOOD_STREAM_PREFIX) {
+            return Err(SubscribeReject::StreamNotFound {
+                stream_id: stream_id.into(),
+            });
+        }
+        self.subscribe_authorized(principal, stream_id, stream_id, cursor)
+            .await
+    }
+
+    /// 情绪订阅授权实际会话，游标和发布则绑定其独立情绪流。
+    pub async fn subscribe_mood(
+        &self,
+        principal: &Principal,
+        session_id: &str,
+        cursor: Option<Cursor>,
+    ) -> Result<SubscribeOutcome, SubscribeReject> {
+        let stream_id = lingxi_adapters::storage::run_store::mood_stream_id(session_id);
+        self.subscribe_authorized(principal, session_id, &stream_id, cursor)
+            .await
+    }
+
+    async fn subscribe_authorized(
+        &self,
+        principal: &Principal,
+        session_id: &str,
+        stream_id: &str,
+        cursor: Option<Cursor>,
+    ) -> Result<SubscribeOutcome, SubscribeReject> {
         // 1. Ownership first: in R02 a stream id IS a session id; unknown
         //    streams are stale-stream rejections, foreign streams are
         //    forbidden — never a peek.
-        match self.sessions.get_for(principal, stream_id).await {
+        match self.sessions.get_for(principal, session_id).await {
             Ok(SessionAccess::Ok(_)) => {}
             Ok(SessionAccess::NotFound) => {
                 return Err(SubscribeReject::StreamNotFound {
@@ -1385,6 +1413,27 @@ impl EventService {
         cursor: Option<Cursor>,
         limit: Option<u32>,
     ) -> Result<EventCut, SubscribePageError> {
+        self.events_page_inner(principal, stream_id, cursor, limit, false)
+            .await
+    }
+    pub async fn mood_events_page(
+        &self,
+        principal: &Principal,
+        session_id: &str,
+        cursor: Option<Cursor>,
+        limit: Option<u32>,
+    ) -> Result<EventCut, SubscribePageError> {
+        self.events_page_inner(principal, session_id, cursor, limit, true)
+            .await
+    }
+    async fn events_page_inner(
+        &self,
+        principal: &Principal,
+        stream_id: &str,
+        cursor: Option<Cursor>,
+        limit: Option<u32>,
+        mood: bool,
+    ) -> Result<EventCut, SubscribePageError> {
         let limit = limit.unwrap_or(self.limits.page_limit_default);
         if limit == 0 || limit > self.limits.page_limit_max {
             return Err(SubscribePageError::InvalidLimit {
@@ -1392,7 +1441,12 @@ impl EventService {
                 max: self.limits.page_limit_max,
             });
         }
-        match self.subscribe(principal, stream_id, cursor).await {
+        let result = if mood {
+            self.subscribe_mood(principal, stream_id, cursor).await
+        } else {
+            self.subscribe(principal, stream_id, cursor).await
+        };
+        match result {
             Ok(SubscribeOutcome::Started { mut cut, .. }) => {
                 // Re-cut to the requested (possibly smaller) page size.
                 if (cut.events.len() as u32) > limit {
@@ -1400,7 +1454,7 @@ impl EventService {
                     let last = cut.events.last().map_or(cut.from_seq, |e| e.seq);
                     cut.next_cursor = Some(
                         SubscribeCursor {
-                            stream_id: stream_id.to_string(),
+                            stream_id: cut.stream_id.clone(),
                             seq: last,
                         }
                         .encode(),

@@ -1,0 +1,47 @@
+{
+  "schema": "lingxi.r06.independent-review.v1",
+  "reviewStatus": "NEEDS_FIX",
+  "leaves": [
+    "R00-T02-LA-32E9930CF9D9",
+    "R00-T02-LA-B09CC9536400"
+  ],
+  "stageAcceptance": false,
+  "r07Ready": false,
+  "baseline": "d73729a2821a51e39e27038c0c42052a1f2f737e",
+  "patchSHA256": "0f3b49aecdce393fcd6a72ebb94966bb7bb2472c9c1b57e285d57e21ae7623a3",
+  "candidate23SHAMatched": true,
+  "worktree": "/private/tmp/lingxi-r06-review-mood",
+  "cargoVersion": "1.98.1",
+  "locked": true,
+  "cargoIncremental": false,
+  "cargoTargetDir": "/Users/study_superior/.cache/lingxi-r06-builds/reviewer-target",
+  "passed": {
+    "r05_t04_streaming": 18,
+    "r06_mood_trajectory": 3,
+    "r06_t04_history": 7,
+    "streaming_norm_unit": 18
+  },
+  "failedTests": [
+    "reviewer_mood_http_page_cursor_remains_bound_to_actual_mood_stream",
+    "reviewer_current_mood_ui_restores_paginated_real_trajectory_without_cursor_failure",
+    "reviewer_mood_paginated_history_actual_network"
+  ],
+  "findings": [
+    {
+      "priority": "P2",
+      "source": "rust/crates/lingxi-service/src/events.rs",
+      "line": 1457,
+      "problem": "HTTP page truncation creates the next mood cursor with session id rather than retained mood stream id, causing self-issued cursor rejection and actual current Mood panel large history recovery failure."
+    }
+  ],
+  "probeSHA256": {
+    "rust/crates/lingxi-service/tests/r06_review_mood.rs": "cc24cf989b92e0329330594c97d31543f3dc0c0608ab6f2d5cb4c2993ccbca9e",
+    "desktop/src/react/components/chat/__tests__/R06ReviewRustMoodLive.test.tsx": "70964f25006f0dbc0560f4f263fee13bbe65304b182ee913f039f2509fdaea40"
+  },
+  "logs": [
+    "/tmp/r06-mood-review-exact-tests.log",
+    "/tmp/r06-mood-review-parser-tests.log",
+    "/tmp/r06-mood-review-page-counterexample.log",
+    "/tmp/r06-mood-review-ui-pagination.log"
+  ]
+}

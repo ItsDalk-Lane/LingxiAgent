@@ -674,7 +674,10 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         // R02-T05: event snapshot / cursor continuation page (same scope
         // as the session read it projects; ownership is re-checked per
         // request against the session the stream belongs to).
-        if let Some(id) = rest.strip_suffix("/events") {
+        if let Some(id) = rest
+            .strip_suffix("/events")
+            .or_else(|| rest.strip_suffix("/mood-events"))
+        {
             if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
                 return RoutePolicy::Scope("chat");
             }
@@ -750,7 +753,10 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         }
         // R06-T04: 统一历史读面（分页 /history 与全量 /export）——与会话读
         // 同 scope，归属按请求重检（gate 在 handler 内先于一切实体读取）。
-        if let Some(id) = rest.strip_suffix("/history") {
+        if let Some(id) = rest
+            .strip_suffix("/history")
+            .or_else(|| rest.strip_suffix("/mood-history"))
+        {
             if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
                 return RoutePolicy::Scope("chat");
             }

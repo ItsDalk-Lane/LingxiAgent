@@ -591,6 +591,14 @@ impl RunDatabase {
 
     /// Idempotent session seed (`INSERT OR IGNORE` on the primary key).
     pub async fn ensure_session_seed(&self, rows: Vec<SessionRow>) -> Result<(), StorageError> {
+        if rows
+            .iter()
+            .any(|row| row.session_id.starts_with(MOOD_STREAM_PREFIX))
+        {
+            return Err(StorageError::InvalidRequest {
+                detail: "reserved mood stream namespace cannot be used as a session id".into(),
+            });
+        }
         self.queue
             .submit(move |conn| {
                 let tx = conn
@@ -1122,6 +1130,15 @@ fn next_seq(conn: &rusqlite::Connection, stream_id: &str) -> Result<i64, Storage
 
 /// Persists one key event row inside the open transaction and advances the
 /// run's `last_event_seq`.
+/// 情绪使用保留命名空间的独立流，真实会话 id 仍在 session_id 字段。
+pub const MOOD_STREAM_PREFIX: &str = "lingxi.mood/";
+pub fn mood_stream_id(session_id: &str) -> String {
+    format!(
+        "{MOOD_STREAM_PREFIX}{}",
+        lingxi_protocol::canon::sha256_hex(session_id.as_bytes())
+    )
+}
+
 fn stage_event(
     conn: &rusqlite::Connection,
     stream_id: &str,
@@ -1131,6 +1148,11 @@ fn stage_event(
     run_id: Option<&str>,
     attempt: Option<&str>,
 ) -> Result<(EventEnvelope, i64), StorageError> {
+    if stream_id.starts_with(MOOD_STREAM_PREFIX) && event.payload.event_type() != "assistant_mood" {
+        return Err(StorageError::InvalidRequest {
+            detail: "reserved mood stream namespace cannot be used as a session id".into(),
+        });
+    }
     let seq = next_seq(conn, stream_id)?;
     let payload_json = canon::canonical_string(&event.payload);
     if event.payload.event_type() == "tool_call_completed" {
@@ -2171,16 +2193,21 @@ impl StoragePort for RunDatabase {
                     let mut envelopes = Vec::with_capacity(events.len());
                     let mut last_seq = run.last_event_seq;
                     for event in &events {
+                        let mood_stream = (event.payload.event_type() == "assistant_mood")
+                            .then(|| mood_stream_id(&session_id));
+                        let event_stream = mood_stream.as_deref().unwrap_or(&stream_id);
                         let (envelope, seq) = stage_event(
                             conn,
-                            &stream_id,
+                            event_stream,
                             &session_id,
                             now_unix_ms as i64,
                             event,
                             Some(&run_id),
                             Some(&attempt),
                         )?;
-                        last_seq = seq;
+                        if mood_stream.is_none() {
+                            last_seq = seq;
+                        }
                         envelopes.push(envelope);
                     }
                     conn.execute(

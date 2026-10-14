@@ -158,6 +158,8 @@ pub enum AssistantPhase {
 pub enum SegmentKind {
     Text,
     Reasoning,
+    /// 仅供独立情绪轨迹展示，不混入助手正文或推理正文。
+    Mood,
 }
 
 /// One block of normalized message content.

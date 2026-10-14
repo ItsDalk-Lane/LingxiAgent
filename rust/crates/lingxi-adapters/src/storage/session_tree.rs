@@ -172,6 +172,14 @@ fn map_err(err: rusqlite::Error) -> StorageError {
 
 /// 种会话行。
 pub async fn seed_session(db: &RunDatabase, req: SeedSession<'_>) -> Result<(), StorageError> {
+    if req
+        .session_id
+        .starts_with(super::run_store::MOOD_STREAM_PREFIX)
+    {
+        return Err(StorageError::InvalidRequest {
+            detail: "reserved mood stream namespace cannot be used as a session id".into(),
+        });
+    }
     let folders_json =
         serde_json::to_string(&req.authorized_folders).map_err(|e| StorageError::Internal {
             detail: e.to_string(),
@@ -564,6 +572,14 @@ pub async fn fork_session_committed_with_files(
     operation: Option<Operation>,
     home: Option<std::path::PathBuf>,
 ) -> Result<(ForkOutcome, EventEnvelope), StorageError> {
+    if req
+        .new_session_id
+        .starts_with(super::run_store::MOOD_STREAM_PREFIX)
+    {
+        return Err(StorageError::InvalidRequest {
+            detail: "reserved mood stream namespace cannot be used as a session id".into(),
+        });
+    }
     let payload_lease = db.file_payload_leases().read_owned().await;
     // 先读源分支链与源会话权限快照（只读）。
     let chain = branch_id_chain(db, req.source_session_id, false).await?;
@@ -1374,6 +1390,11 @@ fn insert_key_event(
     payload: EventPayload,
     now: i64,
 ) -> Result<EventEnvelope, StorageError> {
+    if sid.starts_with(super::run_store::MOOD_STREAM_PREFIX) {
+        return Err(StorageError::InvalidRequest {
+            detail: "reserved mood stream namespace cannot be used as a session id".into(),
+        });
+    }
     let current: Option<i64> = conn
         .query_row(
             "SELECT MAX(seq) FROM key_events WHERE stream_id=?1",

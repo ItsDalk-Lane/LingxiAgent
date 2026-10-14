@@ -99,6 +99,11 @@ pub async fn create_session(
     memory_enabled: bool,
     now_unix_ms: u64,
 ) -> Result<(), StorageError> {
+    if session_id.starts_with(super::run_store::MOOD_STREAM_PREFIX) {
+        return Err(StorageError::InvalidRequest {
+            detail: "reserved mood stream namespace cannot be used as a session id".into(),
+        });
+    }
     let folders_json =
         serde_json::to_string(authorized_folders).map_err(|e| StorageError::Internal {
             detail: e.to_string(),

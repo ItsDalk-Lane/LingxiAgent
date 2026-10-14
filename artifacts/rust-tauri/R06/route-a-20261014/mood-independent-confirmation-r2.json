@@ -1,0 +1,86 @@
+{
+  "schema": "lingxi.r06.independent-review.v1",
+  "reviewStatus": "PASS",
+  "scope": "Mood two-leaf R1 exact candidate plus R2 cursor fix, original counterexamples and 300-item exact real UI recovery on macOS",
+  "leaves": [
+    "R00-T02-LA-32E9930CF9D9",
+    "R00-T02-LA-B09CC9536400"
+  ],
+  "stageAcceptance": false,
+  "r07Ready": false,
+  "baseline": "d73729a2821a51e39e27038c0c42052a1f2f737e",
+  "r1PatchSHA256": "0f3b49aecdce393fcd6a72ebb94966bb7bb2472c9c1b57e285d57e21ae7623a3",
+  "r2PatchSHA256": "623e06a192c647f7c7e68de0eef9e6bee856d519ee38c11da9d17ae68a9e80b6",
+  "exactCandidateFileCount": 24,
+  "allCandidateSHAMatched": true,
+  "worktree": "/private/tmp/lingxi-r06-review-mood",
+  "sourceSHA256": {
+    "rust/crates/lingxi-protocol/src/wire.rs": "513b4118bc009ca16149736acc574f98f7660cdd38ba3ada2219b2bf72bf2170",
+    "rust/crates/lingxi-adapters/src/storage/run_store.rs": "8d45b9fa0f00b5a7aff09142907fd4396efd61a20d7bb86a23567c7e0fc1c875",
+    "rust/crates/lingxi-adapters/src/storage/session_tree.rs": "6803eecff74bccf54b853a01c87635a064a17274117e0bea42b9511a50cbdbdf",
+    "rust/crates/lingxi-adapters/src/storage/session_admin.rs": "6569079be98613368060bcf3d94fe2ed70e2e5a3f118c6b8f7c80e9842ac0af4",
+    "rust/crates/lingxi-service/src/lib.rs": "f2a3148f1cd9cf12ef13745634c1782a2b9334a932a519f6860c1aebc55f7a8a",
+    "rust/crates/lingxi-service/src/runs.rs": "f3024666c1cd956f872d6b502b4b10522628a609784d823da7f9a88dca7f1a2d",
+    "rust/crates/lingxi-service/src/streaming_norm.rs": "d661461954a8433fe78264728fe01c2aae320440d340a1c8f9ab8b3f512488f5",
+    "rust/crates/lingxi-service/src/history.rs": "e07ca2ea86616342b65e65d3d439f7d796c125387b78d241cc1dd0bb28c02d5a",
+    "rust/crates/lingxi-service/src/history_projection.rs": "7d00253f7a37ebce377a45a734a3cc73bb23155d3c85b72f62c7cd340441535a",
+    "rust/crates/lingxi-service/src/auth.rs": "afcc212e93293e8b3614c469a238ac02eea07f82bbb70888adc0cecdf6d753c1",
+    "rust/crates/lingxi-service/src/events.rs": "bea75075340b5ef135e00157daef549fcfab636e7c6b4b6afcd62b79689108b9",
+    "rust/crates/lingxi-service/src/ws.rs": "5379bc8fb51981b7687f7e945d424f1d78c31df0550c83dfb3b9179c62f762ed",
+    "desktop/src/react/components/app/ChatPage.tsx": "fb12da50ffc02a92df1e3318f377e7a71c2dc34edb174c2252cef6f7f632cba0",
+    "rust/crates/lingxi-service/src/mood_trajectory.rs": "bee79d8361e5d5a7f00affd163fc851cdd3e647d91393eb453f6bd4fd05da78f",
+    "rust/crates/lingxi-service/tests/r06_mood_trajectory.rs": "9fdced7fccf6f99a9e42e13cd98e6a58af9d8d75535de7f96f176220e1fe15a7",
+    "desktop/src/react/components/chat/RustMoodPanel.tsx": "fa62b280d91644733bc173b37fd7b7c275ce3da7ece2d80f981b8799c2629d08",
+    "desktop/src/react/components/chat/__tests__/R06RustMoodLive.test.tsx": "ddf925d39411dc90e4109286935f0d7d4117b689e2bfb6b8aaca732788c169a2",
+    "contracts/generated/MANIFEST.json": "a4ae7e259ad62a5db892d0d30562308f84b64c2fcb3add80e8d74ccf6ccd0333",
+    "contracts/generated/jsonschema/EventEnvelope.schema.json": "ba298e21d8a007a2ac4e1126b9b27093ab8ceaa884915e4bb5b5b3910fef99c4",
+    "contracts/generated/jsonschema/KnownEventPayload.schema.json": "4c74dac0dcff67b988f46de6e51d973bc1422318f87718f13a8b79ee9531ea29",
+    "contracts/generated/jsonschema/EventPayload.schema.json": "ffb8d9a22ee0bca71b45a2551e881075ac155a371060692aba5cf121252beaca",
+    "contracts/generated/jsonschema/SegmentKind.schema.json": "da8e49cc4504c8b0ec69b1c341926958900d93b6aab9ec0bc089964c5c70bd14",
+    "contracts/generated/ts/lingxi-protocol.ts": "ebc1b8accc8988aec2c5ad213b5f8e2006185eae454243e85234f0e7ea4f0d3e",
+    "desktop/src/react/components/chat/__tests__/R06ReviewRustMoodLive.test.tsx": "99b8e47bcc8a118cbbfa5272f35d96a7a3c7bb169ee70b322d45d9729a573a9d"
+  },
+  "independentProbeSHA256": {
+    "rust/crates/lingxi-service/tests/r06_review_mood.rs": "d098382f4ca04344f2a08204b384d8086ad14e4789c53b10a558ac119b96788c",
+    "desktop/src/react/components/chat/__tests__/R06IndependentReviewRustMoodLive.test.tsx": "9d2203d854bc04d87f610763d2662caa36820409b2fb55d168879c9ebebfac99"
+  },
+  "tests": {
+    "exact_r06_mood_trajectory_passed": 5,
+    "independent_original_counterexamples_passed": 2,
+    "failed": 0
+  },
+  "counterexamples": [
+    "reviewer_mood_http_page_cursor_remains_bound_to_actual_mood_stream",
+    "reviewer_current_mood_ui_restores_paginated_real_trajectory_without_cursor_failure"
+  ],
+  "uiExactChecks": {
+    "durableMoodSegments": 300,
+    "renderedMoodSegments": 300,
+    "uniqueRenderedTexts": 300,
+    "expectedTexts": "轨迹000 through 轨迹299, all exact matches to durable history",
+    "allComplete": true,
+    "liveOrIncompleteLabelsAbsent": true,
+    "nativeDrivenUIJSON": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "pending": 0
+    }
+  },
+  "cargoVersion": "1.98.1",
+  "locked": true,
+  "cargoIncremental": false,
+  "cargoTargetDir": "/Users/study_superior/.cache/lingxi-r06-builds/reviewer-target",
+  "logs": [
+    "/tmp/r06-mood-r2-independent-exact-tests.log",
+    "/tmp/r06-mood-r2-independent-counterexamples.log"
+  ],
+  "r1FailReport": "/tmp/r06-mood-independent-review.md",
+  "r1OriginalProbeArchive": "/tmp/r06-mood-review-r1-probes",
+  "notValidated": [
+    "Real Electron/Tauri window or all chat functionality.",
+    "Windows/Linux runtime, real paid provider, official package.",
+    "Adversarial connection/token scope races beyond existing tests and real registry-only selection.",
+    "Full R06 stage gate or new full-repo regression; R1 exact old protection 18+7 and parser18 evidence retained, not repeated for this one-line cursor fix."
+  ]
+}

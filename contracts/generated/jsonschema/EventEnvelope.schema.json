@@ -698,11 +698,20 @@
       ]
     },
     "SegmentKind": {
-      "enum": [
-        "text",
-        "reasoning"
-      ],
-      "type": "string"
+      "oneOf": [
+        {
+          "enum": [
+            "text",
+            "reasoning"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "mood",
+          "description": "仅供独立情绪轨迹展示，不混入助手正文或推理正文。",
+          "type": "string"
+        }
+      ]
     },
     "Seq": {
       "description": "Monotonic sequence as a decimal string. Values may exceed 2^53-1; consumers must not parse this into a JS number when precision matters.",

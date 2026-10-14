@@ -545,6 +545,13 @@ pub enum WsClientRequest {
     /// CONTROL frame (see `events.rs`), then business-event frames —
     /// which are bare canonical `EventEnvelope` objects (PROTOCOL_SPEC
     /// §5), never mixed into the control class.
+    /// 独立情绪面订阅，不改变原正文事件流。
+    SubscribeMood {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+        #[serde(default)]
+        cursor: Option<lingxi_protocol::Cursor>,
+    },
     SubscribeEvents {
         #[serde(rename = "streamId")]
         stream_id: String,

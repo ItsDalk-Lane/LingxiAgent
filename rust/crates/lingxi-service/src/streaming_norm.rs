@@ -658,10 +658,21 @@ pub enum TagLayerEvent {
 /// wraps the scanner, tracks in-block state and applies the just-ended
 /// leading-newline trim (layout newlines between a block and the body text
 /// never enter the body).
+/// 独立情绪轨迹使用同一保留标签扫描器，避免再次解析导致转义或代码保护不同。
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum MoodLayerEvent {
+    Start,
+    Text(String),
+    End,
+}
+
 pub struct ReservedTagLayer {
     scanner: ReservedTagScanner,
     in_tag: bool,
     just_ended: bool,
+    capture_mood: bool,
+    mood_active: bool,
+    captured_mood: Vec<MoodLayerEvent>,
 }
 
 impl ReservedTagLayer {
@@ -670,6 +681,9 @@ impl ReservedTagLayer {
             scanner: ReservedTagScanner::new(tags, drop_unknown_orphan_closers),
             in_tag: false,
             just_ended: false,
+            capture_mood: false,
+            mood_active: false,
+            captured_mood: Vec::new(),
         }
     }
 
@@ -691,6 +705,8 @@ impl ReservedTagLayer {
             .collect();
         if self.in_tag {
             out.push(TagLayerEvent::BlockEnd);
+            // 流结束不等于模型确实闭合情绪标签，历史仍保留为未完成。
+            self.mood_active = false;
             self.in_tag = false;
             self.just_ended = true;
         }
@@ -701,15 +717,25 @@ impl ReservedTagLayer {
         self.scanner.reset();
         self.in_tag = false;
         self.just_ended = false;
+        self.mood_active = false;
+        self.captured_mood.clear();
     }
 
     fn handle_token(&mut self, token: ReservedTagToken) -> Option<TagLayerEvent> {
         match token {
-            ReservedTagToken::Open(_) => {
+            ReservedTagToken::Open(name) => {
                 self.in_tag = true;
+                self.mood_active = self.capture_mood && name == "mood";
+                if self.mood_active {
+                    self.captured_mood.push(MoodLayerEvent::Start);
+                }
                 Some(TagLayerEvent::BlockStart)
             }
             ReservedTagToken::Close(_) => {
+                if self.mood_active {
+                    self.captured_mood.push(MoodLayerEvent::End);
+                }
+                self.mood_active = false;
                 self.in_tag = false;
                 self.just_ended = true;
                 Some(TagLayerEvent::BlockEnd)
@@ -723,6 +749,9 @@ impl ReservedTagLayer {
                 };
                 if text.is_empty() {
                     return None;
+                }
+                if self.mood_active {
+                    self.captured_mood.push(MoodLayerEvent::Text(text.clone()));
                 }
                 Some(if self.in_tag {
                     TagLayerEvent::BlockText(text)
@@ -772,6 +801,9 @@ pub struct DeltaNormalizer {
     mood: ReservedTagLayer,
     reasoning_open: bool,
     text_open: bool,
+    mood_ordinal: u32,
+    mood_segment: Option<String>,
+    mood_scope: Option<String>,
 }
 
 impl DeltaNormalizer {
@@ -783,10 +815,23 @@ impl DeltaNormalizer {
             think: ReservedTagLayer::new(&THINK_TAGS, false),
             // The mood layer is the chain tail in the incumbent: it owns the
             // out-of-vocabulary orphan-closer cleanup.
-            mood: ReservedTagLayer::new(&MOOD_TAGS, true),
+            mood: {
+                let mut layer = ReservedTagLayer::new(&MOOD_TAGS, true);
+                layer.capture_mood = true;
+                layer
+            },
             reasoning_open: false,
             text_open: false,
+            mood_ordinal: 0,
+            mood_segment: None,
+            mood_scope: None,
         }
+    }
+
+    /// 情绪轨迹绑定真实模型调用，重试或新尝试不能覆盖同一运行的旧轨迹。
+    pub fn with_mood_scope(mut self, model_call: &str) -> Self {
+        self.mood_scope = Some(lingxi_protocol::canon::sha256_hex(model_call.as_bytes()));
+        self
     }
 
     /// Feeds one provider delta; returns the normalized events in order.
@@ -842,6 +887,52 @@ impl DeltaNormalizer {
             });
         }
         out
+    }
+
+    /// 取出这批真实情绪片段；旧正文规范化返回值保持原样。
+    /// pulse/reflect、代码和转义标签均由同一扫描器保护，不能变成情绪展示。
+    pub fn take_mood_events(&mut self) -> Vec<NormEvent> {
+        let mut output = Vec::new();
+        for event in std::mem::take(&mut self.mood.captured_mood) {
+            match event {
+                MoodLayerEvent::Start => {
+                    self.mood_ordinal += 1;
+                    let segment_id = format!(
+                        "{}:mood:{}{}",
+                        self.segment_base,
+                        self.mood_ordinal,
+                        self.mood_scope
+                            .as_ref()
+                            .map(|scope| format!(":{scope}"))
+                            .unwrap_or_default()
+                    );
+                    self.mood_segment = Some(segment_id.clone());
+                    output.push(NormEvent::SegmentStart {
+                        segment_id,
+                        kind: SegmentKind::Mood,
+                        phase: AssistantPhase::Unresolved,
+                    });
+                }
+                MoodLayerEvent::Text(delta) => {
+                    if let Some(segment_id) = self.mood_segment.clone() {
+                        output.push(NormEvent::SegmentDelta {
+                            segment_id,
+                            delta,
+                            phase: AssistantPhase::Unresolved,
+                        });
+                    }
+                }
+                MoodLayerEvent::End => {
+                    if let Some(segment_id) = self.mood_segment.take() {
+                        output.push(NormEvent::SegmentEnd {
+                            segment_id,
+                            phase: AssistantPhase::Unresolved,
+                        });
+                    }
+                }
+            }
+        }
+        output
     }
 
     fn reasoning_segment_id(&self) -> String {
@@ -1241,6 +1332,81 @@ mod tests {
     }
 
     #[test]
+    fn real_mood_channel_preserves_chunked_text_and_explicit_closure() {
+        let mut norm = DeltaNormalizer::new(3);
+        let mut mood = Vec::new();
+        let mut body = Vec::new();
+        for chunk in ["<mo", "od>清醒", "\nWill: 保持克制</mo", "od>正文"] {
+            body.extend(norm.feed(&ModelTurnDelta::Text(chunk.into())));
+            mood.extend(norm.take_mood_events());
+        }
+        body.extend(norm.finish(true));
+        mood.extend(norm.take_mood_events());
+        assert!(
+            matches!(&mood[0], NormEvent::SegmentStart { kind: SegmentKind::Mood, segment_id, .. } if segment_id == "assistant:3:mood:1")
+        );
+        let text: String = mood
+            .iter()
+            .filter_map(|event| match event {
+                NormEvent::SegmentDelta { delta, .. } => Some(delta.as_str()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(text, "清醒\nWill: 保持克制");
+        assert!(matches!(
+            mood.last(),
+            Some(NormEvent::SegmentEnd {
+                phase: AssistantPhase::Unresolved,
+                ..
+            })
+        ));
+        assert!(body.iter().all(|event| !matches!(event, NormEvent::SegmentDelta { delta, .. } if delta.contains("清醒"))));
+        assert!(norm.take_mood_events().is_empty(), "取出后不能重复广播");
+    }
+
+    #[test]
+    fn code_escaped_hidden_tags_and_absent_mood_never_create_mood() {
+        for text in [
+            "正文",
+            "`<mood>代码</mood>`",
+            "```xml\n<mood>代码</mood>\n```",
+            r"\<mood>转义",
+            "<pulse>秘密</pulse><reflect>秘密</reflect>",
+            "<think><mood>推理</mood></think>",
+        ] {
+            let mut norm = DeltaNormalizer::new(1);
+            norm.feed(&ModelTurnDelta::Text(text.into()));
+            norm.finish(true);
+            assert!(norm.take_mood_events().is_empty(), "不得伪造情绪: {text}");
+        }
+    }
+
+    #[test]
+    fn unfinished_mood_remains_partial_without_a_fabricated_end() {
+        let mut norm = DeltaNormalizer::new(1);
+        norm.feed(&ModelTurnDelta::Text("<mood>未完成".into()));
+        let mut events = norm.take_mood_events();
+        norm.finish(false);
+        events.extend(norm.take_mood_events());
+        assert_eq!(
+            events
+                .iter()
+                .filter(|event| matches!(
+                    event,
+                    NormEvent::SegmentStart {
+                        kind: SegmentKind::Mood,
+                        ..
+                    }
+                ))
+                .count(),
+            1
+        );
+        assert!(!events
+            .iter()
+            .any(|event| matches!(event, NormEvent::SegmentEnd { .. })));
+    }
+
+    #[test]
     fn normalizer_separates_think_mood_and_body() {
         let mut norm = DeltaNormalizer::new(1);
         let mut out = norm.feed(&ModelTurnDelta::Text(
@@ -1257,6 +1423,7 @@ mod tests {
                 NormEvent::SegmentStart { kind, .. } => match kind {
                     SegmentKind::Reasoning => "start:reasoning",
                     SegmentKind::Text => "start:text",
+                    SegmentKind::Mood => "start:mood",
                 },
                 NormEvent::SegmentDelta { phase, .. } | NormEvent::ModelDelta { phase, .. } => {
                     match phase {

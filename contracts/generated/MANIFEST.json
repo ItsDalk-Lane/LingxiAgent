@@ -25,12 +25,12 @@
     "jsonschema/ContractVersions.schema.json": "428b711841caa3861ff229115533753dd4716569077ff04380f99a7a4e3d664b",
     "jsonschema/Cursor.schema.json": "e474b94a4bf7f6318904895dbaec334c5a4411658f0c87e650f39363ec538faa",
     "jsonschema/ErrorCode.schema.json": "678d37775f4471f5cdd5e124398e4a8fc2dc6d33439124f1c3588be6d84302dd",
-    "jsonschema/EventEnvelope.schema.json": "0ee495ef845981ab4eb7d3d11526fd29da9bc7c3285e796db1186506ae5baeba",
+    "jsonschema/EventEnvelope.schema.json": "ba298e21d8a007a2ac4e1126b9b27093ab8ceaa884915e4bb5b5b3910fef99c4",
     "jsonschema/EventId.schema.json": "b6d3a741a0970a7be7de86651616f4e39be2ea3881add1ab19adadd4792ffd0e",
-    "jsonschema/EventPayload.schema.json": "afe93cb509053c8627a6af36a4dae9f56a1852250d325e2b1c301e6290e35dbf",
+    "jsonschema/EventPayload.schema.json": "ffb8d9a22ee0bca71b45a2551e881075ac155a371060692aba5cf121252beaca",
     "jsonschema/HistoryEntry.schema.json": "f82fdbb5c6ab33bf38e65530a28dc69212268e0ed9864e43c37cd38769b445f3",
     "jsonschema/HistoryPage.schema.json": "1e674f9528585c68f02dc21c316a0fd21267fa8e30042c3837c2e957913f3442",
-    "jsonschema/KnownEventPayload.schema.json": "158b94520cfbf926ccd2ec36488053eb3fa0c851cfb86f35edc1e165b63c9313",
+    "jsonschema/KnownEventPayload.schema.json": "4c74dac0dcff67b988f46de6e51d973bc1422318f87718f13a8b79ee9531ea29",
     "jsonschema/ModelCallId.schema.json": "0b2b95776da93290a5feb8f5121f1fd7fa23e5a9f887d13f6e672e07579f2c00",
     "jsonschema/ModelRequest.schema.json": "70b4655e8ec25f15e51268ae05be1c96bc7df10f12d5244b2d43f40fc5b50203",
     "jsonschema/NormalizedMessage.schema.json": "4f1344830a75ff20423933ebd44f8d7f2eb14b297caaa78544ec8a4b18e4174d",
@@ -43,7 +43,7 @@
     "jsonschema/ResourceRef.schema.json": "ae33bceef1579878599f24311d21849cc2a1bc0dc9d62f7cb8852eb362c8c9df",
     "jsonschema/RunId.schema.json": "a08cc4a35ec9e63e2e14fb114a33139614ea3a8de991e659be789b3de2d9cfc8",
     "jsonschema/RunStatus.schema.json": "c29a54fea68351a1e6f1709e21af2af53d1099be66ce71ea23761eb7cdae30c7",
-    "jsonschema/SegmentKind.schema.json": "24a31ff999e3150eae54831215d48196d1b9f3c40b3fbff500887c097460320f",
+    "jsonschema/SegmentKind.schema.json": "da8e49cc4504c8b0ec69b1c341926958900d93b6aab9ec0bc089964c5c70bd14",
     "jsonschema/Seq.schema.json": "0d53862947039b790a9fe72300e79331f5f98234c11566b482b8d8648f32de6c",
     "jsonschema/ServerHello.schema.json": "898bb4a5d1a241a95a2531abce2abbdd7c712e8422955e6bc8ac89e6c24a5f95",
     "jsonschema/SessionId.schema.json": "b5b0d46f7c91300fb0220246bed3d7d24e92b30876db87546dda7622885adfb1",
@@ -55,6 +55,6 @@
     "jsonschema/ToolSchemaDocument.schema.json": "6001256c4fcc6b5ff92f2e897ef251a9923506fcd0d11302051537087aaed90c",
     "jsonschema/UsageRecord.schema.json": "04712c3454b101e5f21590db222a7bbd0d9b5a87dbb7e687634bfbd960fb23dc",
     "jsonschema/index.json": "88b5f2e0890a39e73c3d21f5aec14d29204e42999a18e55ccd1cc9ba2951139d",
-    "ts/lingxi-protocol.ts": "a588cb2902bbbcaf3975b3d0ac774c7920dd984bfa4efbc7d22c04b33bd4b491"
+    "ts/lingxi-protocol.ts": "ebc1b8accc8988aec2c5ad213b5f8e2006185eae454243e85234f0e7ea4f0d3e"
   }
 }

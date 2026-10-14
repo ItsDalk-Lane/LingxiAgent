@@ -109,7 +109,7 @@ pub async fn session_history_route(
                 Ok(full) => full,
                 Err(err) => return storage_error_response(&err),
             };
-        let items = match project_items(&db, &session_id, &messages, true).await {
+        let items = match project_items(&db, &session_id, &messages, true, false).await {
             Ok(items) => items,
             Err(err) => return storage_error_response(&err),
         };
@@ -134,7 +134,7 @@ pub async fn session_history_route(
         Err(err) => return storage_error_response(&err),
     };
     let head_revision = page.head_revision;
-    let items = match project_items(&db, &session_id, &page.messages, !page.has_more).await {
+    let items = match project_items(&db, &session_id, &page.messages, !page.has_more, false).await {
         Ok(items) => items,
         Err(err) => return storage_error_response(&err),
     };
@@ -153,6 +153,37 @@ pub async fn session_history_route(
         runs_before.zip(Some(page_complete)),
     )
     .await
+}
+
+/// 情绪轨迹的独立读面：读取当前分支实际已有的轨迹，不生成实时事件。
+pub async fn session_mood_history_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    if query.is_some_and(|query| !query.is_empty()) {
+        return EndpointError::invalid_message("mood history accepts no query parameters")
+            .into_response();
+    }
+    if let Some(denial) = gate_session(&state, &principal, &session_id).await {
+        return denial;
+    }
+    let db = Arc::clone(state.storage());
+    let (messages, head_revision) =
+        match cms::read_full_branch(&db, &session_id, MAX_HISTORY_LIMIT).await {
+            Ok(full) => full,
+            Err(error) => return storage_error_response(&error),
+        };
+    let items = match project_items(&db, &session_id, &messages, true, true).await {
+        Ok(items) => items,
+        Err(error) => return storage_error_response(&error),
+    };
+    Json(
+        serde_json::json!({"schemaVersion":"lingxi.mood-history.v1","sessionId":session_id,
+        "headRevision":head_revision.to_string(),"items":items}),
+    )
+    .into_response()
 }
 
 /// reconciliation 采样的最小运行快照（内容读取前后各一次）。
@@ -214,7 +245,7 @@ pub async fn session_export_route(
             Ok(full) => full,
             Err(err) => return storage_error_response(&err),
         };
-    let items = match project_items(&db, &session_id, &messages, true).await {
+    let items = match project_items(&db, &session_id, &messages, true, false).await {
         Ok(items) => items,
         Err(err) => return storage_error_response(&err),
     };
@@ -336,6 +367,7 @@ async fn project_items(
     session_id: &str,
     messages: &[MessageRow],
     reached_root: bool,
+    mood_only: bool,
 ) -> Result<Vec<HistoryItem>, StorageError> {
     // 候选 run：页内 id 约定（user: 前缀 / -final 后缀）+ run_id 列。
     let mut candidates: Vec<String> = Vec::new();
@@ -389,16 +421,18 @@ async fn project_items(
             .into_iter()
             .filter_map(|id| id.strip_prefix("user:").map(str::to_string))
             .collect();
-    Ok(project_history_with_audits(
-        &ProjectionInput {
-            messages,
-            events: &events,
-            existing_runs: &existing_runs,
-            lineage: &lineage,
-            user_anchors_on_branch: &user_anchors_on_branch,
-        },
-        &audit_anchors,
-    ))
+    let input = ProjectionInput {
+        messages,
+        events: &events,
+        existing_runs: &existing_runs,
+        lineage: &lineage,
+        user_anchors_on_branch: &user_anchors_on_branch,
+    };
+    Ok(if mood_only {
+        crate::history_projection::project_mood_history(&input)
+    } else {
+        project_history_with_audits(&input, &audit_anchors)
+    })
 }
 
 // ── 响应构造 ──

@@ -195,7 +195,7 @@ and delivery quality are separate facts: a run may complete without a
 final assistant message, and that must not be fabricated. */
 export type RunStatus = "interrupted_needs_attention" | "queued" | "running" | "waiting_approval" | "cancelling" | "cancelled" | "completed" | "failed";
 
-export type SegmentKind = "text" | "reasoning";
+export type SegmentKind = "mood" | "text" | "reasoning";
 
 /** Wire descriptor of one tool call as announced at start. */
 export type ToolCallDescriptor = {

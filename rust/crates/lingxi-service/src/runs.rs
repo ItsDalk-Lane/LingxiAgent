@@ -2205,7 +2205,7 @@ impl RunSupervisor {
             {
                 compiler.record_call_observation(observation);
             }
-            let mut normalizer = DeltaNormalizer::new(turn);
+            let mut normalizer = DeltaNormalizer::new(turn).with_mood_scope(call.as_str());
             let mut delta_event_seq: u64 = 0;
             let mut model_wait = std::pin::pin!(model_child.wait());
             let provider_turn: lingxi_kernel::ports::ProviderTurnResult = 'call: loop {
@@ -2505,7 +2505,8 @@ impl RunSupervisor {
                 }
                 _ => None,
             };
-            let finish_events = normalizer.finish(normalized_final.is_some());
+            let mut finish_events = normalizer.finish(normalized_final.is_some());
+            finish_events.extend(normalizer.take_mood_events());
             self.persist_norm_events(
                 port,
                 events,
@@ -4741,6 +4742,7 @@ impl RunSupervisor {
                 *saw_process_content = true;
             }
             norm_events.extend(normalizer.feed(delta));
+            norm_events.extend(normalizer.take_mood_events());
         }
         self.persist_norm_events(port, events, ctx, call, event_seq, norm_events, now_ms)
             .await
@@ -4772,7 +4774,7 @@ impl RunSupervisor {
             *event_seq += 1;
             key_events.push(KeyEvent {
                 event_id: EventId::new(format!("{run_id}-{}-ev{}", call.as_str(), *event_seq)),
-                payload: EventPayload::Known(norm_event_payload(call, event)),
+                payload: norm_event_payload(call, event),
             });
         }
         let committed = port
@@ -4831,8 +4833,11 @@ impl RunSupervisor {
 /// Maps one normalized delta event onto the frozen wire payload (R05-T04
 /// D5: `model_call_delta` carries the per-phase fragment; the segment
 /// events carry the same text under the segment identity).
-fn norm_event_payload(call: &ModelCallId, event: NormEvent) -> KnownEventPayload {
-    match event {
+fn norm_event_payload(call: &ModelCallId, event: NormEvent) -> EventPayload {
+    if let Some(payload) = crate::mood_trajectory::extension(&event) {
+        return payload;
+    }
+    EventPayload::Known(match event {
         NormEvent::ModelDelta { phase, delta } => {
             KnownEventPayload::ModelCallDelta(ModelCallDeltaPayload {
                 model_call_id: call.clone(),
@@ -4864,7 +4869,7 @@ fn norm_event_payload(call: &ModelCallId, event: NormEvent) -> KnownEventPayload
                 semantic_phase: phase,
             })
         }
-    }
+    })
 }
 
 /// Resolves the explicit no-final cause from what the run actually

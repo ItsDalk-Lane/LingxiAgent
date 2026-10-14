@@ -62,6 +62,7 @@ pub mod mcpbridge;
 pub mod memory;
 pub mod memorytools;
 pub mod model_history;
+mod mood_trajectory;
 pub mod operations;
 pub mod paths;
 pub mod persona;
@@ -5678,6 +5679,23 @@ async fn session_events_page(
     Path(session_id): Path<String>,
     axum::extract::RawQuery(query): axum::extract::RawQuery,
 ) -> Response {
+    session_events_page_inner(principal, state, session_id, query, false).await
+}
+async fn session_mood_events_page(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    axum::extract::RawQuery(query): axum::extract::RawQuery,
+) -> Response {
+    session_events_page_inner(principal, state, session_id, query, true).await
+}
+async fn session_events_page_inner(
+    principal: Principal,
+    state: ServiceState,
+    session_id: String,
+    query: Option<String>,
+    mood: bool,
+) -> Response {
     // Query params: strict parse (unknown keys are hard errors, mirroring
     // the closed-struct policy of the JSON bodies).
     let pairs = ws::parse_query_pairs(query.as_deref().unwrap_or(""));
@@ -5711,11 +5729,18 @@ async fn session_events_page(
             }
         }
     }
-    match state
-        .events
-        .events_page(&principal, &session_id, cursor, limit)
-        .await
-    {
+    let result = if mood {
+        state
+            .events
+            .mood_events_page(&principal, &session_id, cursor, limit)
+            .await
+    } else {
+        state
+            .events
+            .events_page(&principal, &session_id, cursor, limit)
+            .await
+    };
+    match result {
         Ok(cut) => (
             StatusCode::OK,
             Json(EventsPageBody {
@@ -6354,6 +6379,7 @@ async fn run_ws_session<IO>(
                                 return;
                             }
                         };
+                        let mood_request = matches!(&request, ws::WsClientRequest::SubscribeMood { .. });
                         match request {
                             ws::WsClientRequest::SessionRead { session_id } => {
                                 let access = state.sessions.get_for(&principal, &session_id).await;
@@ -6415,7 +6441,8 @@ async fn run_ws_session<IO>(
                                     }
                                 }
                             }
-                            ws::WsClientRequest::SubscribeEvents { stream_id, cursor } => {
+                            ws::WsClientRequest::SubscribeEvents { stream_id, cursor }
+                            | ws::WsClientRequest::SubscribeMood { session_id: stream_id, cursor } => {
                                 if subscription.is_some() {
                                     let error = ProtocolError::new(
                                         ErrorCode::InvalidMessage,
@@ -6435,7 +6462,9 @@ async fn run_ws_session<IO>(
                                     .await;
                                     return;
                                 }
-                                match state.events.subscribe(&principal, &stream_id, cursor).await {
+                                let result = if mood_request { state.events.subscribe_mood(&principal, &stream_id, cursor).await }
+                                    else { state.events.subscribe(&principal, &stream_id, cursor).await };
+                                match result {
                                     Ok(events::SubscribeOutcome::Started { cut, subscription: sub }) => {
                                         if !ensure_ws_principal_current(
                                             &mut writer,
@@ -6925,6 +6954,14 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/history",
             get(history::session_history_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/mood-events",
+            get(session_mood_events_page),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/mood-history",
+            get(history::session_mood_history_route),
         )
         .route(
             "/lingxi/v1/sessions/{session_id}/export",
