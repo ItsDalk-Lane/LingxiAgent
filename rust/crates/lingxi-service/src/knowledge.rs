@@ -2696,12 +2696,32 @@ impl KnowledgeService {
             stats["chunksNewlyEmbedded"] =
                 json!(stats["chunksNewlyEmbedded"].as_u64().unwrap() + entries.len() as u64);
             stats["actualWrittenChunkCount"] = stats["chunksNewlyEmbedded"].clone();
-            self.facts.set_job_embedding_stats(&job.id, &stats)?;
-            self.facts.set_job_progress(
+            // RV7-F12-O1：账目错误在手时，stats/progress 持久化失败以追加出现，
+            // 不得替换账目主因（与 fail_build 清理同口径）。
+            if let Err(error) = self.facts.set_job_embedding_stats(&job.id, &stats) {
+                if let Some(accounting) = &accounting_error {
+                    let code = accounting.code.clone();
+                    return Err(KnowledgeError::new(
+                        code,
+                        format!("{accounting}; embedding stats persistence failed: {error}"),
+                    ));
+                }
+                return Err(error);
+            }
+            if let Err(error) = self.facts.set_job_progress(
                 &job.id,
                 (reused + stats["chunksNewlyEmbedded"].as_u64().unwrap() as usize) as i64,
                 Some(chunks.len() as i64),
-            )?;
+            ) {
+                if let Some(accounting) = &accounting_error {
+                    let code = accounting.code.clone();
+                    return Err(KnowledgeError::new(
+                        code,
+                        format!("{accounting}; embedding progress persistence failed: {error}"),
+                    ));
+                }
+                return Err(error);
+            }
             if let Some(error) = accounting_error {
                 // RV6-F12-01 同族：延迟账目错误同样保留主错误码。
                 if let Err(cleanup) = self.vectors.fail_build(&current.variant_id) {

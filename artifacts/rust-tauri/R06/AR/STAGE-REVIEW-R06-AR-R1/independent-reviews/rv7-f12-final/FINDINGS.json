@@ -1,0 +1,62 @@
+{
+  "review": "RV7",
+  "scope": "R06-AR-F12 final adjudication (third-round fix at 180abc207, closing RV5-F12-01 / RV6-F12-01 / RV6-F12-02)",
+  "baseline_commit": "180abc2071506b010e20ca74346148d1d21a392f",
+  "worktree": "/tmp/lingxi-rv7",
+  "verdict": {
+    "item": "R06-AR-F12",
+    "result": "PASS",
+    "reason": "All three acceptance conditions met: (1) 7/7 fail_build family sites now use preserve-main-error-code + append 'cleanup fail_build rejected (cache status unchanged)' with zero '?' replacement remaining; (2) RV6-F12-02 stats error handled with the same append discipline; (3) same-code regression gate present in the non-provider leg AND proven effective by negative control (reverting to '?' semantics turns the gate red at tests/r06_ar_f12_cache_consumers.rs:378 with the exact RV6-F12-01 defect signature). Full F12 suite plus adjacent knowledge suites all green under independent execution; RV5/RV6 verified anchors re-confirmed."
+  },
+  "fix_verification": {
+    "family_sites_per_rv5": 7,
+    "sites_fixed_append": 7,
+    "sites_remaining_defective": 0,
+    "sites": [
+      {"lines": "2607-2613", "path": "provider failure"},
+      {"lines": "2621-2627", "path": "validate_embedding_batch"},
+      {"lines": "2639-2645", "path": "identity drift (main)"},
+      {"lines": "2687-2693", "path": "upsert_batch failure (RV6 residual #1, fixed this round)"},
+      {"lines": "2707-2713", "path": "accounting_error deferred failure (RV6 residual #2, fixed this round)"},
+      {"lines": "2725-2733", "path": "complete_build_plan"},
+      {"lines": "2738-2746", "path": "complete_job"}
+    ],
+    "pattern": "error.code.clone() + '{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}'; fail_build Ok -> return Err(original main error)",
+    "global_grep": "whole rust tree: 1 definition (lingxi-adapters storage/knowledge.rs:3275) + 8 call sites (service knowledge.rs, incl. pre-existing process_job tail :2338 append) + 2 test assertions; zero '?' forms; no TS counterpart",
+    "rv6_f12_02": "fixed at :2597-2605 — provider-branch set_job_embedding_stats failure preserves provider main error code and appends '; embedding stats persistence failed: {stats_err}'",
+    "regression_gate": {
+      "location": "rust/crates/lingxi-service/tests/r06_ar_f12_cache_consumers.rs:375-386",
+      "leg": "vector_ingestion_future_write_rejection_retains_paid_batch_and_error_code (provider_error=false)",
+      "assertion": "job.error contains 'cleanup fail_build rejected' (append-only signal in same-code scenario)",
+      "negative_control": "reverting :2687 to 'self.vectors.fail_build(...)?;' made the test FAIL at line 378 with error string lacking the append suffix ('...variant failure status unavailable: KNOWLEDGE_SCHEMA_NEWER...'), exactly reproducing the RV6-F12-01 defect; restore verified by rerun 6/6 green and clean git status"
+    }
+  },
+  "findings": [
+    {
+      "id": "RV7-F12-O1",
+      "severity": "minor",
+      "blocking": false,
+      "title": "accounting 在手窗口内的 stats/progress 持久化 ? 仍可替换 accounting 主错误",
+      "file": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sites": [{"lines": "2699", "call": "set_job_embedding_stats ?"}, {"lines": "2700-2704", "call": "set_job_progress ?"}, {"lines": "2618", "call": "set_job_embedding_stats ? (success-path window)"}, {"lines": "2684", "call": "set_job_embedding_stats ? (pre-upsert anchor, success-path window)"}],
+      "note": "accounting_error is held from :2568 but only checked at :2705; a facts-store persistence failure inside that window returns via '?' and drops the accounting main cause. Structurally isomorphic to RV6-F12-02 (provider-branch stats '?') but outside its literal scope (RV6-F12-02 named only :2597; the RV5 obligation covers the fail_build family only). Registered per the RV6 precedent for RV6-F12-02: minor, does not block F12 closure.",
+      "fix": "append-discipline or explicit exemption note for stats/progress persistence failures while accounting_error is in hand"
+    }
+  ],
+  "test_evidence": [
+    {"suite": "r06_ar_f12_cache_consumers", "package": "lingxi-service", "env": "LINGXI_HOME=/tmp/rv7-env/f12", "result": "6 passed / 0 failed", "note": "includes regression-gate leg and provider leg (SYNTHETIC_PROVIDER_ERROR + 'cache status unchanged' + 64 rows preserved + status=building + version=999 + 2 calls)"},
+    {"suite": "r06_ar_f12_cache_preservation", "package": "lingxi-adapters", "env": "LINGXI_HOME=/tmp/rv7-env/f12a", "result": "22 passed / 0 failed"},
+    {"suite": "r06_original_knowledge_proofs", "package": "lingxi-service", "env": "LINGXI_HOME=/tmp/rv7-env/adj", "result": "12 passed / 0 failed"},
+    {"suite": "r06_t07_knowledge_tools", "package": "lingxi-service", "env": "LINGXI_HOME=/tmp/rv7-env/adj", "result": "6 passed / 0 failed"},
+    {"suite": "negative-control (temporary '?' revert)", "package": "lingxi-service", "env": "LINGXI_HOME=/tmp/rv7-env/neg", "result": "expected FAIL at tests line 378, then 6/6 green after restore"}
+  ],
+  "anchors_recheck": {
+    "cache_write_version_gate_same_tx": "lingxi-adapters storage/knowledge.rs:636-646 — Immediate transaction with check_user_version, confirmed",
+    "set_variant_status_version_gate_W12R01F01": "storage/knowledge.rs:2561-2563 via cache_write(INDEX_SCHEMA_VERSION), confirmed",
+    "complete_build_schema_precheck_before_checkpoint": "storage/knowledge.rs:3228-3242 with F12 classification-order comment, confirmed",
+    "ts_swallow_list_excludes_schema_newer_W12R01F02": "lib/knowledge/vector-index-adapter.ts:1114 only swallows SQLITE_(BUSY|LOCKED|READONLY|IOERR|FULL|CANTOPEN); last_used_at inside assertWritableSchema + .immediate() transaction (:1095-1115), confirmed",
+    "ts_ann_init_guard_before_wal_W12R02": "lib/knowledge/ann-index-store.ts:16-50 openKnowledgeCacheDatabase — readonly guard asserts schema first, EXCLUSIVE-transaction revalidation before WAL switch, initialize(db) last, confirmed"
+  },
+  "environment_limits": ["TS suites not rerun (RV5 already 30/30)", "RV5 probe binaries not replayed (anchor recheck permitted, no counter-evidence)", "Windows/Linux/packaged builds/real providers not executed", "F15 out of scope (RV5 PASS)"],
+  "artifacts": {"report": "/tmp/rv7-review/REPORT.md", "findings": "/tmp/rv7-review/FINDINGS.json"}
+}

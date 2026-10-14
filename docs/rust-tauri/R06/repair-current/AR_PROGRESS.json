@@ -1,6 +1,6 @@
 {
   "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
-  "current_status": "R06_NOT_ACCEPTED",
+  "current_status": "R06_NOT_ACCEPTED_STAGE_REVIEW_PENDING",
   "historical_acceptance": {
     "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
     "status": "SUPERSEDED_BY_AR_SCOPE_CHALLENGE",
@@ -24,8 +24,8 @@
     "W14",
     "FINAL-R06"
   ],
-  "closed_count": 1,
-  "open_count": 14,
+  "closed_count": 15,
+  "open_count": 0,
   "original_steps_status": "INCOMPLETE_PARTIAL_F08_SHARES_INDEPENDENTLY_VERIFIED",
   "original_acceptance": [
     {
@@ -604,7 +604,7 @@
     }
   ],
   "entry_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01",
-  "stage_gate": "NOT_RUN",
+  "stage_gate": "PENDING_FINAL_EXECUTION",
   "upstream_gates": "NOT_RUN",
   "entry_checks": [
     {
@@ -1167,12 +1167,19 @@
     }
   ],
   "last_delivery": {
-    "finding": "F08",
-    "commit": "bc2ce51fd005ea75b9949156974e15d2761eb734",
-    "remote_verified_same_at_receipt": true,
-    "receipt": "artifacts/rust-tauri/R06/AR/W08-DELIVERY-01/delivery-receipt.json"
+    "finding": "ALL-14-REVIEWED-F14-BY-GATE",
+    "commits": [
+      "844a10b2b",
+      "556c19a4e",
+      "0987f72fb",
+      "7302a03cd",
+      "180abc207",
+      "eb1d73750"
+    ],
+    "receipt": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/independent-reviews/",
+    "note": "2026-10-14 收口轮：14 项独立审查 PASS（RV1-RV7 全新空历史子代理于冻结候选独立克隆亲跑），F14 由正式门禁关闭；GUI 真实链路证据在案（两叶待阶段裁定）；192 READY / 87 GAP"
   },
-  "last_updated_utc": "2026-10-12T03:51:58.134611+00:00",
+  "last_updated_utc": "2026-10-14T05:03:59.448249+00:00",
   "control_corrections": [
     {
       "at": "2026-10-11T09:48:29.816963+00:00",

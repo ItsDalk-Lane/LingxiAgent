@@ -703,3 +703,17 @@ a_parked_quota_wait 经 bisect 实证源于 bc2ce51fd（AR-F08 工具结果投�
 的时序演进：原测试期望的「父停驻+子等待」交错在现行语义下不可确定性构造
 （子 run 在队列饥饿窗口内先完成）。已派专项按诊断重设计该测试（保留「配额
 等待中被停驻任务的超时结算诚实」契约证明），完成后冻结候选。
+
+### 2026-10-14 GUI 真实通道全链路实跑通过（不是阶段通过）
+
+与用户本人配合完成 native_desktop_resource_roundtrip_real_gui 全链路：真实 Tauri
+应用 + 内嵌 wdio-webdriver + 真实 lingxi-service（r06_gui_service_runner），用户在
+原生选择器完成选文件与取消两次真实交互；资源事件链（subscribe→外部改文件→
+resource.changed→编辑器 4 秒内刷新）、OS 打开（TextEdit 真实窗口+标题核对+截图）、
+系统废纸篓（Finder 定位+字节回读）全部通过，测试 1 passed/180s。修复三处：
+测试期望路径改 canonical（macOS /tmp→/private/tmp 同族）、服务 workspace 必须包含
+proof 目录（订阅授权根）、加 EDITOR_REFRESH_STATE 诊断。两叶（2FB382A137FC 选择器/
+CAA876503B1B OS 打开）真实证据与锚点已登记但保持 GAP：绑定执行窗口正确拒绝 0 测试
+匹配（e2e-test 特性+人工点选不可自动重放，反假绿生效），待阶段评审裁定证据口径。
+证据：artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/
+（截图、观察回执、resource-events.json、e2e-phase 全程）。当前 192 READY / 87 GAP。
