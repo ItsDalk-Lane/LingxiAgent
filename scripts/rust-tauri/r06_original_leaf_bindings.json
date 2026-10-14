@@ -26179,7 +26179,7 @@
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "then": "经路径和冲突校验后把归档文件及 sidecar 移回活跃目录并更新生命周期，返回新路径或错误",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -26188,9 +26188,94 @@
               "package": "lingxi-service",
               "suite": "r06_t03_session_tree",
               "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "physical_restore_sidecar_then_restart_archive_delete_and_db_only_remain_real"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "header_only_old_bug_is_repaired_but_message_and_standalone_sidecar_conflicts_preserve"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "owner_path_agent_header_duplicate_missing_nonregular_and_link_guards_are_real"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "real_sqlite_write_failure_after_prepared_plan_preserves_files_and_lifecycle"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_second_file_rename_failure_rolls_back_jsonl_and_preserves_external_target"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_source_change_during_final_sqlite_wait_is_refused_and_preserved"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_owner_change_during_final_sqlite_wait_cannot_authorize_stale_owner"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_permission_io_failure_during_final_write_rolls_back_everything"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_binary_kill_after_jsonl_move_before_sidecar_or_db_commit_recovers_on_restart"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_db_locator_write_failure_after_both_renames_rolls_back_files_and_db"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "device_owner_changed_after_auth_gate_before_prepared_plan_cannot_restore"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "busy_and_two_actual_concurrent_restores_have_one_physical_commit"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_periodic_cleanup_deletes_legacy_pair_and_does_not_leave_suspended_files"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_post_commit_cleanup_io_failure_reports_committed_state_and_restart_finishes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "two_different_sessions_concurrently_commit_their_own_pairs_and_journals"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "independent_concurrent_actual_sigkill_retains_prepared_and_recovers"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_final_writer_refuses_completed_bad_digest_and_replaced_snapshot_journals"
             }
           ],
-          "meaning": "真实archive/restore生命周期与活动列表变化；不含原sidecar移动/路径校验",
+          "meaning": "真实认证HTTP核路径、实际session/agent/owner/header与冲突；JSONL和sidecar双件实际回活跃并更新DB返回新路径，旧header-only可修复而其他实际消息不可覆盖。prepared日志在最终事务核完整身份/快照/digest，不同会话并发不误收尾。实际SQLite、源/owner变化、第二件rename和权限故障拒绝回滚；提交后cleanup故障明确已提交状态并真实重启收尾。真实SIGKILL同窗口后重启双件原字节恢复，不伪造DB-only文件。配套archive/delete/bulk/periodic清理保持实物与生命周期一致。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -26348,12 +26433,719 @@
                   "quote": "assert_eq!(status, 400, \"超长查询 → 400: {body}\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "physical_restore_sidecar_then_restart_archive_delete_and_db_only_remain_real",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 179,
+              "testEndLine": 262,
+              "assertions": [
+                {
+                  "line": 188,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 189,
+                  "quote": "assert_eq!(result[\"restoredPath\"], dest.to_string_lossy().as_ref())"
+                },
+                {
+                  "line": 190,
+                  "quote": "assert_eq!(result[\"sessionId\"], \"happy\")"
+                },
+                {
+                  "line": 191,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 192,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 193,
+                  "quote": "assert_eq!(std::fs::read(sidecar(&dest)).unwrap(), attachments)"
+                },
+                {
+                  "line": 194,
+                  "quote": "assert_eq!(h.life(\"happy\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 195,
+                  "quote": "assert_eq!(h.pending(\"happy\").await, \"0\")"
+                },
+                {
+                  "line": 201,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 202,
+                  "quote": "assert!(src.exists() && sidecar(&src).exists())"
+                },
+                {
+                  "line": 203,
+                  "quote": "assert!(!dest.exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 206,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"happy\"}))\n            .await\n            .0,\n        404,\n        \"可信locator有缺源时不能变成DB-only成功\"\n    )"
+                },
+                {
+                  "line": 220,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 221,
+                  "quote": "assert_eq!(result[\"restoredPath\"], dest.to_string_lossy().as_ref())"
+                },
+                {
+                  "line": 225,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 232,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 233,
+                  "quote": "assert!(h.life(\"happy\").await.is_none())"
+                },
+                {
+                  "line": 234,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 235,
+                  "quote": "assert!(!dest.exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 242,
+                  "quote": "assert_eq!(code, 201, \"{result}\")"
+                },
+                {
+                  "line": 243,
+                  "quote": "assert_eq!(\n        h.post(\n            \"/lingxi/v1/sessions/archive\",\n            json!({\"sessionId\":\"db-only\"})\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 258,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 259,
+                  "quote": "assert!(result.get(\"restoredPath\").is_none())"
+                },
+                {
+                  "line": 260,
+                  "quote": "assert!(!h.home.join(\"agents/plain/sessions\").exists())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "header_only_old_bug_is_repaired_but_message_and_standalone_sidecar_conflicts_preserve",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 264,
+              "testEndLine": 300,
+              "assertions": [
+                {
+                  "line": 289,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 290,
+                  "quote": "assert_eq!(std::fs::read_to_string(&dest).unwrap(), source)"
+                },
+                {
+                  "line": 291,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&dest)).unwrap(), attached)"
+                },
+                {
+                  "line": 292,
+                  "quote": "assert!(!src.exists())"
+                },
+                {
+                  "line": 294,
+                  "quote": "assert_eq!(code, 409, \"{result}\")"
+                },
+                {
+                  "line": 296,
+                  "quote": "assert_eq!(h.life(kind).await.as_deref(), Some(\"archived\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "owner_path_agent_header_duplicate_missing_nonregular_and_link_guards_are_real",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 302,
+              "testEndLine": 408,
+              "assertions": [
+                {
+                  "line": 313,
+                  "quote": "assert_eq!(code, 201, \"{credential}\")"
+                },
+                {
+                  "line": 318,
+                  "quote": "assert_eq!(\n        remote\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions/restore\",\n                json!({\"sessionPath\":src})\n            )\n            .await\n            .0,\n        403\n    )"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_ne!(h.post(\"/lingxi/v1/sessions/restore\", body).await.0, 200)"
+                },
+                {
+                  "line": 341,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionPath\":fake}))\n            .await\n            .0,\n        403\n    )"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n            .await\n            .0,\n        409\n    )"
+                },
+                {
+                  "line": 360,
+                  "quote": "assert_eq!(\n            h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionPath\":link}))\n                .await\n                .0,\n            403\n        )"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert_ne!(\n            h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n                .await\n                .0,\n            200\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n            .await\n            .0,\n        409,\n        \"非regular来源拒绝\"\n    )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n            h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n                .await\n                .0,\n            409,\n            \"目录祖先链接拒绝\"\n        )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.life(\"guards\").await.as_deref(), Some(\"archived\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "real_sqlite_write_failure_after_prepared_plan_preserves_files_and_lifecycle",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 410,
+              "testEndLine": 439,
+              "assertions": [
+                {
+                  "line": 423,
+                  "quote": "assert_eq!(code, 500, \"{result}\")"
+                },
+                {
+                  "line": 425,
+                  "quote": "assert!(!active(&src).exists())"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert_eq!(h.life(\"db-fault\").await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert_eq!(h.pending(\"db-fault\").await, \"0\")"
+                },
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(\n        h.post(\n            \"/lingxi/v1/sessions/restore\",\n            json!({\"sessionId\":\"db-fault\"})\n        )\n        .await\n        .0,\n        200\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_second_file_rename_failure_rolls_back_jsonl_and_preserves_external_target",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 565,
+              "testEndLine": 567,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_source_change_during_final_sqlite_wait_is_refused_and_preserved",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 569,
+              "testEndLine": 571,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_owner_change_during_final_sqlite_wait_cannot_authorize_stale_owner",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 573,
+              "testEndLine": 575,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_permission_io_failure_during_final_write_rolls_back_everything",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 579,
+              "testEndLine": 581,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_binary_kill_after_jsonl_move_before_sidecar_or_db_commit_recovers_on_restart",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 653,
+              "testEndLine": 759,
+              "assertions": [
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(code, 201, \"{result}\")"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(\n        binary\n            .client\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions/archive\",\n                json!({\"sessionId\":\"actual-crash\"})\n            )\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 709,
+                  "quote": "assert_eq!(unsafe { libc::kill(pid as i32, libc::SIGKILL) }, 0)"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert_eq!(phase, \"archived\")"
+                },
+                {
+                  "line": 728,
+                  "quote": "assert_eq!(prepared, 1)"
+                },
+                {
+                  "line": 730,
+                  "quote": "assert!(!status.success())"
+                },
+                {
+                  "line": 731,
+                  "quote": "assert_eq!(pending.await.unwrap().0, 0, \"实际中断的HTTP不能返回成功\")"
+                },
+                {
+                  "line": 732,
+                  "quote": "assert!(dest.exists() && !src.exists())"
+                },
+                {
+                  "line": 733,
+                  "quote": "assert!(sidecar(&src).exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 736,
+                  "quote": "assert!(!dest.exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 737,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&src).unwrap(),\n        jsonl(\"actual-crash\")\n    )"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&src)).unwrap(), attached)"
+                },
+                {
+                  "line": 744,
+                  "quote": "assert_eq!(pending, 0)"
+                },
+                {
+                  "line": 745,
+                  "quote": "assert_eq!(\n        restarted\n            .client\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions/restore\",\n                json!({\"sessionId\":\"actual-crash\"})\n            )\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 757,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&dest)).unwrap(), attached)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_db_locator_write_failure_after_both_renames_rolls_back_files_and_db",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 761,
+              "testEndLine": 794,
+              "assertions": [
+                {
+                  "line": 774,
+                  "quote": "assert_eq!(code, 500, \"{result}\")"
+                },
+                {
+                  "line": 775,
+                  "quote": "assert!(result\n        .to_string()\n        .contains(\"ACTUAL_AFTER_BOTH_FILES_DB_FAILURE\"))"
+                },
+                {
+                  "line": 779,
+                  "quote": "assert!(!active(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 780,
+                  "quote": "assert_eq!(h.life(\"late-db-fault\").await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 781,
+                  "quote": "assert_eq!(h.pending(\"late-db-fault\").await, \"0\")"
+                },
+                {
+                  "line": 784,
+                  "quote": "assert_eq!(\n        h.post(\n            \"/lingxi/v1/sessions/restore\",\n            json!({\"sessionId\":\"late-db-fault\"})\n        )\n        .await\n        .0,\n        200\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "device_owner_changed_after_auth_gate_before_prepared_plan_cannot_restore",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 796,
+              "testEndLine": 861,
+              "assertions": [
+                {
+                  "line": 807,
+                  "quote": "assert_eq!(code, 201, \"{credential}\")"
+                },
+                {
+                  "line": 815,
+                  "quote": "assert_eq!(read_code, 200, \"设备本来必须有真实访问权: {read_result}\")"
+                },
+                {
+                  "line": 843,
+                  "quote": "assert!(\n        waiting,\n        \"必须观察设备认证结束后的真实prepared写者等待，不能以延迟猜测达点\"\n    )"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(count, 0, \"这是prepared之前的真实归属窗口\")"
+                },
+                {
+                  "line": 852,
+                  "quote": "assert_eq!(code, 409, \"旧设备主体不能沿旧归属保存: {result}\")"
+                },
+                {
+                  "line": 853,
+                  "quote": "assert!(result\n        .to_string()\n        .contains(\"authorized restore owner/agent changed before preparation\"))"
+                },
+                {
+                  "line": 857,
+                  "quote": "assert!(!active(&src).exists())"
+                },
+                {
+                  "line": 858,
+                  "quote": "assert_eq!(h.life(\"before-prepare\").await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 859,
+                  "quote": "assert_eq!(h.pending(\"before-prepare\").await, \"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "busy_and_two_actual_concurrent_restores_have_one_physical_commit",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 863,
+              "testEndLine": 918,
+              "assertions": [
+                {
+                  "line": 880,
+                  "quote": "assert_eq!(code, 409, \"{result}\")"
+                },
+                {
+                  "line": 881,
+                  "quote": "assert!(result.to_string().contains(\"session_busy\"))"
+                },
+                {
+                  "line": 883,
+                  "quote": "assert_eq!(h.pending(\"concurrency\").await, \"0\")"
+                },
+                {
+                  "line": 901,
+                  "quote": "assert_eq!(statuses, [200, 409], \"真实并发不能双成功: {one:?} {two:?}\")"
+                },
+                {
+                  "line": 903,
+                  "quote": "assert_eq!(\n        success[\"restoredPath\"],\n        active(&src).to_string_lossy().as_ref()\n    )"
+                },
+                {
+                  "line": 907,
+                  "quote": "assert_eq!(std::fs::read_to_string(active(&src)).unwrap(), old)"
+                },
+                {
+                  "line": 908,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(sidecar(&active(&src))).unwrap(),\n        attached\n    )"
+                },
+                {
+                  "line": 912,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 913,
+                  "quote": "assert_eq!(h.life(\"concurrency\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 915,
+                  "quote": "assert_eq!(count, \"1\")"
+                },
+                {
+                  "line": 916,
+                  "quote": "assert_eq!(h.pending(\"concurrency\").await, \"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_periodic_cleanup_deletes_legacy_pair_and_does_not_leave_suspended_files",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 920,
+              "testEndLine": 934,
+              "assertions": [
+                {
+                  "line": 927,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 928,
+                  "quote": "assert!(result[\"deleted\"].as_u64().unwrap() >= 1)"
+                },
+                {
+                  "line": 929,
+                  "quote": "assert!(h.life(\"cleanup-physical\").await.is_none())"
+                },
+                {
+                  "line": 930,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 931,
+                  "quote": "assert!(!active(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 932,
+                  "quote": "assert_eq!(h.pending(\"cleanup-physical\").await, \"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_post_commit_cleanup_io_failure_reports_committed_state_and_restart_finishes",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 937,
+              "testEndLine": 1012,
+              "assertions": [
+                {
+                  "line": 994,
+                  "quote": "assert_eq!(code, 500, \"真实清扫权限失败必须明确报错: {result}\")"
+                },
+                {
+                  "line": 995,
+                  "quote": "assert!(result\n        .to_string()\n        .contains(\"legacy lifecycle commit succeeded\"))"
+                },
+                {
+                  "line": 998,
+                  "quote": "assert!(result.to_string().contains(\"Permission denied\"))"
+                },
+                {
+                  "line": 999,
+                  "quote": "assert_eq!(h.life(\"cleanup-error\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert_eq!(std::fs::read_to_string(&dest).unwrap(), original)"
+                },
+                {
+                  "line": 1002,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&dest)).unwrap(), attached)"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert!(remaining.exists())"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(h.pending(\"cleanup-error\").await, \"1\")"
+                },
+                {
+                  "line": 1007,
+                  "quote": "assert!(!remaining.exists())"
+                },
+                {
+                  "line": 1008,
+                  "quote": "assert_eq!(h.pending(\"cleanup-error\").await, \"0\")"
+                },
+                {
+                  "line": 1009,
+                  "quote": "assert_eq!(h.life(\"cleanup-error\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 1010,
+                  "quote": "assert_eq!(std::fs::read_to_string(&dest).unwrap(), original)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "two_different_sessions_concurrently_commit_their_own_pairs_and_journals",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 1015,
+              "testEndLine": 1055,
+              "assertions": [
+                {
+                  "line": 1040,
+                  "quote": "assert_eq!(ra.0, 200, \"{ra:?}\")"
+                },
+                {
+                  "line": 1041,
+                  "quote": "assert_eq!(rb.0, 200, \"{rb:?}\")"
+                },
+                {
+                  "line": 1043,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 1044,
+                  "quote": "assert_eq!(std::fs::read_to_string(active(&src)).unwrap(), jsonl(id))"
+                },
+                {
+                  "line": 1045,
+                  "quote": "assert_eq!(\n            std::fs::read_to_string(sidecar(&active(&src))).unwrap(),\n            attached\n        )"
+                },
+                {
+                  "line": 1049,
+                  "quote": "assert_eq!(h.life(id).await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 1050,
+                  "quote": "assert_eq!(h.pending(id).await, \"0\")"
+                },
+                {
+                  "line": 1052,
+                  "quote": "assert_eq!(receipts.as_deref(), Some(\"1\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "independent_concurrent_actual_sigkill_retains_prepared_and_recovers",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 1060,
+              "testEndLine": 1185,
+              "assertions": [
+                {
+                  "line": 1075,
+                  "quote": "assert_eq!(code, 201, \"{value}\")"
+                },
+                {
+                  "line": 1076,
+                  "quote": "assert_eq!(\n            binary\n                .client\n                .request(\n                    \"POST\",\n                    \"/lingxi/v1/sessions/archive\",\n                    json!({\"sessionId\":id})\n                )\n                .await\n                .0,\n            200\n        )"
+                },
+                {
+                  "line": 1114,
+                  "quote": "assert_eq!(unsafe { libc::kill(pid as i32, libc::SIGKILL) }, 0)"
+                },
+                {
+                  "line": 1148,
+                  "quote": "assert!(active(&src).exists() && !src.exists() && sidecar(&src).exists())"
+                },
+                {
+                  "line": 1154,
+                  "quote": "assert!(other_src.exists() && !active(other_src).exists())"
+                },
+                {
+                  "line": 1155,
+                  "quote": "assert_eq!(std::fs::read_to_string(other_src).unwrap(), jsonl(other_id))"
+                },
+                {
+                  "line": 1159,
+                  "quote": "assert_eq!(\n                std::fs::read_to_string(sidecar(other_src)).unwrap(),\n                expected.to_string()\n            )"
+                },
+                {
+                  "line": 1163,
+                  "quote": "assert!(!sidecar(&active(other_src)).exists())"
+                },
+                {
+                  "line": 1165,
+                  "quote": "assert_eq!(pending, 0)"
+                },
+                {
+                  "line": 1168,
+                  "quote": "assert!(\n            restored_back,\n            \"另一个会话错误完成仍在执行的prepared日志，真实重启没有退回未提交JSONL\"\n        )"
+                },
+                {
+                  "line": 1172,
+                  "quote": "assert_eq!(\n            state, \"prepared\",\n            \"真实移动未提交期间，本日志必须保持prepared\"\n        )"
+                },
+                {
+                  "line": 1176,
+                  "quote": "assert!(receipt.is_empty(), \"活跃日志不得提前产生completed收据\")"
+                },
+                {
+                  "line": 1177,
+                  "quote": "assert_eq!(std::fs::read_to_string(&src).unwrap(), jsonl(&id))"
+                },
+                {
+                  "line": 1178,
+                  "quote": "assert!(sidecar(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 1180,
+                  "quote": "assert_eq!(a.await.unwrap().0, 200)"
+                },
+                {
+                  "line": 1181,
+                  "quote": "assert_eq!(b.await.unwrap().0, 200)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_final_writer_refuses_completed_bad_digest_and_replaced_snapshot_journals",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 1188,
+              "testEndLine": 1307,
+              "assertions": [
+                {
+                  "line": 1233,
+                  "quote": "assert_eq!(pending.await.unwrap().0, 200)"
+                },
+                {
+                  "line": 1236,
+                  "quote": "assert!(src.exists() && sidecar(&src).exists() && !active(&src).exists())"
+                },
+                {
+                  "line": 1237,
+                  "quote": "assert!(tokio::time::timeout(\n                Duration::from_millis(200),\n                h.state\n                    .storage()\n                    .query_one_text(\"SELECT 'actual-final-writer-waits'\", vec![])\n            )\n            .await\n            .is_err())"
+                },
+                {
+                  "line": 1270,
+                  "quote": "assert_eq!(\n                status, 500,\n                \"日志已经失效，不能继续触碰文件或报告成功: {response}\"\n            )"
+                },
+                {
+                  "line": 1274,
+                  "quote": "assert!(response\n                .to_string()\n                .contains(\"prepared journal missing/changed\"))"
+                },
+                {
+                  "line": 1278,
+                  "quote": "assert!(!active(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 1279,
+                  "quote": "assert_eq!(h.life(&id).await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 1281,
+                  "quote": "assert_eq!(\n                h.pending(&id).await,\n                if kind == \"journal-completed\" {\n                    \"0\"\n                } else {\n                    \"1\"\n                }\n            )"
+                },
+                {
+                  "line": 1292,
+                  "quote": "assert_eq!(restarted.pending(&id).await, \"0\")"
+                },
+                {
+                  "line": 1294,
+                  "quote": "assert_eq!(\n                restarted\n                    .post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":id}))\n                    .await\n                    .0,\n                200\n            )"
+                },
+                {
+                  "line": 1305,
+                  "quote": "assert!(caught, \"没有捕获真实最终事务等待窗口，不能计PASS\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust恢复仅更新数据库生命周期，没有原归档文件及sidecar经路径/冲突校验移回活跃目录、返回新路径的证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -26362,9 +27154,94 @@
               "package": "lingxi-service",
               "suite": "r06_t03_session_tree",
               "test": "management_surface_rename_pin_memory_archive_restore_delete_cleanup"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "physical_restore_sidecar_then_restart_archive_delete_and_db_only_remain_real"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "header_only_old_bug_is_repaired_but_message_and_standalone_sidecar_conflicts_preserve"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "owner_path_agent_header_duplicate_missing_nonregular_and_link_guards_are_real"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "real_sqlite_write_failure_after_prepared_plan_preserves_files_and_lifecycle"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_second_file_rename_failure_rolls_back_jsonl_and_preserves_external_target"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_source_change_during_final_sqlite_wait_is_refused_and_preserved"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_owner_change_during_final_sqlite_wait_cannot_authorize_stale_owner"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_permission_io_failure_during_final_write_rolls_back_everything"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_binary_kill_after_jsonl_move_before_sidecar_or_db_commit_recovers_on_restart"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_db_locator_write_failure_after_both_renames_rolls_back_files_and_db"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "device_owner_changed_after_auth_gate_before_prepared_plan_cannot_restore"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "busy_and_two_actual_concurrent_restores_have_one_physical_commit"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_periodic_cleanup_deletes_legacy_pair_and_does_not_leave_suspended_files"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_post_commit_cleanup_io_failure_reports_committed_state_and_restart_finishes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "two_different_sessions_concurrently_commit_their_own_pairs_and_journals"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "independent_concurrent_actual_sigkill_retains_prepared_and_recovers"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_archive_jsonl_restore",
+              "test": "actual_final_writer_refuses_completed_bad_digest_and_replaced_snapshot_journals"
             }
           ],
-          "meaning": "真实archive/restore生命周期与活动列表变化；不含原sidecar移动/路径校验",
+          "meaning": "真实认证HTTP核路径、实际session/agent/owner/header与冲突；JSONL和sidecar双件实际回活跃并更新DB返回新路径，旧header-only可修复而其他实际消息不可覆盖。prepared日志在最终事务核完整身份/快照/digest，不同会话并发不误收尾。实际SQLite、源/owner变化、第二件rename和权限故障拒绝回滚；提交后cleanup故障明确已提交状态并真实重启收尾。真实SIGKILL同窗口后重启双件原字节恢复，不伪造DB-only文件。配套archive/delete/bulk/periodic清理保持实物与生命周期一致。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -26522,18 +27399,723 @@
                   "quote": "assert_eq!(status, 400, \"超长查询 → 400: {body}\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "physical_restore_sidecar_then_restart_archive_delete_and_db_only_remain_real",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 179,
+              "testEndLine": 262,
+              "assertions": [
+                {
+                  "line": 188,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 189,
+                  "quote": "assert_eq!(result[\"restoredPath\"], dest.to_string_lossy().as_ref())"
+                },
+                {
+                  "line": 190,
+                  "quote": "assert_eq!(result[\"sessionId\"], \"happy\")"
+                },
+                {
+                  "line": 191,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 192,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 193,
+                  "quote": "assert_eq!(std::fs::read(sidecar(&dest)).unwrap(), attachments)"
+                },
+                {
+                  "line": 194,
+                  "quote": "assert_eq!(h.life(\"happy\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 195,
+                  "quote": "assert_eq!(h.pending(\"happy\").await, \"0\")"
+                },
+                {
+                  "line": 201,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 202,
+                  "quote": "assert!(src.exists() && sidecar(&src).exists())"
+                },
+                {
+                  "line": 203,
+                  "quote": "assert!(!dest.exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 206,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"happy\"}))\n            .await\n            .0,\n        404,\n        \"可信locator有缺源时不能变成DB-only成功\"\n    )"
+                },
+                {
+                  "line": 220,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 221,
+                  "quote": "assert_eq!(result[\"restoredPath\"], dest.to_string_lossy().as_ref())"
+                },
+                {
+                  "line": 225,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 232,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 233,
+                  "quote": "assert!(h.life(\"happy\").await.is_none())"
+                },
+                {
+                  "line": 234,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 235,
+                  "quote": "assert!(!dest.exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 242,
+                  "quote": "assert_eq!(code, 201, \"{result}\")"
+                },
+                {
+                  "line": 243,
+                  "quote": "assert_eq!(\n        h.post(\n            \"/lingxi/v1/sessions/archive\",\n            json!({\"sessionId\":\"db-only\"})\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 258,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 259,
+                  "quote": "assert!(result.get(\"restoredPath\").is_none())"
+                },
+                {
+                  "line": 260,
+                  "quote": "assert!(!h.home.join(\"agents/plain/sessions\").exists())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "header_only_old_bug_is_repaired_but_message_and_standalone_sidecar_conflicts_preserve",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 264,
+              "testEndLine": 300,
+              "assertions": [
+                {
+                  "line": 289,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 290,
+                  "quote": "assert_eq!(std::fs::read_to_string(&dest).unwrap(), source)"
+                },
+                {
+                  "line": 291,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&dest)).unwrap(), attached)"
+                },
+                {
+                  "line": 292,
+                  "quote": "assert!(!src.exists())"
+                },
+                {
+                  "line": 294,
+                  "quote": "assert_eq!(code, 409, \"{result}\")"
+                },
+                {
+                  "line": 296,
+                  "quote": "assert_eq!(h.life(kind).await.as_deref(), Some(\"archived\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "owner_path_agent_header_duplicate_missing_nonregular_and_link_guards_are_real",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 302,
+              "testEndLine": 408,
+              "assertions": [
+                {
+                  "line": 313,
+                  "quote": "assert_eq!(code, 201, \"{credential}\")"
+                },
+                {
+                  "line": 318,
+                  "quote": "assert_eq!(\n        remote\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions/restore\",\n                json!({\"sessionPath\":src})\n            )\n            .await\n            .0,\n        403\n    )"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_ne!(h.post(\"/lingxi/v1/sessions/restore\", body).await.0, 200)"
+                },
+                {
+                  "line": 341,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionPath\":fake}))\n            .await\n            .0,\n        403\n    )"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n            .await\n            .0,\n        409\n    )"
+                },
+                {
+                  "line": 360,
+                  "quote": "assert_eq!(\n            h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionPath\":link}))\n                .await\n                .0,\n            403\n        )"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert_ne!(\n            h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n                .await\n                .0,\n            200\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n        h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n            .await\n            .0,\n        409,\n        \"非regular来源拒绝\"\n    )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n            h.post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":\"guards\"}))\n                .await\n                .0,\n            409,\n            \"目录祖先链接拒绝\"\n        )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.life(\"guards\").await.as_deref(), Some(\"archived\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "real_sqlite_write_failure_after_prepared_plan_preserves_files_and_lifecycle",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 410,
+              "testEndLine": 439,
+              "assertions": [
+                {
+                  "line": 423,
+                  "quote": "assert_eq!(code, 500, \"{result}\")"
+                },
+                {
+                  "line": 425,
+                  "quote": "assert!(!active(&src).exists())"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert_eq!(h.life(\"db-fault\").await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert_eq!(h.pending(\"db-fault\").await, \"0\")"
+                },
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(\n        h.post(\n            \"/lingxi/v1/sessions/restore\",\n            json!({\"sessionId\":\"db-fault\"})\n        )\n        .await\n        .0,\n        200\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_second_file_rename_failure_rolls_back_jsonl_and_preserves_external_target",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 565,
+              "testEndLine": 567,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_source_change_during_final_sqlite_wait_is_refused_and_preserved",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 569,
+              "testEndLine": 571,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_owner_change_during_final_sqlite_wait_cannot_authorize_stale_owner",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 573,
+              "testEndLine": 575,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_permission_io_failure_during_final_write_rolls_back_everything",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 579,
+              "testEndLine": 581,
+              "assertions": []
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_binary_kill_after_jsonl_move_before_sidecar_or_db_commit_recovers_on_restart",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 653,
+              "testEndLine": 759,
+              "assertions": [
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(code, 201, \"{result}\")"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(\n        binary\n            .client\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions/archive\",\n                json!({\"sessionId\":\"actual-crash\"})\n            )\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 709,
+                  "quote": "assert_eq!(unsafe { libc::kill(pid as i32, libc::SIGKILL) }, 0)"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert_eq!(phase, \"archived\")"
+                },
+                {
+                  "line": 728,
+                  "quote": "assert_eq!(prepared, 1)"
+                },
+                {
+                  "line": 730,
+                  "quote": "assert!(!status.success())"
+                },
+                {
+                  "line": 731,
+                  "quote": "assert_eq!(pending.await.unwrap().0, 0, \"实际中断的HTTP不能返回成功\")"
+                },
+                {
+                  "line": 732,
+                  "quote": "assert!(dest.exists() && !src.exists())"
+                },
+                {
+                  "line": 733,
+                  "quote": "assert!(sidecar(&src).exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 736,
+                  "quote": "assert!(!dest.exists() && !sidecar(&dest).exists())"
+                },
+                {
+                  "line": 737,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&src).unwrap(),\n        jsonl(\"actual-crash\")\n    )"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&src)).unwrap(), attached)"
+                },
+                {
+                  "line": 744,
+                  "quote": "assert_eq!(pending, 0)"
+                },
+                {
+                  "line": 745,
+                  "quote": "assert_eq!(\n        restarted\n            .client\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions/restore\",\n                json!({\"sessionId\":\"actual-crash\"})\n            )\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 757,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&dest)).unwrap(), attached)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_db_locator_write_failure_after_both_renames_rolls_back_files_and_db",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 761,
+              "testEndLine": 794,
+              "assertions": [
+                {
+                  "line": 774,
+                  "quote": "assert_eq!(code, 500, \"{result}\")"
+                },
+                {
+                  "line": 775,
+                  "quote": "assert!(result\n        .to_string()\n        .contains(\"ACTUAL_AFTER_BOTH_FILES_DB_FAILURE\"))"
+                },
+                {
+                  "line": 779,
+                  "quote": "assert!(!active(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 780,
+                  "quote": "assert_eq!(h.life(\"late-db-fault\").await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 781,
+                  "quote": "assert_eq!(h.pending(\"late-db-fault\").await, \"0\")"
+                },
+                {
+                  "line": 784,
+                  "quote": "assert_eq!(\n        h.post(\n            \"/lingxi/v1/sessions/restore\",\n            json!({\"sessionId\":\"late-db-fault\"})\n        )\n        .await\n        .0,\n        200\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "device_owner_changed_after_auth_gate_before_prepared_plan_cannot_restore",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 796,
+              "testEndLine": 861,
+              "assertions": [
+                {
+                  "line": 807,
+                  "quote": "assert_eq!(code, 201, \"{credential}\")"
+                },
+                {
+                  "line": 815,
+                  "quote": "assert_eq!(read_code, 200, \"设备本来必须有真实访问权: {read_result}\")"
+                },
+                {
+                  "line": 843,
+                  "quote": "assert!(\n        waiting,\n        \"必须观察设备认证结束后的真实prepared写者等待，不能以延迟猜测达点\"\n    )"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(count, 0, \"这是prepared之前的真实归属窗口\")"
+                },
+                {
+                  "line": 852,
+                  "quote": "assert_eq!(code, 409, \"旧设备主体不能沿旧归属保存: {result}\")"
+                },
+                {
+                  "line": 853,
+                  "quote": "assert!(result\n        .to_string()\n        .contains(\"authorized restore owner/agent changed before preparation\"))"
+                },
+                {
+                  "line": 857,
+                  "quote": "assert!(!active(&src).exists())"
+                },
+                {
+                  "line": 858,
+                  "quote": "assert_eq!(h.life(\"before-prepare\").await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 859,
+                  "quote": "assert_eq!(h.pending(\"before-prepare\").await, \"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "busy_and_two_actual_concurrent_restores_have_one_physical_commit",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 863,
+              "testEndLine": 918,
+              "assertions": [
+                {
+                  "line": 880,
+                  "quote": "assert_eq!(code, 409, \"{result}\")"
+                },
+                {
+                  "line": 881,
+                  "quote": "assert!(result.to_string().contains(\"session_busy\"))"
+                },
+                {
+                  "line": 883,
+                  "quote": "assert_eq!(h.pending(\"concurrency\").await, \"0\")"
+                },
+                {
+                  "line": 901,
+                  "quote": "assert_eq!(statuses, [200, 409], \"真实并发不能双成功: {one:?} {two:?}\")"
+                },
+                {
+                  "line": 903,
+                  "quote": "assert_eq!(\n        success[\"restoredPath\"],\n        active(&src).to_string_lossy().as_ref()\n    )"
+                },
+                {
+                  "line": 907,
+                  "quote": "assert_eq!(std::fs::read_to_string(active(&src)).unwrap(), old)"
+                },
+                {
+                  "line": 908,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(sidecar(&active(&src))).unwrap(),\n        attached\n    )"
+                },
+                {
+                  "line": 912,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 913,
+                  "quote": "assert_eq!(h.life(\"concurrency\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 915,
+                  "quote": "assert_eq!(count, \"1\")"
+                },
+                {
+                  "line": 916,
+                  "quote": "assert_eq!(h.pending(\"concurrency\").await, \"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_periodic_cleanup_deletes_legacy_pair_and_does_not_leave_suspended_files",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 920,
+              "testEndLine": 934,
+              "assertions": [
+                {
+                  "line": 927,
+                  "quote": "assert_eq!(code, 200, \"{result}\")"
+                },
+                {
+                  "line": 928,
+                  "quote": "assert!(result[\"deleted\"].as_u64().unwrap() >= 1)"
+                },
+                {
+                  "line": 929,
+                  "quote": "assert!(h.life(\"cleanup-physical\").await.is_none())"
+                },
+                {
+                  "line": 930,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 931,
+                  "quote": "assert!(!active(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 932,
+                  "quote": "assert_eq!(h.pending(\"cleanup-physical\").await, \"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_post_commit_cleanup_io_failure_reports_committed_state_and_restart_finishes",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 937,
+              "testEndLine": 1012,
+              "assertions": [
+                {
+                  "line": 994,
+                  "quote": "assert_eq!(code, 500, \"真实清扫权限失败必须明确报错: {result}\")"
+                },
+                {
+                  "line": 995,
+                  "quote": "assert!(result\n        .to_string()\n        .contains(\"legacy lifecycle commit succeeded\"))"
+                },
+                {
+                  "line": 998,
+                  "quote": "assert!(result.to_string().contains(\"Permission denied\"))"
+                },
+                {
+                  "line": 999,
+                  "quote": "assert_eq!(h.life(\"cleanup-error\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert_eq!(std::fs::read_to_string(&dest).unwrap(), original)"
+                },
+                {
+                  "line": 1002,
+                  "quote": "assert_eq!(std::fs::read_to_string(sidecar(&dest)).unwrap(), attached)"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert!(remaining.exists())"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(h.pending(\"cleanup-error\").await, \"1\")"
+                },
+                {
+                  "line": 1007,
+                  "quote": "assert!(!remaining.exists())"
+                },
+                {
+                  "line": 1008,
+                  "quote": "assert_eq!(h.pending(\"cleanup-error\").await, \"0\")"
+                },
+                {
+                  "line": 1009,
+                  "quote": "assert_eq!(h.life(\"cleanup-error\").await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 1010,
+                  "quote": "assert_eq!(std::fs::read_to_string(&dest).unwrap(), original)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "two_different_sessions_concurrently_commit_their_own_pairs_and_journals",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 1015,
+              "testEndLine": 1055,
+              "assertions": [
+                {
+                  "line": 1040,
+                  "quote": "assert_eq!(ra.0, 200, \"{ra:?}\")"
+                },
+                {
+                  "line": 1041,
+                  "quote": "assert_eq!(rb.0, 200, \"{rb:?}\")"
+                },
+                {
+                  "line": 1043,
+                  "quote": "assert!(!src.exists() && !sidecar(&src).exists())"
+                },
+                {
+                  "line": 1044,
+                  "quote": "assert_eq!(std::fs::read_to_string(active(&src)).unwrap(), jsonl(id))"
+                },
+                {
+                  "line": 1045,
+                  "quote": "assert_eq!(\n            std::fs::read_to_string(sidecar(&active(&src))).unwrap(),\n            attached\n        )"
+                },
+                {
+                  "line": 1049,
+                  "quote": "assert_eq!(h.life(id).await.as_deref(), Some(\"active\"))"
+                },
+                {
+                  "line": 1050,
+                  "quote": "assert_eq!(h.pending(id).await, \"0\")"
+                },
+                {
+                  "line": 1052,
+                  "quote": "assert_eq!(receipts.as_deref(), Some(\"1\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "independent_concurrent_actual_sigkill_retains_prepared_and_recovers",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 1060,
+              "testEndLine": 1185,
+              "assertions": [
+                {
+                  "line": 1075,
+                  "quote": "assert_eq!(code, 201, \"{value}\")"
+                },
+                {
+                  "line": 1076,
+                  "quote": "assert_eq!(\n            binary\n                .client\n                .request(\n                    \"POST\",\n                    \"/lingxi/v1/sessions/archive\",\n                    json!({\"sessionId\":id})\n                )\n                .await\n                .0,\n            200\n        )"
+                },
+                {
+                  "line": 1114,
+                  "quote": "assert_eq!(unsafe { libc::kill(pid as i32, libc::SIGKILL) }, 0)"
+                },
+                {
+                  "line": 1148,
+                  "quote": "assert!(active(&src).exists() && !src.exists() && sidecar(&src).exists())"
+                },
+                {
+                  "line": 1154,
+                  "quote": "assert!(other_src.exists() && !active(other_src).exists())"
+                },
+                {
+                  "line": 1155,
+                  "quote": "assert_eq!(std::fs::read_to_string(other_src).unwrap(), jsonl(other_id))"
+                },
+                {
+                  "line": 1159,
+                  "quote": "assert_eq!(\n                std::fs::read_to_string(sidecar(other_src)).unwrap(),\n                expected.to_string()\n            )"
+                },
+                {
+                  "line": 1163,
+                  "quote": "assert!(!sidecar(&active(other_src)).exists())"
+                },
+                {
+                  "line": 1165,
+                  "quote": "assert_eq!(pending, 0)"
+                },
+                {
+                  "line": 1168,
+                  "quote": "assert!(\n            restored_back,\n            \"另一个会话错误完成仍在执行的prepared日志，真实重启没有退回未提交JSONL\"\n        )"
+                },
+                {
+                  "line": 1172,
+                  "quote": "assert_eq!(\n            state, \"prepared\",\n            \"真实移动未提交期间，本日志必须保持prepared\"\n        )"
+                },
+                {
+                  "line": 1176,
+                  "quote": "assert!(receipt.is_empty(), \"活跃日志不得提前产生completed收据\")"
+                },
+                {
+                  "line": 1177,
+                  "quote": "assert_eq!(std::fs::read_to_string(&src).unwrap(), jsonl(&id))"
+                },
+                {
+                  "line": 1178,
+                  "quote": "assert!(sidecar(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 1180,
+                  "quote": "assert_eq!(a.await.unwrap().0, 200)"
+                },
+                {
+                  "line": 1181,
+                  "quote": "assert_eq!(b.await.unwrap().0, 200)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs",
+              "test": "actual_final_writer_refuses_completed_bad_digest_and_replaced_snapshot_journals",
+              "sourceSHA256": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+              "testStartLine": 1188,
+              "testEndLine": 1307,
+              "assertions": [
+                {
+                  "line": 1233,
+                  "quote": "assert_eq!(pending.await.unwrap().0, 200)"
+                },
+                {
+                  "line": 1236,
+                  "quote": "assert!(src.exists() && sidecar(&src).exists() && !active(&src).exists())"
+                },
+                {
+                  "line": 1237,
+                  "quote": "assert!(tokio::time::timeout(\n                Duration::from_millis(200),\n                h.state\n                    .storage()\n                    .query_one_text(\"SELECT 'actual-final-writer-waits'\", vec![])\n            )\n            .await\n            .is_err())"
+                },
+                {
+                  "line": 1270,
+                  "quote": "assert_eq!(\n                status, 500,\n                \"日志已经失效，不能继续触碰文件或报告成功: {response}\"\n            )"
+                },
+                {
+                  "line": 1274,
+                  "quote": "assert!(response\n                .to_string()\n                .contains(\"prepared journal missing/changed\"))"
+                },
+                {
+                  "line": 1278,
+                  "quote": "assert!(!active(&src).exists() && !sidecar(&active(&src)).exists())"
+                },
+                {
+                  "line": 1279,
+                  "quote": "assert_eq!(h.life(&id).await.as_deref(), Some(\"archived\"))"
+                },
+                {
+                  "line": 1281,
+                  "quote": "assert_eq!(\n                h.pending(&id).await,\n                if kind == \"journal-completed\" {\n                    \"0\"\n                } else {\n                    \"1\"\n                }\n            )"
+                },
+                {
+                  "line": 1292,
+                  "quote": "assert_eq!(restarted.pending(&id).await, \"0\")"
+                },
+                {
+                  "line": 1294,
+                  "quote": "assert_eq!(\n                restarted\n                    .post(\"/lingxi/v1/sessions/restore\", json!({\"sessionId\":id}))\n                    .await\n                    .0,\n                200\n            )"
+                },
+                {
+                  "line": 1305,
+                  "quote": "assert!(caught, \"没有捕获真实最终事务等待窗口，不能计PASS\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust恢复仅更新数据库生命周期，没有原归档文件及sidecar经路径/冲突校验移回活跃目录、返回新路径的证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "Rust恢复仅更新数据库生命周期，没有原归档文件及sidecar经路径/冲突校验移回活跃目录、返回新路径的证明。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261014/archive-restore-proof-review.json"
     },
     {
       "id": "R00-T02-LA-3236B05B284F",

@@ -1,0 +1,99 @@
+{
+  "leaf": "R00-T02-LA-31CDA283A11A",
+  "review": "INDEPENDENT_R2",
+  "verdict": "PASS_REVIEWED_ARCHIVE_RESTORE_SCOPE",
+  "stageAccepted": false,
+  "stageReady": false,
+  "candidate": {
+    "root": "/tmp/lingxi-archive-independent-review",
+    "head": "d73729a2821a51e39e27038c0c42052a1f2f737e",
+    "patches": {
+      "/tmp/lingxi-archive-jsonl-restore.patch": "bba1cd9ccaae944c6309fde77f9069a9d8d93ef2f25f6281e39120fb40b43f1b",
+      "/tmp/lingxi-archive-jsonl-restore-r2.patch": "913822dd74763074309199fa05cc17f09edcb03826eb3f8697b509bbb0659e52"
+    }
+  },
+  "sourceHashes": {
+    "rust/crates/lingxi-adapters/Cargo.toml": "94fab8c324e8ba409c4b5a9d78c4beb93b563581d271df8a2e45f66e9bbe2703",
+    "rust/crates/lingxi-adapters/src/storage/mod.rs": "6fe4a4fcea56b1e84b13a8d9a20c7b9def975c97e34feb905e7be763524506fb",
+    "rust/crates/lingxi-adapters/src/storage/run_store.rs": "219eb08fe86bf2399a36b209164d2e8fe7921678af0efb4a26f250dd1916ef7d",
+    "rust/crates/lingxi-adapters/src/storage/session_admin.rs": "c9669b0d5961e57170422f9b8cc22ac30497d58bbcb96de1a3b569dc8964f15d",
+    "rust/crates/lingxi-adapters/src/storage/legacy_session_files.rs": "0bc36c6d3bdd41170cfac03aa0e227d4c4045122e3cd8372f1b09219d9ffe508",
+    "rust/crates/lingxi-service/src/session_admin.rs": "0ee644d817c3c038847028bc9b1d2e9a6b74fefb9ded7abd731d398c13941410",
+    "rust/crates/lingxi-service/src/lib.rs": "9a88bafe9c80a0798fd79686c5b40fffbca58d257763a398ef465c96a96e386c",
+    "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs": "4e2b5f9c36d2747dbe0f3b1cb3f25d280fa0cd87d744301037ab0216d630c29b",
+    "rust/crates/lingxi-service/tests/r06_archive_jsonl_independent_r2.rs": "23bc695acf2bc61d0124450558744afafda4a065b02563a62e337a3001ffb1e3"
+  },
+  "original14BytePrefix": {
+    "unchanged": true,
+    "bytes": 39650,
+    "sha256": "12189bbb4418b4e7847dae830831f08ab58ed024e51ef2d7447c10bb32bc749b"
+  },
+  "runtime": {
+    "cargo": "/Users/study_superior/.cargo/bin/cargo",
+    "locked": true,
+    "CARGO_INCREMENTAL": "0",
+    "LINGXI_HOME": "/tmp/lingxi-archive-review-env/home",
+    "TMPDIR": "/tmp/lingxi-archive-review-env/tmp",
+    "LINGXI_PRODUCT_DIR": "/tmp/lingxi-archive-independent-review/lib",
+    "CARGO_TARGET_DIR": "/Users/study_superior/.cache/lingxi-r06-builds/archive-review-target",
+    "targetCopied": false
+  },
+  "p1Disposition": {
+    "R1": "actual two-session HTTP restore,SIGKILL while JSONL moved sidecar unmoved;completed journal,DB archived;actual restart left split pair;reviewer log preserved",
+    "R2": "same real window with both session journals actually durable;prepared/empty receipt before SIGKILL;actual restart rolls back both original JSONL/sidecar pairs byte-for-byte",
+    "positiveEvidence": "/tmp/archive-review-r2-independent-sigkill.log",
+    "originalNegativeEvidence": "/tmp/archive-review-independent-concurrent.log",
+    "originalNegativeExperiment": "/tmp/r06-archive-independent-review-tests.rs",
+    "positiveExperiment": "/tmp/r06-archive-independent-review-r2-tests.rs"
+  },
+  "actualExecuted": {
+    "independentSameWindowCrash": {
+      "pass": 1,
+      "fail": 0,
+      "log": "/tmp/archive-review-r2-independent-sigkill.log"
+    },
+    "affectedSuite": {
+      "pass": 17,
+      "fail": 0,
+      "ignored": 0,
+      "log": "/tmp/archive-review-r2-affected-suite.log",
+      "threeNew": [
+        "two_different_sessions_concurrently_commit_their_own_pairs_and_journals",
+        "independent_concurrent_actual_sigkill_retains_prepared_and_recovers",
+        "actual_final_writer_refuses_completed_bad_digest_and_replaced_snapshot_journals"
+      ]
+    }
+  },
+  "existing69Evidence": {
+    "independentlyPassedOnR1": true,
+    "repeatedOnR2": false,
+    "reason": "controller prohibited redundant large regression with no new reason;production delta only legacy_session_files.rs and current affected17+independent same-window test executed",
+    "service34Log": "/tmp/archive-review-service-regression.log",
+    "adapters35Log": "/tmp/archive-review-adapter-regression-final.log"
+  },
+  "checks": {
+    "diffCheck": "PASS",
+    "clippy": "not independently rerun on R2",
+    "fmt": "not independently rerun on R2",
+    "fullRecoveryCallSites": [
+      "legacy_session_files.rs:930 recover_pending",
+      "lingxi-service/src/lib.rs:1148 bootstrap only"
+    ],
+    "runtimeRecovery": "finish calls recover_plan on self.plans only;allow_undo=false;prepare refuses pending same-session journal"
+  },
+  "logHashes": {
+    "/tmp/archive-review-independent-concurrent.log": "686515b16b22823cd470d6d8483f9f7b3073a677b569b6bb58ce48b63fcec0e2",
+    "/tmp/archive-review-r2-independent-sigkill.log": "7694ff6e0488bcad34f0d168e48a6b4fbc8b6b1d10e95cd8e3b2d58656025c48",
+    "/tmp/archive-review-r2-affected-suite.log": "dcd44cb2b097c1ecaa3c85134fd4e664dd378c0d6e0405b40524b194b057883c",
+    "/tmp/archive-review-service-regression.log": "ad4a94804f052eb33b5d5a443bab3c6172c6cf2974c6603bdacb642a907b23ad",
+    "/tmp/archive-review-adapter-regression-final.log": "ae257a76ddfee2be89eff7c0acd055b55bbdd85ecb75088335ae7760d1d40815"
+  },
+  "limits": [
+    "macOS actual SIGKILL,not power loss",
+    "Windows/Linux not executed",
+    "no disk-full/formal packaging/full R06 gate",
+    "existing migrated JSONL bound to actual DB row only;not R08 production migration",
+    "not a total R06/R07 verdict",
+    "original R1 experiment kept byte-for-byte as negative control;no unchanged R1 bad-window detector called a positive test on R2"
+  ]
+}

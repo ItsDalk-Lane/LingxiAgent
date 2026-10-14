@@ -16,6 +16,7 @@ pub mod agent_memory;
 pub mod backup;
 pub mod canonical_message_store;
 pub mod knowledge;
+pub mod legacy_session_files;
 pub mod migrations;
 pub mod queue;
 pub mod run_store;

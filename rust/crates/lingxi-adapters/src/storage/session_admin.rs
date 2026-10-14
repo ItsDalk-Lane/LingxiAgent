@@ -54,6 +54,7 @@ pub struct ArchiveOutcome {
 pub struct ArchiveFailure {
     pub source: StorageError,
     pub outcome: ArchiveOutcome,
+    pub rolled_back: bool,
 }
 
 /// 恢复 / 删除的结局（三态，调用方映射 404/409/200，绝不静默成功）。
@@ -334,6 +335,53 @@ pub async fn archive_session_counted(
     skip_ids: &[String],
     now_unix_ms: u64,
 ) -> Result<ArchiveOutcome, ArchiveFailure> {
+    let expected_descendants = if db.legacy_session_root().is_some() {
+        Some(
+            list_descendant_sessions(db, session_id)
+                .await
+                .map_err(|source| ArchiveFailure {
+                    source,
+                    outcome: ArchiveOutcome {
+                        archived_children: 0,
+                        detached_children: 0,
+                        skipped_streaming_children: 0,
+                        errors: 1,
+                    },
+                    rolled_back: false,
+                })?,
+        )
+    } else {
+        None
+    };
+    let mut ids = vec![session_id.to_string()];
+    if child_mode == Some(ChildMode::ArchiveChildren) {
+        if let Some(descendants) = &expected_descendants {
+            ids.extend(
+                descendants
+                    .iter()
+                    .filter(|id| !skip_ids.contains(id))
+                    .cloned(),
+            );
+        }
+    }
+    let physical = super::legacy_session_files::Batch::prepare(
+        db,
+        &ids,
+        super::legacy_session_files::Transition::Archive,
+        now_unix_ms,
+    )
+    .await
+    .map_err(|source| ArchiveFailure {
+        source,
+        outcome: ArchiveOutcome {
+            archived_children: 0,
+            detached_children: 0,
+            skipped_streaming_children: skip_ids.len(),
+            errors: 1,
+        },
+        rolled_back: false,
+    })?;
+    let physical_in_txn = physical.clone();
     let sid = session_id.to_string();
     let mode = child_mode;
     let skips: Vec<String> = skip_ids.to_vec();
@@ -344,7 +392,13 @@ pub async fn archive_session_counted(
     let result = db
         .queue()
         .submit(move |conn| {
-            with_write_txn(conn, busy, |conn| {
+            physical_in_txn.transaction(conn, busy, |conn| {
+                if let Some(expected)=&expected_descendants {
+                    let mut stmt=conn.prepare("WITH RECURSIVE descendants(id) AS (SELECT session_id FROM sessions WHERE parent_session_id=?1 UNION SELECT s.session_id FROM sessions s JOIN descendants d ON s.parent_session_id=d.id) SELECT id FROM descendants ORDER BY id").map_err(map_err)?;
+                    let actual=stmt.query_map([&sid],|r|r.get::<_,String>(0)).map_err(map_err)?.collect::<Result<Vec<_>,_>>().map_err(map_err)?;
+                    let mut expected=expected.clone();expected.sort();
+                    if actual!=expected{return Err(StorageError::Conflict{detail:"legacy archive lineage changed before commit".into()});}
+                }
                 let lifecycle: Option<String> = conn
                     .query_row(
                         "SELECT lifecycle FROM sessions WHERE session_id=?1",
@@ -459,7 +513,7 @@ pub async fn archive_session_counted(
             })
         })
         .await;
-    result.map_err(|source| ArchiveFailure {
+    let result = result.map_err(|source| ArchiveFailure {
         source,
         outcome: ArchiveOutcome {
             // 事务未提交，已尝试的翻转不计为成功。
@@ -468,7 +522,14 @@ pub async fn archive_session_counted(
             skipped_streaming_children: skipped.load(std::sync::atomic::Ordering::SeqCst),
             errors: 1,
         },
-    })
+        rolled_back: true,
+    })?;
+    physical.finish(db).await.map_err(|source| ArchiveFailure {
+        source,
+        outcome: result.clone(),
+        rolled_back: false,
+    })?;
+    Ok(result)
 }
 
 /// 恢复归档会话为 active（现役 restore：仅归档态允许）。
@@ -477,12 +538,35 @@ pub async fn restore_session(
     session_id: &str,
     now_unix_ms: u64,
 ) -> Result<LifecycleOutcome, StorageError> {
+    restore_session_checked(db, session_id, now_unix_ms, None).await
+}
+/// 已认证DB归属作最终CAS；路径只比较，不能登记任意客户端落点。
+pub async fn restore_session_checked(
+    db: &RunDatabase,
+    session_id: &str,
+    now_unix_ms: u64,
+    expected: Option<super::legacy_session_files::ExpectedSource>,
+) -> Result<LifecycleOutcome, StorageError> {
+    let physical = super::legacy_session_files::Batch::prepare_checked(
+        db,
+        &[session_id.to_string()],
+        super::legacy_session_files::Transition::Restore,
+        now_unix_ms,
+        expected.clone(),
+    )
+    .await?;
+    let physical_in_txn = physical.clone();
     let sid = session_id.to_string();
     let now = now_unix_ms as i64;
     let busy = db.options().busy_timeout_ms;
-    db.queue()
+    let result = db
+        .queue()
         .submit(move |conn| {
-            with_write_txn(conn, busy, |conn| {
+            physical_in_txn.transaction(conn, busy, |conn| {
+                if let Some(expected)=&expected {
+                    let actual:Option<(String,String)>=conn.query_row("SELECT agent_id,owner_user_id FROM sessions WHERE session_id=?1",[&sid],|r|Ok((r.get(0)?,r.get(1)?))).optional().map_err(map_err)?;
+                    if actual.is_some()&&actual!=Some((expected.agent.clone(),expected.owner.clone())){return Err(StorageError::Conflict{detail:"legacy_session_conflict: authorized restore owner/agent changed before commit".into()});}
+                }
                 let lifecycle: Option<String> = conn
                     .query_row(
                         "SELECT lifecycle FROM sessions WHERE session_id=?1",
@@ -506,7 +590,9 @@ pub async fn restore_session(
                 Ok(LifecycleOutcome::Done)
             })
         })
-        .await
+        .await?;
+    physical.finish(db).await?;
+    Ok(result)
 }
 
 /// 永久删除一个**已归档**会话及其全部派生数据。
@@ -530,11 +616,19 @@ pub async fn delete_archived_session(
     db: &RunDatabase,
     session_id: &str,
 ) -> Result<LifecycleOutcome, StorageError> {
+    let physical = super::legacy_session_files::Batch::prepare(
+        db,
+        &[session_id.to_string()],
+        super::legacy_session_files::Transition::Delete,
+        0,
+    )
+    .await?;
+    let physical_in_txn = physical.clone();
     let sid = session_id.to_string();
     let busy = db.options().busy_timeout_ms;
-    db.queue()
+    let result=db.queue()
         .submit(move |conn| {
-            with_write_txn(conn, busy, |conn| {
+            physical_in_txn.transaction(conn, busy, |conn| {
                 let lifecycle: Option<String> = conn
                     .query_row(
                         "SELECT lifecycle FROM sessions WHERE session_id=?1",
@@ -620,7 +714,9 @@ pub async fn delete_archived_session(
                 Ok(LifecycleOutcome::Done)
             })
         })
-        .await
+        .await?;
+    physical.finish(db).await?;
+    Ok(result)
 }
 
 /// 列出已归档会话（归档时间倒序；对照现役 listArchivedSessions）。

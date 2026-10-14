@@ -777,3 +777,9 @@ F14开放、R06未验收；人格/头像、工具记忆和EX-01等后续批仍�
 新增14叶已实现和独立复核，当前登记219 READY / 60 GAP；原279叶断言及Then逐字保留，阶段状态仍未验收，历史FAIL78门禁结果保留。两轮独立审查的实际反例均留档：人格全部来源竞态/native edit可用性缺口、EX01最终提交/真实PUT发布guard遗漏、经验并发成功丢失已修复。main10相关套111 PASS，人格相关37 PASS、清理来源4 PASS，三库严格Clippy/协议56文件无漂移。EX01这里只关闭服务核心，slash/WS/UI仍须实现；本批干净绑定窗口待执行，不能以这些数字声明R06/R07验收。后续分工与恢复点见route-a-20261014/PLAN.md及batch2-validation.json。
 
 第二批隔离整改后，冻结窗口37/37、14原叶rollup PASS，全部37回执绑定同一候选源且前后稳定。初次窗口1个source-changed失败由new Persona fixture污染产品目录造成，原失败及三份精确SHA样例留诊断，不将其算PASS；FIX仅可信宿主素材根显式注入测试自身root/product，生产默认解析链与原全部断言不改。累计18叶闭合（219 READY / 60 GAP），仅R06完成17/26；正式全量门禁仍未执行。
+
+### 2026-10-14 单项并行收尾：归档恢复R2
+
+主树当前已推送坐标仍d73729a，新增归档恢复已整合未提交。17新增实际HTTP/SQLite/磁盘检查主树PASS；R1原并发反例确认不同会话prepared被全量recover误收尾，原失败保留。R2运行prepare不recover他人，finish限本批，最终事务核完整prepared/digest/owner/snapshot；独立同真实窗口SIGKILL后真restart两会话原JSONL与16MiB sidecar全字节退回，独立17+1PASS。将冻结主树单项绑定后提交推送，不等待下一批。其他Dream删除/设置/Mood仍各自候选树执行，未算完成，不写阶段接受。
+
+归档单项新窗口18/18绑定及两组原断言rollup PASS，完整候选SHA011622e0564b508ecb3dafee352120b6e8d3c99648e90b611f6ef9b01e65d492，全部源码前后稳定；实际新增17+受影响旧34PASS，登记契约20PASS，strictClippy PASS。原合成环境遗漏失败保留，不更改任何原断言。累计19/78完成，59尚未实现，26仅R06仍17完成；窗口后仅补审计记录，不宣称全阶段终验或最终提交封印。

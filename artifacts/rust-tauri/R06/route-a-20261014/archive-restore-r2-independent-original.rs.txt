@@ -1,0 +1,52 @@
+#[cfg(unix)]
+#[tokio::test(flavor="multi_thread",worker_threads=4)]
+async fn independent_concurrent_sessions_keep_prepared_journal_until_actual_commit() {
+    let home=unique("independent-concurrent-crash");let mut binary=Binary::start(&home).await;
+    let home=home.canonicalize().unwrap();let dir=home.join("agents/lingxi/sessions/archived");
+    let mut files=Vec::new();
+    for id in ["independent-a","independent-b"] {
+        let (code,value)=binary.client.request("POST","/lingxi/v1/sessions",json!({"sessionId":id,"agentId":"lingxi","title":id})).await;assert_eq!(code,201,"{value}");
+        assert_eq!(binary.client.request("POST","/lingxi/v1/sessions/archive",json!({"sessionId":id})).await.0,200);
+        std::fs::create_dir_all(&dir).unwrap();let src=dir.join(format!("{id}.jsonl"));std::fs::write(&src,jsonl(id)).unwrap();
+        let mut body:Value=serde_json::from_str(&sidecar_bytes(id,&src)).unwrap();body["independentPadding"]=json!("x".repeat(16*1024*1024));
+        std::fs::write(sidecar(&src),body.to_string()).unwrap();files.push((id.to_string(),src));
+    }
+    let pid=binary.child.id().unwrap();let db=home.join("lingxi-service/data/runs.db");let watch=files.clone();
+    let watcher=tokio::task::spawn_blocking(move|| {
+        let conn=rusqlite::Connection::open(db).unwrap();let deadline=std::time::Instant::now()+Duration::from_secs(15);
+        while std::time::Instant::now()<deadline {
+            for (id,src) in &watch {
+                let state:Option<(String,String,String)>=conn.query_row("SELECT o.state,COALESCE(o.receipt_json,''),s.lifecycle FROM session_operations o JOIN sessions s ON s.session_id=o.session_id WHERE o.session_id=?1 AND o.operation_kind='legacy_session_file_transition' ORDER BY o.created_at_unix_ms DESC LIMIT 1",[id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?))).optional().unwrap();
+                if let Some((state,receipt,phase))=state {
+                    if state=="completed" && phase=="archived" && receipt.contains("recovered") {
+                        let moved=active(src).exists() && !src.exists() && sidecar(src).exists() && !sidecar(&active(src)).exists();
+                        if moved {
+                            // 仅终止本实验实际启动的合成服务，捕获已失去prepared保护的真实双文件中断。
+                            assert_eq!(unsafe{libc::kill(pid as i32,libc::SIGKILL)},0);
+                            return Some((id.clone(),src.clone(),state,receipt,phase));
+                        }
+                    }
+                }
+            }
+            std::thread::sleep(Duration::from_micros(20));
+        }
+        None
+    });
+    let ca=binary.client.clone();let cb=binary.client.clone();
+    let a=tokio::spawn(async move{ca.request("POST","/lingxi/v1/sessions/restore",json!({"sessionId":"independent-a"})).await});
+    let b=tokio::spawn(async move{cb.request("POST","/lingxi/v1/sessions/restore",json!({"sessionId":"independent-b"})).await});
+    let observed=watcher.await.unwrap();
+    if let Some((id,src,state,receipt,phase))=observed {
+        binary.child.wait().await.unwrap();let ra=a.await.unwrap();let rb=b.await.unwrap();
+        eprintln!("INDEPENDENT_CONCURRENT_JOURNAL id={id} state={state} phase={phase} receipt={receipt} responses={ra:?}/{rb:?}");
+        assert!(active(&src).exists()&&!src.exists()&&sidecar(&src).exists());
+        let restarted=Binary::start(&home).await;
+        let restored_back=src.exists()&&!active(&src).exists();
+        eprintln!("INDEPENDENT_RESTART_BACK={restored_back} source_jsonl={} active_jsonl={} source_sidecar={} active_sidecar={}",src.exists(),active(&src).exists(),sidecar(&src).exists(),sidecar(&active(&src)).exists());
+        restarted.stop().await;
+        assert!(restored_back,"另一个会话错误完成仍在执行的prepared日志，真实重启没有退回未提交JSONL");
+    } else {
+        assert_eq!(a.await.unwrap().0,200);assert_eq!(b.await.unwrap().0,200);binary.stop().await;
+        panic!("没有捕获跨会话prepared干扰，不能以未观察到反例签PASS");
+    }
+}

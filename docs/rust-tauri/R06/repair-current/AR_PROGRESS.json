@@ -2158,6 +2158,26 @@
         "originalLeavesPassed": 14,
         "report": "artifacts/rust-tauri/R06/route-a-20261014/batch2-binding-window-summary.json"
       }
+    },
+    "archive_restore": {
+      "status": "IMPLEMENTED_REVIEWED_FROZEN_BINDING_WINDOW_PASS",
+      "leafIds": [
+        "R00-T02-LA-31CDA283A11A"
+      ],
+      "registeredReady": 220,
+      "registeredGap": 59,
+      "completedInitialGaps": 19,
+      "remainingInitialGaps": 59,
+      "onlyR06Completed": 17,
+      "onlyR06Remaining": 9,
+      "stageAccepted": false,
+      "independentReview": "artifacts/rust-tauri/R06/route-a-20261014/archive-restore-independent-review-r2.json",
+      "bindingWindow": {
+        "bindingsPassed": 18,
+        "originalLeavesPassed": 1,
+        "report": "artifacts/rust-tauri/R06/route-a-20261014/archive-restore-binding-window-summary.json"
+      },
+      "validation": "artifacts/rust-tauri/R06/route-a-20261014/archive-restore-validation.json"
     }
   }
 }

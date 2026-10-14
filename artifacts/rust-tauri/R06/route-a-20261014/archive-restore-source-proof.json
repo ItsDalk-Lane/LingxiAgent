@@ -1,0 +1,107 @@
+{
+  "leaf": "R00-T02-LA-31CDA283A11A",
+  "new_boundary": "archive-jsonl-sidecar-restore",
+  "baseline": {
+    "head": "2c8f8ddd0b75b4de61ebd047a0246a7f88f6d486",
+    "main_rust_working_snapshot": "/tmp/archive-restore-base/source-snapshot.json",
+    "method": "主树只读复制全部Rust文件一次，净补丁仅相对此快照指定文件；不覆盖同批EX/persona/memory/native改动",
+    "files": {
+      "rust/crates/lingxi-adapters/Cargo.toml": "015ca2669a825c5e0c54c2aa8cd9ac5f01c2fc505acad01d2b4aaab9387399a4",
+      "rust/crates/lingxi-adapters/src/storage/mod.rs": "6d9e8c275e1afddb75f76e09b7c90c11ad73ffccd865b7324ceec1369895aa70",
+      "rust/crates/lingxi-adapters/src/storage/run_store.rs": "853c76930c217e6df3a7e4707a7c271886b1c578085c4c4bde85a7a7badb6bd6",
+      "rust/crates/lingxi-adapters/src/storage/session_admin.rs": "d609226affd3fa39a3e717b6fb50492b881324afb51c35a5add7a00bbe66544b",
+      "rust/crates/lingxi-service/src/session_admin.rs": "7e726ab682ebb7f9134a1b8b358a2aa3e8295be4c00ed632ae901503e1a4cae7",
+      "rust/crates/lingxi-service/src/lib.rs": "ebc23bac0668e997d1dd34361bedf3c75743627ecb4d004779c756dabe86f1bd"
+    }
+  },
+  "candidate_files": {
+    "rust/crates/lingxi-adapters/Cargo.toml": "94fab8c324e8ba409c4b5a9d78c4beb93b563581d271df8a2e45f66e9bbe2703",
+    "rust/crates/lingxi-adapters/src/storage/mod.rs": "6fe4a4fcea56b1e84b13a8d9a20c7b9def975c97e34feb905e7be763524506fb",
+    "rust/crates/lingxi-adapters/src/storage/run_store.rs": "219eb08fe86bf2399a36b209164d2e8fe7921678af0efb4a26f250dd1916ef7d",
+    "rust/crates/lingxi-adapters/src/storage/session_admin.rs": "c9669b0d5961e57170422f9b8cc22ac30497d58bbcb96de1a3b569dc8964f15d",
+    "rust/crates/lingxi-adapters/src/storage/legacy_session_files.rs": "294dd48039abfae6ed58dcb097a236e017a1331a774074306a8b38c62d3d2815",
+    "rust/crates/lingxi-service/src/session_admin.rs": "0ee644d817c3c038847028bc9b1d2e9a6b74fefb9ded7abd731d398c13941410",
+    "rust/crates/lingxi-service/src/lib.rs": "daf28d3940e0810321fb7c2db77171b2e488858ab41e90f5a7eccdfdcfe9fe5e",
+    "rust/crates/lingxi-service/tests/r06_archive_jsonl_restore.rs": "12189bbb4418b4e7847dae830831f08ab58ed024e51ef2d7447c10bb32bc749b"
+  },
+  "authority": {
+    "home": "only composition-root bound canonical home",
+    "path": "lookup only; type=session header id then actual DB ownership gate",
+    "agent": "actual sessions.agent_id; no request-selected registration",
+    "locator": "durable completed receipt only after actual physical and DB final commit",
+    "db_only": "no legacy candidate or established locator: true DB flow, no fabricated JSONL path",
+    "guard": "authorized owner/agent/path checked before prepared write and final BEGIN IMMEDIATE; file marks include content digest and file identity",
+    "physical": "directory handles O_NOFOLLOW on Unix; macOS renameatx_np RENAME_EXCL/Linux renameat2 RENAME_NOREPLACE; never replace concurrent target",
+    "journal": "existing session_operations schema; prepared before any move; final before/after lifecycle decides restart undo or cleanup",
+    "receipt_path": "captured before session admission permit drops"
+  },
+  "ts_sources": {
+    "restore": "server/routes/sessions.ts:2813",
+    "archive": "server/routes/sessions.ts:373",
+    "delete": "server/routes/sessions.ts:515",
+    "header_only": "server/routes/sessions.ts:584",
+    "locator": "server/routes/sessions.ts:686",
+    "sidecar": "lib/session-files/session-file-registry.ts:15"
+  },
+  "validation": {
+    "new_tests": 14,
+    "existing_tests": 69,
+    "total": 83,
+    "ignored": 0,
+    "new_log": "/tmp/archive-final.log",
+    "service_regression": {
+      "F01": 8,
+      "history_content": 12,
+      "session_tree": 14,
+      "log": "/tmp/archive-final-regression.log"
+    },
+    "adapter_regression": {
+      "migration_idempotency": 2,
+      "migration_receipts": 3,
+      "session_file_store": 12,
+      "session_tree": 18,
+      "log": "/tmp/archive-adapters.log"
+    },
+    "negative_controls": [
+      {
+        "probe": "target message conflict",
+        "baseline_status": 200,
+        "required_status": 409,
+        "exit": 101,
+        "log": "/tmp/archive-negative-header_only_old_bug.log"
+      },
+      {
+        "probe": "device owner changes after auth before prepared write",
+        "baseline_status": 200,
+        "required_status": 409,
+        "exit": 101,
+        "log": "/tmp/archive-negative-device_owner_changed.log"
+      }
+    ],
+    "clippy": "PASS service/adapters --lib -D warnings",
+    "clippy_log": "/tmp/archive-clippy.log",
+    "fmt": "PASS",
+    "diff_check": "PASS"
+  },
+  "validation_only_baseline_sync": {
+    "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+    "change": "同步主控已有chunks_exact→as_chunks等价lint修正，仅用于验证，不放入本补丁",
+    "candidate_sha256": "1ed88ea62331c0b7e5571f5a25968a81dee0222bb4d4f9990d9d94c7b78e1600"
+  },
+  "environment": {
+    "cargo": "/Users/study_superior/.cargo/bin/cargo",
+    "locked": true,
+    "target": "/tmp/lingxi-ex01-target",
+    "HOME": "/tmp/lingxi-archive-env/home",
+    "LINGXI_HOME": "/tmp/lingxi-archive-env/home",
+    "TMPDIR": "/tmp/lingxi-archive-env/tmp",
+    "CARGO_HOME": "/Users/study_superior/.cargo",
+    "RUSTUP_HOME": "/Users/study_superior/.rustup"
+  },
+  "limits": [
+    "未实跑Windows/Linux，Windows使用MoveFileExW不覆盖及逐层链接拒绝，未声称其目录句柄能力与Unix相同",
+    "未实跑真实断电或磁盘满；实际SIGKILL、真实chmod权限失败、实际SQLite写拒绝已经验证",
+    "不执行已有JSONL迁移/正式切换；只恢复已存在且能对应真实DB行的文件，不自动建立虚构Row",
+    "不变更门禁/断言/登记/台账，不签R06_ACCEPTED或R07_READY，不提交推送"
+  ]
+}

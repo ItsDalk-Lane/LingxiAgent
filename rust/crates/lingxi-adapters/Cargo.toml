@@ -44,6 +44,8 @@ publish.workspace = true
 #     ALLOWED_PROXY_PROTOCOLS), and the flag is an EMPTY cfg gate inside the
 #     already-locked reqwest 0.13.5 — no new crates, no version changes.
 [dependencies]
+# 复用已锁定版本，生产归档移动使用目录句柄与不覆盖rename。
+libc = "0.2.189"
 lingxi-kernel = { path = "../lingxi-kernel" }
 lingxi-protocol = { path = "../lingxi-protocol" }
 base64 = "0.23.1"

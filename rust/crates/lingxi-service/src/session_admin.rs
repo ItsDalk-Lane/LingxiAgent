@@ -25,6 +25,9 @@ use lingxi_kernel::ports::StorageError;
 pub enum SessionAdminError {
     NotFound,
     InactiveMemorySession,
+    LegacyFileConflict {
+        detail: String,
+    },
     /// 生命周期态不允许（如未归档却永久删除/恢复，已归档却再归档）→ 409。
     WrongLifecycle {
         detail: String,
@@ -59,6 +62,16 @@ pub enum SessionAdminError {
 impl From<StorageError> for SessionAdminError {
     fn from(e: StorageError) -> Self {
         match &e {
+            StorageError::Conflict { detail } if detail.starts_with("legacy_session_conflict:") => {
+                SessionAdminError::LegacyFileConflict {
+                    detail: detail.clone(),
+                }
+            }
+            StorageError::InvalidRequest { detail }
+                if detail == "legacy_session_file_not_found" =>
+            {
+                SessionAdminError::NotFound
+            }
             StorageError::Conflict { detail } if detail == "session_memory_inactive" => {
                 SessionAdminError::InactiveMemorySession
             }
@@ -310,7 +323,20 @@ impl SessionAdminService {
     pub async fn restore_session(&self, sid: &str, now: u64) -> Result<(), SessionAdminError> {
         let (svc, sid) = (self.clone(), sid.to_string());
         Self::join(tokio::spawn(async move {
-            svc.restore_session_inner(&sid, now).await
+            svc.restore_session_inner(&sid, now, None).await
+        }))
+        .await
+        .map(|_| ())
+    }
+    pub async fn restore_session_checked(
+        &self,
+        sid: &str,
+        now: u64,
+        expected: lingxi_adapters::storage::legacy_session_files::ExpectedSource,
+    ) -> Result<Option<std::path::PathBuf>, SessionAdminError> {
+        let (svc, sid) = (self.clone(), sid.to_string());
+        Self::join(tokio::spawn(async move {
+            svc.restore_session_inner(&sid, now, Some(expected)).await
         }))
         .await
     }
@@ -497,7 +523,7 @@ impl SessionAdminService {
                             skipped_streaming_children: failure.outcome.skipped_streaming_children,
                             errors: failure.outcome.errors,
                         },
-                        rolled_back: true,
+                        rolled_back: failure.rolled_back,
                     },
                     other => other,
                 });
@@ -545,12 +571,22 @@ impl SessionAdminService {
         &self,
         session_id: &str,
         now_unix_ms: u64,
-    ) -> Result<(), SessionAdminError> {
+        expected: Option<lingxi_adapters::storage::legacy_session_files::ExpectedSource>,
+    ) -> Result<Option<std::path::PathBuf>, SessionAdminError> {
         let _permit = self.acquire(&[session_id])?;
-        match store::restore_session(&self.storage, session_id, now_unix_ms).await? {
+        match store::restore_session_checked(&self.storage, session_id, now_unix_ms, expected)
+            .await?
+        {
             store::LifecycleOutcome::Done => {
                 self.reclaim_context(session_id);
-                self.cleanup_deleted_payloads().await
+                self.cleanup_deleted_payloads().await?;
+                Ok(
+                    lingxi_adapters::storage::legacy_session_files::restored_path(
+                        &self.storage,
+                        session_id,
+                    )
+                    .await?,
+                )
             }
             store::LifecycleOutcome::NotFound => Err(SessionAdminError::NotFound),
             store::LifecycleOutcome::WrongLifecycle => Err(SessionAdminError::WrongLifecycle {
@@ -1097,6 +1133,9 @@ fn disposal_error_message(err: &SessionAdminError) -> String {
     match err {
         SessionAdminError::NotFound => "session not found".to_string(),
         SessionAdminError::InactiveMemorySession => "session_memory_inactive".to_string(),
+        SessionAdminError::LegacyFileConflict { detail } => {
+            format!("session_file_conflict: {detail}")
+        }
         SessionAdminError::WrongLifecycle { detail } => {
             format!("session_lifecycle_conflict: {detail}")
         }

@@ -1,0 +1,53 @@
+{
+  "scope": "归档恢复31CDA283A11A单项，不是阶段验收",
+  "status": "PASS",
+  "mainNativeNewPassed": 17,
+  "mainAffectedOldPassed": 34,
+  "clippyServiceAdapters": "PASS",
+  "bindingContractPassed": 20,
+  "bindingWindow": {
+    "bindingsPassed": 18,
+    "originalLeavesPassed": 1,
+    "sourceStable": true,
+    "sourceCandidateSha256": "011622e0564b508ecb3dafee352120b6e8d3c99648e90b611f6ef9b01e65d492",
+    "summary": "archive-restore-binding-window-summary.json"
+  },
+  "independentReview": "archive-restore-independent-review-r2.json",
+  "assertionsThenOriginal279Unchanged": true,
+  "initialGapsCompleted": 19,
+  "initialGapsRemaining": 59,
+  "onlyR06Completed": 17,
+  "onlyR06Remaining": 9,
+  "stageAccepted": false,
+  "environmentCorrection": "首次主树命令未设LINGXI_HOME，17项均在夹具入口NotPresent失败、未执行功能；设置独立合成HOME/TMPDIR后17/17实跑PASS，原失败日志保留。",
+  "limitations": [
+    "Windows/Linux、真实断电/磁盘满、正式打包和R06全门禁未执行",
+    "日志损坏明确拒绝保全，需要恢复可信日志，不猜测或抹去错误"
+  ],
+  "logs": [
+    {
+      "path": "/tmp/r06-main-archive-r2-tests.log",
+      "sha256": "a0ba2ff8a3d51391560f29d3898c0cdd5df02f5fb6bd6f427660bdc98153fc25"
+    },
+    {
+      "path": "/tmp/r06-main-archive-r2-tests-env.log",
+      "sha256": "0ac9eb50dfa38729821a5179ae13d2ff83e5b1d48b2bd2835cbfa04da3f3bb0d"
+    },
+    {
+      "path": "/tmp/r06-main-archive-old-regression.log",
+      "sha256": "72221a21ec59657700389ecceedac600cc02617eaa840aea39e76d7d3f695702"
+    },
+    {
+      "path": "/tmp/r06-main-archive-clippy.log",
+      "sha256": "2cd5d651f425be59950d789293b88fad087770a44e1e59eda551c0ffcb0d157e"
+    },
+    {
+      "path": "/tmp/r06-main-archive-binding-contract.log",
+      "sha256": "f0b224b0f1c2bca46ec7cf6607c9285b4039cc6d88a536e69b01167417c46ac3"
+    },
+    {
+      "path": "/tmp/r06-main-archive-bindings.log",
+      "sha256": "fc7737a705d142f4f83cb0920cb5c95c24e522f2f77805c86f74bdecb07aaf14"
+    }
+  ]
+}

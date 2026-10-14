@@ -135,6 +135,7 @@ pub struct RunDatabase {
     /// [`StorageError::RunIdExhausted`] instead of a panic.
     run_id_seq: Arc<std::sync::atomic::AtomicU64>,
     file_payload_leases: Arc<tokio::sync::RwLock<()>>,
+    legacy_session_root: Arc<std::sync::OnceLock<PathBuf>>,
 }
 
 /// 同一进程内重复打开同一数据库也必须共用准入；跨进程宿主须先持InstanceGuard。
@@ -162,6 +163,30 @@ fn shared_session_admission(
 }
 
 impl RunDatabase {
+    /// 仅组合根绑定真实home；客户端路径不能改变这份归属边界。
+    pub fn bind_legacy_session_root(&self, home: &Path) -> Result<(), StorageError> {
+        let canonical = std::fs::canonicalize(home).map_err(|e| StorageError::Io {
+            detail: e.to_string(),
+        })?;
+        if let Some(bound) = self.legacy_session_root.get() {
+            if bound != &canonical {
+                return Err(StorageError::Conflict {
+                    detail: "legacy session home already bound".into(),
+                });
+            }
+        } else {
+            self.legacy_session_root
+                .set(canonical)
+                .map_err(|_| StorageError::Conflict {
+                    detail: "legacy session home binding raced".into(),
+                })?;
+        }
+        Ok(())
+    }
+    pub fn legacy_session_root(&self) -> Option<&Path> {
+        self.legacy_session_root.get().map(PathBuf::as_path)
+    }
+
     /// 内部恢复按宿主 call 身份读原不可改写账目，不暴露新的用户查询入口。
     pub async fn model_usage_by_call(
         &self,
@@ -193,6 +218,7 @@ impl RunDatabase {
             queue,
             run_id_seq: Arc::new(std::sync::atomic::AtomicU64::new(0)),
             file_payload_leases: Arc::new(tokio::sync::RwLock::new(())),
+            legacy_session_root: Arc::new(std::sync::OnceLock::new()),
         };
         let applied_by = format!("lingxi-adapters {}", env!("CARGO_PKG_VERSION"));
         let outcome: MigrationOutcome = db

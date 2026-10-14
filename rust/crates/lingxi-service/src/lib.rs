@@ -1142,6 +1142,12 @@ impl ServiceState {
             .ensure_session_seed(sessions::SessionStore::seed_rows(deps.clock.now_unix_ms()))
             .await
             .map_err(ServiceStartupError::Storage)?;
+        storage
+            .bind_legacy_session_root(&config.data_home)
+            .map_err(ServiceStartupError::Storage)?;
+        lingxi_adapters::storage::legacy_session_files::recover_pending(&storage)
+            .await
+            .map_err(ServiceStartupError::Storage)?;
         let storage = Arc::new(storage);
         // R03-T02: the session surface owns the per-session serialization
         // gate (busy `session_busy` rejection + bounded steering inbox);
@@ -4117,6 +4123,10 @@ fn session_admin_error_response(err: session_admin::SessionAdminError) -> Respon
         E::InactiveMemorySession => {
             EndpointError::forbidden("session_memory_inactive").into_response()
         }
+        E::LegacyFileConflict { detail } => {
+            EndpointError::resource_failure(StatusCode::CONFLICT, "session_file_conflict", detail)
+                .into_response()
+        }
         E::WrongLifecycle { detail } => {
             EndpointError::new(StatusCode::CONFLICT, ErrorCode::Conflict, detail)
                 .with_reason("session_lifecycle_conflict")
@@ -4430,25 +4440,95 @@ struct SessionIdBody {
     session_id: String,
 }
 
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct RestoreSessionBody {
+    #[serde(default)]
+    session_id: Option<String>,
+    #[serde(default, alias = "path")]
+    session_path: Option<std::path::PathBuf>,
+}
 /// `POST /lingxi/v1/sessions/restore` — 恢复归档会话（现役 :2813；仅归档态）。
 async fn restore_session_route(
     axum::Extension(principal): axum::Extension<Principal>,
     State(state): State<ServiceState>,
-    body: Result<Json<SessionIdBody>, axum::extract::rejection::JsonRejection>,
+    body: Result<Json<RestoreSessionBody>, axum::extract::rejection::JsonRejection>,
 ) -> Response {
     let Json(req) = match body {
         Ok(j) => j,
         Err(rej) => return EndpointError::from_json_rejection(&rej).into_response(),
     };
-    if let Err(resp) = gate_session_owned(&state, &principal, &req.session_id).await {
-        return resp;
-    }
+    let requested_path = match req.session_path {
+        Some(path) => {
+            if !path.is_absolute() {
+                return EndpointError::forbidden("invalid_session_path").into_response();
+            }
+            let root = state.storage.legacy_session_root().unwrap();
+            let path = if let Ok(rel) = path.strip_prefix(&state.config.data_home) {
+                root.join(rel)
+            } else {
+                path
+            };
+            Some(path)
+        }
+        None => None,
+    };
+    let path_id = if let Some(path) = &requested_path {
+        match lingxi_adapters::storage::legacy_session_files::session_id_for_path(
+            &state.storage,
+            path,
+        )
+        .await
+        {
+            Ok(id) => Some(id),
+            Err(StorageError::InvalidRequest { detail })
+                if detail == "legacy_session_file_not_found" =>
+            {
+                return EndpointError::not_found().into_response()
+            }
+            Err(error) => {
+                return EndpointError::forbidden(&format!("invalid_session_path: {error}"))
+                    .into_response()
+            }
+        }
+    } else {
+        None
+    };
+    let session_id = match (req.session_id, path_id) {
+        (Some(id), Some(path_id)) if id != path_id => {
+            return EndpointError::resource_failure(
+                StatusCode::CONFLICT,
+                "session_locator_mismatch",
+                "sessionId and sessionPath disagree",
+            )
+            .into_response()
+        }
+        (Some(id), _) | (_, Some(id)) if !id.is_empty() => id,
+        _ => {
+            return EndpointError::invalid_message("sessionId or sessionPath is required")
+                .into_response()
+        }
+    };
+    let facts = match get_session_owned(&state, &principal, &session_id).await {
+        Ok(facts) => facts,
+        Err(response) => return response,
+    };
+    let expected = lingxi_adapters::storage::legacy_session_files::ExpectedSource {
+        agent: facts.agent_id,
+        owner: facts.owner_user_id,
+        path: requested_path,
+    };
     match state
         .session_admin
-        .restore_session(&req.session_id, state.clock.now_unix_ms())
+        .restore_session_checked(&session_id, state.clock.now_unix_ms(), expected)
         .await
     {
-        Ok(()) => (StatusCode::OK, Json(serde_json::json!({ "ok": true }))).into_response(),
+        Ok(Some(path)) => (
+            StatusCode::OK,
+            Json(serde_json::json!({"ok":true,"sessionId":session_id,"restoredPath":path})),
+        )
+            .into_response(),
+        Ok(None) => (StatusCode::OK, Json(serde_json::json!({"ok":true}))).into_response(),
         Err(err) => session_admin_error_response(err),
     }
 }
