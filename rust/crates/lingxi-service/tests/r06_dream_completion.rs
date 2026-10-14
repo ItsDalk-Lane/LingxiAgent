@@ -1,0 +1,1544 @@
+//! 手动dream四叶真实HTTP、五阶段模型、费用、磁盘修订与下一消费者。
+//! 只门控外部供应商响应，不替换被验收业务核心。
+use lingxi_kernel::ports::StoragePort;
+use lingxi_service::{
+    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+};
+use serde_json::{json, Value};
+use std::{
+    net::SocketAddr,
+    path::PathBuf,
+    sync::{Arc, Mutex},
+    time::Duration,
+};
+use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+use tokio::net::{TcpListener, TcpStream};
+
+type ProviderGate = Option<(
+    tokio::sync::oneshot::Sender<()>,
+    tokio::sync::oneshot::Receiver<()>,
+)>;
+
+struct Fixture {
+    addr: SocketAddr,
+    state: ServiceState,
+    home: PathBuf,
+    token: String,
+    denied: String,
+    chat: String,
+    requests: Arc<Mutex<Vec<Value>>>,
+    provider_gate: Arc<Mutex<ProviderGate>>,
+    stop: tokio::sync::oneshot::Sender<()>,
+    task: tokio::task::JoinHandle<()>,
+    stub_stop: tokio::sync::oneshot::Sender<()>,
+    stub_task: tokio::task::JoinHandle<()>,
+}
+async fn read_request(socket: &mut TcpStream) -> (String, Vec<u8>) {
+    let mut bytes = Vec::new();
+    let mut block = [0u8; 4096];
+    loop {
+        let n = socket.read(&mut block).await.unwrap();
+        assert!(n > 0);
+        bytes.extend_from_slice(&block[..n]);
+        if let Some(index) = bytes.windows(4).position(|b| b == b"\r\n\r\n") {
+            let headers = String::from_utf8(bytes[..index].to_vec()).unwrap();
+            let length = headers
+                .lines()
+                .find_map(|line| {
+                    line.to_lowercase()
+                        .strip_prefix("content-length:")
+                        .and_then(|v| v.trim().parse::<usize>().ok())
+                })
+                .unwrap_or(0);
+            if bytes.len() >= index + 4 + length {
+                return (headers, bytes[index + 4..index + 4 + length].to_vec());
+            }
+        }
+    }
+}
+impl Fixture {
+    async fn start(tag: &str) -> Self {
+        let root = std::env::temp_dir().join(format!(
+            "dream-completion-{tag}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let home = root.join("home");
+        let workspace = root.join("workspace");
+        std::fs::create_dir_all(&workspace).unwrap();
+        let product = root.join("product");
+        for (dir, name, text) in [
+            ("identity-templates", "completion-persona", "默认身份"),
+            ("agents-templates", "completion-persona", "默认说明"),
+            ("yuan", "completion-persona", "你是 {{agentName}}，协作助手"),
+        ] {
+            std::fs::create_dir_all(product.join(dir)).unwrap();
+            std::fs::write(product.join(dir).join(format!("{name}.md")), text).unwrap();
+        }
+        for id in ["agentA", "agentB"] {
+            let dir = home.join("agents").join(id);
+            std::fs::create_dir_all(dir.join("memory")).unwrap();
+            std::fs::write(dir.join("config.yaml"),format!("locale: zh\nagent:\n  name: 助手{id}\n  yuan: completion-persona\nmemory:\n  enabled: true\n")).unwrap();
+        }
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let stub_addr = listener.local_addr().unwrap();
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let saved = requests.clone();
+        let provider_gate = Arc::new(Mutex::new(
+            None::<(
+                tokio::sync::oneshot::Sender<()>,
+                tokio::sync::oneshot::Receiver<()>,
+            )>,
+        ));
+        let served_gate = provider_gate.clone();
+        let (stub_stop, mut stop_rx) = tokio::sync::oneshot::channel();
+        let stub_task = tokio::spawn(async move {
+            loop {
+                let accepted =
+                    tokio::select! {_=&mut stop_rx=>break,value=listener.accept()=>value};
+                let (mut socket, _) = accepted.unwrap();
+                let saved = saved.clone();
+                let served_gate = served_gate.clone();
+                tokio::spawn(async move {
+                    let (_, body) = read_request(&mut socket).await;
+                    let request: Value = serde_json::from_slice(&body).unwrap();
+                    let instruction = request["messages"][0]["content"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    let payload: Value = serde_json::from_str(
+                        request["messages"].as_array().unwrap().last().unwrap()["content"]
+                            .as_str()
+                            .unwrap_or("null"),
+                    )
+                    .unwrap_or(Value::Null);
+                    saved.lock().unwrap().push(request.clone());
+                    let gate = { served_gate.lock().unwrap().take() };
+                    if let Some((entered, release)) = gate {
+                        entered.send(()).unwrap();
+                        release.await.unwrap();
+                    }
+                    let content = if request["model"] == "chat-model" {
+                        "实际消费后的模型回复".to_string()
+                    } else {
+                        provider_answer(&instruction, &payload).to_string()
+                    };
+                    let frame = json!({"id":"dream","choices":[{"index":0,"delta":{"role":"assistant","content":content},"finish_reason":"stop"}]});
+                    let sse = format!(
+                        "data: {frame}\n\ndata: {}\n\ndata: [DONE]\n\n",
+                        json!({"id":"persona","choices":[],"usage":{"prompt_tokens":23,"completion_tokens":8}})
+                    );
+                    let wire=format!("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{sse}",sse.len());
+                    socket.write_all(wire.as_bytes()).await.unwrap();
+                });
+            }
+        });
+        let mut plane_json = json!({"providers":{"persona-stub":{"protocol":"openai-completions","endpoint":format!("http://{stub_addr}/v1"),"auth":{"kind":"apiKey","apiKey":"synthetic-persona-key"}}},"models":{"chat":{"provider":"persona-stub","model":"chat-model","capabilities":{"tools":true},"compat":{"contextWindow":200000}},"memory":{"provider":"persona-stub","model":"memory-model","compat":{"contextWindow":200000}}}});
+        if tag == "unconfigured" {
+            plane_json["models"]
+                .as_object_mut()
+                .unwrap()
+                .remove("memory");
+        }
+        let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
+            &plane_json.to_string(),
+        )
+        .unwrap();
+        let credential = Arc::new(
+            lingxi_service::credentials::CredentialService::bootstrap(
+                &plane,
+                &root.join("credentials"),
+                Arc::new(lingxi_service::inject::SystemClock),
+            )
+            .unwrap(),
+        );
+        let gateway =
+            Arc::new(lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane));
+        let compiler = Arc::new(
+            lingxi_service::context_compiler::ContextCompilerService::new(Arc::new(
+                lingxi_service::context_compiler::FileContextMaterialSource::from_home(
+                    &home,
+                    product.clone(),
+                    lingxi_service::context_compiler::HostFacts {
+                        platform: "darwin".into(),
+                        os_type: "Darwin".into(),
+                        os_release: "test".into(),
+                        shell_label: "zsh".into(),
+                        workspace: workspace.to_string_lossy().into_owned(),
+                    },
+                ),
+            )),
+        );
+        let config = ServiceConfig {
+            bind_addr: "127.0.0.1:0".parse().unwrap(),
+            data_home: home.clone(),
+            home_source: HomeSource::Cli,
+            network_mode: NetworkMode::Loopback,
+            shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
+        };
+        let layout = prepare_layout(&home).unwrap();
+        let state = ServiceState::bootstrap_with_deps(
+            config,
+            &layout,
+            ServiceDeps {
+                model_gateway: Some(gateway),
+                credential_service: Some(credential),
+                network_plane: if tag == "missing-network" {
+                    None
+                } else {
+                    Some(lingxi_adapters::models::network::NetworkPlane::direct_isolated())
+                },
+                workspace_root: Some(workspace),
+                product_material_dir: Some(product),
+                context_compiler: Some(compiler),
+                ..ServiceDeps::default()
+            },
+        )
+        .await
+        .unwrap();
+        let token = state.auth().local_token();
+        let denied = state
+            .auth()
+            .issue_device_credential("user_local", &[], None)
+            .unwrap()
+            .secret;
+        let chat = state
+            .auth()
+            .issue_device_credential("user_local", &["chat"], None)
+            .unwrap()
+            .secret;
+        let (stop, stop_rx) = tokio::sync::oneshot::channel();
+        let (ready, ready_rx) = tokio::sync::oneshot::channel();
+        let served = state.clone();
+        let task = tokio::spawn(async move {
+            run(
+                served,
+                async {
+                    let _ = stop_rx.await;
+                },
+                |addr| {
+                    let _ = ready.send(addr);
+                },
+                None,
+            )
+            .await
+            .unwrap();
+        });
+        let addr = ready_rx.await.unwrap();
+        Self {
+            addr,
+            state,
+            home,
+            token,
+            denied,
+            chat,
+            requests,
+            provider_gate,
+            stop,
+            task,
+            stub_stop,
+            stub_task,
+        }
+    }
+    fn pause_next_provider(
+        &self,
+    ) -> (
+        tokio::sync::oneshot::Receiver<()>,
+        tokio::sync::oneshot::Sender<()>,
+    ) {
+        let (entered, received) = tokio::sync::oneshot::channel();
+        let (release, resumed) = tokio::sync::oneshot::channel();
+        assert!(self
+            .provider_gate
+            .lock()
+            .unwrap()
+            .replace((entered, resumed))
+            .is_none());
+        (received, release)
+    }
+    async fn raw(
+        &self,
+        method: &str,
+        path: &str,
+        token: &str,
+        body: &[u8],
+        etag: Option<&str>,
+    ) -> (u16, String, Vec<u8>) {
+        let mut stream = TcpStream::connect(self.addr).await.unwrap();
+        let conditional = etag
+            .map(|e| format!("If-None-Match: {e}\r\n"))
+            .unwrap_or_default();
+        let headers=format!("{method} {path} HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer {token}\r\nContent-Type: application/json\r\nContent-Length: {}\r\n{conditional}Connection: close\r\n\r\n",body.len());
+        stream.write_all(headers.as_bytes()).await.unwrap();
+        let _ = stream.write_all(body).await;
+        let mut received = Vec::new();
+        let read = tokio::time::timeout(Duration::from_secs(40), stream.read_to_end(&mut received))
+            .await
+            .unwrap();
+        if let Err(error) = read {
+            assert_eq!(error.kind(), std::io::ErrorKind::ConnectionReset, "{error}");
+        }
+        let index = received.windows(4).position(|b| b == b"\r\n\r\n").unwrap();
+        let headers = String::from_utf8(received[..index].to_vec()).unwrap();
+        let code = headers.split_whitespace().nth(1).unwrap().parse().unwrap();
+        (code, headers, received[index + 4..].to_vec())
+    }
+    async fn request(&self, method: &str, path: &str, payload: Value) -> (u16, Value) {
+        let (code, _, body) = self
+            .raw(
+                method,
+                path,
+                &self.token,
+                payload.to_string().as_bytes(),
+                None,
+            )
+            .await;
+        (code, serde_json::from_slice(&body).unwrap_or(Value::Null))
+    }
+    async fn restart(&mut self) {
+        let gateway = self.state.model_gateway().cloned();
+        let credentials = self.state.credential_service().cloned();
+        let (placeholder, _) = tokio::sync::oneshot::channel();
+        std::mem::replace(&mut self.stop, placeholder)
+            .send(())
+            .unwrap();
+        let old = std::mem::replace(&mut self.task, tokio::spawn(async {}));
+        old.await.unwrap();
+        let config = ServiceConfig {
+            bind_addr: "127.0.0.1:0".parse().unwrap(),
+            data_home: self.home.clone(),
+            home_source: HomeSource::Cli,
+            network_mode: NetworkMode::Loopback,
+            shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
+        };
+        self.state = ServiceState::bootstrap_with_deps(
+            config,
+            &prepare_layout(&self.home).unwrap(),
+            ServiceDeps {
+                model_gateway: gateway,
+                credential_service: credentials,
+                network_plane: Some(
+                    lingxi_adapters::models::network::NetworkPlane::direct_isolated(),
+                ),
+                workspace_root: Some(self.home.parent().unwrap().join("workspace")),
+                product_material_dir: Some(self.home.parent().unwrap().join("product")),
+                ..ServiceDeps::default()
+            },
+        )
+        .await
+        .unwrap();
+        self.token = self.state.auth().local_token();
+        let (stop, stop_rx) = tokio::sync::oneshot::channel();
+        let (ready, ready_rx) = tokio::sync::oneshot::channel();
+        let state = self.state.clone();
+        self.stop = stop;
+        self.task = tokio::spawn(async move {
+            run(
+                state,
+                async {
+                    let _ = stop_rx.await;
+                },
+                |addr| {
+                    let _ = ready.send(addr);
+                },
+                None,
+            )
+            .await
+            .unwrap();
+        });
+        self.addr = ready_rx.await.unwrap();
+    }
+    async fn finish(self) {
+        self.stop.send(()).unwrap();
+        tokio::time::timeout(Duration::from_secs(10), self.task)
+            .await
+            .unwrap()
+            .unwrap();
+        let _ = self.stub_stop.send(());
+        self.stub_task.await.unwrap();
+        std::fs::remove_dir_all(self.home.parent().unwrap()).unwrap();
+    }
+}
+fn provider_answer(instruction: &str, input: &Value) -> Value {
+    if input.to_string().contains("破坏来源") {
+        return json!({"units":[{"sourceBlockId":"unknown","section":"facts","text":"非法新信息"}]});
+    }
+    if instruction.contains("memory.dream.atomize") {
+        json!({"units":input["sourceBlocks"].as_array().unwrap().iter().map(|b|json!({"sourceBlockId":b["id"],"section":b["section"],"text":b["text"]})).collect::<Vec<_>>()})
+    } else if instruction.contains("memory.dream.dedupe") {
+        json!({"groups":input["units"].as_array().unwrap().iter().map(|u|json!({"sourceUnitIds":[u["id"]],"relation":"distinct"})).collect::<Vec<_>>()})
+    } else if instruction.contains("memory.dream.optimize") {
+        json!({"units":input["groups"].as_array().unwrap().iter().map(|g|json!({"groupId":g["id"],"section":g["section"],"text":g["sources"][0]["text"]})).collect::<Vec<_>>(),"removedGroups":[]})
+    } else if instruction.contains("memory.dream.compose") {
+        json!({"paragraphs":input["units"].as_array().unwrap().iter().map(|u|json!({"sourceUnitIds":[u["id"]],"section":u["section"],"topic":"用户偏好","text":u["text"]})).collect::<Vec<_>>()})
+    } else {
+        json!({"ok":true,"missingClaims":[],"compoundUnits":[],"incorrectMerges":[],"unsupportedClaims":[],"subjectLeaks":[],"unsafeRemovals":[],"duplicateClaims":[],"fragmentedTopics":[],"incoherentParagraphs":[],"insufficientCompression":[]})
+    }
+}
+fn seed(fx: &Fixture, agent: &str, text: &str) {
+    let store = fx.state.memory().compiled_store(agent).unwrap();
+    store.write_facts(text).unwrap();
+    store.write_longterm("- 用户长期学习音乐").unwrap();
+    store.write_today("今日不能改变").unwrap();
+}
+async fn chat_run(fx: &Fixture, input: &str) {
+    let started = fx
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/dream-consumer/execute",
+            json!({"input":input}),
+        )
+        .await;
+    assert_eq!(started.0, 200, "{started:?}");
+    let id = started.1["runId"].as_str().unwrap();
+    for _ in 0..400 {
+        let status = fx
+            .state
+            .storage()
+            .query_one_text("SELECT status FROM runs WHERE run_id=?1", vec![id.into()])
+            .await
+            .unwrap();
+        if status.as_deref() == Some("completed") {
+            return;
+        }
+        assert_ne!(status.as_deref(), Some("failed"), "Run失败");
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    panic!("实际Run没有完成");
+}
+async fn wait_result(fx: &Fixture, agent: &str) -> Value {
+    for _ in 0..400 {
+        let (code, status) = fx
+            .request(
+                "GET",
+                &format!("/lingxi/v1/memories/dream/status?agentId={agent}"),
+                Value::Null,
+            )
+            .await;
+        assert_eq!(code, 200, "{status}");
+        if status["status"] != "running" {
+            return status;
+        }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    panic!("dream未完成")
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn manual_five_stages_atomic_revision_usage_and_next_consumer() {
+    let fx = Fixture::start("success").await;
+    seed(&fx, "agentA", "- 用户喜欢音乐\n- 用户喜欢音乐");
+    seed(&fx, "agentB", "乙的独立资料");
+    let before = std::fs::read(fx.home.join("agents/agentB/memory/memory.md")).unwrap();
+    let created = fx
+        .request(
+            "POST",
+            "/lingxi/v1/sessions",
+            json!({"sessionId":"dream-consumer","agentId":"agentA","title":"同会话消费新记忆"}),
+        )
+        .await;
+    assert_eq!(created.0, 201);
+    chat_run(&fx, "整理前读取记忆").await;
+    let initial = fx
+        .requests
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|r| r["model"] == "chat-model")
+        .unwrap()
+        .to_string();
+    assert!(initial.contains("- 用户喜欢音乐\\n- 用户喜欢音乐"));
+    let (code, started) = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    assert_eq!(code, 202, "{started}");
+    assert_eq!(started["status"], "running");
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["status"], "succeeded", "{status}");
+    assert_eq!(status["lastRun"]["changed"], true);
+    assert_eq!(status["lastRun"]["model"], "memory-model");
+    let id = status["lastRun"]["revisionId"].as_str().unwrap();
+    let revisions = fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/revisions?agentId=agentA",
+            Value::Null,
+        )
+        .await;
+    assert_eq!(revisions.0, 200);
+    assert_eq!(revisions.1["revisions"].as_array().unwrap().len(), 1);
+    assert_eq!(revisions.1["revisions"][0]["revisionId"], id);
+    assert!(revisions.1["revisions"][0].get("before").is_none());
+    let detail = fx
+        .request(
+            "GET",
+            &format!("/lingxi/v1/memories/dream/revisions/{id}?agentId=agentA"),
+            Value::Null,
+        )
+        .await;
+    assert_eq!(detail.0, 200);
+    assert!(detail.1["revision"]["before"]["facts"]
+        .as_str()
+        .unwrap()
+        .contains("- 用户喜欢音乐"));
+    assert_eq!(detail.1["current"]["facts"], "用户喜欢音乐");
+    assert_eq!(detail.1["current"]["today"], "今日不能改变");
+    assert_eq!(
+        fx.request(
+            "GET",
+            &format!("/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB"),
+            Value::Null
+        )
+        .await
+        .0,
+        404
+    );
+    assert_eq!(
+        std::fs::read(fx.home.join("agents/agentB/memory/memory.md")).unwrap(),
+        before
+    );
+    let calls = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    assert_eq!(calls.len(), 5);
+    assert_eq!(status["lastRun"]["appliedOperationCount"], 3);
+    assert!(calls
+        .iter()
+        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)));
+    assert!(calls
+        .iter()
+        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded));
+    assert_eq!(
+        fx.requests
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|r| r["model"] == "memory-model")
+            .count(),
+        5
+    );
+    assert!(!fx
+        .home
+        .join("agents/agentA/memory/dream/pending-apply.json")
+        .exists());
+    // 同一真实Session的下一Run必须消费已发布新记忆，不能只靠新会话刷新。
+    chat_run(&fx, "整理后读取记忆").await;
+    let wire = fx
+        .requests
+        .lock()
+        .unwrap()
+        .iter()
+        .rfind(|r| r["model"] == "chat-model")
+        .unwrap()
+        .to_string();
+    assert!(wire.contains("用户喜欢音乐"));
+    assert!(!wire.contains("- 用户喜欢音乐\\n- 用户喜欢音乐"));
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn configured_refusals_disabled_and_unconfigured_are_real() {
+    let fx = Fixture::start("unconfigured").await;
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        503
+    );
+    assert_eq!(
+        fx.request(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=missing",
+            Value::Null
+        )
+        .await
+        .0,
+        404
+    );
+    assert!(fx.requests.lock().unwrap().is_empty());
+    fx.finish().await;
+    let fx = Fixture::start("refusals").await;
+    let (read_code, _, _) = fx
+        .raw(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=agentA",
+            &fx.chat,
+            b"",
+            None,
+        )
+        .await;
+    assert_eq!(read_code, 403);
+    let (code, _, _) = fx
+        .raw(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            &fx.denied,
+            b"{}",
+            None,
+        )
+        .await;
+    assert_eq!(code, 403);
+    assert_eq!(
+        fx.request(
+            "PATCH",
+            "/lingxi/v1/agents/agentA/config",
+            json!({"memory":{"enabled":false}})
+        )
+        .await
+        .0,
+        200
+    );
+    let result = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    assert_eq!(result.0, 409, "{result:?}");
+    assert_eq!(result.1["code"], "dream_memory_disabled");
+    assert!(fx.requests.lock().unwrap().is_empty());
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn busy_is_same_agent_and_other_agent_can_finish() {
+    let fx = Fixture::start("busy").await;
+    seed(&fx, "agentA", "- 甲资料");
+    seed(&fx, "agentB", "- 乙资料");
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    let result = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    assert_eq!(result.0, 409);
+    assert_eq!(result.1["code"], "dream_already_running");
+    for (method, path, body) in [
+        (
+            "PUT",
+            "/lingxi/v1/memories/compiled/facts?agentId=agentA",
+            json!({"facts":"抢写"}),
+        ),
+        (
+            "DELETE",
+            "/lingxi/v1/memories/compiled?agentId=agentA",
+            json!({}),
+        ),
+        ("DELETE", "/lingxi/v1/memories?agentId=agentA", json!({})),
+    ] {
+        assert_eq!(fx.request(method, path, body).await.0, 409, "{path}");
+    }
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentB",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    assert_eq!(wait_result(&fx, "agentB").await["status"], "succeeded");
+    release.send(()).unwrap();
+    assert_eq!(wait_result(&fx, "agentA").await["status"], "succeeded");
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn disabling_cancels_paid_run_persists_markers_and_reenabling_resumes() {
+    let fx = Fixture::start("toggle").await;
+    seed(&fx, "agentA", "- 用户偏好艺术");
+    let before = std::fs::read(fx.home.join("agents/agentA/memory/facts.md")).unwrap();
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    let update = fx
+        .request(
+            "PUT",
+            "/lingxi/v1/agents/agentA/config",
+            json!({"memory":{"enabled":false}}),
+        )
+        .await;
+    assert_eq!(update.0, 200, "{update:?}");
+    let cfg = fx
+        .request("GET", "/lingxi/v1/agents/agentA/config", Value::Null)
+        .await;
+    assert_eq!(cfg.1["memory"]["enabled"], false);
+    assert!(cfg.1["memory"]["disabledSince"].as_str().is_some());
+    release.send(()).unwrap();
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["status"], "failed");
+    assert_eq!(status["lastRun"]["errorCode"], "dream_cancelled");
+    assert_eq!(status["tickerPaused"], true);
+    assert_eq!(
+        std::fs::read(fx.home.join("agents/agentA/memory/facts.md")).unwrap(),
+        before
+    );
+    let paid = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    assert_eq!(paid.len(), 1);
+    assert!(paid[0].usage.is_some());
+    assert_eq!(paid[0].transport_attempts, Some(1));
+    assert_eq!(
+        paid[0].outcome,
+        lingxi_kernel::usage::CallOutcome::Succeeded
+    );
+
+    assert_eq!(
+        fx.request(
+            "PUT",
+            "/lingxi/v1/agents/agentA/config",
+            json!({"memory":{"enabled":true}})
+        )
+        .await
+        .0,
+        200
+    );
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["tickerPaused"], false);
+    assert!(status["reenableAt"].as_str().is_some());
+    assert!(status["disabledSince"].as_str().is_some());
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    assert_eq!(wait_result(&fx, "agentA").await["status"], "succeeded");
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn source_race_and_invalid_model_never_commit() {
+    let fx = Fixture::start("source-race").await;
+    seed(&fx, "agentA", "- 用户当前资料");
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    std::fs::write(
+        fx.home.join("agents/agentA/memory/longterm.md"),
+        "外部后改不能覆盖",
+    )
+    .unwrap();
+    release.send(()).unwrap();
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(
+        status["lastRun"]["errorCode"], "dream_memory_changed",
+        "{status}"
+    );
+    assert_eq!(
+        std::fs::read_to_string(fx.home.join("agents/agentA/memory/longterm.md")).unwrap(),
+        "外部后改不能覆盖"
+    );
+    assert!(fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/revisions?agentId=agentA",
+            Value::Null
+        )
+        .await
+        .1["revisions"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    fx.finish().await;
+    let fx = Fixture::start("invalid").await;
+    seed(&fx, "agentA", "- 破坏来源");
+    let before = std::fs::read(fx.home.join("agents/agentA/memory/memory.md")).unwrap();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["status"], "failed");
+    assert_eq!(status["lastRun"]["changed"], false);
+    assert_eq!(fx.requests.lock().unwrap().len(), 2);
+    assert_eq!(
+        std::fs::read(fx.home.join("agents/agentA/memory/memory.md")).unwrap(),
+        before
+    );
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn real_restart_reads_persisted_report_without_repeating_paid_calls() {
+    let mut fx = Fixture::start("restart").await;
+    seed(&fx, "agentA", "- 用户保持长期资料");
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let first = wait_result(&fx, "agentA").await;
+    assert_eq!(first["status"], "succeeded");
+    let paid = fx.requests.lock().unwrap().len();
+    fx.restart().await;
+    let next = wait_result(&fx, "agentA").await;
+    assert_eq!(next["lastRun"], first["lastRun"]);
+    assert_eq!(fx.requests.lock().unwrap().len(), paid);
+    // 重启必须把持久化的未完成运行判为中断，不能把旧running或半写状态当成功。
+    let path = fx.home.join("agents/agentA/memory/dream/state.json");
+    let mut saved: Value = serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+    saved["runtime"] = json!({"runId":"persisted-interrupted","status":"running","startedAt":"2026-10-14T00:00:00Z"});
+    std::fs::write(&path, saved.to_string()).unwrap();
+    fx.restart().await;
+    let interrupted = wait_result(&fx, "agentA").await;
+    assert_eq!(interrupted["lastRun"]["errorCode"], "dream_run_interrupted");
+    assert_eq!(interrupted["status"], "failed");
+    assert_eq!(fx.requests.lock().unwrap().len(), paid);
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn explicit_cancel_keeps_paid_response_and_never_applies() {
+    let fx = Fixture::start("cancel").await;
+    seed(&fx, "agentA", "- 用户唯一记忆");
+    let before = std::fs::read(fx.home.join("agents/agentA/memory/facts.md")).unwrap();
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    assert_eq!(
+        fx.request(
+            "DELETE",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    release.send(()).unwrap();
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["lastRun"]["errorCode"], "dream_cancelled");
+    assert_eq!(
+        std::fs::read(fx.home.join("agents/agentA/memory/facts.md")).unwrap(),
+        before
+    );
+    let paid = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    assert_eq!(paid.len(), 1);
+    assert!(paid[0].usage.is_some());
+    assert_eq!(
+        paid[0].outcome,
+        lingxi_kernel::usage::CallOutcome::Succeeded
+    );
+    fx.finish().await;
+}
+#[cfg(target_os = "macos")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn real_partial_disk_failure_rolls_back_and_recovery_is_explicit() {
+    let fx = Fixture::start("disk-failure").await;
+    seed(&fx, "agentA", "- 用户唯一资料");
+    let dir = fx.home.join("agents/agentA/memory");
+    let files = ["facts.md", "longterm.md", "memory.md"];
+    let revisions = fx.state.memory().dream_store("agentA").unwrap();
+    for n in 0..10 {
+        revisions
+            .save(&format!("history-{n}"), "manual", "dream", None)
+            .unwrap();
+    }
+    let history = revisions.list().unwrap();
+    assert_eq!(history.len(), 10);
+    let old: Vec<_> = files
+        .iter()
+        .map(|name| std::fs::read(dir.join(name)).unwrap())
+        .collect();
+    assert!(std::process::Command::new("chflags")
+        .arg("uchg")
+        .arg(dir.join("longterm.md"))
+        .status()
+        .unwrap()
+        .success());
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["status"], "failed");
+    assert!(status["lastRun"]["error"]
+        .as_str()
+        .unwrap()
+        .contains("回滚失败"));
+    assert_eq!(status["lastRun"]["recoveryRequired"], true);
+    assert_eq!(status["lastRun"]["changed"], Value::Null);
+    assert!(dir.join("dream/pending-apply.json").is_file());
+    assert_eq!(revisions.list().unwrap(), history);
+    for (name, old) in files.iter().zip(&old) {
+        assert_eq!(&std::fs::read(dir.join(name)).unwrap(), old);
+    }
+    assert!(std::process::Command::new("chflags")
+        .arg("nouchg")
+        .arg(dir.join("longterm.md"))
+        .status()
+        .unwrap()
+        .success());
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    assert_eq!(wait_result(&fx, "agentA").await["status"], "succeeded");
+    assert!(!dir.join("dream/pending-apply.json").exists());
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn mixed_config_failure_retains_earlier_global_write_and_agent_toggle_state() {
+    let fx = Fixture::start("mixed").await;
+    let before = std::fs::read(fx.home.join("agents/agentA/config.yaml")).unwrap();
+    let result=fx.request("PUT","/lingxi/v1/agents/agentA/config",json!({"locale":"ja","agent":{"yuan":"missing-invalid-yuan"},"memory":{"enabled":false}})).await;
+    assert_eq!(result.0, 400, "{result:?}");
+    assert_eq!(
+        std::fs::read(fx.home.join("agents/agentA/config.yaml")).unwrap(),
+        before
+    );
+    let prefs: Value = serde_json::from_str(
+        &std::fs::read_to_string(fx.home.join("user/preferences.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(prefs["locale"], "ja");
+    let read = fx
+        .request("GET", "/lingxi/v1/agents/agentA/config", Value::Null)
+        .await;
+    assert_eq!(read.1["memory"]["enabled"], true);
+    assert_eq!(read.1["locale"], "ja");
+    let status = wait_result(&fx, "agentA").await;
+    assert_eq!(status["tickerPaused"], false);
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn empty_memory_fails_without_model_and_unchanged_result_has_no_fake_revision() {
+    let fx = Fixture::start("empty-unchanged").await;
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let empty = wait_result(&fx, "agentA").await;
+    assert_eq!(empty["lastRun"]["errorCode"], "dream_no_memory");
+    assert!(fx.requests.lock().unwrap().is_empty());
+    let store = fx.state.memory().compiled_store("agentA").unwrap();
+    store.write_facts("用户喜欢稳定日常").unwrap();
+    store.write_longterm("用户长期学习音乐").unwrap();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let result = wait_result(&fx, "agentA").await;
+    assert_eq!(result["status"], "succeeded");
+    assert_eq!(result["lastRun"]["changed"], false);
+    assert_eq!(result["lastRun"]["revisionId"], Value::Null);
+    assert_eq!(result["lastRun"]["appliedOperationCount"], 0);
+    assert_eq!(
+        result["lastRun"]["beforeChars"],
+        result["lastRun"]["afterChars"]
+    );
+    assert_eq!(fx.requests.lock().unwrap().len(), 5);
+    assert!(fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/revisions?agentId=agentA",
+            Value::Null
+        )
+        .await
+        .1["revisions"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure() {
+    let fx = Fixture::start("lifecycle").await;
+    seed(&fx, "agentA", "- 用户资料");
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let result = wait_result(&fx, "agentA").await;
+    assert_eq!(result["status"], "succeeded");
+    let id = result["lastRun"]["revisionId"].clone();
+    let calls = fx.requests.lock().unwrap().len();
+    fx.state.model_gateway().unwrap().reload(
+        lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
+            "{\"providers\":{},\"models\":{}}",
+        )
+        .unwrap(),
+    );
+    let live = fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/revisions?agentId=agentA",
+            Value::Null,
+        )
+        .await;
+    assert_eq!(live.0, 200);
+    assert_eq!(live.1["revisions"][0]["revisionId"], id);
+    let absent = fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=agentA",
+            Value::Null,
+        )
+        .await;
+    assert_eq!(absent.0, 503);
+    assert_eq!(absent.1["reason"], "dream_model_unconfigured");
+    assert_eq!(absent.1["coreAvailable"], true);
+    // 真正宿主生命周期停止方法，同一方法也接入服务退出与助手删除。
+    fx.state.memory().dream().stop_agent("agentA");
+    for (method, path) in [
+        ("GET", "/lingxi/v1/memories/dream/revisions?agentId=agentA"),
+        ("GET", "/lingxi/v1/memories/dream/status?agentId=agentA"),
+        ("POST", "/lingxi/v1/memories/dream/runs?agentId=agentA"),
+    ] {
+        let response = fx.request(method, path, json!({})).await;
+        assert_eq!(response.0, 503, "{response:?}");
+        assert_eq!(response.1["reason"], "dream_core_stopped");
+        assert_eq!(response.1["coreAvailable"], false);
+        assert!(response.1.get("revisions").is_none());
+    }
+    assert_eq!(
+        fx.request(
+            "GET",
+            &format!(
+                "/lingxi/v1/memories/dream/revisions/{}?agentId=agentA",
+                id.as_str().unwrap()
+            ),
+            Value::Null
+        )
+        .await
+        .0,
+        503
+    );
+    assert_eq!(
+        fx.request(
+            "GET",
+            "/lingxi/v1/memories/dream/revisions?agentId=agentB",
+            Value::Null
+        )
+        .await
+        .0,
+        200
+    );
+    assert_eq!(fx.requests.lock().unwrap().len(), calls);
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn actual_agent_deletion_stops_paid_dream_without_recreating_deleted_data() {
+    let fx = Fixture::start("delete-lifecycle").await;
+    seed(&fx, "agentA", "- 用户甲资料");
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    let delete = fx
+        .request("DELETE", "/lingxi/v1/agents/agentA", json!({}))
+        .await;
+    assert_eq!(delete.0, 200, "{delete:?}");
+    release.send(()).unwrap();
+    tokio::time::timeout(
+        Duration::from_secs(10),
+        fx.state.memory().dream().wait_stopped(),
+    )
+    .await
+    .unwrap();
+    assert!(!fx.home.join("agents/agentA").exists());
+    assert_eq!(
+        fx.request(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=agentA",
+            Value::Null
+        )
+        .await
+        .0,
+        404
+    );
+    let paid = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    assert_eq!(paid.len(), 1);
+    assert!(paid[0].usage.is_some());
+    assert_eq!(
+        paid[0].outcome,
+        lingxi_kernel::usage::CallOutcome::Succeeded
+    );
+    fx.finish().await;
+}
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn actual_service_shutdown_waits_for_paid_cancelled_dream_settlement() {
+    let mut fx = Fixture::start("shutdown-lifecycle").await;
+    seed(&fx, "agentA", "- 用户原始资料");
+    let before = std::fs::read(fx.home.join("agents/agentA/memory/facts.md")).unwrap();
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    let (placeholder, _) = tokio::sync::oneshot::channel();
+    std::mem::replace(&mut fx.stop, placeholder)
+        .send(())
+        .unwrap();
+    // 等真实run停止信号关闭核心，而不是测试写一个状态位。
+    for _ in 0..200 {
+        if fx
+            .state
+            .memory()
+            .dream()
+            .lifecycle(&fx.state, "agentA")
+            .is_err()
+        {
+            break;
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    assert!(fx
+        .state
+        .memory()
+        .dream()
+        .lifecycle(&fx.state, "agentA")
+        .is_err());
+    release.send(()).unwrap();
+    let task = std::mem::replace(&mut fx.task, tokio::spawn(async {}));
+    tokio::time::timeout(Duration::from_secs(10), task)
+        .await
+        .unwrap()
+        .unwrap();
+    let paid = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    assert_eq!(paid.len(), 1);
+    assert!(paid[0].usage.is_some());
+    assert_eq!(
+        paid[0].outcome,
+        lingxi_kernel::usage::CallOutcome::Succeeded
+    );
+    assert_eq!(
+        std::fs::read(fx.home.join("agents/agentA/memory/facts.md")).unwrap(),
+        before
+    );
+    let saved: Value = serde_json::from_str(
+        &std::fs::read_to_string(fx.home.join("agents/agentA/memory/dream/state.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(saved["lastRun"]["errorCode"], "dream_cancelled");
+    assert_eq!(saved["runtime"], Value::Null);
+    fx.stub_stop.send(()).unwrap();
+    fx.stub_task.await.unwrap();
+    std::fs::remove_dir_all(fx.home.parent().unwrap()).unwrap();
+}
+
+// 独立反例：删除最后助手应保全正在运行的付费整理与核心。
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn review_last_agent_refusal_preserves_pending_dream() {
+    let fx = Fixture::start("review-last-agent").await;
+    assert_eq!(
+        fx.request("DELETE", "/lingxi/v1/agents/agentB", json!({}))
+            .await
+            .0,
+        200
+    );
+    seed(&fx, "agentA", "- 用户真实资料");
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    let refused = fx
+        .request("DELETE", "/lingxi/v1/agents/agentA", json!({}))
+        .await;
+    assert_eq!(refused.0, 400, "{refused:?}");
+    assert_eq!(
+        fx.request(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=agentA",
+            Value::Null
+        )
+        .await
+        .0,
+        200
+    );
+    release.send(()).unwrap();
+    assert_eq!(wait_result(&fx, "agentA").await["status"], "succeeded");
+    assert_eq!(fx.requests.lock().unwrap().len(), 5);
+    fx.finish().await;
+}
+// 独立磁盘故障：删除失败后现役助手不能永久失去整理核心。
+#[cfg(target_os = "macos")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn review_failed_agent_delete_must_not_permanently_stop_live_core() {
+    let fx = Fixture::start("review-delete-io").await;
+    seed(&fx, "agentA", "- 用户真实资料");
+    let dir = fx.home.join("agents/agentA");
+    assert!(std::process::Command::new("chflags")
+        .arg("uchg")
+        .arg(&dir)
+        .status()
+        .unwrap()
+        .success());
+    let deleted = fx
+        .request("DELETE", "/lingxi/v1/agents/agentA", json!({}))
+        .await;
+    assert!(std::process::Command::new("chflags")
+        .arg("nouchg")
+        .arg(&dir)
+        .status()
+        .unwrap()
+        .success());
+    let read = fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=agentA",
+            Value::Null,
+        )
+        .await;
+    let start = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    eprintln!("DELETE_IO deleted={deleted:?} read={read:?} start={start:?} agent_exists={} config_exists={}",dir.exists(),dir.join("config.yaml").exists());
+    // 清理前记录真实响应，避免故障残留影响其它测试。
+    if start.0 == 202 {
+        let _ = wait_result(&fx, "agentA").await;
+    }
+    fx.finish().await;
+    assert_eq!(deleted.0, 500, "{deleted:?}");
+    assert_eq!(
+        read.0, 200,
+        "真实删除失败后助手仍存在，core不应永久停用: {read:?}"
+    );
+    assert_eq!(start.0, 202, "{start:?}");
+}
+// 独立来源竞态：只改只读周记段同样阻止付费后的发布；恢复再运行成功。
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn review_paid_week_source_race_then_real_retry() {
+    let fx = Fixture::start("review-week-race").await;
+    seed(&fx, "agentA", "- 用户真实资料");
+    let dir = fx.home.join("agents/agentA/memory");
+    let before = std::fs::read(dir.join("facts.md")).unwrap();
+    let (entered, release) = fx.pause_next_provider();
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    entered.await.unwrap();
+    std::fs::write(dir.join("today.md"), "- 外部后改的今天记录").unwrap();
+    release.send(()).unwrap();
+    let result = wait_result(&fx, "agentA").await;
+    assert_eq!(result["status"], "failed", "{result}");
+    assert_eq!(std::fs::read(dir.join("facts.md")).unwrap(), before);
+    assert_eq!(
+        std::fs::read_to_string(dir.join("today.md")).unwrap(),
+        "- 外部后改的今天记录"
+    );
+    assert!(fx
+        .state
+        .memory()
+        .dream_store("agentA")
+        .unwrap()
+        .list()
+        .unwrap()
+        .is_empty());
+    let paid = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    assert!(!paid.is_empty());
+    assert!(paid.iter().all(|x| x.usage.is_some()));
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    assert_eq!(wait_result(&fx, "agentA").await["status"], "succeeded");
+    assert_eq!(
+        std::fs::read_to_string(dir.join("today.md")).unwrap(),
+        "- 外部后改的今天记录"
+    );
+    fx.finish().await;
+}
+// 删除失败恢复存活核心；已取消旧运行不复活，旧付费响应结算后新运行才可开始。
+#[cfg(target_os = "macos")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn failed_delete_cancels_old_paid_run_then_releases_live_core_for_new_run() {
+    let fx = Fixture::start("delete-failure-paid-recovery").await;
+    seed(&fx, "agentA", "- 甲用户真实资料");
+    seed(&fx, "agentB", "- 乙助手独立资料");
+    let dir = fx.home.join("agents/agentA");
+    let config = std::fs::read(dir.join("config.yaml")).unwrap();
+    let before = std::fs::read(dir.join("memory/facts.md")).unwrap();
+    let (entered, release) = fx.pause_next_provider();
+    let started = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    assert_eq!(started.0, 202);
+    let old_id = started.1["runId"].clone();
+    entered.await.unwrap();
+    assert!(std::process::Command::new("chflags")
+        .arg("-R")
+        .arg("uchg")
+        .arg(&dir)
+        .status()
+        .unwrap()
+        .success());
+    let deleted = fx
+        .request("DELETE", "/lingxi/v1/agents/agentA", json!({}))
+        .await;
+    assert!(std::process::Command::new("chflags")
+        .arg("-R")
+        .arg("nouchg")
+        .arg(&dir)
+        .status()
+        .unwrap()
+        .success());
+    assert_eq!(deleted.0, 500, "{deleted:?}");
+    assert_eq!(std::fs::read(dir.join("config.yaml")).unwrap(), config);
+    assert_eq!(std::fs::read(dir.join("memory/facts.md")).unwrap(), before);
+    let read = fx
+        .request(
+            "GET",
+            "/lingxi/v1/memories/dream/status?agentId=agentA",
+            Value::Null,
+        )
+        .await;
+    assert_eq!(read.0, 200, "{read:?}");
+    assert_eq!(read.1["status"], "running");
+    assert_eq!(read.1["runId"], old_id);
+    let busy = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    assert_eq!(busy.0, 409, "{busy:?}");
+    assert_eq!(busy.1["code"], "dream_already_running");
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentB",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    assert_eq!(wait_result(&fx, "agentB").await["status"], "succeeded");
+    release.send(()).unwrap();
+    let old = wait_result(&fx, "agentA").await;
+    assert_eq!(old["status"], "failed");
+    assert_eq!(old["lastRun"]["runId"], old_id);
+    assert_eq!(old["lastRun"]["errorCode"], "dream_cancelled");
+    assert_eq!(old["lastRun"]["changed"], false);
+    assert_eq!(std::fs::read(dir.join("memory/facts.md")).unwrap(), before);
+    assert!(fx
+        .state
+        .memory()
+        .dream_store("agentA")
+        .unwrap()
+        .list()
+        .unwrap()
+        .is_empty());
+    let paid = fx
+        .state
+        .storage()
+        .query_model_call_usage(lingxi_kernel::usage::ModelUsageQuery {
+            purpose: Some("auxiliary.memory".into()),
+            ..Default::default()
+        })
+        .await
+        .unwrap();
+    let old_paid: Vec<_> = paid
+        .iter()
+        .filter(|row| row.parent_run_id.as_deref() == old_id.as_str())
+        .collect();
+    assert_eq!(old_paid.len(), 1);
+    assert!(old_paid[0].usage.is_some());
+    assert_eq!(old_paid[0].transport_attempts, Some(1));
+    assert_eq!(
+        old_paid[0].outcome,
+        lingxi_kernel::usage::CallOutcome::Succeeded
+    );
+    let new = fx
+        .request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({}),
+        )
+        .await;
+    assert_eq!(new.0, 202, "{new:?}");
+    assert_ne!(new.1["runId"], old_id);
+    let completed = wait_result(&fx, "agentA").await;
+    assert_eq!(completed["status"], "succeeded");
+    assert_eq!(completed["lastRun"]["runId"], new.1["runId"]);
+    assert_eq!(completed["lastRun"]["changed"], true);
+    assert_eq!(
+        fx.requests.lock().unwrap().len(),
+        11,
+        "旧A一次+B五步+新A五步，旧任务不恢复"
+    );
+    fx.finish().await;
+}

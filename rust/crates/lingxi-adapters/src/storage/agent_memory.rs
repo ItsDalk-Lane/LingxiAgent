@@ -170,13 +170,13 @@ fn memory_operation_state(memory_dir: &Path) -> std::sync::Arc<MemoryOperationSt
     states.insert(key, Arc::downgrade(&state));
     state
 }
-struct MemoryOperationGuard(std::sync::Arc<MemoryOperationState>);
+pub struct MemoryOperationGuard(std::sync::Arc<MemoryOperationState>);
 impl Drop for MemoryOperationGuard {
     fn drop(&mut self) {
         *self.0.active.lock().expect("助手记忆操作状态锁") = None;
     }
 }
-fn begin_memory_operation(
+pub fn begin_memory_operation(
     memory_dir: &Path,
     kind: MemoryOperationKind,
 ) -> Result<MemoryOperationGuard, MemoryError> {
@@ -2137,6 +2137,219 @@ impl DreamRevisionStore {
     pub fn new(memory_dir: &Path) -> Self {
         Self {
             memory_dir: memory_dir.to_path_buf(),
+        }
+    }
+
+    /// 整段后台模型执行持有同一助手的操作门；提交不能再次取得同一门。
+    pub fn snapshot_for_operation(
+        &self,
+        guard: &MemoryOperationGuard,
+    ) -> Result<Value, MemoryError> {
+        self.check_guard(guard)?;
+        self.snapshot_sections_with_baseline(true)
+    }
+    fn check_guard(&self, guard: &MemoryOperationGuard) -> Result<(), MemoryError> {
+        if !std::sync::Arc::ptr_eq(&guard.0, &memory_operation_state(&self.memory_dir)) {
+            return Err(MemoryError::InvalidRequest(
+                "记忆操作门不属于当前助手".into(),
+            ));
+        }
+        Ok(())
+    }
+    fn pending_path(&self) -> PathBuf {
+        self.memory_dir.join("dream/pending-apply.json")
+    }
+    /// 中断的多文件写入恢复旧字节；失败显式返回，不能把残留称为成功。
+    pub fn recover_for_operation(&self, guard: &MemoryOperationGuard) -> Result<(), MemoryError> {
+        self.check_guard(guard)?;
+        let path = self.pending_path();
+        let raw = match std::fs::read_to_string(&path) {
+            Ok(raw) => raw,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(()),
+            Err(error) => return Err(error.into()),
+        };
+        let journal: Value =
+            serde_json::from_str(&raw).map_err(|error| MemoryError::Store(error.to_string()))?;
+        self.rollback_apply(&journal)?;
+        remove_if_exists(&path).map_err(MemoryError::from)
+    }
+    fn rollback_apply(&self, journal: &Value) -> Result<(), MemoryError> {
+        let mut errors = Vec::new();
+        let entries = journal["files"]
+            .as_object()
+            .ok_or_else(|| MemoryError::Store("梦境恢复日志格式损坏".into()))?;
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
+        for (name, content) in entries {
+            if !matches!(name.as_str(), "facts.md" | "longterm.md" | "memory.md") {
+                return Err(MemoryError::Store("梦境恢复日志含未知路径".into()));
+            }
+            let path = self.memory_dir.join(name);
+            let result = if content.is_null() {
+                remove_if_exists(&path)
+            } else {
+                atomic_write(
+                    &path,
+                    content
+                        .as_str()
+                        .ok_or_else(|| MemoryError::Store("梦境恢复日志正文无效".into()))?,
+                )
+            };
+            if let Err(error) = result {
+                errors.push(format!("{name}: {error}"));
+            }
+        }
+        if let Some(retained) = journal["retentionFiles"].as_object() {
+            for (id, content) in retained {
+                let path = self.revision_path(id)?;
+                if let Err(error) = atomic_write(
+                    &path,
+                    content
+                        .as_str()
+                        .ok_or_else(|| MemoryError::Store("修订保留日志损坏".into()))?,
+                ) {
+                    errors.push(format!("修订{id}: {error}"));
+                }
+            }
+        }
+        if let Some(id) = journal["revisionId"].as_str() {
+            if let Err(error) = remove_if_exists(&self.revision_path(id)?) {
+                errors.push(error.to_string());
+            }
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(MemoryError::Io(format!(
+                "梦境回滚失败: {}",
+                errors.join("; ")
+            )))
+        }
+    }
+    /// 验证同一快照后原子发布可编辑两段与编译产物；原始事实/今日/本周不变。
+    pub fn apply_for_operation(
+        &self,
+        guard: &MemoryOperationGuard,
+        run_id: &str,
+        expected_hash: &str,
+        facts: &str,
+        longterm: &str,
+        is_zh: bool,
+    ) -> Result<Option<Value>, MemoryError> {
+        self.check_guard(guard)?;
+        let current = self.snapshot_sections_with_baseline(true)?;
+        if dream_snapshot_hash(&current)? != expected_hash {
+            return Err(MemoryError::Conflict {
+                code: "dream_memory_changed".into(),
+                message: "整理期间记忆已改变，未覆盖".into(),
+            });
+        }
+        let facts = normalize_compiled_section_body(facts);
+        let longterm = normalize_compiled_section_body(longterm);
+        if current["facts"].as_str() == Some(&facts)
+            && current["longterm"].as_str() == Some(&longterm)
+        {
+            return Ok(None);
+        }
+        let mut files = serde_json::Map::new();
+        for name in ["facts.md", "longterm.md", "memory.md"] {
+            let path = self.memory_dir.join(name);
+            match std::fs::symlink_metadata(&path) {
+                Ok(meta) if !meta.is_file() || meta.file_type().is_symlink() => {
+                    return Err(MemoryError::Io(format!("{name}必须为真实文件")))
+                }
+                Ok(_) => {
+                    files.insert(name.into(), json!(std::fs::read_to_string(&path)?));
+                }
+                Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                    files.insert(name.into(), Value::Null);
+                }
+                Err(error) => return Err(error.into()),
+            }
+        }
+        // 新修订随正文成功才发布；保留剪裁前的旧修订，失败不能丢用户历史。
+        let revision_id = format!(
+            "{}-{}",
+            now_iso().replace([':', '.'], "-"),
+            run_id[run_id.len().saturating_sub(8)..].to_lowercase()
+        );
+        let revision = json!({"schemaVersion":1,"revisionId":revision_id,"runId":run_id,"trigger":"manual","createdAt":now_iso(),"kind":"dream","restoresRevisionId":null,"before":current});
+        let mut old_paths = Vec::new();
+        match std::fs::read_dir(self.revisions_dir()) {
+            Ok(entries) => {
+                for entry in entries {
+                    let entry = entry?;
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    if name.ends_with(".json") {
+                        old_paths.push((name, entry.path()));
+                    }
+                }
+            }
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+            Err(error) => return Err(error.into()),
+        }
+        old_paths.sort_by(|a, b| b.0.cmp(&a.0));
+        let mut retention = serde_json::Map::new();
+        for (name, path) in old_paths.into_iter().skip(MAX_REVISIONS - 1) {
+            let id = name.trim_end_matches(".json");
+            self.revision_path(id)?;
+            let meta = std::fs::symlink_metadata(&path)?;
+            if !meta.is_file() || meta.file_type().is_symlink() {
+                return Err(MemoryError::Io("修订必须为真实文件".into()));
+            }
+            retention.insert(id.into(), json!(std::fs::read_to_string(path)?));
+        }
+        let journal = json!({"schemaVersion":1,"revisionId":revision["revisionId"],"files":files,"retentionFiles":retention});
+        if let Err(error) = atomic_write(&self.pending_path(), &journal.to_string()) {
+            let cleanup =
+                remove_if_exists(&self.revision_path(revision["revisionId"].as_str().unwrap())?);
+            return Err(MemoryError::Io(format!(
+                "梦境日志保存失败: {error}; 修订清理: {cleanup:?}"
+            )));
+        }
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
+        let apply = (|| -> Result<(), MemoryError> {
+            if dream_snapshot_hash(&self.snapshot_sections_with_baseline(true)?)? != expected_hash {
+                return Err(MemoryError::Conflict {
+                    code: "dream_memory_changed".into(),
+                    message: "发布前记忆已改变".into(),
+                });
+            }
+            for (name, text) in [("facts.md", &facts), ("longterm.md", &longterm)] {
+                atomic_write(
+                    &self.memory_dir.join(name),
+                    &if text.is_empty() {
+                        String::new()
+                    } else {
+                        format!("{text}\n")
+                    },
+                )?;
+            }
+            CompiledMemoryStore::new(&self.memory_dir, is_zh).assemble_unlocked()?;
+            atomic_write(
+                &self.revision_path(revision["revisionId"].as_str().unwrap())?,
+                &(serde_json::to_string_pretty(&revision)
+                    .map_err(|error| MemoryError::Store(error.to_string()))?
+                    + "\n"),
+            )?;
+            self.prune()?;
+            remove_if_exists(&self.pending_path())?;
+            Ok(())
+        })();
+        match apply {
+            Ok(()) => Ok(Some(revision)),
+            Err(error @ MemoryError::Conflict { .. }) => {
+                remove_if_exists(&self.revision_path(revision["revisionId"].as_str().unwrap())?)
+                    .map_err(MemoryError::from)?;
+                remove_if_exists(&self.pending_path()).map_err(MemoryError::from)?;
+                Err(error)
+            }
+            Err(error) => match self.rollback_apply(&journal) {
+                Ok(()) => {
+                    remove_if_exists(&self.pending_path()).map_err(MemoryError::from)?;
+                    Err(error)
+                }
+                Err(rollback) => Err(MemoryError::Io(format!("{error}; {rollback}"))),
+            },
         }
     }
 

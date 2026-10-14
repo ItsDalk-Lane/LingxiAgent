@@ -6990,6 +6990,7 @@
         "r06_test_002e562b5f7235cd96d2",
         "r06_test_010691e66b3aa29531b8",
         "r06_test_018cfbd67ea11cc1d56c",
+        "r06_test_0201dcfd557fa3d6f66c",
         "r06_test_0384a7289f7409790b0b",
         "r06_test_05c18659efcea252e261",
         "r06_test_05cab72bc37b043463d7",
@@ -7127,6 +7128,7 @@
         "r06_test_549d7c622806eac43591",
         "r06_test_550a20a0412474b78ff5",
         "r06_test_55959514844e8d6cf8c0",
+        "r06_test_566f1f06bf69c68a501c",
         "r06_test_56928f9dc4edf0a25712",
         "r06_test_56aa98c89dd0159d3aac",
         "r06_test_56b2f3eabcbce34f9761",
@@ -7386,6 +7388,7 @@
         "r06_test_ef3fdeeee62465e495d7",
         "r06_test_f00339a9dc730bc9087f",
         "r06_test_f075bf0bd6b22b9f4b79",
+        "r06_test_f14a7adb0b419dc80dba",
         "r06_test_f1b1ea2b9f30b66ca0e0",
         "r06_test_f1f616e1d549d10a451c",
         "r06_test_f256e339c06a591f8125",
@@ -7398,6 +7401,7 @@
         "r06_test_f5c0626f03464980eab7",
         "r06_test_f5ff15d29a8970896136",
         "r06_test_f6364578fc2151c7976a",
+        "r06_test_f6ab3994a6548d5d41cf",
         "r06_test_f6c784810e052fadb108",
         "r06_test_f6cbb63a724b450e0823",
         "r06_test_f75c0ca223d01cc09704",
@@ -16324,9 +16328,36 @@
         "拒绝/边界：ticker 不可用 503；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_0201dcfd557fa3d6f66c",
+        "r06_test_566f1f06bf69c68a501c",
+        "r06_test_56aa98c89dd0159d3aac",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-76EE734926B4-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-76EE734926B4-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-76EE734926B4-assertion-00"
+        ],
+        [
+          "R00-T02-LA-76EE734926B4-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-771296A194E0",
@@ -18606,9 +18637,38 @@
         "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_0201dcfd557fa3d6f66c",
+        "r06_test_3886c50eb8efe2cc6d11",
+        "r06_test_566f1f06bf69c68a501c",
+        "r06_test_f14a7adb0b419dc80dba",
+        "r06_test_f6ab3994a6548d5d41cf",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-A9AD4C7F76AE-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-A9AD4C7F76AE-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-A9AD4C7F76AE-assertion-00"
+        ],
+        [
+          "R00-T02-LA-A9AD4C7F76AE-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-A9B0BBAD449C",
@@ -19387,9 +19447,38 @@
         "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_0201dcfd557fa3d6f66c",
+        "r06_test_3886c50eb8efe2cc6d11",
+        "r06_test_566f1f06bf69c68a501c",
+        "r06_test_f14a7adb0b419dc80dba",
+        "r06_test_f6ab3994a6548d5d41cf",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-B45ECEC543C6-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-B45ECEC543C6-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-B45ECEC543C6-assertion-00"
+        ],
+        [
+          "R00-T02-LA-B45ECEC543C6-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-B47CAC08F418",
@@ -85368,7 +85457,7 @@
           "拒绝/边界：ticker 不可用 503；不应错误扩大写入或披露范围"
         ],
         "then": "返回指定助手修订清单",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -85377,9 +85466,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_original_memory_skill_proofs",
                 "test": "original_nonempty_revision_lists_are_agent_scoped_and_read_only"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "manual_five_stages_atomic_revision_usage_and_next_consumer"
               }
             ],
-            "meaning": "真实非空修订GET返回A两项与B一项，ID精确对应各助手落盘修订，不泄露before正文，两助手文件均不改写",
+            "meaning": "真实五阶段整理生成修订，指定助手GET逐项返回真实修订ID；A/B独立，清单不披露before正文，两边文件均未改写。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
@@ -85441,16 +85535,203 @@
                     "quote": "assert_eq!(file_snapshot(&memory_dir(&server, \"agentB\")), before_b)"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 430,
+                "testEndLine": 549,
+                "assertions": [
+                  {
+                    "line": 442,
+                    "quote": "assert_eq!(created.0, 201)"
+                  },
+                  {
+                    "line": 452,
+                    "quote": "assert!(initial.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 460,
+                    "quote": "assert_eq!(code, 202, \"{started}\")"
+                  },
+                  {
+                    "line": 461,
+                    "quote": "assert_eq!(started[\"status\"], \"running\")"
+                  },
+                  {
+                    "line": 463,
+                    "quote": "assert_eq!(status[\"status\"], \"succeeded\", \"{status}\")"
+                  },
+                  {
+                    "line": 464,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"changed\"], true)"
+                  },
+                  {
+                    "line": 465,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"model\"], \"memory-model\")"
+                  },
+                  {
+                    "line": 474,
+                    "quote": "assert_eq!(revisions.0, 200)"
+                  },
+                  {
+                    "line": 475,
+                    "quote": "assert_eq!(revisions.1[\"revisions\"].as_array().unwrap().len(), 1)"
+                  },
+                  {
+                    "line": 476,
+                    "quote": "assert_eq!(revisions.1[\"revisions\"][0][\"revisionId\"], id)"
+                  },
+                  {
+                    "line": 477,
+                    "quote": "assert!(revisions.1[\"revisions\"][0].get(\"before\").is_none())"
+                  },
+                  {
+                    "line": 485,
+                    "quote": "assert_eq!(detail.0, 200)"
+                  },
+                  {
+                    "line": 486,
+                    "quote": "assert!(detail.1[\"revision\"][\"before\"][\"facts\"]\n        .as_str()\n        .unwrap()\n        .contains(\"- 用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 490,
+                    "quote": "assert_eq!(detail.1[\"current\"][\"facts\"], \"用户喜欢音乐\")"
+                  },
+                  {
+                    "line": 491,
+                    "quote": "assert_eq!(detail.1[\"current\"][\"today\"], \"今日不能改变\")"
+                  },
+                  {
+                    "line": 492,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\"/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB\"),\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+                  },
+                  {
+                    "line": 502,
+                    "quote": "assert_eq!(\n        std::fs::read(fx.home.join(\"agents/agentB/memory/memory.md\")).unwrap(),\n        before\n    )"
+                  },
+                  {
+                    "line": 515,
+                    "quote": "assert_eq!(calls.len(), 5)"
+                  },
+                  {
+                    "line": 516,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"appliedOperationCount\"], 3)"
+                  },
+                  {
+                    "line": 517,
+                    "quote": "assert!(calls\n        .iter()\n        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)))"
+                  },
+                  {
+                    "line": 520,
+                    "quote": "assert!(calls\n        .iter()\n        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded))"
+                  },
+                  {
+                    "line": 523,
+                    "quote": "assert_eq!(\n        fx.requests\n            .lock()\n            .unwrap()\n            .iter()\n            .filter(|r| r[\"model\"] == \"memory-model\")\n            .count(),\n        5\n    )"
+                  },
+                  {
+                    "line": 532,
+                    "quote": "assert!(!fx\n        .home\n        .join(\"agents/agentA/memory/dream/pending-apply.json\")\n        .exists())"
+                  },
+                  {
+                    "line": 546,
+                    "quote": "assert!(wire.contains(\"用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 547,
+                    "quote": "assert!(!wire.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+                  }
+                ]
               }
             ],
             "coverage": "FULL",
             "missingClauses": []
+          },
+          {
+            "index": 1,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure"
+              }
+            ],
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 1052,
+                "testEndLine": 1132,
+                "assertions": [
+                  {
+                    "line": 1055,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 1066,
+                    "quote": "assert_eq!(result[\"status\"], \"succeeded\")"
+                  },
+                  {
+                    "line": 1082,
+                    "quote": "assert_eq!(live.0, 200)"
+                  },
+                  {
+                    "line": 1083,
+                    "quote": "assert_eq!(live.1[\"revisions\"][0][\"revisionId\"], id)"
+                  },
+                  {
+                    "line": 1091,
+                    "quote": "assert_eq!(absent.0, 503)"
+                  },
+                  {
+                    "line": 1092,
+                    "quote": "assert_eq!(absent.1[\"reason\"], \"dream_model_unconfigured\")"
+                  },
+                  {
+                    "line": 1093,
+                    "quote": "assert_eq!(absent.1[\"coreAvailable\"], true)"
+                  },
+                  {
+                    "line": 1102,
+                    "quote": "assert_eq!(response.0, 503, \"{response:?}\")"
+                  },
+                  {
+                    "line": 1103,
+                    "quote": "assert_eq!(response.1[\"reason\"], \"dream_core_stopped\")"
+                  },
+                  {
+                    "line": 1104,
+                    "quote": "assert_eq!(response.1[\"coreAvailable\"], false)"
+                  },
+                  {
+                    "line": 1105,
+                    "quote": "assert!(response.1.get(\"revisions\").is_none())"
+                  },
+                  {
+                    "line": 1107,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\n                \"/lingxi/v1/memories/dream/revisions/{}?agentId=agentA\",\n                id.as_str().unwrap()\n            ),\n            Value::Null\n        )\n        .await\n        .0,\n        503\n    )"
+                  },
+                  {
+                    "line": 1120,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/revisions?agentId=agentB\",\n            Value::Null\n        )\n        .await\n        .0,\n        200\n    )"
+                  },
+                  {
+                    "line": 1130,
+                    "quote": "assert_eq!(fx.requests.lock().unwrap().len(), calls)"
+                  }
+                ]
+              }
+            ],
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "真实核心stop_agent之后清单/详情均503并不含修订；B仍200且无额外供应商调用。无模型与核心停止分别明确报告，不把无配置当作核心不存在。"
           }
         ],
-        "gaps": [
-          "原ticker不可用503与现行dream_revisions_route不依赖ticker、直接200的行为不同；不能伪造503通过。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/memory-skills.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261014/dream-proof-review.json"
       },
       {
         "id": "R00-T02-LA-771296A194E0",
@@ -102047,8 +102328,132 @@
           "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围"
         ],
         "then": "启动一次手动 dream，返回 202 与运行信息",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
+          {
+            "index": 0,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "manual_five_stages_atomic_revision_usage_and_next_consumer"
+              }
+            ],
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 430,
+                "testEndLine": 549,
+                "assertions": [
+                  {
+                    "line": 442,
+                    "quote": "assert_eq!(created.0, 201)"
+                  },
+                  {
+                    "line": 452,
+                    "quote": "assert!(initial.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 460,
+                    "quote": "assert_eq!(code, 202, \"{started}\")"
+                  },
+                  {
+                    "line": 461,
+                    "quote": "assert_eq!(started[\"status\"], \"running\")"
+                  },
+                  {
+                    "line": 463,
+                    "quote": "assert_eq!(status[\"status\"], \"succeeded\", \"{status}\")"
+                  },
+                  {
+                    "line": 464,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"changed\"], true)"
+                  },
+                  {
+                    "line": 465,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"model\"], \"memory-model\")"
+                  },
+                  {
+                    "line": 474,
+                    "quote": "assert_eq!(revisions.0, 200)"
+                  },
+                  {
+                    "line": 475,
+                    "quote": "assert_eq!(revisions.1[\"revisions\"].as_array().unwrap().len(), 1)"
+                  },
+                  {
+                    "line": 476,
+                    "quote": "assert_eq!(revisions.1[\"revisions\"][0][\"revisionId\"], id)"
+                  },
+                  {
+                    "line": 477,
+                    "quote": "assert!(revisions.1[\"revisions\"][0].get(\"before\").is_none())"
+                  },
+                  {
+                    "line": 485,
+                    "quote": "assert_eq!(detail.0, 200)"
+                  },
+                  {
+                    "line": 486,
+                    "quote": "assert!(detail.1[\"revision\"][\"before\"][\"facts\"]\n        .as_str()\n        .unwrap()\n        .contains(\"- 用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 490,
+                    "quote": "assert_eq!(detail.1[\"current\"][\"facts\"], \"用户喜欢音乐\")"
+                  },
+                  {
+                    "line": 491,
+                    "quote": "assert_eq!(detail.1[\"current\"][\"today\"], \"今日不能改变\")"
+                  },
+                  {
+                    "line": 492,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\"/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB\"),\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+                  },
+                  {
+                    "line": 502,
+                    "quote": "assert_eq!(\n        std::fs::read(fx.home.join(\"agents/agentB/memory/memory.md\")).unwrap(),\n        before\n    )"
+                  },
+                  {
+                    "line": 515,
+                    "quote": "assert_eq!(calls.len(), 5)"
+                  },
+                  {
+                    "line": 516,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"appliedOperationCount\"], 3)"
+                  },
+                  {
+                    "line": 517,
+                    "quote": "assert!(calls\n        .iter()\n        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)))"
+                  },
+                  {
+                    "line": 520,
+                    "quote": "assert!(calls\n        .iter()\n        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded))"
+                  },
+                  {
+                    "line": 523,
+                    "quote": "assert_eq!(\n        fx.requests\n            .lock()\n            .unwrap()\n            .iter()\n            .filter(|r| r[\"model\"] == \"memory-model\")\n            .count(),\n        5\n    )"
+                  },
+                  {
+                    "line": 532,
+                    "quote": "assert!(!fx\n        .home\n        .join(\"agents/agentA/memory/dream/pending-apply.json\")\n        .exists())"
+                  },
+                  {
+                    "line": 546,
+                    "quote": "assert!(wire.contains(\"用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 547,
+                    "quote": "assert!(!wire.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+                  }
+                ]
+              }
+            ],
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "真实POST202返回运行状态，五阶段供应商响应真实计费落账、发布修订与正文；同一Session下一Run消费新正文。"
+          },
           {
             "index": 1,
             "tests": [
@@ -102056,9 +102461,24 @@
                 "package": "lingxi-service",
                 "suite": "r06_t06_memory",
                 "test": "dream_faces_report_absence_and_revisions_serve_from_store"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "configured_refusals_disabled_and_unconfigured_are_real"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "busy_is_same_agent_and_other_agent_can_finish"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure"
               }
             ],
-            "meaning": "实际POST无ticker503；不是成功启动证明",
+            "meaning": "settings.write权限拒绝403；实际关闭记忆409；同助手已有运行409且不能抢写清理，B独立完成；无配置503且无模型调用，核心真实停止503并不扩大披露。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
@@ -102080,20 +102500,161 @@
                     "quote": "    assert_eq!(status, 503);\n\n    // revisions 面（文件存储直读，无 ticker 依赖）\n    let (status, body) = server"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "configured_refusals_disabled_and_unconfigured_are_real",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 551,
+                "testEndLine": 617,
+                "assertions": [
+                  {
+                    "line": 553,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        503\n    )"
+                  },
+                  {
+                    "line": 563,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/status?agentId=missing\",\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+                  },
+                  {
+                    "line": 573,
+                    "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+                  },
+                  {
+                    "line": 585,
+                    "quote": "assert_eq!(read_code, 403)"
+                  },
+                  {
+                    "line": 595,
+                    "quote": "assert_eq!(code, 403)"
+                  },
+                  {
+                    "line": 596,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"PATCH\",\n            \"/lingxi/v1/agents/agentA/config\",\n            json!({\"memory\":{\"enabled\":false}})\n        )\n        .await\n        .0,\n        200\n    )"
+                  },
+                  {
+                    "line": 613,
+                    "quote": "assert_eq!(result.0, 409, \"{result:?}\")"
+                  },
+                  {
+                    "line": 614,
+                    "quote": "assert_eq!(result.1[\"code\"], \"dream_memory_disabled\")"
+                  },
+                  {
+                    "line": 615,
+                    "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "busy_is_same_agent_and_other_agent_can_finish",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 619,
+                "testEndLine": 673,
+                "assertions": [
+                  {
+                    "line": 624,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 642,
+                    "quote": "assert_eq!(result.0, 409)"
+                  },
+                  {
+                    "line": 643,
+                    "quote": "assert_eq!(result.1[\"code\"], \"dream_already_running\")"
+                  },
+                  {
+                    "line": 657,
+                    "quote": "assert_eq!(fx.request(method, path, body).await.0, 409, \"{path}\")"
+                  },
+                  {
+                    "line": 659,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentB\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 669,
+                    "quote": "assert_eq!(wait_result(&fx, \"agentB\").await[\"status\"], \"succeeded\")"
+                  },
+                  {
+                    "line": 671,
+                    "quote": "assert_eq!(wait_result(&fx, \"agentA\").await[\"status\"], \"succeeded\")"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 1052,
+                "testEndLine": 1132,
+                "assertions": [
+                  {
+                    "line": 1055,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 1066,
+                    "quote": "assert_eq!(result[\"status\"], \"succeeded\")"
+                  },
+                  {
+                    "line": 1082,
+                    "quote": "assert_eq!(live.0, 200)"
+                  },
+                  {
+                    "line": 1083,
+                    "quote": "assert_eq!(live.1[\"revisions\"][0][\"revisionId\"], id)"
+                  },
+                  {
+                    "line": 1091,
+                    "quote": "assert_eq!(absent.0, 503)"
+                  },
+                  {
+                    "line": 1092,
+                    "quote": "assert_eq!(absent.1[\"reason\"], \"dream_model_unconfigured\")"
+                  },
+                  {
+                    "line": 1093,
+                    "quote": "assert_eq!(absent.1[\"coreAvailable\"], true)"
+                  },
+                  {
+                    "line": 1102,
+                    "quote": "assert_eq!(response.0, 503, \"{response:?}\")"
+                  },
+                  {
+                    "line": 1103,
+                    "quote": "assert_eq!(response.1[\"reason\"], \"dream_core_stopped\")"
+                  },
+                  {
+                    "line": 1104,
+                    "quote": "assert_eq!(response.1[\"coreAvailable\"], false)"
+                  },
+                  {
+                    "line": 1105,
+                    "quote": "assert!(response.1.get(\"revisions\").is_none())"
+                  },
+                  {
+                    "line": 1107,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\n                \"/lingxi/v1/memories/dream/revisions/{}?agentId=agentA\",\n                id.as_str().unwrap()\n            ),\n            Value::Null\n        )\n        .await\n        .0,\n        503\n    )"
+                  },
+                  {
+                    "line": 1120,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/revisions?agentId=agentB\",\n            Value::Null\n        )\n        .await\n        .0,\n        200\n    )"
+                  },
+                  {
+                    "line": 1130,
+                    "quote": "assert_eq!(fx.requests.lock().unwrap().len(), calls)"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "ticker缺席503有证据；memory关闭/忙/已运行409路径没有当前ticker，无法证明。"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          "成功202启动手动dream未实现，当前返回503不算成功。",
-          "生产dream_run_route恒返503 dream_unavailable，未实现成功202启动手动dream。",
-          "ticker缺席503有证据；memory关闭/忙/已运行409路径没有当前ticker，无法证明。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/memory-skills.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261014/dream-proof-review.json"
       },
       {
         "id": "R00-T02-LA-A9B0BBAD449C",
@@ -108862,8 +109423,174 @@
           "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围"
         ],
         "then": "返回指定助手 ticker 当前状态",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
+          {
+            "index": 0,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "manual_five_stages_atomic_revision_usage_and_next_consumer"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "busy_is_same_agent_and_other_agent_can_finish"
+              }
+            ],
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 430,
+                "testEndLine": 549,
+                "assertions": [
+                  {
+                    "line": 442,
+                    "quote": "assert_eq!(created.0, 201)"
+                  },
+                  {
+                    "line": 452,
+                    "quote": "assert!(initial.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 460,
+                    "quote": "assert_eq!(code, 202, \"{started}\")"
+                  },
+                  {
+                    "line": 461,
+                    "quote": "assert_eq!(started[\"status\"], \"running\")"
+                  },
+                  {
+                    "line": 463,
+                    "quote": "assert_eq!(status[\"status\"], \"succeeded\", \"{status}\")"
+                  },
+                  {
+                    "line": 464,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"changed\"], true)"
+                  },
+                  {
+                    "line": 465,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"model\"], \"memory-model\")"
+                  },
+                  {
+                    "line": 474,
+                    "quote": "assert_eq!(revisions.0, 200)"
+                  },
+                  {
+                    "line": 475,
+                    "quote": "assert_eq!(revisions.1[\"revisions\"].as_array().unwrap().len(), 1)"
+                  },
+                  {
+                    "line": 476,
+                    "quote": "assert_eq!(revisions.1[\"revisions\"][0][\"revisionId\"], id)"
+                  },
+                  {
+                    "line": 477,
+                    "quote": "assert!(revisions.1[\"revisions\"][0].get(\"before\").is_none())"
+                  },
+                  {
+                    "line": 485,
+                    "quote": "assert_eq!(detail.0, 200)"
+                  },
+                  {
+                    "line": 486,
+                    "quote": "assert!(detail.1[\"revision\"][\"before\"][\"facts\"]\n        .as_str()\n        .unwrap()\n        .contains(\"- 用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 490,
+                    "quote": "assert_eq!(detail.1[\"current\"][\"facts\"], \"用户喜欢音乐\")"
+                  },
+                  {
+                    "line": 491,
+                    "quote": "assert_eq!(detail.1[\"current\"][\"today\"], \"今日不能改变\")"
+                  },
+                  {
+                    "line": 492,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\"/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB\"),\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+                  },
+                  {
+                    "line": 502,
+                    "quote": "assert_eq!(\n        std::fs::read(fx.home.join(\"agents/agentB/memory/memory.md\")).unwrap(),\n        before\n    )"
+                  },
+                  {
+                    "line": 515,
+                    "quote": "assert_eq!(calls.len(), 5)"
+                  },
+                  {
+                    "line": 516,
+                    "quote": "assert_eq!(status[\"lastRun\"][\"appliedOperationCount\"], 3)"
+                  },
+                  {
+                    "line": 517,
+                    "quote": "assert!(calls\n        .iter()\n        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)))"
+                  },
+                  {
+                    "line": 520,
+                    "quote": "assert!(calls\n        .iter()\n        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded))"
+                  },
+                  {
+                    "line": 523,
+                    "quote": "assert_eq!(\n        fx.requests\n            .lock()\n            .unwrap()\n            .iter()\n            .filter(|r| r[\"model\"] == \"memory-model\")\n            .count(),\n        5\n    )"
+                  },
+                  {
+                    "line": 532,
+                    "quote": "assert!(!fx\n        .home\n        .join(\"agents/agentA/memory/dream/pending-apply.json\")\n        .exists())"
+                  },
+                  {
+                    "line": 546,
+                    "quote": "assert!(wire.contains(\"用户喜欢音乐\"))"
+                  },
+                  {
+                    "line": 547,
+                    "quote": "assert!(!wire.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "busy_is_same_agent_and_other_agent_can_finish",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 619,
+                "testEndLine": 673,
+                "assertions": [
+                  {
+                    "line": 624,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 642,
+                    "quote": "assert_eq!(result.0, 409)"
+                  },
+                  {
+                    "line": 643,
+                    "quote": "assert_eq!(result.1[\"code\"], \"dream_already_running\")"
+                  },
+                  {
+                    "line": 657,
+                    "quote": "assert_eq!(fx.request(method, path, body).await.0, 409, \"{path}\")"
+                  },
+                  {
+                    "line": 659,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentB\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 669,
+                    "quote": "assert_eq!(wait_result(&fx, \"agentB\").await[\"status\"], \"succeeded\")"
+                  },
+                  {
+                    "line": 671,
+                    "quote": "assert_eq!(wait_result(&fx, \"agentA\").await[\"status\"], \"succeeded\")"
+                  }
+                ]
+              }
+            ],
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "真实GET返回指定助手当前running/succeeded、实际run/revision信息；跨助手任务独立，不以占位状态冒充成功。"
+          },
           {
             "index": 1,
             "tests": [
@@ -108871,9 +109598,19 @@
                 "package": "lingxi-service",
                 "suite": "r06_t06_memory",
                 "test": "dream_faces_report_absence_and_revisions_serve_from_store"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "configured_refusals_disabled_and_unconfigured_are_real"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_dream_completion",
+                "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure"
               }
             ],
-            "meaning": "原实际ticker不可用503错误码",
+            "meaning": "真实未知助手404、无读取权限403；无模型503明确coreAvailable=true，真正stop_agent后503/coreAvailable=false，停止A不影响B且读状态不调用模型。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
@@ -108891,20 +109628,124 @@
                     "quote": "    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request(\n            \"POST\","
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "configured_refusals_disabled_and_unconfigured_are_real",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 551,
+                "testEndLine": 617,
+                "assertions": [
+                  {
+                    "line": 553,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        503\n    )"
+                  },
+                  {
+                    "line": 563,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/status?agentId=missing\",\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+                  },
+                  {
+                    "line": 573,
+                    "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+                  },
+                  {
+                    "line": 585,
+                    "quote": "assert_eq!(read_code, 403)"
+                  },
+                  {
+                    "line": 595,
+                    "quote": "assert_eq!(code, 403)"
+                  },
+                  {
+                    "line": 596,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"PATCH\",\n            \"/lingxi/v1/agents/agentA/config\",\n            json!({\"memory\":{\"enabled\":false}})\n        )\n        .await\n        .0,\n        200\n    )"
+                  },
+                  {
+                    "line": 613,
+                    "quote": "assert_eq!(result.0, 409, \"{result:?}\")"
+                  },
+                  {
+                    "line": 614,
+                    "quote": "assert_eq!(result.1[\"code\"], \"dream_memory_disabled\")"
+                  },
+                  {
+                    "line": 615,
+                    "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+                "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+                "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+                "testStartLine": 1052,
+                "testEndLine": 1132,
+                "assertions": [
+                  {
+                    "line": 1055,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+                  },
+                  {
+                    "line": 1066,
+                    "quote": "assert_eq!(result[\"status\"], \"succeeded\")"
+                  },
+                  {
+                    "line": 1082,
+                    "quote": "assert_eq!(live.0, 200)"
+                  },
+                  {
+                    "line": 1083,
+                    "quote": "assert_eq!(live.1[\"revisions\"][0][\"revisionId\"], id)"
+                  },
+                  {
+                    "line": 1091,
+                    "quote": "assert_eq!(absent.0, 503)"
+                  },
+                  {
+                    "line": 1092,
+                    "quote": "assert_eq!(absent.1[\"reason\"], \"dream_model_unconfigured\")"
+                  },
+                  {
+                    "line": 1093,
+                    "quote": "assert_eq!(absent.1[\"coreAvailable\"], true)"
+                  },
+                  {
+                    "line": 1102,
+                    "quote": "assert_eq!(response.0, 503, \"{response:?}\")"
+                  },
+                  {
+                    "line": 1103,
+                    "quote": "assert_eq!(response.1[\"reason\"], \"dream_core_stopped\")"
+                  },
+                  {
+                    "line": 1104,
+                    "quote": "assert_eq!(response.1[\"coreAvailable\"], false)"
+                  },
+                  {
+                    "line": 1105,
+                    "quote": "assert!(response.1.get(\"revisions\").is_none())"
+                  },
+                  {
+                    "line": 1107,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\n                \"/lingxi/v1/memories/dream/revisions/{}?agentId=agentA\",\n                id.as_str().unwrap()\n            ),\n            Value::Null\n        )\n        .await\n        .0,\n        503\n    )"
+                  },
+                  {
+                    "line": 1120,
+                    "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/revisions?agentId=agentB\",\n            Value::Null\n        )\n        .await\n        .0,\n        200\n    )"
+                  },
+                  {
+                    "line": 1130,
+                    "quote": "assert_eq!(fx.requests.lock().unwrap().len(), calls)"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "缺ticker503已证，未知Agent404和指定助手范围的完整状态检查缺失。"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          "指定助手ticker状态未实现，当前返回503不算状态读取成功。",
-          "生产dream_status_route恒返503，无法返回ticker当前状态。",
-          "缺ticker503已证，未知Agent404和指定助手范围的完整状态检查缺失。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/memory-skills.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261014/dream-proof-review.json"
       },
       {
         "id": "R00-T02-LA-B47CAC08F418",
@@ -142242,6 +143083,56 @@
         "--show-output"
       ]
     },
+    "r06_test_0201dcfd557fa3d6f66c": {
+      "package": "lingxi-service",
+      "suite": "r06_dream_completion",
+      "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_dream_completion",
+        "manual_five_stages_atomic_revision_usage_and_next_consumer",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_566f1f06bf69c68a501c": {
+      "package": "lingxi-service",
+      "suite": "r06_dream_completion",
+      "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_dream_completion",
+        "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
     "r06_test_d5e2386e55224e5ae18c": {
       "package": "lingxi-service",
       "suite": "r06_original_skills_bundle_proofs",
@@ -142912,6 +143803,56 @@
         "--test",
         "r06_agent_config_readback",
         "experiments_read_and_write",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_f6ab3994a6548d5d41cf": {
+      "package": "lingxi-service",
+      "suite": "r06_dream_completion",
+      "test": "configured_refusals_disabled_and_unconfigured_are_real",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_dream_completion",
+        "configured_refusals_disabled_and_unconfigured_are_real",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_f14a7adb0b419dc80dba": {
+      "package": "lingxi-service",
+      "suite": "r06_dream_completion",
+      "test": "busy_is_same_agent_and_other_agent_can_finish",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_dream_completion",
+        "busy_is_same_agent_and_other_agent_can_finish",
         "--",
         "--exact",
         "--show-output"
@@ -197984,6 +198925,270 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-76EE734926B4": [
+      {
+        "case": "R00-T02-LA-76EE734926B4-assertion-00",
+        "expect": 1,
+        "assertion": "成功：执行“列出记忆修订”后，返回指定助手修订清单",
+        "commandRefs": [
+          "r06_test_0201dcfd557fa3d6f66c",
+          "r06_test_56aa98c89dd0159d3aac"
+        ],
+        "evidenceMeaning": "真实五阶段整理生成修订，指定助手GET逐项返回真实修订ID；A/B独立，清单不披露before正文，两边文件均未改写。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+            "test": "original_nonempty_revision_lists_are_agent_scoped_and_read_only",
+            "sourceSHA256": "aa29b0cfae0bdbf0b2b9bb1fe64bbc34b7e35456b05025600e57689605f40143",
+            "testStartLine": 1867,
+            "testEndLine": 1934,
+            "assertions": [
+              {
+                "line": 1903,
+                "quote": "assert_eq!(status, 200)"
+              },
+              {
+                "line": 1904,
+                "quote": "assert_eq!(result[\"agentId\"], \"agentA\")"
+              },
+              {
+                "line": 1906,
+                "quote": "assert_eq!(actual.len(), 2)"
+              },
+              {
+                "line": 1907,
+                "quote": "assert!(actual\n        .iter()\n        .any(|r| r[\"revisionId\"] == first[\"revisionId\"]))"
+              },
+              {
+                "line": 1910,
+                "quote": "assert!(actual\n        .iter()\n        .any(|r| r[\"revisionId\"] == second[\"revisionId\"]))"
+              },
+              {
+                "line": 1913,
+                "quote": "assert!(!actual\n        .iter()\n        .any(|r| r[\"revisionId\"] == other[\"revisionId\"]))"
+              },
+              {
+                "line": 1916,
+                "quote": "assert!(actual\n        .iter()\n        .all(|r| r.get(\"before\").is_none() && r[\"sectionChars\"][\"facts\"].as_u64().unwrap() > 0))"
+              },
+              {
+                "line": 1926,
+                "quote": "assert_eq!(status, 200)"
+              },
+              {
+                "line": 1927,
+                "quote": "assert_eq!(result[\"agentId\"], \"agentB\")"
+              },
+              {
+                "line": 1928,
+                "quote": "assert_eq!(result[\"revisions\"].as_array().unwrap().len(), 1)"
+              },
+              {
+                "line": 1929,
+                "quote": "assert_eq!(result[\"revisions\"][0][\"revisionId\"], other[\"revisionId\"])"
+              },
+              {
+                "line": 1930,
+                "quote": "assert_eq!(file_snapshot(&memory_dir(&server, \"agentA\")), before_a)"
+              },
+              {
+                "line": 1931,
+                "quote": "assert_eq!(file_snapshot(&memory_dir(&server, \"agentB\")), before_b)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 430,
+            "testEndLine": 549,
+            "assertions": [
+              {
+                "line": 442,
+                "quote": "assert_eq!(created.0, 201)"
+              },
+              {
+                "line": 452,
+                "quote": "assert!(initial.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+              },
+              {
+                "line": 460,
+                "quote": "assert_eq!(code, 202, \"{started}\")"
+              },
+              {
+                "line": 461,
+                "quote": "assert_eq!(started[\"status\"], \"running\")"
+              },
+              {
+                "line": 463,
+                "quote": "assert_eq!(status[\"status\"], \"succeeded\", \"{status}\")"
+              },
+              {
+                "line": 464,
+                "quote": "assert_eq!(status[\"lastRun\"][\"changed\"], true)"
+              },
+              {
+                "line": 465,
+                "quote": "assert_eq!(status[\"lastRun\"][\"model\"], \"memory-model\")"
+              },
+              {
+                "line": 474,
+                "quote": "assert_eq!(revisions.0, 200)"
+              },
+              {
+                "line": 475,
+                "quote": "assert_eq!(revisions.1[\"revisions\"].as_array().unwrap().len(), 1)"
+              },
+              {
+                "line": 476,
+                "quote": "assert_eq!(revisions.1[\"revisions\"][0][\"revisionId\"], id)"
+              },
+              {
+                "line": 477,
+                "quote": "assert!(revisions.1[\"revisions\"][0].get(\"before\").is_none())"
+              },
+              {
+                "line": 485,
+                "quote": "assert_eq!(detail.0, 200)"
+              },
+              {
+                "line": 486,
+                "quote": "assert!(detail.1[\"revision\"][\"before\"][\"facts\"]\n        .as_str()\n        .unwrap()\n        .contains(\"- 用户喜欢音乐\"))"
+              },
+              {
+                "line": 490,
+                "quote": "assert_eq!(detail.1[\"current\"][\"facts\"], \"用户喜欢音乐\")"
+              },
+              {
+                "line": 491,
+                "quote": "assert_eq!(detail.1[\"current\"][\"today\"], \"今日不能改变\")"
+              },
+              {
+                "line": 492,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\"/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB\"),\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+              },
+              {
+                "line": 502,
+                "quote": "assert_eq!(\n        std::fs::read(fx.home.join(\"agents/agentB/memory/memory.md\")).unwrap(),\n        before\n    )"
+              },
+              {
+                "line": 515,
+                "quote": "assert_eq!(calls.len(), 5)"
+              },
+              {
+                "line": 516,
+                "quote": "assert_eq!(status[\"lastRun\"][\"appliedOperationCount\"], 3)"
+              },
+              {
+                "line": 517,
+                "quote": "assert!(calls\n        .iter()\n        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)))"
+              },
+              {
+                "line": 520,
+                "quote": "assert!(calls\n        .iter()\n        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded))"
+              },
+              {
+                "line": 523,
+                "quote": "assert_eq!(\n        fx.requests\n            .lock()\n            .unwrap()\n            .iter()\n            .filter(|r| r[\"model\"] == \"memory-model\")\n            .count(),\n        5\n    )"
+              },
+              {
+                "line": 532,
+                "quote": "assert!(!fx\n        .home\n        .join(\"agents/agentA/memory/dream/pending-apply.json\")\n        .exists())"
+              },
+              {
+                "line": 546,
+                "quote": "assert!(wire.contains(\"用户喜欢音乐\"))"
+              },
+              {
+                "line": 547,
+                "quote": "assert!(!wire.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-76EE734926B4-assertion-01",
+        "expect": 1,
+        "assertion": "拒绝/边界：ticker 不可用 503；不应错误扩大写入或披露范围",
+        "commandRefs": [
+          "r06_test_566f1f06bf69c68a501c"
+        ],
+        "evidenceMeaning": "真实核心stop_agent之后清单/详情均503并不含修订；B仍200且无额外供应商调用。无模型与核心停止分别明确报告，不把无配置当作核心不存在。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 1052,
+            "testEndLine": 1132,
+            "assertions": [
+              {
+                "line": 1055,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 1066,
+                "quote": "assert_eq!(result[\"status\"], \"succeeded\")"
+              },
+              {
+                "line": 1082,
+                "quote": "assert_eq!(live.0, 200)"
+              },
+              {
+                "line": 1083,
+                "quote": "assert_eq!(live.1[\"revisions\"][0][\"revisionId\"], id)"
+              },
+              {
+                "line": 1091,
+                "quote": "assert_eq!(absent.0, 503)"
+              },
+              {
+                "line": 1092,
+                "quote": "assert_eq!(absent.1[\"reason\"], \"dream_model_unconfigured\")"
+              },
+              {
+                "line": 1093,
+                "quote": "assert_eq!(absent.1[\"coreAvailable\"], true)"
+              },
+              {
+                "line": 1102,
+                "quote": "assert_eq!(response.0, 503, \"{response:?}\")"
+              },
+              {
+                "line": 1103,
+                "quote": "assert_eq!(response.1[\"reason\"], \"dream_core_stopped\")"
+              },
+              {
+                "line": 1104,
+                "quote": "assert_eq!(response.1[\"coreAvailable\"], false)"
+              },
+              {
+                "line": 1105,
+                "quote": "assert!(response.1.get(\"revisions\").is_none())"
+              },
+              {
+                "line": 1107,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\n                \"/lingxi/v1/memories/dream/revisions/{}?agentId=agentA\",\n                id.as_str().unwrap()\n            ),\n            Value::Null\n        )\n        .await\n        .0,\n        503\n    )"
+              },
+              {
+                "line": 1120,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/revisions?agentId=agentB\",\n            Value::Null\n        )\n        .await\n        .0,\n        200\n    )"
+              },
+              {
+                "line": 1130,
+                "quote": "assert_eq!(fx.requests.lock().unwrap().len(), calls)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-778CBDA01964": [
       {
         "case": "R00-T02-LA-778CBDA01964-assertion-00",
@@ -211199,6 +212404,314 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-A9AD4C7F76AE": [
+      {
+        "case": "R00-T02-LA-A9AD4C7F76AE-assertion-00",
+        "expect": 1,
+        "assertion": "成功：执行“手动触发记忆整理”后，启动一次手动 dream，返回 202 与运行信息",
+        "commandRefs": [
+          "r06_test_0201dcfd557fa3d6f66c"
+        ],
+        "evidenceMeaning": "真实POST202返回运行状态，五阶段供应商响应真实计费落账、发布修订与正文；同一Session下一Run消费新正文。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 430,
+            "testEndLine": 549,
+            "assertions": [
+              {
+                "line": 442,
+                "quote": "assert_eq!(created.0, 201)"
+              },
+              {
+                "line": 452,
+                "quote": "assert!(initial.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+              },
+              {
+                "line": 460,
+                "quote": "assert_eq!(code, 202, \"{started}\")"
+              },
+              {
+                "line": 461,
+                "quote": "assert_eq!(started[\"status\"], \"running\")"
+              },
+              {
+                "line": 463,
+                "quote": "assert_eq!(status[\"status\"], \"succeeded\", \"{status}\")"
+              },
+              {
+                "line": 464,
+                "quote": "assert_eq!(status[\"lastRun\"][\"changed\"], true)"
+              },
+              {
+                "line": 465,
+                "quote": "assert_eq!(status[\"lastRun\"][\"model\"], \"memory-model\")"
+              },
+              {
+                "line": 474,
+                "quote": "assert_eq!(revisions.0, 200)"
+              },
+              {
+                "line": 475,
+                "quote": "assert_eq!(revisions.1[\"revisions\"].as_array().unwrap().len(), 1)"
+              },
+              {
+                "line": 476,
+                "quote": "assert_eq!(revisions.1[\"revisions\"][0][\"revisionId\"], id)"
+              },
+              {
+                "line": 477,
+                "quote": "assert!(revisions.1[\"revisions\"][0].get(\"before\").is_none())"
+              },
+              {
+                "line": 485,
+                "quote": "assert_eq!(detail.0, 200)"
+              },
+              {
+                "line": 486,
+                "quote": "assert!(detail.1[\"revision\"][\"before\"][\"facts\"]\n        .as_str()\n        .unwrap()\n        .contains(\"- 用户喜欢音乐\"))"
+              },
+              {
+                "line": 490,
+                "quote": "assert_eq!(detail.1[\"current\"][\"facts\"], \"用户喜欢音乐\")"
+              },
+              {
+                "line": 491,
+                "quote": "assert_eq!(detail.1[\"current\"][\"today\"], \"今日不能改变\")"
+              },
+              {
+                "line": 492,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\"/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB\"),\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+              },
+              {
+                "line": 502,
+                "quote": "assert_eq!(\n        std::fs::read(fx.home.join(\"agents/agentB/memory/memory.md\")).unwrap(),\n        before\n    )"
+              },
+              {
+                "line": 515,
+                "quote": "assert_eq!(calls.len(), 5)"
+              },
+              {
+                "line": 516,
+                "quote": "assert_eq!(status[\"lastRun\"][\"appliedOperationCount\"], 3)"
+              },
+              {
+                "line": 517,
+                "quote": "assert!(calls\n        .iter()\n        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)))"
+              },
+              {
+                "line": 520,
+                "quote": "assert!(calls\n        .iter()\n        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded))"
+              },
+              {
+                "line": 523,
+                "quote": "assert_eq!(\n        fx.requests\n            .lock()\n            .unwrap()\n            .iter()\n            .filter(|r| r[\"model\"] == \"memory-model\")\n            .count(),\n        5\n    )"
+              },
+              {
+                "line": 532,
+                "quote": "assert!(!fx\n        .home\n        .join(\"agents/agentA/memory/dream/pending-apply.json\")\n        .exists())"
+              },
+              {
+                "line": 546,
+                "quote": "assert!(wire.contains(\"用户喜欢音乐\"))"
+              },
+              {
+                "line": 547,
+                "quote": "assert!(!wire.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-A9AD4C7F76AE-assertion-01",
+        "expect": 1,
+        "assertion": "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围",
+        "commandRefs": [
+          "r06_test_3886c50eb8efe2cc6d11",
+          "r06_test_566f1f06bf69c68a501c",
+          "r06_test_f14a7adb0b419dc80dba",
+          "r06_test_f6ab3994a6548d5d41cf"
+        ],
+        "evidenceMeaning": "settings.write权限拒绝403；实际关闭记忆409；同助手已有运行409且不能抢写清理，B独立完成；无配置503且无模型调用，核心真实停止503并不扩大披露。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
+            "test": "dream_faces_report_absence_and_revisions_serve_from_store",
+            "sourceSHA256": "6bdd7f191e196511c24a7d3456d85c72060dde02fe6c5696c7b9ee41bf9ec56a",
+            "testStartLine": 347,
+            "testEndLine": 394,
+            "assertions": [
+              {
+                "line": 358,
+                "quote": "    assert_eq!(status, 503, \"{body}\");\n    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request("
+              },
+              {
+                "line": 359,
+                "quote": "    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request(\n            \"POST\","
+              },
+              {
+                "line": 367,
+                "quote": "    assert_eq!(status, 503);\n\n    // revisions 面（文件存储直读，无 ticker 依赖）\n    let (status, body) = server"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "configured_refusals_disabled_and_unconfigured_are_real",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 551,
+            "testEndLine": 617,
+            "assertions": [
+              {
+                "line": 553,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        503\n    )"
+              },
+              {
+                "line": 563,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/status?agentId=missing\",\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+              },
+              {
+                "line": 573,
+                "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+              },
+              {
+                "line": 585,
+                "quote": "assert_eq!(read_code, 403)"
+              },
+              {
+                "line": 595,
+                "quote": "assert_eq!(code, 403)"
+              },
+              {
+                "line": 596,
+                "quote": "assert_eq!(\n        fx.request(\n            \"PATCH\",\n            \"/lingxi/v1/agents/agentA/config\",\n            json!({\"memory\":{\"enabled\":false}})\n        )\n        .await\n        .0,\n        200\n    )"
+              },
+              {
+                "line": 613,
+                "quote": "assert_eq!(result.0, 409, \"{result:?}\")"
+              },
+              {
+                "line": 614,
+                "quote": "assert_eq!(result.1[\"code\"], \"dream_memory_disabled\")"
+              },
+              {
+                "line": 615,
+                "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "busy_is_same_agent_and_other_agent_can_finish",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 619,
+            "testEndLine": 673,
+            "assertions": [
+              {
+                "line": 624,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 642,
+                "quote": "assert_eq!(result.0, 409)"
+              },
+              {
+                "line": 643,
+                "quote": "assert_eq!(result.1[\"code\"], \"dream_already_running\")"
+              },
+              {
+                "line": 657,
+                "quote": "assert_eq!(fx.request(method, path, body).await.0, 409, \"{path}\")"
+              },
+              {
+                "line": 659,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentB\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 669,
+                "quote": "assert_eq!(wait_result(&fx, \"agentB\").await[\"status\"], \"succeeded\")"
+              },
+              {
+                "line": 671,
+                "quote": "assert_eq!(wait_result(&fx, \"agentA\").await[\"status\"], \"succeeded\")"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 1052,
+            "testEndLine": 1132,
+            "assertions": [
+              {
+                "line": 1055,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 1066,
+                "quote": "assert_eq!(result[\"status\"], \"succeeded\")"
+              },
+              {
+                "line": 1082,
+                "quote": "assert_eq!(live.0, 200)"
+              },
+              {
+                "line": 1083,
+                "quote": "assert_eq!(live.1[\"revisions\"][0][\"revisionId\"], id)"
+              },
+              {
+                "line": 1091,
+                "quote": "assert_eq!(absent.0, 503)"
+              },
+              {
+                "line": 1092,
+                "quote": "assert_eq!(absent.1[\"reason\"], \"dream_model_unconfigured\")"
+              },
+              {
+                "line": 1093,
+                "quote": "assert_eq!(absent.1[\"coreAvailable\"], true)"
+              },
+              {
+                "line": 1102,
+                "quote": "assert_eq!(response.0, 503, \"{response:?}\")"
+              },
+              {
+                "line": 1103,
+                "quote": "assert_eq!(response.1[\"reason\"], \"dream_core_stopped\")"
+              },
+              {
+                "line": 1104,
+                "quote": "assert_eq!(response.1[\"coreAvailable\"], false)"
+              },
+              {
+                "line": 1105,
+                "quote": "assert!(response.1.get(\"revisions\").is_none())"
+              },
+              {
+                "line": 1107,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\n                \"/lingxi/v1/memories/dream/revisions/{}?agentId=agentA\",\n                id.as_str().unwrap()\n            ),\n            Value::Null\n        )\n        .await\n        .0,\n        503\n    )"
+              },
+              {
+                "line": 1120,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/revisions?agentId=agentB\",\n            Value::Null\n        )\n        .await\n        .0,\n        200\n    )"
+              },
+              {
+                "line": 1130,
+                "quote": "assert_eq!(fx.requests.lock().unwrap().len(), calls)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-A9B0BBAD449C": [
       {
         "case": "R00-T02-LA-A9B0BBAD449C-assertion-00",
@@ -216513,6 +218026,310 @@
               {
                 "line": 488,
                 "quote": "assert_eq!(file_snapshot(&server.workspace), before_workspace)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
+    "R00-T02-LA-B45ECEC543C6": [
+      {
+        "case": "R00-T02-LA-B45ECEC543C6-assertion-00",
+        "expect": 1,
+        "assertion": "成功：执行“查看记忆整理状态”后，返回指定助手 ticker 当前状态",
+        "commandRefs": [
+          "r06_test_0201dcfd557fa3d6f66c",
+          "r06_test_f14a7adb0b419dc80dba"
+        ],
+        "evidenceMeaning": "真实GET返回指定助手当前running/succeeded、实际run/revision信息；跨助手任务独立，不以占位状态冒充成功。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "manual_five_stages_atomic_revision_usage_and_next_consumer",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 430,
+            "testEndLine": 549,
+            "assertions": [
+              {
+                "line": 442,
+                "quote": "assert_eq!(created.0, 201)"
+              },
+              {
+                "line": 452,
+                "quote": "assert!(initial.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+              },
+              {
+                "line": 460,
+                "quote": "assert_eq!(code, 202, \"{started}\")"
+              },
+              {
+                "line": 461,
+                "quote": "assert_eq!(started[\"status\"], \"running\")"
+              },
+              {
+                "line": 463,
+                "quote": "assert_eq!(status[\"status\"], \"succeeded\", \"{status}\")"
+              },
+              {
+                "line": 464,
+                "quote": "assert_eq!(status[\"lastRun\"][\"changed\"], true)"
+              },
+              {
+                "line": 465,
+                "quote": "assert_eq!(status[\"lastRun\"][\"model\"], \"memory-model\")"
+              },
+              {
+                "line": 474,
+                "quote": "assert_eq!(revisions.0, 200)"
+              },
+              {
+                "line": 475,
+                "quote": "assert_eq!(revisions.1[\"revisions\"].as_array().unwrap().len(), 1)"
+              },
+              {
+                "line": 476,
+                "quote": "assert_eq!(revisions.1[\"revisions\"][0][\"revisionId\"], id)"
+              },
+              {
+                "line": 477,
+                "quote": "assert!(revisions.1[\"revisions\"][0].get(\"before\").is_none())"
+              },
+              {
+                "line": 485,
+                "quote": "assert_eq!(detail.0, 200)"
+              },
+              {
+                "line": 486,
+                "quote": "assert!(detail.1[\"revision\"][\"before\"][\"facts\"]\n        .as_str()\n        .unwrap()\n        .contains(\"- 用户喜欢音乐\"))"
+              },
+              {
+                "line": 490,
+                "quote": "assert_eq!(detail.1[\"current\"][\"facts\"], \"用户喜欢音乐\")"
+              },
+              {
+                "line": 491,
+                "quote": "assert_eq!(detail.1[\"current\"][\"today\"], \"今日不能改变\")"
+              },
+              {
+                "line": 492,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\"/lingxi/v1/memories/dream/revisions/{id}?agentId=agentB\"),\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+              },
+              {
+                "line": 502,
+                "quote": "assert_eq!(\n        std::fs::read(fx.home.join(\"agents/agentB/memory/memory.md\")).unwrap(),\n        before\n    )"
+              },
+              {
+                "line": 515,
+                "quote": "assert_eq!(calls.len(), 5)"
+              },
+              {
+                "line": 516,
+                "quote": "assert_eq!(status[\"lastRun\"][\"appliedOperationCount\"], 3)"
+              },
+              {
+                "line": 517,
+                "quote": "assert!(calls\n        .iter()\n        .all(|row| row.usage.is_some() && row.transport_attempts == Some(1)))"
+              },
+              {
+                "line": 520,
+                "quote": "assert!(calls\n        .iter()\n        .all(|row| row.outcome == lingxi_kernel::usage::CallOutcome::Succeeded))"
+              },
+              {
+                "line": 523,
+                "quote": "assert_eq!(\n        fx.requests\n            .lock()\n            .unwrap()\n            .iter()\n            .filter(|r| r[\"model\"] == \"memory-model\")\n            .count(),\n        5\n    )"
+              },
+              {
+                "line": 532,
+                "quote": "assert!(!fx\n        .home\n        .join(\"agents/agentA/memory/dream/pending-apply.json\")\n        .exists())"
+              },
+              {
+                "line": 546,
+                "quote": "assert!(wire.contains(\"用户喜欢音乐\"))"
+              },
+              {
+                "line": 547,
+                "quote": "assert!(!wire.contains(\"- 用户喜欢音乐\\\\n- 用户喜欢音乐\"))"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "busy_is_same_agent_and_other_agent_can_finish",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 619,
+            "testEndLine": 673,
+            "assertions": [
+              {
+                "line": 624,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 642,
+                "quote": "assert_eq!(result.0, 409)"
+              },
+              {
+                "line": 643,
+                "quote": "assert_eq!(result.1[\"code\"], \"dream_already_running\")"
+              },
+              {
+                "line": 657,
+                "quote": "assert_eq!(fx.request(method, path, body).await.0, 409, \"{path}\")"
+              },
+              {
+                "line": 659,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentB\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 669,
+                "quote": "assert_eq!(wait_result(&fx, \"agentB\").await[\"status\"], \"succeeded\")"
+              },
+              {
+                "line": 671,
+                "quote": "assert_eq!(wait_result(&fx, \"agentA\").await[\"status\"], \"succeeded\")"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-B45ECEC543C6-assertion-01",
+        "expect": 1,
+        "assertion": "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围",
+        "commandRefs": [
+          "r06_test_3886c50eb8efe2cc6d11",
+          "r06_test_566f1f06bf69c68a501c",
+          "r06_test_f6ab3994a6548d5d41cf"
+        ],
+        "evidenceMeaning": "真实未知助手404、无读取权限403；无模型503明确coreAvailable=true，真正stop_agent后503/coreAvailable=false，停止A不影响B且读状态不调用模型。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
+            "test": "dream_faces_report_absence_and_revisions_serve_from_store",
+            "sourceSHA256": "6bdd7f191e196511c24a7d3456d85c72060dde02fe6c5696c7b9ee41bf9ec56a",
+            "testStartLine": 347,
+            "testEndLine": 394,
+            "assertions": [
+              {
+                "line": 358,
+                "quote": "    assert_eq!(status, 503, \"{body}\");\n    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request("
+              },
+              {
+                "line": 359,
+                "quote": "    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request(\n            \"POST\","
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "configured_refusals_disabled_and_unconfigured_are_real",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 551,
+            "testEndLine": 617,
+            "assertions": [
+              {
+                "line": 553,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        503\n    )"
+              },
+              {
+                "line": 563,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/status?agentId=missing\",\n            Value::Null\n        )\n        .await\n        .0,\n        404\n    )"
+              },
+              {
+                "line": 573,
+                "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+              },
+              {
+                "line": 585,
+                "quote": "assert_eq!(read_code, 403)"
+              },
+              {
+                "line": 595,
+                "quote": "assert_eq!(code, 403)"
+              },
+              {
+                "line": 596,
+                "quote": "assert_eq!(\n        fx.request(\n            \"PATCH\",\n            \"/lingxi/v1/agents/agentA/config\",\n            json!({\"memory\":{\"enabled\":false}})\n        )\n        .await\n        .0,\n        200\n    )"
+              },
+              {
+                "line": 613,
+                "quote": "assert_eq!(result.0, 409, \"{result:?}\")"
+              },
+              {
+                "line": 614,
+                "quote": "assert_eq!(result.1[\"code\"], \"dream_memory_disabled\")"
+              },
+              {
+                "line": 615,
+                "quote": "assert!(fx.requests.lock().unwrap().is_empty())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+            "test": "live_core_without_model_reads_revision_and_stopped_core_refuses_disclosure",
+            "sourceSHA256": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+            "testStartLine": 1052,
+            "testEndLine": 1132,
+            "assertions": [
+              {
+                "line": 1055,
+                "quote": "assert_eq!(\n        fx.request(\n            \"POST\",\n            \"/lingxi/v1/memories/dream/runs?agentId=agentA\",\n            json!({})\n        )\n        .await\n        .0,\n        202\n    )"
+              },
+              {
+                "line": 1066,
+                "quote": "assert_eq!(result[\"status\"], \"succeeded\")"
+              },
+              {
+                "line": 1082,
+                "quote": "assert_eq!(live.0, 200)"
+              },
+              {
+                "line": 1083,
+                "quote": "assert_eq!(live.1[\"revisions\"][0][\"revisionId\"], id)"
+              },
+              {
+                "line": 1091,
+                "quote": "assert_eq!(absent.0, 503)"
+              },
+              {
+                "line": 1092,
+                "quote": "assert_eq!(absent.1[\"reason\"], \"dream_model_unconfigured\")"
+              },
+              {
+                "line": 1093,
+                "quote": "assert_eq!(absent.1[\"coreAvailable\"], true)"
+              },
+              {
+                "line": 1102,
+                "quote": "assert_eq!(response.0, 503, \"{response:?}\")"
+              },
+              {
+                "line": 1103,
+                "quote": "assert_eq!(response.1[\"reason\"], \"dream_core_stopped\")"
+              },
+              {
+                "line": 1104,
+                "quote": "assert_eq!(response.1[\"coreAvailable\"], false)"
+              },
+              {
+                "line": 1105,
+                "quote": "assert!(response.1.get(\"revisions\").is_none())"
+              },
+              {
+                "line": 1107,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            &format!(\n                \"/lingxi/v1/memories/dream/revisions/{}?agentId=agentA\",\n                id.as_str().unwrap()\n            ),\n            Value::Null\n        )\n        .await\n        .0,\n        503\n    )"
+              },
+              {
+                "line": 1120,
+                "quote": "assert_eq!(\n        fx.request(\n            \"GET\",\n            \"/lingxi/v1/memories/dream/revisions?agentId=agentB\",\n            Value::Null\n        )\n        .await\n        .0,\n        200\n    )"
+              },
+              {
+                "line": 1130,
+                "quote": "assert_eq!(fx.requests.lock().unwrap().len(), calls)"
               }
             ]
           }
@@ -238760,82 +240577,6 @@
         ]
       }
     ],
-    "R00-T02-LA-76EE734926B4": [
-      {
-        "case": "R00-T02-LA-76EE734926B4-assertion-00",
-        "expect": 1,
-        "assertion": "成功：执行“列出记忆修订”后，返回指定助手修订清单",
-        "commandRefs": [
-          "r06_test_56aa98c89dd0159d3aac"
-        ],
-        "evidenceMeaning": "真实非空修订GET返回A两项与B一项，ID精确对应各助手落盘修订，不泄露before正文，两助手文件均不改写",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
-            "test": "original_nonempty_revision_lists_are_agent_scoped_and_read_only",
-            "sourceSHA256": "aa29b0cfae0bdbf0b2b9bb1fe64bbc34b7e35456b05025600e57689605f40143",
-            "testStartLine": 1867,
-            "testEndLine": 1934,
-            "assertions": [
-              {
-                "line": 1903,
-                "quote": "assert_eq!(status, 200)"
-              },
-              {
-                "line": 1904,
-                "quote": "assert_eq!(result[\"agentId\"], \"agentA\")"
-              },
-              {
-                "line": 1906,
-                "quote": "assert_eq!(actual.len(), 2)"
-              },
-              {
-                "line": 1907,
-                "quote": "assert!(actual\n        .iter()\n        .any(|r| r[\"revisionId\"] == first[\"revisionId\"]))"
-              },
-              {
-                "line": 1910,
-                "quote": "assert!(actual\n        .iter()\n        .any(|r| r[\"revisionId\"] == second[\"revisionId\"]))"
-              },
-              {
-                "line": 1913,
-                "quote": "assert!(!actual\n        .iter()\n        .any(|r| r[\"revisionId\"] == other[\"revisionId\"]))"
-              },
-              {
-                "line": 1916,
-                "quote": "assert!(actual\n        .iter()\n        .all(|r| r.get(\"before\").is_none() && r[\"sectionChars\"][\"facts\"].as_u64().unwrap() > 0))"
-              },
-              {
-                "line": 1926,
-                "quote": "assert_eq!(status, 200)"
-              },
-              {
-                "line": 1927,
-                "quote": "assert_eq!(result[\"agentId\"], \"agentB\")"
-              },
-              {
-                "line": 1928,
-                "quote": "assert_eq!(result[\"revisions\"].as_array().unwrap().len(), 1)"
-              },
-              {
-                "line": 1929,
-                "quote": "assert_eq!(result[\"revisions\"][0][\"revisionId\"], other[\"revisionId\"])"
-              },
-              {
-                "line": 1930,
-                "quote": "assert_eq!(file_snapshot(&memory_dir(&server, \"agentA\")), before_a)"
-              },
-              {
-                "line": 1931,
-                "quote": "assert_eq!(file_snapshot(&memory_dir(&server, \"agentB\")), before_b)"
-              }
-            ]
-          }
-        ],
-        "coverage": "FULL",
-        "missingClauses": []
-      }
-    ],
     "R00-T02-LA-7CBF6F4A6760": [
       {
         "case": "R00-T02-LA-7CBF6F4A6760-assertion-00",
@@ -241048,44 +242789,6 @@
         ]
       }
     ],
-    "R00-T02-LA-A9AD4C7F76AE": [
-      {
-        "case": "R00-T02-LA-A9AD4C7F76AE-assertion-01",
-        "expect": 1,
-        "assertion": "拒绝/边界：settings.write；记忆关闭/忙/已有运行返回 409；ticker 不可用 503；不应错误扩大写入或披露范围",
-        "commandRefs": [
-          "r06_test_3886c50eb8efe2cc6d11"
-        ],
-        "evidenceMeaning": "实际POST无ticker503；不是成功启动证明",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
-            "test": "dream_faces_report_absence_and_revisions_serve_from_store",
-            "sourceSHA256": "6bdd7f191e196511c24a7d3456d85c72060dde02fe6c5696c7b9ee41bf9ec56a",
-            "testStartLine": 347,
-            "testEndLine": 394,
-            "assertions": [
-              {
-                "line": 358,
-                "quote": "    assert_eq!(status, 503, \"{body}\");\n    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request("
-              },
-              {
-                "line": 359,
-                "quote": "    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request(\n            \"POST\","
-              },
-              {
-                "line": 367,
-                "quote": "    assert_eq!(status, 503);\n\n    // revisions 面（文件存储直读，无 ticker 依赖）\n    let (status, body) = server"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "ticker缺席503有证据；memory关闭/忙/已运行409路径没有当前ticker，无法证明。"
-        ]
-      }
-    ],
     "R00-T02-LA-AD7FAE6288FA": [
       {
         "case": "R00-T02-LA-AD7FAE6288FA-assertion-00",
@@ -242129,40 +243832,6 @@
         "coverage": "PARTIAL",
         "missingClauses": [
           "非法/缺失路径返回 false，不把永久删除混入"
-        ]
-      }
-    ],
-    "R00-T02-LA-B45ECEC543C6": [
-      {
-        "case": "R00-T02-LA-B45ECEC543C6-assertion-01",
-        "expect": 1,
-        "assertion": "拒绝/边界：ticker 不可用 503；助手不存在 404；不应错误扩大写入或披露范围",
-        "commandRefs": [
-          "r06_test_3886c50eb8efe2cc6d11"
-        ],
-        "evidenceMeaning": "原实际ticker不可用503错误码",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t06_memory.rs",
-            "test": "dream_faces_report_absence_and_revisions_serve_from_store",
-            "sourceSHA256": "6bdd7f191e196511c24a7d3456d85c72060dde02fe6c5696c7b9ee41bf9ec56a",
-            "testStartLine": 347,
-            "testEndLine": 394,
-            "assertions": [
-              {
-                "line": 358,
-                "quote": "    assert_eq!(status, 503, \"{body}\");\n    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request("
-              },
-              {
-                "line": 359,
-                "quote": "    assert_eq!(body[\"code\"], \"dream_unavailable\");\n    let (status, _) = server\n        .request(\n            \"POST\","
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "缺ticker503已证，未知Agent404和指定助手范围的完整状态检查缺失。"
         ]
       }
     ],

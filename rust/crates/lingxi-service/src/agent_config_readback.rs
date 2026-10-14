@@ -2538,7 +2538,13 @@ pub async fn agent_config_put_route(
 
     // 显式保存请求助手 A。
     let config_path = agent_dir.join("config.yaml");
-    if let Err(message) = save_agent_config_merge(&config_path, &agent_partial) {
+    if let Err(message) = memory.dream().save_config(
+        &agent_id,
+        agent_partial
+            .pointer("/memory/enabled")
+            .and_then(Value::as_bool),
+        || save_agent_config_merge(&config_path, &agent_partial),
+    ) {
         return internal_error(message);
     }
     // updateConfig(agentPartial, {agentId})：运行时刷新（端口=重读合并）。

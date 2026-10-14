@@ -37,6 +37,7 @@ use crate::ServiceState;
 pub struct MemoryService {
     home: PathBuf,
     runtime_dir: PathBuf,
+    dream: crate::dream_service::DreamService,
     search_embedder:
         std::sync::Mutex<Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>>>,
 }
@@ -46,6 +47,7 @@ impl MemoryService {
         Self {
             home,
             runtime_dir,
+            dream: crate::dream_service::DreamService::default(),
             search_embedder: std::sync::Mutex::new(None),
         }
     }
@@ -67,6 +69,14 @@ impl MemoryService {
             .lock()
             .unwrap_or_else(|p| p.into_inner())
             .clone()
+    }
+
+    pub fn dream(&self) -> &crate::dream_service::DreamService {
+        &self.dream
+    }
+
+    pub(crate) fn deletion_runtime_dir(&self) -> &Path {
+        &self.runtime_dir
     }
 
     pub fn home(&self) -> &Path {
@@ -205,8 +215,37 @@ impl MemoryService {
         agent_id: &str,
         patch: AgentConfigFlags,
     ) -> Result<String, MemoryError> {
+        let toggle = patch.memory_enabled;
+        self.patch_flags_with_toggle(agent_id, patch, toggle)
+    }
+
+    /// 总开关时间标记与业务暂停共用配置保存入口；非记忆字段不会刷新时间。
+    pub fn patch_flags_with_toggle(
+        &self,
+        agent_id: &str,
+        patch: AgentConfigFlags,
+        toggle: Option<bool>,
+    ) -> Result<String, MemoryError> {
         let path = self.config_path(agent_id)?;
-        am::patch_agent_config(&path, |text| AgentConfigPatch::write_flags(text, &patch))
+        self.dream().save_config(agent_id, toggle, || {
+            am::patch_agent_config(&path, |text| {
+                let text = AgentConfigPatch::write_flags(text, &patch)?;
+                if let Some(enabled) = toggle {
+                    let mut document = am::config::AgentConfigDocument::parse(&text)?;
+                    let key = if enabled {
+                        "reenableAt"
+                    } else {
+                        "disabledSince"
+                    };
+                    let mut memory = serde_json::Map::new();
+                    memory.insert(key.into(), json!(am::now_iso()));
+                    document.deep_merge(&json!({"memory":memory}))?;
+                    document.render()
+                } else {
+                    Ok(text)
+                }
+            })
+        })
     }
 
     pub fn resolve_primary_agent_checked(&self) -> Result<Option<String>, MemoryError> {
@@ -801,9 +840,8 @@ pub async fn memories_import_route(
 
 // ── dream faces (memory-dream.ts) ───────────────────────────────────────────
 
-/// GET /lingxi/v1/memories/dream/status — the automated dream ticker is the
-/// R07 background face; its absence is `503 dream_unavailable` (the incumbent
-/// reports the same code when `ticker?.getDreamStatus` is missing, :57-58).
+/// 手动整理核心的真实状态；核心停止与模型未配置分别标注原因。
+/// 定时触发仍由调度层负责，不能用是否配置模型冒充核心是否存在。
 pub async fn dream_status_route(
     State(state): State<ServiceState>,
     RawQuery(query): RawQuery,
@@ -812,38 +850,47 @@ pub async fn dream_status_route(
         Ok(id) => id,
         Err(resp) => return resp,
     };
-    if let Err(err) = state.memory().dream_store(&agent_id) {
-        return error_response(&err);
+    match state.memory().dream().status(&state, &agent_id) {
+        Ok(status) => Json(status).into_response(),
+        Err(error) => dream_error_response(error, "dream_unavailable"),
     }
-    dream_unavailable(agent_id)
 }
 
-fn dream_unavailable(agent_id: String) -> Response {
-    (
-        StatusCode::SERVICE_UNAVAILABLE,
-        Json(json!({
-            "code": "dream_unavailable",
-            "error": "Memory Dream is unavailable for this agent",
-            "agentId": agent_id,
-            "reason": "dream_ticker_absent_in_candidate",
-        })),
-    )
-        .into_response()
-}
-
-/// POST /lingxi/v1/memories/dream/runs — same 503 semantics (:66-85).
+/// 启动真实后台五阶段整理；返回运行ID后可读取同一持久状态。
 pub async fn dream_run_route(
     State(state): State<ServiceState>,
     RawQuery(query): RawQuery,
 ) -> Response {
     let agent_id = match agent_id_from_query(query.as_deref()) {
         Ok(id) => id,
-        Err(resp) => return resp,
+        Err(response) => return response,
     };
-    if let Err(err) = state.memory().dream_store(&agent_id) {
-        return error_response(&err);
+    match state.memory().dream().start(state.clone(), agent_id) {
+        Ok(started) => (StatusCode::ACCEPTED, Json(started)).into_response(),
+        Err(error) => dream_error_response(error, "dream_run_failed"),
     }
-    dream_unavailable(agent_id)
+}
+
+/// 取消请求不抹去已经发生的付费用量；模型返回后不再发布正文。
+pub async fn dream_cancel_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    let agent_id = match agent_id_from_query(query.as_deref()) {
+        Ok(id) => id,
+        Err(response) => return response,
+    };
+    if let Err(error) = state.memory().roots(&agent_id) {
+        return error_response(&error);
+    }
+    match state.memory().dream().cancel(&agent_id) {
+        Ok(()) => (
+            StatusCode::ACCEPTED,
+            Json(json!({"agentId":agent_id,"status":"cancelling"})),
+        )
+            .into_response(),
+        Err(error) => dream_error_response(error, "dream_run_failed"),
+    }
 }
 
 fn dream_revision_summary(revision: &Value) -> Value {
@@ -892,6 +939,9 @@ pub async fn dream_revisions_route(
         Ok(id) => id,
         Err(resp) => return resp,
     };
+    if let Err(error) = state.memory().dream().lifecycle(&state, &agent_id) {
+        return dream_error_response(error, "dream_unavailable");
+    }
     match state
         .memory()
         .dream_store(&agent_id)
@@ -917,6 +967,10 @@ pub async fn dream_revision_detail_route(
         Ok(id) => id,
         Err(resp) => return resp,
     };
+    if let Err(error) = state.memory().dream().lifecycle(&state, &agent_id) {
+        return dream_error_response(error, "dream_unavailable");
+    }
+
     let service = state.memory();
     let store = match service.dream_store(&agent_id) {
         Ok(store) => store,
@@ -944,12 +998,25 @@ pub async fn dream_revision_detail_route(
 }
 
 fn dream_error_response(err: MemoryError, fallback: &str) -> Response {
+    if matches!(
+        err,
+        MemoryError::InvalidRequest(_) | MemoryError::AgentNotFound(_)
+    ) {
+        return error_response(&err);
+    }
+
     let code = match &err {
+        MemoryError::AgentNotFound(_) => "agent_not_found",
         MemoryError::NotFound(_) => "dream_revision_not_found",
         MemoryError::Conflict { code, .. }
             if matches!(
                 code.as_str(),
-                "dream_memory_changed" | "dream_memory_busy" | "dream_already_running"
+                "dream_memory_changed"
+                    | "dream_memory_busy"
+                    | "dream_already_running"
+                    | "dream_memory_disabled"
+                    | "dream_unavailable"
+                    | "dream_not_running"
             ) =>
         {
             code.as_str()
@@ -957,16 +1024,18 @@ fn dream_error_response(err: MemoryError, fallback: &str) -> Response {
         _ => fallback,
     };
     let status = match code {
-        "dream_revision_not_found" => StatusCode::NOT_FOUND,
+        "dream_revision_not_found" | "agent_not_found" => StatusCode::NOT_FOUND,
         "dream_unavailable" => StatusCode::SERVICE_UNAVAILABLE,
-        "dream_memory_changed" | "dream_memory_busy" | "dream_already_running" => {
-            StatusCode::CONFLICT
-        }
+        "dream_memory_changed"
+        | "dream_memory_busy"
+        | "dream_already_running"
+        | "dream_memory_disabled"
+        | "dream_not_running" => StatusCode::CONFLICT,
         _ => StatusCode::INTERNAL_SERVER_ERROR,
     };
     (
         status,
-        Json(json!({ "code": code, "error": err.to_string() })),
+        Json(json!({ "code": code, "error": err.to_string(), "reason": match &err {MemoryError::Conflict {message,..} if code=="dream_unavailable" => message.split(':').next(), _=>None}, "coreAvailable": if code=="dream_unavailable" {Some(!matches!(&err,MemoryError::Conflict{message,..} if message.starts_with("dream_core_stopped")))}else{None} })),
     )
         .into_response()
 }
@@ -982,6 +1051,10 @@ pub async fn dream_revision_restore_route(
         Ok(id) => id,
         Err(resp) => return resp,
     };
+    if let Err(error) = state.memory().dream().lifecycle(&state, &agent_id) {
+        return dream_error_response(error, "dream_unavailable");
+    }
+
     let payload = if body.is_empty() {
         json!({})
     } else {
@@ -1552,8 +1625,18 @@ pub async fn agent_config_patch_route(
         // 纯全局 patch：agentPartial 为空，直接返回已应用的全局键。
         return Json(json!({ "ok": true, "globalApplied": global_applied })).into_response();
     }
-    match state.memory().patch_flags(&agent_id, flags) {
+    let memory_toggle = payload.pointer("/memory/enabled").and_then(Value::as_bool);
+    let patch = state
+        .memory()
+        .patch_flags_with_toggle(&agent_id, flags, memory_toggle);
+    match patch {
         Ok(_text) => {
+            if let Some(enabled) = memory_toggle {
+                state.app_events().publish(
+                    "memory-master-changed",
+                    json!({"agentId":agent_id,"enabled":enabled}),
+                );
+            }
             // 工作区技能策略变化 → 通知运行时重筛（agents.ts PUT config 的
             // skills-changed 端口；T06 拆出的 flag 面保持同一通知语义）。
             if payload

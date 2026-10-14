@@ -1,0 +1,44 @@
+{
+  "status": "PASS_SCOPED_LIFECYCLE_ONLY",
+  "r1Finding": "DREAM-R1 core permanently stopped on failed deletion is remediated",
+  "patchSHA256": "29fac9faca2b09b85f98bc7d9d475845bb5a5996bcb304274afdd7291057eae6",
+  "candidateSourceStable": true,
+  "candidateSHA256": {
+    "rust/crates/lingxi-service/src/dream_service.rs": "25734a0ceffdf429650ba09e72f2a94feada3f921d02dbc693847d02b5c39896",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "91b058baf60f1430059d0526a7cf17966dd12ef0179284dcc6eadc24db64b7ce",
+    "rust/crates/lingxi-service/tests/r06_dream_completion.rs": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c"
+  },
+  "sourceManifest": "/tmp/r06-dream-independent-r2-source-sha.json",
+  "tests": {
+    "r06_dream_completion": {
+      "pass": 17,
+      "fail": 0,
+      "elapsedSeconds": 49.89
+    },
+    "r06_t06_memory": {
+      "pass": 7,
+      "fail": 0,
+      "elapsedSeconds": 0.61
+    },
+    "originalIndependentR1Assertions": {
+      "pass": 3,
+      "fail": 0,
+      "elapsedSeconds": 7.61,
+      "unchanged": true
+    },
+    "deletePartialDataGapReproducer": {
+      "observed": true,
+      "deleteHTTP": 500,
+      "agentDirExists": true,
+      "configPreserved": true,
+      "factsExists": false,
+      "longtermExists": false
+    }
+  },
+  "open": [
+    "R3 deletion data integrity/recovery: real DELETE500 removes inner memory files",
+    "0B483D7F6A43: automatic ticker pause/resume unimplemented",
+    "full stage gate not run"
+  ],
+  "overallAcceptance": "NOT_GRANTED"
+}

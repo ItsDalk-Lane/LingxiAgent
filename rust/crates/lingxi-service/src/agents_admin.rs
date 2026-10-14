@@ -18,6 +18,8 @@
 // 单元声明沿用 agent_memory.rs 对 agent_config.rs 的既有 #[path] 模式。
 #[path = "agent_config_readback.rs"]
 pub mod agent_config_readback;
+#[path = "agent_deletions.rs"]
+pub mod agent_deletions;
 
 use std::path::PathBuf;
 use std::sync::{Mutex, MutexGuard};
@@ -316,6 +318,8 @@ impl MemoryService {
         id: Option<&str>,
         yuan: Option<&str>,
     ) -> Result<(String, String), AgentLifecycleError> {
+        let _deletions = agent_deletions::lock_deletions();
+        let reserved = self.reserved_deleted_agent_ids()?;
         let name = name.trim();
         if name.is_empty() {
             return Err(AgentLifecycleError::bad_request("name is required"));
@@ -326,11 +330,12 @@ impl MemoryService {
         std::fs::create_dir_all(self.agents_root()).map_err(|err| {
             AgentLifecycleError::internal(format!("cannot create agents root: {err}"))
         })?;
-        let existing: std::collections::HashSet<String> = self
+        let mut existing: std::collections::HashSet<String> = self
             .scan_live_agent_dirs()?
             .into_iter()
             .map(|(id, _)| id)
             .collect();
+        existing.extend(reserved);
         let base = id
             .map(str::to_string)
             .unwrap_or_else(|| slug_from_name(name));
@@ -384,46 +389,6 @@ impl MemoryService {
             AgentLifecycleError::internal(format!("cannot write agent config.yaml: {err}"))
         })?;
         Ok((agent_id, name.to_string()))
-    }
-
-    /// 删除助手；返回替代助手 id（当被删者是当前/主助手时已切换过去）。
-    pub fn delete_agent(&self, agent_id: &str) -> Result<Option<String>, AgentLifecycleError> {
-        let dir = self.agent_dir_checked(agent_id)?;
-        let remaining = self.ordered_live_agents()?;
-        let others: Vec<&(String, PathBuf)> =
-            remaining.iter().filter(|(id, _)| id != agent_id).collect();
-        if others.is_empty() {
-            return Err(AgentLifecycleError::bad_request(
-                "cannot delete the last agent",
-            ));
-        }
-        let replacement = others.first().map(|(id, _)| id.clone());
-        let was_referenced = {
-            let preferences = self.read_preferences_strict()?;
-            preferences["current_agent_id"].as_str() == Some(agent_id)
-                || preferences["primary_agent_id"].as_str() == Some(agent_id)
-        };
-        std::fs::remove_dir_all(&dir).map_err(|err| {
-            AgentLifecycleError::internal(format!("cannot delete agent directory: {err}"))
-        })?;
-        if replacement.is_some() && was_referenced {
-            let _guard = preferences_locked();
-            let mut preferences = self.read_preferences_strict()?;
-            let mut changed = false;
-            if preferences["current_agent_id"].as_str() == Some(agent_id) {
-                preferences["current_agent_id"] = json!(replacement);
-                changed = true;
-            }
-            if preferences["primary_agent_id"].as_str() == Some(agent_id) {
-                preferences["primary_agent_id"] = json!(replacement);
-                changed = true;
-            }
-            if changed {
-                self.write_preferences(&preferences)?;
-            }
-            return Ok(replacement);
-        }
-        Ok(None)
     }
 
     /// 切换当前助手；可选 cwd 写入 desk.last_cwd 并去重合并 desk.cwd_history。
@@ -659,7 +624,8 @@ pub async fn agents_delete_route(
     };
     let requested = payload.get("deleteSkills").and_then(Value::as_array);
     match state.memory().delete_agent(&agent_id) {
-        Ok(replacement) => {
+        Ok(mut deletion) => {
+            let replacement = deletion["replacementAgentId"].as_str().map(str::to_owned);
             // 广播顺序与原实现一致：替代切换先于删除事件。
             if let Some(replacement) = replacement.as_deref() {
                 if let Some(name) = state.memory().agent_display_name(replacement) {
@@ -689,17 +655,9 @@ pub async fn agents_delete_route(
                 // 存活助手（删除前 ≥2 助手是硬前提，此处必非空；原实现用引擎级
                 // 用户技能模型，端口以存活者视图承担只读判定）。
                 let Some(view_agent) = other_live.first().cloned() else {
-                    return Json(json!({
-                        "ok": true,
-                        "replacementAgentId": replacement,
-                        "skillsDeleted": [],
-                        "skillsSkipped": [{
-                            "name": "*",
-                            "reason": "removal_failed",
-                            "detail": "no live view agent for skill removal",
-                        }],
-                    }))
-                    .into_response();
+                    deletion["skillsDeleted"] = json!([]);
+                    deletion["skillsSkipped"] = json!([{"name":"*","reason":"removal_failed","detail":"no live view agent for skill removal"}]);
+                    return Json(deletion).into_response();
                 };
                 for raw in names.iter().filter_map(|item| item.as_str()) {
                     if enabled_elsewhere.contains(raw) {
@@ -723,13 +681,9 @@ pub async fn agents_delete_route(
                         .publish("skills-changed", json!({ "agentId": Value::Null }));
                 }
             }
-            Json(json!({
-                "ok": true,
-                "replacementAgentId": replacement,
-                "skillsDeleted": skills_deleted,
-                "skillsSkipped": skills_skipped,
-            }))
-            .into_response()
+            deletion["skillsDeleted"] = json!(skills_deleted);
+            deletion["skillsSkipped"] = json!(skills_skipped);
+            Json(deletion).into_response()
         }
         Err(err) => err.response(),
     }

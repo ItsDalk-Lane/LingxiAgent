@@ -38,6 +38,7 @@ pub mod context_compiler;
 pub mod conversation_map;
 pub mod credentials;
 pub mod dedup;
+pub mod dream_service;
 pub mod epoch;
 pub mod events;
 pub mod exectools;
@@ -1244,6 +1245,15 @@ impl ServiceState {
                     })?;
             }
         }
+        if let Some((access, _)) = &workspace_access {
+            access
+                .protect_service_root(&layout.runtime_dir.join("agent-deletions"))
+                .map_err(|error| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: error.to_string(),
+                    })
+                })?;
+        }
         let file_safety = Arc::new(file_safety::FileSafety::new(&config.data_home));
         // R06-T06：记忆/技能/人格服务（工具面注册模型侧工具需要它们）。
         // product_dir 复用 T01 的解析链。
@@ -1259,6 +1269,11 @@ impl ServiceState {
             t06_data_home.clone(),
             layout.runtime_dir.clone(),
         ));
+        memory_service.recover_agent_deletions().map_err(|error| {
+            ServiceStartupError::Storage(StorageError::Io {
+                detail: format!("cannot recover agent deletions: {error}"),
+            })
+        })?;
         let rollback_file_changes = memory_service.rollback_file_changes().map_err(|err| {
             ServiceStartupError::Storage(StorageError::Io {
                 detail: format!("cannot load workspace rollback preference: {err}"),
@@ -7162,7 +7177,7 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         .route(
             "/lingxi/v1/memories/dream/runs",
-            post(memory::dream_run_route),
+            post(memory::dream_run_route).delete(memory::dream_cancel_route),
         )
         .route(
             "/lingxi/v1/memories/dream/revisions",
@@ -7177,6 +7192,14 @@ pub fn build_router(state: ServiceState) -> Router {
             post(memory::dream_revision_restore_route),
         )
         // ── R06 助手生命周期集合面（列表/创建/切换/删除/主助手/排序）──
+        .route(
+            "/lingxi/v1/agent-deletions",
+            get(agents_admin::agent_deletions::deletion_receipts_route),
+        )
+        .route(
+            "/lingxi/v1/agent-deletions/{deletion_id}/cleanup",
+            post(agents_admin::agent_deletions::deletion_cleanup_route),
+        )
         .route(
             "/lingxi/v1/agents",
             get(agents_admin::agents_list_route).post(agents_admin::agents_create_route),
@@ -7548,6 +7571,13 @@ where
     let conn_admission = Arc::clone(state.connection_admission());
     let header_budget = state.admission().request_budget();
     let knowledge_on_signal = knowledge_worker.clone();
+    let dream_service = Arc::clone(state.memory());
+    let dream_on_signal = Arc::clone(&dream_service);
+    let dream_budget = drain_budget.unwrap_or(std::time::Duration::from_millis(
+        state.config().shutdown_timeout_ms,
+    ));
+    let dream_stop_at = Arc::new(std::sync::Mutex::new(None::<std::time::Instant>));
+    let dream_signal_at = Arc::clone(&dream_stop_at);
     let router = build_router(state);
     // The graceful-shutdown future consumes the stop signal and records the
     // signal instant; the drain budget watchdog is armed at THAT instant (the
@@ -7557,6 +7587,8 @@ where
     let (signal_tx, signal_rx) = tokio::sync::oneshot::channel::<std::time::Instant>();
     let graceful = async move {
         shutdown.await;
+        *dream_signal_at.lock().unwrap() = Some(std::time::Instant::now());
+        dream_on_signal.dream().stop_all();
         knowledge_on_signal.shutdown();
         let _ = signal_tx.send(std::time::Instant::now());
     };
@@ -7613,6 +7645,24 @@ where
         .map_err(|error| ServiceError::Serve {
             source: std::io::Error::other(error.to_string()),
         })?;
+    dream_service.dream().stop_all();
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    if tokio::time::timeout(remaining, dream_service.dream().wait_stopped())
+        .await
+        .is_err()
+    {
+        eprintln!(
+            "{} phase=memory_dream residue=unsettled_model_call",
+            shutdown::SHUTDOWN_TIMEOUT_MARKER
+        );
+        return outcome.map(|_| ServeOutcome {
+            drain_timed_out: true,
+        });
+    }
     outcome
 }
 

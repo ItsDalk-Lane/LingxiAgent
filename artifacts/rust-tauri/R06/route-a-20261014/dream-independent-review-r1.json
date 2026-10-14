@@ -1,0 +1,56 @@
+{
+  "status": "NEEDS_FIX",
+  "scope": "EX04 manual dream core; three R06 dream faces; memory.enabled partial only",
+  "patchSHA256": "f8ec25d04dbd2c7d4b4623bed25790e12b7a9c0e8fe4d6c0c3745c79f220dbff",
+  "candidateSourceStable": true,
+  "sourceSHA256": {
+    "rust/crates/lingxi-service/src/dream_service.rs": "67670b0b0574f8db7811e3b1584794fac649c56b9ff3dcede0e6d0a7ed69bd9a",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "a0e8150e5d24f4b739ad970b242d9156641fb87d87d4597056a19978820e985a",
+    "rust/crates/lingxi-service/src/agent_config_readback.rs": "18976946d5ae266145457a63bb210d4bdb40b93e60e77aa472936dec1ab47e3b",
+    "rust/crates/lingxi-service/src/memory.rs": "0019d244ce602772839ec6551244ed2b22af2f8a5298a224d5c866d038bc6ea7",
+    "rust/crates/lingxi-service/src/lib.rs": "2dfc3342fd2e0aa3c08a7f316a416b41d59af7a8efac54d4541e6c7f746e5136",
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "d20b3791db5d72ef0a57385886b652773558a7fb6d2ace378206004bc0a8e99e",
+    "rust/crates/lingxi-service/tests/r06_dream_completion.rs": "50e6e1e62f31b8f1dd0f563958c29e18b82d3765019062589b3a0feadfb49169"
+  },
+  "originalTests": {
+    "r06_dream_completion": {
+      "pass": 13,
+      "fail": 0
+    },
+    "r06_t06_memory": {
+      "pass": 7,
+      "fail": 0
+    }
+  },
+  "independentTests": {
+    "pass": 2,
+    "fail": 1,
+    "lastAgentRefusal": "PASS",
+    "paidReadonlySourceRaceAndRetry": "PASS",
+    "failedDeleteCoreAvailability": "FAIL"
+  },
+  "findings": [
+    {
+      "id": "DREAM-R1",
+      "priority": "P2",
+      "source": "rust/crates/lingxi-service/src/agents_admin.rs:406",
+      "trigger": "real uchg agent directory; DELETE returns500; remove uchg",
+      "observed": "agent/config still present; status and run permanently503 dream_core_stopped",
+      "requirement": "failed deletion must preserve or explicitly recover live agent core without cancelling unrelated agents",
+      "fix": "arbitrate pending deletion safely; stop/cancel must prevent late directory recreation; restore live lifecycle if removal failed and agent survives; preserve paid responses and final state"
+    }
+  ],
+  "leafAssessment": {
+    "76EE734926B4": "implemented core conditions; cannot close until DREAM-R1 fixed",
+    "A9AD4C7F76AE": "implemented core conditions; cannot close until DREAM-R1 fixed",
+    "B45ECEC543C6": "implemented core conditions; cannot close until DREAM-R1 fixed",
+    "0B483D7F6A43": "PARTIAL: actual pending manual cancellation/re-enable and dates implemented; no automatic ticker scheduler or true ticker pause/resume"
+  },
+  "limits": [
+    "no full stage gate",
+    "no cross-platform disk fault proof",
+    "no actual paid vendor",
+    "no formal package",
+    "usage-storage failure not runtime tested"
+  ]
+}

@@ -1,0 +1,560 @@
+//! 助手删除：同盘真实原子暂存是逻辑提交点，物理清理单独记录并可恢复。
+use super::{preferences_locked, AgentLifecycleError};
+use crate::{memory::MemoryService, ServiceState};
+use axum::{
+    extract::{Path as AxumPath, State},
+    response::{IntoResponse, Response},
+    Json,
+};
+use lingxi_adapters::storage::agent_memory as am;
+use serde_json::{json, Value};
+use std::{
+    io::Write,
+    path::{Path, PathBuf},
+    sync::{Arc, Mutex, MutexGuard},
+};
+static DELETIONS: Mutex<()> = Mutex::new(());
+pub(super) fn lock_deletions() -> MutexGuard<'static, ()> {
+    DELETIONS.lock().unwrap_or_else(|e| e.into_inner())
+}
+fn io_error(error: impl std::fmt::Display) -> AgentLifecycleError {
+    AgentLifecycleError::internal(format!("agent deletion storage failure: {error}"))
+}
+fn valid_id(id: &str) -> Result<(), AgentLifecycleError> {
+    if id.is_empty() || !id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
+        return Err(AgentLifecycleError::bad_request(
+            "invalid deletion receipt id",
+        ));
+    }
+    Ok(())
+}
+fn real_dir(path: &Path) -> Result<(), AgentLifecycleError> {
+    let meta = std::fs::symlink_metadata(path).map_err(io_error)?;
+    if !meta.is_dir() || meta.file_type().is_symlink() {
+        return Err(io_error("deletion directory must be a real directory"));
+    }
+    Ok(())
+}
+fn directory_present(path: &Path) -> Result<bool, AgentLifecycleError> {
+    match std::fs::symlink_metadata(path) {
+        Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => Ok(true),
+        Ok(_) => Err(io_error("deletion data path must be a real directory")),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
+        Err(error) => Err(io_error(error)),
+    }
+}
+fn create_private_dir(path: &Path) -> Result<(), AgentLifecycleError> {
+    if !path.exists() {
+        let mut builder = std::fs::DirBuilder::new();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::DirBuilderExt;
+            builder.mode(0o700);
+        }
+        builder.create(path).map_err(io_error)?;
+    }
+    real_dir(path)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o700)).map_err(io_error)?;
+    }
+    Ok(())
+}
+fn sync_dir(path: &Path) -> Result<(), AgentLifecycleError> {
+    #[cfg(unix)]
+    {
+        std::fs::File::open(path)
+            .and_then(|file| file.sync_all())
+            .map_err(io_error)?;
+    }
+    // Windows标准文件接口无目录同步；文件本身sync_all，范围为进程重启恢复。
+    #[cfg(not(unix))]
+    {
+        let _ = path;
+    }
+    Ok(())
+}
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum DeletionPhase {
+    AfterPrepared,
+    AfterMoved,
+}
+type Hook = Arc<dyn Fn(DeletionPhase, &Path) + Send + Sync>;
+static HOOK: Mutex<Option<(PathBuf, Hook)>> = Mutex::new(None);
+/// 可信时序探针只在真实持久准备/真实rename之后调用，HTTP没有注入入口。
+#[doc(hidden)]
+pub struct DeletionTestHookGuard(Option<(PathBuf, Hook)>);
+impl Drop for DeletionTestHookGuard {
+    fn drop(&mut self) {
+        *HOOK.lock().unwrap() = self.0.take();
+    }
+}
+#[doc(hidden)]
+pub fn deletion_test_hook(home: &Path, hook: Hook) -> DeletionTestHookGuard {
+    let previous = HOOK.lock().unwrap().replace((home.to_path_buf(), hook));
+    DeletionTestHookGuard(previous)
+}
+fn probe(home: &Path, phase: DeletionPhase, transaction: &Path) {
+    let hook = HOOK
+        .lock()
+        .unwrap()
+        .as_ref()
+        .filter(|(root, _)| root == home)
+        .map(|(_, h)| h.clone());
+    if let Some(hook) = hook {
+        hook(phase, transaction);
+    }
+}
+impl MemoryService {
+    fn deletion_root(&self) -> PathBuf {
+        self.deletion_runtime_dir().join("agent-deletions")
+    }
+    fn deletion_transaction(&self, id: &str) -> Result<PathBuf, AgentLifecycleError> {
+        valid_id(id)?;
+        let root = self.deletion_root();
+        real_dir(&root)?;
+        let transaction = root.join(id);
+        real_dir(&transaction)?;
+        Ok(transaction)
+    }
+    fn save_deletion_receipt(&self, receipt: &mut Value) -> Result<(), AgentLifecycleError> {
+        receipt["updatedAt"] = json!(am::now_iso());
+        let id = receipt["deletionId"]
+            .as_str()
+            .ok_or_else(|| io_error("receipt omitted id"))?;
+        let dir = self.deletion_transaction(id)?;
+        let path = dir.join("receipt.json");
+        if let Ok(meta) = std::fs::symlink_metadata(&path) {
+            if !meta.is_file() || meta.file_type().is_symlink() {
+                return Err(io_error("receipt must be a real file"));
+            }
+        }
+        let temp = dir.join(format!(
+            ".receipt-{}.tmp",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(io_error)?
+                .as_nanos()
+        ));
+        let mut file = std::fs::OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .open(&temp)
+            .map_err(io_error)?;
+        file.write_all(
+            serde_json::to_string_pretty(receipt)
+                .map_err(io_error)?
+                .as_bytes(),
+        )
+        .map_err(io_error)?;
+        file.sync_all().map_err(io_error)?;
+        drop(file);
+        std::fs::rename(&temp, &path).map_err(io_error)?;
+        sync_dir(&dir)
+    }
+    fn read_deletion_receipt(&self, id: &str) -> Result<Value, AgentLifecycleError> {
+        let dir = self.deletion_transaction(id)?;
+        let path = dir.join("receipt.json");
+        let meta = std::fs::symlink_metadata(&path).map_err(io_error)?;
+        if !meta.is_file() || meta.file_type().is_symlink() {
+            return Err(io_error("receipt must be a real file"));
+        }
+        let value: Value =
+            serde_json::from_slice(&std::fs::read(path).map_err(io_error)?).map_err(io_error)?;
+        if value["schemaVersion"] != 1
+            || value["deletionId"] != id
+            || !value["logicalDeleted"].is_boolean()
+            || !value["cleanupPending"].is_boolean()
+            || !value["referencesPending"].is_boolean()
+            || !matches!(
+                value["status"].as_str(),
+                Some("prepared" | "committed" | "completed" | "aborted")
+            )
+            || value["logicalDeleted"].as_bool()
+                != Some(matches!(
+                    value["status"].as_str(),
+                    Some("committed" | "completed")
+                ))
+        {
+            return Err(io_error("invalid deletion receipt"));
+        }
+        am::validate_agent_id(
+            value["agentId"]
+                .as_str()
+                .ok_or_else(|| io_error("receipt agent id missing"))?,
+        )?;
+        am::validate_agent_id(
+            value["targetReplacementAgentId"]
+                .as_str()
+                .ok_or_else(|| io_error("receipt replacement id missing"))?,
+        )?;
+        self.validate_deletion_materials(&value)?;
+        Ok(value)
+    }
+    // 所有入口使用同一实物判定；坏收据不能停用现役助手、改引用或清掉暂存。
+    fn validate_deletion_materials(&self, receipt: &Value) -> Result<(), AgentLifecycleError> {
+        let agent = receipt["agentId"].as_str().unwrap();
+        let id = receipt["deletionId"].as_str().unwrap();
+        let public_present = directory_present(&self.agents_root().join(agent))?;
+        let staged_present = directory_present(&self.deletion_transaction(id)?.join("data"))?;
+        let consistent = match receipt["status"].as_str().unwrap() {
+            "prepared" => public_present != staged_present,
+            "aborted" => !staged_present,
+            "committed" => !public_present,
+            "completed" => !public_present && !staged_present,
+            _ => false,
+        };
+        if !consistent {
+            return Err(io_error(
+                "deletion receipt contradicts actual public/staged agent data; recovery refused",
+            ));
+        }
+        Ok(())
+    }
+    // 首份收据之前崩溃只能留下空目录或未发布收据；不碰任何带data/未知文件的目录。
+    fn unpublished_intent(&self, dir: &Path) -> Result<bool, AgentLifecycleError> {
+        match std::fs::symlink_metadata(dir.join("receipt.json")) {
+            Ok(_) => return Ok(false),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            Err(error) => return Err(io_error(error)),
+        }
+        for entry in std::fs::read_dir(dir).map_err(io_error)? {
+            let entry = entry.map_err(io_error)?;
+            let name = entry.file_name().to_string_lossy().to_string();
+            let meta = entry.path().symlink_metadata().map_err(io_error)?;
+            let temporary = name
+                .strip_prefix(".receipt-")
+                .and_then(|s| s.strip_suffix(".tmp"))
+                .is_some_and(|s| !s.is_empty() && s.chars().all(|c| c.is_ascii_digit()));
+            if !temporary || !meta.is_file() || meta.file_type().is_symlink() {
+                return Err(io_error(
+                    "receiptless deletion directory contains data; recovery refused",
+                ));
+            }
+        }
+        Ok(true)
+    }
+    fn prune_unpublished_intents(&self) -> Result<(), AgentLifecycleError> {
+        let root = self.deletion_root();
+        if !root.exists() {
+            return Ok(());
+        }
+        real_dir(&root)?;
+        for entry in std::fs::read_dir(&root).map_err(io_error)? {
+            let entry = entry.map_err(io_error)?;
+            valid_id(&entry.file_name().to_string_lossy())?;
+            real_dir(&entry.path())?;
+            if self.unpublished_intent(&entry.path())? {
+                std::fs::remove_dir_all(entry.path()).map_err(io_error)?;
+                sync_dir(&root)?;
+            }
+        }
+        Ok(())
+    }
+    fn deletion_ids(&self) -> Result<Vec<String>, AgentLifecycleError> {
+        let root = self.deletion_root();
+        let entries = match std::fs::read_dir(&root) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(vec![]),
+            Err(e) => return Err(io_error(e)),
+        };
+        real_dir(&root)?;
+        let mut out = Vec::new();
+        for entry in entries {
+            let entry = entry.map_err(io_error)?;
+            let id = entry.file_name().to_string_lossy().to_string();
+            valid_id(&id)?;
+            real_dir(&entry.path())?;
+            if !self.unpublished_intent(&entry.path())? {
+                out.push(id);
+            }
+        }
+        out.sort();
+        Ok(out)
+    }
+    pub(super) fn reserved_deleted_agent_ids(&self) -> Result<Vec<String>, AgentLifecycleError> {
+        self.deletion_ids()?
+            .into_iter()
+            .map(|id| self.read_deletion_receipt(&id))
+            .collect::<Result<Vec<_>, _>>()
+            .map(|receipts| {
+                receipts
+                    .into_iter()
+                    .filter(|r| r["status"] != "aborted")
+                    .filter_map(|r| r["agentId"].as_str().map(str::to_owned))
+                    .collect()
+            })
+    }
+    fn prepare_deletion(&self, agent: &str) -> Result<Value, AgentLifecycleError> {
+        let dir = self.agent_dir_checked(agent)?;
+        real_dir(&dir)?;
+        let live = self.ordered_live_agents()?;
+        let other = live
+            .iter()
+            .find(|(id, _)| id != agent)
+            .ok_or_else(|| AgentLifecycleError::bad_request("cannot delete the last agent"))?;
+        let preferences = self.read_preferences_strict()?;
+        let referenced =
+            preferences["current_agent_id"] == agent || preferences["primary_agent_id"] == agent;
+        real_dir(self.deletion_runtime_dir())?;
+        create_private_dir(&self.deletion_root())?;
+        static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let id = format!(
+            "delete-{}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(io_error)?
+                .as_nanos(),
+            SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        );
+        create_private_dir(&self.deletion_root().join(&id))?;
+        sync_dir(&self.deletion_root())?;
+        let mut receipt = json!({"schemaVersion":1,"deletionId":id,"agentId":agent,"targetReplacementAgentId":other.0,"wasReferenced":referenced,"logicalDeleted":false,"cleanupPending":false,"referencesPending":false,"replacementAgentId":null,"status":"prepared","createdAt":am::now_iso()});
+        if let Err(error) = self.save_deletion_receipt(&mut receipt) {
+            let cleanup = std::fs::remove_dir_all(self.deletion_root().join(&id));
+            return Err(AgentLifecycleError::internal(format!(
+                "{error}; preparation cleanup: {cleanup:?}"
+            )));
+        }
+        probe(
+            self.home(),
+            DeletionPhase::AfterPrepared,
+            &self.deletion_transaction(&id)?,
+        );
+        Ok(receipt)
+    }
+    fn repair_deletion_references(&self, receipt: &mut Value) -> Result<(), AgentLifecycleError> {
+        let agent = receipt["agentId"].as_str().unwrap().to_owned();
+        let _preferences = preferences_locked();
+        let mut prefs = self.read_preferences_strict()?;
+        let needs_switch = ["current_agent_id", "primary_agent_id"]
+            .iter()
+            .any(|key| prefs[*key] == agent);
+        let mut replacement = receipt["targetReplacementAgentId"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        if needs_switch && self.agent_dir_checked(&replacement).is_err() {
+            replacement = self
+                .ordered_live_agents()?
+                .into_iter()
+                .find(|(id, _)| id != &agent)
+                .map(|(id, _)| id)
+                .ok_or_else(|| io_error("no live replacement for pending deletion references"))?;
+            receipt["referenceRepairReplacement"] = json!(replacement);
+            receipt["targetReplacementAgentId"] = json!(replacement);
+        }
+        let mut changed = false;
+        for key in ["current_agent_id", "primary_agent_id"] {
+            if prefs[key] == agent {
+                prefs[key] = json!(replacement);
+                changed = true;
+            }
+        }
+        if let Some(order) = prefs["agent_order"].as_array_mut() {
+            let old = order.len();
+            order.retain(|id| id != &agent);
+            changed |= old != order.len();
+        }
+        if changed {
+            self.write_preferences(&prefs)?;
+        }
+        receipt["referencesPending"] = json!(false);
+        receipt["referenceError"] = Value::Null;
+        if receipt["wasReferenced"] == true {
+            receipt["replacementAgentId"] = json!(replacement);
+        }
+        Ok(())
+    }
+    fn settle_deletion(&self, receipt: &mut Value) -> Result<(), AgentLifecycleError> {
+        let id = receipt["deletionId"].as_str().unwrap().to_owned();
+        let transaction = self.deletion_transaction(&id)?;
+        self.validate_deletion_materials(receipt)?;
+        if receipt["logicalDeleted"] != true {
+            return Ok(());
+        }
+        receipt["status"] = json!("committed");
+        receipt["cleanupPending"] = json!(true);
+        // 提交收据未能持久化前不清理暂存；重启可从真实prepared+data恢复。
+        if let Err(error) = self.save_deletion_receipt(receipt) {
+            receipt["journalError"] = json!(error.to_string());
+            return Ok(());
+        }
+        match self.repair_deletion_references(receipt) {
+            Ok(()) => {}
+            Err(error) => {
+                receipt["referencesPending"] = json!(true);
+                receipt["referenceError"] = json!(error.to_string());
+                self.save_deletion_receipt(receipt)?;
+                return Ok(());
+            }
+        }
+        self.save_deletion_receipt(receipt)?;
+        let staged = transaction.join("data");
+        let result = match std::fs::symlink_metadata(&staged) {
+            Ok(meta) if meta.is_dir() && !meta.file_type().is_symlink() => {
+                std::fs::remove_dir_all(&staged)
+            }
+            Ok(_) => return Err(io_error("staged agent data must be a real directory")),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(e) => Err(e),
+        };
+        match result {
+            Ok(()) => {
+                receipt["cleanupPending"] = json!(false);
+                receipt["cleanupError"] = Value::Null;
+                receipt["status"] = json!("completed");
+                sync_dir(&transaction)?;
+            }
+            Err(error) => {
+                receipt["cleanupPending"] = json!(true);
+                receipt["cleanupError"] = json!(error.to_string());
+            }
+        }
+        self.save_deletion_receipt(receipt)
+    }
+    pub fn delete_agent(&self, agent: &str) -> Result<Value, AgentLifecycleError> {
+        let _deletions = lock_deletions();
+        let mut receipt = self.dream().delete_agent_files(
+            agent,
+            || self.prepare_deletion(agent),
+            |mut receipt| {
+                let id = receipt["deletionId"].as_str().unwrap().to_owned();
+                let transaction = self.deletion_transaction(&id)?;
+                let dir = self.agents_root().join(agent);
+                let _publication = am::ContextMaterialMutation::for_path(&dir);
+                if let Err(error) = std::fs::rename(&dir, transaction.join("data")) {
+                    receipt["status"] = json!("aborted");
+                    receipt["moveError"] = json!(error.to_string());
+                    self.save_deletion_receipt(&mut receipt).map_err(|save| {
+                        AgentLifecycleError::internal(format!(
+                            "cannot stage agent: {error}; abort receipt failed: {save}"
+                        ))
+                    })?;
+                    return Err(AgentLifecycleError::internal(format!(
+                        "cannot stage agent for deletion: {error}"
+                    )));
+                }
+                receipt["logicalDeleted"] = json!(true);
+                receipt["cleanupPending"] = json!(true);
+                receipt["referencesPending"] = json!(true);
+                receipt["status"] = json!("committed");
+                if let Err(error) =
+                    sync_dir(&self.agents_root()).and_then(|_| sync_dir(&transaction))
+                {
+                    receipt["journalError"] = json!(error.to_string());
+                }
+                probe(self.home(), DeletionPhase::AfterMoved, &transaction);
+                self.validate_deletion_materials(&receipt)?;
+                Ok(receipt)
+            },
+        )?;
+        if let Err(error) = self.settle_deletion(&mut receipt) {
+            receipt["journalError"] = json!(error.to_string());
+        }
+        Ok(public_receipt(&receipt))
+    }
+    /// prepared收据按真实两处目录判断；不把可能半清的data搬回公共助手目录。
+    fn recover_one_deletion(&self, id: &str) -> Result<Value, AgentLifecycleError> {
+        let mut receipt = self.read_deletion_receipt(id)?;
+        if receipt["status"] == "aborted" {
+            return Ok(public_receipt(&receipt));
+        }
+        let agent = receipt["agentId"].as_str().unwrap().to_owned();
+        let staged = self.deletion_transaction(id)?.join("data");
+        if receipt["status"] == "prepared" {
+            let public_present = directory_present(&self.agents_root().join(&agent))?;
+            if directory_present(&staged)? {
+                if public_present {
+                    return Err(io_error(
+                        "prepared deletion has both public and staged agent; recovery refused",
+                    ));
+                }
+                receipt["logicalDeleted"] = json!(true);
+                receipt["status"] = json!("committed");
+                receipt["referencesPending"] = json!(true);
+            } else if public_present {
+                receipt["status"] = json!("aborted");
+                self.save_deletion_receipt(&mut receipt)?;
+                return Ok(public_receipt(&receipt));
+            } else {
+                return Err(io_error("prepared receipt lost both original and staged agent; cannot invent deletion outcome"));
+            }
+        }
+        self.dream().stop_agent(&agent);
+        self.settle_deletion(&mut receipt)?;
+        Ok(public_receipt(&receipt))
+    }
+    pub fn recover_agent_deletions(&self) -> Result<(), AgentLifecycleError> {
+        let _lock = lock_deletions();
+        self.prune_unpublished_intents()?;
+        let ids = self.deletion_ids()?;
+        // 先验证整批收据，避免后面的坏记录让启动恢复只执行一半业务动作。
+        for id in &ids {
+            self.read_deletion_receipt(id)?;
+        }
+        for id in ids {
+            self.recover_one_deletion(&id)?;
+        }
+        Ok(())
+    }
+    pub fn retry_agent_deletion_cleanup(&self, id: &str) -> Result<Value, AgentLifecycleError> {
+        let _lock = lock_deletions();
+        self.recover_one_deletion(id)
+    }
+    pub fn agent_deletion_receipts(&self) -> Result<Vec<Value>, AgentLifecycleError> {
+        let _lock = lock_deletions();
+        self.deletion_ids()?
+            .into_iter()
+            .map(|id| {
+                let mut receipt = self.read_deletion_receipt(&id)?;
+                if receipt["status"] == "prepared" {
+                    let staged = self.deletion_transaction(&id)?.join("data");
+                    match std::fs::symlink_metadata(&staged) {
+                        Ok(_) => {
+                            real_dir(&staged)?;
+                            let agent = receipt["agentId"].as_str().unwrap();
+                            if directory_present(&self.agents_root().join(agent))? {
+                                return Err(io_error("prepared deletion has both public and staged agent; query refused"));
+                            }
+                            receipt["logicalDeleted"] = json!(true);
+                            receipt["cleanupPending"] = json!(true);
+                            receipt["referencesPending"] = json!(true);
+                            receipt["status"] = json!("committed");
+                            receipt["journalCheckpointPending"] = json!(true);
+                        }
+                        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+                        Err(error) => return Err(io_error(error)),
+                    }
+                }
+                Ok(public_receipt(&receipt))
+            })
+            .collect()
+    }
+}
+fn public_receipt(receipt: &Value) -> Value {
+    let mut value = receipt.clone();
+    let object = value.as_object_mut().unwrap();
+    object.remove("schemaVersion");
+    object.remove("targetReplacementAgentId");
+    object.remove("wasReferenced");
+    object.insert("ok".into(), json!(receipt["logicalDeleted"] == true));
+    value
+}
+pub async fn deletion_receipts_route(State(state): State<ServiceState>) -> Response {
+    match state.memory().agent_deletion_receipts() {
+        Ok(receipts) => Json(json!({"deletions":receipts})).into_response(),
+        Err(error) => error.response(),
+    }
+}
+pub async fn deletion_cleanup_route(
+    State(state): State<ServiceState>,
+    AxumPath(id): AxumPath<String>,
+) -> Response {
+    match state.memory().retry_agent_deletion_cleanup(&id) {
+        Ok(value) => Json(value).into_response(),
+        Err(error) => error.response(),
+    }
+}

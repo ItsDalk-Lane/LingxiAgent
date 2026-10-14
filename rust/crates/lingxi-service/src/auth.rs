@@ -1017,6 +1017,19 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         // R06 助手生命周期集合面：读 = settings.read；写 = settings.write
         // （server/route-security.ts agents 集合路由同口径）。仅匹配无更深
         // 路径段的形态，避免遮蔽下方按 face 分类的子路由。
+        if p == "/lingxi/v1/agent-deletions" && (m == "GET" || m == "HEAD") {
+            return RoutePolicy::Scope("settings.read");
+        }
+        if let Some(rest) = p.strip_prefix("/lingxi/v1/agent-deletions/") {
+            if rest
+                .strip_suffix("/cleanup")
+                .is_some_and(|id| !id.is_empty() && !id.contains('/'))
+                && m == "POST"
+            {
+                return RoutePolicy::Scope("settings.write");
+            }
+            return RoutePolicy::LocalOnly;
+        }
         if p == "/lingxi/v1/agents" {
             if m == "GET" || m == "HEAD" {
                 return RoutePolicy::Scope("settings.read");

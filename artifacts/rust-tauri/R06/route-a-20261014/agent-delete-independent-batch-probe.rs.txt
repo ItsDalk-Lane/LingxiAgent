@@ -1,0 +1,431 @@
+//! R3 助手删除真实原子暂存、待清理收据与重启恢复。
+//! 只门控外部供应商响应，不替换被验收业务核心。
+use lingxi_kernel::ports::StoragePort;
+use lingxi_service::{
+    prepare_layout, run, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+};
+use serde_json::{json, Value};
+use std::{
+    net::SocketAddr,
+    path::PathBuf,
+    sync::{Arc, Mutex},
+    time::Duration,
+};
+use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
+use tokio::net::{TcpListener, TcpStream};
+
+type ProviderGate = Option<(
+    tokio::sync::oneshot::Sender<()>,
+    tokio::sync::oneshot::Receiver<()>,
+)>;
+
+struct Fixture {
+    addr: SocketAddr,
+    state: ServiceState,
+    home: PathBuf,
+    token: String,
+    denied: String,
+    chat: String,
+    requests: Arc<Mutex<Vec<Value>>>,
+    provider_gate: Arc<Mutex<ProviderGate>>,
+    stop: tokio::sync::oneshot::Sender<()>,
+    task: tokio::task::JoinHandle<()>,
+    stub_stop: tokio::sync::oneshot::Sender<()>,
+    stub_task: tokio::task::JoinHandle<()>,
+}
+async fn read_request(socket: &mut TcpStream) -> (String, Vec<u8>) {
+    let mut bytes = Vec::new();
+    let mut block = [0u8; 4096];
+    loop {
+        let n = socket.read(&mut block).await.unwrap();
+        assert!(n > 0);
+        bytes.extend_from_slice(&block[..n]);
+        if let Some(index) = bytes.windows(4).position(|b| b == b"\r\n\r\n") {
+            let headers = String::from_utf8(bytes[..index].to_vec()).unwrap();
+            let length = headers
+                .lines()
+                .find_map(|line| {
+                    line.to_lowercase()
+                        .strip_prefix("content-length:")
+                        .and_then(|v| v.trim().parse::<usize>().ok())
+                })
+                .unwrap_or(0);
+            if bytes.len() >= index + 4 + length {
+                return (headers, bytes[index + 4..index + 4 + length].to_vec());
+            }
+        }
+    }
+}
+impl Fixture {
+    async fn start(tag: &str) -> Self {
+        let root = std::env::temp_dir().join(format!(
+            "dream-completion-{tag}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let home = root.join("home");
+        let workspace = root.join("workspace");
+        std::fs::create_dir_all(&workspace).unwrap();
+        let product = root.join("product");
+        for (dir, name, text) in [
+            ("identity-templates", "completion-persona", "默认身份"),
+            ("agents-templates", "completion-persona", "默认说明"),
+            ("yuan", "completion-persona", "你是 {{agentName}}，协作助手"),
+        ] {
+            std::fs::create_dir_all(product.join(dir)).unwrap();
+            std::fs::write(product.join(dir).join(format!("{name}.md")), text).unwrap();
+        }
+        for id in ["agentA", "agentB"] {
+            let dir = home.join("agents").join(id);
+            std::fs::create_dir_all(dir.join("memory")).unwrap();
+            std::fs::write(dir.join("config.yaml"),format!("locale: zh\nagent:\n  name: 助手{id}\n  yuan: completion-persona\nmemory:\n  enabled: true\n")).unwrap();
+        }
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let stub_addr = listener.local_addr().unwrap();
+        let requests = Arc::new(Mutex::new(Vec::new()));
+        let saved = requests.clone();
+        let provider_gate = Arc::new(Mutex::new(
+            None::<(
+                tokio::sync::oneshot::Sender<()>,
+                tokio::sync::oneshot::Receiver<()>,
+            )>,
+        ));
+        let served_gate = provider_gate.clone();
+        let (stub_stop, mut stop_rx) = tokio::sync::oneshot::channel();
+        let stub_task = tokio::spawn(async move {
+            loop {
+                let accepted =
+                    tokio::select! {_=&mut stop_rx=>break,value=listener.accept()=>value};
+                let (mut socket, _) = accepted.unwrap();
+                let saved = saved.clone();
+                let served_gate = served_gate.clone();
+                tokio::spawn(async move {
+                    let (_, body) = read_request(&mut socket).await;
+                    let request: Value = serde_json::from_slice(&body).unwrap();
+                    let instruction = request["messages"][0]["content"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    let payload: Value = serde_json::from_str(
+                        request["messages"].as_array().unwrap().last().unwrap()["content"]
+                            .as_str()
+                            .unwrap_or("null"),
+                    )
+                    .unwrap_or(Value::Null);
+                    saved.lock().unwrap().push(request.clone());
+                    let gate = { served_gate.lock().unwrap().take() };
+                    if let Some((entered, release)) = gate {
+                        entered.send(()).unwrap();
+                        release.await.unwrap();
+                    }
+                    let content = if request["model"] == "chat-model" {
+                        "实际消费后的模型回复".to_string()
+                    } else {
+                        provider_answer(&instruction, &payload).to_string()
+                    };
+                    let frame = json!({"id":"dream","choices":[{"index":0,"delta":{"role":"assistant","content":content},"finish_reason":"stop"}]});
+                    let sse = format!(
+                        "data: {frame}\n\ndata: {}\n\ndata: [DONE]\n\n",
+                        json!({"id":"persona","choices":[],"usage":{"prompt_tokens":23,"completion_tokens":8}})
+                    );
+                    let wire=format!("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{sse}",sse.len());
+                    socket.write_all(wire.as_bytes()).await.unwrap();
+                });
+            }
+        });
+        let mut plane_json = json!({"providers":{"persona-stub":{"protocol":"openai-completions","endpoint":format!("http://{stub_addr}/v1"),"auth":{"kind":"apiKey","apiKey":"synthetic-persona-key"}}},"models":{"chat":{"provider":"persona-stub","model":"chat-model","capabilities":{"tools":true},"compat":{"contextWindow":200000}},"memory":{"provider":"persona-stub","model":"memory-model","compat":{"contextWindow":200000}}}});
+        if tag == "unconfigured" {
+            plane_json["models"]
+                .as_object_mut()
+                .unwrap()
+                .remove("memory");
+        }
+        let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
+            &plane_json.to_string(),
+        )
+        .unwrap();
+        let credential = Arc::new(
+            lingxi_service::credentials::CredentialService::bootstrap(
+                &plane,
+                &root.join("credentials"),
+                Arc::new(lingxi_service::inject::SystemClock),
+            )
+            .unwrap(),
+        );
+        let gateway =
+            Arc::new(lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane));
+        let compiler = Arc::new(
+            lingxi_service::context_compiler::ContextCompilerService::new(Arc::new(
+                lingxi_service::context_compiler::FileContextMaterialSource::from_home(
+                    &home,
+                    product.clone(),
+                    lingxi_service::context_compiler::HostFacts {
+                        platform: "darwin".into(),
+                        os_type: "Darwin".into(),
+                        os_release: "test".into(),
+                        shell_label: "zsh".into(),
+                        workspace: workspace.to_string_lossy().into_owned(),
+                    },
+                ),
+            )),
+        );
+        let config = ServiceConfig {
+            bind_addr: "127.0.0.1:0".parse().unwrap(),
+            data_home: home.clone(),
+            home_source: HomeSource::Cli,
+            network_mode: NetworkMode::Loopback,
+            shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
+        };
+        let layout = prepare_layout(&home).unwrap();
+        let state = ServiceState::bootstrap_with_deps(
+            config,
+            &layout,
+            ServiceDeps {
+                model_gateway: Some(gateway),
+                credential_service: Some(credential),
+                network_plane: if tag == "missing-network" {
+                    None
+                } else {
+                    Some(lingxi_adapters::models::network::NetworkPlane::direct_isolated())
+                },
+                workspace_root: Some(workspace),
+                product_material_dir: Some(product),
+                context_compiler: Some(compiler),
+                ..ServiceDeps::default()
+            },
+        )
+        .await
+        .unwrap();
+        let token = state.auth().local_token();
+        let denied = state
+            .auth()
+            .issue_device_credential("user_local", &[], None)
+            .unwrap()
+            .secret;
+        let chat = state
+            .auth()
+            .issue_device_credential("user_local", &["chat"], None)
+            .unwrap()
+            .secret;
+        let (stop, stop_rx) = tokio::sync::oneshot::channel();
+        let (ready, ready_rx) = tokio::sync::oneshot::channel();
+        let served = state.clone();
+        let task = tokio::spawn(async move {
+            run(
+                served,
+                async {
+                    let _ = stop_rx.await;
+                },
+                |addr| {
+                    let _ = ready.send(addr);
+                },
+                None,
+            )
+            .await
+            .unwrap();
+        });
+        let addr = ready_rx.await.unwrap();
+        Self {
+            addr,
+            state,
+            home,
+            token,
+            denied,
+            chat,
+            requests,
+            provider_gate,
+            stop,
+            task,
+            stub_stop,
+            stub_task,
+        }
+    }
+    fn pause_next_provider(
+        &self,
+    ) -> (
+        tokio::sync::oneshot::Receiver<()>,
+        tokio::sync::oneshot::Sender<()>,
+    ) {
+        let (entered, received) = tokio::sync::oneshot::channel();
+        let (release, resumed) = tokio::sync::oneshot::channel();
+        assert!(self
+            .provider_gate
+            .lock()
+            .unwrap()
+            .replace((entered, resumed))
+            .is_none());
+        (received, release)
+    }
+    async fn raw(
+        &self,
+        method: &str,
+        path: &str,
+        token: &str,
+        body: &[u8],
+        etag: Option<&str>,
+    ) -> (u16, String, Vec<u8>) {
+        let mut stream = TcpStream::connect(self.addr).await.unwrap();
+        let conditional = etag
+            .map(|e| format!("If-None-Match: {e}\r\n"))
+            .unwrap_or_default();
+        let headers=format!("{method} {path} HTTP/1.1\r\nHost: localhost\r\nAuthorization: Bearer {token}\r\nContent-Type: application/json\r\nContent-Length: {}\r\n{conditional}Connection: close\r\n\r\n",body.len());
+        stream.write_all(headers.as_bytes()).await.unwrap();
+        let _ = stream.write_all(body).await;
+        let mut received = Vec::new();
+        let read = tokio::time::timeout(Duration::from_secs(40), stream.read_to_end(&mut received))
+            .await
+            .unwrap();
+        if let Err(error) = read {
+            assert_eq!(error.kind(), std::io::ErrorKind::ConnectionReset, "{error}");
+        }
+        let index = received.windows(4).position(|b| b == b"\r\n\r\n").unwrap();
+        let headers = String::from_utf8(received[..index].to_vec()).unwrap();
+        let code = headers.split_whitespace().nth(1).unwrap().parse().unwrap();
+        (code, headers, received[index + 4..].to_vec())
+    }
+    async fn request(&self, method: &str, path: &str, payload: Value) -> (u16, Value) {
+        let (code, _, body) = self
+            .raw(
+                method,
+                path,
+                &self.token,
+                payload.to_string().as_bytes(),
+                None,
+            )
+            .await;
+        (code, serde_json::from_slice(&body).unwrap_or(Value::Null))
+    }
+    async fn restart(&mut self) {
+        let gateway = self.state.model_gateway().cloned();
+        let credentials = self.state.credential_service().cloned();
+        let (placeholder, _) = tokio::sync::oneshot::channel();
+        std::mem::replace(&mut self.stop, placeholder)
+            .send(())
+            .unwrap();
+        let old = std::mem::replace(&mut self.task, tokio::spawn(async {}));
+        old.await.unwrap();
+        let config = ServiceConfig {
+            bind_addr: "127.0.0.1:0".parse().unwrap(),
+            data_home: self.home.clone(),
+            home_source: HomeSource::Cli,
+            network_mode: NetworkMode::Loopback,
+            shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
+        };
+        self.state = ServiceState::bootstrap_with_deps(
+            config,
+            &prepare_layout(&self.home).unwrap(),
+            ServiceDeps {
+                model_gateway: gateway,
+                credential_service: credentials,
+                network_plane: Some(
+                    lingxi_adapters::models::network::NetworkPlane::direct_isolated(),
+                ),
+                workspace_root: Some(self.home.parent().unwrap().join("workspace")),
+                product_material_dir: Some(self.home.parent().unwrap().join("product")),
+                ..ServiceDeps::default()
+            },
+        )
+        .await
+        .unwrap();
+        self.token = self.state.auth().local_token();
+        let (stop, stop_rx) = tokio::sync::oneshot::channel();
+        let (ready, ready_rx) = tokio::sync::oneshot::channel();
+        let state = self.state.clone();
+        self.stop = stop;
+        self.task = tokio::spawn(async move {
+            run(
+                state,
+                async {
+                    let _ = stop_rx.await;
+                },
+                |addr| {
+                    let _ = ready.send(addr);
+                },
+                None,
+            )
+            .await
+            .unwrap();
+        });
+        self.addr = ready_rx.await.unwrap();
+    }
+    async fn finish(self) {
+        self.stop.send(()).unwrap();
+        tokio::time::timeout(Duration::from_secs(10), self.task)
+            .await
+            .unwrap()
+            .unwrap();
+        let _ = self.stub_stop.send(());
+        self.stub_task.await.unwrap();
+        std::fs::remove_dir_all(self.home.parent().unwrap()).unwrap();
+    }
+}
+fn provider_answer(instruction: &str, input: &Value) -> Value {
+    if input.to_string().contains("破坏来源") {
+        return json!({"units":[{"sourceBlockId":"unknown","section":"facts","text":"非法新信息"}]});
+    }
+    if instruction.contains("memory.dream.atomize") {
+        json!({"units":input["sourceBlocks"].as_array().unwrap().iter().map(|b|json!({"sourceBlockId":b["id"],"section":b["section"],"text":b["text"]})).collect::<Vec<_>>()})
+    } else if instruction.contains("memory.dream.dedupe") {
+        json!({"groups":input["units"].as_array().unwrap().iter().map(|u|json!({"sourceUnitIds":[u["id"]],"relation":"distinct"})).collect::<Vec<_>>()})
+    } else if instruction.contains("memory.dream.optimize") {
+        json!({"units":input["groups"].as_array().unwrap().iter().map(|g|json!({"groupId":g["id"],"section":g["section"],"text":g["sources"][0]["text"]})).collect::<Vec<_>>(),"removedGroups":[]})
+    } else if instruction.contains("memory.dream.compose") {
+        json!({"paragraphs":input["units"].as_array().unwrap().iter().map(|u|json!({"sourceUnitIds":[u["id"]],"section":u["section"],"topic":"用户偏好","text":u["text"]})).collect::<Vec<_>>()})
+    } else {
+        json!({"ok":true,"missingClaims":[],"compoundUnits":[],"incorrectMerges":[],"unsupportedClaims":[],"subjectLeaks":[],"unsafeRemovals":[],"duplicateClaims":[],"fragmentedTopics":[],"incoherentParagraphs":[],"insufficientCompression":[]})
+    }
+}
+fn seed(fx: &Fixture, agent: &str, text: &str) {
+    let store = fx.state.memory().compiled_store(agent).unwrap();
+    store.write_facts(text).unwrap();
+    store.write_longterm("- 用户长期学习音乐").unwrap();
+    store.write_today("今日不能改变").unwrap();
+}
+async fn wait_result(fx: &Fixture, agent: &str) -> Value {
+    for _ in 0..400 {
+        let (code, status) = fx
+            .request(
+                "GET",
+                &format!("/lingxi/v1/memories/dream/status?agentId={agent}"),
+                Value::Null,
+            )
+            .await;
+        assert_eq!(code, 200, "{status}");
+        if status["status"] != "running" {
+            return status;
+        }
+        tokio::time::sleep(Duration::from_millis(20)).await;
+    }
+    panic!("dream未完成")
+}
+
+// 独立正反控制：整批先验证，后面的坏记录不能触发先前合法pending的清理。
+#[cfg(target_os="macos")]
+#[tokio::test(flavor="multi_thread",worker_threads=4)]
+async fn review_r4_batch_refusal_preserves_prior_pending_then_actual_retry_completes() {
+ let fx=Fixture::start("review-r4-batch").await;seed(&fx,"agentA","- 暂存中不可丢失的唯一用户资料");seed(&fx,"agentB","- 乙助手的独立资料");
+ assert_eq!(fx.request("PUT","/lingxi/v1/agents/primary",json!({"id":"agentA"})).await.0,200);
+ assert_eq!(fx.request("POST","/lingxi/v1/agents/switch",json!({"id":"agentA"})).await.0,200);
+ let prefs=fx.home.join("user/preferences.json");
+ assert!(std::process::Command::new("chflags").arg("uchg").arg(&prefs).status().unwrap().success());
+ let deleted=fx.request("DELETE","/lingxi/v1/agents/agentA",json!({})).await;
+ assert!(std::process::Command::new("chflags").arg("nouchg").arg(&prefs).status().unwrap().success());
+ assert_eq!(deleted.0,200);assert_eq!(deleted.1["referencesPending"],true);
+ let id=deleted.1["deletionId"].as_str().unwrap();let root=fx.home.join("lingxi-service/agent-deletions");let pending=root.join(id);let source=pending.join("data/memory/facts.md");
+ let facts=std::fs::read(&source).unwrap();let prefs_before=std::fs::read(&prefs).unwrap();let pending_before=std::fs::read(pending.join("receipt.json")).unwrap();
+ // 明确的坏收据前置：后排序的记录引用真实未删除B，不能把它当已完成删除。
+ let bad_id="zz-review-bad-receipt";let bad=root.join(bad_id);std::fs::create_dir(&bad).unwrap();
+ let mut corrupted:Value=serde_json::from_slice(&pending_before).unwrap();corrupted["deletionId"]=json!(bad_id);corrupted["agentId"]=json!("agentB");corrupted["targetReplacementAgentId"]=json!("agentA");corrupted["status"]=json!("completed");corrupted["logicalDeleted"]=json!(true);corrupted["cleanupPending"]=json!(false);corrupted["referencesPending"]=json!(false);
+ let bad_bytes=serde_json::to_vec(&corrupted).unwrap();std::fs::write(bad.join("receipt.json"),&bad_bytes).unwrap();
+ let recovered=fx.state.memory().recover_agent_deletions();assert!(recovered.is_err());
+ assert_eq!(std::fs::read(&source).unwrap(),facts);assert_eq!(std::fs::read(&prefs).unwrap(),prefs_before);assert_eq!(std::fs::read(pending.join("receipt.json")).unwrap(),pending_before);assert_eq!(std::fs::read(bad.join("receipt.json")).unwrap(),bad_bytes);
+ assert_eq!(fx.request("GET","/lingxi/v1/memories/dream/status?agentId=agentB",Value::Null).await.0,200);
+ std::fs::remove_dir_all(&bad).unwrap();
+ let retried=fx.request("POST",&format!("/lingxi/v1/agent-deletions/{id}/cleanup"),json!({})).await;assert_eq!(retried.0,200);assert_eq!(retried.1["status"],"completed");assert_eq!(retried.1["cleanupPending"],false);assert_eq!(retried.1["referencesPending"],false);assert!(!pending.join("data").exists());
+ let after:Value=serde_json::from_slice(&std::fs::read(&prefs).unwrap()).unwrap();assert_eq!(after["current_agent_id"],"agentB");
+ assert_eq!(fx.request("POST","/lingxi/v1/memories/dream/runs?agentId=agentB",json!({})).await.0,202);assert_eq!(wait_result(&fx,"agentB").await["status"],"succeeded");
+ fx.finish().await;
+}

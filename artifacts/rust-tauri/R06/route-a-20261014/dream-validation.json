@@ -1,0 +1,62 @@
+{
+  "status": "SCOPED_MAIN_INTEGRATION_AND_BINDINGS_PASS_NOT_STAGE_ACCEPTANCE",
+  "sourceSHA256": {
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "d20b3791db5d72ef0a57385886b652773558a7fb6d2ace378206004bc0a8e99e",
+    "rust/crates/lingxi-service/src/agent_config_readback.rs": "18976946d5ae266145457a63bb210d4bdb40b93e60e77aa472936dec1ab47e3b",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "ebd831d1566ebca2238a3afec91891ab0afdae544543f75dc1683b938a8e6c73",
+    "rust/crates/lingxi-service/src/auth.rs": "98bc99c3f42deb431da03713e969e5c4e17cdb214589f75840baf263ee64f58b",
+    "rust/crates/lingxi-service/src/lib.rs": "0d653b75c78501471cd1cd008e564c52d331195d60020b0dc98de95995509c56",
+    "rust/crates/lingxi-service/src/memory.rs": "4400d86e002d0625e995a71396abee395adda4545df253c6aafbfdf9e0f50289",
+    "rust/crates/lingxi-service/src/dream_service.rs": "47833342c299acc7b707538c1c9a62c2c330e75adb3c139d40c2501889177381",
+    "rust/crates/lingxi-service/src/agent_deletions.rs": "939d7104611b6614094c746c4dba2a5c0626e82f8cd829fb82b1dcdbbf667d6a",
+    "rust/crates/lingxi-service/tests/r06_dream_completion.rs": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+    "rust/crates/lingxi-service/tests/r06_agent_delete_completion.rs": "cf26f5d3c8072aad4c5090b7f458c508c918c329435622a046842ef70c388352"
+  },
+  "mainTests": {
+    "dream": 17,
+    "deleteRecovery": 10,
+    "originalMemory": 7,
+    "agentLifecycle": 2,
+    "affectedTotal": 36,
+    "originalAgentScopedReadOnlyRevisions": 1,
+    "failed": 0
+  },
+  "checks": {
+    "strictClippyServiceAndAdaptersAllTargets": "PASS",
+    "fmt": "PASS",
+    "original279AssertionsAndThenUnchangedFromBaseline": "PASS",
+    "registrationContract": {
+      "passed": 20,
+      "failed": 0
+    }
+  },
+  "logs": {
+    "main-tests.log": {
+      "path": "/private/tmp/r06-main-dream-20261015/main-tests.log",
+      "sha256": "f31d25d45b9bff9b404ed725e5881820e7830a030a0ad35f63ab065ea52cc44a"
+    },
+    "clippy.log": {
+      "path": "/private/tmp/r06-main-dream-20261015/clippy.log",
+      "sha256": "beb722fac2d77e798213fe33af0a68899000f1ce2c457802873b55eb454c9686"
+    },
+    "original-revisions.log": {
+      "path": "/private/tmp/r06-main-dream-20261015/original-revisions.log",
+      "sha256": "dc5fea3a3e4f971d459a50ed6f601ec6a7f02513d449109039526f8a7930056f"
+    },
+    "window.log": {
+      "path": "/private/tmp/r06-main-dream-20261015/window.log",
+      "sha256": "ff6ba94da8ffa0f032aa54a9dd6cdba24c8d457799ea2b4a2ed3b191d63b8c65"
+    }
+  },
+  "bindingWindow": "dream-binding-window-summary.json",
+  "stageAccepted": false,
+  "notClaimed": [
+    "automatic ticker pause/resume",
+    "full deletion UI",
+    "other platforms",
+    "real supplier bills",
+    "packaging",
+    "stage gate"
+  ],
+  "scopeNote": "Execution window binds the actual complete execution candidate. Subsequent audit-only records are not a final committed stage seal."
+}

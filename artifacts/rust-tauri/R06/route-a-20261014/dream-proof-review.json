@@ -1,0 +1,14 @@
+{
+  "status": "INDEPENDENT_R2_AND_DELETE_R4_PASS_NOT_STAGE_ACCEPTANCE",
+  "leaves": [
+    "R00-T02-LA-76EE734926B4",
+    "R00-T02-LA-A9AD4C7F76AE",
+    "R00-T02-LA-B45ECEC543C6"
+  ],
+  "independentReview": [
+    "dream-independent-review-r2.json",
+    "agent-delete-independent-review-r4.json"
+  ],
+  "stageAccepted": false,
+  "scope": "三项手动整理核心、真实状态及修订；0B自动ticker与3516完整删除UI尚未登记，不替代全阶段门禁。"
+}

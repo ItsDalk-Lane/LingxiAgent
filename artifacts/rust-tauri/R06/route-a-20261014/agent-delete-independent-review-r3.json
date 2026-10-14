@@ -1,0 +1,37 @@
+{
+  "status": "NEEDS_FIX",
+  "patchSHA256": "939049013ed797cc84bc0d32756f925b86cb3fb14f751cb68653e23159bf1aed",
+  "sourceManifest": "/tmp/r06-agent-delete-r3-independent-source-sha.json",
+  "sourceStable": true,
+  "authorCandidateFilesMatch": true,
+  "originalTests": {
+    "r06_agent_delete_completion": 7,
+    "r06_dream_completion": 17,
+    "r06_t06_memory": 7,
+    "r06_agent_admin_lifecycle": 2,
+    "fail": 0
+  },
+  "independentTests": {
+    "pass": 1,
+    "fail": 1,
+    "originalTopOnlyUchgPreservesAllBytesThenFiveStages": "PASS",
+    "inconsistentCommittedReceipt": "FAIL"
+  },
+  "findings": [
+    {
+      "id": "DELETE-R3-1",
+      "priority": "P2",
+      "source": "rust/crates/lingxi-service/src/agent_deletions.rs::recover_one_deletion",
+      "faultPrecondition": "actual aborted receipt from failed rename corrupted into structurally-valid committed receipt; public agent still present; staged data absent",
+      "actual": "POST cleanup200/completed/logicalDeleted/oktrue; live AgentA dream permanently503",
+      "expected": "reject contradictory disk state before stop/ref repair/staged cleanup; never claim completed logical deletion for still-public agent",
+      "scope": "receipt corruption/recovery; not claimed normal successful rename output"
+    }
+  ],
+  "open": [
+    "DELETE-R3-1",
+    "0B automatic ticker pause/resume",
+    "remaining pathlink/receiptless corrupt-state adversarial tests not run after confirmed finding",
+    "full stage gate not run"
+  ]
+}
