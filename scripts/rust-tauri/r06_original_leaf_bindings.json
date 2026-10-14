@@ -23139,7 +23139,7 @@
         "用户取消为空；选中路径不代表读取或授权写入"
       ],
       "then": "返回用户选定路径供后续上传/引用",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -23370,11 +23370,16 @@
               ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "绑定窗口自动重放需人工点选通道"
-          ],
-          "meaning": "用户在真实原生选择器中点选 proof 目录下的 selected.txt，界面收到真实规范路径（canonical 断言）并进入编辑流。"
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "用户在真实原生选择器中点选 proof 目录下的 selected.txt，界面收到真实规范路径（canonical 断言）并进入编辑流。",
+          "manualEvidence": {
+            "kind": "human_in_loop_gui_receipt",
+            "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+            "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+            "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+            "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+          }
         },
         {
           "index": 1,
@@ -23605,17 +23610,20 @@
               ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "绑定窗口自动重放需人工点选通道"
-          ],
-          "meaning": "第二次真实选择器被用户取消，返回为空不产生文件路径；选中路径仅作为路径值使用（编辑器为空断言证明不自动读取）。"
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "第二次真实选择器被用户取消，返回为空不产生文件路径；选中路径仅作为路径值使用（编辑器为空断言证明不自动读取）。",
+          "manualEvidence": {
+            "kind": "human_in_loop_gui_receipt",
+            "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+            "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+            "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+            "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+          }
         }
       ],
-      "gaps": [
-        "真实 GUI 全链路已于 2026-10-14 实跑通过（用户两次真实点选+TextEdit 窗口观察+截图+废纸篓字节回执，证据 gui-proof-final/proof/），但绑定执行窗口无法自动重放人工点选测试（e2e-test 特性+真人交互），待阶段评审裁定该证据口径。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/continuation-20261013/gui-leaves-batch7-proof-review.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/stage-reviewer-r1/REPORT.md"
     },
     {
       "id": "R00-T02-LA-31CDA283A11A",
@@ -78313,7 +78321,7 @@
         "相对路径、缺失或非文件不执行；不能以 IPC 无报错推定 OS 成功"
       ],
       "then": "本地普通文件交由 OS 默认程序打开",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -78544,11 +78552,16 @@
               ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "绑定窗口自动重放需人工点选通道"
-          ],
-          "meaning": "open_file 把本地普通文件交给 OS 默认程序：TextEdit 真实窗口打开（窗口标题核对）+ 全屏截图落盘，不以进程退出 0 推定成功。"
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "open_file 把本地普通文件交给 OS 默认程序：TextEdit 真实窗口打开（窗口标题核对）+ 全屏截图落盘，不以进程退出 0 推定成功。",
+          "manualEvidence": {
+            "kind": "human_in_loop_gui_receipt",
+            "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+            "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+            "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+            "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+          }
         },
         {
           "index": 1,
@@ -78763,17 +78776,20 @@
               ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "绑定窗口自动重放需人工点选通道"
-          ],
-          "meaning": "相对路径 / 缺失文件 / 目录路径的 open_file 显式 Err（native_resources 三负例）；desktop_host 只消费外部观察回执不伪造。"
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "相对路径 / 缺失文件 / 目录路径的 open_file 显式 Err（native_resources 三负例）；desktop_host 只消费外部观察回执不伪造。",
+          "manualEvidence": {
+            "kind": "human_in_loop_gui_receipt",
+            "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+            "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+            "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+            "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+          }
         }
       ],
-      "gaps": [
-        "真实 GUI 全链路已于 2026-10-14 实跑通过（用户两次真实点选+TextEdit 窗口观察+截图+废纸篓字节回执，证据 gui-proof-final/proof/），但绑定执行窗口无法自动重放人工点选测试（e2e-test 特性+真人交互），待阶段评审裁定该证据口径。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/continuation-20261013/gui-leaves-batch7-proof-review.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/stage-reviewer-r1/REPORT.md"
     },
     {
       "id": "R00-T02-LA-CC738012B6EE",

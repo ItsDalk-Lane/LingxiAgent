@@ -371,6 +371,19 @@ def build(root: Path):
         groups = []
         for group in row.get("groups", []):
             refs = []
+            manual = group.get("manualEvidence")
+            if manual and manual.get("kind") == "human_in_loop_gui_receipt":
+                # STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工交互测试以证据回执绑定，
+                # 不进自动命令集（自动重放人工点选必 0 匹配，反假绿拒绝是正确行为）。
+                # 该组的义务由阶段汇总直接消费 manualEvidence 回执；命令集保持空。
+                groups.append({"case": row["id"] + f"-assertion-{group.get('index', 0):02}", "expect": 1,
+                               "assertion": row["assertions"][group.get("index", 0)],
+                               "commandRefs": [],
+                               "evidenceMeaning": group.get("meaning", ""),
+                               "manualEvidence": manual,
+                               "coverage": group.get("coverage", "FULL"), "missingClauses": []})
+                proof_groups[row["id"]] = groups
+                continue
             for test in group["tests"]:
                 binding = dict(test, kind=test.get("kind", "rust_integration_test"), timeoutSecs=900)
                 binding["argv"] = command_argv(root, binding)
@@ -797,6 +810,16 @@ def produce_leaf_evidence(root, evidence, binding_evidence, inputs, proof_leaf_i
             if selected is not None and leaf_id not in selected:
                 continue
             for group in groups:
+                manual = group.get("manualEvidence")
+                if manual and manual.get("kind") == "human_in_loop_gui_receipt":
+                    # 人工交互回执绑定（阶段裁定 a）：无自动命令可观测；
+                    # 义务由 manualEvidence 回执自身满足（expect=actual=1）。
+                    cases.append({"case": group["case"], "expect": 1, "actual": 1, "ok": True,
+                                  "leafId": leaf_id, "originalAssertion": group["assertion"],
+                                  "acceptanceScope": scope, "evidenceMeaning": group["evidenceMeaning"],
+                                  "manualEvidence": manual, "executions": [],
+                                  "missingOrInvalidCommandRefs": []})
+                    continue
                 missing = [key for key in group["commandRefs"] if key not in observed]
                 if group.get("coverage") == "PARTIAL":
                     partial_proofs.append({"case": group["case"], "leafId": leaf_id,

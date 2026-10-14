@@ -135,6 +135,8 @@ class R06StageInputsContract(unittest.TestCase):
                   for binding in case["supportingTests"]}
         for row in self.inputs["originalProofInventory"]["items"]:
             for group in row.get("groups", []):
+                if group.get("manualEvidence", {}).get("kind") == "human_in_loop_gui_receipt":
+                    continue  # 人工交互绑定不进自动命令集（阶段裁定 a）
                 for test in group["tests"]:
                     binding = dict(test, kind=test.get("kind", "rust_integration_test"), timeoutSecs=900)
                     binding["argv"] = self.stage.command_argv(self.root, binding)

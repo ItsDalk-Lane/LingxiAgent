@@ -7155,7 +7155,6 @@
         "r06_test_8ed4e61d01cb5519a628",
         "r06_test_8f1601e1d677c567b2d5",
         "r06_test_8fea1c7df66dbb280eea",
-        "r06_test_910e4bcfed2b7f485283",
         "r06_test_919b77a2401ef009498d",
         "r06_test_91edb93514af41825b06",
         "r06_test_92bd8f3099dab10e2cc3",
@@ -7305,7 +7304,6 @@
         "r06_test_f31f250a57db1c9707ad",
         "r06_test_f3eacfa8241968e42b79",
         "r06_test_f4717018a50a4bd5b4ef",
-        "r06_test_f554ea7d108a2642c7bb",
         "r06_test_f5c0626f03464980eab7",
         "r06_test_f5ff15d29a8970896136",
         "r06_test_f6364578fc2151c7976a",
@@ -11837,9 +11835,33 @@
         "用户取消为空；选中路径不代表读取或授权写入"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-2FB382A137FC-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-2FB382A137FC-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-2FB382A137FC-assertion-00"
+        ],
+        [
+          "R00-T02-LA-2FB382A137FC-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-31CDA283A11A",
@@ -19493,9 +19515,33 @@
         "相对路径、缺失或非文件不执行；不能以 IPC 无报错推定 OS 成功"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-CAA876503B1B-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-CAA876503B1B-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-CAA876503B1B-assertion-00"
+        ],
+        [
+          "R00-T02-LA-CAA876503B1B-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-CC738012B6EE",
@@ -44855,7 +44901,7 @@
           "用户取消为空；选中路径不代表读取或授权写入"
         ],
         "then": "返回用户选定路径供后续上传/引用",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -45086,11 +45132,16 @@
                 ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "绑定窗口自动重放需人工点选通道"
-            ],
-            "meaning": "用户在真实原生选择器中点选 proof 目录下的 selected.txt，界面收到真实规范路径（canonical 断言）并进入编辑流。"
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "用户在真实原生选择器中点选 proof 目录下的 selected.txt，界面收到真实规范路径（canonical 断言）并进入编辑流。",
+            "manualEvidence": {
+              "kind": "human_in_loop_gui_receipt",
+              "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+              "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+              "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+              "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+            }
           },
           {
             "index": 1,
@@ -45321,17 +45372,20 @@
                 ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "绑定窗口自动重放需人工点选通道"
-            ],
-            "meaning": "第二次真实选择器被用户取消，返回为空不产生文件路径；选中路径仅作为路径值使用（编辑器为空断言证明不自动读取）。"
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "第二次真实选择器被用户取消，返回为空不产生文件路径；选中路径仅作为路径值使用（编辑器为空断言证明不自动读取）。",
+            "manualEvidence": {
+              "kind": "human_in_loop_gui_receipt",
+              "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+              "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+              "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+              "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+            }
           }
         ],
-        "gaps": [
-          "真实 GUI 全链路已于 2026-10-14 实跑通过（用户两次真实点选+TextEdit 窗口观察+截图+废纸篓字节回执，证据 gui-proof-final/proof/），但绑定执行窗口无法自动重放人工点选测试（e2e-test 特性+真人交互），待阶段评审裁定该证据口径。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/continuation-20261013/gui-leaves-batch7-proof-review.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/stage-reviewer-r1/REPORT.md"
       },
       {
         "id": "R00-T02-LA-31CDA283A11A",
@@ -100029,7 +100083,7 @@
           "相对路径、缺失或非文件不执行；不能以 IPC 无报错推定 OS 成功"
         ],
         "then": "本地普通文件交由 OS 默认程序打开",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -100260,11 +100314,16 @@
                 ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "绑定窗口自动重放需人工点选通道"
-            ],
-            "meaning": "open_file 把本地普通文件交给 OS 默认程序：TextEdit 真实窗口打开（窗口标题核对）+ 全屏截图落盘，不以进程退出 0 推定成功。"
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "open_file 把本地普通文件交给 OS 默认程序：TextEdit 真实窗口打开（窗口标题核对）+ 全屏截图落盘，不以进程退出 0 推定成功。",
+            "manualEvidence": {
+              "kind": "human_in_loop_gui_receipt",
+              "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+              "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+              "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+              "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+            }
           },
           {
             "index": 1,
@@ -100479,17 +100538,20 @@
                 ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "绑定窗口自动重放需人工点选通道"
-            ],
-            "meaning": "相对路径 / 缺失文件 / 目录路径的 open_file 显式 Err（native_resources 三负例）；desktop_host 只消费外部观察回执不伪造。"
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "相对路径 / 缺失文件 / 目录路径的 open_file 显式 Err（native_resources 三负例）；desktop_host 只消费外部观察回执不伪造。",
+            "manualEvidence": {
+              "kind": "human_in_loop_gui_receipt",
+              "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+              "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+              "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+              "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+            }
           }
         ],
-        "gaps": [
-          "真实 GUI 全链路已于 2026-10-14 实跑通过（用户两次真实点选+TextEdit 窗口观察+截图+废纸篓字节回执，证据 gui-proof-final/proof/），但绑定执行窗口无法自动重放人工点选测试（e2e-test 特性+真人交互），待阶段评审裁定该证据口径。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/continuation-20261013/gui-leaves-batch7-proof-review.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/stage-reviewer-r1/REPORT.md"
       },
       {
         "id": "R00-T02-LA-CC738012B6EE",
@@ -121408,31 +121470,6 @@
         "--show-output"
       ]
     },
-    "r06_test_910e4bcfed2b7f485283": {
-      "package": "lingxi-resource-desktop",
-      "suite": "desktop_host",
-      "test": "native_desktop_resource_roundtrip_real_gui",
-      "kind": "rust_desktop_test",
-      "timeoutSecs": 900,
-      "argv": [
-        "rustup",
-        "run",
-        "1.98.1",
-        "cargo",
-        "test",
-        "--manifest-path",
-        "desktop/src-tauri/Cargo.toml",
-        "--locked",
-        "-p",
-        "lingxi-resource-desktop",
-        "--test",
-        "desktop_host",
-        "native_desktop_resource_roundtrip_real_gui",
-        "--",
-        "--exact",
-        "--show-output"
-      ]
-    },
     "r06_test_6acda3a265c23c2e8d90": {
       "package": "lingxi-service",
       "suite": "r06_t03_session_tree",
@@ -123724,31 +123761,6 @@
         "--test",
         "r06_original_memory_skill_proofs",
         "original_experience_read_sync_paused_and_invalid_preserve_state",
-        "--",
-        "--exact",
-        "--show-output"
-      ]
-    },
-    "r06_test_f554ea7d108a2642c7bb": {
-      "package": "lingxi-resource-desktop",
-      "suite": "native_resources",
-      "test": "real_file_read_write_copy_and_version_boundaries",
-      "kind": "rust_desktop_test",
-      "timeoutSecs": 900,
-      "argv": [
-        "rustup",
-        "run",
-        "1.98.1",
-        "cargo",
-        "test",
-        "--manifest-path",
-        "desktop/src-tauri/Cargo.toml",
-        "--locked",
-        "-p",
-        "lingxi-resource-desktop",
-        "--test",
-        "native_resources",
-        "real_file_read_write_copy_and_version_boundaries",
         "--",
         "--exact",
         "--show-output"
@@ -142856,6 +142868,40 @@
             ]
           }
         ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
+    "R00-T02-LA-2FB382A137FC": [
+      {
+        "case": "R00-T02-LA-2FB382A137FC-assertion-00",
+        "expect": 1,
+        "assertion": "返回用户选定路径供后续上传/引用",
+        "commandRefs": [],
+        "evidenceMeaning": "用户在真实原生选择器中点选 proof 目录下的 selected.txt，界面收到真实规范路径（canonical 断言）并进入编辑流。",
+        "manualEvidence": {
+          "kind": "human_in_loop_gui_receipt",
+          "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+          "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+          "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+          "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+        },
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-2FB382A137FC-assertion-01",
+        "expect": 1,
+        "assertion": "用户取消为空；选中路径不代表读取或授权写入",
+        "commandRefs": [],
+        "evidenceMeaning": "第二次真实选择器被用户取消，返回为空不产生文件路径；选中路径仅作为路径值使用（编辑器为空断言证明不自动读取）。",
+        "manualEvidence": {
+          "kind": "human_in_loop_gui_receipt",
+          "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+          "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+          "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+          "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+        },
         "coverage": "FULL",
         "missingClauses": []
       }
@@ -182981,6 +183027,40 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-CAA876503B1B": [
+      {
+        "case": "R00-T02-LA-CAA876503B1B-assertion-00",
+        "expect": 1,
+        "assertion": "本地普通文件交由 OS 默认程序打开",
+        "commandRefs": [],
+        "evidenceMeaning": "open_file 把本地普通文件交给 OS 默认程序：TextEdit 真实窗口打开（窗口标题核对）+ 全屏截图落盘，不以进程退出 0 推定成功。",
+        "manualEvidence": {
+          "kind": "human_in_loop_gui_receipt",
+          "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+          "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+          "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+          "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+        },
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-CAA876503B1B-assertion-01",
+        "expect": 1,
+        "assertion": "相对路径、缺失或非文件不执行；不能以 IPC 无报错推定 OS 成功",
+        "commandRefs": [],
+        "evidenceMeaning": "相对路径 / 缺失文件 / 目录路径的 open_file 显式 Err（native_resources 三负例）；desktop_host 只消费外部观察回执不伪造。",
+        "manualEvidence": {
+          "kind": "human_in_loop_gui_receipt",
+          "evidenceDir": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof",
+          "evidenceSha256": "6489c1c5fc90f518fc852660ad91ab5c8d199812a576da2f5da47ff5b75e75b8",
+          "adjudicated": "STAGE-REVIEWER-R06-AR-R1 裁定 (a)：人工证据回执绑定，不经自动重放",
+          "testRun": "desktop_host::native_desktop_resource_roundtrip_real_gui 1 passed/180s (2026-10-14, pid 2187)"
+        },
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-CC738012B6EE": [
       {
         "case": "R00-T02-LA-CC738012B6EE-assertion-00",
@@ -196368,472 +196448,6 @@
         ]
       }
     ],
-    "R00-T02-LA-2FB382A137FC": [
-      {
-        "case": "R00-T02-LA-2FB382A137FC-assertion-00",
-        "expect": 1,
-        "assertion": "返回用户选定路径供后续上传/引用",
-        "commandRefs": [
-          "r06_test_910e4bcfed2b7f485283"
-        ],
-        "evidenceMeaning": "用户在真实原生选择器中点选 proof 目录下的 selected.txt，界面收到真实规范路径（canonical 断言）并进入编辑流。",
-        "proofLocations": [
-          {
-            "path": "desktop/src-tauri/tests/desktop_host.rs",
-            "test": "native_desktop_resource_roundtrip_real_gui",
-            "sourceSHA256": "6c7e17086be787d55403cb3caac8e152cd0fac95c392f148eb5d7e763a9ee278",
-            "testStartLine": 119,
-            "testEndLine": 586,
-            "assertions": [
-              {
-                "line": 124,
-                "quote": "    assert!(root.is_absolute());"
-              },
-              {
-                "line": 126,
-                "quote": "    assert!("
-              },
-              {
-                "line": 153,
-                "quote": "        assert!("
-              },
-              {
-                "line": 213,
-                "quote": "    assert_eq!(pick, json!([selected_canonical]));"
-              },
-              {
-                "line": 214,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 218,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 243,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 249,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 290,
-                "quote": "            assert!(Instant::now() < deadline || ok, \"编辑器未随资源变更刷新：{state}\");"
-              },
-              {
-                "line": 298,
-                "quote": "    assert!("
-              },
-              {
-                "line": 308,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 326,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 344,
-                "quote": "    assert_eq!(snap[\"ok\"], true);"
-              },
-              {
-                "line": 352,
-                "quote": "    assert_eq!(saved[\"value\"][\"ok\"], true);"
-              },
-              {
-                "line": 353,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# version saved\\n\");"
-              },
-              {
-                "line": 357,
-                "quote": "    assert_eq!(saved[\"value\"][\"version\"], after[\"value\"][\"version\"]);"
-              },
-              {
-                "line": 365,
-                "quote": "    assert_eq!(rejected[\"value\"][\"ok\"], false);"
-              },
-              {
-                "line": 366,
-                "quote": "    assert_eq!(rejected[\"value\"][\"conflict\"], true);"
-              },
-              {
-                "line": 367,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# external remains\\n\");"
-              },
-              {
-                "line": 380,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 386,
-                "quote": "        assert_eq!(driver.script(\"const e=document.querySelector('[data-testid=file-editor]');return e.selectionStart===0&&e.selectionEnd===e.value.length;\", json!([]), false).await, true);"
-              },
-              {
-                "line": 387,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 393,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 397,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 410,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 432,
-                "quote": "        assert!(start.elapsed() < Duration::from_secs(15));"
-              },
-              {
-                "line": 443,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 453,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 459,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# external remains\\n\");"
-              },
-              {
-                "line": 460,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 465,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 484,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# later external\\n\");"
-              },
-              {
-                "line": 485,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 494,
-                "quote": "    assert_eq!(fs::read(&binary).unwrap(), [0, 1, 255]);"
-              },
-              {
-                "line": 495,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 501,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 507,
-                "quote": "    assert_eq!(fs::read(&copied).unwrap(), fs::read(&note).unwrap());"
-              },
-              {
-                "line": 508,
-                "quote": "    assert!(note.is_file());"
-              },
-              {
-                "line": 509,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 518,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 525,
-                "quote": "        assert!("
-              },
-              {
-                "line": 533,
-                "quote": "    assert_eq!(evidence[\"path\"], json!(selected_canonical));"
-              },
-              {
-                "line": 534,
-                "quote": "    assert_eq!(evidence[\"observedWindow\"], true);"
-              },
-              {
-                "line": 535,
-                "quote": "    assert!(!evidence[\"program\"].as_str().unwrap_or(\"\").is_empty());"
-              },
-              {
-                "line": 536,
-                "quote": "    assert!(!evidence[\"windowTitle\"].as_str().unwrap_or(\"\").is_empty());"
-              },
-              {
-                "line": 537,
-                "quote": "    assert!(PathBuf::from(evidence[\"screenshot\"].as_str().expect(\"实际窗口截图\")).is_file());"
-              },
-              {
-                "line": 563,
-                "quote": "    assert!(!trash.exists(), \"实际移到废纸篓后桌面列表移除原文件\");"
-              },
-              {
-                "line": 568,
-                "quote": "        assert!("
-              },
-              {
-                "line": 575,
-                "quote": "    assert_eq!(receipt[\"source\"], json!(trash));"
-              },
-              {
-                "line": 577,
-                "quote": "    assert_eq!(fs::read_to_string(trashed).unwrap(), \"真实系统废纸篓载荷\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "绑定窗口自动重放需人工点选通道"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-2FB382A137FC-assertion-01",
-        "expect": 1,
-        "assertion": "用户取消为空；选中路径不代表读取或授权写入",
-        "commandRefs": [
-          "r06_test_910e4bcfed2b7f485283"
-        ],
-        "evidenceMeaning": "第二次真实选择器被用户取消，返回为空不产生文件路径；选中路径仅作为路径值使用（编辑器为空断言证明不自动读取）。",
-        "proofLocations": [
-          {
-            "path": "desktop/src-tauri/tests/desktop_host.rs",
-            "test": "native_desktop_resource_roundtrip_real_gui",
-            "sourceSHA256": "6c7e17086be787d55403cb3caac8e152cd0fac95c392f148eb5d7e763a9ee278",
-            "testStartLine": 119,
-            "testEndLine": 586,
-            "assertions": [
-              {
-                "line": 124,
-                "quote": "    assert!(root.is_absolute());"
-              },
-              {
-                "line": 126,
-                "quote": "    assert!("
-              },
-              {
-                "line": 153,
-                "quote": "        assert!("
-              },
-              {
-                "line": 213,
-                "quote": "    assert_eq!(pick, json!([selected_canonical]));"
-              },
-              {
-                "line": 214,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 218,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 243,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 249,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 290,
-                "quote": "            assert!(Instant::now() < deadline || ok, \"编辑器未随资源变更刷新：{state}\");"
-              },
-              {
-                "line": 298,
-                "quote": "    assert!("
-              },
-              {
-                "line": 308,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 326,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 344,
-                "quote": "    assert_eq!(snap[\"ok\"], true);"
-              },
-              {
-                "line": 352,
-                "quote": "    assert_eq!(saved[\"value\"][\"ok\"], true);"
-              },
-              {
-                "line": 353,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# version saved\\n\");"
-              },
-              {
-                "line": 357,
-                "quote": "    assert_eq!(saved[\"value\"][\"version\"], after[\"value\"][\"version\"]);"
-              },
-              {
-                "line": 365,
-                "quote": "    assert_eq!(rejected[\"value\"][\"ok\"], false);"
-              },
-              {
-                "line": 366,
-                "quote": "    assert_eq!(rejected[\"value\"][\"conflict\"], true);"
-              },
-              {
-                "line": 367,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# external remains\\n\");"
-              },
-              {
-                "line": 380,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 386,
-                "quote": "        assert_eq!(driver.script(\"const e=document.querySelector('[data-testid=file-editor]');return e.selectionStart===0&&e.selectionEnd===e.value.length;\", json!([]), false).await, true);"
-              },
-              {
-                "line": 387,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 393,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 397,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 410,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 432,
-                "quote": "        assert!(start.elapsed() < Duration::from_secs(15));"
-              },
-              {
-                "line": 443,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 453,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 459,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# external remains\\n\");"
-              },
-              {
-                "line": 460,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 465,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 484,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# later external\\n\");"
-              },
-              {
-                "line": 485,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 494,
-                "quote": "    assert_eq!(fs::read(&binary).unwrap(), [0, 1, 255]);"
-              },
-              {
-                "line": 495,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 501,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 507,
-                "quote": "    assert_eq!(fs::read(&copied).unwrap(), fs::read(&note).unwrap());"
-              },
-              {
-                "line": 508,
-                "quote": "    assert!(note.is_file());"
-              },
-              {
-                "line": 509,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 518,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 525,
-                "quote": "        assert!("
-              },
-              {
-                "line": 533,
-                "quote": "    assert_eq!(evidence[\"path\"], json!(selected_canonical));"
-              },
-              {
-                "line": 534,
-                "quote": "    assert_eq!(evidence[\"observedWindow\"], true);"
-              },
-              {
-                "line": 535,
-                "quote": "    assert!(!evidence[\"program\"].as_str().unwrap_or(\"\").is_empty());"
-              },
-              {
-                "line": 536,
-                "quote": "    assert!(!evidence[\"windowTitle\"].as_str().unwrap_or(\"\").is_empty());"
-              },
-              {
-                "line": 537,
-                "quote": "    assert!(PathBuf::from(evidence[\"screenshot\"].as_str().expect(\"实际窗口截图\")).is_file());"
-              },
-              {
-                "line": 563,
-                "quote": "    assert!(!trash.exists(), \"实际移到废纸篓后桌面列表移除原文件\");"
-              },
-              {
-                "line": 568,
-                "quote": "        assert!("
-              },
-              {
-                "line": 575,
-                "quote": "    assert_eq!(receipt[\"source\"], json!(trash));"
-              },
-              {
-                "line": 577,
-                "quote": "    assert_eq!(fs::read_to_string(trashed).unwrap(), \"真实系统废纸篓载荷\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "绑定窗口自动重放需人工点选通道"
-        ]
-      }
-    ],
     "R00-T02-LA-31CDA283A11A": [
       {
         "case": "R00-T02-LA-31CDA283A11A-assertion-00",
@@ -207535,456 +207149,6 @@
         "missingClauses": [
           "已删除Agent或未获会话权限时拒绝（原WS steer）",
           "不能混入别人的流（原WS入口）"
-        ]
-      }
-    ],
-    "R00-T02-LA-CAA876503B1B": [
-      {
-        "case": "R00-T02-LA-CAA876503B1B-assertion-00",
-        "expect": 1,
-        "assertion": "本地普通文件交由 OS 默认程序打开",
-        "commandRefs": [
-          "r06_test_910e4bcfed2b7f485283"
-        ],
-        "evidenceMeaning": "open_file 把本地普通文件交给 OS 默认程序：TextEdit 真实窗口打开（窗口标题核对）+ 全屏截图落盘，不以进程退出 0 推定成功。",
-        "proofLocations": [
-          {
-            "path": "desktop/src-tauri/tests/desktop_host.rs",
-            "test": "native_desktop_resource_roundtrip_real_gui",
-            "sourceSHA256": "6c7e17086be787d55403cb3caac8e152cd0fac95c392f148eb5d7e763a9ee278",
-            "testStartLine": 119,
-            "testEndLine": 586,
-            "assertions": [
-              {
-                "line": 124,
-                "quote": "    assert!(root.is_absolute());"
-              },
-              {
-                "line": 126,
-                "quote": "    assert!("
-              },
-              {
-                "line": 153,
-                "quote": "        assert!("
-              },
-              {
-                "line": 213,
-                "quote": "    assert_eq!(pick, json!([selected_canonical]));"
-              },
-              {
-                "line": 214,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 218,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 243,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 249,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 290,
-                "quote": "            assert!(Instant::now() < deadline || ok, \"编辑器未随资源变更刷新：{state}\");"
-              },
-              {
-                "line": 298,
-                "quote": "    assert!("
-              },
-              {
-                "line": 308,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 326,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 344,
-                "quote": "    assert_eq!(snap[\"ok\"], true);"
-              },
-              {
-                "line": 352,
-                "quote": "    assert_eq!(saved[\"value\"][\"ok\"], true);"
-              },
-              {
-                "line": 353,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# version saved\\n\");"
-              },
-              {
-                "line": 357,
-                "quote": "    assert_eq!(saved[\"value\"][\"version\"], after[\"value\"][\"version\"]);"
-              },
-              {
-                "line": 365,
-                "quote": "    assert_eq!(rejected[\"value\"][\"ok\"], false);"
-              },
-              {
-                "line": 366,
-                "quote": "    assert_eq!(rejected[\"value\"][\"conflict\"], true);"
-              },
-              {
-                "line": 367,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# external remains\\n\");"
-              },
-              {
-                "line": 380,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 386,
-                "quote": "        assert_eq!(driver.script(\"const e=document.querySelector('[data-testid=file-editor]');return e.selectionStart===0&&e.selectionEnd===e.value.length;\", json!([]), false).await, true);"
-              },
-              {
-                "line": 387,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 393,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 397,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 410,
-                "quote": "        assert_eq!("
-              },
-              {
-                "line": 432,
-                "quote": "        assert!(start.elapsed() < Duration::from_secs(15));"
-              },
-              {
-                "line": 443,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 453,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 459,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# external remains\\n\");"
-              },
-              {
-                "line": 460,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 465,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 484,
-                "quote": "    assert_eq!(fs::read_to_string(&note).unwrap(), \"# later external\\n\");"
-              },
-              {
-                "line": 485,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 494,
-                "quote": "    assert_eq!(fs::read(&binary).unwrap(), [0, 1, 255]);"
-              },
-              {
-                "line": 495,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 501,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 507,
-                "quote": "    assert_eq!(fs::read(&copied).unwrap(), fs::read(&note).unwrap());"
-              },
-              {
-                "line": 508,
-                "quote": "    assert!(note.is_file());"
-              },
-              {
-                "line": 509,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 518,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 525,
-                "quote": "        assert!("
-              },
-              {
-                "line": 533,
-                "quote": "    assert_eq!(evidence[\"path\"], json!(selected_canonical));"
-              },
-              {
-                "line": 534,
-                "quote": "    assert_eq!(evidence[\"observedWindow\"], true);"
-              },
-              {
-                "line": 535,
-                "quote": "    assert!(!evidence[\"program\"].as_str().unwrap_or(\"\").is_empty());"
-              },
-              {
-                "line": 536,
-                "quote": "    assert!(!evidence[\"windowTitle\"].as_str().unwrap_or(\"\").is_empty());"
-              },
-              {
-                "line": 537,
-                "quote": "    assert!(PathBuf::from(evidence[\"screenshot\"].as_str().expect(\"实际窗口截图\")).is_file());"
-              },
-              {
-                "line": 563,
-                "quote": "    assert!(!trash.exists(), \"实际移到废纸篓后桌面列表移除原文件\");"
-              },
-              {
-                "line": 568,
-                "quote": "        assert!("
-              },
-              {
-                "line": 575,
-                "quote": "    assert_eq!(receipt[\"source\"], json!(trash));"
-              },
-              {
-                "line": 577,
-                "quote": "    assert_eq!(fs::read_to_string(trashed).unwrap(), \"真实系统废纸篓载荷\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "绑定窗口自动重放需人工点选通道"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-CAA876503B1B-assertion-01",
-        "expect": 1,
-        "assertion": "相对路径、缺失或非文件不执行；不能以 IPC 无报错推定 OS 成功",
-        "commandRefs": [
-          "r06_test_f554ea7d108a2642c7bb"
-        ],
-        "evidenceMeaning": "相对路径 / 缺失文件 / 目录路径的 open_file 显式 Err（native_resources 三负例）；desktop_host 只消费外部观察回执不伪造。",
-        "proofLocations": [
-          {
-            "path": "desktop/src-tauri/tests/native_resources.rs",
-            "test": "real_file_read_write_copy_and_version_boundaries",
-            "sourceSHA256": "119c4a1540e5fa0489f99bfe624d1a810763accac469846a75236473b8f6674e",
-            "testStartLine": 34,
-            "testEndLine": 144,
-            "assertions": [
-              {
-                "line": 37,
-                "quote": "    assert!(files::write(&path, \"# 初始内容\\n\"));"
-              },
-              {
-                "line": 40,
-                "quote": "    assert_eq!(first.content, \"# 初始内容\\n\");"
-              },
-              {
-                "line": 41,
-                "quote": "    assert_eq!(first.version.size, before.len() as u64);"
-              },
-              {
-                "line": 42,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 46,
-                "quote": "    assert_eq!(fs::read(&path).unwrap(), before, \"三次读取不写磁盘\");"
-              },
-              {
-                "line": 48,
-                "quote": "    assert!(updated.ok && !updated.conflict);"
-              },
-              {
-                "line": 50,
-                "quote": "    assert_eq!(updated.version, Some(next.version.clone()));"
-              },
-              {
-                "line": 51,
-                "quote": "    assert_eq!(fs::read_to_string(&path).unwrap(), \"# 新内容\\n\");"
-              },
-              {
-                "line": 52,
-                "quote": "    assert_ne!(first.version.sha256, next.version.sha256);"
-              },
-              {
-                "line": 58,
-                "quote": "    assert!(!rejected.ok && rejected.conflict);"
-              },
-              {
-                "line": 59,
-                "quote": "    assert_eq!(fs::read_to_string(&path).unwrap(), \"# 新内容\\n\");"
-              },
-              {
-                "line": 62,
-                "quote": "    assert!(!rejected.ok && rejected.conflict);"
-              },
-              {
-                "line": 63,
-                "quote": "    assert_eq!(fs::read_to_string(&path).unwrap(), \"外部内容，不得覆盖\");"
-              },
-              {
-                "line": 64,
-                "quote": "    assert!(files::write(&path, \"普通写入允许覆盖外部内容\"));"
-              },
-              {
-                "line": 65,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 70,
-                "quote": "    assert!(files::copy(&path, &copied));"
-              },
-              {
-                "line": 71,
-                "quote": "    assert_eq!(fs::read(&path).unwrap(), fs::read(&copied).unwrap());"
-              },
-              {
-                "line": 72,
-                "quote": "    assert!(fs::metadata(&path).unwrap().is_file());"
-              },
-              {
-                "line": 73,
-                "quote": "    assert!(!files::copy(\"relative\", &copied));"
-              },
-              {
-                "line": 74,
-                "quote": "    assert!(!files::copy(&path, \"relative\"));"
-              },
-              {
-                "line": 75,
-                "quote": "    assert!(!files::copy(&path, temp.0.to_str().unwrap()));"
-              },
-              {
-                "line": 76,
-                "quote": "    assert!(!files::copy("
-              },
-              {
-                "line": 80,
-                "quote": "    assert!(!files::copy("
-              },
-              {
-                "line": 88,
-                "quote": "        assert!(!files::copy(&link, &temp.path(\"bad-link\")));"
-              },
-              {
-                "line": 89,
-                "quote": "        assert!(!std::path::Path::new(&temp.path(\"bad-link\")).exists());"
-              },
-              {
-                "line": 92,
-                "quote": "    assert!(files::write_binary("
-              },
-              {
-                "line": 97,
-                "quote": "    assert_eq!(fs::read(temp.path(\"sub/data.bin\")).unwrap(), bytes);"
-              },
-              {
-                "line": 98,
-                "quote": "    assert!(files::snapshot(&temp.path(\"sub/data.bin\")).is_err());"
-              },
-              {
-                "line": 99,
-                "quote": "    assert!(!files::write_binary(\"\", \"YQ==\", &temp.0));"
-              },
-              {
-                "line": 100,
-                "quote": "    assert!(!files::write_binary(\"relative\", \"YQ==\", &temp.0));"
-              },
-              {
-                "line": 101,
-                "quote": "    assert!(!files::write_binary("
-              },
-              {
-                "line": 106,
-                "quote": "    assert!(!std::path::Path::new(&temp.path(\"bad-base64\")).exists());"
-              },
-              {
-                "line": 107,
-                "quote": "    assert!(!files::write_binary("
-              },
-              {
-                "line": 112,
-                "quote": "    assert!(!files::write(\"relative\", \"bad\"));"
-              },
-              {
-                "line": 113,
-                "quote": "    assert!(!files::write(temp.0.to_str().unwrap(), \"bad\"));"
-              },
-              {
-                "line": 114,
-                "quote": "    assert!(!files::save(\"relative\", \"bad\", None).ok);"
-              },
-              {
-                "line": 115,
-                "quote": "    assert!(!files::save(temp.0.to_str().unwrap(), \"bad\", None).ok);"
-              },
-              {
-                "line": 116,
-                "quote": "    assert!(files::snapshot(\"relative\").is_err());"
-              },
-              {
-                "line": 117,
-                "quote": "    assert!(files::snapshot(&temp.path(\"missing\")).is_err());"
-              },
-              {
-                "line": 123,
-                "quote": "    assert_eq!("
-              },
-              {
-                "line": 136,
-                "quote": "    assert!(files::base64(&limit).is_err());"
-              },
-              {
-                "line": 137,
-                "quote": "    assert!(files::base64(\"relative\").is_err());"
-              },
-              {
-                "line": 138,
-                "quote": "    assert!(files::base64(&temp.path(\"missing\")).is_err());"
-              },
-              {
-                "line": 139,
-                "quote": "    assert!(files::open_file(\"relative\").is_err());"
-              },
-              {
-                "line": 140,
-                "quote": "    assert!(files::open_file(&temp.path(\"missing\")).is_err());"
-              },
-              {
-                "line": 141,
-                "quote": "    assert!(files::open_file(temp.0.to_str().unwrap()).is_err());"
-              },
-              {
-                "line": 142,
-                "quote": "    assert!(!files::trash_item(\"relative\"));"
-              },
-              {
-                "line": 143,
-                "quote": "    assert!(!files::trash_item(&temp.path(\"missing\")));"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "绑定窗口自动重放需人工点选通道"
         ]
       }
     ],

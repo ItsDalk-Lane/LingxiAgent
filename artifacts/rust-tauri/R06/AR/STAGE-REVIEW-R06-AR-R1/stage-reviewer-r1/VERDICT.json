@@ -1,0 +1,121 @@
+{
+  "schema": "lingxi.r06.stage-review-verdict.v1",
+  "reviewer": "STAGE-REVIEWER-R06-AR-R1",
+  "baseline": {
+    "commit": "c432a24ea38b3b0ca96f6248421ecb4995357bf9",
+    "worktree": "/tmp/lingxi-stage",
+    "worktreeClean": true
+  },
+  "verdict": "CONDITIONAL_PASS",
+  "verdictNote": "放行进入 R07 门禁执行段；正式阶段状态在条件落地前仍为 R06_NOT_ACCEPTED（当前必需 NOT_RUN 不得直接追认）。",
+  "conditions": [
+    {
+      "id": "C1",
+      "kind": "REGISTRATION_FIX_BEFORE_GATE",
+      "statement": "将人工 GUI 绑定 r06_test_910e4bcfed2b7f485283 (native_desktop_resource_roundtrip_real_gui) 移出 F14-C02 executionCommandRefs：按 guiEvidence 裁定改人工证据回执绑定并翻两叶 READY，或维持 GAP→R09 并移除绑定",
+      "reason": "该绑定 argv 无 --features e2e-test，套件首行 #![cfg(feature=\"e2e-test\")] 编译为 0 测试；执行器结算规则（r06_stage_inputs.py:588-592）拒绝 0 匹配，verify-stage R06 按现行登记必在 F14-C02 确定性失败",
+      "blocking": true
+    },
+    {
+      "id": "C2",
+      "kind": "GATE_EXECUTION",
+      "statement": "verify-stage R06 于全新证据目录真实执行 exit 0（含受影响 R05→R04→R03→R02 闭包与 C04 负控电池）",
+      "reason": "F14 remaining_scope=门禁执行本身；F14-C01 登记腿已由本人预验 PASS（r02_registry_consistency.py 13 entries 精确相等）",
+      "blocking": true
+    },
+    {
+      "id": "C3",
+      "kind": "R06_DUE_COMPLETIONS",
+      "statement": "五类 R06 到期项在最终验收前完成（不得登记到 R07 放行）：EX-01 核心份额（compact_now 真实提交入口+enabled/keepRecent/reserve 真实设置消费+自定义关注）；R00-T02-LA-BC675C664910（助手 config.yaml 完整 GET+全局注入+秘密掩码）；知识来源约束五叶最小宿主 R00-T02-LA-01E1E3CF7FA8/8A62470CC75D/9283371CDAD8/76E2F5AAF035/5F5365322CFF；R00-T02-LA-269958F82F8A gap 文案重锚（源码已实现 require_scope_source 整单 KNOWLEDGE_SCOPE_VIOLATION+测试断言在案，登记文案过时）；R00-T02-LA-4F0466F7C090 OS 沙盒条款补证或显式降级；R00-T02-LA-31CDA283A11A 的 R06 份（sidecar 路径/冲突校验）裁决",
+      "blocking": true
+    },
+    {
+      "id": "C4",
+      "kind": "OPEN_LEDGER_CONTINUITY",
+      "statement": "33 项 R06-ONLY GAP 叶与 12 项 EX 核心份额维持登记开放，按 gapHosts 裁定逐类推进（R06 最小宿主或既有后继宿主），不得以登记代替实现；GUI 两叶翻 READY 后 R09 重建宿主时回归一次 OS 行为",
+      "blocking": false
+    }
+  ],
+  "adjudications": {
+    "guiEvidence": {
+      "ruling": "ACCEPT_AND_CLOSE_READY",
+      "leaves": ["R00-T02-LA-2FB382A137FC", "R00-T02-LA-CAA876503B1B"],
+      "standard": "人工证据回执绑定（gui-proof-final 证据包 SHA），不经自动重放；R09 新宿主回归一次",
+      "fallback": "若门禁机制无法编码人工回执绑定：维持 GAP 转 R09 并随附证据包，同时该绑定仍须移出 F14-C02 自动清单",
+      "personalVerification": {
+        "testLog": "gui-test4.log: 1 passed / 180.23s, NATIVE_UI_PHASE COMPLETE pid=2187 (sha256 4aec0f0c5ece…)",
+        "osOpen": "os-open-observation.json: TextEdit/selected.txt/observedWindow=true + os-open-window.png (sha256 7d122f4eb3c6…)",
+        "trashBytes": "~/.Trash/lingxi-native-trash-2187.txt 亲读存在，27 字节 UTF-8 =「真实系统废纸篓载荷」，与 desktop_host.rs:539/:577 写读断言一致 (sha256 448d7977c53d…)",
+        "events": "resource-events.json 真实 provider_watch resource.changed 序列",
+        "negativePaths": "native_resources.rs:139-141 relative/missing/目录 is_err 自动覆盖（绑定 r06_test_f75c0ca223d01cc09704）",
+        "antiFakeGreen": "执行器拒绝自动重放人工点选（e2e-test 特性门控+零匹配结算拒绝）为正确行为，不否定人工证据效力"
+      }
+    },
+    "gapHosts": {
+      "totalGAP": 87,
+      "r06OnlyCount": 33,
+      "fiveCategoryViolations": [
+        {"category": "配置正确性", "items": ["R00-T02-LA-BC675C664910 (R06-ONLY, config.yaml 完整 GET 未实现)", "EX-01 设置真实消费核心份额"], "ruling": "回 R06 最小宿主，不得推后"},
+        {"category": "知识来源约束", "items": ["R00-T02-LA-01E1E3CF7FA8", "R00-T02-LA-8A62470CC75D", "R00-T02-LA-9283371CDAD8", "R00-T02-LA-76E2F5AAF035", "R00-T02-LA-5F5365322CFF", "EX-07/EX-08/EX-09 核心份额"], "ruling": "服务侧检查最小宿主回 R06，不得推后；R00-T02-LA-269958F82F8A 文案过时须重锚（源码已修）"},
+        {"category": "历史上下文", "items": ["发现级 F01 已 PASS+亲跑 8/8；残余=EX-01 compact_now 真实入口核心份额"], "ruling": "EX-01 核心份额 R06 完成；slash/WS 入口面可随 C/R08 宿主"},
+        {"category": "会话文件引用", "items": ["发现级 F04 已 PASS；残余 R00-T02-LA-4F0466F7C090 单句（沙盒不可用拒绝）、R00-T02-LA-31CDA283A11A R06 份"], "ruling": "R06 补证或显式降级/产品决策，不得静默推后"},
+        {"category": "嵌入一致性", "items": [], "ruling": "无 GAP 残留（F09–F12 全 PASS，r06_ar_f12_cache_consumers 亲跑 6/6）"}
+      ],
+      "perCategory": {
+        "A_模型工具注册": "文件族(ls/grep/find/file/materialize)→R07 承接（ResourceIO 局部证明保留）；记忆/知识工具族(learn_lesson/record_experience/notes/tasks/checkpoint)→EX-03/EX-06 承载，R06 核心份额最小宿主",
+        "B_WS流": "服务端 WS 契约(WS prompt run/resume/steer/abort/interject/WS compaction)→R06 补最小服务份额；客户端/回执显示→R08",
+        "C_slash": "入口面→R08 slash 宿主；compact 族服务语义核心→EX-01 R06",
+        "D_dream_ticker": "R07 ticker 宿主承接（登记已如实标注未移植）",
+        "E_summary_store": "EX-04 承载，R06 核心份额（记忆整理闭环），界面/调度后续",
+        "F_watch": "R09 承接（服务侧 watch 已实证：resource-events.json 真实事件）",
+        "G_GUI族": "R08/R09 承接（Tauri frontend 仅 probe 页，登记如实）",
+        "H_记忆遗留": "服务端事件/字段(tenets-changed/agent-updated/removedCount/检索状态/experience 刷新)→R06 最小宿主（R06-ONLY）；UI→R08",
+        "I_知识面": "五叶最小宿主回 R06（见 fiveCategoryViolations）",
+        "J_Office桥": "EX-07 承载，R06 核心份额（受控成熟解析器可用），完整编辑/渲染 R08",
+        "K_文件布局": "31CDA R06 份最小宿主或显式产品决策+R08 物理迁移；BB0A→R09 桌面宿主；4F04→R06 补证/显式降级",
+        "L_人格头像与配置族": "服务侧 R06-ONLY（agent-updated 广播/role 头像/ETag/deleteSkills 连带/reload 广播/sidecar 冻结提示词读取/rewind 用户批准/研究子代理开关）→R06 最小宿主或按 EX-12 显式冲突路径裁决，不得静默归 R07"
+      }
+    },
+    "exObligations": {
+      "ruling": "TRUTHFUL_NOT_FALSELY_CLOSED",
+      "detail": "12/12 NOT_RUN、SOURCE_ONLY、runtime_evidence 空；deadline=『R06 阶段验收前：核心/服务份额』；current_vs_later 逐项保留 R06 核心要求；AR_PROGRESS extra_open=12/extra_closed=0 且未减少 15F/60C；EX-12 显式标注 R07 映射为冲突非延期许可",
+      "implication": "如实的另一面：核心份额按其自身 deadline 构成 R06 放行条件（并入 C3），不是可转移项"
+    }
+  },
+  "f14": {
+    "ruling": "CONDITIONAL_CLOSE_BY_GATE",
+    "statement": "verify-stage R06 真实执行 exit 0 即关闭 F14；不要求本审查内先跑",
+    "prerequisite": "C1（real-gui 绑定移出自动清单），否则门禁确定性红",
+    "c01PersonalRun": "r02_registry_consistency.py PASS: 13 entries (v1–v13, 含 v8/v9 与 r06 v10–v13) 精确相等"
+  },
+  "independentReviews": {
+    "verified": "rv1(F01/F03/F04 PASS@844a10b2b 62/62)、rv2(F02/F05 PASS)、rv3(F06/F07 PASS)、rv4(F09/F10/F11/F13 PASS)、rv5(F15 PASS; F12 FAIL→RV5-F12-01)、rv6(F12 FAIL→2 残留)、rv7(F12 PASS@180abc207+负控)；F08 独立 PASS+远端回执；RV7-F12-O1 已在基线修复（knowledge.rs:2699-2710 亲读）",
+    "matrixBackfill": "14 PASS + F14 pending 与矩阵一致，未虚关"
+  },
+  "evidence": {
+    "anchorSuitesPersonallyRun": [
+      {"suite": "r06_ar_f01_history", "result": "8 passed / 0 failed", "cluster": "F01"},
+      {"suite": "r06_ar_f12_cache_consumers", "result": "6 passed / 0 failed", "cluster": "F12", "env": "LINGXI_HOME=/tmp/stage-env/home"},
+      {"suite": "r06_original_knowledge_proofs", "result": "12 passed / 0 failed", "cluster": "knowledge"},
+      {"suite": "r06_original_memory_skill_proofs", "result": "19 passed / 0 failed", "kind": "leaf-anchor bonus"},
+      {"suite": "r06_original_skills_bundle_proofs", "result": "12 passed / 0 failed", "kind": "leaf-anchor bonus"},
+      {"suite": "r06_b7b_config_scope_prefs", "result": "2 passed / 0 failed", "kind": "leaf-anchor bonus"}
+    ],
+    "registrationCheck": {"command": "python3 -B scripts/rust-tauri/r06_stage_inputs.py --check --evidence /tmp/stage-review/inputs-check", "exit": 0, "inputsDigestSha256": "85d571554403f51f", "note": "gitignored task-catalog.json 需拷入 worktree；脚本缺料拒绝为正确行为"},
+    "registryCheck": {"command": "python3 -B scripts/rust-tauri/r02_registry_consistency.py --root .", "exit": 0, "result": "PASS 13 entries"},
+    "spotCheck": {"sample": ["R00-T02-LA-F829AEA5931C", "R00-T02-LA-B097BDDC1E10", "R00-T02-LA-2CAF7E2573D8", "R00-T02-LA-EA26288DA2DB", "R00-T02-LA-24BC2E961E3E"], "seed": 20261014, "assertionsMatchR00Source": "5/5", "anchorsExist": "5/5", "coverage": "FULL"},
+    "ledgerCounts": {"ready": 192, "gap": 87, "r06OnlyGap": 33, "requiredLeaves": 280},
+    "guiProofDigests": {
+      "gui-test4.log": "4aec0f0c5ecec44835ea46979731a129ac1a8f6a164f6e36d6008f9223cb89f7",
+      "e2e-phase.json": "e5f5f86d14cb32940bb4baabf33ef6e82d79e67453db46fbe1be865ef50e0989",
+      "os-open-observation.json": "9333167c6cccc2602f292aad52556342cf4c359a21878a093a1671d3db0b2687",
+      "system-trash-observation.json": "2ed529f509ed5f496bf1a68e26290997acc420b6b797516019f57b86356f6876",
+      "resource-events.json": "3afa983a679c93df9cd877d2b4f3cb799fb57077bbf2f71610130b5ee91b733f",
+      "os-open-window.png": "7d122f4eb3c626ab966162fa4c93197db130c44848c847cf0eb37ab08f8a5b5c",
+      "trashFileByteReadback": "~/.Trash/lingxi-native-trash-2187.txt = 真实系统废纸篓载荷 (27B UTF-8)"
+    },
+    "workProducts": ["/tmp/stage-review/REPORT.md", "/tmp/stage-review/VERDICT.json", "/tmp/stage-review/inputs-check/inputs.json", "/tmp/stage-review/gap-leaves.txt", "/tmp/stage-review/gap-stages.txt"]
+  },
+  "notRun": ["verify-stage R06 全量门禁与 R05→R02 闭包（放行后主控动作）", "Windows/Linux、真实供应商 LIVE、正式打包", "TS vitest 三套重放（RV5 30/30 在案）", "lingxi-service 全 workspace 重跑（按抽验口径跑 8 套件）"],
+  "report": "/tmp/stage-review/REPORT.md"
+}
