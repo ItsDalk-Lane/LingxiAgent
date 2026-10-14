@@ -4,7 +4,7 @@
   "resultVersion": "lingxi.xtask.verify-stage.v1",
   "defaultTimeoutSecs": 1800,
   "commands": {
-    "r06_inputs": {
+    "r06_inputs_check": {
       "argv": [
         "python3",
         "-B",
@@ -5700,7 +5700,7 @@
       "id": "R06-A01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_a31f1c96eccaca4fa9d9"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5709,7 +5709,7 @@
       "id": "R06-A02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_15f081399b5697580121",
         "r06_test_f4717018a50a4bd5b4ef"
       ],
@@ -5719,7 +5719,7 @@
       "id": "R06-A03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_13680d9fff1bc73f0497"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5728,7 +5728,7 @@
       "id": "R06-A04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_8da3530ce0980f044bf5"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5737,7 +5737,7 @@
       "id": "R06-A05",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_7bedfc803a97b827c46d",
         "r06_test_452dbda28a35d43f020b",
         "r06_test_ba36986fd96e6c9c562c",
@@ -5750,7 +5750,7 @@
       "id": "R06-A06",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_a7ad7af9963867b133ba"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5759,7 +5759,7 @@
       "id": "R06-A07",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_27670d33ccc54d2f33e4"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5768,7 +5768,7 @@
       "id": "R06-A08",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_5866f34d95c00a303eb4",
         "r06_test_522c4f33f8dd0e9103a2"
       ],
@@ -5778,7 +5778,7 @@
       "id": "R06-A09",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_c6a1cf8a285e48278b05"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5787,7 +5787,7 @@
       "id": "R06-A10",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_934b4d4b90ce47e8673b"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5796,7 +5796,7 @@
       "id": "R06-A11",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_b6e0dcf50d00ea357a4f",
         "r06_test_db65a81e04d027646560"
       ],
@@ -5806,7 +5806,7 @@
       "id": "R06-A12",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_504dad10e02bdeac94c3",
         "r06_test_658c26c4a3f528aabf33"
       ],
@@ -5816,7 +5816,7 @@
       "id": "R06-A13",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_002e562b5f7235cd96d2",
         "r06_test_56928f9dc4edf0a25712"
       ],
@@ -5826,7 +5826,7 @@
       "id": "R06-A14",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_cbc19cd68d80e786726f"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5835,7 +5835,7 @@
       "id": "R06-A15",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_a5c01899a6daed65dec2"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5844,7 +5844,7 @@
       "id": "R06-A16",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_24b99b07405d8d6ab03d",
         "r06_test_ce8ebc015de0b8784a32"
       ],
@@ -5854,7 +5854,7 @@
       "id": "R06-AR-F01-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_db5d65857337002bbdba"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5863,7 +5863,7 @@
       "id": "R06-AR-F01-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_c7b1b8f64f761ce1eb98"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5872,7 +5872,7 @@
       "id": "R06-AR-F01-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_f9ce34f3b23619f4e415"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5881,7 +5881,7 @@
       "id": "R06-AR-F01-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_a094820a892b63b20394"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5890,7 +5890,7 @@
       "id": "R06-AR-F02-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_76fd72a90ea2ec6b5721"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -5899,7 +5899,7 @@
       "id": "R06-AR-F02-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_1fca3a3cf8652bd93334",
         "r06_test_21c93bc5615c124afd50",
         "r06_test_9c5ceeab530c8348d191"
@@ -5910,7 +5910,7 @@
       "id": "R06-AR-F02-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_f00339a9dc730bc9087f",
         "r06_test_783ed4646aed5d3e6c79"
       ],
@@ -5920,7 +5920,7 @@
       "id": "R06-AR-F02-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_550a20a0412474b78ff5",
         "r06_test_70975ebd4be107a95d22"
       ],
@@ -5930,7 +5930,7 @@
       "id": "R06-AR-F03-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_2b6615db5aa9ff61836b",
         "r06_test_a88ac189f1653cd149c1",
         "r06_test_bcb7c1e99861a0221929",
@@ -5959,7 +5959,7 @@
       "id": "R06-AR-F03-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_2b6615db5aa9ff61836b",
         "r06_test_a88ac189f1653cd149c1",
         "r06_test_bcb7c1e99861a0221929",
@@ -5988,7 +5988,7 @@
       "id": "R06-AR-F03-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_2b6615db5aa9ff61836b",
         "r06_test_a88ac189f1653cd149c1",
         "r06_test_bcb7c1e99861a0221929",
@@ -6017,7 +6017,7 @@
       "id": "R06-AR-F03-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_2b6615db5aa9ff61836b",
         "r06_test_a88ac189f1653cd149c1",
         "r06_test_bcb7c1e99861a0221929",
@@ -6046,7 +6046,7 @@
       "id": "R06-AR-F04-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_6bbea69eebd1552fead1"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6055,7 +6055,7 @@
       "id": "R06-AR-F04-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e5f8cba841d0280a7e21"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6064,7 +6064,7 @@
       "id": "R06-AR-F04-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_0917da0e51fada065f45"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6073,7 +6073,7 @@
       "id": "R06-AR-F04-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_2e03106a96dec6c69ed1"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6082,7 +6082,7 @@
       "id": "R06-AR-F05-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_f3eacfa8241968e42b79",
         "r06_test_954c069fcddfd8702759"
       ],
@@ -6092,7 +6092,7 @@
       "id": "R06-AR-F05-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_8b42a41c3e6e7745e98d",
         "r06_test_12ff18511f1d1ea19601"
       ],
@@ -6102,7 +6102,7 @@
       "id": "R06-AR-F05-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e7adf068d213e89ade71",
         "r06_test_07f174c1833dcf967355"
       ],
@@ -6112,7 +6112,7 @@
       "id": "R06-AR-F05-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_4864520b589b7712f000"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6121,7 +6121,7 @@
       "id": "R06-AR-F06-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_c8c4848f0c139fd48ed4",
         "r06_test_16c548d87454d36ae027"
       ],
@@ -6131,7 +6131,7 @@
       "id": "R06-AR-F06-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_433d9281f3e04562dd53",
         "r06_test_39530e4fa56dc3bc81c7",
         "r06_test_16c548d87454d36ae027"
@@ -6142,7 +6142,7 @@
       "id": "R06-AR-F06-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_39530e4fa56dc3bc81c7",
         "r06_test_16c548d87454d36ae027"
       ],
@@ -6152,7 +6152,7 @@
       "id": "R06-AR-F06-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_d5abdd0520eb6cd91d57",
         "r06_test_16c548d87454d36ae027"
       ],
@@ -6162,7 +6162,7 @@
       "id": "R06-AR-F07-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_219e67a511ff19ce0ec1"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6171,7 +6171,7 @@
       "id": "R06-AR-F07-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_43c75b62977aa5fc069b"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6180,7 +6180,7 @@
       "id": "R06-AR-F07-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_50f60a3c64cea52bdec5"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6189,7 +6189,7 @@
       "id": "R06-AR-F07-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_326fbfaf82aaf506a079"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6198,7 +6198,7 @@
       "id": "R06-AR-F08-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_6895a2059d694c85faf7"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6207,7 +6207,7 @@
       "id": "R06-AR-F08-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_05c18659efcea252e261"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6216,7 +6216,7 @@
       "id": "R06-AR-F08-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_8adac2a1c914f10cc730"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6225,7 +6225,7 @@
       "id": "R06-AR-F08-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_6195c27f850951c707aa"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6234,7 +6234,7 @@
       "id": "R06-AR-F09-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_f82d4b33a721818b7f90",
         "r06_test_ea0fe8d8751249013ccf",
         "r06_test_18127768428203770e9d"
@@ -6245,7 +6245,7 @@
       "id": "R06-AR-F09-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e4df7a408317175a885e",
         "r06_test_2d8a2b0984145220c1ab",
         "r06_test_7bf8c1ffae019b81cb93",
@@ -6262,7 +6262,7 @@
       "id": "R06-AR-F09-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_f8590aa99afb5b167939",
         "r06_test_44c3208b143c916a386a"
       ],
@@ -6272,7 +6272,7 @@
       "id": "R06-AR-F09-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_0f94822b5601965dd04c",
         "r06_test_d7cfc5d9188cc09a4c33"
       ],
@@ -6282,7 +6282,7 @@
       "id": "R06-AR-F10-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_574ac85180c664cb17ef"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6291,7 +6291,7 @@
       "id": "R06-AR-F10-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_96e17da810f2dc514f6f"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6300,7 +6300,7 @@
       "id": "R06-AR-F10-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_2b5b680c9733803f4739"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6309,7 +6309,7 @@
       "id": "R06-AR-F10-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_4dcda69f848f32edeb71"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6318,7 +6318,7 @@
       "id": "R06-AR-F11-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_796a1f2c30f0398a9b34"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6327,7 +6327,7 @@
       "id": "R06-AR-F11-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e47e26749bcb3b9dfb5a",
         "r06_test_1bcceb7518b4d5e29be7",
         "r06_test_947d6bf325c056f8b30c",
@@ -6339,7 +6339,7 @@
       "id": "R06-AR-F11-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e0d1164d1eda21704728",
         "r06_test_72cd17b40f941daf8e8e",
         "r06_test_70bd3e3e679343b3d286",
@@ -6353,7 +6353,7 @@
       "id": "R06-AR-F11-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_796a1f2c30f0398a9b34"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
@@ -6362,7 +6362,7 @@
       "id": "R06-AR-F12-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e5610341b82928267c96",
         "r06_test_c2b82a4b4c11c54a8aef",
         "r06_test_cf46c83e95e439239dc3"
@@ -6373,7 +6373,7 @@
       "id": "R06-AR-F12-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_cabcc692b8bd348556fc",
         "r06_test_07c1a41ecf16fa49ddbd",
         "r06_test_9794536cd87586a6f1d4"
@@ -6384,7 +6384,7 @@
       "id": "R06-AR-F12-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_d5622970718085be9e36",
         "r06_test_250d00ac042cd6a5d6cc",
         "r06_test_3e8ba06cd62516890fd9"
@@ -6395,7 +6395,7 @@
       "id": "R06-AR-F12-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_d2af3650b47d7f69d80c",
         "r06_test_e07134edee429e5d8438",
         "r06_test_168a7228849b1aeae828",
@@ -6408,7 +6408,7 @@
       "id": "R06-AR-F13-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_9422b479a5d9301afe3c",
         "r06_test_1d0d73d1bdfbf032f194"
       ],
@@ -6418,7 +6418,7 @@
       "id": "R06-AR-F13-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_9422b479a5d9301afe3c",
         "r06_test_1d0d73d1bdfbf032f194"
       ],
@@ -6428,7 +6428,7 @@
       "id": "R06-AR-F13-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_9422b479a5d9301afe3c",
         "r06_test_1d0d73d1bdfbf032f194"
       ],
@@ -6438,7 +6438,7 @@
       "id": "R06-AR-F13-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_9422b479a5d9301afe3c",
         "r06_test_1d0d73d1bdfbf032f194"
       ],
@@ -6448,7 +6448,7 @@
       "id": "R06-AR-F14-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_e5f01f8bd649246f5708",
         "r06_test_cc45f672b3359fd6a593",
         "r06_test_29cbc2a740294f483e45",
@@ -6460,7 +6460,7 @@
       "id": "R06-AR-F14-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_002e562b5f7235cd96d2",
         "r06_test_018cfbd67ea11cc1d56c",
         "r06_test_0384a7289f7409790b0b",
@@ -6853,7 +6853,7 @@
       "id": "R06-AR-F14-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_ae7440724d90c6dcce75",
         "r06_test_f2b30c5b5138f9df42d8",
         "r06_test_838be16680152dfb2bdb",
@@ -6866,7 +6866,7 @@
       "id": "R06-AR-F15-C01",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_1243c6e4a5203bf6d126",
         "r06_test_1c1ea6a7ef2b34598a0f",
         "r06_test_461dbe879e16d1297d89",
@@ -6887,7 +6887,7 @@
       "id": "R06-AR-F15-C02",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_1243c6e4a5203bf6d126",
         "r06_test_1c1ea6a7ef2b34598a0f",
         "r06_test_461dbe879e16d1297d89",
@@ -6908,7 +6908,7 @@
       "id": "R06-AR-F15-C03",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_1243c6e4a5203bf6d126",
         "r06_test_1c1ea6a7ef2b34598a0f",
         "r06_test_461dbe879e16d1297d89",
@@ -6929,7 +6929,7 @@
       "id": "R06-AR-F15-C04",
       "requirement": "REQUIRED",
       "commandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_1243c6e4a5203bf6d126",
         "r06_test_1c1ea6a7ef2b34598a0f",
         "r06_test_461dbe879e16d1297d89",
@@ -20028,5 +20028,5 @@
       "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
     }
   ],
-  "inputDigestSha256": "c8dcdbc59414fab0df63ea65e91b3f3391b318932960f530ec3afea2a288e8f6"
+  "inputDigestSha256": "9f7aa957ff0017b50e8d2d12ebb257449a608ec3d34c054ec24e2d488f75f25b"
 }

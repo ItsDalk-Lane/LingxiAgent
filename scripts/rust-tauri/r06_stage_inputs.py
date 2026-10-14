@@ -341,7 +341,7 @@ def build(root: Path):
               "cases": cases, "requiredLeaves": leaves,
               "currentStatus": "IMPLEMENTATION_REGISTERED_ACCEPTANCE_NOT_RUN",
               "note": "只登记本轮 15 项及原 R06 范围；无完整逐断言绑定时保持未完成，未运行不写 PASS。"}
-    commands = {"r06_inputs": {"argv": ["python3", "-B", "scripts/rust-tauri/r06_stage_inputs.py",
+    commands = {"r06_inputs_check": {"argv": ["python3", "-B", "scripts/rust-tauri/r06_stage_inputs.py",
                                               "--check", "--evidence", "{EVIDENCE}/R06_INPUTS"],
                                "timeoutSecs": 120, "evidencePaths": ["{EVIDENCE}/R06_INPUTS/inputs.json"]},
                 "r05_regression_gate": {"argv": ["cargo", "run", "--manifest-path", "rust/Cargo.toml", "--locked", "-p", "xtask", "--",
@@ -362,7 +362,7 @@ def build(root: Path):
                              "evidencePaths": [relative + "/binding-result.json"]}
             refs.append(key)
         case["executionCommandRefs"] = refs
-        scenarios.append({"id": case["id"], "requirement": "REQUIRED", "commandRefs": ["r06_inputs", *refs],
+        scenarios.append({"id": case["id"], "requirement": "REQUIRED", "commandRefs": ["r06_inputs_check", *refs],
                           "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"})
     inventory = original_proof_inventory(root, leaves)
     inputs["originalProofInventory"] = inventory
@@ -406,7 +406,7 @@ def build(root: Path):
     # C03 直接消费原 R05 门禁及其前序闭包，绝不以 Cargo 结果替代。
     for case, scenario in zip(cases, scenarios):
         if case["id"] == "R06-AR-F14-C02":
-            scenario["commandRefs"] = ["r06_inputs", *sorted(bindings)]
+            scenario["commandRefs"] = ["r06_inputs_check", *sorted(bindings)]
             case["executionCommandRefs"] = scenario["commandRefs"]
             case["bindingStatus"] = "CURRENT_STAGE_AGGREGATE_EXECUTION"
         elif case["id"] == "R06-AR-F14-C03":

@@ -143,7 +143,7 @@ class R06StageInputsContract(unittest.TestCase):
                     unique[self.stage.binding_key(binding)] = binding
         self.assertEqual(bindings, unique)
         scenarios = {row["id"]: row for row in self.graph["scenarios"]}
-        self.assertEqual(scenarios["R06-AR-F14-C02"]["commandRefs"], ["r06_inputs", *sorted(bindings), "r06_z_leaf_evidence"])
+        self.assertEqual(scenarios["R06-AR-F14-C02"]["commandRefs"], ["r06_inputs_check", *sorted(bindings), "r06_z_leaf_evidence"])
         self.assertEqual(scenarios["R06-AR-F14-C03"]["commandRefs"], ["r05_regression_gate"])
         self.assert_positive("unchanged-positive")
 

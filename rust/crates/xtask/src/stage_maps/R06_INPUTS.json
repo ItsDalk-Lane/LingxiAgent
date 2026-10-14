@@ -6960,7 +6960,7 @@
       "bindingStatus": "CURRENT_STAGE_AGGREGATE_EXECUTION",
       "stageVerdictOwner": "xtask verify-stage R06",
       "executionCommandRefs": [
-        "r06_inputs",
+        "r06_inputs_check",
         "r06_test_002e562b5f7235cd96d2",
         "r06_test_018cfbd67ea11cc1d56c",
         "r06_test_0384a7289f7409790b0b",
