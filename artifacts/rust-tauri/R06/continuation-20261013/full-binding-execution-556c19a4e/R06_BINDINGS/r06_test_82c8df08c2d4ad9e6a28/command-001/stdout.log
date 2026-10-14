@@ -1,0 +1,17 @@
+
+running 1 test
+test agent_lifecycle_roundtrip_and_rejections ... ok
+
+successes:
+
+---- agent_lifecycle_roundtrip_and_rejections stdout ----
+LINGXI_AUTH_REJECTED request_id="req-e8c61292ee6e9f36243d9529c0b3df6e" method=GET path=/lingxi/v1/agents status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58892
+LINGXI_AUTH_REJECTED request_id="req-f07e532df67214f8f8b21e688ce6a86b" method=GET path=/lingxi/v1/app-events status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58893
+LINGXI_AUTH_REJECTED request_id="req-bedcfa444c9cb371a84a7c5609b55832" method=POST path=/lingxi/v1/agents status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58894
+
+
+successes:
+    agent_lifecycle_roundtrip_and_rejections
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.15s
+

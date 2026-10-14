@@ -1,0 +1,15 @@
+
+running 1 test
+test session_content_serves_only_history_referenced_resources ... ok
+
+successes:
+
+---- session_content_serves_only_history_referenced_resources stdout ----
+LINGXI_AUTH_REJECTED request_id="req-2c9a86873b510b916958bacb8dd29147" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:55372
+
+
+successes:
+    session_content_serves_only_history_referenced_resources
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.60s
+

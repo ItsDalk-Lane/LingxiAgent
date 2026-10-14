@@ -1,0 +1,148 @@
+{
+  "review": {
+    "reviewer": "RV4 (fresh independent reviewer, R06 closeout)",
+    "frozen_candidate": "844a10b2b83a98bb909a9f83bb89f140021d5adc",
+    "worktree": "/tmp/lingxi-rv4",
+    "worktree_clean_during_review": true,
+    "date": "2026-10-13",
+    "scope": ["R06-AR-F09", "R06-AR-F10", "R06-AR-F11", "R06-AR-F13"],
+    "criteria": "PASS if all obligations met; FAIL if gaps; BLOCKED only for external conditions",
+    "overall_verdict": "PASS"
+  },
+  "test_execution": {
+    "command": "cargo test --locked -p lingxi-service --test r06_ar_w09_embedding_batches --test r06_ar_w10_embedding_identity --test r06_ar_w11_embedding_lifecycle --test r06_ar_f13_submission --test r06_t07_knowledge_tools --test r06_original_knowledge_proofs -- --test-threads=1",
+    "env": {
+      "LINGXI_HOME": "/tmp/rv4-env/home",
+      "W09_EVIDENCE": "/tmp/rv4-env/w09",
+      "W10_EVIDENCE": "/tmp/rv4-env/w10",
+      "W11_EVIDENCE": "/tmp/rv4-env/w11",
+      "TMPDIR": "/tmp/rv4-env/tmp",
+      "CARGO_TARGET_DIR": "/tmp/rv4-target"
+    },
+    "suites": [
+      {"name": "r06_ar_w09_embedding_batches", "passed": 16, "failed": 0},
+      {"name": "r06_ar_w10_embedding_identity", "passed": 9, "failed": 0},
+      {"name": "r06_ar_w11_embedding_lifecycle", "passed": 11, "failed": 0},
+      {"name": "r06_ar_f13_submission", "passed": 2, "failed": 0},
+      {"name": "r06_t07_knowledge_tools", "passed": 6, "failed": 0},
+      {"name": "r06_original_knowledge_proofs", "passed": 12, "failed": 0}
+    ],
+    "total": {"passed": 56, "failed": 0},
+    "own_run_receipts": [
+      "/tmp/rv4-env/w09/c02-quota-cancel.json (ledger [], wire [])",
+      "/tmp/rv4-env/w11/c03-quota-true.json (0 usage rows, 0 wire, Cancelled)",
+      "/tmp/rv4-env/w11/c03-quota-false.json (1 row usage_state=unknown transport_attempts=0)"
+    ]
+  },
+  "findings": [
+    {
+      "id": "R06-AR-F09",
+      "verdict": "PASS",
+      "obligations_met": [
+        "first-batch probe duplication removed: ingest loop iterates missing.chunks(EMBED_BATCH); no peek/peekable in knowledge.rs; boundary goldens 1/64/65/128/129 green",
+        "unified stats: requestCountSemantics=confirmed_or_possibly_sent_excluding_known_not_sent plus transport/confirmed/knownNotSent/unknownSent/pending counters",
+        "checkpoint gap resumption real: missing = plan - checkpoint; c02_failed and c02_sigkill tests; incompatible identity starts distinct variant, paid bytes preserved",
+        "ready fast path costs zero requests: c04 asserts stub.capture() unchanged on reuse; dimensions learned only from same-full-fingerprint ready variant"
+      ],
+      "evidence": [
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/src/knowledge.rs (missing.chunks loop ~L2474; stats block L2440-2567; ready reuse L2379-2421)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/tests/r06_ar_w09_embedding_batches.rs (c01/c02/c03/c04)"
+      ]
+    },
+    {
+      "id": "R06-AR-F10",
+      "verdict": "PASS",
+      "prior_formal_result": "INDEPENDENT_REVIEW01 FAIL (C01-C03 limited PASS, C04 FAIL: SIGKILL running job reingest 409 left crash-running jobs unrecovered)",
+      "obligations_met": [
+        "single-resolved immutable route snapshot drives dispatch, parse, journal receipt, and returned served identity (embedding_operation.rs embed_owned_observed); no second config read for labeling",
+        "per-batch identity verification: identity != served -> fail_build + conflict, distinct variant required",
+        "same-dimension isolation via lingxi.embedding-identity.v2 descriptor incl. parameter_fingerprint",
+        "full chain: query served identity + dimension isolation (c03), failed-build restart under changed identity (c04), C04 recovery gap closed at runtime: crash_running_job_recovers_distinct_identity_and_preserves_paid_vectors (SIGKILL mid-batch, model-b restart, redundant manual reingest honestly 409, worker recovers crashed RUNNING job, old paid rows byte-identical, new rows complete, wire accounts 2 old A attempts incl. unknown + all B batches)"
+      ],
+      "evidence": [
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/src/embedding_operation.rs L976-1210, L1280-1439",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/src/knowledge.rs L2603-2618 (per-batch identity guard)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-kernel/src/knowledge.rs L163-174 (identity v2 descriptor)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs L839-937 (crash-running test)"
+      ]
+    },
+    {
+      "id": "R06-AR-F11",
+      "verdict": "PASS",
+      "obligations_met": [
+        "trusted ownership (principal/session/run/attempt/parent tool/cause_ref/absolute deadline/cancel scope) threaded via EmbeddingCallRuntime; no model self-reported identity",
+        "in-run retrieval inherits parent scope via search_in_scope_owned; standalone ingest uses service-minted stable job identity (knowledge-job:{studio}:{jobId}, attempt job:{id}#a{n}) with persisted absolute deadline enforced by ensure_job_active; no all-None paths",
+        "late fence across quota/credential/request/batch/write/completion: W11 c03 family green (loud cancel, deadline not renewed, parent cancel settles once, native FIFO retains claim)",
+        "honest usage attribution: paid/unknown rows never zeroed; pre-send known-not-sent cancel skips fictional row (see fix2_ruling); construction failure still records failed/unknown row"
+      ],
+      "evidence": [
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/src/knowledge.rs L1493-1516 (query runtime), L2228-2260 (job runtime), L565-600 (deadline fence)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/src/cancel.rs (CancelScope tree)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/tests/r06_ar_w11_embedding_lifecycle.rs"
+      ]
+    },
+    {
+      "id": "R06-AR-F13",
+      "verdict": "PASS",
+      "obligations_met": [
+        "real authenticated POST /lingxi/v1/sessions/{id}/execute with knowledge{notebookIds,sourceIds}: server freezes per-turn scope + source versions, binds subject/session/run, actual model request carries server-minted scope handle (本轮知识资料范围 asserted on real wire)",
+        "schema-compatible extension field; no UI rewrite dependency",
+        "per-execution validation: old-scope tool call -> real Failed receipt + next model request receives KNOWLEDGE_SCOPE_VIOLATION; invalid selection rejected pre-model-request with zero model calls, prior active scope preserved; no-selection turn declares no knowledge tools",
+        "canonical records + recovery: invocation journal receipts; HTTP-500 retry advances only attempt and preserves frozen sources against mid-flight source removal/addition (snapshot/artifact ids byte-equal)"
+      ],
+      "evidence": [
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/tests/r06_ar_f13_submission.rs (L206-399, L484-620)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/tests/r06_t07_knowledge_tools.rs (6/6)",
+        "/tmp/lingxi-rv4/rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs (12/12)"
+      ]
+    }
+  ],
+  "fix_rulings": {
+    "FIX-1_cross_attempt_recovery": {
+      "claim": "prior_attempt_closed lets new-attempt takeover fill gaps while same-attempt auto-resend still refused",
+      "ruling": "CONFIRMED",
+      "evidence": "embedding_operation.rs L1149-1209: unconfirmed_paid && !prior_attempt_closed refuses; interrupted unknown settled+archived before new call identity minted; W09 sigkill + W10 crash-running green"
+    },
+    "FIX-2_presend_cancel_zero_fee_row": {
+      "claim": "cancelled && transportAttempts==0 && knownNotSent skips fee row; wire-touched cancels stay honest unknown; W11 c03 assertion changed to empty ledger accordingly",
+      "ruling": "AGREE (ruling correct)",
+      "independent_evidence": [
+        "W09 frozen evidence (predates change, 2026-10-11): artifacts/rust-tauri/R06/AR/W09-E01/safe/commands/complete-family-09/c02-quota-cancel.json -> ledger:[], wire:[], pendingCallIntentCount:1; presend-construction-11/c01-presend-build.json -> failed (not cancelled) construction error still writes transport_attempts:0 usage_state:unknown row",
+        "TS original semantics: core/model-operation-client.ts -> usageLedger.start() only immediately before real fetch; credential resolution (resolveOperationFresh, engine.ts _embedKnowledgeTextsForModel resolveFresh before client) and provider gate wait (lib/knowledge/ingestion-service.ts embeddingGate.run wraps embedTextsForModel with abort signal) precede ledger start -> pre-send cancel writes NO row in TS; on-wire AbortError -> recordError('aborted') honest unknown row",
+        "implementation is the narrow guard at embedding_operation.rs L614-618; journal (embedding-calls-v1) still written before accounting, job stats keep pendingCallIntentCount/knownNotSentAttemptCount -> no fact lost",
+        "old W11 c03 assertion matched neither W09 frozen evidence nor TS; not an evidence-weakening change: cancelled branch still asserts loud Cancelled + zero wire; deadline branch retains 1-row unknown assertions",
+        "unknown accounting class drives unconfirmed_paid recovery guard; polluting it with provably-not-sent cancels would spuriously block same-attempt retry"
+      ]
+    },
+    "FIX-3_pending_stats_preserved": {
+      "claim": "parent cancel mid-flight keeps pendingRequestCount for takeover attempt instead of folding into unknown locally",
+      "ruling": "CONFIRMED",
+      "evidence": "knowledge.rs L2558-2567: only converges pendingRequestCount into unknownSentRequestCount when !batch_runtime.cancel.is_cancelled(); takeover reads unknownRequestsFromPreviousAttempt"
+    }
+  },
+  "gaps_and_observations": [
+    {
+      "id": "OBS-1",
+      "severity": "bookkeeping-only",
+      "note": "AR_ISSUE_MATRIX.json entries for F09/F10/F11/F13 still carry pre-repair statuses (F10 INDEPENDENT_REVIEW01_FAIL..., F13 OPEN, F09 self_check EXECUTOR_SELF_CHECK_RECORDED...) inconsistent with frozen candidate reality; refresh at closeout commit"
+    },
+    {
+      "id": "OBS-2",
+      "severity": "optional-hardening",
+      "note": "F13 restart read-only recovery covered by persisted turn_scope rows + journal read-back; no dedicated cross-process restart test for scope recovery itself (SIGKILL restart evidence lives on embedding side). Not a remaining_scope violation"
+    },
+    {
+      "id": "OBS-3",
+      "severity": "out-of-scope",
+      "note": "Adjacent reds attributed elsewhere per handoff: cancel_link_inheritance (F14 family), original_knowledge_proofs budget (fixed via explicit max_model_turns=64; re-verified 12/12 green in this review)"
+    }
+  ],
+  "verdicts": {
+    "R06-AR-F09": "PASS",
+    "R06-AR-F10": "PASS",
+    "R06-AR-F11": "PASS",
+    "R06-AR-F13": "PASS",
+    "FIX-2 cross-suite ruling": "AGREE (uphold W09 frozen semantics)"
+  },
+  "non_declarations": "This review covers only the four listed issues and their named surfaces on frozen candidate 844a10b2b; it is not a stage gate, not an R06/R07 acceptance, and makes no claim about other AR issues or platform/packaging validation."
+}

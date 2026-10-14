@@ -1,0 +1,71 @@
+diff --git a/scripts/rust-tauri/r06_evaluation_audit.py b/scripts/rust-tauri/r06_evaluation_audit.py
+index a6e733920..4bca7e1f9 100644
+--- a/scripts/rust-tauri/r06_evaluation_audit.py
++++ b/scripts/rust-tauri/r06_evaluation_audit.py
+@@ -266,6 +266,54 @@ def owned_listing(path, label):
+                    for p in root.rglob("*") if p.is_file()])
+ 
+ 
++# F02 恢复保留件（.lingxi-recovery-<id>.original）是 edit 既有文件的故意生产行为；
++# 评测器不忽略它，只在其与生产恢复记录逐项吻合（状态/双哈希/retainedPath/
++# 已知前内容）时放行，语义文件集合仍精确钉死。
++RECOVERY_RETAINED_STATUSES = {"completed_original_retained", "external_original_retained",
++                              "unknown_original_retained", "failed_before_exchange_retained"}
++
++
++def justified_recovery(home, workspace, listing, originals, label):
++    """返回 listing 中有生产恢复记录背书的恢复件；其余额外文件一律不豁免。"""
++    records_root = owned_path(owned_path(home, label+" 恢复记录根")/"file-recovery-records", label+" 恢复记录目录")
++    workspace_resolved = owned_path(workspace, label+" 恢复工作区")
++    justified = {}
++    for name, digest_value in listing.items():
++        if not (name.startswith(".lingxi-recovery-") and name.endswith(".original")):
++            continue
++        identifier = name[len(".lingxi-recovery-"):-len(".original")]
++        record_path = records_root/(identifier+".json")
++        require(record_path.is_file(), label+" 恢复件缺生产恢复记录")
++        record = parse_json(record_path.read_text())
++        require(record.get("id") == identifier and record.get("status") in RECOVERY_RETAINED_STATUSES,
++                label+" 恢复记录身份/状态不符")
++        retained = owned_path(record["retainedPath"], label+" 恢复对象")
++        require(retained.parent == workspace_resolved and retained.name == name
++                and sha_bytes(retained.read_bytes()) == digest_value,
++                label+" 恢复对象路径/字节与记录不符")
++        target = owned_path(record["filePath"], label+" 恢复目标")
++        require(target.parent == workspace_resolved and target.name in originals
++                and record["expected"]["sha256"] == sha_bytes(originals[target.name].encode())
++                and record["replacementSha256"] == listing[target.name],
++                label+" 恢复前后双哈希与已知语义内容不符")
++        if record["status"] == "completed_original_retained":
++            # 完成交换的保留件必须就是被换出的原对象；字节与记录expected一致。
++            require(sha_bytes(retained.read_bytes()) == record["expected"]["sha256"],
++                    label+" 保留件字节与恢复记录原对象不符")
++        justified[name] = digest_value
++    # 反向：工作区内完成的保留记录不得藏匿其恢复件。
++    for record_path in records_root.glob("*.json"):
++        record = parse_json(record_path.read_text())
++        if record["status"] != "completed_original_retained":
++            continue
++        retained = owned_path(record["retainedPath"], label+" 恢复对象")
++        target = owned_path(record["filePath"], label+" 恢复目标")
++        if target.parent == workspace_resolved:
++            require(retained.name in listing and sha_bytes(retained.read_bytes()) == listing[retained.name],
++                    label+" 已完成恢复记录的保留件被藏匿/漂移")
++    return justified
++
++
+ def run_binding(facts, home, run, label):
+     accepted = one([v for v in values(facts, "run_accepted") if v["databaseHome"] == home and v["runId"] == run], label+" 接纳")
+     ready = one([v for v in values(facts, "service_ready") if same(v["pid"], accepted["servicePid"])], label+" READY")
+@@ -421,7 +469,10 @@ def audit_metrics(records, facts):
+             # 这里证明原常驻写任务；F07真实按需发现→说明→调用仍须由独立精确测试执行，不由本分支虚报。
+         elif task_id == "BE-03":
+             require(same(emitted, [("edit",{"path":"b.md","edits":[{"oldText":"OLD-TEXT-42","newText":"NEW-TEXT-99"}]}),("edit",{"path":"evil.md","edits":[{"oldText":"x","newText":"y"}],"evil_extra":"bypass"})]),label+" 原嵌套参数/拒绝调用不符")
+-            require(same(listing, {"b.md":sha_bytes("第一行\nNEW-TEXT-99 在中间\n第三行\n".encode()),"evil.md":sha_bytes(b"x\n")}) and any("unknown property" in t.lower() or "schema" in t.lower() or "not dispatched" in t for t in tool_texts(wires)),label+" 嵌套修改/真实拒绝效果不符")
++            originals={"b.md":"第一行\nOLD-TEXT-42 在中间\n第三行\n","evil.md":"x\n"}
++            recovery=justified_recovery(home,workspace,listing,originals,label)
++            require(same({k:v for k,v in listing.items() if k not in recovery},
++                    {"b.md":sha_bytes("第一行\nNEW-TEXT-99 在中间\n第三行\n".encode()),"evil.md":sha_bytes(b"x\n")}) and any("unknown property" in t.lower() or "schema" in t.lower() or "not dispatched" in t for t in tool_texts(wires)),label+" 嵌套修改/真实拒绝效果不符")
+         elif task_id == "BE-04":
+             require(same(emitted, [("browser_navigate",{"url":"https://example.com"})]*2) and not invocation and not listing,label+" 目录外工具实际派发/副作用")
+             for marker,leg in [("BE04A","explainLeg"),("BE04B","forceLegNormalPrompt"),("BE04C","forceLegInjectionPrompt")]:
