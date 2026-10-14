@@ -1553,6 +1553,7 @@ async fn concurrent_spends_of_one_grant_produce_exactly_one_winner() {
         async move {
             let req_ctx = kernel_ctx(SESSION, tag);
             let req = approval::ApprovalRequest {
+                requires_scope_review: false,
                 tool_call_id: ToolCallId::new(format!("race-{tag}")),
                 target: "tool:first-party:probe_write".to_string(),
                 args_digest: digest,
@@ -1655,6 +1656,7 @@ async fn restart_invalidates_old_approvals_and_grants() {
     .args_digest
     .hex;
     let req = approval::ApprovalRequest {
+        requires_scope_review: false,
         tool_call_id: ToolCallId::new("restart-replay".to_string()),
         target: "tool:first-party:probe_write".to_string(),
         args_digest: digest,
@@ -1741,6 +1743,7 @@ async fn alias_cannot_reuse_a_single_use_grant() {
         async move {
             let ctx = kernel_ctx(SESSION, "alias-run");
             let req = approval::ApprovalRequest {
+                requires_scope_review: false,
                 tool_call_id: ToolCallId::new(format!("alias-{tag}")),
                 target: "tool:first-party:probe_write".to_string(),
                 args_digest: digest,

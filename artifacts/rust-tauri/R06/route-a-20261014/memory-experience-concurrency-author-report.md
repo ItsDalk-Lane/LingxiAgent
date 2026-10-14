@@ -1,0 +1,20 @@
+# 并发经验记录修复增量
+
+基线：已交付并应用的memory-tools.patch，SHA256 4a15522e6eef8db43448ae35e87f199f80cb11f332bfe5a7719b1b5c5b73c4ec。独立工作树仍为/tmp/lingxi-r06-memory-events；本增量仅3文件，未改主树、未提交推送、未改旧验收断言或门禁。独立review证据原文件保持不变。
+
+补丁experience-concurrency.patch，SHA256 333f0b1b2425336f0c4f02a1ff24f840da77d9243a50d432a606bf662d48d3e4。主树正向应用检查、作者树反向检查及diff空白检查通过。
+
+ExperienceStore.record_entry现在在同助手memory操作门内完整读取旧资料、发布经验文档、内部重建索引及失败恢复。sync_categories整份同步与单独rebuild_index使用同一操作门；内部rebuild_index_unlocked避免再次获取门。记录冲突在正式工具返回ErrorCode::Conflict、retryable=true，不虚报added=true。不同助手使用不同门，不互相阻塞。
+
+memory_operation_state增加目录尚未存在时canonical父目录+leaf的稳定键，避免memory首次创建或助手目录别名把同助手拆成不同门。仍与compile/maintenance/dream/restore共用agent/memory操作门。未改操作门公开可见性，Dream作者可独立修改。
+
+指定工具链：/Users/study_superior/.cargo/bin/cargo，cargo 1.98.1 (797e8a9bc 2026-08-05)。所有测试使用绝对manifest及--locked；LINGXI_HOME、TMPDIR、CARGO_TARGET_DIR全部/tmp合成。旧交付所列Homebrew cargo命令不计入指定工具链达标；本次相关回归均重新按指定工具链执行。
+
+通过验证：
+- reviewer原始独立反例完整复制后原断言原样执行，independent-concurrency-final.log：16并发中1成功、15明确Conflict，所有成功经验保留；原证据SHA为79a5a5859271e826fc9dec7e56785b398ff5084f44e6aea03f064f61f6c6a35e。因Conflict允许，成功条数可能随调度变化，判据是每个added=true随后可读。
+- r06_memory_tool_completion完整10例通过（all-memory-tool-tests.log）。保留此前6例所有断言，新添reviewer并发断言并增强至少1成功、每个成功进入实际索引及真正注册recall工具；另3例证明record/sync/rebuild操作期间同助手拒绝、不同助手独立；真实助手目录只读导致索引临时文件发布失败、文档恢复且旧经验/索引byte不变；首次创建memory和路径别名仍同门。
+- 原r06_original_memory_skill_proofs 19、r06_t06_memory 7、r06_ar_f08_projection 8通过（related-regression.log），此前6例本次也再次通过。总计44个唯一相关测试通过，独立review反例另一次原样执行通过。
+
+该增量不改details消费路径。正式内部模型输入/wire/history仍保留native字段；当前外部HTTP模型适配器只发送正文，不声明供应商请求包含details。缺新统计字段的旧小消息仍兼容，原负控只证明超预算详情即使缺统计亦被拒绝。事实向量检索验证不冒称生产自动嵌入流水已完成。
+
+未执行全阶段门禁、真实供应商账户、其他平台或打包。锁只能约束同一服务进程通过生产Store入口的操作，不对绕过应用直接改文件的外部写者作保证。

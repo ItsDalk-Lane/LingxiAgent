@@ -2129,5 +2129,35 @@
     "remaining_only_r06_gap": 22,
     "plan": "docs/rust-tauri/R06/repair-current/route-a-20261014/PLAN.md",
     "w11_historical_reader_identity": "UNKNOWN_NOT_ATTRIBUTED"
+  },
+  "route_a": {
+    "batch2": {
+      "status": "IMPLEMENTED_REVIEWED_FROZEN_BINDING_WINDOW_PASS",
+      "leafIds": [
+        "R00-T02-LA-4F0466F7C090",
+        "R00-T02-LA-396F817018F6",
+        "R00-T02-LA-53B672CBEA46",
+        "R00-T02-LA-4870805E3A3D",
+        "R00-T02-LA-856B28902999",
+        "R00-T02-LA-7C699FD2A740",
+        "R00-T02-LA-7F0F3F76E38A",
+        "R00-T02-LA-BB4CD1E4CD43",
+        "R00-T02-LA-7570BE1F2527",
+        "R00-T02-LA-4A56F26EDA32",
+        "R00-T02-LA-E4BEE8E6974A",
+        "R00-T02-LA-0779DAF64B03",
+        "R00-T02-LA-7432B00DEC94",
+        "R00-T02-LA-A17D742E55B7"
+      ],
+      "registeredReady": 219,
+      "registeredGap": 60,
+      "stageAccepted": false,
+      "validation": "artifacts/rust-tauri/R06/route-a-20261014/batch2-validation.json",
+      "bindingWindow": {
+        "bindingsPassed": 37,
+        "originalLeavesPassed": 14,
+        "report": "artifacts/rust-tauri/R06/route-a-20261014/batch2-binding-window-summary.json"
+      }
+    }
   }
 }

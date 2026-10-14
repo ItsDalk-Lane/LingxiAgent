@@ -91,6 +91,7 @@ fn resolve_secret_patch(patch: &Value, existing: &Value) -> Value {
 /// writeSecretFileSync（shared/secret-fs.ts）：tmp（0600）→ rename。权限
 /// 收紧失败记录并继续（存储用户数据是主职责），Windows 无 POSIX 位。
 fn write_secret_file(path: &Path, text: &str) -> std::io::Result<()> {
+    let _publication = am::ContextMaterialMutation::for_path(path);
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
@@ -2302,6 +2303,9 @@ pub async fn agent_config_put_route(
             .into_response();
     }
 
+    if let Err(detail) = crate::compaction::CompactionSettings::from_config(&partial) {
+        return bad_request(detail);
+    }
     // 白名单校验：tools.disabled 只允许 OPTIONAL_TOOL_NAMES。
     if let Some(disabled) = partial
         .get("tools")

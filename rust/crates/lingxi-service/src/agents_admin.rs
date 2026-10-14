@@ -251,9 +251,18 @@ impl MemoryService {
                         "invalid config.yaml for agent {id}: {err}"
                     ))
                 })?;
+            // 列表现读简介与头像，不持有写入前的花名册缓存。
+            let description =
+                crate::persona::read_description(&dir).map_err(AgentLifecycleError::from)?;
+            let avatar = ["png", "jpg", "jpeg", "webp"].iter().any(|ext| {
+                dir.join("avatars").join(format!("agent.{ext}")).is_file()
+                    || dir.join(format!("avatar.{ext}")).is_file()
+            });
             agents.push(json!({
                 "id": id,
                 "name": scan.agent_name.unwrap_or_else(|| id.clone()),
+                "description": description,
+                "hasAvatar": avatar,
                 "yuan": scan.yuan,
                 "locale": scan.locale,
                 "memoryEnabled": scan.memory_enabled.unwrap_or(true),

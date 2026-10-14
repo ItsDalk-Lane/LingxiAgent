@@ -38,6 +38,8 @@ use crate::task_supervisor::TaskKind;
 /// One approval request the gate resolves.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApprovalRequest {
+    /// 业务删除范围必须逐次确认；仅参数相同的旧预授权不能覆盖新命中条目。
+    pub requires_scope_review: bool,
     pub tool_call_id: ToolCallId,
     pub target: String,
     pub args_digest: String,

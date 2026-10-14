@@ -595,7 +595,12 @@ fn scan_roster(
                     name: scan.agent_name.unwrap_or_else(|| id.clone()),
                     id,
                     model: None,
-                    summary: None,
+                    summary: crate::persona::read_description(&dir).map_err(|error| {
+                        ContextMaterialError::Read {
+                            path: dir.join("description.md"),
+                            detail: error.to_string(),
+                        }
+                    })?,
                 });
             }
         }
@@ -612,7 +617,12 @@ fn scan_roster(
         id: current_agent_id.to_string(),
         name: current_agent_name.to_string(),
         model: None,
-        summary: None,
+        summary: crate::persona::read_description(&agents_root.join(current_agent_id)).map_err(
+            |error| ContextMaterialError::Read {
+                path: agents_root.join(current_agent_id).join("description.md"),
+                detail: error.to_string(),
+            },
+        )?,
     }];
     roster.append(&mut others);
     Ok(roster)
@@ -842,6 +852,21 @@ impl ContextCompilerService {
             session_started_unix_ms,
             true,
         )
+    }
+
+    /// 同步最终保存时保留资料发布栅栏；活动写者存在时显式拒绝。
+    pub fn with_material_commit<T>(
+        &self,
+        commit: impl FnOnce() -> Result<T, lingxi_kernel::ports::StorageError>,
+    ) -> Result<T, lingxi_kernel::ports::StorageError> {
+        match self.materials.publication_epoch() {
+            Some(epoch) => epoch.with_stable_commit(commit).unwrap_or_else(|| {
+                Err(lingxi_kernel::ports::StorageError::Conflict {
+                    detail: "context material publication active at manual commit".into(),
+                })
+            }),
+            None => commit(),
+        }
     }
 
     pub fn compile_snapshot(

@@ -97,7 +97,15 @@ pub(crate) struct TrustedToolLifetime {
 tokio::task_local! {
     pub(crate) static TOOL_LIFETIME: TrustedToolLifetime;
     static KNOWLEDGE_RUNTIME: crate::operations::EmbeddingCallRuntime;
+    static REVIEW_SCOPE: Option<serde_json::Value>;
 }
+
+/// 删除执行端只能消费网关已冻结并复核的范围，模型参数不能铸造该范围。
+pub(crate) fn review_scope() -> Option<serde_json::Value> {
+    REVIEW_SCOPE.try_with(Clone::clone).ok().flatten()
+}
+pub type ReviewScopeExtractor =
+    Arc<dyn Fn(&str, &EffectiveArguments) -> Result<serde_json::Value, String> + Send + Sync>;
 
 pub(crate) fn knowledge_runtime(
     ctx: &RunContext,
@@ -373,6 +381,7 @@ impl ToolPolicyPort for FailClosedPolicy {
         match input.permission_kind {
             PermissionKind::Read => PolicyVerdict::Allowed,
             PermissionKind::Execute
+            | PermissionKind::Review
             | PermissionKind::ArgumentAwareFile
             | PermissionKind::ArgumentAwareSessionFolders => PolicyVerdict::NeedsApproval {
                 reason: format!(
@@ -665,6 +674,8 @@ pub struct PreparedInvocation {
     /// record binds (the approver approves exactly this scope) and what
     /// `execute_prepared` re-derives before dispatch.
     pub resources: Vec<ResourceScope>,
+    /// 对实际匹配的删除条目生成的确认摘要。
+    pub review_summary: Option<String>,
 }
 
 /// Server-side binding record (never handed to the model). The
@@ -699,6 +710,7 @@ struct PreparedRecord {
     /// approval record carries and what execute-time re-derivation must
     /// reproduce.
     resources: Vec<ResourceScope>,
+    review_scope: Option<serde_json::Value>,
 }
 
 /// One bound executor + the registrar's reason (audit: why this executor
@@ -709,6 +721,7 @@ struct ExecutorBinding {
     executor: Arc<dyn ToolExecutorPort>,
     reason: String,
     resources: Option<ResourceExtractor>,
+    review: Option<ReviewScopeExtractor>,
 }
 
 struct PreparedState {
@@ -753,6 +766,15 @@ impl std::fmt::Debug for ToolInvocationGateway {
             .finish_non_exhaustive()
     }
 }
+
+// 已审阅的工具调用与其同一次检查产生的权限、范围和确认材料。
+type AdmissionChecks = (
+    lingxi_kernel::toolcatalog::PreparedToolCall,
+    InvocationEntry,
+    Vec<ResourceScope>,
+    PolicyVerdict,
+    Option<serde_json::Value>,
+);
 
 impl ToolInvocationGateway {
     /// Full construction. The policy port is REQUIRED — wiring without a
@@ -859,8 +881,26 @@ impl ToolInvocationGateway {
                     executor,
                     reason: reason.to_string(),
                     resources,
+                    review: None,
                 },
             );
+    }
+
+    /// 注册业务资源的实际删除范围；范围与文件权限分别校验。
+    pub fn bind_executor_with_review(
+        &self,
+        target_id: ToolTargetId,
+        executor: Arc<dyn ToolExecutorPort>,
+        review: ReviewScopeExtractor,
+        reason: &str,
+    ) {
+        self.bind_executor(target_id.clone(), executor, reason);
+        self.executors
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .get_mut(&target_id)
+            .expect("刚绑定的执行端")
+            .review = Some(review);
     }
 
     /// Observability: the registered reasons of the bound executors.
@@ -894,7 +934,25 @@ impl ToolInvocationGateway {
         request: InvocationRequest,
     ) -> Result<PreparedInvocation, GatewayRefusal> {
         let now = self.clock.now_unix_ms();
-        let (prepared_tool_call, entry, resources, policy) = self.admission_checks(&request)?;
+        let (prepared_tool_call, entry, resources, policy, review_scope) =
+            self.admission_checks(&request)?;
+        let review_summary = review_scope.as_ref().map(|scope| {
+            let items = scope["items"].as_array().expect("注册端给出条目列表");
+            format!(
+                "删除 {} 条置顶原则（助手 {}）：\n{}",
+                items.len(),
+                scope["agentId"].as_str().unwrap_or(""),
+                items
+                    .iter()
+                    .map(|item| format!(
+                        "- {}：{}",
+                        item["id"].as_str().unwrap_or(""),
+                        item["content"].as_str().unwrap_or("")
+                    ))
+                    .collect::<Vec<_>>()
+                    .join("\n")
+            )
+        });
         let args_digest_hex = prepared_tool_call.args_digest.hex.clone();
         let expires_at = now.saturating_add(self.prepared_ttl_ms);
         let handle_nonce = match crate::auth::hex_random_public(16) {
@@ -935,6 +993,7 @@ impl ToolInvocationGateway {
             created_at_unix_ms: now,
             expires_at_unix_ms: expires_at,
             resources: resources.clone(),
+            review_scope,
         };
         let mut prepared = self
             .prepared
@@ -970,6 +1029,7 @@ impl ToolInvocationGateway {
             expires_at_unix_ms: expires_at,
             policy,
             resources,
+            review_summary,
         })
     }
 
@@ -1028,15 +1088,7 @@ impl ToolInvocationGateway {
     fn admission_checks(
         &self,
         request: &InvocationRequest,
-    ) -> Result<
-        (
-            lingxi_kernel::toolcatalog::PreparedToolCall,
-            InvocationEntry,
-            Vec<ResourceScope>,
-            PolicyVerdict,
-        ),
-        GatewayRefusal,
-    > {
+    ) -> Result<AdmissionChecks, GatewayRefusal> {
         let prepared_tool_call = self
             .registry
             .prepare_invocation(
@@ -1108,6 +1160,18 @@ impl ToolInvocationGateway {
                 None => Vec::new(),
             }
         };
+        let review_scope = {
+            let bindings = self.executors.lock().unwrap_or_else(|p| p.into_inner());
+            bindings
+                .get(&prepared_tool_call.target_id)
+                .and_then(|b| b.review.as_ref())
+                .map(|derive| derive(&request.agent_id, &prepared_tool_call.effective))
+                .transpose()
+                .map_err(|message| GatewayRefusal::ResourceScopeDenied {
+                    code: "review_scope_refused".into(),
+                    message,
+                })?
+        };
         let policy_input = PolicyAdjudicationInput {
             entry,
             target_id: prepared_tool_call.target_id.as_str().to_string(),
@@ -1136,7 +1200,7 @@ impl ToolInvocationGateway {
             }
             verdict => verdict,
         };
-        Ok((prepared_tool_call, entry, resources, policy))
+        Ok((prepared_tool_call, entry, resources, policy, review_scope))
     }
 
     /// R05 RR1 F11: the whole-batch ADMISSION probe — the pure validation
@@ -1467,6 +1531,21 @@ impl ToolInvocationGateway {
                 }
             }
         }
+        if let Some(derive) = binding.review.as_ref() {
+            let current = derive(&record.agent_id, &record.effective).map_err(|message| {
+                GatewayRefusal::ResourceScopeDenied {
+                    code: "review_scope_refused".into(),
+                    message,
+                }
+            })?;
+            if record.review_scope.as_ref() != Some(&current) {
+                return Err(GatewayRefusal::ResourceScopeChanged {
+                    target_id: record.target_id.as_str().into(),
+                    bound: "confirmed pinned-memory items".into(),
+                    current: "matched items changed; confirmation required again".into(),
+                });
+            }
+        }
         // 5) Dispatch with the SERVER-BOUND arguments.
         let request = ToolRequest {
             target: record.target_id.as_str().to_string(),
@@ -1530,7 +1609,10 @@ impl ToolInvocationGateway {
         let mut executed = KNOWLEDGE_RUNTIME
             .scope(
                 runtime,
-                self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+                REVIEW_SCOPE.scope(
+                    record.review_scope.clone(),
+                    self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+                ),
             )
             .await?;
         // 6) R04-A15 — the DELIVERY-REGISTRATION audit. The executor ran,

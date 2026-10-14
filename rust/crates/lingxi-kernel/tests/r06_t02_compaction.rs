@@ -71,6 +71,7 @@ fn tool_result(seq: u32, text: &str) -> ExchangeItem {
         provider_call_id: Some(format!("call_{seq:04}")),
         outcome: ToolOutcome::Success {
             result: lingxi_kernel::ports::ToolSuccess {
+                details: None,
                 content: vec![ContentBlock::Text {
                     text: text.to_string(),
                 }],

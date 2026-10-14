@@ -56,6 +56,134 @@ fn archive_actor(body: &Value) -> Result<Principal, StorageError> {
     Ok(actor)
 }
 
+/// 真正手动操作的提交坐标；与 Run 来源严格分开。
+pub type ManualContextCommit = Arc<
+    dyn Fn(&mut dyn FnMut() -> Result<(), StorageError>) -> Result<(), StorageError> + Send + Sync,
+>;
+struct ManualSaveGuard {
+    cancel: crate::cancel::CancelScope,
+    phase: Arc<std::sync::atomic::AtomicU8>,
+    context: ManualContextCommit,
+}
+impl store::ManualCompactionCommit for ManualSaveGuard {
+    fn allowed(&self) -> bool {
+        !self.cancel.is_cancelled() && self.phase.load(std::sync::atomic::Ordering::SeqCst) == 0
+    }
+    fn commit(
+        &self,
+        write: &mut dyn FnMut() -> Result<(), StorageError>,
+    ) -> Result<(), StorageError> {
+        (self.context)(&mut || {
+            use std::sync::atomic::Ordering::SeqCst;
+            // 材料/目录栅栏内与取消共用最终裁决，接着直接执行实际COMMIT。
+            if self.cancel.is_cancelled()
+                || self.phase.compare_exchange(0, 2, SeqCst, SeqCst).is_err()
+            {
+                return Err(StorageError::Conflict {
+                    detail: "manual compaction cancelled before commit".into(),
+                });
+            }
+            write()
+        })
+    }
+}
+pub struct ManualCompactionAction<'a> {
+    pub principal: &'a Principal,
+    pub agent: &'a str,
+    pub session: &'a str,
+    pub action_id: &'a str,
+    pub pre_head: Option<String>,
+    pub pre_revision: u64,
+    pub before: &'a [ExchangeItem],
+    pub after: &'a [ExchangeItem],
+    pub refreshed_context: Value,
+    pub cancel: crate::cancel::CancelScope,
+    pub commit_phase: Arc<std::sync::atomic::AtomicU8>,
+    pub now: u64,
+    pub context_commit: ManualContextCommit,
+}
+fn encoded_items(items: &[ExchangeItem]) -> Result<Vec<Value>, StorageError> {
+    items.iter().map(encode_item).collect()
+}
+fn manual_source(body: &Value) -> Result<&str, StorageError> {
+    let action = str_field(body, "sourceAction")?;
+    if body["sourceKind"] != "manual_compaction"
+        || !action.starts_with("compact-action-")
+        || action.len() != "compact-action-".len() + 64
+        || !action["compact-action-".len()..]
+            .bytes()
+            .all(|b| b.is_ascii_hexdigit())
+        || body.get("sourceRun").is_some()
+        || body.get("attempt").is_some()
+    {
+        return Err(corrupt(
+            "invalid manual action identity; never a Run archive",
+        ));
+    }
+    Ok(action)
+}
+fn manual_replacement(
+    body: &Value,
+    parent: Option<&str>,
+    before: &[ExchangeItem],
+) -> Result<Vec<ExchangeItem>, StorageError> {
+    manual_source(body)?;
+    let payload = &body["payload"];
+    let context = &body["refreshedContext"];
+    let method = match context["fresh"].as_bool() {
+        Some(true) => "fresh-compact",
+        Some(false) => "compact",
+        None => return Err(corrupt("manual action fresh/method binding missing")),
+    };
+    if context["request"]["method"] != method
+        || (!context["request"]["customInstructions"].is_null()
+            && context["request"]["customInstructions"]
+                .as_str()
+                .is_none_or(|text| text.len() > 8192))
+    {
+        return Err(corrupt("manual action request binding invalid"));
+    }
+    let previous = encoded_items(before)?;
+    let expected_digest = canon::sha256_hex(&canon::canonical_json_bytes(&json!(previous)));
+    if payload["mode"] != "replace"
+        || payload.get("projection").is_some()
+        || body["preHead"].as_str() != parent
+        || body["preRevision"].as_u64().is_none()
+        || body["preHistoryDigest"] != expected_digest
+        || !body["refreshedContext"].is_object()
+        || !body["refreshedContext"]["tools"].is_object()
+        || body["refreshedContext"]["render"].as_str().is_none()
+    {
+        return Err(corrupt(
+            "manual action branch/history/context binding mismatch",
+        ));
+    }
+    let wire = payload["items"]
+        .as_array()
+        .ok_or_else(|| corrupt("manual archive items missing"))?;
+    let cut = wire
+        .first()
+        .and_then(|item| item["covered"].as_u64())
+        .and_then(|n| usize::try_from(n).ok())
+        .ok_or_else(|| corrupt("manual summary cut missing"))?;
+    if cut == 0
+        || cut >= previous.len()
+        || wire[0]["kind"] != "summary"
+        || wire[0]["midRun"] != false
+        || wire[1..] != previous[cut..]
+    {
+        return Err(corrupt(
+            "manual replacement differs from retained original history",
+        ));
+    }
+    let items = wire
+        .iter()
+        .map(decode_item)
+        .collect::<Result<Vec<_>, _>>()?;
+    validate_pairs(&items)?;
+    Ok(items)
+}
+
 pub struct ModelHistory {
     storage: Arc<RunDatabase>,
 }
@@ -116,6 +244,10 @@ impl ModelHistory {
                 return Err(corrupt("abandoned archive binding mismatch"));
             }
             let actor = archive_actor(&v)?;
+            if v.get("sourceKind").is_some() {
+                manual_source(&v)?;
+                continue;
+            }
             if str_field(&v, "sourceSession")? == session {
                 let run = str_field(&v, "sourceRun")?;
                 if seen.insert(run.to_string()) {
@@ -354,7 +486,6 @@ impl ModelHistory {
                 {
                     return Err(corrupt("archive scope/schema mismatch"));
                 }
-                str_field(&v, "sourceRun")?;
                 str_field(&v, "sourceSession")?;
                 let payload = &v["payload"];
                 let mut binding = v.clone();
@@ -368,6 +499,30 @@ impl ModelHistory {
                     return Err(corrupt("archive digest mismatch"));
                 }
                 let actor = archive_actor(&v)?;
+                if v.get("sourceKind").is_some() {
+                    let action = manual_source(&v)?;
+                    let source_session = str_field(&v, "sourceSession")?;
+                    if row.message_id != format!("model-history:manual:{action}")
+                        || source_session.is_empty()
+                    {
+                        return Err(corrupt("manual action row/source lineage disagreement"));
+                    }
+                    // fork复制的是完整自足档案，源删除后不持有假Run外键；源仍在时必须核准谱系。
+                    if let Some(source) =
+                        store::get_session_row(&self.storage, source_session).await?
+                    {
+                        if source.owner_user_id != session_owner
+                            || source.agent_id != agent
+                            || !lineage_sessions.contains(source_session)
+                        {
+                            return Err(corrupt(
+                                "manual action source owner/agent/lineage disagreement",
+                            ));
+                        }
+                    }
+                    exchange = manual_replacement(&v, row.parent_message_id.as_deref(), &exchange)?;
+                    continue;
+                }
                 let source_run = str_field(&v, "sourceRun")?;
                 let source_session = str_field(&v, "sourceSession")?;
                 if !branch_run_inputs.contains(source_run) {
@@ -461,13 +616,9 @@ impl ModelHistory {
                             }
                         }
                     }
-                    let projected = projected_tool_item(projection)?;
-                    if !requested.arguments.digest_matches(&requested.args_digest) {
-                        if !is_argument_refusal(&projected, requested) {
-                            return Err(corrupt(
-                                "bad argument digest lacks exact rejection outcome",
-                            ));
-                        }
+                    let digest_mismatch =
+                        !requested.arguments.digest_matches(&requested.args_digest);
+                    if digest_mismatch {
                         let refusal = payload.get("argumentRefusal").ok_or_else(|| {
                             corrupt("bad argument digest lacks trusted refusal archive")
                         })?;
@@ -511,6 +662,11 @@ impl ModelHistory {
                         verified_argument_refusals.insert(host_id.to_string());
                     } else if payload.get("argumentRefusal").is_some() {
                         return Err(corrupt("unexpected argument refusal archive"));
+                    }
+                    // 拒绝凭据先核对真实执行账，随后仍严格验证投影及容量，不能让伪造拒绝蒙混过关。
+                    let projected = projected_tool_item(projection)?;
+                    if digest_mismatch && !is_argument_refusal(&projected, requested) {
+                        return Err(corrupt("bad argument digest lacks exact rejection outcome"));
                     }
                     if payload["items"] != json!([encode_item(&projected)?]) {
                         return Err(corrupt("projection/archive disagreement"));
@@ -725,6 +881,73 @@ impl ModelHistory {
         validate_pairs(&exchange)?;
         Ok(exchange)
     }
+    pub async fn record_manual_compaction(
+        &self,
+        action: ManualCompactionAction<'_>,
+    ) -> Result<(), StorageError> {
+        self.gate(action.principal, action.agent, action.session)
+            .await?;
+        let owner = store::get_session_row(&self.storage, action.session)
+            .await?
+            .ok_or_else(|| corrupt("manual session missing"))?
+            .owner_user_id;
+        let chain = store::list_branch_messages(&self.storage, action.session).await?;
+        let mut source_runs = Vec::new();
+        let mut excluded = HashSet::new();
+        for row in &chain {
+            if let Some(run) = row.message_id.strip_prefix("user:") {
+                source_runs.push(run.to_string());
+            }
+            if row.entry_type == ENTRY_TYPE {
+                let previous: Value =
+                    serde_json::from_str(&row.content_json).map_err(|e| corrupt(e.to_string()))?;
+                if let Some(ids) = previous.get("excludedChildRuns") {
+                    excluded.extend(decode::<Vec<String>>(ids)?);
+                }
+            }
+        }
+        excluded.extend(
+            cms::read_lineage_children(&self.storage, &source_runs)
+                .await?
+                .into_iter()
+                .map(|(_, child)| child),
+        );
+        let mut excluded: Vec<_> = excluded.into_iter().collect();
+        excluded.sort();
+        let mut body = json!({"schema":ENTRY_TYPE,"sourceKind":"manual_compaction",
+            "sourceAction":action.action_id,"owner":owner,"agent":action.agent,
+            "actorKind":action.principal.storage_kind(),"actorSubject":action.principal.storage_subject(),
+            "sourceSession":action.session,"boundSession":action.session,
+            "preHead":action.pre_head,"preRevision":action.pre_revision,
+            "preHistoryDigest":canon::sha256_hex(&canon::canonical_json_bytes(&json!(encoded_items(action.before)?))),
+            "excludedChildRuns":excluded,"refreshedContext":action.refreshed_context,
+            "payload":{"mode":"replace","items":encoded_items(action.after)?}});
+        manual_replacement(&body, action.pre_head.as_deref(), action.before)?;
+        body["digest"] = json!(canon::sha256_hex(&canon::canonical_json_bytes(&body)));
+        let message_id = format!("model-history:manual:{}", action.action_id);
+        let allowed = Arc::new(ManualSaveGuard {
+            cancel: action.cancel,
+            phase: action.commit_phase,
+            context: action.context_commit,
+        });
+        store::append_manual_compaction(
+            &self.storage,
+            store::AppendMessage {
+                session_id: action.session,
+                message_id: &message_id,
+                parent_message_id: action.pre_head.as_deref(),
+                run_id: None,
+                role: "model_history",
+                content_json: &body.to_string(),
+                entry_type: ENTRY_TYPE,
+                model_call_id: None,
+                now_unix_ms: action.now,
+            },
+            allowed,
+        )
+        .await
+    }
+
     /// 每一步先保存到同一消息树，再进入下一请求；摘要替换只覆盖模型投影。
     #[allow(clippy::too_many_arguments)]
     pub async fn record(
@@ -826,7 +1049,11 @@ impl ModelHistory {
         for row in chain.iter().filter(|r| r.entry_type == ENTRY_TYPE) {
             let old: Value =
                 serde_json::from_str(&row.content_json).map_err(|e| corrupt(e.to_string()))?;
-            sources.push(str_field(&old, "sourceRun")?.to_string());
+            if old.get("sourceKind").is_some() {
+                manual_source(&old)?;
+            } else {
+                sources.push(str_field(&old, "sourceRun")?.to_string());
+            }
             if let Some(ids) = old.get("excludedChildRuns") {
                 excluded.extend(decode::<Vec<String>>(ids)?);
             }
@@ -1000,7 +1227,11 @@ pub(crate) fn encode_item(item: &ExchangeItem) -> Result<Value, StorageError> {
 fn encode_outcome(outcome: &ToolOutcome) -> Value {
     match outcome {
         ToolOutcome::Success { result } => {
-            json!({"status":"success","content":result.content,"refs":result.resource_refs,"truncated":result.truncated,"digest":result.content_digest,"process":result.status.as_deref().map(|s|match s{ToolRunStatus::Exited{code}=>json!({"kind":"exited","code":code}),ToolRunStatus::Running{handle}=>json!({"kind":"running","handle":handle}),ToolRunStatus::StopUnconfirmed{handle,detail}=>json!({"kind":"unconfirmed","handle":handle,"detail":detail})})})
+            let mut value = json!({"status":"success","content":result.content,"refs":result.resource_refs,"truncated":result.truncated,"digest":result.content_digest,"process":result.status.as_deref().map(|s|match s{ToolRunStatus::Exited{code}=>json!({"kind":"exited","code":code}),ToolRunStatus::Running{handle}=>json!({"kind":"running","handle":handle}),ToolRunStatus::StopUnconfirmed{handle,detail}=>json!({"kind":"unconfirmed","handle":handle,"detail":detail})})});
+            if let Some(details) = &result.details {
+                value["details"] = json!(details);
+            }
+            value
         }
         ToolOutcome::Failed { error } => json!({"status":"failed","error":error}),
         ToolOutcome::Cancelled => json!({"status":"cancelled"}),
@@ -1015,6 +1246,10 @@ fn decode_outcome(v: &Value) -> Result<ToolOutcome, StorageError> {
             if str_field(v, "digest")? != result.content_digest {
                 return Err(corrupt("projection content digest mismatch"));
             }
+            result.details = match v.get("details") {
+                None | Some(Value::Null) => None,
+                Some(value) => Some(decode(value)?),
+            };
             result.resource_refs = decode(&v["refs"])?;
             result.truncated = decode(&v["truncated"])?;
             let p = &v["process"];
@@ -1035,7 +1270,25 @@ fn decode_outcome(v: &Value) -> Result<ToolOutcome, StorageError> {
                     _ => return Err(corrupt("unknown process status")),
                 }))
             };
-            ToolOutcome::Success { result }
+            if result
+                .details
+                .as_ref()
+                .and_then(|fields| fields.get("_modelProjection"))
+                .and_then(|metadata| metadata.get("detailsTruncated"))
+                .and_then(Value::as_bool)
+                == Some(true)
+                && !result.truncated
+            {
+                return Err(corrupt("structured details truncation flag mismatch"));
+            }
+            let outcome = ToolOutcome::Success { result };
+            if matches!(&outcome, ToolOutcome::Success { result } if result.details.is_some())
+                && crate::hooks::tool_outcome_model_bytes(&outcome)
+                    > crate::hooks::MAX_TOOL_SUCCESS_PROJECTION_BYTES
+            {
+                return Err(corrupt("structured details exceed model projection budget"));
+            }
+            outcome
         }
         "failed" => ToolOutcome::Failed {
             error: decode(&v["error"])?,
@@ -1252,8 +1505,10 @@ pub fn projected_tool_item(projection: &Value) -> Result<ExchangeItem, StorageEr
     let outcome = match wire.status {
         ToolResultStatus::Success => {
             str_field(projection, "rawContentDigest")?;
+            let details = wire.details;
             let content = wire.content;
             let mut result = ToolSuccess::from_content(content);
+            result.details = details;
             if str_field(projection, "projectionContentDigest")? != result.content_digest {
                 return Err(corrupt("F08 projection digest"));
             }
@@ -1294,9 +1549,16 @@ pub fn projected_tool_item(projection: &Value) -> Result<ExchangeItem, StorageEr
         },
     };
     let rendered = lingxi_adapters::models::tool_render::render_tool_outcome_text(&outcome).len();
+    let model_bytes = crate::hooks::tool_outcome_model_bytes(&outcome);
+    let details_flag_mismatch = matches!(&outcome, ToolOutcome::Success { result } if
+        result.details.as_ref().and_then(|fields|fields.get("_modelProjection")).and_then(|metadata|metadata.get("detailsTruncated")).and_then(Value::as_bool) == Some(true) && !result.truncated);
     if projection["renderedBytes"].as_u64() != Some(rendered as u64)
+        || projection
+            .get("modelProjectionBytes")
+            .is_some_and(|bytes| bytes.as_u64() != Some(model_bytes as u64))
+        || details_flag_mismatch
         || (matches!(outcome, ToolOutcome::Success { .. })
-            && rendered > crate::hooks::MAX_TOOL_SUCCESS_PROJECTION_BYTES)
+            && model_bytes > crate::hooks::MAX_TOOL_SUCCESS_PROJECTION_BYTES)
     {
         return Err(corrupt("F08 projection rendered budget mismatch"));
     }

@@ -1138,6 +1138,67 @@ pub fn platform_sandbox(
     }
 }
 
+/// 原生文件写入的可用性前置条件：每次调用重新验证真实系统助手及隔离机制。
+/// 文件范围与原子替换仍由 FileTools/FileSafety 承担；本检查不宣称父进程写入在沙盒内执行。
+pub fn native_write_sandbox_available(
+    helper_override: Option<&Path>,
+) -> Result<(), SandboxRefusal> {
+    match detect_sandbox_backend() {
+        SandboxBackendKind::Seatbelt => {
+            let helper = helper_override.unwrap_or_else(|| Path::new(SEATBELT_HELPER_DEFAULT));
+            verify_helper_metadata("seatbelt", helper, "sandbox-exec")?;
+            run_seatbelt_enforcement_probe(helper).map_err(|detail| {
+                SandboxRefusal::HelperUntrusted {
+                    backend: "seatbelt",
+                    path: helper.to_path_buf(),
+                    detail,
+                }
+            })
+        }
+        SandboxBackendKind::Bwrap => {
+            let helper = helper_override.unwrap_or_else(|| Path::new(BWRAP_HELPER_DEFAULT));
+            verify_helper_metadata("bwrap", helper, "bwrap")?;
+            probe_bwrap_version(helper).map_err(|detail| SandboxRefusal::HelperUntrusted {
+                backend: "bwrap",
+                path: helper.to_path_buf(),
+                detail,
+            })?;
+            // 版本存在不代表当前内核允许隔离；实际建立只读根与独立网络命名空间。
+            let status = std::process::Command::new(helper)
+                .args([
+                    "--ro-bind",
+                    "/",
+                    "/",
+                    "--unshare-net",
+                    "--",
+                    "/usr/bin/true",
+                ])
+                .stdin(std::process::Stdio::null())
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::null())
+                .status()
+                .map_err(|error| SandboxRefusal::HelperUntrusted {
+                    backend: "bwrap",
+                    path: helper.to_path_buf(),
+                    detail: error.to_string(),
+                })?;
+            if !status.success() {
+                return Err(SandboxRefusal::PolicyUnsupported {
+                    backend: "bwrap",
+                    detail: format!("native write sandbox availability probe failed: {status}"),
+                });
+            }
+            Ok(())
+        }
+        SandboxBackendKind::RestrictedTokenDeferred | SandboxBackendKind::Unsupported => {
+            Err(SandboxRefusal::PolicyUnsupported {
+                backend: "unsupported",
+                detail: "native writes require an available OS sandbox backend".into(),
+            })
+        }
+    }
+}
+
 // ── unit tests ──────────────────────────────────────────────────────────────
 
 #[cfg(test)]

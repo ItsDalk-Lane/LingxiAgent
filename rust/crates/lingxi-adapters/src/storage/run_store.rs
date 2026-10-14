@@ -1474,6 +1474,40 @@ pub(crate) fn with_write_txn<T>(
     }
 }
 
+type WriteCommitGuard<'a> =
+    dyn FnMut(&mut dyn FnMut() -> Result<(), StorageError>) -> Result<(), StorageError> + 'a;
+
+/// 在真正COMMIT上调用同步裁决；拒绝时连同暂存消息/分支头全部回滚。
+pub(crate) fn with_write_txn_guarded<T>(
+    conn: &rusqlite::Connection,
+    busy_timeout_ms: u64,
+    f: impl FnOnce(&rusqlite::Connection) -> Result<T, StorageError>,
+    guard: &mut WriteCommitGuard<'_>,
+) -> Result<T, StorageError> {
+    conn.execute_batch("BEGIN IMMEDIATE")
+        .map_err(|err| migrations::map_rusqlite_busy(err, busy_timeout_ms))?;
+    let result = f(conn).and_then(|value| {
+        guard(&mut || {
+            conn.execute_batch("COMMIT")
+                .map_err(|err| migrations::map_rusqlite_busy(err, busy_timeout_ms))
+        })?;
+        Ok(value)
+    });
+    match result {
+        Ok(value) => Ok(value),
+        Err(err) => {
+            if let Err(rollback_err) = conn.execute_batch("ROLLBACK") {
+                return Err(StorageError::Internal {
+                    detail: format!(
+                        "transaction failed ({err}) AND rollback failed ({rollback_err})"
+                    ),
+                });
+            }
+            Err(err)
+        }
+    }
+}
+
 /// Rebuilds the durable envelopes of a run's already-committed key events
 /// (idempotent replay path: publication can catch up from the store).
 fn read_run_events(

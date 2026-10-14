@@ -623,6 +623,8 @@ impl std::error::Error for ServiceStartupError {}
 /// sleeps.
 #[derive(Clone)]
 pub struct ServiceDeps {
+    /// 可信宿主指定的产品素材根；测试用自身临时目录，默认仍沿现行环境/安装目录解析。
+    pub product_material_dir: Option<std::path::PathBuf>,
     /// 可信宿主的确定性文件写入时序探针，生产默认关闭，无 HTTP 或配置入口。
     #[doc(hidden)]
     pub native_file_mutation_test_hook: Option<filetools::MutationTestHook>,
@@ -789,6 +791,7 @@ type ToolPlaneHandles = (
 impl Default for ServiceDeps {
     fn default() -> Self {
         Self {
+            product_material_dir: None,
             native_file_mutation_test_hook: None,
             ws_ticket_ttl_ms: ws::DEFAULT_WS_TICKET_TTL_MS,
             rate_window_ms: limits::DEFAULT_HTTP_RATE_WINDOW_MS,
@@ -1238,11 +1241,13 @@ impl ServiceState {
         // R06-T06：记忆/技能/人格服务（工具面注册模型侧工具需要它们）。
         // product_dir 复用 T01 的解析链。
         let t06_data_home = config.data_home.clone();
-        let t06_product_dir = context_compiler::resolve_product_dir(
-            std::env::var("LINGXI_PRODUCT_DIR").ok().as_deref(),
-            &std::env::current_exe().unwrap_or_else(|_| t06_data_home.join("lingxi-service")),
-            &t06_data_home,
-        );
+        let t06_product_dir = deps.product_material_dir.clone().unwrap_or_else(|| {
+            context_compiler::resolve_product_dir(
+                std::env::var("LINGXI_PRODUCT_DIR").ok().as_deref(),
+                &std::env::current_exe().unwrap_or_else(|_| t06_data_home.join("lingxi-service")),
+                &t06_data_home,
+            )
+        });
         let memory_service = Arc::new(memory::MemoryService::new(
             t06_data_home.clone(),
             layout.runtime_dir.clone(),
@@ -1549,6 +1554,11 @@ impl ServiceState {
             }
             None => None,
         };
+        if let Some(compaction) = &compaction_service {
+            compaction
+                .bind_agent_settings_root(config.data_home.join("agents"))
+                .map_err(ServiceStartupError::Storage)?;
+        }
         let runs = runs.with_compaction(compaction_service.clone());
         // R06-T06: the skill install guard — the `guard` auxiliary slot over
         // the SAME gateway/credential/network plane (fail-closed when the
@@ -1934,9 +1944,12 @@ impl ServiceState {
         if let (Some(model_gateway), Some(operations)) =
             (deps.model_gateway.clone(), operations_entry.clone())
         {
-            knowledge_service.set_embedder(Some(Arc::new(
-                knowledge::GatewayKnowledgeEmbedder::new(model_gateway, operations),
-            )));
+            let embedder = Arc::new(knowledge::GatewayKnowledgeEmbedder::new(
+                model_gateway,
+                operations,
+            ));
+            knowledge_service.set_embedder(Some(embedder.clone()));
+            memory_service.set_search_embedder(Some(embedder));
         }
         // R06-T05: session-file 服务的 lingxiHome 等价根（config 在下面的
         // struct literal 里被 Arc 收走，先取出）。
@@ -6779,6 +6792,14 @@ pub fn build_router(state: ServiceState) -> Router {
             get(conversation_map::layout_get_route).put(conversation_map::layout_put_route),
         )
         .route(
+            "/lingxi/v1/sessions/{session_id}/compact",
+            post(history::history_content::compact_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/compact/cancel",
+            post(history::history_content::cancel_compaction_route),
+        )
+        .route(
             "/lingxi/v1/sessions/{session_id}/fresh-compact",
             post(history::history_content::fresh_compact_route),
         )
@@ -7181,11 +7202,23 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/agents/{agent_id}/avatar",
             get(persona::avatar_get_route)
                 .post(persona::avatar_post_route)
-                .delete(persona::avatar_delete_route),
+                .delete(persona::avatar_delete_route)
+                .layer(axum::extract::DefaultBodyLimit::max(
+                    persona::MAX_AVATAR_BYTES,
+                )),
         )
         .route(
             "/lingxi/v1/agents/{agent_id}/avatar-path",
             get(persona::avatar_path_route),
+        )
+        .route(
+            "/lingxi/v1/avatar/{role}",
+            get(persona::role_avatar_get_route)
+                .post(persona::role_avatar_post_route)
+                .delete(persona::role_avatar_delete_route)
+                .layer(axum::extract::DefaultBodyLimit::max(
+                    persona::MAX_AVATAR_BYTES,
+                )),
         )
         // ── R06-T06 skills 面 ──
         .route("/lingxi/v1/skills", get(skills::skills_list_route))

@@ -233,13 +233,87 @@ pub fn tool_result_guard(
 pub const MAX_TOOL_SUCCESS_PROJECTION_BYTES: usize = DEFAULT_MAX_TOOL_RESULT_BYTES;
 pub const MAX_TOOL_WARNING_BYTES: usize = 2048;
 
+/// 正文渲染和原生业务详情共享同一预算；详情不能借非正文通道绕过限制。
+pub fn tool_outcome_model_bytes(outcome: &lingxi_kernel::ports::ToolOutcome) -> usize {
+    let rendered = lingxi_adapters::models::tool_render::render_tool_outcome_text(outcome).len();
+    let details = match outcome {
+        lingxi_kernel::ports::ToolOutcome::Success { result } => result
+            .details
+            .as_ref()
+            .map(|details| {
+                lingxi_protocol::canon::canonical_json_bytes(&serde_json::Value::Object(
+                    details.clone(),
+                ))
+                .len()
+            })
+            .unwrap_or(0),
+        _ => 0,
+    };
+    rendered.saturating_add(details)
+}
+
+fn bounded_details(
+    details: Option<&serde_json::Map<String, serde_json::Value>>,
+    budget: usize,
+) -> Result<(Option<serde_json::Map<String, serde_json::Value>>, bool), ()> {
+    use serde_json::{json, Value};
+    let Some(details) = details else {
+        return Ok((None, false));
+    };
+    let original = Value::Object(details.clone());
+    let original_bytes = lingxi_protocol::canon::canonical_json_bytes(&original).len();
+    if original_bytes <= budget {
+        return Ok((Some(details.clone()), false));
+    }
+    fn shorten(value: &Value, string_bytes: usize, array_items: usize) -> Value {
+        match value {
+            Value::String(text) => Value::String(truncate_text_head_tail(text, string_bytes).0),
+            Value::Array(items) => Value::Array(
+                items
+                    .iter()
+                    .take(array_items)
+                    .map(|item| shorten(item, string_bytes, array_items))
+                    .collect(),
+            ),
+            Value::Object(fields) => Value::Object(
+                fields
+                    .iter()
+                    .map(|(key, value)| (key.clone(), shorten(value, string_bytes, array_items)))
+                    .collect(),
+            ),
+            other => other.clone(),
+        }
+    }
+    // 保留字段名、数值和数据类型；完整正文/列表仍在raw档案中，模型看到明确的截断标记。
+    for (string_bytes, array_items) in [
+        (4096, 16),
+        (2048, 8),
+        (1024, 4),
+        (512, 2),
+        (128, 1),
+        (32, 0),
+        (0, 0),
+    ] {
+        let Value::Object(mut projected) = shorten(&original, string_bytes, array_items) else {
+            unreachable!()
+        };
+        projected.insert("_modelProjection".into(), json!({"detailsTruncated":true,"originalDetailsBytes":original_bytes,"policy":"bounded_details_raw_result_preserved"}));
+        if lingxi_protocol::canon::canonical_json_bytes(&Value::Object(projected.clone())).len()
+            <= budget
+        {
+            return Ok((Some(projected), true));
+        }
+    }
+    // 不能删去字段身份来假称成功；调用端明确拒绝这个模型投影。
+    Err(())
+}
+
 pub fn project_tool_success(
     original: &lingxi_kernel::ports::ToolSuccess,
     warnings: &[String],
     guarded_content: Vec<ContentBlock>,
     any_truncated: bool,
 ) -> lingxi_kernel::ports::ToolOutcome {
-    use lingxi_adapters::models::tool_render::render_tool_outcome_text;
     use lingxi_kernel::ports::{ToolOutcome, ToolSuccess};
 
     let mut content = Vec::new();
@@ -252,21 +326,37 @@ pub fn project_tool_success(
     }
     content.extend(guarded_content);
     let warning_blocks = usize::from(!warnings.is_empty());
-    let build = |content: Vec<ContentBlock>, truncated: bool| {
+    let build = |content: Vec<ContentBlock>,
+                 truncated: bool,
+                 details: Option<&serde_json::Map<String, serde_json::Value>>| {
         let mut result = ToolSuccess::from_content(content);
+        result.details = details.cloned();
         result.resource_refs = original.resource_refs.clone();
         result.status = original.status.clone();
         result.truncated = original.truncated || truncated;
         result
     };
-    let initial = build(content.clone(), changed);
-    if render_tool_outcome_text(&ToolOutcome::Success {
+    let initial = build(content.clone(), changed, original.details.as_ref());
+    if tool_outcome_model_bytes(&ToolOutcome::Success {
         result: initial.clone(),
-    })
-    .len()
-        <= MAX_TOOL_SUCCESS_PROJECTION_BYTES
+    }) <= MAX_TOOL_SUCCESS_PROJECTION_BYTES
     {
         return ToolOutcome::Success { result: initial };
+    }
+
+    let (details, details_truncated) = match bounded_details(original.details.as_ref(), MAX_TOOL_SUCCESS_PROJECTION_BYTES / 2) {
+        Ok(projected) => projected,
+        Err(()) => return ToolOutcome::Failed { error: lingxi_protocol::ProtocolError::new(
+            lingxi_protocol::ErrorCode::InvalidMessage,
+            "Tool success model projection exceeds the 32KiB budget in structured details; raw result is archived, content was not sent to the model", false) },
+    };
+    let build_limited =
+        |content, truncated| build(content, truncated || details_truncated, details.as_ref());
+    let limited = ToolOutcome::Success {
+        result: build_limited(content.clone(), changed),
+    };
+    if tool_outcome_model_bytes(&limited) <= MAX_TOOL_SUCCESS_PROJECTION_BYTES {
+        return limited;
     }
 
     // 先为不能随意修改的身份、签名和进程状态及所有分隔符预留真实渲染开销。
@@ -284,11 +374,10 @@ pub fn project_tool_success(
             other => other.clone(),
         })
         .collect::<Vec<_>>();
-    let skeleton_result = build(skeleton, true);
-    let reserved = render_tool_outcome_text(&ToolOutcome::Success {
+    let skeleton_result = build_limited(skeleton, true);
+    let reserved = tool_outcome_model_bytes(&ToolOutcome::Success {
         result: skeleton_result,
     })
-    .len()
     .saturating_add(content.len())
     .saturating_add(original.resource_refs.len())
     .saturating_add(1);
@@ -323,9 +412,15 @@ pub fn project_tool_success(
             _ => {}
         }
     }
-    ToolOutcome::Success {
-        result: build(content, true),
+    let projected = ToolOutcome::Success {
+        result: build_limited(content, true),
+    };
+    if tool_outcome_model_bytes(&projected) > MAX_TOOL_SUCCESS_PROJECTION_BYTES {
+        return ToolOutcome::Failed { error: lingxi_protocol::ProtocolError::new(
+            lingxi_protocol::ErrorCode::InvalidMessage,
+            "Tool success model projection exceeds the 32KiB budget; raw result is archived, content was not sent to the model", false) };
     }
+    projected
 }
 
 fn text_of(content: &[ContentBlock]) -> String {

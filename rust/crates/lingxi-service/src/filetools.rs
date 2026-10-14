@@ -146,6 +146,7 @@ fn text_success(text: String, truncated: bool, resource_refs: Vec<ResourceRef>) 
     let canonical = lingxi_protocol::canon::canonical_json_bytes(&value);
     ToolOutcome::Success {
         result: ToolSuccess {
+            details: None,
             content_digest: hex(&Sha256::digest(&canonical)),
             content,
             resource_refs,
@@ -1414,6 +1415,7 @@ pub struct FileTools {
     mutations: std::sync::Mutex<MutationLocks>,
     mutation_hook: std::sync::Mutex<Option<MutationTestHook>>,
     file_safety: std::sync::OnceLock<Arc<crate::file_safety::FileSafety>>,
+    native_write_helper: std::sync::Mutex<Option<PathBuf>>,
 }
 
 /// The directory handle + final component of one authorized target.
@@ -1516,6 +1518,7 @@ impl FileTools {
             mutations: std::sync::Mutex::new(MutationLocks::default()),
             mutation_hook: std::sync::Mutex::new(None),
             file_safety: std::sync::OnceLock::new(),
+            native_write_helper: std::sync::Mutex::new(None),
         }
     }
 
@@ -1523,6 +1526,29 @@ impl FileTools {
     pub fn set_file_safety(&self, safety: Arc<crate::file_safety::FileSafety>) {
         let _ = self.file_safety.set(safety);
         self.propagate_mutation_hook_to_safety();
+    }
+
+    /// 测试仅替换系统助手的定位，不替换真实验证或文件写入逻辑；生产沿固定系统路径。
+    #[doc(hidden)]
+    pub fn set_native_write_helper_test_override(&self, helper: Option<PathBuf>) {
+        *self
+            .native_write_helper
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner()) = helper;
+    }
+
+    fn require_native_write_sandbox(&self) -> Result<(), ToolOutcome> {
+        let helper = self
+            .native_write_helper
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .clone();
+        crate::sandbox::native_write_sandbox_available(helper.as_deref()).map_err(|error| {
+            failed(
+                ErrorCode::UpstreamUnavailable,
+                format!("native modification refused: {error}"),
+            )
+        })
     }
 
     /// Installs the test-only mutation seam (see [`MutationTestHook`]).
@@ -1853,6 +1879,10 @@ impl FileTools {
                 "write requires a string `content` argument".to_string(),
             );
         };
+        // 必须在创建父目录、临时文件或写入任何用户字节前拒绝不可用的系统沙盒。
+        if let Err(outcome) = self.require_native_write_sandbox() {
+            return outcome;
+        }
         let (scope, target, file) =
             match self.open_with_churn(ctx, &raw_path, ResourceOp::Write, true) {
                 OpenOutcome::Ready {
@@ -1949,6 +1979,10 @@ impl FileTools {
                 "Edit tool input is invalid. edits must contain at least one replacement."
                     .to_string(),
             );
+        }
+        // 编辑也会修改磁盘；不可通过编辑入口绕过原生写入的可用性前置条件。
+        if let Err(outcome) = self.require_native_write_sandbox() {
+            return outcome;
         }
         let (scope, target, file) =
             match self.open_with_churn(ctx, &raw_path, ResourceOp::Write, false) {

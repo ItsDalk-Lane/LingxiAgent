@@ -64,11 +64,7 @@
 //! - overview 的 taskDistribution：TS 按任务元数据 type 分类（media/
 //!   workflow/subagent/other）；Rust 模型的权威任务事实只有 run_lineage
 //!   子 run（subagent），workflow/media/other 无事实来源，如实报 0。
-//! - fresh-compact 的压缩输入工具快照：run 内路径从 live registry 重建；
-//!   路由层无法触达 registry（ServiceState 不暴露），用空快照——工具声明
-//!   token 分量不进该路由级估算。工具快照本身按 Rust 模型在下一个 run 的
-//!   每次模型调用从 live registry 重建（runs.rs R05-T01 C08），无需本路由
-//!   刷新。
+//! - 手动/fresh压缩经真实工具目录构建快照，并与刷新材料一起原子提交到模型档案。
 //!
 //! 路由注册由主控在 lib.rs 统一完成；测试在本模块配套测试文件内以
 //! axum::Router 挂载（含鉴权 Extension 注入）。
@@ -1367,165 +1363,450 @@ pub async fn fresh_compact_route(
     axum::Extension(principal): axum::Extension<Principal>,
     State(state): State<ServiceState>,
     Path(session_id): Path<String>,
+    body: axum::body::Bytes,
 ) -> Response {
+    manual_compact(&state, &principal, &session_id, &body, true).await
+}
+/// 手动压缩只跳过自动触发/enabled闸，提交与 fresh 共用同一原子来源合同。
+pub async fn compact_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+    body: axum::body::Bytes,
+) -> Response {
+    manual_compact(&state, &principal, &session_id, &body, false).await
+}
+pub async fn cancel_compaction_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    Path(session_id): Path<String>,
+) -> Response {
+    if let Err(response) = gate_owned(&state, &principal, &session_id).await {
+        return response;
+    }
+    let Some(compaction) = state.compaction() else {
+        return EndpointError::resource_failure(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "compaction_service_unavailable",
+            "no real compaction service",
+        )
+        .into_response();
+    };
+    match compaction.cancel_manual(&session_id) {
+        Ok(true) => Json(json!({"ok":true,"cancelled":true})).into_response(),
+        Ok(false) => EndpointError::resource_failure(
+            StatusCode::CONFLICT,
+            "no_active_compaction",
+            "no cancellable manual compaction",
+        )
+        .into_response(),
+        Err(error) => storage_error_response(&error),
+    }
+}
+struct ManualScopeGuard {
+    service: Arc<crate::compaction::CompactionService>,
+    session: String,
+}
+impl Drop for ManualScopeGuard {
+    fn drop(&mut self) {
+        self.service.finish_manual(&self.session);
+    }
+}
+fn tool_snapshot_receipt(tools: &lingxi_kernel::model_exchange::ToolDeclarationSnapshot) -> Value {
+    json!({"catalogGeneration":tools.catalog_generation,"declarations":tools.declarations.iter().map(|d|json!({"target":d.target,"wireName":d.wire_name,"description":d.description,"inputSchema":d.input_schema})).collect::<Vec<_>>()})
+}
+fn current_tools(
+    state: &ServiceState,
+) -> Result<lingxi_kernel::model_exchange::ToolDeclarationSnapshot, StorageError> {
+    match state.tool_gateway() {
+        Some(gateway) => lingxi_kernel::model_exchange::ToolDeclarationSnapshot::from_registry(
+            gateway.registry(),
+        )
+        .map_err(|e| StorageError::InvalidRequest {
+            detail: format!("compaction tools: {e}"),
+        }),
+        None => Ok(lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty()),
+    }
+}
+async fn manual_compact(
+    state: &ServiceState,
+    principal: &Principal,
+    session_id: &str,
+    body: &[u8],
+    fresh: bool,
+) -> Response {
+    let facts = match gate_owned(state, principal, session_id).await {
+        Ok(facts) => facts,
+        Err(response) => return response,
+    };
+    let payload: Value = if body.is_empty() {
+        json!({})
+    } else {
+        match serde_json::from_slice(body) {
+            Ok(value) => value,
+            Err(e) => {
+                return EndpointError::resource_failure(
+                    StatusCode::BAD_REQUEST,
+                    "invalid_compaction_input",
+                    e.to_string(),
+                )
+                .into_response()
+            }
+        }
+    };
+    let Some(map) = payload.as_object() else {
+        return EndpointError::resource_failure(
+            StatusCode::BAD_REQUEST,
+            "invalid_compaction_input",
+            "body must be an object",
+        )
+        .into_response();
+    };
+    let method = if fresh { "fresh-compact" } else { "compact" };
+    if map
+        .keys()
+        .any(|key| !matches!(key.as_str(), "customInstructions" | "method"))
+        || map
+            .get("method")
+            .is_some_and(|value| value.as_str() != Some(method))
+        || map
+            .get("customInstructions")
+            .is_some_and(|value| value.as_str().is_none_or(|text| text.len() > 8192))
+    {
+        return EndpointError::resource_failure(
+            StatusCode::BAD_REQUEST,
+            "invalid_compaction_input",
+            "unknown method/key or invalid customInstructions (max 8192 bytes)",
+        )
+        .into_response();
+    }
     let Some(compaction) = state.compaction().cloned() else {
         return EndpointError::resource_failure(
             StatusCode::SERVICE_UNAVAILABLE,
             "compaction_service_unavailable",
-            "the compaction service is not wired on this service (no real model chain)",
+            "no real model chain",
         )
         .into_response();
     };
-    let facts = match gate_owned(&state, &principal, &session_id).await {
-        Ok(facts) => facts,
-        Err(resp) => return resp,
-    };
-    let row = match gate_active(&state, &session_id).await {
-        Ok(row) => row,
-        Err(resp) => return resp,
-    };
-    // 运行中拒绝（现役 "session is streaming, try again after the reply
-    // completes"）：会话 admission 被运行中的 run 持有即视为流式。
-    let permit = match state
+    let _permit = match state
         .storage()
         .session_admission()
-        .try_acquire(&[&session_id], usize::MAX)
+        .try_acquire(&[session_id], usize::MAX)
     {
         Ok(permit) => permit,
         Err(_) => return EndpointError::session_busy().into_response(),
+    };
+    // admission之后复检生命周期，拒绝与归档/删除并发的旧快照。
+    let row = match gate_active(state, session_id).await {
+        Ok(row) => row,
+        Err(response) => return response,
+    };
+    let settings = match compaction.settings_for(&facts.agent_id) {
+        Ok(settings) => settings,
+        Err(error) => return storage_error_response(&error),
     };
     let Some(compiler) = state.context_compiler() else {
         return EndpointError::resource_failure(
             StatusCode::SERVICE_UNAVAILABLE,
             "context_compiler_unavailable",
-            "the context compiler is not wired on this service",
+            "no real context compiler",
         )
         .into_response();
     };
-    // 按当前 Agent 配置重建提示词工件（fresh-compact 的「刷新能力快照」
-    // 半区：材料现读现编译——render 即压缩请求的系统槽）。
     let compiled = match compiler.compile_snapshot(
-        &session_id,
+        session_id,
         &facts.agent_id,
         false,
         row.created_at_unix_ms.unsigned_abs(),
         row.memory_enabled,
     ) {
         Ok(compiled) => compiled,
-        Err(err) => {
+        Err(error) => {
             return EndpointError::resource_failure(
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "context_compile_failed",
-                format!("fresh-compact cannot rebuild the prompt artifact: {err}"),
+                error.to_string(),
             )
-            .into_response();
+            .into_response()
         }
     };
     let system_prompt = compiled.render().to_string();
     let observation = compiled.observation().clone();
-    let rebuilt = json!({
-        "renderTokens": observation.get("renderTokens").cloned().unwrap_or(Value::Null),
-        "preambleTokens": observation.get("preambleTokens").cloned().unwrap_or(Value::Null),
-        "materialSha256": observation.get("materialSha256").cloned().unwrap_or(Value::Null),
-        "materialRevision": observation.get("materialRevision").cloned().unwrap_or(Value::Null),
-    });
-    // 旧上下文（权威历史；fresh-compact 无当前 run，current_run 传空串）。
-    let kernel_principal = crate::sessions::kernel_principal_of(&principal);
+    let rebuilt = json!({"renderTokens":observation["renderTokens"],"preambleTokens":observation["preambleTokens"],"materialSha256":observation["materialSha256"],"materialRevision":observation["materialRevision"]});
+    let kernel_principal = crate::sessions::kernel_principal_of(principal);
     let history = crate::model_history::ModelHistory::new(Arc::clone(state.storage()));
+    let (chain, pre_revision) = match cms::read_full_branch(
+        state.storage(),
+        session_id,
+        crate::history::MAX_HISTORY_LIMIT,
+    )
+    .await
+    {
+        Ok(facts) => facts,
+        Err(error) => return storage_error_response(&error),
+    };
+    let pre_head = chain.last().map(|row| row.message_id.clone());
     let exchange = match history
-        .load(&kernel_principal, &facts.agent_id, &session_id, "")
+        .load(&kernel_principal, &facts.agent_id, session_id, "")
         .await
     {
         Ok(exchange) => exchange,
-        Err(err) => return storage_error_response(&err),
+        Err(error) => return storage_error_response(&error),
     };
-    let empty_exchange = exchange.is_empty();
-    let tools = lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty();
+    let tools = match current_tools(state) {
+        Ok(tools) => tools,
+        Err(error) => return storage_error_response(&error),
+    };
+    let tool_receipt = tool_snapshot_receipt(&tools);
     let input = MidRunCompactionInput {
         exchange: &exchange,
-        system_prompt: Some(system_prompt.as_str()),
+        system_prompt: Some(&system_prompt),
         submission: "",
         tools: &tools,
         last_usage: None,
         tail_from: exchange.len(),
     };
+    // action是真实手动操作身份；底层辅助执行器只复用关联容器，绝不写Run或用户输入。
+    let nonce = format!(
+        "{}:{}:{}:{}:{}",
+        session_id,
+        state.clock().now_unix_ms(),
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0),
+        method
+    );
+    let action_id = format!(
+        "compact-action-{}",
+        lingxi_protocol::canon::sha256_hex(nonce.as_bytes())
+    );
     let ctx = RunContext {
-        principal: kernel_principal,
-        session_id: lingxi_protocol::SessionId::new(session_id.clone()),
-        run_id: lingxi_protocol::RunId::new(format!("{session_id}-fresh-compact")),
-        attempt: lingxi_protocol::AttemptId::new("fresh-compact"),
+        principal: kernel_principal.clone(),
+        session_id: lingxi_protocol::SessionId::new(session_id),
+        run_id: lingxi_protocol::RunId::new(&action_id),
+        attempt: lingxi_protocol::AttemptId::new("manual-action-correlation"),
         generation: 1,
     };
-    let cancel = CancelScope::background_root("fresh-compact");
+    let cancel = CancelScope::background_root(&action_id);
+    let commit_phase = match compaction.register_manual_cancel(session_id, cancel.clone()) {
+        Ok(phase) => phase,
+        Err(error) => return storage_error_response(&error),
+    };
+    let _scope = ManualScopeGuard {
+        service: compaction.clone(),
+        session: session_id.into(),
+    };
+    state.app_events().publish(
+        "compaction_accepted",
+        json!({"sessionId":session_id,"actionId":action_id,"method":method}),
+    );
     let tokens_before = lingxi_kernel::compaction::estimate_exchange_tokens(&exchange)
         .saturating_add(u64::from(lingxi_kernel::context::estimate_text_tokens(
             &system_prompt,
         )));
-    let outcome = if empty_exchange {
-        // 现役 "Nothing to compact" → noopReason（fresh-compact/policy.ts）。
-        CompactionOutcome::NotTriggered
-    } else {
-        match compaction
-            .compact_now(
-                &ctx,
-                state.storage().as_ref(),
-                &facts.agent_id,
-                "session.fresh_compact",
-                None,
-                None,
-                &input,
-                &cancel,
-                0,
-            )
-            .await
-        {
-            Ok(outcome) => outcome,
-            Err(err) => return storage_error_response(&err),
-        }
+    let outcome = match compaction
+        .compact_now_with_focus(
+            &ctx,
+            state.storage().as_ref(),
+            &facts.agent_id,
+            if fresh {
+                "session.fresh_compact"
+            } else {
+                "session.manual_compact"
+            },
+            None,
+            Some(action_id.clone()),
+            &input,
+            &cancel,
+            0,
+            payload["customInstructions"].as_str(),
+        )
+        .await
+    {
+        Ok(outcome) => outcome,
+        Err(error) => return storage_error_response(&error),
     };
-    let (tokens_after, context_window, noop_reason) = match &outcome {
+    let (tokens_after, context_window, noop_reason, degraded) = match &outcome {
         CompactionOutcome::Compacted {
-            exchange, report, ..
+            exchange: after,
+            report,
+            ..
         }
         | CompactionOutcome::HardTruncated {
-            exchange, report, ..
-        } => (
-            lingxi_kernel::compaction::estimate_exchange_tokens(exchange).saturating_add(
-                u64::from(lingxi_kernel::context::estimate_text_tokens(&system_prompt)),
-            ),
-            report.context_window,
-            None,
-        ),
-        CompactionOutcome::NotTriggered => (tokens_before, 0, Some("nothing_to_compact")),
-        CompactionOutcome::Cancelled => {
-            // 现役：压缩失败抛错（不呈现成功）。
-            return EndpointError::resource_failure(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "fresh_compact_failed",
-                "fresh-compact was cancelled",
+            exchange: after,
+            report,
+            ..
+        } => {
+            if cancel.is_cancelled() {
+                return EndpointError::resource_failure(
+                    StatusCode::CONFLICT,
+                    "compaction_cancelled",
+                    "manual compaction cancelled before commit",
+                )
+                .into_response();
+            }
+            let confirm = match compiler.compile_snapshot(
+                session_id,
+                &facts.agent_id,
+                false,
+                row.created_at_unix_ms.unsigned_abs(),
+                row.memory_enabled,
+            ) {
+                Ok(snapshot) => snapshot,
+                Err(error) => {
+                    return EndpointError::resource_failure(
+                        StatusCode::CONFLICT,
+                        "compaction_context_changed",
+                        error.to_string(),
+                    )
+                    .into_response()
+                }
+            };
+            let confirm_tools = match current_tools(state) {
+                Ok(tools) => tools,
+                Err(error) => return storage_error_response(&error),
+            };
+            let confirm_settings = match compaction.settings_for(&facts.agent_id) {
+                Ok(settings) => settings,
+                Err(error) => return storage_error_response(&error),
+            };
+            if confirm.render() != system_prompt
+                || tool_snapshot_receipt(&confirm_tools) != tool_receipt
+                || confirm_settings != settings
+            {
+                return EndpointError::resource_failure(
+                    StatusCode::CONFLICT,
+                    "compaction_context_changed",
+                    "materials/tools/settings changed during compaction; history preserved",
+                )
+                .into_response();
+            }
+            let final_compiler = Arc::clone(compiler);
+            let final_compaction = Arc::clone(&compaction);
+            let final_registry = state
+                .tool_gateway()
+                .map(|gateway| Arc::clone(gateway.registry()));
+            let final_agent = facts.agent_id.clone();
+            let final_session = session_id.to_string();
+            let final_prompt = system_prompt.clone();
+            let final_observation = observation.clone();
+            let final_settings = settings.clone();
+            let final_generation = tools.catalog_generation;
+            let started = row.created_at_unix_ms.unsigned_abs();
+            let memory_enabled = row.memory_enabled;
+            let context_commit: crate::model_history::ManualContextCommit = Arc::new(
+                move |write| {
+                    let refused = || {
+                        StorageError::Conflict {
+                        detail: "materials/tools/settings changed before manual archive COMMIT; history preserved".into(),
+                    }
+                    };
+                    let mut save = || {
+                        final_compiler.with_material_commit(|| {
+                            // 在拿到真实数据库写锁之后采集；栅栏一直保留到COMMIT结束。
+                            // 直接文件编辑按既有双采集的最终稳定快照裁决，不沿用HTTP复检。
+                            let snapshot = final_compiler
+                                .compile_snapshot(
+                                    &final_session,
+                                    &final_agent,
+                                    false,
+                                    started,
+                                    memory_enabled,
+                                )
+                                .map_err(|_| refused())?;
+                            if snapshot.render() != final_prompt
+                                || snapshot.observation()["materialSha256"]
+                                    != final_observation["materialSha256"]
+                                || snapshot.observation()["materialRevision"]
+                                    != final_observation["materialRevision"]
+                                || final_compaction
+                                    .settings_for(&final_agent)
+                                    .map_err(|_| refused())?
+                                    != final_settings
+                            {
+                                return Err(refused());
+                            }
+                            write()
+                        })
+                    };
+                    match &final_registry {
+                        Some(registry) => registry
+                            .with_catalog_generation(final_generation, &mut save)
+                            .unwrap_or_else(|| Err(refused())),
+                        None => save(),
+                    }
+                },
+            );
+            let commit = crate::model_history::ManualCompactionAction {
+                principal: &kernel_principal,
+                agent: &facts.agent_id,
+                session: session_id,
+                action_id: &action_id,
+                pre_head,
+                pre_revision,
+                before: &exchange,
+                after,
+                refreshed_context: json!({"render":system_prompt,"observation":observation,"tools":tool_receipt,"fresh":fresh,"request":{"method":method,"customInstructions":payload["customInstructions"]}}),
+                cancel: cancel.clone(),
+                commit_phase: commit_phase.clone(),
+                now: state.clock().now_unix_ms(),
+                context_commit,
+            };
+            if let Err(error) = history.record_manual_compaction(commit).await {
+                if matches!(&error,StorageError::InvalidRequest{detail} if detail=="model_history: branch head changed before archive commit")
+                {
+                    return EndpointError::resource_failure(
+                        StatusCode::CONFLICT,
+                        "compaction_branch_changed",
+                        "effective branch changed during compaction; history preserved",
+                    )
+                    .into_response();
+                }
+                if matches!(&error, StorageError::Conflict { .. }) {
+                    return EndpointError::resource_failure(
+                        StatusCode::CONFLICT,
+                        "compaction_commit_refused",
+                        error.to_string(),
+                    )
+                    .into_response();
+                }
+                return storage_error_response(&error);
+            }
+            (
+                lingxi_kernel::compaction::estimate_exchange_tokens(after).saturating_add(
+                    u64::from(lingxi_kernel::context::estimate_text_tokens(&system_prompt)),
+                ),
+                report.context_window,
+                None,
+                matches!(outcome, CompactionOutcome::HardTruncated { .. }),
             )
-            .into_response();
+        }
+        CompactionOutcome::NotTriggered => (tokens_before, 0, Some("nothing_to_compact"), false),
+        CompactionOutcome::Cancelled => {
+            return EndpointError::resource_failure(
+                StatusCode::CONFLICT,
+                "compaction_cancelled",
+                "manual compaction cancelled; history preserved",
+            )
+            .into_response()
         }
         CompactionOutcome::Failed { detail } => {
             return EndpointError::resource_failure(
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "fresh_compact_failed",
-                format!("fresh-compact failed: {detail}"),
+                if fresh {
+                    "fresh_compact_failed"
+                } else {
+                    "compaction_failed"
+                },
+                detail.clone(),
             )
-            .into_response();
+            .into_response()
         }
     };
-    let _ = permit;
-    Json(json!({
-        "ok": true,
-        "fresh": true,
-        "tokensBefore": tokens_before,
-        "tokensAfter": tokens_after,
-        "contextWindow": if context_window > 0 { Value::from(context_window) } else { Value::Null },
-        "noopReason": noop_reason,
-        "rebuiltPrompt": rebuilt,
-    }))
-    .into_response()
+    state.app_events().publish("compaction_succeeded",json!({"sessionId":session_id,"actionId":action_id,"noopReason":noop_reason,"degraded":degraded}));
+    Json(json!({"ok":true,"fresh":fresh,"actionId":action_id,"tokensBefore":tokens_before,"tokensAfter":tokens_after,"contextWindow":if context_window>0{Value::from(context_window)}else{Value::Null},"noopReason":noop_reason,"degraded":degraded,"rebuiltPrompt":rebuilt})).into_response()
 }
 
 // ═══════════════ 5DCB0352EB08：跨会话协作模型工具（session tool） ═══════════════

@@ -394,6 +394,26 @@ impl ApprovalService {
     // lands on the kernel's refusal before anything is dispatched.
     pub fn adjudicate(&self, input: &PolicyAdjudicationInput) -> PolicyVerdict {
         use lingxi_kernel::toolcatalog::PermissionKind;
+        if input.permission_kind == PermissionKind::Review {
+            return match input.permission_context {
+                InvocationPermissionContext::UserSession {
+                    mode: SessionPermissionMode::ReadOnly,
+                } => PolicyVerdict::Denied {
+                    code: ACTION_BLOCKED_BY_READ_ONLY.into(),
+                    layer: "session".into(),
+                    message: "review action is blocked in read-only mode".into(),
+                },
+                InvocationPermissionContext::UserSession { .. } => PolicyVerdict::NeedsApproval {
+                    reason: "review the exact matched items before deleting pinned memories".into(),
+                },
+                InvocationPermissionContext::Subagent { .. } => PolicyVerdict::Denied {
+                    code: TOOL_APPROVAL_UNAVAILABLE.into(),
+                    layer: "approval_policy".into(),
+                    message: "unattended subagents cannot confirm a pinned-memory deletion scope"
+                        .into(),
+                },
+            };
+        }
         match input.permission_context {
             InvocationPermissionContext::UserSession { mode } => match mode {
                 SessionPermissionMode::Operate => PolicyVerdict::Allowed,
@@ -733,7 +753,7 @@ impl ApprovalGate for ApprovalService {
             // 1) A matching live pre-authorization answers immediately
             //    (one use spent atomically). The incumbent's
             //    pre-authorization contract: the exact invocation only.
-            if self.spend_preauthorization(ctx, req) {
+            if !req.requires_scope_review && self.spend_preauthorization(ctx, req) {
                 return ApprovalDecision::Approved;
             }
             // 2) Mint the bound approval record and park.
@@ -1077,6 +1097,7 @@ mod tests {
             .expect("grant");
         // The exact invocation spends exactly one use…
         let req_a = crate::approval::ApprovalRequest {
+            requires_scope_review: false,
             tool_call_id: ToolCallId::new("call-1".to_string()),
             target: "tool:first-party:write".to_string(),
             args_digest: "digest-A".to_string(),
@@ -1097,6 +1118,7 @@ mod tests {
             )
             .expect("grant 2");
         let req_b = crate::approval::ApprovalRequest {
+            requires_scope_review: false,
             tool_call_id: ToolCallId::new("call-2".to_string()),
             target: "tool:first-party:write".to_string(),
             args_digest: "digest-B".to_string(),
@@ -1120,6 +1142,7 @@ mod tests {
             )
             .expect("grant 3");
         let req_c = crate::approval::ApprovalRequest {
+            requires_scope_review: false,
             tool_call_id: ToolCallId::new("call-3".to_string()),
             target: "tool:first-party:write".to_string(),
             args_digest: "digest-A3".to_string(),

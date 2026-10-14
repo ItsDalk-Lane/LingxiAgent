@@ -650,7 +650,9 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 {
                     return RoutePolicy::Scope("chat")
                 }
-                "fresh-compact" if id_clean && m == "POST" => return RoutePolicy::Scope("chat"),
+                "fresh-compact" | "compact" | "compact/cancel" if id_clean && m == "POST" => {
+                    return RoutePolicy::Scope("chat")
+                }
                 content
                     if id_clean
                         && content.starts_with("content/")
@@ -1098,6 +1100,15 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             let skills_patch = rest.contains("/skills/") || rest.contains("/skill-bundles/");
             if skills_patch && m == "PATCH" {
                 return RoutePolicy::Scope("settings.write");
+            }
+        }
+        if let Some(role) = p.strip_prefix("/lingxi/v1/avatar/") {
+            if !role.is_empty() && !role.contains('/') {
+                return match m.as_str() {
+                    "GET" | "HEAD" => RoutePolicy::Scope("chat"),
+                    "POST" | "DELETE" => RoutePolicy::Scope("settings.write"),
+                    _ => RoutePolicy::LocalOnly,
+                };
             }
         }
         // avatar：读 = chat（route-security.ts:100 isAvatarReadRoute → chat）；

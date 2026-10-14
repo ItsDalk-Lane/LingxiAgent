@@ -307,6 +307,9 @@ pub enum ToolResultStatus {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ToolResultWire {
+    /// 可选业务字段；旧消息缺字段时仍可读取。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Map<String, serde_json::Value>>,
     pub status: ToolResultStatus,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub content: Vec<ContentBlock>,

@@ -478,6 +478,7 @@ fn golden_samples() -> Vec<Golden> {
         size_bytes: Some((1u64 << 53) + 99),
     };
     let tool_result = ToolResultWire {
+        details: None,
         status: ToolResultStatus::Success,
         content: vec![
             ContentBlock::Text {

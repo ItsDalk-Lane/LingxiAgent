@@ -968,6 +968,7 @@ mod tests {
             KnownEventPayload::ToolCallCompleted(ToolCallCompletedPayload {
                 tool_call_id: ToolCallId::new("r2-tc0001"),
                 result: ToolResultWire {
+                    details: None,
                     status: ToolResultStatus::Failed,
                     content: Vec::new(),
                     resource_refs: Vec::new(),

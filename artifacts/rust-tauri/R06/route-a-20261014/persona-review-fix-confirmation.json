@@ -1,0 +1,154 @@
+{
+  "schema": "lingxi.r06.independent-review.v1",
+  "reviewStatus": "PASS",
+  "scope": "persona eight leaves plus source consistency fix and native write/edit availability checks on macOS",
+  "stageAcceptance": false,
+  "r07Ready": false,
+  "baseSha": "2c8f8ddd0b75b4de61ebd047a0246a7f88f6d486",
+  "worktree": "/private/tmp/lingxi-r06-review-persona-native",
+  "r2Patch": "/private/tmp/r06-persona-r2-incremental.patch",
+  "r2PatchSHA256": "3d77b4c24b6a8dfded32a84b7bf260856d9a1c0676f226357952a5ece518de9f",
+  "sourceRaceTests": [
+    "description_all_material_races_refuse_stale_commit_and_preserve_paid_usage"
+  ],
+  "sourceRaceTestBindings": [
+    {
+      "package": "lingxi-service",
+      "suite": "r06_review_persona",
+      "test": "reviewer_sibling_material_change_is_refused_before_description_publication",
+      "result": "PASS",
+      "reportedUsagePreserved": true,
+      "stableControl": "PASS"
+    },
+    {
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "description_all_material_races_refuse_stale_commit_and_preserve_paid_usage",
+      "result": "PASS",
+      "variants": [
+        "sibling-agents",
+        "sibling-identity",
+        "own-identity",
+        "config-name",
+        "config-yuan",
+        "config-locale",
+        "preferences-name",
+        "preferences-locale",
+        "fallback-template",
+        "fallback-example",
+        "new-preferred-template",
+        "new-own-persona",
+        "empty-target-template"
+      ],
+      "variantCount": 13,
+      "stableControlCount": 13,
+      "reportedUsagePreserved": true
+    }
+  ],
+  "nativeUnavailableTests": [
+    "reviewer_edit_refuses_unavailable_native_sandbox_before_write",
+    "native_write_refuses_missing_or_untrusted_sandbox_without_creating_or_overwriting"
+  ],
+  "eightLeafTestBindings": [
+    {
+      "leafId": "R00-T02-LA-4870805E3A3D",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_487080_agents_write_refreshes_actual_description_and_next_roster",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-7C699FD2A740",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_7c699f_public_write_and_legacy_alias_publish_only_after_persistence",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-856B28902999",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_856b28_identity_write_refreshes_actual_description_and_next_roster",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-7F0F3F76E38A",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_7f0f3f_agent_avatar_upload_cleans_formats_refreshes_next_list_and_event",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-BB4CD1E4CD43",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_bb4cd1_agent_avatar_delete_cleans_all_formats_and_is_idempotent",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-4A56F26EDA32",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_4a56f2_role_avatar_delete_restores_defaults_and_preserves_other_target",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-7570BE1F2527",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_7570be_role_avatar_upload_selects_explicit_agent_and_user_without_crosstalk",
+      "result": "PASS"
+    },
+    {
+      "leafId": "R00-T02-LA-E4BEE8E6974A",
+      "package": "lingxi-service",
+      "suite": "r06_persona_completion",
+      "test": "original_e4bee8_role_avatar_returns_bytes_etag_304_and_404_under_actual_permissions",
+      "result": "PASS"
+    }
+  ],
+  "regressionResults": {
+    "r06_persona_completion_excluding_matrix": 11,
+    "r04_t04_file_tools": 11,
+    "r04_t06_sandbox": 10,
+    "r06_agent_admin_lifecycle": 2,
+    "r06_t01_context_compiler": 21,
+    "totalPassed": 55,
+    "failed": 0
+  },
+  "cargoVersion": "1.98.1",
+  "locked": true,
+  "cargoTargetDir": "/Users/study_superior/.cache/lingxi-r06-builds/reviewer-target",
+  "sourceSHA256": {
+    "rust/crates/lingxi-service/src/persona.rs": "6e2020ada32b4503a420e5a4b7d7850a8f41d6d13e2cad87acd05965442ff5ba",
+    "rust/crates/lingxi-service/src/filetools.rs": "2d0475b3f81181dd19d8a978172cc16395c9b1d339a662b3136a615700117dbd",
+    "rust/crates/lingxi-service/src/sandbox.rs": "276feae6510cbd33b3d3ce64a8e24bee3c43d88c52d3e137d6a052595524f9b2",
+    "rust/crates/lingxi-service/tests/r06_persona_completion.rs": "2b5f9b7c263d81ec00c301b72d438da794efc9263bde758606046df2a6415acf",
+    "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+    "rust/crates/lingxi-service/tests/r06_review_persona.rs": "c72ebd0e56af7ec825e53459cb3d8cf7304cabe1c76a7b95dde31350866812c4",
+    "rust/crates/lingxi-service/tests/r06_review_native.rs": "29d60560861e5f8c339da77d00f1ac7d54f5f9d5fcb092ba74bdc725119bc3a1"
+  },
+  "nativeMethodsMatchMain": true,
+  "nativeMethodSHA256": {
+    "require_native_write_sandbox": "1eb3c44e9927194d6b8ac9c7f0cae53a9b1c0c89a9cb176bcaf7ef46acf46e63",
+    "run_write": "632322fd572c290bf6b6ed6cd185f31d7bc304bc86caf7d799053c8e7665ae7f",
+    "run_edit": "fa29709339022f9de4cb4cd9806848746f37c91b2c59018bbd17a2e4cce9f307"
+  },
+  "logs": [
+    "/tmp/r06-review-persona-r2-counterexample.log",
+    "/tmp/r06-review-persona-r2-matrix.log",
+    "/tmp/r06-review-native-r2-counterexample.log",
+    "/tmp/r06-review-persona-native-r2-regressions.log"
+  ],
+  "limitations": [
+    "Not full R06 acceptance or R07 readiness.",
+    "Not Windows/Linux runtime, real paid provider, desktop UI or official packaging validation.",
+    "Native file writes still execute in parent process; available sandbox probing does not imply parent OS containment.",
+    "Main contains unrelated ToolSuccess details initialization; copied production methods match main byte-for-byte, unrelated main changes were not tested in this independent base."
+  ],
+  "status": "PASS",
+  "independentSourceRaceTests": [
+    "reviewer_sibling_material_change_is_refused_before_description_publication",
+    "description_all_material_races_refuse_stale_commit_and_preserve_paid_usage"
+  ]
+}

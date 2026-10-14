@@ -44,11 +44,29 @@ pub struct ContextMaterialEpoch {
     writers: std::sync::atomic::AtomicUsize,
     revision: std::sync::atomic::AtomicU64,
 }
+// 最高位是最终提交保留位；低位仍容纳原有嵌套/并行资料写者。
+const MATERIAL_COMMIT_FENCE: usize = 1usize << (usize::BITS - 1);
+struct MaterialCommitFence<'a>(&'a ContextMaterialEpoch);
+impl Drop for MaterialCommitFence<'_> {
+    fn drop(&mut self) {
+        self.0.writers.store(0, std::sync::atomic::Ordering::SeqCst);
+    }
+}
 impl ContextMaterialEpoch {
+    /// 只在没有活动写者时进入；同步检查和SQL提交期间阻止新资料发布。
+    /// 不等待既有写者，避免与其数据库操作形成锁序循环。
+    pub fn with_stable_commit<T>(&self, commit: impl FnOnce() -> T) -> Option<T> {
+        use std::sync::atomic::Ordering::SeqCst;
+        self.writers
+            .compare_exchange(0, MATERIAL_COMMIT_FENCE, SeqCst, SeqCst)
+            .ok()?;
+        let _fence = MaterialCommitFence(self);
+        Some(commit())
+    }
     pub fn stable_revision(&self) -> Option<u64> {
         use std::sync::atomic::Ordering::SeqCst;
         let revision = self.revision.load(SeqCst);
-        (self.writers.load(SeqCst) == 0).then_some(revision)
+        (self.writers.load(SeqCst) & !MATERIAL_COMMIT_FENCE == 0).then_some(revision)
     }
 }
 
@@ -76,7 +94,21 @@ impl ContextMaterialMutation {
     pub fn for_home(home: &Path) -> Self {
         use std::sync::atomic::Ordering::SeqCst;
         let epoch = context_material_epoch(home);
-        epoch.writers.fetch_add(1, SeqCst);
+        loop {
+            let writers = epoch.writers.load(SeqCst);
+            if writers & MATERIAL_COMMIT_FENCE != 0 {
+                // 最终提交只执行同步读和COMMIT；嵌套写者不会遭遇此保留位。
+                std::thread::yield_now();
+                continue;
+            }
+            if epoch
+                .writers
+                .compare_exchange(writers, writers + 1, SeqCst, SeqCst)
+                .is_ok()
+            {
+                break;
+            }
+        }
         epoch.revision.fetch_add(1, SeqCst);
         Self(epoch)
     }
@@ -117,9 +149,15 @@ fn memory_operation_state(memory_dir: &Path) -> std::sync::Arc<MemoryOperationSt
     use std::sync::{Arc, Mutex, OnceLock, Weak};
     static STATES: OnceLock<Mutex<std::collections::HashMap<PathBuf, Weak<MemoryOperationState>>>> =
         OnceLock::new();
-    let key = memory_dir
-        .canonicalize()
-        .unwrap_or_else(|_| memory_dir.to_path_buf());
+    // 目录首次创建前后必须是同一把锁；先解析已存在的助手目录，避免路径别名分裂操作门。
+    let key = memory_dir.canonicalize().unwrap_or_else(|_| {
+        memory_dir
+            .parent()
+            .and_then(|parent| parent.canonicalize().ok())
+            .zip(memory_dir.file_name())
+            .map(|(parent, name)| parent.join(name))
+            .unwrap_or_else(|| memory_dir.to_path_buf())
+    });
     let mut states = STATES
         .get_or_init(|| Mutex::new(std::collections::HashMap::new()))
         .lock()
@@ -535,6 +573,7 @@ fn redact_credit_card(text: &str) -> Option<String> {
 
 // ── FactStore (fact-store.ts) ───────────────────────────────────────────────
 
+#[derive(Clone)]
 pub struct FactRow {
     pub id: i64,
     pub fact: String,
@@ -737,6 +776,91 @@ impl FactStore {
             .map_err(|e| MemoryError::Store(e.to_string()))
     }
 
+    /// 事实向量按实际模型身份保存；维度与有限值必须可验证。
+    pub fn upsert_embedding(
+        &self,
+        fact_id: i64,
+        model_key: &str,
+        vector: &[f32],
+    ) -> Result<(), MemoryError> {
+        if model_key.is_empty() || vector.is_empty() || vector.iter().any(|v| !v.is_finite()) {
+            return Err(MemoryError::InvalidRequest("invalid fact embedding".into()));
+        }
+        let bytes: Vec<u8> = vector.iter().flat_map(|v| v.to_le_bytes()).collect();
+        self.conn.execute("INSERT INTO fact_embeddings(fact_id,model_key,dimensions,vector,updated_at) VALUES(?1,?2,?3,?4,?5) ON CONFLICT(fact_id) DO UPDATE SET model_key=excluded.model_key,dimensions=excluded.dimensions,vector=excluded.vector,updated_at=excluded.updated_at",
+            rusqlite::params![fact_id, model_key, vector.len() as i64, bytes, now_iso()]).map_err(|e| MemoryError::Store(e.to_string()))?;
+        Ok(())
+    }
+
+    pub fn embedding_coverage(
+        &self,
+        model_key: &str,
+        dimensions: usize,
+    ) -> Result<usize, MemoryError> {
+        self.conn.query_row("SELECT COUNT(*) FROM fact_embeddings e JOIN facts f ON f.id=e.fact_id WHERE e.model_key=?1 AND e.dimensions=?2", rusqlite::params![model_key, dimensions as i64], |row| row.get::<_, i64>(0))
+            .map(|n| n as usize).map_err(|e| MemoryError::Store(e.to_string()))
+    }
+
+    /// 真正对所属事实向量计算余弦排名；不同模型/维度的向量不得混用。
+    pub fn semantic_search(
+        &self,
+        model_key: &str,
+        query: &[f32],
+        limit: usize,
+    ) -> Result<Vec<FactRow>, MemoryError> {
+        if query.is_empty() || query.iter().any(|v| !v.is_finite()) {
+            return Err(MemoryError::InvalidRequest("invalid query vector".into()));
+        }
+        let mut stmt = self.conn.prepare("SELECT f.*,e.vector FROM facts f JOIN fact_embeddings e ON e.fact_id=f.id WHERE e.model_key=?1 AND e.dimensions=?2").map_err(|e| MemoryError::Store(e.to_string()))?;
+        let rows = stmt
+            .query_map(rusqlite::params![model_key, query.len() as i64], |row| {
+                Ok((Self::row_to_fact(row)?, row.get::<_, Vec<u8>>("vector")?))
+            })
+            .map_err(|e| MemoryError::Store(e.to_string()))?;
+        let norm = query
+            .iter()
+            .map(|v| (*v as f64).powi(2))
+            .sum::<f64>()
+            .sqrt();
+        if norm == 0.0 {
+            return Err(MemoryError::InvalidRequest("zero query vector".into()));
+        }
+        let mut scored = Vec::new();
+        for row in rows {
+            let (fact, bytes) = row.map_err(|e| MemoryError::Store(e.to_string()))?;
+            if bytes.len() != query.len() * 4 {
+                return Err(MemoryError::Store(
+                    "corrupt fact embedding dimensions".into(),
+                ));
+            }
+            let vector: Vec<f32> = bytes
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .map(|bytes| f32::from_le_bytes(*bytes))
+                .collect();
+            if vector.iter().any(|v| !v.is_finite()) {
+                return Err(MemoryError::Store("corrupt fact embedding values".into()));
+            }
+            let other_norm = vector
+                .iter()
+                .map(|v| (*v as f64).powi(2))
+                .sum::<f64>()
+                .sqrt();
+            if other_norm == 0.0 {
+                continue;
+            }
+            let dot = vector
+                .iter()
+                .zip(query)
+                .map(|(a, b)| *a as f64 * *b as f64)
+                .sum::<f64>();
+            scored.push((fact, dot / (norm * other_norm)));
+        }
+        scored.sort_by(|a, b| b.1.total_cmp(&a.1).then_with(|| a.0.id.cmp(&b.0.id)));
+        Ok(scored.into_iter().take(limit).map(|(row, _)| row).collect())
+    }
+
     pub fn delete_by_id(&self, id: i64) -> Result<bool, MemoryError> {
         self.conn
             .execute("DELETE FROM facts WHERE id = ?1", [id])
@@ -757,18 +881,28 @@ impl FactStore {
     }
 
     pub fn clear_all(&self) -> Result<(), MemoryError> {
-        self.conn
+        self.clear_all_with(|| Ok(()))
+    }
+
+    // 事实、检索索引和关联向量同一事务提交；配套文件失败时事实也不清空。
+    fn clear_all_with(
+        &self,
+        apply_files: impl FnOnce() -> Result<(), MemoryError>,
+    ) -> Result<(), MemoryError> {
+        let transaction = self
+            .conn
+            .unchecked_transaction()
+            .map_err(|error| MemoryError::Store(error.to_string()))?;
+        transaction
             .execute("DELETE FROM facts", [])
-            .map_err(|e| MemoryError::Store(e.to_string()))?;
-        self.conn
-            .query_row(
-                "INSERT INTO facts_fts(facts_fts) VALUES ('rebuild') RETURNING 1",
-                [],
-                |_| Ok(()),
-            )
-            .or(Ok(()))
-            .map_err(|e: rusqlite::Error| MemoryError::Store(e.to_string()))?;
-        Ok(())
+            .map_err(|error| MemoryError::Store(error.to_string()))?;
+        transaction
+            .execute("INSERT INTO facts_fts(facts_fts) VALUES ('rebuild')", [])
+            .map_err(|error| MemoryError::Store(error.to_string()))?;
+        apply_files()?;
+        transaction
+            .commit()
+            .map_err(|error| MemoryError::Store(error.to_string()))
     }
 
     /// Tag search with json_each exact matching (fact-store.ts:347-389):
@@ -1070,6 +1204,42 @@ impl TenetsStore {
             .into_iter()
             .filter(|t| t.status == TenetStatus::Active)
             .collect()
+    }
+
+    pub fn active_checked(&self) -> Result<Vec<Tenet>, MemoryError> {
+        let mut file = self.read_strict()?;
+        sort_tenets(&mut file.tenets);
+        Ok(file
+            .tenets
+            .into_iter()
+            .filter(|t| t.status == TenetStatus::Active)
+            .collect())
+    }
+
+    /// 在同一存储操作内核对确认时的内容并全量删除，避免逐项删除中途扩大范围。
+    pub fn remove_reviewed(
+        &self,
+        expected: &[(String, String)],
+    ) -> Result<Vec<(String, String)>, MemoryError> {
+        if expected.is_empty() {
+            return Ok(Vec::new());
+        }
+        self.with_file(|file| {
+            for (id, content) in expected {
+                if !file.tenets.iter().any(|t| {
+                    &t.id == id && &t.content == content && t.status == TenetStatus::Active
+                }) {
+                    return Err(MemoryError::Conflict {
+                        code: "PINNED_REVIEW_SCOPE_CHANGED".into(),
+                        message: "confirmed pinned item changed; review again".into(),
+                    });
+                }
+            }
+            for (id, _) in expected {
+                tenets_remove(file, id);
+            }
+            Ok(expected.to_vec())
+        })
     }
 
     pub fn pending(&self) -> Vec<Tenet> {
@@ -1435,18 +1605,103 @@ impl CompiledMemoryStore {
     }
 
     pub fn reset_and_clear(&self) -> Result<(), MemoryError> {
-        let _operation =
-            begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
-        self.write_reset_marker_unlocked()?;
-        self.clear_artifacts_unlocked()
+        self.reset_and_clear_sources(None)
     }
 
     pub fn reset_and_clear_all_facts(&self, facts: &FactStore) -> Result<(), MemoryError> {
+        self.reset_and_clear_sources(Some(facts))
+    }
+
+    // 只清当前助手的直接 JSON 总结来源，与现役 clearCompiledSummarySources 一致。
+    // 先检查全部路径并保留旧字节，拒绝或数据库提交失败时恢复文件，不能假报成功。
+    fn reset_and_clear_sources(&self, facts: Option<&FactStore>) -> Result<(), MemoryError> {
         let _operation =
             begin_memory_operation(&self.memory_dir, MemoryOperationKind::Maintenance)?;
-        self.write_reset_marker_unlocked()?;
-        facts.clear_all()?;
-        self.clear_artifacts_unlocked()
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
+        let summaries = self.path("summaries");
+        let summary_existed = match std::fs::symlink_metadata(&summaries) {
+            Ok(metadata) if metadata.is_dir() && !metadata.file_type().is_symlink() => true,
+            Ok(_) => {
+                return Err(MemoryError::InvalidRequest(
+                    "总结来源目录必须为当前助手的真实目录".into(),
+                ))
+            }
+            Err(error) if error.kind() == io::ErrorKind::NotFound => false,
+            Err(error) => return Err(error.into()),
+        };
+        let mut paths = vec![self.path("reset.json")];
+        for name in COMPILED_FILES {
+            let path = self.path(name);
+            paths.push(path.with_extension("md.fingerprint"));
+            paths.push(path);
+        }
+        let mut summary_sources = Vec::new();
+        if summary_existed {
+            for entry in std::fs::read_dir(&summaries).map_err(MemoryError::from)? {
+                let entry = entry.map_err(MemoryError::from)?;
+                if entry.file_type().map_err(MemoryError::from)?.is_file()
+                    && entry.file_name().to_string_lossy().ends_with(".json")
+                {
+                    summary_sources.push(entry.path());
+                }
+            }
+        }
+        summary_sources.sort();
+        paths.extend(summary_sources.iter().cloned());
+        let mut snapshots = Vec::new();
+        for path in paths {
+            let bytes = match std::fs::symlink_metadata(&path) {
+                Ok(metadata) if metadata.is_file() && !metadata.file_type().is_symlink() => {
+                    Some(std::fs::read(&path).map_err(MemoryError::from)?)
+                }
+                Ok(_) => {
+                    return Err(MemoryError::InvalidRequest(
+                        "记忆清理路径不是普通文件".into(),
+                    ))
+                }
+                Err(error) if error.kind() == io::ErrorKind::NotFound => None,
+                Err(error) => return Err(error.into()),
+            };
+            snapshots.push((path, bytes));
+        }
+        let apply = || -> Result<(), MemoryError> {
+            self.clear_artifacts_unlocked()?;
+            std::fs::create_dir_all(&summaries).map_err(MemoryError::from)?;
+            for path in &summary_sources {
+                std::fs::remove_file(path).map_err(MemoryError::from)?;
+            }
+            self.write_reset_marker_unlocked()?;
+            Ok(())
+        };
+        let result = match facts {
+            Some(facts) => facts.clear_all_with(apply),
+            None => apply(),
+        };
+        if let Err(error) = result {
+            let mut rollback_errors = Vec::new();
+            for (path, bytes) in &snapshots {
+                let restore = match bytes {
+                    Some(bytes) => std::fs::write(path, bytes),
+                    None => remove_if_exists(path),
+                };
+                if let Err(rollback) = restore {
+                    rollback_errors.push(rollback.to_string());
+                }
+            }
+            if !summary_existed && summaries.exists() {
+                if let Err(rollback) = std::fs::remove_dir(&summaries) {
+                    rollback_errors.push(rollback.to_string());
+                }
+            }
+            if !rollback_errors.is_empty() {
+                return Err(MemoryError::Store(format!(
+                    "记忆清理失败：{error}；文件恢复失败：{}",
+                    rollback_errors.join("; ")
+                )));
+            }
+            return Err(error);
+        }
+        Ok(())
     }
 
     /// clearCompiledMemoryArtifacts (compiled-memory-state.ts:45-57): empty
@@ -1634,6 +1889,55 @@ impl ExperienceStore {
         docs
     }
 
+    fn check_local_path(&self, path: &Path, directory: bool) -> Result<(), MemoryError> {
+        match std::fs::symlink_metadata(path) {
+            Ok(meta)
+                if meta.file_type().is_symlink()
+                    || (directory && !meta.is_dir())
+                    || (!directory && !meta.is_file()) =>
+            {
+                Err(MemoryError::InvalidRequest(
+                    "experience path must belong to this agent and cannot be a link".into(),
+                ))
+            }
+            Ok(_) => Ok(()),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
+            Err(err) => Err(err.into()),
+        }
+    }
+
+    pub fn list_documents_checked(&self) -> Result<Vec<ExperienceDoc>, MemoryError> {
+        self.check_local_path(&self.dir(), true)?;
+        let entries = match std::fs::read_dir(self.dir()) {
+            Ok(entries) => entries,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(err) => return Err(err.into()),
+        };
+        let mut docs = Vec::new();
+        for entry in entries {
+            let entry = entry?;
+            let file = entry.file_name().to_string_lossy().to_string();
+            if !file.ends_with(".md") {
+                continue;
+            }
+            self.check_local_path(&entry.path(), false)?;
+            let raw = std::fs::read_to_string(entry.path())?;
+            let (title, body) = parse_experience_document(&raw, file.trim_end_matches(".md"));
+            docs.push(ExperienceDoc { title, file, body });
+        }
+        docs.sort_by(|a, b| a.file.cmp(&b.file));
+        Ok(docs)
+    }
+
+    pub fn index_text_checked(&self) -> Result<String, MemoryError> {
+        self.check_local_path(&self.index_path(), false)?;
+        match std::fs::read_to_string(self.index_path()) {
+            Ok(text) => Ok(text),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
+            Err(err) => Err(err.into()),
+        }
+    }
+
     /// serializeExperienceDocument (experience.ts:353-355).
     fn serialize_document(&self, title: &str, body: &str) -> String {
         use base64::Engine as _;
@@ -1644,11 +1948,20 @@ impl ExperienceStore {
         )
     }
 
-    /// rebuildIndex (experience.ts:29-61).
+    /// 索引与经验变更使用同一助手操作锁，不能在另一写者尚未发布时重建。
     pub fn rebuild_index(&self) -> Result<(), MemoryError> {
-        let docs = self.list_documents();
+        let _operation = begin_memory_operation(
+            &self.agent_dir.join("memory"),
+            MemoryOperationKind::Maintenance,
+        )?;
+        self.rebuild_index_unlocked()
+    }
+
+    fn rebuild_index_unlocked(&self) -> Result<(), MemoryError> {
+        self.check_local_path(&self.index_path(), false)?;
+        let docs = self.list_documents_checked()?;
         if docs.is_empty() {
-            std::fs::write(self.index_path(), "").map_err(MemoryError::from)?;
+            atomic_write(&self.index_path(), "").map_err(MemoryError::from)?;
             return Ok(());
         }
         let mut blocks = Vec::new();
@@ -1677,7 +1990,7 @@ impl ExperienceStore {
         } else {
             format!("{}\n", blocks.join("\n\n"))
         };
-        std::fs::write(self.index_path(), content).map_err(MemoryError::from)
+        atomic_write(&self.index_path(), &content).map_err(MemoryError::from)
     }
 
     /// recordEntry (experience.ts:68-97): dedup by substring, number + append.
@@ -1691,9 +2004,16 @@ impl ExperienceStore {
                 "invalid experience category".into(),
             ));
         };
+        // 从读旧正文到索引发布及失败恢复都持有同一助手锁，成功记录不能互相覆盖。
+        let _operation = begin_memory_operation(
+            &self.agent_dir.join("memory"),
+            MemoryOperationKind::Maintenance,
+        )?;
+        self.check_local_path(&self.dir(), true)?;
+        self.index_text_checked()?;
         std::fs::create_dir_all(self.dir()).map_err(MemoryError::from)?;
         let existing_doc = self
-            .list_documents()
+            .list_documents_checked()?
             .into_iter()
             .find(|d| d.title == safe_category);
         let (file_name, existing) = match existing_doc {
@@ -1719,13 +2039,35 @@ impl ExperienceStore {
             format!("{}\n{line}", existing.trim_end())
         };
         let serialized = self.serialize_document(&safe_category, &updated);
-        std::fs::write(&file_path, serialized).map_err(MemoryError::from)?;
-        self.rebuild_index()?;
+        self.check_local_path(&file_path, false)?;
+        let previous = match std::fs::read_to_string(&file_path) {
+            Ok(text) => Some(text),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => None,
+            Err(err) => return Err(err.into()),
+        };
+        atomic_write(&file_path, &serialized)?;
+        if let Err(error) = self.rebuild_index_unlocked() {
+            let rollback = match previous {
+                Some(text) => atomic_write(&file_path, &text),
+                None => std::fs::remove_file(&file_path),
+            };
+            if let Err(rollback_error) = rollback {
+                return Err(MemoryError::Io(format!(
+                    "experience index failed: {error}; restoring document failed: {rollback_error}"
+                )));
+            }
+            return Err(error);
+        }
         Ok((true, None))
     }
 
     /// syncExperienceCategories (experience.ts:99-125): whole-document PUT.
     pub fn sync_categories(&self, categories: &[(String, String)]) -> Result<(), MemoryError> {
+        // 整份同步与新增经验、单独重建索引共用同一个门，避免读取到彼此的中间状态。
+        let _operation = begin_memory_operation(
+            &self.agent_dir.join("memory"),
+            MemoryOperationKind::Maintenance,
+        )?;
         std::fs::create_dir_all(self.dir()).map_err(MemoryError::from)?;
         let existing = self.list_documents();
         let by_title: std::collections::HashMap<String, &ExperienceDoc> =
@@ -1759,7 +2101,7 @@ impl ExperienceStore {
                 remove_if_exists(&self.dir().join(&doc.file)).map_err(MemoryError::from)?;
             }
         }
-        self.rebuild_index()
+        self.rebuild_index_unlocked()
     }
 
     pub fn read_merged(&self) -> (String, Vec<Value>) {

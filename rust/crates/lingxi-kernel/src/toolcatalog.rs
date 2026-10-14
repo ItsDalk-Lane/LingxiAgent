@@ -426,6 +426,8 @@ pub enum PermissionKind {
     Read,
     /// Allowed in operate, blocked in read-only, prompted otherwise.
     Execute,
+    /// 删除范围需要明确审阅；即使会话允许操作也不能免除确认。
+    Review,
     /// Argument-aware (the `file` tool): read-only sub-actions map to
     /// Read, everything else to Execute.
     ArgumentAwareFile,
@@ -438,6 +440,7 @@ impl PermissionKind {
         match self {
             PermissionKind::Read => "read",
             PermissionKind::Execute => "execute",
+            PermissionKind::Review => "review",
             PermissionKind::ArgumentAwareFile => "file",
             PermissionKind::ArgumentAwareSessionFolders => "session-folders",
         }
@@ -1814,6 +1817,20 @@ impl ToolRegistry {
         self.lock().catalog_generation
     }
 
+    /// 最终持久化检查与提交共用目录锁，禁止检查之后再跨代发布。
+    /// 闭包不能再次访问目录，以免重复获取同一个锁。
+    pub fn with_catalog_generation<T>(
+        &self,
+        expected: u64,
+        commit: impl FnOnce() -> T,
+    ) -> Option<T> {
+        let state = self.lock();
+        if state.catalog_generation != expected {
+            return None;
+        }
+        Some(commit())
+    }
+
     /// Updates a target's manifest (version, schema, description, …).
     /// The target's lifecycle generation AND the catalog generation
     /// advance: every description snapshot taken before the update is
@@ -2195,6 +2212,58 @@ mod tests {
     use super::*;
     use lingxi_protocol::digest_arguments;
     use serde_json::json;
+
+    #[test]
+    fn final_commit_generation_lock_blocks_actual_catalog_mutation() {
+        use std::{
+            sync::{mpsc, Arc},
+            time::Duration,
+        };
+        let registry = Arc::new(ToolRegistry::new());
+        let receipt = registry
+            .register(
+                read_manifest(ToolOrigin::FirstParty, "read", "Read"),
+                &budget(),
+            )
+            .unwrap();
+        let generation = registry.catalog_generation();
+        let (entered_tx, entered_rx) = mpsc::channel();
+        let (release_tx, release_rx) = mpsc::channel();
+        let saved_registry = Arc::clone(&registry);
+        let commit = std::thread::spawn(move || {
+            saved_registry
+                .with_catalog_generation(generation, || {
+                    entered_tx.send(()).unwrap();
+                    release_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+                })
+                .expect("同代允许保存裁决");
+        });
+        entered_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+        let (changed_tx, changed_rx) = mpsc::channel();
+        let changed_registry = Arc::clone(&registry);
+        let change = std::thread::spawn(move || {
+            changed_registry
+                .set_availability(
+                    &receipt.target_id,
+                    Availability::Disabled {
+                        reason: "真实并发禁用".into(),
+                    },
+                )
+                .unwrap();
+            changed_tx.send(()).unwrap();
+        });
+        assert!(
+            changed_rx.recv_timeout(Duration::from_millis(100)).is_err(),
+            "最终裁决到保存之间不能跨代"
+        );
+        release_tx.send(()).unwrap();
+        commit.join().unwrap();
+        changed_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+        change.join().unwrap();
+        assert!(registry
+            .with_catalog_generation(generation, || panic!("旧代次不能保存"))
+            .is_none());
+    }
 
     fn budget() -> SchemaBudget {
         SchemaBudget::default()

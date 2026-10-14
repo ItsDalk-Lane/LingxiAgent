@@ -28,6 +28,8 @@
 //!   `auxiliary.summarize` usage 记录——成功、失败、取消都有账
 //!   （R05 RR1 F21/F38 纪律）。
 
+use serde_json::Value;
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use lingxi_adapters::models::auxiliary::{AuxiliaryExecutor, AuxiliaryRequest, AuxiliaryStep};
@@ -48,6 +50,63 @@ use lingxi_protocol::{ContentBlock, ModelCallId, ToolCallId};
 use crate::cancel::CancelScope;
 use crate::inject::ServiceClock;
 use crate::quotas::{QuotaManager, QuotaResource};
+
+/// 现役 SettingsManager 的三项设置；缺省 reserve 继续跟随模型窗口。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CompactionSettings {
+    pub enabled: bool,
+    pub reserve_tokens: Option<u64>,
+    pub keep_recent_tokens: u64,
+}
+impl Default for CompactionSettings {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            reserve_tokens: None,
+            keep_recent_tokens: compaction::KEEP_RECENT_TOKENS,
+        }
+    }
+}
+impl CompactionSettings {
+    pub fn from_config(config: &Value) -> Result<Self, String> {
+        let mut settings = Self::default();
+        let Some(section) = config.get("compaction") else {
+            return Ok(settings);
+        };
+        let map = section.as_object().ok_or("compaction must be an object")?;
+        if let Some(enabled) = map.get("enabled") {
+            settings.enabled = enabled
+                .as_bool()
+                .ok_or("compaction.enabled must be a boolean")?;
+        }
+        for key in ["reserveTokens", "keepRecentTokens"] {
+            if let Some(value) = map.get(key) {
+                // 与 SDK 的 Number.isSafeInteger + 非负约束一致，不把坏设置读成默认。
+                let tokens = value
+                    .as_u64()
+                    .filter(|n| *n <= 9_007_199_254_740_991)
+                    .ok_or_else(|| {
+                        format!("compaction.{key} must be a non-negative safe integer")
+                    })?;
+                if key == "reserveTokens" {
+                    settings.reserve_tokens = Some(tokens);
+                } else {
+                    settings.keep_recent_tokens = tokens;
+                }
+            }
+        }
+        Ok(settings)
+    }
+    fn budget(&self, window: u64) -> ContextBudget {
+        ContextBudget {
+            context_window: window,
+            reserve_tokens: self
+                .reserve_tokens
+                .unwrap_or_else(|| compaction::compute_reserve_tokens(window)),
+            keep_recent_tokens: self.keep_recent_tokens,
+        }
+    }
+}
 
 /// 压缩触发评估 + 执行的输入事实（driver 在 loop 顶采集）。
 pub struct MidRunCompactionInput<'a> {
@@ -116,6 +175,10 @@ pub struct CompactionService {
     gateway: Arc<ConfigModelGateway>,
     quotas: Arc<QuotaManager>,
     clock: Arc<dyn ServiceClock>,
+    settings_root: std::sync::RwLock<Option<PathBuf>>,
+    manual_cancels: std::sync::Mutex<
+        std::collections::HashMap<String, (CancelScope, Arc<std::sync::atomic::AtomicU8>)>,
+    >,
 }
 
 impl std::fmt::Debug for CompactionService {
@@ -136,7 +199,111 @@ impl CompactionService {
             gateway,
             quotas,
             clock,
+            settings_root: std::sync::RwLock::new(None),
+            manual_cancels: std::sync::Mutex::new(std::collections::HashMap::new()),
         }
+    }
+
+    /// 组合根绑定真实助手配置根；同一实例不能跨资料根串用。
+    pub fn bind_agent_settings_root(&self, root: PathBuf) -> Result<(), StorageError> {
+        let mut stored = self
+            .settings_root
+            .write()
+            .map_err(|_| StorageError::Internal {
+                detail: "compaction settings lock poisoned".into(),
+            })?;
+        if stored.as_ref().is_some_and(|existing| existing != &root) {
+            return Err(StorageError::InvalidRequest {
+                detail: "compaction service already bound to another home".into(),
+            });
+        }
+        *stored = Some(root);
+        Ok(())
+    }
+    pub fn settings_for(&self, agent_id: &str) -> Result<CompactionSettings, StorageError> {
+        let root = self
+            .settings_root
+            .read()
+            .map_err(|_| StorageError::Internal {
+                detail: "compaction settings lock poisoned".into(),
+            })?
+            .clone();
+        let Some(root) = root else {
+            return Ok(CompactionSettings::default());
+        };
+        lingxi_adapters::storage::agent_memory::validate_agent_id(agent_id).map_err(|e| {
+            StorageError::InvalidRequest {
+                detail: e.to_string(),
+            }
+        })?;
+        let config = lingxi_adapters::storage::agent_memory::config::read_yaml_mapping_as_json(
+            &root.join(agent_id).join("config.yaml"),
+        )
+        .map_err(|e| StorageError::InvalidRequest {
+            detail: format!("compaction settings: {e}"),
+        })?
+        .unwrap_or_else(|| serde_json::json!({}));
+        CompactionSettings::from_config(&config)
+            .map_err(|detail| StorageError::InvalidRequest { detail })
+    }
+    pub fn register_manual_cancel(
+        &self,
+        session: &str,
+        cancel: CancelScope,
+    ) -> Result<Arc<std::sync::atomic::AtomicU8>, StorageError> {
+        let mut pending = self
+            .manual_cancels
+            .lock()
+            .map_err(|_| StorageError::Internal {
+                detail: "manual compaction lock poisoned".into(),
+            })?;
+        if pending.contains_key(session) {
+            return Err(StorageError::Conflict {
+                detail: "manual compaction already active".into(),
+            });
+        }
+        // 0=可取消；1=取消获胜；2=事务提交裁决获胜（不能再报告取消成功）。
+        let phase = Arc::new(std::sync::atomic::AtomicU8::new(0));
+        pending.insert(session.into(), (cancel, phase.clone()));
+        Ok(phase)
+    }
+    pub fn finish_manual(&self, session: &str) {
+        let mut pending = self
+            .manual_cancels
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if let Some((cancel, phase)) = pending.remove(session) {
+            let _ = phase.compare_exchange(
+                0,
+                1,
+                std::sync::atomic::Ordering::SeqCst,
+                std::sync::atomic::Ordering::SeqCst,
+            );
+            cancel.cancel("manual compaction scope closed");
+        }
+    }
+    pub fn cancel_manual(&self, session: &str) -> Result<bool, StorageError> {
+        let pending = self
+            .manual_cancels
+            .lock()
+            .map_err(|_| StorageError::Internal {
+                detail: "manual compaction lock poisoned".into(),
+            })?;
+        Ok(pending.get(session).is_some_and(|(cancel, phase)| {
+            if phase
+                .compare_exchange(
+                    0,
+                    1,
+                    std::sync::atomic::Ordering::SeqCst,
+                    std::sync::atomic::Ordering::SeqCst,
+                )
+                .is_err()
+            {
+                return false;
+            }
+            cancel.cancel("manual compaction cancelled");
+            true
+        }))
     }
 
     /// turn 边界的压缩判定与执行（现役 session-compaction-runtime 的
@@ -156,6 +323,10 @@ impl CompactionService {
         cancel: &CancelScope,
         compaction_seq: u32,
     ) -> Result<CompactionOutcome, StorageError> {
+        let settings = self.settings_for(agent_id)?;
+        if !settings.enabled {
+            return Ok(CompactionOutcome::NotTriggered);
+        }
         // ── 1) 窗口解析（chat 路由的声明式 compat；F02 单快照读） ──
         let chat_dispatch = match self
             .gateway
@@ -175,9 +346,10 @@ impl CompactionService {
             .compat
             .as_ref()
             .and_then(|compat| compat.context_window);
-        let Some(budget) = ContextBudget::for_declared_window(window) else {
+        let Some(window) = window.filter(|window| *window > 0) else {
             return Ok(CompactionOutcome::NotTriggered);
         };
+        let budget = settings.budget(window);
         // F-02：判定主信号的族口径——usage 来自 chat 路由族，其 wire input
         // 是否已含 cache 分量由 R05 映射表仲裁（included 绝不重复加计）。
         let usage_inclusion = usage_inclusion_of(chat_dispatch.route.protocol);
@@ -221,23 +393,13 @@ impl CompactionService {
             // R3-F-01：回退链的 chat 腿复用本方法顶部的同代快照（绝不二次
             // 读取跨代混杂——R05 RR1 F02 纪律）。
             Some(&chat_dispatch),
+            None,
         )
         .await
     }
 
-    /// 手动压缩入口（现役 `/compact` → bridge `compactSession` → 同一
-    /// `runCachePreservingCompactionForSession` 管线 的对应物）：跳过
-    /// 阈值判定（用户明确点名要压），窗口未声明时按现役 reserve 公式
-    /// （`max(16384, ceil(0×20%))` = 16384）与固定 keep_recent 执行。
-    /// 窗口解析失败不视为错误（现役手动路径对 contextWindow 返回
-    /// null 的形态）。失败语义与自动路径一致：`Failed` 携带可诊断
-    /// 错误，调用方保留原历史。
-    ///
-    /// 会话命令面（slash 派发）不属于本任务范围——Rust 侧尚无其宿主
-    /// （run 外历史面归 R06-T04）；本入口是触发源无关的执行面，未来
-    /// 命令面直接调它。
-    /// 新Run恢复完整分支时，没有本Run上一调用usage；按标明来源的保守请求估算检查。
-    /// 不改变原mid-run的真实usage判定，避免每次用户输入重新把预算当成空历史。
+    /// 新 Run 恢复分支没有上一调用 usage，按明确来源的保守请求估算检查。
+    /// enabled 只控制自动压缩；关闭时驱动仍必须复检请求是否越过预算。
     #[allow(clippy::too_many_arguments)]
     pub async fn maybe_compact_restored<P: StoragePort>(
         &self,
@@ -251,17 +413,25 @@ impl CompactionService {
         cancel: &CancelScope,
         sequence: u32,
     ) -> Result<CompactionOutcome, StorageError> {
+        let settings = self.settings_for(agent_id)?;
+        if !settings.enabled {
+            return Ok(CompactionOutcome::NotTriggered);
+        }
         let dispatch = self
             .gateway
             .resolve_dispatch(&ModelRouteRequest::for_operation(ModelOperation::Chat))
             .map_err(|e| StorageError::InvalidRequest {
                 detail: e.to_string(),
             })?;
-        let Some(budget) = ContextBudget::for_declared_window(
-            dispatch.compat.as_ref().and_then(|c| c.context_window),
-        ) else {
+        let Some(window) = dispatch
+            .compat
+            .as_ref()
+            .and_then(|c| c.context_window)
+            .filter(|w| *w > 0)
+        else {
             return Ok(CompactionOutcome::NotTriggered);
         };
+        let budget = settings.budget(window);
         let facts = TurnBudgetFacts {
             system_tokens: input
                 .system_prompt
@@ -302,6 +472,7 @@ impl CompactionService {
                 report,
                 false,
                 Some(&dispatch),
+                None,
             )
             .await?;
         Ok(match outcome {
@@ -317,17 +488,35 @@ impl CompactionService {
         &self,
         input: &MidRunCompactionInput<'_>,
     ) -> Result<bool, StorageError> {
+        self.restored_request_fits_with_settings(input, &CompactionSettings::default())
+    }
+    pub fn restored_request_fits_for_agent(
+        &self,
+        agent_id: &str,
+        input: &MidRunCompactionInput<'_>,
+    ) -> Result<bool, StorageError> {
+        self.restored_request_fits_with_settings(input, &self.settings_for(agent_id)?)
+    }
+    fn restored_request_fits_with_settings(
+        &self,
+        input: &MidRunCompactionInput<'_>,
+        settings: &CompactionSettings,
+    ) -> Result<bool, StorageError> {
         let dispatch = self
             .gateway
             .resolve_dispatch(&ModelRouteRequest::for_operation(ModelOperation::Chat))
             .map_err(|e| StorageError::InvalidRequest {
                 detail: e.to_string(),
             })?;
-        let Some(budget) = ContextBudget::for_declared_window(
-            dispatch.compat.as_ref().and_then(|c| c.context_window),
-        ) else {
+        let Some(window) = dispatch
+            .compat
+            .as_ref()
+            .and_then(|c| c.context_window)
+            .filter(|w| *w > 0)
+        else {
             return Ok(true);
         };
+        let budget = settings.budget(window);
         let tokens = input
             .system_prompt
             .map(|s| u64::from(estimate_text_tokens(s)))
@@ -351,6 +540,35 @@ impl CompactionService {
         cancel: &CancelScope,
         compaction_seq: u32,
     ) -> Result<CompactionOutcome, StorageError> {
+        self.compact_now_with_focus(
+            ctx,
+            port,
+            agent_id,
+            origin,
+            parent_run_id,
+            cause_ref,
+            input,
+            cancel,
+            compaction_seq,
+            None,
+        )
+        .await
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub async fn compact_now_with_focus<P: StoragePort>(
+        &self,
+        ctx: &RunContext,
+        port: &P,
+        agent_id: &str,
+        origin: &'static str,
+        parent_run_id: Option<String>,
+        cause_ref: Option<String>,
+        input: &MidRunCompactionInput<'_>,
+        cancel: &CancelScope,
+        compaction_seq: u32,
+        custom_focus: Option<&str>,
+    ) -> Result<CompactionOutcome, StorageError> {
+        let settings = self.settings_for(agent_id)?;
         let chat_dispatch = self
             .gateway
             .resolve_dispatch(&ModelRouteRequest::for_operation(ModelOperation::Chat))
@@ -366,11 +584,7 @@ impl CompactionService {
             .as_ref()
             .map(|dispatch| usage_inclusion_of(dispatch.route.protocol))
             .unwrap_or_default();
-        let budget = ContextBudget {
-            context_window: window,
-            reserve_tokens: compaction::compute_reserve_tokens(window),
-            keep_recent_tokens: compaction::KEEP_RECENT_TOKENS,
-        };
+        let budget = settings.budget(window);
         let tail_from = input.tail_from.min(input.exchange.len());
         let facts = TurnBudgetFacts {
             system_tokens: input
@@ -400,6 +614,7 @@ impl CompactionService {
             // 现役 `/compact`（bridge compactSession）不追加 mid-run 通知。
             false,
             chat_dispatch.as_ref(),
+            custom_focus,
         )
         .await
     }
@@ -427,6 +642,7 @@ impl CompactionService {
         report: TurnBudgetReport,
         mid_run: bool,
         chat_dispatch: Option<&ResolvedDispatch>,
+        custom_focus: Option<&str>,
     ) -> Result<CompactionOutcome, StorageError> {
         // ── 3) 切点规划（工具配对不可证明 = 响亮拒绝，run 续跑） ──
         let plan = match compaction::plan_compaction(input.exchange, budget.keep_recent_tokens) {
@@ -501,7 +717,7 @@ impl CompactionService {
             compaction::build_summary_instruction(&compaction::SummaryInstructionSpec {
                 old_region_items: plan.cut_index,
                 split_turn,
-                custom_focus: None,
+                custom_focus: custom_focus.map(str::to_string),
             });
 
         // ── 6) fit 检查（现役 session-compactor.ts:2064-2083，摘要模型
@@ -989,8 +1205,17 @@ impl CompactionService {
     ) -> Result<(), StorageError> {
         let record = lingxi_kernel::usage::ModelCallUsageRecord {
             session_id: Some(ctx.session_id.to_string()),
-            run_id: Some(ctx.run_id.to_string()),
-            attempt: Some(ctx.attempt.to_string()),
+            // 手动 action 只是辅助请求关联，绝不创建假 Run/输入或写假外键。
+            run_id: (!matches!(
+                ledger.origin,
+                "session.manual_compact" | "session.fresh_compact"
+            ))
+            .then(|| ctx.run_id.to_string()),
+            attempt: (!matches!(
+                ledger.origin,
+                "session.manual_compact" | "session.fresh_compact"
+            ))
+            .then(|| ctx.attempt.to_string()),
             model_call_id: call_id.as_str().to_string(),
             purpose: format!("auxiliary.{}", AuxiliarySlot::Summarize.config_key()),
             origin: ledger.origin.to_string(),

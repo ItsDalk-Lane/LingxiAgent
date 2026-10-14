@@ -1284,6 +1284,8 @@ pub enum ToolOutcome {
 /// over the canonical content and never replaces it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolSuccess {
+    /// 工具的结构化业务字段；正文与这些字段分别保留。
+    pub details: Option<serde_json::Map<String, serde_json::Value>>,
     /// Actual content blocks of the result (text, resource refs, provider
     /// opaque payloads).
     pub content: Vec<lingxi_protocol::ContentBlock>,
@@ -1335,6 +1337,7 @@ impl ToolSuccess {
         let value = serde_json::to_value(&content).expect("content blocks serialize to JSON");
         let canonical = lingxi_protocol::canon::canonical_json_bytes(&value);
         Self {
+            details: None,
             content,
             resource_refs: Vec::new(),
             truncated: false,

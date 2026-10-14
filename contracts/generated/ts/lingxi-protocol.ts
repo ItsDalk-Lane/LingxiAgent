@@ -211,6 +211,8 @@ success/failed/cancelled/unknown, carries content blocks, resource refs,
 truncation and the error with retry semantics). */
 export type ToolResultWire = {
   content?: ContentBlock[];
+  /** 可选业务字段；旧消息缺字段时仍可读取。 */
+  details?: Record<string, unknown> | null;
   error?: ProtocolError | null;
   resourceRefs?: ResourceRef[];
   status: ToolResultStatus;

@@ -20,7 +20,7 @@ use lingxi_protocol::canon;
 use lingxi_protocol::{EventEnvelope, EventId, EventPayload, Seq, SessionId, StreamId};
 
 use super::migrations;
-use super::run_store::{with_write_txn, RunDatabase};
+use super::run_store::{with_write_txn, with_write_txn_guarded, RunDatabase};
 use super::session_operations::{self, Operation};
 
 /// fork 源会话行快照（agent/owner/title/权限档/授权目录 JSON/谱系深度）。
@@ -204,6 +204,28 @@ pub async fn seed_session(db: &RunDatabase, req: SeedSession<'_>) -> Result<(), 
 
 /// 追加消息（message 或标记条目）。seq 由会话内 MAX(seq)+1 分配。
 pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<(), StorageError> {
+    append_message_checked(db, req, None).await
+}
+/// 手动档案最终保存裁决；实现必须同步执行，不得在持有DB写锁时等待异步队列。
+pub trait ManualCompactionCommit: Send + Sync {
+    fn allowed(&self) -> bool;
+    fn commit(
+        &self,
+        write: &mut dyn FnMut() -> Result<(), StorageError>,
+    ) -> Result<(), StorageError>;
+}
+pub async fn append_manual_compaction(
+    db: &RunDatabase,
+    req: AppendMessage<'_>,
+    allowed: std::sync::Arc<dyn ManualCompactionCommit>,
+) -> Result<(), StorageError> {
+    append_message_checked(db, req, Some(allowed)).await
+}
+async fn append_message_checked(
+    db: &RunDatabase,
+    req: AppendMessage<'_>,
+    allowed: Option<std::sync::Arc<dyn ManualCompactionCommit>>,
+) -> Result<(), StorageError> {
     let session_id = req.session_id.to_string();
     let message_id = req.message_id.to_string();
     let parent = req.parent_message_id.map(str::to_string);
@@ -216,7 +238,7 @@ pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<
     let busy = db.options().busy_timeout_ms;
     db.queue()
         .submit(move |conn| {
-            with_write_txn(conn, busy, |conn| {
+            let append = |conn: &rusqlite::Connection| {
                 // 模型档案只允许接在读取到的同一有效头；检查和写入共用事务。
                 if entry_type == "lingxi-model-exchange-v1" {
                     let head: Option<String> = conn
@@ -234,6 +256,16 @@ pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<
                                 .into(),
                         });
                     }
+                }
+                if let Some(allowed) = &allowed {
+                    let body: serde_json::Value = serde_json::from_str(&content).map_err(|e| StorageError::Corrupted { detail: format!("manual archive JSON: {e}") })?;
+                    let revision: i64 = conn.query_row("SELECT revision FROM session_branch_heads WHERE session_id=?1", [&session_id], |r| r.get(0)).optional().map_err(map_err)?.unwrap_or(0);
+                    let facts: Option<(String,String,String)> = conn.query_row("SELECT owner_user_id,agent_id,lifecycle FROM sessions WHERE session_id=?1", [&session_id], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?))).optional().map_err(map_err)?;
+                    if entry_type != "lingxi-model-exchange-v1" || body["sourceKind"] != "manual_compaction"
+                        || body["preRevision"].as_u64() != u64::try_from(revision).ok()
+                        || facts.as_ref().is_none_or(|(owner,agent,lifecycle)| body["owner"] != *owner || body["agent"] != *agent || lifecycle != "active")
+                    { return Err(StorageError::Conflict { detail: "manual compaction source revision/session changed before commit".into() }); }
+                    if !allowed.allowed() { return Err(StorageError::Conflict { detail: "manual compaction cancelled before commit".into() }); }
                 }
                 let seq: i64 = conn
                     .query_row(
@@ -283,7 +315,11 @@ pub async fn append_message(db: &RunDatabase, req: AppendMessage<'_>) -> Result<
                 )
                 .map_err(map_err)?;
                 Ok(())
-            })
+            };
+            match &allowed {
+                Some(guard) => with_write_txn_guarded(conn, busy, append, &mut |write| guard.commit(write)),
+                None => with_write_txn(conn, busy, append),
+            }
         })
         .await?;
     Ok(())
@@ -795,30 +831,54 @@ pub async fn fork_session_committed_with_files(
                                 detail: "model_history fork scope/digest disagreement".into(),
                             });
                         }
-                        let source_run = body["sourceRun"]
-                            .as_str()
-                            .filter(|id| !id.is_empty())
-                            .ok_or_else(|| StorageError::Corrupted {
-                                detail: "model_history fork source Run missing".into(),
-                            })?;
-                        if body["sourceSession"].as_str().is_none_or(str::is_empty)
-                            || !rows.iter().any(|r| r.0 == format!("user:{source_run}"))
-                            || !matches!(
-                                body["payload"]["mode"].as_str(),
-                                Some("append" | "replace")
-                            )
-                            || body["payload"]["items"].as_array().is_none_or(|items| {
-                                items.iter().any(|item| {
-                                    !matches!(
-                                        item["kind"].as_str(),
-                                        Some("user" | "assistant" | "tool" | "summary")
-                                    )
+                        if body.get("sourceKind").is_some() {
+                            let action = body["sourceAction"]
+                                .as_str()
+                                .filter(|id| id.starts_with("compact-action-"))
+                                .ok_or_else(|| StorageError::Corrupted {
+                                    detail: "manual fork missing action identity".into(),
+                                })?;
+                            if body["sourceKind"] != "manual_compaction"
+                                || body.get("sourceRun").is_some()
+                                || mid != &format!("model-history:manual:{action}")
+                                || body["preHead"].as_str() != _old_parent.as_deref()
+                                || body["preRevision"].as_u64().is_none()
+                                || body["payload"]["mode"] != "replace"
+                                || body["payload"]["items"].as_array().is_none_or(|items| {
+                                    items.first().is_none_or(|item| item["kind"] != "summary")
                                 })
-                            })
-                        {
-                            return Err(StorageError::Corrupted {
-                                detail: "model_history fork source/structure disagreement".into(),
-                            });
+                            {
+                                return Err(StorageError::Corrupted {
+                                    detail: "manual fork action/structure disagreement".into(),
+                                });
+                            }
+                        } else {
+                            let source_run = body["sourceRun"]
+                                .as_str()
+                                .filter(|id| !id.is_empty())
+                                .ok_or_else(|| StorageError::Corrupted {
+                                    detail: "model_history fork source Run missing".into(),
+                                })?;
+                            if body["sourceSession"].as_str().is_none_or(str::is_empty)
+                                || !rows.iter().any(|r| r.0 == format!("user:{source_run}"))
+                                || !matches!(
+                                    body["payload"]["mode"].as_str(),
+                                    Some("append" | "replace")
+                                )
+                                || body["payload"]["items"].as_array().is_none_or(|items| {
+                                    items.iter().any(|item| {
+                                        !matches!(
+                                            item["kind"].as_str(),
+                                            Some("user" | "assistant" | "tool" | "summary")
+                                        )
+                                    })
+                                })
+                            {
+                                return Err(StorageError::Corrupted {
+                                    detail: "model_history fork source/structure disagreement"
+                                        .into(),
+                                });
+                            }
                         }
                         body["boundSession"] = serde_json::json!(new_id);
                         body["digest"] = serde_json::json!(canon::sha256_hex(

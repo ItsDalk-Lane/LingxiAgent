@@ -466,6 +466,14 @@
           },
           "type": "array"
         },
+        "details": {
+          "additionalProperties": true,
+          "description": "可选业务字段；旧消息缺字段时仍可读取。",
+          "type": [
+            "object",
+            "null"
+          ]
+        },
         "error": {
           "anyOf": [
             {

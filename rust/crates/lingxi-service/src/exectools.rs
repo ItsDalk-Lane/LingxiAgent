@@ -148,6 +148,7 @@ fn text_success(
     let canonical = lingxi_protocol::canon::canonical_json_bytes(&value);
     ToolOutcome::Success {
         result: ToolSuccess {
+            details: None,
             content_digest: hex(&Sha256::digest(&canonical)),
             content,
             resource_refs,

@@ -389,6 +389,102 @@ fn assert_no_temp_residue(root: &Path) {
     }
 }
 
+#[cfg(target_os = "macos")]
+#[tokio::test]
+async fn native_write_refuses_missing_or_untrusted_sandbox_without_creating_or_overwriting() {
+    let h = file_harness(StepsProvider::new(vec![])).await;
+    let ctx = kernel_ctx("sandbox-write", "sandbox-write-run");
+    let target = h.ws.join("user.txt");
+    std::fs::write(&target, "用户后改内容".as_bytes()).unwrap();
+    let helper = h.root.join("missing-helper/sandbox-exec");
+    h.core
+        .tools
+        .set_native_write_helper_test_override(Some(helper.clone()));
+    for (index, path) in ["user.txt", "not-created/child.txt"].iter().enumerate() {
+        let result = call_file_tool(
+            &h,
+            &ctx,
+            &format!("missing-{index}"),
+            &h.core.write_target,
+            json!({"path":path,"content":"不得写入"}),
+        )
+        .await
+        .unwrap();
+        assert!(error_text(&result).contains("sandbox_helper_missing"));
+        assert_eq!(std::fs::read(&target).unwrap(), "用户后改内容".as_bytes());
+        assert!(!h.ws.join("not-created").exists());
+        assert_no_temp_residue(&h.root);
+    }
+    std::fs::create_dir_all(helper.parent().unwrap()).unwrap();
+    std::fs::write(&helper, b"#!/bin/sh\nexit 0\n").unwrap();
+    let result = call_file_tool(
+        &h,
+        &ctx,
+        "untrusted-helper",
+        &h.core.write_target,
+        json!({"path":"user.txt","content":"不得覆盖"}),
+    )
+    .await
+    .unwrap();
+    assert!(error_text(&result).contains("sandbox_helper_untrusted"));
+    assert_eq!(std::fs::read(&target).unwrap(), "用户后改内容".as_bytes());
+    assert_no_temp_residue(&h.root);
+    assert_eq!(h.changes.records.lock().unwrap().len(), 0);
+    let read = call_file_tool(
+        &h,
+        &ctx,
+        "read-before-denied-edit",
+        &h.core.read_target,
+        json!({"path":"user.txt"}),
+    )
+    .await
+    .unwrap();
+    assert!(matches!(read.outcome, ToolOutcome::Success { .. }));
+    std::fs::remove_file(&helper).unwrap();
+    let edit = call_file_tool(
+        &h,
+        &ctx,
+        "edit-with-missing-helper",
+        &h.core.edit_target,
+        json!({"path":"user.txt","edits":[{"oldText":"用户后改内容","newText":"不得写入"}]}),
+    )
+    .await
+    .unwrap();
+    assert!(error_text(&edit).contains("sandbox_helper_missing"));
+    assert_eq!(std::fs::read(&target).unwrap(), "用户后改内容".as_bytes());
+    assert_eq!(h.changes.records.lock().unwrap().len(), 0);
+    assert_no_temp_residue(&h.root);
+    // 恢复真实系统助手，真实写入成功；随后再次不可用必须重新拒绝，不能缓存旧成功。
+    h.core.tools.set_native_write_helper_test_override(None);
+    let result = call_file_tool(
+        &h,
+        &ctx,
+        "real-helper",
+        &h.core.write_target,
+        json!({"path":"user.txt","content":"真实成功字节"}),
+    )
+    .await
+    .unwrap();
+    assert!(matches!(result.outcome, ToolOutcome::Success { .. }));
+    assert_eq!(std::fs::read(&target).unwrap(), "真实成功字节".as_bytes());
+    h.core
+        .tools
+        .set_native_write_helper_test_override(Some(helper));
+    let result = call_file_tool(
+        &h,
+        &ctx,
+        "missing-after-success",
+        &h.core.write_target,
+        json!({"path":"user.txt","content":"不能缓存成功"}),
+    )
+    .await
+    .unwrap();
+    assert!(error_text(&result).contains("sandbox_helper_missing"));
+    assert_eq!(std::fs::read(&target).unwrap(), "真实成功字节".as_bytes());
+    assert_no_temp_residue(&h.root);
+    teardown(&h).await;
+}
+
 // ── R04-A07: concurrent edit does not overwrite the user's change ──────────
 
 /// The FULL real chain: the tool reads version 1; the USER (an external

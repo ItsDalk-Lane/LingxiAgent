@@ -1,0 +1,71 @@
+{
+  "status": "EXECUTED_TEST_BOUND_NOT_STAGE_ACCEPTANCE",
+  "leaf": "R00-T02-LA-4F0466F7C090",
+  "proof": {
+    "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+    "test": "native_write_refuses_missing_or_untrusted_sandbox_without_creating_or_overwriting",
+    "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+    "testStartLine": 394,
+    "testEndLine": 486,
+    "assertions": [
+      {
+        "line": 413,
+        "quote": "assert!(error_text(&result).contains(\"sandbox_helper_missing\"))"
+      },
+      {
+        "line": 414,
+        "quote": "assert_eq!(std::fs::read(&target).unwrap(), \"用户后改内容\".as_bytes())"
+      },
+      {
+        "line": 415,
+        "quote": "assert!(!h.ws.join(\"not-created\").exists())"
+      },
+      {
+        "line": 429,
+        "quote": "assert!(error_text(&result).contains(\"sandbox_helper_untrusted\"))"
+      },
+      {
+        "line": 430,
+        "quote": "assert_eq!(std::fs::read(&target).unwrap(), \"用户后改内容\".as_bytes())"
+      },
+      {
+        "line": 432,
+        "quote": "assert_eq!(h.changes.records.lock().unwrap().len(), 0)"
+      },
+      {
+        "line": 442,
+        "quote": "assert!(matches!(read.outcome, ToolOutcome::Success { .. }))"
+      },
+      {
+        "line": 453,
+        "quote": "assert!(error_text(&edit).contains(\"sandbox_helper_missing\"))"
+      },
+      {
+        "line": 454,
+        "quote": "assert_eq!(std::fs::read(&target).unwrap(), \"用户后改内容\".as_bytes())"
+      },
+      {
+        "line": 455,
+        "quote": "assert_eq!(h.changes.records.lock().unwrap().len(), 0)"
+      },
+      {
+        "line": 468,
+        "quote": "assert!(matches!(result.outcome, ToolOutcome::Success { .. }))"
+      },
+      {
+        "line": 469,
+        "quote": "assert_eq!(std::fs::read(&target).unwrap(), \"真实成功字节\".as_bytes())"
+      },
+      {
+        "line": 482,
+        "quote": "assert!(error_text(&result).contains(\"sandbox_helper_missing\"))"
+      },
+      {
+        "line": 483,
+        "quote": "assert_eq!(std::fs::read(&target).unwrap(), \"真实成功字节\".as_bytes())"
+      }
+    ]
+  },
+  "scope": "补齐OS沙盒不可用拒绝这一条款；文件范围/原子性由既有FileTools/FileSafety证明。不宣称父进程文件写入在OS隔离子进程中执行。",
+  "environmentCorrection": "r04_t06拒写sentinel位于编译期CARGO_TARGET_TMPDIR；target必须在/private/tmp与TMPDIR之外，不能将本就允许的临时目录误当拒写区域。"
+}

@@ -37,11 +37,36 @@ use crate::ServiceState;
 pub struct MemoryService {
     home: PathBuf,
     runtime_dir: PathBuf,
+    search_embedder:
+        std::sync::Mutex<Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>>>,
 }
 
 impl MemoryService {
     pub fn new(home: PathBuf, runtime_dir: PathBuf) -> Self {
-        Self { home, runtime_dir }
+        Self {
+            home,
+            runtime_dir,
+            search_embedder: std::sync::Mutex::new(None),
+        }
+    }
+
+    /// 复用模型网关的真实嵌入链；未接线与未配置模型分别报告。
+    pub fn set_search_embedder(
+        &self,
+        embedder: Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>>,
+    ) {
+        *self
+            .search_embedder
+            .lock()
+            .unwrap_or_else(|p| p.into_inner()) = embedder;
+    }
+    pub fn search_embedder(
+        &self,
+    ) -> Option<std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>> {
+        self.search_embedder
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
     }
 
     pub fn home(&self) -> &Path {
@@ -621,9 +646,7 @@ pub async fn memories_week_day_put_route(
     }
 }
 
-/// DELETE /lingxi/v1/memories/compiled?agentId= (config.ts:590-604): reset
-/// marker + clear compiled artifacts (fact sources clearing belongs to the
-/// summary store the candidate has not migrated — reported, not faked).
+/// 清除当前助手的编译产物及直接 JSON 总结来源，留下重置标记，保留原始事实。
 pub async fn memories_compiled_delete_route(
     State(state): State<ServiceState>,
     RawQuery(query): RawQuery,
@@ -644,8 +667,7 @@ pub async fn memories_compiled_delete_route(
     }
 }
 
-/// DELETE /lingxi/v1/memories?agentId= (config.ts:607-626): facts.db clearAll
-/// + compiled reset/clear.
+/// 清除当前助手的事实、编译产物及直接 JSON 总结来源，留下重置标记。
 pub async fn memories_delete_route(
     State(state): State<ServiceState>,
     RawQuery(query): RawQuery,

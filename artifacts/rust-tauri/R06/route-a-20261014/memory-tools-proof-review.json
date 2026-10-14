@@ -1,0 +1,32 @@
+{
+  "status": "EXECUTED_TESTS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "leaves": {
+    "R00-T02-LA-0779DAF64B03": {
+      "tests": [
+        "unpin_review_actual_scope_structured_counts_history_and_agent_isolation",
+        "unpin_changed_matches_during_confirmation_refuse_all_deletions",
+        "large_native_details_share_projection_budget_keep_raw_and_restore_same_projection"
+      ],
+      "coverage": "FULL"
+    },
+    "R00-T02-LA-7432B00DEC94": {
+      "tests": [
+        "memory_search_status_no_hits_not_searched_and_agent_channel_isolation",
+        "memory_semantic_real_provider_no_model_no_coverage_timeout_and_actual_vector_hits",
+        "large_native_details_share_projection_budget_keep_raw_and_restore_same_projection"
+      ],
+      "coverage": "FULL"
+    },
+    "R00-T02-LA-A17D742E55B7": {
+      "tests": [
+        "record_and_recall_registered_tools_preserve_failures_and_agent_boundaries",
+        "independent_concurrent_record_successes_are_all_recallable",
+        "experience_record_sync_rebuild_and_rollback_share_one_agent_operation_gate",
+        "experience_failed_index_publish_keeps_operation_gate_through_document_rollback",
+        "experience_operation_gate_survives_memory_directory_creation_and_agent_path_alias",
+        "large_native_details_share_projection_budget_keep_raw_and_restore_same_projection"
+      ],
+      "coverage": "FULL"
+    }
+  }
+}

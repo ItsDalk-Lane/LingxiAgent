@@ -79,6 +79,36 @@ fn text_success(text: String) -> ToolOutcome {
     }
 }
 
+fn success_details(text: String, details: Value) -> ToolOutcome {
+    let mut result = lingxi_kernel::ports::ToolSuccess::text(text);
+    result.details = Some(details.as_object().expect("业务字段必须是对象").clone());
+    ToolOutcome::Success { result }
+}
+
+fn matched_pins(
+    store: &am::TenetsStore,
+    args: &Value,
+) -> Result<Vec<(String, String)>, am::MemoryError> {
+    let id = args.get("id").and_then(Value::as_str).unwrap_or("").trim();
+    let keyword = args
+        .get("keyword")
+        .and_then(Value::as_str)
+        .unwrap_or("")
+        .replace("\r\n", "\n")
+        .replace('\r', "\n")
+        .trim()
+        .to_lowercase();
+    Ok(store
+        .active_checked()?
+        .into_iter()
+        .filter(|t| {
+            (!id.is_empty() && t.id == id)
+                || (!keyword.is_empty() && t.content.to_lowercase().contains(&keyword))
+        })
+        .map(|t| (t.id, t.content))
+        .collect())
+}
+
 fn args_of(request: &lingxi_kernel::ports::ToolRequest) -> Value {
     request.arguments.as_value().clone()
 }
@@ -100,6 +130,8 @@ enum ToolKind {
     TenetPropose,
     ContextNotes,
     InstallSkill,
+    RecordExperience,
+    RecallExperience,
 }
 
 impl MemoryTools {
@@ -114,7 +146,12 @@ impl MemoryTools {
         }
     }
 
-    fn run_search_memory(&self, args: &Value) -> ToolOutcome {
+    async fn run_search_memory(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+        call: &ToolCallId,
+        args: &Value,
+    ) -> ToolOutcome {
         let agent = match self.bound_agent() {
             Ok(agent) => agent,
             Err(outcome) => return outcome,
@@ -128,11 +165,16 @@ impl MemoryTools {
             Err(err) => return failed(ErrorCode::Internal, err.to_string()),
         };
         if size == 0 {
-            return text_success(
+            return success_details(
                 "Memory is empty — no facts are stored for this agent yet.".into(),
+                json!({"retrieval":"empty_store", "semantic":"not_searched", "facts":[]}),
             );
         }
-        let query = args.get("query").and_then(Value::as_str).unwrap_or("");
+        let query = args
+            .get("query")
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .trim();
         let tags: Vec<String> = args
             .get("tags")
             .and_then(Value::as_array)
@@ -147,108 +189,216 @@ impl MemoryTools {
         let date_to = args
             .get("date_to")
             .and_then(Value::as_str)
-            .map(|v| format!("{v}T23:59"));
+            .map(|d| format!("{d}T23:59"));
+        let cross_channel = args
+            .get("cross_channel")
+            .and_then(Value::as_bool)
+            .unwrap_or(false);
+        let visible = |row: &am::FactRow| {
+            !ctx.session_id.as_str().starts_with("channel-")
+                || cross_channel
+                || !row
+                    .session_id
+                    .as_deref()
+                    .unwrap_or("")
+                    .starts_with("channel-")
+                || row.session_id.as_deref() == Some(ctx.session_id.as_str())
+        };
         let mut results: Vec<(am::FactRow, &'static str)> = Vec::new();
-        let mut seen: std::collections::HashSet<i64> = std::collections::HashSet::new();
-        // Strategy 1: tag match (memory-search.ts:157-168)
+        let mut seen = std::collections::HashSet::new();
         if !tags.is_empty() {
-            if let Ok(rows) = store.search_by_tags(&tags, date_from, date_to.as_deref(), 15) {
-                for row in rows {
+            let rows = match store.search_by_tags(&tags, date_from, date_to.as_deref(), 15) {
+                Ok(rows) => rows,
+                Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+            };
+            for row in rows {
+                if visible(&row) && seen.insert(row.id) {
+                    results.push((row, "tag"));
+                }
+            }
+        }
+        let mut searched = !tags.is_empty();
+        let mut semantic = if results.len() >= 3 {
+            "skipped_tag_sufficient"
+        } else {
+            "not_searched"
+        };
+        let mut coverage = None;
+        if results.len() < 3 && !query.is_empty() {
+            searched = true;
+            let fts = match store.search_full_text(query, 10) {
+                Ok(rows) => rows.into_iter().filter(visible).collect::<Vec<_>>(),
+                Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+            };
+            let mut semantic_rows = Vec::new();
+            semantic = "not_configured";
+            if let Some(embedder) = self.memory.search_embedder() {
+                match embedder.identity() {
+                    Ok(None) => semantic = "unavailable_no_model",
+                    Err(_) => semantic = "unavailable_unresolvable",
+                    Ok(Some(_)) => {
+                        let mut runtime = match crate::toolgateway::knowledge_runtime(ctx, call) {
+                            Ok(runtime) => runtime,
+                            Err(err) => return ToolOutcome::Failed { error: err },
+                        };
+                        runtime.cancel = runtime.cancel.child(
+                            format!("memory-query:{}", call),
+                            crate::cancel::ScopeKind::ModelCall,
+                        );
+                        let attempt = tokio::time::timeout(
+                            std::time::Duration::from_secs(2),
+                            embedder.embed_owned(
+                                vec![query.into()],
+                                crate::knowledge::EmbeddingInputType::Query,
+                                &runtime,
+                                None,
+                            ),
+                        )
+                        .await;
+                        match attempt {
+                            Err(_) => {
+                                runtime.cancel.cancel("memory query embedding timeout");
+                                semantic = "skipped_timeout";
+                            }
+                            Ok(Err(_)) => semantic = "unavailable_unresolvable",
+                            Ok(Ok(result)) => {
+                                if let Some(error) = result.accounting_error {
+                                    return failed(ErrorCode::Internal, error.to_string());
+                                }
+                                if result.vectors.len() != 1
+                                    || result.vectors[0].len()
+                                        != result.identity.dimensions as usize
+                                    || result.vectors[0].is_empty()
+                                    || result.vectors[0].iter().any(|v| !v.is_finite())
+                                {
+                                    semantic = "unavailable_unresolvable";
+                                } else {
+                                    let count = match store.embedding_coverage(
+                                        &result.identity.key,
+                                        result.vectors[0].len(),
+                                    ) {
+                                        Ok(count) => count,
+                                        Err(err) => {
+                                            return failed(ErrorCode::Internal, err.to_string())
+                                        }
+                                    };
+                                    coverage = Some(count);
+                                    if count == 0 {
+                                        semantic = "skipped_no_coverage";
+                                    } else {
+                                        semantic = "used";
+                                        semantic_rows = match store.semantic_search(
+                                            &result.identity.key,
+                                            &result.vectors[0],
+                                            15,
+                                        ) {
+                                            Ok(rows) => rows.into_iter().filter(visible).collect(),
+                                            Err(err) => {
+                                                return failed(ErrorCode::Internal, err.to_string())
+                                            }
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            let rankings = [
+                fts.iter().map(|row| row.id.to_string()).collect(),
+                semantic_rows
+                    .iter()
+                    .map(|row: &am::FactRow| row.id.to_string())
+                    .collect(),
+            ];
+            for (id, _) in lingxi_kernel::knowledge::fuse_rankings(&rankings, 25) {
+                let ft = fts.iter().find(|row| row.id.to_string() == id);
+                let sm = semantic_rows.iter().find(|row| row.id.to_string() == id);
+                if let Some(row) = sm.or(ft) {
                     if seen.insert(row.id) {
-                        results.push((row, "tag"));
+                        results.push((
+                            row.clone(),
+                            match (ft.is_some(), sm.is_some()) {
+                                (true, true) => "semantic+fts",
+                                (_, true) => "semantic",
+                                _ => "fts",
+                            },
+                        ));
                     }
                 }
             }
         }
-        // Strategy 2: FTS (+ semantic path when wired — status reported honestly)
-        let semantic_status = "not_configured";
-        if results.len() < 3 && !query.is_empty() {
-            match store.search_full_text(query, 10) {
-                Ok(rows) => {
-                    for row in rows {
-                        if seen.insert(row.id) {
-                            results.push((row, "fts"));
-                        }
-                    }
-                }
+        results.retain(|(row, _)| {
+            row.time
+                .as_deref()
+                .map(|time| {
+                    date_from.is_none_or(|from| time >= from)
+                        && date_to.as_deref().is_none_or(|to| time <= to)
+                })
+                .unwrap_or(true)
+        });
+        let retrieval = if !searched {
+            "not_searched"
+        } else if results.is_empty() {
+            "no_matches"
+        } else {
+            "matched"
+        };
+        let facts: Vec<Value> = results.iter().map(|(row,source)| json!({"id":row.id,"fact":row.fact,"time":row.time,"tags":row.tags,"source":source})).collect();
+        let mut text = if results.is_empty() {
+            if searched {
+                "No memory matches this search.".into()
+            } else {
+                "Memory was not searched: provide a query or tags.".into()
+            }
+        } else {
+            results
+                .iter()
+                .enumerate()
+                .map(|(i, (row, _))| {
+                    format!(
+                        "{}. {} ({}){}",
+                        i + 1,
+                        row.fact,
+                        row.tags.join(", "),
+                        row.time
+                            .as_deref()
+                            .map(|t| format!(" — {t}"))
+                            .unwrap_or_default()
+                    )
+                })
+                .collect::<Vec<_>>()
+                .join("\n")
+        };
+        let diagnostics = if searched && results.is_empty() {
+            match store.zero_result_diagnostics(query) {
+                Ok(value) => value,
                 Err(err) => return failed(ErrorCode::Internal, err.to_string()),
             }
-        }
-        // date filter on all results (memory-search.ts:234-242)
-        if date_from.is_some() || date_to.is_some() {
-            results.retain(|(row, _)| match &row.time {
-                None => true,
-                Some(time) => {
-                    if let Some(from) = date_from {
-                        if time.as_str() < from {
-                            return false;
-                        }
-                    }
-                    if let Some(to) = &date_to {
-                        if time.as_str() > to.as_str() {
-                            return false;
-                        }
-                    }
-                    true
-                }
-            });
-        }
-        if results.is_empty() {
-            let mut parts = vec!["No memory matches this search.".to_string()];
-            if let Ok(Some(diagnostics)) = store.zero_result_diagnostics(query) {
-                let counts: Vec<String> = diagnostics
-                    .as_array()
-                    .map(|entries| {
-                        entries
-                            .iter()
-                            .map(|e| {
-                                format!(
-                                    "『{}』{} 条",
-                                    e.get("term").and_then(Value::as_str).unwrap_or(""),
-                                    e.get("count").and_then(Value::as_i64).unwrap_or(0)
-                                )
-                            })
-                            .collect()
-                    })
-                    .unwrap_or_default();
-                if !counts.is_empty() {
-                    parts.push(format!("Per-term hit counts: {}", counts.join("、")));
-                    if diagnostics
-                        .as_array()
-                        .map(|entries| {
-                            entries
-                                .iter()
-                                .any(|e| e.get("count").and_then(Value::as_i64).unwrap_or(1) == 0)
-                        })
-                        .unwrap_or(false)
-                    {
-                        parts.push("Try rewriting the query without the zero-hit terms.".into());
-                    }
-                }
+        } else {
+            None
+        };
+        if let Some(terms) = &diagnostics {
+            let entries = terms.as_array().expect("逐词诊断列表");
+            text.push_str(&format!(
+                "\nPer-term hit counts: {}",
+                entries
+                    .iter()
+                    .map(|e| format!("『{}』{} 条", e["term"].as_str().unwrap_or(""), e["count"]))
+                    .collect::<Vec<_>>()
+                    .join("、")
+            ));
+            if entries.iter().any(|e| e["count"].as_i64() == Some(0)) {
+                text.push_str("\nTry rewriting the query without the zero-hit terms.");
             }
-            if semantic_status != "used" && semantic_status != "not_configured" {
-                parts.push(format!("semantic search status: {semantic_status}"));
-            }
-            return text_success(parts.join("\n"));
         }
-        let lines: Vec<String> = results
-            .iter()
-            .enumerate()
-            .map(|(i, (row, _))| {
-                let tags_str = if row.tags.is_empty() {
-                    String::new()
-                } else {
-                    format!(" ({})", row.tags.join(", "))
-                };
-                let time_str = row
-                    .time
-                    .as_deref()
-                    .map(|t| format!(" — {t}"))
-                    .unwrap_or_default();
-                format!("{}. {}{}{}", i + 1, row.fact, tags_str, time_str)
-            })
-            .collect();
-        text_success(lines.join("\n"))
+        text.push_str(&format!(
+            "\nretrieval status: {retrieval}; semantic search status: {semantic}"
+        ));
+        success_details(
+            text,
+            json!({"retrieval":retrieval,"semantic":semantic,"coverage":coverage,"facts":facts,"diagnostics":diagnostics}),
+        )
     }
 
     fn run_pin_memory(&self, args: &Value) -> ToolOutcome {
@@ -292,46 +442,154 @@ impl MemoryTools {
             Ok(store) => store,
             Err(err) => return failed(ErrorCode::Internal, err.to_string()),
         };
-        let existing = store.active();
-        if existing.is_empty() {
-            return text_success("Pinned memory is empty; nothing to remove.".into());
+        let Some(scope) = crate::toolgateway::review_scope() else {
+            return failed(
+                ErrorCode::Unauthorized,
+                "pinned deletion requires a trusted reviewed scope".into(),
+            );
+        };
+        if scope["agentId"].as_str() != Some(agent.as_str()) {
+            return failed(
+                ErrorCode::Unauthorized,
+                "pinned deletion scope belongs to another agent".into(),
+            );
         }
-        let id = args
-            .get("id")
-            .and_then(Value::as_str)
-            .map(str::trim)
-            .unwrap_or("");
-        let keyword = args
-            .get("keyword")
-            .and_then(Value::as_str)
-            .map(|k| k.replace("\r\n", "\n").trim().to_lowercase())
-            .unwrap_or_default();
-        if id.is_empty() && keyword.is_empty() {
-            return text_success("Nothing matched: provide an id or keyword.".into());
+        let expected: Vec<(String, String)> = scope["items"]
+            .as_array()
+            .expect("确认范围中的条目列表")
+            .iter()
+            .map(|item| {
+                (
+                    item["id"].as_str().expect("条目ID").into(),
+                    item["content"].as_str().expect("条目正文").into(),
+                )
+            })
+            .collect();
+        let current = match matched_pins(&store, args) {
+            Ok(items) => items,
+            Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+        };
+        if current != expected {
+            return failed(
+                ErrorCode::Conflict,
+                "pinned deletion scope changed; review again".into(),
+            );
         }
-        let mut removed = Vec::new();
-        for tenet in existing {
-            let matches_id = !id.is_empty() && tenet.id == id;
-            let matches_keyword =
-                !keyword.is_empty() && tenet.content.to_lowercase().contains(&keyword);
-            if matches_id || matches_keyword {
-                match store.remove(&tenet.id) {
-                    Ok(true) => removed.push((tenet.id.clone(), tenet.content.clone())),
-                    Ok(false) => {}
-                    Err(err) => return failed(ErrorCode::Internal, err.to_string()),
-                }
+        let removed = match store.remove_reviewed(&expected) {
+            Ok(items) => items,
+            Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+        };
+        let text = if removed.is_empty() {
+            "Nothing matched: pinned memory is empty or no item matched.".into()
+        } else {
+            format!(
+                "Removed {} pinned item(s): {}",
+                removed.len(),
+                removed
+                    .iter()
+                    .map(|(_, c)| c.clone())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        };
+        success_details(
+            text,
+            json!({"removedCount":removed.len(),"removedItems":removed.iter().map(|(id,content)|json!({"id":id,"content":content})).collect::<Vec<_>>()}),
+        )
+    }
+
+    fn run_experience(&self, args: &Value, record: bool) -> ToolOutcome {
+        let agent = match self.bound_agent() {
+            Ok(agent) => agent,
+            Err(outcome) => return outcome,
+        };
+        match self.memory.read_flags(&agent) {
+            Ok(flags) if flags.experience_enabled.unwrap_or(false) => {}
+            Ok(_) => {
+                return success_details(
+                    "Experience is paused for this agent.".into(),
+                    json!({"paused":true}),
+                )
+            }
+            Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+        }
+        let store = match self.memory.experience_store(&agent) {
+            Ok(store) => store,
+            Err(err) => return failed(ErrorCode::Internal, err.to_string()),
+        };
+        let category = args
+            .get("category")
+            .and_then(Value::as_str)
+            .unwrap_or("")
+            .trim_start_matches('#')
+            .trim();
+        if record {
+            let content = args
+                .get("content")
+                .and_then(Value::as_str)
+                .unwrap_or("")
+                .trim();
+            if category.is_empty() || content.is_empty() {
+                return failed(
+                    ErrorCode::InvalidMessage,
+                    "category and content must be non-empty".into(),
+                );
+            }
+            match store.record_entry(category, content) {
+                Ok((added, reason)) => success_details(
+                    if added {
+                        format!("Recorded in {category}: {content}")
+                    } else {
+                        "This experience already exists.".into()
+                    },
+                    json!({"category":category,"content":content,"added":added,"reason":reason}),
+                ),
+                Err(err @ am::MemoryError::Conflict { .. }) => ToolOutcome::Failed {
+                    error: ProtocolError::new(ErrorCode::Conflict, err.to_string(), true),
+                },
+                Err(err) => failed(
+                    if matches!(err, am::MemoryError::InvalidRequest(_)) {
+                        ErrorCode::InvalidMessage
+                    } else {
+                        ErrorCode::Internal
+                    },
+                    err.to_string(),
+                ),
+            }
+        } else if category.is_empty() {
+            match store.index_text_checked() {
+                Ok(text) => success_details(
+                    if text.trim().is_empty() {
+                        "Experience library is empty.".into()
+                    } else {
+                        text
+                    },
+                    json!({}),
+                ),
+                Err(err) => failed(ErrorCode::Internal, err.to_string()),
+            }
+        } else {
+            let Some(category) = lingxi_kernel::memory::normalize_experience_category(category)
+            else {
+                return failed(
+                    ErrorCode::InvalidMessage,
+                    "invalid experience category".into(),
+                );
+            };
+            match store.list_documents_checked() {
+                Ok(docs) => match docs.into_iter().find(|doc| doc.title == category) {
+                    Some(doc) => success_details(
+                        format!("# {}\n\n{}", doc.title, doc.body),
+                        json!({"category":doc.title}),
+                    ),
+                    None => success_details(
+                        format!("Experience category not found: {category}"),
+                        json!({"category":category,"found":false}),
+                    ),
+                },
+                Err(err) => failed(ErrorCode::Internal, err.to_string()),
             }
         }
-        if removed.is_empty() {
-            let label = if id.is_empty() { keyword.as_str() } else { id };
-            return text_success(format!("No pinned item matched \"{label}\"."));
-        }
-        let items: Vec<String> = removed.iter().map(|(_, c)| c.clone()).collect();
-        text_success(format!(
-            "Removed {} pinned item(s): {}",
-            removed.len(),
-            items.join(", ")
-        ))
     }
 
     fn run_tenet_propose(&self, args: &Value) -> ToolOutcome {
@@ -608,7 +866,7 @@ impl ToolExecutorPort for MemoryTools {
     fn execute<'a>(
         &'a self,
         ctx: &'a lingxi_kernel::RunContext,
-        _call: &'a ToolCallId,
+        call: &'a ToolCallId,
         request: &'a lingxi_kernel::ports::ToolRequest,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         // The wire target is the registry target id ("tool:first-party:<name>",
@@ -626,6 +884,8 @@ impl ToolExecutorPort for MemoryTools {
             "tenet_propose" => ToolKind::TenetPropose,
             "context_notes" => ToolKind::ContextNotes,
             "install_skill" => ToolKind::InstallSkill,
+            "record_experience" => ToolKind::RecordExperience,
+            "recall_experience" => ToolKind::RecallExperience,
             other => {
                 return Box::pin(async move {
                     ToolExecutionResult::of_ctx(
@@ -641,8 +901,28 @@ impl ToolExecutorPort for MemoryTools {
         let args = args_of(request);
         let ctx = ctx.clone();
         Box::pin(async move {
+            // 助手材料必须与网关铸造的运行归属相同；上下文笔记仅以当前会话为归属。
+            let runtime = match crate::toolgateway::knowledge_runtime(&ctx, call) {
+                Ok(runtime) => runtime,
+                Err(error) => {
+                    return ToolExecutionResult::of_ctx(&ctx, ToolOutcome::Failed { error })
+                }
+            };
+            if !matches!(kind, ToolKind::ContextNotes)
+                && runtime.ownership.agent_id.as_deref() != Some(self.agent_id.as_str())
+            {
+                return ToolExecutionResult::of_ctx(
+                    &ctx,
+                    failed(
+                        ErrorCode::Unauthorized,
+                        "memory tool belongs to another agent; the action was not run".into(),
+                    ),
+                );
+            }
             let outcome = match kind {
-                ToolKind::SearchMemory => self.run_search_memory(&args),
+                ToolKind::SearchMemory => self.run_search_memory(&ctx, call, &args).await,
+                ToolKind::RecordExperience => self.run_experience(&args, true),
+                ToolKind::RecallExperience => self.run_experience(&args, false),
                 ToolKind::PinMemory => self.run_pin_memory(&args),
                 ToolKind::UnpinMemory => self.run_unpin_memory(&args),
                 ToolKind::TenetPropose => self.run_tenet_propose(&args),
@@ -684,6 +964,7 @@ pub fn register_memory_tools(
                 "tags": {"type": "array", "items": {"type": "string"}},
                 "date_from": {"type": "string"},
                 "date_to": {"type": "string"},
+                "cross_channel": {"type": "boolean"},
             },
             "additionalProperties": false,
         }),
@@ -703,8 +984,8 @@ pub fn register_memory_tools(
     );
     let unpin_manifest = manifest(
         "unpin_memory",
-        "Remove pinned items by id or keyword (all matches are removed).",
-        PermissionKind::Execute,
+        "Remove pinned items by id or keyword after reviewing the exact matched items.",
+        PermissionKind::Review,
         "unpin_memory.unpin",
         DeclaredPermission::Execute,
         json!({
@@ -765,13 +1046,31 @@ pub fn register_memory_tools(
             "additionalProperties": false,
         }),
     );
-    for (_name, m) in [
+    let record_manifest = manifest(
+        "record_experience",
+        "Record a concise lesson in this agent's enabled experience library.",
+        PermissionKind::Execute,
+        "record_experience.record",
+        DeclaredPermission::Execute,
+        json!({"type":"object","properties":{"category":{"type":"string","minLength":1},"content":{"type":"string","minLength":1}},"required":["category","content"],"additionalProperties":false}),
+    );
+    let recall_manifest = manifest(
+        "recall_experience",
+        "Read this agent's experience index, or a specific category.",
+        PermissionKind::Read,
+        "recall_experience.read",
+        DeclaredPermission::ReadOnly,
+        json!({"type":"object","properties":{"category":{"type":"string"}},"additionalProperties":false}),
+    );
+    for (name, m) in [
         ("search_memory", search_manifest),
         ("pin_memory", pin_manifest),
         ("unpin_memory", unpin_manifest),
         ("tenet_propose", tenet_manifest),
         ("context_notes", notes_manifest),
         ("install_skill", install_manifest),
+        ("record_experience", record_manifest),
+        ("recall_experience", recall_manifest),
     ] {
         // Registration failure is a LOUD startup error, never a silent skip —
         // a quietly missing tool is exactly the failure mode the A11 tool
@@ -780,13 +1079,27 @@ pub fn register_memory_tools(
         let receipt = registry
             .register(m, budget)
             .expect("the resident memory/skill tools register");
-        gateway.bind_executor(
-            receipt.target_id,
-            Arc::new(MemoryToolExecutor {
-                tools: Arc::clone(&tools),
-            }),
-            "R06-T06 memory/skill tool executor (per-agent memory surface)",
-        );
+        let executor = Arc::new(MemoryToolExecutor {
+            tools: Arc::clone(&tools),
+        });
+        if name == "unpin_memory" {
+            let scoped = Arc::clone(&tools);
+            gateway.bind_executor_with_review(receipt.target_id, executor, Arc::new(move |current_agent, args| {
+                if current_agent != scoped.agent_id {
+                    return Err("pinned-memory review belongs to another agent; no items were read".into());
+                }
+                let agent = scoped.bound_agent().map_err(|_| "agent is unavailable".to_string())?;
+                let store = scoped.memory.tenets_store(&agent).map_err(|err| err.to_string())?;
+                let items = matched_pins(&store, args.as_value()).map_err(|err| err.to_string())?;
+                Ok(json!({"agentId":agent,"items":items.iter().map(|(id,content)|json!({"id":id,"content":content})).collect::<Vec<_>>()}))
+            }), "R06 pinned-memory deletion review scope");
+        } else {
+            gateway.bind_executor(
+                receipt.target_id,
+                executor,
+                "R06-T06 memory/skill tool executor (per-agent memory surface)",
+            );
+        }
     }
 }
 

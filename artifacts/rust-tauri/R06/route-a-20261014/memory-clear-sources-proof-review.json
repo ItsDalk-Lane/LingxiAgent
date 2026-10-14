@@ -1,0 +1,23 @@
+{
+  "status": "EXECUTED_TESTS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "leaves": {
+    "R00-T02-LA-396F817018F6": {
+      "tests": [
+        "clear_summary_sources_is_agent_scoped_preserves_raw_until_all_clear_and_next_read_is_empty",
+        "clear_sources_denied_invalid_io_and_database_failure_keep_actual_sources_facts_and_marker",
+        "clear_sources_refuses_linked_directory_and_cannot_clear_another_agents_sources",
+        "late_summary_delete_io_failure_rolls_back_compiled_files_marker_and_fact_transaction"
+      ],
+      "meaning": "真实清除事实/关联向量/检索索引、五个整理文件及直接JSON总结来源，留下重置标记；另一助手完整保留。只清直接普通JSON，不递归、不删除其他格式；只读凭证/未知助手/异常路径/链接目录拒绝零副作用；数据库拒绝和实际总结删除I/O故障均返回错误，文件/重置标记/事实事务恢复。"
+    },
+    "R00-T02-LA-53B672CBEA46": {
+      "tests": [
+        "clear_summary_sources_is_agent_scoped_preserves_raw_until_all_clear_and_next_read_is_empty",
+        "clear_sources_denied_invalid_io_and_database_failure_keep_actual_sources_facts_and_marker",
+        "clear_sources_refuses_linked_directory_and_cannot_clear_another_agents_sources",
+        "late_summary_delete_io_failure_rolls_back_compiled_files_marker_and_fact_transaction"
+      ],
+      "meaning": "真实清除五个整理文件及直接JSON总结来源，留下重置标记；原始事实保留，下一GET整理正文为空。只清直接普通JSON，不递归、不删除其他格式；只读凭证/未知助手/异常路径/链接目录拒绝零副作用；数据库拒绝和实际总结删除I/O故障均返回错误，文件/重置标记/事实事务恢复。"
+    }
+  }
+}

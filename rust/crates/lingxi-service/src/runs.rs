@@ -1719,6 +1719,7 @@ impl RunSupervisor {
                     "projectionContentDigest": projection_digest,
                     "result": tool_result_wire(&outcome),
                     "renderedBytes": lingxi_adapters::models::tool_render::render_tool_outcome_text(&outcome).len(),
+                    "modelProjectionBytes": crate::hooks::tool_outcome_model_bytes(&outcome),
                     "successBudgetBytes": crate::hooks::MAX_TOOL_SUCCESS_PROJECTION_BYTES,
                     "errorBudgetPolicy": "untruncated",
                     "scope": "model_context_projection_not_raw_tool_archive"
@@ -1957,13 +1958,22 @@ impl RunSupervisor {
                     }
                 }
             }
-            if turn == 1
-                && exchange
-                    .iter()
-                    .any(|i| matches!(i, ExchangeItem::CurrentSubmission))
+            // 自动压缩关闭时每个请求仍必须有真实输出余量，不能借 enabled=false 放行超窗。
+            let auto_compaction_disabled = self
+                .compaction
+                .as_ref()
+                .map(|service| service.settings_for(agent_id))
+                .transpose()?
+                .is_some_and(|settings| !settings.enabled);
+            if auto_compaction_disabled
+                || (turn == 1
+                    && exchange
+                        .iter()
+                        .any(|i| matches!(i, ExchangeItem::CurrentSubmission)))
             {
                 if let Some(compaction) = &self.compaction {
-                    if !compaction.restored_request_fits(
+                    if !compaction.restored_request_fits_for_agent(
+                        agent_id,
                         &crate::compaction::MidRunCompactionInput {
                             exchange: &exchange,
                             system_prompt: system_prompt.as_deref(),
@@ -3541,14 +3551,19 @@ impl RunSupervisor {
                                 // surface; `summarize_arguments` is keys
                                 // + type tags only).
                                 let gate_req = ApprovalRequest {
+                                    requires_scope_review: prepared.as_ref().is_some_and(|p| p.permission_kind == lingxi_kernel::toolcatalog::PermissionKind::Review),
                                     tool_call_id: call_id.clone(),
                                     target: request.target.clone(),
                                     args_digest: request.args_digest.hex.clone(),
-                                    args_summary: request.args_summary.clone().or_else(|| {
-                                        Some(lingxi_kernel::toolcatalog::summarize_arguments(
-                                            &request.arguments,
-                                        ))
-                                    }),
+                                    args_summary: prepared
+                                        .as_ref()
+                                        .and_then(|p| p.review_summary.clone())
+                                        .or_else(|| request.args_summary.clone())
+                                        .or_else(|| {
+                                            Some(lingxi_kernel::toolcatalog::summarize_arguments(
+                                                &request.arguments,
+                                            ))
+                                        }),
                                     // R04-T04: the approval RECORD binds the
                                     // REAL resource scopes the gateway
                                     // derived at preparation (canonical
@@ -4963,6 +4978,7 @@ fn journal_receipt_of(outcome: &ToolOutcome) -> InvocationReceipt {
 fn tool_result_wire(outcome: &ToolOutcome) -> ToolResultWire {
     match outcome {
         ToolOutcome::Success { result } => ToolResultWire {
+            details: result.details.clone(),
             status: ToolResultStatus::Success,
             content: result.content.clone(),
             resource_refs: result.resource_refs.clone(),
@@ -4970,6 +4986,7 @@ fn tool_result_wire(outcome: &ToolOutcome) -> ToolResultWire {
             error: None,
         },
         ToolOutcome::Failed { error } => ToolResultWire {
+            details: None,
             status: ToolResultStatus::Failed,
             content: Vec::new(),
             resource_refs: Vec::new(),
@@ -4977,6 +4994,7 @@ fn tool_result_wire(outcome: &ToolOutcome) -> ToolResultWire {
             error: Some(error.clone()),
         },
         ToolOutcome::Cancelled => ToolResultWire {
+            details: None,
             status: ToolResultStatus::Cancelled,
             content: Vec::new(),
             resource_refs: Vec::new(),
@@ -4984,6 +5002,7 @@ fn tool_result_wire(outcome: &ToolOutcome) -> ToolResultWire {
             error: None,
         },
         ToolOutcome::Unknown { reason } => ToolResultWire {
+            details: None,
             status: ToolResultStatus::Unknown,
             content: Vec::new(),
             resource_refs: Vec::new(),
@@ -5112,6 +5131,7 @@ mod tests {
         assert_eq!(receipt.dedup_id.as_deref(), Some(expected_digest.as_str()));
         let exited = ToolOutcome::Success {
             result: lingxi_kernel::ports::ToolSuccess {
+                details: None,
                 status: Some(Box::new(lingxi_kernel::ports::ToolRunStatus::Exited {
                     code: 3,
                 })),
