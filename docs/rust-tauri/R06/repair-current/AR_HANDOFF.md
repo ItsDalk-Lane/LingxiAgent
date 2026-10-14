@@ -717,3 +717,37 @@ CAA876503B1B OS 打开）真实证据与锚点已登记但保持 GAP：绑定执
 匹配（e2e-test 特性+人工点选不可自动重放，反假绿生效），待阶段评审裁定证据口径。
 证据：artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/
 （截图、观察回执、resource-events.json、e2e-phase 全程）。当前 192 READY / 87 GAP。
+
+### 2026-10-14 C3 最小宿主落地 + verify-stage R06 首次真实执行：门禁 FAIL（R06 未验收，F14 保持开放）
+
+**C3 已完成（bd0333e2d）**：BC675C664910 config GET（真实 yaml/全局注入/供应商摘要/availableTools/
+全量秘密掩码/工作区 GC）；01E1E3CF7FA8 笔记本删除级联清理所属来源+冻结引用 409；9283371CDAD8 来源删除、
+8A62470CC75D 重试摄入补 studio 归属校验；76E2F5AAF035 摄入任务 studio 限定+不可达源文件状态；
+5F5365322CFF outline 越权报错+knowledge_read 按 sectionId/aroundChunkId 定位；269958F82F8A 重锚并补
+过滤拒绝测试。7 叶 READY，登记 201 READY / 78 GAP；干净窗口 116 叶 152 绑定全 PASS。
+已知偏差（未修）：笔记本删除按 R00 叶断言「删除笔记本及其来源」实现，现役 TS deleteNotebook 只摘 membership
+且无冻结 409；Rust chunker 重叠步进方向与 TS 相反（chunk 间约 256 字符空隙，section 读取已按 block 重算
+规避）；grep 参数名 regex 与 TS regexp 不一致且 simple_regex 为字面量占位；config GET 的
+availableTools 无运行时/插件工具；摄入不可达检测为按请求 stat（TS 为 watcher）。
+
+**门禁基础设施修复（156d46623）**：`r06_inputs` 命令日志目录与 `{EVIDENCE}/R06_INPUTS` 在 macOS
+大小写不敏感文件系统上撞名，使门禁第一步必败；命令键改名 `r06_inputs_check`。xtask 以 debug 构建
+运行时每个绑定前后对 ~5144 个候选文件做未优化 SHA-256，约 1 分钟/绑定；改用 release 构建
+（`cargo build --release -p xtask` 后直接运行二进制）约快 3 倍，全 376 绑定约 2.5 小时。
+
+**首次完整执行结果（evidence: artifacts/rust-tauri/R06/verify-stage-final-20261014，未提交）**：
+376 绑定 371 PASS / 5 FAIL；随后 r06_z_leaf_evidence FAIL，R05 回归腿被中止（门禁已确定不能 exit 0）。
+5 个 FAIL：(1) f12 `c02_actual_io_limit_preserves_original`、`c03_rebuild_io_failure_keeps_quarantined_original`
+——测试通过但回显子进程 stdout，其 `test c02_io_child ... ok` 行触发单测试结算反假绿检查；已修
+（子进程输出逐行加前缀，仅改证据文本），两绑定经包装脚本重放 PASS。(2) w11
+`c03_actual_driver_cancel_native_fifo_*`、`c03_absolute_deadline_native_fifo_*`、
+`c03_retained_paid_recovery_native_wait_*`——门禁内一次性失败（取消时 run 已结束、cancelVerdict None、
+elapsedMs 0），同一二进制/同一环境形态单独重放 8/8、10 核 CPU 抢占下 6/6、经包装脚本 5/5 均通过，
+未能复现、根因未定位；下次门禁若再现须深挖，不得靠重跑代替证据。
+
+**结构性阻断（需要决策）**：R06.json 中 78 个叶 basisKind=required_behavior_pending
+（26 个仅属 R06，其余带 R03/R04/R07/R08/R09 份额），verify.rs `roll_up_supplemental_leaf`
+对其硬判 BLOCKED，overall PASS 要求全部叶 PASS 或 DEFERRED。因此「verify-stage R06 exit 0」在这 78 叶
+绑定为 READY（或经授权的治理变更改为合法延期）之前不可达；阶段审查 C2 与 C4（33 R06-ONLY GAP 叶维持开放）
+互相冲突，需要重新裁定。阶段审查 C3 另列项（EX-01 核心份额、4F0466F7C090 沙盒条款、31CDA283A11A 的 R06 份）
+本轮未做。阶段状态仍为 R06_NOT_ACCEPTED，不声明 R07_READY。

@@ -189,6 +189,15 @@ fn c02_io_child() {
     assert_eq!(error.code, "KNOWLEDGE_STORAGE_IO", "{error}");
 }
 
+/// 子进程输出逐行加前缀后再回显：原样回显会让子进程的 `test … ok` 行混入父测试输出，
+/// 门禁的单测试结算检查会因此误判。
+fn quote_child(bytes: &[u8]) -> String {
+    String::from_utf8_lossy(bytes)
+        .lines()
+        .map(|line| format!("\n  | {line}"))
+        .collect()
+}
+
 #[cfg(unix)]
 #[test]
 fn c02_actual_io_limit_preserves_original() {
@@ -209,8 +218,8 @@ fn c02_actual_io_limit_preserves_original() {
         eprintln!(
             "I/O child status={} stdout={} stderr={}",
             output.status,
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
+            quote_child(&output.stdout),
+            quote_child(&output.stderr)
         );
         assert!(output.status.success());
         assert_eq!(std::fs::read(&path).unwrap(), before);
@@ -465,8 +474,8 @@ fn c03_rebuild_io_failure_keeps_quarantined_original() {
         eprintln!(
             "rebuild failure child {} {} {}",
             output.status,
-            String::from_utf8_lossy(&output.stdout),
-            String::from_utf8_lossy(&output.stderr)
+            quote_child(&output.stdout),
+            quote_child(&output.stderr)
         );
         assert!(output.status.success());
         let original = quarantine_originals(&root);
