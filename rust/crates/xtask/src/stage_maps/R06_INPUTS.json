@@ -57218,21 +57218,45 @@
               {
                 "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
                 "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-                "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-                "testStartLine": 973,
-                "testEndLine": 1024,
+                "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+                "testStartLine": 1162,
+                "testEndLine": 1213,
                 "assertions": [
                   {
-                    "line": 1014,
-                    "quote": "    assert!(child_of_a.is_cancelled());"
+                    "line": 1168,
+                    "quote": "assert!(root_a.scope.cancel(\"first\"))"
                   },
                   {
-                    "line": 1015,
-                    "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                    "line": 1169,
+                    "quote": "assert!(!root_a.scope.cancel(\"second\"))"
                   },
                   {
-                    "line": 1019,
-                    "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                    "line": 1170,
+                    "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+                  },
+                  {
+                    "line": 1171,
+                    "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+                  },
+                  {
+                    "line": 1190,
+                    "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+                  },
+                  {
+                    "line": 1196,
+                    "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+                  },
+                  {
+                    "line": 1203,
+                    "quote": "assert!(child_of_a.is_cancelled())"
+                  },
+                  {
+                    "line": 1204,
+                    "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+                  },
+                  {
+                    "line": 1208,
+                    "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                   }
                 ]
               }
@@ -74997,21 +75021,45 @@
               {
                 "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
                 "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-                "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-                "testStartLine": 973,
-                "testEndLine": 1024,
+                "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+                "testStartLine": 1162,
+                "testEndLine": 1213,
                 "assertions": [
                   {
-                    "line": 1014,
-                    "quote": "    assert!(child_of_a.is_cancelled());"
+                    "line": 1168,
+                    "quote": "assert!(root_a.scope.cancel(\"first\"))"
                   },
                   {
-                    "line": 1015,
-                    "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                    "line": 1169,
+                    "quote": "assert!(!root_a.scope.cancel(\"second\"))"
                   },
                   {
-                    "line": 1019,
-                    "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                    "line": 1170,
+                    "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+                  },
+                  {
+                    "line": 1171,
+                    "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+                  },
+                  {
+                    "line": 1190,
+                    "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+                  },
+                  {
+                    "line": 1196,
+                    "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+                  },
+                  {
+                    "line": 1203,
+                    "quote": "assert!(child_of_a.is_cancelled())"
+                  },
+                  {
+                    "line": 1204,
+                    "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+                  },
+                  {
+                    "line": 1208,
+                    "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                   }
                 ]
               }
@@ -75261,21 +75309,45 @@
               {
                 "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
                 "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-                "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-                "testStartLine": 973,
-                "testEndLine": 1024,
+                "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+                "testStartLine": 1162,
+                "testEndLine": 1213,
                 "assertions": [
                   {
-                    "line": 1014,
-                    "quote": "    assert!(child_of_a.is_cancelled());"
+                    "line": 1168,
+                    "quote": "assert!(root_a.scope.cancel(\"first\"))"
                   },
                   {
-                    "line": 1015,
-                    "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                    "line": 1169,
+                    "quote": "assert!(!root_a.scope.cancel(\"second\"))"
                   },
                   {
-                    "line": 1019,
-                    "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                    "line": 1170,
+                    "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+                  },
+                  {
+                    "line": 1171,
+                    "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+                  },
+                  {
+                    "line": 1190,
+                    "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+                  },
+                  {
+                    "line": 1196,
+                    "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+                  },
+                  {
+                    "line": 1203,
+                    "quote": "assert!(child_of_a.is_cancelled())"
+                  },
+                  {
+                    "line": 1204,
+                    "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+                  },
+                  {
+                    "line": 1208,
+                    "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                   }
                 ]
               }
@@ -92706,21 +92778,45 @@
               {
                 "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
                 "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-                "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-                "testStartLine": 973,
-                "testEndLine": 1024,
+                "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+                "testStartLine": 1162,
+                "testEndLine": 1213,
                 "assertions": [
                   {
-                    "line": 1014,
-                    "quote": "    assert!(child_of_a.is_cancelled());"
+                    "line": 1168,
+                    "quote": "assert!(root_a.scope.cancel(\"first\"))"
                   },
                   {
-                    "line": 1015,
-                    "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                    "line": 1169,
+                    "quote": "assert!(!root_a.scope.cancel(\"second\"))"
                   },
                   {
-                    "line": 1019,
-                    "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                    "line": 1170,
+                    "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+                  },
+                  {
+                    "line": 1171,
+                    "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+                  },
+                  {
+                    "line": 1190,
+                    "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+                  },
+                  {
+                    "line": 1196,
+                    "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+                  },
+                  {
+                    "line": 1203,
+                    "quote": "assert!(child_of_a.is_cancelled())"
+                  },
+                  {
+                    "line": 1204,
+                    "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+                  },
+                  {
+                    "line": 1208,
+                    "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                   }
                 ]
               }
@@ -197653,21 +197749,45 @@
           {
             "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
             "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-            "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-            "testStartLine": 973,
-            "testEndLine": 1024,
+            "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+            "testStartLine": 1162,
+            "testEndLine": 1213,
             "assertions": [
               {
-                "line": 1014,
-                "quote": "    assert!(child_of_a.is_cancelled());"
+                "line": 1168,
+                "quote": "assert!(root_a.scope.cancel(\"first\"))"
               },
               {
-                "line": 1015,
-                "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                "line": 1169,
+                "quote": "assert!(!root_a.scope.cancel(\"second\"))"
               },
               {
-                "line": 1019,
-                "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                "line": 1170,
+                "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+              },
+              {
+                "line": 1171,
+                "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+              },
+              {
+                "line": 1190,
+                "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+              },
+              {
+                "line": 1196,
+                "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+              },
+              {
+                "line": 1203,
+                "quote": "assert!(child_of_a.is_cancelled())"
+              },
+              {
+                "line": 1204,
+                "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+              },
+              {
+                "line": 1208,
+                "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
               }
             ]
           }
@@ -201049,21 +201169,45 @@
           {
             "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
             "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-            "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-            "testStartLine": 973,
-            "testEndLine": 1024,
+            "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+            "testStartLine": 1162,
+            "testEndLine": 1213,
             "assertions": [
               {
-                "line": 1014,
-                "quote": "    assert!(child_of_a.is_cancelled());"
+                "line": 1168,
+                "quote": "assert!(root_a.scope.cancel(\"first\"))"
               },
               {
-                "line": 1015,
-                "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                "line": 1169,
+                "quote": "assert!(!root_a.scope.cancel(\"second\"))"
               },
               {
-                "line": 1019,
-                "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                "line": 1170,
+                "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+              },
+              {
+                "line": 1171,
+                "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+              },
+              {
+                "line": 1190,
+                "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+              },
+              {
+                "line": 1196,
+                "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+              },
+              {
+                "line": 1203,
+                "quote": "assert!(child_of_a.is_cancelled())"
+              },
+              {
+                "line": 1204,
+                "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+              },
+              {
+                "line": 1208,
+                "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
               }
             ]
           }
@@ -201257,21 +201401,45 @@
           {
             "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
             "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-            "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-            "testStartLine": 973,
-            "testEndLine": 1024,
+            "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+            "testStartLine": 1162,
+            "testEndLine": 1213,
             "assertions": [
               {
-                "line": 1014,
-                "quote": "    assert!(child_of_a.is_cancelled());"
+                "line": 1168,
+                "quote": "assert!(root_a.scope.cancel(\"first\"))"
               },
               {
-                "line": 1015,
-                "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                "line": 1169,
+                "quote": "assert!(!root_a.scope.cancel(\"second\"))"
               },
               {
-                "line": 1019,
-                "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                "line": 1170,
+                "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+              },
+              {
+                "line": 1171,
+                "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+              },
+              {
+                "line": 1190,
+                "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+              },
+              {
+                "line": 1196,
+                "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+              },
+              {
+                "line": 1203,
+                "quote": "assert!(child_of_a.is_cancelled())"
+              },
+              {
+                "line": 1204,
+                "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+              },
+              {
+                "line": 1208,
+                "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
               }
             ]
           }
@@ -204653,21 +204821,45 @@
           {
             "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
             "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-            "sourceSHA256": "c14272566afcee269520ffef460eac0361fde8a54235466fc4315a37dc4fdb43",
-            "testStartLine": 973,
-            "testEndLine": 1024,
+            "sourceSHA256": "347697bee5cd7ddf86ef28e1758b8b9268f350caecf538bea2f7aa372336560d",
+            "testStartLine": 1162,
+            "testEndLine": 1213,
             "assertions": [
               {
-                "line": 1014,
-                "quote": "    assert!(child_of_a.is_cancelled());"
+                "line": 1168,
+                "quote": "assert!(root_a.scope.cancel(\"first\"))"
               },
               {
-                "line": 1015,
-                "quote": "    assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    );"
+                "line": 1169,
+                "quote": "assert!(!root_a.scope.cancel(\"second\"))"
               },
               {
-                "line": 1019,
-                "quote": "    assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    );"
+                "line": 1170,
+                "quote": "assert!(!root_a.scope.cancel(\"third\"))"
+              },
+              {
+                "line": 1171,
+                "quote": "assert_eq!(root_a.scope.reason().as_deref(), Some(\"first\"))"
+              },
+              {
+                "line": 1190,
+                "quote": "assert!(\n        [\"first\", \"race-r1\", \"race-r2\", \"race-r3\"].contains(&reason.as_str()),\n        \"linearized first reason: {reason}\"\n    )"
+              },
+              {
+                "line": 1196,
+                "quote": "assert_eq!(root_a.scope.reason(), Some(frozen), \"the reason is frozen\")"
+              },
+              {
+                "line": 1203,
+                "quote": "assert!(child_of_a.is_cancelled())"
+              },
+              {
+                "line": 1204,
+                "quote": "assert!(\n        !root_b.scope.is_cancelled(),\n        \"the unrelated root B keeps running\"\n    )"
+              },
+              {
+                "line": 1208,
+                "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
               }
             ]
           }
