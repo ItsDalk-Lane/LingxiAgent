@@ -751,3 +751,23 @@ elapsedMs 0），同一二进制/同一环境形态单独重放 8/8、10 核 CPU
 绑定为 READY（或经授权的治理变更改为合法延期）之前不可达；阶段审查 C2 与 C4（33 R06-ONLY GAP 叶维持开放）
 互相冲突，需要重新裁定。阶段审查 C3 另列项（EX-01 核心份额、4F0466F7C090 沙盒条款、31CDA283A11A 的 R06 份）
 本轮未做。阶段状态仍为 R06_NOT_ACCEPTED，不声明 R07_READY。
+
+### 2026-10-14 路线 A 首批：会话笔记及记忆事件四叶 + W11 FIFO 加固（不是阶段通过）
+
+用户明确选 A，逐项实现全部 78 GAP，优先 26 个 only-R06；未授权延期或修改门禁。
+会话笔记无会话/空写入/缺 text/超限明确 Failed，16KiB 边界成功、溢出保全；新增原则
+tenets-changed（含重复）、pinned/experience agent-updated 成功事件与拒绝零副作用，
+下一实际 Run 现读新原则/人格/config、经验 GET/search 现读分类/索引。四叶全部绑定，
+205 READY / 74 GAP，only-R06 剩 22；新窗口 7 绑定和四叶 rollup PASS。
+
+W11 正式失败的模型后续请求已明确携带 temporary-not-regular-file 拒绝，说明 FIFO
+writer 提前被 reader 放行。受控 reader 注入精确复刻 None verdict/0ms/tasks=[]；
+修测试夹具为0200只写，显式释放/失败清理恢复0600，同用户非预期read得到EACCES。
+原生产/强断言/门禁不变；具体历史 reader 身份未知，未归因 Spotlight 或门禁自身。
+主控整合套件12/12，五旧 native 与新增隔离检查共6个包装绑定均PASS（Desktop长证据路径）。
+新负控按C03命名进入原发现器，未修改发现规则。
+
+主控整合记忆/上下文三套47/0，登记契约20/20。execute-reviewed-proofs保留调用者
+仓库外cargo目标，未指定也默认仓库外，满足接力工具链约束；不改判定。原始运行目录
+仅本地保留，小回执见 route-a-20261014/batch1-validation.json。正式门禁未重跑，
+F14开放、R06未验收；人格/头像、工具记忆和EX-01等后续批仍在独立工作树进行。

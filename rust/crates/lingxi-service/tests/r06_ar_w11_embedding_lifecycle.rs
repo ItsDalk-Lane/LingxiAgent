@@ -974,8 +974,6 @@ fn native_tasks(runs: &lingxi_service::RunSupervisor) -> Value {
 }
 #[cfg(unix)]
 fn obstruct_canonical(root: &Path) -> (PathBuf, PathBuf, Value) {
-    use std::ffi::CString;
-    use std::os::unix::ffi::OsStrExt;
     let path = std::fs::read_dir(root)
         .unwrap()
         .map(|e| e.unwrap().path())
@@ -990,13 +988,27 @@ fn obstruct_canonical(root: &Path) -> (PathBuf, PathBuf, Value) {
         "{}.pending",
         lingxi_kernel::knowledge::sha256_hex(before["modelCallId"].as_str().unwrap().as_bytes())
     ));
-    let cpath = CString::new(pending.as_os_str().as_bytes()).unwrap();
-    assert_eq!(
-        unsafe { libc::mkfifo(cpath.as_ptr(), 0o600) },
-        0,
-        "独占合成FIFO"
-    );
+    create_native_fifo(&pending);
     (path, pending, before)
+}
+#[cfg(unix)]
+fn create_native_fifo(path: &Path) {
+    use std::ffi::CString;
+    use std::os::unix::ffi::OsStrExt;
+    use std::os::unix::fs::PermissionsExt;
+    let cpath = CString::new(path.as_os_str().as_bytes()).unwrap();
+    // 同用户的资料扫描也可能打开 FIFO；只允许 writer，防止它提前解除真实 open 等待。
+    assert_eq!(unsafe { libc::mkfifo(cpath.as_ptr(), 0o200) }, 0);
+    assert_eq!(
+        std::fs::metadata(path).unwrap().permissions().mode() & 0o400,
+        0,
+        "显式放行前 FIFO 不能有读权限"
+    );
+}
+#[cfg(unix)]
+fn allow_native_fifo_reader(path: &Path) -> std::io::Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))
 }
 #[cfg(unix)]
 struct FifoCleanup(PathBuf);
@@ -1005,6 +1017,9 @@ impl Drop for FifoCleanup {
     fn drop(&mut self) {
         use std::os::unix::fs::OpenOptionsExt;
         // 失败也释放本测试的实际 writer，避免 panic 把阻塞线程遗留给 runtime。
+        if allow_native_fifo_reader(&self.0).is_err() {
+            return;
+        }
         if let Ok(reader) = std::fs::OpenOptions::new()
             .read(true)
             .custom_flags(libc::O_NONBLOCK)
@@ -1018,11 +1033,52 @@ impl Drop for FifoCleanup {
 #[cfg(unix)]
 fn release_native_fifo(path: &Path) -> std::fs::File {
     use std::os::unix::fs::OpenOptionsExt;
+    allow_native_fifo_reader(path).unwrap();
     std::fs::OpenOptions::new()
         .read(true)
         .custom_flags(libc::O_NONBLOCK)
         .open(path)
         .unwrap()
+}
+
+#[cfg(unix)]
+#[test]
+fn c03_native_fifo_blocks_incidental_reader_until_explicit_release() {
+    use std::os::unix::fs::OpenOptionsExt;
+    let home = unique_dir("fifo-reader-isolation");
+    let pending = home.join("native.pending");
+    create_native_fifo(&pending);
+    let cleanup = FifoCleanup(pending.clone());
+    let premature = std::fs::OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NONBLOCK)
+        .open(&pending)
+        .expect_err("显式放行之前，同用户读者不得解除 writer 等待");
+    assert_eq!(premature.kind(), std::io::ErrorKind::PermissionDenied);
+    let (entered_tx, entered_rx) = std::sync::mpsc::channel();
+    let (opened_tx, opened_rx) = std::sync::mpsc::channel();
+    let writer_path = pending.clone();
+    let writer = std::thread::spawn(move || {
+        entered_tx.send(()).unwrap();
+        let file = std::fs::OpenOptions::new()
+            .write(true)
+            .open(writer_path)
+            .unwrap();
+        opened_tx.send(()).unwrap();
+        drop(file);
+    });
+    entered_rx.recv_timeout(Duration::from_secs(2)).unwrap();
+    assert_eq!(
+        opened_rx.recv_timeout(Duration::from_millis(100)),
+        Err(std::sync::mpsc::RecvTimeoutError::Timeout),
+        "没有测试 reader，真实 writer 必须仍在系统调用中等待"
+    );
+    let reader = release_native_fifo(&pending);
+    opened_rx.recv_timeout(Duration::from_secs(2)).unwrap();
+    writer.join().unwrap();
+    drop(reader);
+    drop(cleanup);
+    std::fs::remove_file(pending).unwrap();
 }
 
 #[cfg(unix)]
@@ -1245,8 +1301,6 @@ async fn c03_absolute_deadline_native_fifo_retains_claim_and_known_paid_usage() 
 #[cfg(unix)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn c02_paid_native_waiter_drop_preserves_real_bytes_until_physical_exit_and_recovery() {
-    use std::ffi::CString;
-    use std::os::unix::ffi::OsStrExt;
     let home = unique_dir("paid-waiter-drop");
     let stub = FarEnd::start().await;
     let state = boot_owned(&home, &stub, Duration::from_secs(20)).await;
@@ -1276,8 +1330,7 @@ async fn c02_paid_native_waiter_drop_preserves_real_bytes_until_physical_exit_an
         "{}.pending",
         lingxi_kernel::knowledge::sha256_hex(call.as_bytes())
     ));
-    let cpath = CString::new(pending.as_os_str().as_bytes()).unwrap();
-    assert_eq!(unsafe { libc::mkfifo(cpath.as_ptr(), 0o600) }, 0);
+    create_native_fifo(&pending);
     let _cleanup = FifoCleanup(pending.clone());
     stub.release.add_permits(1);
     let until = std::time::Instant::now() + Duration::from_secs(2);
@@ -1364,8 +1417,6 @@ async fn c02_paid_native_waiter_drop_preserves_real_bytes_until_physical_exit_an
 #[cfg(unix)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn c02_eight_retained_paid_results_refuse_ninth_before_send_and_recover_all() {
-    use std::ffi::CString;
-    use std::os::unix::ffi::OsStrExt;
     let home = unique_dir("paid-full-capacity");
     let stub = FarEnd::start().await;
     let state = boot_owned(&home, &stub, Duration::from_secs(60)).await;
@@ -1405,8 +1456,7 @@ async fn c02_eight_retained_paid_results_refuse_ninth_before_send_and_recover_al
             "{}.pending",
             lingxi_kernel::knowledge::sha256_hex(call.as_bytes())
         ));
-        let cpath = CString::new(pending.as_os_str().as_bytes()).unwrap();
-        assert_eq!(unsafe { libc::mkfifo(cpath.as_ptr(), 0o600) }, 0);
+        create_native_fifo(&pending);
         cleanups.push(FifoCleanup(pending.clone()));
         stub.release.add_permits(1);
         let until = std::time::Instant::now() + Duration::from_secs(2);
@@ -1544,8 +1594,6 @@ async fn c02_eight_retained_paid_results_refuse_ninth_before_send_and_recover_al
 #[cfg(unix)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn c03_retained_paid_recovery_native_wait_keeps_original_cancel_and_deadline() {
-    use std::ffi::CString;
-    use std::os::unix::ffi::OsStrExt;
     for deadline_case in [false, true] {
         let home = unique_dir(if deadline_case {
             "recovery-native-deadline"
@@ -1601,8 +1649,7 @@ async fn c03_retained_paid_recovery_native_wait_keeps_original_cancel_and_deadli
         );
         assert_eq!(usage[0]["input_tokens"], 5);
         std::fs::remove_dir(&pending).unwrap();
-        let cpath = CString::new(pending.as_os_str().as_bytes()).unwrap();
-        assert_eq!(unsafe { libc::mkfifo(cpath.as_ptr(), 0o600) }, 0);
+        create_native_fifo(&pending);
         let _cleanup = FifoCleanup(pending.clone());
         let child = runtime.clone();
         let operation = ops.clone();

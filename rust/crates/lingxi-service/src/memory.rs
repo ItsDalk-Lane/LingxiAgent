@@ -1055,12 +1055,18 @@ pub async fn tenets_post_route(
         .tenets_store(&agent_id)
         .and_then(|store| store.add_direct(content, priority, new_id))
     {
-        Ok((tenet, duplicate)) => Json(json!({
-            "ok": true,
-            "tenet": tenet_json(&tenet),
-            "duplicate": duplicate,
-        }))
-        .into_response(),
+        Ok((tenet, duplicate)) => {
+            // 与现役一致：重复提交仍属于成功响应，也广播所属助手的原则变化。
+            state
+                .app_events()
+                .publish("tenets-changed", json!({ "agentId": agent_id }));
+            Json(json!({
+                "ok": true,
+                "tenet": tenet_json(&tenet),
+                "duplicate": duplicate,
+            }))
+            .into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
@@ -1158,16 +1164,20 @@ pub async fn pinned_put_route(
         .tenets_store(&agent_id)
         .and_then(|store| store.replace_pinned(&pins, new_id))
     {
-        Ok(created) => Json(json!({
-            "ok": true,
-            "pins": state
-                .memory()
-                .tenets_store(&agent_id)
-                .map(|s| s.active().iter().map(|t| Value::String(t.content.clone())).collect::<Vec<_>>())
-                .unwrap_or_default(),
-            "added": created.iter().map(tenet_json).collect::<Vec<_>>(),
-        }))
-        .into_response(),
+        Ok(created) => {
+            let store = match state.memory().tenets_store(&agent_id) {
+                Ok(store) => store,
+                Err(err) => return error_response(&err),
+            };
+            state
+                .app_events()
+                .publish("agent-updated", json!({ "agentId": agent_id }));
+            Json(json!({
+                "ok": true,
+                "pins": store.active().iter().map(|t| Value::String(t.content.clone())).collect::<Vec<_>>(),
+                "added": created.iter().map(tenet_json).collect::<Vec<_>>(),
+            })).into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
@@ -1286,36 +1296,47 @@ pub async fn experience_put_route(
         )
             .into_response();
     };
-    // Split merged markdown into `# category` sections (agents.ts:1046-1061).
+    // 标题可使用任意空白分隔；重复分类正文合并，与现役 Map 的语义一致。
     let mut categories: Vec<(String, String)> = Vec::new();
-    let mut current: Option<(String, Vec<String>)> = None;
+    let mut current: Option<usize> = None;
     for line in content.split('\n') {
-        if let Some(title) = line.strip_prefix("# ").map(str::trim) {
-            if let Some((name, lines)) = current.take() {
-                categories.push((name, lines.join("\n")));
-            }
-            match lingxi_kernel::memory::normalize_experience_category(title) {
-                Some(normalized) => current = Some((normalized, Vec::new())),
-                None => {
-                    return (
-                        StatusCode::BAD_REQUEST,
-                        Json(json!({ "error": "invalid experience category" })),
-                    )
-                        .into_response();
-                }
-            }
-        } else if let Some((_, lines)) = current.as_mut() {
-            lines.push(line.to_string());
+        let heading = line.strip_prefix('#').filter(|rest| {
+            rest.chars().next().is_some_and(char::is_whitespace) && !rest.trim().is_empty()
+        });
+        if let Some(title) = heading.map(str::trim) {
+            let Some(normalized) = lingxi_kernel::memory::normalize_experience_category(title)
+            else {
+                return (
+                    StatusCode::BAD_REQUEST,
+                    Json(json!({ "error": "invalid experience category" })),
+                )
+                    .into_response();
+            };
+            let index = categories
+                .iter()
+                .position(|(name, _)| name == &normalized)
+                .unwrap_or_else(|| {
+                    categories.push((normalized, String::new()));
+                    categories.len() - 1
+                });
+            current = Some(index);
+        } else if let Some(index) = current {
+            categories[index].1.push_str(line);
+            categories[index].1.push('\n');
         }
-    }
-    if let Some((name, lines)) = current.take() {
-        categories.push((name, lines.join("\n")));
     }
     match service
         .experience_store(&agent_id)
         .and_then(|store| store.sync_categories(&categories))
     {
-        Ok(()) => Json(json!({ "ok": true })).into_response(),
+        Ok(()) => {
+            // 编译端每次运行重新读取配置和提示词材料，经验读取端实时读分类及索引。
+            // 更新通知只在同步成功后发送；没有独立的旧助手缓存需要替换。
+            state
+                .app_events()
+                .publish("agent-updated", json!({ "agentId": agent_id }));
+            Json(json!({ "ok": true })).into_response()
+        }
         Err(err) => error_response(&err),
     }
 }

@@ -1,0 +1,180 @@
+{
+  "status": "PARTIAL_CONTINUATION_NOT_STAGE_ACCEPTANCE",
+  "baseCommit": "6d19332793c0819f5219a4ed42fcc8f0d7f813a4",
+  "ready": 205,
+  "gap": 74,
+  "newReadyLeaves": [
+    "R00-T02-LA-628005EDFF37",
+    "R00-T02-LA-04EE57C5D2BF",
+    "R00-T02-LA-7563265D4241",
+    "R00-T02-LA-DCF0836C3A16"
+  ],
+  "contractTests": {
+    "passed": 20,
+    "failed": 0
+  },
+  "mainIntegratedRegression": {
+    "r06_original_memory_skill_proofs": 19,
+    "r06_t01_context_compiler": 21,
+    "r06_t06_memory": 7
+  },
+  "mainW11Suite": {
+    "passed": 12,
+    "failed": 0
+  },
+  "windows": {
+    "batch1-execution": {
+      "count": 7,
+      "entries": [
+        {
+          "key": "r06_test_0733387ea12a0fd260b8",
+          "test": "experience_sync_event_reads_latest_documents_and_next_run_reloads_materials",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "9e23e0e5bbc232d75db79ead931f4b8fc2c42ac54a6c733fc5e95d1e641b1808",
+          "stdoutSha256": "14d5dc5e48985807ec7ccbc4f9ca445ef61b17ea20b00658606a2276e36ad356",
+          "stderrSha256": "60ea8b350f8f9113a404ff840735b80466e9eb4d3e121bf46f96be1d1a197624"
+        },
+        {
+          "key": "r06_test_258d2e6c395b0bda7051",
+          "test": "original_context_notes_append_reopen_and_oversize_preserve_old_value",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "b1c5ff4c53b6da070e217a24f8613bb7e3c89cae5f291bb72f54a3f98d8a880d",
+          "stdoutSha256": "9bb2fe8605e765abeca2c463466f9542d3f2c3fdefa52219dae837d55dd4713c",
+          "stderrSha256": "4a6d3b9bd658867e936b587421caf0bf5718b9799477a02cd50e923852bebb3a"
+        },
+        {
+          "key": "r06_test_2e33481eac06ed987266",
+          "test": "original_experience_read_sync_paused_and_invalid_preserve_state",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "42fc3aa3ff229c14c69ee3b2ef382e358ccbc9d54f8069aa79db18525f5de469",
+          "stdoutSha256": "c35b4588efdc158707d88648326bad2141a78ba480436cdd82881142981f0637",
+          "stderrSha256": "53ffcfab2a3c569298aea0c5a68495dea8c337306a6a6664b3dd23d43fa263c4"
+        },
+        {
+          "key": "r06_test_389f81a5c0c7fe5f0823",
+          "test": "original_tenet_http_states_duplicate_limits_and_pinned_visibility",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "4433455c0e5c3b91b5e6fb64a3ea923b1153d1e66c9392cc15ac49b130113623",
+          "stdoutSha256": "d11ab7d718237a0dabdc4c9bfb957f369cb90c5b0c648d8283e02a41c353c372",
+          "stderrSha256": "53ffcfab2a3c569298aea0c5a68495dea8c337306a6a6664b3dd23d43fa263c4"
+        },
+        {
+          "key": "r06_test_49b4e33ff410b6b19542",
+          "test": "pinned_replacement_event_and_next_actual_run_use_latest_principles",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "0c9cd0ba20689165acde3b6e98bfe0a831b1a35e4ecf26cbc29f486c1bce5715",
+          "stdoutSha256": "981d09880c02f8d381bb133502c4451fcaa2ecc4655e5811a692da2888b455e2",
+          "stderrSha256": "c0cfac2ca039e060afdfbd2c1228355f86d4400e807800f4939f612175ec8610"
+        },
+        {
+          "key": "r06_test_66e4a7fb3573a50e3fa8",
+          "test": "original_tenet_decisions_and_pinned_replacement_preserve_nonactive",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "2950ae417275925b4a8e67c36bdb0f0806a5cbf60805303af56b3a4f34a953fd",
+          "stdoutSha256": "d4c0a0f2e18e1953a924cbcc94249d820d1ba668b17dfe7f090821f286ead483",
+          "stderrSha256": "53ffcfab2a3c569298aea0c5a68495dea8c337306a6a6664b3dd23d43fa263c4"
+        },
+        {
+          "key": "r06_test_68e0accf860884608603",
+          "test": "direct_tenets_success_duplicate_events_and_refusals_are_agent_scoped",
+          "passed": true,
+          "sourceCandidateSha256": "4cc6ddcb162a808a13dace9f0f09437841d231e19f4467750a10bed8a94b8049",
+          "resultSha256": "3e1ff1dab339cbcc7d0eca853cfee78fc9542e4f154cb51085e8466685a683f3",
+          "stdoutSha256": "f6479e35bfb462342c22c299d917c757aaa1db82dca9a1012a52ed1aee5a6581",
+          "stderrSha256": "c0cfac2ca039e060afdfbd2c1228355f86d4400e807800f4939f612175ec8610"
+        }
+      ],
+      "localRawEvidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/route-a-20261014/batch1-execution",
+      "stageVerdict": "NOT_A_STAGE_VERDICT"
+    },
+    "w11-binding-execution": {
+      "count": 6,
+      "entries": [
+        {
+          "key": "r06_test_2bccce20dcfe39650959",
+          "test": "c02_eight_retained_paid_results_refuse_ninth_before_send_and_recover_all",
+          "passed": true,
+          "sourceCandidateSha256": "16cdf08a705860e6f661624560ab90b667481cb92e9b91b12a666ce0dbcda1c8",
+          "resultSha256": "3013570fc21a21265d668e554eb7ae5ffe25dcf9d39619b8f95f8cca2bbf402b",
+          "stdoutSha256": "7b2c6f225793bfadf577efd3b2185186e5ad6d8ac3d97f915aaa189279aed245",
+          "stderrSha256": "2c6a21cf82668a0f5851e645ff1afa523d38b54f7cab51366b88b59885ff3acb"
+        },
+        {
+          "key": "r06_test_3fc0a440c590ad5664d9",
+          "test": "c03_absolute_deadline_native_fifo_retains_claim_and_known_paid_usage",
+          "passed": true,
+          "sourceCandidateSha256": "16cdf08a705860e6f661624560ab90b667481cb92e9b91b12a666ce0dbcda1c8",
+          "resultSha256": "233cfcc47a4af0d7387da069fa3143dce436b5ce73bc3c36b22acadc5e41fb05",
+          "stdoutSha256": "53cdeecc263bb33fb0dec438b1aaa533f8ef42a85d21a1375a42e541b47f3bba",
+          "stderrSha256": "c7bde3abd821f83deac1c14b4831baedc325ca91622d65c09155dab08b4e7e7c"
+        },
+        {
+          "key": "r06_test_5ad05fdc279acf69d07f",
+          "test": "c03_actual_driver_cancel_native_fifo_keeps_paid_ledger_and_physical_lease",
+          "passed": true,
+          "sourceCandidateSha256": "16cdf08a705860e6f661624560ab90b667481cb92e9b91b12a666ce0dbcda1c8",
+          "resultSha256": "42f48b9893b2f1bb4e5efdb1ee6ed59e8d2ccc919ca67933198127d73458a8f9",
+          "stdoutSha256": "32cf90cfd7e7c63dd232ce4f71a11eb765e940c767f841450fc66668ce1fe5a2",
+          "stderrSha256": "c7bde3abd821f83deac1c14b4831baedc325ca91622d65c09155dab08b4e7e7c"
+        },
+        {
+          "key": "r06_test_947d6bf325c056f8b30c",
+          "test": "c02_paid_native_waiter_drop_preserves_real_bytes_until_physical_exit_and_recovery",
+          "passed": true,
+          "sourceCandidateSha256": "16cdf08a705860e6f661624560ab90b667481cb92e9b91b12a666ce0dbcda1c8",
+          "resultSha256": "879a1659ef7479f5658302e934818861412f7ec765a9ff1bd00b170fe2ecf8af",
+          "stdoutSha256": "4a3d81f7c510ee5426cb6114385f9cf1565a0595b4f0051b5028c9a18b2851a2",
+          "stderrSha256": "c362f8bd8261a9a7f53c182020125098c216ae839c190476f94d7ca7995f5cff"
+        },
+        {
+          "key": "r06_test_ca21eb62c15df8a4fc21",
+          "test": "c03_retained_paid_recovery_native_wait_keeps_original_cancel_and_deadline",
+          "passed": true,
+          "sourceCandidateSha256": "16cdf08a705860e6f661624560ab90b667481cb92e9b91b12a666ce0dbcda1c8",
+          "resultSha256": "2d80ed37d7b8a77698d69c2a3e85035cd9eba0d5b388f40d9e8a06e25e898c01",
+          "stdoutSha256": "c3bbffa0e16694956b086d173e2601a1ee13a800dbfaf7ad5d066dcb5ef33d0a",
+          "stderrSha256": "12411fcae99ef8bdcee64cac62866eaadf26bf99229f0026c20adf3820d78738"
+        },
+        {
+          "key": "r06_test_fd1783c926aea55ac439",
+          "test": "c03_native_fifo_blocks_incidental_reader_until_explicit_release",
+          "passed": true,
+          "sourceCandidateSha256": "16cdf08a705860e6f661624560ab90b667481cb92e9b91b12a666ce0dbcda1c8",
+          "resultSha256": "e26abdc3a98feeefd2225f4a7b0d04a94cee2a0207bde60fd8b31b54d7d86082",
+          "stdoutSha256": "ca7caa6ddffc698c9d4af732dc17d81d0cb91665cff0a9e331e31ebcbc8ecdac",
+          "stderrSha256": "c7bde3abd821f83deac1c14b4831baedc325ca91622d65c09155dab08b4e7e7c"
+        }
+      ],
+      "localRawEvidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/route-a-20261014/w11-binding-execution",
+      "stageVerdict": "NOT_A_STAGE_VERDICT"
+    }
+  },
+  "localLogs": {
+    "batch1-final-contract": {
+      "path": "/tmp/r06-a-main-20261014/batch1-final-contract.log",
+      "sha256": "cdd3dc2100833a28276b682c8b835136a2aa0227416964cb4c1a7daad61cac77"
+    },
+    "batch1-regressions": {
+      "path": "/tmp/r06-a-main-20261014/batch1-regressions.log",
+      "sha256": "57d6ce89ce89d86b84f1b87466453f7311b46530dd3ce3bf6e2cc048ef305c11"
+    },
+    "w11": {
+      "path": "/tmp/r06-a-main-20261014/w11.log",
+      "sha256": "8e6745e8094a7661481ae349778186b80d464a39b8e344e53b076ed0c9b56e6f"
+    },
+    "w11-bindings": {
+      "path": "/tmp/r06-a-main-20261014/w11-bindings.log",
+      "sha256": "64e9b4e090e31ef8ec428a0b2f143140d5eff099d5a1064140e7463779a7a527"
+    },
+    "batch1-window": {
+      "path": "/tmp/r06-a-main-20261014/batch1-window.log",
+      "sha256": "ab010d7022878baf87e927a1881536a9aa382f391c65fcc81eba46efb2a46627"
+    }
+  }
+}

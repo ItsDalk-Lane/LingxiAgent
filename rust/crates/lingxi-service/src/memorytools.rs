@@ -394,6 +394,13 @@ impl MemoryTools {
     }
 
     fn run_context_notes(&self, ctx: &lingxi_kernel::RunContext, args: &Value) -> ToolOutcome {
+        // 没有会话时不能把失败包装成空笔记，也不能创建无归属文件。
+        if ctx.session_id.as_str().trim().is_empty() {
+            return failed(
+                ErrorCode::InvalidMessage,
+                "no active session — context notes are session-scoped".into(),
+            );
+        }
         let action = args.get("action").and_then(Value::as_str).unwrap_or("read");
         let notes = self.memory.context_notes();
         match action {
@@ -409,10 +416,14 @@ impl MemoryTools {
             },
             "write" | "append" => {
                 let Some(text) = args.get("text").and_then(Value::as_str) else {
-                    return text_success("text is required for write/append".into());
+                    return failed(
+                        ErrorCode::InvalidMessage,
+                        "text is required for write/append".into(),
+                    );
                 };
                 if text.trim().is_empty() {
-                    return text_success(
+                    return failed(
+                        ErrorCode::InvalidMessage,
                         "refusing to write empty notes (use them or drop them)".into(),
                     );
                 }
@@ -421,7 +432,8 @@ impl MemoryTools {
                         Ok(current) if !current.is_empty() => {
                             format!("{}\n{}", current.trim_end(), text)
                         }
-                        _ => text.to_string(),
+                        Ok(_) => text.to_string(),
+                        Err(err) => return failed(ErrorCode::Internal, err.to_string()),
                     }
                 } else {
                     text.to_string()

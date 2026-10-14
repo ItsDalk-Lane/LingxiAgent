@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
@@ -31,7 +32,8 @@ for key in sorted(selected):
     if binding["kind"] == "rust_desktop_test":
         env.pop("CARGO_TARGET_DIR", None)
     else:
-        env["CARGO_TARGET_DIR"] = str(ROOT / "rust/target-r06-continuation")
+        # 保留调用者指定的独立构建缓存；未指定时同样放在仓库外。
+        env.setdefault("CARGO_TARGET_DIR", str(Path(tempfile.gettempdir()) / "lingxi-r06-reviewed-target"))
     result = subprocess.run([
         sys.executable, "-B", str(SCRIPT), "--binding", key, "--evidence",
         str(evidence / "R06_BINDINGS" / key),

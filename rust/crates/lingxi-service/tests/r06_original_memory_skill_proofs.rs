@@ -1779,21 +1779,87 @@ async fn original_context_notes_append_reopen_and_oversize_preserve_old_value() 
         original_notes_call(&reopened, session, 216, json!({"action":"read"})).await,
     );
     assert_eq!(text, "context notes:\n原第一块\n原第二块");
-    let empty = original_tool_text(
-        original_notes_call(
-            &reopened,
-            session,
-            217,
-            json!({"action":"write","text":"   "}),
-        )
-        .await,
-    );
+    let empty = match original_notes_call(
+        &reopened,
+        session,
+        217,
+        json!({"action":"write","text":"   "}),
+    )
+    .await
+    .outcome
+    {
+        lingxi_kernel::ports::ToolOutcome::Failed { error } => {
+            assert_eq!(error.code, lingxi_protocol::ErrorCode::InvalidMessage);
+            error.message
+        }
+        other => panic!("空写入必须明确失败：{other:?}"),
+    };
     assert!(empty.contains("refusing to write empty notes"));
     assert_eq!(
         reopened.memory.context_notes().read(session).unwrap(),
         "原第一块\n原第二块"
     );
-    // 空写入当前是Success拒绝文本而非原错误结果，整项继续保留GAP。
+    for (sequence, args) in [
+        (218, json!({"action":"append","text":"\n "})),
+        (219, json!({"action":"write"})),
+    ] {
+        let rejected = original_notes_call(&reopened, session, sequence, args).await;
+        assert!(matches!(
+            rejected.outcome,
+            lingxi_kernel::ports::ToolOutcome::Failed { .. }
+        ));
+        assert_eq!(
+            reopened.memory.context_notes().read(session).unwrap(),
+            "原第一块\n原第二块"
+        );
+    }
+    let no_session = original_notes_call(
+        &reopened,
+        "",
+        220,
+        json!({"action":"write","text":"不得落盘"}),
+    )
+    .await;
+    assert!(matches!(
+        no_session.outcome,
+        lingxi_kernel::ports::ToolOutcome::Failed { .. }
+    ));
+    assert_eq!(
+        reopened.memory.context_notes().read(session).unwrap(),
+        "原第一块\n原第二块"
+    );
+    let cap = lingxi_adapters::storage::agent_memory::CONTEXT_NOTES_MAX_BYTES;
+    let exact = "x".repeat(cap);
+    let exact_result = original_notes_call(
+        &reopened,
+        session,
+        221,
+        json!({"action":"write","text":exact}),
+    )
+    .await;
+    assert!(matches!(
+        exact_result.outcome,
+        lingxi_kernel::ports::ToolOutcome::Success { .. }
+    ));
+    assert_eq!(
+        reopened.memory.context_notes().read(session).unwrap().len(),
+        cap
+    );
+    let overflow = original_notes_call(
+        &reopened,
+        session,
+        222,
+        json!({"action":"append","text":"y"}),
+    )
+    .await;
+    assert!(matches!(
+        overflow.outcome,
+        lingxi_kernel::ports::ToolOutcome::Failed { .. }
+    ));
+    assert_eq!(
+        reopened.memory.context_notes().read(session).unwrap(),
+        "x".repeat(cap)
+    );
     server.stop_and_clean().await;
 }
 
