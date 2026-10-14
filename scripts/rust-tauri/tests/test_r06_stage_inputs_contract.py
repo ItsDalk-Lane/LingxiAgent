@@ -364,7 +364,9 @@ class R06StageInputsContract(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0, "登记校验不能代替分支行为的逐断言证据")
         leaves = json.loads((leaf_dir / "leaf-cases.json").read_text())
         self.assertFalse(leaves["passedRegisteredAssertions"])
-        self.assertTrue(all(row["actual"] is None and not row["ok"] for row in leaves["cases"]))
+        # 人工回执绑定的 GUI 叶不受「单绑定已跑」影响（其义务由回执自身满足）
+        self.assertTrue(all(row["actual"] is None and not row["ok"] for row in leaves["cases"]
+                            if "manualEvidence" not in row))
         self.assertTrue(leaves["partialProofs"])
         for row in leaves["partialProofs"]:
             self.assertFalse(row["originalAssertionSatisfied"])
