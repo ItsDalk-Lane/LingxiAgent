@@ -2594,7 +2594,15 @@ impl KnowledgeService {
                     stats["failedRequestCount"] = json!(
                         stats["failedRequestCount"].as_u64().unwrap() + potentially_sent_count
                     );
-                    self.facts.set_job_embedding_stats(&job.id, &stats)?;
+                    // RV6-F12-02：统计持久化失败也不得替换 provider 主错误——
+                    // 追加详情，主错误码与传输事实保持可追溯。
+                    if let Err(stats_err) = self.facts.set_job_embedding_stats(&job.id, &stats) {
+                        let code = error.code.clone();
+                        return Err(KnowledgeError::new(
+                            code,
+                            format!("{error}; embedding stats persistence failed: {stats_err}"),
+                        ));
+                    }
                     if let Some(build) = &build {
                         if let Err(cleanup) = self.vectors.fail_build(&build.variant_id) {
                             let code = error.code.clone();
@@ -2675,7 +2683,14 @@ impl KnowledgeService {
             // 写入前保存变体锚点；写后统计故障可从已确认的字节恢复真实写入数。
             self.facts.set_job_embedding_stats(&job.id, &stats)?;
             if let Err(error) = self.vectors.upsert_batch(&current.variant_id, &entries) {
-                self.vectors.fail_build(&current.variant_id)?;
+                // RV6-F12-01 同族：清理失败不得替换 upsert 主错误（append 口径）。
+                if let Err(cleanup) = self.vectors.fail_build(&current.variant_id) {
+                    let code = error.code.clone();
+                    return Err(KnowledgeError::new(
+                        code,
+                        format!("{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}"),
+                    ));
+                }
                 return Err(error);
             }
             stats["chunksNewlyEmbedded"] =
@@ -2688,7 +2703,14 @@ impl KnowledgeService {
                 Some(chunks.len() as i64),
             )?;
             if let Some(error) = accounting_error {
-                self.vectors.fail_build(&current.variant_id)?;
+                // RV6-F12-01 同族：延迟账目错误同样保留主错误码。
+                if let Err(cleanup) = self.vectors.fail_build(&current.variant_id) {
+                    let code = error.code.clone();
+                    return Err(KnowledgeError::new(
+                        code,
+                        format!("{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}"),
+                    ));
+                }
                 return Err(error);
             }
         }

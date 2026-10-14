@@ -372,6 +372,17 @@ async fn vector_ingestion_upgrade_case(provider_error: bool) {
             .as_deref()
             .unwrap()
             .contains("cache status unchanged"));
+    } else {
+        // RV6-F12-01 回归闸：upsert 路径主/清理错误同码（均 SCHEMA_NEWER），
+        // 追加语义的固定后缀是唯一可区分信号——替换语义下该后缀消失。
+        assert!(
+            job.error
+                .as_deref()
+                .unwrap()
+                .contains("cleanup fail_build rejected"),
+            "主错误必须保留且清理失败以追加出现（当前错误串：{}）",
+            job.error.as_deref().unwrap()
+        );
     }
     let observer = Connection::open(home.join("knowledge/knowledge_vector.db")).unwrap();
     assert_eq!(
