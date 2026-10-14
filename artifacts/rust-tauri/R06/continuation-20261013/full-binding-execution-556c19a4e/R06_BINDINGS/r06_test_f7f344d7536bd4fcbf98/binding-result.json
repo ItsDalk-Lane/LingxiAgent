@@ -1,0 +1,142 @@
+{
+  "schema": "lingxi.r06.executed-binding.v1",
+  "key": "r06_test_f7f344d7536bd4fcbf98",
+  "sourceCandidateSha256": "3812e9d9c0bf8bc5b3bc2ebd7a0781e27fb920f450dc74605031636c6e002ad5",
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_agent_config_readback",
+    "test": "put_config_validation_and_auth",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_agent_config_readback",
+      "put_config_validation_and_auth",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "command": {
+    "binding": {
+      "package": "lingxi-service",
+      "suite": "r06_agent_config_readback",
+      "test": "put_config_validation_and_auth",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_agent_config_readback",
+        "put_config_validation_and_auth",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_agent_config_readback",
+      "put_config_validation_and_auth",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "sourceBeforeSha256": "3812e9d9c0bf8bc5b3bc2ebd7a0781e27fb920f450dc74605031636c6e002ad5",
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/stdout.log",
+    "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/stderr.log",
+    "timeoutSecs": 900,
+    "syntheticEnvironment": {
+      "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/runtime/home",
+      "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/runtime/tmp",
+      "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+      "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/w01_evidence",
+      "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/w09_evidence",
+      "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/w10_evidence",
+      "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/w11_evidence",
+      "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/lingxi_w03_evidence",
+      "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/lingxi_f05_evidence",
+      "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/lingxi_f08_evidence",
+      "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/t08",
+      "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-execution-556c19a4e/R06_BINDINGS/r06_test_f7f344d7536bd4fcbf98/command-001/raw/t08-evaluations.jsonl"
+    },
+    "actualArgv": [
+      "/Users/study_superior/.cargo/bin/rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_agent_config_readback",
+      "put_config_validation_and_auth",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "pid": 83351,
+    "elapsedSecs": 2.432,
+    "outputCheck": {
+      "valid": true,
+      "expectedTest": "put_config_validation_and_auth",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "put_config_validation_and_auth"
+      ],
+      "reason": ""
+    },
+    "stdoutSha256": "c80d4028944cab24b91d92b1ad8fd7370a46025ce108f613d0189f8fe04f0554",
+    "stderrSha256": "da86c6a0d1a9a759f5a043010195d17fd80aad589e715e865e7e0d8f078de5de",
+    "sourceAfterSha256": "3812e9d9c0bf8bc5b3bc2ebd7a0781e27fb920f450dc74605031636c6e002ad5",
+    "sourceStable": true,
+    "localPassed": true
+  },
+  "passed": true,
+  "stageVerdict": "NOT_A_STAGE_VERDICT"
+}

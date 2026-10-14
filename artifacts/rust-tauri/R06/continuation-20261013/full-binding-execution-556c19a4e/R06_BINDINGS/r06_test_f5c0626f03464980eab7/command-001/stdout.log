@@ -1,0 +1,15 @@
+
+running 1 test
+test session_summary_returns_rolling_record_and_blank_is_not_a_summary ... ok
+
+successes:
+
+---- session_summary_returns_rolling_record_and_blank_is_not_a_summary stdout ----
+LINGXI_AUTH_REJECTED request_id="req-cced565f8b4fb74abbac977ab6730321" method=GET path=/lingxi/v1/sessions/sum-s/summary status=401 Unauthorized reason=missing_credential remote=127.0.0.1:65304
+
+
+successes:
+    session_summary_returns_rolling_record_and_blank_is_not_a_summary
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 2.62s
+

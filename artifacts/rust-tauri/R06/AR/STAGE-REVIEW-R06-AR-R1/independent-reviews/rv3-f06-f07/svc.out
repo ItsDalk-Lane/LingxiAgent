@@ -1,0 +1,15 @@
+LINGXI_SERVICE_READY addr=127.0.0.1:18100 home=/private/tmp/rv3-env/manual/home source=cli
+
+=== LINGXI_TEST_GUARD: ABORTING TEST PROCESS TO PROTECT THE MACHINE ===
+  reason  : wall clock 600.06s exceeded the 600.00s limit (TEST_TIME_LIMIT_SEC)
+  process : lingxi-service (pid 42328)
+  memory  : now 0.04 GiB (40140800 bytes) / limit 8.00 GiB (8589934592 bytes)
+  elapsed : 600.06s / time budget 600.00s
+  live test threads (libtest names each thread after its test function):
+    - lingxi-db-worker
+    - main
+    - tokio-rt-worker
+  next    : reproduce single-threaded (`cargo test <name> -- --test-threads=1 --nocapture`);
+            adjust or disable: TEST_MEM_LIMIT_MB=16384, TEST_MEM_LIMIT_MB=0,
+            TEST_TIME_LIMIT_SEC=0 (0 = off), LINGXI_TEST_GUARD=0 (off entirely)
+===========================================================================

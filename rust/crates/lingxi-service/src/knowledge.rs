@@ -2596,7 +2596,13 @@ impl KnowledgeService {
                     );
                     self.facts.set_job_embedding_stats(&job.id, &stats)?;
                     if let Some(build) = &build {
-                        self.vectors.fail_build(&build.variant_id)?;
+                        if let Err(cleanup) = self.vectors.fail_build(&build.variant_id) {
+                            let code = error.code.clone();
+                            return Err(KnowledgeError::new(
+                                code,
+                                format!("{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}"),
+                            ));
+                        }
                     }
                     return Err(error);
                 }
@@ -2604,7 +2610,13 @@ impl KnowledgeService {
             self.facts.set_job_embedding_stats(&job.id, &stats)?;
             if let Err(error) = validate_embedding_batch(&served, &vectors, batch.len()) {
                 if let Some(build) = &build {
-                    self.vectors.fail_build(&build.variant_id)?;
+                    if let Err(cleanup) = self.vectors.fail_build(&build.variant_id) {
+                        let code = error.code.clone();
+                        return Err(KnowledgeError::new(
+                            code,
+                            format!("{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}"),
+                        ));
+                    }
                 }
                 return Err(error);
             }
@@ -2612,10 +2624,19 @@ impl KnowledgeService {
                 .as_ref()
                 .is_some_and(|identity| *identity != served)
             {
+                let main = KnowledgeError::conflict(
+                    "embedding identity changed; preserve old paid results and rebuild a distinct variant",
+                );
                 if let Some(build) = &build {
-                    self.vectors.fail_build(&build.variant_id)?;
+                    if let Err(cleanup) = self.vectors.fail_build(&build.variant_id) {
+                        let code = main.code.clone();
+                        return Err(KnowledgeError::new(
+                            code,
+                            format!("{main}; cleanup fail_build rejected (cache status unchanged): {cleanup}"),
+                        ));
+                    }
                 }
-                return Err(KnowledgeError::conflict("embedding identity changed; preserve old paid results and rebuild a distinct variant"));
+                return Err(main);
             }
             let _write = self.write_gate.try_lock().map_err(|_| {
                 KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
@@ -2679,12 +2700,28 @@ impl KnowledgeService {
             .ok_or_else(|| KnowledgeError::index_invalid("no confirmed embedding identity"))?;
         let build = build.ok_or_else(|| KnowledgeError::index_invalid("no vector build"))?;
         if let Err(error) = self.vectors.complete_build_plan(&build.variant_id, &plan) {
-            self.vectors.fail_build(&build.variant_id)?;
+            if let Err(cleanup) = self.vectors.fail_build(&build.variant_id) {
+                let code = error.code.clone();
+                return Err(KnowledgeError::new(
+                    code,
+                    format!(
+                        "{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}"
+                    ),
+                ));
+            }
             return Err(error);
         }
         stats["model"] = json!({"key":identity.key,"provider":identity.provider,"modelId":identity.model_id,"protocol":identity.protocol,"dimensions":identity.dimensions,"parameterFingerprint":identity.parameter_fingerprint});
         if let Err(error) = self.facts.complete_job(&job.id, &stats) {
-            self.vectors.fail_build(&build.variant_id)?;
+            if let Err(cleanup) = self.vectors.fail_build(&build.variant_id) {
+                let code = error.code.clone();
+                return Err(KnowledgeError::new(
+                    code,
+                    format!(
+                        "{error}; cleanup fail_build rejected (cache status unchanged): {cleanup}"
+                    ),
+                ));
+            }
             return Err(error);
         }
         Ok(())
