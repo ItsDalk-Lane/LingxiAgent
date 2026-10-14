@@ -1,0 +1,15 @@
+
+running 1 test
+test original_archived_list_aggregates_agents_and_projects_first_visible_user_text ... ok
+
+successes:
+
+---- original_archived_list_aggregates_agents_and_projects_first_visible_user_text stdout ----
+{"agentAggregation":3,"archivedRows":5,"emptyPreview":"","firstUserNotLastOrAssistant":true,"historyUnchanged":true,"internalEnvelopesExcluded":true,"noSplitScalar":true,"originalLeaf":"R00-T02-LA-43FFB75F252C","utf16Limit":100}
+
+
+successes:
+    original_archived_list_aggregates_agents_and_projects_first_visible_user_text
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.13s
+

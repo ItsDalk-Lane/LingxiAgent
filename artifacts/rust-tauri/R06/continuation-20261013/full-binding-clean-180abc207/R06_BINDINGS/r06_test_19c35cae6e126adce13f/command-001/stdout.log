@@ -1,0 +1,18 @@
+
+running 1 test
+test subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity ... ok
+
+successes:
+
+---- subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity stdout ----
+
+thread 'subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity' (4353301) panicked at crates/lingxi-service/tests/r06_original_chat_proofs.rs:448:40:
+ACTUAL_CHILD_PANIC_REASON_941
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+successes:
+    subagent_actual_panic_and_provider_failure_return_reasons_and_reclaim_capacity
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.17s
+

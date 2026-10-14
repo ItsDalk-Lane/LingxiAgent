@@ -3803,6 +3803,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_b92a6b984a67e3678859/binding-result.json"
       ]
     },
+    "r06_test_910e4bcfed2b7f485283": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_910e4bcfed2b7f485283",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_910e4bcfed2b7f485283"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_910e4bcfed2b7f485283/binding-result.json"
+      ]
+    },
     "r06_test_6acda3a265c23c2e8d90": {
       "argv": [
         "python3",
@@ -5183,6 +5198,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_2e33481eac06ed987266/binding-result.json"
       ]
     },
+    "r06_test_f554ea7d108a2642c7bb": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_f554ea7d108a2642c7bb",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f554ea7d108a2642c7bb"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f554ea7d108a2642c7bb/binding-result.json"
+      ]
+    },
     "r06_test_dace28f0c2d8a7530535": {
       "argv": [
         "python3",
@@ -6430,6 +6460,7 @@
         "r06_test_8ed4e61d01cb5519a628",
         "r06_test_8f1601e1d677c567b2d5",
         "r06_test_8fea1c7df66dbb280eea",
+        "r06_test_910e4bcfed2b7f485283",
         "r06_test_919b77a2401ef009498d",
         "r06_test_91edb93514af41825b06",
         "r06_test_92bd8f3099dab10e2cc3",
@@ -6579,6 +6610,7 @@
         "r06_test_f31f250a57db1c9707ad",
         "r06_test_f3eacfa8241968e42b79",
         "r06_test_f4717018a50a4bd5b4ef",
+        "r06_test_f554ea7d108a2642c7bb",
         "r06_test_f5c0626f03464980eab7",
         "r06_test_f5ff15d29a8970896136",
         "r06_test_f6364578fc2151c7976a",
@@ -19534,5 +19566,5 @@
       "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
     }
   ],
-  "inputDigestSha256": "a2ea3214651ebb620bfcf3c5a4dc53e9d23d558dc3248eba31d6357c5cefb7b2"
+  "inputDigestSha256": "85d571554403f51f01bcdf00a9376d52318091b24098cc96e543c4626c08ddf1"
 }

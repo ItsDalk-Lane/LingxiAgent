@@ -1,0 +1,16 @@
+
+running 1 test
+test rotate_continue_deleted_agent_and_draft_cleanup ... ok
+
+successes:
+
+---- rotate_continue_deleted_agent_and_draft_cleanup stdout ----
+LINGXI_AUTH_REJECTED request_id="req-f909a9ad7b807a401958fb411d21c02b" method=POST path=/lingxi/v1/sessions/rotate status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63156
+LINGXI_AUTH_REJECTED request_id="req-abd613fb41840dde88f98233b13b5cac" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63170
+
+
+successes:
+    rotate_continue_deleted_agent_and_draft_cleanup
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.10s
+

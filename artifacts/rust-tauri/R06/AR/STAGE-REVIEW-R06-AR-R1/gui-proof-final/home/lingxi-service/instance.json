@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "serverKind": "lingxi-service",
+  "serverVersion": "0.0.0",
+  "wireProtocolMin": 1,
+  "wireProtocolMax": 1,
+  "dataEpoch": 1,
+  "instanceId": "f563b812f91240f87f7a5c557c1bf257",
+  "startNonce": "ec94c6c2e0654b34",
+  "pid": 95150,
+  "bindAddr": "127.0.0.1:54921",
+  "transport": "http",
+  "startedAtUnixMs": 1791952788362,
+  "homePath": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/home"
+}

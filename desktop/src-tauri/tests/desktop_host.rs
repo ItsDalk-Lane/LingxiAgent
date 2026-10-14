@@ -207,8 +207,14 @@ async fn native_desktop_resource_roundtrip_real_gui() {
     let pick = driver
         .script("return window.__nativeSelections[0];", json!([]), false)
         .await;
-    assert_eq!(pick, json!([selected]));
-    assert_eq!(fs::read_to_string(&selected).unwrap(), "原生选择不修改文件");
+    // macOS 原生选择器返回规范化路径（/tmp → /private/tmp）：期望侧取同一
+    // 规范化形式，比较的是「选中的就是这个文件」而非路径字面拼写。
+    let selected_canonical = selected.canonicalize().unwrap_or_else(|_| selected.clone());
+    assert_eq!(pick, json!([selected_canonical]));
+    assert_eq!(
+        fs::read_to_string(&selected).unwrap(),
+        "原生选择不修改文件"
+    );
     assert_eq!(
         driver
             .script(
@@ -268,7 +274,26 @@ async fn native_desktop_resource_roundtrip_real_gui() {
         )
         .await;
     fs::write(&note, "# resource-changed\n").unwrap();
-    driver.wait_script("return document.querySelector('[data-testid=file-editor]')?.value==='# resource-changed\\n';", json!([]), Duration::from_secs(15)).await;
+    // 诊断增强：轮询同时打印 watchError/编辑器状态，定位订阅链断点。
+    {
+        let deadline = Instant::now() + Duration::from_secs(20);
+        loop {
+            let state = driver
+                .script(
+                    "return {err: document.querySelector('[data-testid=watch-error]')?.textContent||null, editor: document.querySelector('[data-testid=file-editor]')?.value||null};",
+                    json!([]),
+                    false,
+                )
+                .await;
+            let ok = state["editor"].as_str() == Some("# resource-changed\n");
+            println!("EDITOR_REFRESH_STATE {state}");
+            assert!(Instant::now() < deadline || ok, "编辑器未随资源变更刷新：{state}");
+            if ok {
+                break;
+            }
+            tokio::time::sleep(Duration::from_secs(1)).await;
+        }
+    }
     let resource_evidence = driver.script("return window.__nativeEvents.filter(v=>(v.events||[]).some(e=>e.type==='resource.changed'));", json!([]), false).await;
     assert!(
         !resource_evidence.as_array().unwrap().is_empty(),
@@ -504,7 +529,8 @@ async fn native_desktop_resource_roundtrip_real_gui() {
         tokio::time::sleep(Duration::from_millis(250)).await;
     }
     let evidence: Value = serde_json::from_slice(&fs::read(observation).unwrap()).unwrap();
-    assert_eq!(evidence["path"], json!(selected));
+    // 观察回执的 path 同为规范化口径（编排方按真实窗口记录）。
+    assert_eq!(evidence["path"], json!(selected_canonical));
     assert_eq!(evidence["observedWindow"], true);
     assert!(!evidence["program"].as_str().unwrap_or("").is_empty());
     assert!(!evidence["windowTitle"].as_str().unwrap_or("").is_empty());

@@ -1,0 +1,15 @@
+
+running 1 test
+test original_pin_order_checks_each_owner_and_rolls_back_failed_reordering ... ok
+
+successes:
+
+---- original_pin_order_checks_each_owner_and_rolls_back_failed_reordering stdout ----
+{"duplicate":400,"failedReordersUnchanged":true,"missing":404,"mixedOwners":403,"originalLeaf":"R00-T02-LA-2ED065BED168","restoredPositive":true,"secondUpdateFailure":500,"unpinClearsTimeAndOrder":true}
+
+
+successes:
+    original_pin_order_checks_each_owner_and_rolls_back_failed_reordering
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 5.41s
+

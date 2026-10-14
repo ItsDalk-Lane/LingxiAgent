@@ -1,29 +1,4 @@
 {
-  "refreshed": [
-    {
-      "id": "R00-T02-LA-4EA88B5073E4",
-      "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-      "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
-      "mode": "reanchored"
-    },
-    {
-      "id": "R00-T02-LA-84E22CD74BE1",
-      "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-      "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
-      "mode": "reanchored"
-    },
-    {
-      "id": "R00-T02-LA-857747F848F6",
-      "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-      "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
-      "mode": "reanchored"
-    },
-    {
-      "id": "R00-T02-LA-B47CAC08F418",
-      "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels",
-      "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
-      "mode": "reanchored"
-    }
-  ],
-  "unchanged": 877
+  "refreshed": [],
+  "unchanged": 881
 }

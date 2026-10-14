@@ -1,0 +1,16 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/desktop_host.rs (desktop/src-tauri/target/debug/deps/desktop_host-d8c97cde3b303335)
+
+running 1 test
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791953314, tv_nsec: 736997000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/selected.txt","phase":"PICK_FILE","pid":2187}
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791953352, tv_nsec: 338241000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/selected.txt","phase":"CANCEL_PICKER","pid":2187}
+test native_desktop_resource_roundtrip_real_gui has been running for over 60 seconds
+EDITOR_REFRESH_STATE {"editor":"# initial\n","err":null}
+EDITOR_REFRESH_STATE {"editor":"# resource-changed\n","err":null}
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791953382, tv_nsec: 807927000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/selected.txt","phase":"OS_OPEN_WINDOW","pid":2187}
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791953404, tv_nsec: 123505000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/lingxi-native-trash-2187.txt","phase":"VERIFY_SYSTEM_TRASH","pid":2187}
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791953493, tv_nsec: 536958000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/selected.txt","phase":"COMPLETE","pid":2187}
+test native_desktop_resource_roundtrip_real_gui ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 180.23s
+

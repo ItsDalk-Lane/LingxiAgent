@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/desktop_host.rs (desktop/src-tauri/target/debug/deps/desktop_host-d8c97cde3b303335)
+
+running 1 test
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791952802, tv_nsec: 920994000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/selected.txt","phase":"PICK_FILE","pid":95546}
+test native_desktop_resource_roundtrip_real_gui has been running for over 60 seconds
+NATIVE_UI_PHASE {"at":"SystemTime { tv_sec: 1791952910, tv_nsec: 651131000 }","file":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/proof/selected.txt","phase":"CANCEL_PICKER","pid":95546}
+
+thread 'native_desktop_resource_roundtrip_real_gui' (4504397) panicked at tests/desktop_host.rs:102:13:
+界面未到达要求状态：return document.querySelector('[data-testid=file-editor]')?.value==='# resource-changed\n';
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test native_desktop_resource_roundtrip_real_gui ... FAILED
+
+failures:
+
+failures:
+    native_desktop_resource_roundtrip_real_gui
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 132.45s
+
+error: test failed, to rerun pass `--test desktop_host`

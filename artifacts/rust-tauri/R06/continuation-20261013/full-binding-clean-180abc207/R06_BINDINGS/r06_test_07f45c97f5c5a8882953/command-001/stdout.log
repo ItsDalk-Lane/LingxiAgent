@@ -1,0 +1,16 @@
+
+running 1 test
+test original_pin_deleted_agent_refuses_without_writes_and_allows_unpin ... ok
+
+successes:
+
+---- original_pin_deleted_agent_refuses_without_writes_and_allows_unpin stdout ----
+LINGXI_AUTH_REJECTED request_id="req-5d09cfdd84755a6f3f02eb0bbd988be1" method=POST path=/lingxi/v1/sessions/pin status=401 Unauthorized reason=missing_credential remote=127.0.0.1:56405
+{"deletedAgentPin":409,"markerAndSessionUnchangedOnRefusal":true,"originalLeaf":"R00-T02-LA-0D4F0EFC9DAE","realUnreadableDeletionState":500,"restoredLiveAgentPin":true,"unpinStillAllowed":true}
+
+
+successes:
+    original_pin_deleted_agent_refuses_without_writes_and_allows_unpin
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 17 filtered out; finished in 2.70s
+
