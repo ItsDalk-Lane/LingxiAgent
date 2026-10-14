@@ -1,0 +1,16 @@
+
+running 1 test
+test conversation_map_layout_get_merge_replace_collapsed ... ok
+
+successes:
+
+---- conversation_map_layout_get_merge_replace_collapsed stdout ----
+LINGXI_AUTH_REJECTED request_id="req-6f312a027386c8d7f2fb680930f91098" method=GET [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:61203
+LINGXI_AUTH_REJECTED request_id="req-ff66b064b9587456518e54fe80f8050f" method=PUT [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:61204
+
+
+successes:
+    conversation_map_layout_get_merge_replace_collapsed
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.13s
+

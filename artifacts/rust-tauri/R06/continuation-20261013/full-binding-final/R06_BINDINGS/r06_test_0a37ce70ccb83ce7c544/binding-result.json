@@ -1,0 +1,142 @@
+{
+  "schema": "lingxi.r06.executed-binding.v1",
+  "key": "r06_test_0a37ce70ccb83ce7c544",
+  "sourceCandidateSha256": "d6e3eab0a9698423d1ac2b40d8cab65c3b2db9bf7e98ef41a8589d12b1418d15",
+  "binding": {
+    "package": "lingxi-service",
+    "suite": "r06_user_preferences",
+    "test": "user_preference_pairs_and_tenets_broadcast",
+    "kind": "rust_integration_test",
+    "timeoutSecs": 900,
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_user_preferences",
+      "user_preference_pairs_and_tenets_broadcast",
+      "--",
+      "--exact",
+      "--show-output"
+    ]
+  },
+  "command": {
+    "binding": {
+      "package": "lingxi-service",
+      "suite": "r06_user_preferences",
+      "test": "user_preference_pairs_and_tenets_broadcast",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_user_preferences",
+        "user_preference_pairs_and_tenets_broadcast",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "argv": [
+      "rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_user_preferences",
+      "user_preference_pairs_and_tenets_broadcast",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+    "sourceBeforeSha256": "d6e3eab0a9698423d1ac2b40d8cab65c3b2db9bf7e98ef41a8589d12b1418d15",
+    "exitCode": 0,
+    "timedOut": false,
+    "stdout": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/stdout.log",
+    "stderr": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/stderr.log",
+    "timeoutSecs": 900,
+    "syntheticEnvironment": {
+      "LINGXI_HOME": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/runtime/home",
+      "TMPDIR": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/runtime/tmp",
+      "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+      "W01_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/w01_evidence",
+      "W09_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/w09_evidence",
+      "W10_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/w10_evidence",
+      "W11_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/w11_evidence",
+      "LINGXI_W03_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/lingxi_w03_evidence",
+      "LINGXI_F05_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/lingxi_f05_evidence",
+      "LINGXI_F08_EVIDENCE": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/lingxi_f08_evidence",
+      "R06_T08_RAW_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/t08",
+      "R06_T08_EVAL_OUT": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/continuation-20261013/full-binding-final/R06_BINDINGS/r06_test_0a37ce70ccb83ce7c544/command-001/raw/t08-evaluations.jsonl"
+    },
+    "actualArgv": [
+      "/Users/study_superior/.cargo/bin/rustup",
+      "run",
+      "1.98.1",
+      "cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r06_user_preferences",
+      "user_preference_pairs_and_tenets_broadcast",
+      "--",
+      "--exact",
+      "--show-output"
+    ],
+    "pid": 9507,
+    "elapsedSecs": 4.678,
+    "outputCheck": {
+      "valid": true,
+      "expectedTest": "user_preference_pairs_and_tenets_broadcast",
+      "runningCounts": [
+        "1"
+      ],
+      "resultSummaries": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "passedTestNames": [
+        "user_preference_pairs_and_tenets_broadcast"
+      ],
+      "reason": ""
+    },
+    "stdoutSha256": "9c910733031e2e0b2626c1aec872bf545a6c98b8d316669d28a1fb4bb33ade28",
+    "stderrSha256": "64d11423a41b2bb3dbaf62eea776a71de692c916fd822b0227ce6a8b6eab4cb2",
+    "sourceAfterSha256": "d6e3eab0a9698423d1ac2b40d8cab65c3b2db9bf7e98ef41a8589d12b1418d15",
+    "sourceStable": true,
+    "localPassed": true
+  },
+  "passed": true,
+  "stageVerdict": "NOT_A_STAGE_VERDICT"
+}

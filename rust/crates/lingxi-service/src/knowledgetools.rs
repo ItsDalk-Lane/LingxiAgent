@@ -78,6 +78,79 @@ fn args_of(request: &lingxi_kernel::ports::ToolRequest) -> Value {
     request.arguments.as_value().clone()
 }
 
+/// knowledge_read 的 sectionId / aroundChunkId / neighborWindow 选择器
+/// （knowledge-read-tool.ts：空串等同未选择；两种定位互斥；不得与
+/// query/fromOrdinal/toOrdinal 混用；非零 neighborWindow 只配 aroundChunkId）。
+enum OwnedNavigation {
+    Section(String),
+    AroundChunk {
+        chunk_id: String,
+        neighbor_window: Option<usize>,
+    },
+}
+
+impl OwnedNavigation {
+    fn as_selector(&self) -> crate::knowledge::ReadNavigation<'_> {
+        match self {
+            Self::Section(id) => crate::knowledge::ReadNavigation::Section(id),
+            Self::AroundChunk {
+                chunk_id,
+                neighbor_window,
+            } => crate::knowledge::ReadNavigation::AroundChunk {
+                chunk_id,
+                neighbor_window: *neighbor_window,
+            },
+        }
+    }
+}
+
+fn read_navigation(params: &Value) -> Result<Option<OwnedNavigation>, ToolOutcome> {
+    let invalid = |message: &str| {
+        failed(
+            ErrorCode::InvalidMessage,
+            format!("KNOWLEDGE_INVALID_ARGUMENT: {message}"),
+        )
+    };
+    let optional_id = |key: &str| -> Result<Option<String>, ToolOutcome> {
+        match params.get(key) {
+            None => Ok(None),
+            Some(Value::String(raw)) if raw.trim().is_empty() => Ok(None),
+            Some(Value::String(raw)) => Ok(Some(raw.trim().to_string())),
+            Some(_) => Err(invalid(&format!("{key} is required"))),
+        }
+    };
+    let conflicting = || invalid("Knowledge parent read selectors are invalid or conflicting");
+    let section_id = optional_id("sectionId")?;
+    let chunk_id = optional_id("aroundChunkId")?;
+    let neighbor_window = match params.get("neighborWindow") {
+        None => None,
+        Some(value) => match value.as_u64().filter(|window| *window <= 3) {
+            Some(window) => Some(window as usize),
+            None => return Err(conflicting()),
+        },
+    };
+    let mixed = params
+        .get("query")
+        .and_then(Value::as_str)
+        .is_some_and(|query| !query.trim().is_empty())
+        || params.get("fromOrdinal").is_some()
+        || params.get("toOrdinal").is_some();
+    if (neighbor_window.is_some_and(|window| window != 0) && chunk_id.is_none())
+        || (section_id.is_some() && chunk_id.is_some())
+        || ((section_id.is_some() || chunk_id.is_some()) && mixed)
+    {
+        return Err(conflicting());
+    }
+    Ok(match (section_id, chunk_id) {
+        (Some(id), None) => Some(OwnedNavigation::Section(id)),
+        (None, Some(chunk_id)) => Some(OwnedNavigation::AroundChunk {
+            chunk_id,
+            neighbor_window,
+        }),
+        _ => None,
+    })
+}
+
 fn require_scope_id(params: &Value) -> Result<String, ToolOutcome> {
     let scope_id = params["scopeId"]
         .as_str()
@@ -329,6 +402,10 @@ impl KnowledgeTools {
                 "KNOWLEDGE_INVALID_ARGUMENT: sourceId is required".into(),
             );
         }
+        let navigation = match read_navigation(params) {
+            Ok(navigation) => navigation,
+            Err(outcome) => return outcome,
+        };
         let scope = match self
             .knowledge
             .resolve_turn_scope(&scope_id, &ctx.session_id.to_string())
@@ -348,6 +425,20 @@ impl KnowledgeTools {
         };
         let offset = params["offset"].as_u64().unwrap_or(0) as usize;
         let max_chars = params["maxChars"].as_u64().unwrap_or(6000) as usize;
+        if let Some(navigation) = navigation {
+            return match self.knowledge.read_scope_navigation(
+                &scope,
+                &ctx.session_id.to_string(),
+                &source_id,
+                params["notebookId"].as_str(),
+                navigation.as_selector(),
+                offset,
+                max_chars,
+            ) {
+                Ok(page) => text_success(page.to_string()),
+                Err(error) => knowledge_failed(&error),
+            };
+        }
         // 读取方式：全块顺序读（blockId 定位链由 sectionId/aroundChunkId 的
         // 服务侧解析承担——这里按 artifact 顺序 + 偏移分页）。
         let blocks = match self.knowledge.list_artifact_blocks(parse_artifact_id) {

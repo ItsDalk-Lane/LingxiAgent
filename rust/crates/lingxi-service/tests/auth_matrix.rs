@@ -2331,3 +2331,105 @@ async fn device_registry_failure_is_not_reported_as_bad_credentials() {
     );
     server.stop_and_assert_clean().await;
 }
+
+/// GET /lingxi/v1/agents/{id}/config 与 config-flags 读面同级：需要
+/// settings.read（R00-T02-LA-BC675C664910 的"不扩大披露范围"边界）。
+/// 无该 scope 的设备主体被策略层拒绝，处理器不运行、无任何落盘副作用。
+#[tokio::test]
+async fn agent_config_get_requires_settings_read_scope_without_side_effects() {
+    let server = default_server("agent-config-get-scope").await;
+    let agents_root = server.home.join("agents");
+    std::fs::create_dir_all(agents_root.join("scoped")).unwrap();
+    std::fs::write(
+        agents_root.join("scoped/config.yaml"),
+        "agent:\n  name: Scoped\napi:\n  provider: p\n  api_key: sk-scope-secret\n",
+    )
+    .unwrap();
+    let yaml_before = std::fs::read(agents_root.join("scoped/config.yaml")).unwrap();
+
+    let issue = |scopes: &'static str| {
+        let addr = server.addr;
+        let bearer = server.bearer();
+        async move {
+            let (status, body) = http(
+                addr,
+                "POST",
+                "/lingxi/v1/devices/credentials",
+                &[("Authorization", &bearer)],
+                Some(&format!(
+                    r#"{{"userId":"user_scope_probe","scopes":{scopes}}}"#
+                )),
+            )
+            .await;
+            assert_eq!(status, 201, "issue credential: {body}");
+            serde_json::from_str::<serde_json::Value>(&body).unwrap()["secret"]
+                .as_str()
+                .unwrap()
+                .to_string()
+        }
+    };
+    let chat_only = issue(r#"["chat"]"#).await;
+    let settings_read = issue(r#"["settings.read"]"#).await;
+    let auth = |secret: &str| format!("Bearer {secret}");
+
+    // 无 settings.read：403 insufficient_scope，且响应不含配置内容。
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/agents/scoped/config",
+        &[("Authorization", &auth(&chat_only))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 403, "chat-only 设备读 config 必须 403: {body}");
+    assert!(body.contains("insufficient_scope"), "body: {body}");
+    assert!(!body.contains("Scoped") && !body.contains("sk-scope-secret"));
+    assert_eq!(
+        std::fs::read(agents_root.join("scoped/config.yaml")).unwrap(),
+        yaml_before
+    );
+
+    // 有 settings.read：可读，秘密掩码。
+    let (status, body) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/agents/scoped/config",
+        &[("Authorization", &auth(&settings_read))],
+        None,
+    )
+    .await;
+    assert_eq!(status, 200, "settings.read 设备可读: {body}");
+    let value: serde_json::Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(value["agent"]["name"], "Scoped");
+    assert_eq!(value["api"]["api_key"], "********");
+    assert!(!body.contains("sk-scope-secret"));
+
+    // settings.read 不授予写：PUT 仍被拒（不扩大写入范围），文件不变。
+    let (status, body) = http(
+        server.addr,
+        "PUT",
+        "/lingxi/v1/agents/scoped/config",
+        &[("Authorization", &auth(&settings_read))],
+        Some(r#"{"agent":{"name":"Hacked"}}"#),
+    )
+    .await;
+    assert_eq!(status, 403, "settings.read 不能写 config: {body}");
+    assert!(
+        std::fs::read_to_string(agents_root.join("scoped/config.yaml"))
+            .unwrap()
+            .contains("name: Scoped")
+    );
+
+    // 无凭证 401。
+    let (status, _) = http(
+        server.addr,
+        "GET",
+        "/lingxi/v1/agents/scoped/config",
+        &[],
+        None,
+    )
+    .await;
+    assert_eq!(status, 401);
+
+    server.stop_and_assert_clean().await;
+}

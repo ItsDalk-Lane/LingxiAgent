@@ -1,0 +1,15 @@
+
+running 1 test
+test user_preference_pairs_and_tenets_broadcast ... ok
+
+successes:
+
+---- user_preference_pairs_and_tenets_broadcast stdout ----
+LINGXI_AUTH_REJECTED request_id="req-48543f176e1effb41fcdf7efee1cfbbf" method=GET path=/lingxi/v1/preferences/autolearn status=401 Unauthorized reason=missing_credential remote=127.0.0.1:60335
+
+
+successes:
+    user_preference_pairs_and_tenets_broadcast
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.13s
+

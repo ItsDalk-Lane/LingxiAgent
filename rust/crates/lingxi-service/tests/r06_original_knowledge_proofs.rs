@@ -1001,6 +1001,629 @@ async fn original_failed_and_untracked_jobs_retry_and_delete_wins() {
 }
 
 #[tokio::test]
+async fn original_notebook_delete_purges_owned_sources_and_keeps_shared_ones() {
+    use lingxi_adapters::storage::knowledge::{KnowledgeFactStore, KnowledgeIndexStore};
+    let home = unique_dir("original-notebook-delete");
+    let state = boot("original-notebook-delete", &home, None).await;
+    let studio = state.knowledge().studio_id().to_string();
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let knowledge = state.knowledge();
+    let doomed = knowledge.create_notebook("待删笔记本").unwrap();
+    let doomed_id = doomed["id"].as_str().unwrap().to_string();
+    let keeper = knowledge.create_notebook("保留笔记本").unwrap();
+    let keeper_id = keeper["id"].as_str().unwrap().to_string();
+    let mut owned = Vec::new();
+    for (name, text) in [
+        ("独占一", NOTE_TEXT_A),
+        ("独占二", "# 独占二\n\n第二份独占来源正文。"),
+    ] {
+        let imported = knowledge
+            .import_pasted_text(&doomed_id, text, Some(name))
+            .unwrap();
+        owned.push(imported["source"]["id"].as_str().unwrap().to_string());
+    }
+    let shared = knowledge
+        .import_pasted_text(
+            &doomed_id,
+            "# 共享\n\n同时属于两个笔记本。",
+            Some("共享来源"),
+        )
+        .unwrap();
+    let shared_id = shared["source"]["id"].as_str().unwrap().to_string();
+    facts.add_membership(&keeper_id, &shared_id).unwrap();
+    let other = knowledge
+        .import_pasted_text(&keeper_id, "# 无关\n\n不属于待删笔记本。", Some("无关来源"))
+        .unwrap();
+    let other_id = other["source"]["id"].as_str().unwrap().to_string();
+    let server = serve(state.clone()).await;
+    for source in owned.iter().chain([&shared_id, &other_id]) {
+        let nb = if *source == other_id {
+            &keeper_id
+        } else {
+            &doomed_id
+        };
+        wait_until_job(&server, nb, source, "pending_embedding").await;
+    }
+    // 删除前的真实物理痕迹：快照文件、解析产物文件、FTS 变体、任务行。
+    let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
+    let mut owned_files = Vec::new();
+    let mut owned_artifacts = Vec::new();
+    for source in &owned {
+        let snapshot = facts.latest_snapshot_for_source(source).unwrap();
+        let snapshot_file = home.join("knowledge").join(&snapshot.storage_path);
+        assert!(snapshot_file.exists());
+        owned_files.push(snapshot_file);
+        let artifacts = facts.list_source_parse_artifacts(source).unwrap();
+        assert!(!artifacts.is_empty());
+        for (artifact_id, snapshot_id) in artifacts {
+            let path = home
+                .join("knowledge")
+                .join("artifacts")
+                .join(snapshot_id)
+                .join(format!("{artifact_id}.json"));
+            assert!(path.exists());
+            assert!(!index
+                .list_ready_variant_metadata(&artifact_id)
+                .unwrap()
+                .is_empty());
+            owned_files.push(path);
+            owned_artifacts.push(artifact_id);
+        }
+        assert!(!facts
+            .list_ingestion_jobs(None, Some(source), 50)
+            .unwrap()
+            .is_empty());
+    }
+    let shared_snapshot = facts.latest_snapshot_for_source(&shared_id).unwrap();
+    let other_snapshot = facts.latest_snapshot_for_source(&other_id).unwrap();
+    let other_jobs_before = facts
+        .list_ingestion_jobs(Some(&keeper_id), Some(&other_id), 50)
+        .unwrap();
+    assert!(facts
+        .list_ingestion_jobs(Some(&doomed_id), Some(&shared_id), 50)
+        .unwrap()
+        .iter()
+        .any(|job| job.status == "pending_embedding"));
+
+    let (status, result) = server
+        .request(
+            "DELETE",
+            &format!("/lingxi/v1/knowledge/notebooks/{doomed_id}"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    assert_eq!(result["notebook"]["id"], doomed_id);
+    assert!(result["notebook"]["deletedAt"].is_string());
+    let mut deleted: Vec<String> = result["deletedSourceIds"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_str().unwrap().to_string())
+        .collect();
+    deleted.sort();
+    let mut expected = owned.clone();
+    expected.sort();
+    assert_eq!(deleted, expected, "只删除独占来源，共享来源不在结果里");
+    assert!(result["cancelledJobs"].as_u64().unwrap() >= 2);
+    // 笔记本已不可见，独占来源的事实行/任务/文件/索引全部清理。
+    assert!(facts.get_notebook(&studio, &doomed_id).is_err());
+    let (status, error) = server
+        .request(
+            "GET",
+            &format!("/lingxi/v1/knowledge/notebooks/{doomed_id}"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{error}");
+    for source in &owned {
+        assert!(facts.get_source(source).is_err());
+        assert!(facts
+            .list_ingestion_jobs(None, Some(source), 50)
+            .unwrap()
+            .is_empty());
+        assert!(facts
+            .list_source_parse_artifacts(source)
+            .unwrap()
+            .is_empty());
+    }
+    for path in &owned_files {
+        assert!(!path.exists(), "独占来源文件必须清理: {}", path.display());
+    }
+    for artifact in &owned_artifacts {
+        assert!(index
+            .list_ready_variant_metadata(artifact)
+            .unwrap()
+            .is_empty());
+    }
+    // 共享来源只失去该笔记本的 membership：行、文件、另一笔记本关系保留，本笔记本的活跃任务被取消。
+    assert_eq!(facts.get_source(&shared_id).unwrap().id, shared_id);
+    assert_eq!(
+        facts.read_snapshot_bytes(&shared_snapshot).unwrap(),
+        "# 共享\n\n同时属于两个笔记本。".as_bytes()
+    );
+    assert!(!facts
+        .get_membership(&doomed_id, &shared_id)
+        .unwrap()
+        .removed_at
+        .is_none());
+    assert!(facts
+        .get_membership(&keeper_id, &shared_id)
+        .unwrap()
+        .removed_at
+        .is_none());
+    let shared_jobs = facts
+        .list_ingestion_jobs(Some(&doomed_id), Some(&shared_id), 50)
+        .unwrap();
+    assert!(!shared_jobs.is_empty());
+    assert!(shared_jobs
+        .iter()
+        .all(|job| job.status == "failed" && job.cancelled_at.is_some()));
+    // 无关来源完全不受影响。
+    assert_eq!(facts.get_source(&other_id).unwrap().id, other_id);
+    assert_eq!(
+        facts.read_snapshot_bytes(&other_snapshot).unwrap(),
+        "# 无关\n\n不属于待删笔记本。".as_bytes()
+    );
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(Some(&keeper_id), Some(&other_id), 50)
+            .unwrap(),
+        other_jobs_before
+    );
+    let (status, listed) = server
+        .request(
+            "GET",
+            &format!("/lingxi/v1/knowledge/notebooks/{keeper_id}/sources"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    let mut kept: Vec<&str> = listed["sources"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|entry| entry["source"]["id"].as_str().unwrap())
+        .collect();
+    kept.sort();
+    let mut kept_expected = vec![shared_id.as_str(), other_id.as_str()];
+    kept_expected.sort();
+    assert_eq!(kept, kept_expected);
+    server.stop().await;
+}
+
+#[tokio::test]
+async fn original_notebook_delete_refuses_frozen_foreign_and_missing_without_side_effects() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("original-notebook-delete-refuse");
+    let state = boot("original-notebook-delete-refuse", &home, None).await;
+    let studio = state.knowledge().studio_id().to_string();
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let knowledge = state.knowledge();
+    let notebook = knowledge.create_notebook("冻结保护").unwrap();
+    let id = notebook["id"].as_str().unwrap().to_string();
+    let mut sources = Vec::new();
+    for (name, text) in [("甲", NOTE_TEXT_A), ("乙", "# 乙\n\n另一份来源。")] {
+        let imported = knowledge.import_pasted_text(&id, text, Some(name)).unwrap();
+        sources.push(imported["source"]["id"].as_str().unwrap().to_string());
+    }
+    let server = serve(state.clone()).await;
+    for source in &sources {
+        wait_until_job(&server, &id, source, "pending_embedding").await;
+    }
+    let (status, _) = server
+        .request(
+            "POST",
+            "/lingxi/v1/knowledge/turn-scopes",
+            Some(json!({"notebookIds":[id],"sessionId":"notebook-delete-freeze","turnId":"one"})),
+        )
+        .await;
+    assert_eq!(status, 201);
+    let snapshots: Vec<_> = sources
+        .iter()
+        .map(|s| facts.latest_snapshot_for_source(s).unwrap())
+        .collect();
+    let artifact_files: Vec<_> = sources
+        .iter()
+        .flat_map(|s| facts.list_source_parse_artifacts(s).unwrap())
+        .map(|(artifact, snapshot)| {
+            home.join("knowledge")
+                .join("artifacts")
+                .join(snapshot)
+                .join(format!("{artifact}.json"))
+        })
+        .collect();
+    assert!(!artifact_files.is_empty() && artifact_files.iter().all(|p| p.exists()));
+    let jobs_before = facts.list_ingestion_jobs(None, None, 1000).unwrap();
+    let notebook_before = facts.get_notebook(&studio, &id).unwrap();
+    let members_before: Vec<_> = sources
+        .iter()
+        .map(|s| facts.get_membership(&id, s).unwrap())
+        .collect();
+    assert_eq!(facts.list_notebook_sources(&id).unwrap().len(), 2);
+    let assert_untouched = |label: &str| {
+        assert_eq!(
+            facts.get_notebook(&studio, &id).unwrap(),
+            notebook_before,
+            "{label}"
+        );
+        let members_now: Vec<_> = sources
+            .iter()
+            .map(|s| facts.get_membership(&id, s).unwrap())
+            .collect();
+        assert_eq!(members_now, members_before, "{label}");
+        assert_eq!(
+            facts.list_ingestion_jobs(None, None, 1000).unwrap(),
+            jobs_before,
+            "{label}: 拒绝不能取消或新增任务"
+        );
+        for (source, snapshot) in sources.iter().zip(&snapshots) {
+            assert_eq!(
+                facts.get_source(source).unwrap().deleted_at,
+                None,
+                "{label}"
+            );
+            assert!(
+                facts.read_snapshot_bytes(snapshot).is_ok(),
+                "{label}: 快照文件必须保留"
+            );
+        }
+        assert!(artifact_files.iter().all(|p| p.exists()), "{label}");
+    };
+    // 活跃 scope 冻结了成员来源：409，笔记本/成员/来源/任务/文件原样保留。
+    let (status, error) = server
+        .request(
+            "DELETE",
+            &format!("/lingxi/v1/knowledge/notebooks/{id}"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{error}");
+    assert_eq!(error["error"], "KNOWLEDGE_CONFLICT");
+    assert_untouched("frozen");
+    // 他 studio 的笔记本与不存在的笔记本：404，且不碰任何事实。
+    let foreign_nb = facts.create_notebook("other-studio", "外部笔记本").unwrap();
+    let (foreign_source, foreign_snapshot) = facts
+        .create_source_with_snapshot(
+            "other-studio",
+            "pasted_text",
+            "外部来源",
+            &json!({}),
+            b"foreign studio body",
+            "text/plain",
+        )
+        .unwrap();
+    facts
+        .add_membership(&foreign_nb.id, &foreign_source.id)
+        .unwrap();
+    for target in [foreign_nb.id.as_str(), "knb_missing"] {
+        let (status, error) = server
+            .request(
+                "DELETE",
+                &format!("/lingxi/v1/knowledge/notebooks/{target}"),
+                None,
+            )
+            .await;
+        assert_eq!(status, 404, "{target}: {error}");
+        assert_eq!(error["error"], "KNOWLEDGE_NOT_FOUND");
+    }
+    assert_eq!(
+        facts
+            .get_notebook("other-studio", &foreign_nb.id)
+            .unwrap()
+            .deleted_at,
+        None
+    );
+    assert_eq!(
+        facts
+            .get_membership(&foreign_nb.id, &foreign_source.id)
+            .unwrap()
+            .removed_at,
+        None
+    );
+    assert_eq!(
+        facts.read_snapshot_bytes(&foreign_snapshot).unwrap(),
+        b"foreign studio body"
+    );
+    assert_eq!(
+        facts.get_source(&foreign_source.id).unwrap().deleted_at,
+        None
+    );
+    assert_untouched("foreign/missing");
+    // 冻结解除后同一删除成功：证明上面的 409 确由冻结引用造成。
+    let empty = knowledge.create_notebook("接管冻结").unwrap();
+    let (status, _) = server
+        .request(
+            "POST",
+            "/lingxi/v1/knowledge/turn-scopes",
+            Some(json!({"notebookIds":[empty["id"]],"sessionId":"notebook-delete-freeze","turnId":"two"})),
+        )
+        .await;
+    assert_eq!(status, 201);
+    let (status, result) = server
+        .request(
+            "DELETE",
+            &format!("/lingxi/v1/knowledge/notebooks/{id}"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    assert_eq!(result["deletedSourceIds"].as_array().unwrap().len(), 2);
+    for (source, snapshot) in sources.iter().zip(&snapshots) {
+        assert!(facts.get_source(source).is_err());
+        assert!(!home.join("knowledge").join(&snapshot.storage_path).exists());
+    }
+    assert!(artifact_files.iter().all(|p| !p.exists()));
+    assert_eq!(
+        facts.get_source(&foreign_source.id).unwrap().deleted_at,
+        None
+    );
+    server.stop().await;
+}
+
+#[tokio::test]
+async fn original_source_delete_refuses_foreign_studio_without_changing_rows_or_files() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("original-source-delete-foreign");
+    let state = boot("original-source-delete-foreign", &home, None).await;
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let knowledge = state.knowledge();
+    // 他 studio 的来源带成员关系与一个已失败任务（在 worker 启动前准备）。
+    let foreign_nb = facts.create_notebook("other-studio", "外部笔记本").unwrap();
+    let (foreign, snapshot) = facts
+        .create_source_with_snapshot(
+            "other-studio",
+            "pasted_text",
+            "外部来源",
+            &json!({}),
+            b"foreign studio body",
+            "text/plain",
+        )
+        .unwrap();
+    facts.add_membership(&foreign_nb.id, &foreign.id).unwrap();
+    facts
+        .enqueue_source_ingestion(&foreign_nb.id, &foreign.id, None, "cfg")
+        .unwrap();
+    let claimed = facts.claim_next_job().unwrap().unwrap();
+    assert_eq!(claimed.source_id, foreign.id);
+    facts.fail_job(&claimed.id, "外部先前失败").unwrap();
+    let foreign_job = facts.get_job(&claimed.id).unwrap();
+    let local_nb = knowledge.create_notebook("本地").unwrap();
+    let local_nb_id = local_nb["id"].as_str().unwrap().to_string();
+    let local = knowledge
+        .import_pasted_text(&local_nb_id, "# 本地\n\n本地来源正文。", Some("本地来源"))
+        .unwrap();
+    let local_id = local["source"]["id"].as_str().unwrap().to_string();
+    let local_snapshot = facts.latest_snapshot_for_source(&local_id).unwrap();
+    let server = serve(state).await;
+    wait_until_job(&server, &local_nb_id, &local_id, "pending_embedding").await;
+    let foreign_membership = facts.get_membership(&foreign_nb.id, &foreign.id).unwrap();
+    let foreign_file = home.join("knowledge").join(&snapshot.storage_path);
+    assert!(foreign_file.exists());
+    for target in [foreign.id.as_str(), "ksrc_missing"] {
+        let (status, error) = server
+            .request(
+                "DELETE",
+                &format!("/lingxi/v1/knowledge/sources/{target}"),
+                None,
+            )
+            .await;
+        assert_eq!(status, 404, "{target}: {error}");
+        assert_eq!(error["error"], "KNOWLEDGE_NOT_FOUND");
+    }
+    assert_eq!(facts.get_source(&foreign.id).unwrap(), foreign);
+    assert_eq!(
+        facts.get_membership(&foreign_nb.id, &foreign.id).unwrap(),
+        foreign_membership
+    );
+    assert_eq!(facts.get_job(&claimed.id).unwrap(), foreign_job);
+    assert_eq!(foreign_job.cancelled_at, None);
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(None, Some(&foreign.id), 50)
+            .unwrap()
+            .len(),
+        1
+    );
+    assert!(foreign_file.exists());
+    assert_eq!(
+        facts.read_snapshot_bytes(&snapshot).unwrap(),
+        b"foreign studio body"
+    );
+    // 成功路径：本 studio 来源被清理，且不波及他 studio 来源。
+    let (status, purge) = server
+        .request(
+            "DELETE",
+            &format!("/lingxi/v1/knowledge/sources/{local_id}"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{purge}");
+    assert!(purge["cancelledJobs"].as_u64().unwrap() >= 1);
+    assert!(facts.get_source(&local_id).is_err());
+    assert!(!home
+        .join("knowledge")
+        .join(&local_snapshot.storage_path)
+        .exists());
+    assert!(facts
+        .list_ingestion_jobs(None, Some(&local_id), 50)
+        .unwrap()
+        .is_empty());
+    assert_eq!(facts.get_source(&foreign.id).unwrap(), foreign);
+    assert!(foreign_file.exists());
+    assert_eq!(facts.get_job(&claimed.id).unwrap(), foreign_job);
+    server.stop().await;
+}
+
+#[tokio::test]
+async fn original_reingest_refuses_foreign_and_non_member_sources_without_creating_jobs() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("original-reingest-membership");
+    let state = boot("original-reingest-membership", &home, None).await;
+    let studio = state.knowledge().studio_id().to_string();
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let knowledge = state.knowledge();
+    let nb_a = knowledge.create_notebook("甲").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let nb_b = knowledge.create_notebook("乙").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    // 仅属于 B 的本 studio 来源；曾属于 A 后被移除的来源；他 studio 来源（伪造 A 的 membership 行）。
+    let only_b = knowledge
+        .import_pasted_text(&nb_b, "# 乙独有\n\n只在乙里。", Some("乙独有"))
+        .unwrap()["source"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let removed = knowledge
+        .import_pasted_text(&nb_a, "# 被移除\n\n曾在甲里。", Some("被移除"))
+        .unwrap()["source"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let (foreign, foreign_snapshot) = facts
+        .create_source_with_snapshot(
+            "other-studio",
+            "pasted_text",
+            "外部来源",
+            &json!({}),
+            b"foreign studio body",
+            "text/plain",
+        )
+        .unwrap();
+    facts.add_membership(&nb_a, &foreign.id).unwrap();
+    let (untracked, _) = facts
+        .create_source_with_snapshot(
+            &studio,
+            "pasted_text",
+            "未跟踪",
+            &json!({}),
+            b"Untracked member body.",
+            "text/plain",
+        )
+        .unwrap();
+    facts.add_membership(&nb_a, &untracked.id).unwrap();
+    let server = serve(state).await;
+    wait_until_job(&server, &nb_b, &only_b, "pending_embedding").await;
+    wait_until_job(&server, &nb_a, &removed, "pending_embedding").await;
+    facts.remove_source_from_notebook(&nb_a, &removed).unwrap();
+    let total_before = facts.list_ingestion_jobs(None, None, 1000).unwrap().len();
+    let foreign_before = facts.get_source(&foreign.id).unwrap();
+    let membership_before = facts.get_membership(&nb_a, &foreign.id).unwrap();
+    let removed_jobs = facts
+        .list_ingestion_jobs(Some(&nb_a), Some(&removed), 50)
+        .unwrap();
+    let only_b_jobs = facts
+        .list_ingestion_jobs(Some(&nb_b), Some(&only_b), 50)
+        .unwrap();
+    let refusals = [
+        (nb_a.as_str(), foreign.id.as_str(), "foreign studio source"),
+        (
+            nb_a.as_str(),
+            only_b.as_str(),
+            "member of another notebook only",
+        ),
+        (nb_a.as_str(), removed.as_str(), "membership removed"),
+        ("knb_missing", untracked.id.as_str(), "missing notebook"),
+        (nb_a.as_str(), "ksrc_missing", "missing source"),
+    ];
+    for (notebook, source, label) in refusals {
+        let (status, error) = server
+            .request(
+                "POST",
+                &format!("/lingxi/v1/knowledge/notebooks/{notebook}/sources/{source}/reingest"),
+                None,
+            )
+            .await;
+        assert_eq!(status, 404, "{label}: {error}");
+        assert_eq!(error["error"], "KNOWLEDGE_NOT_FOUND", "{label}");
+        assert_eq!(
+            facts.list_ingestion_jobs(None, None, 1000).unwrap().len(),
+            total_before,
+            "{label}: 拒绝不能创建任务行"
+        );
+    }
+    assert!(facts
+        .list_ingestion_jobs(None, Some(&foreign.id), 50)
+        .unwrap()
+        .is_empty());
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(Some(&nb_a), Some(&removed), 50)
+            .unwrap(),
+        removed_jobs
+    );
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(Some(&nb_b), Some(&only_b), 50)
+            .unwrap(),
+        only_b_jobs
+    );
+    assert!(facts
+        .list_ingestion_jobs(Some(&nb_a), Some(&only_b), 50)
+        .unwrap()
+        .is_empty());
+    assert_eq!(facts.get_source(&foreign.id).unwrap(), foreign_before);
+    assert_eq!(
+        facts.get_membership(&nb_a, &foreign.id).unwrap(),
+        membership_before
+    );
+    assert_eq!(
+        facts.read_snapshot_bytes(&foreign_snapshot).unwrap(),
+        b"foreign studio body"
+    );
+    // 成功路径：本 studio 的成员来源（尚无任务）被兜底入队，恰好新增一个任务。
+    assert!(facts
+        .list_ingestion_jobs(Some(&nb_a), Some(&untracked.id), 50)
+        .unwrap()
+        .is_empty());
+    let (status, created) = server
+        .request(
+            "POST",
+            &format!(
+                "/lingxi/v1/knowledge/notebooks/{nb_a}/sources/{}/reingest",
+                untracked.id
+            ),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{created}");
+    assert_eq!(created["retried"], false);
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(Some(&nb_a), Some(&untracked.id), 50)
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        facts.list_ingestion_jobs(None, None, 1000).unwrap().len(),
+        total_before + 1
+    );
+    wait_until_job(&server, &nb_a, &untracked.id, "pending_embedding").await;
+    // 非 failed 的最新任务仍是 409 且不新增任务。
+    let (status, error) = server
+        .request(
+            "POST",
+            &format!(
+                "/lingxi/v1/knowledge/notebooks/{nb_a}/sources/{}/reingest",
+                untracked.id
+            ),
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{error}");
+    assert_eq!(
+        facts.list_ingestion_jobs(None, None, 1000).unwrap().len(),
+        total_before + 1
+    );
+    server.stop().await;
+}
+
+#[tokio::test]
 async fn original_directory_import_reports_each_effect_and_rejects_invalid_root() {
     use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
     let home = unique_dir("original-directory-import");
@@ -1060,6 +1683,772 @@ async fn original_directory_import_reports_each_effect_and_rejects_invalid_root(
         );
     }
     server.stop().await;
+}
+
+/// 直接读权威事实库等待另一 studio 的 job 到达目标状态（该 studio 不能经被测 HTTP 面观察）。
+async fn wait_for_facts_job(home: &Path, notebook_id: &str, source_id: &str, expect_status: &str) {
+    let facts =
+        lingxi_adapters::storage::knowledge::KnowledgeFactStore::open(&home.join("knowledge"))
+            .unwrap();
+    let deadline = std::time::Instant::now() + Duration::from_secs(30);
+    loop {
+        let jobs = facts
+            .list_ingestion_jobs(Some(notebook_id), Some(source_id), 200)
+            .unwrap();
+        if jobs.iter().any(|job| job.status == expect_status) {
+            return;
+        }
+        if std::time::Instant::now() > deadline {
+            panic!("facts job never reached {expect_status}: {jobs:?}");
+        }
+        tokio::time::sleep(Duration::from_millis(150)).await;
+    }
+}
+
+fn job_ids(listing: &Value) -> Vec<String> {
+    let mut ids = listing["jobs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|job| job["id"].as_str().unwrap().to_string())
+        .collect::<Vec<_>>();
+    ids.sort();
+    ids
+}
+
+fn counts_total(listing: &Value) -> u64 {
+    listing["counts"]
+        .as_object()
+        .unwrap()
+        .values()
+        .map(|count| count.as_u64().unwrap())
+        .sum()
+}
+
+#[tokio::test]
+async fn original_ingestion_listing_is_studio_scoped_and_reports_unreachable_sources() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("original-ingestion-listing");
+    let state = boot("original-ingestion-listing", &home, None).await;
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let docs = unique_dir("original-ingestion-listing-files");
+    let own_file = docs.join("own-original.md");
+    let foreign_file = docs.join("foreign-original.md");
+    std::fs::write(&own_file, "# 本地原文\n\n本 studio 的可达原文件。").unwrap();
+    std::fs::write(&foreign_file, "# 外部原文\n\n外部 studio 的原文件。").unwrap();
+    let knowledge = state.knowledge().clone();
+    let notebook = knowledge.create_notebook("任务列表甲").unwrap();
+    let nb = notebook["id"].as_str().unwrap().to_string();
+    let second_notebook = knowledge.create_notebook("任务列表丙").unwrap();
+    let nb2 = second_notebook["id"].as_str().unwrap().to_string();
+    let file_import = knowledge
+        .import_file(&nb, own_file.to_str().unwrap(), Some("本地文件"))
+        .unwrap();
+    let file_source = file_import["source"]["id"].as_str().unwrap().to_string();
+    let pasted = knowledge
+        .import_pasted_text(&nb, "仅粘贴文本，没有原文件路径。", Some("粘贴"))
+        .unwrap();
+    let pasted_source = pasted["source"]["id"].as_str().unwrap().to_string();
+    let other_nb_source = knowledge
+        .import_pasted_text(&nb2, "第二个本地笔记本的来源。", Some("丙来源"))
+        .unwrap()["source"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let server = serve(state.clone()).await;
+    for (notebook_id, source_id) in [
+        (&nb, &file_source),
+        (&nb, &pasted_source),
+        (&nb2, &other_nb_source),
+    ] {
+        wait_until_job(&server, notebook_id, source_id, "pending_embedding").await;
+    }
+    // 第二个 studio 的真实笔记本/来源/任务（含其原文件路径）。
+    let foreign_knowledge =
+        lingxi_service::knowledge::KnowledgeService::new(&home, "foreign-studio".into()).unwrap();
+    let foreign_nb = foreign_knowledge.create_notebook("外部笔记本").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let foreign_import = foreign_knowledge
+        .import_file(
+            &foreign_nb,
+            foreign_file.to_str().unwrap(),
+            Some("外部文件"),
+        )
+        .unwrap();
+    let foreign_source = foreign_import["source"]["id"].as_str().unwrap().to_string();
+    wait_for_facts_job(&home, &foreign_nb, &foreign_source, "pending_embedding").await;
+    let foreign_jobs_before = facts
+        .list_ingestion_jobs(Some(&foreign_nb), None, 200)
+        .unwrap();
+    assert_eq!(foreign_jobs_before.len(), 1, "外部 studio 必须有真实 job");
+    let all_jobs_before = facts.list_ingestion_jobs(None, None, 500).unwrap();
+    assert_eq!(all_jobs_before.len(), 4, "库中共 3 个本地 + 1 个外部 job");
+
+    let list = |query: String| {
+        let server = &server;
+        async move {
+            let (status, body) = server
+                .request(
+                    "GET",
+                    &format!("/lingxi/v1/knowledge/ingestion{query}"),
+                    None,
+                )
+                .await;
+            assert_eq!(status, 200, "{body}");
+            body
+        }
+    };
+    // 成功：无筛选 → 仅本 studio 的 3 个 job 与对应计数，外部任何 id 都不出现。
+    let all = list(String::new()).await;
+    assert_eq!(all["jobs"].as_array().unwrap().len(), 3, "{all}");
+    assert_eq!(all["counts"]["pending_embedding"], 3);
+    assert_eq!(counts_total(&all), 3);
+    let mut stored_own = all_jobs_before
+        .iter()
+        .filter(|job| job.notebook_id != foreign_nb)
+        .map(|job| job.id.clone())
+        .collect::<Vec<_>>();
+    stored_own.sort();
+    assert_eq!(
+        job_ids(&all),
+        stored_own,
+        "返回的正是本 studio 实际入库的任务"
+    );
+    for job in all["jobs"].as_array().unwrap() {
+        assert!([&nb, &nb2].contains(&&job["notebookId"].as_str().unwrap().to_string()));
+    }
+    let rendered = all.to_string();
+    for foreign_id in [&foreign_nb, &foreign_source, &foreign_jobs_before[0].id] {
+        assert!(!rendered.contains(foreign_id.as_str()), "{rendered}");
+    }
+    assert_eq!(all["unreachableSources"], json!([]), "原文件都可达");
+
+    // 边界：notebookId / sourceId 筛选。
+    let by_notebook = list(format!("?notebookId={nb}")).await;
+    assert_eq!(by_notebook["jobs"].as_array().unwrap().len(), 2);
+    assert!(by_notebook["jobs"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|job| job["notebookId"] == nb.as_str()));
+    assert_eq!(counts_total(&by_notebook), 2);
+    let by_source = list(format!("?sourceId={file_source}")).await;
+    assert_eq!(by_source["jobs"].as_array().unwrap().len(), 1);
+    assert_eq!(by_source["jobs"][0]["sourceId"], file_source.as_str());
+    let by_both = list(format!("?notebookId={nb2}&sourceId={other_nb_source}")).await;
+    assert_eq!(by_both["jobs"].as_array().unwrap().len(), 1);
+    let mismatch = list(format!("?notebookId={nb2}&sourceId={file_source}")).await;
+    assert_eq!(mismatch["jobs"], json!([]));
+
+    // 隔离：外部 notebook / source 与不存在的 id 同样得到空 jobs、零计数，不披露存在性。
+    let foreign_by_notebook = list(format!("?notebookId={foreign_nb}")).await;
+    let missing_by_notebook = list("?notebookId=notebook-never-existed".into()).await;
+    assert_eq!(foreign_by_notebook["jobs"], json!([]));
+    assert_eq!(counts_total(&foreign_by_notebook), 0);
+    assert_eq!(foreign_by_notebook["jobs"], missing_by_notebook["jobs"]);
+    assert_eq!(foreign_by_notebook["counts"], missing_by_notebook["counts"]);
+    let foreign_by_source = list(format!("?sourceId={foreign_source}")).await;
+    let missing_by_source = list("?sourceId=source-never-existed".into()).await;
+    assert_eq!(foreign_by_source["jobs"], json!([]));
+    assert_eq!(foreign_by_source["jobs"], missing_by_source["jobs"]);
+    let foreign_both = list(format!(
+        "?notebookId={foreign_nb}&sourceId={foreign_source}"
+    ))
+    .await;
+    assert_eq!(foreign_both["jobs"], json!([]));
+    assert_eq!(counts_total(&foreign_both), 0);
+    // 外部 studio 的计数/任务不被任何查询改动，也没有新增任务。
+    assert_eq!(
+        facts
+            .list_ingestion_jobs(Some(&foreign_nb), None, 200)
+            .unwrap(),
+        foreign_jobs_before
+    );
+    assert_eq!(
+        facts.list_ingestion_jobs(None, None, 500).unwrap(),
+        all_jobs_before
+    );
+
+    // 不可达：本地与外部原文件都被删除；只列本 studio 的 file 来源，且是显式标注的状态。
+    std::fs::remove_file(&own_file).unwrap();
+    std::fs::remove_file(&foreign_file).unwrap();
+    let unreachable = list(String::new()).await;
+    let entries = unreachable["unreachableSources"].as_array().unwrap();
+    assert_eq!(entries.len(), 1, "{unreachable}");
+    assert_eq!(entries[0]["sourceId"], file_source.as_str());
+    assert_eq!(entries[0]["studioId"], knowledge.studio_id());
+    assert_eq!(entries[0]["notebooks"], json!([nb]));
+    assert_eq!(entries[0]["unreachable"], true);
+    assert_eq!(entries[0]["watching"], false);
+    assert_eq!(entries[0]["detection"], "on_demand_stat");
+    assert!(entries[0]["unreachableSince"].is_null());
+    assert!(entries[0]["unreachableReason"]
+        .as_str()
+        .unwrap()
+        .starts_with("ENOENT:"));
+    let rendered = unreachable.to_string();
+    for foreign_id in [&foreign_nb, &foreign_source] {
+        assert!(!rendered.contains(foreign_id.as_str()), "{rendered}");
+    }
+    assert!(!rendered.contains(foreign_file.to_str().unwrap()));
+    assert!(
+        !rendered.contains(own_file.to_str().unwrap()),
+        "不披露原路径"
+    );
+    // 筛选不影响不可达清单（原路由同口径），jobs 仍按筛选收窄。
+    let filtered = list(format!("?notebookId={nb2}")).await;
+    assert_eq!(filtered["jobs"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        filtered["unreachableSources"],
+        unreachable["unreachableSources"]
+    );
+    // 原文件恢复 → 状态实时回到可达，不留陈旧标记。
+    std::fs::write(&own_file, "# 本地原文\n\n恢复后的原文件。").unwrap();
+    assert_eq!(list(String::new()).await["unreachableSources"], json!([]));
+    // 整个读取期间没有写入任何 job。
+    assert_eq!(
+        facts.list_ingestion_jobs(None, None, 500).unwrap(),
+        all_jobs_before
+    );
+    server.stop().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn original_outline_sections_drive_knowledge_read_and_refuse_out_of_scope() {
+    use lingxi_adapters::storage::knowledge::{KnowledgeFactStore, KnowledgeIndexStore};
+    use std::future::IntoFuture;
+    let home = unique_dir("original-outline-read");
+    let docs = unique_dir("original-outline-read-files");
+    let paragraph =
+        |mark: &str, index: usize| format!("{mark}_P{index} {}", "章节内的连续原文。".repeat(70));
+    let section = |title: &str, mark: &str, paragraphs: usize| {
+        let body = (0..paragraphs)
+            .map(|index| paragraph(mark, index))
+            .collect::<Vec<_>>()
+            .join("\n\n");
+        format!("# {title}\n\n{body}")
+    };
+    let document = [
+        section("第一章 灵犀架构", "SEC_ONE", 6),
+        section("第二章 检索", "SEC_TWO", 2),
+        section("第三章 引用", "SEC_THREE", 2),
+    ]
+    .join("\n\n");
+    let main_file = docs.join("main.md");
+    std::fs::write(&main_file, &document).unwrap();
+    let second_file = docs.join("second.md");
+    std::fs::write(
+        &second_file,
+        section("同笔记本另一来源", "SECOND_SOURCE", 2),
+    )
+    .unwrap();
+    let empty_file = docs.join("empty.md");
+    std::fs::write(&empty_file, "\n\n   \n").unwrap();
+
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route(
+                    "/chat/completions",
+                    axum::routing::post(knowledge_proof_provider),
+                )
+                .with_state(script.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot_chat(&home, &endpoint).await;
+    let knowledge = state.knowledge().clone();
+    let server = serve(state.clone()).await;
+    let nb = knowledge.create_notebook("导航甲").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    // 每次入库后等后台任务稳定再继续写入：知识库 SQLite 不设忙等待，准备阶段不得与后台写入争用。
+    let main = knowledge
+        .import_file(&nb, main_file.to_str().unwrap(), Some("主来源"))
+        .unwrap();
+    let src = main["source"]["id"].as_str().unwrap().to_string();
+    let main_artifact = main["parseArtifact"]["id"].as_str().unwrap().to_string();
+    wait_until_job(&server, &nb, &src, "pending_embedding").await;
+    let second = knowledge
+        .import_file(&nb, second_file.to_str().unwrap(), Some("同笔记本未选来源"))
+        .unwrap();
+    let second_src = second["source"]["id"].as_str().unwrap().to_string();
+    let second_artifact = second["parseArtifact"]["id"].as_str().unwrap().to_string();
+    wait_until_job(&server, &nb, &second_src, "pending_embedding").await;
+    // 空文档：解析被显式拒绝，来源仍在笔记本内，没有可导航章节。
+    let empty_error = knowledge
+        .import_file(&nb, empty_file.to_str().unwrap(), Some("空文档"))
+        .unwrap_err();
+    assert_eq!(empty_error.code, "KNOWLEDGE_PARSE_FAILED");
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let empty_src = facts
+        .list_notebook_sources(&nb)
+        .unwrap()
+        .into_iter()
+        .find(|entry| entry.source.display_name == "空文档")
+        .expect("空文档来源已登记")
+        .source
+        .id;
+    let foreign_knowledge =
+        lingxi_service::knowledge::KnowledgeService::new(&home, "foreign-studio".into()).unwrap();
+    let foreign_nb = foreign_knowledge.create_notebook("导航乙").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let foreign = foreign_knowledge
+        .import_pasted_text(
+            &foreign_nb,
+            &format!("# 外部章节\n\nFOREIGN_B_MARK {}", "外部原文。".repeat(40)),
+            Some("外部来源"),
+        )
+        .unwrap();
+    let foreign_src = foreign["source"]["id"].as_str().unwrap().to_string();
+    let foreign_artifact = foreign["parseArtifact"]["id"].as_str().unwrap().to_string();
+    wait_for_facts_job(&home, &foreign_nb, &foreign_src, "pending_embedding").await;
+
+    let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
+    let ready = |artifact: &str| {
+        let variants = index.list_ready_variant_metadata(artifact).unwrap();
+        assert_eq!(variants.len(), 1);
+        index.list_variant_chunks(&variants[0].0).unwrap()
+    };
+    let sections = index
+        .list_artifact_section_metadata(&main_artifact)
+        .unwrap();
+    let chunks = ready(&main_artifact);
+    assert_eq!(sections.len(), 3, "三章各一节：{sections:?}");
+    let (section_one, section_two) = (&sections[0], &sections[1]);
+    let section_one_chunks = chunks
+        .iter()
+        .filter(|chunk| chunk.section_id.as_deref() == Some(section_one.id.as_str()))
+        .collect::<Vec<_>>();
+    assert!(section_one_chunks.len() >= 2, "第一章必须跨多个片段");
+    let first_chunk = section_one_chunks[0];
+    let middle_position = chunks
+        .iter()
+        .position(|chunk| chunk.chunk_id == section_one_chunks[1].chunk_id)
+        .unwrap();
+    let second_section = index
+        .list_artifact_section_metadata(&second_artifact)
+        .unwrap()[0]
+        .clone();
+    let second_chunk = ready(&second_artifact)[0].clone();
+    let foreign_section = index
+        .list_artifact_section_metadata(&foreign_artifact)
+        .unwrap()[0]
+        .clone();
+    let foreign_chunk = ready(&foreign_artifact)[0].clone();
+    let rows_before = (
+        facts.list_notebook_sources(&nb).unwrap().len(),
+        facts.list_ingestion_jobs(None, None, 500).unwrap(),
+    );
+
+    let read = |args: Value| ("knowledge_read".to_string(), args);
+    let outline = |args: Value| ("knowledge_outline".to_string(), args);
+    script.lock().unwrap().before_read = Some(Arc::new(|| {}));
+    script.lock().unwrap().calls = vec![
+        outline(json!({"scopeId":"runtime","sourceId":src})), // 0
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"sectionId":section_two.id,"maxChars":8000}),
+        ), // 1
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"sectionId":section_one.id,"maxChars":8000}),
+        ), // 2
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"aroundChunkId":first_chunk.chunk_id,"maxChars":8000}),
+        ), // 3
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"aroundChunkId":section_one_chunks[1].chunk_id,"neighborWindow":0,"maxChars":8000}),
+        ), // 4
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"aroundChunkId":section_one_chunks[1].chunk_id,"neighborWindow":1,"maxChars":8000}),
+        ), // 5
+        read(json!({"scopeId":"runtime","sourceId":src,"sectionId":second_section.id})), // 6
+        read(json!({"scopeId":"runtime","sourceId":src,"sectionId":foreign_section.id})), // 7
+        read(json!({"scopeId":"runtime","sourceId":src,"aroundChunkId":foreign_chunk.chunk_id})), // 8
+        read(json!({"scopeId":"runtime","sourceId":src,"aroundChunkId":second_chunk.chunk_id})), // 9
+        read(json!({"scopeId":"runtime","sourceId":src,"sectionId":"section-never-existed"})), // 10
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"sectionId":section_one.id,"aroundChunkId":first_chunk.chunk_id}),
+        ), // 11
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"sectionId":section_one.id,"fromOrdinal":1}),
+        ), // 12
+        read(json!({"scopeId":"runtime","sourceId":src,"neighborWindow":2})),                  // 13
+        read(json!({"scopeId":"runtime","sourceId":second_src,"sectionId":second_section.id})), // 14
+        read(json!({"scopeId":"runtime","sourceId":src,"sectionId":section_one.id,"maxChars":256})), // 15
+        read(
+            json!({"scopeId":"runtime","sourceId":src,"sectionId":section_two.id,"offset":999999}),
+        ), // 16
+        outline(json!({"scopeId":"runtime","sourceId":foreign_src})), // 17
+        outline(json!({"scopeId":"runtime","sourceId":second_src})),  // 18
+        outline(json!({"scopeId":"runtime","notebookId":foreign_nb})), // 19
+        outline(json!({"scopeId":"runtime","notebookId":"notebook-never-existed"})), // 20
+        outline(json!({"scopeId":"runtime","sourceId":"source-never-existed"})), // 21
+        outline(json!({"scopeId":"runtime","notebookId":nb,"sourceId":foreign_src})), // 22
+        outline(json!({"scopeId":"runtime","sourceId":empty_src})),   // 23
+        read(json!({"scopeId":"runtime","sourceId":empty_src,"sectionId":section_one.id})), // 24
+        outline(json!({"scopeId":"runtime"})),                        // 25
+    ];
+    let (status, executed) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(json!({"input":"核对章节导航与范围拒绝","knowledge":{"notebookIds":[nb],"sourceIds":[src, empty_src]}})),
+        )
+        .await;
+    assert_eq!(status, 200, "{executed}");
+    let requests = script.lock().unwrap().requests.clone();
+    assert_eq!(requests.len(), 26 * 2 + 1);
+    let final_body = requests.last().unwrap();
+    let result = |index: usize| {
+        final_body["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|m| {
+                m["role"] == "tool" && m["tool_call_id"] == format!("original-result-{index}")
+            })
+            .map(proof_content)
+            .unwrap()
+    };
+    let blocks = facts.list_artifact_blocks(&main_artifact).unwrap();
+    let block_text = |block_id: &str| blocks.iter().find(|block| block.id == block_id).unwrap();
+    let joined = |value: &Value| {
+        value["spans"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|span| span["text"].as_str().unwrap())
+            .collect::<String>()
+    };
+    let expected_range = |start: usize, end: usize| {
+        blocks
+            .iter()
+            .filter(|block| (start..=end).contains(&block.ordinal))
+            .map(|block| block.text.as_str())
+            .collect::<String>()
+    };
+
+    // 成功：outline 给出可导航章节与块范围，且受冻结 scope 约束（只有主来源）。
+    let listed: Value = serde_json::from_str(&result(0)).unwrap();
+    assert_eq!(listed["notebooks"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        listed["notebooks"][0]["sources"].as_array().unwrap().len(),
+        1
+    );
+    let listed_sections = listed["notebooks"][0]["sources"][0]["sections"]
+        .as_array()
+        .unwrap();
+    assert_eq!(listed_sections.len(), 3);
+    assert_eq!(listed_sections[1]["sectionId"], section_two.id.as_str());
+    assert_eq!(
+        listed_sections[1]["startBlockOrdinal"],
+        section_two.start_block_ordinal
+    );
+    assert_eq!(
+        listed_sections[1]["endBlockOrdinal"],
+        section_two.end_block_ordinal
+    );
+    assert_eq!(listed_sections[1]["headingPath"], json!(["第二章 检索"]));
+    // outline 的 sectionId 直接用于 read：只读该章块范围，不夹带其它章节/来源。
+    let read_two: Value = serde_json::from_str(&result(1)).unwrap();
+    assert_eq!(read_two["mode"], "section");
+    assert_eq!(read_two["sectionId"], section_two.id.as_str());
+    assert_eq!(read_two["parentSectionHeading"], json!(["第二章 检索"]));
+    assert_eq!(read_two["sourceId"], src.as_str());
+    assert_eq!(read_two["truncated"], false);
+    let text_two = joined(&read_two);
+    assert_eq!(
+        text_two,
+        expected_range(
+            section_two.start_block_ordinal,
+            section_two.end_block_ordinal
+        )
+    );
+    assert!(text_two.contains("SEC_TWO_P0") && text_two.contains("SEC_TWO_P1"));
+    for other in ["SEC_ONE", "SEC_THREE", "SECOND_SOURCE", "FOREIGN_B"] {
+        assert!(!text_two.contains(other), "章节读取越界读到 {other}");
+    }
+    for span in read_two["spans"].as_array().unwrap() {
+        let ordinal = span["blockOrdinal"].as_u64().unwrap() as usize;
+        assert!(
+            (section_two.start_block_ordinal..=section_two.end_block_ordinal).contains(&ordinal)
+        );
+        let block = block_text(span["blockId"].as_str().unwrap());
+        assert_eq!(block.parse_artifact_id, main_artifact);
+        assert!(span["citationMarkdown"]
+            .as_str()
+            .unwrap()
+            .contains(span["citationId"].as_str().unwrap()));
+    }
+    let read_one: Value = serde_json::from_str(&result(2)).unwrap();
+    let text_one = joined(&read_one);
+    assert_eq!(
+        text_one,
+        expected_range(
+            section_one.start_block_ordinal,
+            section_one.end_block_ordinal
+        )
+    );
+    assert!(text_one.contains("SEC_ONE_P5") && !text_one.contains("SEC_TWO"));
+    // aroundChunkId 缺省窗口 → 恢复到所在父章节；显式窗口 → 精读相邻片段。
+    let around_section: Value = serde_json::from_str(&result(3)).unwrap();
+    assert_eq!(around_section["mode"], "section");
+    assert_eq!(
+        around_section["aroundChunkId"],
+        first_chunk.chunk_id.as_str()
+    );
+    assert_eq!(joined(&around_section), text_one);
+    let chunk_text = |chunk: &lingxi_adapters::storage::knowledge::StoredChunk| {
+        chunk
+            .spans
+            .iter()
+            .map(|span| {
+                block_text(&span.block_id)
+                    .text
+                    .chars()
+                    .skip(span.block_start_offset)
+                    .take(span.block_end_offset - span.block_start_offset)
+                    .collect::<String>()
+            })
+            .collect::<String>()
+    };
+    let around_only: Value = serde_json::from_str(&result(4)).unwrap();
+    assert_eq!(around_only["mode"], "around-chunk");
+    assert_eq!(around_only["neighborWindow"], 0);
+    assert_eq!(
+        around_only["requestedRange"],
+        json!([middle_position + 1, middle_position + 1])
+    );
+    assert_eq!(joined(&around_only), chunk_text(section_one_chunks[1]));
+    assert!(joined(&around_only).len() < text_one.len());
+    let around_window: Value = serde_json::from_str(&result(5)).unwrap();
+    assert_eq!(around_window["mode"], "around-chunk");
+    assert_eq!(
+        around_window["requestedRange"],
+        json!([middle_position, middle_position + 2])
+    );
+    assert_eq!(around_window["totalChunks"], chunks.len());
+    assert!(joined(&around_window).len() > joined(&around_only).len());
+    assert!(joined(&around_window).contains(&chunk_text(section_one_chunks[1])));
+    // 续读：同一章节分页，offset 之间无重叠/遗漏。
+    let paged: Value = serde_json::from_str(&result(15)).unwrap();
+    assert_eq!(paged["mode"], "section");
+    assert_eq!(paged["returnedChars"], 256);
+    assert_eq!(paged["truncated"], true);
+    assert_eq!(paged["nextOffset"], 256);
+    assert_eq!(paged["totalChars"], text_one.chars().count());
+    assert_eq!(
+        joined(&paged),
+        text_one.chars().take(256).collect::<String>()
+    );
+
+    // 跨来源隔离：同笔记本未选来源、外部 studio、不存在的章节/片段一律范围违规，
+    // 且错误文本不泄露其原文。
+    for index in [6, 7, 8, 9, 10, 14] {
+        let message = result(index);
+        assert!(
+            message.contains("KNOWLEDGE_SCOPE_VIOLATION"),
+            "{index}: {message}"
+        );
+        for leaked in ["SECOND_SOURCE", "FOREIGN_B", "\"spans\""] {
+            assert!(!message.contains(leaked), "{index}: {message}");
+        }
+    }
+    // 选择器冲突/非法 → 参数错误，不静默降级为整源读取。
+    for index in [11, 12, 13] {
+        let message = result(index);
+        assert!(
+            message.contains("KNOWLEDGE_INVALID_ARGUMENT"),
+            "{index}: {message}"
+        );
+        assert!(!message.contains("\"spans\""), "{index}: {message}");
+    }
+    assert!(
+        result(16).contains("KNOWLEDGE_INVALID_ARGUMENT"),
+        "{}",
+        result(16)
+    );
+
+    // outline 范围拒绝：未选来源/外部来源/外部笔记本/不存在 id 都是错误而不是空成功。
+    for index in [17, 18, 19, 20, 21, 22] {
+        let message = result(index);
+        assert!(
+            message.contains("KNOWLEDGE_SCOPE_VIOLATION"),
+            "{index}: {message}"
+        );
+        assert!(!message.contains("\"notebooks\""), "{index}: {message}");
+        for leaked in ["同笔记本未选来源", "外部来源", "导航乙"] {
+            assert!(!message.contains(leaked), "{index}: {message}");
+        }
+    }
+    // 空文档只返回空大纲（来源在、无章节、无片段），而不是错误；读取章节则显式失败。
+    let empty_outline: Value = serde_json::from_str(&result(23)).unwrap();
+    assert_eq!(empty_outline["notebooks"].as_array().unwrap().len(), 1);
+    let empty_sources = empty_outline["notebooks"][0]["sources"].as_array().unwrap();
+    assert_eq!(empty_sources.len(), 1);
+    assert_eq!(empty_sources[0]["sourceId"], empty_src.as_str());
+    assert_eq!(empty_sources[0]["sections"], json!([]));
+    assert_eq!(empty_sources[0]["chunkCount"], 0);
+    assert!(
+        result(24).contains("KNOWLEDGE_PARSE_NOT_READY"),
+        "{}",
+        result(24)
+    );
+    let whole: Value = serde_json::from_str(&result(25)).unwrap();
+    let whole_sources = whole["notebooks"][0]["sources"].as_array().unwrap();
+    assert_eq!(whole_sources.len(), 2, "scope 内正好两个来源");
+    assert!(whole_sources
+        .iter()
+        .all(|entry| entry["sourceId"] == src.as_str() || entry["sourceId"] == empty_src.as_str()));
+    // 读取与拒绝都没有改动来源或摄入任务。
+    assert_eq!(
+        (
+            facts.list_notebook_sources(&nb).unwrap().len(),
+            facts.list_ingestion_jobs(None, None, 500).unwrap()
+        ),
+        rows_before
+    );
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn original_grep_filters_reject_invalid_values_and_apply_heading_prefix() {
+    use std::future::IntoFuture;
+    let home = unique_dir("original-grep-filters");
+    let docs = unique_dir("original-grep-filters-files");
+    let file = docs.join("grep.md");
+    std::fs::write(
+        &file,
+        "# 原章节\n\nGREP_FILTER_ALPHA 位于原章节。\n\n# 另一章\n\nGREP_FILTER_ALPHA 位于另一章。",
+    )
+    .unwrap();
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route(
+                    "/chat/completions",
+                    axum::routing::post(knowledge_proof_provider),
+                )
+                .with_state(script.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot_chat(&home, &endpoint).await;
+    let knowledge = state.knowledge().clone();
+    let nb = knowledge.create_notebook("过滤甲").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let src = knowledge
+        .import_file(&nb, file.to_str().unwrap(), Some("过滤原文"))
+        .unwrap()["source"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let server = serve(state.clone()).await;
+    wait_until_job(&server, &nb, &src, "pending_embedding").await;
+    let facts =
+        lingxi_adapters::storage::knowledge::KnowledgeFactStore::open(&home.join("knowledge"))
+            .unwrap();
+    let jobs_before = facts.list_ingestion_jobs(None, None, 500).unwrap();
+    let grep = |args: Value| ("knowledge_grep".to_string(), args);
+    script.lock().unwrap().calls = vec![
+        grep(
+            json!({"scopeId":"runtime","pattern":"GREP_FILTER_ALPHA","headingFilter":"章".repeat(257)}),
+        ), // 0
+        grep(json!({"scopeId":"runtime","pattern":"GREP_FILTER_ALPHA","sourceIds":[" "]})), // 1
+        grep(json!({"scopeId":"runtime","pattern":"GREP_FILTER_ALPHA","headingFilter":"原章"})), // 2
+        grep(
+            json!({"scopeId":"runtime","pattern":"GREP_FILTER_ALPHA","headingFilter":"  原章节  ","sourceIds":[src]}),
+        ), // 3
+        grep(json!({"scopeId":"runtime","pattern":"GREP_FILTER_ALPHA"})), // 4
+        grep(
+            json!({"scopeId":"runtime","pattern":"GREP_FILTER_ALPHA","headingFilter":"章".repeat(256)}),
+        ), // 5
+        grep(json!({"scopeId":"runtime","pattern":"x".repeat(513)})),     // 6
+    ];
+    let (status, executed) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(json!({"input":"核对 grep 过滤器","knowledge":{"notebookIds":[nb],"sourceIds":[src]}})),
+        )
+        .await;
+    assert_eq!(status, 200, "{executed}");
+    let requests = script.lock().unwrap().requests.clone();
+    assert_eq!(requests.len(), 7 * 2 + 1);
+    let final_body = requests.last().unwrap();
+    let result = |index: usize| {
+        final_body["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|m| {
+                m["role"] == "tool" && m["tool_call_id"] == format!("original-result-{index}")
+            })
+            .map(proof_content)
+            .unwrap()
+    };
+    for index in [0, 1, 6] {
+        let message = result(index);
+        assert!(
+            message.contains("KNOWLEDGE_INVALID_ARGUMENT"),
+            "{index}: {message}"
+        );
+        assert!(
+            !message.contains("GREP_FILTER_ALPHA 位于"),
+            "{index}: {message}"
+        );
+        assert!(!message.contains("\"matches\""), "{index}: {message}");
+    }
+    assert!(
+        result(0).contains("headingFilter exceeds the 256"),
+        "{}",
+        result(0)
+    );
+    assert!(
+        result(1).contains("sourceIds must be a non-empty array"),
+        "{}",
+        result(1)
+    );
+    // 成功边界：标题前缀只保留原章节命中；trim 后同口径；恰好 256 字符合法但无命中。
+    for index in [2, 3] {
+        let filtered: Value = serde_json::from_str(&result(index)).unwrap();
+        let matches = filtered["matches"].as_array().unwrap();
+        assert_eq!(matches.len(), 1, "{index}: {filtered}");
+        assert_eq!(matches[0]["sourceId"], src.as_str());
+        assert_eq!(matches[0]["headingPath"], json!(["原章节"]));
+        assert!(matches[0]["snippet"]
+            .as_str()
+            .unwrap()
+            .contains("位于原章节"));
+    }
+    let unfiltered: Value = serde_json::from_str(&result(4)).unwrap();
+    assert_eq!(unfiltered["matches"].as_array().unwrap().len(), 2);
+    let boundary: Value = serde_json::from_str(&result(5)).unwrap();
+    assert_eq!(boundary["matches"], json!([]));
+    assert_eq!(
+        facts.list_ingestion_jobs(None, None, 500).unwrap(),
+        jobs_before
+    );
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
 }
 
 async fn boot_chat(home: &Path, endpoint: &str) -> ServiceState {
@@ -1368,7 +2757,7 @@ async fn original_tools_use_authentic_run_scope_and_frozen_citable_source() {
             json!({"scopeId":"runtime","pattern":"柠檬酸含量","headingFilter":"HEADING_NEVER_MATCHES_ORIGINAL_PROOF"}),
         ),
     ];
-    wait_until_job(&server, other_id, foreign, "pending_embedding").await;
+    wait_for_facts_job(&home, other_id, foreign, "pending_embedding").await;
     let (status,executed)=server.request("POST","/lingxi/v1/sessions/sess_local_alpha/execute",Some(json!({"input":"核对只选甲来源的原义知识行为","knowledge":{"notebookIds":[id],"sourceIds":[src]}}))).await;
     assert_eq!(status, 200, "{executed}");
     let run = executed["runId"].as_str().unwrap();
@@ -1879,7 +3268,7 @@ async fn original_manage_refusals_and_no_write_authorization_preserve_facts() {
             .collect::<Vec<_>>()
     };
     let server = serve(state.clone()).await;
-    wait_until_job(&server, foreign_id, source_id, "pending_embedding").await;
+    wait_for_facts_job(&home, foreign_id, source_id, "pending_embedding").await;
     // 等真实后台初始化稳定后再取基线，初始化写入不能误算为拒绝操作的副作用。
     let snapshot = facts.latest_snapshot_for_source(source_id).unwrap();
     let foreign_before = facts.get_source(source_id).unwrap();

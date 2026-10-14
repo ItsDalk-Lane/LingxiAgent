@@ -1,0 +1,16 @@
+
+running 1 test
+test original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations ... ok
+
+successes:
+
+---- original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations stdout ----
+LINGXI_AUTH_REJECTED request_id="req-da1158d084e1eed5494111e69c96338a" method=DELETE [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64886
+LINGXI_AUTH_REJECTED request_id="req-f70814a68b5d2529c7ae29bc7f123ab9" method=DELETE [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:64887
+
+
+successes:
+    original_resource_watch_handle_lifecycle_and_cursor_reads_use_real_provider_registrations
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.09s
+

@@ -1,4 +1,5 @@
-//! R06 A 块剩余后端叶子：`PUT /agents/{id}/config` 供应商读回链、
+//! R06 A 块剩余后端叶子：`GET/PUT /agents/{id}/config`（GET 为完整设置读面）、
+//! `PUT /agents/{id}/config` 供应商读回链、
 //! current_status 只读面、experiments 读/写、cache-snapshot observation 读。
 //!
 //! 语义源（端口式移植，不猜造）：
@@ -12,6 +13,14 @@
 //! - `shared/config-scope.ts` + `core/preferences-manager.ts` — 全局字段经
 //!   setter 写 `user/preferences.json`。
 //! - `lib/tools/current-status-tool.ts` — list/get 协议的状态键目录。
+//! - `server/routes/agents.ts:557-634` — GET config（GC 工作区历史 → 读盘
+//!   → experience 归一 → `_raw` → 全局字段注入 → 供应商摘要 → availableTools
+//!   → 递归掩码）。端口边界：无运行时 agent/插件注册表，availableTools =
+//!   core+standard+可选开关（beautify/office 需插件工具注册，端口无 → 不列；
+//!   computer 需 Computer Use 启用，端口无 → 隐藏）；供应商 base_url/api 取目录
+//!   与插件定义值，无内置默认 URL 表（不回退 registry 默认）；config.yaml
+//!   违反端口配置校验时显式 500（不静默降级）；目录读取失败 → `providers: {}`
+//!   并记 warn 日志；读目录不触发遗留迁移落盘。
 //! - `server/routes/experiments.ts` + `lib/experiments/registry.ts` +
 //!   `lib/memory/cache-snapshot-observation.ts`。
 //!
@@ -214,6 +223,12 @@ impl ProviderCatalog {
 /// （added-models.yaml → catalog；无遗留则物化空目录——与现役 load 的
 /// 副作用一致：首次读取即建立 provider-catalog.json）。
 fn load_catalog(home: &Path) -> Result<ProviderCatalog, String> {
+    load_catalog_with(home, true)
+}
+
+/// `persist=false` 时遗留目录迁移只在内存中完成、不落盘（只读路由用，
+/// 读取不产生写副作用）。
+fn load_catalog_with(home: &Path, persist: bool) -> Result<ProviderCatalog, String> {
     let read = std::fs::read(catalog_path(home));
     match read {
         Ok(bytes) => {
@@ -255,7 +270,9 @@ fn load_catalog(home: &Path) -> Result<ProviderCatalog, String> {
                 providers: normalize_provider_map(legacy.as_ref().and_then(|v| v.get("providers"))),
                 meta,
             };
-            catalog.save(home)?;
+            if persist {
+                catalog.save(home)?;
+            }
             Ok(catalog)
         }
         Err(err) => Err(format!("cannot read provider catalog: {err}")),
@@ -840,7 +857,11 @@ fn registry_remove_provider(home: &Path, provider_id: &str) -> Result<(), String
 /// _mergeRawProviderConfig）：本地插件的定义字段（display_name/base_url/
 /// api/models…）与目录 overlay 合并，模型表按 id merge。内置条目即目录值。
 fn merged_catalog_providers(home: &Path) -> Result<Map<String, Value>, String> {
-    let catalog = load_catalog(home)?;
+    merged_catalog_providers_with(home, true)
+}
+
+fn merged_catalog_providers_with(home: &Path, persist: bool) -> Result<Map<String, Value>, String> {
+    let catalog = load_catalog_with(home, persist)?;
     let mut merged = Map::new();
     for (name, overlay) in &catalog.providers {
         if !has_local_plugin(home, name) {
@@ -1723,6 +1744,13 @@ fn normalize_bridge_permission_mode(value: &Value) -> &'static str {
 /// 网络代理 strict 归一（shared/network-proxy.ts）；manual 无任何代理 URL
 /// 或 URL 非法时抛错（现役 setNetworkProxy strict 行为）。
 fn normalize_network_proxy_strict(value: &Value) -> Result<Value, String> {
+    normalize_network_proxy(value, true)
+}
+
+/// normalizeNetworkProxyConfig（strict=false 为读侧宽松归一：非法模式回
+/// system、非法/无主机 URL 清空、带路径的 URL 去路径、manual 无任何代理
+/// 回默认配置）。
+fn normalize_network_proxy(value: &Value, strict: bool) -> Result<Value, String> {
     let input = value.as_object();
     let mode = input
         .and_then(|m| m.get("mode"))
@@ -1732,7 +1760,7 @@ fn normalize_network_proxy_strict(value: &Value) -> Result<Value, String> {
         Some(mode) => mode,
         None => {
             if let Some(raw) = input.and_then(|m| m.get("mode")) {
-                if !raw.is_null() {
+                if strict && !raw.is_null() {
                     return Err("network proxy mode must be system, manual, or direct".into());
                 }
             }
@@ -1776,24 +1804,34 @@ fn normalize_network_proxy_strict(value: &Value) -> Result<Value, String> {
         if raw.is_empty() {
             return Ok(String::new());
         }
-        let (scheme, rest) = raw
-            .split_once("://")
-            .ok_or_else(|| format!("{field} must be a valid proxy URL"))?;
+        let lenient_empty = |message: String| -> Result<String, String> {
+            if strict {
+                Err(message)
+            } else {
+                Ok(String::new())
+            }
+        };
+        let Some((scheme, rest)) = raw.split_once("://") else {
+            return lenient_empty(format!("{field} must be a valid proxy URL"));
+        };
         if rest.is_empty() || rest.contains(['?', '#']) {
-            return Err(format!("{field} must be a valid proxy URL"));
+            return lenient_empty(format!("{field} must be a valid proxy URL"));
         }
         if !matches!(scheme, "http" | "https" | "socks" | "socks5") {
-            return Err(format!("{field} must use http, https, socks, or socks5"));
+            return lenient_empty(format!("{field} must use http, https, socks, or socks5"));
         }
         let (authority, path) = match rest.find('/') {
             Some(idx) => (&rest[..idx], &rest[idx..]),
             None => (rest, ""),
         };
         if authority.is_empty() {
-            return Err(format!("{field} must include a host"));
+            return lenient_empty(format!("{field} must include a host"));
         }
         if !path.is_empty() && path != "/" {
-            return Err(format!("{field} must not include a path"));
+            if strict {
+                return Err(format!("{field} must not include a path"));
+            }
+            return Ok(format!("{scheme}://{authority}"));
         }
         Ok(raw.trim_end_matches('/').to_string())
     };
@@ -1810,6 +1848,16 @@ fn normalize_network_proxy_strict(value: &Value) -> Result<Value, String> {
         .iter()
         .any(|key| normalized[key].as_str().is_some_and(|v| !v.is_empty()));
     if !has_any {
+        if !strict {
+            return Ok(json!({
+                "mode": "system",
+                "httpProxy": "",
+                "httpsProxy": "",
+                "wsProxy": "",
+                "wssProxy": "",
+                "noProxy": default_no_proxy,
+            }));
+        }
         return Err("manual network proxy requires at least one proxy URL".into());
     }
     Ok(normalized)
@@ -2590,6 +2638,485 @@ fn emit_agent_config_app_events(
     if agent_partial.get("skills").is_some() || has_workspace_skill_policy {
         events.publish("skills-changed", json!({ "agentId": agent_id }));
     }
+}
+
+// ── GET /agents/{id}/config（agents.ts:557-634）──────────────────────────────
+
+/// DEFAULT_SECRET_KEYS（shared/secret-custody.ts）：精确键名注册表，不做
+/// 后缀/子串匹配。
+const SECRET_KEYS: [&str; 16] = [
+    "api_key",
+    "apiKey",
+    "token",
+    "botToken",
+    "webhookToken",
+    "robotToken",
+    "appSecret",
+    "clientSecret",
+    "corpSecret",
+    "webhookSecret",
+    "oauthClientSecret",
+    "suiteSecret",
+    "secret",
+    "password",
+    "accessToken",
+    "refreshToken",
+];
+
+/// maskSecretValue：非空字符串 → `********`，其余（含空串/非字符串）→ ""。
+fn mask_secret_value(value: &Value) -> Value {
+    match value.as_str() {
+        Some(text) if !text.is_empty() => Value::String(MASKED_SECRET.to_string()),
+        _ => Value::String(String::new()),
+    }
+}
+
+/// maskObjectSecrets：递归掩码全部密钥字段（数组逐项递归）。
+fn mask_object_secrets(value: &Value) -> Value {
+    match value {
+        Value::Array(items) => Value::Array(items.iter().map(mask_object_secrets).collect()),
+        Value::Object(map) => Value::Object(
+            map.iter()
+                .map(|(key, entry)| {
+                    let masked = if SECRET_KEYS.contains(&key.as_str()) {
+                        mask_secret_value(entry)
+                    } else {
+                        mask_object_secrets(entry)
+                    };
+                    (key.clone(), masked)
+                })
+                .collect(),
+        ),
+        other => other.clone(),
+    }
+}
+
+/// JS 真值（`{}`/`[]` 为真，与 `truthy` 的写侧口径不同）。
+fn js_truthy(value: Option<&Value>) -> bool {
+    match value {
+        None | Some(Value::Null) => false,
+        Some(Value::Bool(v)) => *v,
+        Some(Value::Number(v)) => v.as_f64().is_some_and(|n| n != 0.0 && !n.is_nan()),
+        Some(Value::String(v)) => !v.is_empty(),
+        Some(_) => true,
+    }
+}
+
+/// `value || ""`。
+fn or_empty_string(value: Option<&Value>) -> Value {
+    match value {
+        Some(v) if js_truthy(Some(v)) => v.clone(),
+        _ => Value::String(String::new()),
+    }
+}
+
+/// normalizeWorkspacePath（shared/workspace-history.ts）。
+fn normalize_workspace_path(value: Option<&Value>) -> Option<String> {
+    let trimmed = value?.as_str()?.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let slashed = trimmed.replace('\\', "/");
+    if slashed == "/" {
+        return Some(slashed);
+    }
+    let bytes = slashed.as_bytes();
+    let drive_root = (bytes.len() == 2 || (bytes.len() == 3 && bytes[2] == b'/'))
+        && bytes[0].is_ascii_alphabetic()
+        && bytes[1] == b':';
+    if drive_root {
+        return Some(if slashed.ends_with('/') {
+            slashed
+        } else {
+            format!("{slashed}/")
+        });
+    }
+    Some(slashed.trim_end_matches('/').to_string())
+}
+
+const WORKSPACE_HISTORY_LIMIT: usize = 10;
+
+/// mergeWorkspaceHistory(existing, [])：规范化、去重、按上限截断。
+fn merge_workspace_history(existing: &[Value]) -> Vec<String> {
+    let mut next: Vec<String> = Vec::new();
+    for value in existing {
+        let Some(normalized) = normalize_workspace_path(Some(value)) else {
+            continue;
+        };
+        if !next.contains(&normalized) {
+            next.push(normalized);
+        }
+    }
+    next.truncate(WORKSPACE_HISTORY_LIMIT);
+    next
+}
+
+/// classifyWorkspacePathForGc：只有确定"不存在"（ENOENT/ENOTDIR）才算
+/// missing；权限错误等未知状态保留。
+fn workspace_path_is_missing(path: &str) -> bool {
+    match std::fs::metadata(path) {
+        Ok(_) => false,
+        Err(err) => matches!(
+            err.kind(),
+            std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory
+        ),
+    }
+}
+
+/// pruneMissingWorkspaceConfig（shared/workspace-persistence-gc.ts）：
+/// cwd_history 丢弃已消失目录，last_cwd / desk.home_folder 消失则置 null
+/// （saveConfig 的 null 删键语义）。
+fn prune_missing_workspace_config(config: &Value) -> Option<Value> {
+    let mut patch = Map::new();
+    if let Some(history) = config.get("cwd_history").and_then(Value::as_array) {
+        let current = merge_workspace_history(history);
+        let kept: Vec<String> = current
+            .iter()
+            .filter(|item| !workspace_path_is_missing(item))
+            .cloned()
+            .collect();
+        if kept != current {
+            patch.insert("cwd_history".into(), json!(kept));
+        }
+    }
+    if let Some(last) = normalize_workspace_path(config.get("last_cwd")) {
+        if workspace_path_is_missing(&last) {
+            patch.insert("last_cwd".into(), Value::Null);
+        }
+    }
+    if let Some(home) =
+        normalize_workspace_path(config.get("desk").and_then(|d| d.get("home_folder")))
+    {
+        if workspace_path_is_missing(&home) {
+            patch.insert("desk".into(), json!({ "home_folder": null }));
+        }
+    }
+    if patch.is_empty() {
+        None
+    } else {
+        Some(Value::Object(patch))
+    }
+}
+
+/// gcWorkspacePersistence({agentId}) 端口：请求助手 config.yaml 的工作区
+/// 历史 + preferences.json 的 workspace_ui_state 里已消失的根目录。
+/// workspace_ui_state 只删 workspaces 的已消失键（端口没有该状态的
+/// 写入面，不重新归一化其余内容）。无变化不落盘。
+fn gc_workspace_persistence(memory: &MemoryService, agent_dir: &Path) -> Result<(), String> {
+    let config_path = agent_dir.join("config.yaml");
+    let config = am::config::read_yaml_mapping_as_json(&config_path)
+        .map_err(|err| format!("cannot read config.yaml: {err}"))?
+        .unwrap_or_else(|| json!({}));
+    if let Some(patch) = prune_missing_workspace_config(&config) {
+        save_agent_config_merge(&config_path, &patch)?;
+    }
+
+    let _guard = crate::agents_admin::preferences_locked();
+    let mut preferences = memory.read_preferences_root()?;
+    let mut changed = false;
+    if let Some(workspaces) = preferences
+        .get_mut("workspace_ui_state")
+        .and_then(|state| state.get_mut("workspaces"))
+        .and_then(Value::as_object_mut)
+    {
+        let before = workspaces.len();
+        workspaces.retain(|workspace, _| {
+            normalize_workspace_path(Some(&Value::String(workspace.clone())))
+                .is_none_or(|path| !workspace_path_is_missing(&path))
+        });
+        changed = workspaces.len() != before;
+    }
+    if changed {
+        memory.write_preferences_root(&preferences)?;
+    }
+    Ok(())
+}
+
+fn pref_bool_not_false(prefs: &Value, key: &str) -> Value {
+    Value::Bool(prefs.get(key) != Some(&Value::Bool(false)))
+}
+
+fn permission_mode_from(block: Option<&Value>, allow_read_only_flag: bool) -> Value {
+    let block = block.and_then(Value::as_object);
+    if let Some(mode) = block
+        .and_then(|m| m.get("permissionMode"))
+        .and_then(Value::as_str)
+    {
+        if matches!(mode, "auto" | "operate" | "read_only") {
+            return json!(mode);
+        }
+    }
+    if allow_read_only_flag && block.is_some_and(|m| m.get("readOnly") == Some(&Value::Bool(true)))
+    {
+        return json!("read_only");
+    }
+    json!("auto")
+}
+
+/// CONFIG_SCHEMA 全局字段 getter（core/preferences-manager.ts 各 getter
+/// 的读侧口径，默认值/归一一致）。
+fn global_field_value(prefs: &Value, key: &str) -> Value {
+    match key {
+        "locale" => or_empty_string(prefs.get("locale")),
+        "user.name" => or_empty_string(prefs.get("userName")),
+        "timezone" => or_empty_string(prefs.get("timezone")),
+        "sandbox" => pref_bool_not_false(prefs, "sandbox"),
+        // 现役：win32 无网络隔离，恒为 true。
+        "sandbox_network" => {
+            if cfg!(windows) {
+                Value::Bool(true)
+            } else {
+                pref_bool_not_false(prefs, "sandbox_network")
+            }
+        }
+        "hardware_acceleration" => pref_bool_not_false(prefs, "hardware_acceleration"),
+        "file_backup" => {
+            let days = prefs
+                .get("file_backup")
+                .and_then(|cfg| cfg.get("retention_days"))
+                .and_then(|v| match v {
+                    Value::Number(n) => n.as_f64(),
+                    Value::String(text) => text.trim().parse::<f64>().ok(),
+                    _ => None,
+                })
+                .filter(|n| n.is_finite() && *n > 0.0);
+            json!({ "retention_days": days.unwrap_or(1.0) })
+        }
+        "update_channel" => match prefs.get("update_channel") {
+            value if js_truthy(value) => value.cloned().unwrap_or(Value::Null),
+            _ => json!("stable"),
+        },
+        "auto_check_updates" => pref_bool_not_false(prefs, "auto_check_updates"),
+        "keep_awake" => Value::Bool(prefs.get("keep_awake") == Some(&Value::Bool(true))),
+        "thinking_level" => {
+            normalize_thinking_level(prefs.get("thinking_level").unwrap_or(&Value::Null))
+        }
+        "editor" => normalize_editor_typography(prefs.get("editor")),
+        "capabilities.learn_skills" => match prefs.get("learn_skills") {
+            value if js_truthy(value) => value.cloned().unwrap_or(Value::Null),
+            _ => json!({ "enabled": true, "safety_review": true }),
+        },
+        "desk.heartbeat_master" => pref_bool_not_false(prefs, "heartbeat_master"),
+        "channels.enabled" => {
+            Value::Bool(prefs.get("channels_enabled") == Some(&Value::Bool(true)))
+        }
+        "bridge.permissionMode" => permission_mode_from(prefs.get("bridge"), true),
+        "bridge.readOnly" => {
+            Value::Bool(permission_mode_from(prefs.get("bridge"), true) == json!("read_only"))
+        }
+        "bridge.receiptEnabled" => Value::Bool(
+            prefs.get("bridge").and_then(|b| b.get("receiptEnabled")) != Some(&Value::Bool(false)),
+        ),
+        "bridge.richStreamingEnabled" => Value::Bool(
+            prefs
+                .get("bridge")
+                .and_then(|b| b.get("richStreamingEnabled"))
+                != Some(&Value::Bool(false)),
+        ),
+        "automation.permissionMode" => permission_mode_from(prefs.get("automation"), false),
+        "network_proxy" => {
+            normalize_network_proxy(prefs.get("network_proxy").unwrap_or(&Value::Null), false)
+                .expect("宽松归一不会失败")
+        }
+        other => unreachable!("未登记的全局字段 {other}"),
+    }
+}
+
+/// injectGlobalFields（shared/config-scope.ts）：全局字段覆盖到 config
+/// 对象（嵌套父节点不是对象时先置为 {}）。
+fn inject_global_fields(config: &mut Map<String, Value>, prefs: &Value) {
+    for field in GLOBAL_FIELDS {
+        let value = global_field_value(prefs, field);
+        match field.split_once('.') {
+            None => {
+                config.insert((*field).to_string(), value);
+            }
+            Some((parent, child)) => {
+                let slot = config
+                    .entry(parent.to_string())
+                    .or_insert_with(|| json!({}));
+                if !slot.is_object() {
+                    *slot = json!({});
+                }
+                slot.as_object_mut()
+                    .expect("已确保对象")
+                    .insert(child.to_string(), value);
+            }
+        }
+    }
+}
+
+/// normalizeExperienceConfigForResponse：experience 对象化，enabled 只认
+/// 布尔 true。
+fn normalize_experience_for_response(config: &mut Map<String, Value>) {
+    let mut experience = config
+        .get("experience")
+        .and_then(Value::as_object)
+        .cloned()
+        .unwrap_or_default();
+    let enabled = experience.get("enabled") == Some(&Value::Bool(true));
+    experience.insert("enabled".into(), Value::Bool(enabled));
+    config.insert("experience".into(), Value::Object(experience));
+}
+
+/// 供应商摘要（base_url / api / 掩码 api_key / models / model_count）。
+/// 目录读取失败 → `{}`（现役 catch 分支），失败原因记日志而不伪装成空目录。
+fn providers_summary(home: &Path) -> Value {
+    let providers = match merged_catalog_providers_with(home, false) {
+        Ok(providers) => providers,
+        Err(message) => {
+            tracing::warn!(%message, "provider catalog unreadable; GET agent config returns empty providers");
+            return json!({});
+        }
+    };
+    let mut entries = Map::new();
+    for (name, raw) in &providers {
+        let models = raw.get("models").and_then(Value::as_array);
+        let text = |key: &str| {
+            raw.get(key)
+                .filter(|v| js_truthy(Some(v)))
+                .cloned()
+                .unwrap_or_else(|| Value::String(String::new()))
+        };
+        entries.insert(
+            name.clone(),
+            json!({
+                "base_url": text("base_url"),
+                "api": text("api"),
+                "api_key": mask_secret_value(raw.get("api_key").unwrap_or(&Value::Null)),
+                "models": models.cloned().unwrap_or_default(),
+                "model_count": models.map_or(0, Vec::len),
+            }),
+        );
+    }
+    Value::Object(entries)
+}
+
+const CORE_TOOL_NAMES: [&str; 12] = [
+    "read",
+    "write",
+    "edit",
+    "exec_command",
+    "write_stdin",
+    "grep",
+    "find",
+    "ls",
+    "search_memory",
+    "pin_memory",
+    "unpin_memory",
+    "web_search",
+];
+
+const STANDARD_TOOL_NAMES: [&str; 26] = [
+    "web_fetch",
+    "todo_write",
+    "notify",
+    "stage_files",
+    "file",
+    "materialize",
+    "subagent",
+    "subagent_reply",
+    "subagent_close",
+    "channel",
+    "record_experience",
+    "recall_experience",
+    "tenet_propose",
+    "check_pending_tasks",
+    "current_status",
+    "ask_user",
+    "session_folders",
+    "stop_task",
+    "hana_card_guide",
+    "show_card",
+    "loop_control",
+    "knowledge_search",
+    "knowledge_read",
+    "knowledge_outline",
+    "knowledge_grep",
+    "knowledge_manage",
+];
+
+/// 插件承载的可选类别：只有对应插件工具真的注册才出现在设置面。
+const PLUGIN_BACKED_OPTIONAL_TOOLS: [&str; 2] = ["beautify", "office"];
+
+/// computeSettingsAvailableToolNames（shared/tool-categories.ts）+
+/// hideDisabledGlobalToolsForSettings 的端口：设置面的稳定工具面 =
+/// 常驻内置（core + standard）∪ 全部可选开关。端口没有运行时 agent 实例，
+/// 也没有插件工具注册表（pluginTools 恒空 → beautify/office 不出现）；
+/// 全局工具 computer 仅在 Computer Use 启用时出现，端口无该能力 → 隐藏。
+/// 结果只取决于路径 id 对应的助手，与焦点无关。
+fn settings_available_tools() -> Vec<&'static str> {
+    let mut result: Vec<&'static str> = Vec::new();
+    for name in CORE_TOOL_NAMES
+        .iter()
+        .chain(STANDARD_TOOL_NAMES.iter())
+        .chain(OPTIONAL_TOOL_NAMES.iter())
+    {
+        if PLUGIN_BACKED_OPTIONAL_TOOLS.contains(name) || result.contains(name) {
+            continue;
+        }
+        result.push(*name);
+    }
+    result
+}
+
+fn agent_not_found() -> Response {
+    (
+        StatusCode::NOT_FOUND,
+        Json(json!({ "error": "agent not found" })),
+    )
+        .into_response()
+}
+
+/// GET /lingxi/v1/agents/{agent_id}/config（`settings.read` 由路由策略层
+/// 把关，与 config-flags 读面同级）。目标助手只由路径 id 决定，焦点不参与。
+pub async fn agent_config_get_route(
+    State(state): State<ServiceState>,
+    AxumPath(agent_id): AxumPath<String>,
+) -> Response {
+    if validate_agent_id(&agent_id).is_err() {
+        return agent_not_found();
+    }
+    let memory = state.memory();
+    let Ok(agent_dir) = memory.agent_dir_checked(&agent_id) else {
+        return agent_not_found();
+    };
+
+    // 先清掉已消失目录的工作区历史，再读（任何入口读到的 config 一致）。
+    if let Err(message) = gc_workspace_persistence(memory, &agent_dir) {
+        return internal_error(message);
+    }
+
+    // 直接读盘解析，不经任何缓存。
+    let config = match am::config::read_yaml_mapping_as_json(&agent_dir.join("config.yaml")) {
+        Ok(config) => config.unwrap_or_else(|| json!({})),
+        Err(err) => return internal_error(format!("cannot read config.yaml: {err}")),
+    };
+    let Value::Object(mut config) = config else {
+        return internal_error("config.yaml must contain a mapping");
+    };
+
+    normalize_experience_for_response(&mut config);
+    let raw_block = |name: &str| {
+        let block = config.get(name);
+        json!({
+            "provider": or_empty_string(block.and_then(|b| b.get("provider"))),
+            "base_url": or_empty_string(block.and_then(|b| b.get("base_url"))),
+        })
+    };
+    let raw = json!({ "api": raw_block("api"), "embedding_api": raw_block("embedding_api") });
+    config.insert("_raw".into(), raw);
+
+    let preferences = match memory.read_preferences_root() {
+        Ok(preferences) => preferences,
+        Err(message) => return internal_error(message),
+    };
+    inject_global_fields(&mut config, &preferences);
+
+    config.insert("providers".into(), providers_summary(memory.home()));
+    config.insert("availableTools".into(), json!(settings_available_tools()));
+
+    Json(mask_object_secrets(&Value::Object(config))).into_response()
 }
 
 // ── current_status 只读面（lib/tools/current-status-tool.ts list/get）───────

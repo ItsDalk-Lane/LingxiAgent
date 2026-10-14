@@ -380,6 +380,19 @@ pub struct SearchRequest {
     pub limit: usize,
 }
 
+/// (block id, 起偏移, 止偏移) 原文读取范围。
+type ReadRanges = Vec<(String, usize, usize)>;
+
+/// knowledge_read 的定位方式（sectionId / aroundChunkId 二选一）。
+pub enum ReadNavigation<'a> {
+    Section(&'a str),
+    AroundChunk {
+        chunk_id: &'a str,
+        /// None = 未显式给出（有父章节时读整节，否则默认每侧 1 片）。
+        neighbor_window: Option<usize>,
+    },
+}
+
 /// grep 请求（与 SearchRequest 同层）：source_ids 必须全为冻结子集；
 /// heading_filter 为可选标题前缀（空标题路径永不命中）。
 pub struct GrepRequest<'a> {
@@ -671,9 +684,40 @@ impl KnowledgeService {
         Ok(notebook_json(&notebook))
     }
 
+    /// 删除笔记本及其独占来源（与 delete_source 同一物理清理）；仍被其他笔记本挂靠的
+    /// 共享来源只摘 membership。任一成员来源被活跃 turn/run scope 冻结则 409，
+    /// 且在任何写入之前拒绝，笔记本/membership/来源/任务保持原样。
     pub fn delete_notebook(&self, notebook_id: &str) -> Result<Value, KnowledgeError> {
+        let _write = self.write_gate.try_lock().map_err(|_| {
+            KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
+        })?;
+        self.facts.get_notebook(&self.studio_id, notebook_id)?;
+        let members = self.facts.list_active_member_source_ids(notebook_id)?;
+        for source_id in &members {
+            if self.facts.any_active_scope_freezes_source(source_id)? {
+                return Err(KnowledgeError::conflict(
+                    "notebook source is referenced by an active turn scope",
+                ));
+            }
+        }
+        let mut deleted_sources = Vec::new();
+        let mut cancelled_jobs = 0usize;
+        for source_id in &members {
+            if self
+                .facts
+                .source_has_other_active_membership(source_id, notebook_id)?
+            {
+                continue;
+            }
+            cancelled_jobs += self.purge_source_everywhere(source_id)?;
+            deleted_sources.push(source_id.clone());
+        }
         let notebook = self.facts.delete_notebook(&self.studio_id, notebook_id)?;
-        Ok(notebook_json(&notebook))
+        Ok(json!({
+            "notebook": notebook_json(&notebook),
+            "deletedSourceIds": deleted_sources,
+            "cancelledJobs": cancelled_jobs,
+        }))
     }
 
     pub fn get_notebook_config(&self, notebook_id: &str) -> Result<Value, KnowledgeError> {
@@ -1056,12 +1100,20 @@ impl KnowledgeService {
         let _write = self.write_gate.try_lock().map_err(|_| {
             KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
         })?;
+        self.facts
+            .get_source_in_studio(&self.studio_id, source_id)?;
         if self.facts.any_active_scope_freezes_source(source_id)? {
             return Err(KnowledgeError::conflict(
                 "source is referenced by an active turn scope",
             ));
         }
-        self.facts.get_source(source_id)?;
+        let cancelled = self.purge_source_everywhere(source_id)?;
+        Ok(json!({"cancelledJobs": cancelled, "purge": {"snapshots": true, "indexVariants": true}}))
+    }
+
+    /// 来源的完整物理清理（delete_source 与 delete_notebook 共用）：取消活跃 job、
+    /// 清向量/FTS 变体与解析产物文件、标删并清事实行与快照文件。调用方已持有写闸并完成校验。
+    fn purge_source_everywhere(&self, source_id: &str) -> Result<usize, KnowledgeError> {
         let artifacts = self.facts.list_source_parse_artifacts(source_id)?;
         let cancelled = self.facts.cancel_jobs_for_source(source_id)?;
         // 只清此来源的全部版本；缓存写入失败必须返回错误，不能声称purge成功。
@@ -1086,7 +1138,7 @@ impl KnowledgeService {
         }
         self.facts.delete_source(source_id)?;
         self.facts.purge_source(source_id)?;
-        Ok(json!({"cancelledJobs": cancelled, "purge": {"snapshots": true, "indexVariants": true}}))
+        Ok(cancelled)
     }
 
     /// reingest：failed 重试 / 无 job 兜底入队 / 非 failed 409（manager.ts:1833-1846）。
@@ -1096,6 +1148,8 @@ impl KnowledgeService {
         source_id: &str,
     ) -> Result<Value, KnowledgeError> {
         self.facts.get_notebook(&self.studio_id, notebook_id)?;
+        self.facts
+            .require_member_source(&self.studio_id, notebook_id, source_id)?;
         let (_, profile) = self.notebook_chunk_profile(notebook_id)?;
         let latest = self.facts.latest_job_for_source(notebook_id, source_id)?;
         match latest {
@@ -1119,14 +1173,73 @@ impl KnowledgeService {
         notebook_id: Option<&str>,
         source_id: Option<&str>,
     ) -> Result<Value, KnowledgeError> {
-        let jobs = self
+        // jobs/counts 经 notebooks 联接限定本 studio；外部 studio 的 notebook/source
+        // id 只得到空 jobs 与零计数，与原路由一致，不披露其存在。
+        let jobs = self.facts.list_ingestion_jobs_for_studio(
+            &self.studio_id,
+            notebook_id,
+            source_id,
+            200,
+        )?;
+        let counts = self
             .facts
-            .list_ingestion_jobs(notebook_id, source_id, 200)?;
-        let counts = self.facts.count_jobs_by_status(notebook_id)?;
+            .count_jobs_by_status_for_studio(&self.studio_id, notebook_id)?;
         Ok(json!({
             "jobs": jobs.iter().map(job_json).collect::<Vec<_>>(),
             "counts": counts,
+            "unreachableSources": self.unreachable_sources()?,
         }))
+    }
+
+    /// 本 studio 原文件不可达的 file 来源（原路由 unreachableSources：只列不可达项）。
+    /// 无常驻 watcher：每次查询对来源登记的原始绝对路径实时 stat，
+    /// `watching:false` / `unreachableSince:null` / `detection` 显式标注这是按需探测。
+    fn unreachable_sources(&self) -> Result<Vec<Value>, KnowledgeError> {
+        let mut by_source: std::collections::BTreeMap<String, (String, Vec<String>)> =
+            std::collections::BTreeMap::new();
+        for notebook in self.facts.list_notebooks(&self.studio_id)? {
+            for entry in self.facts.list_notebook_sources(&notebook.id)? {
+                if entry.source.source_type != "file" {
+                    continue;
+                }
+                let Some(path) = entry
+                    .source
+                    .origin_metadata
+                    .get("importedFrom")
+                    .and_then(|value| value.as_str())
+                    .filter(|path| std::path::Path::new(path).is_absolute())
+                else {
+                    continue;
+                };
+                by_source
+                    .entry(entry.source.id.clone())
+                    .or_insert_with(|| (path.to_string(), Vec::new()))
+                    .1
+                    .push(notebook.id.clone());
+            }
+        }
+        let mut unreachable = Vec::new();
+        for (source_id, (path, notebooks)) in by_source {
+            let Err(error) = std::fs::metadata(&path) else {
+                continue;
+            };
+            let code = match error.kind() {
+                std::io::ErrorKind::NotFound => "ENOENT",
+                std::io::ErrorKind::PermissionDenied => "EACCES",
+                _ => "EIO",
+            };
+            unreachable.push(json!({
+                "sourceId": source_id,
+                "studioId": self.studio_id,
+                "notebooks": notebooks,
+                "watching": false,
+                "unreachable": true,
+                "unreachableReason": format!("{code}: {error}").chars().take(512).collect::<String>(),
+                "unreachableSince": Value::Null,
+                "detection": "on_demand_stat",
+            }));
+        }
+        Ok(unreachable)
     }
 
     // ── 解析（citation-grade parser，source-adapters.ts 镜像）────────────────
@@ -2063,6 +2176,15 @@ impl KnowledgeService {
         source_id: Option<&str>,
     ) -> Result<Value, KnowledgeError> {
         let scope = self.resolve_turn_scope(scope_id, session_id)?;
+        // 原 knowledge_outline：筛选不在本轮冻结范围内（含不存在）显式拒绝，
+        // 不返回空成功，也不借错误区分"存在但越权"与"不存在"。
+        if notebook_id.is_some_and(|id| !scope.notebook_ids.iter().any(|item| item == id))
+            || source_id.is_some_and(|id| !scope.sources.iter().any(|item| item.source_id == id))
+        {
+            return Err(KnowledgeError::scope_violation(
+                "目录筛选超出本轮资料范围。",
+            ));
+        }
         let mut notebooks_out: Vec<Value> = Vec::new();
         for notebook in &scope.notebook_ids {
             if notebook_id.is_some() && notebook_id != Some(notebook.as_str()) {
@@ -2140,6 +2262,201 @@ impl KnowledgeService {
             }));
         }
         Ok(json!({"scopeId": scope.id, "notebooks": notebooks_out}))
+    }
+
+    /// 冻结来源在本轮 notebook 下的 ready 索引变体（与 search/outline 同一 profile 推导；
+    /// 指纹不一致视为过期，不读旧索引）。
+    fn ready_variant_for_frozen(
+        &self,
+        notebook_id: &str,
+        artifact_id: &str,
+    ) -> Result<Option<(String, usize)>, KnowledgeError> {
+        let (target, _) = self.notebook_chunk_profile(notebook_id)?;
+        let blocks = self.facts.list_artifact_blocks(artifact_id)?;
+        let chunker_blocks: Vec<ChunkerBlock> = blocks.iter().map(chunker_block_of).collect();
+        let fingerprint = block_fingerprint(&chunker_blocks);
+        let profile_hash =
+            resolve_chunker_config(&chunker_blocks, Some(target)).map(|(_, _, id)| id)?;
+        let Some((variant_id, count)) = self
+            .index
+            .get_ready_variant_metadata(artifact_id, &profile_hash)?
+        else {
+            return Ok(None);
+        };
+        let current = self
+            .index
+            .get_variant(&variant_id)?
+            .map(|variant| variant.block_fingerprint);
+        Ok((current == Some(fingerprint)).then_some((variant_id, count)))
+    }
+
+    /// knowledge_read 的章节/命中邻域导航（knowledge-read-tool.ts 的 sectionId /
+    /// aroundChunkId 语义）：只读本轮冻结来源在 ready 索引变体内的章节片段范围，
+    /// 越出冻结来源/变体的 id 一律 SCOPE_VIOLATION，索引缺失/不一致显式报错。
+    #[allow(clippy::too_many_arguments)]
+    pub fn read_scope_navigation(
+        &self,
+        scope: &ks::TurnScopeRow,
+        session_id: &str,
+        source_id: &str,
+        notebook_id: Option<&str>,
+        selector: ReadNavigation<'_>,
+        offset: usize,
+        max_chars: usize,
+    ) -> Result<Value, KnowledgeError> {
+        let frozen = self.require_scope_source(scope, source_id)?;
+        let notebook = match notebook_id {
+            Some(id) => frozen
+                .notebook_ids
+                .iter()
+                .find(|item| item.as_str() == id && scope.notebook_ids.contains(item)),
+            None => frozen
+                .notebook_ids
+                .iter()
+                .find(|item| scope.notebook_ids.contains(item)),
+        }
+        .ok_or_else(|| {
+            KnowledgeError::scope_violation("Knowledge notebook is outside this turn's scope")
+        })?
+        .clone();
+        let artifact_id = frozen.parse_artifact_id.clone().ok_or_else(|| {
+            KnowledgeError::new(
+                "KNOWLEDGE_PARSE_NOT_READY",
+                "Knowledge source has no frozen parse artifact",
+            )
+        })?;
+        let Some((variant_id, _)) = self.ready_variant_for_frozen(&notebook, &artifact_id)? else {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_PARSE_NOT_READY",
+                format!("Knowledge source index is not ready yet (sourceId: {source_id})"),
+            ));
+        };
+        let chunks = self.index.list_variant_chunks(&variant_id)?;
+        let sections = self.index.list_artifact_section_metadata(&artifact_id)?;
+        let chunker_blocks: Vec<ChunkerBlock> = self
+            .facts
+            .list_artifact_blocks(&artifact_id)?
+            .iter()
+            .map(chunker_block_of)
+            .collect();
+        let drafts = lingxi_kernel::knowledge::build_sections(&artifact_id, &chunker_blocks);
+        let spans_of = |selected: &[&ks::StoredChunk]| -> ReadRanges {
+            selected
+                .iter()
+                .flat_map(|chunk| chunk.spans.iter())
+                .map(|span| {
+                    (
+                        span.block_id.clone(),
+                        span.block_start_offset,
+                        span.block_end_offset,
+                    )
+                })
+                .collect()
+        };
+        // 章节读取以冻结原文块重算的章节块范围为准（与已落库章节元数据逐项核对），
+        // 不依赖片段滑窗覆盖，因此不会漏读片段间的原文。
+        let section_read = |section_id: &str| -> Result<(ReadRanges, Value), KnowledgeError> {
+            let outside = || {
+                KnowledgeError::scope_violation(
+                    "Section is outside the frozen source and index variant",
+                )
+            };
+            let stored = sections
+                .iter()
+                .find(|section| section.id == section_id)
+                .ok_or_else(outside)?;
+            if !chunks
+                .iter()
+                .any(|chunk| chunk.section_id.as_deref() == Some(section_id))
+            {
+                return Err(outside());
+            }
+            let draft = drafts
+                .iter()
+                .find(|draft| draft.id == section_id)
+                .filter(|draft| {
+                    draft.start_block_ordinal == stored.start_block_ordinal
+                        && draft.end_block_ordinal == stored.end_block_ordinal
+                        && draft.heading_path == stored.heading_path
+                })
+                .ok_or_else(|| {
+                    KnowledgeError::index_invalid("Section raw positions are inconsistent")
+                })?;
+            Ok((
+                draft
+                    .block_spans
+                    .iter()
+                    .map(|(block_id, start, end, _, _)| (block_id.clone(), *start, *end))
+                    .collect(),
+                json!({
+                    "mode": "section",
+                    "sectionId": stored.id,
+                    "parentSectionHeading": stored.heading_path,
+                    "startBlockOrdinal": stored.start_block_ordinal,
+                    "endBlockOrdinal": stored.end_block_ordinal,
+                }),
+            ))
+        };
+        let (ranges, mut meta) = match selector {
+            ReadNavigation::Section(section_id) => section_read(section_id)?,
+            ReadNavigation::AroundChunk {
+                chunk_id,
+                neighbor_window,
+            } => {
+                let position = chunks
+                    .iter()
+                    .position(|chunk| chunk.chunk_id == chunk_id)
+                    .ok_or_else(|| {
+                        KnowledgeError::scope_violation(
+                            "Neighbor hit is outside the frozen source and index variant",
+                        )
+                    })?;
+                let around = &chunks[position];
+                match (neighbor_window, around.section_id.as_deref()) {
+                    // 小片段负责定位，未显式给窗口时恢复到所在父章节。
+                    (None, Some(section_id)) => {
+                        let (ranges, mut meta) = section_read(section_id)?;
+                        meta["aroundChunkId"] = json!(chunk_id);
+                        (ranges, meta)
+                    }
+                    (window, _) => {
+                        let window = window.unwrap_or(1);
+                        let from = position.saturating_sub(window);
+                        let to = (position + window + 1).min(chunks.len());
+                        let selected: Vec<&ks::StoredChunk> = chunks[from..to].iter().collect();
+                        (
+                            spans_of(&selected),
+                            json!({
+                                "mode": "around-chunk",
+                                "aroundChunkId": chunk_id,
+                                "neighborWindow": window,
+                                "requestedRange": [from + 1, to],
+                                "totalChunks": chunks.len(),
+                            }),
+                        )
+                    }
+                }
+            }
+        };
+        let mut page = self.read_citation_page(
+            scope,
+            session_id,
+            source_id,
+            &artifact_id,
+            &ranges,
+            offset,
+            max_chars,
+        )?;
+        meta["sourceId"] = json!(source_id);
+        meta["notebookId"] = json!(notebook);
+        meta["scopeId"] = json!(scope.id);
+        meta["parseArtifactId"] = json!(artifact_id);
+        if let (Some(page), Some(meta)) = (page.as_object_mut(), meta.as_object()) {
+            for (key, value) in meta {
+                page.insert(key.clone(), value.clone());
+            }
+        }
+        Ok(page)
     }
 
     // ── 摄入 worker ─────────────────────────────────────────────────────────
@@ -3536,7 +3853,7 @@ pub async fn notebook_delete_route(
     axum::extract::Path(notebook_id): axum::extract::Path<String>,
 ) -> Response {
     match state.knowledge().delete_notebook(&notebook_id) {
-        Ok(notebook) => Json(json!({"notebook": notebook})).into_response(),
+        Ok(result) => Json(result).into_response(),
         Err(err) => knowledge_error_response(&err),
     }
 }

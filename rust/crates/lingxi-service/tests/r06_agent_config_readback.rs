@@ -92,7 +92,8 @@ async fn boot() -> Server {
         // 本块五个处理器。
         .route(
             "/lingxi/v1/agents/{agent_id}/config",
-            axum::routing::put(readback::agent_config_put_route),
+            axum::routing::get(readback::agent_config_get_route)
+                .put(readback::agent_config_put_route),
         )
         .route(
             "/lingxi/v1/current-status",
@@ -1407,6 +1408,521 @@ async fn cache_snapshot_observation_delete() {
     )
     .await;
     assert_eq!(status, 401, "无凭证 401");
+
+    shutdown(server).await;
+}
+
+// ── GET /agents/{id}/config（R00-T02-LA-BC675C664910）────────────────────────
+
+fn write_preferences(server: &Server, mutate: impl FnOnce(&mut serde_json::Map<String, Value>)) {
+    let mut prefs = preferences(server);
+    if !prefs.is_object() {
+        prefs = json!({});
+    }
+    mutate(prefs.as_object_mut().unwrap());
+    std::fs::create_dir_all(server.home.join("user")).unwrap();
+    std::fs::write(
+        server.home.join("user/preferences.json"),
+        serde_json::to_string_pretty(&prefs).unwrap(),
+    )
+    .unwrap();
+}
+
+fn agent_config_path(server: &Server, agent_id: &str) -> PathBuf {
+    server
+        .home
+        .join("agents")
+        .join(agent_id)
+        .join("config.yaml")
+}
+
+const A_SECRETS: [&str; 7] = [
+    "sk-plain-A-secret",
+    "sk-embed-secret",
+    "tg-bot-secret-123",
+    "pw-secret-456",
+    "tok-in-list-789",
+    "sk-custom-plain-1",
+    "oauth-client-secret-0",
+];
+
+#[tokio::test]
+async fn get_config_reads_real_yaml_injects_globals_and_masks_every_secret() {
+    let server = boot().await;
+    make_agents(&server).await;
+    // 目录里的供应商（经真实 PUT 写入，含明文 key 与两个模型）。
+    let (status, body) = ok(
+        &server,
+        "PUT",
+        "/lingxi/v1/agents/agreadb/config",
+        Some(&json!({
+            "providers": {
+                "my-custom": {
+                    "api_key": "sk-custom-plain-1",
+                    "base_url": "https://custom.example/v1",
+                    "models": ["m-one", { "id": "m-two", "name": "M Two" }]
+                },
+                "keyless": { "base_url": "https://keyless.example/v1", "models": [] }
+            }
+        })),
+    )
+    .await;
+    assert_eq!(status, 200, "准备供应商：{body}");
+
+    // A 的真实 config.yaml：多处秘密 + yaml 里的全局键诱饵 + 非布尔 experience。
+    std::fs::write(
+        agent_config_path(&server, "agreada"),
+        "agent:\n  name: A\n  tagline: only-in-A\n\
+api:\n  provider: myprov\n  api_key: sk-plain-A-secret\n  base_url: https://a.example/v1\n\
+embedding_api:\n  provider: embedprov\n  api_key: sk-embed-secret\n\
+experience:\n  note: keep-me\n\
+channels:\n  telegram:\n    botToken: tg-bot-secret-123\n    chat: public-chat\n\
+other:\n  password: pw-secret-456\n  clientSecret: oauth-client-secret-0\n  items:\n    - token: tok-in-list-789\n      label: visible-label\n\
+locale: yaml-decoy-locale\nuser:\n  name: yaml-decoy-name\n",
+    )
+    .unwrap();
+    write_preferences(&server, |prefs| {
+        prefs.insert("locale".into(), json!("zh-CN"));
+        prefs.insert("userName".into(), json!("Tester"));
+        prefs.insert("timezone".into(), json!("Asia/Shanghai"));
+        prefs.insert("sandbox".into(), json!(false));
+        prefs.insert("keep_awake".into(), json!(true));
+        prefs.insert("update_channel".into(), json!("beta"));
+        prefs.insert("thinking_level".into(), json!("HIGH"));
+        prefs.insert(
+            "file_backup".into(),
+            json!({ "retention_days": 7, "enabled": true }),
+        );
+        prefs.insert(
+            "bridge".into(),
+            json!({ "permissionMode": "operate", "receiptEnabled": false }),
+        );
+        prefs.insert(
+            "automation".into(),
+            json!({ "permissionMode": "read_only" }),
+        );
+        prefs.insert("heartbeat_master".into(), json!(false));
+        prefs.insert("channels_enabled".into(), json!(true));
+        prefs.insert("network_proxy".into(), json!({ "mode": "direct" }));
+        prefs.insert(
+            "learn_skills".into(),
+            json!({ "enabled": false, "safety_review": true }),
+        );
+    });
+
+    let a_yaml_before = std::fs::read(agent_config_path(&server, "agreada")).unwrap();
+    let b_yaml_before = std::fs::read(agent_config_path(&server, "agreadb")).unwrap();
+    let prefs_before = std::fs::read(server.home.join("user/preferences.json")).unwrap();
+    let catalog_before = std::fs::read(server.home.join("provider-catalog.json")).unwrap();
+
+    // 焦点是 B，读的是路径指定的 A。
+    let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200, "{body}");
+
+    // 读的是 A 的真实 config.yaml（含 yaml 里非秘密内容原样）。
+    assert_eq!(body["agent"]["name"], json!("A"));
+    assert_eq!(body["agent"]["tagline"], json!("only-in-A"));
+    assert_eq!(body["api"]["provider"], json!("myprov"));
+    assert_eq!(body["api"]["base_url"], json!("https://a.example/v1"));
+    assert_eq!(body["channels"]["telegram"]["chat"], json!("public-chat"));
+    assert_eq!(body["other"]["items"][0]["label"], json!("visible-label"));
+    // experience.enabled 归一为布尔（缺省 → false），其余字段保留。
+    assert_eq!(body["experience"]["enabled"], json!(false));
+    assert_eq!(body["experience"]["note"], json!("keep-me"));
+    // _raw 结构。
+    assert_eq!(
+        body["_raw"],
+        json!({
+            "api": { "provider": "myprov", "base_url": "https://a.example/v1" },
+            "embedding_api": { "provider": "embedprov", "base_url": "" },
+        })
+    );
+
+    // 全部秘密字段（递归，含数组内）掩码为 ********，且整个响应体不含任何明文。
+    assert_eq!(body["api"]["api_key"], json!("********"));
+    assert_eq!(body["embedding_api"]["api_key"], json!("********"));
+    assert_eq!(body["channels"]["telegram"]["botToken"], json!("********"));
+    assert_eq!(body["other"]["password"], json!("********"));
+    assert_eq!(body["other"]["clientSecret"], json!("********"));
+    assert_eq!(body["other"]["items"][0]["token"], json!("********"));
+    let raw_text = body.to_string();
+    for secret in A_SECRETS {
+        assert!(!raw_text.contains(secret), "响应泄露明文 {secret}");
+    }
+
+    // 全局字段：偏好值覆盖 yaml 里的同名诱饵，缺省项取现役默认。
+    assert_eq!(body["locale"], json!("zh-CN"));
+    assert_eq!(body["user"]["name"], json!("Tester"));
+    assert_eq!(body["timezone"], json!("Asia/Shanghai"));
+    assert_eq!(body["sandbox"], json!(false));
+    assert_eq!(body["sandbox_network"], json!(true));
+    assert_eq!(body["hardware_acceleration"], json!(true));
+    assert_eq!(body["file_backup"], json!({ "retention_days": 7.0 }));
+    assert_eq!(body["update_channel"], json!("beta"));
+    assert_eq!(body["auto_check_updates"], json!(true));
+    assert_eq!(body["keep_awake"], json!(true));
+    assert_eq!(body["thinking_level"], json!("high"));
+    assert_eq!(body["editor"]["markdown"]["bodyFontSize"], json!(16.0));
+    assert_eq!(
+        body["capabilities"]["learn_skills"],
+        json!({ "enabled": false, "safety_review": true })
+    );
+    assert_eq!(body["desk"]["heartbeat_master"], json!(false));
+    assert_eq!(body["channels"]["enabled"], json!(true));
+    assert_eq!(body["bridge"]["permissionMode"], json!("operate"));
+    assert_eq!(body["bridge"]["readOnly"], json!(false));
+    assert_eq!(body["bridge"]["receiptEnabled"], json!(false));
+    assert_eq!(body["bridge"]["richStreamingEnabled"], json!(true));
+    assert_eq!(body["automation"]["permissionMode"], json!("read_only"));
+    assert_eq!(body["network_proxy"]["mode"], json!("direct"));
+    assert_eq!(
+        body["network_proxy"]["noProxy"],
+        json!("localhost, 127.0.0.1, ::1")
+    );
+
+    // 供应商摘要：掩码 key、base_url、模型数。
+    let custom = &body["providers"]["my-custom"];
+    assert_eq!(custom["base_url"], json!("https://custom.example/v1"));
+    assert_eq!(custom["api_key"], json!("********"));
+    assert_eq!(custom["model_count"], json!(2));
+    assert_eq!(custom["models"].as_array().unwrap().len(), 2);
+    assert!(custom["api"].is_string());
+    let keyless = &body["providers"]["keyless"];
+    assert_eq!(keyless["api_key"], json!(""), "无 key 的供应商掩码为空串");
+    assert_eq!(keyless["model_count"], json!(0));
+
+    // availableTools：真实列表，含可选开关（即使该助手不是焦点），无重复。
+    let tools: Vec<&str> = body["availableTools"]
+        .as_array()
+        .expect("availableTools 是数组")
+        .iter()
+        .map(|v| v.as_str().unwrap())
+        .collect();
+    for expected in [
+        "read",
+        "exec_command",
+        "web_fetch",
+        "lsp",
+        "workflow",
+        "update_settings",
+    ] {
+        assert!(tools.contains(&expected), "缺 {expected}: {tools:?}");
+    }
+    assert!(!tools.contains(&"computer"), "Computer Use 未启用 → 隐藏");
+    let mut deduped = tools.clone();
+    deduped.sort_unstable();
+    deduped.dedup();
+    assert_eq!(deduped.len(), tools.len(), "无重复");
+
+    // 读面不写：config.yaml / 偏好 / 目录 / 焦点助手配置全部字节不变。
+    assert_eq!(
+        std::fs::read(agent_config_path(&server, "agreada")).unwrap(),
+        a_yaml_before
+    );
+    assert_eq!(
+        std::fs::read(agent_config_path(&server, "agreadb")).unwrap(),
+        b_yaml_before
+    );
+    assert_eq!(
+        std::fs::read(server.home.join("user/preferences.json")).unwrap(),
+        prefs_before
+    );
+    assert_eq!(
+        std::fs::read(server.home.join("provider-catalog.json")).unwrap(),
+        catalog_before
+    );
+
+    shutdown(server).await;
+}
+
+#[tokio::test]
+async fn get_config_identity_is_keyed_by_path_not_focus_and_never_discloses_another_agent() {
+    let server = boot().await;
+    make_agents(&server).await;
+    std::fs::write(
+        agent_config_path(&server, "agreada"),
+        "agent:\n  name: A\napi:\n  provider: pa\n  api_key: sk-only-in-a\nmarker_a: alpha\n",
+    )
+    .unwrap();
+    std::fs::write(
+        agent_config_path(&server, "agreadb"),
+        "agent:\n  name: B\napi:\n  provider: pb\n  api_key: sk-only-in-b\nmarker_b: beta\n",
+    )
+    .unwrap();
+
+    // 焦点 = B：读 A 得 A，读 B 得 B，互不披露。
+    let (status, a_body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200);
+    assert_eq!(a_body["agent"]["name"], json!("A"));
+    assert_eq!(a_body["marker_a"], json!("alpha"));
+    assert!(a_body.get("marker_b").is_none());
+    let a_text = a_body.to_string();
+    assert!(
+        !a_text.contains("sk-only-in-b") && !a_text.contains("\"B\"") && !a_text.contains("beta")
+    );
+    let (status, b_body) = ok(&server, "GET", "/lingxi/v1/agents/agreadb/config", None).await;
+    assert_eq!(status, 200);
+    assert_eq!(b_body["agent"]["name"], json!("B"));
+    assert_eq!(b_body["marker_b"], json!("beta"));
+    assert!(b_body.get("marker_a").is_none());
+    assert!(!b_body.to_string().contains("sk-only-in-a"));
+
+    // 切焦点到 A：读 B 仍是 B（焦点不决定身份）。
+    let (status, _) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/agents/switch",
+        Some(&json!({"id": "agreada"})),
+    )
+    .await;
+    assert_eq!(status, 200);
+    let (_, b_after_switch) = ok(&server, "GET", "/lingxi/v1/agents/agreadb/config", None).await;
+    assert_eq!(b_after_switch["agent"]["name"], json!("B"));
+    assert_eq!(b_after_switch["marker_b"], json!("beta"));
+    assert_eq!(b_after_switch["_raw"]["api"]["provider"], json!("pb"));
+    assert_eq!(b_after_switch["api"]["api_key"], json!("********"));
+
+    shutdown(server).await;
+}
+
+#[tokio::test]
+async fn get_config_provider_registry_failure_gives_empty_providers_not_an_error() {
+    let server = boot().await;
+    make_agents(&server).await;
+    std::fs::write(
+        agent_config_path(&server, "agreada"),
+        "agent:\n  name: A\napi:\n  provider: pa\n  api_key: sk-still-masked\n",
+    )
+    .unwrap();
+    // 损坏的权威目录：供应商读取失败。
+    let catalog_path = server.home.join("provider-catalog.json");
+    std::fs::write(&catalog_path, "{ this is not json").unwrap();
+    let broken = std::fs::read(&catalog_path).unwrap();
+
+    let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200, "供应商失败不致整体失败：{body}");
+    assert_eq!(
+        body["providers"],
+        json!({}),
+        "失败 → 空对象（非 null/数组）"
+    );
+    assert!(body["providers"].is_object());
+    // 其余内容照常：yaml、全局注入、availableTools、掩码。
+    assert_eq!(body["agent"]["name"], json!("A"));
+    assert_eq!(body["api"]["api_key"], json!("********"));
+    assert!(body["availableTools"]
+        .as_array()
+        .is_some_and(|t| !t.is_empty()));
+    assert!(!body.to_string().contains("sk-still-masked"));
+    // 读面不修复/改写损坏目录。
+    assert_eq!(std::fs::read(&catalog_path).unwrap(), broken);
+
+    shutdown(server).await;
+}
+
+#[tokio::test]
+async fn get_config_without_catalog_reads_without_creating_it() {
+    let server = boot().await;
+    make_agents(&server).await;
+    assert!(!server.home.join("provider-catalog.json").exists());
+    let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["providers"], json!({}));
+    assert!(
+        !server.home.join("provider-catalog.json").exists(),
+        "读面不因遗留目录迁移而落盘"
+    );
+    shutdown(server).await;
+}
+
+#[tokio::test]
+async fn get_config_gcs_gone_workspace_history_before_answering_only_for_that_agent() {
+    let server = boot().await;
+    make_agents(&server).await;
+    let ws = server.home.join("ws");
+    let keep = ws.join("keep");
+    let keep2 = ws.join("keep2");
+    std::fs::create_dir_all(&keep).unwrap();
+    std::fs::create_dir_all(&keep2).unwrap();
+    let gone = ws.join("gone");
+    let gone2 = ws.join("gone2");
+    let (keep_s, keep2_s, gone_s, gone2_s) = (
+        keep.to_string_lossy().to_string(),
+        keep2.to_string_lossy().to_string(),
+        gone.to_string_lossy().to_string(),
+        gone2.to_string_lossy().to_string(),
+    );
+    std::fs::write(
+        agent_config_path(&server, "agreada"),
+        format!(
+            "agent:\n  name: A\ncwd_history:\n  - {gone_s}\n  - {keep_s}/\n  - {gone2_s}\n  - {keep2_s}\nlast_cwd: {gone_s}\ndesk:\n  home_folder: {gone2_s}\n  heartbeat_enabled: true\n"
+        ),
+    )
+    .unwrap();
+    // 另一助手同样带已消失目录：不属于本次请求，必须原样不动。
+    let b_yaml = format!("agent:\n  name: B\ncwd_history:\n  - {gone_s}\nlast_cwd: {gone_s}\n");
+    std::fs::write(agent_config_path(&server, "agreadb"), &b_yaml).unwrap();
+    write_preferences(&server, |prefs| {
+        prefs.insert("locale".into(), json!("en-US"));
+        prefs.insert(
+            "workspace_ui_state".into(),
+            json!({ "version": 2, "workspaces": {
+                keep_s.clone(): { "updatedAt": 1, "surfaces": {} },
+                gone_s.clone(): { "updatedAt": 2, "surfaces": {} },
+            }}),
+        );
+    });
+
+    let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200, "{body}");
+    // 响应已是 GC 之后的结果（先 GC 再读）。
+    assert_eq!(body["cwd_history"], json!([keep_s, keep2_s]));
+    assert!(body.get("last_cwd").is_none(), "last_cwd 已清：{body}");
+    assert!(
+        body["desk"].get("home_folder").is_none(),
+        "home_folder 已清"
+    );
+    assert_eq!(
+        body["desk"]["heartbeat_enabled"],
+        json!(true),
+        "同块其它键保留"
+    );
+    assert_eq!(body["agent"]["name"], json!("A"));
+
+    // 磁盘副作用：A 的 YAML 真的被改写，B 的原样。
+    let disk = lingxi_adapters_yaml_json(&server, "agreada");
+    assert_eq!(disk["cwd_history"], json!([keep_s, keep2_s]));
+    assert!(disk.get("last_cwd").is_none());
+    assert!(disk["desk"].get("home_folder").is_none());
+    assert_eq!(disk["desk"]["heartbeat_enabled"], json!(true));
+    assert_eq!(
+        std::fs::read_to_string(agent_config_path(&server, "agreadb")).unwrap(),
+        b_yaml
+    );
+    // 偏好里已消失的工作区 UI 状态被清，存活项与无关偏好保留。
+    let prefs = preferences(&server);
+    let workspaces = prefs["workspace_ui_state"]["workspaces"]
+        .as_object()
+        .unwrap();
+    assert!(workspaces.contains_key(&keep_s) && !workspaces.contains_key(&gone_s));
+    assert_eq!(prefs["locale"], json!("en-US"));
+
+    // 幂等：再读无变化 → 不重写文件。
+    let a_mtime = mtime(&agent_config_path(&server, "agreada"));
+    let prefs_mtime = mtime(&server.home.join("user/preferences.json"));
+    let (status, again) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200);
+    assert_eq!(again["cwd_history"], body["cwd_history"]);
+    assert_eq!(mtime(&agent_config_path(&server, "agreada")), a_mtime);
+    assert_eq!(
+        mtime(&server.home.join("user/preferences.json")),
+        prefs_mtime
+    );
+
+    shutdown(server).await;
+}
+
+#[tokio::test]
+async fn get_config_unknown_or_invalid_agent_is_404_with_no_side_effects() {
+    let server = boot().await;
+    make_agents(&server).await;
+    let gone = server
+        .home
+        .join("ws/never-created")
+        .to_string_lossy()
+        .to_string();
+    std::fs::write(
+        agent_config_path(&server, "agreada"),
+        format!("agent:\n  name: A\ncwd_history:\n  - {gone}\n"),
+    )
+    .unwrap();
+    write_preferences(&server, |prefs| {
+        prefs.insert(
+            "workspace_ui_state".into(),
+            json!({ "version": 2, "workspaces": { gone.clone(): { "updatedAt": 1, "surfaces": {} } } }),
+        );
+    });
+    let a_before = std::fs::read(agent_config_path(&server, "agreada")).unwrap();
+    let prefs_before = std::fs::read(server.home.join("user/preferences.json")).unwrap();
+    let agents_before: Vec<_> = {
+        let mut names: Vec<_> = std::fs::read_dir(server.home.join("agents"))
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        names.sort();
+        names
+    };
+
+    for path in [
+        "/lingxi/v1/agents/nope/config",
+        "/lingxi/v1/agents/Bad%20Id/config",
+        "/lingxi/v1/agents/..%2Fagreada/config",
+    ] {
+        let (status, body) = ok(&server, "GET", path, None).await;
+        assert_eq!(status, 404, "{path}: {body}");
+        assert_eq!(body, json!({ "error": "agent not found" }), "{path}");
+    }
+    // 无凭证 401。
+    let (status, _) = http(
+        &server,
+        "GET",
+        "/lingxi/v1/agents/agreada/config",
+        None,
+        None,
+    )
+    .await;
+    assert_eq!(status, 401);
+
+    // 拒绝路径不触发 GC，也不建目录/写偏好。
+    assert_eq!(
+        std::fs::read(agent_config_path(&server, "agreada")).unwrap(),
+        a_before
+    );
+    assert_eq!(
+        std::fs::read(server.home.join("user/preferences.json")).unwrap(),
+        prefs_before
+    );
+    let mut agents_after: Vec<_> = std::fs::read_dir(server.home.join("agents"))
+        .unwrap()
+        .map(|e| e.unwrap().file_name())
+        .collect();
+    agents_after.sort();
+    assert_eq!(agents_after, agents_before);
+
+    shutdown(server).await;
+}
+
+#[tokio::test]
+async fn get_config_experience_enabled_is_boolean_and_invalid_config_fails_loudly() {
+    let server = boot().await;
+    make_agents(&server).await;
+    // enabled: true 原样为 true；B 无 experience 块 → 归一出 {enabled:false}。
+    std::fs::write(
+        agent_config_path(&server, "agreada"),
+        "agent:\n  name: A\nexperience:\n  enabled: true\n",
+    )
+    .unwrap();
+    let (_, a_body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(a_body["experience"], json!({ "enabled": true }));
+    std::fs::write(agent_config_path(&server, "agreadb"), "agent:\n  name: B\n").unwrap();
+    let (_, b_body) = ok(&server, "GET", "/lingxi/v1/agents/agreadb/config", None).await;
+    assert_eq!(b_body["experience"], json!({ "enabled": false }));
+
+    // 违反端口配置校验的磁盘内容：显式 500，不静默改写/降级，也不泄露密钥。
+    let invalid =
+        "agent:\n  name: A\napi:\n  api_key: sk-invalid-case\nexperience:\n  enabled: \"yes\"\n";
+    std::fs::write(agent_config_path(&server, "agreada"), invalid).unwrap();
+    let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 500, "{body}");
+    assert!(body["error"]
+        .as_str()
+        .unwrap()
+        .contains("experience.enabled"));
+    assert!(!body.to_string().contains("sk-invalid-case"));
+    assert_eq!(
+        std::fs::read_to_string(agent_config_path(&server, "agreada")).unwrap(),
+        invalid
+    );
 
     shutdown(server).await;
 }

@@ -1080,23 +1080,74 @@ impl KnowledgeFactStore {
     ) -> Result<NotebookRow, KnowledgeError> {
         self.get_notebook(studio_id, notebook_id)?;
         let now = now_iso(&*self.clock);
-        let conn = lock_conn(&self.conn);
-        conn.execute(
+        let mut conn = lock_conn(&self.conn);
+        // 删除、摘 membership 与取消该笔记本活跃 job 同事务提交（knowledge-store.ts deleteNotebook）。
+        let tx = conn
+            .transaction()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute(
             "UPDATE notebooks SET deleted_at=?1, updated_at=?1 WHERE id=?2",
             params![now, notebook_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        conn.execute(
+        tx.execute(
             "UPDATE notebook_sources SET removed_at=?1 WHERE notebook_id=?2 AND removed_at IS NULL",
             params![now, notebook_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        conn.query_row(
-            "SELECT id, studio_id, name, created_at, updated_at, deleted_at FROM notebooks WHERE id=?1",
-            params![notebook_id],
-            Self::map_notebook,
+        tx.execute(
+            "UPDATE ingestion_jobs SET status='failed', cancelled_at=?1, error='cancelled: notebook deleted', updated_at=?1 WHERE notebook_id=?2 AND status IN ('queued','running','pending_embedding')",
+            params![now, notebook_id],
         )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let row = tx
+            .query_row(
+                "SELECT id, studio_id, name, created_at, updated_at, deleted_at FROM notebooks WHERE id=?1",
+                params![notebook_id],
+                Self::map_notebook,
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.commit()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(row)
+    }
+
+    /// 笔记本当前活跃 membership 的来源 id（来源未删除；按加入顺序）。
+    pub fn list_active_member_source_ids(
+        &self,
+        notebook_id: &str,
+    ) -> Result<Vec<String>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(
+                "SELECT ns.source_id FROM notebook_sources ns JOIN sources s ON s.id = ns.source_id
+                 WHERE ns.notebook_id=?1 AND ns.removed_at IS NULL AND s.deleted_at IS NULL
+                 ORDER BY ns.added_at, ns.source_id",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![notebook_id], |row| row.get::<_, String>(0))
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+    }
+
+    /// 来源是否仍被其他未删除笔记本活跃挂靠（共享来源不随单个笔记本删除而清理）。
+    pub fn source_has_other_active_membership(
+        &self,
+        source_id: &str,
+        notebook_id: &str,
+    ) -> Result<bool, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let count: i64 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM notebook_sources ns JOIN notebooks n ON n.id = ns.notebook_id
+                 WHERE ns.source_id=?1 AND ns.notebook_id<>?2 AND ns.removed_at IS NULL AND n.deleted_at IS NULL",
+                params![source_id, notebook_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(count > 0)
     }
 
     // ── notebook config ─────────────────────────────────────────────────────
@@ -1261,6 +1312,44 @@ impl KnowledgeFactStore {
         .optional()
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
         .ok_or_else(|| KnowledgeError::not_found("Knowledge source was not found"))
+    }
+
+    /// 仅返回当前 studio 拥有的未删除来源；他 studio 来源与不存在一样 404，不泄露存在性。
+    pub fn get_source_in_studio(
+        &self,
+        studio_id: &str,
+        source_id: &str,
+    ) -> Result<SourceRow, KnowledgeError> {
+        let source = self.get_source(source_id)?;
+        if source.studio_id != studio_id {
+            return Err(KnowledgeError::not_found("Knowledge source was not found"));
+        }
+        Ok(source)
+    }
+
+    /// 来源必须属于该 studio 且在给定笔记本有活跃 membership，否则 404（入队/重试前置校验）。
+    pub fn require_member_source(
+        &self,
+        studio_id: &str,
+        notebook_id: &str,
+        source_id: &str,
+    ) -> Result<SourceRow, KnowledgeError> {
+        let source = self.get_source_in_studio(studio_id, source_id)?;
+        let member: i64 = {
+            let conn = lock_conn(&self.conn);
+            conn.query_row(
+                "SELECT COUNT(*) FROM notebook_sources WHERE notebook_id=?1 AND source_id=?2 AND removed_at IS NULL",
+                params![notebook_id, source_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+        };
+        if member == 0 {
+            return Err(KnowledgeError::not_found(
+                "Knowledge source is not in this Notebook",
+            ));
+        }
+        Ok(source)
     }
 
     fn map_source(row: &rusqlite::Row<'_>) -> rusqlite::Result<SourceRow> {
@@ -1853,6 +1942,79 @@ impl KnowledgeFactStore {
             created_at: row.get(13)?,
             updated_at: row.get(14)?,
         })
+    }
+
+    /// studio 限定的 job 列表（knowledge-store.ts listIngestionJobs：JOIN notebooks
+    /// 取 studio；外部 studio 的 notebook/source 只会得到空结果，不披露存在性）。
+    pub fn list_ingestion_jobs_for_studio(
+        &self,
+        studio_id: &str,
+        notebook_id: Option<&str>,
+        source_id: Option<&str>,
+        limit: usize,
+    ) -> Result<Vec<JobRow>, KnowledgeError> {
+        let columns = Self::JOB_COLUMNS
+            .split(',')
+            .map(|column| format!("j.{}", column.trim()))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let mut sql = format!(
+            "SELECT {columns} FROM ingestion_jobs j JOIN notebooks nb ON nb.id = j.notebook_id WHERE nb.studio_id = ?1"
+        );
+        let mut bound: Vec<rusqlite::types::Value> =
+            vec![rusqlite::types::Value::Text(studio_id.to_string())];
+        if let Some(notebook_id) = notebook_id {
+            bound.push(rusqlite::types::Value::Text(notebook_id.to_string()));
+            sql.push_str(&format!(" AND j.notebook_id = ?{}", bound.len()));
+        }
+        if let Some(source_id) = source_id {
+            bound.push(rusqlite::types::Value::Text(source_id.to_string()));
+            sql.push_str(&format!(" AND j.source_id = ?{}", bound.len()));
+        }
+        bound.push(rusqlite::types::Value::Integer(limit as i64));
+        sql.push_str(&format!(
+            " ORDER BY j.created_at DESC, j.id DESC LIMIT ?{}",
+            bound.len()
+        ));
+        let conn = lock_conn(&self.conn);
+        let mut stmt = conn
+            .prepare(&sql)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(rusqlite::params_from_iter(bound), Self::map_job)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(rows)
+    }
+
+    /// studio 限定的状态计数（countIngestionJobsByStatus：同样 JOIN notebooks）。
+    pub fn count_jobs_by_status_for_studio(
+        &self,
+        studio_id: &str,
+        notebook_id: Option<&str>,
+    ) -> Result<serde_json::Value, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let mut counts = serde_json::json!({
+            "queued": 0, "running": 0, "pending_embedding": 0, "failed": 0, "done": 0
+        });
+        let mut stmt = conn
+            .prepare(
+                "SELECT j.status, COUNT(*) FROM ingestion_jobs j JOIN notebooks nb ON nb.id = j.notebook_id \
+                 WHERE nb.studio_id = ?1 AND (?2 IS NULL OR j.notebook_id = ?2) GROUP BY j.status",
+            )
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![studio_id, notebook_id], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, i64>(1)?))
+            })
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        for row in rows {
+            let (status, count) =
+                row.map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            counts[status.as_str()] = serde_json::json!(count);
+        }
+        Ok(counts)
     }
 
     pub fn list_ingestion_jobs(

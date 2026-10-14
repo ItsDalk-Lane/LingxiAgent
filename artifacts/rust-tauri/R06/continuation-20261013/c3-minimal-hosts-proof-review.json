@@ -1,0 +1,45 @@
+{
+  "status": "EXECUTED_TESTS_BOUND_NOT_STAGE_ACCEPTANCE",
+  "leaves": {
+    "R00-T02-LA-BC675C664910": {
+      "boundGroups": [
+        0,
+        1
+      ]
+    },
+    "R00-T02-LA-01E1E3CF7FA8": {
+      "boundGroups": [
+        0,
+        1
+      ]
+    },
+    "R00-T02-LA-9283371CDAD8": {
+      "boundGroups": [
+        1
+      ]
+    },
+    "R00-T02-LA-8A62470CC75D": {
+      "boundGroups": [
+        1
+      ]
+    },
+    "R00-T02-LA-76E2F5AAF035": {
+      "boundGroups": [
+        0,
+        1
+      ]
+    },
+    "R00-T02-LA-5F5365322CFF": {
+      "boundGroups": [
+        0,
+        1,
+        2
+      ]
+    },
+    "R00-T02-LA-269958F82F8A": {
+      "boundGroups": [
+        2
+      ]
+    }
+  }
+}

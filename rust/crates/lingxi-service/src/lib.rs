@@ -7129,7 +7129,8 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         .route(
             "/lingxi/v1/agents/{agent_id}/config",
-            patch(memory::agent_config_patch_route)
+            get(agents_admin::agent_config_readback::agent_config_get_route)
+                .patch(memory::agent_config_patch_route)
                 .put(agents_admin::agent_config_readback::agent_config_put_route),
         )
         // R06 A 块读回叶：运行时状态键 / 实验读写 / 观察记录读面。
