@@ -1,0 +1,390 @@
+{
+  "status": "AUTHOR_PASS_READY_FOR_INDEPENDENT_REVIEW",
+  "requestedLeaves": [
+    "FBDEED",
+    "8E2D44"
+  ],
+  "patch": "/private/tmp/r06-session-completion-delivery/map-browser-final.patch",
+  "patchSHA256": "ff4a3e502d1fac6879d13fd88782506e6344bab0d5e9d8119726de530881e080",
+  "baseSourceSetSHA256": "fbb0c1041c9535100ff41274e8c1e6b66da105e7cc99a09ee7b518f992eb3336",
+  "candidateSourceSetSHA256": "dd7a2cdaaedcf270a9fbab378c066b7e68e0f996f03d33159fa7025cf577b485",
+  "manifest": "/private/tmp/r06-session-completion-delivery/map-browser-final-source-sha.json",
+  "sourceRoot": "/private/tmp/lingxi-r06-agent-delete",
+  "frozenCandidate": "/private/tmp/r06-session-completion-delivery/map-browser-final-candidate",
+  "files": 26,
+  "rustSuites": [
+    {
+      "suite": "r06_conversation_map_and_checkpoint",
+      "passed": 3
+    },
+    {
+      "suite": "r06_session_list_projection",
+      "passed": 1
+    },
+    {
+      "suite": "r06_session_map_browser_completion",
+      "passed": 2
+    },
+    {
+      "suite": "r06_t03_session_tree",
+      "passed": 14
+    }
+  ],
+  "rustPassed": 20,
+  "oldVitest": 25,
+  "mapUI": {
+    "raw": "/private/tmp/lingxi-r06-agent-delete-env/tmp/lingxi-r06-map-62620-1792039491195670000",
+    "groups": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "checks": [
+      {
+        "group": 0,
+        "name": "production-map-loads-real-layout-and-turn-cards"
+      },
+      {
+        "group": 0,
+        "name": "actual-other-service-empty-map-clears-old-owner-with-zero-put"
+      },
+      {
+        "group": 1,
+        "name": "workspace-selector-real-focus-with-no-cwd-zero-files-read"
+      },
+      {
+        "group": 2,
+        "name": "zoom-locate-only-change-real-camera"
+      },
+      {
+        "group": 1,
+        "name": "card-selects-real-session-files-models-and-same-session-zero-fetch"
+      },
+      {
+        "group": 1,
+        "name": "same-revision-cache-zero-history-and-changed-revision-real-history-refresh"
+      },
+      {
+        "group": 4,
+        "name": "collapse-reload-and-external-current-reveal-replace-list"
+      },
+      {
+        "group": 4,
+        "name": "real-collapse-write-failure-keeps-local-collapse-and-old-disk-until-reload"
+      },
+      {
+        "group": 3,
+        "name": "real-pointer-drag-persists-card-position"
+      },
+      {
+        "group": 3,
+        "name": "real-write-failure-keeps-local-drag-but-disk-unchanged"
+      },
+      {
+        "group": 5,
+        "name": "real-reset-write-failure-keeps-local-reset-but-old-disk"
+      },
+      {
+        "group": 5,
+        "name": "reset-replaces-all-positions-on-disk"
+      },
+      {
+        "group": 2,
+        "name": "invalid-local-coordinates-send-zero-put"
+      },
+      {
+        "group": 0,
+        "name": "actual-read-failure-explicit-warning-without-success-or-disk-rewrite"
+      },
+      {
+        "group": 1,
+        "name": "archive-refusal-retains-current-session-but-selected-card-already-changes"
+      },
+      {
+        "group": 6,
+        "name": "empty-whitespace-zero-send-and-continue-real-prompt-without-fork-or-switch"
+      },
+      {
+        "group": 6,
+        "name": "real-fork-IO-error-and-missing-anchor-preserve-draft-then-actual-branch-prompt-focus"
+      },
+      {
+        "group": 6,
+        "name": "actual-running-provider-busy-queues-input-with-zero-extra-prompt"
+      },
+      {
+        "group": 6,
+        "name": "real-paused-service-unknown-delivery-preserves-draft-and-zero-duplicate-submit"
+      }
+    ],
+    "actualProviderRequests": 36,
+    "actualRuns": 12,
+    "actualUserPromptFrames": 4,
+    "reportedUsageRows": 36,
+    "eachRunCalls": 3,
+    "defaultOffCalls": 6,
+    "secondHighCalls": 30,
+    "snapshotSHA256": "9c28c2d24266fe9a4ca3c244c06f7bcc9c0a0f4e8b56383ad4179c61f9f53d5c",
+    "visualInspection": "已实际查看截图：可见卡片连边及当前会话紫色强调；截图同一最终源码窗口。"
+  },
+  "browserUI": {
+    "raw": "/private/tmp/lingxi-r06-agent-delete-env/tmp/lingxi-r06-browser-62620-1792039483121338000",
+    "trace": [
+      {
+        "kind": "foreign-host-refusal",
+        "status": 403
+      },
+      {
+        "kind": "second-host-refusal",
+        "status": 409
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 200,
+        "data": {
+          "agentId": "browser-agent",
+          "agentName": "browser-agent",
+          "authorizedFolders": [],
+          "browserResume": {
+            "found": true,
+            "status": "resumed",
+            "url": "data:text/html,%3Ctitle%3Esession-1%3C%2Ftitle%3E%3Cp%3Eowned-1%3C%2Fp%3E"
+          },
+          "browserRunning": true,
+          "browserUrl": "data:text/html,%3Ctitle%3Esession-1%3C%2Ftitle%3E%3Cp%3Eowned-1%3C%2Fp%3E",
+          "currentModelAvailable": false,
+          "currentModelId": null,
+          "currentModelProvider": null,
+          "currentModelUnavailableReason": "model_plane_unavailable",
+          "cwd": null,
+          "historyRevision": "\"r0-e0\"",
+          "isStreaming": false,
+          "memoryEnabled": false,
+          "ok": true,
+          "path": "native:browser-b",
+          "permissionMode": null,
+          "projectId": null,
+          "sessionId": "browser-b",
+          "thinkingLevel": null,
+          "workspaceFolders": []
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 200,
+        "data": {
+          "agentId": "browser-agent",
+          "agentName": "browser-agent",
+          "authorizedFolders": [],
+          "browserResume": {
+            "found": false,
+            "reason": "no_session_browser",
+            "status": "attempted"
+          },
+          "browserRunning": false,
+          "browserUrl": null,
+          "currentModelAvailable": false,
+          "currentModelId": null,
+          "currentModelProvider": null,
+          "currentModelUnavailableReason": "model_plane_unavailable",
+          "cwd": null,
+          "historyRevision": "\"r0-e0\"",
+          "isStreaming": false,
+          "memoryEnabled": false,
+          "ok": true,
+          "path": "native:browser-c",
+          "permissionMode": null,
+          "projectId": null,
+          "sessionId": "browser-c",
+          "thinkingLevel": null,
+          "workspaceFolders": []
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 404,
+        "data": {
+          "code": "not_found",
+          "details": {
+            "causeId": "resource.not_found",
+            "requestId": "req-44c732ef24f81dcd2928d5ace7d21537"
+          },
+          "message": "resource not found",
+          "retryable": false
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 403,
+        "data": {
+          "code": "forbidden",
+          "details": {
+            "causeId": "authz.cross_principal_access",
+            "reason": "cross_principal_access",
+            "requestId": "req-984f30bb95a53bcd4beb7cae326cba74"
+          },
+          "message": "not allowed for this principal",
+          "retryable": false
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 502,
+        "data": {
+          "code": "internal",
+          "details": {
+            "causeId": "internal",
+            "reason": "browser_resume_failed",
+            "requestId": "req-c7793e5277f2f98adc8e3fb01620da1c"
+          },
+          "message": "浏览器宿主连接中断",
+          "retryable": false
+        }
+      },
+      {
+        "kind": "real-disconnect-after-dispatch",
+        "actualBrowserPath": "native:browser-a",
+        "bothViewsAlive": true
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 200,
+        "data": {
+          "agentId": "browser-agent",
+          "agentName": "browser-agent",
+          "authorizedFolders": [],
+          "browserResume": {
+            "found": true,
+            "status": "resumed",
+            "url": "data:text/html,%3Ctitle%3Esession-1%3C%2Ftitle%3E%3Cp%3Eowned-1%3C%2Fp%3E"
+          },
+          "browserRunning": true,
+          "browserUrl": "data:text/html,%3Ctitle%3Esession-1%3C%2Ftitle%3E%3Cp%3Eowned-1%3C%2Fp%3E",
+          "currentModelAvailable": false,
+          "currentModelId": null,
+          "currentModelProvider": null,
+          "currentModelUnavailableReason": "model_plane_unavailable",
+          "cwd": null,
+          "historyRevision": "\"r0-e0\"",
+          "isStreaming": false,
+          "memoryEnabled": false,
+          "ok": true,
+          "path": "native:browser-b",
+          "permissionMode": null,
+          "projectId": null,
+          "sessionId": "browser-b",
+          "thinkingLevel": null,
+          "workspaceFolders": []
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/sessions/switch",
+        "status": 200,
+        "data": {
+          "agentId": "browser-agent",
+          "agentName": "browser-agent",
+          "authorizedFolders": [],
+          "browserResume": {
+            "reason": "no_browser_host",
+            "status": "skipped"
+          },
+          "browserRunning": false,
+          "browserUrl": null,
+          "currentModelAvailable": false,
+          "currentModelId": null,
+          "currentModelProvider": null,
+          "currentModelUnavailableReason": "model_plane_unavailable",
+          "cwd": null,
+          "historyRevision": "\"r0-e0\"",
+          "isStreaming": false,
+          "memoryEnabled": false,
+          "ok": true,
+          "path": "native:browser-a",
+          "permissionMode": null,
+          "projectId": null,
+          "sessionId": "browser-a",
+          "thinkingLevel": null,
+          "workspaceFolders": []
+        }
+      }
+    ],
+    "oldViewSurvived": true,
+    "host": "现役setupBrowserCommands及handleBrowserCommand恢复分支从当前main.cjs AST精确提取，在真实Electron BrowserWindow/WebContentsView执行；生产Rust真实HTTP/WS；未伪造浏览器恢复核心或网络回执。"
+  },
+  "checks": {
+    "strictClippy": "PASS",
+    "fmt": "PASS",
+    "tsRoot": "PASS",
+    "tsNode": "PASS",
+    "tsTest": "PASS",
+    "sourceWindowUnchanged": "PASS"
+  },
+  "negativeEvidence": [
+    {
+      "path": "/private/tmp/lingxi-r06-agent-delete-env/tmp/map-send-original-unknown-negative-r4/map-ui-failure.json",
+      "classification": "真实产品FAIL",
+      "fact": "实际WS已发，原15秒账本进入delivery_unknown但原草稿已被关闭"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-agent-delete-env/tmp/map-default-model-original-negative/default-fork-choice-observed.json",
+      "classification": "真实产品FAIL",
+      "fact": "原旧会话分支记录model/thinking均null，未冻结实际默认pair"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-agent-delete-env/tmp/map-cached-history-original-negative/map-ui-failure.json",
+      "classification": "真实产品FAIL",
+      "fact": "同一权威修订且无条件校验记录仍额外读历史，源于studio无引号与history含引号令牌不一致；未实证陈旧显示，撤回此前静态陈旧推断"
+    },
+    {
+      "path": "/private/tmp/lingxi-r06-agent-delete-env/tmp/browser-host-original-negative-r2/browser-failure.json",
+      "classification": "真实缺失路由404",
+      "fact": "前端真实宿主请求接当前旧CLI，升级HTTP404；旧setup本身Rust早返无宿主"
+    },
+    {
+      "path": "/private/tmp/r06-session-completion-delivery/map-browser-old-service-regression.log",
+      "classification": "作者候选回退FAIL已修，不改原断言",
+      "fact": "原先把损坏JSON200改500与旧兼容断言冲突；最终恢复200默认并明确degraded/readError，UI拒绝当成功，原3旧测试通过"
+    }
+  ],
+  "limits": [
+    "仅macOS现役Electron+Rust实际验证，未声称Tauri或其他平台窗口已测",
+    "宿主腿执行当前生产函数与真实Electron视图，未声称完整main.cjs全应用冷启动",
+    "浏览器宿主仅本机所有者；当前会话无浏览器时实际尝试后found=false；完全无宿主时显式skipped/no_browser_host",
+    "宿主断开时焦点偏好可能已提交，甚至视图可能已恢复但回执丢失；HTTP502显式失败，无回滚或未变动承诺",
+    "原生工作区证明实际绝对cwd及无cwd；未登记mountId继续明确400，不声称已注册挂载路径",
+    "实际供应商为本机真实HTTP替身，未调用外部付费供应商",
+    "未改Main/登记/门禁/白名单/原始断言；未提交推送",
+    "此前session_created生命周期7独立patch不重复纳26；Main81B已含白名单token"
+  ],
+  "integration": [
+    "保留Root V14主动委派policy getter在PreparedForkUi之前、唯一fork INSERT的proactive第13列与末参数；本包mem/project继承及gateway参数与其合并",
+    "main.cjs只setupBrowserCommands独立块；QuickChat其它块无修改",
+    "session-actions仅原生list修订规范化及switch缓存比较；保留Root81B fetchSessionHistoryPage函数",
+    "lib/auth及service/sessions必须精准hunk整合，不用整文件覆盖Root近期Read/Mood/QuickChat/资源变化"
+  ],
+  "commands": {
+    "rust": "CARGO_TARGET_DIR=/private/tmp/lingxi-r06-agent-delete-target CARGO_INCREMENTAL=0 LINGXI_HOME=/private/tmp/lingxi-r06-agent-delete-env/home TMPDIR=/private/tmp/lingxi-r06-agent-delete-env/tmp R06_NODE_BIN=/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node /Users/study_superior/.cargo/bin/cargo test --locked -p lingxi-service --test r06_session_map_browser_completion --test r06_t03_session_tree --test r06_conversation_map_and_checkpoint --test r06_session_list_projection -- --test-threads=1 --show-output",
+    "strict": "/Users/study_superior/.cargo/bin/cargo clippy --locked -p lingxi-service --lib -- -D warnings",
+    "vitest": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node node_modules/vitest/vitest.mjs run desktop/src/react/__tests__/components/conversation-map/conversation-map.test.ts --reporter=dot"
+  },
+  "logs": [
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-final-tests.log",
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-final-strict.log",
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-final-fmt.log",
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-final-old-ui.log",
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-ts-root.log",
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-ts-node.log",
+    "/private/tmp/r06-session-completion-delivery/map-browser-frozen-ts-test.log"
+  ]
+}

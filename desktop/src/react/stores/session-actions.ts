@@ -992,7 +992,7 @@ export async function loadSessions(): Promise<void> {
     const data = await res.json();
     if (native && (!ownsSessionConnection(owner) || version !== nativeListVersion)) return;
     if (native && (!data || !Array.isArray(data.sessions) || data.sessions.some((item: any) => !item || typeof item.sessionId !== 'string' || item.path !== `native:${item.sessionId}` || typeof item.revision !== 'string'))) throw new Error('会话列表格式无效，已保留原列表');
-    const rows = native ? data.sessions.map((item: any) => ({ ...item, modified: typeof item.modified === 'number' ? new Date(item.modified).toISOString() : null })) : data;
+    const rows = native ? data.sessions.map((item: any) => ({ ...item, revision: JSON.stringify(item.revision), modified: typeof item.modified === 'number' ? new Date(item.modified).toISOString() : null })) : data;
     const serverSessions = Array.isArray(rows) ? rows.map(normalizeServerSessionProjection) : [];
     const localSessions = useStore.getState().sessions || [];
     const sessions = mergeSessionsWithOptimisticFirstMessages(serverSessions, localSessions);
@@ -1298,8 +1298,12 @@ export async function switchSession(path: string): Promise<void> {
     // 一旦 currentSessionPath 指向新 session，主窗口 WebSocket 会将该 session 的流式事件
     // 路由到 streamBufferManager，触发 bumpMessageLiveVersion，导致 loadMessages 的
     // 竞态守卫跳过 hydrate，store 丢失完整历史。提前加载可避免此竞态。
-    const hasData = !!sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState().chatSessions, path);
-    if (!hasData) {
+    const cachedMessages = sessionScopedValue(useStore.getState() as Record<string, any>, useStore.getState().chatSessions, path);
+    const hasData = !!cachedMessages;
+    // 原生切换以服务器当前历史修订判断缓存；稳定修订不读，新增回合必须真实恢复。
+    const nativeNeedsReload = native && hasData
+      && (typeof data.historyRevision !== 'string' || cachedMessages.revision !== data.historyRevision || isStreaming);
+    if (!hasData || nativeNeedsReload) {
       await loadMessages(path);
       if (myVersion !== _switchVersion || (native && !ownsSessionConnection(owner))) return;
     }

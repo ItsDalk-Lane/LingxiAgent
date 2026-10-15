@@ -142,6 +142,7 @@ impl FileKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionFileOrigin {
     StageFiles,
+    FileCopy,
     UserUpload,
     UserAttachment,
     BridgeInbound,
@@ -163,6 +164,7 @@ impl SessionFileOrigin {
     pub fn wire(self) -> &'static str {
         match self {
             SessionFileOrigin::StageFiles => "stage_files",
+            SessionFileOrigin::FileCopy => "file_copy",
             SessionFileOrigin::UserUpload => "user_upload",
             SessionFileOrigin::UserAttachment => "user_attachment",
             SessionFileOrigin::BridgeInbound => "bridge_inbound",
@@ -184,6 +186,7 @@ impl SessionFileOrigin {
     fn parse(raw: &str) -> Result<Self, StorageError> {
         match raw {
             "stage_files" => Ok(SessionFileOrigin::StageFiles),
+            "file_copy" => Ok(SessionFileOrigin::FileCopy),
             "user_upload" => Ok(SessionFileOrigin::UserUpload),
             "user_attachment" => Ok(SessionFileOrigin::UserAttachment),
             "bridge_inbound" => Ok(SessionFileOrigin::BridgeInbound),
@@ -210,7 +213,8 @@ pub fn infer_operation(origin: SessionFileOrigin) -> &'static str {
         SessionFileOrigin::StageFiles => "staged",
         SessionFileOrigin::UserUpload => "uploaded",
         SessionFileOrigin::UserAttachment | SessionFileOrigin::BridgeInbound => "attached",
-        SessionFileOrigin::AgentWrite
+        SessionFileOrigin::FileCopy
+        | SessionFileOrigin::AgentWrite
         | SessionFileOrigin::AgentArtifact
         | SessionFileOrigin::PluginOutput
         | SessionFileOrigin::InstallSkillOutput => "created",

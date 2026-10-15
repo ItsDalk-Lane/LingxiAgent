@@ -552,12 +552,19 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if (p == "/lingxi/v1/me" || p == "/lingxi/v1/server/identity") && m == "GET" {
         return RoutePolicy::Authenticated;
     }
+    // 当前桌面浏览器宿主只能由本机所有者接线，chat 凭证不能注册宿主。
+    if p == "/lingxi/v1/browser-host" {
+        return RoutePolicy::LocalOnly;
+    }
     if p == "/lingxi/v1/input-drafts" {
         return if m == "GET" || m == "HEAD" || m == "PUT" {
             RoutePolicy::Authenticated
         } else {
             RoutePolicy::LocalOnly
         };
+    }
+    if p == "/lingxi/v1/conversation-map/layout" && matches!(m.as_str(), "GET" | "HEAD" | "PUT") {
+        return RoutePolicy::Scope("chat");
     }
     if p == "/lingxi/v1/session-thinking-level" && (m == "GET" || m == "POST") {
         return RoutePolicy::Scope("chat");
@@ -746,12 +753,24 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             }
         }
         if let Some(id) = rest.strip_suffix("/approvals") {
-            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") { return RoutePolicy::Scope("chat"); }
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
         }
         if let Some((id, approval)) = rest.split_once("/approvals/") {
-            if !id.is_empty() && !id.contains('/') && !approval.is_empty() && !approval.contains('/') && m == "POST" { return RoutePolicy::Scope("chat"); }
+            if !id.is_empty()
+                && !id.contains('/')
+                && !approval.is_empty()
+                && !approval.contains('/')
+                && m == "POST"
+            {
+                return RoutePolicy::Scope("chat");
+            }
         }
-        if let Some(id) = rest.strip_suffix("/prompt-snapshot").or_else(||rest.strip_suffix("/deferred-rewind")) {
+        if let Some(id) = rest
+            .strip_suffix("/prompt-snapshot")
+            .or_else(|| rest.strip_suffix("/deferred-rewind"))
+        {
             if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
                 return RoutePolicy::Scope("chat");
             }
@@ -904,7 +923,13 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     }
     // R06-T05 Round 5 fs 直读面（server/routes/fs.ts：本地 API 鉴权链内，
     // bearer 即边界）：两叶面一律 LocalOnly。
-    if matches!(p, "/lingxi/v1/fs/read" | "/lingxi/v1/fs/read-base64" | "/lingxi/v1/fs/docx-html" | "/lingxi/v1/fs/xlsx-html") {
+    if matches!(
+        p,
+        "/lingxi/v1/fs/read"
+            | "/lingxi/v1/fs/read-base64"
+            | "/lingxi/v1/fs/docx-html"
+            | "/lingxi/v1/fs/xlsx-html"
+    ) {
         return RoutePolicy::LocalOnly;
     }
     // R06 收口：独立改前存档 restore 面（现役 /api/checkpoints/:id/restore

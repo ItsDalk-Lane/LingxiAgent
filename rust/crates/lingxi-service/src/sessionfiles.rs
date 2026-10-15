@@ -1433,6 +1433,7 @@ fn parse_kind(wire: &str) -> FileKind {
 fn parse_origin(wire: &str) -> SessionFileOrigin {
     match wire {
         "stage_files" => SessionFileOrigin::StageFiles,
+        "file_copy" => SessionFileOrigin::FileCopy,
         "user_upload" => SessionFileOrigin::UserUpload,
         "user_attachment" => SessionFileOrigin::UserAttachment,
         "bridge_inbound" => SessionFileOrigin::BridgeInbound,

@@ -29,12 +29,17 @@ export type MapCardPosition = { x: number; y: number };
 
 export interface MapDraft {
   kind: 'continue' | 'branch';
+  draftId?: string;
   anchorCardId: string;
   sessionId: string;
   sessionPath: string;
   agentId: string | null;
   text: string;
   sending: boolean;
+  /** 草稿在连接内创建；连接离开再返回也不能重放旧操作。 */
+  nativeOwner?: {key: string; revision: number};
+  /** 已提交却尚无可信接收证明；继续操作必须先核对同一账本，不能盲目重发。 */
+  pendingDelivery?: {leaseId:string;clientMessageId:string;sessionId:string;sessionPath:string;agentId:string|null;text:string};
 }
 
 export interface MapPendingTurn {

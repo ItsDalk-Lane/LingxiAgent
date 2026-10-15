@@ -124,6 +124,26 @@ class R06StageInputsContract(unittest.TestCase):
                                   "stdout": result.stdout, "stderr": result.stderr})
         return result, evidence
 
+    def prepare_explicit_unbound_fixture(self):
+        # 负向检查自行建立未完成样本，不能依赖真实项目永远留有缺口。
+        # 仅修改每个测试自己的临时副本，原断言、Then和生产登记均不变。
+        path = self.root / self.stage.ORIGINAL_PROOF_PATH
+        inventory = json.loads(path.read_text())
+        originals = {row["id"]: (row["assertions"], row["then"])
+                     for row in inventory["items"]}
+        row = next(row for row in inventory["items"] if row.get("groups")
+                   and not any(group.get("manualEvidence") for group in row["groups"]))
+        row["status"] = "GAP"
+        row["gaps"] = ["隔离负向样本：故意不提供完整行为证明"]
+        row["groups"][0]["coverage"] = "PARTIAL"
+        row["groups"][0]["missingClauses"] = list(row["gaps"])
+        self.assertEqual({item["id"]: (item["assertions"], item["then"])
+                          for item in inventory["items"]}, originals)
+        self.stage.save(path, inventory)
+        self.inputs, self.graph = self.stage.build(self.root)
+        self.stage.save(self.root / self.stage.INPUT_PATH, self.inputs)
+        self.stage.save(self.root / self.stage.MAP_PATH, self.graph)
+
     def test_build_preserves_required_cases_and_shares_one_execution_binding(self):
         expected = {f"R06-A{i:02}" for i in range(1, 17)}
         expected.update(f"R06-AR-F{i:02}-C{case:02}" for i in range(1, 16) for case in range(1, 5))
@@ -344,6 +364,7 @@ class R06StageInputsContract(unittest.TestCase):
         self.assert_positive("fresh-restored-positive")
 
     def test_tampered_binding_log_is_rejected_and_restored_evidence_is_consumed(self):
+        self.prepare_explicit_unbound_fixture()
         # 先真实执行原登记检查，由生产入口生成收据，不手填成功结果。
         key = next(key for key, binding in self.inputs["executionBindings"].items()
                    if binding.get("kind") == "script" and str(REGISTRY_SCRIPT) in binding["argv"])
@@ -418,6 +439,7 @@ class R06StageInputsContract(unittest.TestCase):
                                                 self.root / "artifacts" / "bindings", self.inputs, invalid)
 
     def test_scoped_proof_cannot_accept_missing_execution_or_release_other_leaves(self):
+        self.prepare_explicit_unbound_fixture()
         selected = next(row["id"] for row in self.inputs["originalProofInventory"]["items"]
                         if row["status"] == "READY")
         bindings = self.root / "artifacts" / "scoped-empty-bindings"

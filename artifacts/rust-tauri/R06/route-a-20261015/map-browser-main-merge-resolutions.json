@@ -1,0 +1,191 @@
+{
+  "resolutions": [
+    "adapter unique INSERT retains proactive_delegation/default policy from experiments",
+    "service receives actual model gateway/default pair freeze and preserves proactive policy unique INSERT",
+    "all other independent merges preserve Main read/QuickChat/chat/prerequisites"
+  ],
+  "files": [
+    {
+      "path": "desktop/main.cjs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/00",
+      "code": 0,
+      "currentSHA256": "475dc388d3e4509b31f654bf2dd594ec0f9a5fbb9a827cb93ed3bda6e074b607",
+      "mergedSHA256": "6f1937f7fd9fd1823c1435312062f419143abcffd28c401126f9834f66ae3c3a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-browser-live/main.cjs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/01",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "36a780877a038408e0b07e2ab28da3b56c5cbcdbea4ef54c7eacd1f1efa12dbd"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-map-live/launch.mjs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/02",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "c7fda78d40f20816397c69de43be68564ed82d1146f5f44e26743f00d551fd6a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-map-live/main.cjs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/03",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "964003c775fca34d2af49112727ddf05909fb2ae91ad13e0799acfef359f5cce"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-map-live/preload.cjs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/04",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "a78e1f2b8a85962576565e73216ec85822fb78a38179d326b23a70bd6b733949"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-map-live/surface.tsx",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/05",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "adebc6581af0dc252409c3bded70dff12899ad71f8678fc61fc442874b153f34"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/ConversationMapCanvas.tsx",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/06",
+      "code": 0,
+      "currentSHA256": "4357c305bc67488927d6366d98656938cf25fb8315a2c2b243ebcf0a7e31bdef",
+      "mergedSHA256": "caee1007c73fef99afe2594ca0473cb27139a1ca814c0048fb14722adf1e329b"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/ConversationMapDraftCard.tsx",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/07",
+      "code": 0,
+      "currentSHA256": "688e02f517aedcb96b3ca2536ff9d35ca19d39966f12bbb7e3d420a739761728",
+      "mergedSHA256": "a209d6beb7b4b9cae577b99d3003026992b22542e666461ee6764b1a9f9b66e6"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/ConversationMapInspector.tsx",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/08",
+      "code": 0,
+      "currentSHA256": "4995bc69018bd4f7adbcab2a345656dc8c551a362bcb047f926493023c0a422d",
+      "mergedSHA256": "b8aa91db602e228bd11e157e91a2e2788b54a2ab2fad58f9e1ada3b5bac0876e"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/ConversationMapPage.tsx",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/09",
+      "code": 0,
+      "currentSHA256": "a1b48e60b0ee15e383bfad5ab44a417560b681c5b338e2d143c51e4b6e7a9a32",
+      "mergedSHA256": "e3d2a290799753fb0107f3145c8a1d5a032549a97a67620139b2f21c2ca2df38"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/conversation-map-projection.ts",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/10",
+      "code": 0,
+      "currentSHA256": "3429914d1b02a4c4cc2d97f3222931e39c7d7a6110024f66a8a660ede8c346b2",
+      "mergedSHA256": "ac78b3c0e34712f33de66f8486c833c624a40292981b185ff3460fdd4aa94a67"
+    },
+    {
+      "path": "desktop/src/react/components/conversation-map/conversation-map-send.ts",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/11",
+      "code": 0,
+      "currentSHA256": "bd86bc2d95457abab06340abee82471d3e88f951dbda2735f2941a97321c6dbc",
+      "mergedSHA256": "cd7e29e3ffbfb37eac71dfa970d12556d4312b064f4d11375e7d07237ceecb8e"
+    },
+    {
+      "path": "desktop/src/react/services/session-connection-owner.ts",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/12",
+      "code": 0,
+      "currentSHA256": "546c497833e6361ce2fd1ad8e59341ab72bd5f8812091c5b558264cb8f29ba3c",
+      "mergedSHA256": "38d06985f4697d1db63b0274efc314a64866bc0dffd8fe0301a0546af120bb45"
+    },
+    {
+      "path": "desktop/src/react/stores/conversation-map-slice.ts",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/13",
+      "code": 0,
+      "currentSHA256": "48c913f41fe65e0e906ea3ddaec61511aaa81188081d3f4f13ebba52b03c84fb",
+      "mergedSHA256": "9ac8d3d4d9997c29df60fc248cbd09d3257ef0dc68d1649af2c95c28a02767fc"
+    },
+    {
+      "path": "desktop/src/react/stores/message-turn-actions.ts",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/14",
+      "code": 0,
+      "currentSHA256": "181146b0fbf2937e71f18c45cec0c80cc42fc6fb01e12d1f9edb54990515e476",
+      "mergedSHA256": "7f726f55d18d01555100576f8f1c025c51d91e3c829ae09348ecf03af905f902"
+    },
+    {
+      "path": "desktop/src/react/stores/session-actions.ts",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/15",
+      "code": 0,
+      "currentSHA256": "4ee858a702f7d2b066baddc29eddad95101ce70a7eb7d8ff89b9ae0285925892",
+      "mergedSHA256": "0ac15752132e82ad56598c81e39d3de430679ba542a864246eb9a60e951210fd"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/16",
+      "code": 2,
+      "currentSHA256": "dbee3180910e8b82e5a8154ccdab94a9b6f6e849a81b6676241b877673078573",
+      "mergedSHA256": "5393ac33e2379f6c30396380b9ce765d3729d5ef29c4dc9bad5b99f13b5051dd"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/17",
+      "code": 0,
+      "currentSHA256": "41726c546c6bb3d50611b52c6726dc829d73eae2b7a33845cc306f34c5ed9ced",
+      "mergedSHA256": "dea1a89589d4ffbd0da08f1230bac8478ef412a38e83b2cab0dfc77d2822f9af"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/browser_host.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/18",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "0cdb3a80cbd4c7da9fbf2d198da88c4e39655956075e1ee686708918294f1bdb"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/conversation_map.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/19",
+      "code": 0,
+      "currentSHA256": "96fb84dc4447179b38284cdcd0cf0768702cf0ea11f3aee0380148ba20ca457a",
+      "mergedSHA256": "c64f5a20be0cedcd272e73e8e2fcacf3711d04e690740fe87ea54b706d1da6b3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/20",
+      "code": 0,
+      "currentSHA256": "03a441791368b30642799e53eef020f431976f727ae2ecc0dbb3e1796a9d20cc",
+      "mergedSHA256": "928f5f5f20d567d968fc22f5bc5de7d75cbe6218de5d3bd7a67886bed360f39f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_tree.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/21",
+      "code": 4,
+      "currentSHA256": "dded3cdee54881573c5e95d72d5c1ea3a85cfb0520233a0512c4fadb4c564d8c",
+      "mergedSHA256": "d8ac516bc7780dc596840becd42c16537f67e8ddae218bcd70a50cb86a6ca665"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/22",
+      "code": 0,
+      "currentSHA256": "1dba80ea1ec55478c40bd82700f389329e7f2df5b3689bde9b32630be79980e9",
+      "mergedSHA256": "33fd5a9363bec3ac6c6e83d90f13a4d5fa4281c99e93dac231d5cdedcab8cf55"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/23",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8"
+    },
+    {
+      "path": "tests/rust-native/session-browser-live.py",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/24",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "078926c6dd2324818ab0e51451a15b771f3aa578a60fac29deb87c6a8d804abd"
+    },
+    {
+      "path": "tests/rust-native/session-map-live.py",
+      "stem": "/private/tmp/r06-map-browser-main-merge-r1/25",
+      "code": 0,
+      "currentSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mergedSHA256": "e25e1c69a91d18bb5b6814d968d7fae0ffea781878e4a8543f45e5d523431dd3"
+    }
+  ]
+}

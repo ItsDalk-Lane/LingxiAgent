@@ -1,0 +1,257 @@
+{
+  "status": "PASS",
+  "scope": "Final four original file/materialization/map/browser leaves only; not stage acceptance",
+  "original279AssertionsAndThenUnchanged": true,
+  "bindingsExecuted": 8,
+  "leafIds": [
+    "R00-T02-LA-3CBCAE9AD914",
+    "R00-T02-LA-AD7FAE6288FA",
+    "R00-T02-LA-8E2D44B48905",
+    "R00-T02-LA-FBDEEDAC0B11"
+  ],
+  "sourceCandidateSha256": "4840505fc2fdd733c2f66f9cbf6f0d30db650c52f4b23bd0626eacd6f6e69a06",
+  "rawEvidence": "/private/tmp/r06-final-four-window-r1-20261015",
+  "rollupExitCode": 0,
+  "results": [
+    {
+      "key": "r06_test_043d6c4514947fa0a3f5",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_resource_tools_completion",
+        "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_resource_tools_completion",
+          "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_138b43d56522674d6102",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_session_map_browser_completion",
+        "test": "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_session_map_browser_completion",
+          "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_481483a02f93a13adbb7",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_resource_tools_completion",
+        "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_resource_tools_completion",
+          "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_82268c379bf9d83a71c2",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_session_focus_detached_project",
+        "test": "focus_switch_detached_create_and_project_assignment",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_session_focus_detached_project",
+          "focus_switch_detached_create_and_project_assignment",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_9f26aac79fabb7519731",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_session_map_browser_completion",
+        "test": "current_map_seven_groups_real_storage_models_and_receipts",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_session_map_browser_completion",
+          "current_map_seven_groups_real_storage_models_and_receipts",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_b0a58efe01504d230e36",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_resource_tools_completion",
+        "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_resource_tools_completion",
+          "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_b92a6b984a67e3678859",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_ar_f04_lifecycle",
+        "test": "f04_local_read_cancelled_future_requires_physical_lease",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_ar_f04_lifecycle",
+          "f04_local_read_cancelled_future_requires_physical_lease",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_fbc22687a171eb9ee34e",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_t05_resourceio",
+        "test": "local_fs_stat_read_write_list_search_rename_move_trash_chain",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t05_resourceio",
+          "local_fs_stat_read_write_list_search_rename_move_trash_chain",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    }
+  ]
+}

@@ -2046,6 +2046,19 @@ impl ToolRegistry {
             };
             permission.capability_base = format!("checkpoint.{action}");
         }
+        if permission.kind == PermissionKind::ArgumentAwareFile {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("copy");
+            permission.kind = if matches!(action, "stat" | "extract") {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Execute
+            };
+            permission.capability_base = format!("file.{action}");
+        }
         let prepared = PreparedToolCall {
             target_id,
             origin: tool.manifest.origin.clone(),

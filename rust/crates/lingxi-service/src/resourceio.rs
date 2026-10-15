@@ -235,6 +235,17 @@ pub(crate) fn error_response(err: ResourceIoError) -> Response {
     EndpointError::resource_failure(status, &err.code, message).into_response()
 }
 
+fn url_error(message: String) -> ResourceIoError {
+    let code = message.split(':').next().unwrap_or("url_fetch_failed");
+    let status = match code {
+        "blocked_private_url" => 403,
+        "url_response_too_large" => 413,
+        "url_read_timeout" => 504,
+        _ => 400,
+    };
+    ResourceIoError::new(status, code, message.clone())
+}
+
 fn non_empty_string(value: Option<&Value>) -> Option<String> {
     match value {
         Some(Value::String(s)) => {
@@ -791,6 +802,7 @@ pub struct ResourceIoService {
     /// D8 文件历史接线：bootstrap 后由组合根 set（现役是引擎事件总线
     /// 上挂 FileHistoryService.handleResourceEvent）。
     file_history: std::sync::OnceLock<Arc<crate::filehistory::FileHistoryService>>,
+    url_provider: std::sync::OnceLock<Arc<crate::resource_url::UrlProvider>>,
 }
 
 /// 读操作结果：meta 为现役结果对象的非 content 字段（resourceKey/
@@ -842,7 +854,24 @@ impl ResourceIoService {
         ResourceIoService {
             inner,
             file_history: std::sync::OnceLock::new(),
+            url_provider: std::sync::OnceLock::new(),
         }
+    }
+
+    /// 组合根明确启用远端只读提供者；缺少它的独立内核仍按原契约拒绝URL。
+    pub fn set_url_provider(
+        &self,
+        provider: Arc<crate::resource_url::UrlProvider>,
+    ) -> Result<(), String> {
+        if let Some(plane) = &self.inner.workspace {
+            plane
+                .access
+                .protect_service_root(provider.root())
+                .map_err(|e| e.to_string())?;
+        }
+        self.url_provider
+            .set(provider)
+            .map_err(|_| "URL provider already configured".into())
     }
 
     pub fn set_file_safety(&self, safety: Arc<crate::file_safety::FileSafety>) {
@@ -930,6 +959,12 @@ impl ResourceIoService {
 
     pub async fn stat(&self, input: &Value, ctx: &OpContext) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
+        if let (ResourceRef::Url { url }, Some(provider)) = (&reference, self.url_provider.get()) {
+            let mut read = provider.read(url).await.map_err(url_error)?;
+            read.meta["exists"] = serde_json::json!(true);
+            read.meta["isDirectory"] = serde_json::json!(false);
+            return Ok(read.meta);
+        }
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
@@ -955,6 +990,14 @@ impl ResourceIoService {
         ctx: &OpContext,
     ) -> Result<ResourceRead, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
+        if let (ResourceRef::Url { url }, Some(provider)) = (&reference, self.url_provider.get()) {
+            let read = provider.read(url).await.map_err(url_error)?;
+            return Ok(ResourceRead {
+                meta: read.meta,
+                content: read.bytes,
+            });
+        }
+
         Self::refuse_if_mount_or_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { .. } => {
@@ -1199,22 +1242,64 @@ impl ResourceIoService {
         ctx: &OpContext,
     ) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
-        match &reference {
-            ResourceRef::LocalFile { .. } => {
-                let retained = self.blocking_permit(ctx)?;
-                let inner = self.inner.clone();
-                let ctx = ctx.clone();
-                let lease = inner.session_files.payload_lease().await;
-                spawn_blocking_io(retained, move || {
-                    let _lease = lease;
-                    inner.local_materialize(&reference, &ctx)
-                })
-                .await
+        if let (ResourceRef::Url { url }, Some(provider)) = (&reference, self.url_provider.get()) {
+            let retained = self.blocking_permit(ctx)?;
+            let cancel = crate::task_supervisor::resource_cancel_scope(
+                ctx,
+                &self.inner.session_files.admission_gate(),
+            )
+            .map_err(|e| {
+                ResourceIoError::new(409, "resource_run_binding_mismatch", e.to_string())
+            })?;
+            let read = provider.read(url).await.map_err(url_error)?;
+            let provider = Arc::clone(provider);
+            let safety = self.file_safety();
+            let access = Arc::clone(&self.local_plane()?.access);
+            let context = ctx.clone();
+            let url = url.clone();
+            spawn_blocking_io(retained, move || {
+                let result = provider
+                    .stage(&url, read, safety.as_ref(), &context.session_id, || {
+                        !cancel.as_ref().is_some_and(|scope| scope.is_cancelled())
+                    })
+                    .map_err(url_error)?;
+                let path = Path::new(
+                    result["filePath"]
+                        .as_str()
+                        .ok_or_else(|| ResourceIoError::io_bad_request("missing staged path"))?,
+                );
+                let snapshot = crate::file_safety::Snapshot::read(path)
+                    .map_err(|e| url_error(e.to_string()))?;
+                access
+                    .grant_materialized_file(
+                        context.principal_kind,
+                        &context.principal_subject,
+                        &context.session_id,
+                        path,
+                        &snapshot,
+                    )
+                    .map_err(url_error)?;
+                Ok(result)
+            })
+            .await
+        } else {
+            Self::refuse_if_mount_or_url(&reference)?;
+            match &reference {
+                ResourceRef::LocalFile { .. } => {
+                    let retained = self.blocking_permit(ctx)?;
+                    let inner = self.inner.clone();
+                    let ctx = ctx.clone();
+                    let lease = inner.session_files.payload_lease().await;
+                    spawn_blocking_io(retained, move || {
+                        let _lease = lease;
+                        inner.local_materialize(&reference, &ctx)
+                    })
+                    .await
+                }
+                ResourceRef::SessionFile { .. } => self.session_file_materialize(&reference).await,
+                ResourceRef::Resource { .. } => self.resource_materialize(&reference).await,
+                ResourceRef::Mount { .. } | ResourceRef::Url { .. } => unreachable!(),
             }
-            ResourceRef::SessionFile { .. } => self.session_file_materialize(&reference).await,
-            ResourceRef::Resource { .. } => self.resource_materialize(&reference).await,
-            ResourceRef::Mount { .. } | ResourceRef::Url { .. } => unreachable!(),
         }
     }
 

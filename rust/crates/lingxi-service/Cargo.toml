@@ -124,6 +124,10 @@ lingxi-adapters = { path = "../lingxi-adapters" }
 
 # N06：Windows 安全审计日志逐层使用目录句柄相对打开，拒绝重解析点。
 # 版本已经存在于工作区锁文件；仅 Windows 目标需要 Native/Win32 声明。
+
+# 资源 URL 读取沿用适配器已经锁定的 HTTP 客户端，不新增包版本。
+reqwest = { version = "0.13.5", features = ["json", "form", "socks"] }
+
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "=0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_Security", "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
 

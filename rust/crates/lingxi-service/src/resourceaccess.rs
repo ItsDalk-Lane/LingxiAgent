@@ -165,6 +165,7 @@ struct GrantKey {
 struct AccessState {
     grants: HashMap<GrantKey, Vec<GrantedRoot>>,
     protected_roots: Vec<PathBuf>,
+    materialized_reads: HashMap<GrantKey, HashMap<PathBuf, serde_json::Value>>,
 }
 
 /// The resource authorization boundary of the native file tools.
@@ -323,11 +324,80 @@ impl ResourceAccess {
         principal_subject: &str,
         session_id: &str,
     ) {
-        self.lock().grants.remove(&GrantKey {
+        let key = GrantKey {
             principal_kind,
             principal_subject: principal_subject.to_string(),
             session_id: session_id.to_string(),
-        });
+        };
+        let mut state = self.lock();
+        state.grants.remove(&key);
+        state.materialized_reads.remove(&key);
+    }
+
+    /// 宿主只授权本次已校验的缓存文件及其版本，不开放整个服务目录。
+    pub(crate) fn grant_materialized_file(
+        &self,
+        principal_kind: &'static str,
+        principal_subject: &str,
+        session_id: &str,
+        path: &Path,
+        snapshot: &crate::file_safety::Snapshot,
+    ) -> Result<(), String> {
+        let current = crate::file_safety::Snapshot::read(path).map_err(|e| e.to_string())?;
+        if current.stamp != snapshot.stamp {
+            return Err("materialized file changed before authorization".into());
+        }
+        let key = GrantKey {
+            principal_kind,
+            principal_subject: principal_subject.into(),
+            session_id: session_id.into(),
+        };
+        let mut state = self.lock();
+        let known = state
+            .materialized_reads
+            .get(&key)
+            .is_some_and(|files| files.contains_key(path));
+        if !known
+            && state
+                .materialized_reads
+                .values()
+                .map(HashMap::len)
+                .sum::<usize>()
+                >= 1024
+        {
+            return Err("materialized file authorization capacity exceeded".into());
+        }
+        state
+            .materialized_reads
+            .entry(key)
+            .or_default()
+            .insert(path.to_path_buf(), snapshot.stamp.clone());
+        Ok(())
+    }
+
+    /// 暂存读取能力绑定精确版本，不能在检查后换成另一份内容。
+    pub(crate) fn validate_materialized_snapshot(
+        &self,
+        kind: &'static str,
+        subject: &str,
+        session: &str,
+        path: &Path,
+        snapshot: &crate::file_safety::Snapshot,
+    ) -> Result<(), String> {
+        let expected = self
+            .lock()
+            .materialized_reads
+            .get(&GrantKey {
+                principal_kind: kind,
+                principal_subject: subject.into(),
+                session_id: session.into(),
+            })
+            .and_then(|files| files.get(path))
+            .cloned();
+        if expected.is_some_and(|stamp| stamp != snapshot.stamp) {
+            return Err("materialized resource version changed".into());
+        }
+        Ok(())
     }
 
     /// Resolves a raw tool path (absolute or relative to `cwd`) to the
@@ -366,6 +436,33 @@ impl ResourceAccess {
                 ),
             });
         };
+        let cached = if op == ResourceOp::Read {
+            self.lock()
+                .materialized_reads
+                .get(&GrantKey {
+                    principal_kind,
+                    principal_subject: principal_subject.into(),
+                    session_id: session_id.into(),
+                })
+                .and_then(|files| files.get(&resolved))
+                .cloned()
+        } else {
+            None
+        };
+        if let Some(expected) = cached {
+            if crate::file_safety::Snapshot::read(&resolved)
+                .is_ok_and(|snapshot| snapshot.stamp == expected)
+            {
+                return Ok(ResourceScope::new(resolved, ResourceOp::Read));
+            }
+            return Err(AccessRefusal {
+                cause: AccessRefusalCause::Blocked,
+                requested_path: requested.display().to_string(),
+                resolved_path: Some(resolved.display().to_string()),
+                op,
+                message: "materialized resource version changed; materialize it again".into(),
+            });
+        }
         let protected = self.lock().protected_roots.iter().any(|root| {
             is_inside(&resolved, root) || (op == ResourceOp::Write && is_inside(root, &resolved))
         });

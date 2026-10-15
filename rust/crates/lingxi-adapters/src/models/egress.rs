@@ -337,7 +337,8 @@ fn system_resolver() -> EgressResolver {
 
 /// True when the candidate is judged by the socket address's IP (v4 or v6)
 /// through the guarded-range table.
-fn socket_addr_is_guarded(addr: &std::net::SocketAddr) -> bool {
+/// 资源URL与模型产物共用同一地址分类，避免两条链对地址别名判断不同。
+pub fn socket_addr_is_guarded(addr: &std::net::SocketAddr) -> bool {
     match addr {
         std::net::SocketAddr::V4(v4) => ip_is_guarded(&v4.ip().octets()),
         std::net::SocketAddr::V6(v6) => {

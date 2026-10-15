@@ -6,6 +6,8 @@ import {
 import { loadSessions, switchSession } from './session-actions';
 import type { ChatMessage } from './chat-types';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { resolveServerConnection } from '../services/server-connection';
+import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch } from '../services/session-connection-owner';
 import { collectUiContext } from '../utils/ui-context';
 import { errorWithCode, presentError } from '../errors/error-presenter';
 import { errorCodeFromResponseBody } from '../../../../shared/error-user-messages.ts';
@@ -123,11 +125,31 @@ export async function forkSessionTurn(
   target: SessionNodeTarget,
 ): Promise<ForkedSessionRef | null> {
   if (!sessionPath) return null;
+  const owner = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null;
 
   try {
     const state = useStore.getState();
     if (sessionScopedListIncludes(state, state.streamingSessions, sessionPath)) return null;
     const identity = resolveSessionIdentity(sessionPath);
+    if (owner) {
+      const boundary = target.role === 'assistant_turn' ? target.turnInputEntryId : target.entryId;
+      if (!boundary) throw new Error('分支锚点尚未就绪');
+      const id = `session-${crypto.randomUUID()}`;
+      const response = await sessionOwnerFetch(owner, `/lingxi/v1/sessions/${encodeURIComponent(identity.sessionId)}/fork`, {
+        method: 'POST', headers: {'content-type':'application/json'},
+        body: JSON.stringify({newSessionId:id,boundaryMessageId:boundary}),
+      });
+      const data = await response.json() as {sessionId?:unknown;parentSessionId?:unknown};
+      if (!ownsSessionConnection(owner)) return null;
+      if (data.sessionId !== id || data.parentSessionId !== identity.sessionId) throw new Error('分支返回的会话身份不一致');
+      const childResponse = await sessionOwnerFetch(owner, `/lingxi/v1/sessions/${encodeURIComponent(id)}`);
+      const child = await childResponse.json() as {sessionId?:unknown;agentId?:unknown};
+      if (!ownsSessionConnection(owner)) return null;
+      if (child.sessionId !== id || typeof child.agentId !== 'string' || !child.agentId) throw new Error('无法核对新分支归属');
+      await loadSessions();
+      if (!ownsSessionConnection(owner)) return null;
+      return {sessionId:id,sessionPath:`native:${id}`,agentId:child.agentId,sourceSessionId:identity.sessionId};
+    }
     const response = await lingxiFetch('/api/sessions/fork', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -154,6 +176,7 @@ export async function forkSessionTurn(
         : null,
     };
   } catch (error) {
+    if (owner && !ownsSessionConnection(owner)) return null;
     reportActionError(sessionPath, error);
     return null;
   }

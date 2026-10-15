@@ -30,6 +30,7 @@ pub mod auth;
 pub mod background;
 pub mod background_tasks;
 pub mod bridgemedia;
+pub mod browser_host;
 pub mod cancel;
 pub mod cardguide;
 pub mod character_cards;
@@ -84,6 +85,8 @@ pub mod recovery;
 pub mod redaction;
 pub mod resourceaccess;
 pub mod resourceio;
+pub mod resource_url;
+pub mod resource_tools;
 pub mod resources;
 pub mod runs;
 pub mod sandbox;
@@ -483,6 +486,7 @@ pub struct ServiceState {
     sessions: Arc<sessions::SessionStore>,
     slash: Arc<slash::SlashService>,
     chat_wire: Arc<chat_wire::ChatWire>,
+    browser_host: Arc<browser_host::BrowserHost>,
     events: Arc<events::EventService>,
     app_events: Arc<appevents::AppEventLog>,
     session_projects: Arc<projects::SessionProjectsService>,
@@ -773,6 +777,8 @@ pub struct ServiceDeps {
     /// surface publishes new policy generations on it. `None` keeps the
     /// pre-F14 direct behavior (the isolated default).
     pub network_plane: Option<std::sync::Arc<lingxi_adapters::models::network::NetworkPlane>>,
+    /// 可用的远端只读资源提供者；缺席的独立组合明确拒绝，不猜测网络能力。
+    pub resource_url_provider: Option<Arc<resource_url::UrlProvider>>,
     /// The workspace root from the strict `--config` file (R05-T01) — the
     /// ONLY workspace source. When present together with a model plane,
     /// the core file tools are registered scoped to it.
@@ -849,6 +855,7 @@ impl Default for ServiceDeps {
             model_plane_source: None,
             credential_service: None,
             network_plane: None,
+            resource_url_provider: None,
             workspace_root: None,
             worker_model: None,
             worker_tool_registration: None,
@@ -1082,10 +1089,12 @@ impl ServiceState {
         ws_max_connections: usize,
         store_options: StoreOptions,
     ) -> Result<Self, ServiceStartupError> {
+        let resource_url_provider=Some(Arc::new(resource_url::UrlProvider::new(&config.data_home)));
         Self::bootstrap_with_deps(
             config,
             layout,
             ServiceDeps {
+                resource_url_provider,
                 ws_ticket_ttl_ms,
                 rate_window_ms,
                 rate_max,
@@ -1364,7 +1373,8 @@ impl ServiceState {
                         .as_ref()
                         .map(|(access, _)| Arc::clone(access)),
                 )
-                .with_session_files(Arc::clone(&session_files)),
+                .with_session_files(Arc::clone(&session_files))
+                .with_model_gateway(deps.model_gateway.clone()),
         );
         let mut tool_plane: Option<ToolPlaneHandles> = None;
         let mut read_file_tools = None;
@@ -2162,6 +2172,14 @@ impl ServiceState {
         // "restore"）。
         resource_io.set_file_history(file_history.clone());
         resource_io.set_file_safety(Arc::clone(&file_safety));
+        if let Some(provider)=deps.resource_url_provider.clone() {
+            resource_io.set_url_provider(provider).map_err(|detail|ServiceStartupError::Storage(StorageError::InvalidRequest{detail}))?;
+        }
+
+        if let (Some(gateway), Some((access, cwd))) = (deps.tool_gateway.as_ref(), workspace_access.as_ref()) {
+            resource_tools::register(gateway.registry(), gateway, Arc::new(resource_tools::ResourceTools::new(Arc::clone(&storage), Arc::clone(&session_files), Arc::clone(&resource_io), Arc::clone(access), cwd.clone(), Arc::clone(&file_safety))), &lingxi_kernel::toolcatalog::SchemaBudget::default());
+        }
+
         // R06-T05 Round 5：fs 直读面授权根（fs.ts :77-86 的候选映射：
         // data_home + workspace）。
         let fs_read = Arc::new(fsread::FsReadService::new(
@@ -2186,6 +2204,7 @@ impl ServiceState {
             sessions: session_arc,
             slash: Arc::new(slash::SlashService::new(&data_home)),
             chat_wire: Arc::new(chat_wire::ChatWire::new(&data_home)),
+            browser_host: Arc::new(browser_host::BrowserHost::default()),
             session_tree: session_tree_handle,
             session_tools,
             interactions,
@@ -5180,6 +5199,30 @@ async fn switch_session_route(
         )
         .into_response();
     }
+    // 焦点提交后等待当前桌面实际恢复；下游失败须如实呈现，不能假称恢复成功。
+    let browser_resume = match state.browser_host.resume(&session_id).await {
+        Ok(value) => value,
+        Err(error) => {
+            return EndpointError::new(StatusCode::BAD_GATEWAY, ErrorCode::Internal, error)
+                .with_reason("browser_resume_failed")
+                .into_response()
+        }
+    };
+    let history_revision = match (
+        lingxi_adapters::storage::canonical_message_store::read_branch_head_revision(
+            state.storage(),
+            &session_id,
+        )
+        .await,
+        lingxi_adapters::storage::canonical_message_store::read_history_event_revision(
+            state.storage(),
+            &session_id,
+        )
+        .await,
+    ) {
+        (Ok(head), Ok(event)) => format!("\"r{head}-e{event}\""),
+        (Err(error), _) | (_, Err(error)) => return EndpointError::storage(&error).into_response(),
+    };
     let agent_name = state
         .memory()
         .agent_display_name(&session.agent_id)
@@ -5208,7 +5251,10 @@ async fn switch_session_route(
             "currentModelAvailable": state.model_gateway().is_some(),
             "currentModelUnavailableReason": if state.model_gateway().is_none() { Some("model_plane_unavailable") } else { None },
             "isStreaming": streaming,
-            "browserResume": { "status": "skipped", "reason": "no_browser_host" },
+            "historyRevision": history_revision,
+            "browserResume": browser_resume,
+            "browserRunning": browser_resume["found"] == true,
+            "browserUrl": browser_resume.get("url"),
         })),
     )
         .into_response()
@@ -7164,6 +7210,11 @@ pub fn build_router(state: ServiceState) -> Router {
             get(history::history_content::session_summary_route),
         )
         .route(
+            "/lingxi/v1/conversation-map/layout",
+            get(conversation_map::owner_layout_get_route)
+                .put(conversation_map::owner_layout_put_route),
+        )
+        .route(
             "/lingxi/v1/sessions/{session_id}/conversation-map/turns",
             get(history::history_content::conversation_map_turns_route),
         )
@@ -7796,6 +7847,7 @@ pub fn build_router(state: ServiceState) -> Router {
             post(issue_device_credential),
         )
         .route("/lingxi/v1/ws", get(ws_handler))
+        .route("/lingxi/v1/browser-host", get(browser_host::route))
         .merge(management::routes())
         .merge(static_web::routes())
         .layer(axum::extract::DefaultBodyLimit::max(

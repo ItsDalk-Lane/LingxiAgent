@@ -394,6 +394,7 @@ pub struct SessionService {
     resource_access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
     probe: Arc<std::sync::Mutex<Option<Arc<dyn SessionOperationProbe>>>>,
     session_files: Option<Arc<crate::sessionfiles::SessionFileService>>,
+    model_gateway: Option<Arc<lingxi_adapters::models::gateway::ConfigModelGateway>>,
 }
 
 /// 故障/竞态观察点只暂停时序，不替换准入、存储或业务逻辑。
@@ -455,6 +456,7 @@ impl PreparedForkUi {
         owner: &str,
         source: &str,
         session: &str,
+        gateway: Option<&lingxi_adapters::models::gateway::ConfigModelGateway>,
     ) -> Result<Self, StorageError> {
         let io = |detail| StorageError::Io { detail };
         if crate::session_ui::read(storage, session)?.is_some() {
@@ -462,7 +464,35 @@ impl PreparedForkUi {
                 detail: format!("session_exists:{session}"),
             });
         }
-        let choice = crate::chat_settings::choice(home, owner, source).map_err(io)?;
+        let mut choice = crate::chat_settings::choice(home, owner, source).map_err(io)?;
+        // 旧会话没有显式选择时，在分支创建前冻结实际默认模型，避免随后默认值改变分支。
+        if let Some(gateway) = gateway {
+            if choice.model.is_none() || choice.thinking_level.is_none() {
+                let (provider, model) = choice
+                    .model
+                    .as_ref()
+                    .map(|(p, m)| (Some(p.clone()), Some(m.clone())))
+                    .unwrap_or((None, None));
+                let dispatch = gateway
+                    .resolve_dispatch(&lingxi_kernel::model_exchange::ModelRouteRequest {
+                        operation: lingxi_kernel::model_exchange::ModelOperation::Chat,
+                        provider,
+                        model,
+                    })
+                    .map_err(|error| io(format!("分支模型选择不可用：{error}")))?;
+                choice.model = Some((dispatch.route.provider, dispatch.route.model));
+                if choice.thinking_level.is_none() {
+                    choice.thinking_level = Some(
+                        if dispatch.compat.as_ref().and_then(|c| c.reasoning) == Some(true) {
+                            "medium"
+                        } else {
+                            "off"
+                        }
+                        .into(),
+                    );
+                }
+            }
+        }
         let metadata = crate::session_ui::read(storage, source)?;
         let mut prepared = Self {
             home: home.into(),
@@ -518,6 +548,7 @@ impl SessionService {
             storage: Arc::clone(&storage),
             events,
             session_files: None,
+            model_gateway: None,
             file_safety: Arc::new(crate::file_safety::FileSafety::new(
                 storage
                     .db_path()
@@ -534,6 +565,14 @@ impl SessionService {
         files: Arc<crate::sessionfiles::SessionFileService>,
     ) -> Self {
         self.session_files = Some(files);
+        self
+    }
+
+    pub fn with_model_gateway(
+        mut self,
+        gateway: Option<Arc<lingxi_adapters::models::gateway::ConfigModelGateway>>,
+    ) -> Self {
+        self.model_gateway = gateway;
         self
     }
 
@@ -841,6 +880,7 @@ impl SessionService {
                     &source.owner_user_id,
                     source_session_id,
                     new_session_id,
+                    self.model_gateway.as_deref(),
                 )
             })
             .transpose()?;

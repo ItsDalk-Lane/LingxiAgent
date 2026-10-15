@@ -1,0 +1,21 @@
+// 仅组合地图窗口；加载、发送、布局和连接均使用生产实现。
+import {createRoot} from 'react-dom/client';
+import {ConversationMapPage} from '../../components/conversation-map/ConversationMapPage';
+import {ToastContainer} from '../../components/ToastContainer';
+import {useStore} from '../../stores';
+import {createLocalServerConnection} from '../../services/server-connection';
+import {connectWebSocket,getWebSocket} from '../../services/websocket';
+import {loadSessions,switchSession} from '../../stores/session-actions';
+import {loadModels} from '../../utils/ui-helpers';
+import {findSendRecordByClientMessageId} from '../../services/composer-send-coordinator';
+import {persistMapLayout} from '../../components/conversation-map/conversation-map-projection';
+import {sendMapDraft} from '../../components/conversation-map/conversation-map-send';
+const info=await window.hana.getServerConnectionInfo!();
+const ids=await (window.hana as unknown as {getSyntheticSessions:()=>Promise<{sessionId:string;otherSessionId:string}>}).getSyntheticSessions();
+const connection=createLocalServerConnection({serverPort:info.port,serverToken:info.token,serverNodeKind:'lingxi-service'})!;
+useStore.setState({activeServerConnection:connection,activeServerConnectionId:connection.connectionId,serverConnections:{[connection.connectionId]:connection},currentSessionId:ids.otherSessionId,currentSessionPath:`native:${ids.otherSessionId}`,currentAgentId:'focus-b',pendingNewSession:false,welcomeVisible:false});
+await loadSessions();await loadModels();
+const pendingSnapshots:unknown[]=[];useStore.subscribe(s=>{if(Object.keys(s.mapPendingTurns).length)pendingSnapshots.push(structuredClone(s.mapPendingTurns))});
+Object.assign(window,{mapFixture:{store:useStore,ids,connect:connectWebSocket,getWebSocket,loadSessions,switchSession,persistMapLayout,sendMapDraft,findSendRecordByClientMessageId,pendingSnapshots}});
+Object.assign(document.getElementById('react-root')!.style,{height:'100vh',display:'flex',flexDirection:'column'});
+createRoot(document.getElementById('react-root')!).render(<><ConversationMapPage/><ToastContainer/></>);

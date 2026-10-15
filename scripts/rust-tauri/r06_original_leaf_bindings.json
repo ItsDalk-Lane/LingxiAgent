@@ -39888,7 +39888,7 @@
         "不存在、覆盖策略不允许、目录提取或目标越权失败；失败时原目标不应被误覆盖。"
       ],
       "then": "stat返回元数据；copy在授权工作区落文件；extract返回文档文本与来源。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -39897,9 +39897,19 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "local_fs_stat_read_write_list_search_rename_move_trash_chain"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
             }
           ],
-          "meaning": "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式模型file stat/copy/extract经现役网关权限与当前工作目录；复制内容逐字相同、真正登记产物/媒体，默认不覆盖、显式rename/overwrite；目标越权/缺源/目录提取/坏策略/只读复制拒绝且旧目标不误覆盖。真实Word/多表Excel与UTF8文本提取带原路径/真实SHA，字符/表数截断明确，坏Office失败不改源。当前会话拥有的fileId实际消费，另一会话先被原消息引用存储拒绝500，无外部内容泄漏；不修改原归属检查。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -40101,12 +40111,208 @@
                   "quote": "    assert!(fx.workspace.join(\"rel\").join(\"note.txt\").exists());"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -40115,9 +40321,19 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "local_fs_stat_read_write_list_search_rename_move_trash_chain"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
             }
           ],
-          "meaning": "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式模型file stat/copy/extract经现役网关权限与当前工作目录；复制内容逐字相同、真正登记产物/媒体，默认不覆盖、显式rename/overwrite；目标越权/缺源/目录提取/坏策略/只读复制拒绝且旧目标不误覆盖。真实Word/多表Excel与UTF8文本提取带原路径/真实SHA，字符/表数截断明确，坏Office失败不改源。当前会话拥有的fileId实际消费，另一会话先被原消息引用存储拒绝500，无外部内容泄漏；不修改原归属检查。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -40319,12 +40535,208 @@
                   "quote": "    assert!(fx.workspace.join(\"rel\").join(\"note.txt\").exists());"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 2,
@@ -40333,9 +40745,19 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "local_fs_stat_read_write_list_search_rename_move_trash_chain"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
             }
           ],
-          "meaning": "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式模型file stat/copy/extract经现役网关权限与当前工作目录；复制内容逐字相同、真正登记产物/媒体，默认不覆盖、显式rename/overwrite；目标越权/缺源/目录提取/坏策略/只读复制拒绝且旧目标不误覆盖。真实Word/多表Excel与UTF8文本提取带原路径/真实SHA，字符/表数截断明确，坏Office失败不改源。当前会话拥有的fileId实际消费，另一会话先被原消息引用存储拒绝500，无外部内容泄漏；不修改原归属检查。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -40537,12 +40959,208 @@
                   "quote": "    assert!(fx.workspace.join(\"rel\").join(\"note.txt\").exists());"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 3,
@@ -40551,9 +41169,19 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "local_fs_stat_read_write_list_search_rename_move_trash_chain"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
             }
           ],
-          "meaning": "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式模型file stat/copy/extract经现役网关权限与当前工作目录；复制内容逐字相同、真正登记产物/媒体，默认不覆盖、显式rename/overwrite；目标越权/缺源/目录提取/坏策略/只读复制拒绝且旧目标不误覆盖。真实Word/多表Excel与UTF8文本提取带原路径/真实SHA，字符/表数截断明确，坏Office失败不改源。当前会话拥有的fileId实际消费，另一会话先被原消息引用存储拒绝500，无外部内容泄漏；不修改原归属检查。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -40755,18 +41383,212 @@
                   "quote": "    assert!(fx.workspace.join(\"rel\").join(\"note.txt\").exists());"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/final-four-proof-review.json"
     },
     {
       "id": "R00-T02-LA-3D7A957EF7FF",
@@ -82622,12 +83444,403 @@
         "选区追问或从卡片打开继续/分支草稿并发送：成功核对 空文本不提交；继续草稿向原会话发 prompt，分支草稿先 fork 再向新会话发 prompt；提交成功显示待回复卡，互斥可入队并提示，已提交或已入队后关闭草稿。；分支草稿先 fork，发送或入队后切换到分支会话，按缓存与修订状态读取或校验消息；继续草稿仅发送或入队。；异会话切换会按工作区有无与 mount 类型读取文件，并刷新模型列表。；空态/未初始化核对 没有草稿或文本仅空白时不发送；分支缺有效锚点时提示失败且保留草稿。；空文本不发送/分支；继续草稿不 fork、不切换。；无工作区不读取工作区文件。；错误/无权限核对 fork 失败或不可证投递显示失败 toast 并保留草稿；可重试的互斥/故障入队显示 queued 而不冒称已发出。"
       ],
       "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "新桌面候选尚无原地图工作区/消息缓存/选中失败/持久化坐标/草稿分支发送完整界面流程；服务端fork不能证明界面联动。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 2,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 3,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 4,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 5,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 6,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_map_seven_groups_real_storage_models_and_receipts",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 50,
+              "testEndLine": 83,
+              "assertions": [
+                {
+                  "line": 53,
+                  "quote": "assert_eq!(value[\"requests\"].as_array().unwrap().len(), expected)"
+                },
+                {
+                  "line": 54,
+                  "quote": "assert_eq!(value[\"persistedModelCalls\"], expected)"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert_eq!(value[\"usageProofs\"].as_array().unwrap().len(), expected / 3)"
+                },
+                {
+                  "line": 58,
+                  "quote": "assert_eq!(checks.len(), 19)"
+                },
+                {
+                  "line": 60,
+                  "quote": "assert!(\n                checks.iter().any(|check| check[\"group\"] == group),\n                \"缺少地图原断言组{group}\"\n            )"
+                },
+                {
+                  "line": 65,
+                  "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 66,
+                  "quote": "assert!(value[\"ui\"][\"observations\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|item| item[\"kind\"] == \"real-watchdog-unknown\"\n                && item[\"phase\"] == \"delivery_unknown\"\n                && item[\"draft\"] == \"MAP-DELIVERY-UNKNOWN\"))"
+                },
+                {
+                  "line": 73,
+                  "quote": "assert_eq!(\n            value[\"ui\"][\"frames\"]\n                .as_array()\n                .unwrap()\n                .iter()\n                .filter(|frame| frame[\"type\"] == \"prompt\")\n                .count(),\n            4\n        )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "原七组实际生产地图+真实CLI/HTTP/WS：布局/焦点展开/换连接隔离，真实拖动/镜头/折叠/重置与写失败乐观显示按原约定保留，坏JSON保持原200但显式degraded/readError并warn，16并发写不丢。当前修订缓存零GET，实际外部新回合切回重读。加号与Inspector创建草稿，continue原SID、branch真实fork新SID发送；真实供应商忙态入原队列零多prompt，真实WS已发但15秒unknown保原文，恢复accepted/terminal后零重发。默认pair/思考在新fork前冻结，权限/记忆/项目/元数据继承，原唯一SQL插入保留proactive策略。19真实窗口检查、12Run/36HTTP请求/36reported账本逐项核对。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/final-four-proof-review.json"
     },
     {
       "id": "R00-T02-LA-90975187F446",
@@ -97134,7 +98347,7 @@
         "无ResourceIO、缺目标、资源不可读或越权时明确错误，不返回假路径。"
       ],
       "then": "本地资源返回真实路径；远端资源先暂存本地副本再返回路径与resourceKey，不修改原资源。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -97148,9 +98361,24 @@
               "package": "lingxi-service",
               "suite": "r06_ar_f04_lifecycle",
               "test": "f04_local_read_cancelled_future_requires_physical_lease"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant"
             }
           ],
-          "meaning": "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式只读materialize经当前真实Run/会话/主体解析本地或已拥有附件真实绝对路径，源不改。URL实际公网HTTPS完整响应才暂存，磁盘SHA与原响应一致，下一真实模型file.extract消费；逐跳公有IP/DNS固定/限跳10秒8MiB，无私网绕过。暂存仅当前主体/会话/精确文件版本可读，外会话/替换版本拒绝。缺目标/不可读/越权显式失败无假路径；UrlProvider缺席的原独立内核仍unsupported，正式CLI明确配置可用提供者。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -97437,12 +98665,253 @@
                   "quote": "assert!(!path.exists())"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 451,
+              "testEndLine": 490,
+              "assertions": [
+                {
+                  "line": 462,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert!(path.is_absolute() && path.exists())"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(\n        lingxi_kernel::session_tree::sha256_hex(&std::fs::read(&path).unwrap()),\n        result[\"details\"][\"version\"][\"sha256\"]\n    )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(result[\"details\"][\"isDirectory\"], false)"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(own[\"ok\"], true, \"{own}\")"
+                },
+                {
+                  "line": 474,
+                  "quote": "assert!(own[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"h=1.1.1.1\"))"
+                },
+                {
+                  "line": 481,
+                  "quote": "assert_eq!(foreign[\"ok\"], false, \"{foreign}\")"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert_eq!(replaced[\"ok\"], false, \"{replaced}\")"
+                },
+                {
+                  "line": 488,
+                  "quote": "assert!(!original.is_empty())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -97456,9 +98925,24 @@
               "package": "lingxi-service",
               "suite": "r06_ar_f04_lifecycle",
               "test": "f04_local_read_cancelled_future_requires_physical_lease"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant"
             }
           ],
-          "meaning": "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式只读materialize经当前真实Run/会话/主体解析本地或已拥有附件真实绝对路径，源不改。URL实际公网HTTPS完整响应才暂存，磁盘SHA与原响应一致，下一真实模型file.extract消费；逐跳公有IP/DNS固定/限跳10秒8MiB，无私网绕过。暂存仅当前主体/会话/精确文件版本可读，外会话/替换版本拒绝。缺目标/不可读/越权显式失败无假路径；UrlProvider缺席的原独立内核仍unsupported，正式CLI明确配置可用提供者。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -97745,12 +99229,253 @@
                   "quote": "assert!(!path.exists())"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 451,
+              "testEndLine": 490,
+              "assertions": [
+                {
+                  "line": 462,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert!(path.is_absolute() && path.exists())"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(\n        lingxi_kernel::session_tree::sha256_hex(&std::fs::read(&path).unwrap()),\n        result[\"details\"][\"version\"][\"sha256\"]\n    )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(result[\"details\"][\"isDirectory\"], false)"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(own[\"ok\"], true, \"{own}\")"
+                },
+                {
+                  "line": 474,
+                  "quote": "assert!(own[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"h=1.1.1.1\"))"
+                },
+                {
+                  "line": 481,
+                  "quote": "assert_eq!(foreign[\"ok\"], false, \"{foreign}\")"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert_eq!(replaced[\"ok\"], false, \"{replaced}\")"
+                },
+                {
+                  "line": 488,
+                  "quote": "assert!(!original.is_empty())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 2,
@@ -97764,9 +99489,24 @@
               "package": "lingxi-service",
               "suite": "r06_ar_f04_lifecycle",
               "test": "f04_local_read_cancelled_future_requires_physical_lease"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_resource_tools_completion",
+              "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant"
             }
           ],
-          "meaning": "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。",
+          "meaning": "正式只读materialize经当前真实Run/会话/主体解析本地或已拥有附件真实绝对路径，源不改。URL实际公网HTTPS完整响应才暂存，磁盘SHA与原响应一致，下一真实模型file.extract消费；逐跳公有IP/DNS固定/限跳10秒8MiB，无私网绕过。暂存仅当前主体/会话/精确文件版本可读，外会话/替换版本拒绝。缺目标/不可读/越权显式失败无假路径；UrlProvider缺席的原独立内核仍unsupported，正式CLI明确配置可用提供者。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -98053,18 +99793,257 @@
                   "quote": "assert!(!path.exists())"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_copy_extract_stat_and_real_permission_failures_preserve_targets",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 313,
+              "testEndLine": 449,
+              "assertions": [
+                {
+                  "line": 326,
+                  "quote": "assert_eq!(stat[\"ok\"], true, \"{stat}\")"
+                },
+                {
+                  "line": 327,
+                  "quote": "assert_eq!(stat[\"details\"][\"exists\"], true)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert_eq!(copied[\"ok\"], true, \"{copied}\")"
+                },
+                {
+                  "line": 336,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 337,
+                  "quote": "assert_eq!(copied[\"details\"][\"sessionFile\"][\"origin\"], \"file_copy\")"
+                },
+                {
+                  "line": 339,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"own\", file_id)\n        .await\n        .unwrap()\n        .is_some())"
+                },
+                {
+                  "line": 346,
+                  "quote": "assert!(h\n        .state\n        .session_files()\n        .get_file(\"other\", file_id)\n        .await\n        .unwrap()\n        .is_none())"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert_eq!(extract[\"ok\"], true, \"{extract}\")"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_eq!(\n        extract[\"details\"][\"text\"],\n        String::from_utf8_lossy(bytes).as_ref()\n    )"
+                },
+                {
+                  "line": 361,
+                  "quote": "assert_eq!(extract[\"details\"][\"source\"][\"filePath\"], json!(dest))"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(local[\"ok\"], true, \"{local}\")"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(local[\"details\"][\"filePath\"], json!(source))"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(std::fs::read(&source).unwrap(), bytes)"
+                },
+                {
+                  "line": 376,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 377,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(renamed[\"ok\"], true, \"{renamed}\")"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"copy (1).txt\")).unwrap(),\n        \"新的来源\".as_bytes()\n    )"
+                },
+                {
+                  "line": 385,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), bytes)"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(over[\"ok\"], true, \"{over}\")"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(std::fs::read(&dest).unwrap(), \"新的来源\".as_bytes())"
+                },
+                {
+                  "line": 405,
+                  "quote": "assert_eq!(result[\"ok\"], false, \"{result}\")"
+                },
+                {
+                  "line": 416,
+                  "quote": "assert_eq!(\n        status, 500,\n        \"当前存储在模型工具记录阶段先拒绝外会话身份：{error}\"\n    )"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(\n        error\n            .to_string()\n            .contains(\"session_file_reference_not_owned\"),\n        \"{error}\"\n    )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(!cwd.join(\"forbidden.txt\").exists())"
+                },
+                {
+                  "line": 427,
+                  "quote": "assert!(!h.home.parent().unwrap().join(\"outside.txt\").exists())"
+                },
+                {
+                  "line": 435,
+                  "quote": "assert_eq!(ro[\"ok\"], true, \"{ro}\")"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(private[\"ok\"], false, \"{private}\")"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(\n        private.to_string().contains(\"blocked_private_url\"),\n        \"{private}\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_file_extract_office_all_available_sheets_source_and_explicit_truncation",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 539,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 555,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 558,
+                  "quote": "assert!(text.contains(needle), \"{result}\")"
+                },
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(result[\"details\"][\"source\"][\"filePath\"], json!(path))"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(\n            result[\"details\"][\"source\"][\"version\"][\"sha256\"],\n            lingxi_kernel::session_tree::sha256_hex(&bytes)\n        )"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), bytes)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(large[\"ok\"], true, \"{large}\")"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(large[\"details\"][\"truncated\"], true)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(large[\"details\"][\"totalChars\"], 200005)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(large[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"5 characters omitted\"))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(bad[\"ok\"], false, \"{bad}\")"
+                },
+                {
+                  "line": 591,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"bad.docx\")).unwrap(),\n        b\"not an Office archive\"\n    )"
+                },
+                {
+                  "line": 596,
+                  "quote": "assert_eq!(nested[\"ok\"], true, \"{nested}\")"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert_eq!(\n        std::fs::read(cwd.join(\"outputs/nested/copy.docx\")).unwrap(),\n        std::fs::read(cwd.join(\"source.docx\")).unwrap()\n    )"
+                },
+                {
+                  "line": 606,
+                  "quote": "assert_eq!(resolved[\"ok\"], true, \"{resolved}\")"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(resolved[\"details\"][\"filePath\"], owned.real_path)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(copied[\"ok\"], false, \"{copied}\")"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert!(!cwd.join(\"never-created\").exists())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+              "test": "current_public_url_materialization_uses_real_bytes_and_no_cross_session_grant",
+              "sourceSHA256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+              "testStartLine": 451,
+              "testEndLine": 490,
+              "assertions": [
+                {
+                  "line": 462,
+                  "quote": "assert_eq!(result[\"ok\"], true, \"{result}\")"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert!(path.is_absolute() && path.exists())"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(\n        lingxi_kernel::session_tree::sha256_hex(&std::fs::read(&path).unwrap()),\n        result[\"details\"][\"version\"][\"sha256\"]\n    )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(result[\"details\"][\"isDirectory\"], false)"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(own[\"ok\"], true, \"{own}\")"
+                },
+                {
+                  "line": 474,
+                  "quote": "assert!(own[\"details\"][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"h=1.1.1.1\"))"
+                },
+                {
+                  "line": 481,
+                  "quote": "assert_eq!(foreign[\"ok\"], false, \"{foreign}\")"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert_eq!(replaced[\"ok\"], false, \"{replaced}\")"
+                },
+                {
+                  "line": 488,
+                  "quote": "assert!(!original.is_empty())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/final-four-proof-review.json"
     },
     {
       "id": "R00-T02-LA-ADB6B0580864",
@@ -131771,7 +133750,7 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "then": "改变当前会话并尝试恢复该会话浏览器，旧会话浏览器不随切换挂起",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -131780,6 +133759,11 @@
               "package": "lingxi-service",
               "suite": "r06_session_focus_detached_project",
               "test": "focus_switch_detached_create_and_project_assignment"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect"
             }
           ],
           "proofLocations": [
@@ -131935,13 +133919,48 @@
                   "quote": "assert!(\n        types.contains(&\"session-created\"),\n        \"创建广播存在：{types:?}\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 87,
+              "testEndLine": 109,
+              "assertions": [
+                {
+                  "line": 89,
+                  "quote": "assert_eq!(value[\"oldViewSurvived\"], true)"
+                },
+                {
+                  "line": 91,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"data\"][\"browserResume\"][\"status\"] == \"resumed\"\n            && item[\"data\"][\"sessionId\"] == \"browser-b\"))"
+                },
+                {
+                  "line": 95,
+                  "quote": "assert!(trace.iter().any(\n        |item| item[\"data\"][\"browserResume\"][\"status\"] == \"attempted\"\n            && item[\"data\"][\"sessionId\"] == \"browser-c\"\n    ))"
+                },
+                {
+                  "line": 99,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"kind\"] == \"foreign-host-refusal\" && item[\"status\"] == 403))"
+                },
+                {
+                  "line": 102,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"kind\"] == \"second-host-refusal\" && item[\"status\"] == 409))"
+                },
+                {
+                  "line": 105,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"path\"] == \"/lingxi/v1/sessions/switch\" && item[\"status\"] == 502))"
+                },
+                {
+                  "line": 108,
+                  "quote": "assert_eq!(value[\"actualSelectedPath\"], \"native:browser-b\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "浏览器宿主在线时的真实恢复与旧会话浏览器不挂起行为未证：端口按现役 server/PWA 分支返回 typed skip {status:skipped, reason:no_browser_host}，不猜造浏览器态"
-          ],
-          "meaning": "Switch persists current_session_id, returns frozen memoryEnabled and scope, and reports the browser-resume port contract as a typed skip."
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "正式setupBrowserCommands本机Bearer宿主WS→真实Rust owned switch→原handleBrowserCommand resume→真实Electron WebContentsView B挂回，A原页面JS仍活、恢复不弹窗；16有界队列/相关ID/5秒回执。无目标found=false，外来宿主403/重复409、缺会话404/越权403零偏好改动，真实TCP断开502不得假成功，原自动重连后恢复；无宿主明确skipped，不把unsupported当恢复完成。断回执时焦点可能已提交，错误不虚称整体回滚。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
         },
         {
           "index": 1,
@@ -131950,6 +133969,11 @@
               "package": "lingxi-service",
               "suite": "r06_session_focus_detached_project",
               "test": "focus_switch_detached_create_and_project_assignment"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_map_browser_completion",
+              "test": "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect"
             }
           ],
           "proofLocations": [
@@ -132105,17 +134129,52 @@
                   "quote": "assert!(\n        types.contains(&\"session-created\"),\n        \"创建广播存在：{types:?}\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_map_browser_completion.rs",
+              "test": "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect",
+              "sourceSHA256": "2a1cfd13434cc480ca901c09e4d6d90fc260fb5d8e114939ceececc98b6a62e8",
+              "testStartLine": 87,
+              "testEndLine": 109,
+              "assertions": [
+                {
+                  "line": 89,
+                  "quote": "assert_eq!(value[\"oldViewSurvived\"], true)"
+                },
+                {
+                  "line": 91,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"data\"][\"browserResume\"][\"status\"] == \"resumed\"\n            && item[\"data\"][\"sessionId\"] == \"browser-b\"))"
+                },
+                {
+                  "line": 95,
+                  "quote": "assert!(trace.iter().any(\n        |item| item[\"data\"][\"browserResume\"][\"status\"] == \"attempted\"\n            && item[\"data\"][\"sessionId\"] == \"browser-c\"\n    ))"
+                },
+                {
+                  "line": 99,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"kind\"] == \"foreign-host-refusal\" && item[\"status\"] == 403))"
+                },
+                {
+                  "line": 102,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"kind\"] == \"second-host-refusal\" && item[\"status\"] == 409))"
+                },
+                {
+                  "line": 105,
+                  "quote": "assert!(trace\n        .iter()\n        .any(|item| item[\"path\"] == \"/lingxi/v1/sessions/switch\" && item[\"status\"] == 502))"
+                },
+                {
+                  "line": 108,
+                  "quote": "assert_eq!(value[\"actualSelectedPath\"], \"native:browser-b\")"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
           "missingClauses": [],
-          "meaning": "Unknown 404, blank id 400, archived 409 with focus unchanged."
+          "meaning": "正式setupBrowserCommands本机Bearer宿主WS→真实Rust owned switch→原handleBrowserCommand resume→真实Electron WebContentsView B挂回，A原页面JS仍活、恢复不弹窗；16有界队列/相关ID/5秒回执。无目标found=false，外来宿主403/重复409、缺会话404/越权403零偏好改动，真实TCP断开502不得假成功，原自动重连后恢复；无宿主明确skipped，不把unsupported当恢复完成。断回执时焦点可能已提交，错误不虚称整体回滚。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
         }
       ],
-      "gaps": [
-        "没有焦点会话切换及浏览器恢复流程；服务侧新建或读取不证明桌面焦点/浏览器状态。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/final-four-proof-review.json"
     },
     {
       "id": "R00-T02-LA-FD94F19E734D",

@@ -1068,6 +1068,30 @@ pub async fn list_branch_messages(
         .await
 }
 
+/// 列表只判断当前分支是否存在可展示消息；按主键读头部元数据，不扫描正文或模型档案。
+pub async fn branch_has_display_messages(
+    db: &RunDatabase,
+    session_id: &str,
+) -> Result<bool, StorageError> {
+    let sid = session_id.to_owned();
+    db.queue().submit(move |conn| {
+        let head: Option<Option<String>> = conn.query_row("SELECT head_message_id FROM session_branch_heads WHERE session_id=?1", [&sid], |row| row.get(0)).optional().map_err(map_err)?;
+        let mut current = match head {
+            Some(head) => head,
+            None => conn.query_row("SELECT message_id FROM messages WHERE session_id=?1 AND entry_type='message' ORDER BY seq DESC LIMIT 1", [&sid], |row| row.get(0)).optional().map_err(map_err)?,
+        };
+        let mut seen = std::collections::HashSet::new();
+        let mut query = conn.prepare_cached("SELECT parent_message_id,entry_type,role FROM messages WHERE session_id=?1 AND message_id=?2").map_err(map_err)?;
+        while let Some(id) = current {
+            if !seen.insert(id.clone()) { return Err(StorageError::Corrupted {detail:format!("cycle in session branch {sid}")}); }
+            let (parent,entry,role): (Option<String>,String,String) = query.query_row(rusqlite::params![sid,id], |row| Ok((row.get(0)?,row.get(1)?,row.get(2)?))).map_err(map_err)?;
+            if entry == "message" && matches!(role.as_str(), "user" | "assistant" | "toolResult") {return Ok(true);}
+            current=parent;
+        }
+        Ok(false)
+    }).await
+}
+
 /// 会话的全部消息（含被分支丢弃的旧历史；append-only 不删）。
 pub async fn list_all_messages(
     db: &RunDatabase,

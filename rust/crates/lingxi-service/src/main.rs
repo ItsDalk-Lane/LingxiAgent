@@ -390,6 +390,8 @@ async fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    // 正式服务显式接入有界公网资源读取；无该提供者的独立内核继续明确拒绝。
+    deps.resource_url_provider=Some(std::sync::Arc::new(lingxi_service::resource_url::UrlProvider::new(&config.data_home)));
     // 证书/私钥错误必须在绑定端口和写入实例记录之前暴露。
     let tls_acceptor = match cli.tls_cert.as_deref().zip(cli.tls_key.as_deref()) {
         Some((cert, key)) => match lingxi_service::serve::load_tls_acceptor(cert, key) {

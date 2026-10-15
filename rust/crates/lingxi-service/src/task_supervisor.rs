@@ -338,6 +338,25 @@ pub(crate) fn retain_blocking_resource_permit(
         })
         .unwrap_or(Ok(None))
 }
+/// URL暂存线程继承当前真实调用的取消节点，先核实存储与主体。
+pub(crate) fn resource_cancel_scope(
+    ctx: &crate::resourceio::OpContext,
+    gate: &Arc<lingxi_kernel::session_admission::SessionAdmission>,
+) -> Result<Option<CancelScope>, StorageError> {
+    retain_blocking_resource_permit(
+        ctx.principal_kind,
+        &ctx.principal_subject,
+        &ctx.session_id,
+        gate,
+    )?;
+    BLOCKING_RUN_PERMIT
+        .try_with(|issued| {
+            issued
+                .as_ref()
+                .map(|issued| issued.cancellation_scope.clone())
+        })
+        .map_or(Ok(None), Ok)
+}
 /// 同一驱动身份只能进入一次，退出自动释放，不污染持久重放事实。
 pub(crate) struct DriverClaim {
     supervisor: Arc<TaskSupervisor>,

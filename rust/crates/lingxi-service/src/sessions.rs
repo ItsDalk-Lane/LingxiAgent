@@ -2057,6 +2057,16 @@ pub async fn sessions_studio_list_route(
             .cloned()
             .unwrap_or_default();
         let running = !active_run_ids.is_empty();
+        let has_display_messages =
+            match lingxi_adapters::storage::session_tree::branch_has_display_messages(
+                state.storage(),
+                &view.session_id,
+            )
+            .await
+            {
+                Ok(count) => count,
+                Err(error) => return crate::EndpointError::storage(&error).into_response(),
+            };
         sessions.push(serde_json::json!({
             "sessionId": view.session_id,
             "path": crate::session_locator::native(&view.session_id),
@@ -2071,10 +2081,12 @@ pub async fn sessions_studio_list_route(
             "ownerUserId": view.owner_user_id,
             "projectId": tree.as_ref().and_then(|row| row.project_id.clone()),
             "parentSessionId": tree.as_ref().and_then(|row| row.parent_session_id.clone()),
+            "forkedFrom": tree.as_ref().and_then(|row| row.parent_session_id.as_ref().map(|parent| serde_json::json!({"sessionId":parent,"entryId":row.fork_point_message_id}))),
             "pinnedAt": tree.as_ref().and_then(|row| row.pinned_at_unix_ms),
             "pinOrder": tree.as_ref().and_then(|row| row.pin_order),
             "modified": tree.as_ref().map(|row| row.last_activity_unix_ms.unwrap_or(row.created_at_unix_ms)),
             "runCount": view.run_count,
+            "hasDisplayMessages": has_display_messages,
             // 修订点：与 /history 的 ETag 同源字符串（web/mobile 缓存对比材料）。
             "revision": revision,
             // 摘要在场标志（滚动摘要记录，摘要 ticker 未移植时如实为 false）。

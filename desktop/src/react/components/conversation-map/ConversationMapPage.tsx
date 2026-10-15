@@ -7,7 +7,9 @@
  * 双向同步：地图发起的切换不移动相机，外部切换自动展开并居中。
  */
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import { captureSessionConnection, ownsSessionConnection, subscribeSessionConnection, sessionConnectionRevision } from '../../services/session-connection-owner';
+import { resolveServerConnection } from '../../services/server-connection';
 import { useStore } from '../../stores';
 import { useI18n } from '../../hooks/use-i18n';
 import { switchSession } from '../../stores/session-actions';
@@ -51,6 +53,8 @@ function consumeMapInitiatedSwitch(sessionId: string): boolean {
 
 export function ConversationMapPage() {
   const { t } = useI18n();
+  const connectionRevision = useSyncExternalStore(subscribeSessionConnection, sessionConnectionRevision, sessionConnectionRevision);
+  const owner = useMemo(() => resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null, [connectionRevision]);
   const sessions = useStore((s) => s.sessions);
   const projects = useStore((s) => s.sessionProjectCatalog.projects);
   const currentSessionId = useStore((s) => s.currentSessionId);
@@ -97,7 +101,7 @@ export function ConversationMapPage() {
     let cancelled = false;
     fetchMapLayout()
       .then(({ positions, collapsed }) => {
-        if (cancelled) return;
+        if (cancelled || (owner && !ownsSessionConnection(owner))) return;
         const state = useStore.getState();
         if (state.mapLayoutLoaded) return;
         state.setMapCardPositions(positions);
@@ -108,9 +112,9 @@ export function ConversationMapPage() {
         console.warn('[conversation-map] load layout failed', err);
       });
     return () => { cancelled = true; };
-  }, [mapLayoutLoaded]);
+  }, [mapLayoutLoaded, connectionRevision, owner]);
 
-  // sessions 驱动刷新：thread.modified 作为 revision，WS 会话列表更新自动重取过期 turns。
+  // sessions 驱动刷新：权威 revision 驱动缓存，WS 会话列表更新自动重取过期 turns。
   useEffect(() => {
     if (!activeWorkspace) return;
     void loadTurnsForWorkspace(activeWorkspace);
@@ -119,6 +123,7 @@ export function ConversationMapPage() {
   // 待回复卡片交接：问题落盘且（答复非空或已停止流式）→ 清除 pending 条目；
   // 超时条目由 shouldClearMapPendingTurn 兜底清除。
   useEffect(() => {
+    if (owner && !ownsSessionConnection(owner)) return;
     const entries = Object.entries(mapPendingTurns);
     if (entries.length === 0) return;
     const state = useStore.getState();
@@ -131,7 +136,7 @@ export function ConversationMapPage() {
         state.clearMapPendingTurn(sessionPath);
       }
     }
-  }, [mapPendingTurns, mapTurnsBySessionId, streamingSessions, activeWorkspace]);
+  }, [mapPendingTurns, mapTurnsBySessionId, streamingSessions, activeWorkspace, owner]);
 
   const { cards, edges } = useMemo(
     () => (activeWorkspace
@@ -156,6 +161,7 @@ export function ConversationMapPage() {
   const revealAttemptedRef = useRef(false);
 
   useEffect(() => {
+    if (owner && !ownsSessionConnection(owner)) return;
     if (!currentSessionId) {
       prevSessionRef.current = null;
       pendingCenterRef.current = false;
@@ -192,7 +198,7 @@ export function ConversationMapPage() {
     if (!target) return;
     pendingCenterRef.current = false;
     canvasRef.current?.centerOnCard(target.id);
-  }, [currentSessionId, cards, edges, visibleCards, cardById, mapCollapsedCardIds, setMapCollapsedCardIds]);
+  }, [currentSessionId, cards, edges, visibleCards, cardById, mapCollapsedCardIds, setMapCollapsedCardIds, owner]);
 
   // ── Esc：先关草稿，再关详情面板 ──
   useEffect(() => {
@@ -229,6 +235,7 @@ export function ConversationMapPage() {
 
   // 工作区切换 → 激活该工作区最近修改的会话（地图 → 原生同步）。
   const onWorkspaceChange = (key: string) => {
+    if (owner && !ownsSessionConnection(owner)) return;
     setMapActiveWorkspace(key || null);
     const workspace = workspaces.find((ws) => ws.key === key);
     if (!workspace) return;
@@ -243,8 +250,10 @@ export function ConversationMapPage() {
   };
 
   const onResetLayout = () => {
+    if (owner && !ownsSessionConnection(owner)) return;
     if (!activeWorkspace) return;
     if (!window.confirm(t('map.resetLayoutConfirm'))) return;
+    if (owner && !ownsSessionConnection(owner)) return;
     setMapCardPositions({});
     clearMapCamera(activeWorkspace.key);
     persistMapLayout({ positions: {}, replacePositions: true });
@@ -313,6 +322,7 @@ export function ConversationMapPage() {
         <div className={styles.mapArea}>
           <ConversationMapCanvas
             ref={canvasRef}
+            owner={owner}
             workspace={activeWorkspace}
             cards={visibleCards}
             edges={visibleEdges}
@@ -326,9 +336,10 @@ export function ConversationMapPage() {
           {selectedCard && (
             <ConversationMapInspector
               card={selectedCard}
+              owner={owner}
               threadTitle={selectedThreadTitle}
               isLastInThread={selectedIsLastInThread}
-              onClose={() => setMapSelectedCard(null)}
+              onClose={() => { if (!owner || ownsSessionConnection(owner)) setMapSelectedCard(null); }}
             />
           )}
         </div>

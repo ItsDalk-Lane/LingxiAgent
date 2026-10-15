@@ -22,8 +22,9 @@
 //! write；Rust 会话面把该族统一挂在会话 id 路径下，归属即读/写边界。
 //!
 //! 已知端口偏差（显式标注，不静默）：
-//! - 读回默认布局的「任何读/解析失败 → 默认布局」是现役契约本身
-//!   （conversation-map.ts:61-68 防御性归一化），照端口保留。
+//! - 旧防御性读取纯函数仍供兼容调用；当前 HTTP 读写只在确实缺失时返回
+//!   默认布局；坏 JSON 保留旧返回形状并明确 degraded，磁盘错误明确失败。
+//! - 页面无当前会话时可读主体自己的布局；远端主体和本地旧布局分开保存。
 //! - `Math.round` 半数行为：JS `floor(x+0.5)`（.5 朝 +Infinity）；
 //!   Rust `f64::round` 是远离零，故用 [`js_round`] 保持一致。
 //! - 键长 200 的度量：JS 按 UTF-16 码元，Rust 按 Unicode 标量计数
@@ -32,6 +33,10 @@
 //!   上限本身是防御边界，语义（超量丢弃、不报错）一致。
 
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
+
+static LAYOUT_WRITE: LazyLock<tokio::sync::Mutex<()>> =
+    LazyLock::new(|| tokio::sync::Mutex::new(()));
 
 use axum::extract::{Path as AxumPath, State};
 use axum::http::StatusCode;
@@ -183,6 +188,79 @@ pub fn sanitize_collapsed_input(value: Option<&Value>) -> Vec<String> {
     collapsed
 }
 
+/// 本地旧布局保留原位置；其他主体只读写自身的页面偏好。
+fn owner_home(state: &ServiceState, principal: &Principal) -> PathBuf {
+    if principal.is_local_owner() {
+        return state.config().data_home.clone();
+    }
+    let owner = crate::sessions::kernel_principal_of(principal);
+    state
+        .config()
+        .data_home
+        .join("conversation-map-users")
+        .join(lingxi_kernel::session_tree::sha256_hex(
+            format!("{}:{}", owner.storage_kind(), owner.storage_subject()).as_bytes(),
+        ))
+}
+
+enum LayoutReadError {
+    Io(String),
+    Corrupt(String),
+}
+impl LayoutReadError {
+    fn message(self) -> String {
+        match self {
+            Self::Io(value) | Self::Corrupt(value) => value,
+        }
+    }
+}
+/// 缺失是未初始化；坏 JSON 读面沿原契约显式降级，写面仍拒绝覆盖原资料。
+fn read_layout_strict(home: &Path) -> Result<Value, LayoutReadError> {
+    let path = layout_file_path(home);
+    match std::fs::symlink_metadata(&path) {
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(default_layout()),
+        Err(error) => return Err(LayoutReadError::Io(format!("地图布局读取失败：{error}"))),
+        Ok(_) => {}
+    }
+    let snapshot = crate::file_safety::Snapshot::read_bounded(&path, 2 * 1024 * 1024)
+        .map_err(|error| LayoutReadError::Io(format!("地图布局读取失败：{error}")))?;
+    let value: Value = serde_json::from_slice(&snapshot.bytes)
+        .map_err(|error| LayoutReadError::Corrupt(format!("地图布局格式损坏：{error}")))?;
+    // 已解析的旧布局仍沿现役逐字段归一化，保留可用坐标与缺省字段兼容。
+    Ok(normalize_layout(&value))
+}
+fn read_response(home: &Path) -> Response {
+    match read_layout_strict(home) {
+        Ok(value) => Json(value).into_response(),
+        Err(LayoutReadError::Corrupt(message)) => {
+            let mut value = default_layout();
+            value["degraded"] = json!(true);
+            value["readError"] = json!({"code":"layout_corrupt","message":message});
+            Json(value).into_response()
+        }
+        Err(error) => internal_error(error.message()),
+    }
+}
+
+pub async fn owner_layout_get_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+) -> Response {
+    read_response(&owner_home(&state, &principal))
+}
+
+pub async fn owner_layout_put_route(
+    axum::Extension(principal): axum::Extension<Principal>,
+    State(state): State<ServiceState>,
+    body: Result<Json<Value>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(body) = match body {
+        Ok(value) => value,
+        Err(error) => return EndpointError::from_json_rejection(&error).into_response(),
+    };
+    write_layout(&state, &principal, body).await
+}
+
 // ── 路由 ────────────────────────────────────────────────────────────────────
 
 /// 会话归属闸（history_content.rs gate_owned 同口径）：未知 404 / 跨主体
@@ -221,7 +299,7 @@ pub async fn layout_get_route(
     if let Err(resp) = gate_owned(&state, &principal, &session_id).await {
         return resp;
     }
-    Json(read_layout_file(state.config().data_home.as_path())).into_response()
+    read_response(&owner_home(&state, &principal))
 }
 
 /// `PUT /lingxi/v1/sessions/{session_id}/conversation-map/layout` —
@@ -239,6 +317,10 @@ pub async fn layout_put_route(
     if let Err(resp) = gate_owned(&state, &principal, &session_id).await {
         return resp;
     }
+    write_layout(&state, &principal, body).await
+}
+
+async fn write_layout(state: &ServiceState, principal: &Principal, body: Value) -> Response {
     let Value::Object(fields) = &body else {
         return invalid_body();
     };
@@ -248,7 +330,12 @@ pub async fn layout_put_route(
         return invalid_body();
     }
     let replace_positions = fields.get("replacePositions").and_then(Value::as_bool) == Some(true);
-    let current = read_layout_file(state.config().data_home.as_path());
+    let _mutation = LAYOUT_WRITE.lock().await;
+    let home = owner_home(state, principal);
+    let current = match read_layout_strict(&home) {
+        Ok(value) => value,
+        Err(error) => return internal_error(error.message()),
+    };
     let mut positions = match current.get("positions") {
         Some(Value::Object(map)) => map.clone(),
         _ => Map::new(),
@@ -290,7 +377,7 @@ pub async fn layout_put_route(
         "collapsed": collapsed,
         "updatedAt": updated_at,
     });
-    if let Err(message) = write_layout_atomic(state.config().data_home.as_path(), &next) {
+    if let Err(message) = write_layout_atomic(&home, &next) {
         return internal_error(message);
     }
     Json(json!({ "ok": true, "updatedAt": updated_at })).into_response()
@@ -308,18 +395,13 @@ fn iso_millis(ms: u64) -> Result<String, String> {
 /// 原子写入（conversation-map.ts:254-257）：mkdir -p → 写
 /// `{file}.{pid}.tmp` → rename。失败响亮返回，绝不静默。
 fn write_layout_atomic(home: &Path, next: &Value) -> Result<(), String> {
-    let file = layout_file_path(home);
-    if let Some(parent) = file.parent() {
-        std::fs::create_dir_all(parent).map_err(|err| format!("layout mkdir failed: {err}"))?;
-    }
-    let tmp = PathBuf::from(format!("{}.{}.tmp", file.display(), std::process::id()));
     let body = serde_json::to_string_pretty(next)
         .map_err(|err| format!("layout serialize failed: {err}"))?;
-    std::fs::write(&tmp, body).map_err(|err| format!("layout write failed: {err}"))?;
-    std::fs::rename(&tmp, &file).map_err(|err| {
-        let _ = std::fs::remove_file(&tmp);
-        format!("layout rename failed: {err}")
-    })
+    if body.len() > 2 * 1024 * 1024 {
+        return Err("地图布局超过容量上限".into());
+    }
+    lingxi_adapters::storage::agent_memory::atomic_write(&layout_file_path(home), &body)
+        .map_err(|error| format!("layout write failed: {error}"))
 }
 
 fn internal_error(message: String) -> Response {

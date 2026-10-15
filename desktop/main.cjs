@@ -4712,17 +4712,16 @@ function _sendBrowserUserActivity(sessionPath) {
 /** 通过 WebSocket 监听 server 的浏览器命令 */
 function setupBrowserCommands() {
   if (!serverPort || !serverToken) return;
-  if (serverNodeKind === 'lingxi-service') {
-    console.warn('[desktop] Rust service has no legacy browser command channel');
-    return;
-  }
-
+  const rustHost = serverNodeKind === 'lingxi-service';
   const WebSocket = require("ws");
-  const url = `ws://127.0.0.1:${serverPort}/internal/browser?token=${serverToken}`;
+  // 原生服务的浏览器宿主使用本机令牌头，避免将凭证写入地址或日志。
+  const url = rustHost
+    ? `ws://127.0.0.1:${serverPort}/lingxi/v1/browser-host`
+    : `ws://127.0.0.1:${serverPort}/internal/browser?token=${serverToken}`;
   let ws;
 
   function connect() {
-    ws = new WebSocket(url);
+    ws = new WebSocket(url, rustHost ? { headers: { Authorization: `Bearer ${serverToken}` } } : undefined);
     _browserCmdWs = ws;
     ws.on("open", () => {
       console.log("[desktop] Browser control WS connected");
