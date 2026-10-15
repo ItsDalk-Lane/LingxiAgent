@@ -1,6 +1,8 @@
 import { useStore } from './index';
 import type { QuotedSelection } from './input-slice';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { resolveServerConnection } from '../services/server-connection';
+import { captureSessionConnection, ownsSessionConnection } from '../services/session-connection-owner';
 import { noteSessionMemoryEnabled } from '../components/input/composer-memory-mode';
 import { errorWithCode, presentError } from '../errors/error-presenter';
 import { errorCodeFromResponseBody } from '../../../../shared/error-user-messages.ts';
@@ -53,10 +55,22 @@ function seedSideChatComposer(sessionPath: string, quote: QuotedSelection | null
 }
 
 /** 侧边会话创建：失败时保留面板并给出可读错误，不静默回落主会话。 */
-export async function ensureSideChatSession(openedAt: number): Promise<void> {
+let creatingSideChat: {key: string; promise: Promise<void>} | null = null;
+export function ensureSideChatSession(openedAt: number): Promise<void> {
+  const owner = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null;
+  const key = JSON.stringify([owner?.key, owner?.revision, openedAt]);
+  if (creatingSideChat?.key === key) return creatingSideChat.promise;
+  const promise = createSideChatSession(openedAt).finally(() => { if (creatingSideChat?.promise === promise) creatingSideChat = null; });
+  creatingSideChat = {key, promise};
+  return promise;
+}
+async function createSideChatSession(openedAt: number): Promise<void> {
   const initial = useStore.getState();
   if (initial.sideChat.sessionPath) return;
   if (!initial.sideChat.open) return;
+  const owner = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null;
+  const rust = owner?.connection.serverNodeKind === 'lingxi-service';
+  const ownsView = () => { const s = useStore.getState(); return (!rust || ownsSessionConnection(owner)) && s.sideChat.open && s.sideChat.createdAt === openedAt; };
 
   try {
     const body: Record<string, unknown> = {
@@ -84,13 +98,15 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
       body.workspaceFolders = initial.workspaceFolders;
     }
 
-    const res = await lingxiFetch('/api/sessions/new-detached', {
+    if (!ownsView()) return;
+    const res = await lingxiFetch(rust ? '/lingxi/v1/sessions/new-detached-context' : '/api/sessions/new-detached', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
       throwOnHttpError: false,
     });
     const data = await res.json();
+    if (!ownsView()) return;
     if (!res.ok || data?.error || !data?.path) {
       // 错误码跟着异常走（如 session_fork_depth_limit），由 catch 统一翻译成人话。
       throw errorWithCode(
@@ -109,7 +125,7 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
 
     const latest = useStore.getState();
     // 面板在等待期间被关掉（或又被打开成新的一次）：这次创建结果不再属于当前视图。
-    if (!latest.sideChat.open || latest.sideChat.createdAt !== openedAt) return;
+    if (!ownsView()) return;
 
     const seedQuote = latest.sideChat.seedQuote;
     latest.setSideChatSession({ sessionPath, sessionId, agentId: agentIdResolved });
@@ -145,7 +161,7 @@ export async function ensureSideChatSession(openedAt: number): Promise<void> {
     seedSideChatComposer(sessionPath, seedQuote);
   } catch (err) {
     const latest = useStore.getState();
-    if (!latest.sideChat.open || latest.sideChat.createdAt !== openedAt) return;
+    if (!ownsView()) return;
     // 谱系深度超限是明确的产品规则拒绝：toast + 面板失败态都说人话，重试无意义。
     if ((err as { code?: string } | null)?.code === 'session_fork_depth_limit') {
       const text = presentError(err).text;

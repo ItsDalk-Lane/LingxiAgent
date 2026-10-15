@@ -10,6 +10,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useStore } from './stores';
 import { lingxiFetch } from './hooks/use-hana-fetch';
+import { resolveServerConnection } from './services/server-connection';
+import { captureSessionConnection, ownsSessionConnection, sessionSelectionRevision } from './services/session-connection-owner';
+import { sessionIdForPathFromLocatorState, sessionScopedValue } from './stores/session-slice';
 import { toSlash, baseName } from './utils/format';
 import { isAudioFileName } from './utils/file-kind';
 import { buildWaveformFromBase64 } from './utils/audio-waveform';
@@ -111,6 +114,43 @@ export async function attachFilesFromPaths(
     const sessionPath = useStore.getState().currentSessionPath || null;
     for (const p of skillPaths) installSkillFile(p, sessionPath);
     if (srcPaths.length === 0) return;
+  }
+
+  // Rust 附件先建立当前会话的真实快照，发送时只使用服务核对过的 fileId。
+  const rustOwner = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null;
+  if (rustOwner?.connection.serverNodeKind === 'lingxi-service') {
+    const initial = useStore.getState();
+    const target = initial.currentSessionPathOverride || initial.currentSessionPath;
+    const id = target ? sessionIdForPathFromLocatorState(initial, target) : null;
+    const revision = sessionSelectionRevision();
+    const ownsTarget = () => {
+      const current = useStore.getState();
+      return ownsSessionConnection(rustOwner) && sessionSelectionRevision() === revision
+        && (current.currentSessionPathOverride || current.currentSessionPath) === target;
+    };
+    try {
+      if (!id || !target) throw new Error('请先创建会话，再附加文件');
+      for (const path of srcPaths) {
+        if (!ownsTarget()) throw new Error('聊天目标已切换，旧附件结果已丢弃');
+        const state = useStore.getState();
+        const files = sessionScopedValue(state, state.attachedFilesBySession, target) ?? (state.currentSessionPath === target ? state.attachedFiles : []);
+        if (files.length >= 9) break;
+        const response = await lingxiFetch(`/lingxi/v1/sessions/${encodeURIComponent(id)}/attachments/local`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({path, mode: 'snapshot', label: nameMap[path] || baseName(path)}), throwOnHttpError: false,
+        });
+        const data = await response.json();
+        if (!ownsTarget()) throw new Error('聊天目标已切换，旧附件结果已丢弃');
+        if (!response.ok) throw new Error(data.error?.message || data.error || `附件读取失败（${response.status}）`);
+        const file = data.file;
+        if (!file || typeof file.fileId !== 'string' || file.sessionId !== id || typeof file.realPath !== 'string' || typeof file.filename !== 'string') throw new Error('附件身份响应无效');
+        const latest = useStore.getState();
+        const previous = sessionScopedValue(latest, latest.attachedFilesBySession, target) ?? (latest.currentSessionPath === target ? latest.attachedFiles : []);
+        latest.setAttachedFilesForSession(target, [...previous, {fileId: file.fileId, path: file.realPath, name: nameMap[path] || file.label || file.filename, isDirectory: file.isDirectory === true}]);
+      }
+    } catch (error) {
+      if (ownsTarget()) useStore.getState().addToast(error instanceof Error ? error.message : String(error), 'error');
+    }
+    return;
   }
 
   // Desk 文件直接附加（保留原始路径，不走 upload）。

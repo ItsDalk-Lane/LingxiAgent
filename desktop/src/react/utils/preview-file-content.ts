@@ -1,4 +1,42 @@
 import type { PreviewItem } from '../types';
+import { useStore } from '../stores';
+import { resolveServerConnection, appendConnectionAuth, buildConnectionUrl } from '../services/server-connection';
+import { captureSessionConnection, ownsSessionConnection, subscribeSessionConnection } from '../services/session-connection-owner';
+
+/** 预览从当前 Rust 连接真实读取，旧窗口的迟到正文不能进入新连接的预览池。 */
+async function readRustPreview(filePath: string, previewType: string): Promise<PreviewReadResult | null | undefined> {
+  const connection = resolveServerConnection(useStore.getState());
+  if (connection?.serverNodeKind !== 'lingxi-service') return undefined;
+  if (previewType === 'file-info') return {content: ''};
+  const owner = captureSessionConnection();
+  const route = previewType === 'docx' ? 'docx-html' : previewType === 'xlsx' ? 'xlsx-html' : BINARY_PREVIEW_TYPES.has(previewType) ? 'read-base64' : 'read';
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  const stop = subscribeSessionConnection(() => { if (!ownsSessionConnection(owner)) controller.abort(); });
+  try {
+  const response = await fetch(buildConnectionUrl(connection, `/lingxi/v1/fs/${route}?path=${encodeURIComponent(filePath)}`), {headers: appendConnectionAuth(connection), signal: controller.signal});
+  if (!ownsSessionConnection(owner)) throw new Error('连接已切换，旧文件预览已丢弃');
+  if (!response.ok) throw new Error(`文件预览读取失败（${response.status}）`);
+  const maxBytes = 32 * 1024 * 1024;
+  if (Number(response.headers.get('content-length')) > maxBytes) throw new Error('预览内容过大');
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('文件预览正文缺失');
+  const decoder = new TextDecoder(); let bytes = 0; let content = '';
+  try {
+    for (;;) {
+      const chunk = await reader.read(); if (chunk.done) break;
+      bytes += chunk.value.byteLength;
+      if (bytes > maxBytes) throw new Error('预览内容过大');
+      content += decoder.decode(chunk.value, {stream: true});
+    }
+    content += decoder.decode();
+  } finally { await reader.cancel().catch(() => {}); }
+  if (!ownsSessionConnection(owner)) throw new Error('连接已切换，旧文件预览正文已丢弃');
+  if (route === 'read' && content.includes('\0')) throw new Error('二进制文件不能按文本预览');
+  return {content};
+  } finally { clearTimeout(timeout); stop(); }
+}
+
 
 export const PREVIEWABLE_EXTS: Record<string, string> = {
   // 富预览类型（专属渲染管线）
@@ -79,6 +117,8 @@ export interface PreviewReadResult {
 }
 
 export async function readFileForPreviewType(filePath: string, previewType: string): Promise<PreviewReadResult | null> {
+  const rust = await readRustPreview(filePath, previewType);
+  if (rust !== undefined) return rust;
   const p = window.platform;
   if (!p) return null;
   if (previewType === 'file-info') return { content: '' };

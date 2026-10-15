@@ -33,3 +33,13 @@ describe('Rust canonical history shares the production turn projector',()=>{
   const items=projectRustHistoryItems([{kind:'legacy_raw',messageId:'old',seq:'1',raw:{retained:true},reason:'unknown original'}],'session');expect(items[0].type).toBe('interlude');expect(()=>projectRustHistoryItems([{kind:'made_up'}],'session')).toThrow('尚不支持');
  });
 });
+
+
+describe('Rust user presentation retains the real scoped source', () => {
+ it('renders saved user text safely and retains quoted text and optional-label session references', () => {
+  const result=projectRustHistoryItems([{...user,text:'<img src=x onerror=alert(1)>',legacyFields:{quotedText:'真实引文',sessionRefs:[{sessionId:'source'}]}}],'session');
+  expect(result[0].type).toBe('message');if(result[0].type!=='message')throw Error();
+  expect(result[0].data.textHtml).toContain('&lt;img');expect(result[0].data.textHtml).not.toContain('<img');
+  expect(result[0].data.quotedText).toBe('真实引文');expect(result[0].data.sessionRefs).toEqual([{sessionId:'source',label:'Session'}]);
+ });
+});

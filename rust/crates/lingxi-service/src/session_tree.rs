@@ -1591,6 +1591,12 @@ impl crate::runs::UserMessageRecorder for DbUserMessageRecorder {
                 if !chat.files.is_empty() {
                     content["attachments"] = serde_json::json!(chat.files);
                 }
+                if let Some(text) = &chat.quoted_text {
+                    content["quotedText"] = serde_json::json!(text);
+                }
+                if !chat.session_refs.is_empty() {
+                    content["sessionRefs"] = serde_json::json!(chat.session_refs);
+                }
                 if let Some(id) = &chat.client_message_id {
                     content["clientMessageId"] = serde_json::json!(id);
                 }

@@ -6,6 +6,9 @@
 
 import type { PreviewItem } from '../types';
 import type { FileRef } from '../types/file-ref';
+import { useStore } from '../stores';
+import { resolveServerConnection } from '../services/server-connection';
+import { captureSessionConnection, ownsSessionConnection } from '../services/session-connection-owner';
 import { openPreview } from '../stores/preview-actions';
 import { inferKindByExt, isMediaKind } from './file-kind';
 import { openMediaViewerFromContext } from './open-media-viewer';
@@ -66,6 +69,11 @@ export async function openFilePreview(
     sourceRootPath?: string;
   },
 ): Promise<void> {
+  const owner = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service' ? captureSessionConnection() : null;
+  const openOwnedPreview = (item: PreviewItem) => {
+    if (owner && !ownsSessionConnection(owner)) throw new Error('连接已切换，旧文件预览已丢弃');
+    openPreview(item);
+  };
   const fileName = label || filePath.split('/').pop() || filePath;
   const normalizedExt = ext.replace(/^\./, '').toLowerCase();
 
@@ -82,7 +90,7 @@ export async function openFilePreview(
           title: name,
           content: body,
         };
-        openPreview(previewItem);
+        openOwnedPreview(previewItem);
         return;
       }
       // 读取失败（可能是 zip 格式），尝试 skill viewer
@@ -125,7 +133,7 @@ export async function openFilePreview(
           fileVersion: readResult.fileVersion,
           language: previewType === 'code' ? normalizedExt : undefined,
         };
-        openPreview(previewItem);
+        openOwnedPreview(previewItem);
         return;
       }
     }
@@ -144,7 +152,7 @@ export async function openFilePreview(
         fileVersion: textRead.fileVersion,
         language: normalizedExt || undefined,
       };
-      openPreview(previewItem);
+      openOwnedPreview(previewItem);
       return;
     }
 
@@ -157,8 +165,9 @@ export async function openFilePreview(
       filePath,
       ext: normalizedExt,
     };
-    openPreview(previewItem);
+    openOwnedPreview(previewItem);
   } catch (err) {
+    if (owner && !ownsSessionConnection(owner)) return;
     console.error('[file-preview] open preview failed:', err);
     showError(getErrorMessage(err));
   }

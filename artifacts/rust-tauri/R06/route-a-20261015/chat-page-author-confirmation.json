@@ -1,0 +1,49 @@
+{
+  "scope": "R00-T02-LA-81B217A7E581",
+  "conclusion": "PASS_CURRENT_MACOS_ELECTRON_RUST_COMPONENT_SCOPE",
+  "patchSHA256": "9770b702865141db3202486a07b01282c5894072bb21999e2af5b77be02fdf8b",
+  "manifestSHA256": "2ac020b523ade5373fce991d0e40fb48a6621252052bb8ec0624f3db541fa86d",
+  "sourceFiles": 23,
+  "nativeParentSuite": {
+    "log": "/private/tmp/r06-chat-wire-delivery/chat-page-current-full-frozen-r2.log",
+    "passed": 17,
+    "failed": 0,
+    "skipped": 0,
+    "old14AssertionsUnchanged": true,
+    "oldNative27AssertionsUnchanged": true,
+    "newActualAppPagesChecks": 34
+  },
+  "jsLatest": {
+    "passed": 148,
+    "files": 8,
+    "log": "/private/tmp/r06-chat-wire-delivery/chat-page-js-frozen.log"
+  },
+  "threeTypechecks": "PASS",
+  "strictClippy": "PASS service --lib --test r06_chat_wire -D warnings",
+  "originalAssertionsUnmodified": true,
+  "mainMutated": false,
+  "newCargoDependencies": false,
+  "peerPrerequisites": [
+    "Main current source with session24/map-fork external runtime",
+    "session-created-dispatch-incremental.patch SHA256 6eedf08e9d43fc668c93d69ab0f68aab7c521931f49f7d1a117f26045722de07 (WS zero net diff)"
+  ],
+  "notVerified": [
+    "full App initialization",
+    "Tauri window",
+    "Windows/Linux dynamic behavior",
+    "external paid provider",
+    "formal leaf binding",
+    "R06 accepted or R07 ready"
+  ],
+  "negativeImageProbe": {
+    "exitCode": 0,
+    "interpretation": "现有历史协调器已经完成真实权威图片回读；未认定为缺陷，已删除多余新WS水合助手。"
+  },
+  "affectedSlashNativeRegression": {
+    "passed": 1,
+    "failed": 0,
+    "filtered": 7,
+    "durationSeconds": 5.41,
+    "log": "/private/tmp/r06-chat-wire-delivery/chat-page-slash-regression-frozen.log"
+  }
+}

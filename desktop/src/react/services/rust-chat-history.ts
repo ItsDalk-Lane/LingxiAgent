@@ -1,6 +1,7 @@
 /** Rust 历史与实时消息共用回合投影；未知来源不推测成相邻 Run。 */
 import type { ChatListItem, ChatMessage, ContentBlock, UserAttachment } from '../stores/chat-types';
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
+import { renderMarkdown } from '../utils/markdown';
 import { projectAssistantTurn } from '../utils/turn-projector';
 import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from './server-connection';
 import { useStore } from '../stores';
@@ -45,14 +46,14 @@ function attachments(row: Row): UserAttachment[] | undefined {
     if (typeof image.data === 'string') {
       if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(mime) || image.data.length > 20 * 1024 * 1024 || image.data.length === 0) throw new Error('历史图片内容无效');
       try { atob(image.data); } catch { throw new Error('历史图片编码无效'); }
-      return { path: `inline:${string(row.messageId, 'messageId')}:${index}`, name: `图片 ${index + 1}`, isDir: false, mimeType: mime, base64Data: image.data };
+      return { path: `inline:${string(row.messageId, 'messageId')}:${index}`, name: `图片 ${index + 1}.${mime === 'image/jpeg' ? 'jpg' : mime.slice('image/'.length)}`, isDir: false, mimeType: mime, base64Data: image.data };
     }
     const bytes = image.bytes;
     if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(mime) || !Array.isArray(bytes)
       || bytes.length > 20 * 1024 * 1024 || bytes.some((v) => !Number.isInteger(v) || v < 0 || v > 255)) throw new Error('历史图片内容无效');
     let binary = '';
     for (let offset = 0; offset < bytes.length; offset += 8192) binary += String.fromCharCode(...bytes.slice(offset, offset + 8192));
-    return { path: `inline:${string(row.messageId, 'messageId')}:${index}`, name: `图片 ${index + 1}`, isDir: false, mimeType: mime, base64Data: btoa(binary) };
+    return { path: `inline:${string(row.messageId, 'messageId')}:${index}`, name: `图片 ${index + 1}.${mime === 'image/jpeg' ? 'jpg' : mime.slice('image/'.length)}`, isDir: false, mimeType: mime, base64Data: btoa(binary) };
   })];
 }
 interface Turn {
@@ -83,9 +84,15 @@ export function projectRustHistoryItems(items: unknown[], sessionId: string): Ch
         const id = string(row.messageId, 'messageId');
         const run = runId(row);
         if (run) { inputs.set(run, id); const previous = turns.get(run); if (previous) previous.input = id; }
+        const legacy = row.legacyFields == null ? {} : record(row.legacyFields, 'legacyFields');
+        const quotedText = legacy.quotedText == null ? undefined : string(legacy.quotedText, 'quotedText');
+        const sessionRefs = legacy.sessionRefs == null ? undefined : (() => {
+          if (!Array.isArray(legacy.sessionRefs)) throw new Error('历史会话引用格式无效');
+          return legacy.sessionRefs.map(value => { const reference = record(value, 'sessionRef'); return {sessionId: string(reference.sessionId, 'sessionRef.sessionId'), label: reference.label == null ? 'Session' : string(reference.label, 'sessionRef.label')}; });
+        })();
         const timestamp = row.committedAtUnixMs;
         if (typeof timestamp !== 'number' || !Number.isFinite(timestamp)) throw new Error('历史时间无效');
-        output.push({ type: 'message', data: { id, sourceEntryId: id, role: 'user', text: string(row.text, 'text'), timestamp, attachments: attachments(row), ...(typeof (row.legacyFields as Row | undefined)?.clientMessageId === 'string' ? { clientMessageId: (row.legacyFields as Row).clientMessageId as string } : {}) } });
+        output.push({ type: 'message', data: { id, sourceEntryId: id, role: 'user', text: string(row.text, 'text'), textHtml: row.text ? renderMarkdown(string(row.text, 'text')) : undefined, timestamp, quotedText, sessionRefs, attachments: attachments(row), ...(typeof (row.legacyFields as Row | undefined)?.clientMessageId === 'string' ? { clientMessageId: (row.legacyFields as Row).clientMessageId as string } : {}) } });
         break;
       }
       case 'assistant_segment': {

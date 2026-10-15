@@ -1749,3 +1749,305 @@ async fn deleted_agent_steer_is_rejected_without_cancelling_neighbour_session() 
     h.stop().await;
     remote.stop();
 }
+
+#[cfg(target_os = "macos")]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn native_current_app_pages_side_preview_attachment_and_model_response_generation() {
+    let home = unique_dir("chat-app-native");
+    fixture(&home);
+    std::fs::write(home.join("app-preview.txt"), "APP-PREVIEW-REAL-BYTES").unwrap();
+    let attachment_root = unique_dir("chat-app-upload");
+    let attachment = attachment_root.join("app-attachment.txt");
+    std::fs::write(&attachment, "APP-ATTACHMENT-ACTUAL-MODEL-CONSUMER").unwrap();
+    let remote = Remote::start().await;
+    let h = boot(home, &remote, 1000000).await;
+    h.create("desktop").await;
+    h.create("other").await;
+    h.execute("other", "OTHER-SEED").await;
+    for (session, level) in [("desktop", "high"), ("other", "off")] {
+        let (status, value) = h
+            .server
+            .request(
+                "POST",
+                "/lingxi/v1/session-thinking-level",
+                Some(json!({"sessionPath":session,"level":level})),
+            )
+            .await;
+        assert_eq!(status, 200, "{value}");
+    }
+    let initial_session_count = h
+        .state
+        .storage()
+        .query_one_text("SELECT CAST(COUNT(*) AS TEXT) FROM sessions", vec![])
+        .await
+        .unwrap()
+        .unwrap()
+        .parse::<u64>()
+        .unwrap();
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../..");
+    let url = format!("http://{}", h.server.addr);
+    let token = h.server.token.clone();
+    let ui_home = h.home.clone();
+    let mut child = tokio::task::spawn_blocking(move || {
+        std::process::Command::new(std::env::var("R06_NODE_BIN").unwrap_or_else(|_| "node".into()))
+            .arg(root.join("desktop/src/react/__tests__/chat-app-live/launch.mjs"))
+            .env("R06_CHAT_HOME", ui_home)
+            .env("R06_CHAT_ATTACHMENT", attachment)
+            .env("R06_CHAT_URL", url)
+            .env("R06_CHAT_TOKEN", token)
+            .output()
+            .unwrap()
+    });
+    let mut provider_released = false;
+    let output = loop {
+        tokio::select! {
+            output = &mut child => break output.unwrap(),
+            _ = tokio::time::sleep(Duration::from_millis(10)) => {
+                if !provider_released && h.home.join("app-provider-release").exists() {
+                    remote.release.add_permits(1); provider_released = true;
+                }
+            }
+        }
+    };
+    println!(
+        "APP-PAGES-NATIVE: {}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(
+        output.status.success(),
+        "{}; home={}",
+        std::fs::read_to_string(h.home.join("chat-app-failure.txt")).unwrap_or_default(),
+        h.home.display()
+    );
+    let receipt: Value =
+        serde_json::from_slice(&std::fs::read(h.home.join("chat-app-result.json")).unwrap())
+            .unwrap();
+    assert_eq!(receipt["checks"].as_array().unwrap().len(), 34, "{receipt}");
+    assert!(remote.captured().iter().any(|value| value["messages"]
+        .to_string()
+        .contains("APP-ATTACHMENT-ACTUAL-MODEL-CONSUMER")));
+    assert!(remote
+        .captured()
+        .iter()
+        .any(|value| value["messages"]
+            .as_array()
+            .is_some_and(|messages| messages.iter().any(|message| message["content"]
+                .as_array()
+                .is_some_and(|parts| parts.iter().any(|part| part["type"] == "image_url"
+                    && part["image_url"]["url"]
+                        .as_str()
+                        .is_some_and(|url| url.starts_with("data:image/png;base64,"))))))));
+    assert!(h.snapshot("desktop").await.contains("APP-WITH-IMAGE"));
+    let side = receipt["side"]["sessionId"].as_str().unwrap();
+    assert_ne!(side, "desktop");
+    assert!(remote.captured().iter().any(|value| value["messages"]
+        .to_string()
+        .contains("[用户引用的 Session]")
+        && value["messages"].to_string().contains("SIDE-ONLY")));
+    assert!(h.snapshot(side).await.contains("SIDE-ONLY"));
+    assert!(!h.snapshot("desktop").await.contains("SIDE-ONLY"));
+    let proxy: Value =
+        serde_json::from_slice(&std::fs::read(h.home.join("app-proxy-receipt.json")).unwrap())
+            .unwrap();
+    assert_eq!(proxy["delayed"], 2);
+    let dropped = proxy["dropped"].as_array().unwrap();
+    assert!(!dropped.is_empty());
+    assert!(dropped
+        .iter()
+        .all(|path| path == "/lingxi/v1/session-thinking-level"));
+    assert_eq!(
+        receipt["requests"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|request| request["method"] == "POST"
+                && request["url"]
+                    .as_str()
+                    .is_some_and(|url| url.ends_with("/lingxi/v1/session-thinking-level")))
+            .count(),
+        1
+    );
+    let (status, actual_thinking) = h
+        .server
+        .request(
+            "GET",
+            "/lingxi/v1/session-thinking-level?sessionPath=other",
+            None,
+        )
+        .await;
+    assert_eq!(status, 200);
+    assert_eq!(
+        actual_thinking["thinkingLevel"],
+        receipt["thinkingBeforeFailure"]
+    );
+    assert_eq!(
+        h.state
+            .storage()
+            .query_one_text("SELECT CAST(COUNT(*) AS TEXT) FROM sessions", vec![])
+            .await
+            .unwrap()
+            .unwrap(),
+        (initial_session_count + 1).to_string()
+    );
+    h.stop().await;
+    remote.stop();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn model_switch_uses_real_session_admission_and_rejections_preserve_choice() {
+    let home = unique_dir("chat-choice-admission");
+    fixture(&home);
+    let remote = Remote::start().await;
+    let h = boot(home, &remote, 1000000).await;
+    h.create("choice").await;
+    let (_, before) = h
+        .server
+        .request(
+            "GET",
+            "/lingxi/v1/session-thinking-level?sessionPath=choice",
+            None,
+        )
+        .await;
+    let permit = h
+        .state
+        .storage()
+        .session_admission()
+        .try_acquire(&["choice"], usize::MAX)
+        .unwrap();
+    let input = json!({"sessionId":"choice","modelId":"second","provider":"remote"});
+    let (code, _) = h
+        .server
+        .request("POST", "/lingxi/v1/models/switch", Some(input.clone()))
+        .await;
+    assert_eq!(code, 409);
+    assert!(remote.captured().is_empty());
+    assert!(!h.home.join("chat-input-settings.json").exists());
+    assert_eq!(
+        h.server
+            .request(
+                "GET",
+                "/lingxi/v1/session-thinking-level?sessionPath=choice",
+                None
+            )
+            .await
+            .1,
+        before
+    );
+    drop(permit);
+    let (code, changed) = h
+        .server
+        .request("POST", "/lingxi/v1/models/switch", Some(input))
+        .await;
+    assert_eq!(code, 200, "{changed}");
+    let bytes = std::fs::read(h.home.join("chat-input-settings.json")).unwrap();
+    remote.gate.store(true, Ordering::SeqCst);
+    let mut ws = ws_connect(&h).await;
+    ws_send(
+        &mut ws,
+        json!({"type":"prompt","sessionId":"choice","text":"CHOICE-PARKED"}),
+    )
+    .await;
+    remote.parked().await;
+    let (code, _) = h
+        .server
+        .request(
+            "POST",
+            "/lingxi/v1/models/switch",
+            Some(json!({"sessionId":"choice","modelId":"chat","provider":"remote"})),
+        )
+        .await;
+    assert_eq!(code, 409);
+    assert_eq!(
+        std::fs::read(h.home.join("chat-input-settings.json")).unwrap(),
+        bytes
+    );
+    assert_eq!(remote.captured().len(), 1);
+    assert_eq!(remote.captured()[0]["model"], "second");
+    remote.release.add_permits(1);
+    until_frame(&mut ws, "assistant_run_end").await;
+    h.stop().await;
+    remote.stop();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn session_id_references_are_authorized_preserved_and_never_read_source_body_implicitly() {
+    let home = unique_dir("chat-session-references");
+    fixture(&home);
+    let remote = Remote::start().await;
+    let h = boot(home, &remote, 1000000).await;
+    h.create("reference-source").await;
+    h.create("reference-target").await;
+    h.execute("reference-source", "REFERENCE-SOURCE-SECRET-NOT-INHERITED")
+        .await;
+    remote.wire.lock().unwrap().clear();
+    let mut ws = ws_connect(&h).await;
+    ws_send(&mut ws,json!({"type":"prompt","sessionId":"reference-target","text":"引用片段继续追问","displayMessage":{"text":"继续追问","quotedText":"引用片段"},"sessionRefs":[{"sessionId":"reference-source","label":"实际来源"},{"sessionId":"reference-source","label":"重复"}]})).await;
+    until_frame(&mut ws, "assistant_run_end").await;
+    assert_eq!(remote.captured().len(), 1);
+    let input = remote.captured()[0]["messages"].to_string();
+    assert!(input.contains("[用户引用的 Session]"));
+    assert!(input.contains("实际来源: reference-source"));
+    assert!(input.contains("这些只是 Session ID 引用"));
+    assert!(!input.contains("REFERENCE-SOURCE-SECRET-NOT-INHERITED"));
+    let stored=h.state.storage().query_one_text("SELECT content_json FROM messages WHERE session_id='reference-target' AND role='user' ORDER BY seq LIMIT 1",vec![]).await.unwrap().unwrap();
+    let stored: Value = serde_json::from_str(&stored).unwrap();
+    assert_eq!(stored["text"], "继续追问");
+    assert_eq!(stored["quotedText"], "引用片段");
+    assert_eq!(
+        stored["sessionRefs"],
+        json!([{"sessionId":"reference-source","label":"实际来源"}])
+    );
+    let baseline = h.snapshot("reference-target").await;
+    for references in [
+        json!([{"sessionId":"missing"}]),
+        json!([{"sessionId":false}]),
+        json!([{"sessionId":"reference-source","label":false}]),
+        json!([{"sessionId":"reference-source","extra":true}]),
+        json!(vec![json!({"sessionId":"reference-source"}); 33]),
+    ] {
+        ws_send(&mut ws,json!({"type":"prompt","sessionId":"reference-target","text":"BAD-REFERENCE","sessionRefs":references})).await;
+        until_frame(&mut ws, "input_rejected").await;
+        assert_eq!(h.snapshot("reference-target").await, baseline);
+        assert_eq!(remote.captured().len(), 1);
+    }
+    ws_send(&mut ws,json!({"type":"prompt","sessionId":"reference-target","text":"BAD-QUOTE","displayMessage":{"quotedText":1}})).await;
+    let (rejection, _) = until_frame(&mut ws, "input_rejected").await;
+    assert_eq!(rejection["code"], "invalid_quote");
+    assert_eq!(h.snapshot("reference-target").await, baseline);
+    let (code, device) = h
+        .server
+        .request(
+            "POST",
+            "/lingxi/v1/devices/credentials",
+            Some(json!({"userId":"reference-foreign","scopes":["chat"]})),
+        )
+        .await;
+    assert_eq!(code, 201);
+    let foreign = ApiClient {
+        addr: h.server.addr,
+        token: device["secret"].as_str().unwrap().into(),
+    };
+    let (code, value) = foreign
+        .request(
+            "POST",
+            "/lingxi/v1/sessions",
+            Some(json!({"sessionId":"foreign-target","agentId":"lingxi","title":"foreign target"})),
+        )
+        .await;
+    assert_eq!(code, 201, "{value}");
+    let foreign_before = h.snapshot("foreign-target").await;
+    let source_before = h.snapshot("reference-source").await;
+    let mut foreign_ws = ws_connect_api(&foreign).await;
+    ws_send(&mut foreign_ws,json!({"type":"prompt","sessionId":"foreign-target","text":"FORBIDDEN-REFERENCE","sessionRefs":[{"sessionId":"reference-source","label":"claim"}]})).await;
+    let (rejection, _) = until_frame(&mut foreign_ws, "input_rejected").await;
+    assert_eq!(rejection["code"], "session_reference_forbidden");
+    assert!(!rejection
+        .to_string()
+        .contains("REFERENCE-SOURCE-SECRET-NOT-INHERITED"));
+    assert_eq!(h.snapshot("foreign-target").await, foreign_before);
+    assert_eq!(h.snapshot("reference-source").await, source_before);
+    assert_eq!(remote.captured().len(), 1);
+    h.stop().await;
+    remote.stop();
+}

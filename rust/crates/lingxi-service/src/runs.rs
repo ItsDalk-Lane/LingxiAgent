@@ -430,12 +430,21 @@ pub struct ChatRunInput {
     pub client_message_id: Option<String>,
     pub snapshot_version: Option<u64>,
     pub display_text: Option<String>,
+    pub quoted_text: Option<String>,
+    pub session_refs: Vec<serde_json::Value>,
     pub options: lingxi_kernel::model_exchange::ModelTurnOptions,
 }
 
 impl ChatRunInput {
     pub fn canonical_value(&self) -> serde_json::Value {
-        serde_json::json!({"images":crate::model_history::encode_images(&self.images),"files":self.files,"clientMessageId":self.client_message_id,"snapshotVersion":self.snapshot_version,"displayText":self.display_text,"model":self.options.model,"thinkingLevel":self.options.thinking_level})
+        let mut value = serde_json::json!({"images":crate::model_history::encode_images(&self.images),"files":self.files,"clientMessageId":self.client_message_id,"snapshotVersion":self.snapshot_version,"displayText":self.display_text,"model":self.options.model,"thinkingLevel":self.options.thinking_level});
+        if let Some(text) = &self.quoted_text {
+            value["quotedText"] = serde_json::json!(text);
+        }
+        if !self.session_refs.is_empty() {
+            value["sessionRefs"] = serde_json::json!(self.session_refs);
+        }
+        value
     }
 }
 

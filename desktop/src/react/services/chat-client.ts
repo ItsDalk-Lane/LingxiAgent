@@ -18,6 +18,7 @@ export async function chatFetch(path: string, options: Options = {}): Promise<Re
   const url = new URL(path, 'http://chat.invalid');
   let nextPath: string;
   let nextOptions = options;
+  let projectJson: ((value: unknown) => unknown) | null = null;
   const sessionId = (locator: unknown): string => {
     if (typeof locator !== 'string' || !locator) throw new Error('会话身份尚未就绪');
     const id = sessionIdForPathFromLocatorState(state, locator);
@@ -25,6 +26,20 @@ export async function chatFetch(path: string, options: Options = {}): Promise<Re
     return id;
   };
   switch (url.pathname) {
+    case '/api/upload-blob': {
+      const body = JSON.parse(String(options.body || '{}')) as Record<string, unknown>;
+      const id = sessionId(body.sessionPath);
+      if (body.sessionId && body.sessionId !== id) throw new Error('附件会话身份不一致');
+      nextPath = `/lingxi/v1/sessions/${encodeURIComponent(id)}/attachments/blob`;
+      nextOptions = {...options, body: JSON.stringify({name: body.name, mime: body.mimeType, dataBase64: body.base64Data})};
+      projectJson = value => {
+        if (!response.ok) return value;
+        const file = (value as {file?: {fileId?: unknown; sessionId?: unknown; realPath?: unknown; filename?: unknown; label?: unknown}})?.file;
+        if (!file || file.sessionId !== id || typeof file.fileId !== 'string' || typeof file.realPath !== 'string' || typeof file.filename !== 'string') throw new Error('附件身份响应无效');
+        return {uploads: [{fileId: file.fileId, dest: file.realPath, name: typeof body.name === 'string' && body.name ? body.name : typeof file.label === 'string' ? file.label : file.filename}]};
+      };
+      break;
+    }
     case '/api/models': nextPath = '/lingxi/v1/models'; break;
     case '/api/models/set': nextPath = '/lingxi/v1/models/set'; break;
     case '/api/models/switch': {
@@ -54,7 +69,23 @@ export async function chatFetch(path: string, options: Options = {}): Promise<Re
   response.json = async () => {
     const value: unknown = await readJson();
     if (!ownsSelection() || !ownsSessionConnection(owner)) throw new Error('聊天目标已切换，旧回复已丢弃');
-    return value;
+    return projectJson ? projectJson(value) : value;
   };
   return response;
+}
+
+/** 异步读剪贴板或文件之前绑定目标，防止读完后误投递到新连接。 */
+export function captureChatUploadScope(sessionPath: string | null | undefined): () => void {
+  if (resolveServerConnection(useStore.getState())?.serverNodeKind !== 'lingxi-service') return () => {};
+  const owner = captureSessionConnection();
+  if (owner?.connection.serverNodeKind !== 'lingxi-service') return () => {};
+  const revision = sessionSelectionRevision();
+  const state = useStore.getState();
+  const side = sessionPath && state.sideChat.sessionPath === sessionPath ? state.sideChat.createdAt : null;
+  return () => {
+    const current = useStore.getState();
+    if (!ownsSessionConnection(owner) || sessionSelectionRevision() !== revision || (side !== null
+      ? !current.sideChat.open || current.sideChat.sessionPath !== sessionPath || current.sideChat.createdAt !== side
+      : current.currentSessionPath !== sessionPath)) throw new Error('聊天目标已切换，旧附件已丢弃');
+  };
 }

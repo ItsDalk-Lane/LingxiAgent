@@ -1,0 +1,224 @@
+{
+  "status": "PASS",
+  "scope": "One original chat-page leaf only; not stage acceptance",
+  "original279AssertionsAndThenUnchanged": true,
+  "bindingsExecuted": 7,
+  "leafIds": [
+    "R00-T02-LA-81B217A7E581"
+  ],
+  "sourceCandidateSha256": "c87ead01d3f10df1013a86fb990f39fc9b5b724b78e5da05187ad0a7849a42d0",
+  "rawEvidence": "/private/tmp/r06-chat-page-window-r1-20261015",
+  "rollupExitCode": 0,
+  "results": [
+    {
+      "key": "r06_test_159a8c7eab43e921ff83",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_4fe993a5b6c9c22d9bb5",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "native_current_app_pages_side_preview_attachment_and_model_response_generation",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "native_current_app_pages_side_preview_attachment_and_model_response_generation",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_58c95e2d172cfac20d1f",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "model_switch_uses_real_session_admission_and_rejections_preserve_choice",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "model_switch_uses_real_session_admission_and_rejections_preserve_choice",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_9b90230193acc2bca412",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "combo_cancel_during_stream_read",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "combo_cancel_during_stream_read",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_e777035e6dad14cae11c",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "combo_normal_completes_with_final",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "combo_normal_completes_with_final",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_fbc3ebb9e85c2a5ecec5",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "session_id_references_are_authorized_preserved_and_never_read_source_body_implicitly",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "session_id_references_are_authorized_preserved_and_never_read_source_body_implicitly",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_fd17217c5619c3dc4301",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "leaf_steer_semantics_busy_miss_and_drain",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "leaf_steer_semantics_busy_miss_and_drain",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    }
+  ]
+}

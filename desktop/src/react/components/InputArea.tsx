@@ -1,4 +1,4 @@
-import { chatFetch } from '../services/chat-client';
+import { chatFetch, captureChatUploadScope } from '../services/chat-client';
 /**
  * InputArea — 聊天输入区域 React 组件
  *
@@ -18,6 +18,8 @@ import { getSessionCompactionMode, isSessionCompacting } from '../stores/context
 import { selectSessionFiles } from '../stores/selectors/file-refs';
 import { isImageFile, isVideoFile } from '../utils/format';
 import { isAudioFileName } from '../utils/file-kind';
+import { resolveServerConnection } from '../services/server-connection';
+import type { AttachedFile } from '../stores/input-slice';
 import { useI18n } from '../hooks/use-i18n';
 import {
   SessionScopeProvider,
@@ -678,8 +680,20 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   );
 
   // Zustand actions
-  const addAttachedFile = useStore(s => s.addAttachedFile);
-  const removeAttachedFile = useStore(s => s.removeAttachedFile);
+  const legacyAddAttachedFile = useStore(s => s.addAttachedFile);
+  const legacyRemoveAttachedFile = useStore(s => s.removeAttachedFile);
+  const addAttachedFile = useCallback((file: AttachedFile) => {
+    const state = useStore.getState();
+    if (resolveServerConnection(state)?.serverNodeKind !== 'lingxi-service' || !scopedSessionPath) { legacyAddAttachedFile(file); return; }
+    const files = sessionScopedValue(state, state.attachedFilesBySession, scopedSessionPath) ?? (state.currentSessionPath === scopedSessionPath ? state.attachedFiles : []);
+    state.setAttachedFilesForSession(scopedSessionPath, [...files, file]);
+  }, [legacyAddAttachedFile, scopedSessionPath]);
+  const removeAttachedFile = useCallback((index: number) => {
+    const state = useStore.getState();
+    if (resolveServerConnection(state)?.serverNodeKind !== 'lingxi-service' || !scopedSessionPath) { legacyRemoveAttachedFile(index); return; }
+    const files = sessionScopedValue(state, state.attachedFilesBySession, scopedSessionPath) ?? (state.currentSessionPath === scopedSessionPath ? state.attachedFiles : []);
+    state.setAttachedFilesForSession(scopedSessionPath, files.filter((_, i) => i !== index));
+  }, [legacyRemoveAttachedFile, scopedSessionPath]);
   const clearAttachedFiles = useStore(s => s.clearAttachedFiles);
   const clearAttachedFilesForSession = useStore(s => s.clearAttachedFilesForSession);
   const setDocContextAttachedForSession = useStore(s => s.setDocContextAttachedForSession);
@@ -1060,12 +1074,17 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       event.currentTarget.value = '';
       return;
     }
+    const currentFiles = () => {
+      const state = useStore.getState();
+      return scopedSessionPath ? sessionScopedValue(state, state.attachedFilesBySession, scopedSessionPath) ?? (state.currentSessionPath === scopedSessionPath ? state.attachedFiles : []) : state.attachedFiles;
+    };
+    const ownsUpload = captureChatUploadScope(scopedSessionPath);
     const files = Array.from(event.currentTarget.files || []);
     event.currentTarget.value = '';
     try {
       if (files.length === 0) return;
-      if (useStore.getState().attachedFiles.length >= 9) return;
-      const existingVideoCount = useStore.getState().attachedFiles.filter(file => isVideoFile(file.name)).length;
+      if (currentFiles().length >= 9) return;
+      const existingVideoCount = currentFiles().filter(file => isVideoFile(file.name)).length;
       const selectedVideoCount = files.filter(file => isVideoFile(file.name)).length;
       if (existingVideoCount + selectedVideoCount > 3) {
         useStore.getState().addToast(t('error.maxVideos', { max: 3 }), 'error', 6000);
@@ -1073,7 +1092,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       }
 
       for (const file of files) {
-        if (useStore.getState().attachedFiles.length >= 9) break;
+        if (currentFiles().length >= 9) break;
         const mimeType = file.type || (
           isVideoFile(file.name)
             ? chatVideoMimeTypeForName(file.name)
@@ -1107,7 +1126,8 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
               return undefined;
             })
             : undefined;
-          const res = await lingxiFetch('/api/upload-blob', {
+          ownsUpload();
+          const res = await chatFetch('/api/upload-blob', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1119,6 +1139,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
             }),
           });
           const data = await res.json();
+          ownsUpload();
           const upload = data?.uploads?.[0];
           if (upload?.dest) {
             addAttachedFile({
@@ -1292,7 +1313,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       audioRecordingSeqRef.current = index;
       const name = t('input.recordedAudioName', { index });
       const sessionRef = await ensureVoiceSessionRef();
-      const res = await lingxiFetch('/api/upload-blob', {
+      const res = await chatFetch('/api/upload-blob', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1633,6 +1654,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
         e.preventDefault();
         const file = item.getAsFile();
         if (!file) return true;
+        const ownsPasteUpload = captureChatUploadScope(scopedSessionPath);
         const reader = new FileReader();
         reader.onload = async () => {
           const dataUrl = reader.result as string;
@@ -1648,7 +1670,8 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
               base64Data,
               mimeType,
             });
-            const res = await lingxiFetch('/api/upload-blob', {
+            ownsPasteUpload();
+            const res = await chatFetch('/api/upload-blob', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -1659,6 +1682,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
               }),
             });
             const data = await res.json();
+            ownsPasteUpload();
             const upload = data?.uploads?.[0];
             if (upload?.dest) {
               addAttachedFile({ fileId: upload.fileId, path: upload.dest, name: upload.name || uploadPayload.name, isDirectory: false });
@@ -2378,6 +2402,12 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
         attachedFiles={attachedFiles}
         removeAttachedFile={removeAttachedFile}
         hasQuotedSelection={quotedSelections.length > 0}
+        quotedSelections={quotedSelections}
+        removeQuotedSelection={index => {
+          const state = useStore.getState();
+          if (scopedSessionPath) state.removeQuotedSelectionForSession(scopedSessionPath, index);
+          else state.removeQuotedSelection(index);
+        }}
         knowledgeRefSessionKey={knowledgeRefSessionKey}
       />
       <InputStatusBars

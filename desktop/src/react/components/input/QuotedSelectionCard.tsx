@@ -1,9 +1,12 @@
 import { useStore } from '../../stores';
+import type { QuotedSelection } from '../../stores/input-slice';
 import { AttachmentChip } from '../shared/AttachmentChip';
 
-export function QuotedSelectionCard() {
-  const quotedSelections = useStore(s => s.quotedSelections);
-  const removeQuotedSelection = useStore(s => s.removeQuotedSelection);
+export function QuotedSelectionCard({selections, onRemove}: {selections?: readonly QuotedSelection[]; onRemove?: (index: number) => void} = {}) {
+  const primarySelections = useStore(s => s.quotedSelections);
+  const primaryRemove = useStore(s => s.removeQuotedSelection);
+  const quotedSelections = selections ?? primarySelections;
+  const removeQuotedSelection = onRemove ?? primaryRemove;
 
   if (quotedSelections.length === 0) return null;
 

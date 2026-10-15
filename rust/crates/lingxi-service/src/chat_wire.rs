@@ -737,14 +737,14 @@ pub async fn prompt(
         .await;
         return;
     }
-    if !req.agent_review_requests.is_empty() || !req.session_refs.is_empty() {
+    if !req.agent_review_requests.is_empty() {
         reject(
             &tx,
             &req,
             protocol_error(
                 &req.session_id,
                 "unsupported_input_context",
-                "agent review and cross-session references are not connected to this chat input",
+                "agent review is not connected to this chat input",
             ),
         )
         .await;
@@ -769,6 +769,37 @@ pub async fn prompt(
         .await;
         return;
     }
+    let (session_reference_context, session_refs) =
+        match prepare_session_references(&state, &p, &req).await {
+            Ok(value) => value,
+            Err(error) => {
+                reject(&tx, &req, error).await;
+                return;
+            }
+        };
+    let quoted_text = match req
+        .display_message
+        .as_ref()
+        .and_then(|value| value.get("quotedText"))
+    {
+        Some(Value::String(text)) if text.len() <= crate::limits::MAX_SUBMISSION_INPUT_BYTES => {
+            Some(text.clone())
+        }
+        None => None,
+        _ => {
+            reject(
+                &tx,
+                &req,
+                protocol_error(
+                    &req.session_id,
+                    "invalid_quote",
+                    "quoted text must be bounded text",
+                ),
+            )
+            .await;
+            return;
+        }
+    };
     let selection = match knowledge(&req) {
         Ok(v) => v,
         Err(e) => {
@@ -977,6 +1008,10 @@ pub async fn prompt(
         }
     };
     let mut text = req.text.clone();
+    if !session_reference_context.is_empty() {
+        text.push_str("\n\n");
+        text.push_str(&session_reference_context);
+    }
     if !file_context.is_empty() {
         text.push_str("\n\n");
         text.push_str(&file_context);
@@ -1041,6 +1076,8 @@ pub async fn prompt(
                 files,
                 client_message_id: req.client_message_id.clone(),
                 snapshot_version: req.snapshot_version,
+                quoted_text,
+                session_refs,
                 display_text: Some(
                     req.display_message
                         .as_ref()
@@ -1138,7 +1175,13 @@ async fn observe_run(
             {
                 Ok(Some(content)) => match serde_json::from_str::<Value>(&content) {
                     Ok(value) => {
-                        state.chat_wire.publish(&req.session_id,&run,json!({"type":"session_user_message","clientMessageId":req.client_message_id,"snapshotVersion":req.snapshot_version,"message":{"id":id,"sourceEntryId":id,"clientMessageId":req.client_message_id,"snapshotVersion":req.snapshot_version,"text":value["text"],"attachments":value["attachments"],"timestamp":state.clock().now_unix_ms()}}));
+                        let mut attachments =
+                            value["attachments"].as_array().cloned().unwrap_or_default();
+                        let image_count = value["images"].as_array().map_or(0, Vec::len);
+                        for index in 0..image_count {
+                            attachments.push(json!({"path":format!("native-image-pending:{id}:{index}"),"name":format!("图片 {}（读取中）",index+1),"isDir":false}));
+                        }
+                        state.chat_wire.publish(&req.session_id,&run,json!({"type":"session_user_message","clientMessageId":req.client_message_id,"snapshotVersion":req.snapshot_version,"message":{"id":id,"sourceEntryId":id,"clientMessageId":req.client_message_id,"snapshotVersion":req.snapshot_version,"text":value["text"],"attachments":attachments,"hasImages":image_count>0,"quotedText":value["quotedText"],"sessionRefs":value["sessionRefs"],"timestamp":state.clock().now_unix_ms()}}));
                         user_sent = true;
                     }
                     Err(e) => {
@@ -1736,6 +1779,17 @@ pub async fn model_switch_route(
         Ok(v) => v,
         Err(e) => return e,
     };
+    // 与真实 Run 建立共用准入，不能在检查空闲后被新 Run 插入并切掉其模型快照。
+    let _permit = match state
+        .storage()
+        .session_admission()
+        .try_acquire(&[&req.session_id], usize::MAX)
+    {
+        Ok(permit) => permit,
+        Err(_) => {
+            return setting_failure(StatusCode::CONFLICT, "cannot switch model while streaming")
+        }
+    };
     if state
         .chat_wire
         .pending
@@ -1955,7 +2009,75 @@ async fn prepare_files(
                 "attachment text exceeds input limit",
             ));
         }
-        files.push(json!({"fileId":view.file_id,"path":view.real_path,"filePath":view.file_path,"name":view.filename,"mimeType":view.mime,"isDir":false,"status":"available"}));
+        files.push(json!({"fileId":view.file_id,"path":view.real_path,"filePath":view.file_path,"name":view.label.as_deref().unwrap_or(&view.filename),"mimeType":view.mime,"isDir":false,"status":"available"}));
     }
     Ok((context.join("\n\n"), files))
+}
+
+/// 与现役桌面一致，只把已授权的会话 ID 交给模型；不暗中读取来源会话正文。
+async fn prepare_session_references(
+    state: &ServiceState,
+    principal: &Principal,
+    req: &PromptRequest,
+) -> Result<(String, Vec<Value>), Value> {
+    if req.session_refs.len() > 32 {
+        return Err(protocol_error(
+            &req.session_id,
+            "invalid_session_reference",
+            "at most 32 session references",
+        ));
+    }
+    let mut normalized = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    for value in &req.session_refs {
+        let invalid = || {
+            protocol_error(
+                &req.session_id,
+                "invalid_session_reference",
+                "session reference must contain bounded sessionId and label",
+            )
+        };
+        let object = value.as_object().ok_or_else(invalid)?;
+        if object
+            .keys()
+            .any(|key| !matches!(key.as_str(), "sessionId" | "label"))
+        {
+            return Err(invalid());
+        }
+        let id = value["sessionId"]
+            .as_str()
+            .map(str::trim)
+            .filter(|id| !id.is_empty() && id.len() <= 256)
+            .ok_or_else(invalid)?;
+        let label = match object.get("label") {
+            None => "Session",
+            Some(Value::String(label)) if label.len() <= 512 => label.trim(),
+            _ => return Err(invalid()),
+        };
+        crate::get_session_owned(state, principal, id)
+            .await
+            .map_err(|_| {
+                protocol_error(
+                    &req.session_id,
+                    "session_reference_forbidden",
+                    "referenced session unavailable or not owned",
+                )
+            })?;
+        if seen.insert(id.to_owned()) {
+            normalized.push(json!({"sessionId":id,"label":label}));
+        }
+    }
+    if normalized.is_empty() {
+        return Ok((String::new(), normalized));
+    }
+    let mut lines = vec!["[用户引用的 Session]".to_string()];
+    lines.extend(normalized.iter().map(|reference| {
+        format!(
+            "- {}: {}",
+            reference["label"].as_str().unwrap_or("Session"),
+            reference["sessionId"].as_str().unwrap_or_default()
+        )
+    }));
+    lines.push("这些只是 Session ID 引用。是否读取由你根据任务自行判断；需要时调用 session read/Resolver。".into());
+    Ok((lines.join("\n"), normalized))
 }
