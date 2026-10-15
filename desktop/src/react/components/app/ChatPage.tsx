@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { useStore } from '../../stores';
 import { InputArea, type InputAreaProps } from '../InputArea';
+import { InteractiveToolsPanel } from '../interactive/InteractiveToolsPanel';
 import { WelcomeScreen } from '../WelcomeScreen';
 import { ChatArea } from '../chat/ChatArea';
 import RustSessionReviewPanel from '../session/RustSessionReviewPanel';
@@ -55,6 +56,7 @@ export function ChatPage({
           resetKeys={[currentSessionPath]}
           autoRetry={inputSurface === 'mobile' ? { attempts: 2, delayMs: 120 } : undefined}
         >
+          <InteractiveToolsPanel />
           <InputArea key={currentSessionPath || '__new'} surface={inputSurface} />
         </RegionalErrorBoundary>
       </div>

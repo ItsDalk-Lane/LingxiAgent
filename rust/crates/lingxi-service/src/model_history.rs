@@ -762,6 +762,18 @@ impl ModelHistory {
             if row.entry_type == "hana-session-branch-reset" {
                 continue;
             }
+            if matches!(row.entry_type.as_str(), "todo-state-v1" | "interactive-question-v1" | "interactive-answer-v1" | "interactive-card-v1") {
+                let source_run = row.run_id.as_deref().ok_or_else(|| corrupt("interactive UI entry lacks a source Run"))?;
+                let source = self.storage.load_run(&lingxi_protocol::RunId::new(source_run)).await?.ok_or_else(|| corrupt("interactive UI source Run is missing"))?;
+                let source_session = self.storage.get_session(source.session_id.as_str()).await?.ok_or_else(|| corrupt("interactive UI source session is missing"))?;
+                if source_session.owner_user_id != session_owner || source_session.agent_id != agent
+                    || !lineage_sessions.contains(source.session_id.as_str())
+                    || !branch_run_inputs.contains(source_run) {
+                    return Err(corrupt("interactive UI source owner/agent/branch mismatch"));
+                }
+                // 这里只跳过已绑定的页面快照；模型结果仍从真实工具档案恢复。
+                continue;
+            }
             if row.entry_type != "message" {
                 return Err(corrupt(
                     "unknown legacy tree entry; not converted to normal conversation",
@@ -1050,6 +1062,8 @@ impl ModelHistory {
             !(r.entry_type == ENTRY_TYPE
                 && r.message_id
                     .starts_with(&format!("model-history:{}:", ctx.run_id)))
+                && !(matches!(r.entry_type.as_str(), "todo-state-v1" | "interactive-question-v1" | "interactive-answer-v1" | "interactive-card-v1")
+                    && r.run_id.as_deref() == Some(ctx.run_id.as_str()))
                 && !(r.entry_type == "message"
                     && (r.run_id.as_deref() == Some(ctx.run_id.as_str())
                         || r.run_id.as_ref().is_some_and(|id| children.contains(id))
@@ -1613,6 +1627,50 @@ pub fn archive_projection(items: &[ExchangeItem], submission: &str) -> Vec<Excha
     out
 }
 
+/// 图片事实只由服务适配层编解码，内核保持不依赖序列化框架。
+pub(crate) fn encode_images(images: &[lingxi_kernel::model_exchange::InputImage]) -> Value {
+    {
+        use base64::Engine as _;
+        json!(images.iter().map(|image|json!({"mime":image.mime,"data":base64::engine::general_purpose::STANDARD.encode(&image.bytes)})).collect::<Vec<_>>())
+    }
+}
+pub(crate) fn decode_images(
+    value: &Value,
+) -> Result<Vec<lingxi_kernel::model_exchange::InputImage>, StorageError> {
+    let rows = value
+        .as_array()
+        .ok_or_else(|| corrupt("historical images array"))?;
+    if rows.is_empty() || rows.len() > 10 {
+        return Err(corrupt("historical image count"));
+    }
+    rows.iter()
+        .map(|row| {
+            let mime = str_field(row, "mime")?.to_string();
+            if !matches!(
+                mime.as_str(),
+                "image/png" | "image/jpeg" | "image/gif" | "image/webp"
+            ) {
+                return Err(corrupt("historical image mime"));
+            }
+            let bytes: Vec<u8> = if let Some(data) = row.get("data").and_then(Value::as_str) {
+                use base64::Engine as _;
+                if data.len() > 20 * 1024 * 1024 {
+                    return Err(corrupt("historical image encoded size"));
+                }
+                base64::engine::general_purpose::STANDARD
+                    .decode(data)
+                    .map_err(|_| corrupt("historical image encoding"))?
+            } else {
+                decode(&row["bytes"])?
+            };
+            if bytes.is_empty() || bytes.len() > 20 * 1024 * 1024 {
+                return Err(corrupt("historical image bytes"));
+            }
+            Ok(lingxi_kernel::model_exchange::InputImage { bytes, mime })
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1776,46 +1834,3 @@ mod tests {
     }
 }
 
-/// 图片事实只由服务适配层编解码，内核保持不依赖序列化框架。
-pub(crate) fn encode_images(images: &[lingxi_kernel::model_exchange::InputImage]) -> Value {
-    {
-        use base64::Engine as _;
-        json!(images.iter().map(|image|json!({"mime":image.mime,"data":base64::engine::general_purpose::STANDARD.encode(&image.bytes)})).collect::<Vec<_>>())
-    }
-}
-pub(crate) fn decode_images(
-    value: &Value,
-) -> Result<Vec<lingxi_kernel::model_exchange::InputImage>, StorageError> {
-    let rows = value
-        .as_array()
-        .ok_or_else(|| corrupt("historical images array"))?;
-    if rows.is_empty() || rows.len() > 10 {
-        return Err(corrupt("historical image count"));
-    }
-    rows.iter()
-        .map(|row| {
-            let mime = str_field(row, "mime")?.to_string();
-            if !matches!(
-                mime.as_str(),
-                "image/png" | "image/jpeg" | "image/gif" | "image/webp"
-            ) {
-                return Err(corrupt("historical image mime"));
-            }
-            let bytes: Vec<u8> = if let Some(data) = row.get("data").and_then(Value::as_str) {
-                use base64::Engine as _;
-                if data.len() > 20 * 1024 * 1024 {
-                    return Err(corrupt("historical image encoded size"));
-                }
-                base64::engine::general_purpose::STANDARD
-                    .decode(data)
-                    .map_err(|_| corrupt("historical image encoding"))?
-            } else {
-                decode(&row["bytes"])?
-            };
-            if bytes.is_empty() || bytes.len() > 20 * 1024 * 1024 {
-                return Err(corrupt("historical image bytes"));
-            }
-            Ok(lingxi_kernel::model_exchange::InputImage { bytes, mime })
-        })
-        .collect()
-}

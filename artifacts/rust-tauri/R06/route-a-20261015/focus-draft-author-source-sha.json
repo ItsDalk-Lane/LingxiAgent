@@ -1,0 +1,154 @@
+{
+  "status": "FROZEN_SOURCE_FINAL_CHECKS",
+  "base": "c095f606c + frozen chat core44 + Root single-line notModified compatibility",
+  "coreManifestSHA256": "dc5d6053e7b41219230413b1670ef456d5b8c583c7d5f2f5a99379bbeba69734",
+  "baseSourceSetSHA256": "0de3ae6c76e0249d74c0017ca39f72eebdb35fe0c778f0c894583da444ebf27e",
+  "candidateSourceSetSHA256": "66f31c652a1c6cfc89b4d890ea7d325d0eaeb38945a62b07a152f890fc8f440f",
+  "patchSHA256": "f9dc6e93043c4cc40ed74ed74385cd90930f12124b6e42766d0d4e5ceab39898",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_admin.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "f83eb8cbe43e6e6116708ef408193e61843d2e56e23c46f057605127bd7b6dd9",
+      "candidateSHA256": "ac7eb8f7fdfb61629dc54ea0fdaad6cd95056fbb8b72667a0f9a92a7da32dad4"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "aea0be60304e163e378aa775dc468891ed716908f9922b7ac387f37bf9998e26",
+      "candidateSHA256": "515b72bb4411e8f735df93ec0796d6fb41c3567c54dfbdad1de643f75051318b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "baseOrigin": "chat-core-44",
+      "baseSHA256": "9071722902f07d98476cd7698b6a8e7f6e653c7e483015d75746a325a22f0756",
+      "candidateSHA256": "8d6435ab42b4a50e59413c702e185d3e5ac1ff965d32180b3c404df8fc0ba700"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "baseOrigin": "chat-core-44",
+      "baseSHA256": "8f36ecffdbfca0238820837a98aebe428729a0683a6a5f52f861f3118fd1291d",
+      "candidateSHA256": "64cc12aafff5aa23c286e73b7f94ccd803369c0a4975084c6d59cd5903e8f93b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/discovery_tools.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "7fca65825d273d3fa6127bc60c2b5573459913a37845a9db46805a993fb2f48c",
+      "candidateSHA256": "cd66b17b51c77806c99dbe2f5450b439e0164e6c626f31861c2eb00a39352fca"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filetools.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "4b397b780fe3d3320eb8e12a630aab5c6239ff18c0f1fe406516ce38940b7653",
+      "candidateSHA256": "15661b091550c38f79260359339f944e1a98f8d8b4d8c4ac83602e9461f5919e"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseOrigin": "chat-core-44",
+      "baseSHA256": "879b920631973b4f6afdd9d42ea4c7e916dc104c05f2f2fe5adc8200a264b89d",
+      "candidateSHA256": "0793a90fd34cf921c5c3c50948f5acf284fc8984de35fc9e37cda044fea22f28"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resourceaccess.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "b838c8273950664391c0440a7ecb3b840699c64b69cb84d6525776654d24f188",
+      "candidateSHA256": "cc678afb2dcb3803f0063694122e32c68499dde619936dd6c38ceec68214269d"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resourceio.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "12bed9603189493309994d701587d038412718be00d55eba552899b25ae57e8a",
+      "candidateSHA256": "43c9502ad2a2aa1e350f381478f143eb9fee5b115d8bf8192e02f6bdbb0474f5"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "baseOrigin": "chat-core-44",
+      "baseSHA256": "6ea998cc9eb3757c9ecd316e66f7d91314bf0864334c629ed38d9e8d54b7170f",
+      "candidateSHA256": "a168c8629e224ee9e8c6c59ec8390289ca53d2ede00f6cab1b00fb4e1036315d"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_focus.rs",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "040d18d291d45dcb7bf3369a4357b4edfcf5ef96d12fefac94cba4abca9727e4"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_ui.rs",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "d719def669aa8f928719d9f010fe9bac7da1953515930003e7dfd30a04f41183",
+      "candidateSHA256": "fdf10938aafe11cd9917437b2e09ef91b4cccd2368df09753583c4e29a3000c8"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "baseOrigin": "chat-core-44",
+      "baseSHA256": "05ba8870f68e5b264f3ce7a08b0d89487fb439fd306105870b9a0c647f7ac257",
+      "candidateSHA256": "1dba80ea1ec55478c40bd82700f389329e7f2df5b3689bde9b32630be79980e9"
+    },
+    {
+      "path": "desktop/src/react/services/session-connection-owner.ts",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "fc854b0c962ad37836490c77e61f7b8c6d922380be606dfb555ad0b6d5873d91",
+      "candidateSHA256": "546c497833e6361ce2fd1ad8e59341ab72bd5f8812091c5b558264cb8f29ba3c"
+    },
+    {
+      "path": "desktop/src/react/stores/session-actions.ts",
+      "baseOrigin": "chat-core-44 + Root notModified === true compatibility",
+      "baseSHA256": "4b85a607d6ed4d3e24cb0c913223b9b76c33562b4cfb504bf84e8f88703bb812",
+      "candidateSHA256": "4ee858a702f7d2b066baddc29eddad95101ce70a7eb7d8ff89b9ae0285925892"
+    },
+    {
+      "path": "desktop/src/react/stores/chat-types.ts",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "c4a0877b7ebcb2e4fd2ec639c43f5a79d007afef48144fc53f58a95499bc21f1",
+      "candidateSHA256": "12009650b6e5ed4d42a3d47a1c5785b8d3e2786e6d03e279633be7dabfdc6953"
+    },
+    {
+      "path": "desktop/src/react/stores/desk-actions.ts",
+      "baseOrigin": "c095f606c",
+      "baseSHA256": "43cb7e4daf60c22b505ba7466c45c2f1240a169a91db2fe854cbc39679aa8c9c",
+      "candidateSHA256": "64a74da8dce661c4180d61c5fa22925c2fa6b26196214a839cdd2860146a756c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "a6a301d2dc89d232b244399455363a3bf1a568d39a02333582e19a9a7434b15b"
+    },
+    {
+      "path": "tests/rust-native/session-focus-live.py",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "bc36ffc68ca28ed76727fb9bc49d677ffc9e951d28cc977f7625443b52aa7ac7"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-focus-live/launch.mjs",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "b2da12175fd79a6b31fb4d4063c8b9652a9f0a210890a7646420cee40928abae"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-focus-live/main.cjs",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "258a841fa9c2f3ef643993cd2fd615e3afb78ec9f7a094f422d9173067f94df4"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-focus-live/preload.cjs",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "e9a7c5a6a446a283d601594c14bf5e227914451ff638995b907aa9a32f5ff356"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-focus-live/surface.tsx",
+      "baseOrigin": "new",
+      "baseSHA256": null,
+      "candidateSHA256": "bd4932923b18c75d9272af5eb21b2ac043cf86d226e9b26258d82b5411bececd"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "baseOrigin": "chat-core-44",
+      "baseSHA256": "0e512772c7fbe186ec841533dc9fe787bfa527d51d958b1fb6fd7fd5632f6878",
+      "candidateSHA256": "cad9e541d54701e8887d9c7ee2f4b6a4622bdb40fca6cb5a7acd6f8713fd2527"
+    }
+  ]
+}

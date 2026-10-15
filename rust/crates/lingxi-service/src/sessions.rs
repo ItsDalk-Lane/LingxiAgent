@@ -2013,6 +2013,16 @@ pub async fn sessions_studio_list_route(
             Ok(tree) => tree,
             Err(err) => return crate::EndpointError::storage(&err).into_response(),
         };
+        if tree
+            .as_ref()
+            .is_some_and(|row| row.archived_at_unix_ms.is_some())
+        {
+            continue;
+        }
+        let metadata = match crate::session_ui::read(state.storage(), &view.session_id) {
+            Ok(value) => value,
+            Err(error) => return crate::EndpointError::storage(&error).into_response(),
+        };
         let revision = match (
             lingxi_adapters::storage::canonical_message_store::read_branch_head_revision(
                 state.storage(),
@@ -2049,6 +2059,11 @@ pub async fn sessions_studio_list_route(
         let running = !active_run_ids.is_empty();
         sessions.push(serde_json::json!({
             "sessionId": view.session_id,
+            "path": crate::session_locator::native(&view.session_id),
+            "cwd": metadata.as_ref().and_then(|value| value.cwd.clone()),
+            "workspaceFolders": metadata.as_ref().map(|value| value.workspace_folders.clone()).unwrap_or_default(),
+            "authorizedFolders": tree.as_ref().map(|row| row.authorized_folders.clone()).unwrap_or_default(),
+            "memoryEnabled": tree.as_ref().map(|row| row.memory_enabled),
             "title": view.title,
             "agentId": view.agent_id,
             "agentName": agent_names.get(&view.agent_id).cloned()
@@ -2058,7 +2073,7 @@ pub async fn sessions_studio_list_route(
             "parentSessionId": tree.as_ref().and_then(|row| row.parent_session_id.clone()),
             "pinnedAt": tree.as_ref().and_then(|row| row.pinned_at_unix_ms),
             "pinOrder": tree.as_ref().and_then(|row| row.pin_order),
-            "modified": tree.as_ref().and_then(|row| row.last_activity_unix_ms),
+            "modified": tree.as_ref().map(|row| row.last_activity_unix_ms.unwrap_or(row.created_at_unix_ms)),
             "runCount": view.run_count,
             // 修订点：与 /history 的 ETag 同源字符串（web/mobile 缓存对比材料）。
             "revision": revision,

@@ -175,6 +175,14 @@ impl ChatWire {
     pub fn subscribe(&self) -> broadcast::Receiver<Value> {
         self.tx.subscribe()
     }
+    /// 会话创建是生命周期通知，不占用任何模型运行的序号或重放记录。
+    pub(crate) fn publish_session_created(&self, id: &str, session: Value, at_unix_ms: u64) {
+        let _ = self.tx.send(json!({
+            "type": "session_created", "sessionId": id,
+            "sessionPath": crate::session_locator::native(id), "sessionRefVersion": 2,
+            "ts": at_unix_ms, "session": session
+        }));
+    }
     fn publish(&self, id: &str, run: &str, mut frame: Value) {
         let mut streams = self.streams.lock().unwrap_or_else(|e| e.into_inner());
         // 入口先预留容量，活动观察器的条目不得被逐出。

@@ -358,6 +358,25 @@ pub async fn append_branch_entry(
     db: &RunDatabase,
     req: AppendBranchEntry<'_>,
 ) -> Result<String, StorageError> {
+    append_branch_entry_inner(db, req, None, None).await.map(|(id, _)| id)
+}
+
+/// 工具的会话记录和完整业务事件一次提交；事务内复核运行身份与当前尝试。
+pub async fn append_tool_branch_entry(
+    db: &RunDatabase,
+    ctx: &lingxi_kernel::RunContext,
+    req: AppendBranchEntry<'_>,
+    event: EventPayload,
+) -> Result<(String, Option<EventEnvelope>), StorageError> {
+    append_branch_entry_inner(db, req, Some(ctx), Some(event)).await
+}
+async fn append_branch_entry_inner(
+    db: &RunDatabase,
+    req: AppendBranchEntry<'_>,
+    ctx: Option<&lingxi_kernel::RunContext>,
+    event: Option<EventPayload>,
+) -> Result<(String, Option<EventEnvelope>), StorageError> {
+    let ctx = ctx.cloned();
     let session_id = req.session_id.to_string();
     let requested_id = req.message_id.map(str::to_string);
     let entry_type = req.entry_type.to_string();
@@ -368,6 +387,14 @@ pub async fn append_branch_entry(
     db.queue()
         .submit(move |conn| {
             with_write_txn(conn, busy, |conn| {
+                if let Some(ctx) = &ctx {
+                    let valid: bool = conn.query_row(
+                        "SELECT EXISTS(SELECT 1 FROM runs r JOIN sessions s ON s.session_id=r.session_id WHERE r.run_id=?1 AND r.session_id=?2 AND r.owner_kind=?3 AND r.owner_subject=?4 AND r.generation=?5 AND r.status IN ('running','waiting_approval') AND s.archived_at_unix_ms IS NULL AND (SELECT attempt FROM run_attempts WHERE run_id=r.run_id ORDER BY rowid DESC LIMIT 1)=?6)",
+                        rusqlite::params![ctx.run_id.as_str(), session_id, ctx.principal.storage_kind(), ctx.principal.storage_subject(), ctx.generation as i64, ctx.attempt.as_str()], |r| r.get(0)).map_err(map_err)?;
+                    if !valid || ctx.session_id.as_str() != session_id {
+                        return Err(StorageError::Conflict { detail: "interactive tool run identity is stale or unavailable".into() });
+                    }
+                }
                 // parent = 追加时刻的分支头；无头行回退 legacy_tail
                 // （seq 最大的真实 message，不含标记条目）。
                 let head_row: Option<String> = conn
@@ -420,9 +447,9 @@ pub async fn append_branch_entry(
                     "INSERT INTO messages \
                  (message_id, session_id, run_id, role, content_json, model_call_id, \
                   committed_at_unix_ms, seq, parent_message_id, entry_type) \
-                 VALUES (?1,?2,NULL,?3,?4,NULL,?5,?6,?7,?8)",
+                 VALUES (?1,?2,?9,?3,?4,NULL,?5,?6,?7,?8)",
                     rusqlite::params![
-                        message_id, session_id, role, content, now, seq, parent, entry_type
+                        message_id, session_id, role, content, now, seq, parent, entry_type, ctx.as_ref().map(|ctx|ctx.run_id.as_str())
                     ],
                 )
                 .map_err(map_err)?;
@@ -446,7 +473,13 @@ pub async fn append_branch_entry(
                     rusqlite::params![session_id, message_id, now],
                 )
                 .map_err(map_err)?;
-                Ok(message_id)
+                let mut envelope = event.map(|payload| insert_key_event(conn, &session_id, &format!("interactive:{message_id}"), payload, now)).transpose()?;
+                if let (Some(ctx), Some(envelope)) = (&ctx, &mut envelope) {
+                    conn.execute("UPDATE key_events SET run_id=?1,attempt=?2 WHERE event_id=?3",rusqlite::params![ctx.run_id.as_str(),ctx.attempt.as_str(),envelope.event_id.as_str()]).map_err(map_err)?;
+                    conn.execute("UPDATE runs SET last_event_seq=?1,updated_at_unix_ms=?2 WHERE run_id=?3",rusqlite::params![envelope.seq.value() as i64,now,ctx.run_id.as_str()]).map_err(map_err)?;
+                    envelope.run_id=Some(ctx.run_id.clone());envelope.attempt=Some(ctx.attempt.clone());
+                }
+                Ok((message_id, envelope))
             })
         })
         .await

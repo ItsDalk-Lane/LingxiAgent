@@ -6,6 +6,7 @@
 
 import { useStore } from './index';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch, sessionSelectionRevision } from '../services/session-connection-owner';
 import { clearChat } from './agent-actions';
 import type { DeskFile, DeskSearchResult, StudioWorkspace } from '../types';
 import type { WorkspaceDeskState } from './desk-slice';
@@ -545,6 +546,10 @@ export function deskCurrentDir(): string | null {
 
 export async function loadDeskFiles(subdir?: string, overrideDir?: string | null, overrideMountId?: string | null): Promise<void> {
   const s = useStore.getState();
+  const owner = captureSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const selection = sessionSelectionRevision();
+  const owns = () => !native || (ownsSessionConnection(owner) && selection === sessionSelectionRevision() && useStore.getState().currentSessionId === s.currentSessionId);
   if (!hasServerConnection(s)) return;
   if (subdir !== undefined) s.setDeskCurrentPath('');
   const myVersion = ++_deskLoadVersion;
@@ -565,9 +570,14 @@ export async function loadDeskFiles(subdir?: string, overrideDir?: string | null
     const curPath = '';
     if (curPath) params.set('subdir', curPath);
     const qs = params.toString() ? `?${params}` : '';
-    const res = await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    if (native && mountId) throw new Error('当前会话尚未登记该挂载工作区');
+    if (native && !dir) return;
+    if (native && !s.currentSessionId) throw new Error('会话身份缺失，无法读取工作区');
+    const res = native ? await sessionOwnerFetch(owner, `/lingxi/v1/sessions/${encodeURIComponent(s.currentSessionId!)}/workspace-files`)
+      : await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data = await responseJsonOrEmpty(res);
-    if (myVersion !== _deskLoadVersion) return;
+    if (!owns() || myVersion !== _deskLoadVersion) return;
+    if (native && (data.sessionId !== s.currentSessionId || workspaceCompareKey(normalizeWorkspaceComparePath(data.basePath)) !== workspaceCompareKey(normalizeWorkspaceComparePath(dir)) || !Array.isArray(data.files))) throw new Error('工作区列表归属或格式无效');
     if (!mountId && dir && isMissingLocalDeskRootResponse(res, data)) {
       await pruneStaleLocalDeskRoot(dir);
       updateDeskContextBtn();
@@ -594,9 +604,10 @@ export async function loadDeskFiles(subdir?: string, overrideDir?: string | null
       st.setDeskWorkspaceMount(null);
       if (data.basePath) st.setDeskBasePath(data.basePath);
     }
-    loadJianContent();
+    if (!native) loadJianContent();
     updateDeskContextBtn();
   } catch (err) {
+    if (!owns()) return;
     console.error('[jian-desk] load failed:', err);
     if (myVersion !== _deskLoadVersion) return;
     updateDeskContextBtn();
@@ -701,6 +712,10 @@ async function blobToBase64(blob: Blob): Promise<string> {
 
 export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean; overrideDir?: string | null; overrideMountId?: string | null } = {}): Promise<boolean> {
   const s = useStore.getState();
+  const owner = captureSessionConnection();
+  const native = owner?.connection.serverNodeKind === 'lingxi-service';
+  const selection = sessionSelectionRevision();
+  const owns = () => !native || (ownsSessionConnection(owner) && selection === sessionSelectionRevision() && useStore.getState().currentSessionId === s.currentSessionId);
   if (!hasServerConnection(s)) return false;
   const mountId = activeDeskMountId(s, options.overrideMountId);
   const dir = mountId ? undefined : activeDeskRoot(s, options.overrideDir);
@@ -722,9 +737,14 @@ export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean;
     if (normalizedSubdir) params.set('subdir', normalizedSubdir);
     if (!mountId) addSelectedDeskAgentParam(params, s);
     const qs = params.toString() ? `?${params}` : '';
-    const res = await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
+    if (native && mountId) throw new Error('当前会话尚未登记该挂载工作区');
+    if (native && !dir) return false;
+    if (native && !s.currentSessionId) throw new Error('会话身份缺失，无法读取工作区');
+    const res = native ? await sessionOwnerFetch(owner, `/lingxi/v1/sessions/${encodeURIComponent(s.currentSessionId!)}/workspace-files${normalizedSubdir ? `?subdir=${encodeURIComponent(normalizedSubdir)}` : ''}`)
+      : await lingxiFetch(`${mountId ? '/api/workbench/files' : '/api/desk/files'}${qs}`);
     const data = await res.json();
-    if (_deskTreeLoadVersion.get(key) !== myVersion) return false;
+    if (!owns() || _deskTreeLoadVersion.get(key) !== myVersion) return false;
+    if (native && (data.sessionId !== s.currentSessionId || workspaceCompareKey(normalizeWorkspaceComparePath(data.basePath)) !== workspaceCompareKey(normalizeWorkspaceComparePath(dir)) || !Array.isArray(data.files))) throw new Error('工作区列表归属或格式无效');
     if (data.error) throw new Error(String(data.error));
     const st = useStore.getState();
     if (mountId) {
@@ -746,6 +766,7 @@ export async function loadDeskTreeFiles(subdir = '', options: { force?: boolean;
     if (!normalizedSubdir) st.setDeskFiles(data.files || []);
     return true;
   } catch (err) {
+    if (!owns()) return false;
     console.error('[desk-tree] load failed:', err);
     if (_deskTreeLoadVersion.get(key) !== myVersion) return false;
     return false;

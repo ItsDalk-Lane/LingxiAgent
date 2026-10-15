@@ -1,0 +1,122 @@
+{
+  "baseCommit": "c095f606c603ae08862ceafe73157c18dd13c97d",
+  "candidateKind": "private uncommitted contents",
+  "files": [
+    {
+      "path": "desktop/src-tauri/tests/interaction_host.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "768550e7364f885e68914b6e61988a12da9e9c8266f839569b199b20b200bb2d",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/app/ChatPage.tsx",
+      "baseSHA256": "61868ffaca1dd2741cbc1c2c679446d299c8b35f13f3605480b0b78357634a17",
+      "candidateSHA256": "b2a76cca970cb5e6c702be744ef68d66299675bad5443e7e543dc7e5a9ad9890",
+      "new": false
+    },
+    {
+      "path": "desktop/src/react/components/interactive/InteractiveToolsPanel.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "3db2a363419d1dfa10390e7d3f6dce8cf626ac34b4a869b5d76969aa2f63fc71",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/interactive/QuestionCard.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "13c34f41d80a309bfde0295b0ce5b69709e3a105aab7b6ff5ea3d6200b7213f3",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/interactive/SessionCard.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "9d7d657fb0e5e1019cab3e93b395458ee98431351c65d41947fe4da6fc7db0f6",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/interactive/SessionTodoList.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "74b1ad3c282285d3cd45473d65cf74fb18bebad64975a07c280b4aaafb909c4b",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/interactive/__tests__/host/host.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "90446f96a6ff369fd69456089c6af09c39c02b1fc62b8b2d1d6a20aacbf2be79",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/interactive/__tests__/host/index.html",
+      "baseSHA256": null,
+      "candidateSHA256": "4bc9578f3a7dabefcc8d456b2b359a3d6c2c082c4b0c052b6aa5fc7524cc1ab6",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/components/interactive/__tests__/run-live-ui.mjs",
+      "baseSHA256": null,
+      "candidateSHA256": "4988fa2975b56a0401ea2e162b8f681e4b031111af01905ebd3848cd2414b8bf",
+      "new": true
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "baseSHA256": "f5837f0c9f8ab836ad8aecbcd94b57c51dc6ac84f78911bca6119aee8cb17ce6",
+      "candidateSHA256": "8a5e984e5a1c53c59e73789e49650dd09a9cce4d5ae7240987633a097001c750",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "baseSHA256": "c4411a93829673838bbaf74bad7e26682bc13ae0fdceeed18e29fdf938a66ecc",
+      "candidateSHA256": "739a188945d55c506d2f610fd5f11de4951ba69e2546b9a9e5fc11723d81ba4d",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/interaction_store.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "bf73eef8cdaa8f5714ae974abbaf7727fae0404ee4dcf5c407c6843a3a5945fc",
+      "new": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/interactive_tools.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "3cdf5ea747f1c821c41ab195638742b64eaa98024042b1b7a984ed84fbef7703",
+      "new": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseSHA256": "b34146494b9c031b50dfabbcfdc46c95fab102ea173c59ed59167d68a496fbbf",
+      "candidateSHA256": "e8df4c5926c121d22c4fca767f90e714e4b45f5301d92bfe371255166211269c",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/model_history.rs",
+      "baseSHA256": "2018a3b8a7692b72f0f2b64e37c250e4c6709935afb5389c0ee558f767ea66ca",
+      "candidateSHA256": "a54a6fc14bbb6f87ae76fa4d182c271b15f239ed7d3da5dd15bfaa7ab339fd09",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/todos.rs",
+      "baseSHA256": "c9953d5f5b3043d40b04e593d68f48b70964992e60eef66609c4f9971ad088b5",
+      "candidateSHA256": "72fadca8731c94853e76012610ef2c21bddcddb9834f5f8c046e664eeb4bf8f2",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_interactive_completion.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "a07c181752146636cfb759e254d8a1741e8a8f8025db06e714528ba7ef5ab373",
+      "new": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t04_history.rs",
+      "baseSHA256": "e6917c879383e7caae5640f7f4cc80c4ebcd9fd4a4e5e1cfca606918f4605f3a",
+      "candidateSHA256": "70c8e94dddc93040ba77082d9a86270fece954926633e39a0242f4d36e9a2c5b",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_todo_panel.rs",
+      "baseSHA256": "d76e04f305de7c63f351792d9155db58c2c79f6dced3bd400bd9ec311b710c15",
+      "candidateSHA256": "92295a6b4f6bcf85cc84f4294b1addb9c8fd248917f6764875dd17a0ce2ea910",
+      "new": false
+    }
+  ],
+  "candidateAggregateSHA256": "4ea09cb3e6b826a0dcef8bfaf53df381525386c522d9eb3736ac13337b8f195e",
+  "patchSHA256": "cc42f2ba75208a817fc15f9849b4cf8daa70bf85da8a2e8f5de73af7df886bd4"
+}

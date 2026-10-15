@@ -7,6 +7,7 @@
   "permissions": [
     "core:default",
     "allow-select-files",
+    "allow-select-folder",
     "allow-read-file",
     "allow-read-file-snapshot",
     "allow-read-file-base64",

@@ -65,6 +65,29 @@ pub(crate) fn save_choice(
     }
     write_choices(home, &rows)
 }
+/// 创建方持有新 SID admission；已有预备行也不得被覆盖。
+pub(crate) fn save_new_session_choice(
+    home: &Path,
+    owner: &str,
+    session: &str,
+    choice: ChatChoice,
+) -> Result<(), String> {
+    if owner.is_empty() || session.is_empty() {
+        return Err("new session identity missing".into());
+    }
+    let _lock = SETTINGS_LOCK
+        .lock()
+        .map_err(|_| "chat settings lock poisoned")?;
+    let mut rows = read_choices(home)?;
+    if rows.sessions.contains_key(session) {
+        return Err("new session already has model settings".into());
+    }
+    if rows.sessions.len() >= MAX_STREAMS {
+        return Err("chat settings capacity exceeded".into());
+    }
+    rows.sessions.insert(session.into(), choice);
+    write_choices(home, &rows)
+}
 fn write_choices(home: &Path, rows: &Choices) -> Result<(), String> {
     let home = &home
         .canonicalize()
@@ -97,6 +120,24 @@ fn write_choices(home: &Path, rows: &Choices) -> Result<(), String> {
         Err(e) => return Err(e.to_string()),
     }
     .map_err(|e| format!("chat settings save: {e:?}"))
+}
+/// 仅供持有全新 SID admission、且尚未建立该会话的创建方撤回自己的预备行。
+pub(crate) fn remove_new_session_choice(
+    home: &Path,
+    owner: &str,
+    session: &str,
+) -> Result<(), String> {
+    if owner.is_empty() || session.is_empty() {
+        return Err("new session cleanup identity missing".into());
+    }
+    let _lock = SETTINGS_LOCK
+        .lock()
+        .map_err(|_| "chat settings lock poisoned")?;
+    let mut rows = read_choices(home)?;
+    if rows.sessions.remove(session).is_none() {
+        return Ok(());
+    }
+    write_choices(home, &rows)
 }
 /// 调用方必须先取得当前授权事实；此处只维护唯一会话模型/思考真相。
 pub(crate) fn read_session_choice(

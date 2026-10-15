@@ -15,6 +15,7 @@ export function createResourceBridge(invoke: Invoke, listenForFileChanges: FileC
     listSkillFiles: (baseDir: string) => invoke<SkillTree[]>('list_skill_files', { baseDir }),
     readSkillFile: (path: string) => invoke<string | null>('read_skill_file', { path }),
     skillViewerClose: () => invoke<void>('skill_viewer_close'),
+    selectFolder: () => invoke<string | null>('select_folder'),
     selectFiles: (multiple = true) => invoke<string[]>('select_files', { multiple }),
     readFile: (path: string) => invoke<string | null>('read_file', { path }),
     readFileSnapshot: (path: string) => invoke<Snapshot | null>('read_file_snapshot', { path }),
@@ -53,7 +54,7 @@ export function nativeBridge(): ResourceBridge {
     async <T,>(command: string, args?: Record<string, unknown>) => {
       const result = await core.invoke<T>(command, args);
       // 供窗口内资源消费者观察真实回包；不包含宿主凭证，也不替换原生执行。
-      if (command === 'select_files' || command === 'resource_events') window.dispatchEvent(new CustomEvent('lingxi-resource-response', { detail: { command, result } }));
+      if (command === 'select_files' || command === 'select_folder' || command === 'resource_events') window.dispatchEvent(new CustomEvent('lingxi-resource-response', { detail: { command, result } }));
       return result;
     },
     async callback => {

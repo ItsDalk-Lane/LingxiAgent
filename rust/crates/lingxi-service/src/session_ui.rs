@@ -63,3 +63,25 @@ pub(crate) fn workspace(
 ) -> Result<Option<String>, StorageError> {
     Ok(read(storage, session)?.and_then(|value| value.cwd))
 }
+pub(crate) fn save(storage: &RunDatabase, value: &SessionMetadata) -> Result<(), StorageError> {
+    if value.session_id.trim().is_empty() {
+        return Err(io("session identity is required"));
+    }
+    for raw in value.cwd.iter().chain(value.workspace_folders.iter()) {
+        let path = std::path::Path::new(raw);
+        if !path.is_absolute() || !std::fs::metadata(path).map_err(io)?.is_dir() {
+            return Err(io("workspace must be an existing absolute directory"));
+        }
+    }
+    let text = serde_json::to_string_pretty(value).map_err(io)?;
+    lingxi_adapters::storage::agent_memory::atomic_write(&path(storage, &value.session_id)?, &text)
+        .map_err(io)
+}
+
+pub(crate) fn remove_uncreated(storage: &RunDatabase, session: &str) -> Result<(), StorageError> {
+    match std::fs::remove_file(path(storage, session)?) {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(io(error)),
+    }
+}

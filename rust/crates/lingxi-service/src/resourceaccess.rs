@@ -264,6 +264,58 @@ impl ResourceAccess {
         Ok(())
     }
 
+    /// 每轮从真实会话授权目录刷新同一主体的范围；全部验证成功后一次替换。
+    pub fn replace_session_roots(
+        &self,
+        principal_kind: &'static str,
+        principal_subject: &str,
+        session_id: &str,
+        roots: &[String],
+        op: ResourceOp,
+    ) -> Result<(), AccessRefusal> {
+        let mut granted = Vec::new();
+        for raw in roots {
+            let root = Path::new(raw);
+            let resolved = resolve_real(root)
+                .filter(|path| path.is_dir())
+                .ok_or_else(|| AccessRefusal {
+                    cause: AccessRefusalCause::Unresolvable,
+                    requested_path: raw.clone(),
+                    resolved_path: None,
+                    op,
+                    message: "session workspace is not a resolvable directory".into(),
+                })?;
+            // 授权根在建立会话时已正规化；日后被链接替换不能重新授权到另一目录。
+            if root != resolved {
+                return Err(AccessRefusal {
+                    cause: AccessRefusalCause::Unresolvable,
+                    requested_path: raw.clone(),
+                    resolved_path: Some(resolved.to_string_lossy().into_owned()),
+                    op,
+                    message: "session workspace root identity changed".into(),
+                });
+            }
+            if !granted
+                .iter()
+                .any(|item: &GrantedRoot| item.path == resolved)
+            {
+                granted.push(GrantedRoot {
+                    path: resolved,
+                    writable: matches!(op, ResourceOp::Write),
+                });
+            }
+        }
+        self.lock().grants.insert(
+            GrantKey {
+                principal_kind,
+                principal_subject: principal_subject.into(),
+                session_id: session_id.into(),
+            },
+            granted,
+        );
+        Ok(())
+    }
+
     /// Revokes every grant of one (principal, session).
     pub fn revoke_grants(
         &self,

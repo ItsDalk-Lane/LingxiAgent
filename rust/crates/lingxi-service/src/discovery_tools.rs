@@ -102,13 +102,15 @@ pub fn register_discovery_tools(
             move |input: &crate::toolgateway::ResourceExtractionInput,
                   args: &lingxi_kernel::toolcatalog::EffectiveArguments| {
                 let raw = args.as_value()["path"].as_str().unwrap_or(".");
+                let actual_cwd =
+                    crate::toolgateway::workspace().unwrap_or_else(|| extraction_cwd.clone());
                 extraction_access
                     .authorize(
                         input.principal_kind,
                         &input.principal_subject,
                         &input.session_id,
                         std::path::Path::new(raw),
-                        &extraction_cwd,
+                        &actual_cwd,
                         ResourceOp::Read,
                     )
                     .map(|scope| vec![scope])
@@ -142,7 +144,7 @@ impl ToolExecutorPort for Executor {
         let ctx = ctx.clone();
         let kind = self.kind;
         let access = self.access.clone();
-        let cwd = self.cwd.clone();
+        let cwd = crate::toolgateway::workspace().unwrap_or_else(|| self.cwd.clone());
         let args = request.arguments.as_value().clone();
         Box::pin(async move {
             #[cfg(any(target_os = "macos", target_os = "linux", windows))]

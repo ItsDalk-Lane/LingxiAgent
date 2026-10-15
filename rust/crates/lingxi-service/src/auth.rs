@@ -533,6 +533,11 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     }
     // 与 Axum 的实际路由保持精确匹配；不能把未注册的 `/health/` 当作公开路由。
     let p = path;
+    if (p == "/lingxi/v1/sessions/interactions" && matches!(m.as_str(), "GET" | "HEAD"))
+        || (p == "/lingxi/v1/sessions/interactions/answer" && m == "POST")
+    {
+        return RoutePolicy::Scope("chat");
+    }
 
     if p == "/lingxi/v1/health" && (m == "GET" || m == "HEAD") {
         return RoutePolicy::Public;
@@ -601,7 +606,9 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                     | "switch"
                     | "rotate"
                     | "continue-deleted-agent"
+                    | "new"
                     | "new-detached"
+                    | "new-detached-context"
                     | "todos/complete"
                     | "todos/cancel"
                     | "todos/dismiss"
@@ -634,6 +641,9 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             match tail {
                 "slash" | "bridge" if id_clean && m == "POST" => return RoutePolicy::Scope("chat"),
                 "bridge/attachment" if id_clean && matches!(m.as_str(), "POST" | "DELETE") => {
+                    return RoutePolicy::Scope("chat")
+                }
+                "workspace-files" if id_clean && matches!(m.as_str(), "GET" | "HEAD") => {
                     return RoutePolicy::Scope("chat")
                 }
                 "workspace" if id_clean && m == "PUT" => return RoutePolicy::Scope("chat"),

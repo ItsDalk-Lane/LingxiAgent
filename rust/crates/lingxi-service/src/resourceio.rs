@@ -225,7 +225,7 @@ impl std::error::Error for ResourceIoError {}
 /// 路由面错误外发：status 原样、现役 code 进 details.reason
 /// （EndpointError::resource_failure，与 resources.rs 同一约定）；外发
 /// 文本优先 safeMessage（现役 errorJson 语义）。
-fn error_response(err: ResourceIoError) -> Response {
+pub(crate) fn error_response(err: ResourceIoError) -> Response {
     let status = axum::http::StatusCode::from_u16(err.status)
         .unwrap_or(axum::http::StatusCode::INTERNAL_SERVER_ERROR);
     let message = err
@@ -854,6 +854,35 @@ impl ResourceIoService {
     pub fn workspace_root(&self) -> Option<PathBuf> {
         self.inner.workspace.as_ref().map(|plane| plane.cwd.clone())
     }
+    /// 只接受已由会话归属门取得的持久授权根；与模型工具共用同一个授权表。
+    pub(crate) fn restore_session_roots(
+        &self,
+        ctx: &OpContext,
+        roots: &[String],
+    ) -> Result<(), ResourceIoError> {
+        let plane = self
+            .inner
+            .workspace
+            .as_ref()
+            .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
+        plane
+            .access
+            .replace_session_roots(
+                ctx.principal_kind,
+                &ctx.principal_subject,
+                &ctx.session_id,
+                roots,
+                ResourceOp::Write,
+            )
+            .map_err(|error| {
+                ResourceIoError::access_denied(
+                    "restore_session_roots",
+                    error.to_string(),
+                    "会话工作区授权不可用".into(),
+                )
+            })
+    }
+
     pub fn file_safety(&self) -> Arc<crate::file_safety::FileSafety> {
         self.inner.file_safety.read().unwrap().clone()
     }

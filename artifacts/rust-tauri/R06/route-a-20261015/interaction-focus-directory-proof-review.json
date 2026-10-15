@@ -1,0 +1,71 @@
+{
+  "scope": "Two session leaves, three interactive tool leaves, and native directory selection; not full stage acceptance",
+  "rootIntegratedTests": {
+    "newInteractive": 7,
+    "newFocusDraft": 1,
+    "oldSessionRegression": 6,
+    "log": "/private/tmp/r06-interaction-focus-main-r2.log"
+  },
+  "rootThreeTypescriptConfigurations": "PASS",
+  "rootTypesLog": "/private/tmp/r06-interaction-focus-main-types-r2.log",
+  "rootWholeKernelAdaptersServiceAllTargetsStrict": "PASS",
+  "rootWholeStrictLog": "/private/tmp/r06-interaction-focus-all-strict-r1.log",
+  "rootNativeStrict": "PASS",
+  "rootNativeStrictLog": "/private/tmp/r06-directory-native-strict-r1.log",
+  "rootCurrentTauriInteractionScreenshotReviewed": true,
+  "rootInteractionEvidence": "/private/tmp/r06-interaction-focus-main-env/tmp/lingxi-interaction-75e906176057ab16/interactive-ui-evidence",
+  "rootFocusActualWindowChecks": 6,
+  "rootFocusActualProviderCalls": 9,
+  "rootFocusActualLedgerRows": 9,
+  "integrationAdjustments": [
+    "Interaction 19 file candidates individually SHA verified before merge; lib/auth/model_history/ChatPage three-way merge retains current chat and background work",
+    "Focus 24 file base hashes reconstructed from c095 + frozen chat core44 + exact Root === true narrowing; lib conflicts only adjacent field/constructor additions, retain both interactions and focus mutation lock",
+    "Move image encode/decode declarations above existing test module to satisfy whole-target strict lint; no business change or removed assertion",
+    "Directory picker calls real native pick_folder, returns Option<String>, main window capability only; current skill-directory UI displays chosen path but does not install. Native OS choose/cancel is only considered proved after actual registered parent and original leaf rollup pass"
+  ],
+  "retainedRootSetupFailures": [
+    {
+      "log": "/private/tmp/r06-interaction-focus-main-r1.log",
+      "reason": "Root merge preparation aborted at insertion-conflict guard before 24 source set applied; cargo correctly reported missing new focus test target. Fully resolved both insertion fields and constructor members, verified source files, then r2 actual tests passed."
+    },
+    {
+      "log": "/private/tmp/r06-interaction-focus-directory-window-r1-20261015/R06_BINDINGS/r06_test_9b21a2d853775007038f/command-001/stdout.log",
+      "reason": "Real native system picker opened, but raw unbundled test executable cannot be addressed by CUA app selector. Root terminated only own native child PID37593 under directory_picker_host PID37592; actual parent failed and original output retained. Native proof now packages same current binary by hard link with Info.plist so CUA can choose exact application; no mock picker or weakened assertion."
+    },
+    {
+      "log": "/private/tmp/r06-interaction-focus-directory-window-r2-20261015/R06_BINDINGS/r06_test_9b21a2d853775007038f/command-001/stdout.log",
+      "reason": "Actual CUA native choose and Cancel assertions passed, selected.png reviewed; subsequent readonly-window negative started invoke before new WebView initialized, undefined __TAURI__.core. Fixture now waits for actual native bridge plus production skill-viewer DOM; same negative permission assertion retained."
+    }
+  ],
+  "original279AssertionsAndThenUnchanged": true,
+  "limits": [
+    "Interactive model request ProviderPort deterministic; real storage, permission service, HTTP and Tauri UI execute",
+    "Focused runs use controlled real local HTTP supplier, not external paid provider",
+    "Native actual macOS only; Windows/Linux not run",
+    "No full product or full R06 acceptance claim"
+  ],
+  "nativeDirectoryProof": {
+    "status": "PASS",
+    "actualCuaSelectedAndCancelled": true,
+    "actualChecks": 5,
+    "receipt": "/private/tmp/r06-interaction-focus-directory-window-r3-20261015/directory-native/receipt.json",
+    "currentTauriScreenshot": "/private/tmp/r06-interaction-focus-directory-window-r3-20261015/directory-native/selected.png",
+    "checks": [
+      "actual-native-dialog-selected-path",
+      "current-ui-retains-selected-path-not-installed",
+      "actual-cancel-null-keeps-existing-selection",
+      "source-bytes-unchanged-no-install",
+      "readonly-window-rejected"
+    ]
+  },
+  "registeredWindow": {
+    "status": "PASS",
+    "bindings": 10,
+    "sourceCandidateSha256": "6751fb7f9e274c4d04bce8eda72e9cd3870329bad9cdf279db4e5c4a89893492",
+    "rawEvidence": "/private/tmp/r06-interaction-focus-directory-window-r3-20261015"
+  },
+  "registrationContract": {
+    "passed": 20,
+    "log": "/private/tmp/r06-interaction-focus-directory-contract.log"
+  }
+}

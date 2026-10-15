@@ -2924,6 +2924,8 @@ impl ToolExecutorPort for CoreFileExecutor {
         let kind = self.kind;
         let ctx = ctx.clone();
         let args = request.arguments.as_value().clone();
+        // Tokio 阻塞池不继承任务局部值；必须显式带上本轮已经冻结的工作区。
+        let workspace = crate::toolgateway::workspace();
         Box::pin(async move {
             let retained = match crate::task_supervisor::retain_blocking_run_permit(&ctx) {
                 Ok(permit) => permit,
@@ -2937,11 +2939,11 @@ impl ToolExecutorPort for CoreFileExecutor {
             let work_ctx = ctx.clone();
             let outcome = tokio::task::spawn_blocking(move || {
                 let _retained_permit = retained;
-                match kind {
+                crate::toolgateway::with_workspace(workspace, || match kind {
                     FileToolKind::Read => tools.run_read(&work_ctx, &args),
                     FileToolKind::Write => tools.run_write(&work_ctx, &args),
                     FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
-                }
+                })
             })
             .await
             .unwrap_or_else(|join_err| {

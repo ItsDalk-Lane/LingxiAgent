@@ -8,7 +8,7 @@
 
 ## 当前分工
 
-- 主控：整合与逐批绑定；当前57/78完成、还21，26个仅属R06全部完成；继续共享原叶及EX义务。
+- 主控：整合与逐批绑定；当前69/78完成、还9，26个仅属R06全部完成；继续共享原叶及EX义务。
 - 文件工具：ls/find/grep真实三入口、反斜线名称、400层目录/取消与替换边界修后已绑定；主控继续原生桌面入口。
 - 设置/记忆代理：本批真实助手页19动作、待清理收据、角色卡与自动ticker已交付；当前并行推进Slash五叶及Bridge目标隔离。
 - 知识代理：继续EX09章节筛选/粒度/重排显式降级；Root已合旧缓存代际/NFKC/Jieba/真实regex/分块空隙及付费保全，不把这些局部通过当EX09整体验收。
@@ -54,45 +54,45 @@
 - [ ] `R00-T02-LA-3CBCAE9AD914`（R04 / R06）：stat返回元数据；copy在授权工作区落文件；extract返回文档文本与来源。
 - [x] `R00-T02-LA-3FCB259FF69C`（R06 / R08）：删除当前会话历史并提示已清除
 - [x] `R00-T02-LA-4173A08A51CC`（R04 / R06 / R09）：文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口
-- [ ] `R00-T02-LA-421EEA1AC8D5`（R03 / R06 / R08）：先回 compaction_accepted，再按实际结果回 succeeded/noop/failed
+- [x] `R00-T02-LA-421EEA1AC8D5`（R03 / R06 / R08）：先回 compaction_accepted，再按实际结果回 succeeded/noop/failed
 - [x] `R00-T02-LA-4EA88B5073E4`（R03 / R06 / R08）：当前流中止；无活动流时返回已停止提示
 - [x] `R00-T02-LA-4F0466F7C090`（R04 / R06）：文件字节改变并登记会话文件产物。
-- [ ] `R00-T02-LA-52A5D1660088`（R06 / R07）：系统目录对话框返回路径，供技能安装/配置后续处理
+- [x] `R00-T02-LA-52A5D1660088`（R06 / R07）：系统目录对话框返回路径，供技能安装/配置后续处理
 - [x] `R00-T02-LA-5A6E0D526903`（R03 / R06 / R08）：刷新提示词和记忆后压缩，回传 token 变化或原因
 - [x] `R00-T02-LA-6207F7E8C697`（R06 / R08）：create保存会话锚点及可选工作区快照；list/drop反映记录变化。
 - [x] `R00-T02-LA-7244E7DCE678`（R03 / R06）：返回当前会话 pending/resolved/failed 项及结果，不跨会话。
 - [x] `R00-T02-LA-771296A194E0`（R06 / R07）：审核后把课程/技能文档写入Agent技能区，可在后续会话检索。
 - [x] `R00-T02-LA-7803B231FC36`（R06 / R07）：调用工具模型，返回目标语言名称映射
-- [ ] `R00-T02-LA-7CBF6F4A6760`（R03 / R06 / R08）：已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲
-- [ ] `R00-T02-LA-81664285F927`（R03 / R06 / R08）：按 streamId/sinceSeq 补发遗漏事件和重置/截断标记
+- [x] `R00-T02-LA-7CBF6F4A6760`（R03 / R06 / R08）：已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲
+- [x] `R00-T02-LA-81664285F927`（R03 / R06 / R08）：按 streamId/sinceSeq 补发遗漏事件和重置/截断标记
 - [ ] `R00-T02-LA-81B217A7E581`（R03 / R06 / R08）：逐动作核对实际状态与页面投影；失败不伪装成空数据
 - [x] `R00-T02-LA-84E22CD74BE1`（R03 / R06）：任务处理器接收stop，任务状态转终止且回报；支持子代理/媒体等。
 - [x] `R00-T02-LA-857747F848F6`（R03 / R06）：按 taskId 与所属会话停止任务，返回 subagent_stop_result
 - [x] `R00-T02-LA-8A69F0CFFFA1`（R06 / R07）：安装包至 .agents/skills，刷新技能路径，返回 name/installedSkillSource
 - [ ] `R00-T02-LA-8E2D44B48905`（R06 / R08）：逐动作核对实际状态与页面投影；失败不伪装成空数据
-- [ ] `R00-T02-LA-92620BF2264F`（R03 / R06 / R08）：经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复
+- [x] `R00-T02-LA-92620BF2264F`（R03 / R06 / R08）：经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复
 - [ ] `R00-T02-LA-93D5237ADE81`（R04 / R06）：返回文件内容与来源；图片可走视觉桥，Office可抽取文本；不改原文件。
-- [ ] `R00-T02-LA-94CB746D04B7`（R03 / R06 / R08）：输入区出现一张批量提问卡；确认返回按key映射的答案与answered=true；超时只自动填推荐项并标timedOut/autoSelected；拒答返回dismissed且answers为空。
+- [x] `R00-T02-LA-94CB746D04B7`（R03 / R06 / R08）：输入区出现一张批量提问卡；确认返回按key映射的答案与answered=true；超时只自动填推荐项并标timedOut/autoSelected；拒答返回dismissed且answers为空。
 - [ ] `R00-T02-LA-980C099F356F`（R03 / R06）：默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行
 - [x] `R00-T02-LA-99F8CD228733`（R06 / R07）：逐动作核对实际状态与页面投影；失败不伪装成空数据
 - [x] `R00-T02-LA-9CA8A47BE208`（R06 / R07）：独立技能查看器列文件并显示所选文本
 - [ ] `R00-T02-LA-A2C385A33493`（R03 / R06 / R08）：悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话
 - [ ] `R00-T02-LA-AD7FAE6288FA`（R04 / R06）：本地资源返回真实路径；远端资源先暂存本地副本再返回路径与resourceKey，不修改原资源。
 - [x] `R00-T02-LA-AF18F5CEA14F`（R04 / R06）：合法目标存在时 shell.trashItem 后书桌列表更新
-- [ ] `R00-T02-LA-B34F2B298BFA`（R03 / R06 / R08）：会话流发出完整新清单，界面显示各项pending/in_progress/blocked/completed状态。
+- [x] `R00-T02-LA-B34F2B298BFA`（R03 / R06 / R08）：会话流发出完整新清单，界面显示各项pending/in_progress/blocked/completed状态。
 - [x] `R00-T02-LA-B47CAC08F418`（R03 / R06 / R08）：返回 aborted 或 already_stopped；找不到 404，非本会话拥有 403
 - [x] `R00-T02-LA-B97D0D4296FA`（R04 / R06）：返回目录项与元数据，不改文件。
-- [ ] `R00-T02-LA-B9DA1A584C6E`（R06 / R08）：按指定 Agent、工作区、记忆和模型设置新建焦点会话，写元数据并广播
+- [x] `R00-T02-LA-B9DA1A584C6E`（R06 / R08）：按指定 Agent、工作区、记忆和模型设置新建焦点会话，写元数据并广播
 - [x] `R00-T02-LA-BA490D930CA9`（R06 / R07）：重新扫描所有技能并广播 skills-changed；前端再按 agentId 取列表
 - [x] `R00-T02-LA-BB0A168006D7`（R06 / R08）：只接受绝对文件路径和 edit-start/autosave-interval 原因，返回新检查点
 - [x] `R00-T02-LA-BDE3AC44D79C`（R04 / R06）：只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令
-- [ ] `R00-T02-LA-C1FB9C92E813`（R03 / R06 / R08）：活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交
-- [ ] `R00-T02-LA-D483E4CD0935`（R03 / R06 / R08）：经授权进入会话 Run，流式返回阶段、工具和最终回复
+- [x] `R00-T02-LA-C1FB9C92E813`（R03 / R06 / R08）：活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交
+- [x] `R00-T02-LA-D483E4CD0935`（R03 / R06 / R08）：经授权进入会话 Run，流式返回阶段、工具和最终回复
 - [ ] `R00-T02-LA-D8D47C4680C9`（R03 / R06）：逐动作核对实际状态与页面投影；失败不伪装成空数据
-- [ ] `R00-T02-LA-D901852E1B1A`（R03 / R06 / R08）：按 sessionId 保存；sessionPath 先解析为 sessionId
+- [x] `R00-T02-LA-D901852E1B1A`（R03 / R06 / R08）：按 sessionId 保存；sessionPath 先解析为 sessionId
 - [x] `R00-T02-LA-E1625F70C7CC`（R06 / R08）：用户批准后回退会话分支；繁忙时延后到本轮结束并回报；文件恢复受版本检查。
 - [x] `R00-T02-LA-EC77C2B04726`（R04 / R06）：返回匹配行/位置，不修改文件。
-- [ ] `R00-T02-LA-EE2ACB390FCE`（R06 / R07）：生成cardId并把title/code存入会话结果，前端在隔离iframe渲染卡片。
+- [x] `R00-T02-LA-EE2ACB390FCE`（R06 / R07）：生成cardId并把title/code存入会话结果，前端在隔离iframe渲染卡片。
 - [x] `R00-T02-LA-F88B0A969094`（R04 / R06）：返回路径列表，不写文件。
 - [ ] `R00-T02-LA-FBDEEDAC0B11`（R06 / R08）：改变当前会话并尝试恢复该会话浏览器，旧会话浏览器不随切换挂起
 - [x] `R00-T02-LA-FF4F06011B48`（R06 / R08）：读取会话 sidecar 中冻结的系统提示词和工具名
@@ -212,3 +212,11 @@ Word与首张Excel工作表由实际Rust授权文件快照/ZIP/XML转换为HTML�
 - 当前生产Rust/ChatPage/InputArea/Tiptap真窗口27检查；14新父证明及3后台回归通过；三TS、strict Clippy与三crate全部测试目标编译通过。
 - 冻结窗口25个原有及新增登记检查全部实际通过，逐断言6项汇总通过；证据见 `artifacts/rust-tauri/R06/route-a-20261015/chat-backend-binding-window-summary.json`，候选内容SHA `f094d02d619300496f7fae9441c5dfd47a42342efe0a1b473f801f52e04b64fb`。
 - 原端口争用、旧夹具媒体类型未穷尽两次窗口失败保留，分别修启动器独立端口和旧夹具分类；原业务断言未删改。完整聊天页81B仍未计入，R06_NOT_ACCEPTED / F14 OPEN / 无R07_READY。
+
+## 2026-10-15 会话、交互与目录六叶收口
+
+- 两项焦点/草稿、三项真实交互工具、一个真实系统目录选择全部完成当前候选登记。初始78缺口已完成69，剩9；270 READY/9 GAP。
+- Root合并后14检查通过：交互7、旧会话6、新焦点1；当前生产Tauri交互6检查与真实InputArea草稿6检查，真实3个Run/9个请求/9条账本。全kernel/adapters/service all-targets strict和三TS通过。
+- 系统目录对话框由CUA真实选择与取消，返回正确路径/null；未安装、原文不变、只读窗口拒绝。保留裸程序不可定位和新窗口未就绪两次失败，修测试应用包和就绪边界，未改业务断言。
+- 冻结当前候选10个登记检查全部实际PASS，六原叶汇总PASS；候选内容SHA `6751fb7f9e274c4d04bce8eda72e9cd3870329bad9cdf279db4e5c4a89893492`，详情见 `artifacts/rust-tauri/R06/route-a-20261015/interaction-focus-directory-binding-window-summary.json`。
+- 剩9叶分给三个子代理继续：81B聊天页及文件工具3；浏览器恢复/Map2；实验/主动委派2及QuickChat1。原279 assertions/Then未改；R06_NOT_ACCEPTED / F14 OPEN / 无R07_READY。

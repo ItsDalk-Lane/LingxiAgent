@@ -60,6 +60,10 @@ impl AgentLifecycleError {
         }
     }
 
+    pub(crate) fn is_missing(&self) -> bool {
+        self.status == StatusCode::NOT_FOUND
+    }
+
     pub(crate) fn response(&self) -> Response {
         (self.status, Json(json!({ "error": self.message }))).into_response()
     }
@@ -466,6 +470,48 @@ impl MemoryService {
         let mut preferences = self.read_preferences_strict()?;
         preferences["current_session_id"] = json!(session_id);
         self.write_preferences(&preferences)
+    }
+
+    /// 焦点会话和助手在同一次偏好原子写入中发布；不替换其它偏好字段。
+    pub(crate) fn set_current_focus(
+        &self,
+        agent_id: &str,
+        session_id: &str,
+    ) -> Result<(), AgentLifecycleError> {
+        self.agent_dir_checked(agent_id)?;
+        let _guard = preferences_locked();
+        let mut preferences = self.read_preferences_strict()?;
+        preferences["current_agent_id"] = json!(agent_id);
+        preferences["current_session_id"] = json!(session_id);
+        self.write_preferences(&preferences)
+    }
+
+    /// 新建焦点会话沿现役约定记住工作目录；配置失败必须交回调用方。
+    pub(crate) fn record_session_workspace(
+        &self,
+        agent_id: &str,
+        cwd: &str,
+    ) -> Result<(), AgentLifecycleError> {
+        let path = self.agent_dir_checked(agent_id)?.join("config.yaml");
+        self.dream().save_config(agent_id, None, || {
+            let text = std::fs::read_to_string(&path).map_err(|error| {
+                AgentLifecycleError::internal(format!("cannot read config.yaml: {error}"))
+            })?;
+            let mut document = am::config::AgentConfigDocument::parse(&text)?;
+            let mut history = document
+                .string_list("desk", "cwd_history")?
+                .unwrap_or_default();
+            history.retain(|entry| entry != cwd);
+            history.push(cwd.to_string());
+            if history.len() > CWD_HISTORY_CAP {
+                history.drain(..history.len() - CWD_HISTORY_CAP);
+            }
+            document.set_string("desk", "last_cwd", cwd);
+            document.set_string_list("desk", "cwd_history", &history);
+            am::atomic_write(&path, &document.render()?).map_err(|error| {
+                AgentLifecycleError::internal(format!("cannot remember session workspace: {error}"))
+            })
+        })
     }
 
     /// 当前助手解析顺序：current_agent_id → primary_agent_id → None。

@@ -52,7 +52,6 @@ pub mod filehistory;
 pub mod filemeta;
 pub mod filetools;
 pub mod fsread;
-pub mod office;
 pub mod history;
 pub mod history_projection;
 pub mod hooks;
@@ -71,6 +70,7 @@ pub mod memory_ticker;
 pub mod memorytools;
 pub mod model_history;
 mod mood_trajectory;
+pub mod office;
 pub mod operations;
 pub mod paths;
 pub mod persona;
@@ -88,6 +88,7 @@ pub mod sandbox;
 mod security_audit;
 pub mod serve;
 pub mod session_admin;
+pub mod session_focus;
 pub mod session_locator;
 pub mod session_prompt;
 pub mod session_supervisor;
@@ -106,6 +107,8 @@ pub mod streaming_norm;
 pub mod subagents;
 pub mod task_supervisor;
 pub mod todos;
+pub mod interaction_store;
+pub mod interactive_tools;
 pub mod toolcatalog_bridge;
 pub mod toolgateway;
 pub mod transport;
@@ -550,6 +553,8 @@ pub struct ServiceState {
     rollback_preferences_lock: Arc<tokio::sync::Mutex<()>>,
     input_drafts: Arc<input_drafts::InputDraftsService>,
     session_tools: Arc<sessiontools::SessionTools>,
+    interactions: Arc<interaction_store::InteractionStore>,
+    focus_mutation: Arc<tokio::sync::Mutex<()>>,
     approvals: Option<Arc<approval_service::ApprovalService>>,
     /// Subagent runtime (R03-T06): child-run dispatch/reply/close through
     /// the same run supervisor.
@@ -1684,6 +1689,11 @@ impl ServiceState {
         let runs = runs
             .with_context_compiler(deps.context_compiler.clone())
             .with_context_session_store(Arc::clone(&storage))
+            .with_session_resource_access(
+                workspace_access
+                    .as_ref()
+                    .map(|(access, _)| Arc::clone(access)),
+            )
             .with_chat_settings_home(config.data_home.clone());
         // R06-T06: the Pi extension hooks port — production ON (the
         // agent-loop-guard + tool_result guard pipeline). The loop guard's
@@ -1718,6 +1728,10 @@ impl ServiceState {
                 Arc::clone(&session_tools),
                 &lingxi_kernel::toolcatalog::SchemaBudget::default(),
             );
+        }
+        let interactions = Arc::new(interaction_store::InteractionStore::new(Arc::clone(&storage), Arc::clone(&events), Arc::clone(&deps.clock)));
+        if let Some(gateway) = deps.tool_gateway.as_ref() {
+            interactive_tools::register(gateway.registry(), gateway, Arc::clone(&interactions), &lingxi_kernel::toolcatalog::SchemaBudget::default());
         }
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R05-T06: the worker model-callback port. An injected port always
@@ -2142,6 +2156,8 @@ impl ServiceState {
             chat_wire: Arc::new(chat_wire::ChatWire::new(&data_home)),
             session_tree: session_tree_handle,
             session_tools,
+            interactions,
+            focus_mutation: Arc::new(tokio::sync::Mutex::new(())),
             approvals: approval_service_handle,
             session_admin: Arc::new(
                 session_admin::SessionAdminService::new(Arc::clone(&storage))
@@ -2281,6 +2297,8 @@ impl ServiceState {
     pub fn tickets(&self) -> &WsTicketService {
         &self.tickets
     }
+
+    pub fn interactions(&self) -> &Arc<interaction_store::InteractionStore> { &self.interactions }
 
     pub fn sessions(&self) -> &sessions::SessionStore {
         &self.sessions
@@ -5087,7 +5105,42 @@ async fn switch_session_route(
         .with_reason("session_lifecycle_conflict")
         .into_response();
     }
-    if let Err(err) = state.memory().set_current_session(&session_id) {
+    let metadata = match session_ui::read(state.storage(), &session_id) {
+        Ok(value) => value,
+        Err(error) => return EndpointError::storage(&error).into_response(),
+    };
+    // 没配置模型的服务仍可浏览既有会话，但须如实声明模型当前不可用。
+    let choice_result = if state.model_gateway().is_some() {
+        chat_settings::read_session_choice(&state, &session)
+    } else {
+        chat_settings::choice(state.memory().home(), &session.owner_user_id, &session_id)
+    };
+    let choice = match choice_result {
+        Ok(value) => value,
+        Err(error) => {
+            return EndpointError::new(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                ErrorCode::Internal,
+                error,
+            )
+            .into_response()
+        }
+    };
+    let streaming = state.sessions().session_supervisor().is_busy(&session_id);
+    let _focus = state.focus_mutation.lock().await;
+    let _application = character_cards::CARD_APPLICATION_GATE.lock().await;
+    if let Err(response) = gate_agent_not_deleted(&state, &session.agent_id) {
+        return response;
+    }
+    // 只有数据库历史、尚无本地助手目录的旧会话仍可浏览；不能据此制造可创建会话的助手偏好。
+    let focus = match state.memory().agent_dir_checked(&session.agent_id) {
+        Ok(_) => state
+            .memory()
+            .set_current_focus(&session.agent_id, &session_id),
+        Err(error) if error.is_missing() => state.memory().set_current_session(&session_id),
+        Err(error) => Err(error),
+    };
+    if let Err(err) = focus {
         return EndpointError::new(
             StatusCode::INTERNAL_SERVER_ERROR,
             ErrorCode::Internal,
@@ -5112,8 +5165,17 @@ async fn switch_session_route(
             "agentName": agent_name,
             "memoryEnabled": row.memory_enabled,
             "authorizedFolders": row.authorized_folders,
-            "workspaceFolders": [],
-            "cwd": serde_json::Value::Null,
+            "path": session_locator::native(&session_id),
+            "workspaceFolders": metadata.as_ref().map(|value| value.workspace_folders.clone()).unwrap_or_default(),
+            "cwd": metadata.as_ref().and_then(|value| value.cwd.clone()),
+            "projectId": row.project_id,
+            "permissionMode": row.permission_mode,
+            "thinkingLevel": choice.thinking_level,
+            "currentModelProvider": choice.model.as_ref().map(|pair| pair.0.clone()),
+            "currentModelId": choice.model.as_ref().map(|pair| pair.1.clone()),
+            "currentModelAvailable": state.model_gateway().is_some(),
+            "currentModelUnavailableReason": if state.model_gateway().is_none() { Some("model_plane_unavailable") } else { None },
+            "isStreaming": streaming,
             "browserResume": { "status": "skipped", "reason": "no_browser_host" },
         })),
     )
@@ -6950,6 +7012,15 @@ pub fn build_router(state: ServiceState) -> Router {
         // R06-T03 管理面静态路由（axum 静态段优先于 {session_id} 参数段）。
         .route("/lingxi/v1/sessions/rename", post(rename_session_route))
         // R06 焦点切换与独立会话创建（现役 /sessions/switch、/sessions/new-detached）
+        .route("/lingxi/v1/sessions/new", post(session_focus::create_route))
+        .route(
+            "/lingxi/v1/sessions/new-detached-context",
+            post(session_focus::create_detached_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{id}/workspace-files",
+            get(session_focus::workspace_files_route),
+        )
         .route("/lingxi/v1/sessions/switch", post(switch_session_route))
         .route("/lingxi/v1/sessions/rotate", post(rotate_session_route))
         .route(
@@ -6979,6 +7050,8 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/sessions/todos/dismiss",
             post(todos::dismiss_route),
         )
+        .route("/lingxi/v1/sessions/interactions", get(interactive_tools::state_route))
+        .route("/lingxi/v1/sessions/interactions/answer", post(interactive_tools::answer_route))
         .route("/lingxi/v1/sessions/todos", get(todos::panel_route))
         // R06 R2：会话列表投影（sessions.read + Studio 身份闸，现役 studio-list 面）。
         .route(

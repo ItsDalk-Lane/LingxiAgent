@@ -99,6 +99,53 @@ pub async fn create_session(
     memory_enabled: bool,
     now_unix_ms: u64,
 ) -> Result<(), StorageError> {
+    create_session_prepared(
+        db,
+        SessionCreation {
+            session_id,
+            agent_id,
+            owner_user_id,
+            title,
+            permission_mode,
+            authorized_folders,
+            memory_enabled,
+            now_unix_ms,
+            project_id: None,
+            lineage: None,
+        },
+    )
+    .await
+}
+
+/// 焦点创建在调用方持新会话许可时提交完整元数据，项目归属与会话行同事务。
+pub struct SessionCreation<'a> {
+    pub session_id: &'a str,
+    pub agent_id: &'a str,
+    pub owner_user_id: &'a str,
+    pub title: &'a str,
+    pub permission_mode: Option<&'a str>,
+    pub authorized_folders: &'a [String],
+    pub memory_enabled: bool,
+    pub now_unix_ms: u64,
+    pub project_id: Option<&'a str>,
+    pub lineage: Option<(&'a str, u32)>,
+}
+pub async fn create_session_prepared(
+    db: &RunDatabase,
+    creation: SessionCreation<'_>,
+) -> Result<(), StorageError> {
+    let SessionCreation {
+        session_id,
+        agent_id,
+        owner_user_id,
+        title,
+        permission_mode,
+        authorized_folders,
+        memory_enabled,
+        now_unix_ms,
+        project_id,
+        lineage,
+    } = creation;
     if session_id.starts_with(super::run_store::MOOD_STREAM_PREFIX) {
         return Err(StorageError::InvalidRequest {
             detail: "reserved mood stream namespace cannot be used as a session id".into(),
@@ -115,6 +162,9 @@ pub async fn create_session(
     let perm = permission_mode.map(str::to_string);
     let mem = i64::from(memory_enabled);
     let now = now_unix_ms as i64;
+    let project = project_id.map(str::to_string);
+    let parent = lineage.map(|(parent, _)| parent.to_string());
+    let depth = lineage.map_or(0, |(_, depth)| i64::from(depth));
     let busy = db.options().busy_timeout_ms;
     db.queue()
         .submit(move |conn| {
@@ -136,13 +186,46 @@ pub async fn create_session(
                     });
                 }
                 super::session_operations::assert_fresh_identity(conn, &sid)?;
+                if let Some(parent) = parent.as_deref() {
+                    let actual: Option<i64> = conn
+                        .query_row(
+                            "SELECT lineage_depth FROM sessions WHERE session_id=?1",
+                            [parent],
+                            |row| row.get(0),
+                        )
+                        .optional()
+                        .map_err(map_err)?;
+                    if actual
+                        .and_then(|depth| {
+                            lingxi_kernel::session_tree::check_fork_depth(depth as u32)
+                        })
+                        .map(i64::from)
+                        != Some(depth)
+                    {
+                        return Err(StorageError::Conflict {
+                            detail: "new_session_lineage_changed".into(),
+                        });
+                    }
+                }
                 conn.execute(
                     "INSERT INTO sessions \
                  (session_id, agent_id, owner_user_id, title, created_at_unix_ms, \
                   lifecycle, lineage_depth, permission_mode, authorized_folders_json, \
-                  memory_enabled, last_activity_unix_ms) \
-                 VALUES (?1,?2,?3,?4,?5,'active',0,?6,?7,?8,?5)",
-                    rusqlite::params![sid, aid, owner, ttl, now, perm, folders_json, mem],
+                  memory_enabled, last_activity_unix_ms, project_id, parent_session_id) \
+                 VALUES (?1,?2,?3,?4,?5,'active',?11,?6,?7,?8,?5,?9,?10)",
+                    rusqlite::params![
+                        sid,
+                        aid,
+                        owner,
+                        ttl,
+                        now,
+                        perm,
+                        folders_json,
+                        mem,
+                        project,
+                        parent,
+                        depth
+                    ],
                 )
                 .map_err(map_err)?;
                 Ok(())
@@ -1394,4 +1477,23 @@ pub async fn clear_current_history(
             Ok((count,event))
         })
     }).await
+}
+
+/// 只撤销调用方仍持许可、尚无任何运行或消息的新建行；绝不清理既有会话。
+pub async fn remove_unstarted_creation(
+    db: &RunDatabase,
+    session: &str,
+    owner: &str,
+) -> Result<(), StorageError> {
+    let (sid, owner, busy) = (
+        session.to_string(),
+        owner.to_string(),
+        db.options().busy_timeout_ms,
+    );
+    db.queue().submit(move |connection| with_write_txn(connection, busy, |connection| {
+        let used: bool = connection.query_row("SELECT EXISTS(SELECT 1 FROM runs WHERE session_id=?1) OR EXISTS(SELECT 1 FROM messages WHERE session_id=?1)", [&sid], |row| row.get(0)).map_err(map_err)?;
+        if used { return Err(StorageError::Conflict { detail: "new session already has durable activity; initialization cleanup refused".into() }); }
+        connection.execute("DELETE FROM sessions WHERE session_id=?1 AND owner_user_id=?2", rusqlite::params![sid, owner]).map_err(map_err)?;
+        Ok(())
+    })).await
 }

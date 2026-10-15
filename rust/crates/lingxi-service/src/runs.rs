@@ -651,6 +651,7 @@ pub struct RunSupervisor {
     /// landed). `None` keeps the pre-T03 shape exactly (no user-message row).
     user_message_recorder: Option<Arc<dyn UserMessageRecorder>>,
     chat_settings_home: Option<std::path::PathBuf>,
+    session_resource_access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
     knowledge: Option<Arc<crate::knowledge::KnowledgeService>>,
     model_history: Option<Arc<crate::model_history::ModelHistory>>,
 }
@@ -746,6 +747,7 @@ impl RunSupervisor {
             extension_hooks: false,
             user_message_recorder: None,
             chat_settings_home: None,
+            session_resource_access: None,
             model_history: None,
             knowledge: None,
         }
@@ -792,6 +794,7 @@ impl RunSupervisor {
             extension_hooks: false,
             user_message_recorder: None,
             chat_settings_home: None,
+            session_resource_access: None,
             model_history: None,
             knowledge: None,
         })
@@ -868,6 +871,15 @@ impl RunSupervisor {
         storage: Arc<lingxi_adapters::storage::RunDatabase>,
     ) -> Self {
         self.context_session_store = Some(storage);
+        self
+    }
+
+    /// 会话根按本轮权威行恢复，冷启动不依赖先前窗口中的临时授权表。
+    pub fn with_session_resource_access(
+        mut self,
+        access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
+    ) -> Self {
+        self.session_resource_access = access;
         self
     }
 
@@ -1470,6 +1482,35 @@ impl RunSupervisor {
             }
             None => None,
         };
+        if let (Some(access), Some(row)) = (&self.session_resource_access, &session_row) {
+            if let Err(error) = access.replace_session_roots(
+                principal.storage_kind(),
+                &principal.storage_subject(),
+                session_id,
+                &row.authorized_folders,
+                crate::resourceaccess::ResourceOp::Write,
+            ) {
+                let finish = RunFinish::Failed {
+                    cause: FailureCause::StorageFailed {
+                        code: format!("workspace_authorization: {error:?}"),
+                        retryable: false,
+                    },
+                };
+                let finish = self
+                    .adjudicated_finalize(
+                        port,
+                        events,
+                        &ctx,
+                        &entry,
+                        RunStatus::Running,
+                        finish,
+                        now_ms,
+                    )
+                    .await?;
+                guard.disarm();
+                return Ok(finish);
+            }
+        }
         let session_started_ms = session_row
             .as_ref()
             .map_or(now_ms, |row| row.created_at_unix_ms.max(0) as u64);

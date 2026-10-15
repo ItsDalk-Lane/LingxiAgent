@@ -2451,6 +2451,32 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "interaction_focus_directory": {
+      "status": "SIX_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-D901852E1B1A",
+        "R00-T02-LA-B9DA1A584C6E",
+        "R00-T02-LA-94CB746D04B7",
+        "R00-T02-LA-B34F2B298BFA",
+        "R00-T02-LA-EE2ACB390FCE",
+        "R00-T02-LA-52A5D1660088"
+      ],
+      "completedInitialGaps": 69,
+      "remainingInitialGaps": 9,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 270,
+      "gapLeaves": 9,
+      "actualRegisteredBindings": 10,
+      "sourceCandidateSha256": "6751fb7f9e274c4d04bce8eda72e9cd3870329bad9cdf279db4e5c4a89893492",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/interaction-focus-directory-binding-window-summary.json",
+      "proofReview": "artifacts/rust-tauri/R06/route-a-20261015/interaction-focus-directory-proof-review.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

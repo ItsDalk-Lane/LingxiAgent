@@ -7,6 +7,7 @@ fn main() {
             "read_skill_file",
             "skill_viewer_close",
             "select_files",
+            "select_folder",
             "read_file",
             "read_file_snapshot",
             "read_file_base64",

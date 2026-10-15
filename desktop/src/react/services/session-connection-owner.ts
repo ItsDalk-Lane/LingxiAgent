@@ -1,5 +1,7 @@
 /** 会话异步操作绑定真实连接和变更次数；离开后返回也不能接收旧结果。 */
 import { useStore } from '../stores';
+import { SIDE_CHAT_INITIAL_STATE } from '../stores/side-chat-slice';
+import { resetSessionMemoryCache } from '../components/input/composer-memory-mode';
 import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from './server-connection';
 
 export interface SessionConnectionOwner { key: string; revision: number; connection: ServerConnection }
@@ -29,9 +31,17 @@ function observe(): void {
     key = next; revision++;
     const nextRust = resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service';
     const reset = previousRust || nextRust; previousRust = nextRust;
-    if (reset) useStore.setState({ sessions: [], chatSessions: {}, sessionLocatorsById: {},
-      currentSessionId: null, currentSessionPath: null, pendingSessionSwitchPath: null,
-      drafts: {}, draftDocs: {}, draftsHydratedAt: 0 });
+    if (reset) {
+      resetSessionMemoryCache();
+      useStore.setState({ sessions: [], chatSessions: {}, sessionLocatorsById: {},
+      currentSessionId: null, currentSessionPath: null, currentSessionPathOverride: null, pendingSessionSwitchPath: null,
+      sideChat: { ...SIDE_CHAT_INITIAL_STATE, createdAt: Date.now() },
+      drafts: {}, draftDocs: {}, draftsHydratedAt: 0, pendingNewSession: false, pendingDraftId: null,
+      pendingProjectId: null, pendingNewSessionThinkingLevel: null, pendingNewSessionPermissionMode: null,
+      models: [], currentModel: null, sessionModelsByPath: {}, thinkingLevelBySession: {}, thinkingLevel: 'medium', currentAgentId: null,
+      selectedFolder: null, selectedWorkspaceMountId: null, selectedAgentId: null, workspaceFolders: [],
+      deskFiles: [], deskTreeFilesByPath: {}, deskBasePath: '', deskWorkspaceMountId: null });
+    }
     for (const listener of listeners) listener();
   });
 }
@@ -41,9 +51,10 @@ export function subscribeSessionConnection(listener: () => void): () => void {
   observe(); listeners.add(listener); return () => listeners.delete(listener);
 }
 export function captureSessionConnection(): SessionConnectionOwner | null {
-  observe();
   const connection = resolveServerConnection(useStore.getState());
-  return connection ? { key: identity(), revision, connection: structuredClone(connection) } : null;
+  if (!connection) return null;
+  observe();
+  return { key: identity(), revision, connection: structuredClone(connection) };
 }
 export function ownsSessionConnection(owner: SessionConnectionOwner | null): owner is SessionConnectionOwner {
   observe(); return !!owner && owner.key === identity() && owner.revision === revision;
@@ -61,7 +72,12 @@ export async function sessionOwnerFetch(owner: SessionConnectionOwner, path: str
     const response = await fetch(buildConnectionUrl(owner.connection, path), { ...options,
       headers: appendConnectionAuth(owner.connection, options.headers), signal: controller.signal });
     if (!ownsSessionConnection(owner)) throw new Error('连接已切换，已忽略旧结果');
-    if (!response.ok) throw new Error(`请求失败（${response.status}）`);
+    if (!response.ok) {
+      const detail = await response.json().catch(() => null) as { message?: unknown; error?: unknown; code?: unknown } | null;
+      if (!ownsSessionConnection(owner)) throw new Error('连接已切换，已忽略旧错误');
+      const message = typeof detail?.message === 'string' ? detail.message : typeof detail?.error === 'string' ? detail.error : `请求失败（${response.status}）`;
+      throw Object.assign(new Error(message), typeof detail?.code === 'string' ? { code: detail.code } : {});
+    }
     return response;
   } finally { clearTimeout(timeout); stop(); options.signal?.removeEventListener('abort', abort); }
 }

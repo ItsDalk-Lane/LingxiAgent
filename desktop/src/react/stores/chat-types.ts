@@ -554,6 +554,8 @@ export interface SessionModel {
 // 不要为了存别的东西（例如模型快照）就写 stub 进来——会把这个语义打破。
 
 export interface SessionMessages {
+  /** Rust 原始历史与显示缓存同寿命；保全未知记录并支持跨页重投影。 */
+  nativeRawItems?: unknown[];
   items: ChatListItem[];
   hasMore: boolean;
   loadingMore: boolean;

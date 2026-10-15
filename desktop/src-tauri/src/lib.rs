@@ -98,6 +98,16 @@ async fn select_files(
 }
 
 #[tauri::command]
+async fn select_folder(window: WebviewWindow) -> Result<Option<String>, String> {
+    main_only(&window)?;
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    window.dialog().file().set_parent(&window).pick_folder(move |path| {
+        let _ = tx.send(path.map(|path| path.to_string()));
+    });
+    rx.await.map_err(|_| "原生目录选择器未返回".into())
+}
+
+#[tauri::command]
 fn read_file(
     window: WebviewWindow,
     state: State<'_, Arc<DesktopState>>,
@@ -528,6 +538,7 @@ pub fn run() {
             read_skill_file,
             skill_viewer_close,
             select_files,
+            select_folder,
             read_file,
             read_file_snapshot,
             read_file_base64,
