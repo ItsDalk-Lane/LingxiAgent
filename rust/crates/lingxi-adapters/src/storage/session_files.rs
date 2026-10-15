@@ -1292,22 +1292,73 @@ fn add_identity(
     }
 }
 
+/// 完整原生挂载引用有独立授权生命周期；这里只分类身份，不授予读取权限。
+/// 裸路径、错配路径和显式会话附件仍交给原有归属校验。
+fn is_native_mount_path_object(map: &serde_json::Map<String, serde_json::Value>) -> bool {
+    fn descriptor(map: &serde_json::Map<String, serde_json::Value>) -> Option<&str> {
+        let get = |key: &str| map.get(key).and_then(serde_json::Value::as_str);
+        if get("kind") != Some("mount") || get("provider") != Some("mount") {
+            return None;
+        }
+        let id = get("mountId")?;
+        let path = get("path")?;
+        let file = get("filePath")?;
+        if id.trim().is_empty()
+            || file.contains('\0')
+            || path.contains('\0')
+            || path.contains('\\')
+            || (!path.is_empty()
+                && path
+                    .split('/')
+                    .any(|p| p.is_empty() || p == "." || p == ".."))
+            || !std::path::Path::new(file).is_absolute()
+        {
+            return None;
+        }
+        Some(file)
+    }
+    if map.contains_key("realPath") {
+        return false;
+    }
+    if descriptor(map).is_some() {
+        return true;
+    }
+    let Some(resource) = map.get("resource").and_then(serde_json::Value::as_object) else {
+        return false;
+    };
+    let Some(path) = descriptor(resource) else {
+        return false;
+    };
+    map.get("filePath").and_then(serde_json::Value::as_str) == Some(path)
+}
+
 fn collect_identities(
     value: &serde_json::Value,
     ordered: &mut Vec<String>,
     seen: &mut std::collections::HashSet<String>,
+    native_resources: bool,
 ) {
+    let native_resources = native_resources
+        && value
+            .get("target")
+            .and_then(serde_json::Value::as_str)
+            .is_none_or(|target| {
+                matches!(
+                    target,
+                    "tool:first-party:file" | "tool:first-party:materialize"
+                )
+            });
     match value {
         serde_json::Value::String(text) => collect_from_text(text, ordered, seen),
         serde_json::Value::Array(items) => {
             for item in items {
-                collect_identities(item, ordered, seen);
+                collect_identities(item, ordered, seen, native_resources);
             }
         }
         serde_json::Value::Object(map) => {
-            collect_from_object(map, ordered, seen);
+            collect_from_object(map, ordered, seen, native_resources);
             for item in map.values() {
-                collect_identities(item, ordered, seen);
+                collect_identities(item, ordered, seen, native_resources);
             }
         }
         _ => {}
@@ -1318,6 +1369,7 @@ fn collect_from_object(
     map: &serde_json::Map<String, serde_json::Value>,
     ordered: &mut Vec<String>,
     seen: &mut std::collections::HashSet<String>,
+    native_resources: bool,
 ) {
     let get_str = |key: &str| map.get(key).and_then(serde_json::Value::as_str);
     let explicit_type = matches!(get_str("type"), Some("session_file") | Some("session-file"))
@@ -1332,7 +1384,10 @@ fn collect_from_object(
         }
     }
     let has_path = get_str("filePath").is_some() || get_str("realPath").is_some();
-    if file_id.is_some() || explicit_type || has_path {
+    if file_id.is_some()
+        || explicit_type
+        || (has_path && !(native_resources && is_native_mount_path_object(map)))
+    {
         if let Some(p) = get_str("filePath") {
             add_identity(ordered, seen, p);
         }
@@ -1346,7 +1401,6 @@ fn collect_from_object(
         }
     }
 }
-
 /// 文本标记扫描（SESSION_FILE_MARKER_RE / ATTACHED_MEDIA_MARKER_RE 的
 /// 手写等价，无 regex 依赖）：
 /// - `[SessionFile]\s+(\{[^\r\n]*\})`：`{` 到本行最后一个 `}`，JSON 解析
@@ -1375,7 +1429,7 @@ fn collect_from_text(
                 if let Ok(serde_json::Value::Object(map)) =
                     serde_json::from_str::<serde_json::Value>(candidate)
                 {
-                    collect_from_object(&map, ordered, seen);
+                    collect_from_object(&map, ordered, seen, false);
                 }
                 rest = &rest[close + 1..];
             } else {
@@ -1442,7 +1496,14 @@ pub(crate) fn files_on_connection(
 pub fn reference_identities(value: &serde_json::Value) -> Vec<String> {
     let mut ids = Vec::new();
     let mut seen = std::collections::HashSet::new();
-    collect_identities(value, &mut ids, &mut seen);
+    collect_identities(value, &mut ids, &mut seen, false);
+    ids
+}
+
+fn native_reference_identities(value: &serde_json::Value) -> Vec<String> {
+    let mut ids = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    collect_identities(value, &mut ids, &mut seen, true);
     ids
 }
 
@@ -1453,6 +1514,33 @@ pub(crate) fn sync_message_refs(
     message_id: &str,
     content: &str,
     now: u64,
+) -> Result<(), StorageError> {
+    // 只有真实已存模型档案、且来源Run仍属于同一用户，才能保存原生Mount来源。
+    // 普通正文/附件不能靠一个resource字段绕过原有会话文件归属检查。
+    let native=conn.query_row("SELECT EXISTS(SELECT 1 FROM messages m JOIN sessions s ON s.session_id=m.session_id JOIN runs r ON r.run_id=json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.sourceRun') WHERE m.session_id=?1 AND m.message_id=?2 AND m.role='model_history' AND m.entry_type='lingxi-model-exchange-v1' AND json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.schema')='lingxi-model-exchange-v1' AND json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.owner')=s.owner_user_id AND r.owner_subject=s.owner_user_id AND r.session_id=json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.sourceSession') AND (json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.payload.projection.target') IN ('tool:first-party:file','tool:first-party:materialize') OR json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.payload.projection.target') IS NULL))",rusqlite::params![session_id,message_id],|row|row.get::<_,bool>(0)).map_err(map_err)?;
+    sync_refs_inner(conn, session_id, message_id, content, now, native)
+}
+
+/// 仅由真实ToolCallCompleted提交入口调用；不是正文可选标记。
+pub(crate) fn sync_native_tool_result_refs(
+    conn: &rusqlite::Connection,
+    session_id: &str,
+    message_id: &str,
+    content: &str,
+    now: u64,
+    run_id: Option<&str>,
+    tool_call_id: &str,
+) -> Result<(), StorageError> {
+    let native=conn.query_row("SELECT EXISTS(SELECT 1 FROM key_events WHERE session_id=?1 AND run_id=?2 AND event_type='tool_call_started' AND json_extract(payload_json,'$.toolCall.toolCallId')=?3 AND json_extract(payload_json,'$.toolCall.target') IN ('tool:first-party:file','tool:first-party:materialize'))",rusqlite::params![session_id,run_id,tool_call_id],|row|row.get::<_,bool>(0)).map_err(map_err)?;
+    sync_refs_inner(conn, session_id, message_id, content, now, native)
+}
+fn sync_refs_inner(
+    conn: &rusqlite::Connection,
+    session_id: &str,
+    message_id: &str,
+    content: &str,
+    now: u64,
+    native: bool,
 ) -> Result<(), StorageError> {
     let value: serde_json::Value = match serde_json::from_str(content) {
         Ok(value) => value,
@@ -1476,7 +1564,11 @@ pub(crate) fn sync_message_refs(
             serde_json::Value::String(content.to_string())
         }
     };
-    let ids = reference_identities(&value);
+    let ids = if native {
+        native_reference_identities(&value)
+    } else {
+        reference_identities(&value)
+    };
     if ids.is_empty() {
         return touch_on_connection(conn, session_id, now);
     }
@@ -1506,7 +1598,6 @@ pub(crate) fn sync_message_refs(
     }
     touch_on_connection(conn, session_id, now)
 }
-
 /// 文件副本与分支消息属于同一提交。失败只补偿本次新建的副本，不触碰源文件。
 #[derive(Default)]
 pub(crate) struct ForkCopies {

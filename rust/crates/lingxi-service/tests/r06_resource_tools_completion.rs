@@ -191,7 +191,9 @@ impl Harness {
             &layout,
             ServiceDeps {
                 workspace_root: Some(workspace.clone()),
-                resource_url_provider:Some(Arc::new(lingxi_service::resource_url::UrlProvider::new(&home))),
+                resource_url_provider: Some(Arc::new(
+                    lingxi_service::resource_url::UrlProvider::new(&home),
+                )),
                 context_compiler: Some(compiler),
                 clock,
                 turn_provider: Some(provider.clone()),
@@ -598,8 +600,17 @@ async fn current_file_extract_office_all_available_sheets_source_and_explicit_tr
         std::fs::read(cwd.join("outputs/nested/copy.docx")).unwrap(),
         std::fs::read(cwd.join("source.docx")).unwrap()
     );
-    let inspected=h.state.session_files().inspect_local_import(cwd.join("source.docx").to_str().unwrap()).unwrap();
-    let owned=h.state.session_files().register_local_snapshot("office",&inspected,None,"user_attachment").await.unwrap();
+    let inspected = h
+        .state
+        .session_files()
+        .inspect_local_import(cwd.join("source.docx").to_str().unwrap())
+        .unwrap();
+    let owned = h
+        .state
+        .session_files()
+        .register_local_snapshot("office", &inspected, None, "user_attachment")
+        .await
+        .unwrap();
     let resolved = h
         .tool("office", "materialize", json!({"fileId":owned.file_id}))
         .await;

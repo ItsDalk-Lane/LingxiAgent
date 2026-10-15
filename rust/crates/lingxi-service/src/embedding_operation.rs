@@ -979,13 +979,35 @@ impl OperationService {
         runtime: &EmbeddingCallRuntime,
         observer: Option<lingxi_adapters::models::dispatch::SendObserver<'_>>,
     ) -> Result<EmbeddingOwnedOutcome, OperationFailure> {
+        self.embed_owned_selected_observed(
+            request,
+            &ModelRouteRequest::for_operation(ModelOperation::Embedding),
+            runtime,
+            observer,
+        )
+        .await
+    }
+
+    /// 仅可信服务调用者指定模型对，配额、凭证、收据和真实归属沿现役唯一链。
+    pub(crate) async fn embed_owned_selected_observed(
+        &self,
+        request: dialects::embedding::EmbeddingRequest,
+        selection: &ModelRouteRequest,
+        runtime: &EmbeddingCallRuntime,
+        observer: Option<lingxi_adapters::models::dispatch::SendObserver<'_>>,
+    ) -> Result<EmbeddingOwnedOutcome, OperationFailure> {
+        if selection.operation != ModelOperation::Embedding {
+            return Err(internal(
+                "memory embedding selector is not an embedding operation",
+            ));
+        }
         runtime.check()?;
         dialects::embedding::validate_embedding_request(&request)
             .map_err(OperationFailure::from_protocol)?;
         let started = lingxi_adapters::models::dispatch::unix_ms_now();
         let route = self
             .gateway
-            .resolve_route(&ModelRouteRequest::for_operation(ModelOperation::Embedding))
+            .resolve_route(selection)
             .map_err(|e| OperationFailure {
                 code: match &e {
                     ModelGatewayError::UnknownProvider { .. }

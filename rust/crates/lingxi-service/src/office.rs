@@ -115,6 +115,7 @@ fn xml(bytes: &[u8]) -> Result<Node, String> {
 struct Package<'a> {
     archive: zip::ZipArchive<Cursor<&'a [u8]>>,
     total: usize,
+    processing_cache: Option<BTreeMap<String, Vec<u8>>>,
 }
 impl<'a> Package<'a> {
     fn new(bytes: &'a [u8]) -> Result<Self, String> {
@@ -122,9 +123,20 @@ impl<'a> Package<'a> {
         if archive.len() > 4096 {
             return Err("Office archive has too many members".into());
         }
-        Ok(Self { archive, total: 0 })
+        Ok(Self {
+            archive,
+            total: 0,
+            processing_cache: None,
+        })
     }
     fn read(&mut self, path: &str) -> Result<Option<Vec<u8>>, String> {
+        if let Some(bytes) = self
+            .processing_cache
+            .as_ref()
+            .and_then(|cache| cache.get(path))
+        {
+            return Ok(Some(bytes.clone()));
+        }
         let mut entry = match self.archive.by_name(path) {
             Ok(e) => e,
             Err(zip::result::ZipError::FileNotFound) => return Ok(None),
@@ -144,6 +156,9 @@ impl<'a> Package<'a> {
             .ok_or("Office archive size overflow")?;
         if bytes.len() > MAX_XML_BYTES || self.total > MAX_TOTAL_BYTES {
             return Err("Office expanded content exceeds limit".into());
+        }
+        if let Some(cache) = &mut self.processing_cache {
+            cache.insert(path.into(), bytes.clone());
         }
         Ok(Some(bytes))
     }
@@ -409,7 +424,79 @@ pub fn xlsx_for_read(bytes: &[u8]) -> Result<(String, usize), String> {
     Ok((text, omitted))
 }
 
+pub struct WorksheetRow {
+    pub sheet: String,
+    pub row: usize,
+    pub cells: Vec<String>,
+    pub values: Vec<String>,
+}
+
+/// 知识处理保留实际工作表、行号和非空单元格身份；所有表共用解压预算。
+pub fn xlsx_for_processing(bytes: &[u8]) -> Result<(Vec<WorksheetRow>, Vec<String>), String> {
+    let mut package = Package::new(bytes)?;
+    package.processing_cache = Some(BTreeMap::new());
+    let workbook = package.required("xl/workbook.xml")?;
+    let sheets = workbook
+        .child("sheets")
+        .ok_or("xlsx worksheets missing")?
+        .children
+        .iter()
+        .filter(|n| n.name == "sheet")
+        .count();
+    if sheets == 0 {
+        return Err("xlsx worksheets missing".into());
+    }
+    let (mut rows, mut cells, mut warnings) = (Vec::new(), 0, Vec::new());
+    for index in 0..sheets {
+        let (sheet_rows, _, truncated) = match xlsx_sheet_rows(
+            &mut package,
+            index,
+            Some((50_000 - rows.len(), 100_000 - cells)),
+        ) {
+            Ok(rows) => rows,
+            Err(e) if e == "xlsx has no rows" => continue,
+            Err(e) => return Err(e),
+        };
+        cells += sheet_rows.iter().map(|r| r.cells.len()).sum::<usize>();
+        rows.extend(sheet_rows);
+        if let Some(warning) = truncated {
+            warnings.push(warning.into());
+            break;
+        }
+    }
+    Ok((rows, warnings))
+}
+
 fn xlsx_sheet(package: &mut Package<'_>, index: usize) -> Result<ConvertedDocument, String> {
+    let (rows, width, _) = xlsx_sheet_rows(package, index, None)?;
+    let (mut html, mut text) = (String::from("<table>"), String::new());
+    for row in rows {
+        html.push_str("<tr>");
+        let values: std::collections::BTreeMap<_, _> = row
+            .cells
+            .iter()
+            .zip(&row.values)
+            .map(|(cell, value)| Ok((column(cell)?, value)))
+            .collect::<Result<_, String>>()?;
+        for col in 1..=width {
+            let value = values.get(&col).map(|s| s.as_str()).unwrap_or("");
+            html.push_str(&format!("<td>{}</td>", escape(value)));
+            if col > 1 {
+                text.push('\t');
+            }
+            text.push_str(value);
+        }
+        html.push_str("</tr>");
+        text.push('\n');
+    }
+    html.push_str("</table>");
+    Ok(ConvertedDocument { html, text })
+}
+fn xlsx_sheet_rows(
+    package: &mut Package<'_>,
+    index: usize,
+    processing_limits: Option<(usize, usize)>,
+) -> Result<(Vec<WorksheetRow>, usize, Option<&'static str>), String> {
     let workbook = package.required("xl/workbook.xml")?;
     let date1904 = match workbook
         .child("workbookPr")
@@ -463,15 +550,48 @@ fn xlsx_sheet(package: &mut Package<'_>, index: usize) -> Result<ConvertedDocume
     let mut rendered = Vec::new();
     let mut width = 0;
     let mut cells = 0;
-    for row in rows.children.iter().filter(|n| n.name == "row") {
+    let sheet_name = first
+        .attr("name")
+        .ok_or("worksheet name missing")?
+        .to_string();
+    let mut last_row = 0usize;
+    let mut truncated = None;
+    'rows: for row in rows.children.iter().filter(|n| n.name == "row") {
+        if processing_limits.is_some_and(|(limit, _)| rendered.len() >= limit)
+            && row.children.iter().any(|n| n.name == "c")
+        {
+            truncated = Some("row_count_truncated_at_50000");
+            break;
+        }
+        let row_number = row
+            .attr("r")
+            .map(|v| v.parse::<usize>().map_err(|_| "invalid worksheet row"))
+            .transpose()?
+            .unwrap_or(last_row + 1);
+        if row_number == 0 || row_number <= last_row {
+            return Err("worksheet row order invalid".into());
+        }
+        last_row = row_number;
         let mut values = BTreeMap::new();
         let mut inferred = 0;
         for cell in row.children.iter().filter(|n| n.name == "c") {
             cells += 1;
-            if cells > MAX_CELLS {
+            if cells
+                > processing_limits
+                    .map(|(_, limit)| limit)
+                    .unwrap_or(MAX_CELLS)
+            {
+                if processing_limits.is_some() {
+                    truncated = Some("cell_count_truncated_at_100000");
+                    break 'rows;
+                }
                 return Err("worksheet exceeds cell limit".into());
             }
             let col = if let Some(reference) = cell.attr("r") {
+                let suffix = reference.trim_start_matches(|c: char| c.is_ascii_alphabetic());
+                if suffix.parse::<usize>().ok() != Some(row_number) {
+                    return Err("worksheet cell and row identities differ".into());
+                }
                 column(reference)?
             } else {
                 inferred + 1
@@ -523,32 +643,36 @@ fn xlsx_sheet(package: &mut Package<'_>, index: usize) -> Result<ConvertedDocume
             }
         }
         if !values.is_empty() {
-            rendered.push(values);
+            let mut refs = Vec::new();
+            let mut texts = Vec::new();
+            for (col, value) in values {
+                let mut column = col;
+                let mut letters = String::new();
+                while column > 0 {
+                    column -= 1;
+                    letters.insert(0, (b'A' + (column % 26) as u8) as char);
+                    column /= 26;
+                }
+                refs.push(format!("{letters}{row_number}"));
+                texts.push(value);
+            }
+            rendered.push(WorksheetRow {
+                sheet: sheet_name.clone(),
+                row: row_number,
+                cells: refs,
+                values: texts,
+            });
         }
     }
-    if rendered.is_empty() {
+    if rendered.is_empty() && truncated.is_none() {
         return Err("xlsx has no rows".into());
     }
-    if width
-        .checked_mul(rendered.len())
-        .is_none_or(|n| n > MAX_CELLS)
+    if processing_limits.is_none()
+        && width
+            .checked_mul(rendered.len())
+            .is_none_or(|n| n > MAX_CELLS)
     {
         return Err("worksheet display exceeds cell limit".into());
     }
-    let (mut html, mut text) = (String::from("<table>"), String::new());
-    for row in rendered {
-        html.push_str("<tr>");
-        for col in 1..=width {
-            let value = row.get(&col).map(String::as_str).unwrap_or("");
-            html.push_str(&format!("<td>{}</td>", escape(value)));
-            if col > 1 {
-                text.push('\t');
-            }
-            text.push_str(value);
-        }
-        html.push_str("</tr>");
-        text.push('\n');
-    }
-    html.push_str("</table>");
-    Ok(ConvertedDocument { html, text })
+    Ok((rendered, width, truncated))
 }

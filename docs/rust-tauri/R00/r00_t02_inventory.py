@@ -343,7 +343,7 @@ ROUTE_EFFECTS = {
     ("knowledge", "/knowledge/notebooks", "POST"): ("创建知识笔记本", "校验名称并写入当前工作空间知识库，返回新笔记本或错误"),
     ("knowledge", "/knowledge/notebooks/:id", "READ"): ("查看知识笔记本", "返回当前笔记本资料；失败时返回具体错误"),
     ("knowledge", "/knowledge/notebooks/:id", "PATCH"): ("重命名知识笔记本", "名称写入知识库并返回更新后的笔记本；失败时不报告成功"),
-    ("knowledge", "/knowledge/notebooks/:id", "DELETE"): ("删除知识笔记本", "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误"),
+    ("knowledge", "/knowledge/notebooks/:id", "DELETE"): ("删除知识笔记本", "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误"),
     ("access", "/access/account/password", "PUT"): ("设置本地账号密码", "仅本地主人可设置密码；更新账号并记录安全审计，失败时返回错误"),
     ("access", "/access/account/password", "DELETE"): ("移除本地账号密码", "仅本地主人可清除密码；更新账号并记录安全审计，失败时返回错误"),
     ("mcp", "/connectors/:id", "PUT"): ("修改 MCP 连接器", "连接器配置更新，返回更新结果或错误"),

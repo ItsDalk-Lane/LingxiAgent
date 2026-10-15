@@ -99,6 +99,7 @@ tokio::task_local! {
     pub(crate) static TOOL_LIFETIME: TrustedToolLifetime;
     static KNOWLEDGE_RUNTIME: crate::operations::EmbeddingCallRuntime;
     static REVIEW_SCOPE: Option<serde_json::Value>;
+    static EXECUTION_RESOURCES: Vec<ResourceScope>;
     static PREPARE_WORKSPACE: Option<std::path::PathBuf>;
 }
 
@@ -125,6 +126,24 @@ pub(crate) fn with_workspace<T>(
 /// 删除执行端只能消费网关已冻结并复核的范围，模型参数不能铸造该范围。
 pub(crate) fn review_scope() -> Option<serde_json::Value> {
     REVIEW_SCOPE.try_with(Clone::clone).ok().flatten()
+}
+/// 执行端只比较网关已绑定的真实来源，不能把审批后的新挂载根当成旧目标。
+pub(crate) fn require_bound_resource(
+    path: &std::path::Path,
+    op: crate::resourceaccess::ResourceOp,
+) -> Result<(), String> {
+    if EXECUTION_RESOURCES
+        .try_with(|scopes| {
+            scopes
+                .iter()
+                .any(|scope| scope.path == path && scope.op == op)
+        })
+        .unwrap_or(false)
+    {
+        Ok(())
+    } else {
+        Err("resource differs from the gateway-bound approval scope".into())
+    }
 }
 /// 确认范围来自可信调用身份，模型不能指定待审会话或助手。
 pub struct ReviewInput<'a> {
@@ -1665,7 +1684,10 @@ impl ToolInvocationGateway {
                 runtime,
                 REVIEW_SCOPE.scope(
                     record.review_scope.clone(),
-                    self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+                    EXECUTION_RESOURCES.scope(
+                        record.resources.clone(),
+                        self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+                    ),
                 ),
             )
             .await?;

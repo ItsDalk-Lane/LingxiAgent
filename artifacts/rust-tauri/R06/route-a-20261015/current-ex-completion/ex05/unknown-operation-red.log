@@ -1,0 +1,20 @@
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/lingxi-r06-chat-wire/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.44s
+     Running tests/r06_ex05_restore_atomicity.rs (/private/tmp/r06-ex09-target/debug/deps/r06_ex05_restore_atomicity-3cb3f53fc9ed4c42)
+
+running 1 test
+test explicit_unknown_journal_operation_is_refused_without_mutation ... EX05_UNKNOWN_OPERATION {"actualFacts":"UNKNOWN OLD facts\n","allBytesUnchanged":false,"journalPreserved":false,"result":"Ok(true)"}
+
+thread 'explicit_unknown_journal_operation_is_refused_without_mutation' (10027395) panicked at crates/lingxi-adapters/tests/r06_ex05_restore_atomicity.rs:269:5:
+未知operation必须拒绝，不能冒充旧apply执行
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    explicit_unknown_journal_operation_is_refused_without_mutation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r06_ex05_restore_atomicity`

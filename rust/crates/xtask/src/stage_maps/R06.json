@@ -248,6 +248,36 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_522c4f33f8dd0e9103a2/binding-result.json"
       ]
     },
+    "r06_test_a89fcdaca166f8efbf0d": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_a89fcdaca166f8efbf0d",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_a89fcdaca166f8efbf0d"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_a89fcdaca166f8efbf0d/binding-result.json"
+      ]
+    },
+    "r06_test_6badd454ef9747f1d9dc": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_6badd454ef9747f1d9dc",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_6badd454ef9747f1d9dc"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_6badd454ef9747f1d9dc/binding-result.json"
+      ]
+    },
     "r06_test_c6a1cf8a285e48278b05": {
       "argv": [
         "python3",
@@ -366,6 +396,291 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_56928f9dc4edf0a25712/binding-result.json"
+      ]
+    },
+    "r06_test_cd90149e1a844371108f": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_cd90149e1a844371108f",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_cd90149e1a844371108f"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_cd90149e1a844371108f/binding-result.json"
+      ]
+    },
+    "r06_test_6ead7ddd320cded29152": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_6ead7ddd320cded29152",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_6ead7ddd320cded29152"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_6ead7ddd320cded29152/binding-result.json"
+      ]
+    },
+    "r06_test_867ca84fc880938409c4": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_867ca84fc880938409c4",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_867ca84fc880938409c4"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_867ca84fc880938409c4/binding-result.json"
+      ]
+    },
+    "r06_test_62afad49e4c2b76dd7bc": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_62afad49e4c2b76dd7bc",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_62afad49e4c2b76dd7bc"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_62afad49e4c2b76dd7bc/binding-result.json"
+      ]
+    },
+    "r06_test_189797f43c6080d6ac61": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_189797f43c6080d6ac61",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_189797f43c6080d6ac61"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_189797f43c6080d6ac61/binding-result.json"
+      ]
+    },
+    "r06_test_9bc3b5a78e86df460f31": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_9bc3b5a78e86df460f31",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9bc3b5a78e86df460f31"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9bc3b5a78e86df460f31/binding-result.json"
+      ]
+    },
+    "r06_test_96fbe7936db52d5b20ae": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_96fbe7936db52d5b20ae",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_96fbe7936db52d5b20ae"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_96fbe7936db52d5b20ae/binding-result.json"
+      ]
+    },
+    "r06_test_7422f5cccfdd0954798c": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_7422f5cccfdd0954798c",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_7422f5cccfdd0954798c"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_7422f5cccfdd0954798c/binding-result.json"
+      ]
+    },
+    "r06_test_5847b2fadf9e0ba9754f": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_5847b2fadf9e0ba9754f",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_5847b2fadf9e0ba9754f"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_5847b2fadf9e0ba9754f/binding-result.json"
+      ]
+    },
+    "r06_test_b35bc0b5b14ba84fa54b": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b35bc0b5b14ba84fa54b",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b35bc0b5b14ba84fa54b"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b35bc0b5b14ba84fa54b/binding-result.json"
+      ]
+    },
+    "r06_test_a06d4114dd3345f9250f": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_a06d4114dd3345f9250f",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_a06d4114dd3345f9250f"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_a06d4114dd3345f9250f/binding-result.json"
+      ]
+    },
+    "r06_test_6f98dae4e8fbbb2e3dee": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_6f98dae4e8fbbb2e3dee",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_6f98dae4e8fbbb2e3dee"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_6f98dae4e8fbbb2e3dee/binding-result.json"
+      ]
+    },
+    "r06_test_1ea197273e1bb9f396a3": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_1ea197273e1bb9f396a3",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_1ea197273e1bb9f396a3"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_1ea197273e1bb9f396a3/binding-result.json"
+      ]
+    },
+    "r06_test_9d26679d46eeb74ad624": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_9d26679d46eeb74ad624",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9d26679d46eeb74ad624"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9d26679d46eeb74ad624/binding-result.json"
+      ]
+    },
+    "r06_test_423509a30bf10d82889b": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_423509a30bf10d82889b",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_423509a30bf10d82889b"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_423509a30bf10d82889b/binding-result.json"
+      ]
+    },
+    "r06_test_91d4379540206769a81e": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_91d4379540206769a81e",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_91d4379540206769a81e"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_91d4379540206769a81e/binding-result.json"
+      ]
+    },
+    "r06_test_0584a6641d88ca433a7c": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_0584a6641d88ca433a7c",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_0584a6641d88ca433a7c"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_0584a6641d88ca433a7c/binding-result.json"
+      ]
+    },
+    "r06_test_84464139ccd28ea2761b": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_84464139ccd28ea2761b",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_84464139ccd28ea2761b"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_84464139ccd28ea2761b/binding-result.json"
+      ]
+    },
+    "r06_test_be991713447191509ba3": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_be991713447191509ba3",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_be991713447191509ba3"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_be991713447191509ba3/binding-result.json"
       ]
     },
     "r06_test_cbc19cd68d80e786726f": {
@@ -2318,6 +2633,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_a197b90d8fb72b979aa8/binding-result.json"
       ]
     },
+    "r06_test_948d91d47710b7ee38e9": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_948d91d47710b7ee38e9",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_948d91d47710b7ee38e9"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_948d91d47710b7ee38e9/binding-result.json"
+      ]
+    },
     "r06_test_ec23bfc163f9ccb80c2a": {
       "argv": [
         "python3",
@@ -2723,19 +3053,19 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_2d932723f4f9ed26c076/binding-result.json"
       ]
     },
-    "r06_test_f1b1ea2b9f30b66ca0e0": {
+    "r06_test_20d2d63f727869451996": {
       "argv": [
         "python3",
         "-B",
         "scripts/rust-tauri/r06_stage_inputs.py",
         "--binding",
-        "r06_test_f1b1ea2b9f30b66ca0e0",
+        "r06_test_20d2d63f727869451996",
         "--evidence",
-        "{EVIDENCE}/R06_BINDINGS/r06_test_f1b1ea2b9f30b66ca0e0"
+        "{EVIDENCE}/R06_BINDINGS/r06_test_20d2d63f727869451996"
       ],
       "timeoutSecs": 1020,
       "evidencePaths": [
-        "{EVIDENCE}/R06_BINDINGS/r06_test_f1b1ea2b9f30b66ca0e0/binding-result.json"
+        "{EVIDENCE}/R06_BINDINGS/r06_test_20d2d63f727869451996/binding-result.json"
       ]
     },
     "r06_test_7b4a3f6cc1131d44112f": {
@@ -2753,6 +3083,36 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_7b4a3f6cc1131d44112f/binding-result.json"
       ]
     },
+    "r06_test_afa67b3d3466a2c9772d": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_afa67b3d3466a2c9772d",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_afa67b3d3466a2c9772d"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_afa67b3d3466a2c9772d/binding-result.json"
+      ]
+    },
+    "r06_test_b82e375a06e306e7a3fa": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b82e375a06e306e7a3fa",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b82e375a06e306e7a3fa"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b82e375a06e306e7a3fa/binding-result.json"
+      ]
+    },
     "r06_test_46d12e2526b5c58965c4": {
       "argv": [
         "python3",
@@ -2768,6 +3128,66 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_46d12e2526b5c58965c4/binding-result.json"
       ]
     },
+    "r06_test_399c1dcc8ec6c393520a": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_399c1dcc8ec6c393520a",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_399c1dcc8ec6c393520a"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_399c1dcc8ec6c393520a/binding-result.json"
+      ]
+    },
+    "r06_test_b044163142acd993877c": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b044163142acd993877c",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b044163142acd993877c"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b044163142acd993877c/binding-result.json"
+      ]
+    },
+    "r06_test_254f39910b34ff87d32d": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_254f39910b34ff87d32d",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_254f39910b34ff87d32d"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_254f39910b34ff87d32d/binding-result.json"
+      ]
+    },
+    "r06_test_51eee6df3349d49479e4": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_51eee6df3349d49479e4",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_51eee6df3349d49479e4"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_51eee6df3349d49479e4/binding-result.json"
+      ]
+    },
     "r06_test_5cebb3faa148f6e94c85": {
       "argv": [
         "python3",
@@ -2781,6 +3201,36 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_5cebb3faa148f6e94c85/binding-result.json"
+      ]
+    },
+    "r06_test_4fde4eb11c88868c590e": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_4fde4eb11c88868c590e",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_4fde4eb11c88868c590e"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_4fde4eb11c88868c590e/binding-result.json"
+      ]
+    },
+    "r06_test_9ee72e8dc83274f72d9e": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_9ee72e8dc83274f72d9e",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9ee72e8dc83274f72d9e"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9ee72e8dc83274f72d9e/binding-result.json"
       ]
     },
     "r06_test_55959514844e8d6cf8c0": {
@@ -2826,6 +3276,96 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_7badf69f6fff9c5f068a/binding-result.json"
+      ]
+    },
+    "r06_test_b7bb3c95259aa90a775b": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b7bb3c95259aa90a775b",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b7bb3c95259aa90a775b"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b7bb3c95259aa90a775b/binding-result.json"
+      ]
+    },
+    "r06_test_aa32d4d93e79f3dd957d": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_aa32d4d93e79f3dd957d",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_aa32d4d93e79f3dd957d"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_aa32d4d93e79f3dd957d/binding-result.json"
+      ]
+    },
+    "r06_test_f4c69cd4823152447162": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_f4c69cd4823152447162",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f4c69cd4823152447162"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f4c69cd4823152447162/binding-result.json"
+      ]
+    },
+    "r06_test_e6fd2b31d3c055993a57": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_e6fd2b31d3c055993a57",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_e6fd2b31d3c055993a57"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_e6fd2b31d3c055993a57/binding-result.json"
+      ]
+    },
+    "r06_test_c4d6e5cfad5f2fc5b0da": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_c4d6e5cfad5f2fc5b0da",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_c4d6e5cfad5f2fc5b0da"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_c4d6e5cfad5f2fc5b0da/binding-result.json"
+      ]
+    },
+    "r06_test_3ecc6a57573f08a41482": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_3ecc6a57573f08a41482",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_3ecc6a57573f08a41482"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_3ecc6a57573f08a41482/binding-result.json"
       ]
     },
     "r06_test_389f81a5c0c7fe5f0823": {
@@ -2901,6 +3441,21 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_63bab2ad782d064b7aa5/binding-result.json"
+      ]
+    },
+    "r06_test_d2547b671a9d2e03a46d": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_d2547b671a9d2e03a46d",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_d2547b671a9d2e03a46d"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_d2547b671a9d2e03a46d/binding-result.json"
       ]
     },
     "r06_test_62b63bdb9bd89dc32939": {
@@ -4673,6 +5228,51 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_f6cbb63a724b450e0823/binding-result.json"
       ]
     },
+    "r06_test_815798a352be10cffc96": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_815798a352be10cffc96",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_815798a352be10cffc96"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_815798a352be10cffc96/binding-result.json"
+      ]
+    },
+    "r06_test_fa09e8a725ae3d4064d0": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_fa09e8a725ae3d4064d0",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_fa09e8a725ae3d4064d0"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_fa09e8a725ae3d4064d0/binding-result.json"
+      ]
+    },
+    "r06_test_b85c63e63121ac7878f0": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b85c63e63121ac7878f0",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b85c63e63121ac7878f0"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b85c63e63121ac7878f0/binding-result.json"
+      ]
+    },
     "r06_test_fbd8334c7bf09f92521d": {
       "argv": [
         "python3",
@@ -4686,6 +5286,51 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_fbd8334c7bf09f92521d/binding-result.json"
+      ]
+    },
+    "r06_test_accdf4ec0e794a510dd7": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_accdf4ec0e794a510dd7",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_accdf4ec0e794a510dd7"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_accdf4ec0e794a510dd7/binding-result.json"
+      ]
+    },
+    "r06_test_0388334d6ae2f09a6c31": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_0388334d6ae2f09a6c31",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_0388334d6ae2f09a6c31"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_0388334d6ae2f09a6c31/binding-result.json"
+      ]
+    },
+    "r06_test_111be636222c83fdaefe": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_111be636222c83fdaefe",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_111be636222c83fdaefe"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_111be636222c83fdaefe/binding-result.json"
       ]
     },
     "r06_test_e3ff1af0b051821eca20": {
@@ -5873,6 +6518,51 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_60a3abb49c0ef1c1ac25/binding-result.json"
       ]
     },
+    "r06_test_b022c25814b2dccde41b": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b022c25814b2dccde41b",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b022c25814b2dccde41b"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b022c25814b2dccde41b/binding-result.json"
+      ]
+    },
+    "r06_test_839013fa72e9210bc958": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_839013fa72e9210bc958",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_839013fa72e9210bc958"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_839013fa72e9210bc958/binding-result.json"
+      ]
+    },
+    "r06_test_1242090a912a2192f305": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_1242090a912a2192f305",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_1242090a912a2192f305"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_1242090a912a2192f305/binding-result.json"
+      ]
+    },
     "r06_test_35a51ebff0b92086f7e9": {
       "argv": [
         "python3",
@@ -6188,6 +6878,36 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_4780689eedd2834ab458/binding-result.json"
       ]
     },
+    "r06_test_61b824f158c87abb54ea": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_61b824f158c87abb54ea",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_61b824f158c87abb54ea"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_61b824f158c87abb54ea/binding-result.json"
+      ]
+    },
+    "r06_test_73f649b6be0d0b1272ff": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_73f649b6be0d0b1272ff",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_73f649b6be0d0b1272ff"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_73f649b6be0d0b1272ff/binding-result.json"
+      ]
+    },
     "r06_test_66e4a7fb3573a50e3fa8": {
       "argv": [
         "python3",
@@ -6336,6 +7056,36 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_42d0b96e510da57e75bf/binding-result.json"
+      ]
+    },
+    "r06_test_9d862b0be2f070070a6a": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_9d862b0be2f070070a6a",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9d862b0be2f070070a6a"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_9d862b0be2f070070a6a/binding-result.json"
+      ]
+    },
+    "r06_test_edff7f318068c6512112": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_edff7f318068c6512112",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_edff7f318068c6512112"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_edff7f318068c6512112/binding-result.json"
       ]
     },
     "r06_test_a98ecdf93d75da9039cb": {
@@ -7223,6 +7973,66 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_043d6c4514947fa0a3f5/binding-result.json"
       ]
     },
+    "r06_test_b16dd0e5fd666a61cb11": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_b16dd0e5fd666a61cb11",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b16dd0e5fd666a61cb11"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_b16dd0e5fd666a61cb11/binding-result.json"
+      ]
+    },
+    "r06_test_31dc923a05c6d09988b0": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_31dc923a05c6d09988b0",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_31dc923a05c6d09988b0"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_31dc923a05c6d09988b0/binding-result.json"
+      ]
+    },
+    "r06_test_ee30e92fdde9e16a36fa": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_ee30e92fdde9e16a36fa",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_ee30e92fdde9e16a36fa"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_ee30e92fdde9e16a36fa/binding-result.json"
+      ]
+    },
+    "r06_test_89f579de3a129aa3cec2": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_89f579de3a129aa3cec2",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_89f579de3a129aa3cec2"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_89f579de3a129aa3cec2/binding-result.json"
+      ]
+    },
     "r06_test_9aab5b16f73f65b6ec60": {
       "argv": [
         "python3",
@@ -7401,6 +8211,21 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_f6c784810e052fadb108/binding-result.json"
+      ]
+    },
+    "r06_test_21d0221c8888183cfec3": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_21d0221c8888183cfec3",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_21d0221c8888183cfec3"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_21d0221c8888183cfec3/binding-result.json"
       ]
     },
     "r06_test_16a2393b4c97eb344f7f": {
@@ -7733,6 +8558,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_df77e151e45ae37dbf6d/binding-result.json"
       ]
     },
+    "r06_test_971f8e1e8c6ea1829326": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_971f8e1e8c6ea1829326",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_971f8e1e8c6ea1829326"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_971f8e1e8c6ea1829326/binding-result.json"
+      ]
+    },
     "r06_test_5f2231c2654c743d587e": {
       "argv": [
         "python3",
@@ -7746,6 +8586,36 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_5f2231c2654c743d587e/binding-result.json"
+      ]
+    },
+    "r06_test_0b791cfa52b8716f3a66": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_0b791cfa52b8716f3a66",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_0b791cfa52b8716f3a66"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_0b791cfa52b8716f3a66/binding-result.json"
+      ]
+    },
+    "r06_test_f414c0075017f36687dc": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_f414c0075017f36687dc",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f414c0075017f36687dc"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f414c0075017f36687dc/binding-result.json"
       ]
     },
     "r06_test_37d4a0b7cf7ac2257d73": {
@@ -7821,6 +8691,21 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_95690b3f243facdbfb55/binding-result.json"
+      ]
+    },
+    "r06_test_5d52eab23523fbac71cf": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_5d52eab23523fbac71cf",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_5d52eab23523fbac71cf"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_5d52eab23523fbac71cf/binding-result.json"
       ]
     },
     "r06_test_607517992a0af799339f": {
@@ -8125,7 +9010,9 @@
       "commandRefs": [
         "r06_inputs_check",
         "r06_test_5866f34d95c00a303eb4",
-        "r06_test_522c4f33f8dd0e9103a2"
+        "r06_test_522c4f33f8dd0e9103a2",
+        "r06_test_a89fcdaca166f8efbf0d",
+        "r06_test_6badd454ef9747f1d9dc"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
     },
@@ -8173,7 +9060,26 @@
       "commandRefs": [
         "r06_inputs_check",
         "r06_test_002e562b5f7235cd96d2",
-        "r06_test_56928f9dc4edf0a25712"
+        "r06_test_56928f9dc4edf0a25712",
+        "r06_test_cd90149e1a844371108f",
+        "r06_test_6ead7ddd320cded29152",
+        "r06_test_867ca84fc880938409c4",
+        "r06_test_62afad49e4c2b76dd7bc",
+        "r06_test_189797f43c6080d6ac61",
+        "r06_test_9bc3b5a78e86df460f31",
+        "r06_test_96fbe7936db52d5b20ae",
+        "r06_test_7422f5cccfdd0954798c",
+        "r06_test_5847b2fadf9e0ba9754f",
+        "r06_test_b35bc0b5b14ba84fa54b",
+        "r06_test_a06d4114dd3345f9250f",
+        "r06_test_6f98dae4e8fbbb2e3dee",
+        "r06_test_1ea197273e1bb9f396a3",
+        "r06_test_9d26679d46eeb74ad624",
+        "r06_test_423509a30bf10d82889b",
+        "r06_test_91d4379540206769a81e",
+        "r06_test_0584a6641d88ca433a7c",
+        "r06_test_84464139ccd28ea2761b",
+        "r06_test_be991713447191509ba3"
       ],
       "note": "真实具名命令执行结果；逐叶原义务由同一个阶段汇总，命令全绿不代替阶段完成。"
     },
@@ -8822,9 +9728,11 @@
         "r06_test_018cfbd67ea11cc1d56c",
         "r06_test_0201dcfd557fa3d6f66c",
         "r06_test_0384a7289f7409790b0b",
+        "r06_test_0388334d6ae2f09a6c31",
         "r06_test_043d2e95f10d946599fd",
         "r06_test_043d6c4514947fa0a3f5",
         "r06_test_045731ecdaa6f2a14ed4",
+        "r06_test_0584a6641d88ca433a7c",
         "r06_test_059289590bc78e9bbf1e",
         "r06_test_05c18659efcea252e261",
         "r06_test_05cab72bc37b043463d7",
@@ -8842,6 +9750,7 @@
         "r06_test_0a37ce70ccb83ce7c544",
         "r06_test_0a63dff04262d5745643",
         "r06_test_0b6b076b0adc27c39792",
+        "r06_test_0b791cfa52b8716f3a66",
         "r06_test_0b9c15470fd9d70502ad",
         "r06_test_0c1fe78ac0c818a410ed",
         "r06_test_0c715f430837644a1030",
@@ -8851,9 +9760,11 @@
         "r06_test_107ff98999de19efbcef",
         "r06_test_10ba1c758b3ba74f4ec8",
         "r06_test_10c77575c0c61d7a94b0",
+        "r06_test_111be636222c83fdaefe",
         "r06_test_1131ae58a4f29bc24d45",
         "r06_test_11358a4976f537c4cf13",
         "r06_test_120b9f240b02ef99b472",
+        "r06_test_1242090a912a2192f305",
         "r06_test_1243c6e4a5203bf6d126",
         "r06_test_126618cafd85ee1ead57",
         "r06_test_12ff18511f1d1ea19601",
@@ -8874,6 +9785,7 @@
         "r06_test_17813002df9af4e92b62",
         "r06_test_18127768428203770e9d",
         "r06_test_1859167f8b5893d11da0",
+        "r06_test_189797f43c6080d6ac61",
         "r06_test_18cfd715d95a71851ab8",
         "r06_test_18dc7eaa08803f89aa35",
         "r06_test_198d03c56f739841765d",
@@ -8887,19 +9799,23 @@
         "r06_test_1d643fd8dec58282a789",
         "r06_test_1df9e789908eaf37ae00",
         "r06_test_1e0e383bd96cf9732e7d",
+        "r06_test_1ea197273e1bb9f396a3",
         "r06_test_1ed1d41a3d8b9df9dde8",
         "r06_test_1fca3a3cf8652bd93334",
         "r06_test_207d14e09b35f91d4b9e",
+        "r06_test_20d2d63f727869451996",
         "r06_test_21355cd5040c833f4371",
         "r06_test_219e67a511ff19ce0ec1",
         "r06_test_21c1f5eac60b5914018d",
         "r06_test_21c93bc5615c124afd50",
+        "r06_test_21d0221c8888183cfec3",
         "r06_test_228c53c8659f49a87fdf",
         "r06_test_22f609da55faca0dbedd",
         "r06_test_22f6120165c4c84f6ca9",
         "r06_test_238ffa504f5b15d5edbb",
         "r06_test_24b99b07405d8d6ab03d",
         "r06_test_250d00ac042cd6a5d6cc",
+        "r06_test_254f39910b34ff87d32d",
         "r06_test_258d2e6c395b0bda7051",
         "r06_test_2599d5c8137410ea8251",
         "r06_test_25f3d4bd9addbb54c916",
@@ -8924,6 +9840,7 @@
         "r06_test_2e03106a96dec6c69ed1",
         "r06_test_2e33481eac06ed987266",
         "r06_test_2f3ec82a43f003d1897e",
+        "r06_test_31dc923a05c6d09988b0",
         "r06_test_326fbfaf82aaf506a079",
         "r06_test_3274e25601d356d60e54",
         "r06_test_3286f2f4559d2d7d9254",
@@ -8942,6 +9859,7 @@
         "r06_test_392d8457e909539f0cc9",
         "r06_test_392de9222af76ac50997",
         "r06_test_39530e4fa56dc3bc81c7",
+        "r06_test_399c1dcc8ec6c393520a",
         "r06_test_3b84cb4be5b6952ea66c",
         "r06_test_3c65047a74d1640916bb",
         "r06_test_3c6535989617d6e9f5aa",
@@ -8951,9 +9869,11 @@
         "r06_test_3e515b6445d84a2dbdc6",
         "r06_test_3e51a39f7b501bca72e8",
         "r06_test_3e8ba06cd62516890fd9",
+        "r06_test_3ecc6a57573f08a41482",
         "r06_test_3f34073dc123f41fcb10",
         "r06_test_3fc0a440c590ad5664d9",
         "r06_test_3fc1a3615b976c030631",
+        "r06_test_423509a30bf10d82889b",
         "r06_test_423c61082421a8bdf806",
         "r06_test_428b97d3005d469ac6d7",
         "r06_test_42d0b96e510da57e75bf",
@@ -8985,11 +9905,13 @@
         "r06_test_4ec7c3d222b90801eb28",
         "r06_test_4f57f41f1b8073e06fcb",
         "r06_test_4f82516511a94c7abd13",
+        "r06_test_4fde4eb11c88868c590e",
         "r06_test_4fe993a5b6c9c22d9bb5",
         "r06_test_504dad10e02bdeac94c3",
         "r06_test_50dcfb3707109e5b669c",
         "r06_test_50f60a3c64cea52bdec5",
         "r06_test_51953e4b6dd56e41f5c4",
+        "r06_test_51eee6df3349d49479e4",
         "r06_test_522c4f33f8dd0e9103a2",
         "r06_test_52b6e7d279fcc7a1ec37",
         "r06_test_549d7c622806eac43591",
@@ -9002,6 +9924,7 @@
         "r06_test_574ac85180c664cb17ef",
         "r06_test_578007c17fcc7f003d1d",
         "r06_test_580bd4b355359d00c158",
+        "r06_test_5847b2fadf9e0ba9754f",
         "r06_test_5866f34d95c00a303eb4",
         "r06_test_58c95e2d172cfac20d1f",
         "r06_test_5a14f7aac8813d60a10d",
@@ -9011,6 +9934,7 @@
         "r06_test_5c983addaf13435c63d7",
         "r06_test_5cd824f40cc06c7d0f0d",
         "r06_test_5cebb3faa148f6e94c85",
+        "r06_test_5d52eab23523fbac71cf",
         "r06_test_5d8f988784d6a7e3c2ad",
         "r06_test_5e0b447174cd43486cfd",
         "r06_test_5e2f7c73fb9aa0c42e90",
@@ -9023,9 +9947,11 @@
         "r06_test_613f3334749c7a99b82e",
         "r06_test_616f85688bf891d0f863",
         "r06_test_6195c27f850951c707aa",
+        "r06_test_61b824f158c87abb54ea",
         "r06_test_6218d2d56ac5038adbae",
         "r06_test_623e60ee4fda4c18a937",
         "r06_test_626327e120fa5db8f45d",
+        "r06_test_62afad49e4c2b76dd7bc",
         "r06_test_62b63bdb9bd89dc32939",
         "r06_test_634ff528c4555c5c8f6c",
         "r06_test_63ad55be780f86b43513",
@@ -9043,10 +9969,13 @@
         "r06_test_6aa5156db27be9a5331b",
         "r06_test_6acda3a265c23c2e8d90",
         "r06_test_6b6232a7d614fb31587b",
+        "r06_test_6badd454ef9747f1d9dc",
         "r06_test_6bbea69eebd1552fead1",
         "r06_test_6d687671dedec96ca6f3",
         "r06_test_6d82e3a5b66d0b6bf965",
         "r06_test_6d9fbb9ca13f13ee08f6",
+        "r06_test_6ead7ddd320cded29152",
+        "r06_test_6f98dae4e8fbbb2e3dee",
         "r06_test_6fca23825c9543139c4f",
         "r06_test_6fcf0e7a020bd2fc910c",
         "r06_test_70578405dc8330f889a1",
@@ -9057,6 +9986,8 @@
         "r06_test_72cd17b40f941daf8e8e",
         "r06_test_72ee1108d3cd24e710f5",
         "r06_test_736966a249b108a882d8",
+        "r06_test_73f649b6be0d0b1272ff",
+        "r06_test_7422f5cccfdd0954798c",
         "r06_test_747f0cfc89ff8acc1826",
         "r06_test_74cffd6e6418f1c2a5bc",
         "r06_test_74f43de0a7e9394b9c11",
@@ -9079,19 +10010,24 @@
         "r06_test_7ee0ce4ef7fc333cc5d8",
         "r06_test_808ce6ca3819b4531be9",
         "r06_test_8094b6ad7033754f59e0",
+        "r06_test_815798a352be10cffc96",
         "r06_test_8165824ccc512cc23a38",
         "r06_test_82268c379bf9d83a71c2",
         "r06_test_82c8df08c2d4ad9e6a28",
         "r06_test_82f233c793521697b613",
         "r06_test_834b518295e44d3230b2",
         "r06_test_838be16680152dfb2bdb",
+        "r06_test_839013fa72e9210bc958",
+        "r06_test_84464139ccd28ea2761b",
         "r06_test_846d80f375309cebd27b",
+        "r06_test_867ca84fc880938409c4",
         "r06_test_86c67870c018c1637498",
         "r06_test_87edd2672d84f2beccdf",
         "r06_test_87f1a6b0e3cc5d981d81",
         "r06_test_87feeb1750de009f603e",
         "r06_test_88144e520d2d77d6e1f3",
         "r06_test_89bdf012dcefc6430d7d",
+        "r06_test_89f579de3a129aa3cec2",
         "r06_test_8aae8c234f0e5303faed",
         "r06_test_8adac2a1c914f10cc730",
         "r06_test_8ae01affeb9c41dba51d",
@@ -9105,6 +10041,7 @@
         "r06_test_8f1601e1d677c567b2d5",
         "r06_test_8fea1c7df66dbb280eea",
         "r06_test_919b77a2401ef009498d",
+        "r06_test_91d4379540206769a81e",
         "r06_test_91edb93514af41825b06",
         "r06_test_9265cc6cb791bc771bcd",
         "r06_test_92bd8f3099dab10e2cc3",
@@ -9114,6 +10051,7 @@
         "r06_test_93e9a869e6ec7767b24e",
         "r06_test_9422b479a5d9301afe3c",
         "r06_test_947d6bf325c056f8b30c",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_954c069fcddfd8702759",
         "r06_test_955037f96ee4bd11afcc",
         "r06_test_9565a37716a538fd39d7",
@@ -9125,6 +10063,8 @@
         "r06_test_96b916c3a5efdb123a17",
         "r06_test_96d8883dca3680c35545",
         "r06_test_96e17da810f2dc514f6f",
+        "r06_test_96fbe7936db52d5b20ae",
+        "r06_test_971f8e1e8c6ea1829326",
         "r06_test_9794536cd87586a6f1d4",
         "r06_test_9833929e82029ed09f14",
         "r06_test_99cccaaac2077772879a",
@@ -9134,14 +10074,19 @@
         "r06_test_9af3ad2cf9b6909b0dce",
         "r06_test_9b21a2d853775007038f",
         "r06_test_9b90230193acc2bca412",
+        "r06_test_9bc3b5a78e86df460f31",
         "r06_test_9bee970722e4a26b3277",
         "r06_test_9c5ceeab530c8348d191",
+        "r06_test_9d26679d46eeb74ad624",
+        "r06_test_9d862b0be2f070070a6a",
         "r06_test_9eb4dfb264f50fd1f61d",
         "r06_test_9ed20ec83092150399e0",
+        "r06_test_9ee72e8dc83274f72d9e",
         "r06_test_9f26aac79fabb7519731",
         "r06_test_9ff2cf471e7d34e4b9ea",
         "r06_test_a001e8bdc29057b5d437",
         "r06_test_a002350fa4e66cc49612",
+        "r06_test_a06d4114dd3345f9250f",
         "r06_test_a094820a892b63b20394",
         "r06_test_a0fe1ddb44dd16fcff94",
         "r06_test_a10cf73d889e396f6647",
@@ -9162,30 +10107,41 @@
         "r06_test_a7ad7af9963867b133ba",
         "r06_test_a874e2c60d311136b900",
         "r06_test_a88ac189f1653cd149c1",
+        "r06_test_a89fcdaca166f8efbf0d",
         "r06_test_a98ecdf93d75da9039cb",
         "r06_test_a9ed2d50143bcb36309e",
         "r06_test_aa09e0a8f37bb63a0fb8",
+        "r06_test_aa32d4d93e79f3dd957d",
         "r06_test_abd0aa24f7a27f2633e6",
         "r06_test_abe6397b5f2671e1b210",
         "r06_test_ac227fc0b0fdd306ffbf",
         "r06_test_ac4093080de1f861e163",
         "r06_test_ac6e21b981a75cd90d7d",
+        "r06_test_accdf4ec0e794a510dd7",
         "r06_test_adc30b79a5fa2344dd11",
         "r06_test_ae7440724d90c6dcce75",
         "r06_test_af209059bfb751f4edc8",
+        "r06_test_afa67b3d3466a2c9772d",
         "r06_test_afb6c847bd8aee1e7641",
+        "r06_test_b022c25814b2dccde41b",
+        "r06_test_b044163142acd993877c",
         "r06_test_b0941072e258ce3b4895",
         "r06_test_b0a58efe01504d230e36",
         "r06_test_b0c4cfbaddc18c62e24d",
         "r06_test_b12feee25c060c8ce822",
+        "r06_test_b16dd0e5fd666a61cb11",
         "r06_test_b21330ac564b9b04353f",
         "r06_test_b2b34c633f8bd8bb42aa",
+        "r06_test_b35bc0b5b14ba84fa54b",
         "r06_test_b429a14ff905e474a0b7",
         "r06_test_b521dd8bf1b331e40c07",
         "r06_test_b586026dc897dd93a17c",
         "r06_test_b65156e0f5b298e96488",
         "r06_test_b66befc78356fee8f937",
         "r06_test_b6e0dcf50d00ea357a4f",
+        "r06_test_b7bb3c95259aa90a775b",
+        "r06_test_b82e375a06e306e7a3fa",
+        "r06_test_b85c63e63121ac7878f0",
         "r06_test_b87ffd1ff46e53df4739",
         "r06_test_b8f060153b1d1f72c5b9",
         "r06_test_b92a6b984a67e3678859",
@@ -9196,6 +10152,7 @@
         "r06_test_bb1cd07605a91e0ba073",
         "r06_test_bcb7c1e99861a0221929",
         "r06_test_bde6366ff6ef42cf9a4d",
+        "r06_test_be991713447191509ba3",
         "r06_test_bf002d2805bb3171f0fe",
         "r06_test_bf28f55c6029e6aa5668",
         "r06_test_c00c78c3de0ff388e461",
@@ -9210,6 +10167,7 @@
         "r06_test_c31ad75e8f600eb2b2f0",
         "r06_test_c39b2981c83b1700407f",
         "r06_test_c4149c419ab158faf1b6",
+        "r06_test_c4d6e5cfad5f2fc5b0da",
         "r06_test_c54749e535023d68108b",
         "r06_test_c688dfec707fe68cf842",
         "r06_test_c6a1cf8a285e48278b05",
@@ -9232,6 +10190,7 @@
         "r06_test_cd058981b50e0dc974b7",
         "r06_test_cd0fdb87be531298300e",
         "r06_test_cd28f306283a3814e23a",
+        "r06_test_cd90149e1a844371108f",
         "r06_test_cd97ed1324d36f6f0713",
         "r06_test_cddbc7fce74fd2f8cfc6",
         "r06_test_cde91045da0cc40aa57c",
@@ -9243,6 +10202,7 @@
         "r06_test_cf46c83e95e439239dc3",
         "r06_test_d0f7929339193e33b1c7",
         "r06_test_d224f66131be572514b5",
+        "r06_test_d2547b671a9d2e03a46d",
         "r06_test_d2af3650b47d7f69d80c",
         "r06_test_d3932fdf720e541d1690",
         "r06_test_d5622970718085be9e36",
@@ -9292,6 +10252,7 @@
         "r06_test_e5f8cba841d0280a7e21",
         "r06_test_e68ce2ece6b32f3c2dfa",
         "r06_test_e6beae0c3beb6be4357d",
+        "r06_test_e6fd2b31d3c055993a57",
         "r06_test_e777035e6dad14cae11c",
         "r06_test_e7adf068d213e89ade71",
         "r06_test_e7df90764508f8e81c8a",
@@ -9307,6 +10268,8 @@
         "r06_test_ec3dee985556a625fb8f",
         "r06_test_eccec3420d023451da78",
         "r06_test_ecf38e107971730dd7cf",
+        "r06_test_edff7f318068c6512112",
+        "r06_test_ee30e92fdde9e16a36fa",
         "r06_test_ee84943335fc70915e9d",
         "r06_test_ef3ddb47d084b120a414",
         "r06_test_ef3fdeeee62465e495d7",
@@ -9314,7 +10277,6 @@
         "r06_test_f075bf0bd6b22b9f4b79",
         "r06_test_f0ea7ef2543931ced93c",
         "r06_test_f14a7adb0b419dc80dba",
-        "r06_test_f1b1ea2b9f30b66ca0e0",
         "r06_test_f1f616e1d549d10a451c",
         "r06_test_f256e339c06a591f8125",
         "r06_test_f2b30c5b5138f9df42d8",
@@ -9322,7 +10284,9 @@
         "r06_test_f30d56be7a97bb01054b",
         "r06_test_f31f250a57db1c9707ad",
         "r06_test_f3eacfa8241968e42b79",
+        "r06_test_f414c0075017f36687dc",
         "r06_test_f4717018a50a4bd5b4ef",
+        "r06_test_f4c69cd4823152447162",
         "r06_test_f4d15ffcd3c36d173642",
         "r06_test_f58efa757b70150d023a",
         "r06_test_f5c0626f03464980eab7",
@@ -9338,6 +10302,7 @@
         "r06_test_f8590aa99afb5b167939",
         "r06_test_f9ce34f3b23619f4e415",
         "r06_test_f9e3a7f080e3ef8f2ef3",
+        "r06_test_fa09e8a725ae3d4064d0",
         "r06_test_fa15ba88788f8b713ca6",
         "r06_test_fa2083ba89be0ace2e15",
         "r06_test_fbc22687a171eb9ee34e",
@@ -9494,6 +10459,7 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_8e4827fb785d8282e02f",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_9eb4dfb264f50fd1f61d",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_b66befc78356fee8f937",
@@ -9737,18 +10703,24 @@
       "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
       "r00ResultIds": [],
       "r00TestIds": [],
-      "r00Then": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+      "r00Then": "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
       "r00Assertions": [
-        "执行“删除知识笔记本”后核对：删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+        "执行“删除知识笔记本”后核对：删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_20d2d63f727869451996",
+        "r06_test_254f39910b34ff87d32d",
         "r06_test_2d932723f4f9ed26c076",
+        "r06_test_399c1dcc8ec6c393520a",
         "r06_test_46d12e2526b5c58965c4",
+        "r06_test_51eee6df3349d49479e4",
         "r06_test_7b4a3f6cc1131d44112f",
-        "r06_test_f1b1ea2b9f30b66ca0e0",
+        "r06_test_afa67b3d3466a2c9772d",
+        "r06_test_b044163142acd993877c",
+        "r06_test_b82e375a06e306e7a3fa",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -9797,10 +10769,18 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_3ecc6a57573f08a41482",
         "r06_test_4e40ae8d50678e42e032",
+        "r06_test_4fde4eb11c88868c590e",
         "r06_test_55959514844e8d6cf8c0",
         "r06_test_5cebb3faa148f6e94c85",
         "r06_test_7badf69f6fff9c5f068a",
+        "r06_test_9ee72e8dc83274f72d9e",
+        "r06_test_aa32d4d93e79f3dd957d",
+        "r06_test_b7bb3c95259aa90a775b",
+        "r06_test_c4d6e5cfad5f2fc5b0da",
+        "r06_test_e6fd2b31d3c055993a57",
+        "r06_test_f4c69cd4823152447162",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -10061,7 +11041,9 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_8e4827fb785d8282e02f",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
+        "r06_test_d2547b671a9d2e03a46d",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_ec23bfc163f9ccb80c2a",
         "r06_z_leaf_evidence"
@@ -10356,6 +11338,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_e4d0a6bfa7c604b243c3",
@@ -12669,6 +13652,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_b92a6b984a67e3678859",
         "r06_test_d617bfb6e14eeb7d8f27",
@@ -13014,8 +13998,14 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_0388334d6ae2f09a6c31",
+        "r06_test_111be636222c83fdaefe",
         "r06_test_504dad10e02bdeac94c3",
+        "r06_test_815798a352be10cffc96",
+        "r06_test_accdf4ec0e794a510dd7",
+        "r06_test_b85c63e63121ac7878f0",
         "r06_test_f6cbb63a724b450e0823",
+        "r06_test_fa09e8a725ae3d4064d0",
         "r06_test_fbd8334c7bf09f92521d",
         "r06_z_leaf_evidence"
       ],
@@ -15060,6 +16050,7 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_8e4827fb785d8282e02f",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_9eb4dfb264f50fd1f61d",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_a6c84b68e4fdb3094ae0",
@@ -15922,7 +16913,11 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_1242090a912a2192f305",
+        "r06_test_839013fa72e9210bc958",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
+        "r06_test_b022c25814b2dccde41b",
         "r06_test_b92a6b984a67e3678859",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_ec23bfc163f9ccb80c2a",
@@ -16389,6 +17384,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_b92a6b984a67e3678859",
         "r06_test_d617bfb6e14eeb7d8f27",
@@ -16453,6 +17449,7 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_808ce6ca3819b4531be9",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_ec23bfc163f9ccb80c2a",
         "r06_test_fbc22687a171eb9ee34e",
@@ -17078,6 +18075,7 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_808ce6ca3819b4531be9",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_ec23bfc163f9ccb80c2a",
         "r06_z_leaf_evidence"
@@ -17190,8 +18188,10 @@
       "evidenceCommandRefs": [
         "r06_test_43c22054fda93f1452d2",
         "r06_test_4780689eedd2834ab458",
+        "r06_test_61b824f158c87abb54ea",
         "r06_test_634ff528c4555c5c8f6c",
         "r06_test_6d82e3a5b66d0b6bf965",
+        "r06_test_73f649b6be0d0b1272ff",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -17354,6 +18354,7 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_8e4827fb785d8282e02f",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_9eb4dfb264f50fd1f61d",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_b66befc78356fee8f937",
@@ -17738,6 +18739,8 @@
       "evidenceCommandRefs": [
         "r06_test_22f6120165c4c84f6ca9",
         "r06_test_3c65047a74d1640916bb",
+        "r06_test_9d862b0be2f070070a6a",
+        "r06_test_edff7f318068c6512112",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -18446,6 +19449,7 @@
       "evidenceCommandRefs": [
         "r06_test_22f6120165c4c84f6ca9",
         "r06_test_3c65047a74d1640916bb",
+        "r06_test_9d862b0be2f070070a6a",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -18699,34 +19703,9 @@
         "拒绝/边界：body.id 必须有效；切换失败按路由错误返回；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "full_original_behavior",
-      "evidenceCommandRefs": [
-        "r06_test_82c8df08c2d4ad9e6a28",
-        "r06_z_leaf_evidence"
-      ],
-      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
-      "assertionContract": {
-        "producerCommand": "r06_z_leaf_evidence",
-        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
-        "cases": [
-          {
-            "case": "R00-T02-LA-8B48FD65CAFB-assertion-00",
-            "expect": 1
-          },
-          {
-            "case": "R00-T02-LA-8B48FD65CAFB-assertion-01",
-            "expect": 1
-          }
-        ]
-      },
-      "originalAssertionCases": [
-        [
-          "R00-T02-LA-8B48FD65CAFB-assertion-00"
-        ],
-        [
-          "R00-T02-LA-8B48FD65CAFB-assertion-01"
-        ]
-      ]
+      "basisKind": "required_behavior_pending",
+      "evidenceCommandRefs": [],
+      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
     },
     {
       "id": "R00-T02-LA-8C8083F2A5FC",
@@ -20039,6 +21018,7 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_8e4827fb785d8282e02f",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_9eb4dfb264f50fd1f61d",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_b66befc78356fee8f937",
@@ -20737,9 +21717,13 @@
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
         "r06_test_043d6c4514947fa0a3f5",
+        "r06_test_31dc923a05c6d09988b0",
         "r06_test_481483a02f93a13adbb7",
+        "r06_test_89f579de3a129aa3cec2",
         "r06_test_b0a58efe01504d230e36",
+        "r06_test_b16dd0e5fd666a61cb11",
         "r06_test_b92a6b984a67e3678859",
+        "r06_test_ee30e92fdde9e16a36fa",
         "r06_test_fbc22687a171eb9ee34e",
         "r06_z_leaf_evidence"
       ],
@@ -21870,7 +22854,9 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_21d0221c8888183cfec3",
         "r06_test_808ce6ca3819b4531be9",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_ec23bfc163f9ccb80c2a",
         "r06_test_fbc22687a171eb9ee34e",
@@ -22352,6 +23338,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_b92a6b984a67e3678859",
         "r06_test_d617bfb6e14eeb7d8f27",
@@ -23213,9 +24200,12 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_0b791cfa52b8716f3a66",
         "r06_test_33906ae9a3566f6973bb",
         "r06_test_5f2231c2654c743d587e",
+        "r06_test_971f8e1e8c6ea1829326",
         "r06_test_df77e151e45ae37dbf6d",
+        "r06_test_f414c0075017f36687dc",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -23722,6 +24712,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_5d52eab23523fbac71cf",
         "r06_test_95690b3f243facdbfb55",
         "r06_test_eccec3420d023451da78",
         "r06_z_leaf_evidence"
@@ -24032,6 +25023,7 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_e4d0a6bfa7c604b243c3",
@@ -24886,6 +25878,7 @@
       "evidenceCommandRefs": [
         "r06_test_15a7ad931fa9396e0141",
         "r06_test_8e4827fb785d8282e02f",
+        "r06_test_948d91d47710b7ee38e9",
         "r06_test_a197b90d8fb72b979aa8",
         "r06_test_d617bfb6e14eeb7d8f27",
         "r06_test_ec23bfc163f9ccb80c2a",
@@ -25239,5 +26232,5 @@
       ]
     }
   ],
-  "inputDigestSha256": "94bc961330878249a395315f8084e7bf71ed58bcdd709191200c3830cb72c793"
+  "inputDigestSha256": "396f554592bf4088d8fc4a8ddc851e647927df62c7c9a964e38c87b9ca1e66aa"
 }

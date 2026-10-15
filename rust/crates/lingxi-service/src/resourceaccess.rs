@@ -209,6 +209,14 @@ impl ResourceAccess {
         })
     }
 
+    /// 挂载只取得自身根的独立边界；保留保护路径，不继承其它会话授权或缓存能力。
+    pub(crate) fn isolated_to(&self, root: &Path) -> Result<Self, AccessRefusal> {
+        let scoped = Self::new(&[root.to_path_buf()])?;
+        let protected = self.lock().protected_roots.clone();
+        scoped.lock().protected_roots = protected;
+        Ok(scoped)
+    }
+
     /// 服务来源证明与恢复收据不能由通用文件能力读取、改写或连父目录一起删除。
     pub fn protect_service_root(&self, path: &Path) -> Result<(), AccessRefusal> {
         let resolved = resolve_real(path).ok_or_else(|| AccessRefusal {

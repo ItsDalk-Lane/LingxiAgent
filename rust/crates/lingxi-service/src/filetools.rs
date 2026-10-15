@@ -634,6 +634,15 @@ pub(crate) mod fsio {
             Ok(a.st_dev == b.st_dev && a.st_ino == b.st_ino)
         }
 
+        /// 本次独占状态目录必须新建，名称冲突不能复用既有数据。
+        pub fn new_child_directory(&self, name: &OsStr) -> io::Result<Self> {
+            let cname = os_to_c(name);
+            if unsafe { libc::mkdirat(self.fd, cname.as_ptr().cast(), 0o700) } != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            self.child_directory(name, false)
+        }
+
         /// 服务状态子目录只在持有的父目录内创建；打开时不跟随替换后的链接。
         pub fn child_directory(&self, name: &OsStr, create: bool) -> io::Result<Self> {
             let name = os_to_c(name);
@@ -790,6 +799,47 @@ pub(crate) mod fsio {
             Ok(())
         }
 
+        /// 跨目录移动绑定两个已打开目录，目标存在时原子拒绝覆盖。
+        pub fn rename_to_noreplace(
+            &self,
+            from: &OsStr,
+            target: &Self,
+            to: &OsStr,
+        ) -> io::Result<()> {
+            let from = os_to_c(from);
+            let to = os_to_c(to);
+            #[cfg(target_os = "macos")]
+            let result = unsafe {
+                libc::renameatx_np(
+                    self.fd,
+                    from.as_ptr().cast(),
+                    target.fd,
+                    to.as_ptr().cast(),
+                    libc::RENAME_EXCL,
+                )
+            };
+            #[cfg(target_os = "linux")]
+            let result = unsafe {
+                libc::renameat2(
+                    self.fd,
+                    from.as_ptr().cast(),
+                    target.fd,
+                    to.as_ptr().cast(),
+                    libc::RENAME_NOREPLACE,
+                )
+            };
+            #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+            return Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "safe no-replace move unavailable",
+            ));
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
+            if result != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok(())
+        }
+
         /// Atomically renames `from` → `to` WITHIN this directory.
         pub fn rename_within(&self, from: &OsStr, to: &OsStr) -> io::Result<()> {
             let cfrom = os_to_c(from);
@@ -927,6 +977,14 @@ pub(crate) mod fsio {
             Ok(self.dir.canonicalize()? == path.canonicalize()?)
         }
 
+        /// 无句柄原子创建能力时拒绝复用状态目录。
+        pub fn new_child_directory(&self, _name: &OsStr) -> io::Result<Self> {
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "exclusive state directory handle is unavailable",
+            ))
+        }
+
         /// 无安全子目录句柄的平台拒绝写入可信状态，不假装已建立同等边界。
         pub fn child_directory(&self, _name: &OsStr, _create: bool) -> io::Result<Self> {
             Err(io::Error::new(
@@ -997,6 +1055,19 @@ pub(crate) mod fsio {
 
         pub fn publish_new(&self, from: &OsStr, to: &OsStr) -> io::Result<()> {
             std::fs::hard_link(self.dir.join(from), self.dir.join(to))
+        }
+
+        /// 没有同等原子保证时明确拒绝，不使用可能覆盖目标的路径回退。
+        pub fn rename_to_noreplace(
+            &self,
+            _from: &OsStr,
+            _target: &Self,
+            _to: &OsStr,
+        ) -> io::Result<()> {
+            Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "safe no-replace move unavailable",
+            ))
         }
 
         pub fn rename_within(&self, from: &OsStr, to: &OsStr) -> io::Result<()> {

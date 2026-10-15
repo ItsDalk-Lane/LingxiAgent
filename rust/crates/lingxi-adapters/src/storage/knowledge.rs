@@ -23,6 +23,10 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, LazyLock, Mutex, MutexGuard};
 use unicode_normalization::UnicodeNormalization;
 
+#[path = "knowledge_lifecycle.rs"]
+mod lifecycle;
+pub use lifecycle::{ArtifactRetention, VectorUsage};
+
 use lingxi_kernel::knowledge::KnowledgeError;
 use rusqlite::{params, Connection, OptionalExtension};
 
@@ -75,6 +79,24 @@ pub struct SnapshotRow {
     pub byte_size: i64,
     pub storage_path: String,
     pub captured_at: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ProcessingArtifactRow {
+    pub id: String,
+    pub content_snapshot_id: String,
+    pub processor_id: String,
+    pub processor_version: String,
+    pub processor_config_hash: String,
+    pub status: String,
+    pub fidelity: Option<String>,
+    pub output_mime: Option<String>,
+    pub output_path: Option<String>,
+    pub output_sha256: Option<String>,
+    pub locator_map: serde_json::Value,
+    pub warnings: Vec<String>,
+    pub created_at: String,
+    pub completed_at: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -1004,6 +1026,7 @@ pub struct KnowledgeFactStore {
     conn: Mutex<Connection>,
     root: PathBuf,
     clock: ClockMs,
+    root_guard: File,
 }
 
 const FACTS_SCHEMA_VERSION: i64 = 1;
@@ -1056,6 +1079,14 @@ CREATE TABLE IF NOT EXISTS content_snapshots (
     captured_at  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_snapshots_source ON content_snapshots(source_id, captured_at);
+CREATE TABLE IF NOT EXISTS processing_artifacts (
+ id TEXT PRIMARY KEY,content_snapshot_id TEXT NOT NULL REFERENCES content_snapshots(id),
+ processor_id TEXT NOT NULL,processor_version TEXT NOT NULL,processor_config_hash TEXT NOT NULL,
+ status TEXT NOT NULL CHECK(status IN ('processing','ready','failed')),fidelity TEXT,
+ output_mime TEXT,output_path TEXT,output_sha256 TEXT,locator_map_json TEXT NOT NULL DEFAULT '{}',warnings_json TEXT NOT NULL DEFAULT '[]',
+ created_at TEXT NOT NULL,completed_at TEXT,
+ UNIQUE(content_snapshot_id,processor_id,processor_version,processor_config_hash)
+);
 CREATE TABLE IF NOT EXISTS parse_artifacts (
     id                     TEXT PRIMARY KEY,
     content_snapshot_id    TEXT NOT NULL REFERENCES content_snapshots(id),
@@ -1165,6 +1196,22 @@ impl KnowledgeFactStore {
                 .map_err(storage_sqlite)?;
         check_user_version(&tx, FACTS_SCHEMA_VERSION)?;
         tx.execute_batch(FACTS_SCHEMA_SQL).map_err(storage_sqlite)?;
+        let has_output_hash = {
+            let mut columns = tx
+                .prepare("PRAGMA table_info(processing_artifacts)")
+                .map_err(storage_sqlite)?;
+            let names = columns
+                .query_map([], |row| row.get::<_, String>(1))
+                .map_err(storage_sqlite)?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(storage_sqlite)?;
+            names.iter().any(|name| name == "output_sha256")
+        };
+        if !has_output_hash {
+            tx.execute_batch("ALTER TABLE processing_artifacts ADD COLUMN output_sha256 TEXT")
+                .map_err(storage_sqlite)?;
+        }
+
         tx.pragma_update(None, "user_version", FACTS_SCHEMA_VERSION)
             .map_err(storage_sqlite)?;
         tx.commit().map_err(storage_sqlite)?;
@@ -1172,6 +1219,7 @@ impl KnowledgeFactStore {
             conn: Mutex::new(conn),
             root: root.to_path_buf(),
             clock,
+            root_guard: lifecycle::open_root_guard(root)?,
         })
     }
 
@@ -1287,38 +1335,8 @@ impl KnowledgeFactStore {
         studio_id: &str,
         notebook_id: &str,
     ) -> Result<NotebookRow, KnowledgeError> {
-        self.get_notebook(studio_id, notebook_id)?;
-        let now = now_iso(&*self.clock);
-        let mut conn = lock_conn(&self.conn);
-        // 删除、摘 membership 与取消该笔记本活跃 job 同事务提交（knowledge-store.ts deleteNotebook）。
-        let tx = conn
-            .transaction()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        tx.execute(
-            "UPDATE notebooks SET deleted_at=?1, updated_at=?1 WHERE id=?2",
-            params![now, notebook_id],
-        )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        tx.execute(
-            "UPDATE notebook_sources SET removed_at=?1 WHERE notebook_id=?2 AND removed_at IS NULL",
-            params![now, notebook_id],
-        )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        tx.execute(
-            "UPDATE ingestion_jobs SET status='failed', cancelled_at=?1, error='cancelled: notebook deleted', updated_at=?1 WHERE notebook_id=?2 AND status IN ('queued','running','pending_embedding')",
-            params![now, notebook_id],
-        )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        let row = tx
-            .query_row(
-                "SELECT id, studio_id, name, created_at, updated_at, deleted_at FROM notebooks WHERE id=?1",
-                params![notebook_id],
-                Self::map_notebook,
-            )
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        tx.commit()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        Ok(row)
+        self.delete_notebook_retained(studio_id, notebook_id)
+            .map(|result| result.0)
     }
 
     /// 笔记本当前活跃 membership 的来源 id（来源未删除；按加入顺序）。
@@ -1614,8 +1632,88 @@ impl KnowledgeFactStore {
     }
 
     pub fn read_snapshot_bytes(&self, snapshot: &SnapshotRow) -> Result<Vec<u8>, KnowledgeError> {
-        std::fs::read(self.root.join(&snapshot.storage_path))
-            .map_err(|e| KnowledgeError::storage_invalid(format!("snapshot read: {e}")))
+        let expected = format!("snapshots/{}", snapshot.id);
+        if snapshot.storage_path != expected {
+            return Err(KnowledgeError::storage_invalid(
+                "snapshot storage identity mismatch",
+            ));
+        }
+        let bytes = self.read_managed_bytes(&expected, 50 * 1024 * 1024)?;
+        if snapshot.byte_size != bytes.len() as i64 || snapshot.sha256 != sha256_hex(&bytes) {
+            return Err(KnowledgeError::storage_invalid(
+                "snapshot content hash mismatch",
+            ));
+        }
+        Ok(bytes)
+    }
+
+    fn read_managed_bytes(&self, relative: &str, max: usize) -> Result<Vec<u8>, KnowledgeError> {
+        let path = self.root.join(relative);
+        let resolved = std::fs::canonicalize(&path)
+            .map_err(|e| KnowledgeError::storage_invalid(format!("managed content read: {e}")))?;
+        let root = std::fs::canonicalize(&self.root)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if resolved != root.join(relative) || !resolved.starts_with(&root) {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content path redirected",
+            ));
+        }
+        let mut options = OpenOptions::new();
+        options.read(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
+        }
+        let mut file = options
+            .open(&path)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let before = file
+            .metadata()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if !before.is_file() || before.len() > max as u64 {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content is not a bounded regular file",
+            ));
+        }
+        let mut bytes = Vec::new();
+        (&mut file)
+            .take(max as u64 + 1)
+            .read_to_end(&mut bytes)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let after = file
+            .metadata()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let named = std::fs::symlink_metadata(&path)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if bytes.len() > max
+            || !named.is_file()
+            || before.len() != after.len()
+            || before.modified().ok() != after.modified().ok()
+        {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content changed during read",
+            ));
+        }
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::MetadataExt;
+            if before.dev() != named.dev()
+                || before.ino() != named.ino()
+                || before.ctime() != after.ctime()
+                || before.ctime_nsec() != after.ctime_nsec()
+            {
+                return Err(KnowledgeError::storage_invalid(
+                    "managed content identity changed",
+                ));
+            }
+        }
+        if std::fs::canonicalize(&path).ok().as_deref() != Some(resolved.as_path()) {
+            return Err(KnowledgeError::storage_invalid(
+                "managed content parent redirected",
+            ));
+        }
+        Ok(bytes)
     }
 
     /// 解析产物 JSON 原子落盘（artifacts/<snapshotId>/<artifactId>.json）。
@@ -1646,19 +1744,23 @@ impl KnowledgeFactStore {
         source_id: &str,
     ) -> Result<MembershipRow, KnowledgeError> {
         let now = now_iso(&*self.clock);
-        let conn = lock_conn(&self.conn);
-        conn.execute(
-            "INSERT INTO notebook_sources (notebook_id, source_id, added_at) VALUES (?1, ?2, ?3)
-             ON CONFLICT(notebook_id, source_id) DO UPDATE SET removed_at=NULL",
-            params![notebook_id, source_id, now],
-        )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        // 复活语义：重新加入任一笔记本即清除 orphan 标记。
-        conn.execute(
+        let mut conn = lock_conn(&self.conn);
+        let tx = conn
+            .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+            .map_err(storage_sqlite)?;
+        let allowed:bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM notebooks n JOIN sources s ON s.studio_id=n.studio_id WHERE n.id=?1 AND s.id=?2 AND n.deleted_at IS NULL AND s.deleted_at IS NULL)",params![notebook_id,source_id],|r|r.get(0)).map_err(storage_sqlite)?;
+        if !allowed {
+            return Err(KnowledgeError::not_found(
+                "Knowledge source and notebook are not active in the same studio",
+            ));
+        }
+        tx.execute("INSERT INTO notebook_sources (notebook_id,source_id,added_at) VALUES (?1,?2,?3) ON CONFLICT(notebook_id,source_id) DO UPDATE SET removed_at=NULL",params![notebook_id,source_id,now]).map_err(storage_sqlite)?;
+        tx.execute(
             "UPDATE sources SET orphaned_at=NULL WHERE id=?1",
             params![source_id],
         )
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        .map_err(storage_sqlite)?;
+        tx.commit().map_err(storage_sqlite)?;
         drop(conn);
         self.get_membership(notebook_id, source_id)
     }
@@ -1707,7 +1809,7 @@ impl KnowledgeFactStore {
             params![now, notebook_id, source_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        // 零活跃 membership → orphan 标记（保留期后 GC；本任务不做定时 GC，D 项）。
+        // 零活跃 membership → orphan 标记，由显式或启动维护检查保留期限。
         let active: i64 = conn
             .query_row(
                 "SELECT COUNT(*) FROM notebook_sources WHERE source_id=?1 AND removed_at IS NULL",
@@ -1825,6 +1927,8 @@ impl KnowledgeFactStore {
             params![source_id],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        tx.execute("DELETE FROM processing_artifacts WHERE content_snapshot_id IN (SELECT id FROM content_snapshots WHERE source_id=?1)",params![source_id])
+            .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
         tx.execute(
             "DELETE FROM content_snapshots WHERE source_id=?1",
             params![source_id],
@@ -1837,11 +1941,124 @@ impl KnowledgeFactStore {
         drop(conn);
         for snapshot in snapshots {
             let _ = std::fs::remove_file(self.root.join(&snapshot.storage_path));
+            let _ = std::fs::remove_dir_all(self.root.join("artifacts").join(&snapshot.id));
         }
         Ok(())
     }
 
     // ── parse artifacts / blocks / citations ────────────────────────────────
+
+    pub fn processing_artifact(
+        &self,
+        snapshot: &str,
+        processor: &str,
+        version: &str,
+        config: &str,
+    ) -> Result<Option<ProcessingArtifactRow>, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.query_row("SELECT id,content_snapshot_id,processor_id,processor_version,processor_config_hash,status,fidelity,output_mime,output_path,output_sha256,locator_map_json,warnings_json,created_at,completed_at FROM processing_artifacts WHERE content_snapshot_id=?1 AND processor_id=?2 AND processor_version=?3 AND processor_config_hash=?4",params![snapshot,processor,version,config],|r|Ok(ProcessingArtifactRow{
+            id:r.get(0)?,content_snapshot_id:r.get(1)?,processor_id:r.get(2)?,processor_version:r.get(3)?,processor_config_hash:r.get(4)?,status:r.get(5)?,fidelity:r.get(6)?,output_mime:r.get(7)?,output_path:r.get(8)?,output_sha256:r.get(9)?,
+            locator_map:serde_json::from_str(&r.get::<_,String>(10)?).map_err(|e|rusqlite::Error::FromSqlConversionFailure(10,rusqlite::types::Type::Text,Box::new(e)))?,warnings:serde_json::from_str(&r.get::<_,String>(11)?).map_err(|e|rusqlite::Error::FromSqlConversionFailure(11,rusqlite::types::Type::Text,Box::new(e)))?,created_at:r.get(12)?,completed_at:r.get(13)?,
+        })).optional().map_err(|e|KnowledgeError::storage_invalid(e.to_string()))
+    }
+    pub fn begin_processing_artifact(
+        &self,
+        snapshot: &str,
+        processor: &str,
+        version: &str,
+        config: &str,
+    ) -> Result<ProcessingArtifactRow, KnowledgeError> {
+        let id = new_id("kproc");
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        // 已完成产物绝不覆盖；失败/崩溃记录沿同一身份显式重试。
+        conn.execute("INSERT INTO processing_artifacts (id,content_snapshot_id,processor_id,processor_version,processor_config_hash,status,created_at) VALUES(?1,?2,?3,?4,?5,'processing',?6) ON CONFLICT(content_snapshot_id,processor_id,processor_version,processor_config_hash) DO UPDATE SET status='processing',completed_at=NULL,warnings_json='[]' WHERE status!='ready'",params![id,snapshot,processor,version,config,now]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        drop(conn);
+        self.processing_artifact(snapshot, processor, version, config)?
+            .ok_or_else(|| KnowledgeError::storage_invalid("processing artifact missing"))
+    }
+    pub fn complete_processing_artifact(
+        &self,
+        row: &ProcessingArtifactRow,
+        text: &str,
+        locator_map: &serde_json::Value,
+        warnings: &[String],
+    ) -> Result<(), KnowledgeError> {
+        let directory = self.root.join("artifacts").join(&row.content_snapshot_id);
+        std::fs::create_dir_all(&directory)
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        let path = format!("artifacts/{}/{}.txt", row.content_snapshot_id, row.id);
+        let temp = directory.join(format!(".{}.{}.tmp", row.id, new_id("write")));
+        let target = self.root.join(&path);
+        let write = (|| {
+            use std::io::Write;
+            let mut file = std::fs::OpenOptions::new()
+                .create_new(true)
+                .write(true)
+                .open(&temp)?;
+            file.write_all(text.as_bytes())?;
+            file.sync_all()?;
+            std::fs::rename(&temp, &target)
+        })();
+        if let Err(e) = write {
+            let _ = std::fs::remove_file(&temp);
+            return Err(KnowledgeError::storage_invalid(format!(
+                "processor output: {e}"
+            )));
+        }
+        let now = now_iso(&*self.clock);
+        let conn = lock_conn(&self.conn);
+        conn.execute("UPDATE processing_artifacts SET status='ready',fidelity='structural',output_mime='text/plain',output_path=?1,output_sha256=?2,locator_map_json=?3,warnings_json=?4,completed_at=?5 WHERE id=?6 AND status='processing'",params![path,sha256_hex(text.as_bytes()),locator_map.to_string(),serde_json::to_string(warnings).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?,now,row.id]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(())
+    }
+    pub fn fail_processing_artifact(&self, id: &str, reason: &str) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        conn.execute("UPDATE processing_artifacts SET status='failed',warnings_json=?1,completed_at=?2 WHERE id=?3 AND status!='ready'",params![serde_json::json!([reason]).to_string(),now_iso(&*self.clock),id]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        Ok(())
+    }
+    pub fn read_processing_output(
+        &self,
+        row: &ProcessingArtifactRow,
+    ) -> Result<String, KnowledgeError> {
+        if row.status != "ready"
+            || row.fidelity.as_deref() != Some("structural")
+            || row.output_mime.as_deref() != Some("text/plain")
+        {
+            return Err(KnowledgeError::storage_invalid(
+                "processor output is not ready",
+            ));
+        }
+        let expected = format!("artifacts/{}/{}.txt", row.content_snapshot_id, row.id);
+        if row.output_path.as_deref() != Some(&expected) {
+            return Err(KnowledgeError::storage_invalid(
+                "processor output path does not match identity",
+            ));
+        }
+        let bytes = self.read_managed_bytes(&expected, 8 * 1024 * 1024)?;
+        if bytes.len() > 8 * 1024 * 1024
+            || row.output_sha256.as_deref() != Some(&sha256_hex(&bytes))
+        {
+            return Err(KnowledgeError::storage_invalid(
+                "processor output content hash mismatch",
+            ));
+        }
+        String::from_utf8(bytes)
+            .map_err(|_| KnowledgeError::storage_invalid("processor output is not UTF8"))
+    }
+    pub fn bind_processing_artifact(
+        &self,
+        artifact: &str,
+        processing: &str,
+    ) -> Result<(), KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        let changed=conn.execute("UPDATE parse_artifacts SET processing_artifact_id=?1 WHERE id=?2 AND content_snapshot_id=(SELECT content_snapshot_id FROM processing_artifacts WHERE id=?1)",params![processing,artifact]).map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
+        if changed != 1 {
+            return Err(KnowledgeError::storage_invalid(
+                "processor and parser snapshots differ",
+            ));
+        }
+        Ok(())
+    }
 
     pub fn begin_parse_artifact(
         &self,
@@ -3347,6 +3564,7 @@ pub struct BuildBegin {
 pub struct KnowledgeVectorStore {
     conn: Mutex<Connection>,
     _recovery_guard: File,
+    clock: ClockMs,
 }
 
 const VECTOR_SCHEMA_VERSION: i64 = 1;
@@ -3385,15 +3603,29 @@ impl Drop for KnowledgeVectorStore {
 
 impl KnowledgeVectorStore {
     pub fn open(root: &Path) -> Result<Self, KnowledgeError> {
+        Self::open_with_clock(
+            root,
+            Arc::new(|| {
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_millis() as i64)
+                    .unwrap_or(0)
+            }),
+        )
+    }
+
+    pub fn open_with_clock(root: &Path, clock: ClockMs) -> Result<Self, KnowledgeError> {
         std::fs::create_dir_all(root).map_err(storage_io)?;
         let (conn, guard) = open_cache(
             &root.join("knowledge_vector.db"),
             VECTOR_SCHEMA_VERSION,
             VECTOR_SCHEMA_SQL,
         )?;
+        lifecycle::initialize_vector_usage(&conn, clock())?;
         Ok(Self {
             conn: Mutex::new(conn),
             _recovery_guard: guard,
+            clock,
         })
     }
 
@@ -3443,6 +3675,7 @@ impl KnowledgeVectorStore {
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         write_current_algorithm(&conn, &variant_id)?;
+        lifecycle::record_vector_use(&conn, &variant_id, (self.clock)())?;
         conn.commit().map_err(storage_sqlite)?;
         Ok(BuildBegin {
             variant_id,
@@ -3827,6 +4060,12 @@ impl KnowledgeVectorStore {
                 .then_with(|| left.chunk_id.cmp(&right.chunk_id))
         });
         hits.truncate(limit);
+        let mut connection = lock_conn(&self.conn);
+        let tx = cache_write(&mut connection, VECTOR_SCHEMA_VERSION)?;
+        for variant_id in variant_ids {
+            lifecycle::record_vector_use(&tx, variant_id, (self.clock)())?;
+        }
+        tx.commit().map_err(storage_sqlite)?;
         Ok(hits)
     }
 
@@ -3837,6 +4076,11 @@ impl KnowledgeVectorStore {
         let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
         let mut removed = 0;
         for variant in &variants {
+            tx.execute(
+                "DELETE FROM knowledge_vector_usage WHERE variant_id=?1",
+                params![variant.variant_id],
+            )
+            .map_err(storage_sqlite)?;
             tx.execute(
                 "DELETE FROM chunk_vectors WHERE vector_index_variant_id=?1",
                 params![variant.variant_id],

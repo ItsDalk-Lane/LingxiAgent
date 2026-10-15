@@ -367,7 +367,9 @@ pub async fn append_branch_entry(
     db: &RunDatabase,
     req: AppendBranchEntry<'_>,
 ) -> Result<String, StorageError> {
-    append_branch_entry_inner(db, req, None, None).await.map(|(id, _)| id)
+    append_branch_entry_inner(db, req, None, None)
+        .await
+        .map(|(id, _)| id)
 }
 
 /// 工具的会话记录和完整业务事件一次提交；事务内复核运行身份与当前尝试。

@@ -15783,7 +15783,7 @@
    ],
    "requirement": "REQUIRED_SUPPLEMENTAL",
    "feature_id": "F-D08-ROUTE_BEHAVIOR-BEHAVIOR-KNOWLEDGE-KNOWLEDGE-NOTEBOOKS-ID-DELETE-01E1E3",
-   "then": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+   "then": "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
    "formalization_task_id": "R00-T07",
    "ledger_status": "SPECIFIED_NOT_EXECUTED",
    "result_ids": [],

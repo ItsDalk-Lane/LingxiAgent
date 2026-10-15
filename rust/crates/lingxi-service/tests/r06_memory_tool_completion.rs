@@ -1018,6 +1018,7 @@ async fn memory_search_status_no_hits_not_searched_and_agent_channel_isolation()
 }
 
 struct EmbedStub {
+    requests: Arc<Mutex<Vec<Value>>>,
     addr: std::net::SocketAddr,
     mode: Arc<AtomicUsize>,
     calls: Arc<AtomicUsize>,
@@ -1028,13 +1029,17 @@ async fn embedding_stub() -> EmbedStub {
     let addr = listener.local_addr().unwrap();
     let mode = Arc::new(AtomicUsize::new(0));
     let calls = Arc::new(AtomicUsize::new(0));
+    let requests = Arc::new(Mutex::new(Vec::new()));
+    let stub_requests = requests.clone();
     let stub_mode = mode.clone();
     let stub_calls = calls.clone();
     let route = axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
         let mode = stub_mode.clone();
         let calls = stub_calls.clone();
+        let requests = stub_requests.clone();
         async move {
             calls.fetch_add(1, Ordering::SeqCst);
+            requests.lock().unwrap().push(body.clone());
             if mode.load(Ordering::SeqCst) == 1 {
                 tokio::time::sleep(Duration::from_secs(3)).await;
             }
@@ -1053,6 +1058,7 @@ async fn embedding_stub() -> EmbedStub {
         axum::serve(listener, router).await.unwrap();
     });
     EmbedStub {
+        requests,
         addr,
         mode,
         calls,
@@ -1096,6 +1102,11 @@ async fn memory_semantic_real_provider_no_model_no_coverage_timeout_and_actual_v
     let stub = embedding_stub().await;
     let home = dir("semantic");
     agents(&home);
+    agent_embedding_ref(
+        &home,
+        "lingxi",
+        json!({"provider":"embed","id":"memory-embedding"}),
+    );
     let state = boot_embeddings(&home, &stub, true).await;
     let tools = bind_tools(&home, "lingxi", Some(state.memory().clone()));
     let store = tools.memory.fact_store("lingxi").unwrap();
@@ -1123,7 +1134,11 @@ async fn memory_semantic_real_provider_no_model_no_coverage_timeout_and_actual_v
     assert!(text(&no_coverage).contains("skipped_no_coverage"));
     assert_eq!(stub.calls.load(Ordering::SeqCst), 1);
     // 向量来自同一真实供应商链的实测身份；避免伪造 modelKey 声称覆盖。
-    let embedder = state.memory().search_embedder().unwrap();
+    let lingxi_service::memory::SearchEmbeddingResolution::Ready(embedder) =
+        state.memory().search_embedder_for_agent("lingxi").unwrap()
+    else {
+        panic!("已配置助手模型必须可解析")
+    };
     let (identity, vectors) = embedder
         .embed(
             vec!["语义独有内容".into()],
@@ -1666,4 +1681,412 @@ fn experience_operation_gate_survives_memory_directory_creation_and_agent_path_a
     );
     std::fs::remove_file(alias).unwrap();
     std::fs::remove_dir_all(home).unwrap();
+}
+
+#[tokio::test]
+async fn independent_agent_without_memory_embedding_must_not_spend_global_embedding() {
+    let stub = embedding_stub().await;
+    let home = dir("independent-no-agent-embedding");
+    agents(&home);
+    let state = boot_embeddings(&home, &stub, true).await;
+    let tools = bind_tools(&home, "lingxi", Some(state.memory().clone()));
+    tools
+        .memory
+        .fact_store("lingxi")
+        .unwrap()
+        .add(&lingxi_adapters::storage::agent_memory::FactInsert {
+            fact: "agent fact",
+            tags: &[],
+            time: None,
+            session_id: None,
+        })
+        .unwrap();
+    let result = success(
+        tools
+            .call(
+                "search_memory",
+                json!({"query":"different phrase"}),
+                101,
+                "sess_local_alpha",
+            )
+            .await
+            .unwrap(),
+    );
+    let receipt = json!({"semantic":details(&result),"providerCalls":stub.calls.load(Ordering::SeqCst),"agentConfig":std::fs::read_to_string(home.join("agents/lingxi/config.yaml")).unwrap()});
+    std::fs::write(
+        home.join("no-agent-embedding-facts.json"),
+        serde_json::to_vec_pretty(&receipt).unwrap(),
+    )
+    .unwrap();
+    println!("EX06_AGENT_EMBEDDING {receipt}");
+    state.storage().close().await.unwrap();
+    stub.handle.abort();
+    assert_eq!(
+        stub.calls.load(Ordering::SeqCst),
+        0,
+        "当前助手没有memory.embedding_model，不能花费全局知识嵌入模型"
+    );
+    assert_eq!(details(&result)["semantic"], "unavailable_no_model");
+}
+
+fn agent_embedding_ref(home: &Path, agent: &str, model: Value) {
+    let path = home.join("agents").join(agent).join("config.yaml");
+    let mut doc = lingxi_adapters::storage::agent_memory::config::read_agent_config(&path).unwrap();
+    doc.deep_merge(&json!({"memory":{"embedding_model":model}}))
+        .unwrap();
+    std::fs::write(path, doc.render().unwrap()).unwrap();
+}
+struct MemoryChatStub {
+    addr: std::net::SocketAddr,
+    requests: Arc<Mutex<Vec<Value>>>,
+    handle: tokio::task::JoinHandle<()>,
+}
+impl Drop for MemoryChatStub {
+    fn drop(&mut self) {
+        self.handle.abort();
+    }
+}
+async fn memory_chat_stub() -> MemoryChatStub {
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let addr = listener.local_addr().unwrap();
+    let requests = Arc::new(Mutex::new(Vec::new()));
+    let capture = requests.clone();
+    let router=axum::Router::new().route("/v1/chat/completions",axum::routing::post(move |axum::Json(body):axum::Json<Value>| {
+        let capture=capture.clone();async move {
+            capture.lock().unwrap().push(body.clone());
+            let tool_count=body["messages"].as_array().unwrap().iter().filter(|m|m["role"]=="tool").count();
+            let frames=if tool_count>=2 {
+                vec![json!({"choices":[{"index":0,"delta":{"role":"assistant","content":"已检索当前助手记忆"},"finish_reason":null}]}),json!({"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]})]
+            } else {
+                let (name,args)=if tool_count==0 { ("mcp_describe_tool",json!({"name":"search_memory"})) } else { ("mcp_call",json!({"tool":"search_memory","arguments":{"query":"unrelated semantic phrase"}})) };
+                assert!(body["tools"].as_array().unwrap().iter().any(|t|t["function"]["name"]==name));
+                vec![json!({"choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":format!("actual-ex06-call-{tool_count}"),"type":"function","function":{"name":name,"arguments":args.to_string()}}]},"finish_reason":null}]}),json!({"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]})]
+            };
+            let stream=frames.into_iter().map(|f|format!("data: {f}\n\n")).collect::<String>()+"data: [DONE]\n\n";
+            ([(axum::http::header::CONTENT_TYPE,"text/event-stream")],stream)
+        }
+    }));
+    let handle = tokio::spawn(async move { axum::serve(listener, router).await.unwrap() });
+    MemoryChatStub {
+        addr,
+        requests,
+        handle,
+    }
+}
+async fn boot_agent_embedding_plane(
+    home: &Path,
+    a: &EmbedStub,
+    b: &EmbedStub,
+    global: &EmbedStub,
+    global_enabled: bool,
+) -> (ServiceState, MemoryChatStub) {
+    let layout = prepare_layout(home).unwrap();
+    let file = home.join("per-agent-provider-fixture.json");
+    let chat = memory_chat_stub().await;
+    let providers = json!({"a":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",a.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_A"}},"b":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",b.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_B"}},"global":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",global.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_GLOBAL"}},"chat":{"protocol":"openai-completions","endpoint":format!("http://{}/v1",chat.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_CHAT"}}});
+    let mut models = if global_enabled {
+        json!({"embedding":{"provider":"global","model":"global-model"}})
+    } else {
+        json!({})
+    };
+    models["chat"] = json!({"provider":"chat","model":"chat-stub","capabilities":{"tools":true}});
+    std::fs::write(
+        &file,
+        serde_json::to_vec(&json!({"home":home,"providers":providers,"models":models})).unwrap(),
+    )
+    .unwrap();
+    let (source, plane) =
+        lingxi_service::config::resolve_model_plane(Some(&file), &layout.runtime_dir)
+            .unwrap()
+            .unwrap();
+    let credentials = Arc::new(
+        lingxi_service::credentials::CredentialService::bootstrap(
+            &plane,
+            &layout.runtime_dir,
+            Arc::new(SystemClock),
+        )
+        .unwrap(),
+    );
+    let state = ServiceState::bootstrap_with_deps(
+        config(home),
+        &layout,
+        ServiceDeps {
+            model_gateway: Some(Arc::new(
+                lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
+            )),
+            model_plane_source: Some(source),
+            credential_service: Some(credentials),
+            workspace_root: Some(home.into()),
+            ..Default::default()
+        },
+    )
+    .await
+    .unwrap();
+    (state, chat)
+}
+fn embedding_usage_rows(home: &Path) -> Value {
+    let c = rusqlite::Connection::open(home.join("lingxi-service/data/runs.db")).unwrap();
+    let mut q=c.prepare("SELECT model_call_id,provider,model,session_id,run_id,attempt,parent_tool_call_id,transport_attempts,outcome,usage_state,input_tokens,cause_ref FROM model_call_usage WHERE purpose='embedding' ORDER BY recorded_at_unix_ms,model_call_id").unwrap();
+    let rows=q.query_map([],|r|Ok(json!({"id":r.get::<_,String>(0)?,"provider":r.get::<_,String>(1)?,"model":r.get::<_,String>(2)?,"session":r.get::<_,Option<String>>(3)?,"run":r.get::<_,Option<String>>(4)?,"attempt":r.get::<_,Option<String>>(5)?,"parentTool":r.get::<_,Option<String>>(6)?,"attempts":r.get::<_,Option<i64>>(7)?,"outcome":r.get::<_,String>(8)?,"usage":r.get::<_,String>(9)?,"inputTokens":r.get::<_,Option<i64>>(10)?,"cause":r.get::<_,Option<String>>(11)?}))).unwrap().collect::<Result<Vec<_>,_>>().unwrap();
+    json!(rows)
+}
+fn paid_memory_receipts(home: &Path) -> Vec<Value> {
+    std::fs::read_dir(home.join("lingxi-service/media-products/embedding-calls-v1"))
+        .unwrap()
+        .filter_map(|e| {
+            let p = e.unwrap().path();
+            (p.extension().is_some_and(|s| s == "json"))
+                .then(|| serde_json::from_slice::<Value>(&std::fs::read(p).unwrap()).unwrap())
+        })
+        .collect()
+}
+#[tokio::test]
+async fn ex06_agent_selected_models_actual_wire_scope_usage_restart_and_invalid_configs() {
+    let a = embedding_stub().await;
+    let b = embedding_stub().await;
+    let global = embedding_stub().await;
+    let home = dir("ex06-agent-models");
+    agents(&home);
+    agent_embedding_ref(&home, "lingxi", json!({"provider":"a","id":"model-a"}));
+    agent_embedding_ref(&home, "other", json!({"provider":"b","id":"model-b"}));
+    // 现役目录声明两个真实可解析的嵌入模型；全局模型故意使用第三个服务商。
+    std::fs::write(home.join("provider-catalog.json"),serde_json::to_vec(&json!({"catalogVersion":2,"providers":{"a":{"models":[{"id":"model-a","type":"embedding"}]},"b":{"models":[{"id":"model-b","operations":["embedding"]}]}},"meta":{}})).unwrap()).unwrap();
+    let (state, provider) = boot_agent_embedding_plane(&home, &a, &b, &global, true).await;
+    let ta = bind_tools(&home, "lingxi", Some(state.memory().clone()));
+    let tb = bind_tools(&home, "other", Some(state.memory().clone()));
+    let sa = ta.memory.fact_store("lingxi").unwrap();
+    let sb = tb.memory.fact_store("other").unwrap();
+    let fa = sa
+        .add(&lingxi_adapters::storage::agent_memory::FactInsert {
+            fact: "ALPHA_PRIVATE_BODY",
+            tags: &[],
+            time: None,
+            session_id: None,
+        })
+        .unwrap();
+    let fb = sb
+        .add(&lingxi_adapters::storage::agent_memory::FactInsert {
+            fact: "BETA_PRIVATE_BODY",
+            tags: &[],
+            time: None,
+            session_id: None,
+        })
+        .unwrap();
+    let query = json!({"query":"unrelated semantic phrase"});
+    let none = success(
+        ta.call("search_memory", query.clone(), 201, "ex06-a")
+            .await
+            .unwrap(),
+    );
+    assert_eq!(details(&none)["semantic"], "skipped_no_coverage");
+    assert_eq!(a.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(b.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(global.calls.load(Ordering::SeqCst), 0);
+    let lingxi_service::memory::SearchEmbeddingResolution::Ready(ea) =
+        state.memory().search_embedder_for_agent("lingxi").unwrap()
+    else {
+        panic!("A必须可解析")
+    };
+    let lingxi_service::memory::SearchEmbeddingResolution::Ready(eb) =
+        state.memory().search_embedder_for_agent("other").unwrap()
+    else {
+        panic!("B必须可解析")
+    };
+    let (ia, va) = ea
+        .embed(
+            vec!["ALPHA_PRIVATE_BODY".into()],
+            lingxi_service::knowledge::EmbeddingInputType::Document,
+        )
+        .await
+        .unwrap();
+    let (ib, vb) = eb
+        .embed(
+            vec!["BETA_PRIVATE_BODY".into()],
+            lingxi_service::knowledge::EmbeddingInputType::Document,
+        )
+        .await
+        .unwrap();
+    assert_ne!(ia.key, ib.key);
+    sa.upsert_embedding(fa, &ib.key, &vb[0]).unwrap();
+    let wrong_space = success(
+        ta.call("search_memory", query.clone(), 202, "ex06-a")
+            .await
+            .unwrap(),
+    );
+    assert_eq!(details(&wrong_space)["semantic"], "skipped_no_coverage");
+    sa.upsert_embedding(fa, &ia.key, &va[0]).unwrap();
+    sb.upsert_embedding(fb, &ib.key, &vb[0]).unwrap();
+    let hit_a = success(
+        ta.call("search_memory", query.clone(), 203, "ex06-a")
+            .await
+            .unwrap(),
+    );
+    let hit_b = success(
+        tb.call("search_memory", query.clone(), 204, "ex06-b")
+            .await
+            .unwrap(),
+    );
+    assert_eq!(details(&hit_a)["semantic"], "used");
+    assert_eq!(details(&hit_b)["semantic"], "used");
+    assert!(text(&hit_a).contains("ALPHA_PRIVATE_BODY"));
+    assert!(!text(&hit_a).contains("BETA_PRIVATE_BODY"));
+    assert!(text(&hit_b).contains("BETA_PRIVATE_BODY"));
+    assert!(!text(&hit_b).contains("ALPHA_PRIVATE_BODY"));
+    let before = (
+        a.calls.load(Ordering::SeqCst),
+        b.calls.load(Ordering::SeqCst),
+    );
+    assert!(matches!(
+        mismatched_agent_call(&ta, "search_memory", query.clone(), 205).await,
+        ToolOutcome::Failed { .. }
+    ));
+    assert_eq!(
+        before,
+        (
+            a.calls.load(Ordering::SeqCst),
+            b.calls.load(Ordering::SeqCst)
+        )
+    );
+    state
+        .sessions()
+        .set_permission_mode_for(&owner(), "sess_local_alpha", SessionPermissionMode::Operate)
+        .await
+        .unwrap();
+    let run = run_review(&state).await.unwrap();
+    let chat_wire = provider.requests.lock().unwrap().clone();
+    let actual = chat_wire.last().unwrap()["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .rfind(|m| m["role"] == "tool")
+        .unwrap()["content"]
+        .clone();
+    assert!(actual.as_str().unwrap().contains("ALPHA_PRIVATE_BODY"));
+    assert!(actual.as_str().unwrap().contains("used"));
+    assert!(!actual.as_str().unwrap().contains("BETA_PRIVATE_BODY"));
+    let usage = embedding_usage_rows(&home);
+    let actual_rows = usage
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["run"] == run)
+        .collect::<Vec<_>>();
+    assert_eq!(actual_rows.len(), 1);
+    let row = actual_rows[0];
+    assert_eq!(row["provider"], "a");
+    assert_eq!(row["model"], "model-a");
+    assert_eq!(row["session"], "sess_local_alpha");
+    assert!(row["parentTool"].is_string());
+    assert_eq!(row["attempts"], 1);
+    assert_eq!(row["outcome"], "succeeded");
+    assert_eq!(row["inputTokens"], 1);
+    let receipts = paid_memory_receipts(&home);
+    assert!(receipts.iter().any(|r| r["ownership"]["run_id"] == run
+        && r["ownership"]["agent_id"] == "lingxi"
+        && r["ownerBinding"]["parentToolCallId"] == row["parentTool"]));
+    let count_before_restart = (
+        a.calls.load(Ordering::SeqCst),
+        b.calls.load(Ordering::SeqCst),
+    );
+    drop(ea);
+    drop(eb);
+    drop(ta);
+    drop(tb);
+    drop(sa);
+    drop(sb);
+    state.storage().close().await.unwrap();
+    drop(state);
+    let (state, _) = boot_agent_embedding_plane(&home, &a, &b, &global, true).await;
+    assert_eq!(
+        count_before_restart,
+        (
+            a.calls.load(Ordering::SeqCst),
+            b.calls.load(Ordering::SeqCst)
+        )
+    );
+    let ta = bind_tools(&home, "lingxi", Some(state.memory().clone()));
+    let restored = success(
+        ta.call("search_memory", query.clone(), 206, "ex06-after-restart")
+            .await
+            .unwrap(),
+    );
+    assert_eq!(details(&restored)["semantic"], "used");
+    assert!(text(&restored).contains("ALPHA_PRIVATE_BODY"));
+    let before = (
+        a.calls.load(Ordering::SeqCst),
+        b.calls.load(Ordering::SeqCst),
+    );
+    let mut refused = Vec::new();
+    for (i, reference) in [
+        json!({"provider":"missing","id":"model-a"}),
+        json!({"provider":"a","id":"missing-model"}),
+        json!({"provider":"a"}),
+        json!("not a reference"),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        agent_embedding_ref(&home, "lingxi", reference.clone());
+        let result = success(
+            ta.call("search_memory", query.clone(), 210 + i, "ex06-invalid")
+                .await
+                .unwrap(),
+        );
+        assert_eq!(details(&result)["semantic"], "unavailable_unresolvable");
+        refused.push(json!({"ref":reference,"result":details(&result)}));
+    }
+    agent_embedding_ref(&home, "lingxi", Value::Null);
+    let no_model = success(
+        ta.call("search_memory", query.clone(), 215, "ex06-no-model")
+            .await
+            .unwrap(),
+    );
+    assert_eq!(details(&no_model)["semantic"], "unavailable_no_model");
+    assert_eq!(
+        before,
+        (
+            a.calls.load(Ordering::SeqCst),
+            b.calls.load(Ordering::SeqCst)
+        )
+    );
+    assert_eq!(global.calls.load(Ordering::SeqCst), 0);
+    agent_embedding_ref(&home, "lingxi", json!({"provider":"a","id":"model-a"}));
+    drop(ta);
+    state.storage().close().await.unwrap();
+    drop(state);
+    let (state, _) = boot_agent_embedding_plane(&home, &a, &b, &global, false).await;
+    let ta = bind_tools(&home, "lingxi", Some(state.memory().clone()));
+    let without_global = success(
+        ta.call("search_memory", query, 216, "ex06-no-global")
+            .await
+            .unwrap(),
+    );
+    assert_eq!(details(&without_global)["semantic"], "used");
+    assert_eq!(global.calls.load(Ordering::SeqCst), 0);
+    assert!(a
+        .requests
+        .lock()
+        .unwrap()
+        .iter()
+        .all(|r| r["model"] == "model-a"));
+    assert!(b
+        .requests
+        .lock()
+        .unwrap()
+        .iter()
+        .all(|r| r["model"] == "model-b"));
+    let proof = json!({"home":home,"aWire":a.requests.lock().unwrap().clone(),"bWire":b.requests.lock().unwrap().clone(),"globalCalls":0,"differentSpaceKeys":[ia.key,ib.key],"aHit":details(&hit_a),"bHit":details(&hit_b),"wrongSpace":details(&wrong_space),"actualRun":run,"actualRunResult":actual,"actualChatWire":chat_wire,"usage":embedding_usage_rows(&home),"paidReceipts":paid_memory_receipts(&home),"invalid":refused,"noModel":details(&no_model),"afterRestart":details(&restored),"withoutGlobal":details(&without_global)});
+    std::fs::write(
+        home.join("ex06-per-agent-proof.json"),
+        serde_json::to_vec_pretty(&proof).unwrap(),
+    )
+    .unwrap();
+    println!(
+        "EX06_PER_AGENT_PROOF {}",
+        home.join("ex06-per-agent-proof.json").display()
+    );
+    state.storage().close().await.unwrap();
+    a.handle.abort();
+    b.handle.abort();
+    global.handle.abort();
 }

@@ -30,7 +30,13 @@ impl PreparedPackage {
                 "skill source path must be absolute".into(),
             ));
         }
-        let metadata = std::fs::symlink_metadata(path)?;
+        let metadata = std::fs::symlink_metadata(path).map_err(|error| {
+            if error.kind() == std::io::ErrorKind::NotFound {
+                MemoryError::InvalidRequest("skill source package does not exist".into())
+            } else {
+                MemoryError::from(error)
+            }
+        })?;
         if metadata.file_type().is_symlink() {
             return Err(MemoryError::InvalidRequest(
                 "skill package cannot be a link".into(),
@@ -80,6 +86,17 @@ impl PreparedPackage {
         Self::archive(&bytes)
     }
     fn archive(bytes: &[u8]) -> Result<Self, MemoryError> {
+        Self::from_archive(bytes, "")
+    }
+    pub(crate) fn from_archive(bytes: &[u8], subpath: &str) -> Result<Self, MemoryError> {
+        if subpath.split('/').any(|part| matches!(part, "." | ".."))
+            || subpath.starts_with('/')
+            || subpath.contains('\\')
+        {
+            return Err(MemoryError::InvalidRequest(
+                "invalid skill package subpath".into(),
+            ));
+        }
         if bytes.len() as u64 > PACKAGE_BYTES {
             return Err(MemoryError::InvalidRequest(
                 "skill package is too large".into(),
@@ -151,7 +168,10 @@ impl PreparedPackage {
                 ));
             }
         }
-        prepared.path = sl::prepare_local_skill_package(&root)?;
+        let selected = sl::find_skill_package_root(&root, subpath).ok_or_else(|| {
+            MemoryError::InvalidRequest("skill archive does not contain requested SKILL.md".into())
+        })?;
+        prepared.path = sl::prepare_local_skill_package(&selected)?;
         Ok(prepared)
     }
 }

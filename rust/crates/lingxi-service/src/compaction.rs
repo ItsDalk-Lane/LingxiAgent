@@ -47,6 +47,8 @@ use lingxi_kernel::usage::{CallOutcome, ModelCallUsage, ReportedUsage};
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{ContentBlock, ModelCallId, ToolCallId};
 
+#[path = "compaction_recovery.rs"]
+mod recovery;
 use crate::cancel::CancelScope;
 use crate::inject::ServiceClock;
 use crate::quotas::{QuotaManager, QuotaResource};
@@ -176,6 +178,7 @@ pub struct CompactionService {
     quotas: Arc<QuotaManager>,
     clock: Arc<dyn ServiceClock>,
     settings_root: std::sync::RwLock<Option<PathBuf>>,
+    recovery_sources: std::sync::RwLock<Option<recovery::RecoverySources>>,
     manual_cancels: std::sync::Mutex<
         std::collections::HashMap<String, (CancelScope, Arc<std::sync::atomic::AtomicU8>)>,
     >,
@@ -200,6 +203,7 @@ impl CompactionService {
             quotas,
             clock,
             settings_root: std::sync::RwLock::new(None),
+            recovery_sources: std::sync::RwLock::new(None),
             manual_cancels: std::sync::Mutex::new(std::collections::HashMap::new()),
         }
     }
@@ -659,6 +663,16 @@ impl CompactionService {
             }
         };
 
+        let recovery =
+            match self.recovery_material(ctx, agent_id, &input.exchange[..plan.cut_index]) {
+                Ok(recovery) => recovery,
+                Err(detail) => {
+                    return Ok(CompactionOutcome::Failed {
+                        detail: format!("compaction recovery material unavailable: {detail}"),
+                    })
+                }
+            };
+
         // ── 4) 生效摘要路由（R3-F-01，§十#17）：summarize 槽显式配置优先；
         // 槽未配置/不可路由 → 回退 chat 路由（与现役 auxiliary-slots.ts 的
         // summarize 槽 `fallback:"chat"` 对齐，且现役压缩摘要本就是会话模型
@@ -951,6 +965,7 @@ impl CompactionService {
                     &sanitized.text,
                     &input.exchange[..plan.cut_index],
                 );
+                let summary = recovery::append(&summary, &recovery);
                 let exchange = compaction::apply_plan(input.exchange, &plan, summary, mid_run);
                 Ok(CompactionOutcome::Compacted {
                     exchange,
@@ -1004,6 +1019,7 @@ impl CompactionService {
                                     &sanitized.text,
                                     &input.exchange[..plan.cut_index],
                                 );
+                                let summary = recovery::append(&summary, &recovery);
                                 let exchange =
                                     compaction::apply_plan(input.exchange, &plan, summary, mid_run);
                                 Ok(CompactionOutcome::Compacted {

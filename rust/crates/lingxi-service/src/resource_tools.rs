@@ -132,6 +132,20 @@ impl ResourceTools {
             return Ok(value);
         }
         if value["kind"] == "mount" {
+            if value.get("fileId").is_some() || value.get("realPath").is_some() {
+                return Err("mount reference cannot contain a session-file identity".into());
+            }
+            let actual = self
+                .io
+                .mount_claim_path(&value, &Self::context(ctx))
+                .map_err(|e| e.to_string())?;
+            crate::toolgateway::require_bound_resource(&actual, ResourceOp::Read)?;
+            if value
+                .get("filePath")
+                .is_some_and(|path| path.as_str() != actual.to_str())
+            {
+                return Err("mount path claim mismatch".into());
+            }
             return Ok(value);
         }
         let raw = value
@@ -163,11 +177,27 @@ impl ResourceTools {
             .unwrap_or(args);
         let cwd = self.cwd();
         let mut scopes = Vec::new();
-        if let Some(path) = value
-            .get("path")
-            .and_then(Value::as_str)
-            .filter(|_| value["kind"] != "mount")
-        {
+        if value["kind"] == "mount" {
+            // 审批绑定当时登记解析出的真实来源；执行前仍由同一提取器重新核对。
+            let context = OpContext {
+                principal_kind: caller.principal_kind,
+                principal_subject: caller.principal_subject.clone(),
+                session_id: caller.session_id.clone(),
+                source: "agent_tool".into(),
+                reason: Some("file resource approval".into()),
+                session_path: None,
+                emit: true,
+                capture_origin: None,
+            };
+            let path = self
+                .io
+                .mount_claim_path(value, &context)
+                .map_err(|e| e.to_string())?;
+            scopes.push(crate::resourceaccess::ResourceScope::new(
+                path,
+                ResourceOp::Read,
+            ));
+        } else if let Some(path) = value.get("path").and_then(Value::as_str) {
             scopes.push(
                 self.access
                     .authorize(
@@ -217,6 +247,11 @@ impl ResourceTools {
         Ok(scopes)
     }
     async fn track_path(&self, ctx: &RunContext, value: &Value) -> Result<(), String> {
+        // 挂载原地路径继续受挂载授权管理，不能另铸可绕过撤权的永久文件ID。
+        // 复制到工作区的新副本由下方真实copy提交独立登记。
+        if value["resource"]["kind"] == "mount" {
+            return Ok(());
+        }
         if let Some(path) = value.get("filePath").and_then(Value::as_str) {
             self.files
                 .register_file(
@@ -231,6 +266,15 @@ impl ResourceTools {
         }
         Ok(())
     }
+    fn check_mount_result(reference: &Value, result: &Value) -> Result<(), String> {
+        if reference["kind"] == "mount" {
+            let path = result["filePath"]
+                .as_str()
+                .ok_or("mount result has no local path")?;
+            crate::toolgateway::require_bound_resource(Path::new(path), ResourceOp::Read)?;
+        }
+        Ok(())
+    }
     async fn invoke(&self, ctx: &RunContext, request: &ToolRequest) -> Result<Value, String> {
         self.caller(ctx).await?;
         let args = request.arguments.as_value();
@@ -242,6 +286,7 @@ impl ResourceTools {
                 .materialize(&reference, &op)
                 .await
                 .map_err(|e| e.to_string())?;
+            Self::check_mount_result(&reference, &value)?;
             self.track_path(ctx, &value).await?;
             return Ok(value);
         }
@@ -255,6 +300,7 @@ impl ResourceTools {
             if value["exists"] == false {
                 return Err("file does not exist".into());
             }
+            Self::check_mount_result(&reference, &value)?;
             self.track_path(ctx, &value).await?;
             return Ok(value);
         }
@@ -264,6 +310,7 @@ impl ResourceTools {
             .materialize(&reference, &op)
             .await
             .map_err(|e| e.to_string())?;
+        Self::check_mount_result(&reference, &materialized)?;
         if materialized["isDirectory"] == true {
             return Err("file action requires a regular file, not a directory".into());
         }
@@ -272,46 +319,59 @@ impl ResourceTools {
                 .as_str()
                 .ok_or("resource has no local path")?,
         );
-        let retained =
-            crate::task_supervisor::retain_blocking_run_permit(ctx).map_err(|e| e.to_string())?;
-        let cancel =
-            crate::task_supervisor::blocking_run_cancel_scope(ctx).map_err(|e| e.to_string())?;
-        let lease = self.files.payload_lease().await;
-        let path_authority = if reference["kind"] == "local-file" || reference["kind"] == "url" {
-            Some((Arc::clone(&self.access), Self::context(ctx), self.cwd()))
-        } else {
-            None
-        };
-        let snapshot = tokio::task::spawn_blocking(move || {
-            let _retained = retained;
-            let _lease = lease;
-            if cancel.as_ref().is_some_and(|c| c.is_cancelled()) {
-                return Err("file read cancelled".to_string());
+        let snapshot = if reference["kind"] == "mount" {
+            let value = self
+                .io
+                .read_filesystem_snapshot(&reference, &op)
+                .await
+                .map_err(|e| e.to_string())?;
+            if value.0 != source {
+                return Err("mount source changed after materialization".into());
             }
-            let snapshot = Snapshot::read(&source).map_err(|e| e.to_string())?;
-            if let Some((access, op, cwd)) = path_authority {
-                access
-                    .authorize(
+            value
+        } else {
+            let retained = crate::task_supervisor::retain_blocking_run_permit(ctx)
+                .map_err(|e| e.to_string())?;
+            let cancel = crate::task_supervisor::blocking_run_cancel_scope(ctx)
+                .map_err(|e| e.to_string())?;
+            let lease = self.files.payload_lease().await;
+            let path_authority = if reference["kind"] == "local-file" || reference["kind"] == "url"
+            {
+                Some((Arc::clone(&self.access), Self::context(ctx), self.cwd()))
+            } else {
+                None
+            };
+            tokio::task::spawn_blocking(move || {
+                let _retained = retained;
+                let _lease = lease;
+                if cancel.as_ref().is_some_and(|c| c.is_cancelled()) {
+                    return Err("file read cancelled".to_string());
+                }
+                let snapshot = Snapshot::read(&source).map_err(|e| e.to_string())?;
+                if let Some((access, op, cwd)) = path_authority {
+                    access
+                        .authorize(
+                            op.principal_kind,
+                            &op.principal_subject,
+                            &op.session_id,
+                            &source,
+                            &cwd,
+                            ResourceOp::Read,
+                        )
+                        .map_err(|e| e.to_string())?;
+                    access.validate_materialized_snapshot(
                         op.principal_kind,
                         &op.principal_subject,
                         &op.session_id,
                         &source,
-                        &cwd,
-                        ResourceOp::Read,
-                    )
-                    .map_err(|e| e.to_string())?;
-                access.validate_materialized_snapshot(
-                    op.principal_kind,
-                    &op.principal_subject,
-                    &op.session_id,
-                    &source,
-                    &snapshot,
-                )?;
-            }
-            Ok((source, snapshot))
-        })
-        .await
-        .map_err(|e| e.to_string())??;
+                        &snapshot,
+                    )?;
+                }
+                Ok((source, snapshot))
+            })
+            .await
+            .map_err(|e| e.to_string())??
+        };
         if action == "extract" {
             let (path, snapshot) = snapshot;
             let format = path
@@ -361,9 +421,11 @@ impl ResourceTools {
                 ));
             }
             self.track_path(ctx, &materialized).await?;
-            return Ok(
-                json!({"text":text,"source":{"filePath":path,"filename":path.file_name().map(|n|n.to_string_lossy()),"resourceKey":materialized["resourceKey"],"version":snapshot.stamp},"format":parsed.1,"totalChars":total,"truncated":truncated,"omittedSheets":parsed.2}),
-            );
+            let mut result = json!({"text":text,"source":{"filePath":path,"filename":path.file_name().map(|n|n.to_string_lossy()),"resourceKey":materialized["resourceKey"],"version":snapshot.stamp},"format":parsed.1,"totalChars":total,"truncated":truncated,"omittedSheets":parsed.2});
+            if reference["kind"] == "mount" {
+                result["source"]["resource"] = materialized["resource"].clone();
+            }
+            return Ok(result);
         }
         if action != "copy" {
             return Err("unsupported file action".into());

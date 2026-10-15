@@ -551,6 +551,28 @@ impl EgressGuard {
         url: &str,
         deadline_unix_ms: Option<u64>,
     ) -> Result<(Vec<u8>, String), (ProtocolError, bool)> {
+        self.download_bounded(url, deadline_unix_ms, EGRESS_DOWNLOAD_MAX_BYTES, false)
+            .await
+    }
+
+    /// 技能包共用公网解析、固定地址、无重定向与凭证隔离；只放行包类型并限制32MiB。
+    pub async fn download_skill_archive(
+        &self,
+        url: &str,
+        deadline_unix_ms: Option<u64>,
+    ) -> Result<Vec<u8>, (ProtocolError, bool)> {
+        self.download_bounded(url, deadline_unix_ms, 32 * 1024 * 1024, true)
+            .await
+            .map(|(bytes, _)| bytes)
+    }
+
+    async fn download_bounded(
+        &self,
+        url: &str,
+        deadline_unix_ms: Option<u64>,
+        cap: usize,
+        archive: bool,
+    ) -> Result<(Vec<u8>, String), (ProtocolError, bool)> {
         let parts = parse_url(url).map_err(|error| (error, false))?;
         let same_origin = self.check_parts(&parts).map_err(|error| (error, false))?;
         let verified = self
@@ -575,6 +597,11 @@ impl EgressGuard {
             self.client.client().map_err(|error| (error, false))?
         };
         let request = request_client.get(url);
+        let request = if archive {
+            request.header("User-Agent", "LingxiAgentBot/1.0")
+        } else {
+            request
+        };
         let response =
             dispatch::send_head_with_timeouts(request, &self.timeouts, deadline_unix_ms).await?;
         let status = response.status();
@@ -604,19 +631,27 @@ impl EgressGuard {
                 dispatch::parse_retry_after(&headers),
             ));
         }
-        if !(content_type.starts_with("image/")
-            || content_type.starts_with("video/")
-            || content_type.starts_with("audio/"))
-        {
+        let accepted = if archive {
+            matches!(
+                content_type.as_str(),
+                "application/zip" | "application/x-zip-compressed" | "application/octet-stream"
+            )
+        } else {
+            content_type.starts_with("image/")
+                || content_type.starts_with("video/")
+                || content_type.starts_with("audio/")
+        };
+        if !accepted {
             return Err((
-                refuse(format!(
-                    "eggress download of {url:?} answered Content-Type {content_type:?}; only \
-                     image/, video/, or audio/ products are fetchable"
-                )),
+                refuse(if archive {
+                    format!("skill archive download of {url:?} answered refused Content-Type {content_type:?}")
+                } else {
+                    format!("eggress download of {url:?} answered Content-Type {content_type:?}; only image/, video/, or audio/ products are fetchable")
+                }),
                 false,
             ));
         }
-        let bytes = read_bounded(response, EGRESS_DOWNLOAD_MAX_BYTES, deadline_unix_ms).await?;
+        let bytes = read_bounded(response, cap, deadline_unix_ms).await?;
         Ok((bytes, content_type))
     }
 }

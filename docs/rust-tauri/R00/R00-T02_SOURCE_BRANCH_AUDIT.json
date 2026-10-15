@@ -8550,7 +8550,7 @@
         "R00-T02-LA-01E1E3CF7FA8"
       ],
       "branch_selectors": [],
-      "positive": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+      "positive": "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
       "boundary": "失败、冲突或拒绝时核对返回的状态与实际副作用一致",
       "source_scope": [
         "lib/knowledge/errors.ts",
@@ -20145,7 +20145,7 @@
         "R00-T02-LA-01E1E3CF7FA8"
       ],
       "branch_selectors": [],
-      "positive": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+      "positive": "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
       "boundary": "失败、冲突或拒绝时核对返回的状态与实际副作用一致",
       "source_scope": [
         "lib/knowledge/errors.ts",

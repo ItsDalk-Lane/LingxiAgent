@@ -20,6 +20,10 @@ publish.workspace = true
 #     injects a port implementation.
 #   - reqwest / rusqlite: no outbound HTTP and no database access at T01.
 [dependencies]
+# 仅成熟的本地解析器；精确版本随知识处理产物身份固定。
+pdf-extract = "=0.12.1"
+csv = "=1.4.0"
+scraper = { version = "=0.27.0", default-features = false }
 axum = { workspace = true }
 zip = { workspace = true }
 # Office 只解析受限内存中的 XML，不展开外部实体或写出归档成员。

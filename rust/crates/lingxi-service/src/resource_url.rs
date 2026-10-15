@@ -13,12 +13,26 @@ pub struct UrlRead {
 }
 pub struct UrlProvider {
     root: PathBuf,
+    fixture_http: Option<SocketAddr>,
 }
 impl UrlProvider {
     pub fn new(home: &Path) -> Self {
         Self {
             root: home.join("resource-url-cache"),
+            fixture_http: None,
         }
+    }
+    /// 仅可信宿主测试构造外部HTTP传输替身；请求正文和生产构造器不能开启。
+    /// 固定保留域名与本机端口，任何重定向仍逐跳回到真实公网闸。
+    #[doc(hidden)]
+    pub fn with_fixture_http(home: &Path, address: SocketAddr) -> Result<Self, String> {
+        if !address.ip().is_loopback() || address.port() == 0 {
+            return Err("fixture transport must use a bound loopback socket".into());
+        }
+        Ok(Self {
+            root: home.join("resource-url-cache"),
+            fixture_http: Some(address),
+        })
     }
     pub fn root(&self) -> &Path {
         &self.root
@@ -32,7 +46,18 @@ impl UrlProvider {
         let original = reqwest::Url::parse(source).map_err(|e| format!("invalid_url: {e}"))?;
         let mut current = original.clone();
         for redirect in 0..=3 {
-            let sockets = public_addresses(&current).await?;
+            let sockets = if current.scheme() == "http"
+                && current.host_str() == Some("r06-fixture.invalid")
+                && current.username().is_empty()
+                && current.password().is_none()
+                && self
+                    .fixture_http
+                    .is_some_and(|a| current.port_or_known_default() == Some(a.port()))
+            {
+                vec![self.fixture_http.ok_or("fixture transport unavailable")?]
+            } else {
+                public_addresses(&current).await?
+            };
             let host = current.host_str().ok_or("invalid_url: missing host")?;
             // 禁止代理在校验后重新解析或替换目的地；TLS仍验证原始域名。
             let client = reqwest::Client::builder()

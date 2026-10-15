@@ -233,9 +233,21 @@ impl MemoryTools {
             };
             let mut semantic_rows = Vec::new();
             semantic = "not_configured";
-            if let Some(embedder) = self.memory.search_embedder() {
+            let embedder = match self.memory.search_embedder_for_agent(&agent) {
+                Ok(crate::memory::SearchEmbeddingResolution::Unwired) => None,
+                Ok(crate::memory::SearchEmbeddingResolution::NoModel) => {
+                    semantic = "unavailable_no_model";
+                    None
+                }
+                Ok(crate::memory::SearchEmbeddingResolution::Ready(embedder)) => Some(embedder),
+                Err(_) => {
+                    semantic = "unavailable_unresolvable";
+                    None
+                }
+            };
+            if let Some(embedder) = embedder {
                 match embedder.identity() {
-                    Ok(None) => semantic = "unavailable_no_model",
+                    Ok(None) => semantic = "unavailable_unresolvable",
                     Err(_) => semantic = "unavailable_unresolvable",
                     Ok(Some(_)) => {
                         let mut runtime = match crate::toolgateway::knowledge_runtime(ctx, call) {
@@ -715,54 +727,32 @@ impl MemoryTools {
         }
     }
 
-    async fn run_install_skill(&self, args: &Value) -> ToolOutcome {
-        // local_path branch of the incumbent tool (install-skill.ts:470-574);
-        // the GitHub branch reports its flag gate honestly (:357-372).
+    async fn run_install_skill(
+        &self,
+        args: &Value,
+        cancel: &crate::cancel::CancelScope,
+    ) -> ToolOutcome {
         let github = args
             .get("github_url")
             .and_then(Value::as_str)
             .map(str::trim)
             .filter(|s| !s.is_empty());
-        if github.is_some() {
-            return text_success(
-                "GitHub fetching for install_skill is not enabled in this deployment \
-                 (capabilities.learn_skills.allow_github_fetch). Provide a local package path \
-                 visible to the server instead."
-                    .into(),
-            );
-        }
         let local_path = args
             .get("local_path")
             .and_then(Value::as_str)
             .map(str::trim)
             .filter(|s| !s.is_empty());
-        let source = match local_path {
-            Some(path) => PathBuf::from(path),
-            None => {
-                if args
-                    .get("skill_content")
-                    .and_then(Value::as_str)
-                    .map(|s| !s.trim().is_empty())
-                    .unwrap_or(false)
-                    || args
-                        .get("skill_name")
-                        .and_then(Value::as_str)
-                        .map(|s| !s.trim().is_empty())
-                        .unwrap_or(false)
-                {
-                    return text_success(
-                        "install_skill only installs complete skill packages (folder with \
-                         SKILL.md). skill_content is rejected — provide a local package path."
-                            .into(),
-                    );
-                }
-                return text_success(
-                    "Provide exactly one source: a local package path visible to the server."
-                        .into(),
-                );
-            }
-        };
-        // 安装前验证所属助手配置，不能先落盘再吞掉启用错误。
+        if github.is_some()
+            && (local_path.is_some()
+                || args.get("source").is_some()
+                || args.get("fileId").is_some())
+        {
+            return failed(
+                ErrorCode::InvalidMessage,
+                "Provide exactly one skill package source.".into(),
+            );
+        }
+        // 先验证本助手配置，不能下载/安装后才发现归属无效。
         let agent = match self.bound_agent() {
             Ok(agent) => agent,
             Err(outcome) => return outcome,
@@ -770,10 +760,57 @@ impl MemoryTools {
         if let Err(err) = self.memory.read_flags(&agent) {
             return failed(ErrorCode::Internal, err.to_string());
         }
-        let source_key = format!("local_path:{}", source.to_string_lossy());
+        let downloaded;
+        let (source, source_key) = if let Some(url) = github {
+            match self.skills.prepare_github_package(url, cancel).await {
+                Ok((package, key)) => {
+                    downloaded = package;
+                    (downloaded.path().to_path_buf(), key)
+                }
+                Err(err) => {
+                    return failed(
+                        if cancel.is_cancelled() {
+                            ErrorCode::Cancelled
+                        } else {
+                            ErrorCode::InvalidMessage
+                        },
+                        err.to_string(),
+                    )
+                }
+            }
+        } else {
+            let source = match local_path {
+                Some(path) => PathBuf::from(path),
+                None => {
+                    if args
+                        .get("skill_content")
+                        .and_then(Value::as_str)
+                        .map(|s| !s.trim().is_empty())
+                        .unwrap_or(false)
+                        || args
+                            .get("skill_name")
+                            .and_then(Value::as_str)
+                            .map(|s| !s.trim().is_empty())
+                            .unwrap_or(false)
+                    {
+                        return text_success(
+                            "install_skill only installs complete skill packages (folder with \
+                         SKILL.md). skill_content is rejected — provide a local package path."
+                                .into(),
+                        );
+                    }
+                    return text_success(
+                        "Provide exactly one source: a local package path visible to the server."
+                            .into(),
+                    );
+                }
+            };
+            let key = format!("local_path:{}", source.to_string_lossy());
+            (source, key)
+        };
         let result = self
             .skills
-            .install_with_review(&source, "", args, &source_key)
+            .install_with_review_cancellable(&source, "", args, &source_key, Some(cancel))
             .await;
         match result {
             Ok(value) => {
@@ -801,8 +838,10 @@ impl MemoryTools {
                         text.push_str(&format!(
                             "\nSafety review did NOT pass; installed after explicit user confirmation (reason: {reason})."
                         ));
-                    } else {
+                    } else if value.get("safetyReview").and_then(Value::as_bool) == Some(true) {
                         text.push_str("\nSafety review passed.");
+                    } else {
+                        text.push_str("\nSafety review was disabled by setting.");
                     }
                     text_success(text)
                 } else {
@@ -836,7 +875,14 @@ impl MemoryTools {
                     }
                 }
             }
-            Err(err) => failed(ErrorCode::InvalidMessage, err.to_string()),
+            Err(err) => failed(
+                if cancel.is_cancelled() {
+                    ErrorCode::Cancelled
+                } else {
+                    ErrorCode::InvalidMessage
+                },
+                err.to_string(),
+            ),
         }
     }
 
@@ -929,7 +975,7 @@ impl ToolExecutorPort for MemoryTools {
                 ToolKind::UnpinMemory => self.run_unpin_memory(&args),
                 ToolKind::TenetPropose => self.run_tenet_propose(&args),
                 ToolKind::ContextNotes => self.run_context_notes(&ctx, &args),
-                ToolKind::InstallSkill => self.run_install_skill(&args).await,
+                ToolKind::InstallSkill => self.run_install_skill(&args, &runtime.cancel).await,
                 ToolKind::LearnLesson => {
                     match self.skills.learn_lesson(&self.agent_id, &args).await {
                         Ok(value) => success_details(
@@ -1045,8 +1091,8 @@ pub fn register_memory_tools(
     );
     let install_manifest = manifest(
         "install_skill",
-        "Install a complete skill package (folder with SKILL.md) into the shared pool, enabled for this agent. A failed safety review returns requiresRiskConfirmation; only retry with risk_accepted=true plus the returned token after explicit user confirmation.",
-        PermissionKind::Execute,
+        "Install a complete skill package (directory, .zip, .skill, or enabled GitHub source) into the shared pool, enabled for this agent. A failed safety review returns requiresRiskConfirmation; only retry with risk_accepted=true plus the returned token after explicit user confirmation.",
+        PermissionKind::Review,
         "install_skill.install",
         DeclaredPermission::Execute,
         json!({
@@ -1143,3 +1189,7 @@ impl ToolExecutorPort for MemoryToolExecutor {
         ToolExecutorPort::execute(&*self.tools, ctx, call, request)
     }
 }
+
+#[cfg(test)]
+#[path = "skills_github_tests.rs"]
+mod github_tests;

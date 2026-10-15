@@ -101,8 +101,13 @@ pub async fn read_branch_page(
     before: Option<HistoryCursor>,
     limit: u32,
 ) -> Result<BranchPage, StorageError> {
+    if limit == 0 {
+        return Err(StorageError::InvalidRequest {
+            detail: "history page limit must be positive".into(),
+        });
+    }
     let sid = session_id.to_string();
-    let limit = usize::try_from(limit).unwrap_or(usize::MAX);
+    let limit = usize::try_from(limit.min(200)).unwrap_or(200);
     db.queue()
         .submit(move |conn| {
             let mut stats = PageStats::default();
@@ -119,6 +124,11 @@ pub async fn read_branch_page(
             stats.queries += 1;
             stats.rows_examined += u64::from(head_row.is_some());
             let (head_id, head_revision) = match head_row {
+                Some((_, revision)) if revision < 0 => {
+                    return Err(StorageError::Corrupted {
+                        detail: format!("negative branch revision in {sid}"),
+                    })
+                }
                 Some((head, revision)) => (head, revision as u64),
                 None => (None, 0),
             };
@@ -150,7 +160,11 @@ pub async fn read_branch_page(
                             let row = read_message(conn, &sid, &id)?;
                             stats.queries += 1;
                             stats.rows_examined += u64::from(row.is_some());
-                            row
+                            Some(row.ok_or_else(|| StorageError::Corrupted {
+                                detail: format!(
+                                    "session {sid} references missing branch head {id}"
+                                ),
+                            })?)
                         }
                         None => None,
                     }
@@ -181,7 +195,13 @@ pub async fn read_branch_page(
             // 2) 回溯 walk：取 limit+1 探测 has_more。
             let mut walked: Vec<MessageRow> = Vec::new();
             let mut current = start;
+            let mut seen = std::collections::HashSet::new();
             while let Some(row) = current {
+                if row.seq < 0 || !seen.insert(row.message_id.clone()) {
+                    return Err(StorageError::Corrupted {
+                        detail: format!("invalid sequence or cycle in session branch {sid}"),
+                    });
+                }
                 let is_marker = row.entry_type != "message";
                 walked.push(row);
                 if walked.len() > limit {
@@ -231,7 +251,8 @@ fn predecessor(
         stats.queries += 1;
         stats.rows_examined += u64::from(found.is_some());
         return match found {
-            Some(p) => Ok(Some(p)),
+            Some(p) if p.seq >= 0 && p.seq < row.seq => Ok(Some(p)),
+            Some(_) => Err(StorageError::Corrupted { detail: format!("non-decreasing parent sequence or cycle at message '{}' of session {session_id}", row.message_id) }),
             None => Err(StorageError::Corrupted {
                 detail: format!(
                     "message '{}' of session {session_id} references missing parent '{parent}'",
@@ -398,15 +419,16 @@ pub async fn read_branch_head_revision(
     let sid = session_id.to_string();
     db.queue()
         .submit(move |conn| {
-            let revision: Option<i64> = conn
+            let revision: Option<(i64, Option<String>, Option<String>)> = conn
                 .query_row(
-                    "SELECT revision FROM session_branch_heads WHERE session_id=?1",
-                    [&sid],
-                    |r| r.get(0),
-                )
-                .optional()
-                .map_err(map_err)?;
-            Ok(revision.unwrap_or(0) as u64)
+                    "SELECT h.revision,h.head_message_id,m.message_id FROM session_branch_heads h LEFT JOIN messages m ON m.session_id=h.session_id AND m.message_id=h.head_message_id WHERE h.session_id=?1",
+                    [&sid], |r| Ok((r.get(0)?,r.get(1)?,r.get(2)?)),
+                ).optional().map_err(map_err)?;
+            match revision {
+                Some((revision, head, found)) if revision < 0 || (head.is_some() && found.is_none()) => Err(StorageError::Corrupted {detail:format!("invalid revision or dangling branch head in {sid}")}),
+                Some((revision, _, _)) => Ok(revision as u64),
+                None => Ok(0),
+            }
         })
         .await
 }
@@ -452,9 +474,27 @@ pub async fn read_full_branch(
 ) -> Result<(Vec<MessageRow>, u64), StorageError> {
     let mut all: Vec<MessageRow> = Vec::new();
     let mut before: Option<HistoryCursor> = None;
+    let mut seen = std::collections::HashSet::new();
+    let mut revision = None;
     loop {
         let page = read_branch_page(db, session_id, before.clone(), page_limit).await?;
         let head_revision = page.head_revision;
+        if revision.is_some_and(|known| known != head_revision) {
+            return Err(StorageError::Conflict {
+                detail: "history branch changed during export".into(),
+            });
+        }
+        revision = Some(head_revision);
+        if page
+            .messages
+            .iter()
+            .any(|row| !seen.insert(row.message_id.clone()))
+            || (page.has_more && (page.next_before.is_none() || page.next_before == before))
+        {
+            return Err(StorageError::Corrupted {
+                detail: "history export repeated rows or cursor".into(),
+            });
+        }
         // 前插：本页（更老）排在已收集（更新）之前。
         let mut messages = page.messages;
         messages.append(&mut all);

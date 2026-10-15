@@ -1,0 +1,38 @@
+[
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+    "baseSha256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+    "testedSha256": "4f448f9f97cb4bab66d3afcb68d1b6108a97b6fb97aa9801a758d460a02aa819",
+    "unchanged": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
+    "baseSha256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+    "testedSha256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+    "unchanged": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t05_resources.rs",
+    "baseSha256": "27f3b32764b9595acba6f8890aed85e8710d29a4de56b13c1cc235a64bbd7806",
+    "testedSha256": "27f3b32764b9595acba6f8890aed85e8710d29a4de56b13c1cc235a64bbd7806",
+    "unchanged": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
+    "baseSha256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
+    "testedSha256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
+    "unchanged": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
+    "baseSha256": "2189284f1d885dab3893012dcba7c88f78b60853a4089e3fb3f5b99963bfd68d",
+    "testedSha256": "2189284f1d885dab3893012dcba7c88f78b60853a4089e3fb3f5b99963bfd68d",
+    "unchanged": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_ar_f08_projection.rs",
+    "baseSha256": "a53de0d8bdac91c56cc8f2fdd866656e86eec652be27071a0655f36f8d08bb8d",
+    "testedSha256": "a53de0d8bdac91c56cc8f2fdd866656e86eec652be27071a0655f36f8d08bb8d",
+    "unchanged": true
+  }
+]

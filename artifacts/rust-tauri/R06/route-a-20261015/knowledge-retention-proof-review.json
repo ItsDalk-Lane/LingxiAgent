@@ -1,0 +1,12 @@
+{
+  "status": "PENDING_CURRENT_REGISTERED_WINDOW",
+  "authorization": "knowledge-retention-user-amendment.json",
+  "scope": "Only authorized notebook deletion policy; permanent source delete and rejection checks retained",
+  "reanchoredAuthorizedTests": [
+    "original_notebook_delete_refuses_frozen_foreign_and_missing_without_side_effects",
+    "original_notebook_delete_retains_owned_sources_and_keeps_shared_ones"
+  ],
+  "newTrueCoreClockProofs": 3,
+  "originalLeafId": "R00-T02-LA-01E1E3CF7FA8",
+  "stageAccepted": false
+}

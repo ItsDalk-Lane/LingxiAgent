@@ -13201,7 +13201,7 @@
         {
           "method": "DELETE",
           "action": "删除知识笔记本",
-          "visible_result": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+          "visible_result": "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
           "semantic_basis": "源码 handler/消费者逐项复核",
           "needs_followup": false
         },

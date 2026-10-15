@@ -1,0 +1,31 @@
+   Compiling lingxi-adapters v0.0.0 (/private/tmp/lingxi-r06-chat-wire/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.52s
+     Running tests/r06_ex05_independent_review.rs (/private/tmp/r06-ex09-target/debug/deps/r06_ex05_independent_review-ad9cc493289aac78)
+
+running 1 test
+test restore_second_file_io_failure_preserves_every_current_byte ... EX05_RESTORE_FACTS {"files":[{"after":"CURRENT facts\n","before":"CURRENT facts\n","name":"facts.md","unchanged":true},{"after":"CURRENT today\n","before":"CURRENT today\n","name":"today.md","unchanged":true},{"after":"CURRENT longterm\n","before":"CURRENT longterm\n","name":"longterm.md","unchanged":true},{"after":"## Key facts\n\nCURRENT facts\n\n## Today\n\nCURRENT today\n\n## Earlier this week\n\n(none)\n\n## Long-term context\n\nCURRENT longterm\n","before":"## Key facts\n\nCURRENT facts\n\n## Today\n\nCURRENT today\n\n## Earlier this week\n\n(none)\n\n## Long-term context\n\nCURRENT longterm\n","name":"memory.md","unchanged":true}],"pendingExists":false,"result":"Err(Io(\"Operation not permitted (os error 1)\"))","revisions":[{"before":{"facts":"CURRENT facts","longterm":"CURRENT longterm","today":"CURRENT today","weekDays":[]},"createdAt":"2026-10-15T05:54:23.007Z","kind":"pre_restore","restoresRevisionId":"2026-10-15T05-54-23-003Z-t-target","revisionId":"2026-10-15T05-54-23-007Z-69b19053633faa4d","runId":"restore-071cff76ec070066","schemaVersion":1,"trigger":"manual"},{"before":{"facts":"OLD facts","longterm":"OLD longterm","today":"OLD today","weekDays":[]},"createdAt":"2026-10-15T05:54:23.003Z","kind":"dream","restoresRevisionId":null,"revisionId":"2026-10-15T05-54-23-003Z-t-target","runId":"independent-target","schemaVersion":1,"trigger":"manual"}],"root":"/private/tmp/r06-chat-wire-runtime/tmp/ex05-restore-review-12410-1792043663001041000"}
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/r06_ex05_restore_atomicity.rs (/private/tmp/r06-ex09-target/debug/deps/r06_ex05_restore_atomicity-3cb3f53fc9ed4c42)
+
+running 6 tests
+test actual_process_exit_after_first_write_recovers_old_bytes_before_next_consumer ... 
+running 1 test
+
+running 1 test
+test restore_child_driver ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+ok
+test explicit_unknown_journal_operation_is_refused_without_mutation ... EX05_UNKNOWN_OPERATION {"actualFacts":"CURRENT facts\n","allBytesUnchanged":true,"journalPreserved":true,"result":"Err(Store(\"梦境恢复日志格式损坏\"))"}
+ok
+test external_edit_is_preserved_and_unknown_recovery_blocks_compiled_consumption ... ok
+test restore_child_driver ... ok
+test rollback_disk_failure_remains_explicit_and_read_retries_after_real_unlock ... ok
+test successful_restore_undo_keep_target_and_safety_at_ten_revisions_without_touching_sources ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

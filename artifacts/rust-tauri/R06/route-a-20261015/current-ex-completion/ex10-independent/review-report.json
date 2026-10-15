@@ -1,0 +1,52 @@
+{
+  "scope": "R06-EX10当前核心/服务份额；Main只读独立复核",
+  "verdict": "未发现阻断本次macOS当前核心服务份额验收的问题",
+  "mainEdited": false,
+  "privateSourceEdited": false,
+  "registrationOrGateEdited": false,
+  "spec": {
+    "originalFeatureCount": 19,
+    "assertionAndThenExactMatch": true,
+    "textEvidence": "original-spec-text-check.json"
+  },
+  "sourceEvidence": "current-main-source-sha.json",
+  "sourceSetSha256": "814ab781322f154098bc09a83061e47fa626c98d239cf03c435dfb1a2b8f8b65",
+  "binarySha256": "3061b59c158ba85c64aebac76a7a136dcec0d42ce5fbade2ab07f4b3ba21a5e9",
+  "testBinarySha256": "b64f765dad1dcbcf3501081ecdecea44da6f19371f6db5344c5a37d41c667b5a",
+  "independentExperiment": {
+    "command": "python3 /private/tmp/r06-ex10-fresh-review/probe.py",
+    "result": "PASS",
+    "evidence": [
+      "probe.py",
+      "probe-result.json",
+      "probe-trace.json"
+    ],
+    "description": "真实CLI/HTTP，原TS upsertStudioMount登记。监听期间将旧根整个改名并同路径新建目录；旧监听/订阅释放且不泄漏新根条目；旧ID结束返回false；新授权监听接收真实磁盘事件，旧轮询未误清理新代次。"
+  },
+  "targetedReruns": [
+    {
+      "command": "LINGXI_HOME=/private/tmp/r06-ex10-fresh-review/home TMPDIR=/private/tmp/r06-ex10-fresh-review/tmp /Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_resource_mount_tool_completion-83e93b093132c80b actual_pending_copy_approval_binds_mount_root_and_rejects_new_root --exact --nocapture --test-threads=1",
+      "result": "1 PASS; 0 FAIL",
+      "evidence": "approval-rerun.log"
+    },
+    {
+      "command": "LINGXI_HOME=/private/tmp/r06-ex10-fresh-review/home TMPDIR=/private/tmp/r06-ex10-fresh-review/tmp /Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_resource_mount_tool_completion-83e93b093132c80b actual_forged_mount_descriptor_cannot_bypass_session_file_ownership_or_target --exact --nocapture --test-threads=1",
+      "result": "1 PASS; 0 FAIL",
+      "evidence": "ownership-rerun.log"
+    }
+  ],
+  "sourceReview": [
+    "MountLease保留根目录句柄，每次检查当前登记/能力及根身份；watch失败释放代次绑定的订阅，旧轮询不能清除新代次。",
+    "资源正文读取64KiB分块并保留租约；每块前后检查打开文件、目录和当前同名无链接文件身份；JSON读限制20MiB。",
+    "物化挂载原地路径不登记永久SessionFile；实际工作区copy单独登记副本。真实工具调用仅从已存同Run/SID的first-party started分类native；model_history核对可信来源/同用户。公开身份扫描仍识别fileId、realPath、SessionFile文本标记。",
+    "审批准备与执行重新提取来源Read与目标Write；挂载执行结果与已绑定来源路径比对，异步物化后再核对来源。",
+    "list/materialize仍需要read符合原TS mount guard；未将表层capabilities名称误作独立免读权限。"
+  ],
+  "limits": [
+    "19原叶文字及映射一致；本复核仅独立运行上述2个原父和1个新增HTTP实验，未独立重跑作者68父，Root67父另有主代理日志。",
+    "只在macOS实际执行；不能推为Windows/Linux或整体R06通过。",
+    "仅当前storage/local_fs有真实成功链；未实现远端挂载明确501。Windows安全move/trash及非macOS/Linux挂载监听明确Unsupported/501，不能宣称全平台对应成功。",
+    "未验证付费供应商，未验证审批HTTP/UI；审批复跑使用真实Run/网关及ApprovalService公开方法。",
+    "未改Main、私有源码、原断言、门禁、登记或治理；无需合入本复核脚本。"
+  ]
+}

@@ -1,0 +1,517 @@
+[
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/server/identity",
+    "body": null,
+    "status": 200,
+    "response": {
+      "authState": "user",
+      "capabilities": [
+        "bridge",
+        "bridge.manage",
+        "chat",
+        "files",
+        "files.read",
+        "files.write",
+        "providers",
+        "providers.manage",
+        "resources",
+        "resources.read",
+        "resources.write",
+        "secrets",
+        "secrets.write",
+        "settings",
+        "settings.read",
+        "settings.write",
+        "studio",
+        "studio.owner"
+      ],
+      "connectionKind": "local",
+      "credentialKind": "loopback_token",
+      "label": "Lingxi Rust service",
+      "serverId": "server_K15eJMpREVu76ZZYLmBvrA",
+      "serverNodeId": "server_K15eJMpREVu76ZZYLmBvrA",
+      "serverNodeKind": "lingxi-service",
+      "serverNodeTransport": "http",
+      "studioId": "studio_N559g1YM3W13eyIUmN1n5g",
+      "studioLabel": "Personal Studio",
+      "trustState": "local",
+      "userId": "user_local",
+      "userLabel": "Local User",
+      "version": "0.0.0"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/lingxi/v1/resource-io/watch",
+    "body": {
+      "resource": {
+        "kind": "mount",
+        "mountId": "independent",
+        "path": ""
+      }
+    },
+    "status": 200,
+    "response": {
+      "ok": true,
+      "watchId": "f2e5dd83-e0e8-4689-8323-7b33bec1ef42"
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/lingxi/v1/resource-io/subscribe",
+    "body": {
+      "resources": [
+        {
+          "kind": "mount",
+          "mountId": "independent",
+          "path": ""
+        }
+      ]
+    },
+    "status": 200,
+    "response": {
+      "ok": true,
+      "resourceKeys": [
+        "mount:independent:"
+      ],
+      "subscriptionId": "e676ddad-b2d6-4115-ad39-77c05a54a6ed"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": null,
+        "lastErrorMessage": null,
+        "subscriptions": 1,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 2,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": "mount_root_changed",
+        "lastErrorMessage": "挂载监听授权失效",
+        "subscriptions": 0,
+        "watches": []
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "DELETE",
+    "path": "/lingxi/v1/resource-io/watch/f2e5dd83-e0e8-4689-8323-7b33bec1ef42",
+    "body": null,
+    "status": 200,
+    "response": {
+      "ok": true,
+      "released": false
+    }
+  },
+  {
+    "method": "DELETE",
+    "path": "/lingxi/v1/resource-io/subscriptions/e676ddad-b2d6-4115-ad39-77c05a54a6ed",
+    "body": null,
+    "status": 200,
+    "response": {
+      "ok": true,
+      "released": false
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/lingxi/v1/resource-io/watch",
+    "body": {
+      "resource": {
+        "kind": "mount",
+        "mountId": "independent",
+        "path": ""
+      }
+    },
+    "status": 200,
+    "response": {
+      "ok": true,
+      "watchId": "26f97c1a-fd84-42cf-8033-f1011c424861"
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [],
+      "latestSequence": 0,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/events?since=0",
+    "body": null,
+    "status": 200,
+    "response": {
+      "events": [
+        {
+          "changeType": "modified",
+          "occurredAt": "2026-10-15T06:12:21.810Z",
+          "resource": {
+            "filePath": "/private/tmp/r06-ex10-fresh-review/runtime/mount/after-reauthorize.txt",
+            "isDirectory": false,
+            "kind": "mount",
+            "mountId": "independent",
+            "path": "after-reauthorize.txt",
+            "provider": "mount"
+          },
+          "resourceKey": "mount:independent:after-reauthorize.txt",
+          "sequence": 1,
+          "sessionPath": null,
+          "source": "provider_watch",
+          "type": "resource.changed",
+          "version": {
+            "mtimeMs": 1792044741568,
+            "size": 17
+          }
+        }
+      ],
+      "latestSequence": 1,
+      "stale": false
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/lingxi/v1/resource-io/watch-diagnostics",
+    "body": null,
+    "status": 200,
+    "response": {
+      "diagnostics": {
+        "droppedEventCount": 0,
+        "lastErrorCode": "mount_root_changed",
+        "lastErrorMessage": "挂载监听授权失效",
+        "subscriptions": 0,
+        "watches": [
+          {
+            "isDirectory": true,
+            "refCount": 1,
+            "resourceKey": "mount:independent:"
+          }
+        ]
+      },
+      "ok": true
+    }
+  },
+  {
+    "method": "DELETE",
+    "path": "/lingxi/v1/resource-io/watch/26f97c1a-fd84-42cf-8033-f1011c424861",
+    "body": null,
+    "status": 200,
+    "response": {
+      "ok": true,
+      "released": true
+    }
+  }
+]

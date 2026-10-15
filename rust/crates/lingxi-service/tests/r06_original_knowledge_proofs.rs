@@ -1001,7 +1001,7 @@ async fn original_failed_and_untracked_jobs_retry_and_delete_wins() {
 }
 
 #[tokio::test]
-async fn original_notebook_delete_purges_owned_sources_and_keeps_shared_ones() {
+async fn original_notebook_delete_retains_owned_sources_and_keeps_shared_ones() {
     use lingxi_adapters::storage::knowledge::{KnowledgeFactStore, KnowledgeIndexStore};
     let home = unique_dir("original-notebook-delete");
     let state = boot("original-notebook-delete", &home, None).await;
@@ -1095,7 +1095,7 @@ async fn original_notebook_delete_purges_owned_sources_and_keeps_shared_ones() {
     assert_eq!(status, 200, "{result}");
     assert_eq!(result["notebook"]["id"], doomed_id);
     assert!(result["notebook"]["deletedAt"].is_string());
-    let mut deleted: Vec<String> = result["deletedSourceIds"]
+    let mut deleted: Vec<String> = result["orphanedSourceIds"]
         .as_array()
         .unwrap()
         .iter()
@@ -1104,9 +1104,14 @@ async fn original_notebook_delete_purges_owned_sources_and_keeps_shared_ones() {
     deleted.sort();
     let mut expected = owned.clone();
     expected.sort();
-    assert_eq!(deleted, expected, "只删除独占来源，共享来源不在结果里");
+    assert_eq!(
+        deleted, expected,
+        "只登记独占资料的七天保留，共享来源不在结果里"
+    );
     assert!(result["cancelledJobs"].as_u64().unwrap() >= 2);
-    // 笔记本已不可见，独占来源的事实行/任务/文件/索引全部清理。
+    assert_eq!(result["deletedSourceIds"], json!([]));
+    assert_eq!(result["sourceRetentionDays"], 7);
+    // 用户明确选择七天保留：笔记本不可见，独占资料的事实和原文保留，派生索引可清理。
     assert!(facts.get_notebook(&studio, &doomed_id).is_err());
     let (status, error) = server
         .request(
@@ -1117,18 +1122,23 @@ async fn original_notebook_delete_purges_owned_sources_and_keeps_shared_ones() {
         .await;
     assert_eq!(status, 404, "{error}");
     for source in &owned {
-        assert!(facts.get_source(source).is_err());
+        assert!(facts.get_source(source).unwrap().orphaned_at.is_some());
         assert!(facts
             .list_ingestion_jobs(None, Some(source), 50)
             .unwrap()
-            .is_empty());
-        assert!(facts
+            .iter()
+            .all(|job| job.cancelled_at.is_some() || job.status == "done"));
+        assert!(!facts
             .list_source_parse_artifacts(source)
             .unwrap()
             .is_empty());
     }
     for path in &owned_files {
-        assert!(!path.exists(), "独占来源文件必须清理: {}", path.display());
+        assert!(
+            path.exists(),
+            "独占来源文件在七天内必须保留: {}",
+            path.display()
+        );
     }
     for artifact in &owned_artifacts {
         assert!(index
@@ -1348,12 +1358,14 @@ async fn original_notebook_delete_refuses_frozen_foreign_and_missing_without_sid
         )
         .await;
     assert_eq!(status, 200, "{result}");
-    assert_eq!(result["deletedSourceIds"].as_array().unwrap().len(), 2);
+    assert_eq!(result["orphanedSourceIds"].as_array().unwrap().len(), 2);
+    assert_eq!(result["deletedSourceIds"], json!([]));
+    assert_eq!(result["sourceRetentionDays"], 7);
     for (source, snapshot) in sources.iter().zip(&snapshots) {
-        assert!(facts.get_source(source).is_err());
-        assert!(!home.join("knowledge").join(&snapshot.storage_path).exists());
+        assert!(facts.get_source(source).unwrap().orphaned_at.is_some());
+        assert!(home.join("knowledge").join(&snapshot.storage_path).exists());
     }
-    assert!(artifact_files.iter().all(|p| !p.exists()));
+    assert!(artifact_files.iter().all(|p| p.exists()));
     assert_eq!(
         facts.get_source(&foreign_source.id).unwrap().deleted_at,
         None
@@ -1494,7 +1506,14 @@ async fn original_reingest_refuses_foreign_and_non_member_sources_without_creati
             "text/plain",
         )
         .unwrap();
-    facts.add_membership(&nb_a, &foreign.id).unwrap();
+    // 故意注入旧库跨主体脏行，生产挂靠入口本身必须继续拒绝这种关系。
+    rusqlite::Connection::open(home.join("knowledge/knowledge.db"))
+        .unwrap()
+        .execute(
+            "INSERT INTO notebook_sources (notebook_id,source_id,added_at) VALUES (?1,?2,?3)",
+            rusqlite::params![nb_a, foreign.id, foreign.created_at],
+        )
+        .unwrap();
     let (untracked, _) = facts
         .create_source_with_snapshot(
             &studio,
@@ -4805,4 +4824,72 @@ async fn ex09_source_section_and_span_grains_deliver_real_navigation_and_citatio
     server.stop().await;
     upstream.abort();
     let _ = upstream.await;
+}
+
+// 当前界面使用 JavaScript slice：公开引用位置必须按 UTF-16，而非 Rust char 下标。
+#[tokio::test]
+async fn original_citation_non_bmp_offsets_match_current_viewer_and_survive_restart() {
+    use lingxi_adapters::storage::knowledge::KnowledgeFactStore;
+    let home = unique_dir("citation-non-bmp-viewer");
+    let state = boot("citation-non-bmp-viewer", &home, None).await;
+    let knowledge = state.knowledge();
+    let notebook = knowledge.create_notebook("引用位置").unwrap();
+    let original = "😀前文𝄞证据甲乙🦊尾文";
+    let imported = knowledge
+        .import_pasted_text(notebook["id"].as_str().unwrap(), original, None)
+        .unwrap();
+    let artifact = imported["parseArtifact"]["id"].as_str().unwrap();
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let blocks = facts.list_artifact_blocks(artifact).unwrap();
+    let block = blocks.iter().find(|b| b.text.contains("证据甲乙")).unwrap();
+    let start = block.text.chars().position(|c| c == '证').unwrap();
+    let citation = knowledge
+        .create_citation(artifact, &block.id, start, start + 4)
+        .unwrap();
+    let stored_before = facts.resolve_citation(&citation.id).unwrap().citation;
+    let snapshot = facts
+        .latest_snapshot_for_source(imported["source"]["id"].as_str().unwrap())
+        .unwrap();
+    let snapshot_before = facts.read_snapshot_bytes(&snapshot).unwrap();
+    let server = serve(state).await;
+    let (status, body) = server
+        .request(
+            "GET",
+            &format!("/lingxi/v1/knowledge/citations/{}", citation.id),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let text = body["block"]["text"]
+        .as_str()
+        .unwrap()
+        .encode_utf16()
+        .collect::<Vec<_>>();
+    let from = body["citation"]["startOffset"].as_u64().unwrap() as usize;
+    let to = body["citation"]["endOffset"].as_u64().unwrap() as usize;
+    assert_eq!(
+        String::from_utf16(&text[from..to]).unwrap(),
+        "证据甲乙",
+        "当前界面按UTF16 slice必须准确定位原文"
+    );
+    assert_eq!(body["citation"]["canonicalText"], "证据甲乙");
+    assert_eq!(
+        facts.resolve_citation(&citation.id).unwrap().citation,
+        stored_before,
+        "展示兼容不能重写旧引用事实"
+    );
+    assert_eq!(
+        facts.read_snapshot_bytes(&snapshot).unwrap(),
+        snapshot_before
+    );
+    server.stop().await;
+    drop(facts);
+    let restarted = boot("citation-non-bmp-restart", &home, None).await;
+    let after = restarted
+        .knowledge()
+        .resolve_citation(&citation.id)
+        .unwrap();
+    assert_eq!(after["citation"], body["citation"]);
+    assert_eq!(after["block"]["text"], body["block"]["text"]);
+    restarted.knowledge().shutdown();
 }

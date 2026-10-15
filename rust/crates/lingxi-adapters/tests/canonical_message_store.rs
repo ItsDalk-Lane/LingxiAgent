@@ -565,3 +565,35 @@ async fn seed_lineage(db: &RunDatabase) {
         .expect("lineage");
     }
 }
+
+/// EX11：零窗口不可触发全量无限页；错误revision属于损坏而非巨大无符号数。
+#[test]
+fn ex11_zero_page_limit_and_negative_revision_are_explicit_errors() {
+    let (db, _dir) = temp_db("ex11-bounds");
+    seed(&db, "bounded");
+    seed_linear(&db, "bounded", 3);
+    let error = block_on(async {
+        tokio::time::timeout(
+            std::time::Duration::from_secs(1),
+            cms::read_full_branch(&db, "bounded", 0),
+        )
+        .await
+        .expect("零窗口必须有界失败")
+    })
+    .unwrap_err();
+    assert!(matches!(
+        error,
+        lingxi_kernel::ports::StorageError::InvalidRequest { .. }
+    ));
+    rusqlite::Connection::open(db.db_path())
+        .unwrap()
+        .execute(
+            "UPDATE session_branch_heads SET revision=-1 WHERE session_id='bounded'",
+            [],
+        )
+        .unwrap();
+    assert!(matches!(
+        block_on(cms::read_branch_page(&db, "bounded", None, 200)),
+        Err(lingxi_kernel::ports::StorageError::Corrupted { .. })
+    ));
+}

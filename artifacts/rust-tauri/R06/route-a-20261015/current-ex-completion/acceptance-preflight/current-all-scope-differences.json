@@ -1,0 +1,16 @@
+{
+  "allCompleteLeafIDs": 280,
+  "originalInventoryIDs": 279,
+  "allLeafIDsRejectedByProofLeafIDs": [
+    "R00-T02-LA-960668141E07"
+  ],
+  "uniqueAllLeafCommandRefs": 433,
+  "allExecutionBindings": 592,
+  "registeredButNotDirectlyLeafReferenced": 159,
+  "exactDuplicateArgvGroups": [],
+  "registeredNonleafKinds": {
+    "rust_integration_test": 153,
+    "rust_unit_test": 4,
+    "script": 2
+  }
+}

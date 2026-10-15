@@ -34,7 +34,20 @@ use lingxi_adapters::storage::agent_memory::{
 use crate::context_compiler::scan_preferences;
 use crate::ServiceState;
 
+#[derive(Clone)]
+struct SearchEmbeddingPlane {
+    gateway: std::sync::Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
+    operations: std::sync::Arc<crate::operations::OperationService>,
+}
+
+pub enum SearchEmbeddingResolution {
+    Unwired,
+    NoModel,
+    Ready(std::sync::Arc<dyn crate::knowledge::KnowledgeEmbedder>),
+}
+
 pub struct MemoryService {
+    search_plane: std::sync::Mutex<Option<SearchEmbeddingPlane>>,
     home: PathBuf,
     runtime_dir: PathBuf,
     dream: crate::dream_service::DreamService,
@@ -45,6 +58,7 @@ pub struct MemoryService {
 impl MemoryService {
     pub fn new(home: PathBuf, runtime_dir: PathBuf) -> Self {
         Self {
+            search_plane: std::sync::Mutex::new(None),
             home,
             runtime_dir,
             dream: crate::dream_service::DreamService::default(),
@@ -69,6 +83,84 @@ impl MemoryService {
             .lock()
             .unwrap_or_else(|p| p.into_inner())
             .clone()
+    }
+
+    /// 只保存执行平面；每次查询重新读取有权助手的显式选择，绝不继承知识全局模型。
+    pub fn set_search_embedding_plane(
+        &self,
+        gateway: std::sync::Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
+        operations: std::sync::Arc<crate::operations::OperationService>,
+    ) {
+        *self.search_plane.lock().unwrap_or_else(|p| p.into_inner()) = Some(SearchEmbeddingPlane {
+            gateway,
+            operations,
+        });
+    }
+
+    pub fn search_embedder_for_agent(
+        &self,
+        agent_id: &str,
+    ) -> Result<SearchEmbeddingResolution, MemoryError> {
+        use lingxi_kernel::model_exchange::{ModelOperation, ModelRouteRequest};
+        let plane = self
+            .search_plane
+            .lock()
+            .map_err(|_| MemoryError::Io("memory embedding plane lock poisoned".into()))?
+            .clone();
+        let Some(plane) = plane else {
+            return Ok(self
+                .search_embedder()
+                .map(SearchEmbeddingResolution::Ready)
+                .unwrap_or(SearchEmbeddingResolution::Unwired));
+        };
+        let path = self.config_path(agent_id)?;
+        let document = am::config::read_agent_config(&path)?;
+        let Some((provider, model)) = document.model_reference("memory", "embedding_model")? else {
+            return Ok(SearchEmbeddingResolution::NoModel);
+        };
+        let selection = ModelRouteRequest {
+            operation: ModelOperation::Embedding,
+            provider: Some(provider.clone()),
+            model: Some(model.clone()),
+        };
+        // 显式运行配置中的已知模型或现役目录中的嵌入模型才是可解析选择。
+        let configured = plane
+            .gateway
+            .resolve_route(&ModelRouteRequest::for_operation(ModelOperation::Embedding))
+            .is_ok_and(|route| route.provider == provider && route.model == model);
+        if !configured {
+            let catalog =
+                crate::agents_admin::agent_config_readback::merged_catalog_providers_with(
+                    &self.home, false,
+                )
+                .map_err(MemoryError::InvalidRequest)?;
+            let known = catalog
+                .get(&provider)
+                .and_then(|p| p["models"].as_array())
+                .is_some_and(|models| {
+                    models.iter().any(|entry| {
+                        entry["id"] == model
+                            && (entry["type"] == "embedding"
+                                || entry["operations"]
+                                    .as_array()
+                                    .is_some_and(|ops| ops.iter().any(|op| op == "embedding")))
+                    })
+                });
+            if !known {
+                return Err(MemoryError::InvalidRequest("memory embedding model is absent from the configured embedding route and provider catalog".into()));
+            }
+        }
+        plane
+            .gateway
+            .resolve_route(&selection)
+            .map_err(|error| MemoryError::InvalidRequest(error.to_string()))?;
+        Ok(SearchEmbeddingResolution::Ready(std::sync::Arc::new(
+            crate::knowledge::GatewayKnowledgeEmbedder::with_selection(
+                plane.gateway,
+                plane.operations,
+                selection,
+            ),
+        )))
     }
 
     pub fn dream(&self) -> &crate::dream_service::DreamService {
@@ -191,7 +283,10 @@ impl MemoryService {
 
     pub fn dream_store(&self, agent_id: &str) -> Result<DreamRevisionStore, MemoryError> {
         let roots = self.roots(agent_id)?;
-        Ok(DreamRevisionStore::new(&roots.memory_dir))
+        let store = DreamRevisionStore::new(&roots.memory_dir)
+            .with_locale(self.locale_is_zh(&roots.agent_dir)?);
+        store.recover_pending()?;
+        Ok(store)
     }
 
     pub fn context_notes(&self) -> ContextNotesStore {
@@ -987,6 +1082,7 @@ pub async fn dream_revision_detail_route(
                 "agentId": agent_id,
                 "revision": revision,
                 "current": current,
+                "lastRestore": match store.restore_status() { Ok(value)=>value,Err(err)=>return error_response(&err) },
                 "currentHash": match am::dream_snapshot_hash(&current) {
                     Ok(hash) => hash,
                     Err(err) => return dream_error_response(err, "dream_unavailable"),

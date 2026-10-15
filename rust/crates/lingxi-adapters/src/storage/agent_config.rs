@@ -795,6 +795,41 @@ impl AgentConfigDocument {
             .map(|value| value.filter(|s| !s.trim().is_empty()))
     }
 
+    /// 模型引用必须同时提供服务商和模型身份；不从全局设置猜测缺失的一半。
+    pub fn model_reference(
+        &self,
+        section: &str,
+        key: &str,
+    ) -> Result<Option<(String, String)>, MemoryError> {
+        let Some(value) = self.field(section, key) else {
+            return Ok(None);
+        };
+        if matches!(value.value, NodeValue::Scalar(Value::Null)) {
+            return Ok(None);
+        }
+        let NodeValue::Mapping(_) = &value.value else {
+            return Err(invalid(format!(
+                "{section}.{key} must be a model reference"
+            )));
+        };
+        let part = |name: &str| {
+            value
+                .get(name)
+                .and_then(ConfigNode::string)
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(str::to_string)
+        };
+        let provider = part("provider").ok_or_else(|| {
+            invalid(format!(
+                "{section}.{key}.provider must be a nonempty string"
+            ))
+        })?;
+        let model = part("id")
+            .ok_or_else(|| invalid(format!("{section}.{key}.id must be a nonempty string")))?;
+        Ok(Some((provider, model)))
+    }
+
     /// 读取 section.key 处的字符串序列；键缺失返回 None，类型不符显式报错。
     pub fn string_list(
         &self,

@@ -711,7 +711,9 @@ impl OperationService {
             outcome,
             started_at_unix_ms,
             settled_at_unix_ms: Some(lingxi_adapters::models::dispatch::unix_ms_now()),
-            context: context.cloned().or_else(|| MEDIA_TASK_OWNER.try_with(Clone::clone).ok()),
+            context: context
+                .cloned()
+                .or_else(|| MEDIA_TASK_OWNER.try_with(Clone::clone).ok()),
         })
         .await
         .map_err(|failure| OperationFailure {
@@ -998,10 +1000,19 @@ impl OperationService {
         }
         // 会话任务使用不可复用宿主id，旧停止请求不能命中供应商复用id的新任务。
         // 无会话的原operation调用保留既有tracker合同。
-        let mut tracker = if MEDIA_TASK_OWNER.try_with(|_|()).is_ok() {
-            format!("{bare_tracker}-{}",crate::auth::hex_random_public(16).map_err(|error|OperationFailure{code:ErrorCode::Internal,message:format!("cannot mint owned media task identity: {error}"),retryable:false})?)
-        } else {bare_tracker.clone()};
-        let unique_base=tracker.clone();
+        let mut tracker = if MEDIA_TASK_OWNER.try_with(|_| ()).is_ok() {
+            format!(
+                "{bare_tracker}-{}",
+                crate::auth::hex_random_public(16).map_err(|error| OperationFailure {
+                    code: ErrorCode::Internal,
+                    message: format!("cannot mint owned media task identity: {error}"),
+                    retryable: false
+                })?
+            )
+        } else {
+            bare_tracker.clone()
+        };
+        let unique_base = tracker.clone();
         let mut attempt = 1usize;
         loop {
             let live_collision = tasks
@@ -1362,9 +1373,17 @@ impl OperationService {
 
     /// 会话调用携带真实宿主上下文；保留既有独立operation入口的无归属事实。
     pub async fn generate_image_for_context(
-        &self, request: ImageRequest, deadline_unix_ms: Option<u64>, context: &OperationCallContext,
+        &self,
+        request: ImageRequest,
+        deadline_unix_ms: Option<u64>,
+        context: &OperationCallContext,
     ) -> Result<ImageGenerationOutcome, OperationFailure> {
-        MEDIA_TASK_OWNER.scope(context.clone(), self.generate_image(request, deadline_unix_ms)).await
+        MEDIA_TASK_OWNER
+            .scope(
+                context.clone(),
+                self.generate_image(request, deadline_unix_ms),
+            )
+            .await
     }
 
     /// The codex image family answers SSE, not JSON (the bounded aggregate
@@ -1637,9 +1656,17 @@ impl OperationService {
     }
 
     pub async fn submit_video_for_context(
-        &self, request: VideoRequest, deadline_unix_ms: Option<u64>, context: &OperationCallContext,
+        &self,
+        request: VideoRequest,
+        deadline_unix_ms: Option<u64>,
+        context: &OperationCallContext,
     ) -> Result<MediaJobAccepted, OperationFailure> {
-        MEDIA_TASK_OWNER.scope(context.clone(), self.submit_video(request, deadline_unix_ms)).await
+        MEDIA_TASK_OWNER
+            .scope(
+                context.clone(),
+                self.submit_video(request, deadline_unix_ms),
+            )
+            .await
     }
 
     /// Polls one agnes video task: Generating / Failed / Completed (only
@@ -1741,14 +1768,33 @@ impl OperationService {
     }
 
     /// 归属检查和取消使用同一记录，供应商复用id不能误停新一轮或别的会话。
-    pub fn stop_owned_background_task(&self, task: &str, session: &str) -> Option<serde_json::Value> {
-        let record=self.tasks.lock().expect("media task registry").get(task).cloned()?;
-        let Some(owner)=&record.owner else {return Some(serde_json::json!({"status":"rejected","reason":"stable_session_required"}));};
-        if owner.session_id!=session {return Some(serde_json::json!({"status":"rejected","reason":"session_mismatch"}));}
-        let mut state=record.state.lock().expect("media task state");
-        if !state.is_live() {return Some(serde_json::json!({"status":"already_stopped"}));}
-        *state=MediaTaskState::CancelledLocally;
-        Some(serde_json::json!({"status":"aborted","remoteCancel":remote_cancel_fact(record.route.protocol),"localDeliveryStopped":true}))
+    pub fn stop_owned_background_task(
+        &self,
+        task: &str,
+        session: &str,
+    ) -> Option<serde_json::Value> {
+        let record = self
+            .tasks
+            .lock()
+            .expect("media task registry")
+            .get(task)
+            .cloned()?;
+        let Some(owner) = &record.owner else {
+            return Some(
+                serde_json::json!({"status":"rejected","reason":"stable_session_required"}),
+            );
+        };
+        if owner.session_id != session {
+            return Some(serde_json::json!({"status":"rejected","reason":"session_mismatch"}));
+        }
+        let mut state = record.state.lock().expect("media task state");
+        if !state.is_live() {
+            return Some(serde_json::json!({"status":"already_stopped"}));
+        }
+        *state = MediaTaskState::CancelledLocally;
+        Some(
+            serde_json::json!({"status":"aborted","remoteCancel":remote_cancel_fact(record.route.protocol),"localDeliveryStopped":true}),
+        )
     }
 
     // ── speech synthesis (openai / minimax / dashscope / system) ────────

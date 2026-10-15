@@ -35,9 +35,9 @@
 //! - D7：fs.watch → mtime/size 轮询（tokio interval，本模块
 //!   [`DEFAULT_WATCH_POLL_MS`]；现役 80ms 去抖是合并窗口，轮询一拍天然
 //!   合并同窗口内的多次变化，语义等价：一个 watch 目标一拍至多一条事件）。
-//! - D9/J2：mount/url provider 缺席 → `unsupported_provider` 400 响亮拒绝
-//!   （现役无此情形：两个 provider 总是注册；现役 provider 缺失词汇
-//!   provider_not_available 501 留给「workspace 未配置时 local_fs 缺席」）。
+//! - 原D9/J2的缺席拒绝仍用于未接提供者的独立组合；生产挂载读取真实
+//!   studio-mounts.json，仅已登记的本机文件夹提供成功链。其它挂载提供者
+//!   继续显式不可用；URL由组合根的可选只读提供者处理。
 //! - D12：events 查询严格化 —— 只认 `since`，未知/重复键、非负整数以外
 //!   的游标一律 400（现役 Number()||0 静默吞，T04 D1 先例严格化）。
 //! - 删除类操作（trash 源、rename/move 源）在候选人授权闸上映射为
@@ -123,7 +123,7 @@ pub struct ResourceIoError {
 }
 
 impl ResourceIoError {
-    fn new(status: u16, code: &str, message: impl Into<String>) -> Self {
+    pub(crate) fn new(status: u16, code: &str, message: impl Into<String>) -> Self {
         ResourceIoError {
             status,
             code: code.to_string(),
@@ -141,7 +141,7 @@ impl ResourceIoError {
         Self::new(400, "resource_io_error", message)
     }
 
-    fn capability_denied(capability: &str, provider_id: &str) -> Self {
+    pub(crate) fn capability_denied(capability: &str, provider_id: &str) -> Self {
         Self::new(
             403,
             "capability_denied",
@@ -158,14 +158,12 @@ impl ResourceIoError {
     }
 
     /// D9/J2：mount/url provider 缺席的响亮拒绝。
-    fn unsupported_provider(provider_id: &str) -> Self {
+    pub(crate) fn unsupported_provider(provider_id: &str) -> Self {
         Self::new(
             400,
             "unsupported_provider",
             format!(
-                "ResourceIO provider is not supported by this build: {provider_id} \
-                 (mount/url resources are explicitly refused, never silently \
-                 resolved to a local path)"
+                "ResourceIO provider is not configured: {provider_id}; it is never silently resolved to a local path"
             ),
         )
     }
@@ -738,9 +736,11 @@ fn uuid_v4() -> String {
 
 /// workspace 面：候选人 ResourceAccess 授权闸（设计文档 :82「local_fs
 /// provider 复用 ResourceAccess」）+ provider cwd + 回收区根。
+#[derive(Clone)]
 struct WorkspacePlane {
     access: Arc<ResourceAccess>,
     cwd: PathBuf,
+    mount: Option<crate::resource_mounts::MountLease>,
 }
 
 /// 一个 watch 条目的快照（轮询 diff 的基准）。
@@ -767,7 +767,9 @@ struct WatchEntry {
     file_path: PathBuf,
     is_directory: bool,
     ref_count: usize,
+    generation: String,
     snapshot: WatchSnapshot,
+    mount: Option<crate::resource_mounts::MountLease>,
 }
 
 struct Subscription {
@@ -783,8 +785,10 @@ struct IoInner {
     resources: Arc<ResourceService>,
     trash_root: PathBuf,
     workspace: Option<WorkspacePlane>,
+    mounts: std::sync::OnceLock<Arc<crate::resource_mounts::MountProvider>>,
     file_safety: std::sync::RwLock<Arc<crate::file_safety::FileSafety>>,
     bus: ResourceEventBus,
+    watch_gate: Mutex<()>,
     watches: Mutex<HashMap<String, WatchEntry>>,
     watch_ids: Mutex<HashMap<String, String>>,
     subscriptions: Mutex<HashMap<String, Subscription>>,
@@ -840,8 +844,14 @@ impl ResourceIoService {
                 &data_home,
             ))),
             trash_root: data_home.join("trash"),
-            workspace: workspace.map(|(access, cwd)| WorkspacePlane { access, cwd }),
+            workspace: workspace.map(|(access, cwd)| WorkspacePlane {
+                access,
+                cwd,
+                mount: None,
+            }),
+            mounts: std::sync::OnceLock::new(),
             bus: ResourceEventBus::new(now.clone()),
+            watch_gate: Mutex::new(()),
             watches: Mutex::new(HashMap::new()),
             watch_ids: Mutex::new(HashMap::new()),
             subscriptions: Mutex::new(HashMap::new()),
@@ -856,6 +866,28 @@ impl ResourceIoService {
             file_history: std::sync::OnceLock::new(),
             url_provider: std::sync::OnceLock::new(),
         }
+    }
+
+    /// 组合根接入已有挂载登记；独立旧内核未接线时保留明确不可用行为。
+    pub fn set_mount_provider(
+        &self,
+        provider: Arc<crate::resource_mounts::MountProvider>,
+    ) -> Result<(), String> {
+        self.inner
+            .mounts
+            .set(provider)
+            .map_err(|_| "挂载提供者已接线".into())
+    }
+
+    fn operation_cancel(
+        &self,
+        ctx: &OpContext,
+    ) -> Result<Option<crate::cancel::CancelScope>, ResourceIoError> {
+        crate::task_supervisor::resource_cancel_scope(
+            ctx,
+            &self.inner.session_files.admission_gate(),
+        )
+        .map_err(|e| ResourceIoError::new(409, "resource_run_binding_mismatch", e.to_string()))
     }
 
     /// 组合根明确启用远端只读提供者；缺少它的独立内核仍按原契约拒绝URL。
@@ -940,7 +972,7 @@ impl ResourceIoService {
     }
     // ── 内核分派（resource-io.ts callProvider :202-224） ──
 
-    /// provider 闸：mount/url → D9 400；local_fs 缺席 → 现役 501。
+    /// 本机工作区缺席时保持现役501；挂载独立使用已登记根。
     fn local_plane(&self) -> Result<&WorkspacePlane, ResourceIoError> {
         self.inner
             .workspace
@@ -948,11 +980,11 @@ impl ResourceIoService {
             .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))
     }
 
-    fn refuse_if_mount_or_url(reference: &ResourceRef) -> Result<(), ResourceIoError> {
+    fn refuse_unconfigured_url(reference: &ResourceRef) -> Result<(), ResourceIoError> {
         match reference {
-            ResourceRef::Mount { .. } | ResourceRef::Url { .. } => Err(
-                ResourceIoError::unsupported_provider(provider_id_for_ref(reference)),
-            ),
+            ResourceRef::Url { .. } => Err(ResourceIoError::unsupported_provider(
+                provider_id_for_ref(reference),
+            )),
             _ => Ok(()),
         }
     }
@@ -965,22 +997,23 @@ impl ResourceIoService {
             read.meta["isDirectory"] = serde_json::json!(false);
             return Ok(read.meta);
         }
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
                 let lease = inner.session_files.payload_lease().await;
                 spawn_blocking_io(retained, move || {
                     let _lease = lease;
-                    inner.local_stat(&reference, &ctx)
+                    inner.filesystem(&reference, "read", cancel)?.stat(&ctx)
                 })
                 .await
             }
             ResourceRef::SessionFile { .. } => self.session_file_stat(&reference).await,
             ResourceRef::Resource { .. } => self.resource_stat(&reference).await,
-            ResourceRef::Mount { .. } | ResourceRef::Url { .. } => unreachable!(),
+            ResourceRef::Url { .. } => unreachable!(),
         }
     }
 
@@ -998,38 +1031,88 @@ impl ResourceIoService {
             });
         }
 
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
                 let lease = inner.session_files.payload_lease().await;
                 spawn_blocking_io(retained, move || {
                     // 请求取消不代表阻塞线程退出；租约随实际线程释放。
                     let _lease = lease;
-                    inner.local_read(&reference, &ctx)
+                    inner.filesystem(&reference, "read", cancel)?.read(&ctx)
                 })
                 .await
             }
             ResourceRef::SessionFile { .. } => self.session_file_read(&reference).await,
             ResourceRef::Resource { .. } => self.resource_read(&reference).await,
-            ResourceRef::Mount { .. } | ResourceRef::Url { .. } => unreachable!(),
+            ResourceRef::Url { .. } => unreachable!(),
         }
+    }
+
+    /// 输入中的本机路径仅作一致性声明，真实目标仍从当前挂载登记解析。
+    pub(crate) fn mount_claim_path(
+        &self,
+        input: &Value,
+        ctx: &OpContext,
+    ) -> Result<PathBuf, ResourceIoError> {
+        let reference = normalize_resource_ref(input)?;
+        let files = self
+            .inner
+            .filesystem(&reference, "read", self.operation_cancel(ctx)?)?;
+        let plane = files
+            .workspace
+            .as_ref()
+            .ok_or_else(|| ResourceIoError::unsupported_provider("mount"))?;
+        plane.authorize(files.local_path(&files.reference)?, ResourceOp::Read, ctx)
+    }
+
+    /// 模型文件工具复用相同挂载租约与有界句柄读取，不在物化后另开无授权路径。
+    pub(crate) async fn read_filesystem_snapshot(
+        &self,
+        input: &Value,
+        ctx: &OpContext,
+    ) -> Result<(PathBuf, crate::file_safety::Snapshot), ResourceIoError> {
+        let reference = normalize_resource_ref(input)?;
+        if !matches!(
+            reference,
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. }
+        ) {
+            return Err(ResourceIoError::capability_denied(
+                "read_snapshot",
+                provider_id_for_ref(&reference),
+            ));
+        }
+        let retained = self.blocking_permit(ctx)?;
+        let cancel = self.operation_cancel(ctx)?;
+        let lease = self.inner.session_files.payload_lease().await;
+        let inner = Arc::clone(&self.inner);
+        let ctx = ctx.clone();
+        tokio::task::spawn_blocking(move || {
+            let _retained = retained;
+            let _lease = lease;
+            let files = inner.filesystem(&reference, "read", cancel)?;
+            files.local_snapshot(&files.reference, &ctx)
+        })
+        .await
+        .map_err(|e| ResourceIoError::internal(e.to_string()))?
     }
 
     pub async fn list(&self, input: &Value, ctx: &OpContext) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
                 let lease = inner.session_files.payload_lease().await;
                 spawn_blocking_io(retained, move || {
                     let _lease = lease;
-                    inner.local_list(&reference, &ctx)
+                    inner.filesystem(&reference, "list", cancel)?.list(&ctx)
                 })
                 .await
             }
@@ -1049,17 +1132,23 @@ impl ResourceIoService {
         ctx: &OpContext,
     ) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx = ctx.clone();
                 let mode = mode.map(str::to_string);
                 let lease = inner.session_files.payload_lease().await;
                 spawn_blocking_io(retained, move || {
                     let _lease = lease;
-                    inner.local_search(&reference, query.as_deref(), mode.as_deref(), limit, &ctx)
+                    inner.filesystem(&reference, "list", cancel)?.search(
+                        query.as_deref(),
+                        mode.as_deref(),
+                        limit,
+                        &ctx,
+                    )
                 })
                 .await
             }
@@ -1077,14 +1166,17 @@ impl ResourceIoService {
         ctx: &OpContext,
     ) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
                 let result = spawn_blocking_io(retained, move || {
-                    inner.local_write(&reference, &content, &ctx2)
+                    inner
+                        .filesystem(&reference, "write", cancel)?
+                        .write(&content, &ctx2)
                 })
                 .await?;
                 self.emit_changed(&result, ctx);
@@ -1106,7 +1198,7 @@ impl ResourceIoService {
         ctx: &OpContext,
     ) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         let Some(expected_version) = expected.as_object() else {
             return Err(ResourceIoError::io_bad_request(
                 "write-expected-version requires an expectedVersion object",
@@ -1114,17 +1206,15 @@ impl ResourceIoService {
         };
         let expected_version = Value::Object(expected_version.clone());
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
                 let result = spawn_blocking_io(retained, move || {
-                    inner.local_write_expected_version(
-                        &reference,
-                        &content,
-                        &expected_version,
-                        &ctx2,
-                    )
+                    inner
+                        .filesystem(&reference, "write", cancel)?
+                        .write_expected(&content, &expected_version, &ctx2)
                 })
                 .await?;
                 // 冲突是结果不是事件（resource-io.ts :79-84）。
@@ -1181,14 +1271,17 @@ impl ResourceIoService {
                 ),
             ));
         }
-        Self::refuse_if_mount_or_url(&from_ref)?;
+        Self::refuse_unconfigured_url(&from_ref)?;
         match &from_ref {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
                 let result = spawn_blocking_io(retained, move || {
-                    inner.local_move(&from_ref, &to_ref, &ctx2)
+                    inner
+                        .filesystem(&from_ref, "write", cancel)?
+                        .move_to(&to_ref, &ctx2)
                 })
                 .await?;
                 self.emit_renamed(&result, ctx);
@@ -1209,15 +1302,20 @@ impl ResourceIoService {
         ctx: &OpContext,
     ) -> Result<Value, ResourceIoError> {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
-            ResourceRef::LocalFile { .. } => {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                 let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
                 let inner = self.inner.clone();
                 let ctx2 = ctx.clone();
                 let namespace = namespace.map(str::to_string);
                 let result = spawn_blocking_io(retained, move || {
-                    inner.local_trash(&reference, namespace.as_deref(), metadata, &ctx2)
+                    inner.filesystem(&reference, "write", cancel)?.trash(
+                        namespace.as_deref(),
+                        metadata,
+                        &ctx2,
+                    )
                 })
                 .await?;
                 self.emit_deleted(
@@ -1283,22 +1381,25 @@ impl ResourceIoService {
             })
             .await
         } else {
-            Self::refuse_if_mount_or_url(&reference)?;
+            Self::refuse_unconfigured_url(&reference)?;
             match &reference {
-                ResourceRef::LocalFile { .. } => {
+                ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
                     let retained = self.blocking_permit(ctx)?;
+                    let cancel = self.operation_cancel(ctx)?;
                     let inner = self.inner.clone();
                     let ctx = ctx.clone();
                     let lease = inner.session_files.payload_lease().await;
                     spawn_blocking_io(retained, move || {
                         let _lease = lease;
-                        inner.local_materialize(&reference, &ctx)
+                        inner
+                            .filesystem(&reference, "materialize", cancel)?
+                            .materialize(&ctx)
                     })
                     .await
                 }
                 ResourceRef::SessionFile { .. } => self.session_file_materialize(&reference).await,
                 ResourceRef::Resource { .. } => self.resource_materialize(&reference).await,
-                ResourceRef::Mount { .. } | ResourceRef::Url { .. } => unreachable!(),
+                ResourceRef::Url { .. } => unreachable!(),
             }
         }
     }
@@ -1483,6 +1584,26 @@ impl ResourceIoService {
                 ResourceIoError::internal(format!("session file resolve: {err}"))
             }
         })?;
+        if canonical != Path::new(&file_path) {
+            return Err(ResourceIoError::new(
+                409,
+                "resource_read_conflict",
+                "登记文件路径已被重定向",
+            ));
+        }
+        if self
+            .inner
+            .file_safety
+            .read()
+            .unwrap_or_else(|p| p.into_inner())
+            .is_protected(&canonical)
+        {
+            return Err(ResourceIoError::new(
+                403,
+                "resource_access_denied",
+                "受保护的服务资料不可作为通用资源读取",
+            ));
+        }
         Ok((
             resource_key_for_ref(reference),
             entry,
@@ -1558,19 +1679,18 @@ impl ResourceIoService {
             if let Some(observer) = observer {
                 observer();
             }
-            std::fs::read(read_path)
+            registered_json_snapshot(Path::new(&read_path))
         })
         .await
-        .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))?
-        .map_err(|err| ResourceIoError::internal(format!("read session file: {err}")))?;
+        .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))??;
         Ok(ResourceRead {
             meta: serde_json::json!({
                 "resourceKey": resource_key,
                 "resource": Self::session_file_descriptor(reference, &entry, &file_path),
-                "version": version_json(&meta),
+                "version": read_snapshot_version(&content),
                 "filePath": file_path,
             }),
-            content,
+            content: content.bytes,
         })
     }
 
@@ -1660,7 +1780,7 @@ impl ResourceIoService {
     ) -> Result<ResourceRead, ResourceIoError> {
         let lease = self.inner.session_files.payload_lease().await;
         let observer = self.inner.session_files.payload_read_observer();
-        let content = self.resolve_resource_content(reference).await?;
+        let mut content = self.resolve_resource_content(reference).await?;
         let ResourceRef::Resource { resource_id } = reference else {
             unreachable!()
         };
@@ -1670,11 +1790,18 @@ impl ResourceIoService {
             if let Some(observer) = observer {
                 observer();
             }
-            std::fs::read(read_path)
+            registered_json_snapshot(&read_path)
         })
         .await
-        .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))?
-        .map_err(|err| ResourceIoError::internal(format!("read resource: {err}")))?;
+        .map_err(|err| ResourceIoError::internal(format!("read join: {err}")))??;
+        let version = read_snapshot_version(&bytes);
+        content.size = bytes.identity.size;
+        content.mtime_ms = version["mtimeMs"].as_u64().unwrap_or(0);
+        content.etag = format!(
+            "\"{}-{}\"",
+            crate::filemeta::to_base36(content.mtime_ms),
+            crate::filemeta::to_base36(content.size)
+        );
         Ok(ResourceRead {
             meta: serde_json::json!({
                 "resourceKey": resource_key_for_ref(reference),
@@ -1682,7 +1809,7 @@ impl ResourceIoService {
                 "version": Self::resource_version_json(&content),
                 "filePath": content.file_path.to_string_lossy(),
             }),
-            content: bytes,
+            content: bytes.bytes,
         })
     }
 
@@ -1710,9 +1837,18 @@ impl ResourceIoService {
     fn resolve_watch_target(
         &self,
         input: &Value,
-    ) -> Result<(PathBuf, bool, String, Value), ResourceIoError> {
+    ) -> Result<
+        (
+            PathBuf,
+            bool,
+            String,
+            Value,
+            Option<crate::resource_mounts::MountLease>,
+        ),
+        ResourceIoError,
+    > {
         let reference = normalize_resource_ref(input)?;
-        Self::refuse_if_mount_or_url(&reference)?;
+        Self::refuse_unconfigured_url(&reference)?;
         match &reference {
             ResourceRef::LocalFile { path } => {
                 let plane = self.local_plane()?;
@@ -1728,7 +1864,33 @@ impl ResourceIoService {
                     "path": resolved.to_string_lossy(),
                     "filePath": resolved.to_string_lossy(),
                 });
-                Ok((resolved, is_directory, key, resource))
+                Ok((resolved, is_directory, key, resource, None))
+            }
+            ResourceRef::Mount { .. } => {
+                let provider = self
+                    .inner
+                    .mounts
+                    .get()
+                    .ok_or_else(|| ResourceIoError::unsupported_provider("mount"))?;
+                let lease = provider.resolve(&reference, "watch", None)?;
+                lease.check(ResourceOp::Read)?;
+                let ctx = OpContext::local_owner("");
+                let plane = WorkspacePlane {
+                    access: lease.access.clone(),
+                    cwd: lease.root().into(),
+                    mount: Some(lease.clone()),
+                };
+                let path =
+                    plane.authorize(&lease.target().to_string_lossy(), ResourceOp::Read, &ctx)?;
+                let is_dir = path.is_dir();
+                checked_mount_snapshot(&path, is_dir, &lease)?;
+                Ok((
+                    path.clone(),
+                    is_dir,
+                    lease.key(&path)?,
+                    lease.descriptor(&path)?,
+                    Some(lease),
+                ))
             }
             other => Err(ResourceIoError::capability_denied(
                 "watch",
@@ -1754,7 +1916,7 @@ impl ResourceIoService {
     /// registry.retain：已存在 → refCount+1；新建 → 初始快照 + 启动轮询。
     /// 目标必须存在（现役 fs.watch 对缺失路径同步 ENOENT → 路由 400）。
     fn retain_watch(&self, input: &Value) -> Result<String, ResourceIoError> {
-        let (file_path, is_directory, resource_key, _resource) =
+        let (file_path, is_directory, resource_key, _resource, mount) =
             match self.resolve_watch_target(input) {
                 Ok(target) => target,
                 Err(err) => {
@@ -1771,18 +1933,36 @@ impl ResourceIoService {
             return Err(err);
         }
         let mut watches = self.inner.watches.lock().unwrap_or_else(|p| p.into_inner());
+        let stale = watches.get(&resource_key).and_then(|entry| {
+            entry
+                .mount
+                .as_ref()
+                .and_then(|lease| lease.check(ResourceOp::Read).err())
+                .map(|error| (entry.generation.clone(), error))
+        });
+        if let Some((generation, error)) = stale {
+            drop(watches);
+            self.inner
+                .retire_watch_locked(&resource_key, &generation, &error);
+            watches = self.inner.watches.lock().unwrap_or_else(|p| p.into_inner());
+        }
         if let Some(entry) = watches.get_mut(&resource_key) {
             entry.ref_count += 1;
             return Ok(resource_key);
         }
-        let snapshot = snapshot_path(&file_path, is_directory);
+        let snapshot = match &mount {
+            Some(lease) => checked_mount_snapshot(&file_path, is_directory, lease)?,
+            None => snapshot_path(&file_path, is_directory),
+        };
         watches.insert(
             resource_key.clone(),
             WatchEntry {
                 file_path,
                 is_directory,
                 ref_count: 1,
+                generation: uuid_v4(),
                 snapshot,
+                mount,
             },
         );
         drop(watches);
@@ -1805,6 +1985,11 @@ impl ResourceIoService {
 
     /// POST watch：retain + watchId（现役 route :53-67 的 UUID 形态）。
     pub async fn watch(&self, input: &Value) -> Result<String, ResourceIoError> {
+        let _gate = self
+            .inner
+            .watch_gate
+            .lock()
+            .unwrap_or_else(|p| p.into_inner());
         let resource_key = self.retain_watch(input)?;
         let watch_id = uuid_v4();
         self.inner
@@ -1817,6 +2002,11 @@ impl ResourceIoService {
 
     /// DELETE watch/{id}（route :69-76）。
     pub fn unwatch(&self, watch_id: &str) -> bool {
+        let _gate = self
+            .inner
+            .watch_gate
+            .lock()
+            .unwrap_or_else(|p| p.into_inner());
         let Some(resource_key) = self
             .inner
             .watch_ids
@@ -1833,6 +2023,11 @@ impl ResourceIoService {
     /// POST subscribe（registry :96-127）：逐个 retain，失败回滚已 retain
     /// 的（逆序释放），响亮报错。
     pub async fn subscribe(&self, input: &Value) -> Result<Value, ResourceIoError> {
+        let _gate = self
+            .inner
+            .watch_gate
+            .lock()
+            .unwrap_or_else(|p| p.into_inner());
         let resources: Vec<Value> = match input {
             Value::Object(map) => {
                 if let Some(Value::Array(list)) = map.get("resources") {
@@ -1896,6 +2091,11 @@ impl ResourceIoService {
 
     /// DELETE subscriptions/{id}（registry :129-135）。
     pub fn unsubscribe(&self, subscription_id: &str) -> bool {
+        let _gate = self
+            .inner
+            .watch_gate
+            .lock()
+            .unwrap_or_else(|p| p.into_inner());
         let Some(subscription) = self
             .inner
             .subscriptions
@@ -1975,16 +2175,94 @@ impl ResourceIoService {
 impl IoInner {
     /// 一拍轮询：重取快照 → diff → 发事件。同窗口多次变化合并为一条
     /// （现役 80ms 去抖窗口的轮询等价语义，D7）。
+    /// 撤销挂载授权时同步释放关联监听与订阅，不继续发旧授权的事件。
+    fn revoke_watch(&self, key: &str, generation: &str, error: &ResourceIoError) {
+        let _gate = self.watch_gate.lock().unwrap_or_else(|p| p.into_inner());
+        self.retire_watch_locked(key, generation, error);
+    }
+    fn retire_watch_locked(&self, key: &str, generation: &str, error: &ResourceIoError) {
+        {
+            let mut watches = self.watches.lock().unwrap_or_else(|p| p.into_inner());
+            if !watches
+                .get(key)
+                .is_some_and(|entry| entry.generation == generation)
+            {
+                return;
+            }
+            watches.remove(key);
+        }
+        self.watch_ids
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .retain(|_, value| value != key);
+        let removed: Vec<Subscription> = {
+            let mut subscriptions = self.subscriptions.lock().unwrap_or_else(|p| p.into_inner());
+            let ids: Vec<String> = subscriptions
+                .iter()
+                .filter(|(_, s)| s.resource_keys.iter().any(|k| k == key))
+                .map(|(id, _)| id.clone())
+                .collect();
+            ids.into_iter()
+                .filter_map(|id| subscriptions.remove(&id))
+                .collect()
+        };
+        let mut watches = self.watches.lock().unwrap_or_else(|p| p.into_inner());
+        for subscription in removed {
+            for other in subscription.resource_keys {
+                if other != key {
+                    if let Some(entry) = watches.get_mut(&other) {
+                        if entry.ref_count > 1 {
+                            entry.ref_count -= 1;
+                        } else {
+                            watches.remove(&other);
+                        }
+                    }
+                }
+            }
+        }
+        drop(watches);
+        *self.last_error.lock().unwrap_or_else(|p| p.into_inner()) = Some((
+            error.code.clone(),
+            error
+                .safe_message
+                .clone()
+                .unwrap_or_else(|| "挂载监听授权失效".into()),
+        ));
+    }
+
     fn poll_watches_once(self: &Arc<Self>) {
-        let targets: Vec<(String, PathBuf, bool)> = {
+        let targets: Vec<(
+            String,
+            String,
+            PathBuf,
+            bool,
+            Option<crate::resource_mounts::MountLease>,
+        )> = {
             let watches = self.watches.lock().unwrap_or_else(|p| p.into_inner());
             watches
                 .iter()
-                .map(|(key, entry)| (key.clone(), entry.file_path.clone(), entry.is_directory))
+                .map(|(key, entry)| {
+                    (
+                        key.clone(),
+                        entry.generation.clone(),
+                        entry.file_path.clone(),
+                        entry.is_directory,
+                        entry.mount.clone(),
+                    )
+                })
                 .collect()
         };
-        for (resource_key, file_path, is_directory) in targets {
-            let new_snapshot = snapshot_path(&file_path, is_directory);
+        for (resource_key, generation, file_path, is_directory, mount) in targets {
+            let new_snapshot = match &mount {
+                Some(lease) => match checked_mount_snapshot(&file_path, is_directory, lease) {
+                    Ok(value) => value,
+                    Err(error) => {
+                        self.revoke_watch(&resource_key, &generation, &error);
+                        continue;
+                    }
+                },
+                None => snapshot_path(&file_path, is_directory),
+            };
             let events = {
                 let mut watches = self.watches.lock().unwrap_or_else(|p| p.into_inner());
                 let Some(entry) = watches.get_mut(&resource_key) else {
@@ -1995,6 +2273,9 @@ impl IoInner {
                     *dropped += 1;
                     continue;
                 };
+                if entry.generation != generation {
+                    continue;
+                }
                 if entry.snapshot == new_snapshot {
                     continue;
                 }
@@ -2010,8 +2291,8 @@ impl IoInner {
                     } => {
                         let _ = self.bus.changed(BusChanged {
                             change_type: "modified".to_string(),
-                            resource_key: local_key(&path),
-                            resource: local_watch_resource(&path, is_dir),
+                            resource_key: watch_key(&path, mount.as_ref()),
+                            resource: watch_resource(&path, is_dir, mount.as_ref()),
                             version: Some(version),
                             source: "provider_watch".to_string(),
                             reason: None,
@@ -2020,8 +2301,8 @@ impl IoInner {
                     }
                     PollEvent::Deleted { path, is_dir } => {
                         let _ = self.bus.deleted(BusDeleted {
-                            resource_key: local_key(&path),
-                            resource: local_watch_resource(&path, is_dir),
+                            resource_key: watch_key(&path, mount.as_ref()),
+                            resource: watch_resource(&path, is_dir, mount.as_ref()),
                             source: "provider_watch".to_string(),
                             reason: None,
                             session_path: None,
@@ -2043,6 +2324,276 @@ enum PollEvent {
         path: PathBuf,
         is_dir: bool,
     },
+}
+
+fn watch_key(path: &Path, mount: Option<&crate::resource_mounts::MountLease>) -> String {
+    mount
+        .and_then(|m| m.key(path).ok())
+        .unwrap_or_else(|| local_key(path))
+}
+fn watch_resource(
+    path: &Path,
+    is_dir: bool,
+    mount: Option<&crate::resource_mounts::MountLease>,
+) -> Value {
+    let mut value = mount
+        .and_then(|m| m.descriptor(path).ok())
+        .unwrap_or_else(|| local_watch_resource(path, is_dir));
+    value["isDirectory"] = Value::Bool(is_dir);
+    value
+}
+
+/// 挂载监听只读持有目录内的元数据，拒绝链接和授权撤销后的路径重解引用。
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+fn checked_mount_snapshot(
+    path: &Path,
+    is_dir: bool,
+    lease: &crate::resource_mounts::MountLease,
+) -> Result<WatchSnapshot, ResourceIoError> {
+    use crate::filetools::fsio::DirFd;
+    lease.check(ResourceOp::Read)?;
+    let parent = path
+        .parent()
+        .ok_or_else(|| ResourceIoError::io_bad_request("挂载目标缺少父目录"))?;
+    let directory =
+        DirFd::open(parent).map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+    let name = path
+        .file_name()
+        .ok_or_else(|| ResourceIoError::io_bad_request("挂载目标缺少名称"))?;
+    let meta = match directory.entry_metadata(name) {
+        Ok(meta) => meta,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(WatchSnapshot::Missing),
+        Err(e) => return Err(ResourceIoError::io_bad_request(e.to_string())),
+    };
+    if meta.kind != if is_dir { "directory" } else { "file" } {
+        return Err(ResourceIoError::new(
+            409,
+            "resource_watch_conflict",
+            "监听目标身份已改变",
+        ));
+    }
+    let result = if is_dir {
+        let held = directory
+            .child_directory(name, false)
+            .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+        let mut children = BTreeMap::new();
+        for name in held
+            .entry_names(|| false)
+            .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?
+        {
+            let child = held
+                .entry_metadata(&name)
+                .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+            // 链接本身不授予目标权限，不能把外部目标的元数据投影为挂载内容。
+            if !["file", "directory"].contains(&child.kind) {
+                continue;
+            }
+            let ctx = OpContext::local_owner("");
+            if lease
+                .access
+                .authorize(
+                    ctx.principal_kind,
+                    &ctx.principal_subject,
+                    &ctx.session_id,
+                    &path.join(&name),
+                    lease.root(),
+                    ResourceOp::Read,
+                )
+                .is_err()
+            {
+                continue;
+            }
+            children.insert(
+                name.to_string_lossy().into_owned(),
+                ChildSig {
+                    mtime_ms: child.modified_ms.max(0) as u64,
+                    size: child.size,
+                    is_dir: child.kind == "directory",
+                },
+            );
+        }
+        if !held.same_directory(path).unwrap_or(false) {
+            return Err(ResourceIoError::new(
+                409,
+                "resource_watch_conflict",
+                "监听目录已改变",
+            ));
+        }
+        WatchSnapshot::Dir { children }
+    } else {
+        WatchSnapshot::File {
+            mtime_ms: meta.modified_ms.max(0) as u64,
+            size: meta.size,
+        }
+    };
+    lease.check(ResourceOp::Read)?;
+    if !directory.same_directory(parent).unwrap_or(false) {
+        return Err(ResourceIoError::new(
+            409,
+            "resource_watch_conflict",
+            "监听父目录已改变",
+        ));
+    }
+    Ok(result)
+}
+#[cfg(not(any(target_os = "macos", target_os = "linux")))]
+fn checked_mount_snapshot(
+    _path: &Path,
+    _is_dir: bool,
+    _lease: &crate::resource_mounts::MountLease,
+) -> Result<WatchSnapshot, ResourceIoError> {
+    Err(ResourceIoError::new(
+        501,
+        "provider_not_available",
+        "此平台尚无安全挂载监听句柄",
+    ))
+}
+
+fn read_snapshot_version(snapshot: &crate::file_safety::Snapshot) -> Value {
+    serde_json::json!({"mtimeMs":snapshot.identity.modified.duration_since(std::time::UNIX_EPOCH).map(|d|d.as_millis()as u64).unwrap_or(0),"size":snapshot.identity.size})
+}
+
+/// JSON正文必须完整有界且仍对应登记的同一文件，不能跟随读前替换的链接。
+fn registered_json_snapshot(path: &Path) -> Result<crate::file_safety::Snapshot, ResourceIoError> {
+    let snapshot = crate::file_safety::Snapshot::read_bounded(path, 20 * 1024 * 1024).map_err(
+        |e| match e {
+            crate::file_safety::WriteError::Failed(ref text)
+                if text == crate::file_safety::READ_BOUND_EXCEEDED =>
+            {
+                ResourceIoError::new(
+                    413,
+                    "resource_read_too_large",
+                    "资源JSON正文超过20MiB读取预算",
+                )
+            }
+            other => ResourceIoError::new(
+                409,
+                "resource_read_conflict",
+                format!("登记资源已改变：{other}"),
+            ),
+        },
+    )?;
+    if !snapshot.path_is_current(path) {
+        return Err(ResourceIoError::new(
+            409,
+            "resource_read_conflict",
+            "登记资源身份已改变",
+        ));
+    }
+    Ok(snapshot)
+}
+
+struct ResourceDirectoryEntry {
+    name: String,
+    is_dir: bool,
+    size: u64,
+    mtime_ms: u64,
+}
+fn safe_resource_entries(
+    path: &Path,
+    plane: &WorkspacePlane,
+    ctx: &OpContext,
+) -> Result<Vec<ResourceDirectoryEntry>, ResourceIoError> {
+    use crate::filetools::fsio::DirFd;
+    if plane.authorize(&path.to_string_lossy(), ResourceOp::Read, ctx)? != path {
+        return Err(ResourceIoError::new(
+            409,
+            "resource_list_conflict",
+            "目录路径已改变",
+        ));
+    }
+    let held = DirFd::open(path).map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+    let mut out = Vec::new();
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    for name in held
+        .entry_names(|| {
+            plane
+                .mount
+                .as_ref()
+                .is_some_and(|m| m.check(ResourceOp::Read).is_err())
+        })
+        .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?
+    {
+        let meta = held
+            .entry_metadata(&name)
+            .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+        if !["directory", "file"].contains(&meta.kind) {
+            continue;
+        }
+        if plane
+            .authorize(&path.join(&name).to_string_lossy(), ResourceOp::Read, ctx)
+            .is_err()
+        {
+            continue;
+        }
+        out.push(ResourceDirectoryEntry {
+            name: name.to_string_lossy().into_owned(),
+            is_dir: meta.kind == "directory",
+            size: meta.size,
+            mtime_ms: meta.modified_ms.max(0) as u64,
+        });
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+    for entry in
+        std::fs::read_dir(path).map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?
+    {
+        let entry = entry.map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+        let meta = std::fs::symlink_metadata(entry.path())
+            .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+        if !meta.is_file() && !meta.is_dir() {
+            continue;
+        }
+        if plane
+            .authorize(&entry.path().to_string_lossy(), ResourceOp::Read, ctx)
+            .is_err()
+        {
+            continue;
+        }
+        out.push(ResourceDirectoryEntry {
+            name: entry.file_name().to_string_lossy().into_owned(),
+            is_dir: meta.is_dir(),
+            size: meta.len(),
+            mtime_ms: mtime_ms_of(&meta),
+        });
+    }
+    plane.authorize(&path.to_string_lossy(), ResourceOp::Read, ctx)?;
+    if !held.same_directory(path).unwrap_or(false) {
+        return Err(ResourceIoError::new(
+            409,
+            "resource_list_conflict",
+            "目录身份已改变",
+        ));
+    }
+    out.sort_by(|a, b| a.name.cmp(&b.name));
+    Ok(out)
+}
+
+/// 逐级持有父目录；创建新目录时不跟随任何中途替换的链接。
+fn open_resource_parent(
+    path: &Path,
+    create: bool,
+) -> Result<crate::filetools::fsio::DirFd, ResourceIoError> {
+    use crate::filetools::fsio::DirFd;
+    let parent = path
+        .parent()
+        .ok_or_else(|| ResourceIoError::io_bad_request("文件缺少父目录"))?;
+    if !create {
+        return DirFd::open(parent).map_err(|e| ResourceIoError::io_bad_request(e.to_string()));
+    }
+    let mut held =
+        DirFd::open(Path::new("/")).map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+    for component in parent.components() {
+        match component {
+            std::path::Component::RootDir => {}
+            std::path::Component::Normal(name) => {
+                held = held
+                    .child_directory(name, true)
+                    .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+            }
+            _ => return Err(ResourceIoError::io_bad_request("移动目标不是规范绝对路径")),
+        }
+    }
+    Ok(held)
 }
 
 fn local_key(path: &Path) -> String {
@@ -2258,6 +2809,9 @@ impl WorkspacePlane {
         op: ResourceOp,
         ctx: &OpContext,
     ) -> Result<PathBuf, ResourceIoError> {
+        if let Some(mount) = &self.mount {
+            mount.check(op)?;
+        }
         self.access
             .authorize(
                 ctx.principal_kind,
@@ -2305,7 +2859,124 @@ impl WorkspacePlane {
     }
 }
 
+struct FileOperations<'a> {
+    inner: &'a IoInner,
+    workspace: Option<WorkspacePlane>,
+    reference: ResourceRef,
+    mount: Option<crate::resource_mounts::MountLease>,
+}
+impl std::ops::Deref for FileOperations<'_> {
+    type Target = IoInner;
+    fn deref(&self) -> &Self::Target {
+        self.inner
+    }
+}
 impl IoInner {
+    fn filesystem(
+        &self,
+        reference: &ResourceRef,
+        capability: &str,
+        cancel: Option<crate::cancel::CancelScope>,
+    ) -> Result<FileOperations<'_>, ResourceIoError> {
+        let (workspace, reference, mount) = match reference {
+            ResourceRef::LocalFile { .. } => (self.workspace.clone(), reference.clone(), None),
+            ResourceRef::Mount { .. } => {
+                let provider = self
+                    .mounts
+                    .get()
+                    .ok_or_else(|| ResourceIoError::unsupported_provider("mount"))?;
+                let lease = provider.resolve(reference, capability, cancel)?;
+                let target = ResourceRef::LocalFile {
+                    path: lease.target().to_string_lossy().into_owned(),
+                };
+                (
+                    Some(WorkspacePlane {
+                        access: lease.access.clone(),
+                        cwd: lease.root().to_path_buf(),
+                        mount: Some(lease.clone()),
+                    }),
+                    target,
+                    Some(lease),
+                )
+            }
+            other => {
+                return Err(ResourceIoError::capability_denied(
+                    capability,
+                    provider_id_for_ref(other),
+                ));
+            }
+        };
+        Ok(FileOperations {
+            inner: self,
+            workspace,
+            reference,
+            mount,
+        })
+    }
+}
+impl FileOperations<'_> {
+    fn map(&self, value: Value) -> Result<Value, ResourceIoError> {
+        match &self.mount {
+            Some(m) => m.map_result(value),
+            None => Ok(value),
+        }
+    }
+    fn stat(&self, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        self.map(self.local_stat(&self.reference, ctx)?)
+    }
+    fn read(&self, ctx: &OpContext) -> Result<ResourceRead, ResourceIoError> {
+        let mut out = self.local_read(&self.reference, ctx)?;
+        out.meta = self.map(out.meta)?;
+        Ok(out)
+    }
+    fn list(&self, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        self.map(self.local_list(&self.reference, ctx)?)
+    }
+    fn search(
+        &self,
+        query: Option<&str>,
+        mode: Option<&str>,
+        limit: Option<usize>,
+        ctx: &OpContext,
+    ) -> Result<Value, ResourceIoError> {
+        self.map(self.local_search(&self.reference, query, mode, limit, ctx)?)
+    }
+    fn write(&self, content: &[u8], ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        self.map(self.local_write(&self.reference, content, ctx)?)
+    }
+    fn write_expected(
+        &self,
+        content: &[u8],
+        version: &Value,
+        ctx: &OpContext,
+    ) -> Result<Value, ResourceIoError> {
+        self.map(self.local_write_expected_version(&self.reference, content, version, ctx)?)
+    }
+    fn move_to(&self, to: &ResourceRef, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        let target = match &self.mount {
+            Some(m) => m.sibling(to)?,
+            None => to.clone(),
+        };
+        let value = self.local_move(&self.reference, &target, ctx)?;
+        match &self.mount {
+            Some(m) => m.map_move(value),
+            None => Ok(value),
+        }
+    }
+    fn trash(
+        &self,
+        namespace: Option<&str>,
+        metadata: Option<Value>,
+        ctx: &OpContext,
+    ) -> Result<Value, ResourceIoError> {
+        self.map(self.local_trash(&self.reference, namespace, metadata, ctx)?)
+    }
+    fn materialize(&self, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        self.map(self.local_materialize(&self.reference, ctx)?)
+    }
+}
+
+impl FileOperations<'_> {
     fn local_path<'a>(&self, reference: &'a ResourceRef) -> Result<&'a str, ResourceIoError> {
         match reference {
             ResourceRef::LocalFile { path } => Ok(path.as_str()),
@@ -2346,39 +3017,62 @@ impl IoInner {
         }))
     }
 
-    fn local_read(
+    fn local_snapshot(
         &self,
         reference: &ResourceRef,
         ctx: &OpContext,
-    ) -> Result<ResourceRead, ResourceIoError> {
+    ) -> Result<(PathBuf, crate::file_safety::Snapshot), ResourceIoError> {
         let plane = self
             .workspace
             .as_ref()
             .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
         let file_path = plane.authorize(self.local_path(reference)?, ResourceOp::Read, ctx)?;
-        let meta = std::fs::metadata(&file_path).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot stat {}: {err}", file_path.display()))
-        })?;
-        if !meta.is_file() {
-            return Err(ResourceIoError::io_bad_request(format!(
-                "resource is not a file: {}",
-                file_path.display()
-            )));
-        }
         if let Some(observer) = self.session_files.payload_read_observer() {
             observer();
         }
-        let content = std::fs::read(&file_path).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot read {}: {err}", file_path.display()))
-        })?;
+        if std::fs::symlink_metadata(&file_path).is_ok_and(|m| m.is_dir()) {
+            return Err(ResourceIoError::io_bad_request("资源正文读取不接受目录"));
+        }
+        // JSON正文明确限20MiB；先核句柄大小再分配，不跟随授权后被换入的链接。
+        let snapshot = crate::file_safety::Snapshot::read_bounded(&file_path, 20 * 1024 * 1024)
+            .map_err(|error| match error {
+                crate::file_safety::WriteError::Failed(ref text)
+                    if text == crate::file_safety::READ_BOUND_EXCEEDED =>
+                {
+                    ResourceIoError::new(
+                        413,
+                        "resource_read_too_large",
+                        "资源正文超过20MiB读取预算",
+                    )
+                }
+                crate::file_safety::WriteError::Conflict => ResourceIoError::new(
+                    409,
+                    "resource_read_conflict",
+                    "资源在读取期间改变或已撤权",
+                ),
+                other => ResourceIoError::io_bad_request(format!("资源读取失败：{other}")),
+            })?;
+        let current = plane.authorize(self.local_path(reference)?, ResourceOp::Read, ctx)?;
+        if current != file_path || !snapshot.path_is_current(&file_path) {
+            return Err(ResourceIoError::new(
+                409,
+                "resource_read_conflict",
+                "资源路径或身份在读取期间改变",
+            ));
+        }
+        Ok((file_path, snapshot))
+    }
+
+    fn local_read(
+        &self,
+        reference: &ResourceRef,
+        ctx: &OpContext,
+    ) -> Result<ResourceRead, ResourceIoError> {
+        let (file_path, snapshot) = self.local_snapshot(reference, ctx)?;
+        let version = serde_json::json!({"mtimeMs":snapshot.identity.modified.duration_since(std::time::UNIX_EPOCH).map(|d|d.as_millis()as u64).unwrap_or(0),"size":snapshot.identity.size});
         Ok(ResourceRead {
-            meta: serde_json::json!({
-                "resourceKey": local_key(&file_path),
-                "resource": WorkspacePlane::descriptor(&file_path),
-                "version": version_json(&meta),
-                "filePath": file_path.to_string_lossy(),
-            }),
-            content,
+            meta: serde_json::json!({"resourceKey":local_key(&file_path),"resource":WorkspacePlane::descriptor(&file_path),"version":version,"filePath":file_path.to_string_lossy()}),
+            content: snapshot.bytes,
         })
     }
 
@@ -2527,29 +3221,14 @@ impl IoInner {
             .as_ref()
             .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
         let dir_path = plane.authorize(self.local_path(reference)?, ResourceOp::Read, ctx)?;
-        let entries = std::fs::read_dir(&dir_path).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot list {}: {err}", dir_path.display()))
-        })?;
+        let entries = safe_resource_entries(&dir_path, plane, ctx)?;
         let mut items = Vec::new();
         for entry in entries {
-            let entry = entry.map_err(|err| {
-                ResourceIoError::io_bad_request(format!("cannot read dir entry: {err}"))
-            })?;
-            if plane
-                .authorize(&entry.path().to_string_lossy(), ResourceOp::Read, ctx)
-                .is_err()
-            {
-                continue;
-            }
-            let meta = std::fs::metadata(entry.path()).map_err(|err| {
-                ResourceIoError::io_bad_request(format!("cannot stat entry: {err}"))
-            })?;
-            let is_directory = meta.is_dir();
             items.push(serde_json::json!({
-                "name": entry.file_name().to_string_lossy(),
-                "isDirectory": is_directory,
-                "size": if is_directory { Value::Null } else { Value::from(meta.len()) },
-                "mtimeMs": mtime_ms_of(&meta),
+                "name": entry.name,
+                "isDirectory": entry.is_dir,
+                "size": if entry.is_dir { Value::Null } else { Value::from(entry.size) },
+                "mtimeMs": entry.mtime_ms,
             }));
         }
         items.sort_by(|a, b| {
@@ -2582,7 +3261,7 @@ impl IoInner {
         let matches = if needle.is_empty() {
             Vec::new()
         } else if mode == Some("name") {
-            self.search_names(&root_path, &needle, limit)
+            self.search_names(&root_path, &needle, limit, ctx)?
         } else {
             self.search_text(&root_path, &needle, ctx)?
         };
@@ -2593,170 +3272,139 @@ impl IoInner {
         }))
     }
 
-    /// searchText（local-fs-provider.ts :439-460）：递归、跳过
-    /// SEARCH_SKIP_DIRS、逐文件过授权闸（拒绝即跳过）、行号 1 起。
+    /// 先逐目录授权，再从持有目录枚举；文件正文与read共用有界、身份复核读取。
     fn search_text(
         &self,
         root: &Path,
         needle: &str,
         ctx: &OpContext,
     ) -> Result<Vec<Value>, ResourceIoError> {
+        let plane = self
+            .workspace
+            .as_ref()
+            .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
+        let mut pending = vec![root.to_path_buf()];
         let mut matches = Vec::new();
-        self.search_text_visit(root, needle, ctx, &mut matches)?;
+        let mut visited = 0usize;
+        let mut bytes = 0usize;
+        while let Some(current) = pending.pop() {
+            visited += 1;
+            if visited > 100_000 {
+                return Err(ResourceIoError::new(
+                    413,
+                    "resource_search_too_large",
+                    "搜索条目超过预算",
+                ));
+            }
+            if plane
+                .authorize(&current.to_string_lossy(), ResourceOp::Read, ctx)
+                .is_err()
+            {
+                continue;
+            }
+            let meta = std::fs::symlink_metadata(&current)
+                .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+            if meta.is_dir() {
+                if current != root
+                    && current
+                        .file_name()
+                        .is_some_and(|n| SEARCH_SKIP_DIRS.contains(&n.to_string_lossy().as_ref()))
+                {
+                    continue;
+                }
+                for entry in safe_resource_entries(&current, plane, ctx)?
+                    .into_iter()
+                    .rev()
+                {
+                    pending.push(current.join(entry.name));
+                }
+            } else if meta.is_file() {
+                let content = self
+                    .local_read(
+                        &ResourceRef::LocalFile {
+                            path: current.to_string_lossy().into_owned(),
+                        },
+                        ctx,
+                    )?
+                    .content;
+                bytes = bytes.saturating_add(content.len());
+                if bytes > 32 * 1024 * 1024 {
+                    return Err(ResourceIoError::new(
+                        413,
+                        "resource_search_too_large",
+                        "搜索正文超过32MiB预算",
+                    ));
+                }
+                let text = String::from_utf8_lossy(&content);
+                for (index, line) in text.split('\n').enumerate() {
+                    let line = line.strip_suffix('\r').unwrap_or(line);
+                    if line.contains(needle) {
+                        if matches.len() >= 10_000 {
+                            return Err(ResourceIoError::new(
+                                413,
+                                "resource_search_too_large",
+                                "搜索结果超过预算",
+                            ));
+                        }
+                        matches.push(serde_json::json!({"filePath":current.to_string_lossy(),"line":index+1,"text":line}));
+                    }
+                }
+            }
+        }
         matches.sort_by(|a, b| {
-            let path_ord = a["filePath"]
+            a["filePath"]
                 .as_str()
-                .unwrap_or("")
-                .cmp(b["filePath"].as_str().unwrap_or(""));
-            path_ord.then(
-                a["line"]
-                    .as_u64()
-                    .unwrap_or(0)
-                    .cmp(&b["line"].as_u64().unwrap_or(0)),
-            )
+                .cmp(&b["filePath"].as_str())
+                .then(a["line"].as_u64().cmp(&b["line"].as_u64()))
         });
         Ok(matches)
     }
 
-    fn search_text_visit(
-        &self,
-        current: &Path,
-        needle: &str,
-        ctx: &OpContext,
-        matches: &mut Vec<Value>,
-    ) -> Result<(), ResourceIoError> {
-        let meta = std::fs::metadata(current).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot stat {}: {err}", current.display()))
-        })?;
-        if meta.is_dir() {
-            if SEARCH_SKIP_DIRS.contains(
-                &current
-                    .file_name()
-                    .map(|n| n.to_string_lossy().into_owned())
-                    .unwrap_or_default()
-                    .as_str(),
-            ) {
-                return Ok(());
-            }
-            let entries = std::fs::read_dir(current).map_err(|err| {
-                ResourceIoError::io_bad_request(format!("cannot list {}: {err}", current.display()))
-            })?;
-            for entry in entries {
-                let entry = entry.map_err(|err| {
-                    ResourceIoError::io_bad_request(format!("cannot read dir entry: {err}"))
-                })?;
-                self.search_text_visit(&entry.path(), needle, ctx, matches)?;
-            }
-            return Ok(());
-        }
-        if !meta.is_file() {
-            return Ok(());
-        }
-        // 逐文件授权闸（:449-452）：拒绝即跳过，不是错误。
-        let Some(plane) = self.workspace.as_ref() else {
-            return Ok(());
-        };
-        if plane
-            .authorize(&current.to_string_lossy(), ResourceOp::Read, ctx)
-            .is_err()
-        {
-            return Ok(());
-        }
-        let raw = std::fs::read(current).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot read {}: {err}", current.display()))
-        })?;
-        let text = String::from_utf8_lossy(&raw);
-        for (index, line) in text.split('\n').enumerate() {
-            let line = line.strip_suffix('\r').unwrap_or(line);
-            if line.contains(needle) {
-                matches.push(serde_json::json!({
-                    "filePath": current.to_string_lossy(),
-                    "line": index + 1,
-                    "text": line,
-                }));
-            }
-        }
-        Ok(())
-    }
-
-    /// searchNames（local-fs-provider.ts :462-515）：每目录按名排序、
-    /// 跳过目录集、授权闸过滤、小写包含匹配、默认上限 80。
-    fn search_names(&self, root: &Path, needle: &str, limit: Option<usize>) -> Vec<Value> {
-        let max = limit
-            .filter(|limit| *limit > 0)
-            .unwrap_or(DEFAULT_SEARCH_NAME_LIMIT);
-        let needle = needle.to_lowercase();
-        let mut matches = Vec::new();
-        self.search_names_visit(root, root, &needle, max, &mut matches);
-        matches.truncate(max);
-        matches
-    }
-
-    fn search_names_visit(
+    fn search_names(
         &self,
         root: &Path,
-        current: &Path,
         needle: &str,
-        max: usize,
-        matches: &mut Vec<Value>,
-    ) {
-        if matches.len() >= max {
-            return;
-        }
-        let Ok(entries) = std::fs::read_dir(current) else {
-            return;
-        };
-        let mut entries: Vec<_> = entries.flatten().collect();
-        entries.sort_by_key(|entry| entry.file_name());
-        for entry in entries {
-            if matches.len() >= max {
-                break;
-            }
-            let name = entry.file_name().to_string_lossy().into_owned();
-            let path = entry.path();
-            let Ok(meta) = std::fs::metadata(&path) else {
-                continue;
-            };
-            let is_directory = meta.is_dir();
-            if is_directory && SEARCH_SKIP_DIRS.contains(&name.as_str()) {
-                continue;
-            }
-            // 逐条授权闸（:490-493）：拒绝即跳过。
-            if let Some(plane) = self.workspace.as_ref() {
-                let probe = OpContext::local_owner("");
-                if plane
-                    .authorize(&path.to_string_lossy(), ResourceOp::Read, &probe)
-                    .is_err()
-                {
+        limit: Option<usize>,
+        ctx: &OpContext,
+    ) -> Result<Vec<Value>, ResourceIoError> {
+        let plane = self
+            .workspace
+            .as_ref()
+            .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
+        let max = limit
+            .filter(|n| *n > 0)
+            .unwrap_or(DEFAULT_SEARCH_NAME_LIMIT)
+            .min(10_000);
+        let needle = needle.to_lowercase();
+        let mut matches = Vec::new();
+        let mut pending = vec![root.to_path_buf()];
+        let mut visited = 0usize;
+        while let Some(current) = pending.pop() {
+            for entry in safe_resource_entries(&current, plane, ctx)? {
+                visited += 1;
+                if visited > 100_000 {
+                    return Err(ResourceIoError::new(
+                        413,
+                        "resource_search_too_large",
+                        "搜索条目超过预算",
+                    ));
+                }
+                if entry.is_dir && SEARCH_SKIP_DIRS.contains(&entry.name.as_str()) {
                     continue;
                 }
-            }
-            if name.to_lowercase().contains(needle) {
-                let relative = path
-                    .strip_prefix(root)
-                    .map(|rel| rel.to_string_lossy().replace('\\', "/"))
-                    .unwrap_or_default();
-                let parent = path
-                    .parent()
-                    .and_then(|parent| parent.strip_prefix(root).ok())
-                    .map(|rel| rel.to_string_lossy().replace('\\', "/"))
-                    .unwrap_or_default();
-                matches.push(serde_json::json!({
-                    "filePath": path.to_string_lossy(),
-                    "line": 0,
-                    "text": name,
-                    "name": name,
-                    "relativePath": relative,
-                    "parentSubdir": parent,
-                    "isDirectory": is_directory,
-                    "size": if is_directory { Value::Null } else { Value::from(meta.len()) },
-                    "mtimeMs": mtime_ms_of(&meta),
-                }));
-            }
-            if is_directory {
-                self.search_names_visit(root, &path, needle, max, matches);
+                let path = current.join(&entry.name);
+                if entry.name.to_lowercase().contains(&needle) {
+                    matches.push(serde_json::json!({"filePath":path.to_string_lossy(),"line":0,"text":entry.name,"name":entry.name,"relativePath":path.strip_prefix(root).unwrap_or(&path).to_string_lossy().replace('\\',"/"),"parentSubdir":current.strip_prefix(root).unwrap_or(&current).to_string_lossy().replace('\\',"/"),"isDirectory":entry.is_dir,"size":if entry.is_dir {Value::Null}else{Value::from(entry.size)},"mtimeMs":entry.mtime_ms}));
+                    if matches.len() >= max {
+                        return Ok(matches);
+                    }
+                }
+                if entry.is_dir {
+                    pending.push(path);
+                }
             }
         }
+        Ok(matches)
     }
 
     fn local_move(
@@ -2782,18 +3430,43 @@ impl IoInner {
                 &target.to_string_lossy(),
             ));
         }
-        if let Some(parent) = target.parent() {
-            std::fs::create_dir_all(parent).map_err(|err| {
-                ResourceIoError::io_bad_request(format!("cannot create parent dirs: {err}"))
-            })?;
+        let source_parent = source
+            .parent()
+            .ok_or_else(|| ResourceIoError::io_bad_request("来源缺少父目录"))?;
+        let target_parent = target
+            .parent()
+            .ok_or_else(|| ResourceIoError::io_bad_request("目标缺少父目录"))?;
+        let from_dir = open_resource_parent(&source, false)?;
+        let to_dir = open_resource_parent(&target, true)?;
+        // 重新核对配置、授权与目录身份后才提交，实际移动不再重新打开路径。
+        if plane.authorize(self.local_path(from)?, ResourceOp::Write, ctx)? != source
+            || plane.authorize(self.local_path(to)?, ResourceOp::Write, ctx)? != target
+            || !from_dir.same_directory(source_parent).unwrap_or(false)
+            || !to_dir.same_directory(target_parent).unwrap_or(false)
+        {
+            return Err(ResourceIoError::new(
+                409,
+                "resource_move_conflict",
+                "移动目录已改变",
+            ));
         }
-        std::fs::rename(&source, &target).map_err(|err| {
-            ResourceIoError::io_bad_request(format!(
-                "cannot move {} to {}: {err}",
-                source.display(),
-                target.display()
-            ))
-        })?;
+        from_dir
+            .rename_to_noreplace(
+                source.file_name().unwrap(),
+                &to_dir,
+                target.file_name().unwrap(),
+            )
+            .map_err(|err| {
+                if err.kind() == std::io::ErrorKind::AlreadyExists {
+                    ResourceIoError::target_already_exists(&target.to_string_lossy())
+                } else {
+                    ResourceIoError::io_bad_request(format!(
+                        "cannot move {} to {}: {err}",
+                        source.display(),
+                        target.display()
+                    ))
+                }
+            })?;
         Ok(serde_json::json!({
             "oldResourceKey": local_key(&source),
             "newResourceKey": local_key(&target),
@@ -2831,16 +3504,13 @@ impl IoInner {
         }
         let trash_id = format!("trash_{}_{}", (self.now)(), random_hex4());
         let trash_path = self.trash_root.join(namespace).join(&trash_id);
-        std::fs::create_dir_all(&trash_path).map_err(|err| {
-            ResourceIoError::io_bad_request(format!("cannot create trash dir: {err}"))
-        })?;
+        let namespace_dir = open_resource_parent(&trash_path, true)?;
+        let trash_dir = namespace_dir
+            .new_child_directory(trash_path.file_name().unwrap())
+            .map_err(|e| {
+                ResourceIoError::io_bad_request(format!("cannot create exclusive trash dir: {e}"))
+            })?;
         let payload_path = trash_path.join("payload");
-        std::fs::rename(&file_path, &payload_path).map_err(|err| {
-            ResourceIoError::io_bad_request(format!(
-                "cannot move {} into trash: {err}",
-                file_path.display()
-            ))
-        })?;
         let mut meta = serde_json::json!({
             "schemaVersion": 1,
             "trashId": trash_id,
@@ -2859,9 +3529,49 @@ impl IoInner {
         }
         let meta_text = serde_json::to_string_pretty(&meta)
             .map_err(|err| ResourceIoError::internal(format!("trash metadata: {err}")))?;
-        std::fs::write(trash_path.join("metadata.json"), format!("{meta_text}\n")).map_err(
-            |err| ResourceIoError::io_bad_request(format!("cannot write trash metadata: {err}")),
-        )?;
+        use std::io::Write as _;
+        let (mut metadata_file, metadata_temp) = trash_dir
+            .create_temp(&random_hex4())
+            .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+        metadata_file
+            .write_all(format!("{meta_text}\n").as_bytes())
+            .and_then(|_| metadata_file.sync_all())
+            .map_err(|e| {
+                ResourceIoError::io_bad_request(format!("cannot write trash metadata: {e}"))
+            })?;
+        trash_dir
+            .rename_to_noreplace(
+                &metadata_temp,
+                &trash_dir,
+                std::ffi::OsStr::new("metadata.json"),
+            )
+            .map_err(|e| ResourceIoError::io_bad_request(e.to_string()))?;
+        let from_dir = open_resource_parent(&file_path, false)?;
+        let to_dir = open_resource_parent(&payload_path, false)?;
+        if plane.authorize(self.local_path(reference)?, ResourceOp::Write, ctx)? != file_path
+            || !from_dir
+                .same_directory(file_path.parent().unwrap())
+                .unwrap_or(false)
+            || !to_dir.same_directory(&trash_path).unwrap_or(false)
+        {
+            return Err(ResourceIoError::new(
+                409,
+                "resource_trash_conflict",
+                "回收目录已改变",
+            ));
+        }
+        if let Err(error) = from_dir.rename_to_noreplace(
+            file_path.file_name().unwrap(),
+            &to_dir,
+            std::ffi::OsStr::new("payload"),
+        ) {
+            // 提交前准备失败仅清理本次独占回收目录，原文件仍在原位。
+            trash_dir.unlink(std::ffi::OsStr::new("metadata.json"));
+            let _ = std::fs::remove_dir(&trash_path);
+            return Err(ResourceIoError::io_bad_request(format!(
+                "cannot move into trash: {error}"
+            )));
+        }
         Ok(serde_json::json!({
             "resourceKey": local_key(&file_path),
             "resource": WorkspacePlane::descriptor(&file_path),

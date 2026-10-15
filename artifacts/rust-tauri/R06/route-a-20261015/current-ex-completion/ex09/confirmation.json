@@ -1,0 +1,68 @@
+{
+  "result": "PASS_SCOPED_EX09_UTF16_CITATION_ADAPTATION",
+  "stageAccepted": false,
+  "mainModified": false,
+  "mainParent": {
+    "argv": [
+      "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_original_knowledge_proofs-a7bf095ff7da297b",
+      "--exact",
+      "original_citation_non_bmp_offsets_match_current_viewer_and_survive_restart",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exitCode": 0,
+    "binaryBeforeSHA256": "87e2f0ae8886c0ab68a867896d811eed6448804556a58ab3e525075be93d79f6",
+    "binaryAfterSHA256": "87e2f0ae8886c0ab68a867896d811eed6448804556a58ab3e525075be93d79f6",
+    "binaryStable": true,
+    "strictExactlyOneTestPassed": true
+  },
+  "originalSharedOldBinaryProbe": {
+    "testsRun": 0,
+    "countedAsPass": false,
+    "log": "/private/tmp/r06-ex09-citation-review/current-main-parent.log"
+  },
+  "independentCurrentHunksOriginalParent": {
+    "testsPassed": 1,
+    "log": "/private/tmp/r06-ex09-citation-review/private-current-hunks-parent.log"
+  },
+  "independentNonBmpEverySegment": {
+    "testsPassed": 1,
+    "log": "/private/tmp/r06-ex09-citation-review/independent-probe.log",
+    "prefix": "😀前缀",
+    "target": "𝄞证据🦊甲乙",
+    "suffix": "🧭后缀",
+    "legacyScalarNegativeRejected": true,
+    "dialogExactExpressionSourceSHA256": "8cbff3cc2b8995f7cf8d62b31c113b651fe76bc809163c14ba77dc51fb66bb32",
+    "rawHttpReceipt": "/private/tmp/r06-ex09-citation-review/independent-http-body.json",
+    "nonemptyVectorsRows": 1,
+    "actualPaidLedgerRowsPreserved": 1,
+    "preservedBeforeAfterAndRestart": [
+      "legacy citation record",
+      "raw snapshot bytes",
+      "nonempty vector BLOB rows",
+      "full model_call_usage rows"
+    ]
+  },
+  "readAndGrep": {
+    "internalOffsetUnit": "unicode_scalar",
+    "internalOffsetsUnchanged": true,
+    "publicUtf16EquivalentFieldsVerified": true,
+    "executionScope": "direct production KnowledgeService and actual frozen scope; not a new HTTP/Run claim"
+  },
+  "viewer": {
+    "actualJsEngine": true,
+    "extractedFromActualProductionComponent": true,
+    "mainCurrentHttpResultPassed": true,
+    "newAllSegmentHttpResultPassed": true,
+    "reactLifecycleOrWindowExecuted": false
+  },
+  "toolchain": "/Users/study_superior/.cargo/bin/cargo 1.98.1 --locked; CARGO_INCREMENTAL=0; target /private/tmp/r06-ex09-target; synthetic LINGXI_HOME/TMPDIR without HOME override",
+  "notRun": [
+    "full React mount and interaction",
+    "Electron/Tauri window",
+    "Windows/Linux",
+    "all 26 original parents independently rerun",
+    "formal stage gate"
+  ],
+  "sourceProof": "/private/tmp/r06-ex09-citation-review/source-proof.json"
+}

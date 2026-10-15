@@ -1,0 +1,79 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.19s
+     Running tests/r06_ar_w10_embedding_identity.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_ar_w10_embedding_identity-db8cd50ddebdf974)
+
+running 9 tests
+test c01_resolved_route_is_immutable_across_pre_send_reload ... W10 c01: 原始请求与数据库收据已写入独立证据
+ok
+test c02_same_dimension_reload_never_poisons_first_variant ... W10 c02: 原始请求与数据库收据已写入独立证据
+ok
+test c03_query_uses_served_identity_during_reload_and_isolates_dimensions ... W10 c03: 原始请求与数据库收据已写入独立证据
+ok
+test c04_failed_build_restarts_under_changed_identity_without_reusing_old_space ... W10 c04-before: 原始请求与数据库收据已写入独立证据
+W10 c04: 原始请求与数据库收据已写入独立证据
+ok
+test configured_unknown_dimensions_and_parameter_compatibility_are_explicit ... W10 configured-identity: 原始请求与数据库收据已写入独立证据
+ok
+test crash_running_job_recovers_distinct_identity_and_preserves_paid_vectors ... LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-ex06-main-env/home/lingxi-r06-ar-w10-crash-running-32701-1792044378451380000 previousInstanceId=c25766233e6be7587b24e40286b0343e previousPid=32706 previousStartNonce=6e5e652a1983d36f previousStartedAtUnixMs=1792044380362 handshakeMismatches=none
+2026-10-15T06:06:22.644468Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W10 crash-running: 原始请求与数据库收据已写入独立证据
+ok
+test legacy_paid_identity_is_preserved_and_requires_explicit_rebuild ... W10 legacy: 原始请求与数据库收据已写入独立证据
+ok
+test positive_production_ingestion_four_way_identity ... W10 positive: 原始请求与数据库收据已写入独立证据
+ok
+test same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible ... W10 parameters: 原始请求与数据库收据已写入独立证据
+ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.53s
+
+     Running tests/r06_ex05_restore_atomicity.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_ex05_restore_atomicity-43e3c05b9b098c99)
+
+running 2 tests
+test review_http_second_write_failure_keeps_bytes_and_success_undo_keeps_ledger ... LINGXI_AUTH_REJECTED request_id="req-9ee3a2fdaa6b3e840797428d1e42c75d" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:59347
+EX05_HTTP {"agentBUnchanged":true,"allCurrentBytesPreserved":true,"failure":{"code":"dream_restore_failed","coreAvailable":null,"details":{"requestId":"req-f96a88004e3fe3d52911eebad7086ce4"},"error":"Operation not permitted (os error 1)","reason":null},"paidAfter":0,"paidBefore":0,"readReceipt":{"preRestoreRevisionId":"2026-10-15T06-06-29-537Z-612605c1610df92b","recoveryRequired":false,"schemaVersion":1,"status":"failed_rolled_back","targetRevisionId":"2026-10-15T06-06-28-263Z-l-target","updatedAt":"2026-10-15T06:06:29.538Z"},"secondWriteStatus":500,"success":{"agentId":"agentA","ok":true,"preRestoreRevisionId":"2026-10-15T06-06-29-542Z-e22f1100c0f424a2","restored":"2026-10-15T06-06-28-263Z-l-target"},"undo":{"agentId":"agentA","ok":true,"preRestoreRevisionId":"2026-10-15T06-06-29-545Z-b14296ab93e87da8","restored":"2026-10-15T06-06-29-542Z-e22f1100c0f424a2"}}
+ok
+test review_next_context_rejects_external_conflict_and_reads_recovered_current_only ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.14s
+
+     Running tests/r06_memory_tool_completion.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_memory_tool_completion-04efc4d1be017d47)
+
+running 12 tests
+test ex06_agent_selected_models_actual_wire_scope_usage_restart_and_invalid_configs ... EX06_PER_AGENT_PROOF /private/tmp/r06-ex06-main-env/tmp/lingxi-r06-tool-completion-ex06-agent-models-33179-1792044391786786000/ex06-per-agent-proof.json
+ok
+test experience_failed_index_publish_keeps_operation_gate_through_document_rollback ... ok
+test experience_operation_gate_survives_memory_directory_creation_and_agent_path_alias ... ok
+test experience_record_sync_rebuild_and_rollback_share_one_agent_operation_gate ... ok
+test independent_agent_without_memory_embedding_must_not_spend_global_embedding ... EX06_AGENT_EMBEDDING {"agentConfig":"agent:\n  name: 合成助手\nmemory:\n  enabled: true\nexperience:\n  enabled: true\n","providerCalls":0,"semantic":{"coverage":null,"diagnostics":[{"count":0,"term":"different"},{"count":0,"term":"phrase"}],"facts":[],"retrieval":"no_matches","semantic":"unavailable_no_model"}}
+ok
+test independent_concurrent_record_successes_are_all_recallable ... REFUSED_2=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_10=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_6=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_5=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_7=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_15=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_14=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_11=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_12=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_8=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_0=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_4=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_9=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_1=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+REFUSED_3=Failed { error: ProtocolError { code: Conflict, message: "dream_memory_busy: 该助手的记忆操作正在进行，请稍后重试", retryable: true, details: None } }
+RECALLED_AFTER_16_SUCCESSES=1. 已存在经验正控
+2. 顺序正控唯一项0结束
+3. 顺序正控唯一项1结束
+4. 顺序正控唯一项2结束
+5. 顺序正控唯一项3结束
+6. 并发原生注册工具唯一项13结束
+ok
+test large_native_details_share_projection_budget_keep_raw_and_restore_same_projection ... ok
+test memory_search_status_no_hits_not_searched_and_agent_channel_isolation ... ok
+test memory_semantic_real_provider_no_model_no_coverage_timeout_and_actual_vector_hits ... ok
+test record_and_recall_registered_tools_preserve_failures_and_agent_boundaries ... ok
+test unpin_changed_matches_during_confirmation_refuse_all_deletions ... ok
+test unpin_review_actual_scope_structured_counts_history_and_agent_isolation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.89s
+

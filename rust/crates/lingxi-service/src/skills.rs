@@ -42,6 +42,8 @@ use crate::ServiceState;
 // （src/skills/），故 "skill_export.rs" 即 src/skill_export.rs。
 #[path = "skills_completion.rs"]
 pub mod completion;
+#[path = "skills_github.rs"]
+pub mod github;
 #[path = "skill_export.rs"]
 pub mod skill_export;
 
@@ -179,6 +181,10 @@ pub struct SkillService {
     auxiliary: Mutex<Option<Arc<lingxi_adapters::models::auxiliary::AuxiliaryExecutor>>>,
     clock: Mutex<Option<Arc<dyn inject::ServiceClock>>>,
     workspace_root: Mutex<Option<PathBuf>>,
+    github_network: Mutex<Arc<lingxi_adapters::models::network::NetworkPlane>>,
+    #[cfg(test)]
+    github_test_transport:
+        Mutex<Option<(String, Arc<lingxi_adapters::models::egress::EgressGuard>)>>,
 }
 
 impl SkillService {
@@ -196,6 +202,11 @@ impl SkillService {
             auxiliary: Mutex::new(None),
             clock: Mutex::new(None),
             workspace_root: Mutex::new(None),
+            github_network: Mutex::new(
+                lingxi_adapters::models::network::NetworkPlane::direct_isolated(),
+            ),
+            #[cfg(test)]
+            github_test_transport: Mutex::new(None),
         }
     }
 
@@ -741,6 +752,19 @@ impl SkillService {
         params: &Value,
         source_key: &str,
     ) -> Result<Value, MemoryError> {
+        self.install_with_review_cancellable(source_dir, subpath, params, source_key, None)
+            .await
+    }
+
+    pub async fn install_with_review_cancellable(
+        &self,
+        source_dir: &Path,
+        subpath: &str,
+        params: &Value,
+        source_key: &str,
+        cancel: Option<&crate::cancel::CancelScope>,
+    ) -> Result<Value, MemoryError> {
+        github::check_cancelled(cancel)?;
         let config_flags = self.learn_skills_flags()?;
         if !config_flags.0 {
             return Ok(json!({
@@ -748,8 +772,8 @@ impl SkillService {
                 "code": "SKILL_INSTALL_DISABLED",
             }));
         }
-        let prepared = sl::prepare_local_skill_package(source_dir)?;
-        let content = std::fs::read_to_string(prepared.join("SKILL.md"))
+        let prepared = completion::PreparedPackage::from_path(source_dir)?;
+        let content = std::fs::read_to_string(prepared.path().join("SKILL.md"))
             .map_err(|e| MemoryError::Io(e.to_string()))?;
         let now_unix_ms = self.now_unix_ms();
         if content.len() > MAX_SKILL_SIZE_BYTES {
@@ -771,11 +795,21 @@ impl SkillService {
             // be held across an await.
             let guard = self.guard.lock().unwrap().clone();
             let review = match guard {
-                Some(guard) => guard.review(&content).await,
+                Some(guard) => {
+                    if let Some(cancel) = cancel {
+                        tokio::select! { biased;
+                            _ = cancel.cancelled() => return Err(MemoryError::InvalidRequest("skill installation cancelled".into())),
+                            result = guard.review(&content) => result,
+                        }
+                    } else {
+                        guard.review(&content).await
+                    }
+                }
                 None => SkillReviewOutcome::Unavailable(
                     "guard slot is not configured; safety review fails closed".into(),
                 ),
             };
+            github::check_cancelled(cancel)?;
             match review {
                 SkillReviewOutcome::Safe => safety_passed = true,
                 SkillReviewOutcome::SizeLimit(len) => {
@@ -791,8 +825,9 @@ impl SkillService {
                         source_key,
                         params,
                         now_unix_ms,
-                        &prepared,
+                        prepared.path(),
                         subpath,
+                        cancel,
                     ));
                 }
                 SkillReviewOutcome::Suspicious(reason) => {
@@ -802,20 +837,17 @@ impl SkillService {
                         source_key,
                         params,
                         now_unix_ms,
-                        &prepared,
+                        prepared.path(),
                         subpath,
+                        cancel,
                     ));
                 }
             }
         }
         let _ = &mut risk_override;
         let _ = &mut risk_reason;
-        let installed = sl::install_skill_package_from_directory(
-            &prepared,
-            &self.skills_dir(),
-            subpath,
-            Some(false),
-        )?;
+        github::check_cancelled(cancel)?;
+        let installed = self.install_reviewed_package(prepared.path(), subpath, cancel)?;
         let _ = (safety_passed, skip_review);
         Ok(json!({
             "ok": true,
@@ -835,6 +867,7 @@ impl SkillService {
         now_unix_ms: u64,
         prepared: &Path,
         subpath: &str,
+        cancel: Option<&crate::cancel::CancelScope>,
     ) -> Value {
         let risk_accepted = params.get("risk_accepted").and_then(Value::as_bool) == Some(true);
         let token = params
@@ -855,12 +888,7 @@ impl SkillService {
             RiskAcceptanceConsumption::Accepted => {
                 // Explicit user confirmation: install proceeds with
                 // default-enabled=false (install-skill.ts:429-447).
-                return match sl::install_skill_package_from_directory(
-                    prepared,
-                    &self.skills_dir(),
-                    subpath,
-                    Some(false),
-                ) {
+                return match self.install_reviewed_package(prepared, subpath, cancel) {
                     Ok(installed) => json!({
                         "ok": true,
                         "skillName": installed.name,
@@ -1303,7 +1331,7 @@ impl SkillService {
         store.create(name, names, "character-card-import", Some(agent_id))
     }
 
-    fn learn_skills_flags(&self) -> Result<(bool, bool, bool), MemoryError> {
+    pub(crate) fn learn_skills_flags(&self) -> Result<(bool, bool, bool), MemoryError> {
         // capabilities.learn_skills: {enabled, allow_github_fetch, safety_review}
         // read from preferences.json (global) with incumbent defaults.
         let prefs = am::read_json_file(&self.home.join("user").join("preferences.json"));

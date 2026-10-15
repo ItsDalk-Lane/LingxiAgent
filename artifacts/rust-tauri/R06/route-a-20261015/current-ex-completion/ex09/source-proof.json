@@ -1,0 +1,29 @@
+{
+  "mainFullSourceSHA256": {
+    "rust/crates/lingxi-service/src/knowledge.rs": "80ef95e1ab857f7ba1741f9aeb40459e7d62117a082834c7af281eaddbe030ae",
+    "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs": "0080124f98c56add4d29d509fcbe12d1147225ea858d4c71dc27d050f928ea7c",
+    "desktop/src/react/components/chat/KnowledgeCitationDialog.tsx": "8cbff3cc2b8995f7cf8d62b31c113b651fe76bc809163c14ba77dc51fb66bb32"
+  },
+  "exactRelevantProductionHunks": {
+    "citationSerialization": {
+      "mainSHA256": "2e9354a0b94fb617611392dc3de78fdebe595e7cfce0723995e6e1542f66b5d6",
+      "privateSHA256": "2e9354a0b94fb617611392dc3de78fdebe595e7cfce0723995e6e1542f66b5d6",
+      "equal": true
+    },
+    "readOffsets": {
+      "mainSHA256": "b8260da581666966b2e2b3c48c3a2ee2aca449bb21ceb37d5cba98496c8657db",
+      "privateSHA256": "b8260da581666966b2e2b3c48c3a2ee2aca449bb21ceb37d5cba98496c8657db",
+      "equal": true
+    },
+    "grepOffsets": {
+      "mainSHA256": "4558db08e91ad96dfd2abd83259936ef78f6c22795836be21f8d18d537381b94",
+      "privateSHA256": "4558db08e91ad96dfd2abd83259936ef78f6c22795836be21f8d18d537381b94",
+      "equal": true
+    },
+    "resolveCitationCallsValidatedSerialization": true
+  },
+  "privateKnowledgeSHA256": "a3f66ea5869d445d334da49077cd12f3408d01eb568e5c44e1f3e9b7f8bb8330",
+  "privateIndependentProbeSHA256": "b7b3432985593a845f51d50b6b2006584ae58ab2408f23da7c7d8690b40aef85",
+  "dialogSliceProbeSHA256": "7e99b6f2b1973ef4ed970e90910e1d0d8a9510eb46cdb5eda2aa5b734fd0377f",
+  "note": "Main整体增量没有覆盖回私树；额外场景仅复用完全相同的引文/read/grep生产hunks"
+}

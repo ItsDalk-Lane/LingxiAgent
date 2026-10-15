@@ -1,0 +1,44 @@
+{
+  "schema": "lingxi.candidate-net-files.v1",
+  "scope": "EX03 current GitHub install tool gap",
+  "baseCommit": "484504bb4cb28ec4378918745e510e6408bb99cb",
+  "candidateSHA256": "3dabe4a1d165189394447500ee326731e1866d9aa830f6e71d5eb60fb06a4970",
+  "patchSHA256": "fc5202c9410a95854aabd3b41e6b16a56058877b0f04f9a91f78e00a074c3ae9",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/egress.rs",
+      "baseSHA256": "209ddd869203fdf198970353a2832b1765b7b02fb01b1394cf91be4cbee67c67",
+      "candidateSHA256": "f1c9dbbc40cd0c9ffc7c7b96aa8418384c2106d1b8491b1c7b5d11badea98373"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseSHA256": "1ddd74adaaa777516f52206d2c4914175116a772bb45b09ece0e52a05f2371ee",
+      "candidateSHA256": "ca135d0bdc6ac0c3ce8801ca99292e943b5b24853747de3b4851e00e68c07a1c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memorytools.rs",
+      "baseSHA256": "e9fee9f4558de2f113151cbda32d124b157bde73a87d2df1ca59f49b284ce4b3",
+      "candidateSHA256": "ccbac95bd63b795fcba704138342522e5e05e6e7dbcfc4a81f2c291b2f67d6e8"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "baseSHA256": "d31961baa0b50a25237f75dc2c48aa807d966afe8f261067541e961d02e8e2ef",
+      "candidateSHA256": "b587eca9e42504ae311142b9c603da65d65a41c040a4c1e4c440a9e0dc779500"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills_completion.rs",
+      "baseSHA256": "923f3a3304b775cf6f995f1080196dc6cafa41a404c561033fce63919bcb2ca7",
+      "candidateSHA256": "14d0c07b1cfe87a1a28c3cf9401c2fa6384ef5fa8474c866f7beab7009c7bf3c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills_github.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "d8817efc9472435dae796d708648c0302e30cc4da1ac00a6363210d5f6d4c3dd"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills_github_tests.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "17380169a867b2c9c56d619dc2c28b8d2ec551b2f29fb495696a41b7776ac126"
+    }
+  ]
+}

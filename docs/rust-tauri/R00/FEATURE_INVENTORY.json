@@ -44525,7 +44525,7 @@
       "title": "删除知识笔记本",
       "classification": "保留",
       "user_action": "用户删除知识笔记本",
-      "visible_result": "删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+      "visible_result": "删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
       "current_entrypoints": [
         "route:knowledge:DELETE:/knowledge/notebooks/:id",
         "route-mount:knowledge"
@@ -44556,7 +44556,7 @@
         "R06-A14"
       ],
       "task_mapping_basis": "knowledge 生产 route 的实施/验收职责",
-      "acceptance_requirement": "用户删除知识笔记本 → 删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+      "acceptance_requirement": "用户删除知识笔记本 → 删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
       "platform_scope": [
         "macOS",
         "Windows",
@@ -44569,7 +44569,7 @@
         "server/composition/open-root.ts:58"
       ],
       "acceptance_assertions": [
-        "执行“删除知识笔记本”后核对：删除笔记本及其来源并返回删除结果；引用保护或失败时返回错误",
+        "执行“删除知识笔记本”后核对：删除笔记本并摘除来源引用；独占资料保留7天后按引用保护清理，共享资料保留；返回删除结果，引用保护或失败时返回错误",
         "失败、冲突或拒绝时核对返回的状态与实际副作用一致"
       ],
       "existing_acceptance_fit": {

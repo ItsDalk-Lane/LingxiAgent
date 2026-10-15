@@ -762,13 +762,32 @@ impl ModelHistory {
             if row.entry_type == "hana-session-branch-reset" {
                 continue;
             }
-            if matches!(row.entry_type.as_str(), "todo-state-v1" | "interactive-question-v1" | "interactive-answer-v1" | "interactive-card-v1") {
-                let source_run = row.run_id.as_deref().ok_or_else(|| corrupt("interactive UI entry lacks a source Run"))?;
-                let source = self.storage.load_run(&lingxi_protocol::RunId::new(source_run)).await?.ok_or_else(|| corrupt("interactive UI source Run is missing"))?;
-                let source_session = self.storage.get_session(source.session_id.as_str()).await?.ok_or_else(|| corrupt("interactive UI source session is missing"))?;
-                if source_session.owner_user_id != session_owner || source_session.agent_id != agent
+            if matches!(
+                row.entry_type.as_str(),
+                "todo-state-v1"
+                    | "interactive-question-v1"
+                    | "interactive-answer-v1"
+                    | "interactive-card-v1"
+            ) {
+                let source_run = row
+                    .run_id
+                    .as_deref()
+                    .ok_or_else(|| corrupt("interactive UI entry lacks a source Run"))?;
+                let source = self
+                    .storage
+                    .load_run(&lingxi_protocol::RunId::new(source_run))
+                    .await?
+                    .ok_or_else(|| corrupt("interactive UI source Run is missing"))?;
+                let source_session = self
+                    .storage
+                    .get_session(source.session_id.as_str())
+                    .await?
+                    .ok_or_else(|| corrupt("interactive UI source session is missing"))?;
+                if source_session.owner_user_id != session_owner
+                    || source_session.agent_id != agent
                     || !lineage_sessions.contains(source.session_id.as_str())
-                    || !branch_run_inputs.contains(source_run) {
+                    || !branch_run_inputs.contains(source_run)
+                {
                     return Err(corrupt("interactive UI source owner/agent/branch mismatch"));
                 }
                 // 这里只跳过已绑定的页面快照；模型结果仍从真实工具档案恢复。
@@ -1062,8 +1081,13 @@ impl ModelHistory {
             !(r.entry_type == ENTRY_TYPE
                 && r.message_id
                     .starts_with(&format!("model-history:{}:", ctx.run_id)))
-                && !(matches!(r.entry_type.as_str(), "todo-state-v1" | "interactive-question-v1" | "interactive-answer-v1" | "interactive-card-v1")
-                    && r.run_id.as_deref() == Some(ctx.run_id.as_str()))
+                && !(matches!(
+                    r.entry_type.as_str(),
+                    "todo-state-v1"
+                        | "interactive-question-v1"
+                        | "interactive-answer-v1"
+                        | "interactive-card-v1"
+                ) && r.run_id.as_deref() == Some(ctx.run_id.as_str()))
                 && !(r.entry_type == "message"
                     && (r.run_id.as_deref() == Some(ctx.run_id.as_str())
                         || r.run_id.as_ref().is_some_and(|id| children.contains(id))
@@ -1833,4 +1857,3 @@ mod tests {
         assert!(decode_item(&forged).is_err());
     }
 }
-

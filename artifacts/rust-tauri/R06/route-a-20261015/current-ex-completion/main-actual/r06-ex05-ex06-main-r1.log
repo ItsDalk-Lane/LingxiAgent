@@ -1,0 +1,62 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.98s
+     Running tests/r06_ar_w10_embedding_identity.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_ar_w10_embedding_identity-db8cd50ddebdf974)
+
+running 9 tests
+test c01_resolved_route_is_immutable_across_pre_send_reload ... 
+thread 'c01_resolved_route_is_immutable_across_pre_send_reload' (10068855) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test c02_same_dimension_reload_never_poisons_first_variant ... 
+thread 'c02_same_dimension_reload_never_poisons_first_variant' (10068878) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test c03_query_uses_served_identity_during_reload_and_isolates_dimensions ... 
+thread 'c03_query_uses_served_identity_during_reload_and_isolates_dimensions' (10068903) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test c04_failed_build_restarts_under_changed_identity_without_reusing_old_space ... 
+thread 'c04_failed_build_restarts_under_changed_identity_without_reusing_old_space' (10068920) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test configured_unknown_dimensions_and_parameter_compatibility_are_explicit ... 
+thread 'configured_unknown_dimensions_and_parameter_compatibility_are_explicit' (10068981) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test crash_running_job_recovers_distinct_identity_and_preserves_paid_vectors ... LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-ex06-main-env/home/lingxi-r06-ar-w10-crash-running-26862-1792044161354692000 previousInstanceId=bd11d3768f99b357760fee788c8dbd6b previousPid=26863 previousStartNonce=fd37f973a1279636 previousStartedAtUnixMs=1792044163038 handshakeMismatches=none
+2026-10-15T06:02:45.160761Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+
+thread 'crash_running_job_recovers_distinct_identity_and_preserves_paid_vectors' (10068987) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test legacy_paid_identity_is_preserved_and_requires_explicit_rebuild ... 
+thread 'legacy_paid_identity_is_preserved_and_requires_explicit_rebuild' (10069498) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test positive_production_ingestion_four_way_identity ... 
+thread 'positive_production_ingestion_four_way_identity' (10069513) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+test same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible ... 
+thread 'same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible' (10069523) panicked at crates/lingxi-service/tests/r06_ar_w10_embedding_identity.rs:342:60:
+evidence root: NotPresent
+FAILED
+
+failures:
+
+failures:
+    c01_resolved_route_is_immutable_across_pre_send_reload
+    c02_same_dimension_reload_never_poisons_first_variant
+    c03_query_uses_served_identity_during_reload_and_isolates_dimensions
+    c04_failed_build_restarts_under_changed_identity_without_reusing_old_space
+    configured_unknown_dimensions_and_parameter_compatibility_are_explicit
+    crash_running_job_recovers_distinct_identity_and_preserves_paid_vectors
+    legacy_paid_identity_is_preserved_and_requires_explicit_rebuild
+    positive_production_ingestion_four_way_identity
+    same_model_endpoint_change_is_incompatible_but_unchanged_reload_is_compatible
+
+test result: FAILED. 0 passed; 9 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.90s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_ar_w10_embedding_identity`

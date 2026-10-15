@@ -677,7 +677,14 @@ impl ContextMaterialSource for FileContextMaterialSource {
         let yuan_type = config.yuan.clone().unwrap_or_else(|| "lingxi".to_string());
 
         let user_profile = read_material(&self.user_dir.join("user.md"))?;
-        let memory_md = read_material(&agent_dir.join("memory").join("memory.md"))?;
+        let memory_dir = agent_dir.join("memory");
+        lingxi_adapters::storage::agent_memory::DreamRevisionStore::new(&memory_dir)
+            .recover_pending()
+            .map_err(|error| ContextMaterialError::Read {
+                path: memory_dir.join("dream/pending-apply.json"),
+                detail: error.to_string(),
+            })?;
+        let memory_md = read_material(&memory_dir.join("memory.md"))?;
         let tenets = read_active_tenets(&agent_dir)?;
         let appearance_summary = read_appearance_summary(&agent_dir)?;
         let roster = scan_roster(&self.agents_root, &query.agent_id, &agent_name)?;

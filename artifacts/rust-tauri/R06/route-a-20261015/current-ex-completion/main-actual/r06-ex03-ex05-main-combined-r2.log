@@ -1,0 +1,54 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.61s
+     Running tests/r06_ex05_restore_atomicity.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_ex05_restore_atomicity-43e3c05b9b098c99)
+
+running 2 tests
+test review_http_second_write_failure_keeps_bytes_and_success_undo_keeps_ledger ... LINGXI_AUTH_REJECTED request_id="req-df2e11d0133aaf63c23930bf7f842d67" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54258
+EX05_HTTP {"agentBUnchanged":true,"allCurrentBytesPreserved":true,"failure":{"code":"dream_restore_failed","coreAvailable":null,"details":{"requestId":"req-cb9b2fd6a90a5169e672094f0d7685fe"},"error":"Operation not permitted (os error 1)","reason":null},"paidAfter":0,"paidBefore":0,"readReceipt":{"preRestoreRevisionId":"2026-10-15T05-52-59-624Z-e31ba2109cdf18dc","recoveryRequired":false,"schemaVersion":1,"status":"failed_rolled_back","targetRevisionId":"2026-10-15T05-52-58-378Z-l-target","updatedAt":"2026-10-15T05:52:59.625Z"},"secondWriteStatus":500,"success":{"agentId":"agentA","ok":true,"preRestoreRevisionId":"2026-10-15T05-52-59-631Z-0b6682f47586e2fb","restored":"2026-10-15T05-52-58-378Z-l-target"},"undo":{"agentId":"agentA","ok":true,"preRestoreRevisionId":"2026-10-15T05-52-59-634Z-ede4b9d1fded285e","restored":"2026-10-15T05-52-59-631Z-0b6682f47586e2fb"}}
+ok
+test review_next_context_rejects_external_conflict_and_reads_recovered_current_only ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.90s
+
+     Running tests/r06_original_memory_skill_proofs.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_original_memory_skill_proofs-779c744ed320957d)
+
+running 19 tests
+test original_clear_compiled_retains_raw_and_all_clear_removes_facts ... LINGXI_AUTH_REJECTED request_id="req-f8c86f2e6e2f428de2d2bd4e2e8aa003" method=DELETE path=/lingxi/v1/memories/compiled status=403 reason=insufficient_scope remote=127.0.0.1:54270
+ok
+test original_compiled_three_sections_live_legacy_and_invalid_no_write ... LINGXI_AUTH_REJECTED request_id="req-9742cf53768ee656102c6eff022f80bf" method=PUT path=/lingxi/v1/memories/compiled/facts status=403 reason=insufficient_scope remote=127.0.0.1:54280
+LINGXI_AUTH_REJECTED request_id="req-3190546cd7b622ba6419991214e3329e" method=PUT path=/lingxi/v1/memories/compiled/today status=403 reason=insufficient_scope remote=127.0.0.1:54286
+LINGXI_AUTH_REJECTED request_id="req-30465c693f9bf9256821dc61d8eb7a60" method=PUT [token] status=403 reason=insufficient_scope remote=127.0.0.1:54291
+ok
+test original_context_notes_append_reopen_and_oversize_preserve_old_value ... ok
+test original_experience_read_sync_paused_and_invalid_preserve_state ... LINGXI_AUTH_REJECTED request_id="req-36319bfde8fbcf8c7e94f3939e136ebe" method=PUT [token] status=403 reason=insufficient_scope remote=127.0.0.1:54307
+ok
+test original_facts_v1_v2_import_export_and_rejections ... LINGXI_AUTH_REJECTED request_id="req-318aa6d5eb9c4cec6846c232c224ca93" method=POST path=/lingxi/v1/memories/import status=403 reason=insufficient_scope remote=127.0.0.1:54318
+ok
+test original_feedback_paused_up_down_duplicate_excerpt_and_agent_isolation ... LINGXI_AUTH_REJECTED request_id="req-02c81ad95654cfa335565e8c7bfd452e" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:54333
+ok
+test original_install_tool_risk_token_complete_package_agent_enable_and_failures ... ok
+test original_manual_skill_install_enables_only_requested_agent_and_refreshes_runtime ... ok
+test original_nonempty_revision_lists_are_agent_scoped_and_read_only ... ok
+test original_pin_and_propose_tools_publish_context_and_preserve_rejections ... ok
+test original_restore_detail_hash_refuses_concurrent_edits_and_preserves_agent_scope ... ok
+test original_restore_real_io_failure_is_500_and_keeps_all_agent_files ... ok
+test original_restore_refuses_real_compilation_tenet_maintenance_dream_and_restore_busy ... LINGXI_AUTH_REJECTED request_id="req-e75bee22415cf0b4c74322ad40126746" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54408
+LINGXI_AUTH_REJECTED request_id="req-5b463e122a973d9f236ae7cd50fd7156" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54414
+LINGXI_AUTH_REJECTED request_id="req-1e0fe5069b76dd04c62abe08be5ef9fd" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54420
+LINGXI_AUTH_REJECTED request_id="req-7815f45a8db59eaf7cac52b7a859b61f" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54447
+LINGXI_AUTH_REJECTED request_id="req-61568f4cc866559b122fd6b12ab9e494" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54456
+ok
+test original_revision_detail_reads_current_live_and_restore_keeps_agent_scope ... LINGXI_AUTH_REJECTED request_id="req-1def19642071bfcf9f3a48683632f743" method=POST [token] status=403 reason=insufficient_scope remote=127.0.0.1:54468
+ok
+test original_tenet_decision_nonpending_capacity_errors_keep_store ... ok
+test original_tenet_decisions_and_pinned_replacement_preserve_nonactive ... LINGXI_AUTH_REJECTED request_id="req-168dc24091e009a35c13a454b0f025a2" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:54489
+ok
+test original_tenet_http_states_duplicate_limits_and_pinned_visibility ... LINGXI_AUTH_REJECTED request_id="req-79644fbb5ab181738c9ce7752c4b2638" method=POST path=/lingxi/v1/agents/agentA/tenets status=403 reason=local_owner_required remote=127.0.0.1:54505
+ok
+test original_unpin_exact_and_multi_match_keep_other_agent_and_nonactive ... ok
+test original_week_days_list_edit_sync_and_rejected_dates ... LINGXI_AUTH_REJECTED request_id="req-4d0bbf57fa197e3a35d773dab380f4f7" method=PUT [token] status=403 reason=insufficient_scope remote=127.0.0.1:54516
+ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 45.53s
+

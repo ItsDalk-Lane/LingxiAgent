@@ -58,12 +58,14 @@ enum ScriptStep {
 }
 
 struct ScriptedProvider {
+    calls: std::sync::atomic::AtomicUsize,
     script: std::sync::Mutex<VecDeque<ScriptStep>>,
 }
 
 impl ScriptedProvider {
     fn new(script: Vec<ScriptStep>) -> Arc<Self> {
         Arc::new(Self {
+            calls: std::sync::atomic::AtomicUsize::new(0),
             script: std::sync::Mutex::new(script.into_iter().collect()),
         })
     }
@@ -85,6 +87,7 @@ impl TurnProviderPort for ScriptedProvider {
         _input: &'a ModelTurnInput,
         deltas: &'a dyn TurnDeltaSink,
     ) -> Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        self.calls.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
         let step = self.script.lock().unwrap().pop_front();
         let ctx_at_issue = ctx.clone();
         let call_id = call.to_string();
@@ -1334,4 +1337,228 @@ async fn collect_snapshot_run_events(
         }
     }
     events
+}
+
+/// EX11：真实SQLite故障经HTTP分页/全量/导出必须在界限内明确拒绝。
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn ex11_corrupt_head_parent_cycle_and_missing_parent_are_bounded_loud_errors() {
+    use lingxi_adapters::storage::session_tree::{append_message, AppendMessage};
+    for kind in ["dangling-head", "parent-cycle", "missing-parent"] {
+        let server = start_server(kind, ScriptedProvider::new(vec![]), false).await;
+        create_session(&server, "legacy-damaged", "损坏记录受控夹具").await;
+        for (id, parent) in [("a", None), ("b", Some("a"))] {
+            append_message(server.state.storage(), AppendMessage {session_id:"legacy-damaged",message_id:id,parent_message_id:parent,run_id:None,role:"user",content_json:r#"{"role":"user","content":[{"type":"text","text":"合成旧记录"}]}"#,entry_type:"message",model_call_id:None,now_unix_ms:1}).await.unwrap();
+        }
+        let sql = match kind {
+            "dangling-head"=>"UPDATE session_branch_heads SET head_message_id='missing' WHERE session_id='legacy-damaged'",
+            "parent-cycle"=>"UPDATE messages SET parent_message_id='b' WHERE session_id='legacy-damaged' AND message_id='a'",
+            _=>"UPDATE messages SET parent_message_id='missing' WHERE session_id='legacy-damaged' AND message_id='b'",
+        };
+        rusqlite::Connection::open(server.state.storage().db_path())
+            .unwrap()
+            .execute(sql, [])
+            .unwrap();
+        let mut receipts = Vec::new();
+        for route in [
+            "/lingxi/v1/sessions/legacy-damaged/history?limit=2",
+            "/lingxi/v1/sessions/legacy-damaged/history?all=1",
+            "/lingxi/v1/sessions/legacy-damaged/export",
+        ] {
+            let start = std::time::Instant::now();
+            let result = tokio::time::timeout(Duration::from_secs(2), server.get(route))
+                .await
+                .expect("损坏历史不可无限回溯");
+            assert_eq!(result.0, 500, "{kind} {route} 不可伪称空成功: {}", result.1);
+            receipts.push(serde_json::json!({"route":route,"status":result.0,"body":result.1,"elapsedMs":start.elapsed().as_millis()}));
+        }
+        if kind == "dangling-head" {
+            let revision=server.state.storage().query_one_text("SELECT CAST(revision AS TEXT) FROM session_branch_heads WHERE session_id='legacy-damaged'",vec![]).await.unwrap().unwrap();
+            let etag = format!("\"r{revision}-e0\"");
+            let response = server
+                .get_full(
+                    "/lingxi/v1/sessions/legacy-damaged/history",
+                    &[("If-None-Match", &etag)],
+                )
+                .await;
+            assert_eq!(
+                response.status, 500,
+                "悬空头不能通过ETag伪称304: {}",
+                response.body
+            );
+            receipts.push(serde_json::json!({"case":"matching-etag","requestEtag":etag,"status":response.status,"body":response.body}));
+        }
+        std::fs::write(
+            server.home.join("ex11-corruption-proof.json"),
+            serde_json::to_vec_pretty(
+                &serde_json::json!({"kind":kind,"corruptionSql":sql,"responses":receipts}),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        println!("EX11_CORRUPTION_PROOF {}", server.home.display());
+        server.stop.send(()).unwrap();
+        server.handle.await.unwrap().unwrap();
+    }
+}
+
+/// EX11：纯文本旧记录兼容、未知字段/原文保留，opaque不冒充可安全回放。
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn ex11_legacy_unknown_fields_raw_and_opaque_are_preserved_or_explicitly_refused() {
+    use lingxi_adapters::storage::session_tree::{append_message, AppendMessage};
+    let provider = ScriptedProvider::new(vec![ScriptStep::Final("EX11-PLAIN-COMPAT-LIVE".into())]);
+    let server = start_server("legacy-compatibility", provider.clone(), false).await;
+    let cases = [
+        (
+            "plain",
+            r#"{"role":"assistant","content":[{"type":"text","text":"纯文本旧回复"}]}"#,
+        ),
+        (
+            "extra",
+            r#"{"role":"assistant","content":[{"type":"text","text":"旧回复"}],"oldPlugin":{"unknownPayload":[1,2,3]}}"#,
+        ),
+        (
+            "opaque",
+            r#"{"role":"assistant","content":[{"type":"opaque","provider":"future-provider","data":{"unresolved":"signature"}}]}"#,
+        ),
+        ("raw", "{broken-json-原文字节"),
+        (
+            "unknown-kind",
+            r#"{"futureKind":"opaque","payload":{"unresolved":"original bytes"}}"#,
+        ),
+    ];
+    let history = lingxi_service::model_history::ModelHistory::new(server.state.storage().clone());
+    let mut receipts = Vec::new();
+    for (sid, body) in cases {
+        create_session(&server, sid, "旧记录兼容边界").await;
+        append_message(server.state.storage(),AppendMessage{session_id:sid,message_id:"legacy-user",parent_message_id:None,run_id:None,role:"user",content_json:r#"{"role":"user","content":[{"type":"text","text":"真实旧用户锚"}]}"#,entry_type:"message",model_call_id:None,now_unix_ms:1}).await.unwrap();
+        append_message(
+            server.state.storage(),
+            AppendMessage {
+                session_id: sid,
+                message_id: "legacy",
+                parent_message_id: Some("legacy-user"),
+                run_id: None,
+                role: "assistant",
+                content_json: body,
+                entry_type: if sid == "unknown-kind" {
+                    "future-opaque-v2"
+                } else {
+                    "message"
+                },
+                model_call_id: None,
+                now_unix_ms: 1,
+            },
+        )
+        .await
+        .unwrap();
+        let page = server
+            .get(&format!("/lingxi/v1/sessions/{sid}/history"))
+            .await;
+        let export = server
+            .get(&format!("/lingxi/v1/sessions/{sid}/export"))
+            .await;
+        assert_eq!(page.0, 200);
+        assert_eq!(export.0, 200);
+        let page_value: serde_json::Value = serde_json::from_str(&page.1).unwrap();
+        let exported: serde_json::Value = serde_json::from_str(&export.1).unwrap();
+        assert_eq!(page_value["items"], exported["items"]);
+        let item = page_value["items"].as_array().unwrap().last().unwrap();
+        match sid {
+            "extra" => {
+                assert_eq!(
+                    item["legacyFields"]["oldPlugin"]["unknownPayload"],
+                    serde_json::json!([1, 2, 3])
+                );
+                assert_eq!(item["run"]["state"], "unknown");
+            }
+            "raw" => {
+                assert_eq!(item["raw"], body);
+                assert!(item["reason"].is_string());
+            }
+            "unknown-kind" => {
+                assert_eq!(
+                    item["raw"],
+                    serde_json::from_str::<serde_json::Value>(body).unwrap()
+                );
+                assert!(item["reason"].is_string());
+            }
+            "opaque" => {
+                assert_eq!(item["content"][0]["data"]["unresolved"], "signature");
+                assert_eq!(item["run"]["state"], "unknown");
+            }
+            _ => assert_eq!(item["run"]["state"], "unknown"),
+        }
+        let loaded = history
+            .load(
+                &lingxi_kernel::Principal::LocalUser,
+                "agent",
+                sid,
+                "new-run",
+            )
+            .await;
+        if sid == "plain" {
+            assert!(loaded.is_ok(), "明示纯文本旧记录兼容失败: {loaded:?}");
+        } else {
+            assert!(
+                loaded.is_err(),
+                "未定型旧载荷不可猜测成普通模型材料: {loaded:?}"
+            );
+        }
+        let before_calls = provider.calls.load(std::sync::atomic::Ordering::SeqCst);
+        let (status, reply) = server
+            .post(
+                &format!("/lingxi/v1/sessions/{sid}/execute"),
+                r#"{"input":"EX11真实兼容读或明确拒绝"}"#,
+            )
+            .await;
+        if sid == "plain" {
+            assert_eq!(status, 200, "{reply}");
+            let run = serde_json::from_str::<serde_json::Value>(&reply).unwrap()["runId"]
+                .as_str()
+                .unwrap()
+                .to_string();
+            assert_eq!(server.wait_terminal(&run).await.0, "completed");
+            assert_eq!(
+                provider.calls.load(std::sync::atomic::Ordering::SeqCst),
+                before_calls + 1
+            );
+        } else {
+            if status == 200 {
+                let run = serde_json::from_str::<serde_json::Value>(&reply).unwrap()["runId"]
+                    .as_str()
+                    .unwrap()
+                    .to_string();
+                assert_eq!(server.wait_terminal(&run).await.0, "failed");
+            } else {
+                assert!(status >= 400, "{status} {reply}");
+            }
+            assert_eq!(
+                provider.calls.load(std::sync::atomic::Ordering::SeqCst),
+                before_calls,
+                "未知材料必须在模型调用前拒绝"
+            );
+        }
+        assert_eq!(
+            server
+                .state
+                .storage()
+                .query_one_text(
+                    "SELECT content_json FROM messages WHERE session_id=?1 AND message_id='legacy'",
+                    vec![sid.into()]
+                )
+                .await
+                .unwrap()
+                .unwrap(),
+            body
+        );
+        receipts.push(serde_json::json!({"case":sid,"sourceRaw":body,"history":page_value,"modelLoad":format!("{loaded:?}"),"executeStatus":status,"executeReply":reply,"providerCalls":provider.calls.load(std::sync::atomic::Ordering::SeqCst)}));
+    }
+    std::fs::write(
+        server.home.join("ex11-compatibility-proof.json"),
+        serde_json::to_vec_pretty(&receipts).unwrap(),
+    )
+    .unwrap();
+    println!("EX11_COMPATIBILITY_PROOF {}", server.home.display());
+    server.stop.send(()).unwrap();
+    server.handle.await.unwrap().unwrap();
 }

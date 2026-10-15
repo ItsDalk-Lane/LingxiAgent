@@ -1,0 +1,113 @@
+{
+  "result": "HOST_SCOPE_PASS",
+  "scope": "EX07当前macOS Rust服务：PDF/DOCX/XLSX/CSV/HTML和受控网页快照；不替代Main整合复验或全阶段封印",
+  "patch": {
+    "path": "/private/tmp/r06-ex07-delivery/frozen/ex07-source-processing.patch",
+    "sha256": "4d9c67421945446af418a342e70dc03f7b6ce69c1240542056277b5a3934018c"
+  },
+  "sourceManifestSha256": "c95f390ee5cfb1bb23d24a9c06c9ab3c92faf03bad14125aa8eaade01d4afd41",
+  "sourceFrozenUnchanged": true,
+  "newTests": {
+    "parsers": 10,
+    "httpRunSources": 9,
+    "result": "PASS",
+    "noSkips": true
+  },
+  "finalCombined": {
+    "pass": 53,
+    "fail": 0,
+    "filtered": 1,
+    "filteredName": "current_native_office_preview_and_visible_real_rust_errors",
+    "log": "/private/tmp/r06-ex07-delivery/frozen-exact-cargo-tests.log"
+  },
+  "earlierRelevantRegression": {
+    "servicePass": 62,
+    "adapterPass": 9,
+    "serviceLog": "/private/tmp/r06-ex07-delivery/original-affected-regression.log",
+    "adapterLog": "/private/tmp/r06-ex07-delivery/adapter-old-tests.log",
+    "overlapsFinalCombined": true
+  },
+  "strict": "PASS",
+  "strictLog": "/private/tmp/r06-ex07-delivery/frozen-exact-cargo-strict.log",
+  "fmt": "PASS",
+  "fmtLog": "/private/tmp/r06-ex07-delivery/frozen-fmt.log",
+  "tsReference": {
+    "source": "lib/knowledge/source-processors.ts",
+    "sha256": "c269dd2ae39be0dd6ae7f553dd75c6611c101a163acafd8f90c8220af56769bb",
+    "actualRun": "/private/tmp/r06-ex07-delivery/ts-reference-clean.log",
+    "fixture": "rust/crates/lingxi-service/tests/fixtures/r06_knowledge/ts-reference.json",
+    "localDateTimezone": "Asia/Shanghai，本机实际TS与Rust比对，不宣称跨时区金样"
+  },
+  "resourceLimits": {
+    "maxInputMiB": 50,
+    "maxOutputMiB": 16,
+    "maxTextMiB": 8,
+    "maxPages": 1000,
+    "maxGlyphItems": 200000,
+    "maxBlocks": 50000,
+    "oneParserLeasePerHost": true,
+    "wallDeadlineSeconds": 5,
+    "actualOsCpuLimitSeconds": 5,
+    "actualOsCoreDumpLimitBytes": 0,
+    "macObservedRssMiB": 512,
+    "pollIntervalMs": 5,
+    "rssUnavailableGraceMs": 50,
+    "macHardMemoryLimit": false,
+    "filesystemSandbox": false,
+    "physicalExpansionProbe": {
+      "inputBytes": 612033,
+      "decodedBytes": 629145600,
+      "result": "observed RSS exceeded; kill+reap; next parse lives",
+      "log": "/private/tmp/r06-ex07-delivery/frozen-exact-cargo-tests.log",
+      "elapsedMs": 2978
+    }
+  },
+  "realFees": {
+    "chatCalls": 17,
+    "documentEmbeddingCalls": 4,
+    "supplier": "真实本机HTTP替身；不是真付费供应商",
+    "facts": "/private/tmp/r06-ex07-delivery/frozen/real-model-ledger-facts.json"
+  },
+  "publicNetwork": {
+    "plainText": "PASS actual https://1.1.1.1/cdn-cgi/trace GET",
+    "html": "NOT_RUN on public Internet; actual controlled HTTP HTML PASS",
+    "exampleDomain": "NETWORK_REFUSED DNS 198.18; preserved failure",
+    "privateUrlAndRedirect": "PASS refusal, zero new sources"
+  },
+  "platforms": {
+    "macosService": "PASS_SCOPE",
+    "linuxRuntime": "NOT_RUN",
+    "windowsParserSupervision": "EXPLICIT_UNSUPPORTED; no Job implementation claim",
+    "electronTauriUi": "NOT_RUN"
+  },
+  "negativeEvidence": [
+    {
+      "file": "/private/tmp/r06-ex07-delivery/parser-first-tests.log",
+      "fact": "真实HTML嵌套script文本SECRET进入正文；同一visible text断言修后通过"
+    },
+    {
+      "file": "/private/tmp/r06-ex07-delivery/parser-r2-tests.log",
+      "fact": "很短子进程退出附近RSS观测瞬时失败导致合法解析拒绝；复检退出状态并最多50ms观测缺口后显式失败，原检查通过"
+    },
+    {
+      "file": "/private/tmp/r06-ex07-delivery/refresh-owner-negative.log",
+      "fact": "原refresh对foreign-studio有效本地来源返回200、displayName/origin绝对路径与快照SHA；加真实require_member_source后同负控404且零来源变动"
+    },
+    {
+      "file": "/private/tmp/r06-ex07-delivery/ts-reference-rust-first.log",
+      "fact": "真实现役TS CSV sheet名为sheet1，Rust初版Sheet1；同逐字段对照修后通过"
+    },
+    {
+      "file": "/private/tmp/r06-ex07-delivery/sparse-workbook-negative.log",
+      "fact": "20个真实稀疏XFD单元格被Office显示矩阵预算误拒；知识处理改用实际单元格预算，旧read显示预算不变，同负控通过"
+    },
+    {
+      "file": "/private/tmp/r06-ex07-delivery/rich-http-r2.log",
+      "fact": "公网example.com DNS落198.18测试网段，生产guard真实502；保留NETWORK_REFUSED，不冒充公网HTML正控。后独立1.1.1.1 GET纯文本正控通过"
+    }
+  ],
+  "mainEdited": false,
+  "gatesOrOriginalAssertionsEdited": false,
+  "committedOrPushed": false,
+  "rootSharedMerge": "keep EX08 root_guard/vector clock/add_membership/7-day deletion; merge exact hunks only"
+}

@@ -15,6 +15,9 @@
 
 use std::sync::{Arc, Mutex, OnceLock};
 
+#[path = "knowledge_lifecycle.rs"]
+mod lifecycle;
+
 use axum::extract::State;
 use axum::http::{header, StatusCode};
 use axum::response::{IntoResponse, Response};
@@ -128,6 +131,7 @@ pub enum EmbeddingInputType {
 /// 生产嵌入器：身份经 ModelGateway 解析（gateway trait，公共端口），调用走
 /// OperationService::embed（凭证/配额/台账单一链，R05 HANDOFF embedding 行）。
 pub struct GatewayKnowledgeEmbedder {
+    selection: lingxi_kernel::model_exchange::ModelRouteRequest,
     gateway: Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
     operations: Arc<crate::operations::OperationService>,
 }
@@ -137,19 +141,31 @@ impl GatewayKnowledgeEmbedder {
         gateway: Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
         operations: Arc<crate::operations::OperationService>,
     ) -> Self {
+        Self::with_selection(
+            gateway,
+            operations,
+            lingxi_kernel::model_exchange::ModelRouteRequest::for_operation(
+                lingxi_kernel::model_exchange::ModelOperation::Embedding,
+            ),
+        )
+    }
+
+    /// 记忆检索冻结助手自己的模型对；实际发送仍走同一个费用与取消链。
+    pub(crate) fn with_selection(
+        gateway: Arc<dyn lingxi_kernel::model_exchange::ModelGatewayPort>,
+        operations: Arc<crate::operations::OperationService>,
+        selection: lingxi_kernel::model_exchange::ModelRouteRequest,
+    ) -> Self {
         Self {
             gateway,
             operations,
+            selection,
         }
     }
 
     fn route(&self) -> Result<lingxi_kernel::model_exchange::ResolvedModelRoute, KnowledgeError> {
         self.gateway
-            .resolve_route(
-                &lingxi_kernel::model_exchange::ModelRouteRequest::for_operation(
-                    lingxi_kernel::model_exchange::ModelOperation::Embedding,
-                ),
-            )
+            .resolve_route(&self.selection)
             .map_err(|error| match error {
                 lingxi_kernel::model_exchange::ModelGatewayError::RouteNotConfigured { .. } => {
                     KnowledgeError::new(
@@ -211,7 +227,7 @@ impl KnowledgeEmbedder for GatewayKnowledgeEmbedder {
             };
             let result = self
                 .operations
-                .embed_owned_observed(request, runtime, Some(&on_send))
+                .embed_owned_selected_observed(request, &self.selection, runtime, Some(&on_send))
                 .await
                 .map_err(|e| KnowledgeError::new("KNOWLEDGE_MODEL_UNAVAILABLE", e.message))?;
             let served = result.served;
@@ -451,9 +467,12 @@ pub struct KnowledgeService {
     vectors: ks::KnowledgeVectorStore,
     studio_id: String,
     embedder: Mutex<Option<Arc<dyn KnowledgeEmbedder>>>,
+    parser_binary: Mutex<Option<std::path::PathBuf>>,
+    url_provider: Mutex<Option<Arc<crate::resource_url::UrlProvider>>>,
     worker: WorkerHandle,
     wake: tokio::sync::Notify,
     write_gate: Mutex<()>,
+    clock: ks::ClockMs,
 }
 
 impl std::fmt::Debug for KnowledgeService {
@@ -471,20 +490,111 @@ const MAX_IMPORT_BYTES: usize = 50 * 1024 * 1024;
 
 impl KnowledgeService {
     pub fn new(data_home: &std::path::Path, studio_id: String) -> Result<Self, KnowledgeError> {
+        Self::new_with_clock(
+            data_home,
+            studio_id,
+            Arc::new(|| lingxi_adapters::models::dispatch::unix_ms_now() as i64),
+        )
+    }
+
+    pub fn new_with_clock(
+        data_home: &std::path::Path,
+        studio_id: String,
+        clock: ks::ClockMs,
+    ) -> Result<Self, KnowledgeError> {
         let root = data_home.join("knowledge");
-        let facts = ks::KnowledgeFactStore::open(&root)?;
+        let facts = ks::KnowledgeFactStore::open_with_clock(&root, clock.clone())?;
         let index = ks::KnowledgeIndexStore::open(&root)?;
-        let vectors = ks::KnowledgeVectorStore::open(&root)?;
+        let vectors = ks::KnowledgeVectorStore::open_with_clock(&root, clock.clone())?;
         Ok(Self {
             facts,
             index,
             vectors,
             studio_id,
             embedder: Mutex::new(None),
+            parser_binary: Mutex::new(None),
+            url_provider: Mutex::new(None),
             worker: WorkerHandle::default(),
             wake: tokio::sync::Notify::new(),
             write_gate: Mutex::new(()),
+            clock,
         })
+    }
+
+    /// 宿主测试绑定同次构建的真实服务子进程；生产默认就是当前服务可执行文件。
+    #[doc(hidden)]
+    pub fn set_parser_binary(&self, path: std::path::PathBuf) -> Result<(), KnowledgeError> {
+        if !path.is_absolute() || !path.is_file() {
+            return Err(KnowledgeError::invalid_argument(
+                "parser binary must be an existing absolute file",
+            ));
+        }
+        *self.parser_binary.lock().expect("parser binary lock") = Some(path);
+        Ok(())
+    }
+    fn parser_binary(&self) -> Result<std::path::PathBuf, KnowledgeError> {
+        self.parser_binary
+            .lock()
+            .expect("parser binary lock")
+            .clone()
+            .map(Ok)
+            .unwrap_or_else(|| {
+                std::env::current_exe()
+                    .map_err(|e| KnowledgeError::storage_invalid(format!("parser executable: {e}")))
+            })
+    }
+
+    pub fn set_url_provider(&self, provider: Option<Arc<crate::resource_url::UrlProvider>>) {
+        *self.url_provider.lock().expect("URL provider lock") = provider;
+    }
+    pub async fn import_web_snapshot(
+        &self,
+        notebook_id: &str,
+        url: &str,
+        display_name: Option<&str>,
+    ) -> Result<Value, KnowledgeError> {
+        self.facts.get_notebook(&self.studio_id, notebook_id)?;
+        let provider = self
+            .url_provider
+            .lock()
+            .expect("URL provider lock")
+            .clone()
+            .ok_or_else(|| {
+                KnowledgeError::new(
+                    "KNOWLEDGE_WEB_FETCH_UNAVAILABLE",
+                    "Web snapshot provider is not configured",
+                )
+            })?;
+        let fetched = provider
+            .read(url)
+            .await
+            .map_err(|reason| KnowledgeError::new("KNOWLEDGE_WEB_FETCH_FAILED", reason))?;
+        let mime = fetched.meta["mimeType"].as_str().unwrap_or("");
+        if !matches!(mime, "text/html" | "text/plain" | "application/xhtml+xml")
+            || fetched.bytes.contains(&0)
+        {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_WEB_TYPE_UNSUPPORTED",
+                "Web snapshot must contain HTML or plain text",
+            ));
+        }
+        let final_url = fetched.meta["finalUrl"].as_str().ok_or_else(|| {
+            KnowledgeError::new(
+                "KNOWLEDGE_WEB_FETCH_FAILED",
+                "Web snapshot provider did not return final URL",
+            )
+        })?;
+        let title = display_name.map(str::to_string).unwrap_or_else(|| {
+            reqwest::Url::parse(final_url)
+                .ok()
+                .and_then(|u| u.host_str().map(str::to_string))
+                .unwrap_or_else(|| "Web snapshot".into())
+        });
+        let (source,snapshot)=self.facts.create_source_with_snapshot(&self.studio_id,"web_snapshot",&title,&json!({"kind":"web_snapshot","originalUrl":url,"finalUrl":final_url,"fetchedAt":fetched.meta["fetchedAt"]}),&fetched.bytes,if mime=="application/xhtml+xml"{"text/html"}else{mime})?;
+        self.facts.add_membership(notebook_id, &source.id)?;
+        let artifact = self.parse_source(&source.id, &snapshot)?;
+        self.enqueue_ingestion(notebook_id, &source.id, artifact["id"].as_str())?;
+        Ok(self.notebook_source_payload(notebook_id, &source, &snapshot, Some(&artifact)))
     }
 
     pub fn studio_id(&self) -> &str {
@@ -525,6 +635,7 @@ impl KnowledgeService {
             KnowledgeError::conflict(format!("another knowledge worker owns this data root: {e}"))
         })?;
         self.facts.recover_interrupted_jobs()?;
+        self.run_lifecycle_maintenance()?;
         let stop_flag = Arc::new(std::sync::atomic::AtomicBool::new(false));
         self.worker
             .stop
@@ -533,9 +644,16 @@ impl KnowledgeService {
         let service = Arc::clone(self);
         let task = tokio::spawn(async move {
             let _ownership = lock;
+            let mut lifecycle_at = std::time::Instant::now();
             loop {
                 if stop_flag.load(std::sync::atomic::Ordering::Acquire) {
                     break;
+                }
+                if lifecycle_at.elapsed() >= std::time::Duration::from_secs(3600) {
+                    if let Err(error) = service.run_lifecycle_maintenance() {
+                        tracing::error!(%error,"knowledge lifecycle maintenance failed; no success receipt");
+                    }
+                    lifecycle_at = std::time::Instant::now();
                 }
                 match service.facts.claim_next_job() {
                     Ok(Some(job)) => service.process_job(job).await,
@@ -684,40 +802,21 @@ impl KnowledgeService {
         Ok(notebook_json(&notebook))
     }
 
-    /// 删除笔记本及其独占来源（与 delete_source 同一物理清理）；仍被其他笔记本挂靠的
-    /// 共享来源只摘 membership。任一成员来源被活跃 turn/run scope 冻结则 409，
-    /// 且在任何写入之前拒绝，笔记本/membership/来源/任务保持原样。
+    /// 删除笔记本只摘引用并取消所属摄入；独占资料保留七天再按引用保护清理。
+    /// 仍保留当前活跃轮冻结时的 409，失败发生在任何修改之前。
     pub fn delete_notebook(&self, notebook_id: &str) -> Result<Value, KnowledgeError> {
         let _write = self.write_gate.try_lock().map_err(|_| {
             KnowledgeError::storage_invalid("knowledge write gate busy; no unbounded wait")
         })?;
-        self.facts.get_notebook(&self.studio_id, notebook_id)?;
-        let members = self.facts.list_active_member_source_ids(notebook_id)?;
-        for source_id in &members {
-            if self.facts.any_active_scope_freezes_source(source_id)? {
-                return Err(KnowledgeError::conflict(
-                    "notebook source is referenced by an active turn scope",
-                ));
-            }
+        let (notebook, orphaned, cancelled) = self
+            .facts
+            .delete_notebook_retained(&self.studio_id, notebook_id)?;
+        for source in &orphaned {
+            self.prune_orphan_indexes(source)?;
         }
-        let mut deleted_sources = Vec::new();
-        let mut cancelled_jobs = 0usize;
-        for source_id in &members {
-            if self
-                .facts
-                .source_has_other_active_membership(source_id, notebook_id)?
-            {
-                continue;
-            }
-            cancelled_jobs += self.purge_source_everywhere(source_id)?;
-            deleted_sources.push(source_id.clone());
-        }
-        let notebook = self.facts.delete_notebook(&self.studio_id, notebook_id)?;
-        Ok(json!({
-            "notebook": notebook_json(&notebook),
-            "deletedSourceIds": deleted_sources,
-            "cancelledJobs": cancelled_jobs,
-        }))
+        Ok(
+            json!({"notebook":notebook_json(&notebook),"deletedSourceIds":[],"orphanedSourceIds":orphaned,"cancelledJobs":cancelled,"sourceRetentionDays":7}),
+        )
     }
 
     pub fn get_notebook_config(&self, notebook_id: &str) -> Result<Value, KnowledgeError> {
@@ -970,7 +1069,7 @@ impl KnowledgeService {
                     &self.studio_id,
                     "file",
                     &file_name,
-                    &json!({"kind": "file", "fileName": file_name}),
+                    &json!({"kind": "file", "fileName": file_name, "importedFrom": file_path}),
                     &bytes,
                     &mime_type,
                 )?;
@@ -1025,7 +1124,9 @@ impl KnowledgeService {
         source_id: &str,
     ) -> Result<Value, KnowledgeError> {
         self.facts.get_notebook(&self.studio_id, notebook_id)?;
-        let source = self.facts.get_source(source_id)?;
+        let source = self
+            .facts
+            .require_member_source(&self.studio_id, notebook_id, source_id)?;
         if source.source_type != "file" {
             return Err(KnowledgeError::invalid_argument(
                 "only file sources can be refreshed",
@@ -1093,6 +1194,7 @@ impl KnowledgeService {
         let membership = self
             .facts
             .remove_source_from_notebook(notebook_id, source_id)?;
+        self.prune_orphan_indexes(source_id)?;
         Ok(json!({"membership": membership_json(&membership)}))
     }
 
@@ -1251,73 +1353,218 @@ impl KnowledgeService {
         source_id: &str,
         snapshot: &ks::SnapshotRow,
     ) -> Result<Value, KnowledgeError> {
+        self.parse_source_for_job(source_id, snapshot, None)
+    }
+    fn parse_source_for_job(
+        &self,
+        source_id: &str,
+        snapshot: &ks::SnapshotRow,
+        job: Option<&ks::JobRow>,
+    ) -> Result<Value, KnowledgeError> {
         let artifact_id = ks::new_id("kpa");
         let parser_config_hash =
             sha256_hex(format!("{KNOWLEDGE_PARSER_ID}/{KNOWLEDGE_PARSER_VERSION}/v1").as_bytes());
-        self.facts
-            .begin_parse_artifact(
-                &artifact_id,
-                &snapshot.id,
-                KNOWLEDGE_PARSER_ID,
-                KNOWLEDGE_PARSER_VERSION,
-                &parser_config_hash,
-            )
-            .map_err(|error| KnowledgeError::storage_invalid(format!("begin_artifact: {error}")))?;
-        let bytes = self.facts.read_snapshot_bytes(snapshot)?;
-        match parse_citation_grade_snapshot(&snapshot.mime_type, &bytes, &artifact_id) {
-            Ok((status, warnings, blocks)) => {
-                if matches!(status.as_str(), "ready") && blocks.is_empty() {
+        self.facts.begin_parse_artifact(
+            &artifact_id,
+            &snapshot.id,
+            KNOWLEDGE_PARSER_ID,
+            KNOWLEDGE_PARSER_VERSION,
+            &parser_config_hash,
+        )?;
+        let active = || {
+            !self
+                .worker
+                .stop
+                .get()
+                .is_some_and(|stop| stop.load(std::sync::atomic::Ordering::Acquire))
+                && job.is_none_or(|job| self.ensure_job_active(job).is_ok())
+        };
+        let result = (|| -> Result<Value, KnowledgeError> {
+            let bytes = self.facts.read_snapshot_bytes(snapshot)?;
+            // 历史快照保留原始MIME与字节；仅从原来已保存的文件名恢复旧generic处理器类型。
+            let mime = if snapshot.mime_type == "application/vnd.lingxi.processor" {
+                let source = self.facts.get_source(source_id)?;
+                resolve_supported_mime_type(
+                    source.origin_metadata["fileName"].as_str().ok_or_else(|| {
+                        KnowledgeError::invalid_argument(
+                            "legacy processor source lacks original file name",
+                        )
+                    })?,
+                    &bytes,
+                )?
+            } else {
+                snapshot.mime_type.clone()
+            };
+            let (document, processing) = if let Some(processor) = processor_identity(&mime) {
+                let config=sha256_hex(format!("{{\"processorId\":\"{processor}\",\"version\":\"1\",\"maxCells\":100000,\"maxRows\":50000}}").as_bytes());
+                let row =
                     self.facts
-                        .fail_parse_artifact(&artifact_id, "empty_document")?;
-                    return Err(KnowledgeError::new(
-                        "KNOWLEDGE_PARSE_FAILED",
-                        "Knowledge source parsing failed",
-                    ));
-                }
-                self.facts.insert_blocks(&blocks).map_err(|error| {
-                    KnowledgeError::storage_invalid(format!("insert_blocks: {error}"))
-                })?;
-                let semantic = json!({
-                    "schemaVersion": 1,
-                    "sourceId": source_id,
-                    "contentSnapshotId": snapshot.id,
-                    "contentSha256": snapshot.sha256,
-                    "parserId": KNOWLEDGE_PARSER_ID,
-                    "parserVersion": KNOWLEDGE_PARSER_VERSION,
-                    "parserConfigHash": parser_config_hash,
-                    "fidelity": "citation_grade",
-                    "status": status,
-                    "warnings": warnings,
-                    "blocks": blocks.iter().map(block_json).collect::<Vec<_>>(),
-                });
-                let relative = self
-                    .facts
-                    .write_semantic_artifact(&snapshot.id, &artifact_id, &semantic)
-                    .map_err(|error| {
-                        KnowledgeError::storage_invalid(format!("write_artifact: {error}"))
-                    })?;
-                let artifact = self
-                    .facts
-                    .complete_parse_artifact(
-                        &artifact_id,
-                        &status,
-                        &warnings.iter().map(String::as_str).collect::<Vec<_>>(),
-                        "citation_grade",
-                        Some(&relative),
+                        .begin_processing_artifact(&snapshot.id, processor, "1", &config)?;
+                let document = if row.status == "ready" {
+                    self.restore_processed_document(&row)?
+                } else {
+                    match crate::knowledge_processors::parse_document_while_active(
+                        &self.parser_binary()?,
+                        &mime,
+                        &bytes,
+                        active,
+                    ) {
+                        Ok(document) => {
+                            let text = document
+                                .blocks
+                                .iter()
+                                .map(|b| b.text.as_str())
+                                .collect::<Vec<_>>()
+                                .join("\n");
+                            let locator = serde_json::Value::Object(
+                                document
+                                    .blocks
+                                    .iter()
+                                    .enumerate()
+                                    .map(|(ordinal, b)| {
+                                        (ordinal.to_string(), b.locator["source"].clone())
+                                    })
+                                    .collect(),
+                            );
+                            if let Err(error) = self.facts.complete_processing_artifact(
+                                &row,
+                                &text,
+                                &locator,
+                                &document.warnings,
+                            ) {
+                                self.facts.fail_processing_artifact(
+                                    &row.id,
+                                    "processor_output_write_failed",
+                                )?;
+                                return Err(error);
+                            }
+                            document
+                        }
+                        Err(error) => {
+                            self.facts.fail_processing_artifact(&row.id, &error)?;
+                            return Err(KnowledgeError::new("KNOWLEDGE_PARSE_FAILED", error));
+                        }
+                    }
+                };
+                self.facts.bind_processing_artifact(&artifact_id, &row.id)?;
+                (document, Some(row.id))
+            } else if matches!(mime.as_str(), "application/pdf" | "text/html") {
+                (
+                    crate::knowledge_processors::parse_document_while_active(
+                        &self.parser_binary()?,
+                        &mime,
+                        &bytes,
+                        active,
                     )
-                    .map_err(|error| {
-                        KnowledgeError::storage_invalid(format!("complete_artifact: {error}"))
-                    })?;
-                Ok(artifact_json_public(&artifact))
-            }
-            Err(reason) => {
-                self.facts.fail_parse_artifact(&artifact_id, &reason)?;
-                Err(KnowledgeError::new(
+                    .map_err(|e| KnowledgeError::new("KNOWLEDGE_PARSE_FAILED", e))?,
+                    None,
+                )
+            } else {
+                let (status, warnings, blocks) = parse_plain_snapshot(&mime, &bytes, &artifact_id)
+                    .map_err(|e| KnowledgeError::new("KNOWLEDGE_PARSE_FAILED", e))?;
+                (
+                    crate::knowledge_processors::ParsedDocument {
+                        status,
+                        warnings,
+                        fidelity: "citation_grade".into(),
+                        blocks: blocks
+                            .into_iter()
+                            .map(|b| crate::knowledge_processors::ParsedBlock {
+                                text: b.text,
+                                locator_type: b.locator_type,
+                                locator: b.locator,
+                            })
+                            .collect(),
+                    },
+                    None,
+                )
+            };
+            if document.status == "ready" && document.blocks.is_empty() {
+                return Err(KnowledgeError::new(
                     "KNOWLEDGE_PARSE_FAILED",
-                    "Knowledge source parsing failed",
-                ))
+                    "empty_document",
+                ));
             }
+            let blocks = document
+                .blocks
+                .into_iter()
+                .enumerate()
+                .map(|(ordinal, b)| ks::BlockRow {
+                    id: format!(
+                        "kb_{}",
+                        &sha256_hex(format!("{artifact_id}:{ordinal}").as_bytes())[..24]
+                    ),
+                    parse_artifact_id: artifact_id.clone(),
+                    ordinal,
+                    text_sha256: sha256_hex(b.text.as_bytes()),
+                    text: b.text,
+                    locator_type: b.locator_type,
+                    locator: b.locator,
+                })
+                .collect::<Vec<_>>();
+            self.facts.insert_blocks(&blocks)?;
+            let semantic = json!({"schemaVersion":1,"sourceId":source_id,"contentSnapshotId":snapshot.id,"contentSha256":snapshot.sha256,"parserId":KNOWLEDGE_PARSER_ID,"parserVersion":KNOWLEDGE_PARSER_VERSION,"parserConfigHash":parser_config_hash,"processingArtifactId":processing,"fidelity":document.fidelity,"status":document.status,"warnings":document.warnings,"blocks":blocks.iter().map(block_json).collect::<Vec<_>>()});
+            let relative =
+                self.facts
+                    .write_semantic_artifact(&snapshot.id, &artifact_id, &semantic)?;
+            let artifact = self.facts.complete_parse_artifact(
+                &artifact_id,
+                &document.status,
+                &document
+                    .warnings
+                    .iter()
+                    .map(String::as_str)
+                    .collect::<Vec<_>>(),
+                &document.fidelity,
+                Some(&relative),
+            )?;
+            Ok(artifact_json_public(&artifact))
+        })();
+        if let Err(error) = &result {
+            self.facts
+                .fail_parse_artifact(&artifact_id, &error.to_string())?;
         }
+        result
+    }
+    fn restore_processed_document(
+        &self,
+        row: &ks::ProcessingArtifactRow,
+    ) -> Result<crate::knowledge_processors::ParsedDocument, KnowledgeError> {
+        let text = self.facts.read_processing_output(row)?;
+        let lines = if text.is_empty() {
+            Vec::new()
+        } else {
+            text.split('\n').collect::<Vec<_>>()
+        };
+        let locators = row.locator_map.as_object().ok_or_else(|| {
+            KnowledgeError::storage_invalid("processor locator map must be an object")
+        })?;
+        if lines.len() != locators.len() {
+            return Err(KnowledgeError::storage_invalid(
+                "processor text and locator map are misaligned",
+            ));
+        }
+        let mut cursor = 0usize;
+        let mut blocks = Vec::new();
+        for (ordinal, line) in lines.into_iter().enumerate() {
+            let entry = locators.get(&ordinal.to_string()).ok_or_else(|| {
+                KnowledgeError::storage_invalid("processor locator map is incomplete")
+            })?;
+            if !entry.is_object() || line.trim().is_empty() {
+                return Err(KnowledgeError::storage_invalid(
+                    "processor locator identity invalid",
+                ));
+            }
+            let length = line.encode_utf16().count();
+            blocks.push(crate::knowledge_processors::ParsedBlock{text:line.into(),locator_type:"text".into(),locator:json!({"lineStart":ordinal+1,"lineEnd":ordinal+1,"charStart":cursor,"charEnd":cursor+length,"source":entry})});
+            cursor += length + 1;
+        }
+        Ok(crate::knowledge_processors::ParsedDocument {
+            status: "ready".into(),
+            warnings: row.warnings.clone(),
+            fidelity: "structural".into(),
+            blocks,
+        })
     }
 
     pub fn list_artifact_blocks(&self, artifact_id: &str) -> Result<Value, KnowledgeError> {
@@ -1420,7 +1667,7 @@ impl KnowledgeService {
             .facts
             .get_parse_artifact(&resolved.citation.parse_artifact_id)?;
         Ok(json!({
-            "citation": citation_json(&resolved.citation),
+            "citation": citation_json(&resolved.citation, &resolved.block)?,
             "block": block_json(&resolved.block),
             "parseArtifact": artifact_json_public(&artifact),
             "snapshot": snapshot_json(&resolved.snapshot),
@@ -2212,6 +2459,9 @@ impl KnowledgeService {
                 "blockOrdinal": block.ordinal,
                 "startOffset": span_start,
                 "endOffset": span_end,
+                "offsetUnit": "unicode_scalar",
+                "utf16StartOffset": scalar_offset_to_utf16(&block.text, span_start),
+                "utf16EndOffset": scalar_offset_to_utf16(&block.text, span_end),
                 "headingPath": locator_heading_path(&block.locator),
                 "pageNumber": block.locator.get("page").and_then(|value| value.as_u64()),
                 "text": text,
@@ -2348,6 +2598,9 @@ impl KnowledgeService {
                         "blockOrdinal": block.ordinal,
                         "startOffset": start,
                         "endOffset": end,
+                        "offsetUnit": "unicode_scalar",
+                        "utf16StartOffset": scalar_offset_to_utf16(&block.text, start),
+                        "utf16EndOffset": scalar_offset_to_utf16(&block.text, end),
                         "lineNumber": line_number,
                         "headingPath": heading_path,
                         "snippet": snippet,
@@ -2671,13 +2924,24 @@ impl KnowledgeService {
             Some(id) => id.clone(),
             None => {
                 let snapshot = self.facts.latest_snapshot_for_source(&job.source_id)?;
-                let artifact = self.parse_source(&job.source_id, &snapshot)?;
+                let artifact = self.parse_source_for_job(&job.source_id, &snapshot, Some(job))?;
                 artifact["id"]
                     .as_str()
                     .ok_or_else(|| KnowledgeError::index_invalid("parse produced no artifact id"))?
                     .to_string()
             }
         };
+        let artifact = self.facts.get_parse_artifact(&artifact_id)?;
+        if artifact.status != "ready" {
+            return Err(KnowledgeError::new(
+                "KNOWLEDGE_PARSE_NOT_READY",
+                if artifact.status == "needs_ocr" {
+                    "Knowledge source requires OCR before retrieval"
+                } else {
+                    "Knowledge source parsing is not ready"
+                },
+            ));
+        }
         self.facts.set_job_phase(&job.id, "chunk")?;
         let blocks = self.facts.list_artifact_blocks(&artifact_id)?;
         let blocks = blocks.iter().map(chunker_block_of).collect::<Vec<_>>();
@@ -3312,9 +3576,8 @@ impl KnowledgeService {
 
 // ── 引用级解析器（source-adapters.ts 镜像）──────────────────────────────────
 
-/// text/plain 与 text/markdown 全保真；html 以标签扫描提取块选择器（jsdom 缺席，
-/// D 项）；pdf/处理器格式显式失败（不静默降级为无定位文本）。
-pub fn parse_citation_grade_snapshot(
+/// 纯文本与Markdown沿原分块合同；HTML、PDF和Office只走宿主受控成熟解析入口。
+fn parse_plain_snapshot(
     mime_type: &str,
     bytes: &[u8],
     artifact_id: &str,
@@ -3332,14 +3595,6 @@ pub fn parse_citation_grade_snapshot(
             let blocks = parse_line_blocks(&text, "markdown", true, artifact_id);
             Ok(("ready".into(), Vec::new(), blocks))
         }
-        "text/html" => {
-            let blocks = parse_html_blocks(&text, artifact_id);
-            Ok(("ready".into(), Vec::new(), blocks))
-        }
-        other if other.starts_with("application/vnd.lingxi.processor") => {
-            Err("processor_unavailable".into())
-        }
-        "application/pdf" => Err("processor_unavailable".into()),
         _ => Err("unsupported_citation_format".into()),
     }
 }
@@ -3430,104 +3685,6 @@ fn heading_level(line: &str) -> Option<(usize, String)> {
     None
 }
 
-/// HTML 块选择器扫描（h1-h6/p/li/blockquote/pre/td/th；无嵌套 DOM，locator 带
-/// headingPath + 序号——结构性 locator 简化，D 项申报）。
-fn parse_html_blocks(text: &str, artifact_id: &str) -> Vec<ks::BlockRow> {
-    let mut blocks: Vec<ks::BlockRow> = Vec::new();
-    let mut heading_path: Vec<String> = Vec::new();
-    let bytes = text.as_bytes();
-    let mut position = 0_usize;
-    let tag_names = [
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "p",
-        "li",
-        "blockquote",
-        "pre",
-        "td",
-        "th",
-    ];
-    while position < bytes.len() {
-        let Some(open_start) = find_sub(&bytes[position..], b"<") else {
-            break;
-        };
-        let abs = position + open_start;
-        let Some(open_end_rel) = find_sub(&bytes[abs..], b">") else {
-            break;
-        };
-        let open_end = abs + open_end_rel;
-        let tag = String::from_utf8_lossy(&bytes[abs + 1..open_end]).to_lowercase();
-        let name = tag
-            .split(|ch: char| ch.is_whitespace() || ch == '>')
-            .next()
-            .unwrap_or("")
-            .to_string();
-        let is_block = tag_names.contains(&name.as_str());
-        if !is_block || tag.starts_with('/') {
-            position = open_end;
-            continue;
-        }
-        let closing = format!("</{name}");
-        let Some(close_rel) = find_sub(&bytes[open_end..], closing.as_bytes()) else {
-            break;
-        };
-        let close_abs = open_end + close_rel;
-        let inner = String::from_utf8_lossy(&bytes[open_end..close_abs]).to_string();
-        let plain = strip_tags(&inner);
-        let condensed = plain.split_whitespace().collect::<Vec<_>>().join(" ");
-        position = close_abs;
-        if condensed.is_empty() {
-            continue;
-        }
-        if name.len() == 2 && name.starts_with('h') {
-            if let Ok(level) = name[1..].parse::<usize>() {
-                heading_path.truncate(level - 1);
-                if heading_path.len() < level {
-                    heading_path.resize(level, String::new());
-                }
-                heading_path[level - 1] = condensed.clone();
-            }
-        }
-        blocks.push(ks::BlockRow {
-            id: format!(
-                "kb_{}",
-                &sha256_hex(format!("{artifact_id}:{}", blocks.len()).as_bytes())[..24]
-            ),
-            parse_artifact_id: artifact_id.to_string(),
-            ordinal: blocks.len(),
-            text: condensed.clone(),
-            text_sha256: sha256_hex(condensed.as_bytes()),
-            locator_type: "html".into(),
-            locator: json!({"headingPath": heading_path.clone(), "tag": name}),
-        });
-    }
-    blocks
-}
-
-fn strip_tags(input: &str) -> String {
-    let mut out = String::new();
-    let mut inside = false;
-    for ch in input.chars() {
-        match ch {
-            '<' => inside = true,
-            '>' => inside = false,
-            ch if !inside => out.push(ch),
-            _ => {}
-        }
-    }
-    out
-}
-
-fn find_sub(haystack: &[u8], needle: &[u8]) -> Option<usize> {
-    haystack
-        .windows(needle.len())
-        .position(|window| window == needle)
-}
-
 /// 文件导入安全（file-import-security.ts + path-security.ts + manager.ts
 /// resolveSupportedMimeType 的 Rust 承担）。
 pub fn read_secure_import_file(
@@ -3581,15 +3738,85 @@ pub fn read_secure_import_file(
             "Knowledge import exceeds the byte limit",
         ));
     }
-    let bytes = std::fs::read(&resolved).map_err(|_| {
-        KnowledgeError::new("KNOWLEDGE_IMPORT_NOT_FOUND", "import file was not found")
+    let bytes = read_import_bytes(&resolved).map_err(|_| {
+        KnowledgeError::new(
+            "KNOWLEDGE_IMPORT_CHANGED",
+            "Knowledge import file changed or could not be read safely",
+        )
     })?;
+    if is_sensitive_path(&resolved, Some(lingxi_home)) {
+        return Err(KnowledgeError::new(
+            "KNOWLEDGE_IMPORT_PATH_BLOCKED",
+            "Knowledge import path is blocked",
+        ));
+    }
     let file_name = resolved
         .file_name()
         .map(|name| name.to_string_lossy().to_string())
         .unwrap_or_default();
     let mime_type = resolve_supported_mime_type(&file_name, &bytes)?;
     Ok((bytes, mime_type, file_name))
+}
+
+fn read_import_bytes(path: &std::path::Path) -> Result<Vec<u8>, String> {
+    use std::io::Read;
+    let parent = path.parent().ok_or("import parent missing")?;
+    let name = path.file_name().ok_or("import name missing")?;
+    if path.canonicalize().ok().as_deref() != Some(path) {
+        return Err("import path redirected".into());
+    }
+    let dir = crate::filetools::fsio::DirFd::open(parent).map_err(|e| e.to_string())?;
+    let mut file = dir
+        .open_attachment_nofollow(name)
+        .ok_or("import missing")?
+        .map_err(|e| e.to_string())?;
+    let before = crate::filetools::fsio::FileIdentity::of(&file).map_err(|e| e.to_string())?;
+    let metadata = file.metadata().map_err(|e| e.to_string())?;
+    if !metadata.is_file() || before.size > MAX_IMPORT_BYTES as u64 {
+        return Err("import must be bounded regular file".into());
+    }
+    let mut bytes = Vec::new();
+    (&mut file)
+        .take(MAX_IMPORT_BYTES as u64 + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| e.to_string())?;
+    if bytes.len() > MAX_IMPORT_BYTES
+        || crate::filetools::fsio::FileIdentity::of(&file).map_err(|e| e.to_string())? != before
+    {
+        return Err("import content changed".into());
+    }
+    let named = dir
+        .open_attachment_nofollow(name)
+        .ok_or("import entry missing")?
+        .map_err(|e| e.to_string())?;
+    if crate::filetools::fsio::FileIdentity::of(&named).map_err(|e| e.to_string())? != before
+        || !dir.same_directory(parent).map_err(|e| e.to_string())?
+        || path.canonicalize().ok().as_deref() != Some(path)
+    {
+        return Err("import entry identity changed".into());
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        let after = file.metadata().map_err(|e| e.to_string())?;
+        if metadata.ctime() != after.ctime() || metadata.ctime_nsec() != after.ctime_nsec() {
+            return Err("import version changed".into());
+        }
+    }
+    Ok(bytes)
+}
+
+fn processor_identity(mime: &str) -> Option<&'static str> {
+    match mime {
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => {
+            Some("lingxi-office-docx")
+        }
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => {
+            Some("lingxi-office-xlsx")
+        }
+        "text/csv" => Some("lingxi-office-csv"),
+        _ => None,
+    }
 }
 
 fn resolve_supported_mime_type(file_name: &str, bytes: &[u8]) -> Result<String, KnowledgeError> {
@@ -3602,7 +3829,9 @@ fn resolve_supported_mime_type(file_name: &str, bytes: &[u8]) -> Result<String, 
         "md" | "markdown" => Some("text/markdown"),
         "html" | "htm" => Some("text/html"),
         "pdf" => Some("application/pdf"),
-        "docx" | "xlsx" | "csv" => Some("application/vnd.lingxi.processor"),
+        "docx" => Some("application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        "xlsx" => Some("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+        "csv" => Some("text/csv"),
         "ppt" | "pptx" | "pptm" | "epub" | "doc" | "xls" => {
             return Err(KnowledgeError::new(
                 "KNOWLEDGE_IMPORT_PROCESSOR_UNAVAILABLE",
@@ -3766,17 +3995,41 @@ fn artifact_json_public(artifact: &ks::ParseArtifactRow) -> Value {
     })
 }
 
-fn citation_json(citation: &ks::CitationRow) -> Value {
-    json!({
+// 内部字符位置与旧引用事实保持原值；公开位置适配现役 JavaScript 界面的 UTF-16 slice。
+fn scalar_offset_to_utf16(text: &str, offset: usize) -> usize {
+    text.chars().take(offset).map(char::len_utf16).sum()
+}
+
+fn citation_json(
+    citation: &ks::CitationRow,
+    block: &ks::BlockRow,
+) -> Result<Value, KnowledgeError> {
+    if citation.start_offset > citation.end_offset
+        || citation.end_offset > block.text.chars().count()
+        || block
+            .text
+            .chars()
+            .skip(citation.start_offset)
+            .take(citation.end_offset - citation.start_offset)
+            .collect::<String>()
+            != citation.canonical_text
+        || sha256_hex(citation.canonical_text.as_bytes()) != citation.canonical_text_sha256
+    {
+        return Err(KnowledgeError::index_invalid(
+            "citation does not match its preserved original block",
+        ));
+    }
+    Ok(json!({
         "id": citation.id,
         "parseArtifactId": citation.parse_artifact_id,
         "blockId": citation.block_id,
-        "startOffset": citation.start_offset,
-        "endOffset": citation.end_offset,
+        "startOffset": scalar_offset_to_utf16(&block.text, citation.start_offset),
+        "endOffset": scalar_offset_to_utf16(&block.text, citation.end_offset),
+        "offsetUnit": "utf16",
         "canonicalText": citation.canonical_text,
         "canonicalTextSha256": citation.canonical_text_sha256,
         "createdAt": citation.created_at,
-    })
+    }))
 }
 
 fn block_json(block: &ks::BlockRow) -> Value {
@@ -4047,10 +4300,16 @@ pub async fn notebook_sources_import_route(
             body["text"].as_str().unwrap_or_default(),
             body["displayName"].as_str(),
         ),
-        "web_snapshot" => Err(KnowledgeError::new(
-            "KNOWLEDGE_WEB_TYPE_UNSUPPORTED",
-            "web snapshot import requires the network fetcher surface (R07 外围面)",
-        )),
+        "web_snapshot" => {
+            state
+                .knowledge()
+                .import_web_snapshot(
+                    &notebook_id,
+                    body["url"].as_str().unwrap_or_default(),
+                    body["displayName"].as_str(),
+                )
+                .await
+        }
         _ => Err(KnowledgeError::invalid_argument(
             "Knowledge source import body is invalid",
         )),

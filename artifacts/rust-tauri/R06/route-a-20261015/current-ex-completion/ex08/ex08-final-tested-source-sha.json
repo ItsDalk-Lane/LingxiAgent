@@ -1,0 +1,38 @@
+{
+  "baseCommit": "634c6dc715b1061c77c4e3fcf7acc87b30d55f11",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge.rs",
+      "sha256": "f8e805722756fcd4bf391bdbe6dbc9cbc43c018f604c2fc563c28e5d8b9be20c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/knowledge_lifecycle.rs",
+      "sha256": "219979412899ad31f2bb5d4b754b5d5aeb19c4f73598955b9517e10d51e61c4b"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge.rs",
+      "sha256": "386fc58d2e385f7ef9b745e0d653413453e6d52ca1842b29a71140b8f754fc1e"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/knowledge_lifecycle.rs",
+      "sha256": "ffc3c850b0fb21aa333aa2320fc323eb9a7ce4f3e050b5e0143bb9ba2b0cc461"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
+      "sha256": "88341e3444398b10b6729b4d41b5a76415551c12725c4c98a0f218efc83c7fb0"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/ex08_independent_review.rs",
+      "sha256": "016572546cecf44ab10339f28d7b05ed037f3d2f52cd99572cdc8513ba83ab2f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/ex08_processing_retention_review.rs",
+      "sha256": "d64a56e14f9dedeb32311e730eb67599245b3111d16ba901322006ea14bcffc1"
+    }
+  ],
+  "originalRootSnapshot": "source-snapshot-frozen.json",
+  "EX07Prerequisites": "ex07-compatibility-prerequisites.json",
+  "fixturePatchSHA256": "7590d57151ab112f7f4e2e9046a48fd69b291bf1f68cf78cdf9db688b2458fd0",
+  "independentProbePatchSHA256": "dbfd0b33840e550bbc3f13de92e621aac157b7bd4fbfabf4e2d9cffee0d4fb66",
+  "productionChangedByReviewer": false
+}

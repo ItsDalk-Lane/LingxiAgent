@@ -1443,7 +1443,9 @@ impl TurnProviderPort for ScriptedUsageProvider {
                 .prior
                 .iter()
                 .map(|item| match item {
-                    ExchangeItem::UserTurn { .. } | ExchangeItem::UserMediaTurn { .. } => "historical_user",
+                    ExchangeItem::UserTurn { .. } | ExchangeItem::UserMediaTurn { .. } => {
+                        "historical_user"
+                    }
                     ExchangeItem::CurrentSubmission => "current_submission",
                     ExchangeItem::AssistantTurn { .. } => "assistant",
                     ExchangeItem::ToolResult { .. } => "tool_result",

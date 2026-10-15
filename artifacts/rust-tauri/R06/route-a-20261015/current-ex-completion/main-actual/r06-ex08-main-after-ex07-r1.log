@@ -1,0 +1,16 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.69s
+     Running unittests src/lib.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/lingxi_service-ef374c6882d7face)
+
+running 8 tests
+test knowledge::lifecycle::tests::legacy_usage_backfill_preserves_exact_vector_bytes_and_future_schema_is_not_written ... ok
+test knowledge::lifecycle::tests::failed_job_with_unsettled_paid_request_keeps_checkpoint_and_source_past_retention ... ok
+test knowledge::lifecycle::tests::actual_gc_refuses_replaced_artifact_directory_before_removing_original_or_outside_file ... ok
+test knowledge::lifecycle::tests::orphan_reattach_clears_timer_and_scope_jobs_citations_protect_actual_bytes ... ok
+test knowledge::lifecycle::tests::shared_null_means_forever_maximum_days_wins_and_foreign_maintenance_is_inert ... ok
+test knowledge::lifecycle::tests::notebook_delete_retains_seven_days_then_purges_only_unreferenced_owned_material ... ok
+test knowledge::lifecycle::tests::fixed_clock_old_vectors_expire_current_and_original_bytes_survive_restart ... ok
+test knowledge::lifecycle::tests::actual_query_refreshes_usage_persistently_and_old_scan_cannot_delete_it ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 417 filtered out; finished in 0.15s
+

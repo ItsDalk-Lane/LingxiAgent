@@ -630,7 +630,7 @@ mod receipt_tests {
             move || {
                 start.wait();
                 for version in 1..=128usize {
-                    let value=json!({"sessionId":"sess_local_alpha","operationId":format!("receipt-{version}"),"process":tools.process,"status":"completed","version":version,"payload":format!("{version}:完整回执").repeat(256)});
+                    let value = json!({"sessionId":"sess_local_alpha","operationId":format!("receipt-{version}"),"process":tools.process,"status":"completed","version":version,"payload":format!("{version}:完整回执").repeat(256)});
                     tools.save("sess_local_alpha", &value).unwrap();
                 }
             }
@@ -652,7 +652,10 @@ mod receipt_tests {
         });
         writer.join().unwrap();
         reader.join().unwrap();
-        assert_eq!(tools.receipt("sess_local_alpha").unwrap().unwrap()["version"], 128);
+        assert_eq!(
+            tools.receipt("sess_local_alpha").unwrap().unwrap()["version"],
+            128
+        );
         state.storage().close().await.unwrap();
     }
 }

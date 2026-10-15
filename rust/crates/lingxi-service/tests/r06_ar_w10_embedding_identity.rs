@@ -1082,6 +1082,23 @@ async fn legacy_paid_identity_is_preserved_and_requires_explicit_rebuild() {
         rusqlite::params![legacy_variant, legacy.key, variant.variant_id],
     )
     .unwrap();
+    // 造旧身份时同步附加事实引用，保留标签、计时和向量原字节。
+    tx.execute(
+        "UPDATE knowledge_derived_algorithms SET variant_id=?1 WHERE variant_id=?2",
+        rusqlite::params![legacy_variant, variant.variant_id],
+    )
+    .unwrap();
+    let has_usage: bool = tx.query_row(
+        "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='knowledge_vector_usage')",
+        [], |row| row.get(0),
+    ).unwrap();
+    if has_usage {
+        tx.execute(
+            "UPDATE knowledge_vector_usage SET variant_id=?1 WHERE variant_id=?2",
+            rusqlite::params![legacy_variant, variant.variant_id],
+        )
+        .unwrap();
+    }
     tx.commit().unwrap();
     drop(conn);
     let before = vector_snapshot(&home);

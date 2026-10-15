@@ -2562,6 +2562,30 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "supplementary_reopen": {
+      "completedInitialGaps": 78,
+      "remainingInitialGaps": 0,
+      "reopenedInitialGap": "R00-T02-LA-7432B00DEC94",
+      "earlierReadyLeafAlsoReopened": "R00-T02-LA-041F938C351F",
+      "reason": "更强独立真实检查发现助手嵌入选择错误和恢复中途失败不原子，已重新打开，不沿用旧READY",
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "status": "BOTH_REOPENED_LEAVES_REGISTERED_CURRENT_WINDOW_PASS",
+      "bindingWindow": "artifacts/rust-tauri/R06/route-a-20261015/restore-semantic-binding-window-summary.json",
+      "registeredBindingsPassed": 18
     }
+  },
+  "ex12_additional_reopen": {
+    "leaf": "R00-T02-LA-8B48FD65CAFB",
+    "status": "GAP_ACTUAL_SESSION_SWITCH_MISSING",
+    "initial78Completed": 78,
+    "initial78Remaining": 0,
+    "earlierReadyAdditionalGap": 1,
+    "reason": "现役完整切助手会创建并聚焦会话；Rust旧READY仅改配置且返回空会话/目录，原证明未覆盖。独立执行者修复并由另一代理复核。",
+    "stageAccepted": false,
+    "R07Ready": false,
+    "F14": "OPEN"
   }
 }

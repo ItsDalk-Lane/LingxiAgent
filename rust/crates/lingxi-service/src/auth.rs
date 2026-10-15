@@ -528,7 +528,12 @@ pub enum RoutePolicy {
 /// R02, local_only is the strictest available default).
 pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     let m = method.to_ascii_uppercase();
-    if m == "POST" && path.strip_prefix("/lingxi/v1/task/").and_then(|p|p.strip_suffix("/abort")).is_some_and(|id|!id.is_empty()&&!id.contains('/')) {
+    if m == "POST"
+        && path
+            .strip_prefix("/lingxi/v1/task/")
+            .and_then(|p| p.strip_suffix("/abort"))
+            .is_some_and(|id| !id.is_empty() && !id.contains('/'))
+    {
         return RoutePolicy::Scope("chat");
     }
     // 与 Axum 的实际路由保持精确匹配；不能把未注册的 `/health/` 当作公开路由。
@@ -995,7 +1000,11 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         }
     }
     if p == "/lingxi/v1/preferences/session-permission-default" {
-        return if m=="GET" || m=="HEAD" { RoutePolicy::Scope("settings.read") } else { RoutePolicy::LocalOnly };
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("settings.read")
+        } else {
+            RoutePolicy::LocalOnly
+        };
     }
     // R06 A 块读回叶：运行时状态键 / 实验读写 / 观察记录（现役
     // experiments.ts：读无显式 scope 门（本地读面）、PATCH settings.write；
@@ -1017,7 +1026,11 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         };
     }
     if p == "/lingxi/v1/preferences/computer-use/approvals" {
-        return if m == "POST" || m == "DELETE" {RoutePolicy::Scope("settings.write")} else {RoutePolicy::LocalOnly};
+        return if m == "POST" || m == "DELETE" {
+            RoutePolicy::Scope("settings.write")
+        } else {
+            RoutePolicy::LocalOnly
+        };
     }
     if p == "/lingxi/v1/preferences/computer-use/request-permissions" {
         return if m == "POST" {

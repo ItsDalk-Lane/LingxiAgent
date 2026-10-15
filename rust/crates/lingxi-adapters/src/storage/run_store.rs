@@ -1161,12 +1161,17 @@ fn stage_event(
                 detail: e.to_string(),
             })?;
         if let Some(result) = value.get("result") {
-            super::session_files::sync_message_refs(
+            super::session_files::sync_native_tool_result_refs(
                 conn,
                 session_id,
                 event.event_id.as_str(),
                 &result.to_string(),
                 now_ms as u64,
+                run_id,
+                value
+                    .get("toolCallId")
+                    .and_then(serde_json::Value::as_str)
+                    .unwrap_or(""),
             )?;
         }
     }

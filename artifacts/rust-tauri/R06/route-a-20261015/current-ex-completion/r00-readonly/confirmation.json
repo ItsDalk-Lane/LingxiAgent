@@ -1,0 +1,21 @@
+{
+  "result": "NEEDS_FIX_SCANNER_AND_NEW_CHANNEL_OWNERSHIP",
+  "mainModified": false,
+  "originalScannerExit": 1,
+  "originalScannerLog": "/private/tmp/r06-r00-inventory-review/current-original-check.log",
+  "staticASTOnly": true,
+  "astChannelPairDifferences": {
+    "handlerOnly": [],
+    "bridgeOnly": []
+  },
+  "newChannelsWithoutExistingDomain": [
+    "get-server-connection-info",
+    "quick-chat-open-session-ack"
+  ],
+  "npmOrR06DirectlyInvoked": false,
+  "existingR00AcceptanceIDs": [
+    "R00-A03",
+    "R00-A04"
+  ],
+  "fullR00CheckPassed": false
+}

@@ -1,0 +1,344 @@
+{
+  "status": "IMPLEMENTED_REGISTERED_CURRENT_WINDOW_PENDING",
+  "addedLinks": [
+    {
+      "leaf": "R00-T02-LA-00C88B996AA0",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-00C88B996AA0",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-00C88B996AA0",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-75753997F5C6",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-75753997F5C6",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-75753997F5C6",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-4E8EDC4E25FC",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-4E8EDC4E25FC",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-4E8EDC4E25FC",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-9FF4E1805297",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-9FF4E1805297",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-9FF4E1805297",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-5FA75FC2FE4C",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-5FA75FC2FE4C",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-5FA75FC2FE4C",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-730E5984212D",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-730E5984212D",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-730E5984212D",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-563F04AF5AD7",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-563F04AF5AD7",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-563F04AF5AD7",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-5FEFBFCEBC04",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-5FEFBFCEBC04",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-5FEFBFCEBC04",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-2EB39AE34CB5",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-2EB39AE34CB5",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-2EB39AE34CB5",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-C4F6E3BFF341",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-C4F6E3BFF341",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-C4F6E3BFF341",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-F9277C29D570",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-F9277C29D570",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-F9277C29D570",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-BC244641BC1E",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-BC244641BC1E",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-BC244641BC1E",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-071B6E2C286A",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-071B6E2C286A",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-071B6E2C286A",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-0CDC88FC0999",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-0CDC88FC0999",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-0CDC88FC0999",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-EB9E56CF6007",
+      "group": 0,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-EB9E56CF6007",
+      "group": 1,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-EB9E56CF6007",
+      "group": 2,
+      "test": "r06_resource_mount_completion::current_cli_registered_mount_http_success_permissions_events_and_disk"
+    },
+    {
+      "leaf": "R00-T02-LA-78B18101F37D",
+      "group": 0,
+      "test": "r06_resource_mount_tool_completion::actual_resource_head_is_metadata_only_large_range_and_json_budget"
+    },
+    {
+      "leaf": "R00-T02-LA-78B18101F37D",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::actual_resource_head_is_metadata_only_large_range_and_json_budget"
+    },
+    {
+      "leaf": "R00-T02-LA-865A9825A3EB",
+      "group": 0,
+      "test": "r06_resource_mount_tool_completion::actual_resource_head_is_metadata_only_large_range_and_json_budget"
+    },
+    {
+      "leaf": "R00-T02-LA-865A9825A3EB",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::actual_resource_head_is_metadata_only_large_range_and_json_budget"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 0,
+      "test": "r06_resource_mount_tool_completion::actual_run_mount_materialize_extract_copy_and_revoked_read"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 0,
+      "test": "r06_resource_mount_tool_completion::actual_mount_materialization_cannot_mint_a_revocation_bypass_file_id"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 0,
+      "test": "r06_resource_mount_tool_completion::actual_forged_mount_descriptor_cannot_bypass_session_file_ownership_or_target"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 0,
+      "test": "r06_resource_mount_tool_completion::actual_pending_copy_approval_binds_mount_root_and_rejects_new_root"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::actual_run_mount_materialize_extract_copy_and_revoked_read"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::actual_mount_materialization_cannot_mint_a_revocation_bypass_file_id"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::actual_forged_mount_descriptor_cannot_bypass_session_file_ownership_or_target"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::actual_pending_copy_approval_binds_mount_root_and_rejects_new_root"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 2,
+      "test": "r06_resource_mount_tool_completion::actual_run_mount_materialize_extract_copy_and_revoked_read"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 2,
+      "test": "r06_resource_mount_tool_completion::actual_mount_materialization_cannot_mint_a_revocation_bypass_file_id"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 2,
+      "test": "r06_resource_mount_tool_completion::actual_forged_mount_descriptor_cannot_bypass_session_file_ownership_or_target"
+    },
+    {
+      "leaf": "R00-T02-LA-AD7FAE6288FA",
+      "group": 2,
+      "test": "r06_resource_mount_tool_completion::actual_pending_copy_approval_binds_mount_root_and_rejects_new_root"
+    },
+    {
+      "leaf": "R00-T02-LA-563F04AF5AD7",
+      "group": 1,
+      "test": "r06_resource_mount_completion::actual_mount_root_inode_replacement_during_read_is_rejected"
+    },
+    {
+      "leaf": "R00-T02-LA-563F04AF5AD7",
+      "group": 1,
+      "test": "r06_resource_mount_completion::actual_registered_session_file_and_resource_read_swap_never_disclose_foreign_bytes"
+    },
+    {
+      "leaf": "R00-T02-LA-563F04AF5AD7",
+      "group": 1,
+      "test": "r06_resource_mount_completion::actual_case_alias_cannot_expose_protected_recovery_via_mount_or_registration"
+    },
+    {
+      "leaf": "R00-T02-LA-071B6E2C286A",
+      "group": 1,
+      "test": "r06_resource_mount_completion::actual_replaced_mount_watch_generation_and_protected_state_remain_isolated"
+    },
+    {
+      "leaf": "R00-T02-LA-BC244641BC1E",
+      "group": 1,
+      "test": "r06_resource_mount_completion::actual_trash_namespace_link_is_refused_before_source_or_outside_changes"
+    },
+    {
+      "leaf": "R00-T02-LA-78B18101F37D",
+      "group": 1,
+      "test": "r06_resource_mount_tool_completion::resource_content_actual_swap_never_delivers_foreign_file"
+    }
+  ],
+  "originalActionCount": 19,
+  "originalAssertionsChanged": false,
+  "stageAccepted": false,
+  "R07Ready": false
+}

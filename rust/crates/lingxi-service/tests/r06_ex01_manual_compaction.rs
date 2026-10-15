@@ -156,6 +156,7 @@ struct Remote {
     addr: SocketAddr,
     wire: Arc<Mutex<Vec<Value>>>,
     fail: Arc<AtomicBool>,
+    bad_once: Arc<AtomicBool>,
     gate: Arc<AtomicBool>,
     entered: Arc<tokio::sync::Semaphore>,
     release: Arc<tokio::sync::Semaphore>,
@@ -170,27 +171,30 @@ impl Remote {
         let addr = listener.local_addr().unwrap();
         let wire = Arc::new(Mutex::new(Vec::new()));
         let fail = Arc::new(AtomicBool::new(false));
+        let bad_once = Arc::new(AtomicBool::new(false));
         let gate = Arc::new(AtomicBool::new(false));
         let entered = Arc::new(tokio::sync::Semaphore::new(0));
         let release = Arc::new(tokio::sync::Semaphore::new(0));
         let number = Arc::new(AtomicUsize::new(0));
-        let (w, f, g, e, r) = (
+        let (w, f, g, e, r, b) = (
             wire.clone(),
             fail.clone(),
             gate.clone(),
             entered.clone(),
             release.clone(),
+            bad_once.clone(),
         );
         let task = tokio::spawn(async move {
             loop {
                 let (mut socket, _) = listener.accept().await.unwrap();
-                let (w, f, g, e, r, n) = (
+                let (w, f, g, e, r, n, b) = (
                     w.clone(),
                     f.clone(),
                     g.clone(),
                     e.clone(),
                     r.clone(),
                     number.clone(),
+                    b.clone(),
                 );
                 tokio::spawn(async move {
                     let mut raw = Vec::new();
@@ -239,8 +243,68 @@ impl Remote {
                         let _ = socket.write_all(response.as_bytes()).await;
                         return;
                     }
+                    let source_text = body["messages"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .rfind(|m| m["role"] == "user")
+                        .map(|m| m["content"].to_string())
+                        .unwrap_or_default();
+                    if !is_summary
+                        && (source_text.contains("EX02-SKILL-PATH=")
+                            || source_text.contains("EX02-WRITE-PATH="))
+                        && !body["messages"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .any(|m| m["role"] == "tool")
+                    {
+                        let source = body["messages"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .rfind(|m| m["role"] == "user")
+                            .unwrap()["content"]
+                            .as_str()
+                            .unwrap();
+                        let writing = source.contains("EX02-WRITE-PATH=");
+                        let path = source
+                            .split(if writing {
+                                "EX02-WRITE-PATH="
+                            } else {
+                                "EX02-SKILL-PATH="
+                            })
+                            .nth(1)
+                            .unwrap()
+                            .lines()
+                            .next()
+                            .unwrap();
+                        let tools = body["tools"].as_array().unwrap();
+                        let wire = |name: &str| {
+                            tools
+                                .iter()
+                                .find_map(|t| {
+                                    (t["function"]["name"].as_str() == Some(name))
+                                        .then(|| name.to_string())
+                                })
+                                .unwrap_or_else(|| panic!("真实工具声明缺失 {name}: {tools:?}"))
+                        };
+                        let calls = json!([{"index":0,"id":"ex02-read","type":"function","function":{"name":wire(if writing {"write"} else {"read"}),"arguments":if writing {json!({"path":path,"content":"MUST-NOT-WRITE"}).to_string()}else{json!({"path":path}).to_string()}}}]);
+                        let payload = format!(
+                            "data: {}\n\ndata: {}\n\ndata: [DONE]\n\n",
+                            json!({"choices":[{"index":0,"delta":{"role":"assistant","tool_calls":calls},"finish_reason":null}]}),
+                            json!({"choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}],"usage":{"prompt_tokens":10,"completion_tokens":10}})
+                        );
+                        let response = format!("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{payload}",payload.len());
+                        socket.write_all(response.as_bytes()).await.unwrap();
+                        return;
+                    }
                     let text = if is_summary {
-                        summary().to_string()
+                        if b.swap(false, Ordering::SeqCst) {
+                            "invalid draft without required headings".into()
+                        } else {
+                            summary().to_string()
+                        }
                     } else {
                         let index = n.fetch_add(1, Ordering::SeqCst);
                         if body["messages"].to_string().contains("EX01-SUMMARY") {
@@ -268,6 +332,7 @@ impl Remote {
             addr,
             wire,
             fail,
+            bad_once,
             gate,
             entered,
             release,
@@ -1163,4 +1228,291 @@ async fn post_usage_precommit_setting_change_preserves_history_and_usage() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn post_usage_precommit_cancel_preserves_history_and_usage() {
     post_usage_precommit_refuses("cancel").await;
+}
+
+/// EX02：真实read/context_notes经压缩、下一Run、重启及再次压缩仍恢复，摘要保持普通用户历史。
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn ex02_actual_skill_and_notes_survive_compaction_restart_next_run_and_repeat() {
+    let home = unique_dir("ex02-material");
+    fixture(&home);
+    let skill = home.join("skills/ex02-skill");
+    std::fs::create_dir_all(&skill).unwrap();
+    std::fs::write(skill.join("SKILL.md"),"---\nname: ex02-skill\ndescription: 合成技能\n---\nEX02_SKILL_BODY_NONCE: 必须保留真实的详细步骤。\n").unwrap();
+    let original_skill = std::fs::read_to_string(skill.join("SKILL.md")).unwrap();
+    std::fs::write(
+        skill.join("SKILL.md"),
+        format!("{original_skill}{}", "详细步骤中🙂文 ".repeat(2000)),
+    )
+    .unwrap();
+    let remote = Remote::start().await;
+    let h = boot(home, &remote, 1000000).await;
+    h.settings(json!({"skills":{"enabled":["ex02-skill"]},"compaction":{"enabled":false,"keepRecentTokens":1}})).await;
+    h.create("ex02-material").await;
+    let (notes_status, notes_result) = h
+        .server
+        .request(
+            "PUT",
+            "/lingxi/v1/sessions/ex02-material/context-notes",
+            Some(json!({"notes":"EX02_CONTEXT_NOTES_NONCE: 保留当前目标与批准边界"})),
+        )
+        .await;
+    assert_eq!(notes_status, 200, "{notes_result}");
+    h.execute("ex02-material",&format!("[Use skill: ex02-skill]\nEX02-SKILL-PATH={}\n当前目标: 完成实际任务，批准未到不得执行写入。",skill.join("SKILL.md").display())).await;
+    for i in 0..3 {
+        h.execute("ex02-material", &format!("后续工作{i}")).await;
+    }
+    let current_skill = std::fs::read_to_string(skill.join("SKILL.md"))
+        .unwrap()
+        .replace(
+            "EX02_SKILL_BODY_NONCE",
+            "EX02_FRESH_SOURCE_NONCE: current selected skill bytes\nEX02_SKILL_BODY_NONCE",
+        );
+    std::fs::write(skill.join("SKILL.md"), current_skill).unwrap();
+    let raw = remote.captured();
+    assert!(raw
+        .iter()
+        .any(|v| v["messages"].to_string().contains("EX02_SKILL_BODY_NONCE")));
+    assert!(h
+        .state
+        .memory()
+        .context_notes()
+        .read("ex02-material")
+        .unwrap()
+        .contains("EX02_CONTEXT_NOTES_NONCE"));
+    let (status, result) = h
+        .server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/ex02-material/compact",
+            Some(json!({})),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    let after = h.load("ex02-material").await;
+    let summary = match &after[0] {
+        lingxi_kernel::model_exchange::ExchangeItem::CompactionSummary { summary, .. } => summary,
+        _ => panic!("必须真实压缩"),
+    };
+    assert!(
+        summary.contains("EX02_SKILL_BODY_NONCE"),
+        "已读技能正文不可悄丢: {summary}"
+    );
+    assert!(
+        summary.contains("EX02_CONTEXT_NOTES_NONCE"),
+        "当前会话便签不可悄丢: {summary}"
+    );
+    assert!(summary.contains("EX02_FRESH_SOURCE_NONCE"));
+    let recall = summary
+        .split_once("<skill-recall>")
+        .unwrap()
+        .1
+        .split_once("</skill-recall>")
+        .unwrap()
+        .0;
+    let recall: Value = serde_json::from_str(recall).unwrap();
+    assert!(
+        recall["entries"][0]["content"]
+            .as_str()
+            .unwrap()
+            .chars()
+            .count()
+            <= 6000
+    );
+    assert!(recall["entries"][0]["content"]
+        .as_str()
+        .unwrap()
+        .contains("truncated for compaction"));
+    let home = h.stop().await;
+    let h = boot(home, &remote, 1000000).await;
+    h.execute("ex02-material", "EX02-RESTART-NEXT").await;
+    let next = remote.captured().last().unwrap().clone();
+    let messages = next["messages"].as_array().unwrap();
+    assert!(
+        messages
+            .iter()
+            .any(|v| v["role"] == "user"
+                && v["content"].to_string().contains("EX02_SKILL_BODY_NONCE"))
+    );
+    assert!(!messages.iter().any(
+        |v| v["role"] == "system" && v["content"].to_string().contains("EX02_SKILL_BODY_NONCE")
+    ));
+    std::fs::remove_file(skill.join("SKILL.md")).unwrap();
+    remote.bad_once.store(true, Ordering::SeqCst);
+    h.execute("ex02-material", &"继续当前任务 ".repeat(2000))
+        .await;
+    let (status, result) = h
+        .server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/ex02-material/compact",
+            Some(json!({})),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    assert!(format!("{:?}", h.load("ex02-material").await).contains("EX02_SKILL_BODY_NONCE"));
+    assert_eq!(
+        remote
+            .captured()
+            .iter()
+            .filter(|v| v["model"] == "summary")
+            .count(),
+        3,
+        "第二次压缩必须真实经过一次格式修复"
+    );
+    assert!(format!("{:?}", h.load("ex02-material").await)
+        .contains("source is not in the current agent catalog"));
+    h.create("ex02-neighbor").await;
+    h.execute("ex02-neighbor", "隔壁会话没有这些便签和已读材料")
+        .await;
+    assert!(!remote.captured().last().unwrap()["messages"]
+        .to_string()
+        .contains("EX02_CONTEXT_NOTES_NONCE"));
+    std::fs::write(
+        h.home.join("ex02-real-provider-wire.json"),
+        serde_json::to_vec_pretty(&remote.captured()).unwrap(),
+    )
+    .unwrap();
+    println!("EX02_RECOVERY_PROOF {}", h.home.display());
+    h.stop().await;
+    remote.stop();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn ex02_unreadable_notes_fail_before_model_and_preserve_history() {
+    let home = unique_dir("ex02-notes-failure");
+    fixture(&home);
+    let remote = Remote::start().await;
+    let h = boot(home, &remote, 1000000).await;
+    h.fill("notes-failure").await;
+    h.settings(json!({"compaction":{"keepRecentTokens":1}}))
+        .await;
+    let path = h.home.join("lingxi-service/context-notes/notes-failure.md");
+    std::fs::create_dir_all(&path).unwrap();
+    let before = h.snapshot("notes-failure").await;
+    let calls = remote.captured().len();
+    let (status, result) = h
+        .server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/notes-failure/compact",
+            Some(json!({})),
+        )
+        .await;
+    assert!(status >= 400, "{status} {result}");
+    assert!(result.to_string().contains("recovery"), "{result}");
+    assert_eq!(before, h.snapshot("notes-failure").await);
+    assert_eq!(remote.captured().len(), calls);
+    std::fs::write(
+        h.home.join("ex02-notes-failure-proof.json"),
+        serde_json::to_vec_pretty(
+            &json!({"status":status,"result":result,"historyUnchanged":true,"modelRequests":0}),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    println!("EX02_NOTES_FAILURE_PROOF {}", h.home.display());
+    h.stop().await;
+    remote.stop();
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn ex02_pending_tool_approval_and_current_goal_cannot_be_compacted_away() {
+    let home = unique_dir("ex02-pending-approval");
+    fixture(&home);
+    let remote = Remote::start().await;
+    let h = boot(home, &remote, 1000000).await;
+    let(status,value)=h.server.request("POST","/lingxi/v1/sessions",Some(json!({"sessionId":"pending-approval","agentId":"lingxi","title":"等待批准","permissionMode":"ask"}))).await;
+    assert_eq!(status, 201, "{value}");
+    for n in 0..4 {
+        h.execute("pending-approval", &format!("先前工作{n}")).await;
+    }
+    h.settings(json!({"compaction":{"keepRecentTokens":1}}))
+        .await;
+    let destination = h.home.join("must-not-write.txt");
+    let input = format!(
+        "EX02_CURRENT_GOAL_NONCE: 未批准不可写入\nEX02-WRITE-PATH={}",
+        destination.display()
+    );
+    let client = ApiClient {
+        addr: h.server.addr,
+        token: h.server.token.clone(),
+    };
+    let task = tokio::spawn(async move {
+        client
+            .request(
+                "POST",
+                "/lingxi/v1/sessions/pending-approval/execute",
+                Some(json!({"input":input})),
+            )
+            .await
+    });
+    let pending = tokio::time::timeout(Duration::from_secs(5), async {
+        loop {
+            let (status, value) = h
+                .server
+                .request(
+                    "GET",
+                    "/lingxi/v1/sessions/pending-approval/approvals",
+                    None,
+                )
+                .await;
+            assert_eq!(status, 200, "{value}");
+            if !value["approvals"].as_array().unwrap().is_empty() {
+                break value;
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .expect("实际写工具应等待批准");
+    assert!(!destination.exists());
+    let before = h.snapshot("pending-approval").await;
+    let (status, result) = h
+        .server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/pending-approval/compact",
+            Some(json!({})),
+        )
+        .await;
+    assert_eq!(status, 409, "{result}");
+    assert_eq!(before, h.snapshot("pending-approval").await);
+    let (_, after) = h
+        .server
+        .request(
+            "GET",
+            "/lingxi/v1/sessions/pending-approval/approvals",
+            None,
+        )
+        .await;
+    assert_eq!(
+        pending["approvals"][0]["approvalId"],
+        after["approvals"][0]["approvalId"]
+    );
+    let id = pending["approvals"][0]["approvalId"].as_str().unwrap();
+    let (status, value) = h
+        .server
+        .request(
+            "POST",
+            &format!("/lingxi/v1/sessions/pending-approval/approvals/{id}"),
+            Some(json!({"action":"rejected"})),
+        )
+        .await;
+    assert_eq!(status, 200, "{value}");
+    assert_eq!(
+        tokio::time::timeout(Duration::from_secs(5), task)
+            .await
+            .unwrap()
+            .unwrap()
+            .0,
+        200
+    );
+    assert!(!destination.exists());
+    assert!(remote.captured().last().unwrap()["messages"]
+        .to_string()
+        .contains("EX02_CURRENT_GOAL_NONCE"));
+    std::fs::write(h.home.join("ex02-pending-proof.json"),serde_json::to_vec_pretty(&json!({"pending":pending,"afterCompactionRefusal":after,"compactionStatus":409,"compactionResult":result,"historyUnchanged":true,"destinationAbsent":true,"wire":remote.captured()})).unwrap()).unwrap();
+    println!("EX02_PENDING_APPROVAL_PROOF {}", h.home.display());
+    h.stop().await;
+    remote.stop();
 }

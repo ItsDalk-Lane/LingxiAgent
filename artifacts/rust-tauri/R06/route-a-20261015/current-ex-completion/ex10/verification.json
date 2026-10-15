@@ -1,0 +1,116 @@
+{
+  "finishedAtUtc": "2026-10-15T06:10:16.954411+00:00",
+  "status": "PASS",
+  "totalRustTests": 68,
+  "cliActionGroups": 16,
+  "env": {
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r06-agent-delete-target",
+    "LINGXI_HOME": "/private/tmp/lingxi-r06-agent-delete-env/home",
+    "TMPDIR": "/private/tmp/lingxi-r06-agent-delete-env/tmp",
+    "R06_NODE_BIN": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node"
+  },
+  "cargoVersion": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "checks": [
+    {
+      "log": "/private/tmp/r06-ex10-mount-delivery/final-combined-r6-tests.log",
+      "sha256": "d32c3eee34bccd714b25aaac86552c0737b4acc329752b78eb333e73f178bab9",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_resource_mount_tool_completion",
+        "--test",
+        "r06_resource_tools_completion",
+        "--test",
+        "r06_resource_mount_completion",
+        "--test",
+        "r06_t05_resourceio",
+        "--test",
+        "r06_t05_resources",
+        "--test",
+        "r06_original_resource_proofs",
+        "--test",
+        "r06_t03_session_tree",
+        "--test",
+        "r06_ar_f08_projection",
+        "--",
+        "--show-output"
+      ],
+      "cwd": "/private/tmp/lingxi-r06-agent-delete/rust",
+      "status": "PASS",
+      "passed": 67
+    },
+    {
+      "log": "/private/tmp/r06-ex10-mount-delivery/final-body-r6-test.log",
+      "sha256": "9a722a928d41ec53636ecb41fc86baa2f39d2eec690429265ae4714b3eb2735a",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "test",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "resources::content_stream::tests::actual_sparse_file_first_frame_is_bounded_and_drop_releases_payload_lease",
+        "--",
+        "--exact",
+        "--show-output"
+      ],
+      "cwd": "/private/tmp/lingxi-r06-agent-delete/rust",
+      "status": "PASS",
+      "passed": 1
+    },
+    {
+      "log": "/private/tmp/r06-ex10-mount-delivery/final-service-r6-strict.log",
+      "sha256": "95397c9b8f386ed6f6a65a50113bdf8c011f863cfc89fd946f1b1c404adefdcf",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--lib",
+        "--test",
+        "r06_resource_mount_completion",
+        "--test",
+        "r06_resource_mount_tool_completion",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/private/tmp/lingxi-r06-agent-delete/rust",
+      "status": "PASS",
+      "passed": null
+    },
+    {
+      "log": "/private/tmp/r06-ex10-mount-delivery/final-adapters-r6-strict.log",
+      "sha256": "0f49396c31e28725c3272f65c58b03025118abd7eb4a3d4858577178f5fec839",
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--locked",
+        "-p",
+        "lingxi-adapters",
+        "--lib",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/private/tmp/lingxi-r06-agent-delete/rust",
+      "status": "PASS",
+      "passed": null
+    }
+  ],
+  "newFourRustFilesFmt": "PASS",
+  "wholeWorkspaceFmt": "NOT_RUN: 634c已有未格式化，由Root统一处理，不改此净包",
+  "applyCheck": "PASS against exact final-base",
+  "all15CandidateShaStillExact": true,
+  "runtimeSourceShaStillExact": true,
+  "unchangedOldSuites": "/private/tmp/r06-ex10-mount-delivery/unchanged-regression-source-sha.json",
+  "mainModified": false,
+  "submitted": false,
+  "registered": false
+}

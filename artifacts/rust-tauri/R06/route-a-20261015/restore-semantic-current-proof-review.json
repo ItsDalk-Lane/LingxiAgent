@@ -1,0 +1,24 @@
+{
+  "status": "CURRENT_MAIN_REGISTERED_WINDOW_PASS_NOT_STAGE_ACCEPTANCE",
+  "leaves": [
+    "R00-T02-LA-7432B00DEC94",
+    "R00-T02-LA-041F938C351F"
+  ],
+  "mainActualLogs": [
+    "/private/tmp/r06-ex05-ex06-main-r2.log",
+    "/private/tmp/r06-ex05-main-adapter-final-r1.log"
+  ],
+  "actualMainServiceParentsPassed": 23,
+  "actualMainAdapterParentsPassed": 7,
+  "childDriverIsNotBoundAsProof": true,
+  "originalAssertionsUnchanged": true,
+  "stageAccepted": false,
+  "R07Ready": false,
+  "countUntilCurrentRegisteredWindowPass": false,
+  "registeredWindow": "/private/tmp/r06-restored-gap-registered-window-r2",
+  "registeredBindingsPassed": 18,
+  "registeredLeavesPassed": 2,
+  "initial78Completed": 78,
+  "initial78Remaining": 0,
+  "earlierReadyRestoreAlsoVerified": true
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "path": "rust/crates/lingxi-service/src/dream_service.rs",
+    "mainSHA": "680007ec172aa06739970b9c153c48abcbf9684c4a07525b6325358ac16470f0",
+    "privateSHA": "680007ec172aa06739970b9c153c48abcbf9684c4a07525b6325358ac16470f0",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/memory_ticker.rs",
+    "mainSHA": "eb1b8241b45bb7da9f2f340a136a13bf2d29d8839f101be54ad68bd532c251c7",
+    "privateSHA": "eb1b8241b45bb7da9f2f340a136a13bf2d29d8839f101be54ad68bd532c251c7",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/memory.rs",
+    "mainSHA": "1f0f970a34ed5207eff5f0115213d8fe49c36f90f263f7f99af3a77e54d33a92",
+    "privateSHA": "1f0f970a34ed5207eff5f0115213d8fe49c36f90f263f7f99af3a77e54d33a92",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/memorytools.rs",
+    "mainSHA": "ccbac95bd63b795fcba704138342522e5e05e6e7dbcfc4a81f2c291b2f67d6e8",
+    "privateSHA": "e9fee9f4558de2f113151cbda32d124b157bde73a87d2df1ca59f49b284ce4b3",
+    "equal": false
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/skills_completion.rs",
+    "mainSHA": "14d0c07b1cfe87a1a28c3cf9401c2fa6384ef5fa8474c866f7beab7009c7bf3c",
+    "privateSHA": "923f3a3304b775cf6f995f1080196dc6cafa41a404c561033fce63919bcb2ca7",
+    "equal": false
+  },
+  {
+    "path": "rust/crates/lingxi-service/src/skills.rs",
+    "mainSHA": "b587eca9e42504ae311142b9c603da65d65a41c040a4c1e4c440a9e0dc779500",
+    "privateSHA": "d31961baa0b50a25237f75dc2c48aa807d966afe8f261067541e961d02e8e2ef",
+    "equal": false
+  },
+  {
+    "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+    "mainSHA": "ff27cdb1d8f9bfdce37f9d28821fcb736a938586415f29bf8a1d4a16549bdfbe",
+    "privateSHA": "ff27cdb1d8f9bfdce37f9d28821fcb736a938586415f29bf8a1d4a16549bdfbe",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_dream_completion.rs",
+    "mainSHA": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+    "privateSHA": "0cf0251e13728a0771030b66658c1bd1dc4fba7d791cb877126e9adfe27f630c",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_memory_tool_completion.rs",
+    "mainSHA": "b061b95aa3db6dddec448619d4915645c9880d4035d7ce0e2d307c1ea694556f",
+    "privateSHA": "b061b95aa3db6dddec448619d4915645c9880d4035d7ce0e2d307c1ea694556f",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_original_memory_skill_proofs.rs",
+    "mainSHA": "aa29b0cfae0bdbf0b2b9bb1fe64bbc34b7e35456b05025600e57689605f40143",
+    "privateSHA": "aa29b0cfae0bdbf0b2b9bb1fe64bbc34b7e35456b05025600e57689605f40143",
+    "equal": true
+  },
+  {
+    "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+    "mainSHA": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+    "privateSHA": null,
+    "equal": false
+  }
+]

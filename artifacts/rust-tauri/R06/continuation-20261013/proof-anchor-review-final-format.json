@@ -1,6 +1,37 @@
 {
   "scope": "Assertion location review only; no coverage or verdict promotion.",
-  "checked": [],
+  "checked": [
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "successful_restore_undo_keep_target_and_safety_at_ten_revisions_without_touching_sources",
+      "source": "rust/crates/lingxi-adapters/tests/r06_ex05_restore_atomicity.rs",
+      "assertionsChecked": 11
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "rollback_disk_failure_remains_explicit_and_read_retries_after_real_unlock",
+      "source": "rust/crates/lingxi-adapters/tests/r06_ex05_restore_atomicity.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "external_edit_is_preserved_and_unknown_recovery_blocks_compiled_consumption",
+      "source": "rust/crates/lingxi-adapters/tests/r06_ex05_restore_atomicity.rs",
+      "assertionsChecked": 8
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "actual_process_exit_after_first_write_recovers_old_bytes_before_next_consumer",
+      "source": "rust/crates/lingxi-adapters/tests/r06_ex05_restore_atomicity.rs",
+      "assertionsChecked": 9
+    },
+    {
+      "id": "R00-T02-LA-041F938C351F",
+      "test": "explicit_unknown_journal_operation_is_refused_without_mutation",
+      "source": "rust/crates/lingxi-adapters/tests/r06_ex05_restore_atomicity.rs",
+      "assertionsChecked": 3
+    }
+  ],
   "changedAssertionsReviewedInTests": [
     "a13_search_within_scope_returns_only_allowed_sources",
     "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows",
@@ -16,6 +47,6 @@
     "websocket_registration_and_foreign_messages_preserve_authorized_session_streams"
   ],
   "missing": [],
-  "eligibleAnchorUpdates": 0,
+  "eligibleAnchorUpdates": 5,
   "applied": true
 }

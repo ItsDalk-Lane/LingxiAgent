@@ -102,9 +102,17 @@ pub struct TodoItem {
     pub id: String,
     pub content: String,
     pub status: String,
-    #[serde(default, rename = "activeForm", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        rename = "activeForm",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub active_form: Option<String>,
-    #[serde(default, rename = "blockedReason", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        default,
+        rename = "blockedReason",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub blocked_reason: Option<String>,
 }
 
@@ -180,7 +188,14 @@ impl TodoSnapshot {
 pub fn compute_todo_list_version(todos: &[TodoItem]) -> String {
     let canonical: Vec<[&str; 4]> = todos
         .iter()
-        .map(|item| [item.content.as_str(), item.active_form.as_deref().unwrap_or(""), item.status.as_str(), item.blocked_reason.as_deref().unwrap_or("")])
+        .map(|item| {
+            [
+                item.content.as_str(),
+                item.active_form.as_deref().unwrap_or(""),
+                item.status.as_str(),
+                item.blocked_reason.as_deref().unwrap_or(""),
+            ]
+        })
         .collect();
     let Some(text) = serde_json::to_string(&canonical).ok() else {
         // 序列化 [String;4] 数组不会失败；若失败，退化为确定性的空串，

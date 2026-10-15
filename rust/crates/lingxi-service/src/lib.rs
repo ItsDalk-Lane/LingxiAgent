@@ -60,8 +60,11 @@ pub mod hooks;
 pub mod inject;
 pub mod input_drafts;
 pub mod instance;
+pub mod interaction_store;
+pub mod interactive_tools;
 pub mod invocations;
 pub mod knowledge;
+pub mod knowledge_processors;
 pub mod knowledgetools;
 pub mod limits;
 pub mod logging;
@@ -83,10 +86,11 @@ pub mod quotas;
 pub mod read_vision;
 pub mod recovery;
 pub mod redaction;
+pub mod resource_mounts;
+pub mod resource_tools;
+pub mod resource_url;
 pub mod resourceaccess;
 pub mod resourceio;
-pub mod resource_url;
-pub mod resource_tools;
 pub mod resources;
 pub mod runs;
 pub mod sandbox;
@@ -112,8 +116,6 @@ pub mod streaming_norm;
 pub mod subagents;
 pub mod task_supervisor;
 pub mod todos;
-pub mod interaction_store;
-pub mod interactive_tools;
 pub mod toolcatalog_bridge;
 pub mod toolgateway;
 pub mod transport;
@@ -1089,7 +1091,8 @@ impl ServiceState {
         ws_max_connections: usize,
         store_options: StoreOptions,
     ) -> Result<Self, ServiceStartupError> {
-        let resource_url_provider=Some(Arc::new(resource_url::UrlProvider::new(&config.data_home)));
+        let resource_url_provider =
+            Some(Arc::new(resource_url::UrlProvider::new(&config.data_home)));
         Self::bootstrap_with_deps(
             config,
             layout,
@@ -1328,6 +1331,9 @@ impl ServiceState {
             t06_data_home.clone(),
             t06_product_dir.clone(),
         ));
+        if let Some(network) = &deps.network_plane {
+            skills_service.set_github_network(Arc::clone(network));
+        }
         skills_service.set_clock(Arc::clone(&deps.clock));
         skills_service.set_workspace_root(deps.workspace_root.clone());
         let persona_service = Arc::new(persona::PersonaService::new(
@@ -1346,6 +1352,7 @@ impl ServiceState {
                 },
             )?,
         );
+        knowledge_service.set_url_provider(deps.resource_url_provider.clone());
         // R05 RR1 F24: the tool-plane handles the worker registration below
         // consumes (registry + gateway + access + workspace). Present
         // exactly when the real chain was wired with a scoped workspace.
@@ -1673,6 +1680,9 @@ impl ServiceState {
         };
         if let Some(compaction) = &compaction_service {
             compaction
+                .bind_recovery_sources(Arc::clone(&skills_service), layout.runtime_dir.clone())
+                .map_err(ServiceStartupError::Storage)?;
+            compaction
                 .bind_agent_settings_root(config.data_home.join("agents"))
                 .map_err(ServiceStartupError::Storage)?;
         }
@@ -1771,9 +1781,18 @@ impl ServiceState {
                 &lingxi_kernel::toolcatalog::SchemaBudget::default(),
             );
         }
-        let interactions = Arc::new(interaction_store::InteractionStore::new(Arc::clone(&storage), Arc::clone(&events), Arc::clone(&deps.clock)));
+        let interactions = Arc::new(interaction_store::InteractionStore::new(
+            Arc::clone(&storage),
+            Arc::clone(&events),
+            Arc::clone(&deps.clock),
+        ));
         if let Some(gateway) = deps.tool_gateway.as_ref() {
-            interactive_tools::register(gateway.registry(), gateway, Arc::clone(&interactions), &lingxi_kernel::toolcatalog::SchemaBudget::default());
+            interactive_tools::register(
+                gateway.registry(),
+                gateway,
+                Arc::clone(&interactions),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
         }
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R05-T06: the worker model-callback port. An injected port always
@@ -2064,8 +2083,13 @@ impl ServiceState {
         }
         if let Some(gateway) = deps.tool_gateway.as_ref() {
             background_tasks::register(
-                gateway.registry(), gateway,
-                Arc::new(background_tasks::TaskTools::new(Arc::clone(&storage), Arc::downgrade(&runs), operations_entry.clone())),
+                gateway.registry(),
+                gateway,
+                Arc::new(background_tasks::TaskTools::new(
+                    Arc::clone(&storage),
+                    Arc::downgrade(&runs),
+                    operations_entry.clone(),
+                )),
                 &lingxi_kernel::toolcatalog::SchemaBudget::default(),
             );
         }
@@ -2099,12 +2123,12 @@ impl ServiceState {
         if let (Some(model_gateway), Some(operations)) =
             (deps.model_gateway.clone(), operations_entry.clone())
         {
+            memory_service.set_search_embedding_plane(model_gateway.clone(), operations.clone());
             let embedder = Arc::new(knowledge::GatewayKnowledgeEmbedder::new(
                 model_gateway,
                 operations,
             ));
-            knowledge_service.set_embedder(Some(embedder.clone()));
-            memory_service.set_search_embedder(Some(embedder));
+            knowledge_service.set_embedder(Some(embedder));
         }
         // R06-T05: session-file 服务的 lingxiHome 等价根（config 在下面的
         // struct literal 里被 Arc 收走，先取出）。
@@ -2172,12 +2196,61 @@ impl ServiceState {
         // "restore"）。
         resource_io.set_file_history(file_history.clone());
         resource_io.set_file_safety(Arc::clone(&file_safety));
-        if let Some(provider)=deps.resource_url_provider.clone() {
-            resource_io.set_url_provider(provider).map_err(|detail|ServiceStartupError::Storage(StorageError::InvalidRequest{detail}))?;
+        if let Some(provider) = deps.resource_url_provider.clone() {
+            resource_io.set_url_provider(provider).map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
         }
 
-        if let (Some(gateway), Some((access, cwd))) = (deps.tool_gateway.as_ref(), workspace_access.as_ref()) {
-            resource_tools::register(gateway.registry(), gateway, Arc::new(resource_tools::ResourceTools::new(Arc::clone(&storage), Arc::clone(&session_files), Arc::clone(&resource_io), Arc::clone(access), cwd.clone(), Arc::clone(&file_safety))), &lingxi_kernel::toolcatalog::SchemaBudget::default());
+        let mount_access = match workspace_access.as_ref() {
+            Some((access, _)) => Arc::clone(access),
+            None => {
+                let access =
+                    Arc::new(resourceaccess::ResourceAccess::new(&[]).map_err(|error| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: error.to_string(),
+                        })
+                    })?);
+                for path in [
+                    data_home.join("file-write-witnesses"),
+                    data_home.join("file-recovery-records"),
+                    layout.runtime_dir.join("agent-deletions"),
+                ] {
+                    access.protect_service_root(&path).map_err(|error| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: error.to_string(),
+                        })
+                    })?;
+                }
+                access
+            }
+        };
+        resource_io
+            .set_mount_provider(Arc::new(resource_mounts::MountProvider::new(
+                &data_home,
+                management.identity_ids().1,
+                mount_access,
+            )))
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+
+        if let (Some(gateway), Some((access, cwd))) =
+            (deps.tool_gateway.as_ref(), workspace_access.as_ref())
+        {
+            resource_tools::register(
+                gateway.registry(),
+                gateway,
+                Arc::new(resource_tools::ResourceTools::new(
+                    Arc::clone(&storage),
+                    Arc::clone(&session_files),
+                    Arc::clone(&resource_io),
+                    Arc::clone(access),
+                    cwd.clone(),
+                    Arc::clone(&file_safety),
+                )),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
         }
 
         // R06-T05 Round 5：fs 直读面授权根（fs.ts :77-86 的候选映射：
@@ -2349,7 +2422,9 @@ impl ServiceState {
         &self.tickets
     }
 
-    pub fn interactions(&self) -> &Arc<interaction_store::InteractionStore> { &self.interactions }
+    pub fn interactions(&self) -> &Arc<interaction_store::InteractionStore> {
+        &self.interactions
+    }
 
     pub fn sessions(&self) -> &sessions::SessionStore {
         &self.sessions
@@ -7128,8 +7203,14 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/sessions/todos/dismiss",
             post(todos::dismiss_route),
         )
-        .route("/lingxi/v1/sessions/interactions", get(interactive_tools::state_route))
-        .route("/lingxi/v1/sessions/interactions/answer", post(interactive_tools::answer_route))
+        .route(
+            "/lingxi/v1/sessions/interactions",
+            get(interactive_tools::state_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/interactions/answer",
+            post(interactive_tools::answer_route),
+        )
         .route("/lingxi/v1/sessions/todos", get(todos::panel_route))
         // R06 R2：会话列表投影（sessions.read + Studio 身份闸，现役 studio-list 面）。
         .route(
@@ -7273,7 +7354,10 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/sessions/{session_id}/deferred-rewind",
             get(sessiontools::deferred_route),
         )
-        .route("/lingxi/v1/task/{task_id}/abort", post(background_tasks::stop_route))
+        .route(
+            "/lingxi/v1/task/{task_id}/abort",
+            post(background_tasks::stop_route),
+        )
         .route(
             "/lingxi/v1/sessions/{session_id}/prompt-snapshot",
             get(session_prompt::get_route),
@@ -7576,7 +7660,10 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/preferences/autolearn",
             get(userprefs::autolearn_get_route).put(userprefs::autolearn_put_route),
         )
-        .route("/lingxi/v1/preferences/session-permission-default", get(userprefs::session_permission_default_get_route))
+        .route(
+            "/lingxi/v1/preferences/session-permission-default",
+            get(userprefs::session_permission_default_get_route),
+        )
         .route(
             "/lingxi/v1/preferences/quick-chat",
             get(userprefs::quick_chat_get_route).put(userprefs::quick_chat_put_route),

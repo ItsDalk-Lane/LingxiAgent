@@ -99,6 +99,26 @@ impl Snapshot {
             stamp,
         })
     }
+    /// 读取收据只对应同一真实文件和父目录，不能把旧字节挂到已换路径上。
+    pub(crate) fn path_is_current(&self, path: &Path) -> bool {
+        (|| -> Result<bool, WriteError> {
+            let Some(parent) = path.parent() else {
+                return Ok(false);
+            };
+            if path.file_name() != Some(self.name.as_os_str())
+                || !self.dir.same_directory(parent)?
+            {
+                return Ok(false);
+            }
+            let Some(file) = self.dir.open_attachment_nofollow(&self.name) else {
+                return Ok(false);
+            };
+            let file = file?;
+            Ok(FileIdentity::of(&file)? == self.identity
+                && stamp(&file, &self.bytes)? == self.stamp)
+        })()
+        .unwrap_or(false)
+    }
 }
 
 pub fn witness_scope(kind: &str, subject: &str, session: &str) -> String {

@@ -21,6 +21,9 @@
 //! 客户端）；候选人中间件对一切请求鉴权（R02 冻结），ticket 降级为
 //! 内容级**附加**校验——带 ticket 时必须有效，凭证也必须存在。
 
+#[path = "resource_content.rs"]
+mod content_stream;
+
 use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -104,7 +107,7 @@ impl std::error::Error for ResourceError {}
 // ── 解析结果与票据类型 ──
 
 /// 现役 resolveContent 返回形状（resource-service.ts :99-108）。
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResolvedContent {
     pub resource_id: String,
     pub file_path: PathBuf,
@@ -224,6 +227,13 @@ impl ResourceService {
         let real = std::fs::canonicalize(&source).map_err(|_| {
             ResourceError::new(404, "resource_content_missing", "resource content missing")
         })?;
+        if real != Path::new(&source) {
+            return Err(ResourceError::new(
+                409,
+                "resource_content_changed",
+                "registered resource path was redirected",
+            ));
+        }
         let meta = std::fs::metadata(&real).map_err(|_| {
             ResourceError::new(404, "resource_content_missing", "resource content missing")
         })?;
@@ -315,6 +325,11 @@ impl ResourceService {
             out.status = "missing".to_string();
             return out;
         };
+        if real != Path::new(&source) {
+            let mut out = view;
+            out.status = "missing".into();
+            return out;
+        }
         let Ok(meta) = std::fs::metadata(&real) else {
             let mut out = view;
             out.status = "missing".to_string();
@@ -674,6 +689,7 @@ pub async fn resource_content_route(
     State(state): State<ServiceState>,
     AxumPath(resource_id): AxumPath<String>,
     headers: axum::http::HeaderMap,
+    method: axum::http::Method,
     Query(query): Query<std::collections::HashMap<String, String>>,
 ) -> Response {
     if let Some(ticket) = query.get("ticket") {
@@ -751,38 +767,27 @@ pub async fn resource_content_route(
         axum::http::StatusCode::OK
     };
 
-    // T05 声明：内容全量内存读（台账 perf note：现役 createReadStream
-    // 流式，流式化留待后续任务；语义/头/状态码保真）。tokio 未启用 fs
-    // feature（不动 feature 面），阻塞读放进 blocking 池。
-    let read_path = content.file_path.clone();
-    let bytes = match tokio::task::spawn_blocking(move || {
-        let _lease = lease;
-        std::fs::read(read_path)
+    // HEAD只建立元数据句柄，不读正文；GET每次只在背压允许时读取64KiB。
+    let expected = content.clone();
+    let observer = if method == axum::http::Method::HEAD {
+        None
+    } else {
+        state.session_files().payload_read_observer()
+    };
+    let stream = match tokio::task::spawn_blocking(move || {
+        content_stream::prepare(&expected, start, length, lease, observer)
     })
     .await
     {
-        Ok(Ok(bytes)) => bytes,
-        Ok(Err(err)) => {
-            return resource_error_response(ResourceError::new(
-                404,
-                "resource_content_missing",
-                format!("resource content missing: {err}"),
-            ))
-        }
-        Err(err) => {
-            return resource_error_response(ResourceError::internal(err));
-        }
+        Ok(Ok(stream)) => stream,
+        Ok(Err(error)) => return resource_error_response(error),
+        Err(error) => return resource_error_response(ResourceError::internal(error)),
     };
-    let body = if content.size == 0 {
-        Vec::new()
+    let body = if method == axum::http::Method::HEAD {
+        drop(stream);
+        axum::body::Body::empty()
     } else {
-        let start = start.min(bytes.len() as u64) as usize;
-        let end = (end as usize).min(bytes.len().saturating_sub(1));
-        if start > end {
-            Vec::new()
-        } else {
-            bytes[start..=end].to_vec()
-        }
+        axum::body::Body::new(stream)
     };
 
     let mut builder = Response::builder()
@@ -806,7 +811,7 @@ pub async fn resource_content_route(
         );
     }
     builder
-        .body(axum::body::Body::from(body))
+        .body(body)
         .unwrap_or_else(|_| EndpointError::not_found().into_response())
 }
 
