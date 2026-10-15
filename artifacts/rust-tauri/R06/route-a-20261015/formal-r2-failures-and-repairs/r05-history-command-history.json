@@ -1,0 +1,41 @@
+{
+  "commonEnvironment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r06-agent-delete-target",
+    "CARGO_INCREMENTAL": "0",
+    "RUST_TEST_THREADS": "1",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib",
+    "PATH_prefix": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin",
+    "HOME": "not overridden"
+  },
+  "commands": [
+    {
+      "suite": "closed_loop",
+      "runtimeRoot": "/tmp/r06-repair-r05-history-stubs/runtime-r2",
+      "command": "/Users/study_superior/.cargo/bin/cargo +1.98.1 test --locked --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t08_closed_loop -- --nocapture",
+      "log": "/tmp/r06-repair-r05-history-stubs/closed-loop-r2.log",
+      "exit": 0,
+      "passed": 11,
+      "failed": 0,
+      "seconds": 13.59
+    },
+    {
+      "suite": "resources",
+      "runtimeRoot": "/tmp/r06-repair-r05-history-stubs/f27-runtime",
+      "command": "/Users/study_superior/.cargo/bin/cargo +1.98.1 test --locked --manifest-path rust/Cargo.toml -p lingxi-service --test r05_t08_resources -- --nocapture",
+      "log": "/tmp/r06-repair-r05-history-stubs/resources-r1.log",
+      "status": "PASS",
+      "exit": 0,
+      "passed": 2,
+      "failed": 0,
+      "seconds": 231.55
+    }
+  ],
+  "earlierAttempt": {
+    "log": "/tmp/r06-repair-r05-history-stubs/closed-loop-r1.log",
+    "status": "STOPPED_AFTER_CONTEXT_PRECONDITION_FAILURE",
+    "cause": "external target cannot discover lib/yuan without LINGXI_PRODUCT_DIR; launch command omitted it",
+    "sourceChangedToFixEnvironment": false,
+    "originalTwoFailures": "c01 and c02 reached failed.provider_error before any model call; c03 stopped by SIGTERM",
+    "exit": 101
+  }
+}

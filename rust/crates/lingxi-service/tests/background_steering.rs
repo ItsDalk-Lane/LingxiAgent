@@ -383,19 +383,92 @@ async fn run_count(state: &ServiceState, session: &str) -> usize {
     .expect("numeric count")
 }
 
-/// Waits for the (session, pop) arrival, skipping interleaved arrivals of
-/// other sessions (deterministic under the per-turn gates).
-async fn await_arrival(
-    arrivals: &mut tokio::sync::mpsc::UnboundedReceiver<(String, String, usize)>,
-    session: &str,
-    pop: usize,
-) -> String {
+// 等待指定会话轮次，保存并行交错到达的其他事件。
+type Arrival = (String, String, usize);
+
+struct ArrivalInbox {
+    receiver: tokio::sync::mpsc::UnboundedReceiver<Arrival>,
+    pending: std::collections::VecDeque<Arrival>,
+}
+
+fn arrival_channel() -> (tokio::sync::mpsc::UnboundedSender<Arrival>, ArrivalInbox) {
+    let (sender, receiver) = tokio::sync::mpsc::unbounded_channel();
+    (
+        sender,
+        ArrivalInbox {
+            receiver,
+            pending: std::collections::VecDeque::new(),
+        },
+    )
+}
+
+async fn await_arrival(arrivals: &mut ArrivalInbox, session: &str, pop: usize) -> String {
+    if let Some(index) = arrivals
+        .pending
+        .iter()
+        .position(|(sess, _, got)| sess == session && *got == pop)
+    {
+        return arrivals.pending.remove(index).expect("已定位待取事件").1;
+    }
     loop {
-        let (sess, run, got) = arrivals.recv().await.expect("arrivals channel open");
+        let (sess, run, got) = arrivals
+            .receiver
+            .recv()
+            .await
+            .expect("arrivals channel open");
         if sess == session && got == pop {
             return run;
         }
+        // 并行会话可先到；保留该事件供后续等待取用，不能消耗后丢弃。
+        arrivals.pending.push_back((sess, run, got));
     }
+}
+
+#[tokio::test]
+async fn arrival_inbox_preserves_interleaved_sessions_and_rounds_exactly_once() {
+    let (sender, mut arrivals) = arrival_channel();
+    // 先固定乱序再读取，无需依赖线程调度碰巧重现丢通知。
+    for (session, run, pop) in [
+        ("beta", "beta-run-1", 1),
+        ("alpha", "alpha-run-2", 2),
+        ("alpha", "alpha-run-1", 1),
+    ] {
+        sender
+            .send((session.to_string(), run.to_string(), pop))
+            .expect("send arrival");
+    }
+    for (session, pop, expected_run) in [
+        ("alpha", 1, "alpha-run-1"),
+        ("beta", 1, "beta-run-1"),
+        ("alpha", 2, "alpha-run-2"),
+    ] {
+        let run = tokio::time::timeout(
+            std::time::Duration::from_secs(1),
+            await_arrival(&mut arrivals, session, pop),
+        )
+        .await
+        .expect("interleaved arrival must remain available");
+        assert_eq!(run, expected_run);
+    }
+    // 已消费事件不能再次返回；等待有界，不让回归检查本身永久挂起。
+    assert!(tokio::time::timeout(
+        std::time::Duration::from_millis(20),
+        await_arrival(&mut arrivals, "alpha", 1),
+    )
+    .await
+    .is_err());
+    sender
+        .send(("gamma".to_string(), "gamma-run".to_string(), 1))
+        .expect("send after cancelled wait");
+    assert_eq!(
+        tokio::time::timeout(
+            std::time::Duration::from_secs(1),
+            await_arrival(&mut arrivals, "gamma", 1),
+        )
+        .await
+        .expect("later arrival remains usable"),
+        "gamma-run"
+    );
 }
 
 async fn wait_until(what: &str, mut probe: impl FnMut() -> bool) {
@@ -443,7 +516,7 @@ fn write_evidence(key: &str, value: serde_json::Value) {
 /// carry the steered text, exactly once.
 #[tokio::test]
 async fn c01_background_accepted_steering_reaches_next_turn_exactly_once() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let g1 = gate();
     let g2 = gate();
     let provider = GatedProvider::new(
@@ -543,7 +616,7 @@ async fn c01_background_accepted_steering_reaches_next_turn_exactly_once() {
 /// submission order; later turns never re-drain earlier texts.
 #[tokio::test]
 async fn c01_adversarial_multi_steer_orders_and_rounds_no_redrain() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let gates: Vec<Arc<tokio::sync::Semaphore>> = vec![gate(), gate(), gate(), gate()];
     let provider = GatedProvider::new(
         vec![(
@@ -685,7 +758,7 @@ async fn c01_adversarial_multi_steer_orders_and_rounds_no_redrain() {
 /// session's turns and never the other session's LATER runs.
 #[tokio::test]
 async fn c02_steering_stays_in_the_authorized_session_across_parallel_runs() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let provider = GatedProvider::new(
         vec![
             (
@@ -827,7 +900,7 @@ async fn c02_steering_stays_in_the_authorized_session_across_parallel_runs() {
 /// submitted.
 #[tokio::test]
 async fn c02_adversarial_cancel_then_quick_new_run_no_misattribution() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let provider = GatedProvider::new(
         vec![
             // The provider pops per SESSION across runs: the cancelled run
@@ -992,7 +1065,7 @@ async fn c02_adversarial_cancel_then_quick_new_run_no_misattribution() {
 /// pending and silently leaked into the session's NEXT run's first turn.
 #[tokio::test]
 async fn c03_midflight_steering_is_consumed_not_leaked_into_next_run() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let provider = GatedProvider::new(
         vec![(
             "sess_local_alpha",
@@ -1101,7 +1174,7 @@ async fn c03_midflight_steering_is_consumed_not_leaked_into_next_run() {
 /// executed by the finished run, never dropped, and never a trigger.
 #[tokio::test]
 async fn c03_too_late_steering_retained_not_claimed_no_auto_trigger() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let provider = GatedProvider::new(
         vec![(
             "sess_local_alpha",
@@ -1228,7 +1301,7 @@ async fn c03_too_late_steering_retained_not_claimed_no_auto_trigger() {
 /// gate — the entry changes nothing).
 #[tokio::test]
 async fn c04_bounded_inbox_same_contract_foreground_and_background() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let provider = GatedProvider::new(
         vec![
             (
@@ -1389,7 +1462,7 @@ async fn c04_bounded_inbox_same_contract_foreground_and_background() {
 /// every accepted text is drained exactly once by the run.
 #[tokio::test]
 async fn c04_adversarial_concurrent_steers_respect_the_bound() {
-    let (arrivals_tx, mut arrivals) = tokio::sync::mpsc::unbounded_channel();
+    let (arrivals_tx, mut arrivals) = arrival_channel();
     let provider = GatedProvider::new(
         vec![(
             "sess_local_alpha",

@@ -113055,29 +113055,49 @@
               {
                 "path": "rust/crates/lingxi-service/tests/background_steering.rs",
                 "test": "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
-                "sourceSHA256": "e5bf5f030764f2982b853edcc8e29ff99028b1b37b9c16a5511f758a387893ae",
-                "testStartLine": 687,
-                "testEndLine": 828,
+                "sourceSHA256": "7cf1c40e0bde65fbbb0dd670e4d15246750b4ea8dcbd92c8995d54eb8dcbb050",
+                "testStartLine": 760,
+                "testEndLine": 892,
                 "assertions": [
                   {
-                    "line": 741,
-                    "quote": "    assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    );"
+                    "line": 810,
+                    "quote": "assert_eq!(alpha_turn1_run, alpha_run)"
                   },
                   {
-                    "line": 755,
-                    "quote": "    assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    );"
+                    "line": 811,
+                    "quote": "assert_eq!(beta_turn1_run, beta_run)"
                   },
                   {
-                    "line": 760,
-                    "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    );"
+                    "line": 814,
+                    "quote": "assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    )"
                   },
                   {
-                    "line": 786,
-                    "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    );"
+                    "line": 828,
+                    "quote": "assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    )"
                   },
                   {
-                    "line": 792,
-                    "quote": "    assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    );"
+                    "line": 833,
+                    "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    )"
+                  },
+                  {
+                    "line": 845,
+                    "quote": "assert_eq!(run_status(&state, &alpha_run).await.0, \"completed\")"
+                  },
+                  {
+                    "line": 846,
+                    "quote": "assert_eq!(run_status(&state, &beta_run).await.0, \"completed\")"
+                  },
+                  {
+                    "line": 859,
+                    "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    )"
+                  },
+                  {
+                    "line": 865,
+                    "quote": "assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    )"
+                  },
+                  {
+                    "line": 878,
+                    "quote": "assert_eq!(run_status(&state, &beta_second).await.0, \"completed\")"
                   }
                 ]
               },
@@ -141712,29 +141732,49 @@
               {
                 "path": "rust/crates/lingxi-service/tests/background_steering.rs",
                 "test": "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
-                "sourceSHA256": "e5bf5f030764f2982b853edcc8e29ff99028b1b37b9c16a5511f758a387893ae",
-                "testStartLine": 687,
-                "testEndLine": 828,
+                "sourceSHA256": "7cf1c40e0bde65fbbb0dd670e4d15246750b4ea8dcbd92c8995d54eb8dcbb050",
+                "testStartLine": 760,
+                "testEndLine": 892,
                 "assertions": [
                   {
-                    "line": 741,
-                    "quote": "    assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    );"
+                    "line": 810,
+                    "quote": "assert_eq!(alpha_turn1_run, alpha_run)"
                   },
                   {
-                    "line": 755,
-                    "quote": "    assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    );"
+                    "line": 811,
+                    "quote": "assert_eq!(beta_turn1_run, beta_run)"
                   },
                   {
-                    "line": 760,
-                    "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    );"
+                    "line": 814,
+                    "quote": "assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    )"
                   },
                   {
-                    "line": 786,
-                    "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    );"
+                    "line": 828,
+                    "quote": "assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    )"
                   },
                   {
-                    "line": 792,
-                    "quote": "    assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    );"
+                    "line": 833,
+                    "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    )"
+                  },
+                  {
+                    "line": 845,
+                    "quote": "assert_eq!(run_status(&state, &alpha_run).await.0, \"completed\")"
+                  },
+                  {
+                    "line": 846,
+                    "quote": "assert_eq!(run_status(&state, &beta_run).await.0, \"completed\")"
+                  },
+                  {
+                    "line": 859,
+                    "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    )"
+                  },
+                  {
+                    "line": 865,
+                    "quote": "assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    )"
+                  },
+                  {
+                    "line": 878,
+                    "quote": "assert_eq!(run_status(&state, &beta_second).await.0, \"completed\")"
                   }
                 ]
               },
@@ -262051,29 +262091,49 @@
           {
             "path": "rust/crates/lingxi-service/tests/background_steering.rs",
             "test": "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
-            "sourceSHA256": "e5bf5f030764f2982b853edcc8e29ff99028b1b37b9c16a5511f758a387893ae",
-            "testStartLine": 687,
-            "testEndLine": 828,
+            "sourceSHA256": "7cf1c40e0bde65fbbb0dd670e4d15246750b4ea8dcbd92c8995d54eb8dcbb050",
+            "testStartLine": 760,
+            "testEndLine": 892,
             "assertions": [
               {
-                "line": 741,
-                "quote": "    assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    );"
+                "line": 810,
+                "quote": "assert_eq!(alpha_turn1_run, alpha_run)"
               },
               {
-                "line": 755,
-                "quote": "    assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    );"
+                "line": 811,
+                "quote": "assert_eq!(beta_turn1_run, beta_run)"
               },
               {
-                "line": 760,
-                "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    );"
+                "line": 814,
+                "quote": "assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    )"
               },
               {
-                "line": 786,
-                "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    );"
+                "line": 828,
+                "quote": "assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    )"
               },
               {
-                "line": 792,
-                "quote": "    assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    );"
+                "line": 833,
+                "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    )"
+              },
+              {
+                "line": 845,
+                "quote": "assert_eq!(run_status(&state, &alpha_run).await.0, \"completed\")"
+              },
+              {
+                "line": 846,
+                "quote": "assert_eq!(run_status(&state, &beta_run).await.0, \"completed\")"
+              },
+              {
+                "line": 859,
+                "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    )"
+              },
+              {
+                "line": 865,
+                "quote": "assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    )"
+              },
+              {
+                "line": 878,
+                "quote": "assert_eq!(run_status(&state, &beta_second).await.0, \"completed\")"
               }
             ]
           },
@@ -289006,29 +289066,49 @@
           {
             "path": "rust/crates/lingxi-service/tests/background_steering.rs",
             "test": "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
-            "sourceSHA256": "e5bf5f030764f2982b853edcc8e29ff99028b1b37b9c16a5511f758a387893ae",
-            "testStartLine": 687,
-            "testEndLine": 828,
+            "sourceSHA256": "7cf1c40e0bde65fbbb0dd670e4d15246750b4ea8dcbd92c8995d54eb8dcbb050",
+            "testStartLine": 760,
+            "testEndLine": 892,
             "assertions": [
               {
-                "line": 741,
-                "quote": "    assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    );"
+                "line": 810,
+                "quote": "assert_eq!(alpha_turn1_run, alpha_run)"
               },
               {
-                "line": 755,
-                "quote": "    assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    );"
+                "line": 811,
+                "quote": "assert_eq!(beta_turn1_run, beta_run)"
               },
               {
-                "line": 760,
-                "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    );"
+                "line": 814,
+                "quote": "assert_eq!(\n        steer(&state, \"sess_local_alpha\", \"STEER-C02-only-alpha\")\n            .await\n            .unwrap(),\n        SteerOutcome::Accepted\n    )"
               },
               {
-                "line": 786,
-                "quote": "    assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    );"
+                "line": 828,
+                "quote": "assert!(\n        alpha_inputs[1].contains(\"[steering]\") && alpha_inputs[1].contains(\"STEER-C02-only-alpha\"),\n        \"the authorized session's next turn carries the steer: {}\",\n        alpha_inputs[1]\n    )"
               },
               {
-                "line": 792,
-                "quote": "    assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    );"
+                "line": 833,
+                "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the bystander session never sees the steer: {beta_inputs:?}\"\n    )"
+              },
+              {
+                "line": 845,
+                "quote": "assert_eq!(run_status(&state, &alpha_run).await.0, \"completed\")"
+              },
+              {
+                "line": 846,
+                "quote": "assert_eq!(run_status(&state, &beta_run).await.0, \"completed\")"
+              },
+              {
+                "line": 859,
+                "quote": "assert!(\n        !beta_inputs\n            .iter()\n            .any(|input| input.contains(\"STEER-C02-only-alpha\")),\n        \"the unrelated next run carries no foreign steering: {beta_inputs:?}\"\n    )"
+              },
+              {
+                "line": 865,
+                "quote": "assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    )"
+              },
+              {
+                "line": 878,
+                "quote": "assert_eq!(run_status(&state, &beta_second).await.0, \"completed\")"
               }
             ]
           },

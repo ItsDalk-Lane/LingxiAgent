@@ -75,19 +75,30 @@ fn row(file_id: &str, owner_session_id: &str, source_key: Option<&str>) -> sf::S
 
 #[test]
 fn supported_tip_matches_the_current_migration_registry() {
-    // v9 之后 C1 批二等修复继续加列（v10..=v13），顶端随实际登记推进；
-    // 历史名保持不变，防迁移被静默改名。
-    assert_eq!(supported_version(), 13);
+    // 当前顶端固定为 v14；历史 v9、v13 的独立身份不能随顶端被改名。
+    assert_eq!(supported_version(), 14);
     let tip = MIGRATIONS.iter().last().expect("tip");
-    assert_eq!(tip.name, "r06_session_workspace_identity");
+    assert_eq!(tip.version, 14);
+    assert_eq!(tip.name, "session_proactive_delegation_at_creation");
     let v9 = MIGRATIONS.iter().find(|m| m.version == 9).expect("v9");
     assert_eq!(v9.name, "r06_t05_session_files_resources");
+    let v13 = MIGRATIONS.iter().find(|m| m.version == 13).expect("v13");
+    assert_eq!(v13.name, "r06_session_workspace_identity");
+}
+
+fn migration_receipts(conn: &rusqlite::Connection) -> Vec<(i64, String, String, i64, String)> {
+    conn.prepare("SELECT version, name, fingerprint, applied_at_unix_ms, applied_by FROM schema_migrations ORDER BY version")
+        .expect("prepare receipts")
+        .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)))
+        .expect("query receipts")
+        .collect::<Result<Vec<_>, _>>()
+        .expect("read receipts")
 }
 
 #[test]
 fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     // 造一个停在 v7 的库：手工顺序执行 V1..=V7 SQL + 收据 + user_version，
-    // 塞入旧表数据，再交给 apply_all 补 v8..=v12。
+    // 塞入旧表数据，再交给 apply_all 补 v8..=v14。
     let conn = rusqlite::Connection::open_in_memory().expect("mem db");
     for m in MIGRATIONS.iter().filter(|m| m.version <= 7) {
         conn.execute_batch(m.sql).expect("apply old sql");
@@ -119,9 +130,11 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     )
     .expect("seed session");
 
-    let out = apply_all(&conn, "test", 2_000).expect("apply v8..=v13");
-    assert_eq!(out.applied, vec![8, 9, 10, 11, 12, 13]);
-    assert_eq!(out.current_version, 13);
+    let old_receipts = migration_receipts(&conn);
+    let out = apply_all(&conn, "test", 2_000).expect("apply v8..=v14");
+    assert_eq!(out.applied, vec![8, 9, 10, 11, 12, 13, 14]);
+    assert_eq!(out.current_version, 14);
+    assert_eq!(out.supported_version, 14);
 
     // 旧数据零损耗。
     let title: String = conn
@@ -160,7 +173,131 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     let user_version: i64 = conn
         .pragma_query_value(None, "user_version", |r| r.get(0))
         .expect("user_version");
-    assert_eq!(user_version, 13);
+    assert_eq!(user_version, 14);
+
+    // 升级前的旧会话默认关闭主动委派，且列本身有非空与默认值约束。
+    let delegation: i64 = conn
+        .query_row(
+            "SELECT proactive_delegation FROM sessions WHERE session_id = 's-old'",
+            [],
+            |r| r.get(0),
+        )
+        .expect("old session delegation");
+    assert_eq!(delegation, 0);
+    let column: (String, i64, String) = conn.query_row(
+        "SELECT type, \"notnull\", dflt_value FROM pragma_table_info('sessions') WHERE name = 'proactive_delegation'",
+        [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+    ).expect("v14 column metadata");
+    assert_eq!(column, ("INTEGER".to_string(), 1, "0".to_string()));
+
+    // 实际收据逐项对独立登记；旧收据的时间和写入者也必须原样保留。
+    let receipts = migration_receipts(&conn);
+    assert_eq!(&receipts[..7], old_receipts.as_slice());
+    let registry: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json"
+    ))
+    .expect("independent migration registry");
+    let registered = registry["new_persistence_points"][0]["migrations"]
+        .as_array()
+        .expect("registered migrations");
+    assert_eq!(registered.len(), 14);
+    assert_eq!(receipts.len(), 14);
+    for (receipt, registered) in receipts.iter().zip(registered) {
+        assert_eq!(
+            receipt.0,
+            registered["version"].as_i64().expect("registered version")
+        );
+        assert_eq!(
+            receipt.1,
+            registered["name"].as_str().expect("registered name")
+        );
+        assert_eq!(
+            receipt.2,
+            registered["fingerprint_sha256"]
+                .as_str()
+                .expect("registered fingerprint")
+        );
+        assert_eq!(receipt.3, if receipt.0 <= 7 { 1_000 } else { 2_000 });
+        assert_eq!(receipt.4, "test");
+    }
+    let schema_version: i64 = conn
+        .pragma_query_value(None, "schema_version", |r| r.get(0))
+        .expect("schema version");
+    let again = apply_all(&conn, "second-open", 3_000).expect("idempotent reopen");
+    assert!(again.applied.is_empty());
+    assert_eq!(again.current_version, 14);
+    assert_eq!(again.supported_version, 14);
+    assert_eq!(migration_receipts(&conn), receipts);
+    assert_eq!(
+        conn.pragma_query_value(None, "schema_version", |r| r.get::<_, i64>(0))
+            .expect("unchanged schema"),
+        schema_version
+    );
+    assert_eq!(
+        conn.pragma_query_value(None, "user_version", |r| r.get::<_, i64>(0))
+            .expect("unchanged version"),
+        14
+    );
+    let old_row: (String, String, String, i64, String, i64) = conn.query_row(
+        "SELECT agent_id, owner_user_id, title, created_at_unix_ms, lifecycle, proactive_delegation FROM sessions WHERE session_id = 's-old'",
+        [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?, r.get(5)?)),
+    ).expect("unchanged old row");
+    assert_eq!(
+        old_row,
+        (
+            "agent".to_string(),
+            "user_local".to_string(),
+            "t".to_string(),
+            1,
+            "active".to_string(),
+            0
+        )
+    );
+}
+
+#[test]
+fn v14_delegation_accepts_only_boolean_values_and_rejects_null() {
+    let conn = rusqlite::Connection::open_in_memory().expect("mem db");
+    apply_all(&conn, "constraint-test", 1_000).expect("apply current schema");
+    conn.execute(
+        "INSERT INTO sessions (session_id, agent_id, owner_user_id, title, created_at_unix_ms) VALUES ('constraint-row', 'agent', 'user_local', 'unchanged', 1)",
+        [],
+    ).expect("insert with default");
+    for value in [0_i64, 1] {
+        assert_eq!(
+            conn.execute(
+                "UPDATE sessions SET proactive_delegation = ?1 WHERE session_id = 'constraint-row'",
+                [value]
+            )
+            .expect("valid boolean"),
+            1
+        );
+        assert_eq!(
+            conn.query_row(
+                "SELECT proactive_delegation FROM sessions WHERE session_id = 'constraint-row'",
+                [],
+                |r| r.get::<_, i64>(0)
+            )
+            .expect("boolean readback"),
+            value
+        );
+    }
+    // 真实写入必须由 SQLite 拒绝，不能只检查 SQL 字符串里是否有约束。
+    for (value, expected_code) in [
+        (Some(2_i64), rusqlite::ffi::SQLITE_CONSTRAINT_CHECK),
+        (Some(-1), rusqlite::ffi::SQLITE_CONSTRAINT_CHECK),
+        (None, rusqlite::ffi::SQLITE_CONSTRAINT_NOTNULL),
+    ] {
+        let error = conn.execute("UPDATE sessions SET proactive_delegation = ?1, title = 'must-rollback' WHERE session_id = 'constraint-row'", [value]).expect_err("invalid value must be rejected");
+        match error {
+            rusqlite::Error::SqliteFailure(code, _) => {
+                assert_eq!(code.extended_code, expected_code)
+            }
+            other => panic!("unexpected constraint error: {other}"),
+        }
+        let unchanged: (i64, String) = conn.query_row("SELECT proactive_delegation, title FROM sessions WHERE session_id = 'constraint-row'", [], |r| Ok((r.get(0)?, r.get(1)?))).expect("rejected write preserved row");
+        assert_eq!(unchanged, (1, "unchanged".to_string()));
+    }
 }
 
 // ── SessionFileStore CRUD / 去重 / alias / refs ──

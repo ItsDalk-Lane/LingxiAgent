@@ -1,0 +1,159 @@
+{
+  "schema": "lingxi.independent-migration-arrival-cross-review.v1",
+  "conclusion": "STATIC_CROSS_REVIEW_PASS",
+  "independentTestsExecuted": 0,
+  "sourceModified": false,
+  "patchSha256": "e55a0d9601b26e4e872f6a06d76da9db85f031b474e7dba82e0a60b6b27dc740",
+  "files": {
+    "rust/crates/lingxi-adapters/tests/session_file_store.rs": "270a1a182b65c3aae5e94948921ffdf778815a5176e50521dc6215676282b62e",
+    "rust/crates/lingxi-service/tests/background_steering.rs": "7cf1c40e0bde65fbbb0dd670e4d15246750b4ea8dcbd92c8995d54eb8dcbb050"
+  },
+  "sourceFacts": {
+    "originalEightBodiesExactAfterEightFactoryReversals": true,
+    "factorySubstitutions": 8,
+    "originalTenCrudTestsExact": true,
+    "rust/crates/lingxi-adapters/src/storage/migrations.rs": {
+      "unchangedFromHead": true,
+      "sha256": "7f863ecede085615c0f1d307d54c56386a3d3a651573bb964379d441666777e4"
+    },
+    "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json": {
+      "unchangedFromHead": true,
+      "sha256": "656165f1fc671078511beb1e413b8f9e8b64d747d5ad99af775c669e68753fe6"
+    },
+    "rust/crates/lingxi-test-guard/src/lib.rs": {
+      "unchangedFromHead": true,
+      "sha256": "a3f482d34d0985a08731db2d7fc1aa40cb5a723d2abd8628e1f0dcdd0c001bc7"
+    },
+    "bufferedProbeEntireHelperAndNewTestExactToMain": true,
+    "negativeControlTestBodyExact": true
+  },
+  "patchInMemoryReplayMatchesCurrent": {
+    "rust/crates/lingxi-adapters/tests/session_file_store.rs": true,
+    "rust/crates/lingxi-service/tests/background_steering.rs": true
+  },
+  "migrationRegistry": [
+    {
+      "version": 1,
+      "name": "initial_run_message_schema",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 2,
+      "name": "stale_result_audit",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 3,
+      "name": "invocation_journal",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 4,
+      "name": "run_lineage",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 5,
+      "name": "model_call_usage_ledger",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 6,
+      "name": "model_call_usage_rr1_f21",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 7,
+      "name": "model_call_usage_rr1_f38_attempts_nullable",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 8,
+      "name": "r06_t03_session_tree",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 9,
+      "name": "r06_t05_session_files_resources",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 10,
+      "name": "session_operation_receipts",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 11,
+      "name": "r06_ar_f04_run_history_anchors",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 12,
+      "name": "r06_session_project_assignment",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 13,
+      "name": "r06_session_workspace_identity",
+      "fingerprintMatchesProductionSql": true
+    },
+    {
+      "version": 14,
+      "name": "session_proactive_delegation_at_creation",
+      "fingerprintMatchesProductionSql": true
+    }
+  ],
+  "authorEvidenceFileHashesVerified": {
+    "arrival-buffered-control": true,
+    "arrival-buffered-control.compile.log": true,
+    "arrival-buffered-control.log": true,
+    "arrival-buffered-control.rs": true,
+    "arrival-lossy-negative": true,
+    "arrival-lossy-negative.compile.log": true,
+    "arrival-lossy-negative.log": true,
+    "arrival-lossy-negative.rs": true,
+    "arrival-negative-control.diff": true,
+    "arrival-negative-control.json": true,
+    "background_steering.before.rs": true,
+    "background_steering.log": true,
+    "background_steering.run.json": true,
+    "diff-check.log": true,
+    "preservation.json": true,
+    "rustfmt.log": true,
+    "session_file_store.before.rs": true,
+    "session_file_store.log": true,
+    "session_file_store.run.json": true,
+    "two-tests.patch": true
+  },
+  "authorRecordedResults": {
+    "sessionFileStore": {
+      "originalTests": 12,
+      "newTests": 1,
+      "passed": 13,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "backgroundSteering": {
+      "originalTests": 8,
+      "newTests": 1,
+      "passed": 9,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "negativeControl": [
+      {
+        "name": "arrival-buffered-control",
+        "actualExitCode": 0,
+        "expectedExitCode": 0,
+        "elapsedSecs": 0.36626601219177246
+      },
+      {
+        "name": "arrival-lossy-negative",
+        "actualExitCode": 101,
+        "expectedExitCode": 101,
+        "elapsedSecs": 1.3756740093231201
+      }
+    ]
+  },
+  "reviewBoundary": "只读源码/差异/既有日志并计算字节与SHA；未运行作者二进制、Cargo、产品或测试，不将作者动态结果冒充本次独立重跑。"
+}

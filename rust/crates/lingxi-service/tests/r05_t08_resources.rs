@@ -396,9 +396,20 @@ fn sse_final(text: &str) -> String {
     )
 }
 
+/// 请求保留完整会话历史，替身只消费最新用户提交及其后的消息。
+fn current_turn_messages(body: &serde_json::Value) -> &[serde_json::Value] {
+    let Some(messages) = body["messages"].as_array() else {
+        return &[];
+    };
+    messages
+        .iter()
+        .rposition(|message| message["role"] == "user")
+        .map(|start| &messages[start..])
+        .unwrap_or(&[])
+}
+
 fn last_tool_result(body: &serde_json::Value) -> Option<String> {
-    body["messages"]
-        .as_array()?
+    current_turn_messages(body)
         .iter()
         .rev()
         .find(|m| m["role"] == "tool")
@@ -407,15 +418,10 @@ fn last_tool_result(body: &serde_json::Value) -> Option<String> {
 }
 
 fn user_text(body: &serde_json::Value) -> String {
-    body["messages"]
-        .as_array()
-        .and_then(|messages| {
-            messages
-                .iter()
-                .find(|m| m["role"] == "user")
-                .and_then(|m| m["content"].as_str())
-                .map(str::to_string)
-        })
+    current_turn_messages(body)
+        .first()
+        .and_then(|message| message["content"].as_str())
+        .map(str::to_string)
         .unwrap_or_default()
 }
 
@@ -573,6 +579,38 @@ fn query_one(db: &rusqlite::Connection, sql: &str, params: &[&str]) -> Option<St
             })
     })
     .ok()
+}
+
+/// 逐个 Run 核实真实执行及回调，避免成功终态掩盖旧历史导致的跳步。
+fn assert_current_load_run(home: &Path, run_id: &str, worker: bool) -> serde_json::Value {
+    let db = open_runs_db(home);
+    let tools = query_one(
+        &db,
+        "SELECT COUNT(*) FROM key_events WHERE run_id = ?1 AND event_type = 'tool_call_completed'",
+        &[run_id],
+    );
+    assert_eq!(tools.as_deref(), Some("1"), "本轮必须实际完成一次工具");
+    let main_calls = query_one(
+        &db,
+        "SELECT COUNT(*) FROM model_call_usage WHERE run_id = ?1 AND model = 'stub-model-f27'",
+        &[run_id],
+    );
+    assert_eq!(
+        main_calls.as_deref(),
+        Some("2"),
+        "本轮工具前后各一次主模型请求"
+    );
+    let callbacks = query_one(
+        &db,
+        "SELECT COUNT(*) FROM model_call_usage WHERE run_id = ?1 AND model = 'summarize-model-f27' AND parent_tool_call_id IS NOT NULL",
+        &[run_id],
+    );
+    assert_eq!(
+        callbacks.as_deref(),
+        Some(if worker { "1" } else { "0" }),
+        "回调账本必须属于本轮工具"
+    );
+    serde_json::json!({"toolCompleted": 1, "mainCalls": 2, "joinedCallbacks": usize::from(worker)})
 }
 
 async fn submit(
@@ -1542,17 +1580,21 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
     }
     *mode.lock().expect("mode") = "long".to_string();
     for cycle in 0..LONG_CYCLES {
+        let before_hits = stub.hits();
         let (s, a) = submit(addr, &token, "sess_local_beta", &format!("long {cycle}")).await;
         assert_eq!(s, 200, "{a}");
         let run_id = a["runId"].as_str().expect("runId").to_string();
         let st = wait_run_status(&home, &run_id, |st| st != "running", "settled").await;
         assert_eq!(st, "completed", "the 512 KiB final settles: {st}");
+        assert_eq!(stub.hits(), before_hits + 2, "本轮实际 read 后再生成长响应");
+        let execution = assert_current_load_run(&home, &run_id, false);
         cycle_results
-            .push(serde_json::json!({"phase":"long", "cycle":cycle, "runId":run_id, "status":st}));
+            .push(serde_json::json!({"phase":"long", "cycle":cycle, "runId":run_id, "status":st, "execution":execution}));
     }
     *mode.lock().expect("mode") = "ok".to_string();
     for cycle in 0..WORKER_CYCLES {
         let before = worker_arrived.load(Ordering::SeqCst);
+        let before_hits = stub.hits();
         let drive_token = token.clone();
         let drive = tokio::spawn(async move {
             submit(
@@ -1588,8 +1630,19 @@ async fn f27_sustained_cancel_error_worker_load_stays_bounded() {
         let run_id = a["runId"].as_str().expect("runId").to_string();
         let st = wait_run_status(&home, &run_id, |st| st != "running", "settled").await;
         assert_eq!(st, "completed", "worker cycle {cycle}: {st}");
+        assert_eq!(
+            worker_arrived.load(Ordering::SeqCst),
+            before + 1,
+            "本轮精确一次真实 callback"
+        );
+        assert_eq!(
+            stub.hits(),
+            before_hits + 3,
+            "本轮主请求、callback、最终请求各一次"
+        );
+        let execution = assert_current_load_run(&home, &run_id, true);
         cycle_results.push(
-            serde_json::json!({"phase":"worker", "cycle":cycle, "runId":run_id, "status":st}),
+            serde_json::json!({"phase":"worker", "cycle":cycle, "runId":run_id, "status":st, "execution":execution}),
         );
         sample(&mut series, child2.pid(), "worker-released");
         let tree = &series.last().expect("released point")["serviceTree"];

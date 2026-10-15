@@ -3,11 +3,11 @@
   "task": "R01-T02",
   "generatedBy": "scripts/rust-tauri/r01-t02-extract-api-surface.mjs (机械提取,禁止手改条目)",
   "generatedFrom": {
-    "contentSha": "f0e44e6e192b876d2b35da3061cf026d8d73a6e2a62278562d690861a925b89a",
+    "contentSha": "ff0008c0cdf4437bc87b269dcefa8ba21efb3bd40e413436c085345e918edf78",
     "note": "contentSha=sha256(JSON.stringify({fullInventory,surfaces,summary,sourceDigests})),内容派生戳,不嵌入 git HEAD 等移动坐标;--check 在当前工作区重跑并全文逐字节 diff(无字段豁免)。",
     "sourceDigests": {
-      "desktop/preload.cjs": "a39d002e01d7f16d8df913ece2e98c980102d3e2c7213fb4fd02dd2e30c9664b",
-      "desktop/src/react/types.ts": "27262febbe020c7cfe7227fede5f6821a6e4234bd3b26ff956dfe64560425465",
+      "desktop/preload.cjs": "6e178ddc1a58e341a499c423e38d4d4ebad8743745d87b7599cdc77366f7549b",
+      "desktop/src/react/types.ts": "1fd8f5e4bcea4b65f5145381f264009e5f14c5d76138f6bf403a14933cdb43eb",
       "server/composition/full-root.ts": "e5f8322020f8f7f014b449f8a9625871630c251483b59a13013b89719d2d77b8",
       "server/composition/open-root.ts": "c9a9a249fdc3dfa7a3e69d499709f335445ef8e00b1b2568b9e233fc9b5a869b",
       "server/index.ts": "0f16d567d1800417318608a1944bb42b0121082ce05593f7facb078ffc09cc17",
@@ -126,6 +126,7 @@
       "invoke:open-skill-viewer",
       "invoke:quick-chat-hide",
       "invoke:quick-chat-open-session",
+      "invoke:quick-chat-open-session-ack",
       "invoke:quick-chat-reload-shortcut",
       "invoke:quick-chat-resize",
       "invoke:quick-chat-shortcut-status",

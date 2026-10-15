@@ -1,0 +1,27 @@
+{
+  "reason": "上轮正式R02副本清理因历史合成会话目录0500不可删除其archived子目录而exit1；仅为本任务自己的未跟踪旧诊断目录恢复owner写权限，不改任何文件字节/产品/检查脚本/断言。",
+  "directory": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/route-a-20261014/archive-execution-r2/R06_BINDINGS/r06_test_5e4d21fad00c7965a52e/command-001/runtime/home/restore-late-io-77384-1791992314013060000/agents/lingxi/sessions",
+  "beforeMode": "0500",
+  "afterMode": "0o700",
+  "uid": 501,
+  "fileDigestsBefore": {
+    "archived/2026-10-14_late-io-0.jsonl": "c8c2424e8145eadc4e88a14b1b137455ea99ed52528019be2615d22900dcbc31",
+    "archived/2026-10-14_late-io-0.jsonl.files.json": "ac0e033c8c0a37c594a1ef4ccca82349258ae79517031b2b958cf06f1d9e1cdb"
+  },
+  "fileDigestsAfter": {
+    "archived/2026-10-14_late-io-0.jsonl": "c8c2424e8145eadc4e88a14b1b137455ea99ed52528019be2615d22900dcbc31",
+    "archived/2026-10-14_late-io-0.jsonl.files.json": "ac0e033c8c0a37c594a1ef4ccca82349258ae79517031b2b958cf06f1d9e1cdb"
+  },
+  "bytesUnchanged": true,
+  "formalFailurePreserved": true,
+  "freshCloneCleanup": {
+    "cpExit": 0,
+    "rmExit": 0,
+    "removed": true,
+    "copiedFileDigests": {
+      "archived/2026-10-14_late-io-0.jsonl": "c8c2424e8145eadc4e88a14b1b137455ea99ed52528019be2615d22900dcbc31",
+      "archived/2026-10-14_late-io-0.jsonl.files.json": "ac0e033c8c0a37c594a1ef4ccca82349258ae79517031b2b958cf06f1d9e1cdb"
+    },
+    "copiedBytesMatch": true
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "status": "CURRENT_USER_SCOPE_TARGETED_REPAIRS_VERIFIED_NOT_FULL_STAGE_ACCEPTANCE",
+  "previousFormalCandidate": "14453cd05b8aeec7951f27c4dbd021ad2a21d486",
+  "previousFormalExitCode": 1,
+  "previousFullFormalFailuresPreserved": true,
+  "targetedBindingRuns": [
+    {
+      "key": "r06_test_0c1fe78ac0c818a410ed",
+      "path": "/private/tmp/r06-targeted-formal-r2-repairs/r06_test_0c1fe78ac0c818a410ed/binding-result.json",
+      "sha256": "d9faa04c47caf91a508cec4f44a5d7933f3834a88e8caf7bacd113590054487a",
+      "passed": true,
+      "sourceStable": true,
+      "sourceCandidateSha256": "22e0c9ce728109d4a7b1b47a59edd444ce8d398730e1430c5dcc20d66830f275",
+      "elapsedSecs": 1.995
+    },
+    {
+      "key": "r06_test_72ee1108d3cd24e710f5",
+      "path": "/private/tmp/r06-targeted-formal-r2-repairs/r06_test_72ee1108d3cd24e710f5/binding-result.json",
+      "sha256": "7e3816e6036555df749e6bf495bf8ce6258337f1fc868b0ea2ac73ff58d08780",
+      "passed": true,
+      "sourceStable": true,
+      "sourceCandidateSha256": "22e0c9ce728109d4a7b1b47a59edd444ce8d398730e1430c5dcc20d66830f275",
+      "elapsedSecs": 127.126
+    },
+    {
+      "key": "r06_test_9b21a2d853775007038f",
+      "path": "/private/tmp/r06-targeted-formal-r2-directory-ready-r2/binding-result.json",
+      "sha256": "015b43b51e88ffe39abe2f8794f044766d84c4f7cb116fd3cff41b35c306001f",
+      "passed": true,
+      "sourceStable": true,
+      "sourceCandidateSha256": "8e6b91b4cd2f700c572854bf7bc0604f45e27bdafd26c27117fb5be1f6e750b8",
+      "elapsedSecs": 112.635
+    }
+  ],
+  "targetedBindingSnapshotNote": "Each run has its own stable actual source snapshot. Native readiness fix followed a real failed targeted GUI run; these targeted results are not merged/reused as full formal evidence.",
+  "repairSuites": {
+    "toolExposureAndBoundaries": {
+      "passed": 36,
+      "failed": 0
+    },
+    "migrationAndArrival": {
+      "passed": 22,
+      "failed": 0,
+      "original8ConcurrentScenarioBodiesByteIdenticalExcept8ChannelFactories": true,
+      "deterministicOldAlgorithmNegativeExit": 101
+    },
+    "r05ClosedLoop": {
+      "passed": 11,
+      "failed": 0,
+      "seconds": 13.59
+    },
+    "r05ResourcePressure": {
+      "passed": 2,
+      "failed": 0,
+      "seconds": 231.55,
+      "cycles": {
+        "cancel": 60,
+        "error": 60,
+        "ok": 15,
+        "long": 10,
+        "worker": 15
+      }
+    },
+    "directoryPredicateControls": {
+      "passed": 6,
+      "failed": 0,
+      "originalAssertionsAndTimeoutsUnchanged": true
+    }
+  },
+  "repairPreparationFailurePreserved": "R05 author r1 omitted LINGXI_PRODUCT_DIR; 0 model/usage. This is not claimed as business negative control; corrected environment r2 passed original suite.",
+  "newTargetedDirectoryFailurePreserved": "/private/tmp/r06-targeted-formal-r2-repairs/r06_test_9b21a2d853775007038f: actual GUI completed but old wait sampled before React notice commit, Option unwrap at line187; no old FAIL altered.",
+  "requiredChecks": {
+    "registrationContracts": 20,
+    "strictClippy": "PASS",
+    "workspaceFmt": "PASS",
+    "apiGenerated56And626Entries": "PASS",
+    "ownershipAndDependencyBoundary": "PASS",
+    "ownHistoricalSyntheticDirectoryCloneCleanup": "PASS"
+  },
+  "original599BindingsExactlyUnchanged": true,
+  "original279AndSpecialContractAcceptanceUnchanged": true,
+  "fullRepeatedPrecheckExecuted": false,
+  "allCurrentSources": {
+    "rust/crates/lingxi-kernel/src/toolcatalog.rs": "4b23cebbe17f0b4656372b243e2ca8ba53597b63dd5c07e9fbe72df5c6c32830",
+    "rust/crates/lingxi-service/src/lib.rs": "3170205170b2dee49c17e667d9e0d4e73cc69c3e1a9bc321070656462f2e0d57",
+    "rust/crates/lingxi-service/tests/r06_ar_f07_catalog.rs": "ae02f6265400a2dd383977c42517dc62fa867ff9a4db6c31515ea18bea03338e",
+    "rust/crates/lingxi-service/tests/background_steering.rs": "7cf1c40e0bde65fbbb0dd670e4d15246750b4ea8dcbd92c8995d54eb8dcbb050",
+    "rust/crates/lingxi-adapters/tests/session_file_store.rs": "270a1a182b65c3aae5e94948921ffdf778815a5176e50521dc6215676282b62e",
+    "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs": "949757f3213af70445b942d0c3380451d22d675635f43ff3f696f476daa4dc4b",
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": "415ee0869ad494d763be68592d473be54fb28c01209363c7fe3fc32570541acd",
+    "desktop/src-tauri/tests/directory_picker_host.rs": "6f1a6a4b2d7717b803ce0eee3eae1509d6dca60fb480d0dc20fec3c4dde2fd79"
+  },
+  "stageAccepted": false,
+  "F14": "OPEN",
+  "R07Ready": false,
+  "futureCopilotCoauthor": "FORBIDDEN",
+  "platformLimit": "macOS real execution, synthetic local model suppliers; no Windows/Linux/paid supplier claim",
+  "latestUserScope": {
+    "instruction": "不要全部验收，只验收刚刚修复的问题。",
+    "fullFormalReacceptance": "EXPLICITLY_EXCLUDED_NOT_STARTED",
+    "targetedRepairValidation": "COMPLETE_PASS",
+    "fullStageAccepted": false,
+    "F14": "OPEN",
+    "R07Ready": false
+  },
+  "finalRegistrationContracts": {
+    "passed": 20,
+    "failed": 0,
+    "seconds": 43.079
+  },
+  "releaseBuildBeforeScopeChange": {
+    "exitCode": 0,
+    "seconds": 2.15,
+    "formalRunStarted": false
+  }
+}

@@ -114,6 +114,128 @@ use lingxi_service::toolgateway::{
 };
 use std::sync::Arc;
 
+#[test]
+fn trusted_resident_addition_preserves_default_policy_and_real_target_boundaries() {
+    let (registry, _gateway) = world();
+    let defaults = lingxi_service::toolcatalog_bridge::RESIDENT_NAMES;
+    assert_eq!(
+        defaults,
+        [
+            "read",
+            "write",
+            "edit",
+            "exec_command",
+            "mcp_search_tools",
+            "mcp_describe_tool",
+            "mcp_call"
+        ]
+    );
+    for name in ["read", "write", "edit", "exec_command"] {
+        let mut tool = manifest();
+        tool.local_name = name.into();
+        registry.register(tool, &SchemaBudget::default()).unwrap();
+    }
+    let mut worker = manifest();
+    worker.origin = ToolOrigin::Plugin {
+        plugin_id: "configured".into(),
+    };
+    worker.local_name = "probe".into();
+    let worker = registry
+        .register(worker, &SchemaBudget::default())
+        .unwrap()
+        .target_id;
+    let mut unrelated = manifest();
+    unrelated.local_name = "unrelated".into();
+    let unrelated = registry
+        .register(unrelated, &SchemaBudget::default())
+        .unwrap()
+        .target_id;
+    let before = ToolDeclarationSnapshot::from_registry(&registry).unwrap();
+    assert_eq!(before.declarations.len(), 7);
+    assert!(before.bind_target(worker.as_str()).is_none());
+    let generation = registry.catalog_generation();
+    let missing = ToolTargetId::parse("tool:plugin:missing:probe");
+    assert!(matches!(
+        registry.add_model_resident(&missing),
+        Err(ToolCatalogError::TargetNotFound { .. })
+    ));
+    assert_eq!(registry.catalog_generation(), generation);
+    registry.add_model_resident(&worker).unwrap();
+    assert_eq!(registry.catalog_generation(), generation + 1);
+    registry.add_model_resident(&worker).unwrap();
+    assert_eq!(registry.catalog_generation(), generation + 1);
+    let sent = ToolDeclarationSnapshot::from_registry(&registry).unwrap();
+    assert_eq!(sent.declarations.len(), 8);
+    assert!(sent.bind_target(unrelated.as_str()).is_none());
+    let declaration = sent
+        .declarations
+        .iter()
+        .find(|d| d.target == worker.as_str())
+        .unwrap();
+    assert_eq!(declaration.input_schema, manifest().input_schema);
+    registry
+        .set_availability(&worker, Availability::Deferred)
+        .unwrap();
+    let deferred_generation = registry.catalog_generation();
+    registry.add_model_resident(&worker).unwrap();
+    assert_eq!(registry.catalog_generation(), deferred_generation);
+    assert!(ToolDeclarationSnapshot::from_registry(&registry)
+        .unwrap()
+        .bind_target(worker.as_str())
+        .is_none());
+    registry
+        .set_availability(
+            &worker,
+            Availability::Disabled {
+                reason: "明确禁用".into(),
+            },
+        )
+        .unwrap();
+    let disabled_generation = registry.catalog_generation();
+    registry.add_model_resident(&worker).unwrap();
+    assert_eq!(registry.catalog_generation(), disabled_generation);
+    assert!(ToolDeclarationSnapshot::from_registry(&registry)
+        .unwrap()
+        .bind_target(worker.as_str())
+        .is_none());
+    assert!(registry
+        .prepare_invocation(
+            &ToolTargetRef::ByTargetId {
+                target_id: worker.clone()
+            },
+            None,
+            &json!({"path":"x"}),
+            &SchemaBudget::default()
+        )
+        .is_err());
+    assert!(
+        sent.bind_target(worker.as_str()).is_some(),
+        "旧发送快照仍冻结"
+    );
+}
+
+#[test]
+fn trusted_resident_addition_keeps_unconfigured_registry_unrestricted() {
+    let registry = ToolRegistry::new();
+    let first = registry
+        .register(manifest(), &SchemaBudget::default())
+        .unwrap()
+        .target_id;
+    let mut other = manifest();
+    other.local_name = "other".into();
+    registry.register(other, &SchemaBudget::default()).unwrap();
+    let generation = registry.catalog_generation();
+    registry.add_model_resident(&first).unwrap();
+    assert_eq!(registry.catalog_generation(), generation);
+    assert_eq!(
+        ToolDeclarationSnapshot::from_registry(&registry)
+            .unwrap()
+            .declarations
+            .len(),
+        2
+    );
+}
+
 fn route(protocol: ProtocolFamily) -> ResolvedModelRoute {
     ResolvedModelRoute {
         provider: "fixture".into(),

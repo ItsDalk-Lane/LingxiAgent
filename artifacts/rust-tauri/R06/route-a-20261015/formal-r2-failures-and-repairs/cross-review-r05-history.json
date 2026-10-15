@@ -1,0 +1,229 @@
+{
+  "schema": "lingxi.independent-r05-history-cross-review.v1",
+  "conclusion": "STATIC_CROSS_REVIEW_PASS",
+  "independentTestsExecuted": 0,
+  "sourceModified": false,
+  "patchSha256": "c2720b6fbb1da483fd78d925d6f9bd6df6ba31172cd5ffc584b161c634206024",
+  "files": {
+    "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs": {
+      "baseSha256": "d53c0f50dce304eb62460c206cb2d38b78ad4d524dcb6f1706df489f7b7a258b",
+      "candidateSha256": "949757f3213af70445b942d0c3380451d22d675635f43ff3f696f476daa4dc4b"
+    },
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": {
+      "baseSha256": "23b03f56bef900fc0563b3348596e61437995f7c05cc25a5173455f11a23e33f",
+      "candidateSha256": "415ee0869ad494d763be68592d473be54fb28c01209363c7fe3fc32570541acd"
+    }
+  },
+  "assertionPreservation": {
+    "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs": {
+      "originalCount": 157,
+      "candidateCount": 161,
+      "removedSyntax": [
+        "assert_eq!( messages[3][\"content\"], v1, \"round {round}: the FRESH nonce rode the next request verbatim\" )"
+      ]
+    },
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": {
+      "originalCount": 79,
+      "candidateCount": 85,
+      "removedSyntax": []
+    }
+  },
+  "defaultProductHistoryRemoved": false,
+  "onlyChangedOldAssertion": "C02 fixed absolute index replaced by unique current submission read receipt, exact same v1 equality",
+  "allResourceConstantsByteEqual": true,
+  "patchReplayMatchesCurrent": {
+    "rust/crates/lingxi-service/tests/r05_t08_closed_loop.rs": true,
+    "rust/crates/lingxi-service/tests/r05_t08_resources.rs": true
+  },
+  "sameLatestUserBoundaryAcrossBothFiles": {
+    "current_turn_messages": true,
+    "last_tool_result": true,
+    "user_text": true
+  },
+  "productionPrerequisitesMatch": {
+    "rust/crates/lingxi-kernel/src/toolcatalog.rs": true,
+    "rust/crates/lingxi-service/src/lib.rs": true,
+    "rust/crates/lingxi-service/src/runs.rs": true,
+    "rust/crates/lingxi-service/src/model_history.rs": true
+  },
+  "logs": {
+    "closed-loop-r1.log": {
+      "sha256": "f6245b727853d8fb7049f0d1044117efdb52ce808b8a2e6008f5c5737bf5d788"
+    },
+    "closed-loop-r2.log": {
+      "sha256": "10e4979717025fa787e8b37db9bec26d0647bf6bf34bf52a060f1be0f53c8871"
+    },
+    "resources-r1.log": {
+      "sha256": "97efc1e14bc8e578a62edb8df67d2e70fe86daf4767bcef94ba31506e5dcee64"
+    }
+  },
+  "authorLoggedResults": {
+    "closedLoop": "11 PASS / 0 FAIL / 0 filtered, 13.59s",
+    "resources": "2 PASS / 0 FAIL / 0 filtered, 231.55s"
+  },
+  "firstEnvironmentFailureFacts": [
+    {
+      "database": "/tmp/r06-repair-r05-history-stubs/runtime/tmp/lingxi-r05t08-c02-home-30061-1792072640841223000/lingxi-service/data/runs.db",
+      "runs": [
+        [
+          "failed",
+          "failed.provider_error"
+        ]
+      ],
+      "modelCalls": 0,
+      "modelEvents": 0
+    },
+    {
+      "database": "/tmp/r06-repair-r05-history-stubs/runtime/tmp/lingxi-r05t08-c01-home-30061-1792072579096498000/lingxi-service/data/runs.db",
+      "runs": [
+        [
+          "failed",
+          "failed.provider_error"
+        ]
+      ],
+      "modelCalls": 0,
+      "modelEvents": 0
+    }
+  ],
+  "authorRawResourceSeries": {
+    "path": "/tmp/r06-repair-r05-history-stubs/f27-runtime/tmp/lingxi-r05f27-f27-series-30766-1792072741192827000/f27-resource-series.json",
+    "sha256": "3af8119d4adbbc2c62724c6006555261ce38d0e539337542aa218e79eef7c7f9",
+    "cycleCounts": {
+      "cancel": 60,
+      "error": 60,
+      "ok": 15,
+      "long": 10,
+      "worker": 15
+    },
+    "longExecutions": [
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 0,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      }
+    ],
+    "workerExecutions": [
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      },
+      {
+        "joinedCallbacks": 1,
+        "mainCalls": 2,
+        "toolCompleted": 1
+      }
+    ]
+  },
+  "reviewBoundary": "只读源码、差异、现存日志/原始资源JSON及首次环境失败SQLite(mode=ro)；未构建、运行或重跑产品测试。作者全量动态结果作为交叉核验过的既有证据，不冒称独立执行。"
+}

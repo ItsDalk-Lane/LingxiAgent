@@ -1514,6 +1514,14 @@ impl ServiceState {
                     &budget,
                 );
                 toolcatalog_bridge::register(&registry, gateway.as_ref(), &budget);
+                // 保留默认七项目录策略，补充已注册终端工具的真实配对声明。
+                registry
+                    .add_model_resident(&_core_process_tools.write_stdin_target)
+                    .map_err(|err| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!("cannot declare the terminal continuation tool: {err}"),
+                        })
+                    })?;
                 tool_plane = Some((
                     Arc::clone(&registry),
                     Arc::clone(&gateway),
@@ -1990,6 +1998,17 @@ impl ServiceState {
                     ServiceStartupError::Storage(StorageError::InvalidRequest {
                         detail: format!(
                             "cannot make the config-declared worker {} resident: {err}",
+                            worker_registration.local_name
+                        ),
+                    })
+                })?;
+            // 可用性和声明筛选相互独立，只补充刚经配置校验并注册成功的目标。
+            registry
+                .add_model_resident(&registered.target)
+                .map_err(|err| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: format!(
+                            "cannot declare the config-declared worker {}: {err}",
                             worker_registration.local_name
                         ),
                     })

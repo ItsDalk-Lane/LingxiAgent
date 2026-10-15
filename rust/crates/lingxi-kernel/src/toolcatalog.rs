@@ -1743,6 +1743,23 @@ impl ToolRegistry {
         }
     }
 
+    /// 为可信宿主已注册的单个目标补充声明资格，不改变可用性或执行授权。
+    pub fn add_model_resident(&self, target: &ToolTargetId) -> Result<(), ToolCatalogError> {
+        let mut state = self.lock();
+        if !state.targets.contains_key(target) {
+            return Err(ToolCatalogError::TargetNotFound {
+                reference: format!("target {target}"),
+            });
+        }
+        // 未配置筛选时原本已声明全部可用目标，不将其收窄为单个目标。
+        if let Some(residents) = state.model_residents.as_mut() {
+            if residents.insert(target.clone()) {
+                state.catalog_generation += 1;
+            }
+        }
+        Ok(())
+    }
+
     /// 一次原子读取完整的当前模型声明；按需工具仍保留在真实目录。
     pub fn model_declaration_snapshot(&self) -> (u64, Vec<ToolFullDescription>) {
         self.model_declaration_snapshot_with_activated_targets(&std::collections::BTreeSet::new())

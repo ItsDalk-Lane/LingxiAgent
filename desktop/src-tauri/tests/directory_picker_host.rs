@@ -156,7 +156,8 @@ async fn native_directory_picker_returns_real_path_cancel_null_and_never_install
         serde_json::to_vec(&json!({"phase":"choose","folder":folder})).unwrap(),
     )
     .unwrap();
-    let selected = driver.wait_script("return window.__directoryResults.length===1 && {result:window.__directoryResults[0],input:document.querySelector('[aria-label=技能目录]').value,notice:document.querySelector('[role=status]')?.textContent};",json!([]),Duration::from_secs(240)).await;
+    // 原生回包事件先于 React 提交；须等原断言要求的界面提示真正显示。
+    let selected = driver.wait_script("return window.__directoryResults.length===1 && document.querySelector('[role=status]')?.textContent?.includes('尚未安装') && {result:window.__directoryResults[0],input:document.querySelector('[aria-label=技能目录]').value,notice:document.querySelector('[role=status]')?.textContent};",json!([]),Duration::from_secs(240)).await;
     assert_eq!(selected["result"], json!(folder));
     assert_eq!(selected["input"], json!(folder));
     assert!(selected["notice"].as_str().unwrap().contains("尚未安装"));
@@ -181,7 +182,8 @@ async fn native_directory_picker_returns_real_path_cancel_null_and_never_install
         )
         .await;
     fs::write(root.join("cancel-ready.json"), b"{\"phase\":\"cancel\"}").unwrap();
-    let cancelled=driver.wait_script("return window.__directoryResults.length===2 && {result:window.__directoryResults[1],input:document.querySelector('[aria-label=技能目录]').value,notice:document.querySelector('[role=status]')?.textContent};",json!([]),Duration::from_secs(240)).await;
+    // 收到取消回包不等于取消提示已经完成渲染，不提前截取中间状态。
+    let cancelled=driver.wait_script("return window.__directoryResults.length===2 && document.querySelector('[role=status]')?.textContent?.includes('已取消') && {result:window.__directoryResults[1],input:document.querySelector('[aria-label=技能目录]').value,notice:document.querySelector('[role=status]')?.textContent};",json!([]),Duration::from_secs(240)).await;
     assert_eq!(cancelled["result"], Value::Null);
     assert_eq!(cancelled["input"], json!(folder));
     assert!(cancelled["notice"].as_str().unwrap().contains("已取消"));

@@ -1,0 +1,40 @@
+{
+  "passed": 6,
+  "failed": 0,
+  "originalAssertionsUnchanged": true,
+  "originalTimeoutsUnchanged": true,
+  "cases": [
+    {
+      "name": "selected",
+      "phase": "event-before-ui",
+      "oldReturnsPrematureSnapshot": true,
+      "fixedWaits": true
+    },
+    {
+      "name": "selected",
+      "phase": "wrong-ui-notice",
+      "fixedWaits": true
+    },
+    {
+      "name": "selected",
+      "phase": "actual-expected-ui-ready",
+      "snapshotPreservesAllFields": true
+    },
+    {
+      "name": "cancelled",
+      "phase": "event-before-ui",
+      "oldReturnsPrematureSnapshot": true,
+      "fixedWaits": true
+    },
+    {
+      "name": "cancelled",
+      "phase": "wrong-ui-notice",
+      "fixedWaits": true
+    },
+    {
+      "name": "cancelled",
+      "phase": "actual-expected-ui-ready",
+      "snapshotPreservesAllFields": true
+    }
+  ]
+}

@@ -825,11 +825,21 @@ async fn wait_run_status(
     }
 }
 
-/// The content of the LAST `role: "tool"` message of a provider request —
-/// what the model legitimately observed from the previous tool round.
-fn last_tool_result(body: &serde_json::Value) -> Option<String> {
-    let messages = body["messages"].as_array()?;
+/// 保留真实完整历史，但替身状态只由最新用户提交及其后的消息决定。
+fn current_turn_messages(body: &serde_json::Value) -> &[serde_json::Value] {
+    let Some(messages) = body["messages"].as_array() else {
+        return &[];
+    };
     messages
+        .iter()
+        .rposition(|message| message["role"] == "user")
+        .map(|start| &messages[start..])
+        .unwrap_or(&[])
+}
+
+/// 只读取本轮真正执行后的最后工具结果，不能复用上一轮结果。
+fn last_tool_result(body: &serde_json::Value) -> Option<String> {
+    current_turn_messages(body)
         .iter()
         .rev()
         .find(|m| m["role"] == "tool")
@@ -837,19 +847,12 @@ fn last_tool_result(body: &serde_json::Value) -> Option<String> {
         .map(str::to_string)
 }
 
-/// The user text of the request (the first user message) — how the
-/// behavioral router tells two sessions' intents apart without any identity
-/// payload (there is none: identity never rides model requests).
+/// 最新提交的文本用于区分本次意图，不从旧用户消息推测本轮。
 fn user_text(body: &serde_json::Value) -> String {
-    body["messages"]
-        .as_array()
-        .and_then(|messages| {
-            messages
-                .iter()
-                .find(|m| m["role"] == "user")
-                .and_then(|m| m["content"].as_str())
-                .map(str::to_string)
-        })
+    current_turn_messages(body)
+        .first()
+        .and_then(|message| message["content"].as_str())
+        .map(str::to_string)
         .unwrap_or_default()
 }
 
@@ -1128,6 +1131,7 @@ async fn c02_two_full_chain_runs_different_runtime_nonces() {
     let addr = child.addr;
 
     let mut final_rows: Vec<String> = Vec::new();
+    let mut nonces = Vec::new();
     for round in 1..=2u32 {
         // The nonce is generated AFTER the stub router is fixed and written
         // into the file only now — the stub cannot pre-know either value.
@@ -1152,14 +1156,43 @@ async fn c02_two_full_chain_runs_different_runtime_nonces() {
             .cloned()
             .collect();
         assert_eq!(this_round.len(), 4, "round {round}: four provider turns");
-        let messages = this_round[1].2["messages"].as_array().expect("messages");
-        // R06-T01: messages[0] is the compiled system context; the read's
-        // tool result now sits at index 3.
+        let read_results: Vec<_> = current_turn_messages(&this_round[1].2)
+            .iter()
+            .filter(|message| {
+                message["role"] == "tool" && message["tool_call_id"] == "call_t08_read"
+            })
+            .collect();
+        assert_eq!(read_results.len(), 1, "本轮只有一次精确 read 回执");
         assert_eq!(
-            messages[3]["content"], v1,
+            read_results[0]["content"], v1,
             "round {round}: the FRESH nonce rode the next request verbatim"
         );
+        if round == 2 {
+            let history = this_round[0].2["messages"].as_array().expect("完整历史");
+            assert!(
+                history.iter().any(|message| {
+                    message["role"] == "user" && message["content"] == "process beta.txt round 1"
+                }),
+                "第二轮保留第一轮真实用户提交"
+            );
+            assert!(
+                history.iter().any(|message| {
+                    message["role"] == "tool"
+                        && message["content"].as_str().is_some_and(|content| {
+                            content.contains(&nonces[0]) && content.contains(EDIT_MARKER)
+                        })
+                }),
+                "第二轮保留第一轮真实工具结果"
+            );
+        }
         let db = open_runs_db(&h.home);
+        assert_eq!(
+            query_one(&db,
+                "SELECT COUNT(*) FROM key_events WHERE run_id = ?1 AND event_type = 'tool_call_completed'",
+                &[&run_id]).as_deref(),
+            Some("3"),
+            "每轮真实完成 read/edit/read，不能仅复用旧结果"
+        );
         let final_row = query_one(
             &db,
             "SELECT content_json FROM messages WHERE run_id = ?1",
@@ -1171,6 +1204,7 @@ async fn c02_two_full_chain_runs_different_runtime_nonces() {
             "round {round} final came from THIS round's tool result: {final_row}"
         );
         final_rows.push(final_row);
+        nonces.push(nonce);
     }
 
     // The two rounds' finals must differ (no fixed template, no turn-number
@@ -1202,10 +1236,10 @@ async fn c03_allowed_and_denied_file_sentinels() {
     let read_for_stub = read_denied.clone();
     let edit_for_stub = edit_denied.clone();
     let stub = StubServer::start(Box::new(move |body| {
-        let tool_count = body["messages"]
-            .as_array()
-            .map(|m| m.iter().filter(|x| x["role"] == "tool").count())
-            .unwrap_or(0);
+        let tool_count = current_turn_messages(body)
+            .iter()
+            .filter(|message| message["role"] == "tool")
+            .count();
         match last_tool_result(body).as_deref() {
             None => Step::Sse(tool_call_turn("call_t08_rd", "read", &read_for_stub)),
             Some(content) if content.contains("DO-NOT-TOUCH") => {
@@ -1900,18 +1934,7 @@ async fn c08_two_sessions_shared_callid_isolated() {
     let mut saw_eta_nonce_on_a = false;
     let mut saw_zeta_nonce_on_b = false;
     for (_, _, body) in &requests {
-        let session_of = if body["messages"]
-            .as_array()
-            .map(|m| {
-                m.iter().any(|x| {
-                    x["role"] == "user"
-                        && x["content"]
-                            .as_str()
-                            .is_some_and(|c| c.contains("file-eta"))
-                })
-            })
-            .unwrap_or(false)
-        {
+        let session_of = if user_text(body).contains("file-eta") {
             "a"
         } else {
             "b"

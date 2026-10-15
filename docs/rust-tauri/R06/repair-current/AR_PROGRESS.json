@@ -1,6 +1,6 @@
 {
   "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
-  "current_status": "R06_NOT_ACCEPTED_STAGE_REVIEW_PENDING",
+  "current_status": "R06_NOT_ACCEPTED_TARGETED_REPAIRS_VALIDATION_COMPLETE",
   "historical_acceptance": {
     "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
     "status": "SUPERSEDED_BY_AR_SCOPE_CHALLENGE",
@@ -604,7 +604,7 @@
     }
   ],
   "entry_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01",
-  "stage_gate": "PENDING_ORIGINAL_FORMAL_STAGE_WITH_EQUIVALENT_PARALLEL_SOURCE_HASHING",
+  "stage_gate": "PREVIOUS_FORMAL_FAIL_PRESERVED_NEW_FULL_STAGE_EXCLUDED_BY_USER",
   "upstream_gates": "NOT_RUN",
   "entry_checks": [
     {
@@ -1179,7 +1179,7 @@
     "receipt": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/independent-reviews/",
     "note": "2026-10-14 收口轮：14 项独立审查 PASS（RV1-RV7 全新空历史子代理于冻结候选独立克隆亲跑），F14 由正式门禁关闭；GUI 真实链路证据在案（两叶待阶段裁定）；192 READY / 87 GAP"
   },
-  "last_updated_utc": "2026-10-14T16:42:23.359514+00:00",
+  "last_updated_utc": "2026-10-15T14:20:19.234088+00:00",
   "control_corrections": [
     {
       "at": "2026-10-11T09:48:29.816963+00:00",
@@ -2100,17 +2100,13 @@
     }
   ],
   "latest_user_execution_scope": {
-    "atUtc": "2026-10-12T05:04:41.207301+00:00",
-    "request": "先直接修复原15个问题，不检查其他问题，不做其他验收",
-    "mode": "DIRECT_F01_F15_IMPLEMENTATION_ONLY",
-    "receipt": "artifacts/rust-tauri/R06/direct-repair-20261012/DIRECT_REPAIR_RECEIPT.json",
-    "preserveExistingResults": true,
-    "formalAcceptance": "NOT_RUN_PER_CURRENT_USER_SCOPE",
-    "otherIssueInvestigation": "NOT_RUN",
-    "commit": "NOT_DONE",
-    "push": "NOT_DONE",
-    "note": "本轮实现与必要衔接确认单独记录。原FAIL/PASS、独立审查和阶段放行状态保留；旧执行流水不是当前正在运行的任务。",
-    "implementationStatus": "F01_F15_SOURCE_REPAIRS_INTEGRATED_NOT_FORMAL_ACCEPTANCE"
+    "instruction": "不要全部验收，只验收刚刚修复的问题。",
+    "scope": "ONLY_NEWLY_REPAIRED_FAILURES",
+    "result": "TARGETED_REPAIRS_VALIDATION_PASS",
+    "fullStageReexecution": "NOT_STARTED_EXPLICITLY_EXCLUDED",
+    "stageAccepted": false,
+    "F14": "OPEN",
+    "R07Ready": false
   },
   "route_a_continuation_20261014": {
     "user_route": "A_IMPLEMENT_ALL_78_NO_GOVERNANCE_CHANGE",
@@ -2593,6 +2589,34 @@
       "registeredBindingsUnchanged": 599,
       "scopeCriteriaAndCheckpointsUnchanged": true,
       "formalStageAccepted": false
+    },
+    "formal_r2_20261015": {
+      "candidateCommit": "14453cd05b8aeec7951f27c4dbd021ad2a21d486",
+      "actualExitCode": 1,
+      "fullOriginalChainFinished": true,
+      "allStageSourcesStable": true,
+      "registeredBindings": {
+        "total": 599,
+        "passed": 596,
+        "failed": 3
+      },
+      "originalAssertionCases": {
+        "total": 687,
+        "passed": 677,
+        "failed": 10
+      },
+      "uniqueFailedTests": 11,
+      "additionalGeneratedChecksFailed": 2,
+      "additionalCleanupChecksFailed": 1,
+      "report": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/formal-r2-final-readback.json",
+      "repairStatus": "TARGETED_REPAIRS_VALIDATION_COMPLETE_PASS",
+      "repeatedFullPrecheck": "CANCELLED_BY_USER_DO_NOT_RUN",
+      "nextAcceptance": "NONE_IN_CURRENT_SCOPE_FULL_STAGE_EXPLICITLY_EXCLUDED",
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "futureCopilotCoauthor": "FORBIDDEN_BY_LATEST_USER_INSTRUCTION",
+      "repairReport": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/repair-result.json"
     }
   },
   "ex12_additional_reopen": {
@@ -2615,5 +2639,5 @@
     "registeredBindingsPassed": 9,
     "bindingWindow": "artifacts/rust-tauri/R06/route-a-20261015/ex12-current-binding-window-summary.json"
   },
-  "stage_gate_previous_executed_failure": "FAIL_EXECUTED_2026-10-14_BLOCKED_78_REQUIRED_BEHAVIOR_PENDING_LEAVES"
+  "stage_gate_previous_executed_failure": "FAIL_EXECUTED_14453CD05_FORMAL_R2"
 }
