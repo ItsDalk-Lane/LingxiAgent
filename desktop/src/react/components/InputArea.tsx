@@ -646,14 +646,20 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   }, [sessionConfirmationExiting]);
 
   // ── 全局 inline notice（截图等非斜杠命令的轻提示）──
+  const inlineNoticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     const handler = (e: Event) => {
       const { text, type, deskDir, filePath } = (e as CustomEvent).detail;
+      if (inlineNoticeTimer.current !== null) clearTimeout(inlineNoticeTimer.current);
       setSlashResult({ text, type, deskDir, filePath });
-      setTimeout(() => setSlashResult(null), 3000);
+      // 连续命令的新收据拥有完整显示时段，旧提示定时器不能抹掉它。
+      inlineNoticeTimer.current = setTimeout(() => { inlineNoticeTimer.current = null; setSlashResult(null); }, 3000);
     };
     window.addEventListener('hana-inline-notice', handler);
-    return () => window.removeEventListener('hana-inline-notice', handler);
+    return () => {
+      window.removeEventListener('hana-inline-notice', handler);
+      if (inlineNoticeTimer.current !== null) clearTimeout(inlineNoticeTimer.current);
+    };
   }, []);
 
   // ── Welcome 模式 placeholder tip（mount、i18n ready、每次 welcome 重新激活时随机一条） ──

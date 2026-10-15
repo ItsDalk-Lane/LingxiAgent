@@ -4297,3 +4297,512 @@ async fn legacy_cache_requires_explicit_rebuild_before_paid_query_and_preserves_
     upstream.abort();
     let _ = upstream.await;
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn ex09_section_filter_applies_before_real_top_one_and_keeps_citable_source() {
+    use std::future::IntoFuture;
+    let home = unique_dir("ex09-section-boundary");
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route(
+                    "/chat/completions",
+                    axum::routing::post(knowledge_proof_provider),
+                )
+                .with_state(script.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot_chat(&home, &endpoint).await;
+    let knowledge = state.knowledge().clone();
+    let server = serve(state).await;
+    let nb = knowledge.create_notebook("章节边界").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    knowledge
+        .update_notebook_settings(&nb, &json!({"chunkTargetChars":100}))
+        .unwrap();
+    let file = home.join("chapters.md");
+    std::fs::write(
+        &file,
+        format!(
+            "# Other\n\n{}\n\n# Chosen\n\nneedle SELECTED {}",
+            ("needle ".repeat(30) + "UNSELECTED.\n\n").repeat(8),
+            "padding ".repeat(30)
+        ),
+    )
+    .unwrap();
+    let imported = knowledge
+        .import_file(&nb, file.to_str().unwrap(), Some("章节来源"))
+        .unwrap();
+    let src = imported["source"]["id"].as_str().unwrap().to_string();
+    wait_until_job(&server, &nb, &src, "pending_embedding").await;
+    script.lock().unwrap().calls = vec![(
+        "knowledge_search".into(),
+        json!({"scopeId":"runtime","query":"needle","channel":"fts","sectionKeys":["Chosen"],"limit":1}),
+    )];
+    let(status,result)=server.request("POST","/lingxi/v1/sessions/sess_local_alpha/execute",Some(json!({"input":"只检索指定章节","knowledge":{"notebookIds":[nb],"sourceIds":[src]}}))).await;
+    assert_eq!(status, 200, "{result}");
+    let request = script.lock().unwrap().requests.last().unwrap().clone();
+    let text = request["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .rev()
+        .find(|m| m["role"] == "tool" && m["tool_call_id"] == "original-result-0")
+        .map(proof_content)
+        .unwrap();
+    let found: Value = serde_json::from_str(&text).unwrap();
+    std::fs::write(
+        home.join("actual-filtered-tool-result.json"),
+        found.to_string(),
+    )
+    .unwrap();
+    assert_eq!(found["hits"].as_array().unwrap().len(), 1, "{found}");
+    assert_eq!(
+        found["hits"][0]["headingPath"],
+        json!(["Chosen"]),
+        "必须在top1之前过滤：{found}"
+    );
+    assert!(found.to_string().contains("SELECTED"), "{found}");
+    assert!(!found.to_string().contains("UNSELECTED"), "{found}");
+    assert!(
+        found["hits"][0]["spans"][0]["citationMarkdown"]
+            .as_str()
+            .is_some(),
+        "{found}"
+    );
+    println!("EX09_FILTER_REAL_HOME {}", home.display());
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+fn ex09_delivered(script: &Arc<std::sync::Mutex<KnowledgeProofScript>>, index: usize) -> String {
+    let request = script.lock().unwrap().requests.last().unwrap().clone();
+    request["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .rev()
+        .find(|message| {
+            message["role"] == "tool"
+                && message["tool_call_id"] == format!("original-result-{index}")
+        })
+        .map(proof_content)
+        .unwrap()
+}
+
+async fn ex09_execute_search(
+    server: &TestServer,
+    script: &Arc<std::sync::Mutex<KnowledgeProofScript>>,
+    nb: &str,
+    source: &str,
+    args: Value,
+) -> String {
+    {
+        let mut pending = script.lock().unwrap();
+        pending.requests.clear();
+        pending.calls = vec![("knowledge_search".into(), args)];
+    }
+    let mut input = json!({"input":"核对指定检索边界","knowledge":{"notebookIds":[nb]}});
+    if !source.is_empty() {
+        input["knowledge"]["sourceIds"] = json!([source]);
+    }
+    let (status, result) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(input),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    ex09_delivered(script, 0)
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn ex09_real_hybrid_section_filter_rejects_foreign_keys_and_reports_unconnected_rerank() {
+    use std::future::IntoFuture;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let home = unique_dir("ex09-hybrid-filter");
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let embeddings = Arc::new(AtomicUsize::new(0));
+    let sent = embeddings.clone();
+    let reranks = Arc::new(AtomicUsize::new(0));
+    let reranked = reranks.clone();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let router=axum::Router::new().route("/chat/completions",axum::routing::post(knowledge_proof_provider)).with_state(script.clone())
+        .route("/embeddings",axum::routing::post(move|body:axum::Json<Value>|{let sent=sent.clone();async move{sent.fetch_add(1,Ordering::SeqCst);let data=body["input"].as_array().unwrap().iter().enumerate().map(|(index,text)|json!({"index":index,"embedding":if text.as_str().unwrap().contains("SELECTED_BODY"){vec![0.0,1.0,0.0,0.0]}else{vec![1.0,0.0,0.0,0.0]}})).collect::<Vec<_>>();axum::Json(json!({"data":data,"usage":{"prompt_tokens":5,"total_tokens":5}}))}}))
+        .route("/rerank",axum::routing::post(move||{let reranked=reranked.clone();async move{reranked.fetch_add(1,Ordering::SeqCst);axum::Json(json!({"results":[]}))}}));
+    let upstream = tokio::spawn(axum::serve(listener, router).into_future());
+    let state = boot_chat_with_embedding(&home, &endpoint, true).await;
+    let knowledge = state.knowledge().clone();
+    let server = serve(state).await;
+    let nb = knowledge.create_notebook("Hybrid章节").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    knowledge
+        .update_notebook_settings(&nb, &json!({"chunkTargetChars":100}))
+        .unwrap();
+    let file = home.join("hybrid.md");
+    std::fs::write(
+        &file,
+        format!(
+            "# Other\n\n{}\n\n# Chosen\n\nneedle SELECTED_BODY {}",
+            ("needle ".repeat(30) + "OUTSIDE_CHAPTER.\n\n").repeat(8),
+            "padding ".repeat(30)
+        ),
+    )
+    .unwrap();
+    let own = knowledge
+        .import_file(&nb, file.to_str().unwrap(), Some("授权来源"))
+        .unwrap();
+    let src = own["source"]["id"].as_str().unwrap().to_string();
+    wait_until_job(&server, &nb, &src, "done").await;
+    let otherfile = home.join("excluded.md");
+    std::fs::write(&otherfile, "# Excluded\n\nneedle EXCLUDED_SOURCE_SECRET").unwrap();
+    let other = knowledge
+        .import_file(&nb, otherfile.to_str().unwrap(), Some("未选来源"))
+        .unwrap();
+    let other_src = other["source"]["id"].as_str().unwrap();
+    wait_until_job(&server, &nb, other_src, "done").await;
+    knowledge
+        .update_notebook_settings(
+            &nb,
+            &json!({"rerankModelRef":{"provider":"configured-provider","id":"configured-rerank"}}),
+        )
+        .unwrap();
+    let args = json!({"scopeId":"runtime","query":"needle","channel":"hybrid","sectionKeys":["Chosen"],"limit":3});
+    let before = embeddings.load(Ordering::SeqCst);
+    let hybrid: Value =
+        serde_json::from_str(&ex09_execute_search(&server, &script, &nb, &src, args.clone()).await)
+            .unwrap();
+    assert_eq!(embeddings.load(Ordering::SeqCst), before + 1);
+    assert_eq!(hybrid["mode"], "hybrid");
+    assert!(!hybrid["hits"].as_array().unwrap().is_empty(), "{hybrid}");
+    for hit in hybrid["hits"].as_array().unwrap() {
+        assert_eq!(hit["sourceId"], src);
+        assert_eq!(hit["headingPath"], json!(["Chosen"]), "{hybrid}");
+        assert_eq!(hit["grain"], "span");
+        assert_eq!(hit["kind"], "original-text");
+        assert!(hit["spans"]
+            .as_array()
+            .is_some_and(|spans| !spans.is_empty()));
+    }
+    assert!(!hybrid.to_string().contains("OUTSIDE_CHAPTER"));
+    assert!(!hybrid.to_string().contains("EXCLUDED_SOURCE_SECRET"));
+    assert!(
+        hybrid["degraded"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|d| d["reason"] == "KNOWLEDGE_RERANK_NOT_CONNECTED"
+                && d["detail"].as_str().unwrap().contains("configured-rerank")),
+        "{hybrid}"
+    );
+    assert_eq!(reranks.load(Ordering::SeqCst), 0);
+    knowledge
+        .update_notebook_settings(&nb, &json!({"rerankModelRef":null}))
+        .unwrap();
+    assert!(knowledge.get_notebook_config(&nb).unwrap()["rerankModelRef"].is_null());
+    let unconfigured: Value =
+        serde_json::from_str(&ex09_execute_search(&server, &script, &nb, &src, args.clone()).await)
+            .unwrap();
+    let order = |value: &Value| {
+        value["hits"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|hit| hit["chunkId"].clone())
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(
+        order(&unconfigured),
+        order(&hybrid),
+        "未接通重排必须保留实际融合排序"
+    );
+    assert!(unconfigured["degraded"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|d| d["reason"] != "KNOWLEDGE_RERANK_NOT_CONNECTED"));
+    knowledge
+        .update_notebook_settings(
+            &nb,
+            &json!({"rerankModelRef":{"provider":"configured-provider","id":"configured-rerank"}}),
+        )
+        .unwrap();
+    let mut local = args.clone();
+    local["channel"] = json!("fts");
+    let before = embeddings.load(Ordering::SeqCst);
+    let fts: Value =
+        serde_json::from_str(&ex09_execute_search(&server, &script, &nb, &src, local).await)
+            .unwrap();
+    assert_eq!(embeddings.load(Ordering::SeqCst), before);
+    assert_eq!(fts["mode"], "fts");
+    assert!(fts["degraded"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|d| d["reason"] != "KNOWLEDGE_RERANK_NOT_CONNECTED"));
+    assert!(fts["hits"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|hit| hit["headingPath"] == json!(["Chosen"])));
+    // 非本来源的真实章节、未知键、非法数组均不能静默变成全范围，也不得发查询嵌入。
+    for keys in [
+        json!(["Excluded"]),
+        json!(["never-existed"]),
+        json!([""]),
+        json!([" "]),
+        json!(["Chosen", 7]),
+        Value::Null,
+        json!("Chosen"),
+    ] {
+        let mut denied = args.clone();
+        denied["sectionKeys"] = keys.clone();
+        let text = ex09_execute_search(&server, &script, &nb, &src, denied).await;
+        assert!(text.starts_with("tool error"), "{keys}: {text}");
+        assert!(!text.contains("EXCLUDED_SOURCE_SECRET"));
+        assert_eq!(embeddings.load(Ordering::SeqCst), before);
+    }
+    let mut cross_source = args.clone();
+    cross_source["sourceIds"] = json!([src]);
+    cross_source["sectionKeys"] = json!(["Excluded"]);
+    let denied = ex09_execute_search(&server, &script, &nb, "", cross_source).await;
+    assert!(denied.contains("KNOWLEDGE_SCOPE_VIOLATION"), "{denied}");
+    assert_eq!(embeddings.load(Ordering::SeqCst), before);
+    // 只有空sectionKeys表示清除章节筛选；显式空来源/笔记本范围不能扩大成全部。
+    for field in ["sourceIds", "notebookIds"] {
+        let mut zero = args.clone();
+        zero[field] = json!([]);
+        zero["sectionKeys"] = json!([]);
+        let no_source: Value =
+            serde_json::from_str(&ex09_execute_search(&server, &script, &nb, &src, zero).await)
+                .unwrap();
+        assert!(
+            no_source["hits"].as_array().unwrap().is_empty(),
+            "显式空{field}不能扩大范围：{no_source}"
+        );
+        assert!(no_source["degraded"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|d| d["reason"] == "KNOWLEDGE_EMPTY_FILTER"));
+        assert_eq!(embeddings.load(Ordering::SeqCst), before);
+        assert_eq!(reranks.load(Ordering::SeqCst), 0);
+    }
+    let mut empty = args;
+    empty["sectionKeys"] = json!([]);
+    empty["channel"] = json!("fts");
+    let cleared: Value =
+        serde_json::from_str(&ex09_execute_search(&server, &script, &nb, &src, empty).await)
+            .unwrap();
+    assert!(!cleared["hits"].as_array().unwrap().is_empty());
+    assert!(cleared["hits"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|hit| hit["sourceId"] == src));
+    assert_eq!(embeddings.load(Ordering::SeqCst), before);
+    std::fs::write(home.join("hybrid-result.json"), hybrid.to_string()).unwrap();
+    println!("EX09_HYBRID_REAL_HOME {}", home.display());
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn ex09_source_section_and_span_grains_deliver_real_navigation_and_citations() {
+    use lingxi_adapters::storage::knowledge as ks;
+    use std::future::IntoFuture;
+    let home = unique_dir("ex09-grains");
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route(
+                    "/chat/completions",
+                    axum::routing::post(knowledge_proof_provider),
+                )
+                .with_state(script.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot_chat(&home, &endpoint).await;
+    let knowledge = state.knowledge().clone();
+    let nb = knowledge.create_notebook("粒度来源").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    knowledge
+        .update_notebook_settings(&nb, &json!({"chunkTargetChars":100}))
+        .unwrap();
+    // 受控解析器输出：章节标题来自结构元数据，不在正文里；生产存储/分块/检索不替身化。
+    let original = "body_unique_original 为真实原文，导航后才能引用。";
+    let facts = ks::KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let (source, snapshot) = facts
+        .create_source_with_snapshot(
+            knowledge.studio_id(),
+            "pasted_text",
+            "TitoloSourceQzx",
+            &json!({}),
+            original.as_bytes(),
+            "text/plain",
+        )
+        .unwrap();
+    facts.add_membership(&nb, &source.id).unwrap();
+    let artifact = ks::new_id("kpa");
+    facts
+        .begin_parse_artifact(
+            &artifact,
+            &snapshot.id,
+            "controlled-structure",
+            "1",
+            "config",
+        )
+        .unwrap();
+    let block = ks::BlockRow {
+        id: ks::new_id("kb"),
+        parse_artifact_id: artifact.clone(),
+        ordinal: 0,
+        text: original.into(),
+        text_sha256: ks::sha256_hex(original.as_bytes()),
+        locator_type: "markdown".into(),
+        locator: json!({"headingPath":["HeadingSectionVbn"]}),
+    };
+    facts.insert_blocks(std::slice::from_ref(&block)).unwrap();
+    facts
+        .complete_parse_artifact(&artifact, "ready", &[], "citation_grade", None)
+        .unwrap();
+    let blocks = vec![ks::ChunkerBlock {
+        id: block.id.clone(),
+        ordinal: 0,
+        text: block.text.clone(),
+        text_sha256: block.text_sha256.clone(),
+        locator_type: block.locator_type.clone(),
+        locator: block.locator.clone(),
+    }];
+    let profile = ks::current_cache_profile_hash(
+        &lingxi_kernel::knowledge::resolve_chunker_config(&blocks, Some(100))
+            .unwrap()
+            .2,
+    );
+    let chunks = ks::build_chunks(&artifact, &blocks, Some(100)).unwrap();
+    let sections = lingxi_kernel::knowledge::build_sections(&artifact, &blocks);
+    let metas = sections
+        .iter()
+        .map(|section| ks::SectionMetaRow {
+            id: section.id.clone(),
+            section_ordinal: section.section_ordinal,
+            heading_path: section.heading_path.clone(),
+            start_block_ordinal: section.start_block_ordinal,
+            end_block_ordinal: section.end_block_ordinal,
+        })
+        .collect::<Vec<_>>();
+    ks::KnowledgeIndexStore::open(&home.join("knowledge"))
+        .unwrap()
+        .replace_artifact_chunks(
+            &artifact,
+            &profile,
+            &lingxi_kernel::knowledge::block_fingerprint(&blocks),
+            &chunks,
+            &metas,
+        )
+        .unwrap();
+    let section = &sections[0].id;
+    {
+        let mut pending = script.lock().unwrap();
+        pending.calls = vec![
+            (
+                "knowledge_search".into(),
+                json!({"scopeId":"runtime","query":"TitoloSourceQzx","channel":"hybrid"}),
+            ),
+            (
+                "knowledge_search".into(),
+                json!({"scopeId":"runtime","query":"HeadingSectionVbn","channel":"hybrid"}),
+            ),
+            (
+                "knowledge_search".into(),
+                json!({"scopeId":"runtime","query":"body_unique_original","channel":"fts"}),
+            ),
+            (
+                "knowledge_read".into(),
+                json!({"scopeId":"runtime","sourceId":source.id,"sectionId":section,"maxChars":8000}),
+            ),
+            (
+                "knowledge_search".into(),
+                json!({"scopeId":"runtime","query":"NOMATCH_NEVER_IN_DOCUMENT","channel":"hybrid"}),
+            ),
+            (
+                "knowledge_search".into(),
+                json!({"scopeId":"runtime","query":format!("{} TitoloSourceQzx",(0..120).map(|n|format!("term{n}")).collect::<Vec<_>>().join(" ")),"channel":"hybrid"}),
+            ),
+        ];
+    }
+    let server = serve(state).await;
+    let(status,result)=server.request("POST","/lingxi/v1/sessions/sess_local_alpha/execute",Some(json!({"input":"核对三种检索粒度与真实导航","knowledge":{"notebookIds":[nb],"sourceIds":[source.id]}}))).await;
+    assert_eq!(status, 200, "{result}");
+    for (index, grain) in [(0, "source"), (1, "section")] {
+        let found: Value = serde_json::from_str(&ex09_delivered(&script, index)).unwrap();
+        assert_eq!(found["hits"].as_array().unwrap().len(), 1, "{found}");
+        let hint = &found["hits"][0];
+        assert_eq!(hint["grain"], grain);
+        assert_eq!(hint["kind"], "navigation-hint");
+        assert!(hint.get("spans").is_none());
+        assert!(!hint.to_string().contains("citationMarkdown"));
+        assert_eq!(hint["readMore"]["sourceId"], source.id);
+        assert_eq!(hint["readMore"]["sectionId"], section.as_str());
+    }
+    let span: Value = serde_json::from_str(&ex09_delivered(&script, 2)).unwrap();
+    assert_eq!(span["hits"][0]["grain"], "span");
+    assert_eq!(span["hits"][0]["kind"], "original-text");
+    assert_eq!(span["hits"][0]["spans"][0]["text"], original);
+    let citation = span["hits"][0]["spans"][0]["citationId"].as_str().unwrap();
+    let (status, resolved) = server
+        .request(
+            "GET",
+            &format!("/lingxi/v1/knowledge/citations/{citation}"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{resolved}");
+    assert!(resolved.to_string().contains(original));
+    assert!(resolved.to_string().contains(&snapshot.id));
+    let read: Value = serde_json::from_str(&ex09_delivered(&script, 3)).unwrap();
+    assert!(read.to_string().contains(original));
+    assert!(read.to_string().contains("citationMarkdown"));
+    let no_match: Value = serde_json::from_str(&ex09_delivered(&script, 4)).unwrap();
+    assert!(no_match["hits"].as_array().unwrap().is_empty());
+    let outside_term_budget: Value = serde_json::from_str(&ex09_delivered(&script, 5)).unwrap();
+    assert!(
+        outside_term_budget["hits"].as_array().unwrap().is_empty(),
+        "标题线索须与FTS遵守相同96词预算：{outside_term_budget}"
+    );
+    assert_eq!(
+        facts
+            .get_blocks_by_ids(std::slice::from_ref(&block.id))
+            .unwrap()[0],
+        block
+    );
+    std::fs::write(
+        home.join("grains-provider-requests.json"),
+        serde_json::to_vec_pretty(&script.lock().unwrap().requests).unwrap(),
+    )
+    .unwrap();
+    println!("EX09_GRAINS_REAL_HOME {}", home.display());
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}

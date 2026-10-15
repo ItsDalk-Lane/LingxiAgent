@@ -737,7 +737,8 @@ impl KnowledgeService {
         let parse_ref =
             |value: Option<&Value>| -> Result<Option<Option<ks::ModelRef>>, KnowledgeError> {
                 match value {
-                    None | Some(Value::Null) => Ok(None),
+                    None => Ok(None),
+                    Some(Value::Null) => Ok(Some(None)),
                     Some(value) => {
                         let provider = value["provider"].as_str().unwrap_or_default().to_string();
                         let id = value["id"].as_str().unwrap_or_default().to_string();
@@ -1646,6 +1647,18 @@ impl KnowledgeService {
         for id in &request.source_ids {
             self.require_scope_source(&scope, id)?;
         }
+        for id in &request.notebook_ids {
+            if !scope.notebook_ids.contains(id) {
+                return Err(KnowledgeError::scope_violation(
+                    "Knowledge notebook filter is outside the frozen scope",
+                ));
+            }
+        }
+        if request.section_keys.iter().any(|key| key.trim().is_empty()) {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge section filter must contain section identities",
+            ));
+        }
 
         // scope 编译：冻结源 → ready 检索锚（(artifact, chunkProfileHash, fingerprint)）。
         #[derive(Clone)]
@@ -1740,14 +1753,58 @@ impl KnowledgeService {
             }
         }
 
+        // 章节键只从本轮已选来源的当前索引生成；验证先于任何模型请求。
+        let mut section_metadata =
+            std::collections::BTreeMap::<String, Vec<ks::SectionMetaRow>>::new();
+        let mut current_chunks = std::collections::HashMap::<String, ks::StoredChunk>::new();
+        let mut allowed_chunk_ids = std::collections::BTreeSet::new();
+        let mut allowed_section_keys = std::collections::BTreeSet::new();
+        for source in &ready {
+            runtime
+                .check()
+                .map_err(|e| KnowledgeError::retrieval_unavailable(e.message))?;
+            let sections = self
+                .index
+                .list_artifact_section_metadata(&source.artifact_id)?;
+            for section in &sections {
+                if !section.heading_path.is_empty() {
+                    allowed_section_keys.insert(section.heading_path.join(" > "));
+                }
+            }
+            for chunk in self.index.list_variant_chunks(&source.variant_id)? {
+                let selected = request.section_keys.is_empty()
+                    || sections.iter().any(|section| {
+                        chunk.section_id.as_deref() == Some(section.id.as_str())
+                            && request
+                                .section_keys
+                                .contains(&section.heading_path.join(" > "))
+                    });
+                if selected {
+                    allowed_chunk_ids.insert(chunk.chunk_id.clone());
+                }
+                current_chunks.insert(chunk.chunk_id.clone(), chunk);
+            }
+            section_metadata.insert(source.artifact_id.clone(), sections);
+        }
+        if request
+            .section_keys
+            .iter()
+            .any(|key| !allowed_section_keys.contains(key))
+        {
+            return Err(KnowledgeError::scope_violation(
+                "Knowledge section filter is outside the selected frozen sources",
+            ));
+        }
+        let allowed = (!request.section_keys.is_empty()).then_some(&allowed_chunk_ids);
+
         // FTS 通道（scope 限定变体集合）。
         let variant_refs: Vec<&str> = ready
             .iter()
             .map(|scope| scope.variant_id.as_str())
             .collect();
-        let fts_hits = self
-            .index
-            .search_fts(&variant_refs, &fts_query, limit * 4)?;
+        let fts_hits =
+            self.index
+                .search_fts_in_chunks(&variant_refs, &fts_query, limit * 4, allowed)?;
 
         // 向量通道（hybrid；A14 维度门）。
         let mut vector_hits: Vec<(String, ks::VectorHit)> = Vec::new();
@@ -1819,8 +1876,12 @@ impl KnowledgeService {
                             }
                             if !viv_ids.is_empty() {
                                 mode = "hybrid".to_string();
-                                let hits =
-                                    self.vectors.search(&viv_ids, query_vector, limit * 4)?;
+                                let hits = self.vectors.search_in_chunks(
+                                    &viv_ids,
+                                    query_vector,
+                                    limit * 4,
+                                    allowed,
+                                )?;
                                 for hit in hits {
                                     vector_hits.push((hit.parse_artifact_id.clone(), hit));
                                 }
@@ -1871,17 +1932,21 @@ impl KnowledgeService {
             candidates_by_id.insert(hit.chunk.chunk_id.clone(), hit.chunk.clone());
         }
         for (_, hit) in &vector_hits {
+            let variant = self
+                .vectors
+                .get_variant(&hit.variant_id)?
+                .ok_or_else(|| KnowledgeError::index_invalid("vector hit variant disappeared"))?;
+            let chunk = current_chunks
+                .get(&hit.chunk_id)
+                .filter(|chunk| chunk.variant_id == variant.chunk_index_variant_id);
+            let Some(chunk) = chunk else {
+                return Err(KnowledgeError::index_invalid(
+                    "vector hit does not belong to the current source chunk plan",
+                ));
+            };
             candidates_by_id
                 .entry(hit.chunk_id.clone())
-                .or_insert_with(|| ks::StoredChunk {
-                    chunk_id: hit.chunk_id.clone(),
-                    variant_id: hit.variant_id.clone(),
-                    ordinal: 0,
-                    section_id: None,
-                    text: String::new(),
-                    token_count: 0,
-                    spans: Vec::new(),
-                });
+                .or_insert_with(|| chunk.clone());
         }
         // 命中组装（grain：span 命中带原文跨度；无跨度的纯标题命中为线索）。
         let mut hits: Vec<SearchHit> = Vec::new();
@@ -1907,6 +1972,19 @@ impl KnowledgeService {
                     page_number = block.locator.get("page").and_then(|value| value.as_u64());
                 }
             }
+            if heading_path.is_empty() {
+                if let Some(section) =
+                    section_metadata
+                        .get(&scope.artifact_id)
+                        .and_then(|sections| {
+                            sections.iter().find(|section| {
+                                chunk.section_id.as_deref() == Some(section.id.as_str())
+                            })
+                        })
+                {
+                    heading_path = section.heading_path.clone();
+                }
+            }
             hits.push(SearchHit {
                 source_id: scope.source_id.clone(),
                 source_name: scope.source_name.clone(),
@@ -1923,6 +2001,93 @@ impl KnowledgeService {
                 score,
                 chunk: chunk.clone(),
             });
+        }
+        if request.channel == SearchChannel::Hybrid {
+            let query_terms = ks::tokenize_search_text(query)
+                .into_iter()
+                .take(ks::MAX_SEARCH_QUERY_TERMS)
+                .collect::<std::collections::BTreeSet<_>>();
+            let title_matches = |text: &str| {
+                ks::tokenize_search_text(text)
+                    .iter()
+                    .any(|term| query_terms.contains(term))
+            };
+            // 只有真实章节和当前chunk提供的导航锚才可发布标题线索；不进入引文证据。
+            for source in &ready {
+                let sections = &section_metadata[&source.artifact_id];
+                let mut hints = Vec::new();
+                for section in sections {
+                    if title_matches(&section.heading_path.join(" > ")) {
+                        hints.push(("section", Some(section), section.heading_path.join(" > ")));
+                    }
+                }
+                if title_matches(&source.source_name) {
+                    hints.push(("source", None, source.source_name.clone()));
+                }
+                for (grain, section, title) in hints {
+                    if hits.len() >= limit {
+                        break;
+                    }
+                    let anchor = current_chunks
+                        .values()
+                        .filter(|chunk| {
+                            chunk.variant_id == source.variant_id
+                                && allowed_chunk_ids.contains(&chunk.chunk_id)
+                                && section.is_none_or(|section| {
+                                    chunk.section_id.as_deref() == Some(section.id.as_str())
+                                })
+                        })
+                        .min_by_key(|chunk| chunk.ordinal);
+                    let Some(anchor) = anchor else { continue };
+                    if hits.iter().any(|hit| {
+                        hit.section_id == anchor.section_id && hit.source_id == source.source_id
+                    }) {
+                        continue;
+                    }
+                    let mut clue = anchor.clone();
+                    clue.spans.clear();
+                    clue.text = title;
+                    let heading = sections
+                        .iter()
+                        .find(|section| clue.section_id.as_deref() == Some(section.id.as_str()))
+                        .map(|section| section.heading_path.clone())
+                        .unwrap_or_default();
+                    hits.push(SearchHit {
+                        source_id: source.source_id.clone(),
+                        source_name: source.source_name.clone(),
+                        parse_artifact_id: source.artifact_id.clone(),
+                        chunk_id: clue.chunk_id.clone(),
+                        section_id: clue.section_id.clone(),
+                        heading_path: heading,
+                        page_number: None,
+                        grain: grain.into(),
+                        score: 1.0 / (61.0 + hits.len() as f64),
+                        chunk: clue,
+                    });
+                }
+            }
+            let mut checked_notebooks = std::collections::BTreeSet::new();
+            for source in &ready {
+                if let Some(frozen) = scope
+                    .sources
+                    .iter()
+                    .find(|frozen| frozen.source_id == source.source_id)
+                {
+                    for notebook in &frozen.notebook_ids {
+                        if (!request.notebook_ids.is_empty()
+                            && !request.notebook_ids.contains(notebook))
+                            || !checked_notebooks.insert(notebook.clone())
+                        {
+                            continue;
+                        }
+                        if let Some(model) =
+                            self.facts.get_notebook_config(notebook)?.rerank_model_ref
+                        {
+                            degraded.push(DegradedScope{reason:"KNOWLEDGE_RERANK_NOT_CONNECTED".into(),detail:format!("configured notebook rerank ({}/{}) has no knowledge-query execution port; kept retrieval ranking",model.provider,model.id),parse_artifact_id:source.artifact_id.clone(),source_id:source.source_id.clone(),source_name:source.source_name.clone()});
+                        }
+                    }
+                }
+            }
         }
         let candidates: Vec<ks::StoredChunk> = candidates_by_id.into_values().collect();
         runtime

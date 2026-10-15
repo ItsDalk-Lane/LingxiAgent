@@ -91,6 +91,7 @@ pub mod sessions;
 pub mod settings_ui;
 pub mod shutdown;
 pub mod skills;
+pub mod slash;
 pub mod stagefiles;
 mod static_web;
 pub mod streaming_norm;
@@ -467,6 +468,7 @@ pub struct ServiceState {
     tickets: Arc<WsTicketService>,
     storage: Arc<RunDatabase>,
     sessions: Arc<sessions::SessionStore>,
+    slash: Arc<slash::SlashService>,
     events: Arc<events::EventService>,
     app_events: Arc<appevents::AppEventLog>,
     session_projects: Arc<projects::SessionProjectsService>,
@@ -2084,6 +2086,7 @@ impl ServiceState {
             )),
             storage: Arc::clone(&storage),
             sessions: session_arc,
+            slash: Arc::new(slash::SlashService::new(&data_home)),
             session_tree: Arc::new(
                 session_tree::SessionService::new(Arc::clone(&storage), Arc::clone(&events))
                     .with_file_safety(
@@ -6368,6 +6371,8 @@ async fn run_ws_session<IO>(
     //    socket is a bare canonical EventEnvelope (PROTOCOL_SPEC §5),
     //    control frames carry frameKind:"control".
     let mut subscription: Option<events::SubscriptionGuard> = None;
+    let (slash_tx, mut slash_rx) = tokio::sync::mpsc::channel::<slash::SlashResult>(8);
+    let mut slash_tasks = tokio::task::JoinSet::new();
     loop {
         let sub_mailbox = subscription.as_ref().map(|s| s.mailbox().clone());
         let sub_frame = async {
@@ -6377,6 +6382,17 @@ async fn run_ws_session<IO>(
             }
         };
         tokio::select! {
+            Some(result) = slash_rx.recv() => {
+                if !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await { return; }
+                if ws::write_ws_text(&mut writer, &canon::canonical_bytes(&result)).await.is_err() { return; }
+            }
+            Some(result) = slash_tasks.join_next(), if !slash_tasks.is_empty() => {
+                if let Err(error) = result {
+                    tracing::error!(%error, "slash command task failed");
+                    let error = ProtocolError::new(ErrorCode::Internal, "slash command task failed", false);
+                    let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
+                }
+            }
             shutdown = shutdown_rx.changed() => {
                 // R02-T06: the coordinator broadcast a shutdown — send a
                 // polite close(1001) and end the session so the drain can
@@ -6419,6 +6435,17 @@ async fn run_ws_session<IO>(
                         };
                         let mood_request = matches!(&request, ws::WsClientRequest::SubscribeMood { .. });
                         match request {
+                            ws::WsClientRequest::Slash { session_id, text, agent_id } => {
+                                if !slash_tasks.is_empty() {
+                                    let error = ProtocolError::new(ErrorCode::Conflict, "slash command already active on this connection", true);
+                                    let _ = ws::write_ws_text(&mut writer, &canon::canonical_bytes(&error)).await;
+                                    continue;
+                                }
+                                let (state, principal, tx) = (state.clone(), principal.clone(), slash_tx.clone());
+                                slash_tasks.spawn(async move {
+                                    slash::dispatch(&state, &principal, &session_id, slash::SlashRequest { text, agent_id }, tx).await;
+                                });
+                            }
                             ws::WsClientRequest::SessionRead { session_id } => {
                                 let access = state.sessions.get_for(&principal, &session_id).await;
                                 if !ensure_ws_principal_current(
@@ -6937,6 +6964,18 @@ pub fn build_router(state: ServiceState) -> Router {
         .route(
             "/lingxi/v1/sessions/{session_id}/conversation-map/layout",
             get(conversation_map::layout_get_route).put(conversation_map::layout_put_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/slash",
+            post(slash::slash_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/bridge",
+            post(slash::register_bridge_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/bridge/attachment",
+            post(slash::attach_route).delete(slash::detach_route),
         )
         .route(
             "/lingxi/v1/sessions/{session_id}/compact",

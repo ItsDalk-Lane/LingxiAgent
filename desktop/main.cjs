@@ -5572,7 +5572,7 @@ wrapIpcHandler("get-server-connection-info", () => ({
 wrapIpcHandler("run-edit-command", (event, command) => {
   const allowed = new Set(["cut", "copy", "paste", "selectAll"]);
   if (!allowed.has(command)) {
-    throw new Error(`Unknown edit command: ${command}`);
+    throw new Error("Unknown edit command");
   }
   event.sender[command]();
   return true;

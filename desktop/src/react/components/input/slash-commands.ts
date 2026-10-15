@@ -5,7 +5,8 @@
  */
 
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
-import { getWebSocket } from '../../services/websocket';
+import { getWebSocket, sendRustSlash } from '../../services/websocket';
+import { resolveServerConnection } from '../../services/server-connection';
 import { useStore } from '../../stores';
 import { ensureSession, loadSessions } from '../../stores/session-actions';
 
@@ -164,6 +165,10 @@ export function executeCompact(
 ): () => Promise<void> {
   return async () => {
     const state = useStore.getState();
+    if (resolveServerConnection(state)?.serverNodeKind === 'lingxi-service') {
+      await executeSlashViaWs(t, 'compact', state.currentAgentId, setBusy, setInput, setMenuOpen)('/compact');
+      return;
+    }
     if (!state.currentSessionId) {
       state.addToast(t('error.noActiveSession'), 'error', 6000);
       return;
@@ -221,6 +226,16 @@ export function executeSlashViaWs(
       ? inputText.trim()
       : `/${cmd}`;
     try {
+      const state = useStore.getState();
+      if (resolveServerConnection(state)?.serverNodeKind === 'lingxi-service') {
+        if (!state.currentSessionId) {
+          state.addToast(t('error.noActiveSession'), 'error', 6000);
+          return;
+        }
+        try { sendRustSlash(state.currentSessionId, rawText, agentId); }
+        catch (error) { state.addToast(error instanceof Error ? error.message : String(error), 'error', 6000); }
+        return;
+      }
       let sessionPath = useStore.getState().currentSessionPath;
       let resolvedAgentId = agentId || null;
       if (!sessionPath) {
@@ -299,5 +314,10 @@ export function buildSlashCommands(
       execute: () => {},
     },
   ];
+  if (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service') {
+    for (const [name, description] of [['stop', '停止当前回复'], ['reset', '清除当前会话历史'], ['fresh-compact', '刷新提示词和记忆后压缩上下文']]) {
+      list.push({ name, label: name, description, busyLabel: '', icon: '', type: 'server-command', execute: () => {} });
+    }
+  }
   return list;
 }

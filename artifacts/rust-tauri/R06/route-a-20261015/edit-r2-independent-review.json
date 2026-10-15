@@ -1,0 +1,54 @@
+{
+  "status": "PASS_ELECTRON_RUST_MAC_SCOPE_TAURI_PENDING",
+  "originalFailurePreserved": "/private/tmp/r06-edit-independent/review.json",
+  "currentParentLog": "/private/tmp/r06-edit-independent/r2-current-parent.log",
+  "currentParentPass": 1,
+  "currentParentRefused": 10,
+  "ownExtraReceipt": {
+    "extraRejected": 10,
+    "senderEvents": [
+      "cut",
+      "copy",
+      "paste"
+    ],
+    "otherEvents": []
+  },
+  "ownReceipt": {
+    "status": "PASS_MAC_ONLY",
+    "binarySha256": "f12c29a5c2ad07f37b88c0075a322e459ea58b0c2155824fe4fd9c12256e734b",
+    "allowed": [
+      {
+        "command": "cut",
+        "actualNativeEvent": "cut"
+      },
+      {
+        "command": "copy",
+        "actualNativeEvent": "copy"
+      },
+      {
+        "command": "paste",
+        "actualNativeEvent": "paste"
+      },
+      {
+        "command": "selectAll",
+        "actualSelection": true
+      }
+    ],
+    "refusedCount": 8,
+    "otherWindowEvents": 0,
+    "fixtureReadsClipboardContents": false,
+    "productionMainSha256": "26485d1ff7dc32ea1156864aa7f2331c7a3dc6c9be9c35247dae82bf01745070",
+    "productionPreloadSourceSha256": "a39d002e01d7f16d8df913ece2e98c980102d3e2c7213fb4fd02dd2e30c9664b",
+    "actualPreloadBundleSha256": "43e9be38be6abf847e6e01609de62a6bdfa7909fac624c96b81703d010918389"
+  },
+  "screenshotActuallyViewed": "/private/tmp/r06-edit-independent/r2-extra/independent-editor.png",
+  "sourceSha256": {
+    "desktop/main.cjs": "26485d1ff7dc32ea1156864aa7f2331c7a3dc6c9be9c35247dae82bf01745070",
+    "desktop/preload.cjs": "a39d002e01d7f16d8df913ece2e98c980102d3e2c7213fb4fd02dd2e30c9664b",
+    "tests/rust-native/edit-command-native.cjs": "67ea20e400b3df345d529cfb4cc3c3a30c4976aa92901fc7b374d2cc46a82dd1",
+    "rust/crates/lingxi-service/tests/r06_edit_command_current_source.rs": "667e644d350cdfeb38d4f4ff20d4e2e7221ff2c1e7c80c31060ac737c098cfee"
+  },
+  "Tauri": "NOT_RUN_PENDING_ROOT_REAL_WINDOW_PROOF",
+  "focusOtherWindow": "ENVIRONMENT_PRECONDITION_NOT_MET",
+  "clipboardContents": "NOT_READ_OR_VERIFIED"
+}

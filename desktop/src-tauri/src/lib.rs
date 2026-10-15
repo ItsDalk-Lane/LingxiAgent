@@ -196,7 +196,7 @@ async fn run_edit_command(window: WebviewWindow, command: String) -> Result<bool
             };
             let _ = tx.send(dispatched);
         }).map_err(|e| e.to_string())?;
-        return rx.await.map_err(|_| "编辑命令未派发".into());
+        rx.await.map_err(|_| "编辑命令未派发".into())
     }
     #[cfg(not(target_os = "macos"))]
     {

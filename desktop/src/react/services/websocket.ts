@@ -42,6 +42,8 @@ import {
 // ── 模块级 WS 实例 ──
 let _ws: WebSocket | null = null;
 let _wsConnectionIsRust = false;
+let _rustSlashConnection: ServerConnection | null = null;
+let _rustSlashReady = false;
 let _wsConnectAttempt = 0;
 let _wsHandshakeTimer: ReturnType<typeof setTimeout> | null = null;
 const RUST_WIRE_PROTOCOL = 1;
@@ -128,6 +130,8 @@ function noteWsFailure(reasonKey: string): void {
 /** 服务重启时先废弃旧连接；等待本轮有效端口和令牌后再重新连接。 */
 export function disconnectWebSocketForRestart(): void {
   _wsConnectAttempt++;
+  _rustSlashConnection = null;
+  _rustSlashReady = false;
   clearRustHandshakeTimer();
   if (_wsRetryTimer) clearTimeout(_wsRetryTimer);
   _wsRetryTimer = null;
@@ -147,6 +151,17 @@ export function disconnectWebSocketForRestart(): void {
 /** 获取当前 WebSocket 实例 */
 export function getWebSocket(): WebSocket | null {
   return _ws;
+}
+
+/** 命令只发给握手通过且仍属于当前完整连接的 Rust socket。 */
+export function sendRustSlash(sessionId: string, text: string, agentId: string | null): void {
+  const current = resolveServerConnection(useStore.getState());
+  if (!_rustSlashReady || !_rustSlashConnection || !current
+    || JSON.stringify(current) !== JSON.stringify(_rustSlashConnection)
+    || !_ws || _ws.readyState !== WebSocket.OPEN) {
+    throw new Error('命令连接尚未就绪或已切换，请等待当前连接后重试');
+  }
+  _ws.send(JSON.stringify({ type: 'slash', sessionId, text, ...(agentId ? { agentId } : {}) }));
 }
 
 /** 发起 WebSocket 连接 */
@@ -196,6 +211,8 @@ function ensureResourceForegroundCatchUp(): void {
 
 async function openConnectionWebSocket(connection: ServerConnection, attempt: number): Promise<void> {
   const isRustService = connection.serverNodeKind === 'lingxi-service';
+  _rustSlashReady = false;
+  _rustSlashConnection = isRustService ? connection : null;
   let rustHandshakeComplete = false;
 
   if (_wsRetryTimer) { clearTimeout(_wsRetryTimer); _wsRetryTimer = null; }
@@ -322,10 +339,30 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
           return;
         }
         rustHandshakeComplete = true;
+        _rustSlashReady = true;
         markConnectionReady();
         return;
       }
-      if (isRustService) return;
+      if (isRustService) {
+        // 只桥接已实现的命令回执，其他 Rust 事件仍走各自正式订阅面。
+        const current = resolveServerConnection(useStore.getState());
+        if (current && JSON.stringify(current) === JSON.stringify(connection)
+          && msg?.type === 'slash_result' && typeof msg.sessionId === 'string'
+          && typeof msg.text === 'string' && ['success', 'error'].includes(msg.level)) {
+          if (msg.historyCleared === true && msg.level === 'success' && msg.targetSessionId === msg.sessionId) {
+            const state = useStore.getState();
+            const path = state.currentSessionId === msg.sessionId ? state.currentSessionPath
+              : state.sessions.find(session => session.sessionId === msg.sessionId)?.path;
+            if (path) {
+              // 成功收据来自真实清除事务；阻止旧在途读回再覆盖已清除的页面。
+              state.bumpLoadMessagesVersion(path);
+              state.initSession(path, [], false, null, null);
+            }
+          }
+          handleServerMessage(msg, composerOriginConnectionKey(connection));
+        }
+        return;
+      }
       recordResourceEventCursor(msg);
       handleServerMessage(msg, composerOriginConnectionKey(connection));
     } catch (err) {
@@ -338,6 +375,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
 
   _ws.onclose = () => {
     if (_ws !== socket) return;
+    _rustSlashReady = false;
     clearRustHandshakeTimer();
     if (!useStore.getState().wsFailureReasonKey) noteWsFailure('status.wsConnectionClosed');
     else setStatus('status.disconnected', false);

@@ -626,6 +626,10 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         if let Some((id, tail)) = rest.split_once('/') {
             let id_clean = !id.is_empty() && !id.contains('/');
             match tail {
+                "slash" | "bridge" if id_clean && m == "POST" => return RoutePolicy::Scope("chat"),
+                "bridge/attachment" if id_clean && matches!(m.as_str(), "POST" | "DELETE") => {
+                    return RoutePolicy::Scope("chat")
+                }
                 "workspace" if id_clean && m == "PUT" => return RoutePolicy::Scope("chat"),
                 "find" if id_clean && (m == "GET" || m == "HEAD") => {
                     return RoutePolicy::Scope("chat")

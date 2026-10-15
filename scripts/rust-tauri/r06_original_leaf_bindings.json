@@ -3117,7 +3117,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_delete_purges_owned_sources_and_keeps_shared_ones",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1004,
               "testEndLine": 1193,
               "assertions": [
@@ -3242,7 +3242,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_delete_refuses_frozen_foreign_and_missing_without_side_effects",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1196,
               "testEndLine": 1362,
               "assertions": [
@@ -3367,7 +3367,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -3512,7 +3512,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_delete_refuses_frozen_foreign_and_missing_without_side_effects",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1196,
               "testEndLine": 1362,
               "assertions": [
@@ -4912,7 +4912,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -5101,7 +5101,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -5140,7 +5140,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -5329,7 +5329,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -5368,7 +5368,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -5557,7 +5557,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -11993,7 +11993,7 @@
         "失败回传压缩失败；接管态目标为被接管桌面会话"
       ],
       "then": "先回复正在压缩，再返回 token 前后数或完成说明",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -12002,9 +12002,14 @@
               "package": "lingxi-service",
               "suite": "r06_t02_compaction",
               "test": "manual_compaction_skips_the_threshold_and_compacts"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "ws_compact_reports_progress_before_real_paid_call_then_commits_only_target"
             }
           ],
-          "meaning": "compact_now 已实现并受检；slash compact入口与先发提示/最终token收据未接。",
+          "meaning": "实际Bridge WS先回正在压缩，真实供应商仍等待时历史未改；释放后真实持久摘要与token收据，只有被接管desktop改变。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
@@ -12058,13 +12063,91 @@
                   "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "ws_compact_reports_progress_before_real_paid_call_then_commits_only_target",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 541,
+              "testEndLine": 618,
+              "assertions": [
+                {
+                  "line": 560,
+                  "quote": "assert_eq!(progress[\"type\"], \"slash_result\")"
+                },
+                {
+                  "line": 561,
+                  "quote": "assert_eq!(progress[\"sessionId\"], \"bridge\")"
+                },
+                {
+                  "line": 562,
+                  "quote": "assert_eq!(progress[\"targetSessionId\"], \"desktop\")"
+                },
+                {
+                  "line": 563,
+                  "quote": "assert!(progress[\"text\"].as_str().unwrap().contains(\"正在压缩\"))"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert_eq!(\n        h.snapshot(\"desktop\").await,\n        desktop_before,\n        \"waiting model cannot mutate history\"\n    )"
+                },
+                {
+                  "line": 572,
+                  "quote": "assert_eq!(done[\"level\"], \"success\")"
+                },
+                {
+                  "line": 573,
+                  "quote": "assert!(done[\"text\"].as_str().unwrap().contains(\"tokens\"))"
+                },
+                {
+                  "line": 574,
+                  "quote": "assert_ne!(h.snapshot(\"desktop\").await, desktop_before)"
+                },
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(h.snapshot(\"bridge\").await, bridge_before)"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(h.snapshot(\"unrelated\").await, unrelated_before)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert!(\n        h.archive(\"desktop\").await[\"refreshedContext\"][\"request\"][\"customInstructions\"]\n            .as_str()\n            .unwrap()\n            .contains(\"precise-focus\")\n    )"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(summary.len(), 1)"
+                },
+                {
+                  "line": 589,
+                  "quote": "assert!(summary[0][\"messages\"].to_string().contains(\"precise-focus\"))"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert_eq!(aux.len(), 1)"
+                },
+                {
+                  "line": 604,
+                  "quote": "assert_eq!(aux[0].outcome, lingxi_kernel::usage::CallOutcome::Succeeded)"
+                },
+                {
+                  "line": 608,
+                  "quote": "assert!(format!(\"{:?}\", h.load(\"desktop\").await).contains(\"EX01-SUMMARY\"))"
+                },
+                {
+                  "line": 611,
+                  "quote": "assert!(done[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"历史已清除\"))"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(h.snapshot(\"unrelated\").await, unrelated_before)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "先回复正在压缩",
-            "返回 token 前后数或完成说明"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -12073,9 +12156,14 @@
               "package": "lingxi-service",
               "suite": "r06_t02_compaction",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "attached_reset_and_fresh_refuse_and_compact_failure_preserves_all_sources"
             }
           ],
-          "meaning": "摘要服务失败局部受检，但未走 slash且无接管目标检查。",
+          "meaning": "真实供应商400明确失败、原历史与费用链保留，Bridge自身与旁会话均不变。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
@@ -12113,22 +12201,67 @@
                   "quote": "    assert_eq!(chat_rows.len(), 0);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "attached_reset_and_fresh_refuse_and_compact_failure_preserves_all_sources",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 708,
+              "testEndLine": 766,
+              "assertions": [
+                {
+                  "line": 726,
+                  "quote": "assert_eq!(result[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n            .as_str()\n            .unwrap()\n            .contains(\"接管桌面会话期间\"))"
+                },
+                {
+                  "line": 732,
+                  "quote": "assert_eq!(remote.captured().len(), call_count)"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"error\")"
+                },
+                {
+                  "line": 736,
+                  "quote": "assert!(result[\"results\"][1][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"压缩失败\"))"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(h.snapshot(id).await, original[i])"
+                },
+                {
+                  "line": 751,
+                  "quote": "assert_eq!(code, 404)"
+                },
+                {
+                  "line": 752,
+                  "quote": "assert_eq!(h.snapshot(\"other\").await, original[2])"
+                },
+                {
+                  "line": 761,
+                  "quote": "assert_eq!(result.0, 200)"
+                },
+                {
+                  "line": 762,
+                  "quote": "assert_eq!(result.1[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(h.snapshot(\"desktop\").await, original[0])"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "失败回传压缩失败（slash回执）",
-            "接管态目标为被接管桌面会话"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "先回复正在压缩",
-        "返回 token 前后数或完成说明",
-        "失败回传压缩失败（slash回执）",
-        "接管态目标为被接管桌面会话"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-proof-review.json"
     },
     {
       "id": "R00-T02-LA-127373C72E30",
@@ -13505,7 +13638,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -13650,7 +13783,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3084,
               "testEndLine": 3253,
               "assertions": [
@@ -13791,7 +13924,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -13936,7 +14069,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_manage_actual_authorized_actions_read_back_facts_and_jobs",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3084,
               "testEndLine": 3253,
               "assertions": [
@@ -14077,7 +14210,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -14222,7 +14355,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_manage_refusals_and_no_write_authorization_preserve_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3256,
               "testEndLine": 3397,
               "assertions": [
@@ -14366,7 +14499,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -14511,7 +14644,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -14616,7 +14749,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_manage_refusals_and_no_write_authorization_preserve_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3256,
               "testEndLine": 3397,
               "assertions": [
@@ -14725,7 +14858,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_manage_interactive_unapproved_and_cancelled_leave_no_sources_or_jobs",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3400,
               "testEndLine": 3502,
               "assertions": [
@@ -14754,11 +14887,11 @@
                   "quote": "assert_eq!(\n            state\n                .storage()\n                .query_one_text(\"SELECT status FROM runs WHERE run_id=?1\", vec![run_id])\n                .await\n                .unwrap()\n                .as_deref(),\n            Some(\"cancelled\")\n        )"
                 },
                 {
-                  "line": 3446,
+                  "line": 3469,
                   "quote": "assert!(facts.list_notebook_sources(id).unwrap().is_empty())"
                 },
                 {
-                  "line": 3447,
+                  "line": 3470,
                   "quote": "assert_eq!(\n            facts.list_ingestion_jobs(Some(id), None, 200).unwrap(),\n            jobs_before\n        )"
                 },
                 {
@@ -14782,7 +14915,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_manage_add_preserves_source_and_reports_background_index_failure_separately",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3505,
               "testEndLine": 3564,
               "assertions": [
@@ -22637,7 +22770,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -22797,7 +22930,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -24102,7 +24235,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -24210,7 +24343,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -24990,7 +25123,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -25098,7 +25231,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -25329,7 +25462,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -25518,7 +25651,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -25542,7 +25675,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -25731,7 +25864,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -25770,7 +25903,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -25959,7 +26092,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -26003,7 +26136,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -26192,7 +26325,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -26216,7 +26349,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_grep_filters_reject_invalid_values_and_apply_heading_prefix",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2326,
               "testEndLine": 2452,
               "assertions": [
@@ -29506,16 +29639,173 @@
         "未知命令回错误；Agent 身份无法解析或系统未就绪时拒绝"
       ],
       "then": "把命令交给同一 slash dispatcher 并以 slash_result 显示",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "命令交给同一 slash dispatcher",
-        "以 slash_result 显示",
-        "未知命令回错误",
-        "Agent 身份无法解析时拒绝",
-        "系统未就绪时拒绝"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "slash_unknown_uses_real_dispatcher_and_explicit_result"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "native_slash_production_input_real_ws_and_inline_result"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "slash_unknown_uses_real_dispatcher_and_explicit_result",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 433,
+              "testEndLine": 460,
+              "assertions": [
+                {
+                  "line": 447,
+                  "quote": "assert_eq!(\n        status, 200,\n        \"production slash dispatcher must exist: {reply}\"\n    )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_eq!(reply[\"results\"][0][\"type\"], \"slash_result\")"
+                },
+                {
+                  "line": 452,
+                  "quote": "assert_eq!(reply[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 453,
+                  "quote": "assert!(reply[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"未知命令\"))"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert!(remote.wire.lock().unwrap().is_empty())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "native_slash_production_input_real_ws_and_inline_result",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 1066,
+              "testEndLine": 1129,
+              "assertions": [
+                {
+                  "line": 1092,
+                  "quote": "assert!(\n        model_history.contains(\"EX01-SUMMARY\"),\n        \"actual model exchange uses the committed summary\"\n    )"
+                },
+                {
+                  "line": 1104,
+                  "quote": "assert!(\n        output.status.success(),\n        \"actual Electron failed: {}\",\n        std::fs::read_to_string(h.home.join(\"slash-ui-failure.txt\")).unwrap_or_default()\n    )"
+                },
+                {
+                  "line": 1112,
+                  "quote": "assert_eq!(proof[\"checks\"].as_array().unwrap().len(), 8)"
+                },
+                {
+                  "line": 1113,
+                  "quote": "assert!(proof[\"sent\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .filter(|v| v[\"type\"] == \"slash\")\n        .all(|v| v[\"sessionId\"] == \"desktop\"))"
+                },
+                {
+                  "line": 1119,
+                  "quote": "assert!(proof[\"compactHistory\"].to_string().contains(\"OLD-USER\"))"
+                },
+                {
+                  "line": 1120,
+                  "quote": "assert!(!proof[\"compactHistory\"]\n        .to_string()\n        .contains(\"lingxi-model-exchange-v1\"))"
+                },
+                {
+                  "line": 1123,
+                  "quote": "assert!(\n        h.load(\"desktop\").await.is_empty(),\n        \"actual UI reset cleared durable model history\"\n    )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "实际HTTP/WS共用生产dispatch；当前Electron实际InputArea/Tiptap及生产WS显示真实slash_result。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "missing_agent_real_unready_and_foreign_bridge_target_are_refused_without_any_mutation"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "missing_agent_real_unready_and_foreign_bridge_target_are_refused_without_any_mutation",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 961,
+              "testEndLine": 1062,
+              "assertions": [
+                {
+                  "line": 977,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 989,
+                  "quote": "assert_eq!(code, 201, \"{result}\")"
+                },
+                {
+                  "line": 999,
+                  "quote": "assert_eq!(code, 403)"
+                },
+                {
+                  "line": 1008,
+                  "quote": "assert_eq!(code, 409)"
+                },
+                {
+                  "line": 1009,
+                  "quote": "assert_eq!(h.snapshot(\"local\").await, original)"
+                },
+                {
+                  "line": 1010,
+                  "quote": "assert_eq!(h.snapshot(\"foreign-desktop\").await, foreign_before)"
+                },
+                {
+                  "line": 1025,
+                  "quote": "assert!((400..500).contains(&code), \"{result}\")"
+                },
+                {
+                  "line": 1026,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1027,
+                  "quote": "assert_eq!(h.snapshot(\"local\").await, original)"
+                },
+                {
+                  "line": 1037,
+                  "quote": "assert_eq!(\n        server\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions\",\n                Some(json!({\"sessionId\":\"not-ready\",\"agentId\":\"lingxi\",\"title\":\"not-ready\"}))\n            )\n            .await\n            .0,\n        201\n    )"
+                },
+                {
+                  "line": 1055,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1056,
+                  "quote": "assert_eq!(result[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 1057,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"未就绪\"))"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实未知命令、Agent不匹配或目录缺失、无压缩/编译服务及外主体均明确拒绝，原资料保全且零新增模型请求。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-proof-review.json"
     },
     {
       "id": "R00-T02-LA-2FB382A137FC",
@@ -40112,7 +40402,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_directory_import_reports_each_effect_and_rejects_invalid_root",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1627,
               "testEndLine": 1686,
               "assertions": [
@@ -40184,7 +40474,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_directory_import_reports_each_effect_and_rejects_invalid_root",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1627,
               "testEndLine": 1686,
               "assertions": [
@@ -40980,12 +41270,267 @@
         "接管态拒绝；未找到时不删除其他会话"
       ],
       "then": "删除当前会话历史并提示已清除",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "未注册原/reset slash动作或接管态拒绝；HTTP永久删除归档会话不等同slash清当前历史。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "reset_physically_clears_only_current_history_preserves_charges_and_next_run_restart"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "native_slash_production_input_real_ws_and_inline_result"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "reset_physically_clears_only_current_history_preserves_charges_and_next_run_restart",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 769,
+              "testEndLine": 842,
+              "assertions": [
+                {
+                  "line": 797,
+                  "quote": "assert_eq!(result[\"results\"][0][\"level\"], \"success\")"
+                },
+                {
+                  "line": 798,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"历史已清除\"))"
+                },
+                {
+                  "line": 802,
+                  "quote": "assert!(h.load(\"current\").await.is_empty())"
+                },
+                {
+                  "line": 803,
+                  "quote": "assert_eq!(h.snapshot(\"other\").await, other)"
+                },
+                {
+                  "line": 804,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_model_call_usage(Default::default())\n            .await\n            .unwrap(),\n        charges\n    )"
+                },
+                {
+                  "line": 813,
+                  "quote": "assert_eq!(\n            h.state\n                .storage()\n                .query_one_text(\n                    &format!(\"SELECT CAST(COUNT(*) AS TEXT) FROM {table} WHERE session_id=?1\"),\n                    vec![\"current\".into()]\n                )\n                .await\n                .unwrap()\n                .unwrap(),\n            \"0\"\n        )"
+                },
+                {
+                  "line": 828,
+                  "quote": "assert_eq!(events.as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 829,
+                  "quote": "assert_eq!(events[0][\"type\"], \"session_history_cleared\")"
+                },
+                {
+                  "line": 830,
+                  "quote": "assert!(events[0][\"seq\"].as_u64().unwrap() > before_rev)"
+                },
+                {
+                  "line": 831,
+                  "quote": "assert!(!events.to_string().contains(\"OLD-USER\"))"
+                },
+                {
+                  "line": 834,
+                  "quote": "assert!(h.load(\"current\").await.is_empty())"
+                },
+                {
+                  "line": 837,
+                  "quote": "assert!(!sent[\"messages\"].to_string().contains(\"OLD-USER\"))"
+                },
+                {
+                  "line": 838,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(\"SLASH-CLEAN-NEXT\"))"
+                },
+                {
+                  "line": 839,
+                  "quote": "assert_eq!(h.snapshot(\"other\").await, other)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "native_slash_production_input_real_ws_and_inline_result",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 1066,
+              "testEndLine": 1129,
+              "assertions": [
+                {
+                  "line": 1092,
+                  "quote": "assert!(\n        model_history.contains(\"EX01-SUMMARY\"),\n        \"actual model exchange uses the committed summary\"\n    )"
+                },
+                {
+                  "line": 1104,
+                  "quote": "assert!(\n        output.status.success(),\n        \"actual Electron failed: {}\",\n        std::fs::read_to_string(h.home.join(\"slash-ui-failure.txt\")).unwrap_or_default()\n    )"
+                },
+                {
+                  "line": 1112,
+                  "quote": "assert_eq!(proof[\"checks\"].as_array().unwrap().len(), 8)"
+                },
+                {
+                  "line": 1113,
+                  "quote": "assert!(proof[\"sent\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .filter(|v| v[\"type\"] == \"slash\")\n        .all(|v| v[\"sessionId\"] == \"desktop\"))"
+                },
+                {
+                  "line": 1119,
+                  "quote": "assert!(proof[\"compactHistory\"].to_string().contains(\"OLD-USER\"))"
+                },
+                {
+                  "line": 1120,
+                  "quote": "assert!(!proof[\"compactHistory\"]\n        .to_string()\n        .contains(\"lingxi-model-exchange-v1\"))"
+                },
+                {
+                  "line": 1123,
+                  "quote": "assert!(\n        h.load(\"desktop\").await.is_empty(),\n        \"actual UI reset cleared durable model history\"\n    )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实reset原子删除当前消息、正文事件、锚点和检查点，费用保留；重启下一Run无旧正文，当前InputArea显示已清除并失效旧读取。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "attached_reset_and_fresh_refuse_and_compact_failure_preserves_all_sources"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "missing_agent_real_unready_and_foreign_bridge_target_are_refused_without_any_mutation"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "attached_reset_and_fresh_refuse_and_compact_failure_preserves_all_sources",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 708,
+              "testEndLine": 766,
+              "assertions": [
+                {
+                  "line": 726,
+                  "quote": "assert_eq!(result[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n            .as_str()\n            .unwrap()\n            .contains(\"接管桌面会话期间\"))"
+                },
+                {
+                  "line": 732,
+                  "quote": "assert_eq!(remote.captured().len(), call_count)"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"error\")"
+                },
+                {
+                  "line": 736,
+                  "quote": "assert!(result[\"results\"][1][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"压缩失败\"))"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(h.snapshot(id).await, original[i])"
+                },
+                {
+                  "line": 751,
+                  "quote": "assert_eq!(code, 404)"
+                },
+                {
+                  "line": 752,
+                  "quote": "assert_eq!(h.snapshot(\"other\").await, original[2])"
+                },
+                {
+                  "line": 761,
+                  "quote": "assert_eq!(result.0, 200)"
+                },
+                {
+                  "line": 762,
+                  "quote": "assert_eq!(result.1[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(h.snapshot(\"desktop\").await, original[0])"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "missing_agent_real_unready_and_foreign_bridge_target_are_refused_without_any_mutation",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 961,
+              "testEndLine": 1062,
+              "assertions": [
+                {
+                  "line": 977,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 989,
+                  "quote": "assert_eq!(code, 201, \"{result}\")"
+                },
+                {
+                  "line": 999,
+                  "quote": "assert_eq!(code, 403)"
+                },
+                {
+                  "line": 1008,
+                  "quote": "assert_eq!(code, 409)"
+                },
+                {
+                  "line": 1009,
+                  "quote": "assert_eq!(h.snapshot(\"local\").await, original)"
+                },
+                {
+                  "line": 1010,
+                  "quote": "assert_eq!(h.snapshot(\"foreign-desktop\").await, foreign_before)"
+                },
+                {
+                  "line": 1025,
+                  "quote": "assert!((400..500).contains(&code), \"{result}\")"
+                },
+                {
+                  "line": 1026,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1027,
+                  "quote": "assert_eq!(h.snapshot(\"local\").await, original)"
+                },
+                {
+                  "line": 1037,
+                  "quote": "assert_eq!(\n        server\n            .request(\n                \"POST\",\n                \"/lingxi/v1/sessions\",\n                Some(json!({\"sessionId\":\"not-ready\",\"agentId\":\"lingxi\",\"title\":\"not-ready\"}))\n            )\n            .await\n            .0,\n        201\n    )"
+                },
+                {
+                  "line": 1055,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1056,
+                  "quote": "assert_eq!(result[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 1057,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"未就绪\"))"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实接管拒绝、busy拒绝、未知会话不动其他会话；旁会话消息/分支/Run原字节保留。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-proof-review.json"
     },
     {
       "id": "R00-T02-LA-4173A08A51CC",
@@ -48510,7 +49055,7 @@
         "接管态仅中止被接管桌面会话，不误停 Bridge 自身其他会话"
       ],
       "then": "当前流中止；无活动流时返回已停止提示",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -48524,9 +49069,19 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "leaf_cancel_outcome_shapes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "stop_takeover_cancels_real_desktop_only_busy_reset_refuses_and_idle_is_explicit"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "native_slash_production_input_real_ws_and_inline_result"
             }
           ],
-          "meaning": "run取消和终态真实检查存在，slash stop及已停止提示未接。",
+          "meaning": "真实等待中Run取消，晚到回复不落盘；空闲明确已停止，实际输入框展示收据。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -48577,13 +49132,104 @@
                   "quote": "    assert!(matches!(\n        missing,\n        lingxi_service::SessionExecuteError::NotFound\n    ));"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "stop_takeover_cancels_real_desktop_only_busy_reset_refuses_and_idle_is_explicit",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 845,
+              "testEndLine": 958,
+              "assertions": [
+                {
+                  "line": 855,
+                  "quote": "assert!(slash(&h, \"other\", \"/stop\").await[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"当前无活动回复\"))"
+                },
+                {
+                  "line": 878,
+                  "quote": "assert_eq!(live.len(), 3)"
+                },
+                {
+                  "line": 886,
+                  "quote": "assert_eq!(reset[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 887,
+                  "quote": "assert!(reset[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"session_busy\"))"
+                },
+                {
+                  "line": 892,
+                  "quote": "assert_eq!(stop[\"results\"][0][\"targetSessionId\"], \"desktop\")"
+                },
+                {
+                  "line": 893,
+                  "quote": "assert_eq!(stop[\"results\"][0][\"level\"], \"success\")"
+                },
+                {
+                  "line": 894,
+                  "quote": "assert!(stop[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"正在停止\"))"
+                },
+                {
+                  "line": 919,
+                  "quote": "assert_eq!(\n            h.state\n                .storage()\n                .query_one_text(\n                    \"SELECT status FROM runs WHERE run_id=?1\",\n                    vec![row.run_id.clone()]\n                )\n                .await\n                .unwrap()\n                .unwrap(),\n            \"running\"\n        )"
+                },
+                {
+                  "line": 932,
+                  "quote": "assert!(slash(&h, \"bridge\", \"/stop\").await[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"当前无活动回复\"))"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(job.await.unwrap().0, 200)"
+                },
+                {
+                  "line": 941,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id=?1 AND role='assistant'\",vec![\"desktop\".into()]).await.unwrap().unwrap(),\"0\",\"late provider response must not become cancelled reply\")"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n            h.state\n                .storage()\n                .query_one_text(\n                    \"SELECT status FROM runs WHERE run_id=?1\",\n                    vec![row.run_id.clone()]\n                )\n                .await\n                .unwrap()\n                .unwrap(),\n            \"completed\"\n        )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "native_slash_production_input_real_ws_and_inline_result",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 1066,
+              "testEndLine": 1129,
+              "assertions": [
+                {
+                  "line": 1092,
+                  "quote": "assert!(\n        model_history.contains(\"EX01-SUMMARY\"),\n        \"actual model exchange uses the committed summary\"\n    )"
+                },
+                {
+                  "line": 1104,
+                  "quote": "assert!(\n        output.status.success(),\n        \"actual Electron failed: {}\",\n        std::fs::read_to_string(h.home.join(\"slash-ui-failure.txt\")).unwrap_or_default()\n    )"
+                },
+                {
+                  "line": 1112,
+                  "quote": "assert_eq!(proof[\"checks\"].as_array().unwrap().len(), 8)"
+                },
+                {
+                  "line": 1113,
+                  "quote": "assert!(proof[\"sent\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .filter(|v| v[\"type\"] == \"slash\")\n        .all(|v| v[\"sessionId\"] == \"desktop\"))"
+                },
+                {
+                  "line": 1119,
+                  "quote": "assert!(proof[\"compactHistory\"].to_string().contains(\"OLD-USER\"))"
+                },
+                {
+                  "line": 1120,
+                  "quote": "assert!(!proof[\"compactHistory\"]\n        .to_string()\n        .contains(\"lingxi-model-exchange-v1\"))"
+                },
+                {
+                  "line": 1123,
+                  "quote": "assert!(\n        h.load(\"desktop\").await.is_empty(),\n        \"actual UI reset cleared durable model history\"\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "当前流中止（slash入口）",
-            "无活动流时返回已停止提示（slash回执）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -48592,9 +49238,14 @@
               "package": "lingxi-service",
               "suite": "cancel_link_inheritance",
               "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "stop_takeover_cancels_real_desktop_only_busy_reset_refuses_and_idle_is_explicit"
             }
           ],
-          "meaning": "现有取消隔离不是Bridge接管入口，无接管桌面目标和Bridge旁观会话对照。",
+          "meaning": "接管只取消实际desktop，Bridge自身与旁会话仍运行并正常完成。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/cancel_link_inheritance.rs",
@@ -48640,22 +49291,71 @@
                   "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "stop_takeover_cancels_real_desktop_only_busy_reset_refuses_and_idle_is_explicit",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 845,
+              "testEndLine": 958,
+              "assertions": [
+                {
+                  "line": 855,
+                  "quote": "assert!(slash(&h, \"other\", \"/stop\").await[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"当前无活动回复\"))"
+                },
+                {
+                  "line": 878,
+                  "quote": "assert_eq!(live.len(), 3)"
+                },
+                {
+                  "line": 886,
+                  "quote": "assert_eq!(reset[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 887,
+                  "quote": "assert!(reset[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"session_busy\"))"
+                },
+                {
+                  "line": 892,
+                  "quote": "assert_eq!(stop[\"results\"][0][\"targetSessionId\"], \"desktop\")"
+                },
+                {
+                  "line": 893,
+                  "quote": "assert_eq!(stop[\"results\"][0][\"level\"], \"success\")"
+                },
+                {
+                  "line": 894,
+                  "quote": "assert!(stop[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"正在停止\"))"
+                },
+                {
+                  "line": 919,
+                  "quote": "assert_eq!(\n            h.state\n                .storage()\n                .query_one_text(\n                    \"SELECT status FROM runs WHERE run_id=?1\",\n                    vec![row.run_id.clone()]\n                )\n                .await\n                .unwrap()\n                .unwrap(),\n            \"running\"\n        )"
+                },
+                {
+                  "line": 932,
+                  "quote": "assert!(slash(&h, \"bridge\", \"/stop\").await[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"当前无活动回复\"))"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(job.await.unwrap().0, 200)"
+                },
+                {
+                  "line": 941,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id=?1 AND role='assistant'\",vec![\"desktop\".into()]).await.unwrap().unwrap(),\"0\",\"late provider response must not become cancelled reply\")"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n            h.state\n                .storage()\n                .query_one_text(\n                    \"SELECT status FROM runs WHERE run_id=?1\",\n                    vec![row.run_id.clone()]\n                )\n                .await\n                .unwrap()\n                .unwrap(),\n            \"completed\"\n        )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "接管态仅中止被接管桌面会话",
-            "不误停 Bridge 自身其他会话"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "当前流中止（slash入口）",
-        "无活动流时返回已停止提示（slash回执）",
-        "接管态仅中止被接管桌面会话",
-        "不误停 Bridge 自身其他会话"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-proof-review.json"
     },
     {
       "id": "R00-T02-LA-4F0466F7C090",
@@ -48776,7 +49476,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_model_write_edit_register_real_session_products_and_update_metadata",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3591,
               "testEndLine": 3686,
               "assertions": [
@@ -48849,7 +49549,7 @@
                   "quote": "assert!(!mismatch.contains(\"Successfully replaced\"), \"{mismatch}\")"
                 },
                 {
-                  "line": 3641,
+                  "line": 3665,
                   "quote": "assert_eq!(std::fs::read(&file).unwrap(), b\"REPLACED_WITH_LONGER_BODY\")"
                 },
                 {
@@ -48873,7 +49573,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_model_file_registration_failure_reports_written_bytes_without_success",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3689,
               "testEndLine": 3796,
               "assertions": [
@@ -55548,7 +56248,7 @@
         "接管态拒绝；失败明确回报且原始历史保留"
       ],
       "then": "刷新提示词和记忆后压缩，回传 token 变化或原因",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -55557,9 +56257,19 @@
               "package": "lingxi-service",
               "suite": "r06_t02_compaction",
               "test": "manual_compaction_skips_the_threshold_and_compacts"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "fresh_refreshes_real_prompt_memory_and_tools_then_failure_preserves_original_history"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "native_slash_production_input_real_ws_and_inline_result"
             }
           ],
-          "meaning": "compact_now可成功，但没有fresh_compact dispatcher或刷新提示词/记忆后压缩链的专属检查。",
+          "meaning": "实际修改当前身份和compiled memory后fresh，真实档案持久最新提示/记忆/工具，重启下一Run实际消费并返回token结果。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
@@ -55613,13 +56323,116 @@
                   "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "fresh_refreshes_real_prompt_memory_and_tools_then_failure_preserves_original_history",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 621,
+              "testEndLine": 705,
+              "assertions": [
+                {
+                  "line": 640,
+                  "quote": "assert_eq!(result[\"results\"].as_array().unwrap().len(), 2)"
+                },
+                {
+                  "line": 641,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"刷新提示词与记忆\"))"
+                },
+                {
+                  "line": 645,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"success\")"
+                },
+                {
+                  "line": 648,
+                  "quote": "assert!(prompt.contains(\"SLASH-FRESH-CURRENT\"))"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(prompt.contains(\"SLASH-NEW-IDENTITY\"))"
+                },
+                {
+                  "line": 650,
+                  "quote": "assert!(prompt.contains(\"SLASH-NEW-COMPILED-MEMORY\"))"
+                },
+                {
+                  "line": 651,
+                  "quote": "assert_eq!(archive[\"refreshedContext\"][\"fresh\"], true)"
+                },
+                {
+                  "line": 656,
+                  "quote": "assert!(call[\"messages\"][0][\"content\"]\n        .as_str()\n        .unwrap()\n        .contains(\"SLASH-NEW-COMPILED-MEMORY\"))"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert!(call[\"messages\"].to_string().contains(\"EX01-SUMMARY\"))"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert!(call[\"tools\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|t| t[\"function\"][\"name\"] == tool[\"wireName\"]))"
+                },
+                {
+                  "line": 675,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"error\")"
+                },
+                {
+                  "line": 676,
+                  "quote": "assert!(result[\"results\"][1][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"fresh-compact 失败\"))"
+                },
+                {
+                  "line": 680,
+                  "quote": "assert_eq!(h.snapshot(\"failure\").await, before)"
+                },
+                {
+                  "line": 690,
+                  "quote": "assert_eq!(\n        usage\n            .iter()\n            .filter(|u| u.origin == \"session.fresh_compact\"\n                && u.outcome == lingxi_kernel::usage::CallOutcome::Failed)\n            .count(),\n        1\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(\n        std::fs::read_to_string(h.home.join(\"agents/lingxi/config.yaml\"))\n            .unwrap()\n            .contains(\"EX01-UNKNOWN-PRESERVED\")\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "native_slash_production_input_real_ws_and_inline_result",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 1066,
+              "testEndLine": 1129,
+              "assertions": [
+                {
+                  "line": 1092,
+                  "quote": "assert!(\n        model_history.contains(\"EX01-SUMMARY\"),\n        \"actual model exchange uses the committed summary\"\n    )"
+                },
+                {
+                  "line": 1104,
+                  "quote": "assert!(\n        output.status.success(),\n        \"actual Electron failed: {}\",\n        std::fs::read_to_string(h.home.join(\"slash-ui-failure.txt\")).unwrap_or_default()\n    )"
+                },
+                {
+                  "line": 1112,
+                  "quote": "assert_eq!(proof[\"checks\"].as_array().unwrap().len(), 8)"
+                },
+                {
+                  "line": 1113,
+                  "quote": "assert!(proof[\"sent\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .filter(|v| v[\"type\"] == \"slash\")\n        .all(|v| v[\"sessionId\"] == \"desktop\"))"
+                },
+                {
+                  "line": 1119,
+                  "quote": "assert!(proof[\"compactHistory\"].to_string().contains(\"OLD-USER\"))"
+                },
+                {
+                  "line": 1120,
+                  "quote": "assert!(!proof[\"compactHistory\"]\n        .to_string()\n        .contains(\"lingxi-model-exchange-v1\"))"
+                },
+                {
+                  "line": 1123,
+                  "quote": "assert!(\n        h.load(\"desktop\").await.is_empty(),\n        \"actual UI reset cleared durable model history\"\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "刷新提示词和记忆后压缩",
-            "回传 token 变化或原因"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -55628,9 +56441,19 @@
               "package": "lingxi-service",
               "suite": "r06_t02_compaction",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "attached_reset_and_fresh_refuse_and_compact_failure_preserves_all_sources"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_slash_completion",
+              "test": "fresh_refreshes_real_prompt_memory_and_tools_then_failure_preserves_original_history"
             }
           ],
-          "meaning": "摘要失败保留exchange受检；没有fresh_compact接管拒绝和入口失败回执。",
+          "meaning": "实际接管拒绝且零模型调用；真实供应商失败明确fresh失败、原历史保留且失败费用记录存在。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
@@ -55668,22 +56491,136 @@
                   "quote": "    assert_eq!(chat_rows.len(), 0);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "attached_reset_and_fresh_refuse_and_compact_failure_preserves_all_sources",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 708,
+              "testEndLine": 766,
+              "assertions": [
+                {
+                  "line": 726,
+                  "quote": "assert_eq!(result[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n            .as_str()\n            .unwrap()\n            .contains(\"接管桌面会话期间\"))"
+                },
+                {
+                  "line": 732,
+                  "quote": "assert_eq!(remote.captured().len(), call_count)"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"error\")"
+                },
+                {
+                  "line": 736,
+                  "quote": "assert!(result[\"results\"][1][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"压缩失败\"))"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(h.snapshot(id).await, original[i])"
+                },
+                {
+                  "line": 751,
+                  "quote": "assert_eq!(code, 404)"
+                },
+                {
+                  "line": 752,
+                  "quote": "assert_eq!(h.snapshot(\"other\").await, original[2])"
+                },
+                {
+                  "line": 761,
+                  "quote": "assert_eq!(result.0, 200)"
+                },
+                {
+                  "line": 762,
+                  "quote": "assert_eq!(result.1[\"results\"][0][\"level\"], \"error\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(h.snapshot(\"desktop\").await, original[0])"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_slash_completion.rs",
+              "test": "fresh_refreshes_real_prompt_memory_and_tools_then_failure_preserves_original_history",
+              "sourceSHA256": "0fa3301c96c72c58b7d1629a871ebfedfdb397bd5c87a5497387cf2be4d324cb",
+              "testStartLine": 621,
+              "testEndLine": 705,
+              "assertions": [
+                {
+                  "line": 640,
+                  "quote": "assert_eq!(result[\"results\"].as_array().unwrap().len(), 2)"
+                },
+                {
+                  "line": 641,
+                  "quote": "assert!(result[\"results\"][0][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"刷新提示词与记忆\"))"
+                },
+                {
+                  "line": 645,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"success\")"
+                },
+                {
+                  "line": 648,
+                  "quote": "assert!(prompt.contains(\"SLASH-FRESH-CURRENT\"))"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(prompt.contains(\"SLASH-NEW-IDENTITY\"))"
+                },
+                {
+                  "line": 650,
+                  "quote": "assert!(prompt.contains(\"SLASH-NEW-COMPILED-MEMORY\"))"
+                },
+                {
+                  "line": 651,
+                  "quote": "assert_eq!(archive[\"refreshedContext\"][\"fresh\"], true)"
+                },
+                {
+                  "line": 656,
+                  "quote": "assert!(call[\"messages\"][0][\"content\"]\n        .as_str()\n        .unwrap()\n        .contains(\"SLASH-NEW-COMPILED-MEMORY\"))"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert!(call[\"messages\"].to_string().contains(\"EX01-SUMMARY\"))"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert!(call[\"tools\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .any(|t| t[\"function\"][\"name\"] == tool[\"wireName\"]))"
+                },
+                {
+                  "line": 675,
+                  "quote": "assert_eq!(result[\"results\"][1][\"level\"], \"error\")"
+                },
+                {
+                  "line": 676,
+                  "quote": "assert!(result[\"results\"][1][\"text\"]\n        .as_str()\n        .unwrap()\n        .contains(\"fresh-compact 失败\"))"
+                },
+                {
+                  "line": 680,
+                  "quote": "assert_eq!(h.snapshot(\"failure\").await, before)"
+                },
+                {
+                  "line": 690,
+                  "quote": "assert_eq!(\n        usage\n            .iter()\n            .filter(|u| u.origin == \"session.fresh_compact\"\n                && u.outcome == lingxi_kernel::usage::CallOutcome::Failed)\n            .count(),\n        1\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(\n        std::fs::read_to_string(h.home.join(\"agents/lingxi/config.yaml\"))\n            .unwrap()\n            .contains(\"EX01-UNKNOWN-PRESERVED\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "接管态拒绝",
-            "fresh_compact失败明确回报且原始历史保留"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "刷新提示词和记忆后压缩",
-        "回传 token 变化或原因",
-        "接管态拒绝",
-        "fresh_compact失败明确回报且原始历史保留"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-proof-review.json"
     },
     {
       "id": "R00-T02-LA-5C043EAD2299",
@@ -56847,7 +57784,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -57036,7 +57973,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -57060,7 +57997,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_outline_sections_drive_knowledge_read_and_refuse_out_of_scope",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1919,
               "testEndLine": 2323,
               "assertions": [
@@ -57337,7 +58274,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -57526,7 +58463,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -57550,7 +58487,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_outline_sections_drive_knowledge_read_and_refuse_out_of_scope",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1919,
               "testEndLine": 2323,
               "assertions": [
@@ -57822,7 +58759,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_outline_sections_drive_knowledge_read_and_refuse_out_of_scope",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1919,
               "testEndLine": 2323,
               "assertions": [
@@ -60734,7 +61671,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -60842,7 +61779,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -62332,7 +63269,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -62492,7 +63429,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -66582,7 +67519,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -66742,7 +67679,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -66920,7 +67857,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -67025,7 +67962,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_ingestion_listing_is_studio_scoped_and_reports_unreachable_sources",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1729,
               "testEndLine": 1916,
               "assertions": [
@@ -67226,7 +68163,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -67331,7 +68268,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_ingestion_listing_is_studio_scoped_and_reports_unreachable_sources",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1729,
               "testEndLine": 1916,
               "assertions": [
@@ -73229,7 +74166,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -73354,7 +74291,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -73459,7 +74396,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_reingest_refuses_foreign_and_non_member_sources_without_creating_jobs",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1459,
               "testEndLine": 1624,
               "assertions": [
@@ -75874,7 +76811,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -76019,7 +76956,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -76144,7 +77081,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_failed_and_untracked_jobs_retry_and_delete_wins",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 857,
               "testEndLine": 1001,
               "assertions": [
@@ -76249,7 +77186,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_source_delete_refuses_foreign_studio_without_changing_rows_or_files",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 1365,
               "testEndLine": 1456,
               "assertions": [
@@ -88541,7 +89478,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -88701,7 +89638,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -93893,7 +94830,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -94053,7 +94990,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -95760,44 +96697,295 @@
         "任意其他命令抛 Unknown edit command；不能执行 shell 或未列出的系统操作"
       ],
       "then": "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
+      "status": "READY",
+      "groups": [
         {
-          "clause": "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
-          "kind": "IMPLEMENTATION_GAP",
-          "reason": "当前Rust/Tauri候选没有桌面webview编辑命令入口，没有cut/copy/paste/selectAll派发或Unknown edit command拒绝面，旧Electron不能替代。",
-          "sourceLocations": [
+          "index": 0,
+          "tests": [
             {
-              "endLine": 95,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-              "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-              "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-              "startLine": 85
+              "package": "lingxi-service",
+              "suite": "r06_edit_command_current_source",
+              "test": "current_rust_desktop_edit_ipc_allows_only_four_native_sender_commands"
             },
             {
-              "endLine": 78,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "独立桌面host建立阶段R09。",
-              "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-              "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-              "startLine": 75
-            },
-            {
-              "endLine": 63,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-              "path": "rust/Cargo.toml",
-              "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-              "startLine": 46
+              "package": "lingxi-resource-desktop",
+              "suite": "edit_current_host",
+              "test": "current_tauri_native_edit_four_commands_and_refusals",
+              "kind": "rust_desktop_test",
+              "features": [
+                "e2e-test"
+              ]
             }
-          ]
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_edit_command_current_source.rs",
+              "test": "current_rust_desktop_edit_ipc_allows_only_four_native_sender_commands",
+              "sourceSHA256": "667e644d350cdfeb38d4f4ff20d4e2e7221ff2c1e7c80c31060ac737c098cfee",
+              "testStartLine": 13,
+              "testEndLine": 89,
+              "assertions": [
+                {
+                  "line": 14,
+                  "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本实际窗口运行腿仅代表macOS\")"
+                },
+                {
+                  "line": 28,
+                  "quote": "assert!(!root.starts_with(&repo))"
+                },
+                {
+                  "line": 34,
+                  "quote": "assert!(!entry.file_type().unwrap().is_symlink())"
+                },
+                {
+                  "line": 49,
+                  "quote": "assert!(build.status.success(), \"当前preload必须真实构建成功\")"
+                },
+                {
+                  "line": 67,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实编辑IPC失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 75,
+                  "quote": "assert_eq!(result[\"status\"], \"PASS_MAC_ONLY\")"
+                },
+                {
+                  "line": 76,
+                  "quote": "assert_eq!(result[\"binarySha256\"], binary_sha)"
+                },
+                {
+                  "line": 77,
+                  "quote": "assert_eq!(\n        result[\"allowed\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .map(|row| row[\"command\"].as_str().unwrap())\n            .collect::<Vec<_>>(),\n        [\"cut\", \"copy\", \"paste\", \"selectAll\"]\n    )"
+                },
+                {
+                  "line": 86,
+                  "quote": "assert_eq!(result[\"refusedCount\"], 10)"
+                },
+                {
+                  "line": 87,
+                  "quote": "assert_eq!(result[\"otherWindowEvents\"], 0)"
+                },
+                {
+                  "line": 88,
+                  "quote": "assert_eq!(result[\"fixtureReadsClipboardContents\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "desktop/src-tauri/tests/edit_current_host.rs",
+              "test": "current_tauri_native_edit_four_commands_and_refusals",
+              "sourceSHA256": "3e7d839d789b2c331ca424ed1f618164adb3b211e3277a5581cf4b0761f2325d",
+              "testStartLine": 89,
+              "testEndLine": 278,
+              "assertions": [
+                {
+                  "line": 120,
+                  "quote": "assert!(start.elapsed() < Duration::from_secs(30), \"真实Tauri未启动\")"
+                },
+                {
+                  "line": 157,
+                  "quote": "assert_eq!(\n        driver\n            .invoke(\"run_edit_command\", json!({\"command\":\"selectAll\"}))\n            .await[\"value\"],\n        true\n    )"
+                },
+                {
+                  "line": 163,
+                  "quote": "assert_eq!(driver.script(\"const e=document.querySelector('[data-testid=file-editor]');return {start:e.selectionStart,end:e.selectionEnd};\",json!([]),false).await,json!({\"start\":0,\"end\":6}))"
+                },
+                {
+                  "line": 165,
+                  "quote": "assert_eq!(\n            driver\n                .invoke(\"run_edit_command\", json!({\"command\":command}))\n                .await[\"value\"],\n            true\n        )"
+                },
+                {
+                  "line": 178,
+                  "quote": "assert_eq!(\n            driver\n                .script(\n                    \"return window.editEvents[arguments[0]];\",\n                    json!([index]),\n                    false\n                )\n                .await,\n            *command\n        )"
+                },
+                {
+                  "line": 188,
+                  "quote": "assert_eq!(\n            driver\n                .script(\n                    \"return document.querySelector('[data-testid=file-editor]').value;\",\n                    json!([]),\n                    false\n                )\n                .await,\n            \"合成编辑样例\"\n        )"
+                },
+                {
+                  "line": 214,
+                  "quote": "assert_eq!(response[\"ok\"], false)"
+                },
+                {
+                  "line": 215,
+                  "quote": "assert!(\n            response[\"invokeError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"Unknown edit command\"),\n            \"{response}\"\n        )"
+                },
+                {
+                  "line": 223,
+                  "quote": "assert_eq!(\n        driver\n            .script(\"return window.editEvents;\", json!([]), false)\n            .await,\n        json!([\"cut\", \"copy\", \"paste\"])\n    )"
+                },
+                {
+                  "line": 230,
+                  "quote": "assert_eq!(view[\"ok\"], true, \"{view}\")"
+                },
+                {
+                  "line": 236,
+                  "quote": "assert!(start.elapsed() < Duration::from_secs(10))"
+                },
+                {
+                  "line": 248,
+                  "quote": "assert_eq!(\n            driver\n                .invoke(\"run_edit_command\", json!({\"command\":command}))\n                .await[\"ok\"],\n            false,\n            \"只读窗口不能修改或向主窗派发\"\n        )"
+                },
+                {
+                  "line": 257,
+                  "quote": "assert_eq!(\n        driver\n            .script(\"return window.editEvents;\", json!([]), false)\n            .await,\n        json!([\"cut\", \"copy\", \"paste\"])\n    )"
+                },
+                {
+                  "line": 263,
+                  "quote": "assert_eq!(fs::read_to_string(&note).unwrap(), \"合成编辑样例\")"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前Rust真实子进程连接下实际生产preload/main IPC，通过两真实Electron窗口验证cut/copy/paste原生事件及selectAll真实选择，仅调用发送窗口。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。 另以当前Tauri真实WebView四命令/9未知字符串拒绝/只读另窗4拒绝及原文不变独立实际验证；不把Electron结果继承给Tauri。"
         },
-        "只允许 cut/copy/paste/selectAll，并向当前 webContents 派发该命令",
-        "任意其他命令抛 Unknown edit command；不能执行 shell 或未列出的系统操作"
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_edit_command_current_source",
+              "test": "current_rust_desktop_edit_ipc_allows_only_four_native_sender_commands"
+            },
+            {
+              "package": "lingxi-resource-desktop",
+              "suite": "edit_current_host",
+              "test": "current_tauri_native_edit_four_commands_and_refusals",
+              "kind": "rust_desktop_test",
+              "features": [
+                "e2e-test"
+              ]
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_edit_command_current_source.rs",
+              "test": "current_rust_desktop_edit_ipc_allows_only_four_native_sender_commands",
+              "sourceSHA256": "667e644d350cdfeb38d4f4ff20d4e2e7221ff2c1e7c80c31060ac737c098cfee",
+              "testStartLine": 13,
+              "testEndLine": 89,
+              "assertions": [
+                {
+                  "line": 14,
+                  "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本实际窗口运行腿仅代表macOS\")"
+                },
+                {
+                  "line": 28,
+                  "quote": "assert!(!root.starts_with(&repo))"
+                },
+                {
+                  "line": 34,
+                  "quote": "assert!(!entry.file_type().unwrap().is_symlink())"
+                },
+                {
+                  "line": 49,
+                  "quote": "assert!(build.status.success(), \"当前preload必须真实构建成功\")"
+                },
+                {
+                  "line": 67,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实编辑IPC失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 75,
+                  "quote": "assert_eq!(result[\"status\"], \"PASS_MAC_ONLY\")"
+                },
+                {
+                  "line": 76,
+                  "quote": "assert_eq!(result[\"binarySha256\"], binary_sha)"
+                },
+                {
+                  "line": 77,
+                  "quote": "assert_eq!(\n        result[\"allowed\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .map(|row| row[\"command\"].as_str().unwrap())\n            .collect::<Vec<_>>(),\n        [\"cut\", \"copy\", \"paste\", \"selectAll\"]\n    )"
+                },
+                {
+                  "line": 86,
+                  "quote": "assert_eq!(result[\"refusedCount\"], 10)"
+                },
+                {
+                  "line": 87,
+                  "quote": "assert_eq!(result[\"otherWindowEvents\"], 0)"
+                },
+                {
+                  "line": 88,
+                  "quote": "assert_eq!(result[\"fixtureReadsClipboardContents\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "desktop/src-tauri/tests/edit_current_host.rs",
+              "test": "current_tauri_native_edit_four_commands_and_refusals",
+              "sourceSHA256": "3e7d839d789b2c331ca424ed1f618164adb3b211e3277a5581cf4b0761f2325d",
+              "testStartLine": 89,
+              "testEndLine": 278,
+              "assertions": [
+                {
+                  "line": 120,
+                  "quote": "assert!(start.elapsed() < Duration::from_secs(30), \"真实Tauri未启动\")"
+                },
+                {
+                  "line": 157,
+                  "quote": "assert_eq!(\n        driver\n            .invoke(\"run_edit_command\", json!({\"command\":\"selectAll\"}))\n            .await[\"value\"],\n        true\n    )"
+                },
+                {
+                  "line": 163,
+                  "quote": "assert_eq!(driver.script(\"const e=document.querySelector('[data-testid=file-editor]');return {start:e.selectionStart,end:e.selectionEnd};\",json!([]),false).await,json!({\"start\":0,\"end\":6}))"
+                },
+                {
+                  "line": 165,
+                  "quote": "assert_eq!(\n            driver\n                .invoke(\"run_edit_command\", json!({\"command\":command}))\n                .await[\"value\"],\n            true\n        )"
+                },
+                {
+                  "line": 178,
+                  "quote": "assert_eq!(\n            driver\n                .script(\n                    \"return window.editEvents[arguments[0]];\",\n                    json!([index]),\n                    false\n                )\n                .await,\n            *command\n        )"
+                },
+                {
+                  "line": 188,
+                  "quote": "assert_eq!(\n            driver\n                .script(\n                    \"return document.querySelector('[data-testid=file-editor]').value;\",\n                    json!([]),\n                    false\n                )\n                .await,\n            \"合成编辑样例\"\n        )"
+                },
+                {
+                  "line": 214,
+                  "quote": "assert_eq!(response[\"ok\"], false)"
+                },
+                {
+                  "line": 215,
+                  "quote": "assert!(\n            response[\"invokeError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"Unknown edit command\"),\n            \"{response}\"\n        )"
+                },
+                {
+                  "line": 223,
+                  "quote": "assert_eq!(\n        driver\n            .script(\"return window.editEvents;\", json!([]), false)\n            .await,\n        json!([\"cut\", \"copy\", \"paste\"])\n    )"
+                },
+                {
+                  "line": 230,
+                  "quote": "assert_eq!(view[\"ok\"], true, \"{view}\")"
+                },
+                {
+                  "line": 236,
+                  "quote": "assert!(start.elapsed() < Duration::from_secs(10))"
+                },
+                {
+                  "line": 248,
+                  "quote": "assert_eq!(\n            driver\n                .invoke(\"run_edit_command\", json!({\"command\":command}))\n                .await[\"ok\"],\n            false,\n            \"只读窗口不能修改或向主窗派发\"\n        )"
+                },
+                {
+                  "line": 257,
+                  "quote": "assert_eq!(\n        driver\n            .script(\"return window.editEvents;\", json!([]), false)\n            .await,\n        json!([\"cut\", \"copy\", \"paste\"])\n    )"
+                },
+                {
+                  "line": 263,
+                  "quote": "assert_eq!(fs::read_to_string(&note).unwrap(), \"合成编辑样例\")"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "实际10个非法参数经真实IPC全拒绝Unknown edit command，含破坏隐式字符串转换对象；零额外编辑事件/另窗事件。独立负控原FAIL保留后修复。 当前macOS Electron和Rust实际执行；其他平台/Tauri正式宿主和阶段未冒称通过。 另以当前Tauri真实WebView四命令/9未知字符串拒绝/只读另窗4拒绝及原文不变独立实际验证；不把Electron结果继承给Tauri。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-proof-review.json"
     },
     {
       "id": "R00-T02-LA-BDEDEF118670",
@@ -96818,7 +98006,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -96983,7 +98171,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -97128,7 +98316,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -99188,7 +100376,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_model_write_edit_register_real_session_products_and_update_metadata",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3591,
               "testEndLine": 3686,
               "assertions": [
@@ -99261,7 +100449,7 @@
                   "quote": "assert!(!mismatch.contains(\"Successfully replaced\"), \"{mismatch}\")"
                 },
                 {
-                  "line": 3641,
+                  "line": 3665,
                   "quote": "assert_eq!(std::fs::read(&file).unwrap(), b\"REPLACED_WITH_LONGER_BODY\")"
                 },
                 {
@@ -99285,7 +100473,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_model_file_registration_failure_reports_written_bytes_without_success",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 3689,
               "testEndLine": 3796,
               "assertions": [
@@ -103621,7 +104809,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -103781,7 +104969,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -105398,7 +106586,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -105527,7 +106715,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_artifact_citation_snapshot_boundaries_and_heading_fallback",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 448,
               "testEndLine": 640,
               "assertions": [
@@ -106322,7 +107510,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -106482,7 +107670,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_notebook_source_routes_reject_without_changing_rows",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 289,
               "testEndLine": 445,
               "assertions": [
@@ -111952,7 +113140,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -112129,7 +113317,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_settings_refresh_remove_reingest_and_purge_use_real_facts",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 643,
               "testEndLine": 854,
               "assertions": [
@@ -115627,7 +116815,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -115816,7 +117004,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -115855,7 +117043,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -116044,7 +117232,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {
@@ -116083,7 +117271,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs",
               "test": "original_tools_use_authentic_run_scope_and_frozen_citable_source",
-              "sourceSHA256": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+              "sourceSHA256": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a",
               "testStartLine": 2618,
               "testEndLine": 2963,
               "assertions": [
@@ -116272,7 +117460,7 @@
                   "quote": "assert!(\n            result(index).contains(\"KNOWLEDGE_SCOPE_VIOLATION\"),\n            \"{}\",\n            result(index)\n        )"
                 },
                 {
-                  "line": 2925,
+                  "line": 2945,
                   "quote": "assert!(!result(index).contains(\"FOREIGN_B\"))"
                 },
                 {

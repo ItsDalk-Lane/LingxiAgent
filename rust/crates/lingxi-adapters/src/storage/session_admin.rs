@@ -1351,3 +1351,47 @@ pub async fn search_sessions(
         })
         .await
 }
+
+/// /reset 真正清除当前会话消息与正文事件，不以回移分支头冒充删除。
+/// 保留会话身份及已发生费用；别的会话、文件内容和模型账单不参与清理。
+pub async fn clear_current_history(
+    db: &RunDatabase,
+    session_id: &str,
+    owner: &str,
+    now: u64,
+) -> Result<(usize, lingxi_protocol::EventEnvelope), StorageError> {
+    let permit = db
+        .session_admission()
+        .try_acquire(&[session_id], usize::MAX)
+        .map_err(|_| StorageError::Conflict {
+            detail: "session_busy".into(),
+        })?;
+    let (sid, owner) = (session_id.to_owned(), owner.to_owned());
+    let busy = db.options().busy_timeout_ms;
+    db.queue().submit(move|conn| {
+        let _permit=permit;
+        with_write_txn(conn,busy,|conn| {
+            let row:Option<(String,String)>=conn.query_row("SELECT owner_user_id,lifecycle FROM sessions WHERE session_id=?1",[&sid],|r|Ok((r.get(0)?,r.get(1)?))).optional().map_err(map_err)?;
+            match row {Some((actual,lifecycle)) if actual==owner&&lifecycle=="active"=>{},_=>return Err(StorageError::Conflict{detail:"session ownership/lifecycle changed before clear".into()})}
+            let active:i64=conn.query_row("SELECT COUNT(*) FROM runs WHERE session_id=?1 AND status IN ('queued','running','waiting_approval','cancelling')",[&sid],|r|r.get(0)).map_err(map_err)?;
+            let pending:i64=conn.query_row("SELECT COUNT(*) FROM session_operations WHERE session_id=?1 AND state='prepared'",[&sid],|r|r.get(0)).map_err(map_err)?;
+            if active>0||pending>0{return Err(StorageError::Conflict{detail:"session_busy".into()});}
+            conn.execute("DELETE FROM checkpoint_file_versions WHERE checkpoint_id IN (SELECT checkpoint_id FROM checkpoints WHERE session_id=?1)",[&sid]).map_err(map_err)?;
+            conn.execute("DELETE FROM file_checkpoints WHERE session_id=?1",[&sid]).map_err(map_err)?;
+            conn.execute("DELETE FROM checkpoints WHERE session_id=?1",[&sid]).map_err(map_err)?;
+            conn.execute("DELETE FROM run_history_anchors WHERE session_id=?1",[&sid]).map_err(map_err)?;
+            let count=conn.execute("DELETE FROM messages WHERE session_id=?1",[&sid]).map_err(map_err)?;
+            let old_seq:i64=conn.query_row("SELECT COALESCE(MAX(seq),0) FROM key_events WHERE stream_id=?1",[&sid],|r|r.get(0)).map_err(map_err)?;
+            let next_seq=old_seq.checked_add(1).ok_or_else(||StorageError::Corrupted{detail:"history event sequence exhausted".into()})?;
+            conn.execute("DELETE FROM key_events WHERE stream_id=?1",[&sid]).map_err(map_err)?;
+            let payload=super::session_tree::unknown_payload("session_history_cleared",serde_json::Map::from_iter([("deletedMessages".into(),serde_json::json!(count))]));
+            let event_id=format!("history-clear:{sid}:{next_seq}");
+            conn.execute("INSERT INTO key_events(event_id,stream_id,seq,session_id,run_id,attempt,event_type,payload_json,committed_at_unix_ms) VALUES(?1,?2,?3,?2,NULL,NULL,'session_history_cleared',?4,?5)",rusqlite::params![event_id,sid,next_seq,lingxi_protocol::canon::canonical_string(&payload),now as i64]).map_err(map_err)?;
+            let event=lingxi_protocol::EventEnvelope::new(lingxi_protocol::EventId::new(event_id),lingxi_protocol::StreamId::new(&sid),lingxi_protocol::Seq::new(next_seq as u64),lingxi_protocol::SessionId::new(&sid),None,None,payload);
+            conn.execute("DELETE FROM session_operations WHERE session_id=?1",[&sid]).map_err(map_err)?;
+            // 空头和递增版本使旧历史游标失效；不复用已清除的旧分支版本。
+            conn.execute("INSERT INTO session_branch_heads(session_id,head_message_id,observed_tail_message_id,revision,head_resolution,updated_at_unix_ms) VALUES(?1,NULL,NULL,1,'persisted_head',?2) ON CONFLICT(session_id) DO UPDATE SET head_message_id=NULL,observed_tail_message_id=NULL,revision=session_branch_heads.revision+1,head_resolution='persisted_head',updated_at_unix_ms=excluded.updated_at_unix_ms",rusqlite::params![sid,now as i64]).map_err(map_err)?;
+            Ok((count,event))
+        })
+    }).await
+}

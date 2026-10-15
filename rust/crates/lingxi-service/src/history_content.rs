@@ -44,10 +44,8 @@
 //!   [`SessionCollabDelivery`] 由宿主接线（见 trait 文档）。
 //!
 //! 显式挂起（C2 块内，无 Rust 宿主面，不在本模块伪造）：
-//! - `R00-T02-LA-3FCB259FF69C`（/reset slash 清当前会话历史）：语义宿主
-//!   （bridge 会话索引/文件、rcState 接管注册表、slash 派发器）均未移植；
-//!   TS 自身拒绝 desktop kind（`session-ops.ts:39` "delete for desktop kind
-//!   not supported"），映射到桌面会话删除即造语义。
+//! - `/reset` 由 `crate::slash` 的统一派发器执行当前会话历史清除；
+//!   Bridge 接管期间明确拒绝，不借用本模块归档/永久删除其他会话。
 //! - `R00-T02-LA-FF4F06011B48`（读会话 sidecar 冻结系统提示词与工具名）：
 //!   Rust 存储模型无会话级 promptSnapshot/toolNames sidecar（冻结面为
 //!   per-run `model_context_snapshot`；GAP 明示不能用另一观察面替代），
@@ -1428,7 +1426,7 @@ fn current_tools(
         None => Ok(lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty()),
     }
 }
-async fn manual_compact(
+pub(crate) async fn manual_compact(
     state: &ServiceState,
     principal: &Principal,
     session_id: &str,

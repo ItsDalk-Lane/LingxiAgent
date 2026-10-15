@@ -2276,6 +2276,44 @@
         "EX09 section filters/grain/explicit rerank degradation"
       ],
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "slash_edit_native": {
+      "status": "SIX_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-0FE8BED686E2",
+        "R00-T02-LA-2FAA749DA790",
+        "R00-T02-LA-3FCB259FF69C",
+        "R00-T02-LA-4EA88B5073E4",
+        "R00-T02-LA-5A6E0D526903",
+        "R00-T02-LA-BDE3AC44D79C"
+      ],
+      "completedInitialGaps": 37,
+      "remainingInitialGaps": 41,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 238,
+      "gapLeaves": 41,
+      "actualRegisteredBindings": 15,
+      "sourceCandidateSha256": "f9cf0a699f4d49472b83b024c2db8cc08292575ad34f10c04eccc95efd63f190",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/slash-edit-binding-window-summary.json",
+      "rootActualCombinedRustPassed": 24,
+      "rootUiPassed": 105,
+      "rootKnowledgePassed": 25,
+      "rootEditElectronPassed": 1,
+      "rootEditTauriPassed": 1,
+      "independentEx09Checks": 43,
+      "independentEx09ActualRuns": 10,
+      "independentEx09ActualUsageRows": 34,
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "nextParallel": [
+        "chat seven original leaves and actual production UI",
+        "session eight original leaves and actual production UI",
+        "root resource tools and native previews"
+      ],
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

@@ -256,6 +256,21 @@ impl KnowledgeTools {
                 )
             }
         };
+        // 不能把非法数组元素过滤掉后变成未限缩的全范围查询。
+        for name in ["notebookIds", "sourceIds", "sectionKeys"] {
+            if let Some(value) = params.get(name) {
+                if !value.as_array().is_some_and(|items| {
+                    items
+                        .iter()
+                        .all(|item| item.as_str().is_some_and(|text| !text.trim().is_empty()))
+                }) {
+                    return failed(
+                        ErrorCode::Forbidden,
+                        format!("KNOWLEDGE_SCOPE_VIOLATION: {name} must contain scope identities"),
+                    );
+                }
+            }
+        }
         let request = SearchRequest {
             scope_id,
             session_id: ctx.session_id.to_string(),
@@ -270,13 +285,56 @@ impl KnowledgeTools {
             Ok(runtime) => runtime,
             Err(error) => return ToolOutcome::Failed { error },
         };
-        let result = match self
-            .knowledge
-            .search_in_scope_owned(&request, &runtime)
-            .await
-        {
-            Ok(result) => result,
-            Err(error) => return knowledge_failed(&error),
+        let explicit_empty = ["notebookIds", "sourceIds"].iter().any(|name| {
+            params
+                .get(*name)
+                .and_then(Value::as_array)
+                .is_some_and(Vec::is_empty)
+        });
+        let result = if explicit_empty {
+            if let Err(error) = runtime.check() {
+                return ToolOutcome::Failed {
+                    error: lingxi_protocol::ProtocolError::new(
+                        error.code,
+                        error.message,
+                        error.retryable,
+                    ),
+                };
+            }
+            let scope = match self
+                .knowledge
+                .resolve_turn_scope(&request.scope_id, &request.session_id)
+            {
+                Ok(scope) => scope,
+                Err(error) => return knowledge_failed(&error),
+            };
+            if request
+                .notebook_ids
+                .iter()
+                .any(|id| !scope.notebook_ids.contains(id))
+                || request
+                    .source_ids
+                    .iter()
+                    .any(|id| !scope.sources.iter().any(|source| source.source_id == *id))
+                || !request.section_keys.is_empty()
+            {
+                return knowledge_failed(
+                    &lingxi_kernel::knowledge::KnowledgeError::scope_violation(
+                        "Knowledge filters are outside the selected frozen sources",
+                    ),
+                );
+            }
+            // 与现役TS一致：明确给出的空来源/笔记本集合为零范围，不能退回全部。
+            crate::knowledge::SearchResult{mode:"fts".into(),degraded:vec![crate::knowledge::DegradedScope{reason:"KNOWLEDGE_EMPTY_FILTER".into(),detail:"the explicit notebook/source filter selects no source; no model request was sent".into(),parse_artifact_id:String::new(),source_id:String::new(),source_name:String::new()}],hits:Vec::new(),candidates:Vec::new(),searched_vector_variants:Vec::new()}
+        } else {
+            match self
+                .knowledge
+                .search_in_scope_owned(&request, &runtime)
+                .await
+            {
+                Ok(result) => result,
+                Err(error) => return knowledge_failed(&error),
+            }
         };
         // span 命中直接回读冻结原文（引文引用由程序签发）。
         let mut hits: Vec<Value> = Vec::new();
@@ -293,6 +351,7 @@ impl KnowledgeTools {
             let mut item = json!({
                 "sourceId": hit.source_id,
                 "sourceName": hit.source_name,
+                "grain": hit.grain,
                 "parseArtifactId": hit.parse_artifact_id,
                 "chunkId": hit.chunk_id,
                 "sectionId": hit.section_id,
@@ -338,6 +397,7 @@ impl KnowledgeTools {
                 }
             } else {
                 item["kind"] = json!("navigation-hint");
+                item["snippet"] = json!(hit.chunk.text.chars().take(1200).collect::<String>());
                 item["notice"] =
                     json!("这里只命中资料或章节标题，尚未返回原文；请按 readMore 读取后再引用。");
             }

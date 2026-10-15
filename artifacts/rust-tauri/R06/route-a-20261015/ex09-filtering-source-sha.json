@@ -1,0 +1,25 @@
+{
+  "patch": "/private/tmp/r06-ex09-filtering-incremental.patch",
+  "patchSha256": "759edf7fa64bbcf08c5d39f92654d18fadb84300dc451dffd64f3a7a442cb9da",
+  "source": "/private/tmp/lingxi-r06-ex09-filtering",
+  "files": {
+    "rust/crates/lingxi-service/src/knowledge.rs": {
+      "base": "9c619d94716c7adb00661f8cfa23a154489a6ba8929348219de9d54445f4a65e",
+      "candidate": "d88126ea8bcef57789b48c23735cf53f375d61c358f8103a1c851f7f61f08216"
+    },
+    "rust/crates/lingxi-service/src/knowledgetools.rs": {
+      "base": "0acf3df1b27d5760dfec3e83a0b002d116b0c74e7bd4189fc0b069e298acda00",
+      "candidate": "33e4fe3cd1bb4f18367429b3c6a09c8bd05f1c2a4bcf1ab7996b8ce33cc5d74c"
+    },
+    "rust/crates/lingxi-adapters/src/storage/knowledge.rs": {
+      "base": "00a3669a66b52b99709524a0c494fdd12c50c4d21e35542cf2f2e36a25e304e1",
+      "candidate": "597e262feacd41d9cbd1c2b8ffa63d506833ec607acfdbf542e19d3bc0c119fc"
+    },
+    "rust/crates/lingxi-service/tests/r06_original_knowledge_proofs.rs": {
+      "base": "aa0d0368dfa4303c9288b939caf22d2501dd061bb96040cf6eac4f4b63b842cb",
+      "candidate": "15e4994bfd2724a3462462a3fe5125d3dc36892b017053fb8e91142318b1480a"
+    }
+  },
+  "original22ExactPrefix": true,
+  "rootAdapter12Preserved": true
+}

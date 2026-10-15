@@ -3080,6 +3080,17 @@ impl KnowledgeIndexStore {
         query: &str,
         limit: usize,
     ) -> Result<Vec<IndexHit>, KnowledgeError> {
+        self.search_fts_in_chunks(variant_ids, query, limit, None)
+    }
+
+    /// 章节范围先过滤再取前N；不能先截断再丢弃不在章节内的候选。
+    pub fn search_fts_in_chunks(
+        &self,
+        variant_ids: &[&str],
+        query: &str,
+        limit: usize,
+        allowed_chunks: Option<&std::collections::BTreeSet<String>>,
+    ) -> Result<Vec<IndexHit>, KnowledgeError> {
         if variant_ids.is_empty() {
             return Ok(Vec::new());
         }
@@ -3091,11 +3102,17 @@ impl KnowledgeIndexStore {
             .join(", ");
         let trimmed = query.trim();
         let match_index = variant_ids.len() + 1;
+        let filter_index = match_index + 1;
+        let chunk_filter = if allowed_chunks.is_some() {
+            format!("AND c.chunk_id IN (SELECT value FROM json_each(?{filter_index}))")
+        } else {
+            String::new()
+        };
         let sql = format!(
             "SELECT c.chunk_id, c.ordinal, c.section_id, c.text, c.token_count, c.spans_json, c.variant_id, bm25(knowledge_chunks_fts) AS score \
              FROM knowledge_chunks_fts f JOIN knowledge_chunks c ON c.rowid = f.rowid \
              WHERE knowledge_chunks_fts MATCH ?{match_index} AND c.variant_id IN ({placeholders}) \
-             ORDER BY score LIMIT {limit}"
+             {chunk_filter} ORDER BY score LIMIT {limit}"
         );
         let conn = lock_conn(&self.conn);
         for variant_id in variant_ids {
@@ -3112,6 +3129,12 @@ impl KnowledgeIndexStore {
             .map(|id| rusqlite::types::Value::Text((*id).to_string()))
             .collect();
         bound.push(rusqlite::types::Value::Text(trimmed.to_string()));
+        if let Some(allowed) = allowed_chunks {
+            bound.push(rusqlite::types::Value::Text(
+                serde_json::to_string(allowed)
+                    .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?,
+            ));
+        }
         let rows = stmt
             .query_map(rusqlite::params_from_iter(bound), move |row| {
                 let chunk = StoredChunk {
@@ -3131,10 +3154,8 @@ impl KnowledgeIndexStore {
                 })
             })
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        let hits = rows
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        Ok(hits)
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
     }
 
     pub fn get_ready_variant_metadata(
@@ -3733,6 +3754,17 @@ impl KnowledgeVectorStore {
         query: &[f32],
         limit: usize,
     ) -> Result<Vec<VectorHit>, KnowledgeError> {
+        self.search_in_chunks(variant_ids, query, limit, None)
+    }
+
+    /// 向量候选与FTS使用同一已授权章节集合，在排序截断之前限缩。
+    pub fn search_in_chunks(
+        &self,
+        variant_ids: &[String],
+        query: &[f32],
+        limit: usize,
+        allowed_chunks: Option<&std::collections::BTreeSet<String>>,
+    ) -> Result<Vec<VectorHit>, KnowledgeError> {
         if variant_ids.is_empty() {
             return Ok(Vec::new());
         }
@@ -3776,6 +3808,9 @@ impl KnowledgeVectorStore {
                     vector.push(f32::from_le_bytes(*chunk));
                 }
                 let score = lingxi_kernel::knowledge::cosine(query, &vector)?;
+                if allowed_chunks.is_some_and(|allowed| !allowed.contains(&chunk_id)) {
+                    continue;
+                }
                 hits.push(VectorHit {
                     variant_id: variant_id.clone(),
                     chunk_id,
