@@ -618,6 +618,12 @@
       "source": "/private/tmp/r06-ex12-current-registered-window-r1.log",
       "sha256": "15ad5ee14acadb51276da2460948afa4b5d93912841b43e9962bc21a9dd439e8",
       "bytes": 1261
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-native-cache-contract-final-r1.log",
+      "source": "/private/tmp/r06-native-cache-contract-final-r1.log",
+      "sha256": "a9658a04773f60d0e6d53e3f7a5d3f6b23ebb3c1a939610b407fb54d1db5552b",
+      "bytes": 195
     }
   ]
 }

@@ -13,7 +13,8 @@ executed=[]
 interruption=None
 for index,(key,binding) in enumerate(sorted(inputs['executionBindings'].items()),1):
  env=os.environ.copy()
- if binding['kind']=='rust_desktop_test':env.pop('CARGO_TARGET_DIR',None)
+ if binding['kind']=='rust_desktop_test':
+  env['CARGO_TARGET_DIR']=env.get('LINGXI_SKILLS_NATIVE_TARGET',str(Path.home()/'.cache/lingxi-r06-builds/tauri-resources'))
  try:
   result=subprocess.run([sys.executable,'-B',str(script),'--binding',key,'--evidence',str(evidence/'R06_BINDINGS'/key)],cwd=root,env=env,timeout=binding['timeoutSecs']+180)
  except (subprocess.TimeoutExpired,OSError) as error:

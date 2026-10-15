@@ -815,3 +815,5 @@ EX12后续独立核对又发现一个原先201 READY中的旧漏项：8B48切助
 两个重新打开的旧READY叶经全新9绑定窗口及全部原断言汇总通过。初始78完成78/剩0，原279全部READY、0GAP；另一个既有特殊合同仍保留，共280合同。全量新增必要回归后为599绑定，不删旧项、不复用旧结果；20登记契约、全workspace strict/fmt当前通过。正式R06、F14和R07状态仍保持未验收/OPEN/不就绪。
 
 接着将实际候选提交并固定HEAD，先任务专属execute-all-current-bindings.py完整599绑定/无范围过滤合同汇总，另新根原verify-stage R06全链。release xtask内嵌阶段图，必须在最后generate之后重新build release；不使用先前旧图二进制。窗口和正式门禁期间源码、文档与HEAD不变，所有测试资料只入专项home/tmp，保留原用户HOME和仓库外构建缓存。
+
+最终启动前确认原生宿主是独立workspace且仓库内debug缓存已不存在；仅修正执行环境，复用既有LINGXI_SKILLS_NATIVE_TARGET到仓库外原生缓存，无界面缓存仍为native-write-clean。没有改Cargo命令、精确用例、超时、判定或源稳定性检查，20契约复验通过；避免按旧helper清空target变量后在仓库内重新生成大量缓存。该环境修正已获独立只读核对，必须在冻结前提交。

@@ -1,0 +1,13 @@
+{
+  "scope": "Execution cache selection only; no judgement or assertion change",
+  "desktopKind": "rust_desktop_test",
+  "trustedHostVariable": "LINGXI_SKILLS_NATIVE_TARGET",
+  "nativeTarget": "/Users/study_superior/.cache/lingxi-r06-builds/tauri-resources",
+  "headlessTarget": "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean",
+  "reason": "Independent desktop workspace has no target-dir configuration and in-repository debug cache is absent; do not recreate a large target inside repository",
+  "cargoArgvUnchanged": true,
+  "lockedExactNamedTestsUnchanged": true,
+  "timeoutsAndSourceChecksUnchanged": true,
+  "independentReview": "/root/review_persona_native confirmed source/environment before full window",
+  "stageAccepted": false
+}

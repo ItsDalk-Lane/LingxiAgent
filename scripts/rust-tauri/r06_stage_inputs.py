@@ -639,6 +639,9 @@ def execute_binding(root: Path, evidence: Path, binding, index: int, timeout: fl
         preparation = execute_binding(root, preparation_dir, preparation_binding, 1,
                                       min(timeout, preparation_binding["timeoutSecs"]), initial_candidate)
     env = synthetic_env(root, command_dir)
+    if binding["kind"] == "rust_desktop_test" and env.get("LINGXI_SKILLS_NATIVE_TARGET"):
+        # 复用宿主明确指定的仓库外原生缓存，避免在仓库内重复生成大型构建目录。
+        env["CARGO_TARGET_DIR"] = env["LINGXI_SKILLS_NATIVE_TARGET"]
     if binding.get("suite") == "r06_original_persona_proofs":
         # 人格模板只在本检查的合成目录准备，不能写入仓库产品材料。
         product = command_dir / "runtime" / "persona-product"
