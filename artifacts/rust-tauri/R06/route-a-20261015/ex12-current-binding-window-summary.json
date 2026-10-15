@@ -1,0 +1,18 @@
+{
+  "schema": "lingxi.leaf-case-results.v1",
+  "producedBy": "r06_stage_inputs.py --leaf-evidence",
+  "sourceCandidateSha256": "9ffec985056a984b07813c08917f12e3e9798947020977956e6eb0e978e906a7",
+  "sourceStable": true,
+  "executionErrors": {},
+  "unboundOriginalLeaves": [],
+  "stageVerdict": "NOT_A_STAGE_VERDICT",
+  "passedRegisteredAssertions": true,
+  "executionScope": "SELECTED_ORIGINAL_REQUIREMENTS",
+  "selectedOriginalLeaves": [
+    "R00-T02-LA-517E697740D9",
+    "R00-T02-LA-8B48FD65CAFB"
+  ],
+  "note": "仅已审阅的逐断言证据由本轮原始日志重算；缺少映射的原义务仍由阶段门禁保持BLOCKED。",
+  "caseCount": 4,
+  "allCasesPassed": true
+}

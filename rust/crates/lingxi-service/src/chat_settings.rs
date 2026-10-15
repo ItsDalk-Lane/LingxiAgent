@@ -151,7 +151,19 @@ pub(crate) fn effective_choice(
     owner: &str,
     session: &str,
 ) -> Result<ChatChoice, String> {
+    effective_choice_with_model(state, owner, session, None)
+}
+/// 显式目标模型在推导思考档位之前生效；无显式模型时保留原默认选择规则。
+pub(crate) fn effective_choice_with_model(
+    state: &ServiceState,
+    owner: &str,
+    session: &str,
+    model: Option<(String, String)>,
+) -> Result<ChatChoice, String> {
     let mut choice = choice(state.memory().home(), owner, session)?;
+    if let Some(model) = model {
+        choice.model = Some(model);
+    }
     if choice.model.is_none() {
         choice.model = state.model_gateway().and_then(|g| {
             g.configured_routes()

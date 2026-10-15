@@ -1,10 +1,10 @@
 {
-  "status": "IMPLEMENTED_INTEGRATED_INDEPENDENTLY_CHECKED_FINAL_FULL_WINDOWS_PENDING",
+  "status": "ALL_ORIGINAL_BEHAVIOR_GAPS_IMPLEMENTED_FRESH_FULL_WINDOW_AND_STAGE_PENDING",
   "initial78Completed": 78,
   "initial78Remaining": 0,
-  "original279RegisteredReady": 278,
+  "original279RegisteredReady": 279,
   "specialReviewedContractCount": 1,
-  "registeredCommandCount": 592,
+  "registeredCommandCount": 599,
   "mainResourceParentsPassed": 68,
   "mainRestoredLeafWindowBindingsPassed": 18,
   "stageAccepted": false,
@@ -15,5 +15,13 @@
   "fullWindowAndOriginalStageStillRequired": true,
   "sealChanged": false,
   "additionalEarlierReadyLeafReopened": "R00-T02-LA-8B48FD65CAFB",
-  "additionalEarlierReadyLeafGap": 1
+  "additionalEarlierReadyLeafGap": 0,
+  "additionalEarlierReadyLeavesReopened": [
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-517E697740D9"
+  ],
+  "earlierReadyReopenedLeavesNowRegisteredPass": [
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-517E697740D9"
+  ]
 }

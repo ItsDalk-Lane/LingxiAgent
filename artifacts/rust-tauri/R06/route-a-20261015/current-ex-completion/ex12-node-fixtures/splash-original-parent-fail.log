@@ -1,0 +1,38 @@
+
+running 1 test
+test current_rust_saved_offline_splash_real_ipc_and_image_fallback ... FAILED
+
+successes:
+
+successes:
+
+failures:
+
+---- current_rust_saved_offline_splash_real_ipc_and_image_fallback stdout ----
+
+thread 'current_rust_saved_offline_splash_real_ipc_and_image_fallback' (10206821) panicked at crates/lingxi-service/tests/r06_splash_avatar_live.rs:26:5:
+真实当前候选离线启动头像失败：
+AssertionError [ERR_ASSERTION]: POST /agents/switch: {"code":"internal","details":{"causeId":"internal","requestId":"req-2c676383bba8656d8815a7e08e845cee"},"message":"model plane unavailable","retryable":false}
+
+500 !== 200
+
+    at request (/Users/study_superior/Desktop/Code/LingxiAgent/tests/rust-native/splash-avatar-native.cjs:54:44)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async startRust (/Users/study_superior/Desktop/Code/LingxiAgent/tests/rust-native/splash-avatar-native.cjs:59:3)
+    at async /Users/study_superior/Desktop/Code/LingxiAgent/tests/rust-native/splash-avatar-native.cjs:111:17 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 500,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    current_rust_saved_offline_splash_real_ipc_and_image_fallback
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+

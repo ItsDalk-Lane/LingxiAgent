@@ -1,0 +1,61 @@
+{
+  "role": "EX12修复作者；未自签独立复核，交由persona",
+  "baseCommit": "c2e9fee8f05c01d219290b82a2b89a5b8f2e57e9",
+  "sourceSetSha256": "b8084d75a5e645ad87b1e9d4906ebb9e1202dd453b0a8538426de18dbf9a7f87",
+  "patchSha256": "6a40e9ae137e6a56325b7630241d40f64cd08ef8986ceb43258767523501239a",
+  "status": "IMPLEMENTED_AND_AUTHOR_VALIDATED_PENDING_INDEPENDENT_REVIEW",
+  "mainEdited": false,
+  "committed": false,
+  "targets": [
+    "R00-T02-LA-8B48FD65CAFB",
+    "R00-T02-LA-517E697740D9"
+  ],
+  "negativeControls": [
+    {
+      "evidence": "negative/result.json",
+      "result": "实际Main switch切B返回sessionPath:null，偏好current_agent=B/current_session仍sA。"
+    },
+    {
+      "evidence": "delete-negative/result.json",
+      "result": "实际Main DELETE当前A后current_agent=B/current_session仍sA；sA实际row.agent仍A。"
+    },
+    {
+      "evidence": "target-only-before-fix.log",
+      "result": "本次早期候选在无全局chat但B有合法模型ref时，真实HTTP500；最终通过显式目标模型先于thinking/dispatch生效修复。不是未实现switch的原Main成功旁路。"
+    }
+  ],
+  "implementation": [
+    "switch复用现有session_focus真实创建/模型设置/存储/焦点端口；移除null会话假成功。已有焦点锁覆盖来源读取、创建和完整上下文广播，与sessions/new/switch串行。",
+    "显式cwd仍兼容；未提供时目标home优先，再当前会话cwd，再现有服务workspace默认。新会话权限档继承当前会话，目标记忆开关从主配置读取。新会话不复用已有A/B历史会话、不继承额外目录授权。",
+    "目标AgentConfigDocument::model_reference严格读取models.chat完整provider/id，经原Gateway验真并传现有NewBody.model；缺ref沿原继承，无效ref拒绝零副作用。原chat_settings默认None合同不变；显式model先于thinking派生，并保留无效显式model400合同。",
+    "记录目录历史和焦点提交复用原配置写锁；焦点写失败撤回本次目录历史。真实HTTP失败控制比对会话数、偏好、配置、广播和技能不变。",
+    "DELETE当前助手先校验最后一个/替代助手/模型/目录，再用同一切换服务创建并提交替代B焦点，随后沿原delete_agent journal/cleanup/retry路径删除A。原agent_deletions实现未改。",
+    "删除后响应提供真实replacementSwitchResult；广播完整B上下文先于agent-deleted。后段rename失败如实回报已成功的B上下文、A不假装已删。referencesPending仍保留原收据replacementAgentId null语义，已提交B上下文另明示。"
+  ],
+  "verificationSummary": "最终冻结源18/18父通过（原生命周期4、原删除10、新真实CLI4）；strict clippy、全workspace fmt、准确Main apply --check通过；原session-focus真实HTTP回归PASS/9次模型请求。",
+  "verification": "verification.json",
+  "fixtureReview": [
+    "fixture-only.patch",
+    "fixture-rationale.json"
+  ],
+  "sourceProof": [
+    "source-sha.json",
+    "validated-runtime-source-window.json"
+  ],
+  "runtimeProofs": {
+    "AGENT_SWITCH_PROOF": "/private/tmp/r06-ex12-switch-repair/tmp/r06-agent-switch-42930-1792047248302184000",
+    "DELETE_CURRENT_FOCUS_PROOF": "/private/tmp/r06-ex12-switch-repair/tmp/r06-delete-current-focus-42930-1792047253370562000",
+    "AGENT_SWITCH_NO_MODEL_PROOF": "/private/tmp/r06-ex12-switch-repair/tmp/r06-agent-switch-no-model-42930-1792047254490417000",
+    "TARGET_ONLY_MODEL_PROOF": "/private/tmp/r06-ex12-switch-repair/tmp/r06-target-only-model-42930-1792047255079864000"
+  },
+  "providerEvidence": "新switch、当前删除替代、无全局chat目标ref三个各真实Run分别3次HTTP模型请求。switch旧B会话冻结global-provider/global-model，新B的HTTP body model=target-model且model_call_usage provider/model=target-provider/target-model；与提示词Agent身份另行核对。",
+  "limits": [
+    "实际运行平台为macOS；未执行Windows/Linux、正式打包或桌面UI，不声明整体R06通过。",
+    "供应商为真实HTTP替身，不是真实付费供应商。原session-focus回归关闭UI，本任务只交当前核心/服务。",
+    "TS允许B焦点已提交而A后段删除失败；本实现明确返回实际B上下文，不承诺跨会话存储/偏好/YAML/文件删除全事务。",
+    "原删除收据恢复栈保留；本次验证未来正常新删除产生的pending/retry/restart，不扩为重写旧历史损坏或历史费用归属。",
+    "未修改Main源码、原279叶文本、门禁、白名单、登记、延期或提交。私树428个Rust源/manifest除本7文件内Rust目标外与当前Main无差异；不夹带旧作者源码。"
+  ],
+  "originalLeafAssertionTextOrGateWhitelistRegistryDeferralEdited": false,
+  "authorizedLegacyFixtureAssertionsAdapted": true
+}

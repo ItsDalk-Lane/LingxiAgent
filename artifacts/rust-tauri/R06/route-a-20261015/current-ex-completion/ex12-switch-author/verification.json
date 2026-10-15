@@ -1,0 +1,118 @@
+{
+  "sourceSetSha256": "b8084d75a5e645ad87b1e9d4906ebb9e1202dd453b0a8538426de18dbf9a7f87",
+  "binarySha256": "24c055d607d225f659112697839b2f680dadb5a530e9c71969a5c0cd30f5a747",
+  "sourceWindowCount": 428,
+  "unrelatedPrivateRuntimeDiffs": [],
+  "checks": [
+    {
+      "command": "LINGXI_HOME=/private/tmp/r06-ex12-switch-repair/home TMPDIR=/private/tmp/r06-ex12-switch-repair/tmp CARGO_TARGET_DIR=/private/tmp/lingxi-r06-agent-delete-target /Users/study_superior/.cargo/bin/cargo +1.98.1 test --manifest-path /private/tmp/lingxi-r06-agent-delete/rust/Cargo.toml -p lingxi-service --test r06_agent_switch_completion --test r06_agent_admin_lifecycle --test r06_agent_delete_completion --locked -- --nocapture --test-threads=1",
+      "result": "18 PASS; 0 FAIL",
+      "log": "final-family-tests-r2.log"
+    },
+    {
+      "command": "LINGXI_HOME=/private/tmp/r06-ex12-switch-repair/home TMPDIR=/private/tmp/r06-ex12-switch-repair/tmp CARGO_TARGET_DIR=/private/tmp/lingxi-r06-agent-delete-target /Users/study_superior/.cargo/bin/cargo +1.98.1 clippy --manifest-path /private/tmp/lingxi-r06-agent-delete/rust/Cargo.toml -p lingxi-service --lib --bin lingxi-service --test r06_agent_admin_lifecycle --test r06_agent_delete_completion --test r06_agent_switch_completion --locked -- -D warnings",
+      "result": "PASS",
+      "log": "final-clippy.log"
+    },
+    {
+      "command": "/Users/study_superior/.cargo/bin/cargo +1.98.1 fmt --manifest-path /private/tmp/lingxi-r06-agent-delete/rust/Cargo.toml --all -- --check",
+      "result": "PASS",
+      "log": "final-fmt.log"
+    },
+    {
+      "command": "R06_SESSION_EVIDENCE=/private/tmp/r06-ex12-switch-repair/final-session-focus-regression-r2 R06_SESSION_SERVICE_BIN=/private/tmp/lingxi-r06-agent-delete-target/debug/lingxi-service R06_SESSION_UI=0 LINGXI_HOME=/private/tmp/r06-ex12-switch-repair/home TMPDIR=/private/tmp/r06-ex12-switch-repair/tmp python3 tests/rust-native/session-focus-live.py",
+      "result": "PASS; 9实际HTTP模型请求/3真实Run",
+      "log": "final-session-focus-regression-r2.log"
+    },
+    {
+      "command": "git apply --check /private/tmp/r06-ex12-switch-repair/net.patch",
+      "result": "PASS",
+      "log": "final-apply-check.log"
+    }
+  ],
+  "proofs": {
+    "AGENT_SWITCH_PROOF": {
+      "root": "/private/tmp/r06-ex12-switch-repair/tmp/r06-agent-switch-42930-1792047248302184000",
+      "result": {
+        "status": "PASS",
+        "existingSessions": [
+          "session-5a47d54be17e5a22a8677da609fdd0f5",
+          "session-7d0ea42a42320d6b45a4d498f471e027"
+        ],
+        "createdSessions": [
+          "session-72e22b562da5c9dfacb11580b5291906",
+          "session-25e5f5dd6128cc2cb61aecf2220aef25",
+          "session-05e044bd3531fbc98f05b12dc0b7afcf",
+          "session-cc9270b3c6c5d1f2119ee3ea993a64ee",
+          "session-bb0c48bfd47fa0d5b12b0506ff316daa"
+        ],
+        "runId": "run_000001a13e56fb81_000001",
+        "modelRequests": 3,
+        "checks": [
+          "fresh_session_and_current_cwd",
+          "next_run_agent_session_cwd",
+          "target_provider_model_http_and_ledger",
+          "target_home_priority",
+          "explicit_cwd",
+          "read_only_permission_preserved",
+          "target_memory_config",
+          "restricted_identity_zero_mutation",
+          "corrupt_config_zero_mutation",
+          "unknown_target_model_zero_mutation",
+          "rejections_zero_mutation",
+          "preference_failure_no_ghost_session",
+          "concurrent_switch_focus_event_consistency",
+          "existing_a_b_sessions_preserved"
+        ]
+      }
+    },
+    "DELETE_CURRENT_FOCUS_PROOF": {
+      "root": "/private/tmp/r06-ex12-switch-repair/tmp/r06-delete-current-focus-42930-1792047253370562000",
+      "result": {
+        "status": "PASS",
+        "deletedSessionAgentUnchanged": "session-788e784abf5569b5aad0d11c70296547",
+        "existingReplacementSessionPreserved": "session-a49e68a208174dbfeadc777e6888775b",
+        "replacementSession": "session-dd53dd50e4f7ff60657e3f68f1d82679",
+        "runId": "run_000001a13e5709b1_000001",
+        "modelRequests": 3,
+        "cleanupWasPending": true,
+        "checks": [
+          "pre_switch_focus_failure_preserves_a_skills_and_old_focus",
+          "replacement_validation_before_delete_or_skill_cleanup",
+          "failed_rename_preserves_a_after_real_b_switch",
+          "current_delete_creates_fresh_b_context",
+          "old_a_b_session_ownership_preserved",
+          "full_context_event_precedes_delete",
+          "real_cleanup_failure_and_receipt_retry",
+          "restart_cleanup_preserves_b_focus",
+          "last_agent_refusal_zero_mutation",
+          "next_run_uses_replacement_agent_session_workspace",
+          "replacement_target_provider_model_http_and_ledger"
+        ]
+      }
+    },
+    "AGENT_SWITCH_NO_MODEL_PROOF": {
+      "root": "/private/tmp/r06-ex12-switch-repair/tmp/r06-agent-switch-no-model-42930-1792047254490417000",
+      "result": {
+        "status": "PASS",
+        "checks": [
+          "no_model_explicit_failure_zero_session_focus_config_mutation"
+        ],
+        "modelRequests": 0
+      }
+    },
+    "TARGET_ONLY_MODEL_PROOF": {
+      "root": "/private/tmp/r06-ex12-switch-repair/tmp/r06-target-only-model-42930-1792047255079864000",
+      "result": {
+        "status": "PASS",
+        "checks": [
+          "explicit_target_model_without_global_chat_route",
+          "actual_target_provider_http_and_usage"
+        ],
+        "sessionId": "session-55aa336b653020ba33449eac666b8e2d",
+        "runId": "run_000001a13e570eee_000001",
+        "modelRequests": 3
+      }
+    }
+  }
+}

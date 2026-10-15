@@ -1,0 +1,36 @@
+{
+  "result": "STATIC_DIRECT_CALLER_GAP",
+  "affectedOriginalLeaves": [
+    "R00-T02-LA-517E697740D9:assertion-0"
+  ],
+  "scope": "delete current agent direct call of same missing full switch; no source edit or dynamic FAIL claimed",
+  "sourceSHA256": {
+    "rust/crates/lingxi-service/src/agent_deletions.rs": "939d7104611b6614094c746c4dba2a5c0626e82f8cd829fb82b1dcdbbf667d6a",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "515b72bb4411e8f735df93ec0796d6fb41c3567c54dfbdad1de643f75051318b",
+    "core/agent-manager.ts": "5b78c38342276a098164ece2cd702399e046028bd337a50b826514ead8ce6df3",
+    "server/routes/agents.ts": "75c544fa7b36181214eff4b02429a00e9d52680606055fb059770f8687a61c26"
+  },
+  "currentSourceFacts": [
+    "repair_deletion_references updates current_agent_id/primary_agent_id/order only",
+    "no current_session_id access throughout agent_deletions module",
+    "delete route emits replacement agent id/name only",
+    "legacy deleteAgent awaits complete switchAgent(replacement) before removal and route publishes replacementSwitchResult.sessionPath"
+  ],
+  "minimalRealProbe": [
+    "create actual owned sA for A and a viable B with configured synthetic declared model/workspace",
+    "set/read actual focus A+sA through existing production API",
+    "DELETE A with deleteSkills empty (also repeat selected exclusive skill variant for3516)",
+    "read actual preferences current agent/current session, SessionFacts owner, response and event session locator",
+    "assert B focus/session owner/context, old A history/usage unaffected; next real B Run consumes B material",
+    "failure negative with unavailable B/model/workspace must preserve A and all skills; do not fake rollback after irreversible deletion"
+  ],
+  "proposedMinimumRepair": "reuse unified full focus/create API before irreversible deletion of current agent; preserve original deletion receipt/error semantics and never rewrite old A session agent row",
+  "notRun": [
+    "minimalRealProbe",
+    "full dynamic suite"
+  ],
+  "affectedRegressionOnly": [
+    "R00-T02-LA-3516A7326DD9"
+  ],
+  "scopeClarification": "3516 original all references means skill references; no proof of failed original3516 assertion. Do not reopen3516 solely via inherited switch assumption; preserve old session/history/usage."
+}

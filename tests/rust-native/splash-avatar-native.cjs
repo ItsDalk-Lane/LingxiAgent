@@ -34,7 +34,11 @@ async function startRust() {
   assert.equal(rustDesktopEnabled(), true);
   const selected = resolveRustBinary({ root, packaged: false, env: process.env });
   assert.equal(selected, binary);
-  service = spawn(selected, ['--home', home, '--bind', '127.0.0.1:0'], {
+  // 切换助手会真实新建并聚焦会话；只声明合成chat模型，不配置记忆等辅助模型。
+  const workspace = path.join(output, 'workspace'); fs.mkdirSync(workspace, { recursive: true });
+  const config = path.join(output, 'service-config.json');
+  fs.writeFileSync(config, JSON.stringify({ home, workspace: fs.realpathSync(workspace), providers: { 'splash-fixture': { protocol: 'openai-completions', endpoint: 'http://127.0.0.1:9/v1', auth: { kind: 'apiKey', apiKey: 'synthetic-splash-key' } } }, models: { chat: { provider: 'splash-fixture', model: 'synthetic-chat', capabilities: { tools: true } } } }));
+  service = spawn(selected, ['--config', config, '--bind', '127.0.0.1:0'], {
     cwd: path.dirname(selected), env: { ...process.env, LINGXI_HOME: home, LINGXI_PRODUCT_DIR: path.join(root, 'lib') }, stdio: ['ignore', 'pipe', 'pipe'],
   });
   const stderr = fs.createWriteStream(path.join(output, 'rust-stderr.log')); service.stderr.pipe(stderr);

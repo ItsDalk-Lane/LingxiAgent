@@ -75,7 +75,26 @@ async fn boot() -> Server {
         network_mode: NetworkMode::Loopback,
         shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
-    let state = ServiceState::bootstrap_with_deps(config, &layout, ServiceDeps::default())
+    // 真实切换会创建会话；读回夹具声明可派发模型，不执行外部供应商请求。
+    let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
+        &json!({"providers":{"readback-fixture":{"protocol":"openai-completions","endpoint":"http://127.0.0.1:1/v1","auth":{"kind":"none"}}},"models":{"chat":{"provider":"readback-fixture","model":"synthetic","capabilities":{"tools":true}}}}).to_string()
+    ).unwrap();
+    let credentials = std::sync::Arc::new(
+        lingxi_service::credentials::CredentialService::bootstrap(
+            &plane,
+            &layout.runtime_dir,
+            std::sync::Arc::new(lingxi_service::inject::SystemClock),
+        )
+        .unwrap(),
+    );
+    let deps = ServiceDeps {
+        model_gateway: Some(std::sync::Arc::new(
+            lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
+        )),
+        credential_service: Some(credentials),
+        ..ServiceDeps::default()
+    };
+    let state = ServiceState::bootstrap_with_deps(config, &layout, deps)
         .await
         .expect("bootstrap");
     let token = state.auth().local_token();
@@ -932,6 +951,10 @@ async fn current_status_list_get_and_readonly() {
     assert_eq!(body["model"]["provider"], json!("my-custom"));
 
     // 会话：无 current_session_id → sessionId null。
+    // 明确准备无焦点场景，不依赖旧切换遗漏会话创建的缺口。
+    write_preferences(&server, |prefs| {
+        prefs.remove("current_session_id");
+    });
     let (_, body) = ok(
         &server,
         "GET",

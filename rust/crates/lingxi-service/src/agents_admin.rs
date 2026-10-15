@@ -4,10 +4,7 @@
 //! 端口边界（显式声明，不冒充完整）：
 //! - 助手事件及deleteSkills清理已接入；先删除助手，再复核独占技能并逐项真实删除。
 //!   非独占或清理失败返回skillsSkipped，成功项才计入skillsDeleted。
-//! - 切换响应的 sessionPath / workspaceFolders / authorizedFolders 不由
-//!   服务端跟踪，返回 null / 空数组；可选 body.cwd 写入该助手 config.yaml
-//!   的 desk.last_cwd 并去重合并 desk.cwd_history（端口适配：桌面壳知道
-//!   实际 cwd，原实现取自引擎进程内状态）。
+//! - 切换复用焦点会话创建流程，返回真实会话、工作区及权限，并记录助手目录历史。
 //! - 列表无服务端缓存：fresh=1/true 被接受并等价直读（原实现的缓存
 //!   失效语义在无缓存端口上自然成立）。
 
@@ -398,63 +395,6 @@ impl MemoryService {
         Ok((agent_id, name.to_string()))
     }
 
-    /// 切换当前助手；可选 cwd 写入 desk.last_cwd 并去重合并 desk.cwd_history。
-    pub fn switch_agent(
-        &self,
-        agent_id: &str,
-        cwd: Option<&str>,
-    ) -> Result<Value, AgentLifecycleError> {
-        let dir = self.agent_dir_checked(agent_id)?;
-        {
-            let _guard = preferences_locked();
-            let mut preferences = self.read_preferences_strict()?;
-            preferences["current_agent_id"] = json!(agent_id);
-            self.write_preferences(&preferences)?;
-        }
-
-        let config_path = dir.join("config.yaml");
-        let text = std::fs::read_to_string(&config_path).map_err(|err| {
-            AgentLifecycleError::internal(format!("cannot read config.yaml: {err}"))
-        })?;
-        let mut document = am::config::AgentConfigDocument::parse(&text)?;
-        let mut history: Vec<String> = document
-            .string_list("desk", "cwd_history")?
-            .unwrap_or_default();
-        let previous_cwd = document.string("desk", "last_cwd")?;
-        let cwd = cwd
-            .map(str::trim)
-            .filter(|value| !value.is_empty())
-            .map(str::to_string)
-            .or(previous_cwd);
-        if let Some(cwd) = &cwd {
-            history.retain(|item| item != cwd);
-            history.push(cwd.clone());
-            if history.len() > CWD_HISTORY_CAP {
-                let drop = history.len() - CWD_HISTORY_CAP;
-                history.drain(..drop);
-            }
-            document.set_string("desk", "last_cwd", cwd);
-            document.set_string_list("desk", "cwd_history", &history);
-            let updated = document.render()?;
-            am::atomic_write(&config_path, &updated).map_err(|err| {
-                AgentLifecycleError::internal(format!("cannot write config.yaml: {err}"))
-            })?;
-        }
-
-        let scan = document.scan()?;
-        Ok(json!({
-            "ok": true,
-            "agent": { "id": agent_id, "name": scan.agent_name.clone().unwrap_or_else(|| agent_id.to_string()) },
-            "sessionPath": Value::Null,
-            "cwd": cwd,
-            "homeFolder": scan.desk_home_folder,
-            "workspaceFolders": [],
-            "authorizedFolders": [],
-            "cwdHistory": history,
-            "memoryMasterEnabled": scan.memory_enabled.unwrap_or(true),
-        }))
-    }
-
     pub fn set_primary_agent(&self, agent_id: &str) -> Result<(), AgentLifecycleError> {
         self.agent_dir_checked(agent_id)?;
         let _guard = preferences_locked();
@@ -491,7 +431,8 @@ impl MemoryService {
         &self,
         agent_id: &str,
         cwd: &str,
-    ) -> Result<(), AgentLifecycleError> {
+        focus_session: Option<&str>,
+    ) -> Result<Vec<String>, AgentLifecycleError> {
         let path = self.agent_dir_checked(agent_id)?.join("config.yaml");
         self.dream().save_config(agent_id, None, || {
             let text = std::fs::read_to_string(&path).map_err(|error| {
@@ -510,7 +451,19 @@ impl MemoryService {
             document.set_string_list("desk", "cwd_history", &history);
             am::atomic_write(&path, &document.render()?).map_err(|error| {
                 AgentLifecycleError::internal(format!("cannot remember session workspace: {error}"))
-            })
+            })?;
+            if let Some(session) = focus_session {
+                if let Err(error) = self.set_current_focus(agent_id, session) {
+                    // 同一配置锁内撤回目录变更；焦点写失败不能留下本次历史。
+                    return match am::atomic_write(&path, &text) {
+                        Ok(()) => Err(error),
+                        Err(rollback) => Err(AgentLifecycleError::internal(format!(
+                            "焦点提交失败：{error}；目录历史回退失败：{rollback}"
+                        ))),
+                    };
+                }
+            }
+            Ok(history)
         })
     }
 
@@ -631,38 +584,169 @@ pub async fn agents_create_route(State(state): State<ServiceState>, body: Bytes)
     }
 }
 
-pub async fn agents_switch_route(State(state): State<ServiceState>, body: Bytes) -> Response {
+pub async fn agents_switch_route(
+    axum::Extension(principal): axum::Extension<crate::Principal>,
+    State(state): State<ServiceState>,
+    body: Bytes,
+) -> Response {
     let payload = match parse_body(&body) {
         Ok(value) => value,
         Err(response) => return response,
     };
-    let Some(id) = payload.get("id").and_then(Value::as_str) else {
-        return (
-            StatusCode::BAD_REQUEST,
-            Json(json!({ "error": "invalid id" })),
-        )
-            .into_response();
-    };
-    let cwd = payload.get("cwd").and_then(Value::as_str);
-    match state.memory().switch_agent(id, cwd) {
-        Ok(context) => {
-            state.app_events().publish(
-                "agent-switched",
-                json!({
-                    "agentId": context["agent"]["id"],
-                    "agentName": context["agent"]["name"],
-                    "cwd": context["cwd"],
-                    "homeFolder": context["homeFolder"],
-                    "memoryMasterEnabled": context["memoryMasterEnabled"],
-                }),
-            );
-            Json(context).into_response()
+    // 完整请求的会话创建/焦点提交不因HTTP等待者断开而中途丢弃。
+    match tokio::spawn(async move { switch_agent(&state, &principal, &payload).await }).await {
+        Ok(response) => response,
+        Err(error) => {
+            AgentLifecycleError::internal(format!("助手切换任务失败：{error}")).response()
         }
-        Err(err) => err.response(),
     }
 }
 
+async fn switch_agent(
+    state: &ServiceState,
+    principal: &crate::Principal,
+    payload: &Value,
+) -> Response {
+    let focus = state.focus_mutation.lock().await;
+    match switch_agent_locked(state, principal, payload, &focus).await {
+        Ok(context) => Json(context).into_response(),
+        Err(response) => *response,
+    }
+}
+
+async fn switch_agent_locked(
+    state: &ServiceState,
+    principal: &crate::Principal,
+    payload: &Value,
+    focus: &tokio::sync::MutexGuard<'_, ()>,
+) -> Result<Value, Box<Response>> {
+    let Some(id) = payload.get("id").and_then(Value::as_str) else {
+        return Err((AgentLifecycleError::bad_request("invalid id").response()).into());
+    };
+    if payload
+        .get("cwd")
+        .is_some_and(|cwd| !cwd.is_null() && !cwd.is_string())
+    {
+        return Err((AgentLifecycleError::bad_request("cwd must be a string").response()).into());
+    }
+    // 调用者持有现有焦点锁，覆盖来源读取、创建及广播。
+    let dir = match state.memory().agent_dir_checked(id) {
+        Ok(dir) => dir,
+        Err(error) => return Err((error.response()).into()),
+    };
+    let config = match am::config::read_agent_config(&dir.join("config.yaml")) {
+        Ok(config) => config,
+        Err(error) => return Err((AgentLifecycleError::from(error).response()).into()),
+    };
+    let scan = match config.scan() {
+        Ok(scan) => scan,
+        Err(error) => return Err((AgentLifecycleError::from(error).response()).into()),
+    };
+    // 目标助手的完整模型身份先验真，再交原创建流程冻结到会话；不借用全局模型充数。
+    let model = match config.model_reference("models", "chat") {
+        Ok(value) => value,
+        Err(error) => return Err((AgentLifecycleError::from(error).response()).into()),
+    };
+    if let Some(pair) = model.as_ref() {
+        let choice = crate::chat_settings::ChatChoice {
+            model: Some(pair.clone()),
+            thinking_level: None,
+        };
+        if let Err(error) = crate::chat_settings::dispatch_choice(state, &choice) {
+            return Err((AgentLifecycleError {
+                status: StatusCode::CONFLICT,
+                message: format!("agent_model_not_available: {error}"),
+            }
+            .response())
+            .into());
+        }
+    }
+    // 配置与历史在创建之前校验，不能先改current_agent再在后续失败。
+    if let Err(error) = config.string_list("desk", "cwd_history") {
+        return Err((AgentLifecycleError::from(error).response()).into());
+    }
+    let preferences = match state.memory().read_preferences_strict() {
+        Ok(value) => value,
+        Err(error) => return Err((error.response()).into()),
+    };
+    let mut previous_cwd = None;
+    let mut mode = None;
+    if let Some(sid) = preferences
+        .get("current_session_id")
+        .and_then(Value::as_str)
+    {
+        crate::get_session_owned(state, principal, sid).await?;
+        let row =
+            match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), sid)
+                .await
+            {
+                Ok(Some(row)) => row,
+                Ok(None) => return Err((crate::EndpointError::not_found().into_response()).into()),
+                Err(error) => {
+                    return Err((crate::EndpointError::storage(&error).into_response()).into())
+                }
+            };
+        mode = row.permission_mode;
+        previous_cwd = match crate::session_ui::read(state.storage(), sid) {
+            Ok(metadata) => metadata.and_then(|metadata| metadata.cwd),
+            Err(error) => {
+                return Err((crate::EndpointError::storage(&error).into_response()).into())
+            }
+        };
+    }
+    let requested = payload
+        .get("cwd")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|cwd| !cwd.is_empty());
+    let cwd = requested
+        .map(str::to_string)
+        .or_else(|| {
+            scan.desk_home_folder
+                .clone()
+                .filter(|cwd| !cwd.trim().is_empty())
+        })
+        .or(previous_cwd);
+    let body = crate::session_focus::NewBody {
+        agent_id: Some(id.into()),
+        current_agent_id: None,
+        current_session_path: None,
+        cwd,
+        workspace_folders: Vec::new(),
+        workspace_mount_id: None,
+        project_id: None,
+        memory_enabled: Some(scan.memory_enabled.unwrap_or(true)),
+        thinking_level: None,
+        permission_mode: mode,
+        title: None,
+        model,
+        record_workspace_history: None,
+        forked_from_session_id: None,
+    };
+    let created =
+        match crate::session_focus::create_locked(state, principal, body, true, focus).await {
+            Ok(value) => value,
+            Err(response) => return Err(response),
+        };
+    // 创建流程已记录真实目录；广播和响应使用同一份已提交会话上下文。
+    let context = json!({
+        "ok":true, "agent":{"id":id,"name":created["agentName"]},
+        "sessionId":created["sessionId"], "sessionPath":created["path"],
+        "cwd":created["cwd"], "homeFolder":scan.desk_home_folder,
+        "workspaceFolders":created["workspaceFolders"], "authorizedFolders":created["authorizedFolders"],
+        "cwdHistory":created["cwdHistory"], "memoryMasterEnabled":scan.memory_enabled.unwrap_or(true),
+        "permissionMode":created["permissionMode"], "currentModelProvider":created["currentModelProvider"],
+        "currentModelId":created["currentModelId"], "thinkingLevel":created["thinkingLevel"],
+    });
+    let mut event = context.clone();
+    event["agentId"] = json!(id);
+    event["agentName"] = created["agentName"].clone();
+    state.app_events().publish("agent-switched", event);
+    Ok(context)
+}
+
 pub async fn agents_delete_route(
+    axum::Extension(principal): axum::Extension<crate::Principal>,
     State(state): State<ServiceState>,
     AxumPath(agent_id): AxumPath<String>,
     body: Bytes,
@@ -671,21 +755,77 @@ pub async fn agents_delete_route(
         Ok(value) => value,
         Err(response) => return response,
     };
+    match tokio::spawn(async move { delete_agent(&state, &principal, &agent_id, &payload).await })
+        .await
+    {
+        Ok(response) => response,
+        Err(error) => {
+            AgentLifecycleError::internal(format!("助手删除任务失败：{error}")).response()
+        }
+    }
+}
+
+async fn delete_agent(
+    state: &ServiceState,
+    principal: &crate::Principal,
+    agent_id: &str,
+    payload: &Value,
+) -> Response {
+    let focus = state.focus_mutation.lock().await;
+    if let Err(error) = state.memory().agent_dir_checked(agent_id) {
+        return error.response();
+    }
+    let preferences = match state.memory().read_preferences_strict() {
+        Ok(value) => value,
+        Err(error) => return error.response(),
+    };
+    let live = match state.memory().ordered_live_agents() {
+        Ok(value) => value,
+        Err(error) => return error.response(),
+    };
+    let candidates: Vec<_> = live.iter().filter(|(id, _)| id != agent_id).collect();
+    let Some(replacement) = candidates
+        .iter()
+        .find(|(id, _)| preferences["primary_agent_id"] == id.as_str())
+        .or_else(|| candidates.first())
+    else {
+        return AgentLifecycleError::bad_request("cannot delete the last agent").response();
+    };
+    let current = preferences["current_agent_id"]
+        .as_str()
+        .or_else(|| preferences["primary_agent_id"].as_str());
+    let mut focused_agent = None;
+    if let Some(sid) = preferences["current_session_id"].as_str() {
+        focused_agent = match state.storage().get_session(sid).await {
+            Ok(value) => value.map(|session| session.agent_id),
+            Err(error) => return crate::EndpointError::storage(&error).into_response(),
+        };
+    }
+    // 必须先成功创建替代助手真实焦点会话，再进入原不可逆删除/清理收据流程。
+    // 已有旧会话和费用归属保持原样，不拿旧会话改助手充数。
+    let replacement_context = if current == Some(agent_id)
+        || focused_agent.as_deref() == Some(agent_id)
+    {
+        match switch_agent_locked(state, principal, &json!({"id":replacement.0}), &focus).await {
+            Ok(context) => Some(context),
+            Err(response) => return *response,
+        }
+    } else {
+        None
+    };
     // 人物卡应用与删除共用异步门，不能在逻辑删除之后由分段导入重建公共目录。
     // 请求正文已收齐并校验；清理重试使用独立收据入口，不经本路由重入。
     let _application = crate::character_cards::CARD_APPLICATION_GATE.lock().await;
     let requested = payload.get("deleteSkills").and_then(Value::as_array);
-    match state.memory().delete_agent(&agent_id) {
+    match state.memory().delete_agent(agent_id) {
         Ok(mut deletion) => {
-            let replacement = deletion["replacementAgentId"].as_str().map(str::to_owned);
-            // 广播顺序与原实现一致：替代切换先于删除事件。
-            if let Some(replacement) = replacement.as_deref() {
-                if let Some(name) = state.memory().agent_display_name(replacement) {
-                    state.app_events().publish(
-                        "agent-switched",
-                        json!({ "agentId": replacement, "agentName": name }),
-                    );
+            // 真正切换已广播完整上下文；删除结果保留同一份会话信息。
+            if let Some(context) = replacement_context.as_ref() {
+                // 原收据仍如实表示未修复的引用；已提交焦点另给完整上下文。
+                if deletion["referencesPending"] != true {
+                    deletion["replacementAgentId"] = context["agent"]["id"].clone();
                 }
+                deletion["replacementSwitchResult"] = context.clone();
             }
             state
                 .app_events()
@@ -698,7 +838,7 @@ pub async fn agents_delete_route(
             let mut skills_deleted: Vec<String> = Vec::new();
             let mut skills_skipped: Vec<Value> = Vec::new();
             if let Some(names) = requested {
-                let other_live = state.memory().other_live_agent_ids(&agent_id);
+                let other_live = state.memory().other_live_agent_ids(agent_id);
                 let enabled_elsewhere: std::collections::HashSet<String> = other_live
                     .iter()
                     .flat_map(|other| state.memory().agent_enabled_skills(other))
@@ -737,7 +877,10 @@ pub async fn agents_delete_route(
             deletion["skillsSkipped"] = json!(skills_skipped);
             Json(deletion).into_response()
         }
-        Err(err) => err.response(),
+        Err(err) => match replacement_context {
+            Some(context) => (err.status, Json(json!({"error":err.message,"replacementAgentId":context["agent"]["id"],"replacementSwitchResult":context}))).into_response(),
+            None => err.response(),
+        },
     }
 }
 

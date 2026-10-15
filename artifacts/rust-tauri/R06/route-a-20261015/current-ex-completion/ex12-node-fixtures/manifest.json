@@ -1,0 +1,60 @@
+{
+  "finishedAtUtc": "2026-10-15T07:06:01.539943+00:00",
+  "status": "PASS",
+  "files": [
+    {
+      "path": "tests/rust-native/splash-avatar-native.cjs",
+      "baseSha256": "ebcb30ad358621d3e74ea1974a687204d55f2a0cf4e22712adc53b8a296bdc8d",
+      "candidateSha256": "0f5b7988af23fe9c5b125ae1fcfc1b655b164235711d8ae3602e1d2f4bdc3aa8"
+    },
+    {
+      "path": "tests/rust-native/settings-owner-orchestrator.mjs",
+      "baseSha256": "e69364fac9567495eeb0bf2cbf811926445fc9c20c790dfd8461138a9e552bb3",
+      "candidateSha256": "8d1c878c3ac3f1bc7eb0e0dcdd0d518cfdc32ab5daade99f2204d16855efa854"
+    }
+  ],
+  "patchSha256": "e2c6a04f3d05466bcd83f20531aa5fd6a1722bab5ed164e408ea7589407ba106",
+  "parents": [
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_splash_avatar_live.rs",
+      "sha256": "752d7d3016200ac574a5af789bc7c81ba8db30ff2ebba5187c93ae83ec5752e7",
+      "assertionsUnchanged": true,
+      "standaloneTestBinary": "/private/tmp/r06-ex12-node-fixtures/r06_splash_avatar_live"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_settings_owner_current_source.rs",
+      "sha256": "c3f5629669f60d95dfc414737b19bc849d9a34cd54403beb857f6e6d1620c847",
+      "assertionsUnchanged": true,
+      "standaloneTestBinary": "/private/tmp/r06-ex12-node-fixtures/r06_settings_owner_current_source"
+    }
+  ],
+  "originalMainParentLogs": [
+    "splash-original-parent-fail.log",
+    "owner-original-parent-fail.log"
+  ],
+  "fixedExactParents": [
+    "r06_splash_avatar_live-fixed-parent-r2.log",
+    "r06_settings_owner_current_source-fixed-parent-r2.log"
+  ],
+  "rawReceipts": [
+    "/private/tmp/r06-ex12-node-fixtures/tmp/r06-splash-native-44840-1792047912566527000/receipt.json",
+    "/private/tmp/r06-ex12-node-fixtures/tmp/r06-settings-owner-44866-1792047917683622000/parent-receipt.json"
+  ],
+  "serviceBinary": "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/lingxi-service",
+  "serviceBinarySha256": "6ff9b025e1138ca8e02bd250c5f9217eafc35cd3611d2c90ab1479861914db5f",
+  "currentBinaryMatchesBothReceipts": true,
+  "mainSourceUnchanged": true,
+  "actualParentChecks": {
+    "splashRecords": 16,
+    "ownerForeignPutCount": 0,
+    "noUtilityPutCount": 0,
+    "noUtilityDisabled": true
+  },
+  "env": {
+    "PATHPrefix": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin",
+    "R06_NODE_BIN": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+    "TMPDIR": "/private/tmp/r06-ex12-node-fixtures/tmp",
+    "LINGXI_HOME": "/private/tmp/r06-ex12-node-fixtures/home"
+  },
+  "tempParentBuild": "原Rust父逐字复制，以1.98.1 rustc --test和现有Main deps重编，仅CARGO_MANIFEST_DIR指私有窄源根，CARGO_BIN_EXE指当前Main服务，不改父源码/断言，不新建target。"
+}

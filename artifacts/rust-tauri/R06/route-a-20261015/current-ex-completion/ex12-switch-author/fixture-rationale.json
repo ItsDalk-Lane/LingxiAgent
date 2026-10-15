@@ -1,0 +1,23 @@
+{
+  "scope": "仅调整有新真实会话行为后不再成立的夹具准备/快照时机，原279叶assertion/Then不动，完整hunk见fixture-only.patch。",
+  "authorizations": "Root明确授权：真实独占目录/模型/workspace夹具；保留全部原生命周期与事件断言，加入实际会话广播；AfterMoved引用写失败；故障前正确B焦点快照；不人为改current_agent为A。",
+  "changes": [
+    {
+      "file": "r06_agent_admin_lifecycle.rs",
+      "reason": "旧夹具无模型/工作区且硬编码不存在/tmp目录；原TS新会话明确要求可用模型。建立本测试独占目录与声明模型，所有cwd/历史去重排序/YAML持久化/拒绝/事件顺序仍严格检查。YAML会折行，因此解析实际落盘last_cwd做精确值比较。完整事件序列保留全部原助手事件顺序并加入真实session-created/focus事件，不过滤事件。"
+    },
+    {
+      "file": "r06_agent_delete_completion.rs::r3_reference_failure...",
+      "reason": "TS先切B成功才删A。将原preferences只读故障移到既有AfterMoved，仅加只读标记并捕获当时真实B偏好，不写造A。保留logicalDeleted/referencesPending/cleanupPending/replacementAgentId null/referenceError原断言，故障后字节等于B快照；重试后primary/current为B，额外断言同一B会话。"
+    },
+    {
+      "file": "r06_agent_delete_completion.rs::r4_corrupt_aborted...",
+      "reason": "物理rename失败前真实B切换可已成功。把坏收据GET/retry/bootstrap不得改偏好的比较基准放到该失败后的正确B快照；额外核对响应B会话。三入口500、收据原字节、助手各资料原字节、实际启动拒绝和后续dream可用等原断言保留。"
+    }
+  ],
+  "tsEvidence": [
+    "core/agent-manager.ts::_doSwitchAgentOnly 读取目标models.chat完整provider/id，未知ref拒绝；_doSwitchAgent以homeFolder→previousCwd→homeCwd创建新会话",
+    "core/session-coordinator.ts::createSession 1839附近：!restore && !effectiveModel抛noAvailableModel，在SessionManager.create前",
+    "core/agent-manager.ts::deleteAgent 先await switchAgent(replacement)，成功才进入删除；允许后段删除失败时B焦点已提交"
+  ]
+}

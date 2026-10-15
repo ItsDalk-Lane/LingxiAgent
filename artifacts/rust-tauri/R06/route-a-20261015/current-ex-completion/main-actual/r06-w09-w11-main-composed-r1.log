@@ -1,0 +1,119 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.46s
+     Running tests/r06_ar_w09_embedding_batches.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_ar_w09_embedding_batches-919bd79a60bb2b2c)
+
+running 16 tests
+test c01_closed_loopback_port_is_an_attempt_but_proves_not_sent ... 2026-10-15T06:34:46.700896Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_71776e6507b8f91830122d22 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider request failed before a response: error sending request for url (http://127.0.0.1:50079/v1/embeddings)
+W09 c01-connect-failure: 原始请求与数据库收据已写入独立证据
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-connect-failure-40203-1792046084486818000 previousInstanceId=cdf36ef809c176fab07451b7cc560954 previousPid=40205 previousStartNonce=342a7d0ffeec88e9 previousStartedAtUnixMs=1792046086086 handshakeMismatches=none
+2026-10-15T06:34:46.753804Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c01-connect-failure-restart: 原始请求与数据库收据已写入独立证据
+ok
+test c01_exact_batch_boundaries ... W09 c01-1: 原始请求与数据库收据已写入独立证据
+W09 c01-64: 原始请求与数据库收据已写入独立证据
+W09 c01-65: 原始请求与数据库收据已写入独立证据
+W09 c01-128: 原始请求与数据库收据已写入独立证据
+W09 c01-129: 原始请求与数据库收据已写入独立证据
+ok
+test c01_presend_request_construction_failure_is_not_a_physical_request ... 2026-10-15T06:34:51.496138Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_55f66ab6756a2f6f5c6fe6e9 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider request construction failed before send: builder error
+W09 c01-presend-build: 原始请求与数据库收据已写入独立证据
+ok
+test c02_bind_failure_joins_worker_before_returning_error ... W09 c02-bind-failure: 原始请求与数据库收据已写入独立证据
+ok
+test c02_failed_checkpoint_resumes_only_gaps ... 2026-10-15T06:34:52.350950Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_b91e4f563425ef936b6fffc6 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-failed-2-40203-1792046091631129000 previousInstanceId=d4a07ab3cdeade58f8388bcce9fe7f89 previousPid=40223 previousStartNonce=04c4e28df26557df previousStartedAtUnixMs=1792046091638 handshakeMismatches=none
+2026-10-15T06:34:52.432614Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-failed-2: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:34:53.427834Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_5866d7c0cf13601eace388a5 error=KNOWLEDGE_MODEL_UNAVAILABLE: provider returned HTTP 400 Bad Request: {"data":null,"error":{"message":"W09 external injected failure"}}
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-failed-3-40203-1792046092679075000 previousInstanceId=051293996edb4bb363ec9e7dc5882a1a previousPid=40225 previousStartNonce=815ff808ac642d3e previousStartedAtUnixMs=1792046092687 handshakeMismatches=none
+2026-10-15T06:34:53.589701Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-failed-3: 原始请求与数据库收据已写入独立证据
+ok
+test c02_graceful_stop_joins_active_worker_before_compatible_gap_recovery ... 2026-10-15T06:34:54.497888Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_e298c162947ebad6214a34fa error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding parent cancelled during wait
+W09 c02-sigterm-active: 原始请求与数据库收据已写入独立证据
+ok
+test c02_last_service_owner_drop_stops_worker_and_releases_single_writer ... W09 c02-owner-drop: 原始请求与数据库收据已写入独立证据
+ok
+test c02_post_commit_statistics_and_job_completion_fault_resume_paid_checkpoint ... 2026-10-15T06:34:55.502136Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_62d1e83c7b4b5456949864bc error=KNOWLEDGE_STORAGE_INVALID: W09 statistics write interrupted after vector commit
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-stats-after-write-40203-1792046094862096000 previousInstanceId=dfe908db00cb95359d04a45181c3c132 previousPid=40231 previousStartNonce=34cd374b62df3306 previousStartedAtUnixMs=1792046094869 handshakeMismatches=none
+2026-10-15T06:34:55.525729Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-stats-after-write: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:34:56.301500Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_102fa6c0ebeda0745fb3cca4 error=KNOWLEDGE_STORAGE_INVALID: W09 job completion failure
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-job-complete-40203-1792046095654254000 previousInstanceId=6cb97f73feefc304c30e6a2e2a9bad33 previousPid=40233 previousStartNonce=65bc79a01150d021 previousStartedAtUnixMs=1792046095661 handshakeMismatches=none
+2026-10-15T06:34:56.344509Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-job-complete: 原始请求与数据库收据已写入独立证据
+ok
+test c02_presend_quota_wait_cancel_records_no_wire_request ... W09 c02-quota-cancel: 原始请求与数据库收据已写入独立证据
+ok
+test c02_sigkill_running_recovers_only_gaps ... LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-sigkill-1-40203-1792046097129303000 previousInstanceId=791792aabf858086ebd15005b8867f5c previousPid=40235 previousStartNonce=9bc3e2740a24c9ef previousStartedAtUnixMs=1792046097137 handshakeMismatches=none
+2026-10-15T06:34:57.744085Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-sigkill-1: 原始请求与数据库收据已写入独立证据
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-sigkill-2-40203-1792046098031397000 previousInstanceId=1b3bf4b84b251ef6ada0fa8ca9a1fb17 previousPid=40237 previousStartNonce=ec5a16412a602949 previousStartedAtUnixMs=1792046098038 handshakeMismatches=none
+2026-10-15T06:34:58.713404Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-sigkill-2: 原始请求与数据库收据已写入独立证据
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-sigkill-3-40203-1792046098901082000 previousInstanceId=b2f104d45afff573326f286f222121f1 previousPid=40239 previousStartNonce=adacd0b1f5d2ec61 previousStartedAtUnixMs=1792046098908 handshakeMismatches=none
+2026-10-15T06:34:59.612378Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c02-sigkill-3: 原始请求与数据库收据已写入独立证据
+ok
+test c02_storage_close_joins_its_active_worker_even_with_live_state_clones_and_spares_other_home ... W09 c02-storage-close-owned: 原始请求与数据库收据已写入独立证据
+ok
+test c02_worker_ownership_and_source_delete_win ... 2026-10-15T06:35:01.350274Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_85013374041730e6c5e1bdda error=KNOWLEDGE_MODEL_UNAVAILABLE: KNOWLEDGE_MODEL_UNAVAILABLE: KNOWLEDGE_STORAGE_INVALID: Query returned no rows; embedding stats persistence failed: KNOWLEDGE_CONFLICT: ingestion no longer running
+2026-10-15T06:35:01.350476Z ERROR lingxi_service::knowledge: knowledge job failure could not be persisted storage_error=KNOWLEDGE_CONFLICT: ingestion status changed before write
+W09 c02-worker-delete: 原始请求与数据库收据已写入独立证据
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-worker-delete-40203-1792046100669903000 previousInstanceId=5282aa5428bb9a7aeda3cf2bfc257a8c previousPid=40241 previousStartNonce=43cb98d6af8c9281 previousStartedAtUnixMs=1792046100677 handshakeMismatches=none
+2026-10-15T06:35:01.504932Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+ok
+test c03_invalid_external_vector_family_cannot_complete ... 2026-10-15T06:35:02.140912Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_50bfecf4e988b553cd6c8f3d error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding response carries 63 rows for 64 inputs
+W09 c03-invalid-short: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:02.757837Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_e8af7926b7fef76ef4ffc98f error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding row index 0 appears twice
+W09 c03-invalid-duplicate: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:03.371992Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_22ba15a28f2ea234d65070d3 error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding vectors disagree on dimensionality (2 vs 3)
+W09 c03-invalid-dimension: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:03.996583Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_ec246472e6ac6ea8cf2b2a3f error=KNOWLEDGE_RETRIEVAL_UNAVAILABLE: embedding identity or batch shape is invalid
+W09 c03-invalid-finite: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:04.599333Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_6fa901f53aec9f2ded126cef error=KNOWLEDGE_MODEL_UNAVAILABLE: embedding row index 99999 out of range of 64 inputs
+W09 c03-invalid-index: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:05.212981Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_b2f3595d4681bdb41720bc6e error=KNOWLEDGE_MODEL_UNAVAILABLE: data[].embedding is an EMPTY vector
+W09 c03-invalid-empty: 原始请求与数据库收据已写入独立证据
+ok
+test c03_progress_and_storage_failure_windows_never_ready ... W09 c03-progress: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:06.529767Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_6b65108a4e03668074e8f42b error=KNOWLEDGE_STORAGE_INVALID: W09 synthetic write failure
+W09 c03-write-abort: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:07.177368Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_84cf9d04974cb0f5a25eb2a1 error=KNOWLEDGE_STORAGE_INVALID: W09 synthetic complete failure
+W09 c03-complete-abort: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:07.838545Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_d6df1b6816d16903498e3f6c error=KNOWLEDGE_INDEX_INVALID: vector build does not match the exact planned chunk set
+W09 c03-wrong-id: 原始请求与数据库收据已写入独立证据
+2026-10-15T06:35:08.505756Z ERROR lingxi_service::knowledge: knowledge ingestion job did not complete job_id=kjob_1ad15b797a6760906b234d57 error=KNOWLEDGE_INDEX_INVALID: vector build does not match the exact planned chunk set
+W09 c03-missing-row: 原始请求与数据库收据已写入独立证据
+ok
+test c04_content_refresh_creates_new_plan_and_preserves_previous_paid_bytes ... W09 c04-content-refresh: 原始请求与数据库收据已写入独立证据
+ok
+test c04_ready_reuse_and_changed_model_endpoint_profile_keep_paid_bytes ... LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-ready-reuse-40203-1792046109179846000 previousInstanceId=4077268b8222959ed9c12ae28ae5c24a previousPid=40255 previousStartNonce=bb8456083ea1f9c8 previousStartedAtUnixMs=1792046109187 handshakeMismatches=none
+2026-10-15T06:35:09.960512Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-ready-reuse-40203-1792046109179846000 previousInstanceId=4a615b476c2cda91b5a6af2b3c4c12a0 previousPid=40256 previousStartNonce=a089a0078eda5aa2 previousStartedAtUnixMs=1792046109960 handshakeMismatches=none
+2026-10-15T06:35:10.140492Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+LINGXI_SERVICE_STALE_RECORD_TAKEN_OVER home=/private/tmp/r06-w09-w11-composed-env/home/lingxi-r06-ar-w09-ready-reuse-40203-1792046109179846000 previousInstanceId=76847cf97466bcdaf0f674c00aa0af5f previousPid=40257 previousStartNonce=acb656511b11c006 previousStartedAtUnixMs=1792046110140 handshakeMismatches=none
+2026-10-15T06:35:10.991379Z  WARN lingxi_service: stale instance record taken over (lock was free; decision never used pid liveness) [token] [token][user]/lingxi-service/instance.stale.json
+W09 c04-ready: 原始请求与数据库收据已写入独立证据
+ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.96s
+
+     Running tests/r06_ar_w11_embedding_lifecycle.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_ar_w11_embedding_lifecycle-203c94db5966c72d)
+
+running 12 tests
+test c01_c04_actual_driver_gateway_embedding_one_permit_and_replay ... ok
+test c02_eight_retained_paid_results_refuse_ninth_before_send_and_recover_all ... ok
+test c02_journal_native_write_failure_is_loud_and_paid_bytes_remain_available ... ok
+test c02_paid_native_waiter_drop_preserves_real_bytes_until_physical_exit_and_recovery ... ok
+test c02_paid_receipt_claim_binding_and_future_schema_refusal ... ok
+test c03_absolute_deadline_native_fifo_retains_claim_and_known_paid_usage ... ok
+test c03_actual_driver_cancel_native_fifo_keeps_paid_ledger_and_physical_lease ... ok
+test c03_actual_driver_embedding_network_deadline_is_not_renewed ... ok
+test c03_actual_parent_cancel_during_embedding_network_settles_once ... ok
+test c03_credential_and_quota_wait_cancel_and_deadline_are_real_and_not_sent ... ok
+test c03_native_fifo_blocks_incidental_reader_until_explicit_release ... ok
+test c03_retained_paid_recovery_native_wait_keeps_original_cancel_and_deadline ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.27s
+

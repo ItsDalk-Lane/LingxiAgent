@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on build directory
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.68s
+     Running tests/r06_session_focus_completion.rs (/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_session_focus_completion-08b099a121408285)
+
+running 1 test
+SESSION-FOCUS: /private/tmp/r06-ex06-main-env/tmp/lingxi-r06-session-focus-43354-1792047511741467000 PASS
+test focused_creation_consumes_pinned_model_workspace_and_native_input_drafts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 11.90s
+

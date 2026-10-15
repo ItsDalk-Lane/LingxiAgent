@@ -1,0 +1,105 @@
+{
+  "result": "PASS_SCOPED_CURRENT_MAIN_HTTP_AND_STATIC_FIXTURE_REVIEW",
+  "sourceSetSha256": "b8084d75a5e645ad87b1e9d4906ebb9e1202dd453b0a8538426de18dbf9a7f87",
+  "patchSha256": "6a40e9ae137e6a56325b7630241d40f64cd08ef8986ceb43258767523501239a",
+  "mainSourceChecks": [
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "expected": "0d7f16a538750e4d606b1c2b7b106d892fe8c12fc9d2aeed9d4c58188b2a0fbe",
+      "actual": "0d7f16a538750e4d606b1c2b7b106d892fe8c12fc9d2aeed9d4c58188b2a0fbe",
+      "matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_focus.rs",
+      "expected": "5fec77091135bf5eea785d6c123a60c714e6b57ce37bbc455b8f49fea830b1de",
+      "actual": "5fec77091135bf5eea785d6c123a60c714e6b57ce37bbc455b8f49fea830b1de",
+      "matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "expected": "a7a0a20e89c0f9f5559c20a6754a83a63f9a04fdcdbd20280b303e649aadef9c",
+      "actual": "a7a0a20e89c0f9f5559c20a6754a83a63f9a04fdcdbd20280b303e649aadef9c",
+      "matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_admin_lifecycle.rs",
+      "expected": "d4eb7119a5643f7150391396a70ce6bb5f9cdc290af40bd21f838a645be82341",
+      "actual": "d4eb7119a5643f7150391396a70ce6bb5f9cdc290af40bd21f838a645be82341",
+      "matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_delete_completion.rs",
+      "expected": "e56e99e8b0822f17a7b10dec92f0c20aa8a22ececc841c8e9e63716e5087d22c",
+      "actual": "e56e99e8b0822f17a7b10dec92f0c20aa8a22ececc841c8e9e63716e5087d22c",
+      "matches": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_switch_completion.rs",
+      "expected": "20653e1625554a2055af71d11719e1e0f24a999d05cdc9ad11f5d1591f2810f3",
+      "actual": "20653e1625554a2055af71d11719e1e0f24a999d05cdc9ad11f5d1591f2810f3",
+      "matches": true
+    },
+    {
+      "path": "tests/rust-native/agent-switch-live.py",
+      "expected": "d2bce023fe7e53b7abd0eb01f9426620b87ba9548243fc3ca4750fe19479c12e",
+      "actual": "d2bce023fe7e53b7abd0eb01f9426620b87ba9548243fc3ca4750fe19479c12e",
+      "matches": true
+    }
+  ],
+  "serviceBinary": "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/lingxi-service",
+  "binarySha256Before": "6ff9b025e1138ca8e02bd250c5f9217eafc35cd3611d2c90ab1479861914db5f",
+  "binarySha256After": "6ff9b025e1138ca8e02bd250c5f9217eafc35cd3611d2c90ab1479861914db5f",
+  "independentControls": {
+    "status": "PASS",
+    "checks": [
+      "malformed_explicit_target_missing_provider_rejects400_zero_mutation",
+      "explicit_targetB_actual_provider_model_and_usage",
+      "reverse_currentB_delete_creates_freshA_focus_before_deletion",
+      "oldA_B_rows_nonempty_canonical_histories_branches_and_all_usage_rows_preserved",
+      "replacementA_next_real_run_uses_actualA_model",
+      "same_replacement_session_in_focus_and_event"
+    ],
+    "modelRequests": 9,
+    "oldA": "session-d65686f673bce1c122c3442b87d57f8c",
+    "oldB": "session-efadd2accfdf63c86aa0ec7170ca86a3",
+    "replacementA": "session-5ca2e39bdf1965f82567777980d71fa7",
+    "runIds": [
+      "run_000001a13e5d2145_000001",
+      "run_000001a13e5d2187_000002",
+      "run_000001a13e5d21ed_000003"
+    ],
+    "historyRows": {
+      "session-d65686f673bce1c122c3442b87d57f8c": 7,
+      "session-efadd2accfdf63c86aa0ec7170ca86a3": 7
+    }
+  },
+  "targetOnlyControl": {
+    "status": "PASS",
+    "checks": [
+      "explicit_target_model_without_global_chat_route",
+      "actual_target_provider_http_and_usage"
+    ],
+    "sessionId": "session-711e62ed2c63b97c884f9ed9cd1efc38",
+    "runId": "run_000001a13e5c673b_000001",
+    "modelRequests": 3
+  },
+  "runtimeScope": "current Main real service/HTTP/gateway/tools/SQLite/files; only external provider transport is synthetic",
+  "realSupplierOrCurrencyCharges": false,
+  "notRun": [
+    "whole18 independent rerun",
+    "macOS native UI this followup",
+    "Windows",
+    "Linux",
+    "formal R06"
+  ],
+  "noMainEdits": true,
+  "fixtureReview": "original lifecycle semantics preserved with valid dirs/model; post-move snapshot captures realB no manual resetA; pre-switch failure covered by actual author CLI and scoped independent malformedref refusal",
+  "sourceChangesReviewed": [
+    "real focus/create shared implementation",
+    "None model helper delegates old body",
+    "explicit target overrides before thinking",
+    "explicit invalid new-session model400 validation restored",
+    "delete pre-switch then original receipt path",
+    "true cwd/focus commit failure rollback"
+  ]
+}

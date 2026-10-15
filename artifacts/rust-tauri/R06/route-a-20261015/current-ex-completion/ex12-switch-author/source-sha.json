@@ -1,0 +1,49 @@
+{
+  "baseCommit": "c2e9fee8f05c01d219290b82a2b89a5b8f2e57e9",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "newFile": false,
+      "baseSha256": "515b72bb4411e8f735df93ec0796d6fb41c3567c54dfbdad1de643f75051318b",
+      "candidateSha256": "0d7f16a538750e4d606b1c2b7b106d892fe8c12fc9d2aeed9d4c58188b2a0fbe"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_focus.rs",
+      "newFile": false,
+      "baseSha256": "028c9283a44cd17b404235be4664f2eb6525cb852b1b581922b3572f01ada732",
+      "candidateSha256": "5fec77091135bf5eea785d6c123a60c714e6b57ce37bbc455b8f49fea830b1de"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "newFile": false,
+      "baseSha256": "64cc12aafff5aa23c286e73b7f94ccd803369c0a4975084c6d59cd5903e8f93b",
+      "candidateSha256": "a7a0a20e89c0f9f5559c20a6754a83a63f9a04fdcdbd20280b303e649aadef9c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_admin_lifecycle.rs",
+      "newFile": false,
+      "baseSha256": "728a94dce11f33817872a951878bb3024c2072ee079a5e4cf5271236a6cd3168",
+      "candidateSha256": "d4eb7119a5643f7150391396a70ce6bb5f9cdc290af40bd21f838a645be82341"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_delete_completion.rs",
+      "newFile": false,
+      "baseSha256": "cf26f5d3c8072aad4c5090b7f458c508c918c329435622a046842ef70c388352",
+      "candidateSha256": "e56e99e8b0822f17a7b10dec92f0c20aa8a22ececc841c8e9e63716e5087d22c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_switch_completion.rs",
+      "newFile": true,
+      "baseSha256": null,
+      "candidateSha256": "20653e1625554a2055af71d11719e1e0f24a999d05cdc9ad11f5d1591f2810f3"
+    },
+    {
+      "path": "tests/rust-native/agent-switch-live.py",
+      "newFile": true,
+      "baseSha256": null,
+      "candidateSha256": "d2bce023fe7e53b7abd0eb01f9426620b87ba9548243fc3ca4750fe19479c12e"
+    }
+  ],
+  "sourceSetSha256": "b8084d75a5e645ad87b1e9d4906ebb9e1202dd453b0a8538426de18dbf9a7f87",
+  "patchSha256": "6a40e9ae137e6a56325b7630241d40f64cd08ef8986ceb43258767523501239a"
+}

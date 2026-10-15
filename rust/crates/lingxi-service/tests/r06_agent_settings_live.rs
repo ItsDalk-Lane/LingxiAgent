@@ -1022,13 +1022,38 @@ async fn native_pending_reference_deletion_current_electron_shows_and_retries_tr
             .0,
         200
     );
+    // 排序中保留A引用；即使B焦点/主助手已提交，删除后仍必须真实写回引用。
+    assert_eq!(
+        fx.request(
+            "PUT",
+            "/lingxi/v1/agents/order",
+            json!({"order":["agentA","agentB"]})
+        )
+        .await
+        .0,
+        200
+    );
     let prefs = fx.home.join("user/preferences.json");
-    assert!(std::process::Command::new("/usr/bin/chflags")
-        .args(["uchg"])
-        .arg(&prefs)
-        .status()
-        .unwrap()
-        .success());
+    // 替代B的真实焦点先提交，再在既有AfterMoved时点令引用持久化失败。
+    use lingxi_service::agents_admin::agent_deletions::{deletion_test_hook, DeletionPhase};
+    let fault_preferences = prefs.clone();
+    let _fault = deletion_test_hook(
+        &fx.home,
+        Arc::new(move |phase, _| {
+            if phase == DeletionPhase::AfterMoved {
+                let focus: Value =
+                    serde_json::from_slice(&std::fs::read(&fault_preferences).unwrap()).unwrap();
+                assert_eq!(focus["current_agent_id"], "agentB");
+                assert_eq!(focus["agent_order"], json!(["agentA", "agentB"]));
+                assert!(std::process::Command::new("/usr/bin/chflags")
+                    .arg("uchg")
+                    .arg(&fault_preferences)
+                    .status()
+                    .unwrap()
+                    .success());
+            }
+        }),
+    );
     let result = electron_ui(&fx, "references-pending").await;
     assert_eq!(result["checks"].as_array().unwrap().len(), 12);
     fx.restart().await;
@@ -1306,13 +1331,38 @@ async fn native_pending_receipt_owner_switch_two_real_services_never_posts_to_ot
             .0,
         200
     );
+    // 排序中保留A引用；即使B焦点/主助手已提交，删除后仍必须真实写回引用。
+    assert_eq!(
+        a.request(
+            "PUT",
+            "/lingxi/v1/agents/order",
+            json!({"order":["agentA","agentB"]})
+        )
+        .await
+        .0,
+        200
+    );
     let prefs = a.home.join("user/preferences.json");
-    assert!(std::process::Command::new("/usr/bin/chflags")
-        .arg("uchg")
-        .arg(&prefs)
-        .status()
-        .unwrap()
-        .success());
+    // 替代B的真实焦点先提交，再在既有AfterMoved时点令引用持久化失败。
+    use lingxi_service::agents_admin::agent_deletions::{deletion_test_hook, DeletionPhase};
+    let fault_preferences = prefs.clone();
+    let _fault = deletion_test_hook(
+        &a.home,
+        Arc::new(move |phase, _| {
+            if phase == DeletionPhase::AfterMoved {
+                let focus: Value =
+                    serde_json::from_slice(&std::fs::read(&fault_preferences).unwrap()).unwrap();
+                assert_eq!(focus["current_agent_id"], "agentB");
+                assert_eq!(focus["agent_order"], json!(["agentA", "agentB"]));
+                assert!(std::process::Command::new("/usr/bin/chflags")
+                    .arg("uchg")
+                    .arg(&fault_preferences)
+                    .status()
+                    .unwrap()
+                    .success());
+            }
+        }),
+    );
     let (code, receipt) = a
         .request("DELETE", "/lingxi/v1/agents/agentA", json!({}))
         .await;

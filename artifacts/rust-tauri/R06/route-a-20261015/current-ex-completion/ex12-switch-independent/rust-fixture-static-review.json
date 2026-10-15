@@ -1,0 +1,34 @@
+{
+  "result": "PASS_FIXTURE_ONLY_STATIC_REVIEW",
+  "sourceSetSHA256": "f8195b57f48754a6b4af23e706c705f563dd35828546cf9cd9d16f19ea946dba",
+  "patchSHA256": "41011b05902abb7c098c8ee79a862f8a3ec109aff63d9b83eaa7438fafac060a",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_config_readback.rs",
+      "baseMatches": true,
+      "candidateMatches": true,
+      "mainAtReview": "d1e9bd62e542088562fa42268f051f20c723d372fd0db94bbaaa0e4213278642"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs",
+      "baseMatches": true,
+      "candidateMatches": true,
+      "mainAtReview": "69271bffcc8f59fb24f83e3f4769137914e66e7669a5ed7fb203bc9eb41af044"
+    }
+  ],
+  "UIAssertionsSourceMatchesFrozen": {
+    "desktop/src/react/settings/__tests__/R06AgentSettingsElectronLive.test.ts": true,
+    "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs": true
+  },
+  "productionChanges": false,
+  "originalR00AssertionsChanged": false,
+  "noCurrentAgentResetToA": true,
+  "faultTiming": "only AfterMoved after real focusB; real orderA/B entry forces reference trim failure",
+  "originalSettingsUiCheckCountsPreserved": [
+    11,
+    12
+  ],
+  "originalReadbackNullFocusCase": "explicit synthetic preparation removes current_session_id before original unchanged null and no-read-sideeffect assertions",
+  "runtimeExecutedByReviewer": false,
+  "authorRuntimeNotInheritedAsIndependentPass": true
+}

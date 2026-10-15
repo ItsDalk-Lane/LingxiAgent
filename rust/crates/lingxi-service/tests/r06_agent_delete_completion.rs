@@ -742,12 +742,25 @@ async fn r3_reference_failure_is_explicit_pending_and_retry_uses_actual_preferen
         200
     );
     let prefs = fx.home.join("user/preferences.json");
-    assert!(std::process::Command::new("chflags")
-        .arg("uchg")
-        .arg(&prefs)
-        .status()
-        .unwrap()
-        .success());
+    // 切换B必须先提交；仅在真实删除移入暂存后注入原引用写故障。
+    use lingxi_service::agents_admin::agent_deletions::{deletion_test_hook, DeletionPhase};
+    let focus_before_reference_failure = Arc::new(Mutex::new(None::<Vec<u8>>));
+    let captured = focus_before_reference_failure.clone();
+    let prefs_for_hook = prefs.clone();
+    let _hook = deletion_test_hook(
+        &fx.home,
+        Arc::new(move |phase, _| {
+            if phase == DeletionPhase::AfterMoved {
+                *captured.lock().unwrap() = Some(std::fs::read(&prefs_for_hook).unwrap());
+                assert!(std::process::Command::new("chflags")
+                    .arg("uchg")
+                    .arg(&prefs_for_hook)
+                    .status()
+                    .unwrap()
+                    .success());
+            }
+        }),
+    );
     let deleted = fx
         .request("DELETE", "/lingxi/v1/agents/agentA", json!({}))
         .await;
@@ -764,7 +777,32 @@ async fn r3_reference_failure_is_explicit_pending_and_retry_uses_actual_preferen
     assert_eq!(deleted.1["replacementAgentId"], Value::Null);
     assert!(deleted.1["referenceError"].as_str().is_some());
     let before: Value = serde_json::from_slice(&std::fs::read(&prefs).unwrap()).unwrap();
-    assert_eq!(before["current_agent_id"], "agentA");
+    let captured = focus_before_reference_failure
+        .lock()
+        .unwrap()
+        .clone()
+        .unwrap();
+    assert_eq!(
+        std::fs::read(&prefs).unwrap(),
+        captured,
+        "引用写失败不改变已提交焦点"
+    );
+    let captured: Value = serde_json::from_slice(&captured).unwrap();
+    assert_eq!(before["current_agent_id"], "agentB");
+    assert_eq!(before["primary_agent_id"], "agentA");
+    let focused_session = captured["current_session_id"].as_str().unwrap();
+    assert_eq!(
+        fx.state
+            .storage()
+            .query_one_text(
+                "SELECT agent_id FROM sessions WHERE session_id=?1",
+                vec![focused_session.to_string()]
+            )
+            .await
+            .unwrap()
+            .as_deref(),
+        Some("agentB")
+    );
     assert!(!fx.home.join("agents/agentA").exists());
     let id = deleted.1["deletionId"].as_str().unwrap();
     let retried = fx
@@ -780,6 +818,10 @@ async fn r3_reference_failure_is_explicit_pending_and_retry_uses_actual_preferen
     let after: Value = serde_json::from_slice(&std::fs::read(&prefs).unwrap()).unwrap();
     assert_eq!(after["current_agent_id"], "agentB");
     assert_eq!(after["primary_agent_id"], "agentB");
+    assert_eq!(
+        after["current_session_id"], captured["current_session_id"],
+        "清理重试保留同一B焦点会话"
+    );
     let current = fx
         .request(
             "GET",
@@ -855,7 +897,6 @@ async fn r4_corrupt_aborted_record_is_rejected_by_get_cleanup_and_actual_bootstr
         .map(|p| std::fs::read(dir.join(p)).unwrap())
         .collect();
     let prefs = fx.home.join("user/preferences.json");
-    let prefs_before = std::fs::read(&prefs).unwrap();
     assert!(std::process::Command::new("chflags")
         .arg("uchg")
         .arg(&dir)
@@ -872,6 +913,14 @@ async fn r4_corrupt_aborted_record_is_rejected_by_get_cleanup_and_actual_bootstr
         .unwrap()
         .success());
     assert_eq!(failed.0, 500);
+    // TS允许先切B成功、后删除失败；坏收据各入口必须保持这份真实已提交状态。
+    let prefs_before = std::fs::read(&prefs).unwrap();
+    let focus: Value = serde_json::from_slice(&prefs_before).unwrap();
+    assert_eq!(focus["current_agent_id"], "agentB");
+    assert_eq!(
+        focus["current_session_id"],
+        failed.1["replacementSwitchResult"]["sessionId"]
+    );
     let transaction = std::fs::read_dir(fx.home.join("lingxi-service/agent-deletions"))
         .unwrap()
         .next()

@@ -414,6 +414,210 @@
       "source": "/private/tmp/r06-ex-main-typecheck.log",
       "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
       "bytes": 119
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-w09-w11-main-composed-r1.log",
+      "source": "/private/tmp/r06-w09-w11-main-composed-r1.log",
+      "sha256": "98ecd2d85dd063fce3e6996fce309a68a456271074596239f168fadeb0443548",
+      "bytes": 15777
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex-main-strict-final-r1.log",
+      "source": "/private/tmp/r06-ex-main-strict-final-r1.log",
+      "sha256": "4836dd987684b7c1d1352e49adc5a1ff89249952125bdcc0d0e7b7acedda1cce",
+      "bytes": 278
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex-main-fmt-final-r1.log",
+      "source": "/private/tmp/r06-ex-main-fmt-final-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex-final-contract-r3.log",
+      "source": "/private/tmp/r06-ex-final-contract-r3.log",
+      "sha256": "1f7b8444173a10857d0757e3ffdc65128a0b306d881f257e74628a3ccee97333",
+      "bytes": 195
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/source-sha.json",
+      "source": "/private/tmp/r06-ex12-switch-repair/source-sha.json",
+      "sha256": "1d3b4ad8af7e9ca59b262cf408c32889577089e31c62d5bbe8f0afbf00d69041",
+      "bytes": 2137
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/verification.json",
+      "source": "/private/tmp/r06-ex12-switch-repair/verification.json",
+      "sha256": "c3404dfc039106ce398c5c1aefd0949108f40a1053a9528a342a1442f0bddcf3",
+      "bytes": 5618
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/author-report.json",
+      "source": "/private/tmp/r06-ex12-switch-repair/author-report.json",
+      "sha256": "f43c3ce9406d58a6c8f711d04ff84954c9f08c6e6b011009a6b5e81686862675",
+      "bytes": 4852
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/fixture-rationale.json",
+      "source": "/private/tmp/r06-ex12-switch-repair/fixture-rationale.json",
+      "sha256": "6a5b9d58468e8bb3d93ceef35af573316dd4c49ef52ca5098dbd0fc3da908e78",
+      "bytes": 2242
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/fixture-only.patch",
+      "source": "/private/tmp/r06-ex12-switch-repair/fixture-only.patch",
+      "sha256": "3151f7992873861dfec979afcb11be9fcb1fa3b23815109495027972e74ce550",
+      "bytes": 9549
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/final-family-tests-r2.log",
+      "source": "/private/tmp/r06-ex12-switch-repair/final-family-tests-r2.log",
+      "sha256": "c8f275a76aa86c257d2301c4a0ad9ceda24ddc11d75fd9b0cbf45a8f2d32ed50",
+      "bytes": 5713
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/final-session-focus-regression-r2.log",
+      "source": "/private/tmp/r06-ex12-switch-repair/final-session-focus-regression-r2.log",
+      "sha256": "714cfbea45ecf98f5bcf764295cdceb81cec83dee8d2f4049df9ae95b1bc7a68",
+      "bytes": 75
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-author/target-only-before-fix.log",
+      "source": "/private/tmp/r06-ex12-switch-repair/target-only-before-fix.log",
+      "sha256": "88cdaad6f5856a879e0ab4cf32459d2027385ac8954373f238df72b172552f13",
+      "bytes": 1042
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-independent/switch-final-review.md",
+      "source": "/private/tmp/r06-ex12-current-review/switch-final-review.md",
+      "sha256": "3e88b9336bc252b227b2a97d3a5be64b8c28af94ba878063ca931554ea34261f",
+      "bytes": 6083
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-independent/switch-final-main-confirmation.json",
+      "source": "/private/tmp/r06-ex12-current-review/switch-final-main-confirmation.json",
+      "sha256": "2286ef3b86e4bd0c5b8e8b814d5594c469c8bb616ba44528e2bcb9319fe56085",
+      "bytes": 4631
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-independent/node-fixture-static-review.json",
+      "source": "/private/tmp/r06-ex12-current-review/node-fixture-static-review.json",
+      "sha256": "1464b9b2640227adc6bc56a5e60ee65b115a917bc05df0765b0af95d69a64961",
+      "bytes": 812
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-independent/rust-fixture-static-review.json",
+      "source": "/private/tmp/r06-ex12-current-review/rust-fixture-static-review.json",
+      "sha256": "aa361b0257f2870da0ffb7396841b9e5e386d1f57a6b2e84fadf4ebf9f83be48",
+      "bytes": 1459
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-independent/delete-current-direct-caller-review.json",
+      "source": "/private/tmp/r06-ex12-current-review/delete-current-direct-caller-review.json",
+      "sha256": "865d9ca66bb77fa0462a9ed0f691c2fae5cba8f079be8d34a8b63e8939e682b6",
+      "bytes": 2301
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-switch-independent/followup-acceptance-checklist.json",
+      "source": "/private/tmp/r06-ex12-current-review/followup-acceptance-checklist.json",
+      "sha256": "46ba76988c4dcb5057b425ea2bf2192d58b919bf1ba5268bec61e9efc4081168",
+      "bytes": 1239
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-rust-fixtures/source-sha.json",
+      "source": "/private/tmp/r06-ex12-fixture-followup/source-sha.json",
+      "sha256": "1887e785a60b405075517cda7ea4dd64c3d4f27b7857d23f5d071de48181fa14",
+      "bytes": 795
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-rust-fixtures/report.json",
+      "source": "/private/tmp/r06-ex12-fixture-followup/report.json",
+      "sha256": "595c7c771907aa7a0bb45e6a862e7bb1fac901e9384db6f0ebb1a806965e8352",
+      "bytes": 3427
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-node-fixtures/manifest.json",
+      "source": "/private/tmp/r06-ex12-node-fixtures/manifest.json",
+      "sha256": "26912b66050dacbc0a4f657b9327f85723795571f42dfa6508b5fd089daf71e1",
+      "bytes": 2755
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-node-fixtures/report.md",
+      "source": "/private/tmp/r06-ex12-node-fixtures/report.md",
+      "sha256": "97f68d663aebcda2b70fb18f835979decc873113c493ee6aefd8e15534e88d05",
+      "bytes": 3421
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-node-fixtures/splash-original-parent-fail.log",
+      "source": "/private/tmp/r06-ex12-node-fixtures/splash-original-parent-fail.log",
+      "sha256": "81fd78d51b9fa055e47caec9dab00697f19e3a02d9c488dc0b0a3edf92bad456",
+      "bytes": 1450
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-node-fixtures/owner-original-parent-fail.log",
+      "source": "/private/tmp/r06-ex12-node-fixtures/owner-original-parent-fail.log",
+      "sha256": "fef33e7d523058cc9f39b3aa1b71f982ef84e285d9048ed9c74f119768b6ab70",
+      "bytes": 3596
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-node-fixtures/r06_splash_avatar_live-fixed-parent-r2.log",
+      "source": "/private/tmp/r06-ex12-node-fixtures/r06_splash_avatar_live-fixed-parent-r2.log",
+      "sha256": "24126599b1f1112f52344bd73c799b2aaf63a2d00fbb59404adcc870f575912a",
+      "bytes": 276
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/ex12-node-fixtures/r06_settings_owner_current_source-fixed-parent-r2.log",
+      "source": "/private/tmp/r06-ex12-node-fixtures/r06_settings_owner_current_source-fixed-parent-r2.log",
+      "sha256": "09959dcf2566013b3f85767ec64fee23681036154ddfbb2745bd06f99dbe613f",
+      "bytes": 318
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-main-family-r1.log",
+      "source": "/private/tmp/r06-ex12-main-family-r1.log",
+      "sha256": "00d7bb955aa39356ccf21acb103af2ec294f2ed997e58c491fe1c062f4f041db",
+      "bytes": 5769
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-main-focus-core-r1.log",
+      "source": "/private/tmp/r06-ex12-main-focus-core-r1.log",
+      "sha256": "49a69c934de535fd0f77bca76ff1532e2ef14c5e2f2456462a926469261cf959",
+      "bytes": 719
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-node-fixtures-main-r1.log",
+      "source": "/private/tmp/r06-ex12-node-fixtures-main-r1.log",
+      "sha256": "311bf2cbb51867866ab147a9a03e83d0220900c0de82cd3bcf64ec2c76c76d67",
+      "bytes": 927
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-rust-fixtures-main-r1.log",
+      "source": "/private/tmp/r06-ex12-rust-fixtures-main-r1.log",
+      "sha256": "f55255e780114c1c1cea6ee30c794e49f8bda60286d102cbb4110162ab05fe32",
+      "bytes": 4865
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-main-strict-final-r1.log",
+      "source": "/private/tmp/r06-ex12-main-strict-final-r1.log",
+      "sha256": "be61eb613fc1e11f33b1756487f6640c72043c79af30667e5676021d534a5d0c",
+      "bytes": 277
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-main-fmt-final-r1.log",
+      "source": "/private/tmp/r06-ex12-main-fmt-final-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-main-contract-final-r1.log",
+      "source": "/private/tmp/r06-ex12-main-contract-final-r1.log",
+      "sha256": "08173643c9449f7ba15597bced5f82baa212027b9c1e6e77f6df313bd5be0704",
+      "bytes": 195
+    },
+    {
+      "path": "artifacts/rust-tauri/R06/route-a-20261015/current-ex-completion/main-actual/r06-ex12-current-registered-window-r1.log",
+      "source": "/private/tmp/r06-ex12-current-registered-window-r1.log",
+      "sha256": "15ad5ee14acadb51276da2460948afa4b5d93912841b43e9962bc21a9dd439e8",
+      "bytes": 1261
     }
   ]
 }

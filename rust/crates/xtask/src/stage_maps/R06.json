@@ -6368,6 +6368,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_a001e8bdc29057b5d437/binding-result.json"
       ]
     },
+    "r06_test_c90a89db4e1a2b5e0f96": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_c90a89db4e1a2b5e0f96",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_c90a89db4e1a2b5e0f96"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_c90a89db4e1a2b5e0f96/binding-result.json"
+      ]
+    },
     "r06_test_c00c78c3de0ff388e461": {
       "argv": [
         "python3",
@@ -6381,6 +6396,51 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_c00c78c3de0ff388e461/binding-result.json"
+      ]
+    },
+    "r06_test_a6afcb990b5e1c45c87d": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_a6afcb990b5e1c45c87d",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_a6afcb990b5e1c45c87d"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_a6afcb990b5e1c45c87d/binding-result.json"
+      ]
+    },
+    "r06_test_c39c70780c37db899e7e": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_c39c70780c37db899e7e",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_c39c70780c37db899e7e"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_c39c70780c37db899e7e/binding-result.json"
+      ]
+    },
+    "r06_test_8235116904ae5adc8258": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_8235116904ae5adc8258",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_8235116904ae5adc8258"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_8235116904ae5adc8258/binding-result.json"
       ]
     },
     "r06_test_e68ce2ece6b32f3c2dfa": {
@@ -7416,6 +7476,51 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_35f72e6dfb4728e4632d/binding-result.json"
+      ]
+    },
+    "r06_test_cdd2e406b53fc11b6610": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_cdd2e406b53fc11b6610",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_cdd2e406b53fc11b6610"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_cdd2e406b53fc11b6610/binding-result.json"
+      ]
+    },
+    "r06_test_fd7f22ecb55d0c1f8926": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_fd7f22ecb55d0c1f8926",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_fd7f22ecb55d0c1f8926"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_fd7f22ecb55d0c1f8926/binding-result.json"
+      ]
+    },
+    "r06_test_41c5df518fcd3bcad3c8": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_41c5df518fcd3bcad3c8",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_41c5df518fcd3bcad3c8"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_41c5df518fcd3bcad3c8/binding-result.json"
       ]
     },
     "r06_test_c909089ff8ea1f0b9a58": {
@@ -9873,6 +9978,7 @@
         "r06_test_3f34073dc123f41fcb10",
         "r06_test_3fc0a440c590ad5664d9",
         "r06_test_3fc1a3615b976c030631",
+        "r06_test_41c5df518fcd3bcad3c8",
         "r06_test_423509a30bf10d82889b",
         "r06_test_423c61082421a8bdf806",
         "r06_test_428b97d3005d469ac6d7",
@@ -10013,6 +10119,7 @@
         "r06_test_815798a352be10cffc96",
         "r06_test_8165824ccc512cc23a38",
         "r06_test_82268c379bf9d83a71c2",
+        "r06_test_8235116904ae5adc8258",
         "r06_test_82c8df08c2d4ad9e6a28",
         "r06_test_82f233c793521697b613",
         "r06_test_834b518295e44d3230b2",
@@ -10101,6 +10208,7 @@
         "r06_test_a5c01899a6daed65dec2",
         "r06_test_a5f3574665960d5530c2",
         "r06_test_a6176259bd12673bcbc0",
+        "r06_test_a6afcb990b5e1c45c87d",
         "r06_test_a6c84b68e4fdb3094ae0",
         "r06_test_a6cd1dd86837681076a5",
         "r06_test_a7611d5db159c537cb2a",
@@ -10166,6 +10274,7 @@
         "r06_test_c2c2885256d891dc87cd",
         "r06_test_c31ad75e8f600eb2b2f0",
         "r06_test_c39b2981c83b1700407f",
+        "r06_test_c39c70780c37db899e7e",
         "r06_test_c4149c419ab158faf1b6",
         "r06_test_c4d6e5cfad5f2fc5b0da",
         "r06_test_c54749e535023d68108b",
@@ -10177,6 +10286,7 @@
         "r06_test_c8c412d92ef6844f9099",
         "r06_test_c8c4848f0c139fd48ed4",
         "r06_test_c909089ff8ea1f0b9a58",
+        "r06_test_c90a89db4e1a2b5e0f96",
         "r06_test_c97cb2f3a50875847cdc",
         "r06_test_c9ce8993691ede5a8ff1",
         "r06_test_ca16a20e181bb95e084c",
@@ -10192,6 +10302,7 @@
         "r06_test_cd28f306283a3814e23a",
         "r06_test_cd90149e1a844371108f",
         "r06_test_cd97ed1324d36f6f0713",
+        "r06_test_cdd2e406b53fc11b6610",
         "r06_test_cddbc7fce74fd2f8cfc6",
         "r06_test_cde91045da0cc40aa57c",
         "r06_test_ce42ceff910a43e75393",
@@ -10310,6 +10421,7 @@
         "r06_test_fbd8334c7bf09f92521d",
         "r06_test_fd17217c5619c3dc4301",
         "r06_test_fd1783c926aea55ac439",
+        "r06_test_fd7f22ecb55d0c1f8926",
         "r06_test_fe66688eb4d1fb720f6a",
         "r06_test_fec3bdd667a6f64a58cd",
         "r06_test_fee34ce51f91bfcbfe0d",
@@ -16335,8 +16447,12 @@
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
       "basisKind": "full_original_behavior",
       "evidenceCommandRefs": [
+        "r06_test_8235116904ae5adc8258",
         "r06_test_82c8df08c2d4ad9e6a28",
+        "r06_test_a6afcb990b5e1c45c87d",
         "r06_test_c00c78c3de0ff388e461",
+        "r06_test_c39c70780c37db899e7e",
+        "r06_test_c90a89db4e1a2b5e0f96",
         "r06_z_leaf_evidence"
       ],
       "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
@@ -19703,9 +19819,37 @@
         "拒绝/边界：body.id 必须有效；切换失败按路由错误返回；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_41c5df518fcd3bcad3c8",
+        "r06_test_82c8df08c2d4ad9e6a28",
+        "r06_test_cdd2e406b53fc11b6610",
+        "r06_test_fd7f22ecb55d0c1f8926",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-8B48FD65CAFB-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-8B48FD65CAFB-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-8B48FD65CAFB-assertion-00"
+        ],
+        [
+          "R00-T02-LA-8B48FD65CAFB-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-8C8083F2A5FC",
@@ -26232,5 +26376,5 @@
       ]
     }
   ],
-  "inputDigestSha256": "396f554592bf4088d8fc4a8ddc851e647927df62c7c9a964e38c87b9ca1e66aa"
+  "inputDigestSha256": "bac1e944df601c5ec02ac5b1385cbc84d085c42abdcf906c3cb48ca3269a53ec"
 }

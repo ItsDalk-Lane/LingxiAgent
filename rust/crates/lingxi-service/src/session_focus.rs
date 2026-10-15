@@ -90,16 +90,34 @@ async fn create(
     body: NewBody,
     focus: bool,
 ) -> Response {
+    let lock = state.focus_mutation.lock().await;
+    match create_locked(state, principal, body, focus, &lock).await {
+        Ok(value) => Json(value).into_response(),
+        Err(response) => *response,
+    }
+}
+
+/// 助手切换与会话新建共用真实流程；调用者持锁覆盖来源读取和最终广播。
+pub(crate) async fn create_locked(
+    state: &ServiceState,
+    principal: &Principal,
+    body: NewBody,
+    focus: bool,
+    _focus_guard: &tokio::sync::MutexGuard<'_, ()>,
+) -> Result<serde_json::Value, Box<Response>> {
     if body
         .workspace_mount_id
         .as_ref()
         .is_some_and(|id| !id.is_empty())
     {
-        return EndpointError::invalid_message("当前服务尚未登记此工作区挂载；请选择实际绝对目录")
-            .into_response();
+        return Err((EndpointError::invalid_message(
+            "当前服务尚未登记此工作区挂载；请选择实际绝对目录",
+        )
+        .into_response())
+        .into());
     }
     if body.workspace_folders.len() > 64 {
-        return EndpointError::invalid_message("工作区目录过多").into_response();
+        return Err((EndpointError::invalid_message("工作区目录过多").into_response()).into());
     }
     let agent = match body
         .agent_id
@@ -111,16 +129,16 @@ async fn create(
         None => match state.memory().current_agent_preference() {
             Ok(Some(value)) => value,
             Ok(None) => {
-                return EndpointError::invalid_message("agentId is required").into_response()
+                return Err(
+                    (EndpointError::invalid_message("agentId is required").into_response()).into(),
+                )
             }
-            Err(error) => return failure(error.message),
+            Err(error) => return Err((failure(error.message)).into()),
         },
     };
-    if let Err(response) = crate::gate_agent_not_deleted(state, &agent) {
-        return response;
-    }
+    crate::gate_agent_not_deleted(state, &agent)?;
     if let Err(error) = state.memory().agent_dir_checked(&agent) {
-        return error.response();
+        return Err((error.response()).into());
     }
     if let Some(path) = body
         .current_session_path
@@ -129,21 +147,21 @@ async fn create(
     {
         let id = match crate::session_locator::resolve(state.storage(), None, Some(path)).await {
             Ok(id) => id,
-            Err(error) => return EndpointError::storage(&error).into_response(),
+            Err(error) => return Err((EndpointError::storage(&error).into_response()).into()),
         };
-        if let Err(response) = crate::gate_session_owned(state, principal, &id).await {
-            return response;
-        }
+        crate::gate_session_owned(state, principal, &id).await?;
     }
     let cwd = match body.cwd.as_deref().filter(|value| !value.trim().is_empty()) {
         Some(value) => match folder(value) {
             Ok(value) => Some(value),
-            Err(error) => return EndpointError::invalid_message(error).into_response(),
+            Err(error) => {
+                return Err((EndpointError::invalid_message(error).into_response()).into())
+            }
         },
         None => match state.resource_io().workspace_root() {
             Some(path) => match folder(&path.to_string_lossy()) {
                 Ok(value) => Some(value),
-                Err(error) => return failure(error),
+                Err(error) => return Err((failure(error)).into()),
             },
             None => None,
         },
@@ -151,18 +169,21 @@ async fn create(
     if (cwd.is_some() || !body.workspace_folders.is_empty())
         && state.resource_io().workspace_root().is_none()
     {
-        return EndpointError::new(
+        return Err((EndpointError::new(
             axum::http::StatusCode::SERVICE_UNAVAILABLE,
             lingxi_protocol::ErrorCode::UpstreamUnavailable,
             "工作区工具未配置，不能声称已启用该目录",
         )
-        .into_response();
+        .into_response())
+        .into());
     }
     let mut folders = Vec::new();
     for raw in &body.workspace_folders {
         let normalized = match folder(raw) {
             Ok(value) => value,
-            Err(error) => return EndpointError::invalid_message(error).into_response(),
+            Err(error) => {
+                return Err((EndpointError::invalid_message(error).into_response()).into())
+            }
         };
         if cwd.as_deref() != Some(normalized.as_str()) && !folders.contains(&normalized) {
             folders.push(normalized);
@@ -172,8 +193,11 @@ async fn create(
     roots.extend(folders.clone());
     let mode = body.permission_mode.as_deref().unwrap_or("operate");
     if lingxi_kernel::subagent::SessionPermissionMode::parse(mode).is_none() {
-        return EndpointError::invalid_message("permissionMode must be operate, ask or read_only")
-            .into_response();
+        return Err((EndpointError::invalid_message(
+            "permissionMode must be operate, ask or read_only",
+        )
+        .into_response())
+        .into());
     }
     let project = body
         .project_id
@@ -181,7 +205,7 @@ async fn create(
         .map(str::trim)
         .filter(|value| !value.is_empty());
     if project.is_some_and(|value| value.len() > 240 || value.chars().any(char::is_control)) {
-        return EndpointError::invalid_message("invalid projectId").into_response();
+        return Err((EndpointError::invalid_message("invalid projectId").into_response()).into());
     }
     let lineage = if let Some(parent) = body
         .forked_from_session_id
@@ -190,29 +214,31 @@ async fn create(
         .filter(|id| !id.is_empty())
     {
         if focus {
-            return EndpointError::invalid_message("焦点新建不接受谱系来源；请选择独立创建")
-                .into_response();
+            return Err(
+                (EndpointError::invalid_message("焦点新建不接受谱系来源；请选择独立创建")
+                    .into_response())
+                .into(),
+            );
         }
-        if let Err(response) = crate::get_session_owned(state, principal, parent).await {
-            return response;
-        }
+        crate::get_session_owned(state, principal, parent).await?;
         let row =
             match lingxi_adapters::storage::session_tree::get_session_row(state.storage(), parent)
                 .await
             {
                 Ok(Some(row)) => row,
-                Ok(None) => return EndpointError::not_found().into_response(),
-                Err(error) => return EndpointError::storage(&error).into_response(),
+                Ok(None) => return Err((EndpointError::not_found().into_response()).into()),
+                Err(error) => return Err((EndpointError::storage(&error).into_response()).into()),
             };
         let Some(depth) = lingxi_kernel::session_tree::check_fork_depth(row.lineage_depth as u32)
         else {
-            return EndpointError::new(
+            return Err((EndpointError::new(
                 axum::http::StatusCode::CONFLICT,
                 lingxi_protocol::ErrorCode::Conflict,
                 "session fork depth limit reached",
             )
             .with_reason("session_fork_depth_limit")
-            .into_response();
+            .into_response())
+            .into());
         };
         Some((parent.to_string(), depth))
     } else {
@@ -220,28 +246,36 @@ async fn create(
     };
     let sid = match crate::auth::hex_random_public(16) {
         Ok(token) => format!("session-{token}"),
-        Err(error) => return failure(error.to_string()),
+        Err(error) => return Err((failure(error.to_string())).into()),
     };
     let owner = principal
         .user_id
         .as_deref()
         .unwrap_or(crate::auth::LOCAL_OWNER_USER_ID);
-    let mut choice = match chat_settings::effective_choice(state, owner, &sid) {
-        Ok(value) => value,
-        Err(error) => return failure(error),
-    };
-    if let Some(pair) = body.model {
-        choice.model = Some(pair);
+    // 显式无效模型仍按原请求错误返回400，不在推导思考档位时变成内部错误。
+    if let Some(model) = body.model.as_ref() {
+        let requested = chat_settings::ChatChoice {
+            model: Some(model.clone()),
+            thinking_level: None,
+        };
+        if let Err(error) = chat_settings::dispatch_choice(state, &requested) {
+            return Err(EndpointError::invalid_message(error).into_response().into());
+        }
     }
+    let mut choice =
+        match chat_settings::effective_choice_with_model(state, owner, &sid, body.model) {
+            Ok(value) => value,
+            Err(error) => return Err((failure(error)).into()),
+        };
     if let Some(level) = body.thinking_level {
         choice.thinking_level = Some(level);
     }
     let dispatch = match chat_settings::dispatch_choice(state, &choice) {
         Ok(value) => value,
-        Err(error) => return EndpointError::invalid_message(error).into_response(),
+        Err(error) => return Err((EndpointError::invalid_message(error).into_response()).into()),
     };
     if let Err(error) = chat_settings::check_thinking(state, &choice) {
-        return EndpointError::invalid_message(error).into_response();
+        return Err((EndpointError::invalid_message(error).into_response()).into());
     }
     // 无论默认以后如何变化，本会话保存本次实际可派发的完整模型身份。
     choice.model = Some((
@@ -249,14 +283,11 @@ async fn create(
         dispatch.route.model.clone(),
     ));
     // 序列化同一服务的焦点发布；新会话准入覆盖配置准备至提交/撤销。
-    let _focus = state.focus_mutation.lock().await;
     // 与角色卡应用、助手删除共用应用门；所有目录和模型参数已经校验完成。
     let _agent_application = crate::character_cards::CARD_APPLICATION_GATE.lock().await;
-    if let Err(response) = crate::gate_agent_not_deleted(state, &agent) {
-        return response;
-    }
+    crate::gate_agent_not_deleted(state, &agent)?;
     if let Err(error) = state.memory().agent_dir_checked(&agent) {
-        return error.response();
+        return Err((error.response()).into());
     }
     let _permit = match state
         .storage()
@@ -265,24 +296,26 @@ async fn create(
     {
         Ok(permit) => permit,
         Err(_) => {
-            return EndpointError::new(
+            return Err((EndpointError::new(
                 axum::http::StatusCode::CONFLICT,
                 lingxi_protocol::ErrorCode::Conflict,
                 "new session identity is busy",
             )
-            .into_response()
+            .into_response())
+            .into())
         }
     };
     match state.storage().get_session(&sid).await {
         Ok(Some(_)) => {
-            return EndpointError::new(
+            return Err((EndpointError::new(
                 axum::http::StatusCode::CONFLICT,
                 lingxi_protocol::ErrorCode::Conflict,
                 "session already exists",
             )
-            .into_response()
+            .into_response())
+            .into())
         }
-        Err(error) => return EndpointError::storage(&error).into_response(),
+        Err(error) => return Err((EndpointError::storage(&error).into_response()).into()),
         Ok(None) => {}
     }
     let metadata = SessionMetadata {
@@ -299,20 +332,22 @@ async fn create(
         .unwrap_or("新会话");
     match session_ui::read(state.storage(), &sid) {
         Ok(Some(_)) => {
-            return EndpointError::new(
+            return Err((EndpointError::new(
                 axum::http::StatusCode::CONFLICT,
                 lingxi_protocol::ErrorCode::Conflict,
                 "new session metadata already exists; refusing to overwrite",
             )
-            .into_response()
+            .into_response())
+            .into())
         }
-        Err(error) => return EndpointError::storage(&error).into_response(),
+        Err(error) => return Err((EndpointError::storage(&error).into_response()).into()),
         Ok(None) => {}
     }
     let mut created = false;
     let mut metadata_prepared = false;
     let mut choice_prepared = false;
     let mut workspace_recorded = false;
+    let mut cwd_history = Vec::new();
     let result: Result<(), String> = async {
         metadata_prepared = true;
         session_ui::save(state.storage(), &metadata).map_err(|error| error.to_string())?;
@@ -348,13 +383,13 @@ async fn create(
             .as_deref()
             .filter(|_| focus || body.record_workspace_history == Some(true))
         {
-            state
+            cwd_history = state
                 .memory()
-                .record_session_workspace(&agent, cwd)
+                .record_session_workspace(&agent, cwd, focus.then_some(sid.as_str()))
                 .map_err(|error| error.message)?;
             workspace_recorded = true;
         }
-        if focus {
+        if focus && !workspace_recorded {
             state
                 .memory()
                 .set_current_focus(&agent, &sid)
@@ -391,7 +426,7 @@ async fn create(
                 }
             }
         }
-        return failure(format!(
+        return Err((failure(format!(
             "{}失败：{error}{}{}",
             if focus {
                 "创建焦点会话"
@@ -408,9 +443,10 @@ async fn create(
             } else {
                 format!("；初始化清理未完成：{}", cleanup_errors.join("；"))
             }
-        ));
+        )))
+        .into());
     }
-    let response = json!({"ok":true,"sessionId":sid,"path":crate::session_locator::native(&sid),"agentId":agent,"agentName":state.memory().agent_display_name(&agent).unwrap_or_else(||agent.clone()),"cwd":cwd,"workspaceFolders":folders,"authorizedFolders":roots,"memoryEnabled":body.memory_enabled.unwrap_or(true),"projectId":project,"forkedFromSessionId":lineage.as_ref().map(|(parent,_)|parent),"parentSessionId":lineage.as_ref().map(|(parent,_)|parent),"lineageDepth":lineage.as_ref().map_or(0,|(_,depth)|*depth),"permissionMode":mode,"accessMode":mode,"planMode":mode=="read_only","thinkingLevel":choice.thinking_level,"currentModelId":dispatch.route.model,"currentModelProvider":dispatch.route.provider,"currentModelName":dispatch.route.model});
+    let response = json!({"ok":true,"sessionId":sid,"path":crate::session_locator::native(&sid),"agentId":agent,"agentName":state.memory().agent_display_name(&agent).unwrap_or_else(||agent.clone()),"cwd":cwd,"cwdHistory":cwd_history,"workspaceFolders":folders,"authorizedFolders":roots,"memoryEnabled":body.memory_enabled.unwrap_or(true),"projectId":project,"forkedFromSessionId":lineage.as_ref().map(|(parent,_)|parent),"parentSessionId":lineage.as_ref().map(|(parent,_)|parent),"lineageDepth":lineage.as_ref().map_or(0,|(_,depth)|*depth),"permissionMode":mode,"accessMode":mode,"planMode":mode=="read_only","thinkingLevel":choice.thinking_level,"currentModelId":dispatch.route.model,"currentModelProvider":dispatch.route.provider,"currentModelName":dispatch.route.model});
     state.app_events().publish(
         "session-created",
         json!({"session":response,"sessionId":sid,"agentId":agent,"detached":!focus}),
@@ -424,7 +460,7 @@ async fn create(
     state
         .chat_wire
         .publish_session_created(&sid, response.clone(), state.clock().now_unix_ms());
-    Json(response).into_response()
+    Ok(response)
 }
 
 #[derive(Deserialize, Default)]

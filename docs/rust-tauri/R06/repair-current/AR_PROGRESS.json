@@ -26,7 +26,7 @@
   ],
   "closed_count": 15,
   "open_count": 0,
-  "original_steps_status": "INCOMPLETE_PARTIAL_F08_SHARES_INDEPENDENTLY_VERIFIED",
+  "original_steps_status": "IMPLEMENTED_CURRENT_CANDIDATE_STAGE_ACCEPTANCE_PENDING",
   "original_acceptance": [
     {
       "id": "R06-A01",
@@ -93,7 +93,7 @@
       "status": "NOT_RUN"
     }
   ],
-  "due_leaves_status": "REGISTERED_NOT_RUN_FULL_LEAF",
+  "due_leaves_status": "ALL_279_ORIGINAL_BEHAVIOR_LEAVES_READY_FRESH_WHOLE_CANDIDATE_WINDOW_PENDING",
   "agents": [
     {
       "id": "/root/ar_w02_executor_01",
@@ -604,7 +604,7 @@
     }
   ],
   "entry_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01",
-  "stage_gate": "FAIL_EXECUTED_2026-10-14_BLOCKED_78_REQUIRED_BEHAVIOR_PENDING_LEAVES",
+  "stage_gate": "PENDING_FRESH_FULL_599_BINDING_WINDOW_AND_ORIGINAL_STAGE_GATE",
   "upstream_gates": "NOT_RUN",
   "entry_checks": [
     {
@@ -2579,13 +2579,23 @@
   },
   "ex12_additional_reopen": {
     "leaf": "R00-T02-LA-8B48FD65CAFB",
-    "status": "GAP_ACTUAL_SESSION_SWITCH_MISSING",
+    "status": "BOTH_EARLIER_READY_LEAVES_REPAIRED_AND_REGISTERED_WINDOW_PASS",
     "initial78Completed": 78,
     "initial78Remaining": 0,
-    "earlierReadyAdditionalGap": 1,
+    "earlierReadyAdditionalGap": 0,
     "reason": "现役完整切助手会创建并聚焦会话；Rust旧READY仅改配置且返回空会话/目录，原证明未覆盖。独立执行者修复并由另一代理复核。",
     "stageAccepted": false,
     "R07Ready": false,
-    "F14": "OPEN"
-  }
+    "F14": "OPEN",
+    "directDeletionCaller": {
+      "leaf": "R00-T02-LA-517E697740D9",
+      "status": "REPAIRED_TRUE_REPLACEMENT_SESSION_AND_MODEL_REGISTERED_PASS",
+      "initial78Affected": false,
+      "earlierReadyAdditionalGap": 0,
+      "note": "同一切换问题的DELETE直接调用面；保留旧会话与费用原归属，不把旧行改绑替代助手。"
+    },
+    "registeredBindingsPassed": 9,
+    "bindingWindow": "artifacts/rust-tauri/R06/route-a-20261015/ex12-current-binding-window-summary.json"
+  },
+  "stage_gate_previous_executed_failure": "FAIL_EXECUTED_2026-10-14_BLOCKED_78_REQUIRED_BEHAVIOR_PENDING_LEAVES"
 }

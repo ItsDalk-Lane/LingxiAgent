@@ -52,7 +52,29 @@ async fn boot() -> Server {
         network_mode: NetworkMode::Loopback,
         shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
-    let state = ServiceState::bootstrap_with_deps(config, &layout, ServiceDeps::default())
+    // 焦点切换创建真实会话；夹具声明实际目录和模型身份，不调用外部供应商。
+    let workspace = home.join("workspace");
+    std::fs::create_dir(&workspace).unwrap();
+    let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
+        &json!({"providers":{"lifecycle":{"protocol":"openai-completions","endpoint":"http://127.0.0.1:1/v1","auth":{"kind":"none"}}},"models":{"chat":{"provider":"lifecycle","model":"synthetic","capabilities":{"tools":true}}}}).to_string()
+    ).unwrap();
+    let credentials = std::sync::Arc::new(
+        lingxi_service::credentials::CredentialService::bootstrap(
+            &plane,
+            &layout.runtime_dir,
+            std::sync::Arc::new(lingxi_service::inject::SystemClock),
+        )
+        .unwrap(),
+    );
+    let deps = ServiceDeps {
+        workspace_root: Some(workspace),
+        model_gateway: Some(std::sync::Arc::new(
+            lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
+        )),
+        credential_service: Some(credentials),
+        ..ServiceDeps::default()
+    };
+    let state = ServiceState::bootstrap_with_deps(config, &layout, deps)
         .await
         .expect("bootstrap");
     let token = state.auth().local_token();
@@ -308,48 +330,55 @@ async fn agent_lifecycle_roundtrip_and_rejections() {
     assert_eq!(status, 400, "非法主助手 id 400");
 
     // ── 切换：上下文 / cwd 持久化 / 去重历史 ──
+    let first = server.home.join("first");
+    let second = server.home.join("second");
+    std::fs::create_dir(&first).unwrap();
+    std::fs::create_dir(&second).unwrap();
     let (status, context) = ok(
         &server,
         "POST",
         "/lingxi/v1/agents/switch",
-        Some(&json!({"id": "beta", "cwd": "/tmp/first"})),
+        Some(&json!({"id": "beta", "cwd": first})),
     )
     .await;
     assert_eq!(status, 200, "切换 beta：{context}");
     assert_eq!(context["agent"]["id"], json!("beta"));
-    assert_eq!(context["cwd"], json!("/tmp/first"));
-    assert_eq!(
-        context["cwdHistory"],
-        json!(["/tmp/first"]),
-        "首条历史：{context}"
-    );
+    assert_eq!(context["cwd"], json!(first));
+    assert_eq!(context["cwdHistory"], json!([first]), "首条历史：{context}");
     assert_eq!(server.preferences()["current_agent_id"], json!("beta"));
     let beta_yaml = config_yaml(&server, "beta");
-    assert!(beta_yaml.contains("last_cwd: /tmp/first"), "{beta_yaml}");
+    let saved_config =
+        lingxi_adapters::storage::agent_memory::config::AgentConfigDocument::parse(&beta_yaml)
+            .unwrap();
+    assert_eq!(
+        saved_config.string("desk", "last_cwd").unwrap(),
+        Some(first.to_string_lossy().into_owned()),
+        "{beta_yaml}"
+    );
     assert!(beta_yaml.contains("cwd_history:"), "{beta_yaml}");
 
     let (_, context) = ok(
         &server,
         "POST",
         "/lingxi/v1/agents/switch",
-        Some(&json!({"id": "beta", "cwd": "/tmp/second"})),
+        Some(&json!({"id": "beta", "cwd": second})),
     )
     .await;
     assert_eq!(
         context["cwdHistory"],
-        json!(["/tmp/first", "/tmp/second"]),
+        json!([first, second]),
         "历史按序追加"
     );
     let (_, context) = ok(
         &server,
         "POST",
         "/lingxi/v1/agents/switch",
-        Some(&json!({"id": "beta", "cwd": "/tmp/first"})),
+        Some(&json!({"id": "beta", "cwd": first})),
     )
     .await;
     assert_eq!(
         context["cwdHistory"],
-        json!(["/tmp/second", "/tmp/first"]),
+        json!([second, first]),
         "重复 cwd 去重后移到末尾"
     );
 
@@ -457,11 +486,19 @@ async fn agent_lifecycle_roundtrip_and_rejections() {
         ("agent-created", "alpha"),
         ("agent-created", "beta"),
         ("agent-created", "gamma"),
+        ("session-created", "beta"),
+        ("session-focus-changed", "beta"),
         ("agent-switched", "beta"),
+        ("session-created", "beta"),
+        ("session-focus-changed", "beta"),
         ("agent-switched", "beta"),
+        ("session-created", "beta"),
+        ("session-focus-changed", "beta"),
         ("agent-switched", "beta"),
         ("agent-deleted", "gamma"),
         // 删除当前助手 beta：替代切换事件先于删除事件（原实现顺序）。
+        ("session-created", "alpha"),
+        ("session-focus-changed", "alpha"),
         ("agent-switched", "alpha"),
         ("agent-deleted", "beta"),
         ("agent-created", "marked"),
@@ -476,9 +513,9 @@ async fn agent_lifecycle_roundtrip_and_rejections() {
         assert!(event["atUnixMs"].as_u64().expect("atUnixMs") > 0);
     }
     assert_eq!(events[0]["payload"]["name"], json!("Alpha"));
-    assert_eq!(events[3]["payload"]["agentName"], json!("Beta"));
-    assert_eq!(events[3]["payload"]["cwd"], json!("/tmp/first"));
-    assert_eq!(events[7]["payload"]["agentName"], json!("Alpha"));
+    assert_eq!(events[5]["payload"]["agentName"], json!("Beta"));
+    assert_eq!(events[5]["payload"]["cwd"], json!(first));
+    assert_eq!(events[15]["payload"]["agentName"], json!("Alpha"));
 
     let latest = feed["latestSequence"].as_u64().expect("latestSequence");
     let (_, tail) = ok(
