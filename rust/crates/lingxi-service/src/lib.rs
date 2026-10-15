@@ -79,6 +79,7 @@ pub mod preview;
 pub mod procsupervisor;
 pub mod projects;
 pub mod quotas;
+pub mod read_vision;
 pub mod recovery;
 pub mod redaction;
 pub mod resourceaccess;
@@ -1366,6 +1367,7 @@ impl ServiceState {
                 .with_session_files(Arc::clone(&session_files)),
         );
         let mut tool_plane: Option<ToolPlaneHandles> = None;
+        let mut read_file_tools = None;
         let mut approval_service_handle = None;
         if let Some(model_gateway) = model_gateway_for_wiring {
             // R05-T02 (C01): the production chain dispatches through the
@@ -1428,6 +1430,7 @@ impl ServiceState {
                     workspace.clone(),
                     &budget,
                 );
+                read_file_tools = Some(Arc::clone(&core_file_tools.tools));
                 core_file_tools
                     .tools
                     .set_file_safety(Arc::clone(&file_safety));
@@ -1580,6 +1583,34 @@ impl ServiceState {
             Some(timeout) => runs.with_stream_idle_timeout(timeout),
             None => runs,
         };
+        // read 视觉桥使用同一供应商、认证、网络策略和模型并发许可；不绕过现有模型平面。
+        if let (Some(tools), Some(gateway), Some(credentials)) = (
+            read_file_tools,
+            deps.model_gateway.clone(),
+            deps.credential_service.clone(),
+        ) {
+            let auxiliary =
+                lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
+                    gateway,
+                    credentials
+                        as Arc<dyn lingxi_adapters::models::credentials::ProviderCredentialPort>,
+                    lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                    deps.network_plane.clone().unwrap_or_else(
+                        lingxi_adapters::models::network::NetworkPlane::direct_isolated,
+                    ),
+                )
+                .map_err(|error| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: format!("cannot construct read vision bridge: {error}"),
+                    })
+                })?;
+            tools.set_read_vision(Arc::new(read_vision::ReadVisionService::new(
+                Arc::new(auxiliary),
+                runs.quotas_shared(),
+                storage.clone(),
+                deps.clock.clone(),
+            )));
+        }
         // R06-T02: the mid-run compaction service. An injected service
         // always wins (the test-seam rule); otherwise, when the real model
         // chain was wired, build the production instance over the SAME
@@ -7494,6 +7525,7 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/preferences/autolearn",
             get(userprefs::autolearn_get_route).put(userprefs::autolearn_put_route),
         )
+        .route("/lingxi/v1/preferences/session-permission-default", get(userprefs::session_permission_default_get_route))
         .route(
             "/lingxi/v1/preferences/quick-chat",
             get(userprefs::quick_chat_get_route).put(userprefs::quick_chat_put_route),

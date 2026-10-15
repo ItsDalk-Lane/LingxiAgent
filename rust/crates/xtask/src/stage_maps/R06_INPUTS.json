@@ -7043,6 +7043,7 @@
         "r06_test_18127768428203770e9d",
         "r06_test_1859167f8b5893d11da0",
         "r06_test_18cfd715d95a71851ab8",
+        "r06_test_18dc7eaa08803f89aa35",
         "r06_test_198d03c56f739841765d",
         "r06_test_19c35cae6e126adce13f",
         "r06_test_1bcceb7518b4d5e29be7",
@@ -7248,6 +7249,7 @@
         "r06_test_8165824ccc512cc23a38",
         "r06_test_82268c379bf9d83a71c2",
         "r06_test_82c8df08c2d4ad9e6a28",
+        "r06_test_82f233c793521697b613",
         "r06_test_834b518295e44d3230b2",
         "r06_test_838be16680152dfb2bdb",
         "r06_test_846d80f375309cebd27b",
@@ -7259,6 +7261,7 @@
         "r06_test_89bdf012dcefc6430d7d",
         "r06_test_8aae8c234f0e5303faed",
         "r06_test_8adac2a1c914f10cc730",
+        "r06_test_8ae01affeb9c41dba51d",
         "r06_test_8b42a41c3e6e7745e98d",
         "r06_test_8d3217f9b6f60891912f",
         "r06_test_8da3530ce0980f044bf5",
@@ -7290,6 +7293,7 @@
         "r06_test_96d8883dca3680c35545",
         "r06_test_96e17da810f2dc514f6f",
         "r06_test_9794536cd87586a6f1d4",
+        "r06_test_9833929e82029ed09f14",
         "r06_test_99cccaaac2077772879a",
         "r06_test_99d175606dfdebc5c60e",
         "r06_test_99ee3d014914a8a379e1",
@@ -7342,6 +7346,7 @@
         "r06_test_b21330ac564b9b04353f",
         "r06_test_b2b34c633f8bd8bb42aa",
         "r06_test_b429a14ff905e474a0b7",
+        "r06_test_b521dd8bf1b331e40c07",
         "r06_test_b586026dc897dd93a17c",
         "r06_test_b65156e0f5b298e96488",
         "r06_test_b66befc78356fee8f937",
@@ -18671,9 +18676,47 @@
         "不存在、越权或解析失败显式说明，不泄漏路径外内容。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_18dc7eaa08803f89aa35",
+        "r06_test_4d36900afef24abfb13e",
+        "r06_test_82f233c793521697b613",
+        "r06_test_93e9a869e6ec7767b24e",
+        "r06_test_9833929e82029ed09f14",
+        "r06_test_b521dd8bf1b331e40c07",
+        "r06_test_e0e11a6f592749ae6f74",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-93D5237ADE81-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-93D5237ADE81-assertion-01",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-93D5237ADE81-assertion-02",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-93D5237ADE81-assertion-00"
+        ],
+        [
+          "R00-T02-LA-93D5237ADE81-assertion-01"
+        ],
+        [
+          "R00-T02-LA-93D5237ADE81-assertion-02"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-94B9BE3AA7A6",
@@ -19739,9 +19782,34 @@
         "不存在会话或窗口销毁时不应伪称切换成功"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_8ae01affeb9c41dba51d",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-A2C385A33493-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-A2C385A33493-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-A2C385A33493-assertion-00"
+        ],
+        [
+          "R00-T02-LA-A2C385A33493-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-A3FE8FD26CB4",
@@ -108462,7 +108530,7 @@
           "不存在、越权或解析失败显式说明，不泄漏路径外内容。"
         ],
         "then": "返回文件内容与来源；图片可走视觉桥，Office可抽取文本；不改原文件。",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -108476,9 +108544,29 @@
                 "package": "lingxi-service",
                 "suite": "r04_t04_file_tools",
                 "test": "r04_a08_symlinks_are_judged_by_their_real_targets"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_refusals_never_send_foreign_pixels_or_register_products"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss"
               }
             ],
-            "meaning": "正式read输入绑定真实目标文件，预设字节与文本精确核对。",
+            "meaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
@@ -108669,6 +108757,218 @@
                     "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 409,
+                "testEndLine": 526,
+                "assertions": [
+                  {
+                    "line": 448,
+                    "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                  },
+                  {
+                    "line": 455,
+                    "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+                  },
+                  {
+                    "line": 460,
+                    "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+                  },
+                  {
+                    "line": 473,
+                    "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+                  },
+                  {
+                    "line": 476,
+                    "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+                  },
+                  {
+                    "line": 485,
+                    "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+                  },
+                  {
+                    "line": 490,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 491,
+                    "quote": "assert_eq!(remote.visions(), 1)"
+                  },
+                  {
+                    "line": 492,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 493,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 494,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 499,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+                  },
+                  {
+                    "line": 500,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+                  },
+                  {
+                    "line": 501,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+                  },
+                  {
+                    "line": 510,
+                    "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+                  },
+                  {
+                    "line": 519,
+                    "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 523,
+                    "quote": "assert_eq!(remote.visions(), 1)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 529,
+                "testEndLine": 616,
+                "assertions": [
+                  {
+                    "line": 558,
+                    "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+                  },
+                  {
+                    "line": 577,
+                    "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                  },
+                  {
+                    "line": 578,
+                    "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 579,
+                    "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+                  },
+                  {
+                    "line": 584,
+                    "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 597,
+                    "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+                  },
+                  {
+                    "line": 599,
+                    "quote": "assert_eq!(remote.visions(), 0)"
+                  },
+                  {
+                    "line": 600,
+                    "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 603,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 608,
+                    "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+                  },
+                  {
+                    "line": 612,
+                    "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+                  },
+                  {
+                    "line": 613,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 619,
+                "testEndLine": 703,
+                "assertions": [
+                  {
+                    "line": 627,
+                    "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+                  },
+                  {
+                    "line": 628,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 639,
+                    "quote": "assert_eq!(code, 201, \"{body}\")"
+                  },
+                  {
+                    "line": 673,
+                    "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+                  },
+                  {
+                    "line": 679,
+                    "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 687,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 688,
+                    "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 692,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 697,
+                    "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 706,
+                "testEndLine": 733,
+                "assertions": [
+                  {
+                    "line": 724,
+                    "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+                  },
+                  {
+                    "line": 726,
+                    "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+                  },
+                  {
+                    "line": 727,
+                    "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+                  },
+                  {
+                    "line": 728,
+                    "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+                  },
+                  {
+                    "line": 729,
+                    "quote": "assert_eq!(remote.visions(), 0)"
+                  },
+                  {
+                    "line": 730,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+                  }
+                ]
               }
             ],
             "coverage": "FULL",
@@ -108681,9 +108981,29 @@
                 "package": "lingxi-service",
                 "suite": "r04_t04_file_tools",
                 "test": "r04_a08_symlinks_are_judged_by_their_real_targets"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_refusals_never_send_foreign_pixels_or_register_products"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss"
               }
             ],
-            "meaning": "越界read准备阶段实际拒绝，无正文返回，敏感源原字节和数量不变。",
+            "meaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
@@ -108741,6 +109061,218 @@
                     "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 409,
+                "testEndLine": 526,
+                "assertions": [
+                  {
+                    "line": 448,
+                    "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                  },
+                  {
+                    "line": 455,
+                    "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+                  },
+                  {
+                    "line": 460,
+                    "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+                  },
+                  {
+                    "line": 473,
+                    "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+                  },
+                  {
+                    "line": 476,
+                    "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+                  },
+                  {
+                    "line": 485,
+                    "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+                  },
+                  {
+                    "line": 490,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 491,
+                    "quote": "assert_eq!(remote.visions(), 1)"
+                  },
+                  {
+                    "line": 492,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 493,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 494,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 499,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+                  },
+                  {
+                    "line": 500,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+                  },
+                  {
+                    "line": 501,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+                  },
+                  {
+                    "line": 510,
+                    "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+                  },
+                  {
+                    "line": 519,
+                    "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 523,
+                    "quote": "assert_eq!(remote.visions(), 1)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 529,
+                "testEndLine": 616,
+                "assertions": [
+                  {
+                    "line": 558,
+                    "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+                  },
+                  {
+                    "line": 577,
+                    "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                  },
+                  {
+                    "line": 578,
+                    "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 579,
+                    "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+                  },
+                  {
+                    "line": 584,
+                    "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 597,
+                    "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+                  },
+                  {
+                    "line": 599,
+                    "quote": "assert_eq!(remote.visions(), 0)"
+                  },
+                  {
+                    "line": 600,
+                    "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 603,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 608,
+                    "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+                  },
+                  {
+                    "line": 612,
+                    "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+                  },
+                  {
+                    "line": 613,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 619,
+                "testEndLine": 703,
+                "assertions": [
+                  {
+                    "line": 627,
+                    "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+                  },
+                  {
+                    "line": 628,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 639,
+                    "quote": "assert_eq!(code, 201, \"{body}\")"
+                  },
+                  {
+                    "line": 673,
+                    "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+                  },
+                  {
+                    "line": 679,
+                    "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 687,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 688,
+                    "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 692,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 697,
+                    "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 706,
+                "testEndLine": 733,
+                "assertions": [
+                  {
+                    "line": 724,
+                    "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+                  },
+                  {
+                    "line": 726,
+                    "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+                  },
+                  {
+                    "line": 727,
+                    "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+                  },
+                  {
+                    "line": 728,
+                    "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+                  },
+                  {
+                    "line": 729,
+                    "quote": "assert_eq!(remote.visions(), 0)"
+                  },
+                  {
+                    "line": 730,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+                  }
+                ]
               }
             ],
             "coverage": "FULL",
@@ -108763,9 +109295,29 @@
                 "package": "lingxi-service",
                 "suite": "r06_original_resource_proofs",
                 "test": "registered_read_reports_missing_and_decode_failure_without_foreign_content"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_refusals_never_send_foreign_pixels_or_register_products"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_read_rich",
+                "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss"
               }
             ],
-            "meaning": "新增正式read专属检查覆盖不存在与解码失败的明确说明，真实越权拒绝不泄漏外部内容，保留旧符号链接授权负控。",
+            "meaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
@@ -109021,29 +109573,226 @@
                     "quote": "assert!(fx\n        .state\n        .session_files()\n        .list_files(\"s-proof\")\n        .await\n        .unwrap()\n        .is_empty());"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 409,
+                "testEndLine": 526,
+                "assertions": [
+                  {
+                    "line": 448,
+                    "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                  },
+                  {
+                    "line": 455,
+                    "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+                  },
+                  {
+                    "line": 460,
+                    "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+                  },
+                  {
+                    "line": 473,
+                    "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+                  },
+                  {
+                    "line": 476,
+                    "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+                  },
+                  {
+                    "line": 485,
+                    "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+                  },
+                  {
+                    "line": 490,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 491,
+                    "quote": "assert_eq!(remote.visions(), 1)"
+                  },
+                  {
+                    "line": 492,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 493,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 494,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 499,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+                  },
+                  {
+                    "line": 500,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+                  },
+                  {
+                    "line": 501,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+                  },
+                  {
+                    "line": 510,
+                    "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+                  },
+                  {
+                    "line": 519,
+                    "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 523,
+                    "quote": "assert_eq!(remote.visions(), 1)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 529,
+                "testEndLine": 616,
+                "assertions": [
+                  {
+                    "line": 558,
+                    "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+                  },
+                  {
+                    "line": 577,
+                    "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                  },
+                  {
+                    "line": 578,
+                    "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 579,
+                    "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+                  },
+                  {
+                    "line": 584,
+                    "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 597,
+                    "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+                  },
+                  {
+                    "line": 599,
+                    "quote": "assert_eq!(remote.visions(), 0)"
+                  },
+                  {
+                    "line": 600,
+                    "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                  },
+                  {
+                    "line": 603,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 608,
+                    "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+                  },
+                  {
+                    "line": 612,
+                    "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+                  },
+                  {
+                    "line": 613,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 619,
+                "testEndLine": 703,
+                "assertions": [
+                  {
+                    "line": 627,
+                    "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+                  },
+                  {
+                    "line": 628,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 639,
+                    "quote": "assert_eq!(code, 201, \"{body}\")"
+                  },
+                  {
+                    "line": 673,
+                    "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+                  },
+                  {
+                    "line": 679,
+                    "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 687,
+                    "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                  },
+                  {
+                    "line": 688,
+                    "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                  },
+                  {
+                    "line": 692,
+                    "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                  },
+                  {
+                    "line": 697,
+                    "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+                "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+                "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+                "testStartLine": 706,
+                "testEndLine": 733,
+                "assertions": [
+                  {
+                    "line": 724,
+                    "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+                  },
+                  {
+                    "line": 726,
+                    "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+                  },
+                  {
+                    "line": 727,
+                    "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+                  },
+                  {
+                    "line": 728,
+                    "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+                  },
+                  {
+                    "line": 729,
+                    "quote": "assert_eq!(remote.visions(), 0)"
+                  },
+                  {
+                    "line": 730,
+                    "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+                  }
+                ]
               }
             ],
             "coverage": "FULL",
             "missingClauses": []
           }
         ],
-        "gaps": [
-          {
-            "clause": "图片可走视觉桥，Office可抽取文本",
-            "kind": "IMPLEMENTATION_GAP",
-            "reason": "原Then含该能力；当前read对非法UTF8/二进制只返回尺寸/摘要元数据，明确称GBK/Office解码和图片附件未迁移，不能用第三句错误说明通过冒充整项完成。",
-            "sourceLocations": [
-              {
-                "endLine": 1804,
-                "path": "rust/crates/lingxi-service/src/filetools.rs",
-                "quote": "            );\n        }\n        drop(target);\n        let fingerprint = identity.fingerprint();\n        let outcome = match decode_text(&bytes) {\n            TextDecode::Text(text) => render_text_read(&text, offset, limit),\n            TextDecode::Binary => {\n                // Honest binary/non-UTF-8 result: no mojibake, no silent\n                // GBK guess. The incumbent's GBK/office decoding is a\n                // worker-surface capability (registered not migrated).\n                text_success(\n                    format!(\n                        \"[Read {raw_path}: {} bytes of binary or non-UTF-8 content (sha256 {}). \\\n                         Text decoding failed; GBK/office decoding and image attachments are \\\n                         not migrated on the Rust file tools yet — only this metadata is \\\n                         returned.]\",\n                        bytes.len(),\n                        hex(&Sha256::digest(&bytes)),\n                    ),\n                    false,\n                    Vec::new(),\n                )",
-                "reason": "read的真实二进制分支显式未迁移Office/图片能力。",
-                "startLine": 1783
-              }
-            ]
-          }
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/quickchat-read-proof-review.json"
       },
       {
         "id": "R00-T02-LA-94B9BE3AA7A6",
@@ -118423,14 +119172,91 @@
           "不存在会话或窗口销毁时不应伪称切换成功"
         ],
         "then": "悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话",
-        "status": "GAP",
-        "groups": [],
-        "gaps": [
-          "悬浮窗口可见/尺寸改变",
-          "选择会话聚焦主窗并打开该会话",
-          "不存在会话或窗口销毁时不应伪称切换成功"
+        "status": "READY",
+        "groups": [
+          {
+            "index": 0,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_quickchat_completion",
+                "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack"
+              }
+            ],
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+                "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+                "sourceSHA256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df",
+                "testStartLine": 4,
+                "testEndLine": 38,
+                "assertions": [
+                  {
+                    "line": 26,
+                    "quote": "assert!(\n        output.status.success(),\n        \"真实快捷窗失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                  },
+                  {
+                    "line": 34,
+                    "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                  },
+                  {
+                    "line": 35,
+                    "quote": "assert_eq!(value[\"checks\"].as_array().unwrap().len(), 9)"
+                  },
+                  {
+                    "line": 36,
+                    "quote": "assert!(value[\"modelCalls\"].as_u64().unwrap() > 0)"
+                  }
+                ]
+              }
+            ],
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "当前生产QuickChatApp/主聊天组件与双真实Electron窗口、CLI、真实HTTP模型共同核对：显示和尺寸改变；实际创建自有会话/一请求一费用账，真正owned switch和主renderer按请求ID/来源摘要/SID/path/连接代际回执确认，主窗真实聚焦后才隐藏。主窗DOM真实包含同一回复；相同路径仍真实服务focus，晚ACK/错owner/不存在会话/main.destroy均明确失败并保留快捷窗；不再无条件隐藏假成功。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+          },
+          {
+            "index": 1,
+            "tests": [
+              {
+                "package": "lingxi-service",
+                "suite": "r06_quickchat_completion",
+                "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack"
+              }
+            ],
+            "proofLocations": [
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+                "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+                "sourceSHA256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df",
+                "testStartLine": 4,
+                "testEndLine": 38,
+                "assertions": [
+                  {
+                    "line": 26,
+                    "quote": "assert!(\n        output.status.success(),\n        \"真实快捷窗失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                  },
+                  {
+                    "line": 34,
+                    "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                  },
+                  {
+                    "line": 35,
+                    "quote": "assert_eq!(value[\"checks\"].as_array().unwrap().len(), 9)"
+                  },
+                  {
+                    "line": 36,
+                    "quote": "assert!(value[\"modelCalls\"].as_u64().unwrap() > 0)"
+                  }
+                ]
+              }
+            ],
+            "coverage": "FULL",
+            "missingClauses": [],
+            "meaning": "当前生产QuickChatApp/主聊天组件与双真实Electron窗口、CLI、真实HTTP模型共同核对：显示和尺寸改变；实际创建自有会话/一请求一费用账，真正owned switch和主renderer按请求ID/来源摘要/SID/path/连接代际回执确认，主窗真实聚焦后才隐藏。主窗DOM真实包含同一回复；相同路径仍真实服务focus，晚ACK/错owner/不存在会话/main.destroy均明确失败并保留快捷窗；不再无条件隐藏假成功。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+          }
         ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/quickchat-read-proof-review.json"
       },
       {
         "id": "R00-T02-LA-A3FE8FD26CB4",
@@ -167737,6 +168563,106 @@
         "--show-output"
       ]
     },
+    "r06_test_b521dd8bf1b331e40c07": {
+      "package": "lingxi-service",
+      "suite": "r06_read_rich",
+      "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_read_rich",
+        "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_82f233c793521697b613": {
+      "package": "lingxi-service",
+      "suite": "r06_read_rich",
+      "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_read_rich",
+        "real_read_refusals_never_send_foreign_pixels_or_register_products",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_18dc7eaa08803f89aa35": {
+      "package": "lingxi-service",
+      "suite": "r06_read_rich",
+      "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_read_rich",
+        "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_9833929e82029ed09f14": {
+      "package": "lingxi-service",
+      "suite": "r06_read_rich",
+      "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_read_rich",
+        "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
     "r06_test_4d36900afef24abfb13e": {
       "package": "lingxi-service",
       "suite": "r06_original_resource_proofs",
@@ -168182,6 +169108,31 @@
         "--test",
         "r06_original_session_proofs",
         "original_session_search_returns_scoped_title_content_and_explicit_read_failures",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_8ae01affeb9c41dba51d": {
+      "package": "lingxi-service",
+      "suite": "r06_quickchat_completion",
+      "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_quickchat_completion",
+        "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
         "--",
         "--exact",
         "--show-output"
@@ -247356,6 +248307,1200 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-93D5237ADE81": [
+      {
+        "case": "R00-T02-LA-93D5237ADE81-assertion-00",
+        "expect": 1,
+        "assertion": "内容与来源一致",
+        "commandRefs": [
+          "r06_test_18dc7eaa08803f89aa35",
+          "r06_test_82f233c793521697b613",
+          "r06_test_93e9a869e6ec7767b24e",
+          "r06_test_9833929e82029ed09f14",
+          "r06_test_b521dd8bf1b331e40c07",
+          "r06_test_e0e11a6f592749ae6f74"
+        ],
+        "evidenceMeaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+            "test": "adversarial_read_pagination_truncation_and_edit_vocabulary",
+            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+            "testStartLine": 936,
+            "testEndLine": 1329,
+            "assertions": [
+              {
+                "line": 956,
+                "quote": "assert_eq!(\n        text_of(&limited),\n        \"l2\\nl3\\nl4\\n\\n[7 more lines in file. Use offset=5 to continue.]\"\n    )"
+              },
+              {
+                "line": 969,
+                "quote": "assert!(text_of(&full).starts_with(\"l1\\nl2\\n\"))"
+              },
+              {
+                "line": 970,
+                "quote": "assert!(!text_of(&full).contains(\"more lines\"))"
+              },
+              {
+                "line": 983,
+                "quote": "assert!(\n            error_text(&result).contains(\"Offset 12 is beyond end of file (11 lines total)\"),\n            \"{}\",\n            error_text(&result)\n        )"
+              },
+              {
+                "line": 1006,
+                "quote": "assert!(\n        text_of(&truncated)\n            .ends_with(\"[Showing lines 1-2000 of 2501. Use offset=2001 to continue.]\"),\n        \"tail: {}\",\n        text_of(&truncated)\n            .chars()\n            .rev()\n            .take(120)\n            .collect::<String>()\n    )"
+              },
+              {
+                "line": 1017,
+                "quote": "assert!(result.truncated, \"the flag is set\")"
+              },
+              {
+                "line": 1029,
+                "quote": "assert!(\n        text_of(&continuation).starts_with(\"line-2001\"),\n        \"{}\",\n        text_of(&continuation).chars().take(60).collect::<String>()\n    )"
+              },
+              {
+                "line": 1035,
+                "quote": "assert!(!result.truncated)"
+              },
+              {
+                "line": 1052,
+                "quote": "assert!(\n        text_of(&wide).starts_with(\"[Line 1 is 60.0KB, exceeds 50.0KB limit\"),\n        \"{}\",\n        text_of(&wide).chars().take(80).collect::<String>()\n    )"
+              },
+              {
+                "line": 1079,
+                "quote": "assert!(\n        text_of(&dup).starts_with(\"[Duplicate read: ten.txt is unchanged\"),\n        \"{}\",\n        text_of(&dup)\n    )"
+              },
+              {
+                "line": 1096,
+                "quote": "assert_eq!(text_of(&bom_read), \"bom content\")"
+              },
+              {
+                "line": 1107,
+                "quote": "assert!(\n        text_of(&binary).contains(\"5 bytes of binary or non-UTF-8 content\"),\n        \"{}\",\n        text_of(&binary)\n    )"
+              },
+              {
+                "line": 1125,
+                "quote": "assert!(\n        error_text(&duplicate).contains(\"Found 3 occurrences of the text in dup.txt\"),\n        \"{}\",\n        error_text(&duplicate)\n    )"
+              },
+              {
+                "line": 1130,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"dup.txt\")).expect(\"untouched\"),\n        \"same same different same\\n\"\n    )"
+              },
+              {
+                "line": 1143,
+                "quote": "assert!(text_of(&unique).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1157,
+                "quote": "assert!(\n        error_text(&not_found).contains(\n            \"Could not find the exact text in vocab.txt. The old text must match exactly\"\n        ),\n        \"{}\",\n        error_text(&not_found)\n    )"
+              },
+              {
+                "line": 1173,
+                "quote": "assert!(\n            error_text(&result).contains(\"oldText must not be empty in vocab.txt\"),\n            \"{}\",\n            error_text(&result)\n        )"
+              },
+              {
+                "line": 1192,
+                "quote": "assert!(\n        error_text(&overlap).contains(\"edits[0] and edits[1] overlap in vocab.txt\"),\n        \"{}\",\n        error_text(&overlap)\n    )"
+              },
+              {
+                "line": 1206,
+                "quote": "assert!(\n        error_text(&no_change).contains(\"No changes made to vocab.txt\"),\n        \"{}\",\n        error_text(&no_change)\n    )"
+              },
+              {
+                "line": 1211,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"vocab.txt\")).expect(\"untouched\"),\n        \"abcdef\\n\"\n    )"
+              },
+              {
+                "line": 1226,
+                "quote": "assert!(\n        error_text(&missing).contains(\"Could not edit file: nope.txt. Error code: ENOENT.\"),\n        \"{}\",\n        error_text(&missing)\n    )"
+              },
+              {
+                "line": 1244,
+                "quote": "assert!(text_of(&crlf).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1245,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"crlf.txt\")).expect(\"endings preserved\"),\n        b\"a\\r\\nB\\r\\nc\\r\\n\"\n    )"
+              },
+              {
+                "line": 1259,
+                "quote": "assert!(text_of(&fuzzy).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1260,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"smart.txt\")).expect(\"replaced\"),\n        \"plain ascii\\n\"\n    )"
+              },
+              {
+                "line": 1274,
+                "quote": "assert!(text_of(&bom_edit).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1275,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"bomedit.txt\")).expect(\"bom preserved\"),\n        b\"\\xEF\\xBB\\xBFKEEP me\\n\"\n    )"
+              },
+              {
+                "line": 1294,
+                "quote": "assert!(\n        text_of(&multi).contains(\"Successfully replaced 2 block(s) in multi.txt\"),\n        \"{}\",\n        text_of(&multi)\n    )"
+              },
+              {
+                "line": 1299,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"multi.txt\")).expect(\"multi\"),\n        \"ONE\\ntwo\\nTHREE\\n\"\n    )"
+              },
+              {
+                "line": 1315,
+                "quote": "assert_eq!(refusal.code(), \"gateway_arguments_invalid\")"
+              },
+              {
+                "line": 1318,
+                "quote": "assert!(call_file_tool(\n        &harness,\n        &ctx,\n        \"read-valid-contrast\",\n        &harness.core.read_target,\n        json!({\"path\": \"ten.txt\"}),\n    )\n    .await\n    .is_ok())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+            "test": "r04_a08_symlinks_are_judged_by_their_real_targets",
+            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+            "testStartLine": 611,
+            "testEndLine": 760,
+            "assertions": [
+              {
+                "line": 658,
+                "quote": "assert_eq!(\n                    refusal.code(),\n                    \"gateway_resource_scope_denied\",\n                    \"{call}: {refusal}\"\n                )"
+              },
+              {
+                "line": 663,
+                "quote": "assert!(\n                    refusal.to_tool_error().message.contains(\"authorized root\"),\n                    \"{call}: {}\",\n                    refusal.to_tool_error().message\n                )"
+              },
+              {
+                "line": 675,
+                "quote": "assert_eq!(sentinel, b\"TOP SECRET SENTINEL\")"
+              },
+              {
+                "line": 676,
+                "quote": "assert_eq!(\n        std::fs::read_dir(harness.root.join(\"restricted\"))\n            .expect(\"restricted dir\")\n            .count(),\n        1,\n        \"the restricted area gained no files\"\n    )"
+              },
+              {
+                "line": 696,
+                "quote": "assert!(\n        text_of(&read).contains(\"external readable doc\"),\n        \"{}\",\n        text_of(&read)\n    )"
+              },
+              {
+                "line": 712,
+                "quote": "assert_eq!(refusal.code(), \"gateway_resource_scope_denied\")"
+              },
+              {
+                "line": 713,
+                "quote": "assert!(\n                refusal\n                    .to_tool_error()\n                    .message\n                    .contains(\"authorized for reads only\"),\n                \"{}\",\n                refusal.to_tool_error().message\n            )"
+              },
+              {
+                "line": 724,
+                "quote": "assert_eq!(\n        std::fs::read(harness.root.join(\"ext/readable.txt\")).expect(\"doc\"),\n        b\"external readable doc\"\n    )"
+              },
+              {
+                "line": 739,
+                "quote": "assert!(text_of(&read).contains(\"inner doc\"))"
+              },
+              {
+                "line": 749,
+                "quote": "assert!(text_of(&write).contains(\"Successfully wrote\"))"
+              },
+              {
+                "line": 750,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"real-inner.txt\")).expect(\"real target\"),\n        b\"written via link\"\n    )"
+              },
+              {
+                "line": 755,
+                "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 409,
+            "testEndLine": 526,
+            "assertions": [
+              {
+                "line": 448,
+                "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+              },
+              {
+                "line": 455,
+                "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+              },
+              {
+                "line": 460,
+                "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+              },
+              {
+                "line": 473,
+                "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+              },
+              {
+                "line": 476,
+                "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+              },
+              {
+                "line": 485,
+                "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+              },
+              {
+                "line": 490,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 491,
+                "quote": "assert_eq!(remote.visions(), 1)"
+              },
+              {
+                "line": 492,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 493,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 494,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 499,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+              },
+              {
+                "line": 500,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+              },
+              {
+                "line": 501,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+              },
+              {
+                "line": 510,
+                "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+              },
+              {
+                "line": 519,
+                "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 523,
+                "quote": "assert_eq!(remote.visions(), 1)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 529,
+            "testEndLine": 616,
+            "assertions": [
+              {
+                "line": 558,
+                "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+              },
+              {
+                "line": 577,
+                "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+              },
+              {
+                "line": 578,
+                "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 579,
+                "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+              },
+              {
+                "line": 584,
+                "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 597,
+                "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+              },
+              {
+                "line": 599,
+                "quote": "assert_eq!(remote.visions(), 0)"
+              },
+              {
+                "line": 600,
+                "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 603,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 608,
+                "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+              },
+              {
+                "line": 612,
+                "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+              },
+              {
+                "line": 613,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 619,
+            "testEndLine": 703,
+            "assertions": [
+              {
+                "line": 627,
+                "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+              },
+              {
+                "line": 628,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 639,
+                "quote": "assert_eq!(code, 201, \"{body}\")"
+              },
+              {
+                "line": 673,
+                "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+              },
+              {
+                "line": 679,
+                "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 687,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 688,
+                "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 692,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 697,
+                "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 706,
+            "testEndLine": 733,
+            "assertions": [
+              {
+                "line": 724,
+                "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+              },
+              {
+                "line": 726,
+                "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+              },
+              {
+                "line": 727,
+                "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+              },
+              {
+                "line": 728,
+                "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+              },
+              {
+                "line": 729,
+                "quote": "assert_eq!(remote.visions(), 0)"
+              },
+              {
+                "line": 730,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-93D5237ADE81-assertion-01",
+        "expect": 1,
+        "assertion": "越权无内容泄漏",
+        "commandRefs": [
+          "r06_test_18dc7eaa08803f89aa35",
+          "r06_test_82f233c793521697b613",
+          "r06_test_9833929e82029ed09f14",
+          "r06_test_b521dd8bf1b331e40c07",
+          "r06_test_e0e11a6f592749ae6f74"
+        ],
+        "evidenceMeaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+            "test": "r04_a08_symlinks_are_judged_by_their_real_targets",
+            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+            "testStartLine": 611,
+            "testEndLine": 760,
+            "assertions": [
+              {
+                "line": 658,
+                "quote": "assert_eq!(\n                    refusal.code(),\n                    \"gateway_resource_scope_denied\",\n                    \"{call}: {refusal}\"\n                )"
+              },
+              {
+                "line": 663,
+                "quote": "assert!(\n                    refusal.to_tool_error().message.contains(\"authorized root\"),\n                    \"{call}: {}\",\n                    refusal.to_tool_error().message\n                )"
+              },
+              {
+                "line": 675,
+                "quote": "assert_eq!(sentinel, b\"TOP SECRET SENTINEL\")"
+              },
+              {
+                "line": 676,
+                "quote": "assert_eq!(\n        std::fs::read_dir(harness.root.join(\"restricted\"))\n            .expect(\"restricted dir\")\n            .count(),\n        1,\n        \"the restricted area gained no files\"\n    )"
+              },
+              {
+                "line": 696,
+                "quote": "assert!(\n        text_of(&read).contains(\"external readable doc\"),\n        \"{}\",\n        text_of(&read)\n    )"
+              },
+              {
+                "line": 712,
+                "quote": "assert_eq!(refusal.code(), \"gateway_resource_scope_denied\")"
+              },
+              {
+                "line": 713,
+                "quote": "assert!(\n                refusal\n                    .to_tool_error()\n                    .message\n                    .contains(\"authorized for reads only\"),\n                \"{}\",\n                refusal.to_tool_error().message\n            )"
+              },
+              {
+                "line": 724,
+                "quote": "assert_eq!(\n        std::fs::read(harness.root.join(\"ext/readable.txt\")).expect(\"doc\"),\n        b\"external readable doc\"\n    )"
+              },
+              {
+                "line": 739,
+                "quote": "assert!(text_of(&read).contains(\"inner doc\"))"
+              },
+              {
+                "line": 749,
+                "quote": "assert!(text_of(&write).contains(\"Successfully wrote\"))"
+              },
+              {
+                "line": 750,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"real-inner.txt\")).expect(\"real target\"),\n        b\"written via link\"\n    )"
+              },
+              {
+                "line": 755,
+                "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 409,
+            "testEndLine": 526,
+            "assertions": [
+              {
+                "line": 448,
+                "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+              },
+              {
+                "line": 455,
+                "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+              },
+              {
+                "line": 460,
+                "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+              },
+              {
+                "line": 473,
+                "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+              },
+              {
+                "line": 476,
+                "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+              },
+              {
+                "line": 485,
+                "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+              },
+              {
+                "line": 490,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 491,
+                "quote": "assert_eq!(remote.visions(), 1)"
+              },
+              {
+                "line": 492,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 493,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 494,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 499,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+              },
+              {
+                "line": 500,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+              },
+              {
+                "line": 501,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+              },
+              {
+                "line": 510,
+                "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+              },
+              {
+                "line": 519,
+                "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 523,
+                "quote": "assert_eq!(remote.visions(), 1)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 529,
+            "testEndLine": 616,
+            "assertions": [
+              {
+                "line": 558,
+                "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+              },
+              {
+                "line": 577,
+                "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+              },
+              {
+                "line": 578,
+                "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 579,
+                "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+              },
+              {
+                "line": 584,
+                "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 597,
+                "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+              },
+              {
+                "line": 599,
+                "quote": "assert_eq!(remote.visions(), 0)"
+              },
+              {
+                "line": 600,
+                "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 603,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 608,
+                "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+              },
+              {
+                "line": 612,
+                "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+              },
+              {
+                "line": 613,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 619,
+            "testEndLine": 703,
+            "assertions": [
+              {
+                "line": 627,
+                "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+              },
+              {
+                "line": 628,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 639,
+                "quote": "assert_eq!(code, 201, \"{body}\")"
+              },
+              {
+                "line": 673,
+                "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+              },
+              {
+                "line": 679,
+                "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 687,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 688,
+                "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 692,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 697,
+                "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 706,
+            "testEndLine": 733,
+            "assertions": [
+              {
+                "line": 724,
+                "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+              },
+              {
+                "line": 726,
+                "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+              },
+              {
+                "line": 727,
+                "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+              },
+              {
+                "line": 728,
+                "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+              },
+              {
+                "line": 729,
+                "quote": "assert_eq!(remote.visions(), 0)"
+              },
+              {
+                "line": 730,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-93D5237ADE81-assertion-02",
+        "expect": 1,
+        "assertion": "不存在、越权或解析失败显式说明，不泄漏路径外内容。",
+        "commandRefs": [
+          "r06_test_18dc7eaa08803f89aa35",
+          "r06_test_4d36900afef24abfb13e",
+          "r06_test_82f233c793521697b613",
+          "r06_test_93e9a869e6ec7767b24e",
+          "r06_test_9833929e82029ed09f14",
+          "r06_test_b521dd8bf1b331e40c07",
+          "r06_test_e0e11a6f592749ae6f74"
+        ],
+        "evidenceMeaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+            "test": "adversarial_read_pagination_truncation_and_edit_vocabulary",
+            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+            "testStartLine": 936,
+            "testEndLine": 1329,
+            "assertions": [
+              {
+                "line": 956,
+                "quote": "assert_eq!(\n        text_of(&limited),\n        \"l2\\nl3\\nl4\\n\\n[7 more lines in file. Use offset=5 to continue.]\"\n    )"
+              },
+              {
+                "line": 969,
+                "quote": "assert!(text_of(&full).starts_with(\"l1\\nl2\\n\"))"
+              },
+              {
+                "line": 970,
+                "quote": "assert!(!text_of(&full).contains(\"more lines\"))"
+              },
+              {
+                "line": 983,
+                "quote": "assert!(\n            error_text(&result).contains(\"Offset 12 is beyond end of file (11 lines total)\"),\n            \"{}\",\n            error_text(&result)\n        )"
+              },
+              {
+                "line": 1006,
+                "quote": "assert!(\n        text_of(&truncated)\n            .ends_with(\"[Showing lines 1-2000 of 2501. Use offset=2001 to continue.]\"),\n        \"tail: {}\",\n        text_of(&truncated)\n            .chars()\n            .rev()\n            .take(120)\n            .collect::<String>()\n    )"
+              },
+              {
+                "line": 1017,
+                "quote": "assert!(result.truncated, \"the flag is set\")"
+              },
+              {
+                "line": 1029,
+                "quote": "assert!(\n        text_of(&continuation).starts_with(\"line-2001\"),\n        \"{}\",\n        text_of(&continuation).chars().take(60).collect::<String>()\n    )"
+              },
+              {
+                "line": 1035,
+                "quote": "assert!(!result.truncated)"
+              },
+              {
+                "line": 1052,
+                "quote": "assert!(\n        text_of(&wide).starts_with(\"[Line 1 is 60.0KB, exceeds 50.0KB limit\"),\n        \"{}\",\n        text_of(&wide).chars().take(80).collect::<String>()\n    )"
+              },
+              {
+                "line": 1079,
+                "quote": "assert!(\n        text_of(&dup).starts_with(\"[Duplicate read: ten.txt is unchanged\"),\n        \"{}\",\n        text_of(&dup)\n    )"
+              },
+              {
+                "line": 1096,
+                "quote": "assert_eq!(text_of(&bom_read), \"bom content\")"
+              },
+              {
+                "line": 1107,
+                "quote": "assert!(\n        text_of(&binary).contains(\"5 bytes of binary or non-UTF-8 content\"),\n        \"{}\",\n        text_of(&binary)\n    )"
+              },
+              {
+                "line": 1125,
+                "quote": "assert!(\n        error_text(&duplicate).contains(\"Found 3 occurrences of the text in dup.txt\"),\n        \"{}\",\n        error_text(&duplicate)\n    )"
+              },
+              {
+                "line": 1130,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"dup.txt\")).expect(\"untouched\"),\n        \"same same different same\\n\"\n    )"
+              },
+              {
+                "line": 1143,
+                "quote": "assert!(text_of(&unique).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1157,
+                "quote": "assert!(\n        error_text(&not_found).contains(\n            \"Could not find the exact text in vocab.txt. The old text must match exactly\"\n        ),\n        \"{}\",\n        error_text(&not_found)\n    )"
+              },
+              {
+                "line": 1173,
+                "quote": "assert!(\n            error_text(&result).contains(\"oldText must not be empty in vocab.txt\"),\n            \"{}\",\n            error_text(&result)\n        )"
+              },
+              {
+                "line": 1192,
+                "quote": "assert!(\n        error_text(&overlap).contains(\"edits[0] and edits[1] overlap in vocab.txt\"),\n        \"{}\",\n        error_text(&overlap)\n    )"
+              },
+              {
+                "line": 1206,
+                "quote": "assert!(\n        error_text(&no_change).contains(\"No changes made to vocab.txt\"),\n        \"{}\",\n        error_text(&no_change)\n    )"
+              },
+              {
+                "line": 1211,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"vocab.txt\")).expect(\"untouched\"),\n        \"abcdef\\n\"\n    )"
+              },
+              {
+                "line": 1226,
+                "quote": "assert!(\n        error_text(&missing).contains(\"Could not edit file: nope.txt. Error code: ENOENT.\"),\n        \"{}\",\n        error_text(&missing)\n    )"
+              },
+              {
+                "line": 1244,
+                "quote": "assert!(text_of(&crlf).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1245,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"crlf.txt\")).expect(\"endings preserved\"),\n        b\"a\\r\\nB\\r\\nc\\r\\n\"\n    )"
+              },
+              {
+                "line": 1259,
+                "quote": "assert!(text_of(&fuzzy).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1260,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"smart.txt\")).expect(\"replaced\"),\n        \"plain ascii\\n\"\n    )"
+              },
+              {
+                "line": 1274,
+                "quote": "assert!(text_of(&bom_edit).contains(\"Successfully replaced 1 block(s)\"))"
+              },
+              {
+                "line": 1275,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"bomedit.txt\")).expect(\"bom preserved\"),\n        b\"\\xEF\\xBB\\xBFKEEP me\\n\"\n    )"
+              },
+              {
+                "line": 1294,
+                "quote": "assert!(\n        text_of(&multi).contains(\"Successfully replaced 2 block(s) in multi.txt\"),\n        \"{}\",\n        text_of(&multi)\n    )"
+              },
+              {
+                "line": 1299,
+                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"multi.txt\")).expect(\"multi\"),\n        \"ONE\\ntwo\\nTHREE\\n\"\n    )"
+              },
+              {
+                "line": 1315,
+                "quote": "assert_eq!(refusal.code(), \"gateway_arguments_invalid\")"
+              },
+              {
+                "line": 1318,
+                "quote": "assert!(call_file_tool(\n        &harness,\n        &ctx,\n        \"read-valid-contrast\",\n        &harness.core.read_target,\n        json!({\"path\": \"ten.txt\"}),\n    )\n    .await\n    .is_ok())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
+            "test": "r04_a08_symlinks_are_judged_by_their_real_targets",
+            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
+            "testStartLine": 611,
+            "testEndLine": 760,
+            "assertions": [
+              {
+                "line": 658,
+                "quote": "assert_eq!(\n                    refusal.code(),\n                    \"gateway_resource_scope_denied\",\n                    \"{call}: {refusal}\"\n                )"
+              },
+              {
+                "line": 663,
+                "quote": "assert!(\n                    refusal.to_tool_error().message.contains(\"authorized root\"),\n                    \"{call}: {}\",\n                    refusal.to_tool_error().message\n                )"
+              },
+              {
+                "line": 675,
+                "quote": "assert_eq!(sentinel, b\"TOP SECRET SENTINEL\")"
+              },
+              {
+                "line": 676,
+                "quote": "assert_eq!(\n        std::fs::read_dir(harness.root.join(\"restricted\"))\n            .expect(\"restricted dir\")\n            .count(),\n        1,\n        \"the restricted area gained no files\"\n    )"
+              },
+              {
+                "line": 696,
+                "quote": "assert!(\n        text_of(&read).contains(\"external readable doc\"),\n        \"{}\",\n        text_of(&read)\n    )"
+              },
+              {
+                "line": 712,
+                "quote": "assert_eq!(refusal.code(), \"gateway_resource_scope_denied\")"
+              },
+              {
+                "line": 713,
+                "quote": "assert!(\n                refusal\n                    .to_tool_error()\n                    .message\n                    .contains(\"authorized for reads only\"),\n                \"{}\",\n                refusal.to_tool_error().message\n            )"
+              },
+              {
+                "line": 724,
+                "quote": "assert_eq!(\n        std::fs::read(harness.root.join(\"ext/readable.txt\")).expect(\"doc\"),\n        b\"external readable doc\"\n    )"
+              },
+              {
+                "line": 739,
+                "quote": "assert!(text_of(&read).contains(\"inner doc\"))"
+              },
+              {
+                "line": 749,
+                "quote": "assert!(text_of(&write).contains(\"Successfully wrote\"))"
+              },
+              {
+                "line": 750,
+                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"real-inner.txt\")).expect(\"real target\"),\n        b\"written via link\"\n    )"
+              },
+              {
+                "line": 755,
+                "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
+            "test": "registered_read_reports_missing_and_decode_failure_without_foreign_content",
+            "sourceSHA256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
+            "testStartLine": 1265,
+            "testEndLine": 1401,
+            "assertions": [
+              {
+                "line": 1345,
+                "quote": "assert!(!format!(\"{refusal:?}\").contains(\"PRIVATE-SENTINEL-NOT-DISCLOSED\"));"
+              },
+              {
+                "line": 1357,
+                "quote": "assert_eq!(error.code, expected);"
+              },
+              {
+                "line": 1358,
+                "quote": "assert!(\n                error\n                    .message\n                    .contains(if index == 0 { \"ENOENT\" } else { \"directory\" }),\n                \"{}\",\n                error.message\n            );"
+              },
+              {
+                "line": 1365,
+                "quote": "assert!(!error.message.contains(\"PRIVATE-SENTINEL-NOT-DISCLOSED\"));"
+              },
+              {
+                "line": 1379,
+                "quote": "assert!(text.contains(\"Text decoding failed\"));"
+              },
+              {
+                "line": 1380,
+                "quote": "assert!(text.contains(\"binary or non-UTF-8\"));"
+              },
+              {
+                "line": 1381,
+                "quote": "assert!(text.contains(\"sha256\"));"
+              },
+              {
+                "line": 1382,
+                "quote": "assert!(!text.contains(\"RAW-CONTENT-NOT-TEXT\"));"
+              },
+              {
+                "line": 1383,
+                "quote": "assert!(!text.contains(\"PRIVATE-SENTINEL-NOT-DISCLOSED\"));"
+              },
+              {
+                "line": 1384,
+                "quote": "assert!(result.resource_refs.is_empty());"
+              },
+              {
+                "line": 1387,
+                "quote": "assert_eq!(\n        std::fs::read(&private).unwrap(),\n        b\"PRIVATE-SENTINEL-NOT-DISCLOSED\"\n    );"
+              },
+              {
+                "line": 1391,
+                "quote": "assert_eq!(std::fs::read(&undecodable).unwrap(), undecodable_bytes);"
+              },
+              {
+                "line": 1392,
+                "quote": "assert!(!fx.workspace.join(\"missing.txt\").exists());"
+              },
+              {
+                "line": 1393,
+                "quote": "assert!(fx\n        .state\n        .session_files()\n        .list_files(\"s-proof\")\n        .await\n        .unwrap()\n        .is_empty());"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 409,
+            "testEndLine": 526,
+            "assertions": [
+              {
+                "line": 448,
+                "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+              },
+              {
+                "line": 455,
+                "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+              },
+              {
+                "line": 460,
+                "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+              },
+              {
+                "line": 473,
+                "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+              },
+              {
+                "line": 476,
+                "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+              },
+              {
+                "line": 485,
+                "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+              },
+              {
+                "line": 490,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 491,
+                "quote": "assert_eq!(remote.visions(), 1)"
+              },
+              {
+                "line": 492,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 493,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 494,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 499,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+              },
+              {
+                "line": 500,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+              },
+              {
+                "line": 501,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+              },
+              {
+                "line": 510,
+                "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+              },
+              {
+                "line": 519,
+                "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 523,
+                "quote": "assert_eq!(remote.visions(), 1)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 529,
+            "testEndLine": 616,
+            "assertions": [
+              {
+                "line": 558,
+                "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+              },
+              {
+                "line": 577,
+                "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+              },
+              {
+                "line": 578,
+                "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 579,
+                "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+              },
+              {
+                "line": 584,
+                "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 597,
+                "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+              },
+              {
+                "line": 599,
+                "quote": "assert_eq!(remote.visions(), 0)"
+              },
+              {
+                "line": 600,
+                "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+              },
+              {
+                "line": 603,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 608,
+                "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+              },
+              {
+                "line": 612,
+                "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+              },
+              {
+                "line": 613,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 619,
+            "testEndLine": 703,
+            "assertions": [
+              {
+                "line": 627,
+                "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+              },
+              {
+                "line": 628,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 639,
+                "quote": "assert_eq!(code, 201, \"{body}\")"
+              },
+              {
+                "line": 673,
+                "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+              },
+              {
+                "line": 679,
+                "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 687,
+                "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+              },
+              {
+                "line": 688,
+                "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+              },
+              {
+                "line": 692,
+                "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+              },
+              {
+                "line": 697,
+                "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+            "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+            "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+            "testStartLine": 706,
+            "testEndLine": 733,
+            "assertions": [
+              {
+                "line": 724,
+                "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+              },
+              {
+                "line": 726,
+                "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+              },
+              {
+                "line": 727,
+                "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+              },
+              {
+                "line": 728,
+                "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+              },
+              {
+                "line": 729,
+                "quote": "assert_eq!(remote.visions(), 0)"
+              },
+              {
+                "line": 730,
+                "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-94B9BE3AA7A6": [
       {
         "case": "R00-T02-LA-94B9BE3AA7A6-assertion-00",
@@ -256179,6 +258324,84 @@
               {
                 "line": 2109,
                 "quote": "assert_eq!(read_session(&server, \"search-owned\").await, baseline)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
+    "R00-T02-LA-A2C385A33493": [
+      {
+        "case": "R00-T02-LA-A2C385A33493-assertion-00",
+        "expect": 1,
+        "assertion": "悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话",
+        "commandRefs": [
+          "r06_test_8ae01affeb9c41dba51d"
+        ],
+        "evidenceMeaning": "当前生产QuickChatApp/主聊天组件与双真实Electron窗口、CLI、真实HTTP模型共同核对：显示和尺寸改变；实际创建自有会话/一请求一费用账，真正owned switch和主renderer按请求ID/来源摘要/SID/path/连接代际回执确认，主窗真实聚焦后才隐藏。主窗DOM真实包含同一回复；相同路径仍真实服务focus，晚ACK/错owner/不存在会话/main.destroy均明确失败并保留快捷窗；不再无条件隐藏假成功。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+            "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+            "sourceSHA256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df",
+            "testStartLine": 4,
+            "testEndLine": 38,
+            "assertions": [
+              {
+                "line": 26,
+                "quote": "assert!(\n        output.status.success(),\n        \"真实快捷窗失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+              },
+              {
+                "line": 34,
+                "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+              },
+              {
+                "line": 35,
+                "quote": "assert_eq!(value[\"checks\"].as_array().unwrap().len(), 9)"
+              },
+              {
+                "line": 36,
+                "quote": "assert!(value[\"modelCalls\"].as_u64().unwrap() > 0)"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-A2C385A33493-assertion-01",
+        "expect": 1,
+        "assertion": "不存在会话或窗口销毁时不应伪称切换成功",
+        "commandRefs": [
+          "r06_test_8ae01affeb9c41dba51d"
+        ],
+        "evidenceMeaning": "当前生产QuickChatApp/主聊天组件与双真实Electron窗口、CLI、真实HTTP模型共同核对：显示和尺寸改变；实际创建自有会话/一请求一费用账，真正owned switch和主renderer按请求ID/来源摘要/SID/path/连接代际回执确认，主窗真实聚焦后才隐藏。主窗DOM真实包含同一回复；相同路径仍真实服务focus，晚ACK/错owner/不存在会话/main.destroy均明确失败并保留快捷窗；不再无条件隐藏假成功。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+            "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+            "sourceSHA256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df",
+            "testStartLine": 4,
+            "testEndLine": 38,
+            "assertions": [
+              {
+                "line": 26,
+                "quote": "assert!(\n        output.status.success(),\n        \"真实快捷窗失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+              },
+              {
+                "line": 34,
+                "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+              },
+              {
+                "line": 35,
+                "quote": "assert_eq!(value[\"checks\"].as_array().unwrap().len(), 9)"
+              },
+              {
+                "line": 36,
+                "quote": "assert!(value[\"modelCalls\"].as_u64().unwrap() > 0)"
               }
             ]
           }
@@ -291329,552 +293552,6 @@
         "missingClauses": [
           "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
         ]
-      }
-    ],
-    "R00-T02-LA-93D5237ADE81": [
-      {
-        "case": "R00-T02-LA-93D5237ADE81-assertion-00",
-        "expect": 1,
-        "assertion": "内容与来源一致",
-        "commandRefs": [
-          "r06_test_93e9a869e6ec7767b24e",
-          "r06_test_e0e11a6f592749ae6f74"
-        ],
-        "evidenceMeaning": "正式read输入绑定真实目标文件，预设字节与文本精确核对。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
-            "test": "adversarial_read_pagination_truncation_and_edit_vocabulary",
-            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
-            "testStartLine": 936,
-            "testEndLine": 1329,
-            "assertions": [
-              {
-                "line": 956,
-                "quote": "assert_eq!(\n        text_of(&limited),\n        \"l2\\nl3\\nl4\\n\\n[7 more lines in file. Use offset=5 to continue.]\"\n    )"
-              },
-              {
-                "line": 969,
-                "quote": "assert!(text_of(&full).starts_with(\"l1\\nl2\\n\"))"
-              },
-              {
-                "line": 970,
-                "quote": "assert!(!text_of(&full).contains(\"more lines\"))"
-              },
-              {
-                "line": 983,
-                "quote": "assert!(\n            error_text(&result).contains(\"Offset 12 is beyond end of file (11 lines total)\"),\n            \"{}\",\n            error_text(&result)\n        )"
-              },
-              {
-                "line": 1006,
-                "quote": "assert!(\n        text_of(&truncated)\n            .ends_with(\"[Showing lines 1-2000 of 2501. Use offset=2001 to continue.]\"),\n        \"tail: {}\",\n        text_of(&truncated)\n            .chars()\n            .rev()\n            .take(120)\n            .collect::<String>()\n    )"
-              },
-              {
-                "line": 1017,
-                "quote": "assert!(result.truncated, \"the flag is set\")"
-              },
-              {
-                "line": 1029,
-                "quote": "assert!(\n        text_of(&continuation).starts_with(\"line-2001\"),\n        \"{}\",\n        text_of(&continuation).chars().take(60).collect::<String>()\n    )"
-              },
-              {
-                "line": 1035,
-                "quote": "assert!(!result.truncated)"
-              },
-              {
-                "line": 1052,
-                "quote": "assert!(\n        text_of(&wide).starts_with(\"[Line 1 is 60.0KB, exceeds 50.0KB limit\"),\n        \"{}\",\n        text_of(&wide).chars().take(80).collect::<String>()\n    )"
-              },
-              {
-                "line": 1079,
-                "quote": "assert!(\n        text_of(&dup).starts_with(\"[Duplicate read: ten.txt is unchanged\"),\n        \"{}\",\n        text_of(&dup)\n    )"
-              },
-              {
-                "line": 1096,
-                "quote": "assert_eq!(text_of(&bom_read), \"bom content\")"
-              },
-              {
-                "line": 1107,
-                "quote": "assert!(\n        text_of(&binary).contains(\"5 bytes of binary or non-UTF-8 content\"),\n        \"{}\",\n        text_of(&binary)\n    )"
-              },
-              {
-                "line": 1125,
-                "quote": "assert!(\n        error_text(&duplicate).contains(\"Found 3 occurrences of the text in dup.txt\"),\n        \"{}\",\n        error_text(&duplicate)\n    )"
-              },
-              {
-                "line": 1130,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"dup.txt\")).expect(\"untouched\"),\n        \"same same different same\\n\"\n    )"
-              },
-              {
-                "line": 1143,
-                "quote": "assert!(text_of(&unique).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1157,
-                "quote": "assert!(\n        error_text(&not_found).contains(\n            \"Could not find the exact text in vocab.txt. The old text must match exactly\"\n        ),\n        \"{}\",\n        error_text(&not_found)\n    )"
-              },
-              {
-                "line": 1173,
-                "quote": "assert!(\n            error_text(&result).contains(\"oldText must not be empty in vocab.txt\"),\n            \"{}\",\n            error_text(&result)\n        )"
-              },
-              {
-                "line": 1192,
-                "quote": "assert!(\n        error_text(&overlap).contains(\"edits[0] and edits[1] overlap in vocab.txt\"),\n        \"{}\",\n        error_text(&overlap)\n    )"
-              },
-              {
-                "line": 1206,
-                "quote": "assert!(\n        error_text(&no_change).contains(\"No changes made to vocab.txt\"),\n        \"{}\",\n        error_text(&no_change)\n    )"
-              },
-              {
-                "line": 1211,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"vocab.txt\")).expect(\"untouched\"),\n        \"abcdef\\n\"\n    )"
-              },
-              {
-                "line": 1226,
-                "quote": "assert!(\n        error_text(&missing).contains(\"Could not edit file: nope.txt. Error code: ENOENT.\"),\n        \"{}\",\n        error_text(&missing)\n    )"
-              },
-              {
-                "line": 1244,
-                "quote": "assert!(text_of(&crlf).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1245,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"crlf.txt\")).expect(\"endings preserved\"),\n        b\"a\\r\\nB\\r\\nc\\r\\n\"\n    )"
-              },
-              {
-                "line": 1259,
-                "quote": "assert!(text_of(&fuzzy).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1260,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"smart.txt\")).expect(\"replaced\"),\n        \"plain ascii\\n\"\n    )"
-              },
-              {
-                "line": 1274,
-                "quote": "assert!(text_of(&bom_edit).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1275,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"bomedit.txt\")).expect(\"bom preserved\"),\n        b\"\\xEF\\xBB\\xBFKEEP me\\n\"\n    )"
-              },
-              {
-                "line": 1294,
-                "quote": "assert!(\n        text_of(&multi).contains(\"Successfully replaced 2 block(s) in multi.txt\"),\n        \"{}\",\n        text_of(&multi)\n    )"
-              },
-              {
-                "line": 1299,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"multi.txt\")).expect(\"multi\"),\n        \"ONE\\ntwo\\nTHREE\\n\"\n    )"
-              },
-              {
-                "line": 1315,
-                "quote": "assert_eq!(refusal.code(), \"gateway_arguments_invalid\")"
-              },
-              {
-                "line": 1318,
-                "quote": "assert!(call_file_tool(\n        &harness,\n        &ctx,\n        \"read-valid-contrast\",\n        &harness.core.read_target,\n        json!({\"path\": \"ten.txt\"}),\n    )\n    .await\n    .is_ok())"
-              }
-            ]
-          },
-          {
-            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
-            "test": "r04_a08_symlinks_are_judged_by_their_real_targets",
-            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
-            "testStartLine": 611,
-            "testEndLine": 760,
-            "assertions": [
-              {
-                "line": 658,
-                "quote": "assert_eq!(\n                    refusal.code(),\n                    \"gateway_resource_scope_denied\",\n                    \"{call}: {refusal}\"\n                )"
-              },
-              {
-                "line": 663,
-                "quote": "assert!(\n                    refusal.to_tool_error().message.contains(\"authorized root\"),\n                    \"{call}: {}\",\n                    refusal.to_tool_error().message\n                )"
-              },
-              {
-                "line": 675,
-                "quote": "assert_eq!(sentinel, b\"TOP SECRET SENTINEL\")"
-              },
-              {
-                "line": 676,
-                "quote": "assert_eq!(\n        std::fs::read_dir(harness.root.join(\"restricted\"))\n            .expect(\"restricted dir\")\n            .count(),\n        1,\n        \"the restricted area gained no files\"\n    )"
-              },
-              {
-                "line": 696,
-                "quote": "assert!(\n        text_of(&read).contains(\"external readable doc\"),\n        \"{}\",\n        text_of(&read)\n    )"
-              },
-              {
-                "line": 712,
-                "quote": "assert_eq!(refusal.code(), \"gateway_resource_scope_denied\")"
-              },
-              {
-                "line": 713,
-                "quote": "assert!(\n                refusal\n                    .to_tool_error()\n                    .message\n                    .contains(\"authorized for reads only\"),\n                \"{}\",\n                refusal.to_tool_error().message\n            )"
-              },
-              {
-                "line": 724,
-                "quote": "assert_eq!(\n        std::fs::read(harness.root.join(\"ext/readable.txt\")).expect(\"doc\"),\n        b\"external readable doc\"\n    )"
-              },
-              {
-                "line": 739,
-                "quote": "assert!(text_of(&read).contains(\"inner doc\"))"
-              },
-              {
-                "line": 749,
-                "quote": "assert!(text_of(&write).contains(\"Successfully wrote\"))"
-              },
-              {
-                "line": 750,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"real-inner.txt\")).expect(\"real target\"),\n        b\"written via link\"\n    )"
-              },
-              {
-                "line": 755,
-                "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
-              }
-            ]
-          }
-        ],
-        "coverage": "FULL",
-        "missingClauses": []
-      },
-      {
-        "case": "R00-T02-LA-93D5237ADE81-assertion-01",
-        "expect": 1,
-        "assertion": "越权无内容泄漏",
-        "commandRefs": [
-          "r06_test_e0e11a6f592749ae6f74"
-        ],
-        "evidenceMeaning": "越界read准备阶段实际拒绝，无正文返回，敏感源原字节和数量不变。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
-            "test": "r04_a08_symlinks_are_judged_by_their_real_targets",
-            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
-            "testStartLine": 611,
-            "testEndLine": 760,
-            "assertions": [
-              {
-                "line": 658,
-                "quote": "assert_eq!(\n                    refusal.code(),\n                    \"gateway_resource_scope_denied\",\n                    \"{call}: {refusal}\"\n                )"
-              },
-              {
-                "line": 663,
-                "quote": "assert!(\n                    refusal.to_tool_error().message.contains(\"authorized root\"),\n                    \"{call}: {}\",\n                    refusal.to_tool_error().message\n                )"
-              },
-              {
-                "line": 675,
-                "quote": "assert_eq!(sentinel, b\"TOP SECRET SENTINEL\")"
-              },
-              {
-                "line": 676,
-                "quote": "assert_eq!(\n        std::fs::read_dir(harness.root.join(\"restricted\"))\n            .expect(\"restricted dir\")\n            .count(),\n        1,\n        \"the restricted area gained no files\"\n    )"
-              },
-              {
-                "line": 696,
-                "quote": "assert!(\n        text_of(&read).contains(\"external readable doc\"),\n        \"{}\",\n        text_of(&read)\n    )"
-              },
-              {
-                "line": 712,
-                "quote": "assert_eq!(refusal.code(), \"gateway_resource_scope_denied\")"
-              },
-              {
-                "line": 713,
-                "quote": "assert!(\n                refusal\n                    .to_tool_error()\n                    .message\n                    .contains(\"authorized for reads only\"),\n                \"{}\",\n                refusal.to_tool_error().message\n            )"
-              },
-              {
-                "line": 724,
-                "quote": "assert_eq!(\n        std::fs::read(harness.root.join(\"ext/readable.txt\")).expect(\"doc\"),\n        b\"external readable doc\"\n    )"
-              },
-              {
-                "line": 739,
-                "quote": "assert!(text_of(&read).contains(\"inner doc\"))"
-              },
-              {
-                "line": 749,
-                "quote": "assert!(text_of(&write).contains(\"Successfully wrote\"))"
-              },
-              {
-                "line": 750,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"real-inner.txt\")).expect(\"real target\"),\n        b\"written via link\"\n    )"
-              },
-              {
-                "line": 755,
-                "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
-              }
-            ]
-          }
-        ],
-        "coverage": "FULL",
-        "missingClauses": []
-      },
-      {
-        "case": "R00-T02-LA-93D5237ADE81-assertion-02",
-        "expect": 1,
-        "assertion": "不存在、越权或解析失败显式说明，不泄漏路径外内容。",
-        "commandRefs": [
-          "r06_test_4d36900afef24abfb13e",
-          "r06_test_93e9a869e6ec7767b24e",
-          "r06_test_e0e11a6f592749ae6f74"
-        ],
-        "evidenceMeaning": "新增正式read专属检查覆盖不存在与解码失败的明确说明，真实越权拒绝不泄漏外部内容，保留旧符号链接授权负控。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
-            "test": "adversarial_read_pagination_truncation_and_edit_vocabulary",
-            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
-            "testStartLine": 936,
-            "testEndLine": 1329,
-            "assertions": [
-              {
-                "line": 956,
-                "quote": "assert_eq!(\n        text_of(&limited),\n        \"l2\\nl3\\nl4\\n\\n[7 more lines in file. Use offset=5 to continue.]\"\n    )"
-              },
-              {
-                "line": 969,
-                "quote": "assert!(text_of(&full).starts_with(\"l1\\nl2\\n\"))"
-              },
-              {
-                "line": 970,
-                "quote": "assert!(!text_of(&full).contains(\"more lines\"))"
-              },
-              {
-                "line": 983,
-                "quote": "assert!(\n            error_text(&result).contains(\"Offset 12 is beyond end of file (11 lines total)\"),\n            \"{}\",\n            error_text(&result)\n        )"
-              },
-              {
-                "line": 1006,
-                "quote": "assert!(\n        text_of(&truncated)\n            .ends_with(\"[Showing lines 1-2000 of 2501. Use offset=2001 to continue.]\"),\n        \"tail: {}\",\n        text_of(&truncated)\n            .chars()\n            .rev()\n            .take(120)\n            .collect::<String>()\n    )"
-              },
-              {
-                "line": 1017,
-                "quote": "assert!(result.truncated, \"the flag is set\")"
-              },
-              {
-                "line": 1029,
-                "quote": "assert!(\n        text_of(&continuation).starts_with(\"line-2001\"),\n        \"{}\",\n        text_of(&continuation).chars().take(60).collect::<String>()\n    )"
-              },
-              {
-                "line": 1035,
-                "quote": "assert!(!result.truncated)"
-              },
-              {
-                "line": 1052,
-                "quote": "assert!(\n        text_of(&wide).starts_with(\"[Line 1 is 60.0KB, exceeds 50.0KB limit\"),\n        \"{}\",\n        text_of(&wide).chars().take(80).collect::<String>()\n    )"
-              },
-              {
-                "line": 1079,
-                "quote": "assert!(\n        text_of(&dup).starts_with(\"[Duplicate read: ten.txt is unchanged\"),\n        \"{}\",\n        text_of(&dup)\n    )"
-              },
-              {
-                "line": 1096,
-                "quote": "assert_eq!(text_of(&bom_read), \"bom content\")"
-              },
-              {
-                "line": 1107,
-                "quote": "assert!(\n        text_of(&binary).contains(\"5 bytes of binary or non-UTF-8 content\"),\n        \"{}\",\n        text_of(&binary)\n    )"
-              },
-              {
-                "line": 1125,
-                "quote": "assert!(\n        error_text(&duplicate).contains(\"Found 3 occurrences of the text in dup.txt\"),\n        \"{}\",\n        error_text(&duplicate)\n    )"
-              },
-              {
-                "line": 1130,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"dup.txt\")).expect(\"untouched\"),\n        \"same same different same\\n\"\n    )"
-              },
-              {
-                "line": 1143,
-                "quote": "assert!(text_of(&unique).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1157,
-                "quote": "assert!(\n        error_text(&not_found).contains(\n            \"Could not find the exact text in vocab.txt. The old text must match exactly\"\n        ),\n        \"{}\",\n        error_text(&not_found)\n    )"
-              },
-              {
-                "line": 1173,
-                "quote": "assert!(\n            error_text(&result).contains(\"oldText must not be empty in vocab.txt\"),\n            \"{}\",\n            error_text(&result)\n        )"
-              },
-              {
-                "line": 1192,
-                "quote": "assert!(\n        error_text(&overlap).contains(\"edits[0] and edits[1] overlap in vocab.txt\"),\n        \"{}\",\n        error_text(&overlap)\n    )"
-              },
-              {
-                "line": 1206,
-                "quote": "assert!(\n        error_text(&no_change).contains(\"No changes made to vocab.txt\"),\n        \"{}\",\n        error_text(&no_change)\n    )"
-              },
-              {
-                "line": 1211,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"vocab.txt\")).expect(\"untouched\"),\n        \"abcdef\\n\"\n    )"
-              },
-              {
-                "line": 1226,
-                "quote": "assert!(\n        error_text(&missing).contains(\"Could not edit file: nope.txt. Error code: ENOENT.\"),\n        \"{}\",\n        error_text(&missing)\n    )"
-              },
-              {
-                "line": 1244,
-                "quote": "assert!(text_of(&crlf).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1245,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"crlf.txt\")).expect(\"endings preserved\"),\n        b\"a\\r\\nB\\r\\nc\\r\\n\"\n    )"
-              },
-              {
-                "line": 1259,
-                "quote": "assert!(text_of(&fuzzy).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1260,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"smart.txt\")).expect(\"replaced\"),\n        \"plain ascii\\n\"\n    )"
-              },
-              {
-                "line": 1274,
-                "quote": "assert!(text_of(&bom_edit).contains(\"Successfully replaced 1 block(s)\"))"
-              },
-              {
-                "line": 1275,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"bomedit.txt\")).expect(\"bom preserved\"),\n        b\"\\xEF\\xBB\\xBFKEEP me\\n\"\n    )"
-              },
-              {
-                "line": 1294,
-                "quote": "assert!(\n        text_of(&multi).contains(\"Successfully replaced 2 block(s) in multi.txt\"),\n        \"{}\",\n        text_of(&multi)\n    )"
-              },
-              {
-                "line": 1299,
-                "quote": "assert_eq!(\n        std::fs::read_to_string(harness.ws.join(\"multi.txt\")).expect(\"multi\"),\n        \"ONE\\ntwo\\nTHREE\\n\"\n    )"
-              },
-              {
-                "line": 1315,
-                "quote": "assert_eq!(refusal.code(), \"gateway_arguments_invalid\")"
-              },
-              {
-                "line": 1318,
-                "quote": "assert!(call_file_tool(\n        &harness,\n        &ctx,\n        \"read-valid-contrast\",\n        &harness.core.read_target,\n        json!({\"path\": \"ten.txt\"}),\n    )\n    .await\n    .is_ok())"
-              }
-            ]
-          },
-          {
-            "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
-            "test": "r04_a08_symlinks_are_judged_by_their_real_targets",
-            "sourceSHA256": "cd1c0502bcd182cc9d01a4f7769ed12307fd44669eba70b67e1b08abd314b78d",
-            "testStartLine": 611,
-            "testEndLine": 760,
-            "assertions": [
-              {
-                "line": 658,
-                "quote": "assert_eq!(\n                    refusal.code(),\n                    \"gateway_resource_scope_denied\",\n                    \"{call}: {refusal}\"\n                )"
-              },
-              {
-                "line": 663,
-                "quote": "assert!(\n                    refusal.to_tool_error().message.contains(\"authorized root\"),\n                    \"{call}: {}\",\n                    refusal.to_tool_error().message\n                )"
-              },
-              {
-                "line": 675,
-                "quote": "assert_eq!(sentinel, b\"TOP SECRET SENTINEL\")"
-              },
-              {
-                "line": 676,
-                "quote": "assert_eq!(\n        std::fs::read_dir(harness.root.join(\"restricted\"))\n            .expect(\"restricted dir\")\n            .count(),\n        1,\n        \"the restricted area gained no files\"\n    )"
-              },
-              {
-                "line": 696,
-                "quote": "assert!(\n        text_of(&read).contains(\"external readable doc\"),\n        \"{}\",\n        text_of(&read)\n    )"
-              },
-              {
-                "line": 712,
-                "quote": "assert_eq!(refusal.code(), \"gateway_resource_scope_denied\")"
-              },
-              {
-                "line": 713,
-                "quote": "assert!(\n                refusal\n                    .to_tool_error()\n                    .message\n                    .contains(\"authorized for reads only\"),\n                \"{}\",\n                refusal.to_tool_error().message\n            )"
-              },
-              {
-                "line": 724,
-                "quote": "assert_eq!(\n        std::fs::read(harness.root.join(\"ext/readable.txt\")).expect(\"doc\"),\n        b\"external readable doc\"\n    )"
-              },
-              {
-                "line": 739,
-                "quote": "assert!(text_of(&read).contains(\"inner doc\"))"
-              },
-              {
-                "line": 749,
-                "quote": "assert!(text_of(&write).contains(\"Successfully wrote\"))"
-              },
-              {
-                "line": 750,
-                "quote": "assert_eq!(\n        std::fs::read(harness.ws.join(\"real-inner.txt\")).expect(\"real target\"),\n        b\"written via link\"\n    )"
-              },
-              {
-                "line": 755,
-                "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
-              }
-            ]
-          },
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
-            "test": "registered_read_reports_missing_and_decode_failure_without_foreign_content",
-            "sourceSHA256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
-            "testStartLine": 1265,
-            "testEndLine": 1401,
-            "assertions": [
-              {
-                "line": 1345,
-                "quote": "assert!(!format!(\"{refusal:?}\").contains(\"PRIVATE-SENTINEL-NOT-DISCLOSED\"));"
-              },
-              {
-                "line": 1357,
-                "quote": "assert_eq!(error.code, expected);"
-              },
-              {
-                "line": 1358,
-                "quote": "assert!(\n                error\n                    .message\n                    .contains(if index == 0 { \"ENOENT\" } else { \"directory\" }),\n                \"{}\",\n                error.message\n            );"
-              },
-              {
-                "line": 1365,
-                "quote": "assert!(!error.message.contains(\"PRIVATE-SENTINEL-NOT-DISCLOSED\"));"
-              },
-              {
-                "line": 1379,
-                "quote": "assert!(text.contains(\"Text decoding failed\"));"
-              },
-              {
-                "line": 1380,
-                "quote": "assert!(text.contains(\"binary or non-UTF-8\"));"
-              },
-              {
-                "line": 1381,
-                "quote": "assert!(text.contains(\"sha256\"));"
-              },
-              {
-                "line": 1382,
-                "quote": "assert!(!text.contains(\"RAW-CONTENT-NOT-TEXT\"));"
-              },
-              {
-                "line": 1383,
-                "quote": "assert!(!text.contains(\"PRIVATE-SENTINEL-NOT-DISCLOSED\"));"
-              },
-              {
-                "line": 1384,
-                "quote": "assert!(result.resource_refs.is_empty());"
-              },
-              {
-                "line": 1387,
-                "quote": "assert_eq!(\n        std::fs::read(&private).unwrap(),\n        b\"PRIVATE-SENTINEL-NOT-DISCLOSED\"\n    );"
-              },
-              {
-                "line": 1391,
-                "quote": "assert_eq!(std::fs::read(&undecodable).unwrap(), undecodable_bytes);"
-              },
-              {
-                "line": 1392,
-                "quote": "assert!(!fx.workspace.join(\"missing.txt\").exists());"
-              },
-              {
-                "line": 1393,
-                "quote": "assert!(fx\n        .state\n        .session_files()\n        .list_files(\"s-proof\")\n        .await\n        .unwrap()\n        .is_empty());"
-              }
-            ]
-          }
-        ],
-        "coverage": "FULL",
-        "missingClauses": []
       }
     ],
     "R00-T02-LA-AD7FAE6288FA": [

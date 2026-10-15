@@ -35,6 +35,8 @@
     "copySource": "소스 복사"
   },
   "quickChat": {
+    "title": "빠른 채팅",
+    "openSessionFailed": "대화를 열지 못했습니다. 빠른 채팅 창은 그대로 열려 있습니다.",
     "close": "빠른 채팅 닫기",
     "openFullSession": "전체 대화 열기",
     "waitingReply": "답장을 기다리는 중...",

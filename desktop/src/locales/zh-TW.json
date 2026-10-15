@@ -35,6 +35,8 @@
     "copySource": "複製原始碼"
   },
   "quickChat": {
+    "title": "快捷聊天",
+    "openSessionFailed": "未能開啟對話，快速聊天視窗已保留。",
     "close": "關閉快速聊天",
     "openFullSession": "打開完整會話",
     "waitingReply": "正在等待回覆...",

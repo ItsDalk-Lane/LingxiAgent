@@ -5638,16 +5638,14 @@ wrapIpcHandler("speech-permission-request", (event) => {
   return getSharedSpeechPermissionController({ hostCanPrompt: app.isPackaged === true }).requestAuthorization();
 });
 wrapIpcBestEffortHandler("quick-chat-resize", (_event, mode) => applyQuickChatMode(mode));
-wrapIpcBestEffortHandler("quick-chat-open-session", (_event, sessionPath) => {
-  if (typeof sessionPath !== "string" || !sessionPath.trim()) return;
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    if (mainWindow.isMinimized()) mainWindow.restore();
-    mainWindow.show();
-    mainWindow.focus();
-    mainWindow.webContents.send("quick-chat-open-session", { sessionPath });
-  }
-  hideQuickChatWindow();
+const quickChatSessionHandoff = require("./quick-chat-session-handoff.cjs").createQuickChatSessionHandoff({
+  getMainWindow: () => mainWindow,
+  getQuickChatWindow: () => quickChatWindow,
+  hideQuickChatWindow,
+  activateApp: () => { if (process.platform === "darwin") app.focus({ steal: true }); },
 });
+wrapIpcHandler("quick-chat-open-session", (event, target) => quickChatSessionHandoff.open(event, target));
+wrapIpcHandler("quick-chat-open-session-ack", (event, result) => quickChatSessionHandoff.acknowledge(event, result));
 
 wrapIpcBestEffortHandler("open-settings", (_event, tab, theme) => createSettingsWindow(tab, theme));
 

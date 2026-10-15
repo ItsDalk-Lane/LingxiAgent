@@ -513,6 +513,25 @@ export interface BrowserViewerOpenTarget {
 }
 
 // ── Platform API 类型声明 ──
+export interface QuickChatSessionTarget {
+  sessionPath: string;
+  sessionId: string | null;
+  ownerKey: string;
+}
+export interface QuickChatOpenSessionRequest extends QuickChatSessionTarget {
+  requestId: string;
+  expiresAt: number;
+}
+export interface QuickChatOpenSessionResult {
+  ok: boolean;
+  requestId?: string | null;
+  sessionId?: string | null;
+  sessionPath?: string | null;
+  ownerKey?: string;
+  code?: string;
+  message?: string;
+}
+
 export interface PlatformApi {
   getServerPort(): Promise<string>;
   getServerToken(): Promise<string>;
@@ -655,8 +674,8 @@ export interface PlatformApi {
   quickChatShortcutStatus?(): Promise<{ shortcut: string; registered: boolean; shortcuts?: string[] }>;  quickChatShow?(): void;
   quickChatHide?(): void;
   quickChatResize?(request: 'compact' | 'chat' | { mode: 'compact' | 'chat'; height?: number }): void;
-  quickChatOpenSession?(sessionPath: string): void;
-  onQuickChatOpenSession?(callback: (payload: { sessionPath?: string }) => void): (() => void) | void;
+  quickChatOpenSession?(target: QuickChatSessionTarget): Promise<QuickChatOpenSessionResult>;
+  onQuickChatOpenSession?(callback: (payload: QuickChatOpenSessionRequest) => Promise<QuickChatOpenSessionResult>): (() => void) | void;
   onQuickChatShown?(callback: () => void): (() => void) | void;
 
   // ── Skill viewer overlay ──

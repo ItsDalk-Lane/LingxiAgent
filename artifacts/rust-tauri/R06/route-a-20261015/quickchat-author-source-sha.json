@@ -1,0 +1,124 @@
+{
+  "schema": "lingxi.candidate-net-files.v1",
+  "baseCommit": "018060254e91f06ed7fe282150f4c26475b00cf3",
+  "candidateSha256": "ae1b42e5cd18472720f6d642edee11e740e6554fddd1562f927443b71e260799",
+  "patchSha256": "1d876bab8439a33949bafbf2c20d830b8adc13626f9350d4220970e8f77c0faa",
+  "files": [
+    {
+      "path": "desktop/main.cjs",
+      "baseSha256": "4e9d29d487f0f0a49c2236c9c5e4de76e18474582a9961b2cdd094a971124536",
+      "candidateSha256": "475dc388d3e4509b31f654bf2dd594ec0f9a5fbb9a827cb93ed3bda6e074b607"
+    },
+    {
+      "path": "desktop/preload.cjs",
+      "baseSha256": "a39d002e01d7f16d8df913ece2e98c980102d3e2c7213fb4fd02dd2e30c9664b",
+      "candidateSha256": "6e178ddc1a58e341a499c423e38d4d4ebad8743745d87b7599cdc77366f7549b"
+    },
+    {
+      "path": "desktop/quick-chat-session-handoff.cjs",
+      "baseSha256": null,
+      "candidateSha256": "6caaa823e5d29e3a1afc8303ce7231203f3cca2de88256eeeba0de15ba0c94f3"
+    },
+    {
+      "path": "desktop/src/locales/en.json",
+      "baseSha256": "b6f0b020bf562d449965a6afc4a1e099dcec37e114cb9a56a63f971afcfdb558",
+      "candidateSha256": "62b034db728113682d0bec75e29d92009e9891e473bd9e9e468087f9406f0a08"
+    },
+    {
+      "path": "desktop/src/locales/ja.json",
+      "baseSha256": "136fd9aeeaf4b753a6304b59ca6f6b181d2b0ce14b7a2c8e5493f1ffa5e253dd",
+      "candidateSha256": "e5c7a45392bfe7df3a07e89034c61a978eab9af80529e567e511d50ede495d07"
+    },
+    {
+      "path": "desktop/src/locales/ko.json",
+      "baseSha256": "31e698c2a0b592b4f9b0991a4974cf9293c18fb09383d8e125b82b742539ca1c",
+      "candidateSha256": "5acda74f0962eeaec107f9e07ff0eb6390a4c85260bc5a377d930e2f4fbc9472"
+    },
+    {
+      "path": "desktop/src/locales/zh-TW.json",
+      "baseSha256": "fd9ed7662c415d771bec40c09ed51e4f85ebbb43dafa1cc6b293d3424bd668d2",
+      "candidateSha256": "1b487f2c2528382caee5e5c2dfae3d579ad4cbadba4fc30844c8ed0f7465596f"
+    },
+    {
+      "path": "desktop/src/locales/zh.json",
+      "baseSha256": "576f9bb562d04a71e88a2269584ce8bfc4901938c5b932fd0f14066748222dac",
+      "candidateSha256": "dbf2b62e945e2e89ce9cd571d3f128011bf4818d4566da917ded03819b18fde0"
+    },
+    {
+      "path": "desktop/src/react/__tests__/quickchat-live/index.html",
+      "baseSha256": null,
+      "candidateSha256": "458e09a84ab5c050325fafad331cfe6935ac14021a2a9407f46baa45302b262f"
+    },
+    {
+      "path": "desktop/src/react/__tests__/quickchat-live/launch.mjs",
+      "baseSha256": null,
+      "candidateSha256": "e1d31ff5aee018832df884fec17d32fbecebd17c126075fb7841b079b1b742f8"
+    },
+    {
+      "path": "desktop/src/react/__tests__/quickchat-live/main.cjs",
+      "baseSha256": null,
+      "candidateSha256": "b7efcd3a82a0e6c8c3e20ffcf79bcd9a6330d2834b366ed4a95fd786b55db8eb"
+    },
+    {
+      "path": "desktop/src/react/__tests__/quickchat-live/surface.tsx",
+      "baseSha256": null,
+      "candidateSha256": "c2d37ec62c3bf5eaf9b909093bc73ae30ee5ee314f0f17e9a2865d3c085e9be7"
+    },
+    {
+      "path": "desktop/src/react/app-init.ts",
+      "baseSha256": "d7c75bc73d7ab3a03af12aeedaaff1e3ab3c47764adcfede7b9ac071c9f659ad",
+      "candidateSha256": "ce384579c2f205ca0c396bbf68d8d8bdc5dd84e5f1dbc7a65bab402ee164e046"
+    },
+    {
+      "path": "desktop/src/react/quick-chat/QuickChatApp.tsx",
+      "baseSha256": "02a419d2a5add046ade6da4a8122a5339b4c7b2c3bb0b877ed34f4bd7bff75d5",
+      "candidateSha256": "cbcc6c163219c5668bdd0408a7c38823a5123db734260e0b2b522de05754a55c"
+    },
+    {
+      "path": "desktop/src/react/quick-chat/rust-quick-chat.ts",
+      "baseSha256": null,
+      "candidateSha256": "7150db09f445792a65a2cb060969be523c95f1b1f612710dac2612dae5a4d7cb"
+    },
+    {
+      "path": "desktop/src/react/services/quick-chat-session-handoff.ts",
+      "baseSha256": null,
+      "candidateSha256": "c56bf601f9883398ecf34b568e07c3671fe41a88879f2f10f151f973558f59c8"
+    },
+    {
+      "path": "desktop/src/react/types.ts",
+      "baseSha256": "27262febbe020c7cfe7227fede5f6821a6e4234bd3b26ff956dfe64560425465",
+      "candidateSha256": "1fd8f5e4bcea4b65f5145381f264009e5f14c5d76138f6bf403a14933cdb43eb"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "baseSha256": "6b1fad26c33509ee4cc5c92255f807072868e9834ac70882cf274b2d1534ebb5",
+      "candidateSha256": "41528c61d9d3c5131c177e00af387564f22194b24ea4136c87492a782579a749"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseSha256": "5e7828ffb987b89a47f6196c544d7e49757edac21cf82416157c16a217317586",
+      "candidateSha256": "db2d9f333e95c2044d47cfc07b46a82ea6174da63b30a5cbc99a54d0ff9a3858"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/userprefs.rs",
+      "baseSha256": "ba4535d0ba5a9950bfe41243e805b38a11f521df846deb24c00ddadc9c9476be",
+      "candidateSha256": "0699aac1016a723b7d4b7a5ff2b87a3e04482bbd96c511f33c934a67bcf7ae50"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+      "baseSha256": null,
+      "candidateSha256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df"
+    },
+    {
+      "path": "tests/quick-chat-session-handoff.test.ts",
+      "baseSha256": null,
+      "candidateSha256": "1b9ac5ab5c1385db4e767470e15f4d794d270ce19a8226bf9d646cbae188e8c2"
+    },
+    {
+      "path": "tests/rust-native/quickchat-live.py",
+      "baseSha256": null,
+      "candidateSha256": "aa3e135b688745e819fcbbea56dcdc4f404fc456a4ce51add55d8714669119f1"
+    }
+  ],
+  "leaf": "R00-T02-LA-A2C385A33493"
+}

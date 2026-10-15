@@ -35,6 +35,8 @@
     "copySource": "Copy source"
   },
   "quickChat": {
+    "title": "Quick Chat",
+    "openSessionFailed": "Could not open this conversation. Quick Chat remains open.",
     "close": "Close Quick Chat",
     "openFullSession": "Open full chat",
     "waitingReply": "Waiting for reply...",

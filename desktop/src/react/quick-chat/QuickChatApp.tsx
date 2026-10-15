@@ -27,6 +27,9 @@ import {
   DEFAULT_QUICK_CHAT_REUSE_TIMEOUT_MINUTES,
   normalizeQuickChatPreferences,
 } from '../../../../shared/quick-chat-preferences.ts';
+import { quickChatRoute, sendQuickChatRustMessage } from './rust-quick-chat';
+import { connectWebSocket, disconnectWebSocketForRestart } from '../services/websocket';
+import { quickChatOwnerKey } from '../services/quick-chat-session-handoff';
 import { shouldResetQuickChatSessionAfterIdle } from './quick-chat-lifecycle';
 import {
   pickQuickChatRuntimeAgent,
@@ -171,6 +174,7 @@ export function QuickChatApp() {
   const [reuseTimeoutMinutes, setReuseTimeoutMinutes] = useState(DEFAULT_QUICK_CHAT_REUSE_TIMEOUT_MINUTES);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [openingFullSession, setOpeningFullSession] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
@@ -187,6 +191,7 @@ export function QuickChatApp() {
   const reuseTimeoutMinutesRef = useRef(DEFAULT_QUICK_CHAT_REUSE_TIMEOUT_MINUTES);
   const isStreamingRef = useRef(false);
   const sendingRef = useRef(false);
+  const openingFullSessionRef = useRef(false);
   const isComposingRef = useRef(false);
 
   const selectedAgent = useMemo(
@@ -269,13 +274,13 @@ export function QuickChatApp() {
     if (!conn) return null;
     try {
       const [prefsRes, agentsRes, permissionRes] = await Promise.all([
-        fetch(buildConnectionUrl(conn, '/api/preferences/quick-chat'), {
+        fetch(buildConnectionUrl(conn, quickChatRoute(conn, '/api/preferences/quick-chat')), {
           headers: appendConnectionAuth(conn),
         }),
-        fetch(buildConnectionUrl(conn, '/api/agents?fresh=1'), {
+        fetch(buildConnectionUrl(conn, quickChatRoute(conn, '/api/agents?fresh=1')), {
           headers: appendConnectionAuth(conn),
         }),
-        fetch(buildConnectionUrl(conn, '/api/preferences/session-permission-default'), {
+        fetch(buildConnectionUrl(conn, quickChatRoute(conn, '/api/preferences/session-permission-default')), {
           headers: appendConnectionAuth(conn),
         }),
       ]);
@@ -327,29 +332,30 @@ export function QuickChatApp() {
           serverNodeKind: info.serverNodeKind, serverNodeTransport: info.serverNodeTransport,
         });
         if (!local) throw new Error('server connection unavailable');
-        if (local.serverNodeKind === 'lingxi-service') throw new Error('Rust quick chat is not migrated');
         if (cancelled) return;
         setConnection(local);
         connectionRef.current = local;
-        useStore.getState().setLocalServerConnection?.(info.port ?? null, info.token ?? null);
+        useStore.setState(state => ({serverPort:String(info.port),serverToken:info.token ?? null,
+          serverConnections:{...state.serverConnections,[local.connectionId]:local},activeServerConnectionId:local.connectionId,activeServerConnection:local}));
+        if (local.serverNodeKind === 'lingxi-service') connectWebSocket();
 
         const [agentsRes, healthRes, configRes, permissionRes, prefsRes, modelsRes] = await Promise.all([
-          fetch(buildConnectionUrl(local, '/api/agents?fresh=1'), {
+          fetch(buildConnectionUrl(local, quickChatRoute(local, '/api/agents?fresh=1')), {
             headers: appendConnectionAuth(local),
           }),
-          fetch(buildConnectionUrl(local, '/api/health'), {
+          fetch(buildConnectionUrl(local, quickChatRoute(local, '/api/health')), {
             headers: appendConnectionAuth(local),
           }),
-          fetch(buildConnectionUrl(local, '/api/config'), {
+          fetch(buildConnectionUrl(local, quickChatRoute(local, '/api/config')), {
             headers: appendConnectionAuth(local),
           }),
-          fetch(buildConnectionUrl(local, '/api/preferences/session-permission-default'), {
+          fetch(buildConnectionUrl(local, quickChatRoute(local, '/api/preferences/session-permission-default')), {
             headers: appendConnectionAuth(local),
           }),
-          fetch(buildConnectionUrl(local, '/api/preferences/quick-chat'), {
+          fetch(buildConnectionUrl(local, quickChatRoute(local, '/api/preferences/quick-chat')), {
             headers: appendConnectionAuth(local),
           }),
-          fetch(buildConnectionUrl(local, '/api/models'), {
+          fetch(buildConnectionUrl(local, quickChatRoute(local, '/api/models')), {
             headers: appendConnectionAuth(local),
           }),
         ]);
@@ -383,6 +389,11 @@ export function QuickChatApp() {
         });
         if (cancelled) return;
         applyQuickChatModels(modelsData);
+        if (local.serverNodeKind === 'lingxi-service') {
+          const rows=Array.isArray(modelsData.models)?modelsData.models:[];
+          const active=rows.find((model:Model)=>model.isCurrent);
+          useStore.setState({models:rows,currentModel:active?{id:active.id,provider:active.provider}:null});
+        }
         loadAvatars(healthData.avatars, healthData.agentId);
 
         const nextAgents = Array.isArray(agentsData.agents) ? agentsData.agents : [];
@@ -411,6 +422,7 @@ export function QuickChatApp() {
     return () => {
       cancelled = true;
       wsRef.current?.close();
+      if (connectionRef.current?.serverNodeKind === 'lingxi-service') disconnectWebSocketForRestart();
     };
   }, [applyRuntimeAgentList, applyRuntimePermissionMode, t]);
 
@@ -447,7 +459,7 @@ export function QuickChatApp() {
   }, []);
 
   const resetDetachedSession = useCallback(() => {
-    if (isStreamingRef.current || sendingRef.current) return;
+    if (isStreamingRef.current || sendingRef.current || openingFullSessionRef.current) return;
     wsRef.current?.close();
     wsRef.current = null;
     sessionPathRef.current = null;
@@ -502,7 +514,7 @@ export function QuickChatApp() {
   const apiFetch = useCallback(async (path: string, init: RequestInit = {}) => {
     const conn = connectionRef.current || connection;
     if (!conn) throw new Error('server connection unavailable');
-    const res = await fetch(buildConnectionUrl(conn, path), {
+    const res = await fetch(buildConnectionUrl(conn, quickChatRoute(conn, path)), {
       ...init,
       headers: appendConnectionAuth(conn, init.headers),
     });
@@ -592,8 +604,7 @@ export function QuickChatApp() {
       body: JSON.stringify({
         agentId: nextAgentId,
         permissionMode: mode,
-        launchContext: null,
-        contextAttachments: [],
+        ...(connectionRef.current?.serverNodeKind === 'lingxi-service' ? {} : {launchContext:null,contextAttachments:[]}),
       }),
     });
     const data = await res.json() as DetachedSessionResponse;
@@ -631,6 +642,11 @@ export function QuickChatApp() {
         item,
         data: item.base64Data || await fileToBase64(item.file),
       })));
+      if (connectionRef.current?.serverNodeKind === 'lingxi-service') {
+        await sendQuickChatRustMessage(nextSessionPath,text,encodedAttachments.map(({item,data})=>({path:item.id,name:item.name,isDir:false,mimeType:item.mimeType,base64Data:data})));
+        setDraft('');setAttachments([]);setSending(false);window.hana?.quickChatResize?.('chat');
+        return;
+      }
       const images = encodedAttachments.map(({ item, data }) => ({
         type: 'image',
         data,
@@ -685,11 +701,25 @@ export function QuickChatApp() {
     addFiles(Array.from(event.dataTransfer.files || []));
   }, [addFiles]);
 
-  const openFullSession = useCallback(() => {
-    if (!sessionPathRef.current) return;
-    markHidden();
-    window.hana?.quickChatOpenSession?.(sessionPathRef.current);
-  }, [markHidden]);
+  const openFullSession = useCallback(async () => {
+    const path = sessionPathRef.current;
+    const origin = connectionRef.current;
+    if (!path || !origin || openingFullSessionRef.current) return;
+    openingFullSessionRef.current = true;
+    setOpeningFullSession(true);
+    try {
+      if (!window.hana?.quickChatOpenSession) throw Error('快捷聊天窗口接口不可用');
+      const ownerKey = await quickChatOwnerKey(origin);
+      if (connectionRef.current !== origin || sessionPathRef.current !== path) throw Error('会话来源已改变');
+      const sid = path.startsWith('native:') ? path.slice(7) : useStore.getState().sessions.find(item => item.path === path)?.sessionId || null;
+      const result = await window.hana.quickChatOpenSession({ sessionPath: path, sessionId: sid, ownerKey });
+      if (!result?.ok) throw Error(result?.message || '主窗口未确认会话');
+      markHidden();
+    } catch (err) {
+      console.warn('[quick-chat] 打开完整会话失败：', err instanceof Error ? err.message : String(err));
+      setError(t('quickChat.openSessionFailed'));
+    } finally { openingFullSessionRef.current = false; setOpeningFullSession(false); }
+  }, [markHidden, openingFullSession, t]);
 
   const handleForkCreated = useCallback(async (forked: ForkedSessionRef) => {
     sessionPathRef.current = forked.sessionPath;
@@ -718,7 +748,7 @@ export function QuickChatApp() {
     window.hana?.quickChatHide?.();
   }, [markHidden]);
 
-  const canSend = (!!draft.trim() || attachments.length > 0) && !sending && !isStreaming && !!connection;
+  const canSend = (!!draft.trim() || attachments.length > 0) && !openingFullSession && !sending && !isStreaming && !!connection;
   const expanded = sessionItems.length > 0 || isStreaming;
   // 快捷面板只有一行的位置，显示人话正文；详情留给主窗口的错误条展开区。
   const displayError = error || inlineError?.text || null;
@@ -771,7 +801,7 @@ export function QuickChatApp() {
                 </button>
                 <div className={styles.threadTitle}>{title}</div>
               </div>
-              <button className={styles.openSessionButton} onClick={openFullSession} disabled={!sessionPath}>
+              <button className={styles.openSessionButton} onClick={() => { void openFullSession(); }} disabled={!sessionPath || openingFullSession}>
                 {t('quickChat.openFullSession')}
               </button>
             </div>
@@ -828,6 +858,7 @@ export function QuickChatApp() {
             className={classNames(inputStyles['input-box'], styles.textarea)}
             ref={textareaRef}
             value={draft}
+            disabled={openingFullSession}
             onChange={(event) => setDraft(event.target.value)}
             onPaste={handlePaste}
             onKeyDown={(event) => {
@@ -859,7 +890,7 @@ export function QuickChatApp() {
                   {selectedAgent && connection ? (
                     <img
                       className={styles.agentAvatar}
-                      src={buildConnectionUrl(connection, `/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar`, { includeTokenQuery: true })}
+                      src={buildConnectionUrl(connection, quickChatRoute(connection, `/api/agents/${encodeURIComponent(selectedAgent.id)}/avatar`), { includeTokenQuery: true })}
                       alt=""
                       onError={(event) => { (event.currentTarget as HTMLImageElement).style.display = 'none'; }}
                     />

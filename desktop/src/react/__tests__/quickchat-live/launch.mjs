@@ -1,0 +1,7 @@
+// 真Vite + Electron，生产preload与两个生产页面只连接合成Rust服务。
+import {createServer,build} from 'vite';import {spawn} from 'node:child_process';import path from 'node:path';import fs from 'node:fs';
+const here=path.dirname(new URL(import.meta.url).pathname),repo=path.resolve(here,'../../../../..');
+const root=process.env.R06_QUICKCHAT_EVIDENCE;if(!root)throw Error('合成证据目录未设置');
+await build({configFile:path.join(repo,'vite.config.preload.js'),build:{outDir:path.join(root,'preload'),emptyOutDir:false},logLevel:'error'});
+const vite=await createServer({configFile:path.join(repo,'vite.config.ts'),root:path.join(repo,'desktop/src'),cacheDir:path.join(root,'vite-cache'),resolve:{alias:{'@':path.join(repo,'desktop/src/react')}},esbuild:{jsx:'automatic'},server:{host:'127.0.0.1',port:0,hmr:false,fs:{allow:[repo]}},optimizeDeps:{include:['react','react-dom/client','zustand']},logLevel:'warn'});
+try{await vite.listen();const renderer=`http://127.0.0.1:${vite.httpServer.address().port}/react/__tests__/quickchat-live/index.html`;const child=spawn(fs.realpathSync(path.join(repo,'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')),[path.join(here,'main.cjs')],{cwd:repo,env:{...process.env,R06_QUICKCHAT_RENDERER:renderer},stdio:['ignore','pipe','pipe']});child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);const timer=setTimeout(()=>child.kill(),100000);const code=await new Promise((resolve,reject)=>{child.once('error',reject);child.once('exit',resolve);});clearTimeout(timer);if(code!==0)throw Error(`双窗验证失败 ${code}`);}finally{await vite.close();}

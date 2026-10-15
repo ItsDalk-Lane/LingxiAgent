@@ -1,0 +1,26 @@
+{
+  "status": "REGISTERED_WINDOW_PASS",
+  "actualMainParents": 22,
+  "actualSuites": {
+    "oldFile": 11,
+    "readRich": 4,
+    "quickchat": 1,
+    "officeIncludingNative": 6
+  },
+  "mainLog": "/private/tmp/r06-quickchat-read-main-r2.log",
+  "officeLog": "/private/tmp/r06-quickchat-read-office-r1.log",
+  "threeTypechecks": "PASS",
+  "allTargetsStrict": "PASS",
+  "rootViewedFreshQuickchatScreenshots": true,
+  "actualQuickchatReceipt": "/private/tmp/r06-quickchat-read-main-env/tmp/lingxi-quickchat-completion-b60ff9a41e8df174/result.json",
+  "original279AssertionsAndThenUnchanged": true,
+  "stageAccepted": false,
+  "limitations": [
+    "macOS actual; other systems NOT_RUN",
+    "controlled actual HTTP providers; paid providers NOT_RUN",
+    "full desktop packaging NOT_RUN"
+  ],
+  "registeredBindings": 8,
+  "sourceCandidateSha256": "8d1f3d0c6fe7cbb9906b7290c73069e8d6ab6aebcbec5f3d92f7395e505534b4",
+  "rawEvidence": "/private/tmp/r06-quickchat-read-window-r1-20261015"
+}

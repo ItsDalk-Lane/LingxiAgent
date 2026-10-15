@@ -207,3 +207,25 @@ pref_pair!(
     goal_preferences,
     set_goal_preferences
 );
+
+/// 新会话默认权限读面：复用现役规范化默认 auto，坏文件显式失败，不写入偏好。
+pub async fn session_permission_default_get_route(State(state): State<ServiceState>) -> Response {
+    match state.memory().read_preferences_root() {
+        Ok(root) => {
+            let raw = root["session_permission_mode_default"]
+                .as_str()
+                .unwrap_or("auto");
+            let mode = if matches!(raw, "auto" | "operate" | "ask" | "read_only") {
+                raw
+            } else {
+                "auto"
+            };
+            Json(json!({"permissionMode":mode})).into_response()
+        }
+        Err(error) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"error":error})),
+        )
+            .into_response(),
+    }
+}

@@ -2518,6 +2518,27 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "quickchat_read": {
+      "status": "TWO_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-A2C385A33493",
+        "R00-T02-LA-93D5237ADE81"
+      ],
+      "completedInitialGaps": 74,
+      "remainingInitialGaps": 4,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 275,
+      "gapLeaves": 4,
+      "actualRegisteredBindings": 8,
+      "sourceCandidateSha256": "8d1f3d0c6fe7cbb9906b7290c73069e8d6ab6aebcbec5f3d92f7395e505534b4",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/quickchat-read-binding-window-summary.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

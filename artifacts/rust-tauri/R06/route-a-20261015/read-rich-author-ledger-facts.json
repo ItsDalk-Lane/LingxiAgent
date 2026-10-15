@@ -1,0 +1,202 @@
+{
+  "rich-read": {
+    "syntheticHome": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-read-42340-1792038924742999000",
+    "database": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-read-42340-1792038924742999000/lingxi-service/data/runs.db",
+    "visionRows": [
+      {
+        "session_id": "pixels",
+        "run_id": "run_000001a13dd7f279_000003",
+        "model_call_id": "read-vision-run_000001a13dd7f279_000003-run_000001a13dd7f279_000003#a1-run_000001a13dd7f279_000003-tc0002",
+        "purpose": "auxiliary.vision",
+        "origin": "read-tool",
+        "provider": "remote",
+        "model": "vision",
+        "protocol": "openai-completions",
+        "parent_tool_call_id": "run_000001a13dd7f279_000003-tc0002",
+        "outcome": "succeeded",
+        "transport_attempts": 1,
+        "input_tokens": 13,
+        "output_tokens": 7
+      }
+    ],
+    "runRows": [
+      {
+        "run_id": "run_000001a13dd7f22e_000001",
+        "session_id": "doc",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f25d_000002",
+        "session_id": "sheet",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f279_000003",
+        "session_id": "pixels",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f296_000004",
+        "session_id": "text",
+        "status": "completed"
+      }
+    ],
+    "sessionFiles": 0
+  },
+  "rich-refusals": {
+    "syntheticHome": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-refusals-42340-1792038925019742000",
+    "database": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-refusals-42340-1792038925019742000/lingxi-service/data/runs.db",
+    "visionRows": [
+      {
+        "session_id": "no-vision",
+        "run_id": "run_000001a13dd7f3af_000006",
+        "model_call_id": "read-vision-run_000001a13dd7f3af_000006-run_000001a13dd7f3af_000006#a1-run_000001a13dd7f3af_000006-tc0002",
+        "purpose": "auxiliary.vision",
+        "origin": "read-tool",
+        "provider": "remote",
+        "model": "chat",
+        "protocol": "unknown",
+        "parent_tool_call_id": "run_000001a13dd7f3af_000006-tc0002",
+        "outcome": "failed",
+        "transport_attempts": 0,
+        "input_tokens": null,
+        "output_tokens": null
+      }
+    ],
+    "runRows": [
+      {
+        "run_id": "run_000001a13dd7f329_000001",
+        "session_id": "bad-doc",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f346_000002",
+        "session_id": "bad-sheet",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f361_000003",
+        "session_id": "empty-sheet",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f37b_000004",
+        "session_id": "bad-image",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f396_000005",
+        "session_id": "missing",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f3af_000006",
+        "session_id": "no-vision",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f3c8_000007",
+        "session_id": "outside",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f3e1_000008",
+        "session_id": "oversize",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f3f9_000009",
+        "session_id": "link",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f412_00000a",
+        "session_id": "fifo",
+        "status": "completed"
+      }
+    ],
+    "sessionFiles": 0
+  },
+  "rich-cancel": {
+    "syntheticHome": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-cancel-42340-1792038925367703000",
+    "database": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-cancel-42340-1792038925367703000/lingxi-service/data/runs.db",
+    "visionRows": [
+      {
+        "session_id": "fail",
+        "run_id": "run_000001a13dd7f482_000001",
+        "model_call_id": "read-vision-run_000001a13dd7f482_000001-run_000001a13dd7f482_000001#a1-run_000001a13dd7f482_000001-tc0002",
+        "purpose": "auxiliary.vision",
+        "origin": "read-tool",
+        "provider": "remote",
+        "model": "vision",
+        "protocol": "unknown",
+        "parent_tool_call_id": "run_000001a13dd7f482_000001-tc0002",
+        "outcome": "failed",
+        "transport_attempts": 1,
+        "input_tokens": null,
+        "output_tokens": null
+      },
+      {
+        "session_id": "cancel",
+        "run_id": "run_000001a13dd7f49e_000002",
+        "model_call_id": "read-vision-run_000001a13dd7f49e_000002-run_000001a13dd7f49e_000002#a1-run_000001a13dd7f49e_000002-tc0002",
+        "purpose": "auxiliary.vision",
+        "origin": "read-tool",
+        "provider": "unreported",
+        "model": "unreported",
+        "protocol": "unknown",
+        "parent_tool_call_id": "run_000001a13dd7f49e_000002-tc0002",
+        "outcome": "cancelled",
+        "transport_attempts": null,
+        "input_tokens": null,
+        "output_tokens": null
+      },
+      {
+        "session_id": "cancel",
+        "run_id": "run_000001a13dd7f4b1_000003",
+        "model_call_id": "read-vision-run_000001a13dd7f4b1_000003-run_000001a13dd7f4b1_000003#a1-run_000001a13dd7f4b1_000003-tc0002",
+        "purpose": "auxiliary.vision",
+        "origin": "read-tool",
+        "provider": "remote",
+        "model": "vision",
+        "protocol": "openai-completions",
+        "parent_tool_call_id": "run_000001a13dd7f4b1_000003-tc0002",
+        "outcome": "succeeded",
+        "transport_attempts": 1,
+        "input_tokens": 13,
+        "output_tokens": 7
+      }
+    ],
+    "runRows": [
+      {
+        "run_id": "run_000001a13dd7f482_000001",
+        "session_id": "fail",
+        "status": "completed"
+      },
+      {
+        "run_id": "run_000001a13dd7f49e_000002",
+        "session_id": "cancel",
+        "status": "cancelled"
+      },
+      {
+        "run_id": "run_000001a13dd7f4b1_000003",
+        "session_id": "cancel",
+        "status": "completed"
+      }
+    ],
+    "sessionFiles": 0
+  },
+  "rich-sheets": {
+    "syntheticHome": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-sheets-42340-1792038925524656000",
+    "database": "/private/tmp/r06-chat-wire-runtime/home/lingxi-r06-ex01-rich-sheets-42340-1792038925524656000/lingxi-service/data/runs.db",
+    "visionRows": [],
+    "runRows": [
+      {
+        "run_id": "run_000001a13dd7f51f_000001",
+        "session_id": "nine",
+        "status": "completed"
+      }
+    ],
+    "sessionFiles": 0
+  }
+}

@@ -8,6 +8,7 @@
  */
 
 import { useStore } from './stores';
+import { openQuickChatSession } from './services/quick-chat-session-handoff';
 import { lingxiFetch } from './hooks/use-hana-fetch';
 import { applyAgentIdentity, loadAgents, loadAvatars } from './stores/agent-actions';
 import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSessionIdentityPatch, sweepOrphanedWorkspaceSessions, switchSession } from './stores/session-actions';
@@ -397,12 +398,7 @@ export async function initApp(): Promise<void> {
   });
 
   // 21. Quick Chat 请求打开后台会话：复用主窗口既有 session 切换路径
-  platform.onQuickChatOpenSession?.((payload: { sessionPath?: string }) => {
-    if (payload?.sessionPath) {
-      void switchSession(payload.sessionPath);
-      loadSessions();
-    }
-  });
+  platform.onQuickChatOpenSession?.(openQuickChatSession);
 
   // 21. Skill Viewer overlay（主进程 / 设置窗口 → 渲染进程）
   window.hana?.onShowSkillViewer?.((data: any) => {

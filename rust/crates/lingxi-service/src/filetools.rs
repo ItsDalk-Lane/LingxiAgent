@@ -12,12 +12,9 @@
 //!   (`[Showing lines X-Y of Z. Use offset=N to continue.]`,
 //!   `[N more lines in file. …]`) and the `truncated` flag set on the
 //!   structured result.
-//! - Encoding: a UTF-8 BOM is stripped. Content that is not valid UTF-8
-//!   is NOT returned as mojibake: the result reports the file as
-//!   binary/non-UTF-8 with its real size and digest (the incumbent's
-//!   GBK transcoding and xlsx/docx office decoding are worker-surface
-//!   capabilities — registered as NOT migrated here, never silently
-//!   degraded).
+//! - UTF-8 BOM 会移除；非 UTF-8 文本明确说明未解码，不返回乱码。
+//!   docx/xlsx 通过有限只读解析抽取正文；图片通过正式配置的视觉桥分析，
+//!   失败不冒充已经成功读取，原文件不改。
 //! - Duplicate-read stub: an ADJACENT identical read (same path/offset/
 //!   limit, within 30s, stat unchanged) returns the incumbent's
 //!   `[Duplicate read: …]` stub (`lib/sandbox/file-freshness.ts`).
@@ -1555,6 +1552,7 @@ pub struct FileTools {
     mutation_hook: std::sync::Mutex<Option<MutationTestHook>>,
     file_safety: std::sync::OnceLock<Arc<crate::file_safety::FileSafety>>,
     native_write_helper: std::sync::Mutex<Option<PathBuf>>,
+    read_vision: std::sync::OnceLock<Arc<crate::read_vision::ReadVisionService>>,
 }
 
 /// The directory handle + final component of one authorized target.
@@ -1658,7 +1656,13 @@ impl FileTools {
             mutation_hook: std::sync::Mutex::new(None),
             file_safety: std::sync::OnceLock::new(),
             native_write_helper: std::sync::Mutex::new(None),
+            read_vision: std::sync::OnceLock::new(),
         }
+    }
+
+    /// 视觉桥仅由服务组合根绑定，模型参数不能指定路由或凭证。
+    pub fn set_read_vision(&self, service: Arc<crate::read_vision::ReadVisionService>) {
+        let _ = self.read_vision.set(service);
     }
 
     /// 组合根共享应用写入的来源证明。
@@ -1839,7 +1843,17 @@ impl FileTools {
                 }
             };
             let target = OpenTarget { dir, name };
-            match open_final(&target) {
+            let opened = if op == ResourceOp::Read {
+                match target.dir.open_attachment_nofollow(&target.name) {
+                    Some(Ok(file)) => FinalOpen::Exists(file),
+                    None => FinalOpen::Missing,
+                    Some(Err(error)) if is_symlink_swap(&error) => FinalOpen::Swap,
+                    Some(Err(error)) => FinalOpen::Error(error),
+                }
+            } else {
+                open_final(&target)
+            };
+            match opened {
                 FinalOpen::Exists(file) => {
                     return OpenOutcome::Ready {
                         scope,
@@ -1885,7 +1899,12 @@ impl FileTools {
 
     // ── read ────────────────────────────────────────────────────────────────
 
-    fn run_read(&self, ctx: &RunContext, args: &serde_json::Value) -> ToolOutcome {
+    fn run_read(
+        &self,
+        ctx: &RunContext,
+        args: &serde_json::Value,
+        image: &mut Option<ReadImage>,
+    ) -> ToolOutcome {
         let raw_path = match arg_path(args) {
             Ok(path) => path,
             Err(outcome) => return outcome,
@@ -1968,8 +1987,24 @@ impl FileTools {
                 format!("Could not read file: {raw_path}. It is a directory."),
             );
         }
+        if !file.metadata().map(|m| m.is_file()).unwrap_or(false) {
+            return failed(
+                ErrorCode::InvalidMessage,
+                "read requires a regular file".into(),
+            );
+        }
+        const MAX_READ_BYTES: u64 = 20 * 1024 * 1024;
+        if identity.size > MAX_READ_BYTES {
+            return failed(
+                ErrorCode::InvalidMessage,
+                "read exceeds the 20MiB input limit".into(),
+            );
+        }
         let mut bytes = Vec::new();
-        if let Err(err) = file.read_to_end(&mut bytes) {
+        if let Err(err) = std::io::Read::by_ref(&mut file)
+            .take(MAX_READ_BYTES + 1)
+            .read_to_end(&mut bytes)
+        {
             return failed(
                 ErrorCode::UpstreamUnavailable,
                 format!(
@@ -1978,20 +2013,105 @@ impl FileTools {
                 ),
             );
         }
+        // 读取后复核同一句柄、父目录及当前授权；任何替换都不返回已读正文。
+        let final_identity = FileIdentity::of(&file).ok();
+        let parent_same = scope
+            .path
+            .parent()
+            .is_some_and(|parent| target.dir.same_directory(parent).unwrap_or(false));
+        let entry_same = target
+            .dir
+            .open_attachment_nofollow(&target.name)
+            .and_then(Result::ok)
+            .and_then(|f| FileIdentity::of(&f).ok())
+            == Some(identity);
+        let authorized = self
+            .authorize(ctx, &raw_path, ResourceOp::Read)
+            .is_ok_and(|current| current.path == scope.path);
+        if bytes.len() as u64 > MAX_READ_BYTES
+            || final_identity != Some(identity)
+            || !parent_same
+            || !entry_same
+            || !authorized
+        {
+            return failed(
+                ErrorCode::Conflict,
+                "read source changed or is no longer authorized".into(),
+            );
+        }
         drop(target);
         let fingerprint = identity.fingerprint();
+        let sha = hex(&Sha256::digest(&bytes));
+        let extension = scope
+            .path
+            .extension()
+            .and_then(|v| v.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        let source = serde_json::json!({"path": raw_path,"sha256":sha,"sizeBytes":bytes.len()});
+        if matches!(extension.as_str(), "docx" | "xlsx") {
+            let converted = if extension == "docx" {
+                crate::office::docx(&bytes).map(|document| (document.text, 0))
+            } else {
+                crate::office::xlsx_for_read(&bytes)
+            };
+            return match converted {
+                Ok((text, omitted_sheets)) => {
+                    let mut outcome = render_text_read(&text, offset, limit);
+                    if let ToolOutcome::Success { result } = &mut outcome {
+                        result.truncated |= omitted_sheets > 0;
+                        result.details = Some(serde_json::json!({"source":source,"format":extension,"omittedSheets":omitted_sheets}).as_object().unwrap().clone());
+                        self.freshness
+                            .observe_read(&session, &scope.path, fingerprint, read_key);
+                    }
+                    outcome
+                }
+                Err(error) => failed(
+                    ErrorCode::InvalidMessage,
+                    format!("Office {} parse failed: {error}", extension),
+                ),
+            };
+        }
+        let mime = if bytes.starts_with(b"\x89PNG\r\n\x1a\n") {
+            Some("image/png")
+        } else if bytes.starts_with(&[0xff, 0xd8, 0xff]) {
+            Some("image/jpeg")
+        } else if bytes.starts_with(b"GIF87a") || bytes.starts_with(b"GIF89a") {
+            Some("image/gif")
+        } else if bytes.len() >= 12 && &bytes[..4] == b"RIFF" && &bytes[8..12] == b"WEBP" {
+            Some("image/webp")
+        } else {
+            None
+        };
+        if let Some(mime) = mime {
+            *image = Some(ReadImage {
+                input: lingxi_kernel::model_exchange::InputImage {
+                    bytes,
+                    mime: mime.into(),
+                },
+                source,
+                canonical: scope.path,
+                fingerprint,
+                read_key,
+            });
+            // 此结果仅在宿主内部传递，真正成功必须等视觉调用和费用持久化。
+            return text_success(String::new(), false, Vec::new());
+        }
+        if matches!(extension.as_str(), "png" | "jpg" | "jpeg" | "gif" | "webp") {
+            return failed(
+                ErrorCode::InvalidMessage,
+                "image signature is invalid or unsupported".into(),
+            );
+        }
         let outcome = match decode_text(&bytes) {
             TextDecode::Text(text) => render_text_read(&text, offset, limit),
             TextDecode::Binary => {
-                // Honest binary/non-UTF-8 result: no mojibake, no silent
-                // GBK guess. The incumbent's GBK/office decoding is a
-                // worker-surface capability (registered not migrated).
+                // 未识别的二进制只返回大小和摘要，不把乱码冒充正文。
                 text_success(
                     format!(
                         "[Read {raw_path}: {} bytes of binary or non-UTF-8 content (sha256 {}). \
-                         Text decoding failed; GBK/office decoding and image attachments are \
-                         not migrated on the Rust file tools yet — only this metadata is \
-                         returned.]",
+                         Text decoding failed; unsupported binary or non-UTF-8 data is \
+                         not treated as readable text — only this metadata is returned.]",
                         bytes.len(),
                         hex(&Sha256::digest(&bytes)),
                     ),
@@ -2000,7 +2120,14 @@ impl FileTools {
                 )
             }
         };
-        if matches!(outcome, ToolOutcome::Success { .. }) {
+        let mut outcome = outcome;
+        if let ToolOutcome::Success { result } = &mut outcome {
+            result.details = Some(
+                serde_json::json!({"source":source,"format":"text-or-binary"})
+                    .as_object()
+                    .unwrap()
+                    .clone(),
+            );
             self.freshness
                 .observe_read(&session, &scope.path, fingerprint, read_key);
         }
@@ -2694,9 +2821,7 @@ enum TextDecode {
     Binary,
 }
 
-/// UTF-8 with BOM strip (the incumbent `decodeBuffer`'s valid-UTF-8
-/// path); anything else is binary (the GBK/office legs are registered
-/// as not migrated).
+/// 普通文本移除 UTF-8 BOM；其余编码明确按未解码内容处理。
 fn decode_text(bytes: &[u8]) -> TextDecode {
     if bytes.starts_with(&[0xEF, 0xBB, 0xBF]) {
         return match std::str::from_utf8(&bytes[3..]) {
@@ -2898,6 +3023,15 @@ pub fn register_core_file_tools(
     }
 }
 
+/// 仅在宿主内部传递本次已授权、已校验版本的像素。
+struct ReadImage {
+    input: lingxi_kernel::model_exchange::InputImage,
+    source: serde_json::Value,
+    canonical: PathBuf,
+    fingerprint: FileFingerprint,
+    read_key: String,
+}
+
 /// One executor bound to one target (read / write / edit). Dispatches
 /// through the T02 gateway ONLY — the executor is never callable from
 /// business code directly (boundary check B1).
@@ -2916,7 +3050,7 @@ impl ToolExecutorPort for CoreFileExecutor {
     fn execute<'a>(
         &'a self,
         ctx: &'a RunContext,
-        _call: &'a ToolCallId,
+        call: &'a ToolCallId,
         request: &'a ToolRequest,
     ) -> Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         // 等待 future 取消后阻塞池仍会继续实际文件作业；许可必须随 closure 真正退出。
@@ -2926,6 +3060,7 @@ impl ToolExecutorPort for CoreFileExecutor {
         let args = request.arguments.as_value().clone();
         // Tokio 阻塞池不继承任务局部值；必须显式带上本轮已经冻结的工作区。
         let workspace = crate::toolgateway::workspace();
+        let call = call.clone();
         Box::pin(async move {
             let retained = match crate::task_supervisor::retain_blocking_run_permit(&ctx) {
                 Ok(permit) => permit,
@@ -2937,21 +3072,67 @@ impl ToolExecutorPort for CoreFileExecutor {
                 }
             };
             let work_ctx = ctx.clone();
-            let outcome = tokio::task::spawn_blocking(move || {
+            let read_tools = Arc::clone(&tools);
+            let (mut outcome, image) = tokio::task::spawn_blocking(move || {
                 let _retained_permit = retained;
-                crate::toolgateway::with_workspace(workspace, || match kind {
-                    FileToolKind::Read => tools.run_read(&work_ctx, &args),
-                    FileToolKind::Write => tools.run_write(&work_ctx, &args),
-                    FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
+                crate::toolgateway::with_workspace(workspace, || {
+                    let mut image = None;
+                    let outcome = match kind {
+                        FileToolKind::Read => tools.run_read(&work_ctx, &args, &mut image),
+                        FileToolKind::Write => tools.run_write(&work_ctx, &args),
+                        FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
+                    };
+                    (outcome, image)
                 })
             })
             .await
             .unwrap_or_else(|join_err| {
-                failed(
-                    ErrorCode::Internal,
-                    format!("file executor worker panicked: {join_err}"),
+                (
+                    failed(
+                        ErrorCode::Internal,
+                        format!("file executor worker panicked: {join_err}"),
+                    ),
+                    None,
                 )
             });
+            if let Some(image) = image {
+                outcome = match read_tools.read_vision.get() {
+                    None => failed(
+                        ErrorCode::UpstreamUnavailable,
+                        "image read requires a configured auxiliary vision bridge".into(),
+                    ),
+                    Some(bridge) => {
+                        match bridge
+                            .describe(
+                                &ctx,
+                                &call,
+                                image.input,
+                                image
+                                    .canonical
+                                    .file_name()
+                                    .and_then(|v| v.to_str())
+                                    .unwrap_or("image"),
+                            )
+                            .await
+                        {
+                            Err(error) => failed(ErrorCode::UpstreamUnavailable, error),
+                            Ok(note) => {
+                                let mut value = text_success(format!("Read image file\nSource: {}\nSHA256: {}\n[Vision analysis of untrusted image]\n{note}", image.source["path"].as_str().unwrap_or("image"), image.source["sha256"].as_str().unwrap_or("")),false,Vec::new());
+                                if let ToolOutcome::Success { result } = &mut value {
+                                    result.details=Some(serde_json::json!({"source":image.source,"visionAdapted":true}).as_object().unwrap().clone());
+                                }
+                                read_tools.freshness.observe_read(
+                                    ctx.session_id.as_str(),
+                                    &image.canonical,
+                                    image.fingerprint,
+                                    image.read_key,
+                                );
+                                value
+                            }
+                        }
+                    }
+                };
+            }
             ToolExecutionResult::of_ctx(&ctx, outcome)
         })
     }

@@ -368,7 +368,48 @@ fn excel_date(value: &str, date1904: bool) -> Result<String, String> {
     Ok(date.to_rfc3339_opts(chrono::SecondsFormat::Millis, true))
 }
 pub fn xlsx(bytes: &[u8]) -> Result<ConvertedDocument, String> {
+    xlsx_sheet(&mut Package::new(bytes)?, 0)
+}
+
+/// 工具读取按现役上限提取前八张表；所有解压共用同一预算，超出表数明确返回。
+pub fn xlsx_for_read(bytes: &[u8]) -> Result<(String, usize), String> {
     let mut package = Package::new(bytes)?;
+    let workbook = package.required("xl/workbook.xml")?;
+    let sheets: Vec<_> = workbook
+        .child("sheets")
+        .ok_or("xlsx worksheets missing")?
+        .children
+        .iter()
+        .filter(|n| n.name == "sheet")
+        .collect();
+    if sheets.is_empty() {
+        return Err("xlsx worksheets missing".into());
+    }
+    let mut text = String::new();
+    for (index, sheet) in sheets.iter().take(8).enumerate() {
+        match xlsx_sheet(&mut package, index) {
+            Ok(document) => {
+                text.push_str(&format!(
+                    "[Sheet: {}]\n{}\n",
+                    sheet.attr("name").unwrap_or("unnamed"),
+                    document.text
+                ));
+            }
+            Err(error) if error == "xlsx has no rows" => {}
+            Err(error) => return Err(error),
+        }
+    }
+    let omitted = sheets.len().saturating_sub(8);
+    if omitted > 0 {
+        text.push_str(&format!(
+            "[Workbook truncated: showing 8/{} sheets]",
+            sheets.len()
+        ));
+    }
+    Ok((text, omitted))
+}
+
+fn xlsx_sheet(package: &mut Package<'_>, index: usize) -> Result<ConvertedDocument, String> {
     let workbook = package.required("xl/workbook.xml")?;
     let date1904 = match workbook
         .child("workbookPr")
@@ -378,10 +419,10 @@ pub fn xlsx(bytes: &[u8]) -> Result<ConvertedDocument, String> {
         Some("1" | "true") => true,
         _ => return Err("invalid workbook calendar".into()),
     };
-    let date_styles = date_styles(&mut package)?;
+    let date_styles = date_styles(package)?;
     let first = workbook
         .child("sheets")
-        .and_then(|n| n.child("sheet"))
+        .and_then(|n| n.children.iter().filter(|n| n.name == "sheet").nth(index))
         .ok_or("xlsx has no rows")?;
     let id = first.attr("id").ok_or("xlsx worksheet identity missing")?;
     let rels = package.required("xl/_rels/workbook.xml.rels")?;

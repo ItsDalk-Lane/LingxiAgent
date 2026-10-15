@@ -83834,7 +83834,7 @@
         "不存在、越权或解析失败显式说明，不泄漏路径外内容。"
       ],
       "then": "返回文件内容与来源；图片可走视觉桥，Office可抽取文本；不改原文件。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -83848,9 +83848,29 @@
               "package": "lingxi-service",
               "suite": "r04_t04_file_tools",
               "test": "r04_a08_symlinks_are_judged_by_their_real_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_refusals_never_send_foreign_pixels_or_register_products"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss"
             }
           ],
-          "meaning": "正式read输入绑定真实目标文件，预设字节与文本精确核对。",
+          "meaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
@@ -84041,6 +84061,218 @@
                   "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 409,
+              "testEndLine": 526,
+              "assertions": [
+                {
+                  "line": 448,
+                  "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+                },
+                {
+                  "line": 460,
+                  "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+                },
+                {
+                  "line": 476,
+                  "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+                },
+                {
+                  "line": 485,
+                  "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert_eq!(remote.visions(), 1)"
+                },
+                {
+                  "line": 492,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 493,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 494,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 499,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+                },
+                {
+                  "line": 500,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+                },
+                {
+                  "line": 510,
+                  "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+                },
+                {
+                  "line": 519,
+                  "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 523,
+                  "quote": "assert_eq!(remote.visions(), 1)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 529,
+              "testEndLine": 616,
+              "assertions": [
+                {
+                  "line": 558,
+                  "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+                },
+                {
+                  "line": 584,
+                  "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+                },
+                {
+                  "line": 599,
+                  "quote": "assert_eq!(remote.visions(), 0)"
+                },
+                {
+                  "line": 600,
+                  "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 608,
+                  "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+                },
+                {
+                  "line": 612,
+                  "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+                },
+                {
+                  "line": 613,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 619,
+              "testEndLine": 703,
+              "assertions": [
+                {
+                  "line": 627,
+                  "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+                },
+                {
+                  "line": 628,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 639,
+                  "quote": "assert_eq!(code, 201, \"{body}\")"
+                },
+                {
+                  "line": 673,
+                  "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+                },
+                {
+                  "line": 679,
+                  "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 687,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 692,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 706,
+              "testEndLine": 733,
+              "assertions": [
+                {
+                  "line": 724,
+                  "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+                },
+                {
+                  "line": 726,
+                  "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+                },
+                {
+                  "line": 728,
+                  "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+                },
+                {
+                  "line": 729,
+                  "quote": "assert_eq!(remote.visions(), 0)"
+                },
+                {
+                  "line": 730,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
@@ -84053,9 +84285,29 @@
               "package": "lingxi-service",
               "suite": "r04_t04_file_tools",
               "test": "r04_a08_symlinks_are_judged_by_their_real_targets"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_refusals_never_send_foreign_pixels_or_register_products"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss"
             }
           ],
-          "meaning": "越界read准备阶段实际拒绝，无正文返回，敏感源原字节和数量不变。",
+          "meaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
@@ -84113,6 +84365,218 @@
                   "quote": "assert!(std::fs::symlink_metadata(harness.ws.join(\"inner-link.txt\"))\n        .expect(\"link\")\n        .file_type()\n        .is_symlink())"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 409,
+              "testEndLine": 526,
+              "assertions": [
+                {
+                  "line": 448,
+                  "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+                },
+                {
+                  "line": 460,
+                  "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+                },
+                {
+                  "line": 476,
+                  "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+                },
+                {
+                  "line": 485,
+                  "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert_eq!(remote.visions(), 1)"
+                },
+                {
+                  "line": 492,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 493,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 494,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 499,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+                },
+                {
+                  "line": 500,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+                },
+                {
+                  "line": 510,
+                  "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+                },
+                {
+                  "line": 519,
+                  "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 523,
+                  "quote": "assert_eq!(remote.visions(), 1)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 529,
+              "testEndLine": 616,
+              "assertions": [
+                {
+                  "line": 558,
+                  "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+                },
+                {
+                  "line": 584,
+                  "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+                },
+                {
+                  "line": 599,
+                  "quote": "assert_eq!(remote.visions(), 0)"
+                },
+                {
+                  "line": 600,
+                  "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 608,
+                  "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+                },
+                {
+                  "line": 612,
+                  "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+                },
+                {
+                  "line": 613,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 619,
+              "testEndLine": 703,
+              "assertions": [
+                {
+                  "line": 627,
+                  "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+                },
+                {
+                  "line": 628,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 639,
+                  "quote": "assert_eq!(code, 201, \"{body}\")"
+                },
+                {
+                  "line": 673,
+                  "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+                },
+                {
+                  "line": 679,
+                  "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 687,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 692,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 706,
+              "testEndLine": 733,
+              "assertions": [
+                {
+                  "line": 724,
+                  "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+                },
+                {
+                  "line": 726,
+                  "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+                },
+                {
+                  "line": 728,
+                  "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+                },
+                {
+                  "line": 729,
+                  "quote": "assert_eq!(remote.visions(), 0)"
+                },
+                {
+                  "line": 730,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
@@ -84135,9 +84599,29 @@
               "package": "lingxi-service",
               "suite": "r06_original_resource_proofs",
               "test": "registered_read_reports_missing_and_decode_failure_without_foreign_content"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_refusals_never_send_foreign_pixels_or_register_products"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_read_rich",
+              "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss"
             }
           ],
-          "meaning": "新增正式read专属检查覆盖不存在与解码失败的明确说明，真实越权拒绝不泄漏外部内容，保留旧符号链接授权负控。",
+          "meaning": "真实Run的read保持文本分页/截断/去重；无链接非阻塞句柄、20MiB上限和前后实际身份/授权校验，Office有限解析和xlsx前8表/第9表明确truncated，无sheets显式失败。原始SHA和来源进入下一真实模型；真实PNG完整像素通过现有vision辅助槽/共享quota/认证/网络发送，实际描述由下一模型消费。未配置/供应商失败/取消各有真实诚实费用账（取消attempts=NULL，不猜零），同一SID取消后再read和重启不重复收费；越权路径/链接、坏Office/伪PNG、FIFO/过大源零视觉泄漏、零文件产物。直接图像工具块、旧GBK/XLS不以本轮声称支持。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r04_t04_file_tools.rs",
@@ -84393,29 +84877,226 @@
                   "quote": "assert!(fx\n        .state\n        .session_files()\n        .list_files(\"s-proof\")\n        .await\n        .unwrap()\n        .is_empty());"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_office_and_vision_reach_next_model_with_source_and_restart_ledger",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 409,
+              "testEndLine": 526,
+              "assertions": [
+                {
+                  "line": 448,
+                  "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert!(\n                actual.contains(&expected_sha),\n                \"source digest must equal the original file bytes: {actual}\"\n            )"
+                },
+                {
+                  "line": 460,
+                  "quote": "assert!(\n            remote.captures().iter().any(|v| v[\"model\"] == \"chat\"\n                && v[\"messages\"].as_array().is_some_and(|rows| rows\n                    .iter()\n                    .any(|m| m[\"role\"] == \"tool\" && m[\"content\"].to_string().contains(expected)))),\n            \"next model did not consume {expected}\"\n        )"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert!(image_call[\"messages\"]\n        .to_string()\n        .contains(\"data:image/png;base64,\"))"
+                },
+                {
+                  "line": 476,
+                  "quote": "assert!(!image_call\n        .to_string()\n        .contains(&workspace.display().to_string()))"
+                },
+                {
+                  "line": 485,
+                  "quote": "assert!(\n            image_call[\"messages\"].to_string().contains(&exact_pixels),\n            \"provider pixels must exactly match the authorized source snapshot\"\n        )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded' AND provider='remote' AND model='vision' AND input_tokens=13 AND output_tokens=7\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert_eq!(remote.visions(), 1)"
+                },
+                {
+                  "line": 492,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 493,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND parent_tool_call_id IS NOT NULL AND transport_attempts=1\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 494,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 499,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"doc.docx\")).unwrap(), docx)"
+                },
+                {
+                  "line": 500,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"sheet.xlsx\")).unwrap(), xlsx)"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"pixels.png\")).unwrap(), png())"
+                },
+                {
+                  "line": 510,
+                  "quote": "assert_eq!(\n        restarted\n            .count(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage\",\n                vec![]\n            )\n            .await,\n        count\n    )"
+                },
+                {
+                  "line": 519,
+                  "quote": "assert!(restarted\n        .history(\"pixels\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 523,
+                  "quote": "assert_eq!(remote.visions(), 1)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_refusals_never_send_foreign_pixels_or_register_products",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 529,
+              "testEndLine": 616,
+              "assertions": [
+                {
+                  "line": 558,
+                  "quote": "assert_eq!(unsafe { libc::mkfifo(path.as_ptr(), 0o600) }, 0)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert!(actual.contains(expected), \"{sid}: {actual}\")"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert!(!actual.contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert!(!actual.contains(\"NOT-IMAGE-SECRET\"))"
+                },
+                {
+                  "line": 584,
+                  "quote": "assert!(!h\n            .history(\"link\")\n            .await\n            .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert!(h.history(\"fifo\").await.contains(\"regular file\"))"
+                },
+                {
+                  "line": 599,
+                  "quote": "assert_eq!(remote.visions(), 0)"
+                },
+                {
+                  "line": 600,
+                  "quote": "assert!(!serde_json::to_string(&remote.captures())\n        .unwrap()\n        .contains(\"FOREIGN-PIXELS-NOT-DISCLOSED\"))"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 608,
+                  "quote": "assert_eq!(\n        std::fs::read(workspace.join(\"bad.png\")).unwrap(),\n        b\"NOT-IMAGE-SECRET\"\n    )"
+                },
+                {
+                  "line": 612,
+                  "quote": "assert!(!workspace.join(\"missing.txt\").exists())"
+                },
+                {
+                  "line": 613,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND transport_attempts>0\",vec![]).await,\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_vision_failure_and_cancel_keep_honest_fees_and_release_session_lease",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 619,
+              "testEndLine": 703,
+              "assertions": [
+                {
+                  "line": 627,
+                  "quote": "assert!(h.history(\"fail\").await.contains(\"READ-VISION-REAL-400\"))"
+                },
+                {
+                  "line": 628,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='fail' AND outcome='failed' AND transport_attempts=1 AND input_tokens IS NULL\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 639,
+                  "quote": "assert_eq!(code, 201, \"{body}\")"
+                },
+                {
+                  "line": 673,
+                  "quote": "assert!(\n            tokio::time::Instant::now() < deadline,\n            \"cancel accounting did not settle\"\n        )"
+                },
+                {
+                  "line": 679,
+                  "quote": "assert!(!h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 687,
+                  "quote": "assert_eq!(h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE purpose='auxiliary.vision' AND session_id='cancel' AND outcome='succeeded'\",vec![]).await,\"1\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert!(h\n        .history(\"cancel\")\n        .await\n        .contains(\"VISION-ACTUAL-BLACK-PIXELS\"))"
+                },
+                {
+                  "line": 692,
+                  "quote": "assert_eq!(\n        h.count(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_files\", vec![])\n            .await,\n        \"0\"\n    )"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(\n        std::fs::read(h.workspace.join(\"pixels.png\")).unwrap(),\n        png()\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_read_rich.rs",
+              "test": "real_read_xlsx_keeps_eight_sheets_and_reports_the_ninth_without_silent_loss",
+              "sourceSHA256": "93caae77f6716a2433b580f5a4a93150ed84c14f5cf2b0a3a3bbf195db554582",
+              "testStartLine": 706,
+              "testEndLine": 733,
+              "assertions": [
+                {
+                  "line": 724,
+                  "quote": "assert!(actual.contains(&format!(\"WORKSHEET-ORIGINAL-{n}\")))"
+                },
+                {
+                  "line": 726,
+                  "quote": "assert!(!actual.contains(\"WORKSHEET-ORIGINAL-9\"))"
+                },
+                {
+                  "line": 727,
+                  "quote": "assert!(actual.contains(\"Workbook truncated: showing 8/9 sheets\"))"
+                },
+                {
+                  "line": 728,
+                  "quote": "assert!(actual.contains(\"\\\"truncated\\\":true\"))"
+                },
+                {
+                  "line": 729,
+                  "quote": "assert_eq!(remote.visions(), 0)"
+                },
+                {
+                  "line": 730,
+                  "quote": "assert_eq!(std::fs::read(workspace.join(\"nine.xlsx\")).unwrap(), bytes)"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
           "missingClauses": []
         }
       ],
-      "gaps": [
-        {
-          "clause": "图片可走视觉桥，Office可抽取文本",
-          "kind": "IMPLEMENTATION_GAP",
-          "reason": "原Then含该能力；当前read对非法UTF8/二进制只返回尺寸/摘要元数据，明确称GBK/Office解码和图片附件未迁移，不能用第三句错误说明通过冒充整项完成。",
-          "sourceLocations": [
-            {
-              "endLine": 1804,
-              "path": "rust/crates/lingxi-service/src/filetools.rs",
-              "quote": "            );\n        }\n        drop(target);\n        let fingerprint = identity.fingerprint();\n        let outcome = match decode_text(&bytes) {\n            TextDecode::Text(text) => render_text_read(&text, offset, limit),\n            TextDecode::Binary => {\n                // Honest binary/non-UTF-8 result: no mojibake, no silent\n                // GBK guess. The incumbent's GBK/office decoding is a\n                // worker-surface capability (registered not migrated).\n                text_success(\n                    format!(\n                        \"[Read {raw_path}: {} bytes of binary or non-UTF-8 content (sha256 {}). \\\n                         Text decoding failed; GBK/office decoding and image attachments are \\\n                         not migrated on the Rust file tools yet — only this metadata is \\\n                         returned.]\",\n                        bytes.len(),\n                        hex(&Sha256::digest(&bytes)),\n                    ),\n                    false,\n                    Vec::new(),\n                )",
-              "reason": "read的真实二进制分支显式未迁移Office/图片能力。",
-              "startLine": 1783
-            }
-          ]
-        }
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/quickchat-read-proof-review.json"
     },
     {
       "id": "R00-T02-LA-94B9BE3AA7A6",
@@ -93795,14 +94476,91 @@
         "不存在会话或窗口销毁时不应伪称切换成功"
       ],
       "then": "悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "悬浮窗口可见/尺寸改变",
-        "选择会话聚焦主窗并打开该会话",
-        "不存在会话或窗口销毁时不应伪称切换成功"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_quickchat_completion",
+              "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+              "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+              "sourceSHA256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df",
+              "testStartLine": 4,
+              "testEndLine": 38,
+              "assertions": [
+                {
+                  "line": 26,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实快捷窗失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 34,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 35,
+                  "quote": "assert_eq!(value[\"checks\"].as_array().unwrap().len(), 9)"
+                },
+                {
+                  "line": 36,
+                  "quote": "assert!(value[\"modelCalls\"].as_u64().unwrap() > 0)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前生产QuickChatApp/主聊天组件与双真实Electron窗口、CLI、真实HTTP模型共同核对：显示和尺寸改变；实际创建自有会话/一请求一费用账，真正owned switch和主renderer按请求ID/来源摘要/SID/path/连接代际回执确认，主窗真实聚焦后才隐藏。主窗DOM真实包含同一回复；相同路径仍真实服务focus，晚ACK/错owner/不存在会话/main.destroy均明确失败并保留快捷窗；不再无条件隐藏假成功。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_quickchat_completion",
+              "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_quickchat_completion.rs",
+              "test": "original_quick_chat_visible_resize_focus_existing_missing_destroyed_and_late_ack",
+              "sourceSHA256": "a0c8fc9f4519e8ae92368b7fef31ab4b8625f79194a11abd1073d880c8ce32df",
+              "testStartLine": 4,
+              "testEndLine": 38,
+              "assertions": [
+                {
+                  "line": 26,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实快捷窗失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 34,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 35,
+                  "quote": "assert_eq!(value[\"checks\"].as_array().unwrap().len(), 9)"
+                },
+                {
+                  "line": 36,
+                  "quote": "assert!(value[\"modelCalls\"].as_u64().unwrap() > 0)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前生产QuickChatApp/主聊天组件与双真实Electron窗口、CLI、真实HTTP模型共同核对：显示和尺寸改变；实际创建自有会话/一请求一费用账，真正owned switch和主renderer按请求ID/来源摘要/SID/path/连接代际回执确认，主窗真实聚焦后才隐藏。主窗DOM真实包含同一回复；相同路径仍真实服务focus，晚ACK/错owner/不存在会话/main.destroy均明确失败并保留快捷窗；不再无条件隐藏假成功。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/quickchat-read-proof-review.json"
     },
     {
       "id": "R00-T02-LA-A3FE8FD26CB4",

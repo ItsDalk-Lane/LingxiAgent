@@ -83,9 +83,14 @@ contextBridge.exposeInMainWorld("hana", {
   quickChatShow: () => ipcRenderer.invoke("quick-chat-show"),
   quickChatHide: () => ipcRenderer.invoke("quick-chat-hide"),
   quickChatResize: (mode) => ipcRenderer.invoke("quick-chat-resize", mode),
-  quickChatOpenSession: (sessionPath) => ipcRenderer.invoke("quick-chat-open-session", sessionPath),
+  quickChatOpenSession: (target) => ipcRenderer.invoke("quick-chat-open-session", target),
   onQuickChatOpenSession: (cb) => {
-    const handler = (_, payload) => cb(payload);
+    const handler = (_, payload) => {
+      Promise.resolve().then(() => cb(payload)).then(
+        result => ipcRenderer.invoke("quick-chat-open-session-ack", { ...result, requestId: payload.requestId }),
+        () => ipcRenderer.invoke("quick-chat-open-session-ack", { ok: false, requestId: payload.requestId, code: "QUICK_CHAT_SWITCH_FAILED", message: "主窗口未能打开该会话" }),
+      ).catch(error => console.error("[quick-chat] 会话确认发送失败：", error.message));
+    };
     ipcRenderer.on("quick-chat-open-session", handler);
     return () => ipcRenderer.removeListener("quick-chat-open-session", handler);
   },

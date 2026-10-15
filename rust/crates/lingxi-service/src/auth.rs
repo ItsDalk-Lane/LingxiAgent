@@ -969,6 +969,9 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             return RoutePolicy::LocalOnly;
         }
     }
+    if p == "/lingxi/v1/preferences/session-permission-default" {
+        return if m=="GET" || m=="HEAD" { RoutePolicy::Scope("settings.read") } else { RoutePolicy::LocalOnly };
+    }
     // R06 A 块读回叶：运行时状态键 / 实验读写 / 观察记录（现役
     // experiments.ts：读无显式 scope 门（本地读面）、PATCH settings.write；
     // observation 读写面按 settings 分类）。

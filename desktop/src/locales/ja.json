@@ -35,6 +35,8 @@
     "copySource": "ソースをコピー"
   },
   "quickChat": {
+    "title": "クイックチャット",
+    "openSessionFailed": "会話を開けませんでした。クイックチャットは開いたままです。",
     "close": "クイックチャットを閉じる",
     "openFullSession": "完全な会話を開く",
     "waitingReply": "返信を待っています...",
