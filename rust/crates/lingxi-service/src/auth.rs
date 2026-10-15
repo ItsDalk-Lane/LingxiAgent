@@ -528,6 +528,9 @@ pub enum RoutePolicy {
 /// R02, local_only is the strictest available default).
 pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     let m = method.to_ascii_uppercase();
+    if m == "POST" && path.strip_prefix("/lingxi/v1/task/").and_then(|p|p.strip_suffix("/abort")).is_some_and(|id|!id.is_empty()&&!id.contains('/')) {
+        return RoutePolicy::Scope("chat");
+    }
     // 与 Axum 的实际路由保持精确匹配；不能把未注册的 `/health/` 当作公开路由。
     let p = path;
 

@@ -785,14 +785,13 @@ async fn thread_registry_refusal_leaves_no_permanent_reservations() {
     teardown(&state, &home).await;
 }
 
-/// Cancellation landing while the child is parked in the MODEL admission
-/// queue (before its first provider call): the child settles `cancelled`
-/// with ZERO provider calls for it — the pre-external-action window of an
-/// inherited cancellation.
+/// 子任务在真实模型队列中尚未调用供应商时取消父任务，保持零调用。
+/// 用独立会话真实占住唯一名额，不把全局占用数误当成父任务已占用。
 #[tokio::test(flavor = "current_thread")]
 async fn parent_cancel_before_the_childs_first_provider_call_settles_with_zero_calls() {
     let thread_slot = Arc::new(Mutex::new(None::<String>));
-    let parent_turn2_gate = Arc::new(tokio::sync::Semaphore::new(0));
+    let parent_dispatch_gate = Arc::new(tokio::sync::Semaphore::new(0));
+    let neighbor_gate = Arc::new(tokio::sync::Semaphore::new(0));
     let provider = ScriptedProvider::new(
         vec![
             (
@@ -811,8 +810,15 @@ async fn parent_cancel_before_the_childs_first_provider_call_settles_with_zero_c
                 "KID".to_string(),
                 vec![Step::Turn(final_turn("child never runs"))],
             ),
+            (
+                "BLOCKER".to_string(),
+                vec![Step::Turn(final_turn("unrelated neighbor finishes"))],
+            ),
         ],
-        vec![(("P".to_string(), 2), Arc::clone(&parent_turn2_gate))],
+        vec![
+            (("P".to_string(), 1), Arc::clone(&parent_dispatch_gate)),
+            (("BLOCKER".to_string(), 1), Arc::clone(&neighbor_gate)),
+        ],
         Arc::clone(&thread_slot),
     );
     let tools = Arc::new(ParkingTool {
@@ -838,19 +844,39 @@ async fn parent_cancel_before_the_childs_first_provider_call_settles_with_zero_c
     .await;
 
     let parent = spawn_execute(&state, "sess_local_alpha", "P: dispatch".to_string());
-    // Turn 1 dispatches; turn 2 parks HOLDING the only model permit; the
-    // child's first model call parks in the admission queue.
-    wait_until("the child queues behind the parked parent turn", || {
+    wait_until("parent first model response is held", || {
+        provider.pops.lock().unwrap().get("P") == Some(&1)
+    })
+    .await;
+    let neighbor = spawn_execute(
+        &state,
+        "sess_local_beta",
+        "BLOCKER: owns the actual model lane".to_string(),
+    );
+    wait_until("neighbor is queued before dispatching a child", || {
         state
             .runs()
             .quotas()
-            .in_use(lingxi_service::QuotaResource::Model)
+            .waiting(lingxi_service::QuotaResource::Model)
             == 1
+    })
+    .await;
+    parent_dispatch_gate.add_permits(1);
+    // 先排队的Beta拿到唯一名额，父任务下一轮与子任务都在真实队列中等待。
+    wait_until("the child queues behind the actual neighbor", || {
+        let pops = provider.pops.lock().unwrap();
+        pops.get("BLOCKER") == Some(&1)
+            && pops.get("KID").copied().unwrap_or(0) == 0
+            && state
+                .runs()
+                .quotas()
+                .in_use(lingxi_service::QuotaResource::Model)
+                == 1
             && state
                 .runs()
                 .quotas()
                 .waiting(lingxi_service::QuotaResource::Model)
-                == 1
+                == 2
     })
     .await;
     let child = latest_subagent_child_of(&state)
@@ -864,6 +890,17 @@ async fn parent_cancel_before_the_childs_first_provider_call_settles_with_zero_c
     )
     .await
     .expect("parent row");
+    assert_eq!(
+        query_text(
+            &state,
+            "SELECT COUNT(*) FROM key_events WHERE run_id=?1 AND event_type='model_call_started'",
+            &child
+        )
+        .await
+        .as_deref(),
+        Some("0"),
+        "取消前先确认真实子任务尚未调用模型"
+    );
 
     // Cancel the parent: the queue wait must exit, the child must settle
     // `cancelled` WITHOUT its provider ever being called.
@@ -901,6 +938,19 @@ async fn parent_cancel_before_the_childs_first_provider_call_settles_with_zero_c
     assert!(
         tools.arrivals.lock().unwrap().is_empty(),
         "ZERO tool executions through the whole scenario"
+    );
+    assert!(
+        state
+            .sessions()
+            .session_supervisor()
+            .is_busy("sess_local_beta"),
+        "取消父任务不能解除独立邻会话的模型占用"
+    );
+    neighbor_gate.add_permits(1);
+    let neighbor_run = neighbor.await.expect("unrelated neighbor finishes");
+    assert_eq!(
+        run_status(&state, &neighbor_run).await.as_deref(),
+        Some("completed")
     );
     teardown(&state, &home).await;
 }
@@ -1218,7 +1268,7 @@ async fn late_and_duplicate_completions_cannot_corrupt_the_closeout() {
 
     // Run 2 (KID2): a fresh parent replies — the middle child completes
     // NORMALLY (its real completion is the accounted one).
-    let _second = spawn_execute(&state, "sess_local_alpha", "P2: reply".to_string());
+    let second = spawn_execute(&state, "sess_local_alpha", "P2: reply".to_string());
     let middle_child = wait_for_next_subagent_child(&state, &[first_child.as_str()]).await;
     wait_status(
         &state,
@@ -1233,9 +1283,15 @@ async fn late_and_duplicate_completions_cannot_corrupt_the_closeout() {
     .await;
     assert_eq!(state.subagents().active_counts("sess_local_alpha"), (0, 0));
 
+    // 子任务结束不表示父任务已释放会话门；先观察真实父任务完成再开下一轮。
+    let second_run = second.await.expect("second parent really exits");
+    assert_eq!(
+        run_status(&state, &second_run).await.as_deref(),
+        Some("completed")
+    );
     // Run 3 (KID3): another reply — the CURRENT run parks, holding
     // exactly one lane pair.
-    let _third = spawn_execute(&state, "sess_local_alpha", "P3: reply".to_string());
+    let third = spawn_execute(&state, "sess_local_alpha", "P3: reply".to_string());
     wait_until("the current child is busy", || {
         busy_thread_of(&state, "sess_local_alpha").is_some()
     })
@@ -1301,6 +1357,15 @@ async fn late_and_duplicate_completions_cannot_corrupt_the_closeout() {
     })
     .await;
     assert_eq!(state.subagents().active_counts("sess_local_alpha"), (0, 0));
+    let third_run = query_text(
+        &state,
+        "SELECT parent_run_id FROM run_lineage WHERE run_id=?1",
+        &current_child,
+    )
+    .await
+    .expect("third parent lineage");
+    cancel_parent(&state, &third_run).await;
+    assert_eq!(third.await.expect("third parent exits cleanly"), third_run);
     teardown(&state, &home).await;
 }
 

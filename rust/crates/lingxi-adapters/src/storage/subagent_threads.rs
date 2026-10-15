@@ -298,6 +298,53 @@ pub async fn progress(
     }).await
 }
 
+/// 后台任务按不可复用的真实子 Run 定位，旧任务不能误指向线程的新一轮。
+pub async fn background_tasks(
+    db: &RunDatabase,
+    session: Option<&str>,
+    task: Option<&str>,
+) -> Result<Vec<Value>, StorageError> {
+    let session = session.map(str::to_string);
+    let task = task.map(str::to_string);
+    db.queue().submit(move |conn| {
+        let mut statement = conn.prepare(
+            "SELECT h.run_id,t.thread_id,t.parent_session_id,t.state_json,r.status,r.terminal_reason,r.created_at_unix_ms,h.history_json \
+             FROM subagent_history_v1 h JOIN subagent_threads_v1 t ON t.thread_id=h.thread_id \
+             JOIN runs r ON r.run_id=h.run_id \
+             WHERE (?1 IS NULL OR t.parent_session_id=?1) AND (?2 IS NULL OR h.run_id=?2) \
+             ORDER BY r.created_at_unix_ms,h.run_id LIMIT 1001"
+        ).map_err(map_rusqlite)?;
+        let found = statement.query_map(params![session,task], |row| Ok((
+            row.get::<_,String>(0)?,row.get::<_,String>(1)?,row.get::<_,String>(2)?,
+            row.get::<_,String>(3)?,row.get::<_,String>(4)?,row.get::<_,Option<String>>(5)?,row.get::<_,i64>(6)?,row.get::<_,String>(7)?
+        ))).map_err(map_rusqlite)?;
+        let mut out = Vec::new();
+        for found in found {
+            let (run,thread,session,raw,status,reason,created,history) = found.map_err(map_rusqlite)?;
+            let state = decode(&raw)?;
+            let current = state["childRunId"].as_str()==Some(run.as_str());
+            let deferred = match status.as_str() {
+                "completed" => "resolved",
+                "failed"|"cancelled"|"interrupted" => "failed",
+                _ => "pending",
+            };
+            // 线程续接后，旧任务读自己的正式历史，不能冒用新一轮结果。
+            let result = if current {state["result"].clone()} else if status=="completed" {
+                let history=decode(&history)?;
+                history.as_array().ok_or_else(||invalid("task history is not an array"))?.iter().rev()
+                    .find(|item|item["kind"]=="assistant").map(|item|item["content"].clone())
+                    .unwrap_or_else(||json!({"terminalReason":reason}))
+            } else {json!({"terminalReason":reason})};
+            out.push(json!({"taskId":run,"threadId":thread,"parentSessionId":session,
+                "type":"subagent","status":deferred,"runStatus":status,"deferredAtUnixMs":created,
+                "reason":reason,"result":result,
+                "meta":{"type":"subagent","threadId":thread}}));
+        }
+        if out.len()>1000 {return Err(invalid("too many background tasks; archive older sessions before listing"));}
+        Ok(out)
+    }).await
+}
+
 /// 旧可信宿主直接驱动的无子线程Run不读取父历史；已有线程缺档案则响亮拒绝。
 pub async fn has_history(db: &RunDatabase, run: &str) -> Result<bool, StorageError> {
     let run = run.to_string();

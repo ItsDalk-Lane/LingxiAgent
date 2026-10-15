@@ -536,6 +536,16 @@ where
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "snake_case", tag = "type", deny_unknown_fields)]
 pub enum WsClientRequest {
+    SubagentStopRequest {
+        #[serde(default, rename = "sessionId")]
+        session_id: Option<String>,
+        #[serde(default, rename = "sessionPath")]
+        session_path: Option<String>,
+        #[serde(rename = "taskId")]
+        task_id: String,
+        #[serde(default, rename = "requestId")]
+        request_id: Option<String>,
+    },
     Slash {
         #[serde(rename = "sessionId")]
         session_id: String,

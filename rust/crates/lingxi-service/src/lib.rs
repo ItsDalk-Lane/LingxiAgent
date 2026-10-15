@@ -28,6 +28,7 @@ pub mod approval_service;
 pub mod artifactverify;
 pub mod auth;
 pub mod background;
+pub mod background_tasks;
 pub mod bridgemedia;
 pub mod cancel;
 pub mod cardguide;
@@ -2000,6 +2001,13 @@ impl ServiceState {
                     detail: e.to_string(),
                 })
             })?;
+        }
+        if let Some(gateway) = deps.tool_gateway.as_ref() {
+            background_tasks::register(
+                gateway.registry(), gateway,
+                Arc::new(background_tasks::TaskTools::new(Arc::clone(&storage), Arc::downgrade(&runs), operations_entry.clone())),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
         }
         let background = background::BackgroundDriveRegistry::new();
         // R03-T07: the STARTUP RECOVERY SCAN. Every non-terminal run a
@@ -6475,6 +6483,10 @@ async fn run_ws_session<IO>(
                         };
                         let mood_request = matches!(&request, ws::WsClientRequest::SubscribeMood { .. });
                         match request {
+                            ws::WsClientRequest::SubagentStopRequest {session_id, session_path, task_id, request_id} => {
+                                let result = background_tasks::ws_stop(&state, &principal, background_tasks::StopBody {session_id,session_path}, &task_id, request_id).await;
+                                if ws::write_ws_text(&mut writer, &canon::canonical_json_bytes(&result)).await.is_err() {return;}
+                            }
                             ws::WsClientRequest::Slash { session_id, text, agent_id } => {
                                 if !slash_tasks.is_empty() {
                                     let error = ProtocolError::new(ErrorCode::Conflict, "slash command already active on this connection", true);
@@ -7053,6 +7065,7 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/sessions/{session_id}/deferred-rewind",
             get(sessiontools::deferred_route),
         )
+        .route("/lingxi/v1/task/{task_id}/abort", post(background_tasks::stop_route))
         .route(
             "/lingxi/v1/sessions/{session_id}/prompt-snapshot",
             get(session_prompt::get_route),

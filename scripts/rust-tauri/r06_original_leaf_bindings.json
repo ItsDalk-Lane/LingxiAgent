@@ -1650,21 +1650,21 @@
             {
               "path": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
               "test": "child_provider_panic_closes_out_and_the_thread_continues",
-              "sourceSHA256": "599660719489cf2d5026a7541ca695d731d7e8ead7ae9cc7ee8f8de0129c95be",
-              "testStartLine": 914,
-              "testEndLine": 1024,
+              "sourceSHA256": "b30fa0fb84fb9cccda1c8c3c2b734765cc2a004aa2a28f47657b36b59422f627",
+              "testStartLine": 964,
+              "testEndLine": 1066,
               "assertions": [
                 {
-                  "line": 979,
-                  "quote": "    assert_eq!((per_session, global), (0, 0));"
+                  "line": 1029,
+                  "quote": "assert_eq!((per_session, global), (0, 0))"
                 },
                 {
-                  "line": 991,
-                  "quote": "    assert_eq!(\n        run_status(&state, &parent_run).await.as_deref(),\n        Some(\"completed\")\n    );"
+                  "line": 1041,
+                  "quote": "assert_eq!(\n        run_status(&state, &parent_run).await.as_deref(),\n        Some(\"completed\")\n    )"
                 },
                 {
-                  "line": 999,
-                  "quote": "    assert_ne!(continuation, child);"
+                  "line": 1049,
+                  "quote": "assert_ne!(continuation, child)"
                 }
               ]
             },
@@ -2095,58 +2095,58 @@
             {
               "path": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
               "test": "thread_registry_refusal_leaves_no_permanent_reservations",
-              "sourceSHA256": "599660719489cf2d5026a7541ca695d731d7e8ead7ae9cc7ee8f8de0129c95be",
+              "sourceSHA256": "b30fa0fb84fb9cccda1c8c3c2b734765cc2a004aa2a28f47657b36b59422f627",
               "testStartLine": 678,
-              "testEndLine": 792,
+              "testEndLine": 786,
               "assertions": [
                 {
                   "line": 741,
-                  "quote": "    assert_eq!(\n        run_status(&state, &parent_b_run).await.as_deref(),\n        Some(\"completed\")\n    );"
+                  "quote": "assert_eq!(\n        run_status(&state, &parent_b_run).await.as_deref(),\n        Some(\"completed\")\n    )"
                 },
                 {
                   "line": 746,
-                  "quote": "    assert!(state.subagents().threads_of(\"sess_local_beta\").is_empty());"
+                  "quote": "assert!(state.subagents().threads_of(\"sess_local_beta\").is_empty())"
                 },
                 {
                   "line": 748,
-                  "quote": "    assert_eq!(per_session, 0);"
+                  "quote": "assert_eq!(per_session, 0)"
                 },
                 {
                   "line": 757,
-                  "quote": "    assert_eq!(\n        refused_children.as_deref(),\n        Some(\"1\"),\n        \"exactly ONE subagent child exists (the refusing dispatch created zero)\"\n    );"
+                  "quote": "assert_eq!(\n        refused_children.as_deref(),\n        Some(\"1\"),\n        \"exactly ONE subagent child exists (the refusing dispatch created zero)\"\n    )"
                 },
                 {
                   "line": 771,
-                  "quote": "    assert!(\n        refusal.contains(\"registry\"),\n        \"the registry-cap refusal reached the model: {refusal}\"\n    );"
+                  "quote": "assert!(\n        refusal.contains(\"registry\"),\n        \"the registry-cap refusal reached the model: {refusal}\"\n    )"
                 },
                 {
                   "line": 776,
-                  "quote": "    assert!(busy_thread_of(&state, \"sess_local_alpha\").is_some());"
+                  "quote": "assert!(busy_thread_of(&state, \"sess_local_alpha\").is_some())"
                 },
                 {
                   "line": 781,
-                  "quote": "    assert_eq!(\n        run_status(&state, &parent_a_run).await.as_deref(),\n        Some(\"completed\")\n    );"
+                  "quote": "assert_eq!(\n        run_status(&state, &parent_a_run).await.as_deref(),\n        Some(\"completed\")\n    )"
                 }
               ]
             },
             {
               "path": "rust/crates/lingxi-service/tests/subagent_closeout.rs",
               "test": "child_provider_panic_closes_out_and_the_thread_continues",
-              "sourceSHA256": "599660719489cf2d5026a7541ca695d731d7e8ead7ae9cc7ee8f8de0129c95be",
-              "testStartLine": 914,
-              "testEndLine": 1024,
+              "sourceSHA256": "b30fa0fb84fb9cccda1c8c3c2b734765cc2a004aa2a28f47657b36b59422f627",
+              "testStartLine": 964,
+              "testEndLine": 1066,
               "assertions": [
                 {
-                  "line": 979,
-                  "quote": "    assert_eq!((per_session, global), (0, 0));"
+                  "line": 1029,
+                  "quote": "assert_eq!((per_session, global), (0, 0))"
                 },
                 {
-                  "line": 991,
-                  "quote": "    assert_eq!(\n        run_status(&state, &parent_run).await.as_deref(),\n        Some(\"completed\")\n    );"
+                  "line": 1041,
+                  "quote": "assert_eq!(\n        run_status(&state, &parent_run).await.as_deref(),\n        Some(\"completed\")\n    )"
                 },
                 {
-                  "line": 999,
-                  "quote": "    assert_ne!(continuation, child);"
+                  "line": 1049,
+                  "quote": "assert_ne!(continuation, child)"
                 }
               ]
             },
@@ -65152,7 +65152,7 @@
         "无store/无会话显示不可用或空结果；不应以其他会话任务充数。"
       ],
       "then": "返回当前会话 pending/resolved/failed 项及结果，不跨会话。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -65161,6 +65161,22 @@
               "package": "lingxi-service",
               "suite": "r06_todo_panel",
               "test": "cancel_semantics_version_mismatch_and_isolation"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourcePath": "rust/crates/lingxi-service/src/background_tasks.rs"
             }
           ],
           "proofLocations": [
@@ -65232,11 +65248,226 @@
                   "quote": "assert_eq!(\n        stored_entries(&server, \"s-other\").await.len(),\n        1,\n        \"对照会话存储不变\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 373,
+              "testEndLine": 514,
+              "assertions": [
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(success(&unavailable)[\"reason\"], \"no_handler\")"
+                },
+                {
+                  "line": 430,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert!(matches!(\n        unavailable_runtime_tool(&h, &missing, \"check_pending_tasks\", json!({})).await,\n        ToolOutcome::Failed { .. }\n    ))"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 445,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a)"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert!(!all.to_string().contains(&b))"
+                },
+                {
+                  "line": 448,
+                  "quote": "assert_eq!(pending[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 449,
+                  "quote": "assert_eq!(success(&outcomes[3])[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(success(&outcomes[4])[\"tasks\"][0][\"status\"], \"failed\")"
+                },
+                {
+                  "line": 456,
+                  "quote": "assert_eq!(success(&outcomes[5])[\"status\"], \"already_stopped\")"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert_eq!(success(&outcomes[6])[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 458,
+                  "quote": "assert!(matches!(outcomes[7], ToolOutcome::Failed { .. }))"
+                },
+                {
+                  "line": 459,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM key_events WHERE run_id=?1\",\n                vec![a.clone()]\n            )\n            .await\n            .unwrap(),\n        before,\n        \"停止后旧模型不能产生新的结果或事件\"\n    )"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert!(\n        cancelled.contains(\"cancelled\"),\n        \"保留真实取消原因：{cancelled}\"\n    )"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert!(\n        !cancelled.contains(\"真实模型结果\"),\n        \"停止后不能写入迟到模型正文\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 517,
+              "testEndLine": 607,
+              "assertions": [
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(resolved[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert_eq!(resolved[\"tasks\"][0][\"taskId\"], first)"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert!(resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第一轮真实独有结果\"))"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert!(!resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第二轮真实独有结果\"))"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(\n        success(&provider.outcomes(\"parent-a\")[3])[\"status\"],\n        \"already_stopped\"\n    )"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(tasks(&h, \"sess_local_alpha\")\n        .await\n        .iter()\n        .any(|task| task[\"taskId\"] != first && task[\"status\"] == \"pending\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourceSHA256": "7a917a34252131313604bf1df9c70351ce2f842ee40421292a0e2d3eb1e8fc95",
+              "testStartLine": 286,
+              "testEndLine": 473,
+              "assertions": [
+                {
+                  "line": 356,
+                  "quote": "assert_ne!(a.task_id, b.task_id)"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_ne!(b.task_id, independent.task_id)"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 3)"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a.task_id)"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"type\"], \"video\")"
+                },
+                {
+                  "line": 368,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert!(all[\"tasks\"][0][\"deferredAt\"]\n            .as_str()\n            .unwrap()\n            .ends_with('Z'))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &b.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"session_mismatch\"\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &independent.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"stable_session_required\"\n        )"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, true)\n                .await\n                .unwrap()[\"reason\"],\n            \"not_found\",\n            \"仅子代理入口不能终止媒体任务\"\n        )"
+                },
+                {
+                  "line": 409,
+                  "quote": "assert_eq!(stop[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 410,
+                  "quote": "assert_eq!(stop[\"remoteCancel\"], \"unsupported\")"
+                },
+                {
+                  "line": 411,
+                  "quote": "assert_eq!(stop[\"localDeliveryStopped\"], true)"
+                },
+                {
+                  "line": 413,
+                  "quote": "assert!(matches!(\n            poll.await.unwrap().unwrap(),\n            MediaTaskStatus::CancelledLocally { .. }\n        ))"
+                },
+                {
+                  "line": 417,
+                  "quote": "assert_eq!(downloads.load(Ordering::SeqCst), 0)"
+                },
+                {
+                  "line": 418,
+                  "quote": "assert!(\n            !products.exists() || std::fs::read_dir(&products).unwrap().next().is_none(),\n            \"迟到供应商结果不得产出文件\"\n        )"
+                },
+                {
+                  "line": 422,
+                  "quote": "assert_eq!(\n            operations.owned_background_tasks(\"sess_local_beta\")[0][\"status\"],\n            \"pending\"\n        )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(tools\n            .list(\"sess_local_alpha\", Some(\"pending\"))\n            .await\n            .unwrap()[\"tasks\"]\n            .as_array()\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert_eq!(\n            tools\n                .list(\"sess_local_alpha\", Some(\"failed\"))\n                .await\n                .unwrap()[\"tasks\"][0][\"reason\"],\n            \"cancelled_locally\"\n        )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_ne!(\n            next.task_id, a.task_id,\n            \"供应商复用id不能重用会话宿主taskId\"\n        )"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 462,
+                  "quote": "assert!(\n            operations\n                .owned_background_tasks(\"sess_local_alpha\")\n                .iter()\n                .any(|task| task[\"taskId\"] == next.task_id && task[\"status\"] == \"pending\"),\n            \"旧id停止不影响新一轮媒体任务\"\n        )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 4)"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
           "missingClauses": [],
-          "meaning": "The panel read returns only the owning session's items (cross-session isolation asserted)."
+          "meaning": "正式模型目录check_pending_tasks只读当前会话真实子Run与宿主归属媒体任务；pending/resolved/failed按真实状态过滤，恢复已结束旧子任务的自有结果、不冒用同线程新结果；没有会话明确失败且不混入其他会话。时间为真实提交时间；无归属独立operation不猜作当前任务。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。"
         },
         {
           "index": 1,
@@ -65250,6 +65481,22 @@
               "package": "lingxi-service",
               "suite": "r06_todo_panel",
               "test": "version_hash_matches_incumbent_shape"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourcePath": "rust/crates/lingxi-service/src/background_tasks.rs"
             }
           ],
           "proofLocations": [
@@ -65410,11 +65657,226 @@
                   "quote": "assert_eq!(todos::compute_todo_list_version(&items), expected)"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 373,
+              "testEndLine": 514,
+              "assertions": [
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(success(&unavailable)[\"reason\"], \"no_handler\")"
+                },
+                {
+                  "line": 430,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert!(matches!(\n        unavailable_runtime_tool(&h, &missing, \"check_pending_tasks\", json!({})).await,\n        ToolOutcome::Failed { .. }\n    ))"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 445,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a)"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert!(!all.to_string().contains(&b))"
+                },
+                {
+                  "line": 448,
+                  "quote": "assert_eq!(pending[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 449,
+                  "quote": "assert_eq!(success(&outcomes[3])[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(success(&outcomes[4])[\"tasks\"][0][\"status\"], \"failed\")"
+                },
+                {
+                  "line": 456,
+                  "quote": "assert_eq!(success(&outcomes[5])[\"status\"], \"already_stopped\")"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert_eq!(success(&outcomes[6])[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 458,
+                  "quote": "assert!(matches!(outcomes[7], ToolOutcome::Failed { .. }))"
+                },
+                {
+                  "line": 459,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM key_events WHERE run_id=?1\",\n                vec![a.clone()]\n            )\n            .await\n            .unwrap(),\n        before,\n        \"停止后旧模型不能产生新的结果或事件\"\n    )"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert!(\n        cancelled.contains(\"cancelled\"),\n        \"保留真实取消原因：{cancelled}\"\n    )"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert!(\n        !cancelled.contains(\"真实模型结果\"),\n        \"停止后不能写入迟到模型正文\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 517,
+              "testEndLine": 607,
+              "assertions": [
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(resolved[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert_eq!(resolved[\"tasks\"][0][\"taskId\"], first)"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert!(resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第一轮真实独有结果\"))"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert!(!resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第二轮真实独有结果\"))"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(\n        success(&provider.outcomes(\"parent-a\")[3])[\"status\"],\n        \"already_stopped\"\n    )"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(tasks(&h, \"sess_local_alpha\")\n        .await\n        .iter()\n        .any(|task| task[\"taskId\"] != first && task[\"status\"] == \"pending\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourceSHA256": "7a917a34252131313604bf1df9c70351ce2f842ee40421292a0e2d3eb1e8fc95",
+              "testStartLine": 286,
+              "testEndLine": 473,
+              "assertions": [
+                {
+                  "line": 356,
+                  "quote": "assert_ne!(a.task_id, b.task_id)"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_ne!(b.task_id, independent.task_id)"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 3)"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a.task_id)"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"type\"], \"video\")"
+                },
+                {
+                  "line": 368,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert!(all[\"tasks\"][0][\"deferredAt\"]\n            .as_str()\n            .unwrap()\n            .ends_with('Z'))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &b.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"session_mismatch\"\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &independent.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"stable_session_required\"\n        )"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, true)\n                .await\n                .unwrap()[\"reason\"],\n            \"not_found\",\n            \"仅子代理入口不能终止媒体任务\"\n        )"
+                },
+                {
+                  "line": 409,
+                  "quote": "assert_eq!(stop[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 410,
+                  "quote": "assert_eq!(stop[\"remoteCancel\"], \"unsupported\")"
+                },
+                {
+                  "line": 411,
+                  "quote": "assert_eq!(stop[\"localDeliveryStopped\"], true)"
+                },
+                {
+                  "line": 413,
+                  "quote": "assert!(matches!(\n            poll.await.unwrap().unwrap(),\n            MediaTaskStatus::CancelledLocally { .. }\n        ))"
+                },
+                {
+                  "line": 417,
+                  "quote": "assert_eq!(downloads.load(Ordering::SeqCst), 0)"
+                },
+                {
+                  "line": 418,
+                  "quote": "assert!(\n            !products.exists() || std::fs::read_dir(&products).unwrap().next().is_none(),\n            \"迟到供应商结果不得产出文件\"\n        )"
+                },
+                {
+                  "line": 422,
+                  "quote": "assert_eq!(\n            operations.owned_background_tasks(\"sess_local_beta\")[0][\"status\"],\n            \"pending\"\n        )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(tools\n            .list(\"sess_local_alpha\", Some(\"pending\"))\n            .await\n            .unwrap()[\"tasks\"]\n            .as_array()\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert_eq!(\n            tools\n                .list(\"sess_local_alpha\", Some(\"failed\"))\n                .await\n                .unwrap()[\"tasks\"][0][\"reason\"],\n            \"cancelled_locally\"\n        )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_ne!(\n            next.task_id, a.task_id,\n            \"供应商复用id不能重用会话宿主taskId\"\n        )"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 462,
+                  "quote": "assert!(\n            operations\n                .owned_background_tasks(\"sess_local_alpha\")\n                .iter()\n                .any(|task| task[\"taskId\"] == next.task_id && task[\"status\"] == \"pending\"),\n            \"旧id停止不影响新一轮媒体任务\"\n        )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 4)"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
           "missingClauses": [],
-          "meaning": "Panel payload (todos/version/finished/allCompleted) is recomputed from the stored entries with the incumbent version hash shape."
+          "meaning": "正式模型目录check_pending_tasks只读当前会话真实子Run与宿主归属媒体任务；pending/resolved/failed按真实状态过滤，恢复已结束旧子任务的自有结果、不冒用同线程新结果；没有会话明确失败且不混入其他会话。时间为真实提交时间；无归属独立operation不猜作当前任务。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。"
         },
         {
           "index": 2,
@@ -65423,6 +65885,22 @@
               "package": "lingxi-service",
               "suite": "r06_todo_panel",
               "test": "gate_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourcePath": "rust/crates/lingxi-service/src/background_tasks.rs"
             }
           ],
           "proofLocations": [
@@ -65458,22 +65936,230 @@
                   "quote": "assert_eq!(status, 409, \"归档会话面板读 409\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 373,
+              "testEndLine": 514,
+              "assertions": [
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(success(&unavailable)[\"reason\"], \"no_handler\")"
+                },
+                {
+                  "line": 430,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert!(matches!(\n        unavailable_runtime_tool(&h, &missing, \"check_pending_tasks\", json!({})).await,\n        ToolOutcome::Failed { .. }\n    ))"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 445,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a)"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert!(!all.to_string().contains(&b))"
+                },
+                {
+                  "line": 448,
+                  "quote": "assert_eq!(pending[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 449,
+                  "quote": "assert_eq!(success(&outcomes[3])[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(success(&outcomes[4])[\"tasks\"][0][\"status\"], \"failed\")"
+                },
+                {
+                  "line": 456,
+                  "quote": "assert_eq!(success(&outcomes[5])[\"status\"], \"already_stopped\")"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert_eq!(success(&outcomes[6])[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 458,
+                  "quote": "assert!(matches!(outcomes[7], ToolOutcome::Failed { .. }))"
+                },
+                {
+                  "line": 459,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM key_events WHERE run_id=?1\",\n                vec![a.clone()]\n            )\n            .await\n            .unwrap(),\n        before,\n        \"停止后旧模型不能产生新的结果或事件\"\n    )"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert!(\n        cancelled.contains(\"cancelled\"),\n        \"保留真实取消原因：{cancelled}\"\n    )"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert!(\n        !cancelled.contains(\"真实模型结果\"),\n        \"停止后不能写入迟到模型正文\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 517,
+              "testEndLine": 607,
+              "assertions": [
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(resolved[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert_eq!(resolved[\"tasks\"][0][\"taskId\"], first)"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert!(resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第一轮真实独有结果\"))"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert!(!resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第二轮真实独有结果\"))"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(\n        success(&provider.outcomes(\"parent-a\")[3])[\"status\"],\n        \"already_stopped\"\n    )"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(tasks(&h, \"sess_local_alpha\")\n        .await\n        .iter()\n        .any(|task| task[\"taskId\"] != first && task[\"status\"] == \"pending\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourceSHA256": "7a917a34252131313604bf1df9c70351ce2f842ee40421292a0e2d3eb1e8fc95",
+              "testStartLine": 286,
+              "testEndLine": 473,
+              "assertions": [
+                {
+                  "line": 356,
+                  "quote": "assert_ne!(a.task_id, b.task_id)"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_ne!(b.task_id, independent.task_id)"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 3)"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a.task_id)"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"type\"], \"video\")"
+                },
+                {
+                  "line": 368,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert!(all[\"tasks\"][0][\"deferredAt\"]\n            .as_str()\n            .unwrap()\n            .ends_with('Z'))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &b.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"session_mismatch\"\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &independent.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"stable_session_required\"\n        )"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, true)\n                .await\n                .unwrap()[\"reason\"],\n            \"not_found\",\n            \"仅子代理入口不能终止媒体任务\"\n        )"
+                },
+                {
+                  "line": 409,
+                  "quote": "assert_eq!(stop[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 410,
+                  "quote": "assert_eq!(stop[\"remoteCancel\"], \"unsupported\")"
+                },
+                {
+                  "line": 411,
+                  "quote": "assert_eq!(stop[\"localDeliveryStopped\"], true)"
+                },
+                {
+                  "line": 413,
+                  "quote": "assert!(matches!(\n            poll.await.unwrap().unwrap(),\n            MediaTaskStatus::CancelledLocally { .. }\n        ))"
+                },
+                {
+                  "line": 417,
+                  "quote": "assert_eq!(downloads.load(Ordering::SeqCst), 0)"
+                },
+                {
+                  "line": 418,
+                  "quote": "assert!(\n            !products.exists() || std::fs::read_dir(&products).unwrap().next().is_none(),\n            \"迟到供应商结果不得产出文件\"\n        )"
+                },
+                {
+                  "line": 422,
+                  "quote": "assert_eq!(\n            operations.owned_background_tasks(\"sess_local_beta\")[0][\"status\"],\n            \"pending\"\n        )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(tools\n            .list(\"sess_local_alpha\", Some(\"pending\"))\n            .await\n            .unwrap()[\"tasks\"]\n            .as_array()\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert_eq!(\n            tools\n                .list(\"sess_local_alpha\", Some(\"failed\"))\n                .await\n                .unwrap()[\"tasks\"][0][\"reason\"],\n            \"cancelled_locally\"\n        )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_ne!(\n            next.task_id, a.task_id,\n            \"供应商复用id不能重用会话宿主taskId\"\n        )"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 462,
+                  "quote": "assert!(\n            operations\n                .owned_background_tasks(\"sess_local_alpha\")\n                .iter()\n                .any(|task| task[\"taskId\"] == next.task_id && task[\"status\"] == \"pending\"),\n            \"旧id停止不影响新一轮媒体任务\"\n        )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 4)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "「无 store 显示不可用」子句在端口无对应概念（存储常在，不存在无 store 形态）；已覆盖空面板与未知会话 404，不猜造 unavailable 状态"
-          ],
-          "meaning": "A session with no todo entries yields the empty panel and an unknown session yields 404."
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "正式模型目录check_pending_tasks只读当前会话真实子Run与宿主归属媒体任务；pending/resolved/failed按真实状态过滤，恢复已结束旧子任务的自有结果、不冒用同线程新结果；没有会话明确失败且不混入其他会话。时间为真实提交时间；无归属独立operation不猜作当前任务。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。"
         }
       ],
-      "gaps": [
-        "仅列当前会话任务",
-        "过滤结果和任务状态一致",
-        "无store/无会话显示不可用或空结果",
-        "不应以其他会话任务充数"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/background-task-proof-review.json"
     },
     {
       "id": "R00-T02-LA-730E5984212D",
@@ -73573,7 +74259,7 @@
         "任务不存在、已结束或无停止处理器给不同结果；不能停止其他会话任务。"
       ],
       "then": "任务处理器接收stop，任务状态转终止且回报；支持子代理/媒体等。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -73582,9 +74268,25 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "combo_cancel_during_stream_read"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourcePath": "rust/crates/lingxi-service/src/background_tasks.rs"
             }
           ],
-          "meaning": "cancel_run_for迟到结果栅栏真实受检，但 stop_task工具未实现；tool产物/文件外部副作用也没有原入口全覆盖。",
+          "meaning": "正式模型stop_task取消当前会话不可复用child Run，保留取消原因，旧迟到模型零新事件、无结果落入；外国任务零影响。不存在、已结束、真实停止处理器不可用分别返回not_found/already_stopped/no_handler；续接后的旧taskId只返回已结束，不取消新Run。真实本地视频供应商已接受任务且轮询挂起时，本地取消交付栅栏阻止下载和文件注册，另一会话任务保持pending；remoteCancel明确unsupported，不伪称远端作业已撤销。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -73610,12 +74312,225 @@
                   "quote": "    assert_eq!(\n        completed, 0,\n        \"the late turn never lands in the cancelled run's stream\"\n    );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 373,
+              "testEndLine": 514,
+              "assertions": [
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(success(&unavailable)[\"reason\"], \"no_handler\")"
+                },
+                {
+                  "line": 430,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert!(matches!(\n        unavailable_runtime_tool(&h, &missing, \"check_pending_tasks\", json!({})).await,\n        ToolOutcome::Failed { .. }\n    ))"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 445,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a)"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert!(!all.to_string().contains(&b))"
+                },
+                {
+                  "line": 448,
+                  "quote": "assert_eq!(pending[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 449,
+                  "quote": "assert_eq!(success(&outcomes[3])[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(success(&outcomes[4])[\"tasks\"][0][\"status\"], \"failed\")"
+                },
+                {
+                  "line": 456,
+                  "quote": "assert_eq!(success(&outcomes[5])[\"status\"], \"already_stopped\")"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert_eq!(success(&outcomes[6])[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 458,
+                  "quote": "assert!(matches!(outcomes[7], ToolOutcome::Failed { .. }))"
+                },
+                {
+                  "line": 459,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM key_events WHERE run_id=?1\",\n                vec![a.clone()]\n            )\n            .await\n            .unwrap(),\n        before,\n        \"停止后旧模型不能产生新的结果或事件\"\n    )"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert!(\n        cancelled.contains(\"cancelled\"),\n        \"保留真实取消原因：{cancelled}\"\n    )"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert!(\n        !cancelled.contains(\"真实模型结果\"),\n        \"停止后不能写入迟到模型正文\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 517,
+              "testEndLine": 607,
+              "assertions": [
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(resolved[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert_eq!(resolved[\"tasks\"][0][\"taskId\"], first)"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert!(resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第一轮真实独有结果\"))"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert!(!resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第二轮真实独有结果\"))"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(\n        success(&provider.outcomes(\"parent-a\")[3])[\"status\"],\n        \"already_stopped\"\n    )"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(tasks(&h, \"sess_local_alpha\")\n        .await\n        .iter()\n        .any(|task| task[\"taskId\"] != first && task[\"status\"] == \"pending\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourceSHA256": "7a917a34252131313604bf1df9c70351ce2f842ee40421292a0e2d3eb1e8fc95",
+              "testStartLine": 286,
+              "testEndLine": 473,
+              "assertions": [
+                {
+                  "line": 356,
+                  "quote": "assert_ne!(a.task_id, b.task_id)"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_ne!(b.task_id, independent.task_id)"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 3)"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a.task_id)"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"type\"], \"video\")"
+                },
+                {
+                  "line": 368,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert!(all[\"tasks\"][0][\"deferredAt\"]\n            .as_str()\n            .unwrap()\n            .ends_with('Z'))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &b.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"session_mismatch\"\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &independent.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"stable_session_required\"\n        )"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, true)\n                .await\n                .unwrap()[\"reason\"],\n            \"not_found\",\n            \"仅子代理入口不能终止媒体任务\"\n        )"
+                },
+                {
+                  "line": 409,
+                  "quote": "assert_eq!(stop[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 410,
+                  "quote": "assert_eq!(stop[\"remoteCancel\"], \"unsupported\")"
+                },
+                {
+                  "line": 411,
+                  "quote": "assert_eq!(stop[\"localDeliveryStopped\"], true)"
+                },
+                {
+                  "line": 413,
+                  "quote": "assert!(matches!(\n            poll.await.unwrap().unwrap(),\n            MediaTaskStatus::CancelledLocally { .. }\n        ))"
+                },
+                {
+                  "line": 417,
+                  "quote": "assert_eq!(downloads.load(Ordering::SeqCst), 0)"
+                },
+                {
+                  "line": 418,
+                  "quote": "assert!(\n            !products.exists() || std::fs::read_dir(&products).unwrap().next().is_none(),\n            \"迟到供应商结果不得产出文件\"\n        )"
+                },
+                {
+                  "line": 422,
+                  "quote": "assert_eq!(\n            operations.owned_background_tasks(\"sess_local_beta\")[0][\"status\"],\n            \"pending\"\n        )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(tools\n            .list(\"sess_local_alpha\", Some(\"pending\"))\n            .await\n            .unwrap()[\"tasks\"]\n            .as_array()\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert_eq!(\n            tools\n                .list(\"sess_local_alpha\", Some(\"failed\"))\n                .await\n                .unwrap()[\"tasks\"][0][\"reason\"],\n            \"cancelled_locally\"\n        )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_ne!(\n            next.task_id, a.task_id,\n            \"供应商复用id不能重用会话宿主taskId\"\n        )"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 462,
+                  "quote": "assert!(\n            operations\n                .owned_background_tasks(\"sess_local_alpha\")\n                .iter()\n                .any(|task| task[\"taskId\"] == next.task_id && task[\"status\"] == \"pending\"),\n            \"旧id停止不影响新一轮媒体任务\"\n        )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 4)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "stop_task停止后无后续产物（工具入口与所有产物）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -73629,9 +74544,25 @@
               "package": "lingxi-service",
               "suite": "cancel_link_inheritance",
               "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourcePath": "rust/crates/lingxi-service/src/background_tasks.rs"
             }
           ],
-          "meaning": "独立取消树不受影响已有局部检查，不是stop_task跨会话任务调用/状态对照。",
+          "meaning": "正式模型stop_task取消当前会话不可复用child Run，保留取消原因，旧迟到模型零新事件、无结果落入；外国任务零影响。不存在、已结束、真实停止处理器不可用分别返回not_found/already_stopped/no_handler；续接后的旧taskId只返回已结束，不取消新Run。真实本地视频供应商已接受任务且轮询挂起时，本地取消交付栅栏阻止下载和文件注册，另一会话任务保持pending；remoteCancel明确unsupported，不伪称远端作业已撤销。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -73698,12 +74629,225 @@
                   "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 373,
+              "testEndLine": 514,
+              "assertions": [
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(success(&unavailable)[\"reason\"], \"no_handler\")"
+                },
+                {
+                  "line": 430,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert!(matches!(\n        unavailable_runtime_tool(&h, &missing, \"check_pending_tasks\", json!({})).await,\n        ToolOutcome::Failed { .. }\n    ))"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 445,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a)"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert!(!all.to_string().contains(&b))"
+                },
+                {
+                  "line": 448,
+                  "quote": "assert_eq!(pending[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 449,
+                  "quote": "assert_eq!(success(&outcomes[3])[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(success(&outcomes[4])[\"tasks\"][0][\"status\"], \"failed\")"
+                },
+                {
+                  "line": 456,
+                  "quote": "assert_eq!(success(&outcomes[5])[\"status\"], \"already_stopped\")"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert_eq!(success(&outcomes[6])[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 458,
+                  "quote": "assert!(matches!(outcomes[7], ToolOutcome::Failed { .. }))"
+                },
+                {
+                  "line": 459,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM key_events WHERE run_id=?1\",\n                vec![a.clone()]\n            )\n            .await\n            .unwrap(),\n        before,\n        \"停止后旧模型不能产生新的结果或事件\"\n    )"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert!(\n        cancelled.contains(\"cancelled\"),\n        \"保留真实取消原因：{cancelled}\"\n    )"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert!(\n        !cancelled.contains(\"真实模型结果\"),\n        \"停止后不能写入迟到模型正文\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 517,
+              "testEndLine": 607,
+              "assertions": [
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(resolved[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert_eq!(resolved[\"tasks\"][0][\"taskId\"], first)"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert!(resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第一轮真实独有结果\"))"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert!(!resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第二轮真实独有结果\"))"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(\n        success(&provider.outcomes(\"parent-a\")[3])[\"status\"],\n        \"already_stopped\"\n    )"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(tasks(&h, \"sess_local_alpha\")\n        .await\n        .iter()\n        .any(|task| task[\"taskId\"] != first && task[\"status\"] == \"pending\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourceSHA256": "7a917a34252131313604bf1df9c70351ce2f842ee40421292a0e2d3eb1e8fc95",
+              "testStartLine": 286,
+              "testEndLine": 473,
+              "assertions": [
+                {
+                  "line": 356,
+                  "quote": "assert_ne!(a.task_id, b.task_id)"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_ne!(b.task_id, independent.task_id)"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 3)"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a.task_id)"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"type\"], \"video\")"
+                },
+                {
+                  "line": 368,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert!(all[\"tasks\"][0][\"deferredAt\"]\n            .as_str()\n            .unwrap()\n            .ends_with('Z'))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &b.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"session_mismatch\"\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &independent.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"stable_session_required\"\n        )"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, true)\n                .await\n                .unwrap()[\"reason\"],\n            \"not_found\",\n            \"仅子代理入口不能终止媒体任务\"\n        )"
+                },
+                {
+                  "line": 409,
+                  "quote": "assert_eq!(stop[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 410,
+                  "quote": "assert_eq!(stop[\"remoteCancel\"], \"unsupported\")"
+                },
+                {
+                  "line": 411,
+                  "quote": "assert_eq!(stop[\"localDeliveryStopped\"], true)"
+                },
+                {
+                  "line": 413,
+                  "quote": "assert!(matches!(\n            poll.await.unwrap().unwrap(),\n            MediaTaskStatus::CancelledLocally { .. }\n        ))"
+                },
+                {
+                  "line": 417,
+                  "quote": "assert_eq!(downloads.load(Ordering::SeqCst), 0)"
+                },
+                {
+                  "line": 418,
+                  "quote": "assert!(\n            !products.exists() || std::fs::read_dir(&products).unwrap().next().is_none(),\n            \"迟到供应商结果不得产出文件\"\n        )"
+                },
+                {
+                  "line": 422,
+                  "quote": "assert_eq!(\n            operations.owned_background_tasks(\"sess_local_beta\")[0][\"status\"],\n            \"pending\"\n        )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(tools\n            .list(\"sess_local_alpha\", Some(\"pending\"))\n            .await\n            .unwrap()[\"tasks\"]\n            .as_array()\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert_eq!(\n            tools\n                .list(\"sess_local_alpha\", Some(\"failed\"))\n                .await\n                .unwrap()[\"tasks\"][0][\"reason\"],\n            \"cancelled_locally\"\n        )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_ne!(\n            next.task_id, a.task_id,\n            \"供应商复用id不能重用会话宿主taskId\"\n        )"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 462,
+                  "quote": "assert!(\n            operations\n                .owned_background_tasks(\"sess_local_alpha\")\n                .iter()\n                .any(|task| task[\"taskId\"] == next.task_id && task[\"status\"] == \"pending\"),\n            \"旧id停止不影响新一轮媒体任务\"\n        )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 4)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "stop_task跨会话任务不受影响"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 2,
@@ -73712,9 +74856,25 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "leaf_cancel_outcome_shapes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourcePath": "rust/crates/lingxi-service/src/background_tasks.rs"
             }
           ],
-          "meaning": "已有runId不存在/已终态结果，但stop_task的无停止处理器和跨会话task所有权未装配。",
+          "meaning": "正式模型stop_task取消当前会话不可复用child Run，保留取消原因，旧迟到模型零新事件、无结果落入；外国任务零影响。不存在、已结束、真实停止处理器不可用分别返回not_found/already_stopped/no_handler；续接后的旧taskId只返回已结束，不取消新Run。真实本地视频供应商已接受任务且轮询挂起时，本地取消交付栅栏阻止下载和文件注册，另一会话任务保持pending；remoteCancel明确unsupported，不伪称远端作业已撤销。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -73740,22 +74900,229 @@
                   "quote": "    assert!(matches!(\n        missing,\n        lingxi_service::SessionExecuteError::NotFound\n    ));"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "model_pending_filters_stop_and_foreign_refusal_use_real_child_runs",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 373,
+              "testEndLine": 514,
+              "assertions": [
+                {
+                  "line": 429,
+                  "quote": "assert_eq!(success(&unavailable)[\"reason\"], \"no_handler\")"
+                },
+                {
+                  "line": 430,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert!(matches!(\n        unavailable_runtime_tool(&h, &missing, \"check_pending_tasks\", json!({})).await,\n        ToolOutcome::Failed { .. }\n    ))"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 445,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a)"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert!(!all.to_string().contains(&b))"
+                },
+                {
+                  "line": 448,
+                  "quote": "assert_eq!(pending[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 449,
+                  "quote": "assert_eq!(success(&outcomes[3])[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(success(&outcomes[4])[\"tasks\"][0][\"status\"], \"failed\")"
+                },
+                {
+                  "line": 456,
+                  "quote": "assert_eq!(success(&outcomes[5])[\"status\"], \"already_stopped\")"
+                },
+                {
+                  "line": 457,
+                  "quote": "assert_eq!(success(&outcomes[6])[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 458,
+                  "quote": "assert!(matches!(outcomes[7], ToolOutcome::Failed { .. }))"
+                },
+                {
+                  "line": 459,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM key_events WHERE run_id=?1\",\n                vec![a.clone()]\n            )\n            .await\n            .unwrap(),\n        before,\n        \"停止后旧模型不能产生新的结果或事件\"\n    )"
+                },
+                {
+                  "line": 487,
+                  "quote": "assert!(\n        cancelled.contains(\"cancelled\"),\n        \"保留真实取消原因：{cancelled}\"\n    )"
+                },
+                {
+                  "line": 491,
+                  "quote": "assert!(\n        !cancelled.contains(\"真实模型结果\"),\n        \"停止后不能写入迟到模型正文\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "continuation_preserves_old_task_result_and_old_stop_cannot_cancel_new_attempt",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 517,
+              "testEndLine": 607,
+              "assertions": [
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(resolved[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert_eq!(resolved[\"tasks\"][0][\"taskId\"], first)"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert!(resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第一轮真实独有结果\"))"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert!(!resolved[\"tasks\"][0][\"result\"]\n        .to_string()\n        .contains(\"第二轮真实独有结果\"))"
+                },
+                {
+                  "line": 588,
+                  "quote": "assert_eq!(\n        success(&provider.outcomes(\"parent-a\")[3])[\"status\"],\n        \"already_stopped\"\n    )"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(tasks(&h, \"sess_local_alpha\")\n        .await\n        .iter()\n        .any(|task| task[\"taskId\"] != first && task[\"status\"] == \"pending\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+              "test": "background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products",
+              "sourceSHA256": "7a917a34252131313604bf1df9c70351ce2f842ee40421292a0e2d3eb1e8fc95",
+              "testStartLine": 286,
+              "testEndLine": 473,
+              "assertions": [
+                {
+                  "line": 356,
+                  "quote": "assert_ne!(a.task_id, b.task_id)"
+                },
+                {
+                  "line": 357,
+                  "quote": "assert_ne!(b.task_id, independent.task_id)"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 3)"
+                },
+                {
+                  "line": 365,
+                  "quote": "assert_eq!(all[\"tasks\"].as_array().unwrap().len(), 1)"
+                },
+                {
+                  "line": 366,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"taskId\"], a.task_id)"
+                },
+                {
+                  "line": 367,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"type\"], \"video\")"
+                },
+                {
+                  "line": 368,
+                  "quote": "assert_eq!(all[\"tasks\"][0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 369,
+                  "quote": "assert!(all[\"tasks\"][0][\"deferredAt\"]\n            .as_str()\n            .unwrap()\n            .ends_with('Z'))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &b.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"session_mismatch\"\n        )"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &independent.task_id, false)\n                .await\n                .unwrap()[\"reason\"],\n            \"stable_session_required\"\n        )"
+                },
+                {
+                  "line": 387,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, true)\n                .await\n                .unwrap()[\"reason\"],\n            \"not_found\",\n            \"仅子代理入口不能终止媒体任务\"\n        )"
+                },
+                {
+                  "line": 409,
+                  "quote": "assert_eq!(stop[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 410,
+                  "quote": "assert_eq!(stop[\"remoteCancel\"], \"unsupported\")"
+                },
+                {
+                  "line": 411,
+                  "quote": "assert_eq!(stop[\"localDeliveryStopped\"], true)"
+                },
+                {
+                  "line": 413,
+                  "quote": "assert!(matches!(\n            poll.await.unwrap().unwrap(),\n            MediaTaskStatus::CancelledLocally { .. }\n        ))"
+                },
+                {
+                  "line": 417,
+                  "quote": "assert_eq!(downloads.load(Ordering::SeqCst), 0)"
+                },
+                {
+                  "line": 418,
+                  "quote": "assert!(\n            !products.exists() || std::fs::read_dir(&products).unwrap().next().is_none(),\n            \"迟到供应商结果不得产出文件\"\n        )"
+                },
+                {
+                  "line": 422,
+                  "quote": "assert_eq!(\n            operations.owned_background_tasks(\"sess_local_beta\")[0][\"status\"],\n            \"pending\"\n        )"
+                },
+                {
+                  "line": 426,
+                  "quote": "assert!(tools\n            .list(\"sess_local_alpha\", Some(\"pending\"))\n            .await\n            .unwrap()[\"tasks\"]\n            .as_array()\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 433,
+                  "quote": "assert_eq!(\n            tools\n                .list(\"sess_local_alpha\", Some(\"failed\"))\n                .await\n                .unwrap()[\"tasks\"][0][\"reason\"],\n            \"cancelled_locally\"\n        )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 451,
+                  "quote": "assert_ne!(\n            next.task_id, a.task_id,\n            \"供应商复用id不能重用会话宿主taskId\"\n        )"
+                },
+                {
+                  "line": 455,
+                  "quote": "assert_eq!(\n            tools\n                .stop(\"sess_local_alpha\", &a.task_id, false)\n                .await\n                .unwrap()[\"status\"],\n            \"already_stopped\"\n        )"
+                },
+                {
+                  "line": 462,
+                  "quote": "assert!(\n            operations\n                .owned_background_tasks(\"sess_local_alpha\")\n                .iter()\n                .any(|task| task[\"taskId\"] == next.task_id && task[\"status\"] == \"pending\"),\n            \"旧id停止不影响新一轮媒体任务\"\n        )"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(submits.load(Ordering::SeqCst), 4)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "任务不存在、已结束或无停止处理器给不同结果（原工具结果）",
-            "不能停止其他会话任务（原taskId入口）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "stop_task停止后无后续产物（工具入口与所有产物）",
-        "stop_task跨会话任务不受影响",
-        "任务不存在、已结束或无停止处理器给不同结果（原工具结果）",
-        "不能停止其他会话任务（原taskId入口）"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/background-task-proof-review.json"
     },
     {
       "id": "R00-T02-LA-856B28902999",
@@ -74389,7 +75756,7 @@
         "他人任务或失效会话被拒绝，不终止无关任务"
       ],
       "then": "按 taskId 与所属会话停止任务，返回 subagent_stop_result",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -74398,9 +75765,14 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "leaf_child_cancel_stops_only_the_child"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators"
             }
           ],
-          "meaning": "现有runId取消不是taskId WS入口，WS未装配subagent_stop_request/result。",
+          "meaning": "真实TCP WebSocket typed subagent_stop_request经现行凭证复核、同一稳定sessionId/native或受信legacy定位器和owner闸，返回subagent_stop_result/requestId；实际只取消指定child Run。异会话、真实外来device主体、失效定位及ID/path冲突均拒绝且两个实际子任务继续运行。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -74422,13 +75794,107 @@
                   "quote": "    assert_eq!(\n        run_status(&state, &parent).await,\n        \"completed\",\n        \"stopping the child does not kill the parent task\"\n    );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 653,
+              "testEndLine": 782,
+              "assertions": [
+                {
+                  "line": 679,
+                  "quote": "assert_eq!(code, 403, \"{value}\")"
+                },
+                {
+                  "line": 680,
+                  "quote": "assert_eq!(value[\"reason\"], \"session_mismatch\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert_eq!(code, 404, \"{value}\")"
+                },
+                {
+                  "line": 689,
+                  "quote": "assert_eq!(value[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 705,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 715,
+                  "quote": "assert_eq!(code, 403, \"{result}\")"
+                },
+                {
+                  "line": 719,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 720,
+                  "quote": "assert_eq!(result[\"reason\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 733,
+                  "quote": "assert_eq!(result[\"type\"], \"subagent_stop_result\")"
+                },
+                {
+                  "line": 734,
+                  "quote": "assert_eq!(result[\"requestId\"], \"negative\")"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 737,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 738,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 742,
+                  "quote": "assert_eq!(value[\"sessionId\"], \"sess_local_alpha\")"
+                },
+                {
+                  "line": 743,
+                  "quote": "assert_eq!(value[\"requestId\"], \"real-stop\")"
+                },
+                {
+                  "line": 745,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 753,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 754,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 764,
+                  "quote": "assert_eq!(value[\"status\"], \"already_stopped\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "按 taskId 与所属会话停止任务",
-            "返回 subagent_stop_result"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -74442,9 +75908,14 @@
               "package": "lingxi-service",
               "suite": "cancel_link_inheritance",
               "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators"
             }
           ],
-          "meaning": "现有session授权拒绝和独立根取消隔离为局部，缺原WS stop请求的他人任务/失效会话检查。",
+          "meaning": "真实TCP WebSocket typed subagent_stop_request经现行凭证复核、同一稳定sessionId/native或受信legacy定位器和owner闸，返回subagent_stop_result/requestId；实际只取消指定child Run。异会话、真实外来device主体、失效定位及ID/path冲突均拒绝且两个实际子任务继续运行。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/auth_matrix.rs",
@@ -74539,22 +76010,111 @@
                   "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 653,
+              "testEndLine": 782,
+              "assertions": [
+                {
+                  "line": 679,
+                  "quote": "assert_eq!(code, 403, \"{value}\")"
+                },
+                {
+                  "line": 680,
+                  "quote": "assert_eq!(value[\"reason\"], \"session_mismatch\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert_eq!(code, 404, \"{value}\")"
+                },
+                {
+                  "line": 689,
+                  "quote": "assert_eq!(value[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 705,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 715,
+                  "quote": "assert_eq!(code, 403, \"{result}\")"
+                },
+                {
+                  "line": 719,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 720,
+                  "quote": "assert_eq!(result[\"reason\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 733,
+                  "quote": "assert_eq!(result[\"type\"], \"subagent_stop_result\")"
+                },
+                {
+                  "line": 734,
+                  "quote": "assert_eq!(result[\"requestId\"], \"negative\")"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 737,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 738,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 742,
+                  "quote": "assert_eq!(value[\"sessionId\"], \"sess_local_alpha\")"
+                },
+                {
+                  "line": 743,
+                  "quote": "assert_eq!(value[\"requestId\"], \"real-stop\")"
+                },
+                {
+                  "line": 745,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 753,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 754,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 764,
+                  "quote": "assert_eq!(value[\"status\"], \"already_stopped\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "他人任务或失效会话被拒绝",
-            "不终止无关任务（实际WS taskId入口）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "按 taskId 与所属会话停止任务",
-        "返回 subagent_stop_result",
-        "他人任务或失效会话被拒绝",
-        "不终止无关任务（实际WS taskId入口）"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/background-task-proof-review.json"
     },
     {
       "id": "R00-T02-LA-865A9825A3EB",
@@ -96032,7 +97592,7 @@
         "拒绝/边界：body 会话上下文经 resolveWsSessionContext；taskId 所有权与运行态决定结果；不应错误扩大写入或披露范围"
       ],
       "then": "返回 aborted 或 already_stopped；找不到 404，非本会话拥有 403",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -96046,9 +97606,14 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "leaf_cancel_outcome_shapes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators"
             }
           ],
-          "meaning": "现有取消是runId链，原chat taskId abort POST路由与aborted/already_stopped词汇未接。",
+          "meaning": "真实HTTP POST task/{id}/abort和WS共享相同定位与所属会话停止函数：当前任务aborted，终态already_stopped，缺失404，异会话/主体403；无上下文或id/path冲突400。HTTP只支持子代理，不误取消媒体任务；模型stop_task另走同一个实际任务核心。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -96095,13 +97660,107 @@
                   "quote": "    assert!(matches!(\n        missing,\n        lingxi_service::SessionExecuteError::NotFound\n    ));"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 653,
+              "testEndLine": 782,
+              "assertions": [
+                {
+                  "line": 679,
+                  "quote": "assert_eq!(code, 403, \"{value}\")"
+                },
+                {
+                  "line": 680,
+                  "quote": "assert_eq!(value[\"reason\"], \"session_mismatch\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert_eq!(code, 404, \"{value}\")"
+                },
+                {
+                  "line": 689,
+                  "quote": "assert_eq!(value[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 705,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 715,
+                  "quote": "assert_eq!(code, 403, \"{result}\")"
+                },
+                {
+                  "line": 719,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 720,
+                  "quote": "assert_eq!(result[\"reason\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 733,
+                  "quote": "assert_eq!(result[\"type\"], \"subagent_stop_result\")"
+                },
+                {
+                  "line": 734,
+                  "quote": "assert_eq!(result[\"requestId\"], \"negative\")"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 737,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 738,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 742,
+                  "quote": "assert_eq!(value[\"sessionId\"], \"sess_local_alpha\")"
+                },
+                {
+                  "line": 743,
+                  "quote": "assert_eq!(value[\"requestId\"], \"real-stop\")"
+                },
+                {
+                  "line": 745,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 753,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 754,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 764,
+                  "quote": "assert_eq!(value[\"status\"], \"already_stopped\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "终止当前会话拥有后台子代理taskId返回aborted或already_stopped",
-            "找不到404，非本会话拥有403（原HTTP taskId入口）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -96115,9 +97774,14 @@
               "package": "lingxi-service",
               "suite": "cancel_link_inheritance",
               "test": "isolation_and_first_reason_survive_repeated_and_concurrent_cancels"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_background_tasks",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators"
             }
           ],
-          "meaning": "没有旧body resolveWsSessionContext的Rust接线；原taskId归属/运行态和披露边界没有入口检查。",
+          "meaning": "真实HTTP POST task/{id}/abort和WS共享相同定位与所属会话停止函数：当前任务aborted，终态already_stopped，缺失404，异会话/主体403；无上下文或id/path冲突400。HTTP只支持子代理，不误取消媒体任务；模型stop_task另走同一个实际任务核心。 本机合成资料与本地供应商真实运行；不宣称外部付费供应商、其他系统或阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/auth_matrix.rs",
@@ -96212,24 +97876,111 @@
                   "quote": "assert_eq!(\n        root_b.phase(),\n        cancel::CancelPhase::Active,\n        \"root B never observed any cancellation\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_background_tasks.rs",
+              "test": "real_http_and_websocket_stop_owned_only_and_reject_stale_locators",
+              "sourceSHA256": "fb73789205bc2516b0eec4f7aecb1b7fa4c610095a84f3221c6c7af6c7b77bab",
+              "testStartLine": 653,
+              "testEndLine": 782,
+              "assertions": [
+                {
+                  "line": 679,
+                  "quote": "assert_eq!(code, 403, \"{value}\")"
+                },
+                {
+                  "line": 680,
+                  "quote": "assert_eq!(value[\"reason\"], \"session_mismatch\")"
+                },
+                {
+                  "line": 688,
+                  "quote": "assert_eq!(code, 404, \"{value}\")"
+                },
+                {
+                  "line": 689,
+                  "quote": "assert_eq!(value[\"reason\"], \"not_found\")"
+                },
+                {
+                  "line": 697,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 705,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 715,
+                  "quote": "assert_eq!(code, 403, \"{result}\")"
+                },
+                {
+                  "line": 719,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 720,
+                  "quote": "assert_eq!(result[\"reason\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 733,
+                  "quote": "assert_eq!(result[\"type\"], \"subagent_stop_result\")"
+                },
+                {
+                  "line": 734,
+                  "quote": "assert_eq!(result[\"requestId\"], \"negative\")"
+                },
+                {
+                  "line": 735,
+                  "quote": "assert_eq!(result[\"status\"], \"rejected\")"
+                },
+                {
+                  "line": 737,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_alpha\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 738,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 741,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 742,
+                  "quote": "assert_eq!(value[\"sessionId\"], \"sess_local_alpha\")"
+                },
+                {
+                  "line": 743,
+                  "quote": "assert_eq!(value[\"requestId\"], \"real-stop\")"
+                },
+                {
+                  "line": 745,
+                  "quote": "assert_eq!(tasks(&h, \"sess_local_beta\").await[0][\"status\"], \"pending\")"
+                },
+                {
+                  "line": 753,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 754,
+                  "quote": "assert_eq!(value[\"status\"], \"aborted\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 764,
+                  "quote": "assert_eq!(value[\"status\"], \"already_stopped\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "body会话上下文经resolveWsSessionContext",
-            "taskId所有权与运行态决定结果",
-            "不应错误扩大写入或披露范围（该入口）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "终止当前会话拥有后台子代理taskId返回aborted或already_stopped",
-        "找不到404，非本会话拥有403（原HTTP taskId入口）",
-        "body会话上下文经resolveWsSessionContext",
-        "taskId所有权与运行态决定结果",
-        "不应错误扩大写入或披露范围（该入口）"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/background-task-proof-review.json"
     },
     {
       "id": "R00-T02-LA-B5CB2993A5C0",

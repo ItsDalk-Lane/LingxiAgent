@@ -237,6 +237,11 @@ pub struct OperationCallContext {
     pub cause_ref: Option<String>,
 }
 
+tokio::task_local! {
+    /// 只由可信宿主传入；媒体请求正文不能创建会话归属。
+    static MEDIA_TASK_OWNER: OperationCallContext;
+}
+
 /// R05-T07: the usage fact of ONE settled operation-plane request. The
 /// operation plane has no run/session of its own — the row is internal
 /// accounting (owner-scoped queries never return it).
@@ -446,6 +451,8 @@ pub enum MediaTaskKind {
 /// old task can never be re-routed onto a new provider by a hot reload.
 #[derive(Debug)]
 pub struct MediaTaskRecord {
+    owner: Option<OperationCallContext>,
+    created_at_unix_ms: u64,
     pub kind: MediaTaskKind,
     /// The id the caller uses (disambiguated when a live task already
     /// holds the provider's bare id).
@@ -493,6 +500,8 @@ impl MediaTaskRecord {
         route: ResolvedModelRoute,
     ) -> Self {
         Self {
+            owner: MEDIA_TASK_OWNER.try_with(Clone::clone).ok(),
+            created_at_unix_ms: lingxi_adapters::models::dispatch::unix_ms_now(),
             kind,
             host_tracker: bare_tracker,
             provider_job_id,
@@ -702,7 +711,7 @@ impl OperationService {
             outcome,
             started_at_unix_ms,
             settled_at_unix_ms: Some(lingxi_adapters::models::dispatch::unix_ms_now()),
-            context: context.cloned(),
+            context: context.cloned().or_else(|| MEDIA_TASK_OWNER.try_with(Clone::clone).ok()),
         })
         .await
         .map_err(|failure| OperationFailure {
@@ -987,10 +996,12 @@ impl OperationService {
                 });
             }
         }
-        // The bare tracker id is the host tracker when free (or held only
-        // by a terminal record); a LIVE collision mints a disambiguated
-        // tracker.
-        let mut tracker = bare_tracker.clone();
+        // 会话任务使用不可复用宿主id，旧停止请求不能命中供应商复用id的新任务。
+        // 无会话的原operation调用保留既有tracker合同。
+        let mut tracker = if MEDIA_TASK_OWNER.try_with(|_|()).is_ok() {
+            format!("{bare_tracker}-{}",crate::auth::hex_random_public(16).map_err(|error|OperationFailure{code:ErrorCode::Internal,message:format!("cannot mint owned media task identity: {error}"),retryable:false})?)
+        } else {bare_tracker.clone()};
+        let unique_base=tracker.clone();
         let mut attempt = 1usize;
         loop {
             let live_collision = tasks
@@ -1010,7 +1021,7 @@ impl OperationService {
                 return Ok(tracker);
             }
             attempt += 1;
-            tracker = format!("{bare_tracker}-{attempt}");
+            tracker = format!("{unique_base}-{attempt}");
         }
     }
 
@@ -1349,6 +1360,13 @@ impl OperationService {
         }
     }
 
+    /// 会话调用携带真实宿主上下文；保留既有独立operation入口的无归属事实。
+    pub async fn generate_image_for_context(
+        &self, request: ImageRequest, deadline_unix_ms: Option<u64>, context: &OperationCallContext,
+    ) -> Result<ImageGenerationOutcome, OperationFailure> {
+        MEDIA_TASK_OWNER.scope(context.clone(), self.generate_image(request, deadline_unix_ms)).await
+    }
+
     /// The codex image family answers SSE, not JSON (the bounded aggregate
     /// text parses through the dedicated dialect entry).
     async fn codex_image(
@@ -1618,6 +1636,12 @@ impl OperationService {
         })
     }
 
+    pub async fn submit_video_for_context(
+        &self, request: VideoRequest, deadline_unix_ms: Option<u64>, context: &OperationCallContext,
+    ) -> Result<MediaJobAccepted, OperationFailure> {
+        MEDIA_TASK_OWNER.scope(context.clone(), self.submit_video(request, deadline_unix_ms)).await
+    }
+
     /// Polls one agnes video task: Generating / Failed / Completed (only
     /// after the video bytes downloaded through the egress guard,
     /// verified non-empty, and registered behind the cancellation fence).
@@ -1699,6 +1723,32 @@ impl OperationService {
             *state = MediaTaskState::CancelledLocally;
         }
         Ok(current_status(&state, &record.route.protocol))
+    }
+
+    /// 不猜测独立operation归属；仅返回当前会话提交过的真实媒体任务。
+    pub fn owned_background_tasks(&self, session: &str) -> Vec<serde_json::Value> {
+        self.tasks.lock().expect("media task registry").values().filter_map(|record| {
+            let owner=record.owner.as_ref().filter(|owner| owner.session_id==session)?;
+            let state=record.state.lock().expect("media task state");
+            let (status,result,reason)=match &*state {
+                MediaTaskState::Tracking=>("pending",serde_json::Value::Null,serde_json::Value::Null),
+                MediaTaskState::CancelledLocally=>("failed",serde_json::Value::Null,serde_json::json!("cancelled_locally")),
+                MediaTaskState::Failed(error)=>("failed",serde_json::Value::Null,serde_json::json!(error)),
+                MediaTaskState::Completed(products)=>("resolved",serde_json::json!(products.iter().map(|p|serde_json::json!({"resourceId":p.resource_id,"path":p.path,"mime":p.mime,"sizeBytes":p.size_bytes,"sha256":p.sha256})).collect::<Vec<_>>()),serde_json::Value::Null),
+            };
+            Some(serde_json::json!({"taskId":record.host_tracker,"status":status,"type":match record.kind{MediaTaskKind::Image=>"image",MediaTaskKind::Video=>"video"},"deferredAtUnixMs":record.created_at_unix_ms,"result":result,"reason":reason,"parentSessionId":owner.session_id,"meta":{"type":"media","runId":owner.run_id}}))
+        }).collect()
+    }
+
+    /// 归属检查和取消使用同一记录，供应商复用id不能误停新一轮或别的会话。
+    pub fn stop_owned_background_task(&self, task: &str, session: &str) -> Option<serde_json::Value> {
+        let record=self.tasks.lock().expect("media task registry").get(task).cloned()?;
+        let Some(owner)=&record.owner else {return Some(serde_json::json!({"status":"rejected","reason":"stable_session_required"}));};
+        if owner.session_id!=session {return Some(serde_json::json!({"status":"rejected","reason":"session_mismatch"}));}
+        let mut state=record.state.lock().expect("media task state");
+        if !state.is_live() {return Some(serde_json::json!({"status":"already_stopped"}));}
+        *state=MediaTaskState::CancelledLocally;
+        Some(serde_json::json!({"status":"aborted","remoteCancel":remote_cancel_fact(record.route.protocol),"localDeliveryStopped":true}))
     }
 
     // ── speech synthesis (openai / minimax / dashscope / system) ────────

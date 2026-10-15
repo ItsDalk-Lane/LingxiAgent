@@ -6023,6 +6023,51 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_736966a249b108a882d8/binding-result.json"
       ]
     },
+    "r06_test_d8983cf79026eca0dff2": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_d8983cf79026eca0dff2",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_d8983cf79026eca0dff2"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_d8983cf79026eca0dff2/binding-result.json"
+      ]
+    },
+    "r06_test_f2b8932e772e5ab51164": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_f2b8932e772e5ab51164",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f2b8932e772e5ab51164"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_f2b8932e772e5ab51164/binding-result.json"
+      ]
+    },
+    "r06_test_cde91045da0cc40aa57c": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_cde91045da0cc40aa57c",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_cde91045da0cc40aa57c"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_cde91045da0cc40aa57c/binding-result.json"
+      ]
+    },
     "r06_test_f5ff15d29a8970896136": {
       "argv": [
         "python3",
@@ -6351,6 +6396,21 @@
       "timeoutSecs": 1020,
       "evidencePaths": [
         "{EVIDENCE}/R06_BINDINGS/r06_test_3d3d25818f9f1ba1140e/binding-result.json"
+      ]
+    },
+    "r06_test_1cf233101ccad8d06ec0": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_1cf233101ccad8d06ec0",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_1cf233101ccad8d06ec0"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_1cf233101ccad8d06ec0/binding-result.json"
       ]
     },
     "r06_test_ac6e21b981a75cd90d7d": {
@@ -8182,6 +8242,7 @@
         "r06_test_1bcceb7518b4d5e29be7",
         "r06_test_1bfbf6fbc1d611e1533b",
         "r06_test_1c1ea6a7ef2b34598a0f",
+        "r06_test_1cf233101ccad8d06ec0",
         "r06_test_1d0d73d1bdfbf032f194",
         "r06_test_1d5060a665ac1d208534",
         "r06_test_1d643fd8dec58282a789",
@@ -8507,6 +8568,7 @@
         "r06_test_cd28f306283a3814e23a",
         "r06_test_cd97ed1324d36f6f0713",
         "r06_test_cddbc7fce74fd2f8cfc6",
+        "r06_test_cde91045da0cc40aa57c",
         "r06_test_ce42ceff910a43e75393",
         "r06_test_ce4e8ebf8db5ade9d5bf",
         "r06_test_ce584df192fdb1f1eae3",
@@ -8530,6 +8592,7 @@
         "r06_test_d75fa9061c3af5e30fa7",
         "r06_test_d7cfc5d9188cc09a4c33",
         "r06_test_d852b7d70f2edec53fd8",
+        "r06_test_d8983cf79026eca0dff2",
         "r06_test_d89f176c4612d572dd67",
         "r06_test_d8def34f1a1df8e40473",
         "r06_test_da9002b704ac487d190b",
@@ -8585,6 +8648,7 @@
         "r06_test_f1f616e1d549d10a451c",
         "r06_test_f256e339c06a591f8125",
         "r06_test_f2b30c5b5138f9df42d8",
+        "r06_test_f2b8932e772e5ab51164",
         "r06_test_f30d56be7a97bb01054b",
         "r06_test_f31f250a57db1c9707ad",
         "r06_test_f3eacfa8241968e42b79",
@@ -16180,9 +16244,47 @@
         "无store/无会话显示不可用或空结果；不应以其他会话任务充数。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_6d687671dedec96ca6f3",
+        "r06_test_ba77e950f6b7f19c1c7b",
+        "r06_test_cb331cb58f96362c7773",
+        "r06_test_cde91045da0cc40aa57c",
+        "r06_test_d8983cf79026eca0dff2",
+        "r06_test_f2b8932e772e5ab51164",
+        "r06_test_f5ff15d29a8970896136",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-7244E7DCE678-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-7244E7DCE678-assertion-01",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-7244E7DCE678-assertion-02",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-7244E7DCE678-assertion-00"
+        ],
+        [
+          "R00-T02-LA-7244E7DCE678-assertion-01"
+        ],
+        [
+          "R00-T02-LA-7244E7DCE678-assertion-02"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-730E5984212D",
@@ -17282,9 +17384,47 @@
         "任务不存在、已结束或无停止处理器给不同结果；不能停止其他会话任务。"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_613f3334749c7a99b82e",
+        "r06_test_9b90230193acc2bca412",
+        "r06_test_bb1cd07605a91e0ba073",
+        "r06_test_cde91045da0cc40aa57c",
+        "r06_test_d8983cf79026eca0dff2",
+        "r06_test_d8def34f1a1df8e40473",
+        "r06_test_f2b8932e772e5ab51164",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-84E22CD74BE1-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-84E22CD74BE1-assertion-01",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-84E22CD74BE1-assertion-02",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-84E22CD74BE1-assertion-00"
+        ],
+        [
+          "R00-T02-LA-84E22CD74BE1-assertion-01"
+        ],
+        [
+          "R00-T02-LA-84E22CD74BE1-assertion-02"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-856B28902999",
@@ -17364,9 +17504,37 @@
         "他人任务或失效会话被拒绝，不终止无关任务"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_1cf233101ccad8d06ec0",
+        "r06_test_bb1cd07605a91e0ba073",
+        "r06_test_d8def34f1a1df8e40473",
+        "r06_test_fe66688eb4d1fb720f6a",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-857747F848F6-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-857747F848F6-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-857747F848F6-assertion-00"
+        ],
+        [
+          "R00-T02-LA-857747F848F6-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-865A9825A3EB",
@@ -20079,9 +20247,38 @@
         "拒绝/边界：body 会话上下文经 resolveWsSessionContext；taskId 所有权与运行态决定结果；不应错误扩大写入或披露范围"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_1cf233101ccad8d06ec0",
+        "r06_test_613f3334749c7a99b82e",
+        "r06_test_bb1cd07605a91e0ba073",
+        "r06_test_d8def34f1a1df8e40473",
+        "r06_test_fe66688eb4d1fb720f6a",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-B47CAC08F418-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-B47CAC08F418-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-B47CAC08F418-assertion-00"
+        ],
+        [
+          "R00-T02-LA-B47CAC08F418-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-B5CB2993A5C0",
@@ -23624,5 +23821,5 @@
       ]
     }
   ],
-  "inputDigestSha256": "e37d82259dde259b7a668e1a9e9d38a3b06e57fe32919d33750b577037bc50f3"
+  "inputDigestSha256": "784a9097af4e8a5f41d345b5572893c35b961ea6d1a95ae85660ec1557939728"
 }

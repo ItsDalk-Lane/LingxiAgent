@@ -2401,6 +2401,30 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "background_tasks": {
+      "status": "FOUR_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-7244E7DCE678",
+        "R00-T02-LA-84E22CD74BE1",
+        "R00-T02-LA-857747F848F6",
+        "R00-T02-LA-B47CAC08F418"
+      ],
+      "completedInitialGaps": 57,
+      "remainingInitialGaps": 21,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 258,
+      "gapLeaves": 21,
+      "actualRegisteredBindings": 13,
+      "sourceCandidateSha256": "cc11a25b19c7be94b68806f30c1a7b570a243c984a714883b3afbea0bc1d6528",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/background-task-binding-window-summary.json",
+      "proofReview": "artifacts/rust-tauri/R06/route-a-20261015/background-task-proof-review.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }
