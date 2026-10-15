@@ -480,6 +480,7 @@ impl KnowledgeTools {
                 "scopeId",
                 "pattern",
                 "sourceIds",
+                "regexp",
                 "regex",
                 "maxResults",
                 "headingFilter",
@@ -492,7 +493,30 @@ impl KnowledgeTools {
             Err(outcome) => return outcome,
         };
         let pattern = params["pattern"].as_str().unwrap_or_default().to_string();
-        let use_regex = params["regex"].as_bool().unwrap_or(false);
+        // 沿用现役 regexp 参数；旧 regex 别名不能与它给出互相矛盾的值。
+        let regex_flag = |key: &str| match params.get(key) {
+            None => Ok(None),
+            Some(Value::Bool(value)) => Ok(Some(*value)),
+            Some(_) => Err(failed(
+                ErrorCode::InvalidMessage,
+                format!("KNOWLEDGE_INVALID_ARGUMENT: {key} must be a boolean"),
+            )),
+        };
+        let regexp = match regex_flag("regexp") {
+            Ok(flag) => flag,
+            Err(outcome) => return outcome,
+        };
+        let alias = match regex_flag("regex") {
+            Ok(flag) => flag,
+            Err(outcome) => return outcome,
+        };
+        if matches!((regexp, alias), (Some(current), Some(old)) if current != old) {
+            return failed(
+                ErrorCode::InvalidMessage,
+                "KNOWLEDGE_INVALID_ARGUMENT: regexp and regex must agree".into(),
+            );
+        }
+        let use_regex = regexp.or(alias).unwrap_or(false);
         let max_results = params["maxResults"].as_u64().unwrap_or(50) as usize;
         // sourceIds 形态先行显式校验（原工具语义）：给出时必须是非空字符串
         // 数组；空数组或非字符串项是参数错误，不得静默按"全量扫描"处理。
@@ -800,7 +824,8 @@ pub fn register_knowledge_tools(
                 "scopeId": {"type": "string"},
                 "pattern": {"type": "string"},
                 "sourceIds": {"type": "array", "items": {"type": "string"}},
-                "regex": {"type": "boolean"},
+                "regexp": {"type": "boolean"},
+                "regex": {"type": "boolean", "description": "Compatibility alias for regexp; both flags must agree when supplied together."},
                 "maxResults": {"type": "integer", "minimum": 1, "maximum": 200},
                 "headingFilter": {"type": "string"},
             },

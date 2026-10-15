@@ -75,11 +75,13 @@ vi.mock('../../settings/store', () => {
   type SettingsStoreHook = {
     (selector?: (s: typeof state) => unknown): unknown;
     getState: () => typeof state;
+    subscribe: () => () => void;
   };
   const hook = ((selector?: (s: typeof state) => unknown) => (
     selector ? selector(state) : state
   )) as SettingsStoreHook;
   hook.getState = () => state;
+  hook.subscribe = () => () => {};
   return { useSettingsStore: hook };
 });
 

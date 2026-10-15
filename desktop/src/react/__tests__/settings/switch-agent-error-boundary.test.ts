@@ -14,6 +14,8 @@ const mockTranslations: Record<string, string> = {};
 
 vi.mock('../../settings/store', () => ({
   useSettingsStore: {
+    // 编排夹具补齐真实store已有订阅接口；连接隔离仍由当前原生窗口回归检查。
+    subscribe: () => () => {},
     getState: () => mockState,
     setState: (patch: Record<string, any>) => Object.assign(mockState, patch),
   },

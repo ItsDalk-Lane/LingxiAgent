@@ -612,3 +612,81 @@ async fn delete_agent_cascades_orphan_skills() {
         .await
         .expect("限时停机");
 }
+
+#[tokio::test]
+async fn creation_generated_id_never_reuses_existing_case_alias_materials() {
+    let server = boot().await;
+    let (status, _) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/agents",
+        Some(&json!({"name":"助手agentA","id":"agentA","yuan":"ming"})),
+    )
+    .await;
+    assert_eq!(status, 200);
+    let original_dir = server.home.join("agents/agentA");
+    let config_path = original_dir.join("config.yaml");
+    let mut original = std::fs::read_to_string(&config_path).unwrap();
+    original.push_str("\nretained_user_option: true\nmemory:\n  enabled: true\n");
+    std::fs::write(&config_path, &original).unwrap();
+    std::fs::create_dir_all(original_dir.join("memory")).unwrap();
+    std::fs::write(original_dir.join("memory/facts.md"), "原助手专属资料").unwrap();
+    let (status, created) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/agents",
+        Some(&json!({"name":"助手agentA"})),
+    )
+    .await;
+    assert_eq!(status, 200, "{created}");
+    assert_eq!(
+        std::fs::read_to_string(&config_path).unwrap(),
+        original,
+        "自动生成ID不得因文件系统大小写别名覆盖原配置"
+    );
+    assert_eq!(
+        std::fs::read_to_string(original_dir.join("memory/facts.md")).unwrap(),
+        "原助手专属资料"
+    );
+    let new_id = created["id"].as_str().unwrap();
+    assert!(server
+        .home
+        .join("agents")
+        .join(new_id)
+        .join("config.yaml")
+        .is_file());
+    assert!(
+        !server
+            .home
+            .join("agents")
+            .join(new_id)
+            .join("memory/facts.md")
+            .exists(),
+        "新助手不得复用原记忆目录"
+    );
+    server.stop.send(()).unwrap();
+    assert!(!server.handle.await.unwrap().unwrap().drain_timed_out);
+}
+
+#[tokio::test]
+async fn creation_explicit_id_refuses_unindexed_directory_and_preserves_materials() {
+    let server = boot().await;
+    let existing = server.home.join("agents/unfinished");
+    std::fs::create_dir_all(&existing).unwrap();
+    std::fs::write(existing.join("retained.txt"), "未登记目录中的原文件").unwrap();
+    let (status, body) = ok(
+        &server,
+        "POST",
+        "/lingxi/v1/agents",
+        Some(&json!({"name":"新助手","id":"unfinished"})),
+    )
+    .await;
+    assert_eq!(status, 409, "尚无配置的现存目录也不得覆盖：{body}");
+    assert!(!existing.join("config.yaml").exists());
+    assert_eq!(
+        std::fs::read_to_string(existing.join("retained.txt")).unwrap(),
+        "未登记目录中的原文件"
+    );
+    server.stop.send(()).unwrap();
+    assert!(!server.handle.await.unwrap().unwrap().drain_timed_out);
+}

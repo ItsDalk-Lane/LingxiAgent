@@ -1,0 +1,44 @@
+{
+  "status": "SCOPE_PASS_FORMAL35_AND_SIX_LEAVES_PASS_NOT_STAGE_ACCEPTANCE",
+  "originalAssertionsAndThenChanged": false,
+  "stageAccepted": false,
+  "combinedActualRustTests": 92,
+  "suiteCounts": [
+    4,
+    14,
+    10,
+    2,
+    14,
+    9,
+    2,
+    17,
+    13,
+    7
+  ],
+  "oldDeleteNativeChildCases": 21,
+  "newSettingsNativeCases": 14,
+  "regularUiUnitCases": 50,
+  "typecheck": "ROOT_NODE_TEST_PASS",
+  "independentOriginalP1Replay": "PASS_B_ZERO_PUT_A_B_DISK_NAMES_PRESERVED",
+  "currentCargoParentOfOriginalP1": "r06_settings_owner_current_source::current_settings_owner_switch_cannot_edit_other_real_service_before_identity_ready",
+  "scopeNotes": [
+    "原独立19组矩阵判定的0/2/14/17/18缺口经实际窗口和根目录合并复核补齐；其余14原组保留原候选证明，并在当前版本重跑。",
+    "Root新增当前Cargo父保留独立双服务原断言进入源码摘要，避免仅靠外部历史脚本。",
+    "Root随后只将测试Node选择改为R06_NODE_BIN或当前node，收据移到任务临时目录；正式绑定窗口会使用此实际当前源重新运行。",
+    "自动与手动真实不同runId，每run五阶段请求与费用匹配，不简单放宽总数。",
+    "仅macOS当前生产Electron界面+Rust；其他平台/Tauri/正式打包/真实供应商未验收。"
+  ],
+  "currentSourceSha256": {
+    "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs": "9e2296d924a3dd190b87e70d0045ee81eaf08ea94c46daf8f0452d27dbfa4278",
+    "rust/crates/lingxi-service/tests/r06_settings_owner_current_source.rs": "c3f5629669f60d95dfc414737b19bc849d9a34cd54403beb857f6e6d1620c847",
+    "desktop/src/react/settings/connection-owner.ts": "181a7616d129052f97cc10b832fb2e44943000c2b03e7e1414bdaa46c0034a8f",
+    "desktop/src/react/settings/tabs/RustAgentTab.tsx": "ef3f81615d3de6cf84a9c0f0d111c315f0daa1438c0988d3f71d5bec9bbc5fcc"
+  },
+  "broaderUi": {
+    "passed": 644,
+    "conditionalSkipped": 4,
+    "failed": 0,
+    "firstRun15FixtureFailuresRetained": true,
+    "originalAssertionsChanged": false
+  }
+}

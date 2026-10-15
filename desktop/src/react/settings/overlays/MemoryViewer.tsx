@@ -20,7 +20,10 @@ export function MemoryViewer() {
     try {
       const aid = useSettingsStore.getState().getSettingsAgentId();
       const res = await lingxiFetch(`/api/memories?agentId=${aid}`);
-      const { memories } = await res.json();
+      const data = await res.json();
+      if (data?.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+      if (!Array.isArray(data?.memories)) throw new Error('记忆响应缺少 memories');
+      const { memories } = data;
 
       if (!memories || memories.length === 0) {
         setHtml(`<div class="memory-viewer-empty">${t('settings.memory.actions.empty')}</div>`);

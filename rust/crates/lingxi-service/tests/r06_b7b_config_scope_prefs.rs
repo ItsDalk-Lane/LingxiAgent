@@ -26,6 +26,12 @@ struct TestServer {
 }
 
 async fn start_server(tag: &str) -> TestServer {
+    start_server_with_ticker(tag, true).await
+}
+async fn start_server_without_ticker(tag: &str) -> TestServer {
+    start_server_with_ticker(tag, false).await
+}
+async fn start_server_with_ticker(tag: &str, ticker_available: bool) -> TestServer {
     let uniq = format!(
         "{}-{}-{tag}",
         std::process::id(),
@@ -76,6 +82,7 @@ async fn start_server(tag: &str) -> TestServer {
         .await
         .expect("bootstrap");
     let token = state.auth().local_token();
+    let memory = state.memory().clone();
     let (stop_tx, stop_rx) = tokio::sync::oneshot::channel::<()>();
     let (ready_tx, ready_rx) = tokio::sync::oneshot::channel::<SocketAddr>();
     let handle = tokio::spawn(async move {
@@ -95,6 +102,17 @@ async fn start_server(tag: &str) -> TestServer {
         Ok(addr) => addr,
         Err(err) => panic!("readiness: {err}; service result: {:?}", handle.await),
     };
+    if !ticker_available {
+        // 先真实启动，再走现役停止/join；保留无运行宿主的原拒绝边界。
+        assert!(memory.dream().ticker().is_running());
+        memory.dream().ticker().stop();
+        memory
+            .dream()
+            .wait_stopped_checked()
+            .await
+            .expect("actual ticker joined");
+        assert!(!memory.dream().ticker().is_running());
+    }
     TestServer {
         addr,
         home,
@@ -387,7 +405,7 @@ async fn global_agent_leaf_split_cross_agent_readback_and_immediate_refilter() {
 
 #[tokio::test]
 async fn mixed_patch_partial_success_and_memory_toggle_timestamps() {
-    let server = start_server("mixed").await;
+    let server = start_server_without_ticker("mixed").await;
 
     // ── 真 mixed patch：keep_awake（全局叶）+ chat（助手叶）同请求覆盖两叶。
     let (status, body) = server

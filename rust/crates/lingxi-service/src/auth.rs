@@ -1014,6 +1014,39 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             }
             return RoutePolicy::Scope("settings.write");
         }
+        // 角色卡会访问本机文件和安装技能；维持本机拥有者写边界。
+        if matches!(
+            p,
+            "/lingxi/v1/character-cards/plan"
+                | "/lingxi/v1/character-cards/import"
+                | "/lingxi/v1/character-cards/export"
+                | "/lingxi/v1/character-cards/export/preview"
+        ) && m == "POST"
+        {
+            return RoutePolicy::LocalOnly;
+        }
+        if (p.starts_with("/lingxi/v1/character-cards/plans/")
+            || p.starts_with("/lingxi/v1/character-cards/export/"))
+            && p.contains("/assets/")
+            && matches!(m.as_str(), "GET" | "HEAD")
+        {
+            // 现役角色卡路径属于 LOCAL_ONLY 兜底，素材也不能扩大到远程设置读权限。
+            return RoutePolicy::LocalOnly;
+        }
+        // 仅注册助手页共享读入口；不存在的设置写法仍按未知路由拒绝。
+        if matches!(
+            p,
+            "/lingxi/v1/settings/snapshot"
+                | "/lingxi/v1/settings/config"
+                | "/lingxi/v1/settings/avatar-health"
+                | "/lingxi/v1/models"
+                | "/lingxi/v1/preferences/models"
+                | "/lingxi/v1/providers/summary"
+                | "/lingxi/v1/user-profile"
+        ) && matches!(m.as_str(), "GET" | "HEAD")
+        {
+            return RoutePolicy::Scope("settings.read");
+        }
         // R06 助手生命周期集合面：读 = settings.read；写 = settings.write
         // （server/route-security.ts agents 集合路由同口径）。仅匹配无更深
         // 路径段的形态，避免遮蔽下方按 face 分类的子路由。

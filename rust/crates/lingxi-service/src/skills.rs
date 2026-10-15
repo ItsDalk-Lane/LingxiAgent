@@ -1113,9 +1113,7 @@ impl SkillService {
             {
                 continue;
             }
-            if entry.path().join(".deleted-agent.json").exists() {
-                continue;
-            }
+            // 墓碑助手不参与独占判定，但已删除技能的历史配置引用也必须清理。
             let path = entry.path().join("config.yaml");
             let text = match am::config::read_config_text(&path) {
                 Ok(text) => text,
@@ -1272,6 +1270,27 @@ impl SkillService {
 
     pub fn bundles_store(&self) -> sl::BundlesStore {
         sl::BundlesStore::new(&self.home)
+    }
+
+    /// 角色卡组合与技能安装/删除共用锁，拒绝把已消失的技能重新写成引用。
+    pub fn create_imported_bundle(
+        &self,
+        name: &str,
+        names: &[String],
+        agent_id: &str,
+    ) -> Result<Value, MemoryError> {
+        let _guard = self.mutation_lock.lock().unwrap();
+        am::resolve_agent_roots(&self.home.join("agents"), agent_id)?;
+        for name in names {
+            if !self.skill_exists(name) {
+                return Err(MemoryError::InvalidRequest(format!(
+                    "imported skill disappeared before bundle publication: {name}"
+                )));
+            }
+        }
+        let store = self.bundles_store();
+        store.load_checked()?;
+        store.create(name, names, "character-card-import", Some(agent_id))
     }
 
     fn learn_skills_flags(&self) -> Result<(bool, bool, bool), MemoryError> {

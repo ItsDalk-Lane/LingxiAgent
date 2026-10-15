@@ -262,6 +262,8 @@ struct RunPermitBinding {
 // 只由真实 driver 注册事实创建；模型参数和公开上下文不能设置此任务局部事实。
 #[derive(Clone)]
 struct BlockingRunPermit {
+    #[cfg(any(unix, windows))]
+    cancellation_scope: CancelScope,
     valid_scope: bool,
     run_id: String,
     principal: lingxi_kernel::Principal,
@@ -294,6 +296,20 @@ pub(crate) fn retain_blocking_run_permit(
             Ok(Some(Arc::clone(&issued.permit)))
         })
         .unwrap_or(Ok(None))
+}
+/// 阻塞只读扫描继承真实调用取消节点；先核许可绑定，公开ctx不能伪造此节点。
+#[cfg(any(unix, windows))]
+pub(crate) fn blocking_run_cancel_scope(
+    ctx: &lingxi_kernel::RunContext,
+) -> Result<Option<CancelScope>, StorageError> {
+    retain_blocking_run_permit(ctx)?;
+    BLOCKING_RUN_PERMIT
+        .try_with(|issued| {
+            issued
+                .as_ref()
+                .map(|issued| issued.cancellation_scope.clone())
+        })
+        .map_or(Ok(None), Ok)
 }
 /// ResourceIO 无公开 run 参数，只能继承当前真实任务局部认证事实，并核实际存储 Arc。
 pub(crate) fn retain_blocking_resource_permit(
@@ -650,6 +666,8 @@ impl TaskSupervisor {
                     return None;
                 }
                 Some(BlockingRunPermit {
+                    #[cfg(any(unix, windows))]
+                    cancellation_scope: scope.clone(),
                     valid_scope,
                     run_id: run_id.into(),
                     principal: principal.clone(),

@@ -1,0 +1,280 @@
+{
+  "noUtility": {
+    "hasUtility": false,
+    "disabled": true,
+    "loading": null,
+    "puts": 0
+  },
+  "stale": {},
+  "forwarded": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity"
+    }
+  ],
+  "uiRequests": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/config",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/config",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/models",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/snapshot",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/server/identity",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/tenets",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/memories/dream/status",
+      "status": 503,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/config",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/user-profile",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 204,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/preferences/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/public-agents-md",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/user-profile",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/identity",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents/agentA/agents-md",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/providers/summary",
+      "status": 200,
+      "origin": "http://127.0.0.1:60098"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 204,
+      "origin": "http://127.0.0.1:60104"
+    },
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/server/identity",
+      "status": 204,
+      "origin": "http://127.0.0.1:60104"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agent-deletions",
+      "status": 200,
+      "origin": "http://127.0.0.1:60104"
+    }
+  ],
+  "aConfig": "agent:\n  name: A独占原名称\n  yuan: lingxi\nmemory:\n  disabledSince: \"2026-10-15T00:40:07.760Z\"\n  enabled: false\n",
+  "bConfig": "agent:\n  name: B独占原名称\n  yuan: lingxi\nmemory:\n  disabledSince: \"2026-10-15T00:40:07.880Z\"\n  enabled: false\n"
+}

@@ -509,30 +509,31 @@ pub async fn memories_health_route(
     };
     let enabled = flags.memory_enabled.unwrap_or(true);
     let mut steps = Vec::new();
-    let mut healthy = enabled;
     if !enabled {
-        steps.push(json!({"step": "memory_ticker", "ok": false, "reason": "memory_disabled"}));
+        steps.push(json!({"step": "memory_ticker", "ok": false, "reason": "memory_disabled", "ticker":service.dream().ticker().snapshot(&agent_id)}));
     } else {
         match service.fact_store(&agent_id) {
             Ok(store) => match store.size() {
                 Ok(_) => steps.push(json!({"step": "fact_store", "ok": true})),
                 Err(err) => {
-                    healthy = false;
                     steps
                         .push(json!({"step": "fact_store", "ok": false, "error": err.to_string()}));
                 }
             },
             Err(err) => {
-                healthy = false;
                 steps.push(json!({"step": "fact_store", "ok": false, "error": err.to_string()}));
             }
         }
-        // The automated ticker (deep-memory/dream scheduling) is the R07
-        // background face — its absence is reported, never faked (diff ledger).
-        steps.push(
-            json!({"step": "memory_ticker", "ok": false, "reason": "ticker_absent_in_candidate"}),
-        );
+        let ticker = service.dream().ticker().snapshot(&agent_id);
+        let available = ticker["available"] == true;
+        let error = ticker["lastError"]
+            .as_str()
+            .or_else(|| ticker["hostError"].as_str());
+        steps.push(json!({"step":"memory_ticker","ok":available && error.is_none(),"scope":"automatic_dream","reason":if available {Value::Null} else {json!("ticker_absent_in_candidate")},"error":error,"ticker":ticker}));
+        // 自动Dream已有真宿主，其余每日编译/摘要/深层维护的份额仍显式缺失。
+        steps.push(json!({"step":"daily_memory_maintenance","ok":false,"reason":"daily_pipeline_absent_in_candidate"}));
     }
+    let healthy = enabled && steps.iter().all(|step| step["ok"] == true);
     Json(json!({
         "agentId": agent_id,
         "enabled": enabled,
@@ -1112,11 +1113,16 @@ pub async fn tenets_list_route(
     State(state): State<ServiceState>,
     AxumPath(agent_id): AxumPath<String>,
 ) -> Response {
-    match state.memory().tenets_store(&agent_id) {
-        Ok(store) => Json(json!({
-            "tenets": store.list().tenets.iter().map(tenet_json).collect::<Vec<_>>()
-        }))
-        .into_response(),
+    match state
+        .memory()
+        .tenets_store(&agent_id)
+        .and_then(|store| store.read_strict())
+    {
+        Ok(mut file) => {
+            lingxi_kernel::memory::sort_tenets(&mut file.tenets);
+            Json(json!({"tenets": file.tenets.iter().map(tenet_json).collect::<Vec<_>>() }))
+                .into_response()
+        }
         Err(err) => error_response(&err),
     }
 }
@@ -1304,7 +1310,10 @@ pub async fn experience_get_route(
         Ok(store) => store,
         Err(err) => return error_response(&err),
     };
-    let (merged, _files) = store.read_merged();
+    let (merged, _files) = match store.read_merged_checked() {
+        Ok(value) => value,
+        Err(error) => return error_response(&error),
+    };
     Json(json!({ "content": merged })).into_response()
 }
 

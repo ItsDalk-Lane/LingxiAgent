@@ -21,6 +21,8 @@ vi.mock('../../settings/store', () => ({
 const mockFetch = vi.fn();
 
 vi.mock('../../settings/api', () => ({
+  // 本组使用旧服务编排，连接键仍按该夹具的所选连接计算。
+  settingsConnectionKey: () => mockState.activeServerConnectionId ?? null,
   lingxiFetch: (...args: unknown[]) => mockFetch(...args),
 }));
 

@@ -2147,7 +2147,11 @@
       "cancel": "取消",
       "confirm": "确定",
       "updated": "头像已更新 ✿",
-      "reset": "已恢复默认头像"
+      "reset": "已恢复默认头像",
+      "selectAgent": "请先选择助手",
+      "readFailed": "头像图片读取失败",
+      "ownerChanged": "连接或助手已改变，请重新选择头像",
+      "canvasUnavailable": "头像裁剪画布不可用"
     },
     "providers": {
       "title": "已注册的供应商",
@@ -4076,6 +4080,18 @@
         "checking": "检测中…",
         "unavailable": "需在桌面应用内检测"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "删除清理进度",
+      "loadFailure": "无法读取或更新删除进度：{error}",
+      "deleted": "助手 {id} 已删除。",
+      "cleanupPending": "剩余文件清理待完成。",
+      "referencesPending": "助手引用更新待完成，尚未确认切换到其他助手。",
+      "journalPending": "删除记录保存待完成。",
+      "retry": "重试清理",
+      "formatError": "删除进度返回格式不正确",
+      "connectionChanged": "连接已改变，请重新打开删除进度",
+      "resultChanged": "连接已改变，原服务的清理结果尚未在此页刷新"
     }
   },
   "onboarding": {

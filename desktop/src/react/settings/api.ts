@@ -7,6 +7,7 @@ import {
   appendConnectionAuth,
   buildConnectionUrl,
   requireServerConnection,
+  resolveServerConnection,
 } from '../services/server-connection';
 import { errorWithCode } from '../errors/error-presenter';
 import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
@@ -15,10 +16,25 @@ const DEFAULT_TIMEOUT = 30_000;
 
 function routeForConnection(connection: { serverNodeKind?: string }, path: string): string {
   if (connection.serverNodeKind !== 'lingxi-service') return path;
+  // 只映射已在原生服务注册的助手设置接口，保留其他设置页的明确不可用边界。
+  if (/^\/api\/(?:agents|memories|character-cards)(?:[/?]|$)/.test(path) || /^\/api\/(?:settings\/snapshot|models|preferences\/models|providers\/summary|user-profile|agent-deletions)(?:[/?]|$)/.test(path)) {
+    return `/lingxi/v1${path.slice('/api'.length)}`;
+  }
+  if (path === '/api/config') return '/lingxi/v1/settings/config';
+  if (path === '/api/health') return '/lingxi/v1/settings/avatar-health';
+  if (path.startsWith('/api/avatar/')) return `/lingxi/v1${path.slice('/api'.length)}`;
   if (path.startsWith('/api/access/') || path.startsWith('/api/devices/')) {
     return `/lingxi/v1${path.slice('/api'.length)}`;
   }
   return path;
+}
+
+/** 原生设置读写的资料所有者必须与 fetch 使用同一有效连接坐标。 */
+export function settingsConnectionKey(): string | null {
+  const state = useSettingsStore.getState();
+  const connection = resolveServerConnection(state);
+  if (connection?.serverNodeKind !== 'lingxi-service') return state.activeServerConnectionId;
+  return JSON.stringify([connection.connectionId, connection.kind, connection.baseUrl, connection.token, connection.serverNodeKind, connection.serverNodeTransport, connection.serverId, connection.serverNodeId, connection.userId, connection.studioId]);
 }
 
 export function lingxiUrl(path: string): string {

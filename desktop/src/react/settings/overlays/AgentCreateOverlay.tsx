@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSettingsStore } from '../store';
 import { lingxiFetch } from '../api';
+import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from '../connection-owner';
 import { t } from '../helpers';
 import { switchToAgent } from '../actions';
 import { Overlay } from '../../ui';
@@ -8,6 +9,8 @@ import styles from '../Settings.module.css';
 import { CharacterCardPreviewOverlay, type CharacterCardPlan } from './CharacterCardPreviewOverlay';
 
 export function AgentCreateOverlay() {
+  useSettingsStore();
+  const ownerRef = useRef<SettingsConnectionOwner | null>(null);
   const showToast = useSettingsStore(s => s.showToast);
   const [visible, setVisible] = useState(false);
   const [name, setName] = useState('');
@@ -23,6 +26,7 @@ export function AgentCreateOverlay() {
 
   useEffect(() => {
     const handler = () => {
+      ownerRef.current = captureSettingsConnection();
       setName('');
       setYuan('lingxi');
       setCardPlan(null);
@@ -44,7 +48,8 @@ export function AgentCreateOverlay() {
   }, []);
 
   const create = async () => {
-    if (creating) return;
+    if (creating || !ownsSettingsConnection(ownerRef.current)) return;
+    const owner = ownerRef.current;
     const trimmed = name.trim();
     if (!trimmed) {
       const message = t('settings.agent.nameRequired');
@@ -63,7 +68,9 @@ export function AgentCreateOverlay() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      await switchToAgent(data.id);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.resultChanged'));
+      await switchToAgent(data.id, owner);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.resultChanged'));
       close();
       showToast(t('settings.agent.created', { name: data.name }), 'success');
     } catch (err: any) {
@@ -76,7 +83,8 @@ export function AgentCreateOverlay() {
   };
 
   const planCardFile = async (file: File | null | undefined) => {
-    if (!file || planning || creating) return;
+    if (!file || planning || creating || !ownsSettingsConnection(ownerRef.current)) return;
+    const owner = ownerRef.current;
     setPlanning(true);
     try {
       const form = new FormData();
@@ -88,6 +96,7 @@ export function AgentCreateOverlay() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.connectionChanged'));
       setCardPlan(data.plan);
       setImportMemory(false);
     } catch (err: any) {
@@ -100,7 +109,8 @@ export function AgentCreateOverlay() {
   };
 
   const confirmCardImport = async () => {
-    if (!cardPlan?.token || creating) return;
+    if (!cardPlan?.token || creating || !ownsSettingsConnection(ownerRef.current)) return;
+    const owner = ownerRef.current;
     setCreating(true);
     try {
       const res = await lingxiFetch('/api/character-cards/import', {
@@ -111,7 +121,9 @@ export function AgentCreateOverlay() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      await switchToAgent(data.agent.id);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.resultChanged'));
+      await switchToAgent(data.agent.id, owner);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.resultChanged'));
       close();
       showToast(t('settings.agent.created', { name: data.agent.name }), 'success');
     } catch (err: any) {
@@ -128,7 +140,7 @@ export function AgentCreateOverlay() {
     <>
     <Overlay
       scope="inline"
-      open={visible && !cardPlan}
+      open={visible && ownsSettingsConnection(ownerRef.current) && !cardPlan}
       onClose={close}
       backdrop="blur"
       closeOnBackdrop={!creating && !planning}
@@ -224,7 +236,7 @@ export function AgentCreateOverlay() {
           </button>
         </div>
     </Overlay>
-    {visible && cardPlan && (
+    {visible && ownsSettingsConnection(ownerRef.current) && cardPlan && (
       <CharacterCardPreviewOverlay
         plan={cardPlan}
         mode="import"

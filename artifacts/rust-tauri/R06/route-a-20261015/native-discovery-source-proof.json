@@ -1,0 +1,471 @@
+{
+  "baseline": {
+    "head": "a270368f96300827a252783c5debca4ec6ec436d",
+    "files": {
+      "rust/Cargo.lock": "166ae15ae25cff5fd099524af5622d72f52a7bb0a3993ff3d863720d6ac03c75",
+      "rust/Cargo.toml": "477530e7bfb314bd0b3a1147b5b1a7c083a24a3cd70bdd19356b537cf5834523",
+      "rust/crates/lingxi-service/Cargo.toml": "88a08ef80858d5f75d9793fe65effc65cafb187050c592d19fec37daa8ea41b3",
+      "rust/crates/lingxi-adapters/src/models/gateway.rs": "c09481614df873318a8f3aa95111cdf05a83acdc7170040f0711c42cc6592fef",
+      "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "ff27cdb1d8f9bfdce37f9d28821fcb736a938586415f29bf8a1d4a16549bdfbe",
+      "rust/crates/lingxi-kernel/src/knowledge.rs": "319067fbb51b8e0d3a6d0d8ea9c1a9ae7984e641187f3a6144bd2970e8aa81eb",
+      "rust/crates/lingxi-service/src/agent_config_readback.rs": "47121ad09276766562fb81f46f510a6039a7ffc4bb4ba48134fcbbddad05ece4",
+      "rust/crates/lingxi-service/src/agents_admin.rs": "aea0be60304e163e378aa775dc468891ed716908f9922b7ac387f37bf9998e26",
+      "rust/crates/lingxi-service/src/auth.rs": "a39baef049b176ef534cda4a95faebaa4e0b559f9845283a45256e5d046ae7a8",
+      "rust/crates/lingxi-service/src/dream_service.rs": "680007ec172aa06739970b9c153c48abcbf9684c4a07525b6325358ac16470f0",
+      "rust/crates/lingxi-service/src/knowledge.rs": "fa73f3a1a5140cc96aa7a870ff54e77300763bb54e317e067731e14c8c2f6802",
+      "rust/crates/lingxi-service/src/knowledgetools.rs": "0acf3df1b27d5760dfec3e83a0b002d116b0c74e7bd4189fc0b069e298acda00",
+      "rust/crates/lingxi-service/src/lib.rs": "2e7e325b1dce199b1c6019d1323e2d22e624c8f32e957499eb5aa3806adde8f0",
+      "rust/crates/lingxi-service/src/memory.rs": "1f0f970a34ed5207eff5f0115213d8fe49c36f90f263f7f99af3a77e54d33a92",
+      "rust/crates/lingxi-service/src/skills.rs": "cbbd734afeced7899219fb69b97d568cfd7af5a4f18f22321713be6ebbfb2a7e",
+      "rust/crates/lingxi-service/src/character_cards.rs": "2bfb561ad5ba3b0b63d21a4c440d2233848e3d3b19844010259403935c3528f5",
+      "rust/crates/lingxi-service/src/memory_ticker.rs": "eb1b8241b45bb7da9f2f340a136a13bf2d29d8839f101be54ad68bd532c251c7",
+      "rust/crates/lingxi-service/src/settings_ui.rs": "9b7e763089e4ea545df950ed06fff383b2ad8c34a5b3b2a7e075ec97681f5edb",
+      "rust/crates/lingxi-service/src/filetools.rs": "38575544e9ac6d2f283f777e5f6f4ded914dc3512e89d6a6bed39316ab8f6965",
+      "rust/crates/lingxi-service/src/task_supervisor.rs": "61d90ad10329decfa50da8601f230baa4dd35e8aab30a38baf5af055913a7eea"
+    }
+  },
+  "originalAssertions": [
+    {
+      "feature_id": "F-D09-TOOL-TOOL-FIND-F88B0A",
+      "classification": "保留",
+      "domain_id": "D09",
+      "stage_ids": [
+        "R04",
+        "R06"
+      ],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "acceptance_ids": [
+        "R04-A07",
+        "R04-A08",
+        "R06-A09",
+        "R06-A10"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-F88B0A969094",
+      "acceptance_assertions": [
+        "命中路径准确",
+        "无写入",
+        "越权路径或扫描错误明确失败；无匹配返回空列表。"
+      ],
+      "existing_acceptance_fit": {
+        "assessment": "逐项见 existing_acceptance_relations；现有 A-ID 不替代新子场景"
+      },
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A07",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“并发编辑不覆盖用户修改”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        },
+        {
+          "acceptance_id": "R04-A08",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“符号链接不能逃逸授权目录”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        },
+        {
+          "acceptance_id": "R06-A09",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“旧附件迁移后可读”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        },
+        {
+          "acceptance_id": "R06-A10",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“缓存回收不误删交付”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        }
+      ]
+    },
+    {
+      "feature_id": "F-D09-TOOL-TOOL-GREP-EC77C2",
+      "classification": "保留",
+      "domain_id": "D09",
+      "stage_ids": [
+        "R04",
+        "R06"
+      ],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "acceptance_ids": [
+        "R04-A07",
+        "R04-A08",
+        "R06-A09",
+        "R06-A10"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-EC77C2B04726",
+      "acceptance_assertions": [
+        "匹配位置正确",
+        "无写入",
+        "无匹配为空；无效正则/越权路径明确失败。"
+      ],
+      "existing_acceptance_fit": {
+        "assessment": "逐项见 existing_acceptance_relations；现有 A-ID 不替代新子场景"
+      },
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A07",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“并发编辑不覆盖用户修改”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        },
+        {
+          "acceptance_id": "R04-A08",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“符号链接不能逃逸授权目录”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        },
+        {
+          "acceptance_id": "R06-A09",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“旧附件迁移后可读”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        },
+        {
+          "acceptance_id": "R06-A10",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“缓存回收不误删交付”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        }
+      ]
+    },
+    {
+      "feature_id": "F-D09-TOOL-TOOL-LS-B97D0D",
+      "classification": "保留",
+      "domain_id": "D09",
+      "stage_ids": [
+        "R04",
+        "R06"
+      ],
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "acceptance_ids": [
+        "R04-A07",
+        "R04-A08",
+        "R06-A09",
+        "R06-A10"
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "supplemental_acceptance_id": "R00-T02-LA-B97D0D4296FA",
+      "acceptance_assertions": [
+        "列表准确",
+        "没有写入",
+        "目录不存在、越权/符号链接逃逸时错误。"
+      ],
+      "existing_acceptance_fit": {
+        "assessment": "逐项见 existing_acceptance_relations；现有 A-ID 不替代新子场景"
+      },
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A07",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“并发编辑不覆盖用户修改”，未操作或核对本入口的列授权目录的文件和子目录。"
+        },
+        {
+          "acceptance_id": "R04-A08",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“符号链接不能逃逸授权目录”，未操作或核对本入口的列授权目录的文件和子目录。"
+        },
+        {
+          "acceptance_id": "R06-A09",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“旧附件迁移后可读”，未操作或核对本入口的列授权目录的文件和子目录。"
+        },
+        {
+          "acceptance_id": "R06-A10",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“缓存回收不误删交付”，未操作或核对本入口的列授权目录的文件和子目录。"
+        }
+      ]
+    },
+    {
+      "id": "R00-T02-LA-F88B0A969094",
+      "feature_id": "F-D09-TOOL-TOOL-FIND-F88B0A",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "given": "当前会话具备调用 find 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 find 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "返回路径列表，不写文件。",
+      "assertions": [
+        "命中路径准确",
+        "无写入",
+        "越权路径或扫描错误明确失败；无匹配返回空列表。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A07",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“并发编辑不覆盖用户修改”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        },
+        {
+          "acceptance_id": "R04-A08",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“符号链接不能逃逸授权目录”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        },
+        {
+          "acceptance_id": "R06-A09",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“旧附件迁移后可读”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        },
+        {
+          "acceptance_id": "R06-A10",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“缓存回收不误删交付”，未操作或核对本入口的按文件名模式列授权工作区文件。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "execution_owner": "Rust Resource",
+      "execution_stage_ids": [
+        "R04",
+        "R06"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    },
+    {
+      "id": "R00-T02-LA-EC77C2B04726",
+      "feature_id": "F-D09-TOOL-TOOL-GREP-EC77C2",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "given": "当前会话具备调用 grep 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 grep 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "返回匹配行/位置，不修改文件。",
+      "assertions": [
+        "匹配位置正确",
+        "无写入",
+        "无匹配为空；无效正则/越权路径明确失败。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A07",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“并发编辑不覆盖用户修改”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        },
+        {
+          "acceptance_id": "R04-A08",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“符号链接不能逃逸授权目录”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        },
+        {
+          "acceptance_id": "R06-A09",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“旧附件迁移后可读”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        },
+        {
+          "acceptance_id": "R06-A10",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“缓存回收不误删交付”，未操作或核对本入口的在授权工作区按文本或正则搜索。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "execution_owner": "Rust Resource",
+      "execution_stage_ids": [
+        "R04",
+        "R06"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    },
+    {
+      "id": "R00-T02-LA-B97D0D4296FA",
+      "feature_id": "F-D09-TOOL-TOOL-LS-B97D0D",
+      "task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "given": "当前会话具备调用 ls 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 ls 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "返回目录项与元数据，不改文件。",
+      "assertions": [
+        "列表准确",
+        "没有写入",
+        "目录不存在、越权/符号链接逃逸时错误。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A07",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“并发编辑不覆盖用户修改”，未操作或核对本入口的列授权目录的文件和子目录。"
+        },
+        {
+          "acceptance_id": "R04-A08",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“符号链接不能逃逸授权目录”，未操作或核对本入口的列授权目录的文件和子目录。"
+        },
+        {
+          "acceptance_id": "R06-A09",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“旧附件迁移后可读”，未操作或核对本入口的列授权目录的文件和子目录。"
+        },
+        {
+          "acceptance_id": "R06-A10",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“缓存回收不误删交付”，未操作或核对本入口的列授权目录的文件和子目录。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T04",
+        "R06-T05"
+      ],
+      "execution_owner": "Rust Resource",
+      "execution_stage_ids": [
+        "R04",
+        "R06"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    }
+  ],
+  "assertionSourceSha256": "462d528b17aba8b8bc9ae10912feda7778adfef92de7c3282d311dc5e7c1bac3",
+  "productionFiles": [
+    "rust/crates/lingxi-service/src/discovery_tools.rs",
+    "rust/crates/lingxi-service/src/discovery_windows.rs",
+    "rust/crates/lingxi-service/src/filetools.rs",
+    "rust/crates/lingxi-service/src/task_supervisor.rs",
+    "rust/crates/lingxi-service/src/lib.rs"
+  ],
+  "scope": "only native ls/find/grep; knowledge grep is a separate leaf; no governance changes",
+  "platform": "R3: macOS current Cargo parent50 and original R04 11 PASS; Linux runtime NOT_RUN; Windows actual implementation Available and GNU API/module+9-test metadata PASS, runtime/linking/full-service target compilation NOT_RUN",
+  "incumbentAndConsumerSha256": {
+    "lib/pi-sdk/search-tools.ts": "42eb462d861b16325514191cb066296f419e95574c7b00d265ba954ffc520567",
+    "lib/sandbox/grep-pager.ts": "bfe189190295e5402ac91bc5bc0dfa97e3e33a5a38fe0d12c35c0d8d6d3632b9",
+    "lib/resource-io/pi-tool-operations.ts": "c68be994fa4f7f32504208921019ed0a3eb89b005bfcd6d88cf45bff564d18cf",
+    "rust/crates/lingxi-service/src/toolcatalog_bridge.rs": "26a43391d6e861bd660d6828ae02a2d6967071d7598cb9cd60bebf4fb35ea7ea",
+    "rust/crates/lingxi-service/src/runs.rs": "f3024666c1cd956f872d6b502b4b10522628a609784d823da7f9a88dca7f1a2d"
+  },
+  "candidateProductionSha256": {
+    "rust/crates/lingxi-service/src/discovery_tools.rs": "43cf4b9e732ff252451bf14c05bff2c7bffc7aab5e23e315286f1a2f7996eadc",
+    "rust/crates/lingxi-service/src/discovery_windows.rs": "6178b954d4b83e983e8ff81503f704ad293905d2db1b92b6662569e22864e909",
+    "rust/crates/lingxi-service/src/filetools.rs": "5231c141ff6208c0212a162db27bb0f3438f447e05898be069c55479f5b6d01b",
+    "rust/crates/lingxi-service/src/task_supervisor.rs": "dbe6ca79231f355eb68fe8d590b99e8758947804aec14dda988542017622a369",
+    "rust/crates/lingxi-service/src/lib.rs": "2f434c5addd772b15e18caacff954a3af7a1e1a188f341e1d57172e0b6c5af1d"
+  },
+  "revision": "R3",
+  "mainPatchBase": {
+    "head": "a270368f96300827a252783c5debca4ec6ec436d",
+    "files": {
+      "rust/Cargo.lock": "166ae15ae25cff5fd099524af5622d72f52a7bb0a3993ff3d863720d6ac03c75",
+      "rust/Cargo.toml": "477530e7bfb314bd0b3a1147b5b1a7c083a24a3cd70bdd19356b537cf5834523",
+      "rust/crates/lingxi-service/Cargo.toml": "88a08ef80858d5f75d9793fe65effc65cafb187050c592d19fec37daa8ea41b3",
+      "rust/crates/lingxi-adapters/src/models/gateway.rs": "c09481614df873318a8f3aa95111cdf05a83acdc7170040f0711c42cc6592fef",
+      "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "ff27cdb1d8f9bfdce37f9d28821fcb736a938586415f29bf8a1d4a16549bdfbe",
+      "rust/crates/lingxi-kernel/src/knowledge.rs": "319067fbb51b8e0d3a6d0d8ea9c1a9ae7984e641187f3a6144bd2970e8aa81eb",
+      "rust/crates/lingxi-service/src/agent_config_readback.rs": "47121ad09276766562fb81f46f510a6039a7ffc4bb4ba48134fcbbddad05ece4",
+      "rust/crates/lingxi-service/src/agents_admin.rs": "aea0be60304e163e378aa775dc468891ed716908f9922b7ac387f37bf9998e26",
+      "rust/crates/lingxi-service/src/auth.rs": "a39baef049b176ef534cda4a95faebaa4e0b559f9845283a45256e5d046ae7a8",
+      "rust/crates/lingxi-service/src/dream_service.rs": "680007ec172aa06739970b9c153c48abcbf9684c4a07525b6325358ac16470f0",
+      "rust/crates/lingxi-service/src/knowledge.rs": "fa73f3a1a5140cc96aa7a870ff54e77300763bb54e317e067731e14c8c2f6802",
+      "rust/crates/lingxi-service/src/knowledgetools.rs": "0acf3df1b27d5760dfec3e83a0b002d116b0c74e7bd4189fc0b069e298acda00",
+      "rust/crates/lingxi-service/src/lib.rs": "2e7e325b1dce199b1c6019d1323e2d22e624c8f32e957499eb5aa3806adde8f0",
+      "rust/crates/lingxi-service/src/memory.rs": "1f0f970a34ed5207eff5f0115213d8fe49c36f90f263f7f99af3a77e54d33a92",
+      "rust/crates/lingxi-service/src/skills.rs": "cbbd734afeced7899219fb69b97d568cfd7af5a4f18f22321713be6ebbfb2a7e",
+      "rust/crates/lingxi-service/src/character_cards.rs": "2bfb561ad5ba3b0b63d21a4c440d2233848e3d3b19844010259403935c3528f5",
+      "rust/crates/lingxi-service/src/memory_ticker.rs": "eb1b8241b45bb7da9f2f340a136a13bf2d29d8839f101be54ad68bd532c251c7",
+      "rust/crates/lingxi-service/src/settings_ui.rs": "9b7e763089e4ea545df950ed06fff383b2ad8c34a5b3b2a7e075ec97681f5edb",
+      "rust/crates/lingxi-service/src/filetools.rs": "38575544e9ac6d2f283f777e5f6f4ded914dc3512e89d6a6bed39316ab8f6965",
+      "rust/crates/lingxi-service/src/task_supervisor.rs": "61d90ad10329decfa50da8601f230baa4dd35e8aab30a38baf5af055913a7eea"
+    }
+  },
+  "candidateProductionAndTestSha256": {
+    "rust/crates/lingxi-service/src/discovery_tools.rs": "43cf4b9e732ff252451bf14c05bff2c7bffc7aab5e23e315286f1a2f7996eadc",
+    "rust/crates/lingxi-service/src/discovery_windows.rs": "6178b954d4b83e983e8ff81503f704ad293905d2db1b92b6662569e22864e909",
+    "rust/crates/lingxi-service/src/filetools.rs": "5231c141ff6208c0212a162db27bb0f3438f447e05898be069c55479f5b6d01b",
+    "rust/crates/lingxi-service/src/task_supervisor.rs": "dbe6ca79231f355eb68fe8d590b99e8758947804aec14dda988542017622a369",
+    "rust/crates/lingxi-service/src/lib.rs": "2f434c5addd772b15e18caacff954a3af7a1e1a188f341e1d57172e0b6c5af1d",
+    "rust/crates/lingxi-service/tests/r06_native_discovery_current_source.rs": "056033095969bb01cff2f0b5c067b83c2a057c9bd033824e0895230bfe09e174",
+    "tests/rust-native/native-discovery-cases.py": "13f28598ae86b56561e0690dadf3c6df5b99ebee9b8d3f565cb0cde874718cf5",
+    "tests/rust-native/native-discovery-regression-probes.py": "eb547011808a3b4831afea3062f325d8ec6c00eafa930e1c72a2ed2ae06c1acf",
+    "tests/rust-native/native-discovery-depth-probes.py": "27fe8c0b0fd44a358f4e0b52871439a39e4c409abb74bd3b9759296a0a595d93",
+    "tests/rust-native/native-discovery-windows-api-typecheck.rs": "235a7e07239f4a854b680007b51db6926c382a0258f7790539a7740f7df7bc88"
+  },
+  "initialImplementationBaseline": {
+    "head": "a270368f96300827a252783c5debca4ec6ec436d",
+    "files": {
+      "rust/crates/lingxi-service/src/filetools.rs": "38575544e9ac6d2f283f777e5f6f4ded914dc3512e89d6a6bed39316ab8f6965",
+      "rust/crates/lingxi-service/src/task_supervisor.rs": "61d90ad10329decfa50da8601f230baa4dd35e8aab30a38baf5af055913a7eea",
+      "rust/crates/lingxi-service/src/resourceaccess.rs": "b838c8273950664391c0440a7ecb3b840699c64b69cb84d6525776654d24f188",
+      "rust/crates/lingxi-service/src/toolgateway.rs": "9a2ff55c1415177b51247a39d0ddf8fe4869e19056e3da97c841d50a8ba8f62c",
+      "rust/crates/lingxi-service/src/lib.rs": "0d653b75c78501471cd1cd008e564c52d331195d60020b0dc98de95995509c56",
+      "rust/crates/lingxi-service/src/dream_service.rs": "47833342c299acc7b707538c1c9a62c2c330e75adb3c139d40c2501889177381",
+      "rust/crates/lingxi-service/src/mood_trajectory.rs": "bee79d8361e5d5a7f00affd163fc851cdd3e647d91393eb453f6bd4fd05da78f",
+      "rust/crates/lingxi-service/src/agents_admin.rs": "ebd831d1566ebca2238a3afec91891ab0afdae544543f75dc1683b938a8e6c73",
+      "rust/crates/lingxi-service/src/history.rs": "e07ca2ea86616342b65e65d3d439f7d796c125387b78d241cc1dd0bb28c02d5a",
+      "rust/crates/lingxi-service/src/memory.rs": "4400d86e002d0625e995a71396abee395adda4545df253c6aafbfdf9e0f50289",
+      "rust/crates/lingxi-service/src/events.rs": "bea75075340b5ef135e00157daef549fcfab636e7c6b4b6afcd62b79689108b9",
+      "rust/crates/lingxi-service/src/ws.rs": "5379bc8fb51981b7687f7e945d424f1d78c31df0550c83dfb3b9179c62f762ed",
+      "rust/crates/lingxi-service/src/agent_deletions.rs": "939d7104611b6614094c746c4dba2a5c0626e82f8cd829fb82b1dcdbbf667d6a",
+      "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "d20b3791db5d72ef0a57385886b652773558a7fb6d2ace378206004bc0a8e99e",
+      "rust/crates/lingxi-adapters/src/storage/run_store.rs": "ba1ec9d5b7da92816173ea5f9dea011975e01de5ce9cbfe637ed6c1171220d72",
+      "rust/crates/lingxi-service/src/history_projection.rs": "7d00253f7a37ebce377a45a734a3cc73bb23155d3c85b72f62c7cd340441535a",
+      "rust/crates/lingxi-protocol/src/wire.rs": "513b4118bc009ca16149736acc574f98f7660cdd38ba3ada2219b2bf72bf2170",
+      "rust/crates/lingxi-service/src/runs.rs": "f3024666c1cd956f872d6b502b4b10522628a609784d823da7f9a88dca7f1a2d",
+      "rust/crates/lingxi-service/src/streaming_norm.rs": "d661461954a8433fe78264728fe01c2aae320440d340a1c8f9ab8b3f512488f5"
+    }
+  },
+  "currentCargoParent": {
+    "source": "rust/crates/lingxi-service/tests/r06_native_discovery_current_source.rs",
+    "test": "macos_native_discovery_current_binary_real_run_and_boundaries",
+    "scriptsWithinCandidateSummary": true,
+    "sharedByAllThreeLeaves": true,
+    "actualCurrentBinarySha256": "036f54c562f3debf15d5e0c3abade337d9859dd07349cb7258c2bcb312fc29c5",
+    "rawReceipt": "/private/tmp/lingxi-native-current-91878-1792001330991132000/parent-receipt.json"
+  }
+}

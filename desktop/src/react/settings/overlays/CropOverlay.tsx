@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSettingsStore } from '../store';
-import { lingxiFetch, lingxiUrl } from '../api';
+import { lingxiFetch, lingxiUrl, settingsConnectionKey } from '../api';
 import { t } from '../helpers';
 import { loadAgents } from '../actions';
 import { Overlay } from '../../ui';
@@ -11,6 +11,8 @@ const OUTPUT_SIZE = 1024;
 
 interface CropState {
   role: string;
+  agentId: string | null;
+  connectionKey: string | null;
   img: HTMLImageElement;
   scale: number;
   minScale: number;
@@ -30,15 +32,24 @@ export function CropOverlay() {
   useEffect(() => {
     const handler = (e: Event) => {
       const { role, file } = (e as CustomEvent).detail;
+      const owner = useSettingsStore.getState();
+      const agentId = owner.getSettingsAgentId();
+      const connectionKey = settingsConnectionKey();
+      if (role === 'agent' && !agentId) { owner.showToast(t('settings.crop.selectAgent'), 'error'); return; }
+      const report = () => owner.showToast(t('settings.crop.readFailed'), 'error');
       const reader = new FileReader();
+      reader.onerror = report;
+      reader.onabort = report;
       reader.onload = () => {
         const img = new Image();
+        img.onerror = report;
         img.onload = () => {
+          if (settingsConnectionKey() !== connectionKey || (role === 'agent' && useSettingsStore.getState().getSettingsAgentId() !== agentId)) { owner.showToast(t('settings.crop.ownerChanged'), 'error'); return; }
           const minScale = CROP_SIZE / Math.min(img.width, img.height);
           const scale = minScale;
           const ox = (CROP_SIZE - img.width * scale) / 2;
           const oy = (CROP_SIZE - img.height * scale) / 2;
-          setCropState({ role, img, scale, minScale, ox, oy });
+          setCropState({ role, agentId, connectionKey, img, scale, minScale, ox, oy });
           setImgSrc(reader.result as string);
           setVisible(true);
         };
@@ -104,11 +115,15 @@ export function CropOverlay() {
   const confirm = async () => {
     if (!cropState) return;
     const s = cropState;
+    const owner = useSettingsStore.getState();
+    if (settingsConnectionKey() !== s.connectionKey || (s.role === 'agent' && owner.getSettingsAgentId() !== s.agentId)) { close(); owner.showToast(t('settings.crop.ownerChanged'), 'error'); return; }
+    try {
     // eslint-disable-next-line no-restricted-syntax -- offscreen canvas for image crop, not part of React tree
     const canvas = document.createElement('canvas');
     canvas.width = OUTPUT_SIZE;
     canvas.height = OUTPUT_SIZE;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error(t('settings.crop.canvasUnavailable'));
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     const srcX = -s.ox / s.scale;
@@ -118,7 +133,8 @@ export function CropOverlay() {
     const dataUrl = canvas.toDataURL('image/png');
     const role = s.role;
     close();
-    await uploadCroppedAvatar(role, dataUrl);
+    await uploadCroppedAvatar(role, dataUrl, s.agentId, s.connectionKey);
+    } catch (error) { owner.showToast(error instanceof Error ? error.message : String(error), 'error'); }
   };
 
   return (
@@ -155,17 +171,18 @@ export function CropOverlay() {
   );
 }
 
-async function uploadCroppedAvatar(role: string, dataUrl: string) {
+async function uploadCroppedAvatar(role: string, dataUrl: string, agentId: string | null, connectionKey: string | null) {
   const store = useSettingsStore.getState();
   try {
     let uploadUrl: string;
     if (role === 'agent') {
-      const agentId = store.getSettingsAgentId();
       uploadUrl = `/api/agents/${agentId}/avatar`;
     } else {
       uploadUrl = `/api/avatar/${role}`;
     }
 
+    // 确认与真实请求捕获之间不等待，上传始终属于打开裁剪时的助手与连接。
+    if (settingsConnectionKey() !== connectionKey || (role === 'agent' && store.getSettingsAgentId() !== agentId)) throw new Error(t('settings.crop.ownerChanged'));
     const res = await lingxiFetch(uploadUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

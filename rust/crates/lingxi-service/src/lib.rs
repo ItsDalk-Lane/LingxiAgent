@@ -31,6 +31,7 @@ pub mod background;
 pub mod bridgemedia;
 pub mod cancel;
 pub mod cardguide;
+pub mod character_cards;
 pub mod checkpoint_store;
 pub mod compaction;
 pub mod config;
@@ -38,6 +39,7 @@ pub mod context_compiler;
 pub mod conversation_map;
 pub mod credentials;
 pub mod dedup;
+pub mod discovery_tools;
 pub mod dream_service;
 pub mod epoch;
 pub mod events;
@@ -61,6 +63,7 @@ pub mod logging;
 mod management;
 pub mod mcpbridge;
 pub mod memory;
+pub mod memory_ticker;
 pub mod memorytools;
 pub mod model_history;
 mod mood_trajectory;
@@ -85,6 +88,7 @@ pub mod session_supervisor;
 pub mod session_tree;
 pub mod sessionfiles;
 pub mod sessions;
+pub mod settings_ui;
 pub mod shutdown;
 pub mod skills;
 pub mod stagefiles;
@@ -661,6 +665,8 @@ pub struct ServiceDeps {
     pub http_request_budget_ms: u64,
     /// Injectable clock (R02-T07).
     pub clock: std::sync::Arc<dyn ServiceClock>,
+    /// 可信宿主周期注入；None沿用真实生产一小时，HTTP没有此配置入口。
+    pub memory_ticker_interval: Option<std::time::Duration>,
     /// Injectable per-request id source (R02-T07).
     pub request_ids: std::sync::Arc<dyn RequestIdGen>,
     /// Injectable model-turn source (R03-T01). `None` (the production
@@ -805,6 +811,7 @@ impl Default for ServiceDeps {
             http_max_in_flight: limits::DEFAULT_HTTP_MAX_IN_FLIGHT,
             http_request_budget_ms: limits::DEFAULT_HTTP_REQUEST_BUDGET_MS,
             clock: std::sync::Arc::new(SystemClock),
+            memory_ticker_interval: None,
             request_ids: std::sync::Arc::new(RandomRequestIdGen),
             turn_provider: None,
             tool_executor: None,
@@ -1269,6 +1276,15 @@ impl ServiceState {
             t06_data_home.clone(),
             layout.runtime_dir.clone(),
         ));
+        memory_service
+            .dream()
+            .ticker()
+            .configure(deps.memory_ticker_interval)
+            .map_err(|error| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest {
+                    detail: error.to_string(),
+                })
+            })?;
         memory_service.recover_agent_deletions().map_err(|error| {
             ServiceStartupError::Storage(StorageError::Io {
                 detail: format!("cannot recover agent deletions: {error}"),
@@ -1364,6 +1380,13 @@ impl ServiceState {
                         file_history.clone(),
                         session_files.clone(),
                     )),
+                    &budget,
+                );
+                discovery_tools::register_discovery_tools(
+                    &registry,
+                    gateway.as_ref(),
+                    access.clone(),
+                    workspace.clone(),
                     &budget,
                 );
                 stagefiles::register_stage_files(
@@ -7259,6 +7282,55 @@ pub fn build_router(state: ServiceState) -> Router {
             axum::routing::patch(projects::update_folder_route)
                 .delete(projects::delete_folder_route),
         )
+        // 角色卡文件与上传面复用同一原生服务及权限边界。
+        .route(
+            "/lingxi/v1/character-cards/plan",
+            post(character_cards::plan_route)
+                .layer(axum::extract::DefaultBodyLimit::max(80 * 1024 * 1024)),
+        )
+        .route(
+            "/lingxi/v1/character-cards/import",
+            post(character_cards::import_route),
+        )
+        .route(
+            "/lingxi/v1/character-cards/export/preview",
+            post(character_cards::export_preview_route),
+        )
+        .route(
+            "/lingxi/v1/character-cards/export",
+            post(character_cards::export_route),
+        )
+        .route(
+            "/lingxi/v1/character-cards/plans/{token}/assets/{key}",
+            get(character_cards::plan_asset_route),
+        )
+        .route(
+            "/lingxi/v1/character-cards/export/{agent_id}/assets/{key}",
+            get(character_cards::export_asset_route),
+        )
+        // 当前桌面助手设置聚合读面，错误沿原处理器返回，其他设置页不借此冒充可用。
+        .route(
+            "/lingxi/v1/settings/snapshot",
+            get(settings_ui::snapshot_route),
+        )
+        .route("/lingxi/v1/settings/config", get(settings_ui::config_route))
+        .route(
+            "/lingxi/v1/settings/avatar-health",
+            get(settings_ui::avatars_health_route),
+        )
+        .route("/lingxi/v1/models", get(settings_ui::models_route))
+        .route(
+            "/lingxi/v1/preferences/models",
+            get(settings_ui::preferences_models_route),
+        )
+        .route(
+            "/lingxi/v1/providers/summary",
+            get(settings_ui::providers_summary_route),
+        )
+        .route(
+            "/lingxi/v1/user-profile",
+            get(settings_ui::user_profile_route),
+        )
         // ── R06-T06 tenets/pinned/experience/config 人格面 ──
         .route(
             "/lingxi/v1/agents/{agent_id}/tenets",
@@ -7560,6 +7632,7 @@ where
         .bound_addr
         .write()
         .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(local);
+    state.memory().dream().ticker().start(state.clone());
     on_ready(local);
 
     // R2-F04: the serving loop enforces CONNECTION-level admission at the
@@ -7651,17 +7724,22 @@ where
         .unwrap()
         .map(|at| dream_budget.saturating_sub(at.elapsed()))
         .unwrap_or(dream_budget);
-    if tokio::time::timeout(remaining, dream_service.dream().wait_stopped())
-        .await
-        .is_err()
-    {
-        eprintln!(
-            "{} phase=memory_dream residue=unsettled_model_call",
-            shutdown::SHUTDOWN_TIMEOUT_MARKER
-        );
-        return outcome.map(|_| ServeOutcome {
-            drain_timed_out: true,
-        });
+    match tokio::time::timeout(remaining, dream_service.dream().wait_stopped_checked()).await {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(error.to_string()),
+            })
+        }
+        Err(_) => {
+            eprintln!(
+                "{} phase=memory_dream residue=unsettled_model_call",
+                shutdown::SHUTDOWN_TIMEOUT_MARKER
+            );
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            });
+        }
     }
     outcome
 }

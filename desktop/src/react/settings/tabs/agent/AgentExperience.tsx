@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { lingxiFetch } from '../../api';
+import { lingxiFetch, settingsConnectionKey } from '../../api';
+import { useSettingsStore } from '../../store';
 import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
 
@@ -35,6 +36,7 @@ export async function putExperience(
 ) {
   try {
     const agentId = store.getSettingsAgentId();
+    const connectionKey = settingsConnectionKey();
     const content = serializeExperience(cats);
     const res = await lingxiFetch(`/api/agents/${agentId}/experience`, {
       method: 'PUT',
@@ -43,6 +45,11 @@ export async function putExperience(
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
+    const current = useSettingsStore.getState();
+    // 同步成功后的页面缓存，避免后续工具配置刷新又显示保存前的旧经验。
+    if (current.getSettingsAgentId() === agentId && settingsConnectionKey() === connectionKey && current.settingsConfig) {
+      current.set({ settingsConfig: { ...current.settingsConfig, _experience: content } });
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     store.showToast(t('settings.saveFailed') + ': ' + msg, 'error');

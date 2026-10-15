@@ -2077,7 +2077,11 @@
       "cancel": "취소",
       "confirm": "확인",
       "updated": "아바타 업데이트됨 ✿",
-      "reset": "아바타가 기본값으로 복원됨"
+      "reset": "아바타가 기본값으로 복원됨",
+      "selectAgent": "먼저 도우미를 선택하세요",
+      "readFailed": "아바타 이미지를 읽을 수 없습니다",
+      "ownerChanged": "연결 또는 도우미가 변경되었습니다. 이미지를 다시 선택하세요.",
+      "canvasUnavailable": "아바타 자르기 캔버스를 사용할 수 없습니다"
     },
     "providers": {
       "title": "등록된 Provider",
@@ -3977,6 +3981,18 @@
         "checking": "확인 중…",
         "unavailable": "데스크톱 앱에서 확인 가능"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "삭제 정리 진행 상황",
+      "loadFailure": "삭제 진행 상황을 읽거나 갱신할 수 없습니다: {error}",
+      "deleted": "도우미 {id}이(가) 삭제되었습니다.",
+      "cleanupPending": "남은 파일 정리가 필요합니다.",
+      "referencesPending": "도우미 참조 갱신이 필요합니다. 다른 도우미로의 전환은 확인되지 않았습니다.",
+      "journalPending": "삭제 기록 저장이 필요합니다.",
+      "retry": "정리 다시 시도",
+      "formatError": "삭제 진행 응답 형식이 잘못되었습니다",
+      "connectionChanged": "연결이 변경되었습니다. 삭제 진행 상황을 다시 여세요.",
+      "resultChanged": "연결이 변경되어 이전 서버의 정리 결과가 아직 반영되지 않았습니다."
     }
   },
   "onboarding": {

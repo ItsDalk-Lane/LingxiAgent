@@ -1693,8 +1693,9 @@ impl KnowledgeService {
             let fingerprint = block_fingerprint(&chunker_blocks);
             // 与摄入 worker 同一策略推导（首块 locatorType 决定 strategy），
             // profileHash 逐字节同源——查询与索引永不各说各话。
-            let profile_hash = resolve_chunker_config(&chunker_blocks, Some(target))
-                .map(|(_, _, config_id)| config_id)?;
+            let profile_hash = ks::current_cache_profile_hash(
+                &resolve_chunker_config(&chunker_blocks, Some(target))?.2,
+            );
             match self
                 .index
                 .get_ready_variant_metadata(artifact_id, &profile_hash)?
@@ -1719,8 +1720,15 @@ impl KnowledgeService {
                     });
                 }
                 _ => degraded.push(DegradedScope {
-                    reason: "KNOWLEDGE_INDEX_BUILDING".into(),
-                    detail: "index stale or missing; rebuild pending".into(),
+                    reason: if self.index.artifact_has_stale_variants(artifact_id)? {
+                        "KNOWLEDGE_INDEX_ALGORITHM_STALE"
+                    } else {
+                        "KNOWLEDGE_INDEX_BUILDING"
+                    }
+                    .into(),
+                    detail:
+                        "index missing or outdated; explicitly rebuild from the original source"
+                            .into(),
                     parse_artifact_id: artifact_id.clone(),
                     source_id: frozen.source_id.clone(),
                     source_name: self
@@ -2089,7 +2097,15 @@ impl KnowledgeService {
         }
         let max_results = max_results.clamp(1, 200);
         let regex = if use_regex {
-            Some(simple_regex(pattern)?)
+            Some(
+                regex::RegexBuilder::new(pattern)
+                    .size_limit(4 * 1024 * 1024)
+                    .dfa_size_limit(4 * 1024 * 1024)
+                    .build()
+                    .map_err(|error| {
+                        KnowledgeError::invalid_argument(format!("invalid regexp: {error}"))
+                    })?,
+            )
         } else {
             None
         };
@@ -2124,42 +2140,56 @@ impl KnowledgeService {
                     }
                 }
                 let chars: Vec<char> = block.text.chars().collect();
-                let mut index = 0_usize;
-                while index < chars.len() {
-                    let matched_len = if let Some(regex) = &regex {
-                        // 简化正则逐位置匹配（literal 常走路径在下方）。
-                        regex.find_at(&chars, index)
+                // 匹配器返回真实字节位置，再按接口约定换成原文字符位置。
+                // find_iter 自行推进零宽匹配，避免空匹配重复或死循环。
+                let positions: Box<dyn Iterator<Item = (usize, usize)> + '_> =
+                    if let Some(regex) = &regex {
+                        Box::new(
+                            regex
+                                .find_iter(&block.text)
+                                .map(|hit| (hit.start(), hit.end())),
+                        )
                     } else {
-                        let pattern_chars: Vec<char> = pattern.chars().collect();
-                        if chars[index..].starts_with(&pattern_chars[..]) {
-                            Some(pattern_chars.len())
-                        } else {
-                            None
-                        }
+                        Box::new(
+                            block
+                                .text
+                                .match_indices(pattern)
+                                .map(|(start, matched)| (start, start + matched.len())),
+                        )
                     };
-                    if let Some(length) = matched_len {
-                        let snippet_start = index.saturating_sub(96);
-                        let snippet_end = (index + length + 96).min(chars.len());
-                        let snippet: String = chars[snippet_start..snippet_end].iter().collect();
-                        matches.push(json!({
-                            "sourceId": frozen.source_id,
-                            "sourceName": source_name,
-                            "parseArtifactId": artifact_id,
-                            "blockId": block.id,
-                            "blockOrdinal": block.ordinal,
-                            "startOffset": index,
-                            "endOffset": index + length,
-                            "lineNumber": block.locator.get("lineStart").and_then(|value| value.as_u64()),
-                            "headingPath": heading_path,
-                            "snippet": snippet,
-                        }));
-                        if matches.len() >= max_results {
-                            truncated = true;
-                            break 'sources;
-                        }
-                        index += length;
-                    } else {
-                        index += 1;
+                let mut previous_byte = 0;
+                let mut previous_char = 0;
+                let mut previous_newlines = 0;
+                for (byte_start, byte_end) in positions {
+                    let prefix = &block.text[previous_byte..byte_start];
+                    let start = previous_char + prefix.chars().count();
+                    let end = start + block.text[byte_start..byte_end].chars().count();
+                    previous_newlines += prefix.bytes().filter(|byte| *byte == b'\n').count();
+                    let line_number = block
+                        .locator
+                        .get("lineStart")
+                        .and_then(Value::as_u64)
+                        .map(|line| line + previous_newlines as u64);
+                    previous_byte = byte_start;
+                    previous_char = start;
+                    let snippet_start = start.saturating_sub(96);
+                    let snippet_end = (end + 96).min(chars.len());
+                    let snippet: String = chars[snippet_start..snippet_end].iter().collect();
+                    matches.push(json!({
+                        "sourceId": frozen.source_id,
+                        "sourceName": source_name,
+                        "parseArtifactId": artifact_id,
+                        "blockId": block.id,
+                        "blockOrdinal": block.ordinal,
+                        "startOffset": start,
+                        "endOffset": end,
+                        "lineNumber": line_number,
+                        "headingPath": heading_path,
+                        "snippet": snippet,
+                    }));
+                    if matches.len() >= max_results {
+                        truncated = true;
+                        break 'sources;
                     }
                 }
             }
@@ -2207,25 +2237,15 @@ impl KnowledgeService {
                 let mut status = "parse_pending";
                 if let Some(artifact_id) = &frozen.parse_artifact_id {
                     status = "ready";
-                    let profile_hash = self
-                        .facts
-                        .list_artifact_blocks(artifact_id)
-                        .ok()
-                        .map(|blocks| {
-                            let chunker_blocks: Vec<ChunkerBlock> =
-                                blocks.iter().map(chunker_block_of).collect();
-                            resolve_chunker_config(&chunker_blocks, Some(target))
-                                .map(|(_, _, config_id)| config_id)
-                                .ok()
-                        })
-                        .unwrap_or_default();
-                    if let Some((variant_id, count)) = profile_hash
-                        .and_then(|profile_hash| {
-                            self.index
-                                .get_ready_variant_metadata(artifact_id, &profile_hash)
-                                .ok()
-                        })
-                        .flatten()
+                    let blocks = self.facts.list_artifact_blocks(artifact_id)?;
+                    let chunker_blocks: Vec<ChunkerBlock> =
+                        blocks.iter().map(chunker_block_of).collect();
+                    let profile_hash = ks::current_cache_profile_hash(
+                        &resolve_chunker_config(&chunker_blocks, Some(target))?.2,
+                    );
+                    if let Some((variant_id, count)) = self
+                        .index
+                        .get_ready_variant_metadata(artifact_id, &profile_hash)?
                     {
                         chunk_count = count;
                         sections_out = self
@@ -2244,7 +2264,11 @@ impl KnowledgeService {
                             .collect();
                         let _ = variant_id;
                     } else {
-                        status = "index_building";
+                        status = if self.index.artifact_has_stale_variants(artifact_id)? {
+                            "index_algorithm_stale"
+                        } else {
+                            "index_building"
+                        };
                     }
                 }
                 sources_out.push(json!({
@@ -2275,8 +2299,9 @@ impl KnowledgeService {
         let blocks = self.facts.list_artifact_blocks(artifact_id)?;
         let chunker_blocks: Vec<ChunkerBlock> = blocks.iter().map(chunker_block_of).collect();
         let fingerprint = block_fingerprint(&chunker_blocks);
-        let profile_hash =
-            resolve_chunker_config(&chunker_blocks, Some(target)).map(|(_, _, id)| id)?;
+        let profile_hash = ks::current_cache_profile_hash(
+            &resolve_chunker_config(&chunker_blocks, Some(target))?.2,
+        );
         let Some((variant_id, count)) = self
             .index
             .get_ready_variant_metadata(artifact_id, &profile_hash)?
@@ -2326,9 +2351,16 @@ impl KnowledgeService {
             )
         })?;
         let Some((variant_id, _)) = self.ready_variant_for_frozen(&notebook, &artifact_id)? else {
+            let reason = if self.index.artifact_has_stale_variants(&artifact_id)? {
+                "KNOWLEDGE_INDEX_ALGORITHM_STALE"
+            } else {
+                "KNOWLEDGE_PARSE_NOT_READY"
+            };
             return Err(KnowledgeError::new(
-                "KNOWLEDGE_PARSE_NOT_READY",
-                format!("Knowledge source index is not ready yet (sourceId: {source_id})"),
+                reason,
+                format!(
+                    "Knowledge source index requires an explicit rebuild (sourceId: {source_id})"
+                ),
             ));
         };
         let chunks = self.index.list_variant_chunks(&variant_id)?;
@@ -2485,7 +2517,9 @@ impl KnowledgeService {
         let blocks = self.facts.list_artifact_blocks(&artifact_id)?;
         let blocks = blocks.iter().map(chunker_block_of).collect::<Vec<_>>();
         let fingerprint = block_fingerprint(&blocks);
-        let (_, _, profile) = resolve_chunker_config(&blocks, Some(target_chars))?;
+        // 分块事实仍用原规则标识；派生缓存单独绑定算法版本，避免复用旧缺口或收费检查点。
+        let profile =
+            ks::current_cache_profile_hash(&resolve_chunker_config(&blocks, Some(target_chars))?.2);
         let planned = build_chunks(&artifact_id, &blocks, Some(target_chars))?;
         if !self
             .index
@@ -3482,94 +3516,6 @@ fn collect_directory_files(path: &std::path::Path, depth: usize, visit: &mut dyn
             visit(path.to_string_lossy().to_string());
         }
     }
-}
-
-/// 简化正则（literal/前缀/字符类以外的完整正则面不在本任务范围——grep 默认
-/// literal；use_regex=true 支持 `.`、`*`、`+`、`?`、字符类与锚点的受限子集）。
-struct SimpleRegex {
-    pattern: Vec<char>,
-}
-
-impl SimpleRegex {
-    fn find_at(&self, text: &[char], start: usize) -> Option<usize> {
-        for begin in start..text.len() {
-            if let Some(length) = match_here(&self.pattern, 0, text, begin) {
-                return Some(length);
-            }
-        }
-        None
-    }
-}
-
-fn match_here(pattern: &[char], pi: usize, text: &[char], ti: usize) -> Option<usize> {
-    if pi >= pattern.len() {
-        return Some(0);
-    }
-    let ch = pattern[pi];
-    let quantified = pi + 1 < pattern.len();
-    match ch {
-        '^' if pi == 0 => {
-            if ti == 0 {
-                match_here(pattern, 1, text, ti)
-            } else {
-                None
-            }
-        }
-        '$' if pi == pattern.len() - 1 => {
-            if ti == text.len() {
-                Some(0)
-            } else {
-                None
-            }
-        }
-        '\\' if quantified => {
-            let escaped = pattern[pi + 1];
-            if ti < text.len() && text[ti] == escaped {
-                match_here(pattern, pi + 2, text, ti + 1).map(|len| len + 1)
-            } else {
-                None
-            }
-        }
-        _ if quantified && matches!(pattern[pi + 1], '*' | '+' | '?') => {
-            let quantifier = pattern[pi + 1];
-            let mut count = 0_usize;
-            let mut end = ti;
-            while end < text.len() && char_matches(ch, text[end]) {
-                count += 1;
-                end += 1;
-                if quantifier == '?' {
-                    break;
-                }
-            }
-            // 贪婪回退。
-            loop {
-                if let Some(len) = match_here(pattern, pi + 2, text, ti + count) {
-                    return Some(count + len);
-                }
-                if count == 0 {
-                    return None;
-                }
-                count -= 1;
-            }
-        }
-        _ => {
-            if ti < text.len() && char_matches(ch, text[ti]) {
-                match_here(pattern, pi + 1, text, ti + 1).map(|len| len + 1)
-            } else {
-                None
-            }
-        }
-    }
-}
-
-fn char_matches(pattern_ch: char, text_ch: char) -> bool {
-    pattern_ch == '.' || pattern_ch == text_ch
-}
-
-fn simple_regex(pattern: &str) -> Result<SimpleRegex, KnowledgeError> {
-    Ok(SimpleRegex {
-        pattern: pattern.chars().collect(),
-    })
 }
 
 // ── 序列化 ──────────────────────────────────────────────────────────────────

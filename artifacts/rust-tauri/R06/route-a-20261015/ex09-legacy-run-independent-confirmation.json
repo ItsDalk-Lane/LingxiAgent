@@ -1,0 +1,48 @@
+{
+  "result": "PASS_LIVE_LEGACY_CACHE_SCOPE",
+  "test": "legacy_cache_requires_explicit_rebuild_before_paid_query_and_preserves_original_source",
+  "command": "TMPDIR=/tmp/r06-ex09-independent-live-runtime/tmp /Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_original_knowledge_proofs-46d3ff82ad4bff82 --exact legacy_cache_requires_explicit_rebuild_before_paid_query_and_preserves_original_source --nocapture",
+  "exitCode": 0,
+  "passed": 1,
+  "ignored": 0,
+  "seconds": 0.81,
+  "home": "/tmp/r06-ex09-independent-live-runtime/tmp/lingxi-r06t07-knowledge-legacy-cache-real-run-29037-1792024572283518000",
+  "log": "/tmp/r06-ex09-independent-legacy-live.log",
+  "rawSqlite": "/tmp/r06-ex09-independent-legacy-live-sqlite.json",
+  "citationFacts": "/tmp/r06-ex09-independent-legacy-live-citation-facts.json",
+  "observed": {
+    "completedRuns": 3,
+    "chatUsageRows": 9,
+    "embeddingUsageRows": 1,
+    "currentJobNewlyEmbedded": 4,
+    "currentJobResumed": 0,
+    "currentJobPaidResponsesReused": 0,
+    "legacyVectorRowsPreserved": 3,
+    "citationRows": 4,
+    "originalSnapshotBytes": 326
+  },
+  "testAssertionsActuallyExecuted": [
+    "stale query has degraded reason and zero embedding calls",
+    "explicit rebuild newer job done",
+    "legacy paid bytes unchanged",
+    "real FTS old missing 上海 and fullwidth quartz now found",
+    "actual next Run consumes search and emits citations",
+    "original snapshot content exact bytes",
+    "restart has hits and no duplicate embedding calls"
+  ],
+  "provider": "external loopback model protocol stub, no actual money spent",
+  "limitations": [
+    "not real paid vendor",
+    "not other platforms/full package/full R06 acceptance"
+  ],
+  "sourceSha256": {
+    "rust/crates/lingxi-adapters/src/storage/knowledge.rs": "00a3669a66b52b99709524a0c494fdd12c50c4d21e35542cf2f2e36a25e304e1",
+    "rust/crates/lingxi-adapters/tests/r06_ex09_search_cache.rs": "aee43dec91c3cf2aabe6670ce0bc2c6d4fcfcd74b73ff81a5a25e1858bf2cfb5",
+    "rust/crates/lingxi-service/src/knowledge.rs": "9c619d94716c7adb00661f8cfa23a154489a6ba8929348219de9d54445f4a65e",
+    "rust/Cargo.lock": "6a0fefc98d9ccb6683f51c19a164e95e32a32e2b38af1b22e09f5287d080c4d7",
+    "rust/crates/lingxi-kernel/src/knowledge.rs": "319067fbb51b8e0d3a6d0d8ea9c1a9ae7984e641187f3a6144bd2970e8aa81eb",
+    "lib/search/search-text.ts": "c831ea28a1c0b65c6de1b0d6ba3b3517020582f7b5f7d31de3205630c165c687"
+  },
+  "homeOverridden": false,
+  "sourceModified": false
+}

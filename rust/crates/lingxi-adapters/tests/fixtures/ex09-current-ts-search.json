@@ -1,0 +1,110 @@
+[
+  {
+    "value": "Ｆｏｏ-bar.BAZ_17 上海",
+    "normalized": "foo-bar.baz_17 上海",
+    "tokens": [
+      "foo-bar.baz_17",
+      "foo",
+      "bar",
+      "baz_17",
+      "上海"
+    ],
+    "literal": "\"foo-bar.baz_17\" OR \"foo\" OR \"bar\" OR \"baz_17\" OR \"上海\""
+  },
+  {
+    "value": "南京市长江大桥",
+    "normalized": "南京市长江大桥",
+    "tokens": [
+      "南京",
+      "京市",
+      "南京市",
+      "长江",
+      "大桥",
+      "长江大桥",
+      "市长",
+      "江大",
+      "京市长",
+      "市长江",
+      "长江大",
+      "江大桥"
+    ],
+    "literal": "\"南京\" OR \"京市\" OR \"南京市\" OR \"长江\" OR \"大桥\" OR \"长江大桥\" OR \"市长\" OR \"江大\" OR \"京市长\" OR \"市长江\" OR \"长江大\" OR \"江大桥\""
+  },
+  {
+    "value": "中华人民共和国国歌",
+    "normalized": "中华人民共和国国歌",
+    "tokens": [
+      "中华",
+      "华人",
+      "人民",
+      "共和",
+      "共和国",
+      "中华人民共和国",
+      "国歌",
+      "民共",
+      "和国",
+      "国国",
+      "中华人",
+      "华人民",
+      "人民共",
+      "民共和",
+      "和国国",
+      "国国歌"
+    ],
+    "literal": "\"中华\" OR \"华人\" OR \"人民\" OR \"共和\" OR \"共和国\" OR \"中华人民共和国\" OR \"国歌\" OR \"民共\" OR \"和国\" OR \"国国\" OR \"中华人\" OR \"华人民\" OR \"人民共\" OR \"民共和\" OR \"和国国\" OR \"国国歌\""
+  },
+  {
+    "value": "とうきょう カタカナ 한국어",
+    "normalized": "とうきょう カタカナ 한국어",
+    "tokens": [
+      "とう",
+      "うき",
+      "きょ",
+      "ょう",
+      "とうき",
+      "うきょ",
+      "きょう",
+      "カタ",
+      "タカ",
+      "カナ",
+      "カタカ",
+      "タカナ",
+      "한국",
+      "국어",
+      "한국어"
+    ],
+    "literal": "\"とう\" OR \"うき\" OR \"きょ\" OR \"ょう\" OR \"とうき\" OR \"うきょ\" OR \"きょう\" OR \"カタ\" OR \"タカ\" OR \"カナ\" OR \"カタカ\" OR \"タカナ\" OR \"한국\" OR \"국어\" OR \"한국어\""
+  },
+  {
+    "value": "alpha beta release-1.2 _x",
+    "normalized": "alpha beta release-1.2 _x",
+    "tokens": [
+      "alpha",
+      "beta",
+      "release-1.2",
+      "_x",
+      "release-1",
+      "2",
+      "x"
+    ],
+    "literal": "\"alpha\" OR \"beta\" OR \"release-1.2\" OR \"_x\" OR \"release-1\" OR \"2\" OR \"x\""
+  },
+  {
+    "value": "𠀀𠀁",
+    "normalized": "𠀀𠀁",
+    "tokens": [
+      "𠀀𠀁"
+    ],
+    "literal": "\"𠀀𠀁\""
+  },
+  {
+    "value": "﻿ＦＯＯ\tK　\nBAR﻿",
+    "normalized": "foo k bar",
+    "tokens": [
+      "foo",
+      "k",
+      "bar"
+    ],
+    "literal": "\"foo\" OR \"k\" OR \"bar\""
+  }
+]

@@ -1380,6 +1380,21 @@ pub const COMPILED_FILES: [&str; 5] = [
     "longterm.md",
 ];
 
+/// 记忆缺失是正常空态；权限、链接、目录及无效文本必须明确失败。
+fn read_optional_memory_text(path: &Path) -> Result<String, MemoryError> {
+    match std::fs::symlink_metadata(path) {
+        Ok(metadata) if !metadata.file_type().is_file() => {
+            return Err(MemoryError::InvalidRequest(
+                "memory material must be a regular file".into(),
+            ))
+        }
+        Ok(_) => {}
+        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(String::new()),
+        Err(error) => return Err(error.into()),
+    }
+    std::fs::read_to_string(path).map_err(Into::into)
+}
+
 pub struct CompiledMemoryStore {
     memory_dir: PathBuf,
     is_zh: bool,
@@ -1425,10 +1440,16 @@ impl CompiledMemoryStore {
             atomic_write(&facts_path, "").map_err(MemoryError::from)?;
         }
         Ok(CompiledSections {
-            facts: normalize_compiled_section_body(&safe_read(&facts_path)),
-            today: normalize_compiled_section_body(&safe_read(&self.path("today.md"))),
-            week: normalize_compiled_week_section_body(&safe_read(&self.path("week.md"))),
-            longterm: normalize_compiled_section_body(&safe_read(&self.path("longterm.md"))),
+            facts: normalize_compiled_section_body(&read_optional_memory_text(&facts_path)?),
+            today: normalize_compiled_section_body(&read_optional_memory_text(
+                &self.path("today.md"),
+            )?),
+            week: normalize_compiled_week_section_body(&read_optional_memory_text(
+                &self.path("week.md"),
+            )?),
+            longterm: normalize_compiled_section_body(&read_optional_memory_text(
+                &self.path("longterm.md"),
+            )?),
         })
     }
 
@@ -1487,6 +1508,22 @@ impl CompiledMemoryStore {
         Ok(normalized)
     }
 
+    /// 角色卡编译资料写入与组装共用同助手操作门，不能在写后组装时重入。
+    pub fn import_sections(&self, sections: &CompiledSections) -> Result<String, MemoryError> {
+        let _operation = begin_memory_operation(&self.memory_dir, MemoryOperationKind::Compile)?;
+        let _publication = ContextMaterialMutation::for_path(&self.memory_dir);
+        std::fs::create_dir_all(&self.memory_dir)?;
+        for (file, content) in [
+            ("facts.md", &sections.facts),
+            ("today.md", &sections.today),
+            ("week.md", &sections.week),
+            ("longterm.md", &sections.longterm),
+        ] {
+            atomic_write(&self.path(file), content)?;
+        }
+        self.assemble_unlocked()
+    }
+
     pub fn write_facts(&self, facts: &str) -> Result<String, MemoryError> {
         self.write_section("facts.md", facts)
     }
@@ -1505,7 +1542,8 @@ impl CompiledMemoryStore {
         let mut dates: Vec<String> = Vec::new();
         match std::fs::read_dir(&daily_dir) {
             Ok(entries) => {
-                for entry in entries.flatten() {
+                for entry in entries {
+                    let entry = entry.map_err(MemoryError::from)?;
                     let name = entry.file_name().to_string_lossy().to_string();
                     if let Some(date) = name.strip_suffix(".md") {
                         if is_valid_iso_date(date) {
@@ -1518,13 +1556,20 @@ impl CompiledMemoryStore {
             Err(err) => return Err(MemoryError::from(err)),
         }
         dates.sort();
-        Ok(dates
+        dates
             .into_iter()
             .map(|date| {
-                let body = safe_read(&daily_dir.join(format!("{date}.md")));
-                (date, body.trim().to_string())
+                let path = daily_dir.join(format!("{date}.md"));
+                let metadata = std::fs::symlink_metadata(&path).map_err(MemoryError::from)?;
+                if !metadata.file_type().is_file() {
+                    return Err(MemoryError::Io(format!(
+                        "daily entry must be a regular file: {date}"
+                    )));
+                }
+                let body = std::fs::read_to_string(&path).map_err(MemoryError::from)?;
+                Ok((date, body.trim().to_string()))
             })
-            .collect())
+            .collect()
     }
 
     /// writeWeekDayEntry (compile.ts:849-866): only existing dates; then
@@ -2102,6 +2147,27 @@ impl ExperienceStore {
             }
         }
         self.rebuild_index_unlocked()
+    }
+
+    /// 设置页读取不能将经验文件读取失败冒充没有经验。
+    pub fn read_merged_checked(&self) -> Result<(String, Vec<Value>), MemoryError> {
+        let mut docs = self.list_documents_checked()?;
+        docs.sort_by(|left, right| left.title.cmp(&right.title));
+        // 设置页使用标题分段；与现役 GET 的分类投影一致，不能把存在的经验显示为空。
+        let blocks = docs
+            .iter()
+            .map(|doc| format!("# {}\n{}", doc.title, doc.body.trim_end()))
+            .collect::<Vec<_>>();
+        let merged = if blocks.is_empty() {
+            String::new()
+        } else {
+            format!("{}\n", blocks.join("\n\n"))
+        };
+        let files = docs
+            .iter()
+            .map(|doc| json!({"file": doc.file, "title": doc.title}))
+            .collect();
+        Ok((merged, files))
     }
 
     pub fn read_merged(&self) -> (String, Vec<Value>) {

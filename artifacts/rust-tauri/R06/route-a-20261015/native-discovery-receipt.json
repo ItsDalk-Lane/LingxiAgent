@@ -1,0 +1,74 @@
+{
+  "actualCurrentBinary": "/tmp/lingxi-ex01-target/debug/lingxi-service",
+  "binarySha256": "036f54c562f3debf15d5e0c3abade337d9859dd07349cb7258c2bcb312fc29c5",
+  "depth400": 4,
+  "evidence": "/private/tmp/lingxi-native-current-91878-1792001330991132000",
+  "independent6": 6,
+  "linuxRuntime": "NOT_RUN",
+  "original40": 40,
+  "sourceScripts": [
+    {
+      "path": "native-discovery-cases.py",
+      "sha256": "13f28598ae86b56561e0690dadf3c6df5b99ebee9b8d3f565cb0cde874718cf5"
+    },
+    {
+      "path": "native-discovery-regression-probes.py",
+      "sha256": "eb547011808a3b4831afea3062f325d8ec6c00eafa930e1c72a2ed2ae06c1acf"
+    },
+    {
+      "path": "native-discovery-depth-probes.py",
+      "sha256": "27fe8c0b0fd44a358f4e0b52871439a39e4c409abb74bd3b9759296a0a595d93"
+    }
+  ],
+  "status": "PASS_MAC_ONLY",
+  "windowsRuntime": "NOT_RUN",
+  "revision": "R3",
+  "authorChecksOnly": true,
+  "formalStageGateNotRunByAuthor": true,
+  "productionWindowsImplemented": true,
+  "windowsServiceTargetBuild": "NOT_RUN",
+  "windowsLinking": "NOT_RUN",
+  "windowsNativeNineRuntime": "NOT_RUN",
+  "windowsRunConsumer": "NOT_RUN",
+  "windowsTargetMetadata": "PASS: production module + API boundary and nine cfg tests only",
+  "r04OriginalThreeToolContract": "11 PASS",
+  "clippyServiceAndParentWarningsDenied": "PASS",
+  "format": "PASS",
+  "windowsClippyProductionAndAPIWarningsDenied": "PASS",
+  "windowsModuleFrozenOriginalSha256": "2875992c321fb27cda19db9a065ab6dcebccab0f25dbcf68885701fb3198112d",
+  "windowsModuleIntegratedSha256": "6178b954d4b83e983e8ff81503f704ad293905d2db1b92b6662569e22864e909",
+  "mainPatchBase": {
+    "head": "a270368f96300827a252783c5debca4ec6ec436d",
+    "files": {
+      "rust/Cargo.lock": "166ae15ae25cff5fd099524af5622d72f52a7bb0a3993ff3d863720d6ac03c75",
+      "rust/Cargo.toml": "477530e7bfb314bd0b3a1147b5b1a7c083a24a3cd70bdd19356b537cf5834523",
+      "rust/crates/lingxi-service/Cargo.toml": "88a08ef80858d5f75d9793fe65effc65cafb187050c592d19fec37daa8ea41b3",
+      "rust/crates/lingxi-adapters/src/models/gateway.rs": "c09481614df873318a8f3aa95111cdf05a83acdc7170040f0711c42cc6592fef",
+      "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "ff27cdb1d8f9bfdce37f9d28821fcb736a938586415f29bf8a1d4a16549bdfbe",
+      "rust/crates/lingxi-kernel/src/knowledge.rs": "319067fbb51b8e0d3a6d0d8ea9c1a9ae7984e641187f3a6144bd2970e8aa81eb",
+      "rust/crates/lingxi-service/src/agent_config_readback.rs": "47121ad09276766562fb81f46f510a6039a7ffc4bb4ba48134fcbbddad05ece4",
+      "rust/crates/lingxi-service/src/agents_admin.rs": "aea0be60304e163e378aa775dc468891ed716908f9922b7ac387f37bf9998e26",
+      "rust/crates/lingxi-service/src/auth.rs": "a39baef049b176ef534cda4a95faebaa4e0b559f9845283a45256e5d046ae7a8",
+      "rust/crates/lingxi-service/src/dream_service.rs": "680007ec172aa06739970b9c153c48abcbf9684c4a07525b6325358ac16470f0",
+      "rust/crates/lingxi-service/src/knowledge.rs": "fa73f3a1a5140cc96aa7a870ff54e77300763bb54e317e067731e14c8c2f6802",
+      "rust/crates/lingxi-service/src/knowledgetools.rs": "0acf3df1b27d5760dfec3e83a0b002d116b0c74e7bd4189fc0b069e298acda00",
+      "rust/crates/lingxi-service/src/lib.rs": "2e7e325b1dce199b1c6019d1323e2d22e624c8f32e957499eb5aa3806adde8f0",
+      "rust/crates/lingxi-service/src/memory.rs": "1f0f970a34ed5207eff5f0115213d8fe49c36f90f263f7f99af3a77e54d33a92",
+      "rust/crates/lingxi-service/src/skills.rs": "cbbd734afeced7899219fb69b97d568cfd7af5a4f18f22321713be6ebbfb2a7e",
+      "rust/crates/lingxi-service/src/character_cards.rs": "2bfb561ad5ba3b0b63d21a4c440d2233848e3d3b19844010259403935c3528f5",
+      "rust/crates/lingxi-service/src/memory_ticker.rs": "eb1b8241b45bb7da9f2f340a136a13bf2d29d8839f101be54ad68bd532c251c7",
+      "rust/crates/lingxi-service/src/settings_ui.rs": "9b7e763089e4ea545df950ed06fff383b2ad8c34a5b3b2a7e075ec97681f5edb",
+      "rust/crates/lingxi-service/src/filetools.rs": "38575544e9ac6d2f283f777e5f6f4ded914dc3512e89d6a6bed39316ab8f6965",
+      "rust/crates/lingxi-service/src/task_supervisor.rs": "61d90ad10329decfa50da8601f230baa4dd35e8aab30a38baf5af055913a7eea"
+    }
+  },
+  "logs": {
+    "/tmp/discovery-r3-current-source-final.log": "b792fb3db9eaef0538519a2573e51cc332111f2972dec38cd7cb84193e005785",
+    "/tmp/discovery-r3-r04-regression.log": "bf1c585f995f69b1ebf7d2286671aaba5429943756b2f8fbb6fb48519cad4dff",
+    "/tmp/discovery-r3-clippy.log": "6ec0afc391b067a970d3487b1f5f60b2fd60e6f70a242591e30c2f412b4c6629",
+    "/tmp/discovery-r3-format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/native-discovery-r3-windows-api.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/native-discovery-r3-windows-tests.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/native-discovery-r3-windows-clippy.log": "55094b3fb6179c2d299e18c7a57e73100f386be1d5f9c97924b0473151766e6b"
+  }
+}

@@ -21,6 +21,8 @@ vi.mock('../../settings/store', () => {
   const hook: any = (selector?: (s: MockState) => unknown) =>
     selector ? selector(mockState) : mockState;
   hook.getState = () => mockState;
+  // 此标题布局试件沿用非响应式store；真正连接隔离由真实窗口和真实store验收。
+  hook.subscribe = () => () => {};
   hook.setState = (partial: Partial<MockState>) => Object.assign(mockState, partial);
   return { useSettingsStore: hook };
 });

@@ -1,0 +1,43 @@
+{
+  "source": "windows_readonly.rs",
+  "sourceSHA256": "2875992c321fb27cda19db9a065ab6dcebccab0f25dbcf68885701fb3198112d",
+  "implementation": "WINDOWS_NATIVE_READ_ONLY_HANDLES_IMPLEMENTED",
+  "compiler": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "staticChecks": {
+    "windowsGNU_library_metadata_D_warnings": "PASS",
+    "windowsGNU_test_metadata_D_warnings": "PASS",
+    "windowsGNU_clippy_lib_and_tests_no_deps_D_warnings": "PASS",
+    "rustfmt": "PASS"
+  },
+  "nativeTestsProvided": 9,
+  "nativeTestsExecuted": false,
+  "WindowsRuntime": "NOT_RUN: host is macOS",
+  "WindowsLinking": "NOT_RUN: metadata/clippy type check only",
+  "serviceIntegration": "NOT_RUN: parent discovery module owned by w11",
+  "safetyIdentity": "volume u64 + full native FileId u128; no truncation",
+  "artifactsContainSecrets": false,
+  "integratedSource": "rust/crates/lingxi-service/src/discovery_windows.rs",
+  "integratedSourceSHA256": "6178b954d4b83e983e8ff81503f704ad293905d2db1b92b6662569e22864e909",
+  "formatOnlyChange": "rustfmt edition2021; native assertions unchanged",
+  "parentAPITargetTypeCheckSource": "tests/rust-native/native-discovery-windows-api-typecheck.rs",
+  "parentAPITargetTypeCheckSourceSHA256": "235a7e07239f4a854b680007b51db6926c382a0258f7790539a7740f7df7bc88",
+  "ownWindowsGNUChecks": {
+    "edition": 2021,
+    "libraryAPIAndProductionModuleMetadata": "PASS",
+    "nineWindowsTestsMetadata": "PASS",
+    "warnings": "DENIED",
+    "strictClippyProductionAPIAndNineTests": "PASS"
+  },
+  "notClaimed": [
+    "Windows runtime",
+    "Windows linking",
+    "whole service Windows target compilation",
+    "real Windows Run consumer",
+    "Linux runtime"
+  ],
+  "logs": {
+    "/tmp/native-discovery-r3-windows-api.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/native-discovery-r3-windows-tests.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/tmp/native-discovery-r3-windows-clippy.log": "55094b3fb6179c2d299e18c7a57e73100f386be1d5f9c97924b0473151766e6b"
+  }
+}

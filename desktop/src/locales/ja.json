@@ -2077,7 +2077,11 @@
       "cancel": "キャンセル",
       "confirm": "確認",
       "updated": "アバターを更新しました ✿",
-      "reset": "アバターをデフォルトに戻しました"
+      "reset": "アバターをデフォルトに戻しました",
+      "selectAgent": "先に助手を選んでください",
+      "readFailed": "アバター画像を読み取れません",
+      "ownerChanged": "接続または助手が変更されました。画像を選び直してください。",
+      "canvasUnavailable": "アバターの切り抜きキャンバスを利用できません"
     },
     "providers": {
       "title": "登録済みプロバイダー",
@@ -3977,6 +3981,18 @@
         "checking": "確認中…",
         "unavailable": "デスクトップアプリ内で確認できます"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "削除後のクリーンアップ",
+      "loadFailure": "削除状況の読み取りまたは更新に失敗しました：{error}",
+      "deleted": "助手 {id} は削除済みです。",
+      "cleanupPending": "残りのファイルの削除が必要です。",
+      "referencesPending": "助手の参照を更新する必要があります。他の助手への切り替えは未確認です。",
+      "journalPending": "削除記録の保存が必要です。",
+      "retry": "クリーンアップを再試行",
+      "formatError": "削除状況の応答形式が無効です",
+      "connectionChanged": "接続が変更されました。削除状況を開き直してください。",
+      "resultChanged": "接続が変更されました。前のサーバーの結果はまだ反映されていません。"
     }
   },
   "onboarding": {

@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useShallow } from 'zustand/react/shallow';
 import { useSettingsStore } from '../store';
 import { lingxiFetch } from '../api';
+import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from '../connection-owner';
 import { t, autoSaveConfig } from '../helpers';
 import { SelectWidget, Toggle, ProviderIcon, ProviderGroupHeader, selectWidgetStyles } from '@/ui';
 import { browseAgent, setPrimaryAgent, loadSettingsConfig, loadAgents } from '../actions';
@@ -20,7 +21,8 @@ import {
   ExperienceBlock, putExperience,
 } from './agent/AgentExperience';
 
-export function AgentTab() {
+export function AgentTab({ configurationReady = true }: { configurationReady?: boolean }) {
+  useSettingsStore();
   const {
     agents, currentAgentId, settingsAgentId, settingsConfig,
     globalModelsConfig, availableModels,
@@ -49,10 +51,11 @@ export function AgentTab() {
   const [expCategories, setExpCategories] = useState<ExpCategory[]>([]);
   const [exportPlanningAgentId, setExportPlanningAgentId] = useState<string | null>(null);
   const [exportingCharacterCard, setExportingCharacterCard] = useState(false);
+  const [exportOwner, setExportOwner] = useState<SettingsConnectionOwner | null>(null);
   const [exportPlan, setExportPlan] = useState<CharacterCardPlan | null>(null);
   const [exportMemory, setExportMemory] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (settingsConfig) {
       setAgentName(settingsConfig.agent?.name || '');
       setIdentity(settingsConfig._identity || '');
@@ -171,6 +174,9 @@ export function AgentTab() {
   const openAgentExportPreview = async (agentId: string) => {
     if (exportPlanningAgentId || exportingCharacterCard) return;
     setExportPlanningAgentId(agentId);
+    const owner = captureSettingsConnection();
+    setExportPlan(null);
+    setExportOwner(owner);
     try {
       const res = await lingxiFetch('/api/character-cards/export/preview', {
         method: 'POST',
@@ -180,6 +186,7 @@ export function AgentTab() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.connectionChanged'));
       setExportPlan(data.plan);
       setExportMemory(false);
     } catch (err: unknown) {
@@ -191,7 +198,8 @@ export function AgentTab() {
   };
 
   const confirmAgentExport = async () => {
-    if (!exportPlan?.agentId || exportingCharacterCard) return;
+    if (!exportPlan?.agentId || exportingCharacterCard || !ownsSettingsConnection(exportOwner)) return;
+    const owner = exportOwner;
     setExportingCharacterCard(true);
     try {
       const res = await lingxiFetch('/api/character-cards/export', {
@@ -205,6 +213,7 @@ export function AgentTab() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      if (!ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.resultChanged'));
       setExportPlan(null);
       setExportMemory(false);
       if (typeof data.filePath === 'string' && data.filePath) {
@@ -252,6 +261,7 @@ export function AgentTab() {
           exportingAgentId={exportPlanningAgentId}
         />
 
+        {configurationReady && <>
         <div className={`${styles['settings-form-field']} ${styles['settings-form-field-center']}`}>
           <input
             className={styles['agent-name-input']}
@@ -329,7 +339,10 @@ export function AgentTab() {
             {t('settings.save')}
           </button>
         </div>
+        </>}
       </SettingsSection>
+      {configurationReady && <>
+
 
       {/* 关于 Ta 的内容保持原样，外层归入标准 Section。 */}
       <SettingsSection title={t('settings.about.title')} surface="plain">
@@ -439,12 +452,14 @@ export function AgentTab() {
         disabled={settingsConfig ? settingsConfig.tools?.disabled ?? ["workflow"] : undefined}
       />
 
-      {exportPlanningAgentId && createPortal((
+      </>}
+
+      {exportPlanningAgentId && ownsSettingsConnection(exportOwner) && createPortal((
         <div className={styles['character-card-preview-overlay']} role="dialog" aria-modal="true">
           <div className={styles['character-card-loading-card']}>{t('settings.agent.generatingCardPreview')}</div>
         </div>
       ), document.body)}
-      {exportPlan && (
+      {exportPlan && ownsSettingsConnection(exportOwner) && (
         <CharacterCardPreviewOverlay
           plan={exportPlan}
           mode="export"

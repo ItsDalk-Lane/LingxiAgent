@@ -25,14 +25,16 @@ vi.mock('../actions', () => ({
   updateSettingsSnapshot: vi.fn(),
 }));
 
-vi.mock('../api', () => ({
-  lingxiFetch: vi.fn(async (url: string) => {
-    if (url === '/api/config') {
-      return new Response(JSON.stringify({ locale: 'zh-CN' }));
-    }
+vi.mock('../api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../api')>();
+  const request = vi.fn(async (url: string, _options?: RequestInit) => {
+    if (url === '/api/config') return new Response(JSON.stringify({ locale: 'zh-CN' }));
     return new Response(JSON.stringify({ experiments: [] }));
-  }),
-}));
+  });
+  return { ...actual, lingxiFetch: request,
+    lingxiFetchJson: async (url: string, options?: RequestInit) => (await request(url, options)).json(),
+  };
+});
 
 describe('SettingsContent tab heading', () => {
   let settingsChangedHandler: ((type: string, data: unknown) => void) | undefined;
@@ -219,7 +221,7 @@ describe('SettingsContent tab heading', () => {
     await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
   });
 
-  it('verifies Rust identity and keeps unavailable settings visibly unavailable', async () => {
+  it('clears foreign cached data before Rust settings and keeps unimplemented tabs unavailable', async () => {
     window.platform.getServerConnectionInfo = vi.fn(async () => ({
       port: 63002, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
     }));
@@ -242,7 +244,7 @@ describe('SettingsContent tab heading', () => {
     expect(lingxiFetch).toHaveBeenCalledWith('/lingxi/v1/server/identity');
     expect(useSettingsStore.getState()).toMatchObject({
       activeTab: 'access', rustSettingsUnavailable: true, settingsConfig: null,
-      settingsConfigStatus: 'error', agents: [], runtimeModels: [],
+      settingsConfigStatus: 'error', agents: [], runtimeModels: [], settingsDataOwner: null, settingsDataAgentId: null,
     });
     expect(actionMocks.loadAgents).not.toHaveBeenCalled();
     expect(actionMocks.loadSettingsModels).not.toHaveBeenCalled();

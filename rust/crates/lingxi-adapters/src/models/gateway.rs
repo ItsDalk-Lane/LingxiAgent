@@ -93,6 +93,30 @@ impl ConfigModelGateway {
         generation
     }
 
+    /// 读取当前已发布模型绑定，供设置页显示真实辅助模型状态；不返回任何凭证。
+    pub fn configured_routes(&self) -> BTreeMap<String, super::config::RouteBinding> {
+        let snapshot = self.current.read().expect("gateway snapshot lock");
+        let models = &snapshot.models;
+        [
+            ("chat", &models.chat),
+            ("title", &models.title),
+            ("summarize", &models.summarize),
+            ("memory", &models.memory),
+            ("vision", &models.vision),
+            ("approval", &models.approval),
+            ("guard", &models.guard),
+            ("embedding", &models.embedding),
+            ("rerank", &models.rerank),
+            ("image", &models.image),
+            ("video", &models.video),
+            ("speech", &models.speech),
+            ("speech_recognition", &models.speech_recognition),
+        ]
+        .into_iter()
+        .filter_map(|(name, binding)| binding.clone().map(|binding| (name.to_string(), binding)))
+        .collect()
+    }
+
     /// The generation the NEXT [`Self::reload`] will install (R05 RR1
     /// F02). Callers that must stamp side tables with the generation a
     /// reload is ABOUT to publish (the credential service's re-seed
@@ -134,6 +158,23 @@ impl ConfigModelGateway {
             .providers
             .iter()
             .map(|(id, entry)| (id.clone(), entry.endpoint.clone()))
+            .collect()
+    }
+
+    /// 设置页只读诊断：当前服务商协议与地址，绝不返回认证材料。
+    pub fn configured_provider_views(&self) -> Vec<(String, String, String)> {
+        self.current
+            .read()
+            .expect("gateway snapshot lock")
+            .providers
+            .iter()
+            .map(|(id, entry)| {
+                (
+                    id.clone(),
+                    entry.protocol.config_name().into(),
+                    entry.endpoint.clone(),
+                )
+            })
             .collect()
     }
 

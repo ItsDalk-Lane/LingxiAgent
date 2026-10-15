@@ -64,3 +64,13 @@ members = [
 edition = "2021"
 license = "UNLICENSED"
 publish = false
+
+[workspace.dependencies]
+# 助手角色卡使用成熟 ZIP 实现，仅启用纯 Rust 的 Deflate，不引入桌面或加密堆栈。
+zip = { version = "=9.0.3", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+# 原有 HTTP 版本保持不变，仅启用角色卡文件上传所需的标准 multipart 提取器。
+axum = { version = "=0.8.9", features = ["multipart"] }
+
+# EX09：纯 Rust 内嵌 Jieba 词典与 Unicode 兼容归一化。
+jieba-rs = { version = "=0.6.8", default-features = false, features = ["default-dict"] }
+unicode-normalization = "=0.1.25"

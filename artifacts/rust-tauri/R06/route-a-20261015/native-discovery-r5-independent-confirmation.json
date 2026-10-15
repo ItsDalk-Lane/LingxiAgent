@@ -1,0 +1,18 @@
+{
+  "result": "PASS_R5_OPTIMIZATION_SCOPE",
+  "sourceSha256": "7fca65825d273d3fa6127bc60c2b5573459913a37845a9db46805a993fb2f48c",
+  "binarySha256": "3cc8dcbca110ce0939c788fc1b2b6cc939f5cdea972ed96fb34f77ab537867f5",
+  "actualCases": 3,
+  "names": [
+    "directory-replaced",
+    "ancestor-moved-outside-and-link",
+    "actual-deep-frame-cancel-lease-and-next-run"
+  ],
+  "source": "/tmp/native-discovery-r5-frame-probes.py",
+  "log": "/tmp/native-discovery-r5-frame-probes.log",
+  "output": "/tmp/native-discovery-r5-independent-frames",
+  "root50Log": "/private/tmp/r06-main-native-20261015/r5-performance-and-boundaries.log",
+  "root50IndependentlyRerun": false,
+  "otherPlatforms": "NOT_RUN",
+  "mainModified": false
+}

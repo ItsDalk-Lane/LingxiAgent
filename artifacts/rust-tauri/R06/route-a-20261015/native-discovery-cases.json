@@ -1,0 +1,880 @@
+{
+  "revision": "R3",
+  "status": "PASS_MAC_ONLY",
+  "currentCargoParent50": {
+    "original40": [
+      {
+        "case": "real read-only session created through authorized product API",
+        "status": "PASS",
+        "detail": {
+          "ownerUserId": "user_local",
+          "sessionId": "native_discovery_readonly"
+        }
+      },
+      {
+        "case": "unauthenticated rejected before provider",
+        "status": "PASS",
+        "detail": 401
+      },
+      {
+        "case": "ls real entries dotfiles metadata",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "entries": [
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": ".hidden",
+              "size": 6,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1700000000000,
+              "name": "a.txt",
+              "size": 44,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": "binary.bin",
+              "size": 12,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": "literal.txt",
+              "size": 8,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": "mixed.TXT",
+              "size": 9,
+              "type": "file"
+            },
+            {
+              "isDirectory": true,
+              "mtimeMs": 1792001331045,
+              "name": "sub",
+              "size": 96,
+              "type": "directory"
+            }
+          ],
+          "kind": "ls",
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 6,
+          "truncated": false
+        }
+      },
+      {
+        "case": "ls bounded explicit complete total",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "entries": [
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": ".hidden",
+              "size": 6,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1700000000000,
+              "name": "a.txt",
+              "size": 44,
+              "type": "file"
+            }
+          ],
+          "kind": "ls",
+          "nextOffset": 2,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 6,
+          "truncated": true
+        }
+      },
+      {
+        "case": "ls default actual workspace",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "entries": [
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": "fifo",
+              "size": 0,
+              "type": "fifo"
+            },
+            {
+              "isDirectory": true,
+              "mtimeMs": 1792001331045,
+              "name": "guard",
+              "size": 96,
+              "type": "directory"
+            },
+            {
+              "isDirectory": true,
+              "mtimeMs": 1792001331045,
+              "name": "safe",
+              "size": 256,
+              "type": "directory"
+            },
+            {
+              "isDirectory": true,
+              "mtimeMs": 1792001331045,
+              "name": "unreadable",
+              "size": 96,
+              "type": "directory"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001331045,
+              "name": "unreadable-file",
+              "size": 8,
+              "type": "file"
+            }
+          ],
+          "kind": "ls",
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 5,
+          "truncated": false
+        }
+      },
+      {
+        "case": "find recursive real glob",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "find",
+          "nextOffset": null,
+          "offset": 0,
+          "paths": [
+            "a.txt",
+            "literal.txt",
+            "mixed.TXT",
+            "sub/b.md"
+          ],
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 4,
+          "truncated": false
+        }
+      },
+      {
+        "case": "find uppercase pattern remains case sensitive",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "find",
+          "nextOffset": null,
+          "offset": 0,
+          "paths": [
+            "mixed.TXT"
+          ],
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 1,
+          "truncated": false
+        }
+      },
+      {
+        "case": "find lowercase pattern uses incumbent smart case",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "find",
+          "nextOffset": null,
+          "offset": 0,
+          "paths": [
+            "a.txt",
+            "literal.txt",
+            "mixed.TXT"
+          ],
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 3,
+          "truncated": false
+        }
+      },
+      {
+        "case": "find genuine empty",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "find",
+          "nextOffset": null,
+          "offset": 0,
+          "paths": [],
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 0,
+          "truncated": false
+        }
+      },
+      {
+        "case": "grep true regex unicode BOM CRLF positions source digest",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [
+            {
+              "context": [],
+              "line": 2,
+              "path": "a.txt",
+              "positions": [
+                {
+                  "byteEnd": 28,
+                  "byteStart": 20,
+                  "column": 4,
+                  "endColumn": 12,
+                  "match": "alpha-17",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "dafd79aaf99d944c12ca5edd3d6129c29339b4cc4b58308851da69e84a1e54b1",
+              "text": "中文 alpha-17",
+              "textTruncated": false
+            },
+            {
+              "context": [],
+              "line": 3,
+              "path": "a.txt",
+              "positions": [
+                {
+                  "byteEnd": 38,
+                  "byteStart": 30,
+                  "column": 1,
+                  "endColumn": 9,
+                  "match": "ALPHA-88",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "dafd79aaf99d944c12ca5edd3d6129c29339b4cc4b58308851da69e84a1e54b1",
+              "text": "ALPHA-88",
+              "textTruncated": false
+            }
+          ],
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 2,
+          "truncated": false
+        }
+      },
+      {
+        "case": "grep literal actual special chars",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [
+            {
+              "context": [],
+              "line": 1,
+              "path": "literal.txt",
+              "positions": [
+                {
+                  "byteEnd": 3,
+                  "byteStart": 0,
+                  "column": 1,
+                  "endColumn": 4,
+                  "match": "a.b",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "af0413637eb6c6de0c9eec4d3e693372835563759eb4316c335ab0a8a5a68f9c",
+              "text": "a.b",
+              "textTruncated": false
+            }
+          ],
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 1,
+          "truncated": false
+        }
+      },
+      {
+        "case": "grep count glob sorted ties",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "counts": [
+            {
+              "count": 2,
+              "path": "a.txt"
+            },
+            {
+              "count": 2,
+              "path": "sub/b.md"
+            }
+          ],
+          "kind": "grep",
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 2,
+          "truncated": false
+        }
+      },
+      {
+        "case": "grep matching files newest first real mtime",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "files": [
+            "sub/b.md",
+            "a.txt"
+          ],
+          "kind": "grep",
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 2,
+          "truncated": false
+        }
+      },
+      {
+        "case": "grep context limit explicit truncation",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [
+            {
+              "context": [
+                {
+                  "line": 1,
+                  "text": "hello 42",
+                  "textTruncated": false
+                },
+                {
+                  "line": 2,
+                  "text": "中文 alpha-17",
+                  "textTruncated": false
+                },
+                {
+                  "line": 3,
+                  "text": "ALPHA-88",
+                  "textTruncated": false
+                }
+              ],
+              "line": 2,
+              "path": "a.txt",
+              "positions": [
+                {
+                  "byteEnd": 25,
+                  "byteStart": 20,
+                  "column": 4,
+                  "endColumn": 9,
+                  "match": "alpha",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "dafd79aaf99d944c12ca5edd3d6129c29339b4cc4b58308851da69e84a1e54b1",
+              "text": "中文 alpha-17",
+              "textTruncated": false
+            }
+          ],
+          "nextOffset": 1,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 2,
+          "truncated": true
+        }
+      },
+      {
+        "case": "grep genuine offset",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [
+            {
+              "context": [],
+              "line": 3,
+              "path": "a.txt",
+              "positions": [
+                {
+                  "byteEnd": 35,
+                  "byteStart": 30,
+                  "column": 1,
+                  "endColumn": 6,
+                  "match": "ALPHA",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "dafd79aaf99d944c12ca5edd3d6129c29339b4cc4b58308851da69e84a1e54b1",
+              "text": "ALPHA-88",
+              "textTruncated": false
+            }
+          ],
+          "nextOffset": null,
+          "offset": 1,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 2,
+          "truncated": false
+        }
+      },
+      {
+        "case": "grep genuine empty and explicit binary skip",
+        "status": "PASS",
+        "detail": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [],
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 1,
+          "skippedDuplicateDirectories": 0,
+          "total": 0,
+          "truncated": false
+        }
+      },
+      {
+        "case": "ls refusal {'path': 'missing'}",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [not_found]: NATIVE_DISCOVERY_OPEN_DIRECTORY_FAILED: NotFound (os=Some(2))"
+        }
+      },
+      {
+        "case": "ls refusal {'path': '/private/tmp/lingxi-native-current-91878-1792001330991132000/original40/outside'}",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: tool resource scope refused: resource_scope_refused: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "find refusal {'path': 'safe', 'pattern': '['}",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [invalid_message]: NATIVE_FIND_INVALID_GLOB"
+        }
+      },
+      {
+        "case": "grep refusal {'path': 'safe', 'pattern': '['}",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [invalid_message]: NATIVE_GREP_INVALID_REGEX: regex parse error:\n    [\n    ^\nerror: unclosed character class"
+        }
+      },
+      {
+        "case": "grep refusal {'path': 'safe', 'pattern': 'alpha', 'offset': 1, 'context': 1}",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [invalid_message]: GREP_OFFSET_WITH_CONTEXT"
+        }
+      },
+      {
+        "case": "ls symlink escape rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "ls external root rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: tool resource scope refused: resource_scope_refused: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "ls missing root rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [not_found]: NATIVE_DISCOVERY_OPEN_DIRECTORY_FAILED: NotFound (os=Some(2))"
+        }
+      },
+      {
+        "case": "find symlink escape rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "find external root rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: tool resource scope refused: resource_scope_refused: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "find missing root rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [not_found]: NATIVE_DISCOVERY_OPEN_DIRECTORY_FAILED: NotFound (os=Some(2))"
+        }
+      },
+      {
+        "case": "grep symlink escape rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "grep external root rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [forbidden]: tool resource scope refused: resource_scope_refused: NATIVE_DISCOVERY_PATH_NOT_AUTHORIZED"
+        }
+      },
+      {
+        "case": "grep missing root rejected",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [not_found]: NATIVE_DISCOVERY_STAT_ROOT_FAILED: NotFound (os=Some(2))"
+        }
+      },
+      {
+        "case": "ls actual directory IO error",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [internal]: NATIVE_DISCOVERY_OPEN_DIRECTORY_FAILED: PermissionDenied (os=Some(13))"
+        }
+      },
+      {
+        "case": "find actual directory IO error",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [internal]: NATIVE_DISCOVERY_OPEN_DIRECTORY_FAILED: PermissionDenied (os=Some(13))"
+        }
+      },
+      {
+        "case": "grep actual directory IO error",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [internal]: NATIVE_DISCOVERY_OPEN_DIRECTORY_FAILED: PermissionDenied (os=Some(13))"
+        }
+      },
+      {
+        "case": "grep actual file IO error",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [internal]: NATIVE_DISCOVERY_OPEN_FILE_FAILED: PermissionDenied (os=Some(13))"
+        }
+      },
+      {
+        "case": "grep FIFO rejected without waiting",
+        "status": "PASS",
+        "detail": {
+          "errorText": "tool error [invalid_message]: NATIVE_GREP_NON_REGULAR_FILE"
+        }
+      },
+      {
+        "case": "read only original bytes metadata and no fake file records",
+        "status": "PASS",
+        "detail": {
+          "safe/.hidden": {
+            "mode": 33188,
+            "mtime_ns": 1792001331045134732,
+            "bytes": "e564b4081d7a9ea4b00dada53bdae70c99b87b6fce869f0c3dd4d2bfa1e53e1c"
+          },
+          "safe/a.txt": {
+            "mode": 33188,
+            "mtime_ns": 1700000000000000000,
+            "bytes": "dafd79aaf99d944c12ca5edd3d6129c29339b4cc4b58308851da69e84a1e54b1"
+          },
+          "safe/binary.bin": {
+            "mode": 33188,
+            "mtime_ns": 1792001331045203482,
+            "bytes": "618a2871e0abcec092fabb95c1248b2ff7c3b2431fac01d31b0d18c1fa7b1d65"
+          },
+          "safe/literal.txt": {
+            "mode": 33188,
+            "mtime_ns": 1792001331045274816,
+            "bytes": "af0413637eb6c6de0c9eec4d3e693372835563759eb4316c335ab0a8a5a68f9c"
+          },
+          "safe/mixed.TXT": {
+            "mode": 33188,
+            "mtime_ns": 1792001331045345525,
+            "bytes": "f3c35988f70a534d92ba48b8c47fec59424419dadf73f47a669138537edb3988"
+          },
+          "safe/sub": {
+            "mode": 16877,
+            "mtime_ns": 1792001331045027398,
+            "bytes": null
+          },
+          "safe/sub/b.md": {
+            "mode": 33188,
+            "mtime_ns": 1700000001000000000,
+            "bytes": "9b31d4c65c3ad103341f22c5e60f8f83fc469300dd60d6a7474a3c9e650155f1"
+          }
+        }
+      },
+      {
+        "case": "reboot next Run consumes persisted genuine tool history",
+        "status": "PASS",
+        "detail": 200
+      },
+      {
+        "case": "OS sees real in-flight scan directory handle before cancellation",
+        "status": "PASS",
+        "detail": "/private/tmp/lingxi-native-current-91878-1792001330991132000/original40/workspace/slow"
+      },
+      {
+        "case": "true in-flight disconnect cancellation and concurrent busy no false success",
+        "status": "PASS",
+        "detail": {
+          "observed": [
+            "run_000001a13b9a66e8_000023",
+            "started"
+          ],
+          "run": "cancelled",
+          "receipts": [
+            [
+              "started",
+              null,
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "case": "physical worker releases session permit then next genuine Run succeeds",
+        "status": "PASS",
+        "detail": {
+          "busyResponses": 0,
+          "accepted": {
+            "runId": "run_000001a13b9a67d4_000024",
+            "runCount": 36
+          }
+        }
+      }
+    ],
+    "independent6": [
+      {
+        "name": "find preserves actual Unix backslash filename",
+        "result": "PASS",
+        "actual": {
+          "byteLimitReached": false,
+          "kind": "find",
+          "nextOffset": null,
+          "offset": 0,
+          "paths": [
+            "odd\\name.txt",
+            "oversized.txt",
+            "too-many-lines.txt",
+            "unicode.txt"
+          ],
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 4,
+          "truncated": false
+        }
+      },
+      {
+        "name": "grep source path preserves actual Unix backslash filename",
+        "result": "PASS",
+        "actual": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [
+            {
+              "context": [],
+              "line": 1,
+              "path": "odd\\name.txt",
+              "positions": [
+                {
+                  "byteEnd": 6,
+                  "byteStart": 0,
+                  "column": 1,
+                  "endColumn": 7,
+                  "match": "NEEDLE",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "821f40256eec3da72c26b23e47a1e7a6e0a7ac6a9a34e15bd0ba47cc2104cffa",
+              "text": "NEEDLE",
+              "textTruncated": false
+            }
+          ],
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 1,
+          "truncated": false
+        }
+      },
+      {
+        "name": "ls actual Unix filename positive control",
+        "result": "PASS",
+        "actual": {
+          "byteLimitReached": false,
+          "entries": [
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001338530,
+              "name": "odd\\name.txt",
+              "size": 7,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001338533,
+              "name": "oversized.txt",
+              "size": 16777217,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001338533,
+              "name": "too-many-lines.txt",
+              "size": 400002,
+              "type": "file"
+            },
+            {
+              "isDirectory": false,
+              "mtimeMs": 1792001338531,
+              "name": "unicode.txt",
+              "size": 28,
+              "type": "file"
+            }
+          ],
+          "kind": "ls",
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 4,
+          "truncated": false
+        }
+      },
+      {
+        "name": "grep astral Unicode BOM CRLF positions",
+        "result": "PASS",
+        "actual": {
+          "byteLimitReached": false,
+          "kind": "grep",
+          "matches": [
+            {
+              "context": [],
+              "line": 2,
+              "path": "unicode.txt",
+              "positions": [
+                {
+                  "byteEnd": 26,
+                  "byteStart": 20,
+                  "column": 4,
+                  "endColumn": 10,
+                  "match": "NEEdLE",
+                  "matchTextTruncated": false
+                }
+              ],
+              "positionsTruncated": false,
+              "sourceSha256": "2c4968fd1b87177c01c57b60cb75f40117ff05ebe1b435e6378ca4b2597de100",
+              "text": "ßβ NEEdLE",
+              "textTruncated": false
+            }
+          ],
+          "nextOffset": null,
+          "offset": 0,
+          "skippedBinaryFiles": 0,
+          "skippedDuplicateDirectories": 0,
+          "total": 1,
+          "truncated": false
+        }
+      },
+      {
+        "name": "oversized file fails explicitly",
+        "result": "PASS",
+        "actual": "tool error [invalid_message]: NATIVE_GREP_FILE_BUDGET_EXCEEDED"
+      },
+      {
+        "name": "too many lines fails explicitly",
+        "result": "PASS",
+        "actual": "tool error [invalid_message]: NATIVE_GREP_LINE_BUDGET_EXCEEDED"
+      }
+    ],
+    "depth400": [
+      {
+        "case": "original legal 400-depth 401-entry actual find correct and service alive",
+        "status": "PASS",
+        "detail": {
+          "elapsed": 26.815954624995356,
+          "actual": {
+            "byteLimitReached": false,
+            "kind": "find",
+            "nextOffset": null,
+            "offset": 0,
+            "paths": [
+              "d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/d/target.txt"
+            ],
+            "skippedBinaryFiles": 0,
+            "skippedDuplicateDirectories": 0,
+            "total": 1,
+            "truncated": false
+          }
+        }
+      },
+      {
+        "case": "same service accepts next genuine Run after deep scan",
+        "status": "PASS",
+        "detail": {
+          "runId": "run_000001a13b9adbb9_000002",
+          "runCount": 2
+        }
+      },
+      {
+        "case": "deep physical scan cancellation terminates honestly and preserves concurrent busy",
+        "status": "PASS",
+        "detail": {
+          "observed": [
+            "run_000001a13b9adbc5_000003",
+            "started",
+            "tool:first-party:find"
+          ],
+          "run": "cancelled",
+          "receipts": [
+            [
+              "started",
+              null
+            ]
+          ]
+        }
+      },
+      {
+        "case": "same service accepts next genuine Run after physical deep cancellation",
+        "status": "PASS",
+        "detail": {
+          "runId": "run_000001a13b9adc1b_000004",
+          "runCount": 4
+        }
+      }
+    ]
+  },
+  "windowsRuntime": "NOT_RUN",
+  "linuxRuntime": "NOT_RUN"
+}

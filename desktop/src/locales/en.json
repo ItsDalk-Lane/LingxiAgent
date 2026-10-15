@@ -2146,7 +2146,11 @@
       "cancel": "Cancel",
       "confirm": "Confirm",
       "updated": "Avatar updated ✿",
-      "reset": "Avatar reset to default"
+      "reset": "Avatar reset to default",
+      "selectAgent": "Select an assistant first",
+      "readFailed": "Could not read the avatar image",
+      "ownerChanged": "The connection or assistant changed. Select the avatar again.",
+      "canvasUnavailable": "Avatar cropping canvas is unavailable"
     },
     "providers": {
       "title": "Registered Providers",
@@ -3975,6 +3979,18 @@
         "checking": "Checking…",
         "unavailable": "Detectable in the desktop app"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "Deletion cleanup",
+      "loadFailure": "Could not read or update deletion progress: {error}",
+      "deleted": "Assistant {id} has been deleted.",
+      "cleanupPending": "Remaining files still need cleanup.",
+      "referencesPending": "Assistant references still need updating. Switching to another assistant is not confirmed.",
+      "journalPending": "The deletion record still needs saving.",
+      "retry": "Retry cleanup",
+      "formatError": "Invalid deletion progress response",
+      "connectionChanged": "The connection changed. Reopen deletion progress.",
+      "resultChanged": "The connection changed. Cleanup results from the previous server have not been refreshed here."
     }
   },
   "onboarding": {

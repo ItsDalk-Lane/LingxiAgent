@@ -26,6 +26,7 @@ pub struct DreamService {
     stopped: Mutex<HashSet<String>>,
     stopped_all: AtomicBool,
     settled: tokio::sync::Notify,
+    ticker: crate::memory_ticker::MemoryTickerHost,
 }
 fn fail(code: &str, message: impl Into<String>) -> MemoryError {
     MemoryError::Conflict {
@@ -103,7 +104,11 @@ fn availability(state: &ServiceState) -> Result<(AuxiliaryExecutor, ModelOperati
 }
 impl DreamService {
     /// 与宿主停止及助手销毁共用的真实生命周期；停止后不能继续披露修订。
+    pub fn ticker(&self) -> &crate::memory_ticker::MemoryTickerHost {
+        &self.ticker
+    }
     pub fn stop_agent(&self, agent: &str) {
+        self.ticker.stop_agent(agent);
         let active = self.active.lock().unwrap();
         self.stopped.lock().unwrap().insert(agent.into());
         if let Some(token) = active.get(agent) {
@@ -125,9 +130,11 @@ impl DreamService {
         }
         let removed = delete(prepared)?;
         self.stopped.lock().unwrap().insert(agent.into());
+        self.ticker.stop_agent(agent);
         Ok(removed)
     }
     pub fn stop_all(&self) {
+        self.ticker.stop();
         let active = self.active.lock().unwrap();
         self.stopped_all.store(true, Ordering::SeqCst);
         for token in active.values() {
@@ -135,12 +142,18 @@ impl DreamService {
         }
     }
     pub async fn wait_stopped(&self) {
+        self.wait_stopped_checked()
+            .await
+            .expect("memory ticker settlement failed");
+    }
+    pub async fn wait_stopped_checked(&self) -> Result<(), MemoryError> {
+        self.ticker.wait_stopped().await?;
         loop {
             let notified = self.settled.notified();
             tokio::pin!(notified);
             notified.as_mut().enable();
             if self.active.lock().unwrap().is_empty() {
-                return;
+                return Ok(());
             }
             notified.await;
         }
@@ -170,6 +183,7 @@ impl DreamService {
                 token.store(true, Ordering::SeqCst);
             }
         }
+        self.ticker.configuration_changed(agent, enabled);
         Ok(result)
     }
     pub fn cancel(&self, agent: &str) -> Result<(), MemoryError> {
@@ -201,7 +215,10 @@ impl DreamService {
             last["finishedAt"] = json!(am::now_iso());
             last["errorCode"] = json!("dream_run_interrupted");
             last["error"] = json!("服务重启中断了记忆整理，未报告成功");
-            saved["lastRun"] = last;
+            saved["lastRun"] = last.clone();
+            if last["trigger"] == "automatic" {
+                saved["lastAutomaticRun"] = last.clone();
+            }
             saved["runtime"] = Value::Null;
             persist(&roots.memory_dir, &mut saved)?;
         }
@@ -209,11 +226,64 @@ impl DreamService {
         let config = am::config::read_yaml_mapping_as_json(&roots.agent_dir.join("config.yaml"))?
             .unwrap_or_else(|| json!({}));
         let running = saved["runtime"].is_object();
+        let ticker = self.ticker.snapshot(agent);
         Ok(
-            json!({"agentId":agent,"status":if running {"running"} else { saved["lastRun"]["status"].as_str().unwrap_or("idle") },"runId":saved["runtime"]["runId"],"startedAt":saved["runtime"]["startedAt"],"lastRun":saved["lastRun"],"memoryEnabled":flags.memory_enabled.unwrap_or(true),"tickerPaused":!flags.memory_enabled.unwrap_or(true),"coreAvailable":true,"disabledSince":config["memory"]["disabledSince"],"reenableAt":config["memory"]["reenableAt"]}),
+            json!({"ticker":ticker,"tickerAvailable":self.ticker.is_running(),"agentId":agent,"status":if running {"running"} else { saved["lastRun"]["status"].as_str().unwrap_or("idle") },"runId":saved["runtime"]["runId"],"startedAt":saved["runtime"]["startedAt"],"lastRun":saved["lastRun"],"memoryEnabled":flags.memory_enabled.unwrap_or(true),"tickerPaused":ticker["paused"],"coreAvailable":true,"disabledSince":config["memory"]["disabledSince"],"reenableAt":config["memory"]["reenableAt"]}),
         )
     }
+    /// 定时服务只读真实既有终态；重启遗留runtime先通过同一记忆门恢复并标注中断。
+    pub(crate) fn persisted_automatic_report(
+        &self,
+        state: &ServiceState,
+        agent: &str,
+    ) -> Result<Option<Value>, MemoryError> {
+        let roots = state.memory().roots(agent)?;
+        match std::fs::metadata(state_path(&roots.memory_dir)) {
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(error) => return Err(error.into()),
+            Ok(_) => {}
+        }
+        let active = self.active.lock().unwrap();
+        let mut saved = read_state(&roots.memory_dir)?;
+        if saved["runtime"]["trigger"] == "automatic" && !active.contains_key(agent) {
+            let guard =
+                am::begin_memory_operation(&roots.memory_dir, am::MemoryOperationKind::Dream)?;
+            am::DreamRevisionStore::new(&roots.memory_dir).recover_for_operation(&guard)?;
+            let mut report = saved["runtime"].clone();
+            report["status"] = json!("failed");
+            report["errorCode"] = json!("dream_run_interrupted");
+            report["error"] = json!("服务重启中断了自动记忆整理，未报告成功");
+            report["finishedAt"] = json!(clock_iso(state)?);
+            saved["runtime"] = Value::Null;
+            saved["lastRun"] = report.clone();
+            saved["lastAutomaticRun"] = report;
+            persist(&roots.memory_dir, &mut saved)?;
+        }
+        let report = if saved["lastAutomaticRun"].is_object() {
+            saved["lastAutomaticRun"].clone()
+        } else {
+            saved["lastRun"].clone()
+        };
+        Ok((report["trigger"] == "automatic"
+            && matches!(report["status"].as_str(), Some("failed" | "succeeded")))
+        .then_some(report))
+    }
     pub fn start(&self, state: ServiceState, agent: String) -> Result<Value, MemoryError> {
+        self.start_with_trigger(state, agent, "manual")
+    }
+    pub(crate) fn start_automatic(
+        &self,
+        state: ServiceState,
+        agent: String,
+    ) -> Result<Value, MemoryError> {
+        self.start_with_trigger(state, agent, "automatic")
+    }
+    fn start_with_trigger(
+        &self,
+        state: ServiceState,
+        agent: String,
+        trigger: &'static str,
+    ) -> Result<Value, MemoryError> {
         let roots = state.memory().roots(&agent)?;
         if !state
             .memory()
@@ -224,25 +294,69 @@ impl DreamService {
             return Err(fail("dream_memory_disabled", "该助手记忆已关闭"));
         }
         self.lifecycle(&state, &agent)?;
-        let (executor, operation) = availability(&state)?;
+        let manual_executor = if trigger == "manual" {
+            Some(availability(&state)?)
+        } else {
+            None
+        };
         let mut active = self.active.lock().unwrap();
         self.lifecycle(&state, &agent)?;
+        if !state
+            .memory()
+            .read_flags(&agent)?
+            .memory_enabled
+            .unwrap_or(true)
+        {
+            return Err(fail("dream_memory_disabled", "该助手记忆已关闭"));
+        }
         if active.contains_key(&agent) {
+            if trigger == "automatic" {
+                return Ok(json!({"status":"skipped","reason":"dream_already_running"}));
+            }
             return Err(fail("dream_already_running", "该助手正在整理记忆"));
+        }
+        if trigger == "automatic" {
+            let config =
+                am::config::read_yaml_mapping_as_json(&roots.agent_dir.join("config.yaml"))?
+                    .unwrap_or_else(|| json!({}));
+            if config
+                .pointer("/memory/dream/auto_enabled")
+                .and_then(Value::as_bool)
+                != Some(true)
+            {
+                return Ok(json!({"status":"skipped","reason":"automatic_disabled"}));
+            }
         }
         let guard = am::begin_memory_operation(&roots.memory_dir, am::MemoryOperationKind::Dream)?;
         let store = am::DreamRevisionStore::new(&roots.memory_dir);
         store.recover_for_operation(&guard)?;
         let mut saved = read_state(&roots.memory_dir)?;
+        let logical_date = logical_date(&state)?;
+        if trigger == "automatic" {
+            if saved["lastAutomaticAttemptDate"] == logical_date {
+                return Ok(json!({"status":"skipped","reason":"already_attempted_today"}));
+            }
+            if saved["lastSuccessfulManualDate"] == logical_date {
+                return Ok(json!({"status":"skipped","reason":"manual_succeeded_today"}));
+            }
+        }
         if saved["runtime"].is_object() {
             let mut last = saved["runtime"].clone();
             last["status"] = json!("failed");
             last["errorCode"] = json!("dream_run_interrupted");
-            last["finishedAt"] = json!(am::now_iso());
+            last["finishedAt"] = json!(clock_iso(&state)?);
+            last["error"] = json!("服务重启中断了记忆整理，未报告成功");
+            if last["trigger"] == "automatic" {
+                saved["lastAutomaticRun"] = last.clone();
+            }
             saved["lastRun"] = last;
         }
         let before = store.snapshot_for_operation(&guard)?;
-        let at = am::now_iso();
+        let at = clock_iso(&state)?;
+        let ticker_epoch = self.ticker.config_epoch(&agent);
+        if trigger == "automatic" {
+            saved["lastAutomaticAttemptDate"] = json!(logical_date);
+        }
         static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
         let run_id = format!(
             "dream-{}-{}-{}",
@@ -250,6 +364,31 @@ impl DreamService {
             now_ms(),
             SEQ.fetch_add(1, Ordering::Relaxed)
         );
+        let is_zh = state.memory().locale_is_zh(&roots.agent_dir)?;
+        let resolved = if trigger == "automatic" && source_blocks(&before).is_empty() {
+            Err(fail("dream_no_memory", "没有可整理的当前记忆"))
+        } else {
+            manual_executor
+                .map(Ok)
+                .unwrap_or_else(|| availability(&state))
+        };
+        let (executor, operation) = match resolved {
+            Ok(value) => value,
+            Err(error) => {
+                let report = json!({"trigger":trigger,"status":"failed","runId":run_id,"startedAt":at,"finishedAt":at,"logicalDate":logical_date,"beforeChars":compiled_chars(&before,is_zh),"afterChars":compiled_chars(&before,is_zh),"model":null,"changed":false,"changedSections":[],"appliedOperationCount":0,"mergedCount":0,"forgottenCount":0,"reviewedCount":0,"notes":[],"revisionId":null,"errorCode":match &error { MemoryError::Conflict{code,..} => code.as_str(), _=>"dream_run_failed" },"error":error.to_string()});
+                saved["runtime"] = Value::Null;
+                saved["lastRun"] = report.clone();
+                if trigger == "automatic" {
+                    saved["lastAutomaticRun"] = report.clone();
+                }
+                persist(&roots.memory_dir, &mut saved)?;
+                if trigger == "automatic" {
+                    self.ticker
+                        .automatic_finished(&agent, &report, Some(ticker_epoch));
+                }
+                return Err(error);
+            }
+        };
         let model = state
             .model_gateway()
             .unwrap()
@@ -257,20 +396,14 @@ impl DreamService {
             .map_err(store_error)?
             .route
             .model;
-        use chrono::Timelike;
-        let local = chrono::Local::now();
-        let logical = if local.hour() < 4 {
-            local - chrono::Duration::hours(4)
-        } else {
-            local
-        };
-        let logical_date = logical.format("%Y-%m-%d").to_string();
-        let is_zh = state.memory().locale_is_zh(&roots.agent_dir)?;
-        let report = json!({"runId":run_id,"trigger":"manual","status":"running","startedAt":at,"logicalDate":logical_date,"beforeChars":compiled_chars(&before,is_zh),"afterChars":compiled_chars(&before,is_zh),"model":model,"revisionId":null,"changed":false,"changedSections":[],"appliedOperationCount":0,"mergedCount":0,"forgottenCount":0,"reviewedCount":0,"notes":[]});
+        let report = json!({"runId":run_id,"trigger":trigger,"status":"running","startedAt":at,"logicalDate":logical_date,"beforeChars":compiled_chars(&before,is_zh),"afterChars":compiled_chars(&before,is_zh),"model":model,"revisionId":null,"changed":false,"changedSections":[],"appliedOperationCount":0,"mergedCount":0,"forgottenCount":0,"reviewedCount":0,"notes":[]});
         saved["runtime"] = report.clone();
         persist(&roots.memory_dir, &mut saved)?;
         let token = Arc::new(AtomicBool::new(false));
         active.insert(agent.clone(), token.clone());
+        if trigger == "automatic" {
+            self.ticker.automatic_started(&agent, &report, ticker_epoch);
+        }
         drop(active);
         let started = json!({"agentId":agent,"status":"running","runId":run_id,"startedAt":at,"lastRun":saved["lastRun"]});
         tokio::spawn(async move {
@@ -288,7 +421,13 @@ impl DreamService {
                 &mut report,
             )
             .await;
-            report["finishedAt"] = json!(am::now_iso());
+            match clock_iso(&state) {
+                Ok(at) => report["finishedAt"] = json!(at),
+                Err(error) => {
+                    report["finishedAt"] = Value::Null;
+                    report["clockError"] = json!(error.to_string());
+                }
+            }
             match result {
                 Ok(()) => {
                     report["status"] = json!("succeeded");
@@ -316,16 +455,29 @@ impl DreamService {
                     let mut saved = read_state(&roots.memory_dir)?;
                     saved["runtime"] = Value::Null;
                     saved["lastRun"] = report.clone();
-                    if report["status"] == "succeeded" {
+                    if report["trigger"] == "automatic" {
+                        saved["lastAutomaticRun"] = report.clone();
+                    }
+                    if report["status"] == "succeeded" && report["trigger"] == "manual" {
                         saved["lastSuccessfulManualDate"] = report["logicalDate"].clone();
                     }
                     persist(&roots.memory_dir, &mut saved)
                 })()
             };
             if let Err(error) = finish {
+                report["status"] = json!("failed");
+                report["errorCode"] = json!("dream_state_write_failed");
+                report["error"] = json!(error.to_string());
                 state.app_events().publish(
                     "dream-state-error",
                     json!({"agentId":agent,"runId":run_id,"error":error.to_string()}),
+                );
+            }
+            if report["trigger"] == "automatic" {
+                state.memory().dream().ticker().automatic_finished(
+                    &agent,
+                    &report,
+                    Some(ticker_epoch),
                 );
             }
             drop(guard);
@@ -337,6 +489,25 @@ impl DreamService {
         });
         Ok(started)
     }
+}
+pub(crate) fn clock_iso(state: &ServiceState) -> Result<String, MemoryError> {
+    let ms = i64::try_from(state.clock().now_unix_ms()).map_err(store_error)?;
+    let now = chrono::DateTime::from_timestamp_millis(ms)
+        .ok_or_else(|| store_error("memory clock is outside supported range"))?;
+    Ok(now.to_rfc3339_opts(chrono::SecondsFormat::Millis, true))
+}
+pub(crate) fn logical_date(state: &ServiceState) -> Result<String, MemoryError> {
+    use chrono::Timelike;
+    let ms = i64::try_from(state.clock().now_unix_ms()).map_err(store_error)?;
+    let now = chrono::DateTime::from_timestamp_millis(ms)
+        .ok_or_else(|| store_error("memory clock is outside supported range"))?
+        .with_timezone(&chrono::Local);
+    let logical = if now.hour() < 4 {
+        now - chrono::Duration::hours(4)
+    } else {
+        now
+    };
+    Ok(logical.format("%Y-%m-%d").to_string())
 }
 fn now_ms() -> u64 {
     std::time::SystemTime::now()

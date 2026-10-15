@@ -2077,7 +2077,11 @@
       "cancel": "取消",
       "confirm": "確定",
       "updated": "頭像已更新 ✿",
-      "reset": "已恢復預設頭像"
+      "reset": "已恢復預設頭像",
+      "selectAgent": "請先選擇助手",
+      "readFailed": "頭像圖片讀取失敗",
+      "ownerChanged": "連線或助手已改變，請重新選擇頭像",
+      "canvasUnavailable": "頭像裁剪畫布不可用"
     },
     "providers": {
       "title": "已註冊的供應商",
@@ -3977,6 +3981,18 @@
         "checking": "檢測中…",
         "unavailable": "需在桌面應用內檢測"
       }
+    },
+    "agentDeletion": {
+      "progressTitle": "刪除清理進度",
+      "loadFailure": "無法讀取或更新刪除進度：{error}",
+      "deleted": "助手 {id} 已刪除。",
+      "cleanupPending": "剩餘檔案清理待完成。",
+      "referencesPending": "助手引用更新待完成，尚未確認切換到其他助手。",
+      "journalPending": "刪除記錄儲存待完成。",
+      "retry": "重試清理",
+      "formatError": "刪除進度回應格式不正確",
+      "connectionChanged": "連線已改變，請重新開啟刪除進度",
+      "resultChanged": "連線已改變，原服務的清理結果尚未在此頁更新"
     }
   },
   "onboarding": {

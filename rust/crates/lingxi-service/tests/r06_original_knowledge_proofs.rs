@@ -2457,6 +2457,19 @@ async fn boot_chat(home: &Path, endpoint: &str) -> ServiceState {
 
 async fn boot_chat_with_embedding(home: &Path, endpoint: &str, embedding: bool) -> ServiceState {
     let layout = prepare_layout(home).unwrap();
+    // 产品模板属于本用例的隔离材料，初始化不得改写仓库里的现役模板。
+    let product = home.join("product-materials");
+    let originals = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lib");
+    for name in ["identity-templates", "agents-templates", "yuan"] {
+        let destination = product.join(name);
+        std::fs::create_dir_all(&destination).unwrap();
+        for entry in std::fs::read_dir(originals.join(name)).unwrap() {
+            let entry = entry.unwrap();
+            if entry.file_type().unwrap().is_file() {
+                std::fs::copy(entry.path(), destination.join(entry.file_name())).unwrap();
+            }
+        }
+    }
     let config_path = home.join("synthetic-service.json");
     let mut configuration = json!({"home":home,"providers":{"main":{"protocol":"openai-completions","endpoint":endpoint,"auth":{"kind":"apiKey","apiKey":"F13_SYNTHETIC_ONLY"}}},"models":{"chat":{"provider":"main","model":"synthetic","capabilities":{"tools":true},"compat":{"contextWindow":1000000}}}});
     if embedding {
@@ -2496,6 +2509,7 @@ async fn boot_chat_with_embedding(home: &Path, endpoint: &str, embedding: bool) 
             model_plane_source: Some(source),
             credential_service: Some(credentials),
             workspace_root: Some(home.to_path_buf()),
+            product_material_dir: Some(product),
             // 本证明套件的单会话场景驱动 17+ 轮工具调用（原义务的逐案探针），
             // 超过默认 32 轮预算：按场景显式放宽（预算语义本身不变，越界仍响亮失败）。
             run_limits: lingxi_service::runs::RunDriveLimits {
@@ -3776,6 +3790,509 @@ async fn original_model_file_registration_failure_reports_written_bytes_without_
     db.execute_batch("DROP TRIGGER r06_tool_metadata_refused")
         .unwrap();
     drop(db);
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test]
+async fn regex_grep_current_run_uses_real_patterns_precise_unicode_offsets_and_rejects_invalid() {
+    use std::future::IntoFuture;
+    let home = unique_dir("regex-grep-current");
+    let docs = unique_dir("regex-grep-current-source");
+    let file = docs.join("patterns.md");
+    let original = "# 模式原文\n\n前缀💡 编号A12与B003\nliteral.*marker";
+    std::fs::write(&file, original).unwrap();
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route(
+                    "/chat/completions",
+                    axum::routing::post(knowledge_proof_provider),
+                )
+                .with_state(script.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot_chat(&home, &endpoint).await;
+    let knowledge = state.knowledge().clone();
+    let nb = knowledge.create_notebook("正则真实原文").unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let src = knowledge
+        .import_file(&nb, file.to_str().unwrap(), Some("模式原文"))
+        .unwrap()["source"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let server = serve(state.clone()).await;
+    wait_until_job(&server, &nb, &src, "pending_embedding").await;
+    let facts =
+        lingxi_adapters::storage::knowledge::KnowledgeFactStore::open(&home.join("knowledge"))
+            .unwrap();
+    let jobs_before = facts.list_ingestion_jobs(None, None, 500).unwrap();
+    let call = |args: Value| ("knowledge_grep".to_string(), args);
+    script.lock().unwrap().calls = vec![
+        call(json!({"scopeId":"runtime","pattern":"(?:A[0-9]{2}|B[0-9]{3})","regexp":true})),
+        call(json!({"scopeId":"runtime","pattern":"(?:A[0-9]{2}|B[0-9]{3})","regex":true})),
+        call(json!({"scopeId":"runtime","pattern":"[","regexp":true})),
+        call(json!({"scopeId":"runtime","pattern":"literal.*marker","regexp":false})),
+        call(json!({"scopeId":"runtime","pattern":"$","regexp":true})),
+        call(json!({"scopeId":"runtime","pattern":"A12","regexp":true,"regex":false})),
+    ];
+    let (status, executed) = server.request("POST", "/lingxi/v1/sessions/sess_local_alpha/execute", Some(json!({"input":"按真实正则扫描冻结原文","knowledge":{"notebookIds":[nb],"sourceIds":[src]}}))).await;
+    assert_eq!(status, 200, "{executed}");
+    let requests = script.lock().unwrap().requests.clone();
+    assert_eq!(requests.len(), 13);
+    let final_body = requests.last().unwrap();
+    let result = |index: usize| {
+        final_body["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|m| {
+                m["role"] == "tool" && m["tool_call_id"] == format!("original-result-{index}")
+            })
+            .map(proof_content)
+            .unwrap()
+    };
+    let first: Value = serde_json::from_str(&result(0)).expect("现役regexp参数必须真正执行正则");
+    let compatible: Value = serde_json::from_str(&result(1)).unwrap();
+    assert_eq!(first, compatible, "旧regex别名保持同一真实语义");
+    let hits = first["matches"].as_array().unwrap();
+    assert_eq!(hits.len(), 2, "{first}");
+    for (hit, expected) in hits.iter().zip(["A12", "B003"]) {
+        assert_eq!(hit["sourceId"], src.as_str());
+        let artifact = hit["parseArtifactId"].as_str().unwrap();
+        let blocks = facts.list_artifact_blocks(artifact).unwrap();
+        let block = blocks
+            .iter()
+            .find(|b| b.id == hit["blockId"].as_str().unwrap())
+            .unwrap();
+        let chars: Vec<char> = block.text.chars().collect();
+        let start = hit["startOffset"].as_u64().unwrap() as usize;
+        let end = hit["endOffset"].as_u64().unwrap() as usize;
+        assert_eq!(
+            chars[start..end].iter().collect::<String>(),
+            expected,
+            "Unicode前缀后位置必须回指真实原文"
+        );
+        assert!(start > 0);
+    }
+    for index in [2, 5] {
+        let error = result(index);
+        assert!(
+            error.contains("KNOWLEDGE_INVALID_ARGUMENT"),
+            "{index}: {error}"
+        );
+        assert!(!error.contains("\"matches\""));
+    }
+    let literal: Value = serde_json::from_str(&result(3)).unwrap();
+    assert_eq!(literal["matches"].as_array().unwrap().len(), 1);
+    let zero: Value = serde_json::from_str(&result(4)).unwrap();
+    let zero_hits = zero["matches"].as_array().unwrap();
+    assert!(!zero_hits.is_empty());
+    assert_eq!(
+        zero["truncated"], false,
+        "零宽匹配必须推进，不能重复填满结果"
+    );
+    for hit in zero_hits {
+        assert_eq!(hit["startOffset"], hit["endOffset"]);
+    }
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), original);
+    assert_eq!(
+        facts.list_ingestion_jobs(None, None, 500).unwrap(),
+        jobs_before
+    );
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test]
+async fn ingested_overlapping_chunks_preserve_gap_text_and_real_run_can_retrieve_it() {
+    use lingxi_adapters::storage::knowledge::{KnowledgeFactStore, KnowledgeIndexStore};
+    use std::future::IntoFuture;
+    let home = unique_dir("overlap-real-run");
+    // 前一片段恰好在100字符处结束，旧错误步进会跳过紧随其后的整个检索词。
+    let original = format!(
+        "{}原空隙必检索{}",
+        "a".repeat(100),
+        "0123456789汉💡".repeat(40)
+    );
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let upstream = tokio::spawn(
+        axum::serve(
+            listener,
+            axum::Router::new()
+                .route(
+                    "/chat/completions",
+                    axum::routing::post(knowledge_proof_provider),
+                )
+                .with_state(script.clone()),
+        )
+        .into_future(),
+    );
+    let state = boot_chat(&home, &endpoint).await;
+    let knowledge = state.knowledge().clone();
+    let notebook = knowledge.create_notebook("全部原文必须可检索").unwrap();
+    let nb = notebook["id"].as_str().unwrap();
+    let server = serve(state.clone()).await;
+    let (status, configured) = server
+        .request(
+            "PUT",
+            &format!("/lingxi/v1/knowledge/notebooks/{nb}/settings"),
+            Some(json!({"chunkTargetChars":100})),
+        )
+        .await;
+    assert_eq!(status, 200, "{configured}");
+    let imported = knowledge
+        .import_pasted_text(nb, &original, Some("空隙原文"))
+        .unwrap();
+    let src = imported["source"]["id"].as_str().unwrap();
+    let artifact = imported["parseArtifact"]["id"].as_str().unwrap();
+    wait_until_job(&server, nb, src, "pending_embedding").await;
+    let (status, cards) = server
+        .request(
+            "GET",
+            &format!("/lingxi/v1/knowledge/parse-artifacts/{artifact}/chunks"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{cards}");
+    let facts = KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let index = KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
+    // 原文卡片采用自动预览配置；本例必须检查实际100字符配置摄入的持久索引。
+    let variants = index.list_ready_variant_metadata(artifact).unwrap();
+    assert_eq!(variants.len(), 1);
+    let chunks = index.list_variant_chunks(&variants[0].0).unwrap();
+    assert_eq!(chunks.len(), variants[0].1);
+    assert!(chunks.len() > 3);
+    for block in facts.list_artifact_blocks(artifact).unwrap() {
+        let chars: Vec<char> = block.text.chars().collect();
+        let mut covered = vec![false; chars.len()];
+        for chunk in &chunks {
+            for span in chunk.spans.iter().filter(|span| span.block_id == block.id) {
+                covered[span.block_start_offset..span.block_end_offset].fill(true);
+                assert_eq!(
+                    chunk
+                        .text
+                        .chars()
+                        .skip(span.chunk_start_offset)
+                        .take(span.chunk_end_offset - span.chunk_start_offset)
+                        .collect::<String>(),
+                    chars[span.block_start_offset..span.block_end_offset]
+                        .iter()
+                        .collect::<String>()
+                );
+            }
+        }
+        assert!(
+            covered.into_iter().all(|value| value),
+            "真实摄入后持久片段不得遗漏原文字符"
+        );
+    }
+    script.lock().unwrap().calls = vec![(
+        "knowledge_search".into(),
+        json!({"scopeId":"runtime","query":"原空隙必检索","channel":"fts"}),
+    )];
+    let (status, result) = server.request("POST", "/lingxi/v1/sessions/sess_local_alpha/execute", Some(json!({"input":"检索此前空隙内的原文","knowledge":{"notebookIds":[nb],"sourceIds":[src]}}))).await;
+    assert_eq!(status, 200, "{result}");
+    let requests = script.lock().unwrap().requests.clone();
+    assert_eq!(requests.len(), 3);
+    let body = requests.last().unwrap();
+    let delivered = body["messages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|message| message["role"] == "tool" && message["tool_call_id"] == "original-result-0")
+        .map(proof_content)
+        .unwrap();
+    let found: Value = serde_json::from_str(&delivered).unwrap();
+    assert!(!found["hits"].as_array().unwrap().is_empty(), "{found}");
+    assert!(delivered.contains("原空隙必检索"), "{delivered}");
+    assert!(delivered.contains(src));
+    let snapshot = imported["snapshot"]["id"].as_str().unwrap();
+    let (status, _, bytes) = server
+        .request_raw(
+            "GET",
+            &format!("/lingxi/v1/knowledge/snapshots/{snapshot}/content"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200);
+    assert_eq!(bytes, original.as_bytes());
+    server.stop().await;
+    upstream.abort();
+    let _ = upstream.await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn legacy_cache_requires_explicit_rebuild_before_paid_query_and_preserves_original_source() {
+    use lingxi_adapters::storage::knowledge as ks;
+    use lingxi_kernel::knowledge::{block_fingerprint, resolve_chunker_config, ChunkerBlock};
+    use std::future::IntoFuture;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let home = unique_dir("legacy-cache-real-run");
+    let script = Arc::new(std::sync::Mutex::new(KnowledgeProofScript::default()));
+    let charges = Arc::new(AtomicUsize::new(0));
+    let counted = charges.clone();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let router = axum::Router::new()
+        .route(
+            "/chat/completions",
+            axum::routing::post(knowledge_proof_provider),
+        )
+        .with_state(script.clone())
+        .route(
+            "/embeddings",
+            axum::routing::post(move |body: axum::Json<Value>| {
+                let counter = counted.clone();
+                async move {
+                    counter.fetch_add(1, Ordering::SeqCst);
+                    embedding_stub_response(body).await
+                }
+            }),
+        );
+    let upstream = tokio::spawn(axum::serve(listener, router).into_future());
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../lingxi-adapters/tests/fixtures/ex09-legacy-source.json"
+    ))
+    .unwrap();
+    let original = fixture["original"].as_str().unwrap();
+    let state = boot_chat(&home, &endpoint).await;
+    let notebook = state.knowledge().create_notebook("旧缓存显式重建").unwrap();
+    let nb = notebook["id"].as_str().unwrap().to_string();
+    state
+        .knowledge()
+        .update_notebook_settings(&nb, &json!({"chunkTargetChars":100}))
+        .unwrap();
+    let imported = state
+        .knowledge()
+        .import_pasted_text(&nb, original, Some("旧缺口原文"))
+        .unwrap();
+    let source = imported["source"]["id"].as_str().unwrap().to_string();
+    let artifact = imported["parseArtifact"]["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let snapshot = imported["snapshot"]["id"].as_str().unwrap().to_string();
+    let server = serve(state).await;
+    wait_until_job(&server, &nb, &source, "pending_embedding").await;
+    server.stop().await;
+    let facts = ks::KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    // 准备已有完成摄入的旧用户状态，避免启动自动续跑掩盖查询旧缓存的行为。
+    assert_eq!(facts.requeue_pending_embedding_jobs().unwrap(), 1);
+    let job = facts.claim_next_job().unwrap().unwrap();
+    facts
+        .complete_job(&job.id, &json!({"fixture":"completed legacy ingestion"}))
+        .unwrap();
+    let blocks = facts.list_artifact_blocks(&artifact).unwrap();
+    assert_eq!(blocks.len(), 1);
+    assert_eq!(blocks[0].text, original);
+    let raw_blocks = blocks
+        .iter()
+        .map(|block| ChunkerBlock {
+            id: block.id.clone(),
+            ordinal: block.ordinal,
+            text: block.text.clone(),
+            text_sha256: block.text_sha256.clone(),
+            locator_type: block.locator_type.clone(),
+            locator: block.locator.clone(),
+        })
+        .collect::<Vec<_>>();
+    let raw_profile = resolve_chunker_config(&raw_blocks, Some(100)).unwrap().2;
+    assert_eq!(raw_profile, fixture["profile"].as_str().unwrap());
+    drop(facts);
+    // 真实旧生产SQL仅重绑本用例来源身份，保留旧漏字正文和收费向量。
+    for (filename, sql) in [
+        (
+            "knowledge_index.db",
+            include_str!("../../lingxi-adapters/tests/fixtures/ex09-legacy-index.sql"),
+        ),
+        (
+            "knowledge_vector.db",
+            include_str!("../../lingxi-adapters/tests/fixtures/ex09-legacy-vector.sql"),
+        ),
+    ] {
+        let path = home.join("knowledge").join(filename);
+        for suffix in ["", "-wal", "-shm"] {
+            let file = PathBuf::from(format!("{}{suffix}", path.display()));
+            if file.exists() {
+                std::fs::remove_file(file).unwrap();
+            }
+        }
+        let sql = sql
+            .replace("'artifact'", &format!("'{artifact}'"))
+            .replace("\"block\"", &format!("\"{}\"", blocks[0].id))
+            .replace(
+                fixture["fingerprint"].as_str().unwrap(),
+                &block_fingerprint(&raw_blocks),
+            );
+        rusqlite::Connection::open(path)
+            .unwrap()
+            .execute_batch(&sql)
+            .unwrap();
+    }
+    let old_vector_bytes = || {
+        let conn = rusqlite::Connection::open(home.join("knowledge/knowledge_vector.db")).unwrap();
+        let mut statement = conn.prepare(
+            "SELECT vector FROM chunk_vectors WHERE vector_index_variant_id=?1 ORDER BY ordinal",
+        ).unwrap();
+        let rows = statement
+            .query_map([fixture["viv"].as_str().unwrap()], |row| {
+                row.get::<_, Vec<u8>>(0)
+            })
+            .unwrap()
+            .collect::<Result<Vec<_>, _>>()
+            .unwrap();
+        rows
+    };
+    let paid_before = old_vector_bytes();
+    assert_eq!(paid_before.len(), 3);
+    let state = boot_chat_with_embedding(&home, &endpoint, true).await;
+    let knowledge = state.knowledge().clone();
+    let server = serve(state).await;
+    let execute_search = |channel: &str| {
+        let mut fixture = script.lock().unwrap();
+        fixture.requests.clear();
+        fixture.calls = vec![(
+            "knowledge_search".into(),
+            json!({"scopeId":"runtime","query":"上海 quartz","channel":channel}),
+        )];
+    };
+    execute_search("hybrid");
+    let input =
+        json!({"input":"检索完整原文","knowledge":{"notebookIds":[nb],"sourceIds":[source]}});
+    let (status, result) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(input.clone()),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    let delivered = || {
+        let request = script.lock().unwrap().requests.last().unwrap().clone();
+        let text = request["messages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .rev()
+            .find(|message| {
+                message["role"] == "tool" && message["tool_call_id"] == "original-result-0"
+            })
+            .map(proof_content)
+            .unwrap();
+        serde_json::from_str::<Value>(&text).unwrap()
+    };
+    let stale = delivered();
+    assert!(stale["hits"].as_array().unwrap().is_empty(), "{stale}");
+    assert!(
+        stale["degraded"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item["reason"] == "KNOWLEDGE_INDEX_ALGORITHM_STALE"),
+        "{stale}"
+    );
+    assert_eq!(
+        charges.load(Ordering::SeqCst),
+        0,
+        "旧缓存不可触发付费查询或暗中重建"
+    );
+    assert_eq!(old_vector_bytes(), paid_before);
+    knowledge.rebuild_notebook(&nb).unwrap();
+    let facts = ks::KnowledgeFactStore::open(&home.join("knowledge")).unwrap();
+    let rebuilding = facts
+        .list_ingestion_jobs(Some(&nb), Some(&source), 20)
+        .unwrap()
+        .into_iter()
+        .find(|item| item.id != job.id)
+        .unwrap();
+    let deadline = std::time::Instant::now() + Duration::from_secs(15);
+    loop {
+        let current = facts.get_job(&rebuilding.id).unwrap();
+        if current.status == "done" {
+            break;
+        }
+        assert_ne!(current.status, "failed", "{current:?}");
+        assert!(std::time::Instant::now() < deadline, "{current:?}");
+        tokio::time::sleep(Duration::from_millis(50)).await;
+    }
+    drop(facts);
+    let ingestion_charges = charges.load(Ordering::SeqCst);
+    assert!(ingestion_charges > 0);
+    assert_eq!(old_vector_bytes(), paid_before);
+    let index = ks::KnowledgeIndexStore::open(&home.join("knowledge")).unwrap();
+    assert!(index.artifact_has_stale_variants(&artifact).unwrap());
+    let new_civ = index
+        .get_ready_variant_metadata(&artifact, &ks::current_cache_profile_hash(&raw_profile))
+        .unwrap()
+        .unwrap()
+        .0;
+    assert_ne!(new_civ, fixture["civ"].as_str().unwrap());
+    for term in ["上海", "quartz"] {
+        assert!(!index
+            .search_fts(&[&new_civ], &ks::build_fts_literal_query(term), 20)
+            .unwrap()
+            .is_empty());
+    }
+    drop(index);
+    execute_search("fts");
+    let (status, result) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(input.clone()),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    let found = delivered();
+    assert!(!found["hits"].as_array().unwrap().is_empty(), "{found}");
+    assert!(
+        found["degraded"].as_array().unwrap().is_empty(),
+        "新版本就绪后旧收费行不再导致错误：{found}"
+    );
+    assert!(found.to_string().contains("上海"));
+    assert_eq!(charges.load(Ordering::SeqCst), ingestion_charges);
+    let (status, _, bytes) = server
+        .request_raw(
+            "GET",
+            &format!("/lingxi/v1/knowledge/snapshots/{snapshot}/content"),
+            None,
+        )
+        .await;
+    assert_eq!(status, 200);
+    assert_eq!(bytes, original.as_bytes());
+    server.stop().await;
+    drop(knowledge);
+    let state = boot_chat_with_embedding(&home, &endpoint, true).await;
+    let server = serve(state).await;
+    execute_search("fts");
+    let (status, result) = server
+        .request(
+            "POST",
+            "/lingxi/v1/sessions/sess_local_alpha/execute",
+            Some(input),
+        )
+        .await;
+    assert_eq!(status, 200, "{result}");
+    assert!(!delivered()["hits"].as_array().unwrap().is_empty());
+    assert_eq!(
+        charges.load(Ordering::SeqCst),
+        ingestion_charges,
+        "重启不重复收费或重建"
+    );
+    assert_eq!(old_vector_bytes(), paid_before);
     server.stop().await;
     upstream.abort();
     let _ = upstream.await;

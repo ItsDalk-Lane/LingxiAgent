@@ -5,6 +5,7 @@ import { createRemoteResource } from './resource-state';
 import { lingxiFetch } from './api';
 import {
   createLocalServerConnection,
+  resolveServerConnection,
   readPersistedServerConnectionState,
   refreshLocalServerConnectionState,
   upsertServerConnection,
@@ -18,6 +19,7 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { SettingsNav } from './SettingsNav';
 import { Toast } from './Toast';
 import { AgentTab } from './tabs/AgentTab';
+import { RustAgentTab } from './tabs/RustAgentTab';
 import { MeTab } from './tabs/MeTab';
 import { InterfaceTab } from './tabs/InterfaceTab';
 import { GeneralTab } from './tabs/GeneralTab';
@@ -150,8 +152,8 @@ export function SettingsContent({
   onActiveTabChange,
   listenToWindowTabSwitch = false,
 }: SettingsContentProps) {
-  const { activeTab, ready, rustSettingsUnavailable } = useSettingsStore(
-    useShallow(s => ({ activeTab: s.activeTab, ready: s.ready, rustSettingsUnavailable: s.rustSettingsUnavailable }))
+  const { activeTab, ready, rustSettingsUnavailable, rustConnection } = useSettingsStore(
+    useShallow(s => ({ activeTab: s.activeTab, ready: s.ready, rustSettingsUnavailable: s.rustSettingsUnavailable, rustConnection: resolveServerConnection(s)?.serverNodeKind === 'lingxi-service' }))
   );
   const set = useSettingsStore(s => s.set);
   const lastReportedActiveTabRef = useRef<string | null>(null);
@@ -179,7 +181,7 @@ export function SettingsContent({
       if (type === 'skills-changed') {
         window.dispatchEvent(new CustomEvent('hana-skills-changed', { detail: data || {} }));
       } else if (type === 'models-changed') {
-        if (!useSettingsStore.getState().rustSettingsUnavailable) void loadSettingsModels();
+        if (!useSettingsStore.getState().rustSettingsUnavailable || resolveServerConnection(useSettingsStore.getState())?.serverNodeKind === 'lingxi-service') void loadSettingsModels();
       }
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;
@@ -187,7 +189,7 @@ export function SettingsContent({
 
   useEffect(() => {
     const refreshModels = () => {
-      if (!useSettingsStore.getState().rustSettingsUnavailable) void loadSettingsModels();
+      if (!useSettingsStore.getState().rustSettingsUnavailable || resolveServerConnection(useSettingsStore.getState())?.serverNodeKind === 'lingxi-service') void loadSettingsModels();
     };
     window.addEventListener('hana-models-changed', refreshModels);
     return () => window.removeEventListener('hana-models-changed', refreshModels);
@@ -253,8 +255,10 @@ export function SettingsContent({
         });
         current.set({ serverPort: Number(transport.port), serverToken: transport.token, ...next });
         if (verified.serverNodeKind === 'lingxi-service') {
-          markRustCoreUnavailable(useSettingsStore.getState());
-          current.showToast(t('settings.rustCoreUnavailable'), 'error');
+          current.set({ rustSettingsUnavailable: true });
+          void loadAgents().then(() => Promise.all([loadSettingsSnapshot(), loadAvatars()])).catch(error => current.showToast(String(error), 'error'));
+          void loadSettingsModels().catch(error => current.showToast(String(error), 'error'));
+          void loadProvidersSummary().catch(error => current.showToast(String(error), 'error'));
           return;
         }
         current.set({ rustSettingsUnavailable: false });
@@ -355,7 +359,11 @@ export function SettingsContent({
                 </div>
               )}
               <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-                {rustSettingsUnavailable && effectiveActiveTab !== 'access' ? (
+                {rustConnection && ready && effectiveActiveTab === 'agent' ? (
+                  <SettingsPage tab={effectiveActiveTab} layout="flow">
+                    <RustAgentTab />
+                  </SettingsPage>
+                ) : rustSettingsUnavailable && effectiveActiveTab !== 'access' ? (
                   // Rust core 不可用时整页内容替换为提示条。提示条仍走同一个页面
                   // 原语（同 padding/布局），只是页体从 <ActiveTab /> 换成 alert——
                   // SettingsContent 的页面清单契约要求每个 tab 的页体都是
@@ -453,14 +461,21 @@ async function initSettings() {
 
     if (requestedRust) {
       await window.i18n.load('zh-CN');
-      markRustCoreUnavailable(useSettingsStore.getState());
+      // 助手设置已有真实读写面；其他尚未接入的导航页仍明确显示不可用。
+      store.set({ rustSettingsUnavailable: true });
       const identityResponse = await lingxiFetch('/lingxi/v1/server/identity');
       const identity = await identityResponse.json();
       if (identity?.serverNodeKind !== 'lingxi-service') {
         throw new Error('Rust settings server identity does not match');
       }
+      const localeResponse = await lingxiFetch('/api/config');
+      const localeConfig = await localeResponse.json();
+      if (localeConfig.error) throw new Error(localeConfig.error);
+      await window.i18n.load(localeConfig.locale || 'zh-CN');
+      const agentsReady = loadAgents();
+      await Promise.all([agentsReady, agentsReady.then(() => loadSettingsSnapshot({ retainSameKeyData: true })), agentsReady.then(() => loadAvatars()), loadSettingsModels()]);
       store.set({ ready: true });
-      store.showToast(t('settings.rustCoreUnavailable'), 'error');
+      void loadProvidersSummary().catch(error => console.error('[settings] providers summary failed:', error));
       return;
     }
     store.set({ rustSettingsUnavailable: false });
@@ -502,8 +517,10 @@ async function initSettings() {
   } catch (err) {
     console.error('[settings] init failed:', err);
     if (requestedRust) {
-      markRustCoreUnavailable(useSettingsStore.getState());
-      store.showToast(err instanceof Error ? err.message : String(err), 'error');
+      const reason = err instanceof Error ? err.message : String(err);
+      // 读取失败保留已有资料并显示错误，不能把失败伪装成成功的空列表。
+      store.set({ rustSettingsUnavailable: true, settingsConfigStatus: 'error', settingsConfigError: reason });
+      store.showToast(reason, 'error');
     }
     store.set({ ready: true }); // 即使失败也移除 mask，让用户能操作
   } finally {

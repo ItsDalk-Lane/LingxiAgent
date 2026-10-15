@@ -651,7 +651,8 @@ pub fn build_chunks(
             if end >= section_chars.len() {
                 break;
             }
-            let next = character_boundary(&section_chars, end, overlap_chars);
+            // 重叠从本片段末尾向前回退，不能向后跳过尚未入索引的原文。
+            let next = end.saturating_sub(overlap_chars).max(start);
             start = if next > start { next } else { end };
         }
     }
@@ -812,6 +813,45 @@ mod tests {
         // 分块配置指纹进入 chunk id 派生（不同配置不同 id）。
         let other = build_chunks("kpa_1", &blocks, Some(300)).expect("chunks 300");
         assert_ne!(chunks[0].id, other[0].id);
+    }
+
+    #[test]
+    fn overlapping_chunks_cover_every_original_character_without_gaps() {
+        let text = "a汉💡bcDEF0123456789".repeat(120);
+        let block = ChunkerBlock {
+            id: "coverage-block".into(),
+            ordinal: 0,
+            text_sha256: sha256_hex(text.as_bytes()),
+            text: text.clone(),
+            locator_type: "text".into(),
+            locator: serde_json::json!({"lineStart":1,"lineEnd":1}),
+        };
+        let chars: Vec<char> = text.chars().collect();
+        let chunks = build_chunks("kpa_coverage", &[block], Some(100)).unwrap();
+        let mut covered = vec![false; chars.len()];
+        let mut previous_end = 0;
+        for (index, chunk) in chunks.iter().enumerate() {
+            let span = &chunk.spans[0];
+            if index > 0 {
+                assert!(
+                    span.block_start_offset < previous_end,
+                    "相邻片段必须向前重叠，不能跳过原文"
+                );
+            }
+            assert_eq!(
+                chunk.text,
+                chars[span.block_start_offset..span.block_end_offset]
+                    .iter()
+                    .collect::<String>()
+            );
+            covered[span.block_start_offset..span.block_end_offset].fill(true);
+            previous_end = span.block_end_offset;
+        }
+        assert!(
+            covered.into_iter().all(|value| value),
+            "每个原文字符都必须进入至少一个可检索片段"
+        );
+        assert_eq!(previous_end, chars.len());
     }
 
     #[test]

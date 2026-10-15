@@ -20,7 +20,8 @@ publish.workspace = true
 #     injects a port implementation.
 #   - reqwest / rusqlite: no outbound HTTP and no database access at T01.
 [dependencies]
-axum = "0.8.9"
+axum = { workspace = true }
+zip = { workspace = true }
 lingxi-protocol = { path = "../lingxi-protocol" }
 # R04-T07: the OFFICIAL MCP Rust SDK (R01 D-06), at the SAME locked
 # version and feature set lingxi-spike already validated

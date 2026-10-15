@@ -26,7 +26,9 @@ function refValue(ref: { provider: string; id: string } | null | undefined): str
 async function fetchJson(path: string): Promise<any> {
   const response = await lingxiFetch(path);
   if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
-  return response.json();
+  const data = await response.json();
+  if (data?.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+  return data;
 }
 
 export function AgentMemoryEmbedding({ agentId }: { agentId: string }) {
@@ -47,6 +49,7 @@ export function AgentMemoryEmbedding({ agentId }: { agentId: string }) {
           fetchJson(`/api/agents/${encodeURIComponent(agentId)}/config`),
         ]);
         if (!active) return;
+        if (!Array.isArray(prefs?.operation_models)) throw new Error('嵌入模型目录响应缺少 operation_models');
         const operationModels: OperationModel[] = Array.isArray(prefs?.operation_models)
           ? prefs.operation_models
           : [];

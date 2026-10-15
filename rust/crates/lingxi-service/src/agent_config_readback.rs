@@ -861,7 +861,10 @@ fn merged_catalog_providers(home: &Path) -> Result<Map<String, Value>, String> {
     merged_catalog_providers_with(home, true)
 }
 
-fn merged_catalog_providers_with(home: &Path, persist: bool) -> Result<Map<String, Value>, String> {
+pub(crate) fn merged_catalog_providers_with(
+    home: &Path,
+    persist: bool,
+) -> Result<Map<String, Value>, String> {
     let catalog = load_catalog_with(home, persist)?;
     let mut merged = Map::new();
     for (name, overlay) in &catalog.providers {
@@ -871,13 +874,22 @@ fn merged_catalog_providers_with(home: &Path, persist: bool) -> Result<Map<Strin
         }
         let storage = plugin_storage_id(name)
             .ok_or_else(|| format!("Invalid local provider plugin id: {name}"))?;
-        let plugin = am::read_json_file(
-            &plugin_root(home)
-                .join(&storage)
-                .join("providers")
-                .join(format!("{storage}.json")),
-        )
-        .unwrap_or_else(|| json!({}));
+        let plugin_path = plugin_root(home)
+            .join(&storage)
+            .join("providers")
+            .join(format!("{storage}.json"));
+        let plugin = if persist {
+            am::read_json_file(&plugin_path).unwrap_or_else(|| json!({}))
+        } else {
+            let bytes = std::fs::read(&plugin_path)
+                .map_err(|error| format!("cannot read provider definition {name}: {error}"))?;
+            let value: Value = serde_json::from_slice(&bytes)
+                .map_err(|error| format!("invalid provider definition {name}: {error}"))?;
+            if !value.is_object() {
+                return Err(format!("provider definition {name} must be an object"));
+            }
+            value
+        };
         let definition = plugin_catalog_definition(&plugin);
         let mut combined = definition.as_object().cloned().unwrap_or_default();
         for (key, value) in overlay.as_object().cloned().unwrap_or_default() {
@@ -2204,12 +2216,8 @@ fn assert_patch_yuan(state: &ServiceState, agent_partial: &Value) -> Result<(), 
             "Invalid yuan \"{key}\": expected a template key"
         )));
     }
-    let product_dir = crate::context_compiler::resolve_product_dir(
-        std::env::var("LINGXI_PRODUCT_DIR").ok().as_deref(),
-        &std::env::current_exe().unwrap_or_else(|_| state.memory().home().join("lingxi-service")),
-        state.memory().home(),
-    );
-    let yuan_dir = product_dir.join("yuan");
+    // 使用启动时已确定的产品材料目录，避免校验与真实人格读取使用不同模板根。
+    let yuan_dir = state.skills().product_dir().join("yuan");
     let known = ["", "en"]
         .iter()
         .any(|sub| yuan_dir.join(sub).join(format!("{key}.md")).is_file());
@@ -3052,10 +3060,10 @@ const PLUGIN_BACKED_OPTIONAL_TOOLS: [&str; 2] = ["beautify", "office"];
 /// computeSettingsAvailableToolNames（shared/tool-categories.ts）+
 /// hideDisabledGlobalToolsForSettings 的端口：设置面的稳定工具面 =
 /// 常驻内置（core + standard）∪ 全部可选开关。端口没有运行时 agent 实例，
-/// 也没有插件工具注册表（pluginTools 恒空 → beautify/office 不出现）；
+/// 读取实际统一工具注册表，只有真实 Plugin 来源出现才开放 beautify/office；
 /// 全局工具 computer 仅在 Computer Use 启用时出现，端口无该能力 → 隐藏。
 /// 结果只取决于路径 id 对应的助手，与焦点无关。
-fn settings_available_tools() -> Vec<&'static str> {
+fn settings_available_tools(state: &ServiceState) -> Vec<&'static str> {
     let mut result: Vec<&'static str> = Vec::new();
     for name in CORE_TOOL_NAMES
         .iter()
@@ -3066,6 +3074,14 @@ fn settings_available_tools() -> Vec<&'static str> {
             continue;
         }
         result.push(*name);
+    }
+    if let Some(gateway) = state.tool_gateway() {
+        let snapshot = gateway.registry().snapshot();
+        for name in PLUGIN_BACKED_OPTIONAL_TOOLS {
+            if snapshot.tools.iter().any(|tool| matches!(&tool.origin, lingxi_kernel::toolcatalog::ToolOrigin::Plugin { plugin_id } if plugin_id == name)) {
+                result.push(name);
+            }
+        }
     }
     result
 }
@@ -3124,7 +3140,10 @@ pub async fn agent_config_get_route(
     inject_global_fields(&mut config, &preferences);
 
     config.insert("providers".into(), providers_summary(memory.home()));
-    config.insert("availableTools".into(), json!(settings_available_tools()));
+    config.insert(
+        "availableTools".into(),
+        json!(settings_available_tools(&state)),
+    );
 
     Json(mask_object_secrets(&Value::Object(config))).into_response()
 }

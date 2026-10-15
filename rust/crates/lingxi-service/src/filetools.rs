@@ -429,6 +429,27 @@ pub(crate) mod fsio {
 
     use super::TEMP_PREFIX;
 
+    /// 从同一目录句柄读取的条目身份与元数据，不借路径重新stat另一个目录。
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    pub struct EntryMetadata {
+        pub kind: &'static str,
+        pub size: u64,
+        pub modified_ms: i64,
+        pub device: u64,
+        pub inode: u128,
+        pub mode: u32,
+        pub modified_nsec: i64,
+    }
+
+    /// 实际已打开文件的完整身份；与Windows的128位文件标识共用同一无损类型。
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    pub fn file_identity(file: &std::fs::File) -> io::Result<(u64, u128)> {
+        use std::os::unix::fs::MetadataExt;
+        let metadata = file.metadata()?;
+        Ok((metadata.dev(), u128::from(metadata.ino())))
+    }
+
     /// An owned parent-directory handle. All opens of the final target
     /// are `openat`-relative to THIS handle, so a path component swapped
     /// after authorization cannot redirect the operation.
@@ -483,6 +504,124 @@ pub(crate) mod fsio {
                 }
             }
             Ok(DirFd { fd })
+        }
+
+        /// 为枚举开启同一目录的独立文件描述，不共享其他调用的目录游标。
+        #[cfg(any(target_os = "macos", target_os = "linux"))]
+        pub fn entry_names(
+            &self,
+            cancelled: impl Fn() -> bool,
+        ) -> io::Result<Vec<std::ffi::OsString>> {
+            #[cfg(not(any(target_os = "macos", target_os = "linux")))]
+            return Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "safe directory enumeration unavailable",
+            ));
+            #[cfg(any(target_os = "macos", target_os = "linux"))]
+            {
+                use std::os::unix::ffi::OsStrExt;
+                let fd = io_error_fd(unsafe {
+                    libc::openat(
+                        self.fd,
+                        c".".as_ptr(),
+                        libc::O_RDONLY | libc::O_DIRECTORY | libc::O_CLOEXEC,
+                    )
+                })?;
+                let stream = unsafe { libc::fdopendir(fd) };
+                if stream.is_null() {
+                    let error = io::Error::last_os_error();
+                    unsafe { libc::close(fd) };
+                    return Err(error);
+                }
+                struct Stream(*mut libc::DIR);
+                impl Drop for Stream {
+                    fn drop(&mut self) {
+                        unsafe { libc::closedir(self.0) };
+                    }
+                }
+                let stream = Stream(stream);
+                let mut names = Vec::new();
+                loop {
+                    if cancelled() {
+                        return Err(io::Error::new(
+                            io::ErrorKind::Interrupted,
+                            "native directory enumeration cancelled",
+                        ));
+                    }
+                    #[cfg(target_os = "macos")]
+                    let errno = unsafe { libc::__error() };
+                    #[cfg(target_os = "linux")]
+                    let errno = unsafe { libc::__errno_location() };
+                    unsafe { *errno = 0 };
+                    let entry = unsafe { libc::readdir(stream.0) };
+                    if entry.is_null() {
+                        let code = unsafe { *errno };
+                        if code != 0 {
+                            return Err(io::Error::from_raw_os_error(code));
+                        }
+                        break;
+                    }
+                    let bytes =
+                        unsafe { std::ffi::CStr::from_ptr((*entry).d_name.as_ptr()) }.to_bytes();
+                    if bytes == b"." || bytes == b".." {
+                        continue;
+                    }
+                    if names.len() >= 100_000 {
+                        return Err(io::Error::other("native directory entry budget exceeded"));
+                    }
+                    names.push(std::ffi::OsStr::from_bytes(bytes).to_os_string());
+                }
+                Ok(names)
+            }
+        }
+        /// lstat语义由持有的父目录决定，符号链接本身和目标授权分别判断。
+        #[cfg(any(target_os = "macos", target_os = "linux"))]
+        pub fn entry_metadata(&self, name: &OsStr) -> io::Result<EntryMetadata> {
+            let cname = os_to_c(name);
+            let mut stat: libc::stat = unsafe { std::mem::zeroed() };
+            if unsafe {
+                libc::fstatat(
+                    self.fd,
+                    cname.as_ptr().cast(),
+                    &mut stat,
+                    libc::AT_SYMLINK_NOFOLLOW,
+                )
+            } != 0
+            {
+                return Err(io::Error::last_os_error());
+            }
+            let kind = match stat.st_mode & libc::S_IFMT {
+                libc::S_IFDIR => "directory",
+                libc::S_IFREG => "file",
+                libc::S_IFLNK => "symlink",
+                libc::S_IFIFO => "fifo",
+                libc::S_IFSOCK => "socket",
+                _ => "other",
+            };
+            let modified_ms = stat
+                .st_mtime
+                .checked_mul(1000)
+                .and_then(|ms| ms.checked_add(stat.st_mtime_nsec / 1_000_000))
+                .ok_or_else(|| io::Error::other("native metadata timestamp overflow"))?;
+            Ok(EntryMetadata {
+                kind,
+                size: u64::try_from(stat.st_size)
+                    .map_err(|_| io::Error::other("invalid native metadata size"))?,
+                modified_ms,
+                device: stat.st_dev as u64,
+                inode: u128::from(stat.st_ino),
+                mode: stat.st_mode as u32,
+                modified_nsec: stat.st_mtime_nsec,
+            })
+        }
+        /// 目录循环按实际句柄身份识别，不能凭字符串路径猜测。
+        #[cfg(any(target_os = "macos", target_os = "linux"))]
+        pub fn directory_identity(&self) -> io::Result<(u64, u128)> {
+            let mut stat: libc::stat = unsafe { std::mem::zeroed() };
+            if unsafe { libc::fstat(self.fd, &mut stat) } != 0 {
+                return Err(io::Error::last_os_error());
+            }
+            Ok((stat.st_dev as u64, u128::from(stat.st_ino)))
         }
 
         /// 核对当前路径仍指向持有的目录，避免目录改名后的授权漂移。

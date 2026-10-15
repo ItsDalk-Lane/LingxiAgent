@@ -298,3 +298,25 @@ ADR 格式依据任务书 06 §1。本文件每条决策含：问题与用户目
 `DEPENDENCY_RULES.json` 现按实际包名 `lingxi-resource-desktop` 登记 `tauri-host` 为 exists。边界检查读取并合并独立 manifest 的锁定 Cargo metadata，立即执行 DEP-05 的依赖规则，同时保持 DEP-07 对 headless workspace 的桌面禁令。未忽略独立模块、未扩大其允许业务依赖；新增负控验证宿主直接依赖 kernel、包路径偏离登记均被拒绝。
 
 本机通过 native_resources 两项、renderer 六项、TypeScript 类型检查、独立前端及宿主构建。真实 GUI picker 流程受 macOS 辅助访问拒绝阻塞，未观察完成的窗口、默认程序或系统废纸篓行为不计通过。此登记只反映已存在的 R06 资源子集，不声明 R06/R09 或跨平台验收完成。证据见 `artifacts/rust-tauri/R06/continuation-20261013/desktop-handoff.json` 与 `boundary-registry-selftest-r2.log`。
+
+## D-14 R06 助手角色卡 ZIP 与标准文件上传
+
+2026-10-14：原叶 206785535A40 要求从真实桌面助手设置导入、预览和导出角色卡。已有 Rust 技能安装器只支持目录，显式拒绝 ZIP；原锁树也没有可复用的压缩库或 multipart 提取器。选用 zip-rs 官方 `zip =9.0.3`，关闭默认特性，只启用 `deflate-flate2-zlib-rs`；复用 axum `=0.8.9`，只新增 multipart 特性。依赖在 `rust/` workspace 声明并锁定，headless 图不引入桌面依赖。
+
+锁定新增包：zip 9.0.3、typed-path 0.12.3、nix 0.31.3、flate2 1.1.10、zlib-rs 0.6.8、crc32fast 1.5.2、multer 3.1.0、spin 0.9.9。版本、许可和 API 依据 Cargo registry 中官方下载源码及 `cargo info zip --registry crates-io`；zip 9.0.3 为 MIT、最低 Rust 1.88，本次指定工具链 1.98.1。锁文件生成是实现准备，其余构建与验证均使用 `--locked`。
+
+替代方案：只支持 JSON 会遗漏原 ZIP 操作；调用系统解压工具不可跨平台稳定使用；手写压缩/多段请求解析增加不必要边界风险。读取严格限制总展开大小、条目数及相对路径，拒绝链接、逃逸和重复路径；上传只用 axum 标准提取器。导出仅写指定工作区（不存在工作区时为本助手资料目录下 exports），不写当前进程仓库目录。验证结果与运行坐标随本次独立交付证据提供，不改变原依赖治理规则或验收白名单。
+
+## D-15 R06 EX09 搜索派生层：纯 Rust Jieba 与 NFKC
+
+**问题与用户目标：**现役 `lib/search/search-text.ts` 使用 NFKC → 小写 → 空白折叠、Jieba 搜索模式（HMM=true）、ASCII 整词、CJK 2/3-grams 与最多96个 FTS 字面词。旧 Rust 实际 SQLite 查询把 alpha 拆字母，误命中 beta；全角 Quartz 漏召回；仅固定 n-gram 没有长江大桥词级切分。本次补真实分词，不修改原文、引用偏移、权威事实或历史身份金样。
+
+**选择与依据：**workspace 精确声明 `jieba-rs =0.6.8`（仅 default-dict；MIT）与 `unicode-normalization =0.1.25`（MIT OR Apache-2.0），adapter通过workspace边引用。Jieba调用 `Jieba::new().cut_for_search(normalized, true)`，默认词典直接内嵌、无运行期联网、无桌面/模型依赖。Unicode脚本、标点和ASCII匹配复用已锁定regex，不新增script包。官方API/源码：[Jieba 0.6.8](https://docs.rs/jieba-rs/0.6.8/jieba_rs/struct.Jieba.html)、[该版Cargo源码](https://raw.githubusercontent.com/messense/jieba-rs/v0.6.8/Cargo.toml)、[NFKC API](https://docs.rs/unicode-normalization/0.1.25/unicode_normalization/trait.UnicodeNormalization.html)。
+
+**替代方案：**jieba-rs 0.11.0默认内嵌词典实际通过include-flate的默认zstd特性引入zstd-sys，未满足本次纯Rust增量要求，故未进入最终依赖图；0.7.4仍同样依赖include-flate 0.3。手写中文词典或只有n-gram不能承担现役Jieba语义；外部词典文件和网络下载增加部署/失效面，未采用。
+
+**精确新锁版本与许可：**jieba-rs0.6.8/MIT、unicode-normalization0.1.25/MIT OR Apache-2.0；传递新增byteorder1.5.0/Unlicense OR MIT、cedarwood0.4.6/BSD-2-Clause、fxhash0.2.1/Apache-2.0 OR MIT、hashbrown0.14.5/MIT OR Apache-2.0、phf/phf_codegen/phf_generator/phf_shared均0.11.3/MIT、rand0.8.8/rand_core0.6.4/siphasher1.0.4均MIT OR Apache-2.0。合计13个新(name,version)条目，受控 `cargo update --workspace` 保留全部原锁版本，无全量升级；最终没有新增*-sys/C/C++/桌面栈。现有SQLite/TLS的原生依赖未扩大为本分词依赖。
+
+**缓存兼容：**独立可重建元数据记录Jieba/NFKC/CJK与反向overlap算法代际。旧无元数据且application_id=0的已识别缓存明确标为LegacyStale；旧chunks、原文和旧向量保留，不进行模型调用或自动计费。未知/损坏元数据拒绝并保留，不能当合法旧算法降级。显式重建才原子写新search_text/tag。`current_cache_profile_hash` 仅命名空间化派生缓存，原profile/civ/viv金样算法保持；服务层应在显式重建/查询一致接入，避免旧向量身份冲突和误复用，整体EX09接线由主控负责。
+
+**验证与限制：**新adapter测试直接执行SQLite写入/FTS查询、原旧生产cache重建、事实快照/引用原字节检查、损坏元数据拒绝及旧schema未来版本保护；不mock被验收业务核心。词典只初始化一次，但会增加首用内存和时间，实际受现有测试资源守卫约束。此次本机验证不代替其它平台/正式包；仅为EX09明确适配器份额，不改依赖规则或宣称整体阶段完成。

@@ -1,8 +1,9 @@
+import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from './connection-owner';
 /**
  * Settings shared actions — extracted from SettingsApp to avoid circular imports
  */
 import { useSettingsStore } from './store';
-import { lingxiFetch, lingxiFetchJson, lingxiUrl } from './api';
+import { lingxiFetch, lingxiFetchJson, lingxiUrl, settingsConnectionKey } from './api';
 import { t } from './helpers';
 import { errorWithCode, localizedReasonOrRaw } from '../errors/error-presenter';
 import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
@@ -27,26 +28,33 @@ function isAbortError(err: unknown): boolean {
 }
 
 export async function loadAgents() {
+  const owner = captureSettingsConnection();
   const store = useSettingsStore.getState();
+  const connectionKey = settingsConnectionKey();
   try {
     const res = await lingxiFetch('/api/agents');
     const data = await res.json();
+    if (!ownsSettingsConnection(owner) || settingsConnectionKey() !== connectionKey) return;
     if (data.error) throw new Error(data.error);
-    const agents = data.agents || [];
+    if (!Array.isArray(data.agents)) throw new Error('助手列表响应缺少 agents');
+    const agents = data.agents;
     let currentAgentId = store.currentAgentId;
-    if (!currentAgentId) {
+    if (!currentAgentId || !agents.some((agent: any) => agent.id === currentAgentId)) {
       const primary = agents.find((a: any) => a.isPrimary) || agents[0];
       if (primary) currentAgentId = primary.id;
     }
     const currentAgent = agents.find((a: any) => a.id === currentAgentId);
     store.set({
       agents,
+      settingsAgentsOwner: owner,
+      agentsError: null,
       currentAgentId,
       agentYuan: currentAgent?.yuan || store.agentYuan,
       agentName: currentAgent?.name || store.agentName,
     });
   } catch (err) {
     console.error('[agents] load failed:', err);
+    store.set({ agentsError: err instanceof Error ? err.message : String(err) });
   }
 }
 
@@ -61,8 +69,16 @@ export async function loadAgents() {
  * initSettings 执行，连接未就绪时 fetch 必败且静默吞掉后无重试）。
  */
 export async function loadProvidersSummary() {
-  const data = await lingxiFetchJson<{ providers?: Record<string, ProviderSummary> }>('/api/providers/summary');
-  useSettingsStore.setState({ providersSummary: data.providers || {} });
+  const connectionKey = settingsConnectionKey();
+  try {
+    const data = await lingxiFetchJson<{ providers?: Record<string, ProviderSummary> }>('/api/providers/summary');
+    if (settingsConnectionKey() !== connectionKey) return;
+    if (!data.providers || typeof data.providers !== 'object' || Array.isArray(data.providers)) throw new Error('供应商摘要响应格式无效');
+    useSettingsStore.setState({ providersSummary: data.providers, providersSummaryError: null });
+  } catch (failure) {
+    useSettingsStore.setState({ providersSummaryError: failure instanceof Error ? failure.message : String(failure) });
+    throw failure;
+  }
 }
 
 export async function loadAvatars() {
@@ -86,7 +102,9 @@ export async function loadAvatars() {
 
 /** 设置窗口里所有模型选择器共享的运行时模型目录。 */
 export async function loadSettingsModels(): Promise<void> {
+  const owner = captureSettingsConnection();
   const myVersion = ++_settingsModelsLoadVersion;
+  const connectionKey = settingsConnectionKey();
   _settingsModelsAbortController?.abort();
   const controller = new AbortController();
   _settingsModelsAbortController = controller;
@@ -95,7 +113,9 @@ export async function loadSettingsModels(): Promise<void> {
     const data = await lingxiFetchJson<{ models?: RuntimeModelInfo[] }>('/api/models', {
       signal: controller.signal,
     });
+    if (!ownsSettingsConnection(owner) || settingsConnectionKey() !== connectionKey) return;
     if (myVersion !== _settingsModelsLoadVersion || _settingsModelsAbortController !== controller) return;
+    if (!Array.isArray(data.models)) throw new Error('模型目录响应缺少 models');
     const runtimeModels = Array.isArray(data.models)
       ? data.models.filter(model => (
           !!model
@@ -103,9 +123,13 @@ export async function loadSettingsModels(): Promise<void> {
           && typeof model.provider === 'string'
         ))
       : [];
-    useSettingsStore.getState().set({ runtimeModels });
+    useSettingsStore.getState().set({ runtimeModels, runtimeModelsError: null });
   } catch (err) {
-    if (!isAbortError(err)) console.error('[settings] models load failed:', err);
+    if (!ownsSettingsConnection(owner)) return;
+    if (!isAbortError(err)) {
+      console.error('[settings] models load failed:', err);
+      useSettingsStore.setState({ runtimeModelsError: err instanceof Error ? err.message : String(err) });
+    }
   } finally {
     if (_settingsModelsAbortController === controller) {
       _settingsModelsAbortController = null;
@@ -114,6 +138,7 @@ export async function loadSettingsModels(): Promise<void> {
 }
 
 export async function loadSettingsConfig() {
+  const owner = captureSettingsConnection();
   const store = useSettingsStore.getState();
   const myVersion = ++_settingsConfigLoadVersion;
   if (_settingsConfigAbortController) {
@@ -122,7 +147,7 @@ export async function loadSettingsConfig() {
   const controller = new AbortController();
   _settingsConfigAbortController = controller;
   const agentId = store.getSettingsAgentId();
-  const resourceKey = makeSettingsResourceKey('config', agentId, store.activeServerConnectionId);
+  const resourceKey = makeSettingsResourceKey('config', agentId, settingsConnectionKey());
   const keepSameOwnerData = store.settingsConfigKey === resourceKey;
   store.set({
     settingsConfigKey: resourceKey,
@@ -172,6 +197,8 @@ export async function loadSettingsConfig() {
       const experienceData = await experienceRes.json();
       config._experience = experienceData.content || '';
     }
+    if (!ownsSettingsConnection(owner)) return;
+    if (resourceKey !== makeSettingsResourceKey('config', useSettingsStore.getState().getSettingsAgentId(), settingsConnectionKey())) return;
     if (myVersion !== _settingsConfigLoadVersion) return;
     if (_settingsConfigAbortController !== controller) return;
     const latest = useSettingsStore.getState();
@@ -181,6 +208,7 @@ export async function loadSettingsConfig() {
       settingsConfigKey: resourceKey,
       settingsConfigStatus: 'ready',
       settingsConfigError: null,
+      settingsDataOwner: owner, settingsDataAgentId: agentId,
       settingsConfig: config,
       globalModelsConfig: globalModels,
       homeFolder: config.desk?.home_folder || null,
@@ -217,13 +245,14 @@ function applySettingsSnapshot(snapshot: SettingsSnapshot, resourceKey: string, 
   const latest = useSettingsStore.getState();
   if (latest.settingsSnapshot.key !== resourceKey || latest.settingsSnapshot.requestId !== requestId) return;
   const config = configFromSnapshot(snapshot);
-  const configKey = makeSettingsResourceKey('config', snapshot.agentId, latest.activeServerConnectionId);
+  const configKey = makeSettingsResourceKey('config', snapshot.agentId, settingsConnectionKey());
   latest.set({
     settingsSnapshot: finishRemoteLoad(latest.settingsSnapshot, resourceKey, requestId, snapshot),
     settingsConfigKey: configKey,
     settingsConfigStatus: 'ready',
     settingsConfigError: null,
     settingsConfig: config,
+    settingsDataOwner: captureSettingsConnection(), settingsDataAgentId: snapshot.agentId,
     globalModelsConfig: snapshot.globalModels || {},
     homeFolder: config.desk?.home_folder || null,
   });
@@ -244,6 +273,7 @@ export function updateSettingsSnapshot(mutator: (snapshot: SettingsSnapshot) => 
 }
 
 export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolean } = {}) {
+  const owner = captureSettingsConnection();
   const store = useSettingsStore.getState();
   const myVersion = ++_settingsSnapshotLoadVersion;
   if (_settingsSnapshotAbortController) {
@@ -252,10 +282,10 @@ export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolea
   const controller = new AbortController();
   _settingsSnapshotAbortController = controller;
   const agentId = store.getSettingsAgentId();
-  const resourceKey = makeSettingsResourceKey('snapshot', agentId, store.activeServerConnectionId);
+  const resourceKey = makeSettingsResourceKey('snapshot', agentId, settingsConnectionKey());
   const currentResource = store.settingsSnapshot || createRemoteResource<SettingsSnapshot>();
   const requestId = currentResource.requestId + 1;
-  const configKey = makeSettingsResourceKey('config', agentId, store.activeServerConnectionId);
+  const configKey = makeSettingsResourceKey('config', agentId, settingsConnectionKey());
   const retainSameKeyData = options.retainSameKeyData === true;
   const keepSameConfigOwnerData = retainSameKeyData && store.settingsConfigKey === configKey;
 
@@ -290,6 +320,8 @@ export async function loadSettingsSnapshot(options: { retainSameKeyData?: boolea
     });
     const snapshot = await res.json() as SettingsSnapshot & { error?: string };
     if (snapshot.error) throw new Error(snapshot.error);
+    if (!ownsSettingsConnection(owner)) return;
+    if (resourceKey !== makeSettingsResourceKey('snapshot', useSettingsStore.getState().getSettingsAgentId(), settingsConnectionKey())) return;
     if (myVersion !== _settingsSnapshotLoadVersion) return;
     if (_settingsSnapshotAbortController !== controller) return;
     applySettingsSnapshot(snapshot as SettingsSnapshot, resourceKey, requestId);
@@ -317,7 +349,9 @@ export async function browseAgent(agentId: string) {
   await loadAgents();
 }
 
-export async function switchToAgent(agentId: string) {
+export async function switchToAgent(agentId: string, owner?: SettingsConnectionOwner | null) {
+  const assertOwner = () => { if (owner && !ownsSettingsConnection(owner)) throw new Error(t('settings.agentDeletion.connectionChanged')); };
+  assertOwner();
   const store = useSettingsStore.getState();
   try {
     const res = await lingxiFetch('/api/agents/switch', {
@@ -333,13 +367,16 @@ export async function switchToAgent(agentId: string) {
       throw errorWithCode(routeError.message, routeError.code);
     }
 
+    assertOwner();
     store.set({
       settingsAgentId: null,
       currentAgentId: data.agent.id,
       agentName: data.agent.name,
     });
     await loadSettingsConfig();
+    assertOwner();
     await loadAgents();
+    assertOwner();
     store.showToast(t('settings.agent.switched', { name: data.agent.name }), 'success');
   } catch (err: any) {
     console.error('[agents] switch failed:', err);

@@ -20,7 +20,8 @@
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::sync::{Arc, LazyLock, Mutex, MutexGuard};
+use unicode_normalization::UnicodeNormalization;
 
 use lingxi_kernel::knowledge::KnowledgeError;
 use rusqlite::{params, Connection, OptionalExtension};
@@ -454,6 +455,222 @@ fn record_cache_owner(path: &Path) -> Result<(), KnowledgeError> {
     std::fs::rename(&temporary, marker).map_err(storage_io)
 }
 
+/// 可重建缓存代际，与权威parser/profile/civ/viv历史算法分离。
+pub const KNOWLEDGE_DERIVED_ALGORITHM: &str =
+    "lingxi.search-nfkc-jieba068-cjk23.reverse-overlap.v2";
+const LEGACY_DERIVED_ALGORITHM: &str = "lingxi.legacy-ascii-char-cjk-gap.forward-overlap.v1";
+const INDEX_APPLICATION_ID: i64 = 0x4c584931;
+const VECTOR_APPLICATION_ID: i64 = 0x4c585631;
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DerivedAlgorithmStatus {
+    Current,
+    LegacyStale,
+}
+
+/// 只给派生缓存增加代际命名空间，不更改事实库的原始profile与历史金样。
+pub fn current_cache_profile_hash(original_profile: &str) -> String {
+    sha256_hex(
+        serde_json::json!([original_profile, KNOWLEDGE_DERIVED_ALGORITHM])
+            .to_string()
+            .as_bytes(),
+    )
+}
+fn derived_table(index: bool) -> &'static str {
+    if index {
+        "chunk_index_variants"
+    } else {
+        "vector_index_variants"
+    }
+}
+fn derived_metadata_header(conn: &Connection, index: bool) -> Result<bool, KnowledgeError> {
+    let application_id: i64 = conn
+        .pragma_query_value(None, "application_id", |r| r.get(0))
+        .map_err(storage_sqlite)?;
+    let exists: bool = conn.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='knowledge_derived_algorithms')", [], |r|r.get(0)).map_err(storage_sqlite)?;
+    if application_id == 0 && !exists {
+        return Ok(false);
+    }
+    if application_id
+        != if index {
+            INDEX_APPLICATION_ID
+        } else {
+            VECTOR_APPLICATION_ID
+        }
+        || !exists
+    {
+        return Err(KnowledgeError::storage_invalid(
+            "derived algorithm metadata missing or unrecognized; preserve cache for inspection",
+        ));
+    }
+    Ok(true)
+}
+fn validate_derived_metadata(conn: &Connection, index: bool) -> Result<bool, KnowledgeError> {
+    if !derived_metadata_header(conn, index)? {
+        return Ok(false);
+    }
+    let sql=format!("SELECT v.id,m.algorithm FROM {} v LEFT JOIN knowledge_derived_algorithms m ON m.variant_id=v.id",derived_table(index));
+    let mut stmt = conn.prepare(&sql).map_err(storage_sqlite)?;
+    let rows = stmt
+        .query_map([], |r| {
+            Ok((r.get::<_, String>(0)?, r.get::<_, Option<String>>(1)?))
+        })
+        .map_err(storage_sqlite)?;
+    for row in rows {
+        let (_, algorithm) = row.map_err(storage_sqlite)?;
+        if !matches!(
+            algorithm.as_deref(),
+            Some(KNOWLEDGE_DERIVED_ALGORITHM | LEGACY_DERIVED_ALGORITHM)
+        ) {
+            return Err(KnowledgeError::storage_invalid(
+                "derived algorithm metadata missing or unknown; original preserved",
+            ));
+        }
+    }
+    let orphans:i64=conn.query_row(&format!("SELECT count(*) FROM knowledge_derived_algorithms m WHERE NOT EXISTS(SELECT 1 FROM {} v WHERE v.id=m.variant_id)",derived_table(index)),[],|r|r.get(0)).map_err(storage_sqlite)?;
+    if orphans != 0 {
+        return Err(KnowledgeError::storage_invalid(
+            "orphan derived algorithm metadata; original preserved",
+        ));
+    }
+    Ok(true)
+}
+/// 缺少代际标记不是“任何SQLite都算旧库”；旧表形状和负载也必须可确认。
+fn validate_legacy_derived_layout(conn: &Connection, index: bool) -> Result<(), KnowledgeError> {
+    if index {
+        conn.prepare("SELECT id,parse_artifact_id,chunk_profile_hash,block_fingerprint,status FROM chunk_index_variants LIMIT 0").map_err(storage_sqlite)?;
+        conn.prepare("SELECT id,parse_artifact_id,section_ordinal,heading_path_json,start_block_ordinal,end_block_ordinal FROM knowledge_sections LIMIT 0").map_err(storage_sqlite)?;
+        conn.prepare("SELECT rowid,text,search_text FROM knowledge_chunks_fts LIMIT 0")
+            .map_err(storage_sqlite)?;
+        let mut stmt=conn.prepare("SELECT v.id,c.ordinal,c.text,c.search_text,c.token_count,c.spans_json FROM knowledge_chunks c LEFT JOIN chunk_index_variants v ON v.id=c.variant_id").map_err(storage_sqlite)?;
+        let rows = stmt
+            .query_map([], |r| {
+                Ok((
+                    r.get::<_, Option<String>>(0)?,
+                    r.get::<_, i64>(1)?,
+                    r.get::<_, String>(2)?,
+                    r.get::<_, String>(3)?,
+                    r.get::<_, i64>(4)?,
+                    r.get::<_, String>(5)?,
+                ))
+            })
+            .map_err(storage_sqlite)?;
+        for row in rows {
+            let (id, ordinal, _, _, tokens, spans) = row.map_err(storage_sqlite)?;
+            if id.is_none()
+                || ordinal < 0
+                || tokens < 0
+                || !serde_json::from_str::<serde_json::Value>(&spans).is_ok_and(|s| s.is_array())
+            {
+                return Err(KnowledgeError::storage_invalid(
+                    "unrecognized legacy chunk payload; preserve original cache",
+                ));
+            }
+        }
+    } else {
+        conn.prepare("SELECT id,chunk_index_variant_id,parse_artifact_id,model_key,chunk_fingerprint,dimensions,status FROM vector_index_variants LIMIT 0").map_err(storage_sqlite)?;
+        let mut stmt=conn.prepare("SELECT v.id,v.dimensions,c.ordinal,c.vector FROM chunk_vectors c LEFT JOIN vector_index_variants v ON v.id=c.vector_index_variant_id").map_err(storage_sqlite)?;
+        let rows = stmt
+            .query_map([], |r| {
+                Ok((
+                    r.get::<_, Option<String>>(0)?,
+                    r.get::<_, Option<i64>>(1)?,
+                    r.get::<_, i64>(2)?,
+                    r.get::<_, Vec<u8>>(3)?,
+                ))
+            })
+            .map_err(storage_sqlite)?;
+        for row in rows {
+            let (id, dimensions, ordinal, bytes) = row.map_err(storage_sqlite)?;
+            let valid =
+                dimensions.is_some_and(|d| d > 0 && d <= 65536 && bytes.len() == d as usize * 4);
+            if id.is_none()
+                || ordinal < 0
+                || !valid
+                || bytes
+                    .as_chunks::<4>()
+                    .0
+                    .iter()
+                    .any(|b| !f32::from_le_bytes(*b).is_finite())
+            {
+                return Err(KnowledgeError::storage_invalid(
+                    "corrupt legacy vector payload; preserve original cache",
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+fn install_derived_metadata(conn: &Connection, index: bool) -> Result<(), KnowledgeError> {
+    if validate_derived_metadata(conn, index)? {
+        return Ok(());
+    }
+    conn.execute_batch(&format!("CREATE TABLE knowledge_derived_algorithms(variant_id TEXT PRIMARY KEY REFERENCES {}(id) ON DELETE CASCADE, algorithm TEXT NOT NULL);",derived_table(index))).map_err(storage_sqlite)?;
+    // 只有已识别的旧schema、且没有本实现的application_id，才明确登记为旧算法。
+    conn.execute(
+        &format!(
+            "INSERT INTO knowledge_derived_algorithms SELECT id,?1 FROM {}",
+            derived_table(index)
+        ),
+        [LEGACY_DERIVED_ALGORITHM],
+    )
+    .map_err(storage_sqlite)?;
+    conn.pragma_update(
+        None,
+        "application_id",
+        if index {
+            INDEX_APPLICATION_ID
+        } else {
+            VECTOR_APPLICATION_ID
+        },
+    )
+    .map_err(storage_sqlite)?;
+    Ok(())
+}
+fn derived_algorithm(
+    conn: &Connection,
+    index: bool,
+    variant: &str,
+) -> Result<Option<DerivedAlgorithmStatus>, KnowledgeError> {
+    if !derived_metadata_header(conn, index)? {
+        return Err(KnowledgeError::storage_invalid(
+            "derived algorithm metadata disappeared; original preserved",
+        ));
+    }
+    let sql=format!("SELECT m.algorithm FROM {} v LEFT JOIN knowledge_derived_algorithms m ON m.variant_id=v.id WHERE v.id=?1",derived_table(index));
+    let value: Option<Option<String>> = conn
+        .query_row(&sql, [variant], |r| r.get(0))
+        .optional()
+        .map_err(storage_sqlite)?;
+    match value {
+        None => Ok(None),
+        Some(Some(s)) if s == KNOWLEDGE_DERIVED_ALGORITHM => {
+            Ok(Some(DerivedAlgorithmStatus::Current))
+        }
+        Some(Some(s)) if s == LEGACY_DERIVED_ALGORITHM => {
+            Ok(Some(DerivedAlgorithmStatus::LegacyStale))
+        }
+        _ => Err(KnowledgeError::storage_invalid(
+            "derived algorithm metadata missing or unknown; original preserved",
+        )),
+    }
+}
+fn require_current_algorithm(
+    conn: &Connection,
+    index: bool,
+    variant: &str,
+) -> Result<(), KnowledgeError> {
+    match derived_algorithm(conn,index,variant)? {
+        Some(DerivedAlgorithmStatus::Current)=>Ok(()),
+        Some(DerivedAlgorithmStatus::LegacyStale)=>Err(KnowledgeError::index_invalid("legacy derived cache is stale; explicitly rebuild from original source with the current cache profile")),
+        None=>Err(KnowledgeError::index_invalid("derived cache variant not found")),
+    }
+}
+fn write_current_algorithm(conn: &Connection, variant: &str) -> Result<(), KnowledgeError> {
+    conn.execute("INSERT INTO knowledge_derived_algorithms(variant_id,algorithm) VALUES(?1,?2) ON CONFLICT(variant_id) DO UPDATE SET algorithm=excluded.algorithm",params![variant,KNOWLEDGE_DERIVED_ALGORITHM]).map_err(storage_sqlite)?;
+    Ok(())
+}
+
 fn try_cache_connection(
     path: &Path,
     supported: i64,
@@ -489,6 +706,7 @@ fn try_cache_connection(
                 "SQLite quick_check failed; original preserved",
             ));
         }
+        validate_derived_metadata(&probe, schema == INDEX_SCHEMA_SQL)?;
         let expected_table = if schema == INDEX_SCHEMA_SQL {
             "chunk_index_variants"
         } else {
@@ -514,12 +732,16 @@ fn try_cache_connection(
                 "existing SQLite file is not a recognized knowledge cache",
             ));
         }
+        if tables > 0 && !derived_metadata_header(&probe, schema == INDEX_SCHEMA_SQL)? {
+            validate_legacy_derived_layout(&probe, schema == INDEX_SCHEMA_SQL)?;
+        }
     }
     let conn = open_connection(path, supported)?;
     let tx = rusqlite::Transaction::new_unchecked(&conn, rusqlite::TransactionBehavior::Immediate)
         .map_err(storage_sqlite)?;
     check_user_version(&tx, supported)?;
     tx.execute_batch(schema).map_err(storage_sqlite)?;
+    install_derived_metadata(&tx, schema == INDEX_SCHEMA_SQL)?;
     tx.pragma_update(None, "user_version", supported)
         .map_err(storage_sqlite)?;
     tx.commit().map_err(storage_sqlite)?;
@@ -642,6 +864,12 @@ fn cache_write(
         .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
         .map_err(storage_sqlite)?;
     check_user_version(&tx, supported)?;
+    let index: bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='chunk_index_variants')",[],|r|r.get(0)).map_err(storage_sqlite)?;
+    if !validate_derived_metadata(&tx, index)? {
+        return Err(KnowledgeError::storage_invalid(
+            "derived metadata disappeared on live writer; original preserved",
+        ));
+    }
     Ok(tx)
 }
 
@@ -652,33 +880,34 @@ fn lock_conn(conn: &Mutex<Connection>) -> MutexGuard<'_, Connection> {
 pub const MIN_CHUNK: i64 = 100;
 pub const MAX_CHUNK: i64 = 100_000;
 
-/// ── 检索分词（lib/search/search-text.ts 的 Rust 承担）──────────────────────
-///
-/// FTS 写入侧派生文本 = 归一化原文 + ASCII 词 + CJK 2/3-gram；查询侧 = 同法
-/// 分词后 OR 连接的引号字面量。与 TS 的差异：jieba 词级分词缺席（词典依赖
-/// 不引入），CJK 召回由 n-gram 层承担——差异台账 D 项申报；NFKC 归一化缺席
-/// 同条申报。
-const CJK_NGRAM_SIZES: [usize; 2] = [2, 3];
+/// 检索派生层：NFKC、Jieba搜索模式与CJK补充词共享现役TS口径。
+static JIEBA: LazyLock<jieba_rs::Jieba> = LazyLock::new(jieba_rs::Jieba::new);
+static ASCII_WORDS: LazyLock<regex::Regex> =
+    LazyLock::new(|| regex::Regex::new(r"[a-z0-9_][a-z0-9_.-]*").expect("固定ASCII分词式"));
+static CJK_RUNS: LazyLock<regex::Regex> = LazyLock::new(|| {
+    regex::Regex::new(r"[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Hangul}]+")
+        .expect("固定CJK脚本分词式")
+});
+// ECMAScript的\s包含FEFF、不包含0085；不借用Rust不同的is_whitespace集合。
+static SEARCH_SPACES: LazyLock<regex::Regex> = LazyLock::new(|| {
+    regex::Regex::new(r"[\t\n\x0B\f\r \u{00A0}\u{1680}\u{2000}-\u{200A}\u{2028}\u{2029}\u{202F}\u{205F}\u{3000}\u{FEFF}]+")
+        .expect("固定搜索空白式")
+});
+static ONLY_PUNCTUATION: LazyLock<regex::Regex> = LazyLock::new(|| {
+    regex::Regex::new(r"^[\p{P}\p{S}\t\n\x0B\f\r \u{00A0}\u{1680}\u{2000}-\u{200A}\u{2028}\u{2029}\u{202F}\u{205F}\u{3000}\u{FEFF}]+$")
+        .expect("固定标点符号式")
+});
+pub const MAX_SEARCH_QUERY_TERMS: usize = 96;
 
-fn is_cjk_char(ch: char) -> bool {
-    // Han / Hiragana / Katakana / Hangul（search-text.ts CJK_RUN_RE 口径）。
-    matches!(ch,
-        '\u{4e00}'..='\u{9fff}'
-        | '\u{3400}'..='\u{4dbf}'
-        | '\u{3040}'..='\u{309f}'
-        | '\u{30a0}'..='\u{30ff}'
-        | '\u{ac00}'..='\u{d7af}')
+pub fn normalize_search_text(value: &str) -> String {
+    let lowered = value.nfkc().collect::<String>().to_lowercase();
+    SEARCH_SPACES
+        .replace_all(&lowered, " ")
+        .trim_matches(' ')
+        .to_string()
 }
 
-fn normalize_search_text(value: &str) -> String {
-    value
-        .to_lowercase()
-        .split_whitespace()
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-/// 写入 FTS 的派生文本（buildSearchDocumentText 同形）。
+/// 只改写可重建search_text，不改变块正文、原文快照或引用偏移。
 pub fn build_search_document_text(value: &str) -> String {
     let normalized = normalize_search_text(value);
     if normalized.is_empty() {
@@ -689,68 +918,48 @@ pub fn build_search_document_text(value: &str) -> String {
     parts.join(" ")
 }
 
-/// 查询分词（tokenizeSearchText 的 ASCII + CJK n-gram 层；jieba 缺席，D 项）。
 pub fn tokenize_search_text(value: &str) -> Vec<String> {
     let normalized = normalize_search_text(value);
     if normalized.is_empty() {
         return Vec::new();
     }
-    let mut tokens: Vec<String> = Vec::new();
-    let mut push = |token: &str| {
-        let token = token.trim();
-        let punctuation_only = !token.is_empty()
-            && token
-                .chars()
-                .all(|ch| ch.is_whitespace() || ch.is_ascii_punctuation());
-        if token.is_empty() || punctuation_only {
+    let mut tokens = Vec::new();
+    let mut seen = std::collections::HashSet::new();
+    let mut push = |word: &str| {
+        let token = normalize_search_text(word);
+        if token.is_empty() || ONLY_PUNCTUATION.is_match(&token) {
             return;
         }
-        if token.chars().count() == 1 && token.chars().all(is_cjk_char) {
+        // 现役 JS 的 length 按 UTF-16 计数，扩展汉字不能当成单码元丢弃。
+        if token.encode_utf16().count() == 1 && CJK_RUNS.is_match(&token) {
             return;
         }
-        if !tokens.iter().any(|existing| existing == token) {
-            tokens.push(token.to_string());
+        if seen.insert(token.clone()) {
+            tokens.push(token);
         }
     };
-    let mut ascii_word = String::new();
-    let mut cjk_run: Vec<char> = Vec::new();
-    let flush_ascii = |ascii_word: &mut String, push: &mut dyn FnMut(&str)| {
-        if !ascii_word.is_empty() {
-            push(ascii_word);
-            ascii_word.clear();
-        }
-    };
-    for ch in normalized.chars() {
-        if ch.is_ascii_alphanumeric() || ch == '_' || ch == '.' || ch == '-' {
-            flush_ascii(&mut ascii_word, &mut push);
-            cjk_run.clear();
-            ascii_word.push(ch);
-        } else if is_cjk_char(ch) {
-            flush_ascii(&mut ascii_word, &mut push);
-            cjk_run.push(ch);
-        } else {
-            flush_ascii(&mut ascii_word, &mut push);
-            cjk_run.clear();
-        }
-        // CJK run 的 n-gram 在收尾统一产出（此处只累积）。
-        if cjk_run.len() >= CJK_NGRAM_SIZES.iter().copied().max().unwrap_or(3) {
-            for size in CJK_NGRAM_SIZES {
-                if cjk_run.len() >= size {
-                    let start = cjk_run.len() - size;
-                    let gram: String = cjk_run[start..].iter().collect();
-                    push(&gram);
-                }
+    for found in ASCII_WORDS.find_iter(&normalized) {
+        push(found.as_str());
+    }
+    for token in JIEBA.cut_for_search(&normalized, true) {
+        push(token);
+    }
+    for found in CJK_RUNS.find_iter(&normalized) {
+        let chars = found.as_str().chars().collect::<Vec<_>>();
+        for size in [2, 3] {
+            for gram in chars.windows(size) {
+                push(&gram.iter().collect::<String>());
             }
         }
     }
-    flush_ascii(&mut ascii_word, &mut push);
     tokens
 }
 
-/// FTS5 字面量查询（buildFtsLiteralQuery 同形：引号转义 + OR 连接）。
+/// FTS5最多96个经过转义的字面词；调用者不能注入MATCH操作符。
 pub fn build_fts_literal_query(value: &str) -> String {
     tokenize_search_text(value)
         .into_iter()
+        .take(MAX_SEARCH_QUERY_TERMS)
         .map(|term| format!("\"{}\"", term.replace('"', "\"\"")))
         .collect::<Vec<_>>()
         .join(" OR ")
@@ -2687,27 +2896,43 @@ impl KnowledgeIndexStore {
         let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
         let mut connection = lock_conn(&self.conn);
         let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
-        conn.execute(
+        let inserted = conn.execute(
             "INSERT INTO chunk_index_variants (id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status) VALUES (?1, ?2, ?3, ?4, 'building')
              ON CONFLICT(id) DO NOTHING",
             params![id, parse_artifact_id, chunk_profile_hash, block_fingerprint],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if inserted != 0 {
+            write_current_algorithm(&conn, &id)?;
+        }
         conn.commit().map_err(storage_sqlite)?;
         drop(connection);
         self.get_variant(&id)?
             .ok_or_else(|| KnowledgeError::storage_invalid("chunk index variant vanished"))
     }
 
+    pub fn derived_algorithm_status(
+        &self,
+        variant_id: &str,
+    ) -> Result<Option<DerivedAlgorithmStatus>, KnowledgeError> {
+        derived_algorithm(&lock_conn(&self.conn), true, variant_id)
+    }
+    pub fn artifact_has_stale_variants(&self, artifact_id: &str) -> Result<bool, KnowledgeError> {
+        let conn = lock_conn(&self.conn);
+        validate_derived_metadata(&conn, true)?;
+        conn.query_row("SELECT EXISTS(SELECT 1 FROM chunk_index_variants v JOIN knowledge_derived_algorithms m ON m.variant_id=v.id WHERE v.parse_artifact_id=?1 AND m.algorithm=?2)",params![artifact_id,LEGACY_DERIVED_ALGORITHM],|r|r.get(0)).map_err(storage_sqlite)
+    }
     pub fn get_variant(&self, variant_id: &str) -> Result<Option<IndexVariantRow>, KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        conn.query_row(
-            "SELECT id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status FROM chunk_index_variants WHERE id=?1",
-            params![variant_id],
-            Self::map_variant,
-        )
-        .optional()
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+        let mut row=conn.query_row("SELECT id, parse_artifact_id, chunk_profile_hash, block_fingerprint, status FROM chunk_index_variants WHERE id=?1",params![variant_id],Self::map_variant).optional().map_err(storage_sqlite)?;
+        if let Some(row) = row.as_mut() {
+            if derived_algorithm(&conn, true, variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+            {
+                row.status = "stale".into();
+            }
+        }
+        Ok(row)
     }
 
     fn map_variant(row: &rusqlite::Row<'_>) -> rusqlite::Result<IndexVariantRow> {
@@ -2723,6 +2948,7 @@ impl KnowledgeIndexStore {
     pub fn set_variant_status(&self, variant_id: &str, status: &str) -> Result<(), KnowledgeError> {
         let mut connection = lock_conn(&self.conn);
         let conn = cache_write(&mut connection, INDEX_SCHEMA_VERSION)?;
+        require_current_algorithm(&conn, true, variant_id)?;
         conn.execute(
             "UPDATE chunk_index_variants SET status=?1 WHERE id=?2",
             params![status, variant_id],
@@ -2739,18 +2965,10 @@ impl KnowledgeIndexStore {
         chunk_profile_hash: &str,
         block_fingerprint: &str,
     ) -> Result<bool, KnowledgeError> {
-        let conn = lock_conn(&self.conn);
-        let row = conn
-            .query_row(
-                "SELECT block_fingerprint, status FROM chunk_index_variants WHERE parse_artifact_id=?1 AND chunk_profile_hash=?2",
-                params![parse_artifact_id, chunk_profile_hash],
-                |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)),
-            )
-            .optional()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        Ok(
-            matches!(row, Some((fingerprint, status)) if fingerprint == block_fingerprint && status == "ready"),
-        )
+        let id = chunk_index_variant_id(parse_artifact_id, chunk_profile_hash);
+        Ok(self
+            .get_variant(&id)?
+            .is_some_and(|row| row.block_fingerprint == block_fingerprint && row.status == "ready"))
     }
 
     /// chunk+FTS 同事务幂等替换（查询只读 ready 变体，不读半写状态）。
@@ -2808,6 +3026,7 @@ impl KnowledgeIndexStore {
             )
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         }
+        write_current_algorithm(&tx, &variant.id)?;
         tx.execute(
             "UPDATE chunk_index_variants SET status='ready' WHERE id=?1",
             params![variant.id],
@@ -2838,6 +3057,7 @@ impl KnowledgeIndexStore {
         variant_id: &str,
     ) -> Result<Vec<StoredChunk>, KnowledgeError> {
         let conn = lock_conn(&self.conn);
+        require_current_algorithm(&conn, true, variant_id)?;
         let mut stmt = conn
             .prepare(
                 "SELECT chunk_id, ordinal, section_id, text, token_count, spans_json FROM knowledge_chunks WHERE variant_id=?1 ORDER BY ordinal",
@@ -2853,7 +3073,7 @@ impl KnowledgeIndexStore {
     }
 
     /// FTS 检索：限定变体集合（scope 作用域的存储侧体现）。query 为 FTS5 MATCH
-    /// 词项（服务层构造）；空查询回落全变体前 N。
+    /// 词项（服务层构造）；无有效词项时不制造无关命中。
     pub fn search_fts(
         &self,
         variant_ids: &[&str],
@@ -2871,20 +3091,19 @@ impl KnowledgeIndexStore {
             .join(", ");
         let trimmed = query.trim();
         let match_index = variant_ids.len() + 1;
-        let sql = if trimmed.is_empty() {
-            format!(
-                "SELECT c.chunk_id, c.ordinal, c.section_id, c.text, c.token_count, c.spans_json, c.variant_id \
-                 FROM knowledge_chunks c WHERE c.variant_id IN ({placeholders}) ORDER BY c.ordinal LIMIT {limit}"
-            )
-        } else {
-            format!(
-                "SELECT c.chunk_id, c.ordinal, c.section_id, c.text, c.token_count, c.spans_json, c.variant_id, bm25(knowledge_chunks_fts) AS score \
-                 FROM knowledge_chunks_fts f JOIN knowledge_chunks c ON c.rowid = f.rowid \
-                 WHERE knowledge_chunks_fts MATCH ?{match_index} AND c.variant_id IN ({placeholders}) \
-                 ORDER BY score LIMIT {limit}"
-            )
-        };
+        let sql = format!(
+            "SELECT c.chunk_id, c.ordinal, c.section_id, c.text, c.token_count, c.spans_json, c.variant_id, bm25(knowledge_chunks_fts) AS score \
+             FROM knowledge_chunks_fts f JOIN knowledge_chunks c ON c.rowid = f.rowid \
+             WHERE knowledge_chunks_fts MATCH ?{match_index} AND c.variant_id IN ({placeholders}) \
+             ORDER BY score LIMIT {limit}"
+        );
         let conn = lock_conn(&self.conn);
+        for variant_id in variant_ids {
+            require_current_algorithm(&conn, true, variant_id)?;
+        }
+        if trimmed.is_empty() {
+            return Ok(Vec::new());
+        }
         let mut stmt = conn
             .prepare(&sql)
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
@@ -2892,10 +3111,7 @@ impl KnowledgeIndexStore {
             .iter()
             .map(|id| rusqlite::types::Value::Text((*id).to_string()))
             .collect();
-        if !trimmed.is_empty() {
-            bound.push(rusqlite::types::Value::Text(trimmed.to_string()));
-        }
-        let scored = !trimmed.is_empty();
+        bound.push(rusqlite::types::Value::Text(trimmed.to_string()));
         let rows = stmt
             .query_map(rusqlite::params_from_iter(bound), move |row| {
                 let chunk = StoredChunk {
@@ -2907,11 +3123,7 @@ impl KnowledgeIndexStore {
                     token_count: row.get::<_, i64>(4)? as usize,
                     spans: spans_from_json(&row.get::<_, String>(5)?),
                 };
-                let score: f64 = if scored {
-                    row.get(7).unwrap_or(0.0)
-                } else {
-                    0.0
-                };
+                let score: f64 = row.get(7)?;
                 Ok(IndexHit {
                     score,
                     variant_id: chunk.variant_id.clone(),
@@ -2965,6 +3177,9 @@ impl KnowledgeIndexStore {
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
         let mut out = Vec::new();
         for id in ids {
+            if derived_algorithm(&conn, true, &id)? != Some(DerivedAlgorithmStatus::Current) {
+                continue;
+            }
             let count: i64 = conn
                 .query_row(
                     "SELECT COUNT(*) FROM knowledge_chunks WHERE variant_id=?1",
@@ -3007,7 +3222,7 @@ impl KnowledgeIndexStore {
     pub fn reset(&self) -> Result<(), KnowledgeError> {
         let mut conn = lock_conn(&self.conn);
         let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
-        tx.execute_batch("DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variants; DELETE FROM knowledge_sections;").map_err(storage_sqlite)?;
+        tx.execute_batch("DELETE FROM knowledge_derived_algorithms; DELETE FROM knowledge_chunks; DELETE FROM chunk_index_variants; DELETE FROM knowledge_sections;").map_err(storage_sqlite)?;
         tx.commit().map_err(storage_sqlite)
     }
 
@@ -3016,6 +3231,7 @@ impl KnowledgeIndexStore {
         let mut conn = lock_conn(&self.conn);
         let tx = cache_write(&mut conn, INDEX_SCHEMA_VERSION)?;
         tx.execute("DELETE FROM knowledge_chunks WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)", params![artifact]).map_err(storage_sqlite)?;
+        tx.execute("DELETE FROM knowledge_derived_algorithms WHERE variant_id IN (SELECT id FROM chunk_index_variants WHERE parse_artifact_id=?1)",params![artifact]).map_err(storage_sqlite)?;
         tx.execute(
             "DELETE FROM chunk_index_variants WHERE parse_artifact_id=?1",
             params![artifact],
@@ -3186,6 +3402,12 @@ impl KnowledgeVectorStore {
             )
             .optional()
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        if existing.is_some()
+            && derived_algorithm(&conn, false, &variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+        {
+            return Err(KnowledgeError::conflict("legacy paid vectors are stale; preserve them and explicitly build a current cache-profile variant"));
+        }
         if existing
             .as_ref()
             .is_some_and(|r| r.chunk_fingerprint != chunk_fingerprint || r.dimensions != dimensions)
@@ -3199,6 +3421,7 @@ impl KnowledgeVectorStore {
             params![variant_id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions],
         )
         .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+        write_current_algorithm(&conn, &variant_id)?;
         conn.commit().map_err(storage_sqlite)?;
         Ok(BuildBegin {
             variant_id,
@@ -3214,6 +3437,7 @@ impl KnowledgeVectorStore {
     ) -> Result<(), KnowledgeError> {
         let mut conn = lock_conn(&self.conn);
         let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        require_current_algorithm(&tx, false, variant_id)?;
         let variant = tx
             .query_row(
                 "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
@@ -3264,6 +3488,7 @@ impl KnowledgeVectorStore {
             .get_variant(variant_id)?
             .ok_or_else(|| KnowledgeError::index_invalid("missing vector variant"))?;
         let conn = lock_conn(&self.conn);
+        require_current_algorithm(&conn, false, variant_id)?;
         let mut stmt=conn.prepare("SELECT chunk_id,ordinal,vector FROM chunk_vectors WHERE vector_index_variant_id=?1 ORDER BY ordinal")
             .map_err(|e|KnowledgeError::storage_invalid(e.to_string()))?;
         let rows = stmt
@@ -3328,6 +3553,7 @@ impl KnowledgeVectorStore {
         // 校验与 ready 在同一个排他事务；其它连接不能在校验后替换计划集合。
         let mut conn = lock_conn(&self.conn);
         let tx = cache_write(&mut conn, VECTOR_SCHEMA_VERSION)?;
+        require_current_algorithm(&tx, false, variant_id)?;
         let dimensions: i64 = tx
             .query_row(
                 "SELECT dimensions FROM vector_index_variants WHERE id=?1",
@@ -3457,35 +3683,46 @@ impl KnowledgeVectorStore {
         })
     }
 
+    pub fn derived_algorithm_status(
+        &self,
+        variant_id: &str,
+    ) -> Result<Option<DerivedAlgorithmStatus>, KnowledgeError> {
+        derived_algorithm(&lock_conn(&self.conn), false, variant_id)
+    }
     pub fn get_variant(
         &self,
         variant_id: &str,
     ) -> Result<Option<VectorVariantRecord>, KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        conn.query_row(
-            "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",
-            params![variant_id],
-            Self::map_variant,
-        )
-        .optional()
-        .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+        let mut row=conn.query_row("SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE id=?1",params![variant_id],Self::map_variant).optional().map_err(storage_sqlite)?;
+        if let Some(row) = row.as_mut() {
+            if derived_algorithm(&conn, false, variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+            {
+                row.status = "stale".into();
+            }
+        }
+        Ok(row)
     }
-
     pub fn list_variants_by_artifact(
         &self,
         parse_artifact_id: &str,
     ) -> Result<Vec<VectorVariantRecord>, KnowledgeError> {
         let conn = lock_conn(&self.conn);
-        let mut stmt = conn
-            .prepare(
-                "SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE parse_artifact_id=?1 ORDER BY id",
-            )
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        let rows = stmt
+        let mut stmt=conn.prepare("SELECT id, chunk_index_variant_id, parse_artifact_id, model_key, chunk_fingerprint, dimensions, status FROM vector_index_variants WHERE parse_artifact_id=?1 ORDER BY id").map_err(storage_sqlite)?;
+        let mut rows = stmt
             .query_map(params![parse_artifact_id], Self::map_variant)
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
-        rows.collect::<Result<Vec<_>, _>>()
-            .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))
+            .map_err(storage_sqlite)?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(storage_sqlite)?;
+        for row in &mut rows {
+            if derived_algorithm(&conn, false, &row.variant_id)?
+                == Some(DerivedAlgorithmStatus::LegacyStale)
+            {
+                row.status = "stale".into();
+            }
+        }
+        Ok(rows)
     }
 
     /// 检索：限定变体集合（viv 身份即来源/分块/模型三维身份）；查询向量维度
@@ -3504,6 +3741,9 @@ impl KnowledgeVectorStore {
             let Some(variant) = self.get_variant(variant_id)? else {
                 continue;
             };
+            if variant.status == "stale" {
+                return Err(KnowledgeError::retrieval_unavailable("legacy vector cache is stale; explicitly rebuild the current cache-profile variant"));
+            }
             if variant.status != "ready" {
                 continue;
             }
@@ -3567,6 +3807,11 @@ impl KnowledgeVectorStore {
                 params![variant.variant_id],
             )
             .map_err(|e| KnowledgeError::storage_invalid(e.to_string()))?;
+            tx.execute(
+                "DELETE FROM knowledge_derived_algorithms WHERE variant_id=?1",
+                params![variant.variant_id],
+            )
+            .map_err(storage_sqlite)?;
             tx.execute(
                 "DELETE FROM vector_index_variants WHERE id=?1",
                 params![variant.variant_id],

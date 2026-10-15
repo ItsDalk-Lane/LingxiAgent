@@ -2,10 +2,8 @@
 //! 列表 / 创建 / 切换 / 删除 / 主助手 / 排序。
 //!
 //! 端口边界（显式声明，不冒充完整）：
-//! - 广播（agent-created / agent-switched / agent-deleted）尚未接入：Rust
-//!   服务目前没有 app 事件面；相关原叶保持开放，不以静默省略冒充完成。
-//! - deleteSkills 连带清理未实现：请求携带非空名单时显式返回 skipped
-//!   （reason=not_implemented_in_port），技能目录保留（原叶缺省分支要求）。
+//! - 助手事件及deleteSkills清理已接入；先删除助手，再复核独占技能并逐项真实删除。
+//!   非独占或清理失败返回skillsSkipped，成功项才计入skillsDeleted。
 //! - 切换响应的 sessionPath / workspaceFolders / authorizedFolders 不由
 //!   服务端跟踪，返回 null / 空数组；可选 body.cwd 写入该助手 config.yaml
 //!   的 desk.last_cwd 并去重合并 desk.cwd_history（端口适配：桌面壳知道
@@ -220,7 +218,9 @@ impl MemoryService {
         Ok(dir)
     }
 
-    fn ordered_live_agents(&self) -> Result<Vec<(String, PathBuf)>, AgentLifecycleError> {
+    pub(crate) fn ordered_live_agents(
+        &self,
+    ) -> Result<Vec<(String, PathBuf)>, AgentLifecycleError> {
         let mut live = self.scan_live_agent_dirs()?;
         let preferences = self.read_preferences_strict()?;
         let order = preferences["agent_order"].as_array();
@@ -339,15 +339,21 @@ impl MemoryService {
         let base = id
             .map(str::to_string)
             .unwrap_or_else(|| slug_from_name(name));
+        // 目录本身也代表占用：大小写别名、未完成配置和链接不能被当作空位置复用。
+        let occupied = |candidate: &str| -> Result<bool, AgentLifecycleError> {
+            if existing.contains(candidate) {
+                return Ok(true);
+            }
+            match std::fs::symlink_metadata(self.agents_root().join(candidate)) {
+                Ok(_) => Ok(true),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
+                Err(error) => Err(AgentLifecycleError::internal(format!(
+                    "cannot inspect agent directory before creation: {error}"
+                ))),
+            }
+        };
         let agent_id = if id.is_some() {
-            if existing.contains(&base)
-                || self
-                    .agents_root()
-                    .join(&base)
-                    .join(".deleted-agent.json")
-                    .symlink_metadata()
-                    .is_ok()
-            {
+            if occupied(&base)? {
                 return Err(AgentLifecycleError::from(am::MemoryError::Conflict {
                     code: "agent_already_exists".into(),
                     message: format!("agent already exists: {base}"),
@@ -355,29 +361,26 @@ impl MemoryService {
             }
             base
         } else {
-            let mut candidate = if existing.contains(&base) {
-                format!("{base}-2")
-            } else {
-                base.clone()
-            };
+            let mut candidate = base.clone();
             let mut suffix = 2;
-            while existing.contains(&candidate)
-                || self
-                    .agents_root()
-                    .join(&candidate)
-                    .join(".deleted-agent.json")
-                    .symlink_metadata()
-                    .is_ok()
-            {
-                suffix += 1;
+            while occupied(&candidate)? {
                 candidate = format!("{base}-{suffix}");
+                suffix += 1;
             }
             candidate
         };
 
         let dir = self.agents_root().join(&agent_id);
-        std::fs::create_dir_all(&dir).map_err(|err| {
-            AgentLifecycleError::internal(format!("cannot create agent directory: {err}"))
+        // 最后一步必须原子新建；检查后新出现的目录也不能被复用或覆盖。
+        std::fs::create_dir(&dir).map_err(|err| {
+            if err.kind() == std::io::ErrorKind::AlreadyExists {
+                AgentLifecycleError::from(am::MemoryError::Conflict {
+                    code: "agent_already_exists".into(),
+                    message: format!("agent directory already exists: {agent_id}"),
+                })
+            } else {
+                AgentLifecycleError::internal(format!("cannot create agent directory: {err}"))
+            }
         })?;
         let mut config = String::new();
         config.push_str("agent:\n");
@@ -622,6 +625,9 @@ pub async fn agents_delete_route(
         Ok(value) => value,
         Err(response) => return response,
     };
+    // 人物卡应用与删除共用异步门，不能在逻辑删除之后由分段导入重建公共目录。
+    // 请求正文已收齐并校验；清理重试使用独立收据入口，不经本路由重入。
+    let _application = crate::character_cards::CARD_APPLICATION_GATE.lock().await;
     let requested = payload.get("deleteSkills").and_then(Value::as_array);
     match state.memory().delete_agent(&agent_id) {
         Ok(mut deletion) => {

@@ -2244,6 +2244,38 @@
         "report": "artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-binding-window-summary.json"
       },
       "validation": "artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-validation.json"
+    },
+    "settings_ticker_native": {
+      "status": "SIX_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-B97D0D4296FA",
+        "R00-T02-LA-EC77C2B04726",
+        "R00-T02-LA-F88B0A969094",
+        "R00-T02-LA-206785535A40",
+        "R00-T02-LA-3516A7326DD9",
+        "R00-T02-LA-0B483D7F6A43"
+      ],
+      "completedInitialGaps": 31,
+      "remainingInitialGaps": 47,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 232,
+      "gapLeaves": 47,
+      "actualRegisteredBindings": 35,
+      "sourceCandidateSha256": "81fa9cfc0ec89a92a816dc998241cf90a57fe4dbf36fa06b0784f5ee3af93895",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/six-leaf-binding-window-summary.json",
+      "rootActualRustTests": 92,
+      "rootSettingsUiPassed": 644,
+      "rootSettingsUiConditionalSkipped": 4,
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "nextParallel": [
+        "Slash five original leaves and Bridge target ownership",
+        "EX09 section filters/grain/explicit rerank degradation"
+      ],
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }
