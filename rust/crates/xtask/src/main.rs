@@ -399,7 +399,10 @@ fn cmd_verify_stage(root: &Path, rest: &[String]) -> ExitCode {
             dirty,
             started,
             |key| {
-                let snapshot = scope.snapshot(root);
+                let snapshot = scope.snapshot(root).map(|mut snapshot| {
+                    snapshot.share_unchanged_entries(&before);
+                    snapshot
+                });
                 checkpoints.push((key.to_string(), now_ms(), snapshot));
             },
         )

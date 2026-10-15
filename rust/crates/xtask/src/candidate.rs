@@ -19,10 +19,17 @@ pub struct Entry {
 #[derive(Clone, Debug)]
 pub struct Snapshot {
     pub digest: String,
-    pub entries: Vec<Entry>,
+    pub entries: std::sync::Arc<Vec<Entry>>,
 }
 
 impl Snapshot {
+    /// 完整重读核对后，仅共用完全相同的只读结果，避免每个检查点重复占用大份内存。
+    pub fn share_unchanged_entries(&mut self, before: &Snapshot) {
+        if self.digest == before.digest && self.entries == before.entries {
+            self.entries = std::sync::Arc::clone(&before.entries);
+        }
+    }
+
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
             "schema": "lingxi-candidate-source-v1",
@@ -198,35 +205,12 @@ impl Scope {
         }
         paths.sort();
         paths.dedup();
-        let mut entries = Vec::with_capacity(paths.len());
-        for raw in paths {
-            let relative = path_from_git(&raw)?;
-            if relative
-                .components()
-                .any(|c| !matches!(c, Component::Normal(_)))
-            {
-                return Err(format!(
-                    "git candidate path is not a plain relative path: {}",
-                    hex(&raw)
-                ));
-            }
-            if self
-                .excluded_relative
-                .as_ref()
-                .is_some_and(|p| relative.starts_with(p))
-                || self.output_files.contains(&relative)
-            {
-                continue;
-            }
-            let (sha256, mode) = hash_candidate_file(root, &relative)?;
-            entries.push(Entry {
-                path_hex: hex(&raw),
-                display: relative.to_string_lossy().into_owned(),
-                kind: "file",
-                sha256: Some(sha256),
-                mode,
-            });
-        }
+        // 每个检查点仍读取全部文件的真实字节；只并行计算，不缓存或省略核对。
+        let workers = std::thread::available_parallelism()
+            .map(usize::from)
+            .unwrap_or(1)
+            .min(4);
+        let entries = self.hash_entries_parallel(root, &paths, workers)?;
         let mut hasher = Sha256::new();
         hasher.update(b"lingxi-candidate-source-v1\0");
         for entry in &entries {
@@ -242,7 +226,74 @@ impl Scope {
         }
         Ok(Snapshot {
             digest: hex(&hasher.finalize()),
-            entries,
+            entries: std::sync::Arc::new(entries),
+        })
+    }
+
+    fn hash_entries(&self, root: &Path, paths: &[Vec<u8>]) -> Result<Vec<Entry>, String> {
+        let mut entries = Vec::with_capacity(paths.len());
+        for raw in paths {
+            let relative = path_from_git(raw)?;
+            if relative
+                .components()
+                .any(|c| !matches!(c, Component::Normal(_)))
+            {
+                return Err(format!(
+                    "git candidate path is not a plain relative path: {}",
+                    hex(raw)
+                ));
+            }
+            if self
+                .excluded_relative
+                .as_ref()
+                .is_some_and(|p| relative.starts_with(p))
+                || self.output_files.contains(&relative)
+            {
+                continue;
+            }
+            let (sha256, mode) = hash_candidate_file(root, &relative)?;
+            entries.push(Entry {
+                path_hex: hex(raw),
+                display: relative.to_string_lossy().into_owned(),
+                kind: "file",
+                sha256: Some(sha256),
+                mode,
+            });
+        }
+        Ok(entries)
+    }
+
+    fn hash_entries_parallel(
+        &self,
+        root: &Path,
+        paths: &[Vec<u8>],
+        workers: usize,
+    ) -> Result<Vec<Entry>, String> {
+        let chunk_size = paths.len().div_ceil(workers.clamp(1, 4)).max(1);
+        std::thread::scope(|scope| {
+            let handles = paths
+                .chunks(chunk_size)
+                .map(|chunk| {
+                    std::thread::Builder::new()
+                        .spawn_scoped(scope, move || self.hash_entries(root, chunk))
+                        .map_err(|error| format!("cannot start candidate hashing worker: {error}"))
+                })
+                .collect::<Vec<_>>();
+            // 全部线程结算后才能返回；按原路径顺序处理结果，任何错误仍拒绝通过。
+            let results = handles
+                .into_iter()
+                .map(|handle| match handle {
+                    Ok(handle) => handle
+                        .join()
+                        .unwrap_or_else(|_| Err("candidate hashing worker panicked".into())),
+                    Err(error) => Err(error),
+                })
+                .collect::<Vec<_>>();
+            let mut entries = Vec::with_capacity(paths.len());
+            for result in results {
+                entries.extend(result?);
+            }
+            Ok(entries)
         })
     }
 }

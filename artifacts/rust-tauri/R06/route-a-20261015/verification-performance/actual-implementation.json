@@ -1,0 +1,52 @@
+{
+  "result": "PASS_SCOPED_ACTUAL_IMPLEMENTATION_STATIC_REVIEW",
+  "baseCommit": "fedad03f1b78f3f96b059aa006a4eb43f8b6b346",
+  "files": [
+    {
+      "path": "rust/crates/xtask/src/candidate.rs",
+      "baseSHA256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+      "candidateSHA256": "088b28be7aeca03e564c57ee9c9723b4c2a07035cefdfe8b27c7e05de5895a8d"
+    },
+    {
+      "path": "rust/crates/xtask/src/main.rs",
+      "baseSHA256": "0f574a0a4f7bddd5f0b60ccb67dbff58d829abff695f619f85493bffc83e9cab",
+      "candidateSHA256": "733a55e2a32280738a53d546bd8ed4c953676dae5cfca80127d0596e2a88b807"
+    },
+    {
+      "path": "rust/crates/xtask/src/candidate/tests.rs",
+      "baseSHA256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+      "candidateSHA256": "7977183be6232e1cc55f94662f043a970b398f68cf76a47d34dee41ccae34000"
+    }
+  ],
+  "unchangedSecureHashAndAuxiliaryTail": true,
+  "unchangedDigestAggregationLoop": true,
+  "oldNineTestsBytePrefixPreserved": true,
+  "mainOnlyDelta": "after_command fresh Scope.snapshot Result.map share_unchanged_entries then push unchanged checkpoint record",
+  "sharingCondition": "digest equality AND Arc<Vec<Entry>> full value equality",
+  "differentOrErrorSnapshotsPreserved": true,
+  "newNegativeTest": "forged same digest with different entry SHA remains distinct and JSON unchanged",
+  "everySnapshotStillFullReadSecureHash": true,
+  "threadBound": 4,
+  "allThreadsJoinedBeforeReturn": true,
+  "verdictOrCheckpointCountChanged": false,
+  "reviewerExecutedTestsOrBuild": false,
+  "mainModifiedByReviewer": false,
+  "rootMeasurementsReadNotReplayed": {
+    "digestSha256": "74585e2058a2e4d2e879a186b64350c68ceabf2118a7e5b69378121d5eaf55d1",
+    "files": 94700,
+    "parallel4Secs": 9.531435333,
+    "sameFullManifest": true,
+    "serialSecs": 18.427440834,
+    "speedup": 1.9333332483723624
+  },
+  "rootReportedTestLogs": [
+    "/private/tmp/r06-candidate-parallel-main-tests-r2.log",
+    "/private/tmp/r06-candidate-parallel-main-targeted-r3.log"
+  ],
+  "limits": [
+    "no cross-platform dynamic claim",
+    "whole formal stage not executed or accepted by reviewer",
+    "snapshot speedup is not full-stage speedup",
+    "all differing checkpoints still retained; no guaranteed worst-case memory bound for active source drift"
+  ]
+}

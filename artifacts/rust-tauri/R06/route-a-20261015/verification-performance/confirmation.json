@@ -1,0 +1,48 @@
+{
+  "result": "PASS_SCOPED_STATIC_IMPLEMENTATION_REVIEW",
+  "mainCandidateSHA256": "43077d185aa0e2efb1726431909d9776e0b6ced31fdd4646a13fa0a6cd7c1d86",
+  "candidateFinalSHA256": "75dbb279a83b6a42356b0c44f60407c7a275448da46d959561da2f1f92c23f3a",
+  "testsFinalSHA256": "b18ba55301f7a36f1d53d2320ed7a1b2d7dbcec5de49ebe4ee8d9d87535c7b4e",
+  "originalCandidateTestsSHA256": "ba69275dc040adf23705349c495f6814c54db80776cb75052aebbe607bea4233",
+  "allOriginalNineTestsBytePrefixPreserved": true,
+  "unchangedTailFromRejectTrackedOutput": true,
+  "unchangedSnapshotAggregateBody": true,
+  "threadBound": 4,
+  "pathOrder": "git bytes sorted/dedup, contiguous chunks, handles joined/collected in chunk order",
+  "allHandlesExplicitlyJoinedBeforeAnyResultReturn": true,
+  "workerSpawnOrPanicFailsClosed": true,
+  "checkpointsOrVerdictRulesEdited": false,
+  "reviewerExecutedBuildOrTests": false,
+  "mainModifiedByReviewer": false,
+  "readExternalMeasurementOnly": {
+    "digestSha256": "f5dc1becedccea30b873ab0883011e53ccc2acccc370dff94516fb160d67dc73",
+    "files": 94700,
+    "parallel4Secs": 11.885150167,
+    "sameFullManifest": true,
+    "serialSecs": 22.673689125,
+    "speedup": 1.9077326585199719
+  },
+  "limits": [
+    "same stable source tree full entries/manifest/digest equal; no claim of identical cross-file mutation sampling times",
+    "more simultaneous FDs/CPU/IO; fixed4 bounds resources",
+    "new Unix nonUTF8 file fixture may be unsupported by host filesystem; current test outcome not inherited",
+    "inflight runner source identity and checkpoint rules forbid hot replacement; a new candidate/run must preserve freshness"
+  ],
+  "existingTestSetsToRun": [
+    "candidate::tests:: (all9 plus new parity test)",
+    "verify::runner_tests:: (including rr3_real_fd_standard_nested_layout_has_stable_checkpoints_at_every_layer and rr3_nested_process_probe)",
+    "new parity/modes/raw path/missing/symlink cases at1/2/4 workers",
+    "xtask strict clippy/fmt on candidate; no business assertion or stage graph change"
+  ],
+  "testsFinalPreviousSHA256": "b18ba55301f7a36f1d53d2320ed7a1b2d7dbcec5de49ebe4ee8d9d87535c7b4e",
+  "readFinalExternalMeasurementOnly": {
+    "digestSha256": "f5dc1becedccea30b873ab0883011e53ccc2acccc370dff94516fb160d67dc73",
+    "files": 94700,
+    "parallel4Secs": 10.50718225,
+    "sameFullManifest": true,
+    "serialSecs": 25.288560708,
+    "speedup": 2.4067880528102576
+  },
+  "newNonUtf8FixtureCapability": "macOS actual EILSEQ documented, path_from_git byte identity always asserted; only macOS EILSEQ is explicit unsupported file creation, all other errors panic",
+  "finalSourceUnchanged": true
+}

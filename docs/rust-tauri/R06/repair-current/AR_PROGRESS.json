@@ -604,7 +604,7 @@
     }
   ],
   "entry_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01",
-  "stage_gate": "PENDING_FRESH_FULL_599_BINDING_WINDOW_AFTER_DELETE_SKILLS_FIX_AND_ORIGINAL_STAGE_GATE",
+  "stage_gate": "PENDING_ORIGINAL_FORMAL_STAGE_WITH_EQUIVALENT_PARALLEL_SOURCE_HASHING",
   "upstream_gates": "NOT_RUN",
   "entry_checks": [
     {
@@ -2585,6 +2585,14 @@
       "status": "FAIL_EXECUTED_REPAIRED_TARGETED_PASS_FRESH_FULL_WINDOW_PENDING",
       "report": "artifacts/rust-tauri/R06/route-a-20261015/delete-skills-window-fix/result.json",
       "formalStageExecuted": false
+    },
+    "verification_performance_20261015": {
+      "report": "artifacts/rust-tauri/R06/route-a-20261015/verification-performance/result.json",
+      "repeatedPrecheck": "CANCELLED_BY_EXPLICIT_USER_INSTRUCTION",
+      "previousFormal": "STOPPED_FOR_VERIFIED_PERFORMANCE_SWITCH_78_PASS_0_FAIL",
+      "registeredBindingsUnchanged": 599,
+      "scopeCriteriaAndCheckpointsUnchanged": true,
+      "formalStageAccepted": false
     }
   },
   "ex12_additional_reopen": {

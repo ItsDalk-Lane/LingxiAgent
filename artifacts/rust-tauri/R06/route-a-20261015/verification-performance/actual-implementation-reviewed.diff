@@ -1,0 +1,289 @@
+diff --git a/rust/crates/xtask/src/candidate.rs b/rust/crates/xtask/src/candidate.rs
+index 02e14a8d1..e9480d494 100644
+--- a/rust/crates/xtask/src/candidate.rs
++++ b/rust/crates/xtask/src/candidate.rs
+@@ -19,10 +19,17 @@ pub struct Entry {
+ #[derive(Clone, Debug)]
+ pub struct Snapshot {
+     pub digest: String,
+-    pub entries: Vec<Entry>,
++    pub entries: std::sync::Arc<Vec<Entry>>,
+ }
+ 
+ impl Snapshot {
++    /// 完整重读核对后，仅共用完全相同的只读结果，避免每个检查点重复占用大份内存。
++    pub fn share_unchanged_entries(&mut self, before: &Snapshot) {
++        if self.digest == before.digest && self.entries == before.entries {
++            self.entries = std::sync::Arc::clone(&before.entries);
++        }
++    }
++
+     pub fn to_json(&self) -> serde_json::Value {
+         serde_json::json!({
+             "schema": "lingxi-candidate-source-v1",
+@@ -198,16 +205,42 @@ impl Scope {
+         }
+         paths.sort();
+         paths.dedup();
++        // 每个检查点仍读取全部文件的真实字节；只并行计算，不缓存或省略核对。
++        let workers = std::thread::available_parallelism()
++            .map(usize::from)
++            .unwrap_or(1)
++            .min(4);
++        let entries = self.hash_entries_parallel(root, &paths, workers)?;
++        let mut hasher = Sha256::new();
++        hasher.update(b"lingxi-candidate-source-v1\0");
++        for entry in &entries {
++            for value in [
++                &entry.path_hex,
++                entry.kind,
++                entry.sha256.as_deref().unwrap_or(""),
++                &entry.mode.map(|m| m.to_string()).unwrap_or_default(),
++            ] {
++                hasher.update((value.len() as u64).to_be_bytes());
++                hasher.update(value.as_bytes());
++            }
++        }
++        Ok(Snapshot {
++            digest: hex(&hasher.finalize()),
++            entries: std::sync::Arc::new(entries),
++        })
++    }
++
++    fn hash_entries(&self, root: &Path, paths: &[Vec<u8>]) -> Result<Vec<Entry>, String> {
+         let mut entries = Vec::with_capacity(paths.len());
+         for raw in paths {
+-            let relative = path_from_git(&raw)?;
++            let relative = path_from_git(raw)?;
+             if relative
+                 .components()
+                 .any(|c| !matches!(c, Component::Normal(_)))
+             {
+                 return Err(format!(
+                     "git candidate path is not a plain relative path: {}",
+-                    hex(&raw)
++                    hex(raw)
+                 ));
+             }
+             if self
+@@ -220,29 +253,47 @@ impl Scope {
+             }
+             let (sha256, mode) = hash_candidate_file(root, &relative)?;
+             entries.push(Entry {
+-                path_hex: hex(&raw),
++                path_hex: hex(raw),
+                 display: relative.to_string_lossy().into_owned(),
+                 kind: "file",
+                 sha256: Some(sha256),
+                 mode,
+             });
+         }
+-        let mut hasher = Sha256::new();
+-        hasher.update(b"lingxi-candidate-source-v1\0");
+-        for entry in &entries {
+-            for value in [
+-                &entry.path_hex,
+-                entry.kind,
+-                entry.sha256.as_deref().unwrap_or(""),
+-                &entry.mode.map(|m| m.to_string()).unwrap_or_default(),
+-            ] {
+-                hasher.update((value.len() as u64).to_be_bytes());
+-                hasher.update(value.as_bytes());
++        Ok(entries)
++    }
++
++    fn hash_entries_parallel(
++        &self,
++        root: &Path,
++        paths: &[Vec<u8>],
++        workers: usize,
++    ) -> Result<Vec<Entry>, String> {
++        let chunk_size = paths.len().div_ceil(workers.clamp(1, 4)).max(1);
++        std::thread::scope(|scope| {
++            let handles = paths
++                .chunks(chunk_size)
++                .map(|chunk| {
++                    std::thread::Builder::new()
++                        .spawn_scoped(scope, move || self.hash_entries(root, chunk))
++                        .map_err(|error| format!("cannot start candidate hashing worker: {error}"))
++                })
++                .collect::<Vec<_>>();
++            // 全部线程结算后才能返回；按原路径顺序处理结果，任何错误仍拒绝通过。
++            let results = handles
++                .into_iter()
++                .map(|handle| match handle {
++                    Ok(handle) => handle
++                        .join()
++                        .unwrap_or_else(|_| Err("candidate hashing worker panicked".into())),
++                    Err(error) => Err(error),
++                })
++                .collect::<Vec<_>>();
++            let mut entries = Vec::with_capacity(paths.len());
++            for result in results {
++                entries.extend(result?);
+             }
+-        }
+-        Ok(Snapshot {
+-            digest: hex(&hasher.finalize()),
+-            entries,
++            Ok(entries)
+         })
+     }
+ }
+diff --git a/rust/crates/xtask/src/candidate/tests.rs b/rust/crates/xtask/src/candidate/tests.rs
+index 5dd2333a6..128a9c5be 100644
+--- a/rust/crates/xtask/src/candidate/tests.rs
++++ b/rust/crates/xtask/src/candidate/tests.rs
+@@ -319,3 +319,136 @@ fn real_os_fd_scope_process_probe() {
+         "{report}"
+     );
+ }
++
++#[test]
++fn parallel_full_file_hashes_preserve_serial_order_modes_and_refusals() {
++    let root = fixture();
++    let scope = Scope::new(&root, &root.join("evidence")).unwrap();
++    let mut paths = Vec::new();
++    for index in 0..33 {
++        let relative = format!("nested/{index:02}/proof.txt");
++        let path = root.join(&relative);
++        fs::create_dir_all(path.parent().unwrap()).unwrap();
++        fs::write(path, vec![index as u8; index * 173 + 1]).unwrap();
++        paths.push(relative.into_bytes());
++    }
++    #[cfg(unix)]
++    {
++        use std::os::unix::ffi::OsStringExt;
++        let raw = b"non-utf8-\xff.txt".to_vec();
++        match fs::write(
++            root.join(OsString::from_vec(raw.clone())),
++            b"exact raw path",
++        ) {
++            Ok(()) => paths.push(raw),
++            Err(error)
++                if cfg!(target_os = "macos") && error.raw_os_error() == Some(libc::EILSEQ) =>
++            {
++                // 本机文件系统明确拒绝非法UTF8文件名；仍核对原始路径字节没有被改写。
++                assert_eq!(os_bytes(path_from_git(&raw).unwrap().as_os_str()), raw);
++                println!("当前macOS文件系统拒绝非法UTF8文件名，真实文件并行比较仅覆盖可创建路径");
++            }
++            Err(error) => panic!("无法准备原始字节路径：{error}"),
++        }
++    }
++    paths.sort();
++    let serial = scope.hash_entries(&root, &paths).unwrap();
++    for workers in [1, 2, 4] {
++        assert_eq!(
++            serial,
++            scope.hash_entries_parallel(&root, &paths, workers).unwrap()
++        );
++    }
++    assert!(scope
++        .hash_entries_parallel(&root, &[], 4)
++        .unwrap()
++        .is_empty());
++    #[cfg(unix)]
++    {
++        use std::os::unix::fs::PermissionsExt;
++        fs::set_permissions(
++            root.join("nested/17/proof.txt"),
++            fs::Permissions::from_mode(0o600),
++        )
++        .unwrap();
++        let changed = scope.hash_entries_parallel(&root, &paths, 4).unwrap();
++        assert_eq!(changed, scope.hash_entries(&root, &paths).unwrap());
++        assert_eq!(
++            changed
++                .iter()
++                .find(|entry| entry.display == "nested/17/proof.txt")
++                .unwrap()
++                .mode,
++            Some(0o600)
++        );
++    }
++    fs::remove_file(root.join("nested/17/proof.txt")).unwrap();
++    assert_eq!(
++        scope.hash_entries(&root, &paths).unwrap_err(),
++        scope.hash_entries_parallel(&root, &paths, 4).unwrap_err()
++    );
++    #[cfg(unix)]
++    {
++        std::os::unix::fs::symlink(
++            root.join("nested/18/proof.txt"),
++            root.join("nested/17/proof.txt"),
++        )
++        .unwrap();
++        let error = scope.hash_entries_parallel(&root, &paths, 4).unwrap_err();
++        assert!(error.contains("symlink"));
++        assert_eq!(error, scope.hash_entries(&root, &paths).unwrap_err());
++    }
++    fs::remove_dir_all(root).unwrap();
++}
++
++#[test]
++fn identical_checkpoint_storage_is_shared_but_changed_checkpoint_still_fails() {
++    let root = fixture();
++    fs::write(root.join("proof.txt"), b"before").unwrap();
++    let scope = Scope::new(&root, &root.join("evidence")).unwrap();
++    let before = scope.snapshot(&root).unwrap();
++    let mut same = scope.snapshot(&root).unwrap();
++    let original_json = same.to_json();
++    assert!(!std::sync::Arc::ptr_eq(&before.entries, &same.entries));
++    same.share_unchanged_entries(&before);
++    assert!(std::sync::Arc::ptr_eq(&before.entries, &same.entries));
++    assert_eq!(same.to_json(), original_json);
++
++    // 即使摘要字段被伪造成相同，条目不同也不能共用原结果。
++    let mut different_entries = before.entries.as_ref().clone();
++    different_entries[0].sha256 = Some("different-content-hash".into());
++    let mut forged_digest = Snapshot {
++        digest: before.digest.clone(),
++        entries: std::sync::Arc::new(different_entries),
++    };
++    let forged_json = forged_digest.to_json();
++    forged_digest.share_unchanged_entries(&before);
++    assert!(!std::sync::Arc::ptr_eq(
++        &before.entries,
++        &forged_digest.entries
++    ));
++    assert_eq!(forged_digest.to_json(), forged_json);
++
++    fs::write(root.join("proof.txt"), b"changed during verification").unwrap();
++    let mut changed = scope.snapshot(&root).unwrap();
++    changed.share_unchanged_entries(&before);
++    assert!(!std::sync::Arc::ptr_eq(&before.entries, &changed.entries));
++    assert_eq!(differences(&before, &changed), vec![hex(b"proof.txt")]);
++    fs::write(root.join("proof.txt"), b"before").unwrap();
++    let mut restored = scope.snapshot(&root).unwrap();
++    restored.share_unchanged_entries(&before);
++    assert!(std::sync::Arc::ptr_eq(&before.entries, &restored.entries));
++    assert!(!snapshots_stable(
++        &before,
++        &[("changed".into(), 0, Ok(changed))],
++        &Ok(restored)
++    ));
++
++    fs::remove_file(root.join("proof.txt")).unwrap();
++    // 未跟踪文件消失必须仍被完整重读发现，不能用已共用的旧结果代替本次核对。
++    let mut missing = scope.snapshot(&root).unwrap();
++    missing.share_unchanged_entries(&before);
++    assert!(!std::sync::Arc::ptr_eq(&before.entries, &missing.entries));
++    assert_eq!(differences(&before, &missing), vec![hex(b"proof.txt")]);
++    fs::remove_dir_all(root).unwrap();
++}
+diff --git a/rust/crates/xtask/src/main.rs b/rust/crates/xtask/src/main.rs
+index 52c454b58..3f99eed60 100644
+--- a/rust/crates/xtask/src/main.rs
++++ b/rust/crates/xtask/src/main.rs
+@@ -399,7 +399,10 @@ fn cmd_verify_stage(root: &Path, rest: &[String]) -> ExitCode {
+             dirty,
+             started,
+             |key| {
+-                let snapshot = scope.snapshot(root);
++                let snapshot = scope.snapshot(root).map(|mut snapshot| {
++                    snapshot.share_unchanged_entries(&before);
++                    snapshot
++                });
+                 checkpoints.push((key.to_string(), now_ms(), snapshot));
+             },
+         )

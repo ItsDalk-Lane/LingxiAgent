@@ -1,0 +1,83 @@
+{
+  "status": "IMPLEMENTATION_SPEEDUP_VERIFIED_FORMAL_STAGE_PENDING",
+  "baseCommit": "fedad03f1b78f3f96b059aa006a4eb43f8b6b346",
+  "userInstruction": "取消重复599预检，直接正式验收；在不降低验收标准下提速。",
+  "previousFormalRun": {
+    "evidence": "/private/tmp/r06-formal-fedad03f1-r1",
+    "stopReceipt": "/private/tmp/r06-formal-fedad03f1-r1/PERFORMANCE_SWITCH_STOPPED.json",
+    "status": "STOPPED_FOR_PERFORMANCE_SWITCH_NOT_A_STAGE_RESULT",
+    "bindingsCompleted": 78,
+    "bindingsFailed": 0,
+    "resultsWillNotBeReusedAsNewRunSuccess": true
+  },
+  "finding": {
+    "candidateFiles": 94700,
+    "candidateMiB": 12684.3,
+    "bindingCommandsObserved": 61,
+    "observedBindingCommandSeconds": 276.761,
+    "formalElapsedApproxSeconds": 1650,
+    "dominantCost": "每条命令后串行全量secure hash，且每个检查点保留完整重复条目。"
+  },
+  "implementation": {
+    "maxHashWorkers": 4,
+    "allFilesReadAtEveryOriginalCheckpoint": true,
+    "noHashOrMetadataCache": true,
+    "perFileSecureOpenAndHashFunctionsByteIdentical": true,
+    "originalOrderingAndAggregateDigestUnchanged": true,
+    "allWorkerResultsJoinedBeforeReturn": true,
+    "anyWorkerErrorOrPanicFails": true,
+    "checkpointMemory": "本次全量快照完成后，digest和全部Entry值双重相等才共用只读Arc条目；不同快照/错误及全部检查点保留。",
+    "fullManifestJSONAndFieldNamesUnchanged": true
+  },
+  "fullManifestComparison": {
+    "digestSha256": "74585e2058a2e4d2e879a186b64350c68ceabf2118a7e5b69378121d5eaf55d1",
+    "files": 94700,
+    "parallel4Secs": 9.531435333,
+    "sameFullManifest": true,
+    "serialSecs": 18.427440834,
+    "speedup": 1.9333332483723624
+  },
+  "benchmarkBoundary": "静态同一树94700文件逐项JSON/摘要相等；仅文件快照计时，不承诺整体验收相同比例加速。",
+  "validation": {
+    "xtaskFull": {
+      "passed": 124,
+      "log": "/private/tmp/r06-candidate-parallel-main-tests-r2.log",
+      "sha256": "60488dd6e9eea0627ce561b583edf843d724685b2facc906e01876a0b92a3aa3"
+    },
+    "sameDigestDifferentEntriesNegative": {
+      "passed": 1,
+      "log": "/private/tmp/r06-candidate-parallel-main-targeted-r3.log",
+      "sha256": "5430fc7d43433f691f30020477f189acd5cf81d816168903e13c928c9be11287"
+    },
+    "registryContracts": {
+      "passed": 20,
+      "log": "/private/tmp/r06-candidate-parallel-contract.log",
+      "sha256": "7d00ac621fcddaadc069b275d867e94367d8d1a8c171f3a4cc53dba83e449d05"
+    },
+    "clippy": {
+      "result": "PASS",
+      "log": "/private/tmp/r06-candidate-parallel-clippy.log",
+      "sha256": "dac7c38bcc7c541b61808bbe62d64195e24d028d6148ce0fae869133f26054fe"
+    },
+    "releaseBuild": {
+      "result": "PASS",
+      "log": "/private/tmp/r06-candidate-parallel-release-build.log",
+      "sha256": "43d155529ea32a79d0fc0b80faebc4725ddea3016e28bac48d19882aaf435850"
+    }
+  },
+  "fmt": "PASS",
+  "registeredBindingsUnchanged": 599,
+  "originalAssertionsCommandsRegistryUnchanged": true,
+  "originalCandidateTestsBytePrefixPreserved": true,
+  "newCandidateTests": 2,
+  "platformLimitation": "macOS文件系统实际拒绝非法UTF8文件名EILSEQ；新测试明确标示实际创建不支持，仍核原始路径字节不变；其他错误仍失败。",
+  "initialExternalFixtureFailure": {
+    "log": "/private/tmp/r06-candidate-perf-probe/tests.log",
+    "sha256": "4e53c0a58084573137cacfa91ae00dd87c53daf978a57f9acb41f7c663f92557",
+    "reason": "新nonUTF8夹具在macOS拒建；旧9测试全部通过，原失败保留。"
+  },
+  "stageAccepted": false,
+  "R07Ready": false,
+  "sealChanged": false,
+  "actualImplementationReview": "actual-implementation.json"
+}

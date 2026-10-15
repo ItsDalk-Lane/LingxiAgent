@@ -319,3 +319,136 @@ fn real_os_fd_scope_process_probe() {
         "{report}"
     );
 }
+
+#[test]
+fn parallel_full_file_hashes_preserve_serial_order_modes_and_refusals() {
+    let root = fixture();
+    let scope = Scope::new(&root, &root.join("evidence")).unwrap();
+    let mut paths = Vec::new();
+    for index in 0..33 {
+        let relative = format!("nested/{index:02}/proof.txt");
+        let path = root.join(&relative);
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(path, vec![index as u8; index * 173 + 1]).unwrap();
+        paths.push(relative.into_bytes());
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStringExt;
+        let raw = b"non-utf8-\xff.txt".to_vec();
+        match fs::write(
+            root.join(OsString::from_vec(raw.clone())),
+            b"exact raw path",
+        ) {
+            Ok(()) => paths.push(raw),
+            Err(error)
+                if cfg!(target_os = "macos") && error.raw_os_error() == Some(libc::EILSEQ) =>
+            {
+                // 本机文件系统明确拒绝非法UTF8文件名；仍核对原始路径字节没有被改写。
+                assert_eq!(os_bytes(path_from_git(&raw).unwrap().as_os_str()), raw);
+                println!("当前macOS文件系统拒绝非法UTF8文件名，真实文件并行比较仅覆盖可创建路径");
+            }
+            Err(error) => panic!("无法准备原始字节路径：{error}"),
+        }
+    }
+    paths.sort();
+    let serial = scope.hash_entries(&root, &paths).unwrap();
+    for workers in [1, 2, 4] {
+        assert_eq!(
+            serial,
+            scope.hash_entries_parallel(&root, &paths, workers).unwrap()
+        );
+    }
+    assert!(scope
+        .hash_entries_parallel(&root, &[], 4)
+        .unwrap()
+        .is_empty());
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(
+            root.join("nested/17/proof.txt"),
+            fs::Permissions::from_mode(0o600),
+        )
+        .unwrap();
+        let changed = scope.hash_entries_parallel(&root, &paths, 4).unwrap();
+        assert_eq!(changed, scope.hash_entries(&root, &paths).unwrap());
+        assert_eq!(
+            changed
+                .iter()
+                .find(|entry| entry.display == "nested/17/proof.txt")
+                .unwrap()
+                .mode,
+            Some(0o600)
+        );
+    }
+    fs::remove_file(root.join("nested/17/proof.txt")).unwrap();
+    assert_eq!(
+        scope.hash_entries(&root, &paths).unwrap_err(),
+        scope.hash_entries_parallel(&root, &paths, 4).unwrap_err()
+    );
+    #[cfg(unix)]
+    {
+        std::os::unix::fs::symlink(
+            root.join("nested/18/proof.txt"),
+            root.join("nested/17/proof.txt"),
+        )
+        .unwrap();
+        let error = scope.hash_entries_parallel(&root, &paths, 4).unwrap_err();
+        assert!(error.contains("symlink"));
+        assert_eq!(error, scope.hash_entries(&root, &paths).unwrap_err());
+    }
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn identical_checkpoint_storage_is_shared_but_changed_checkpoint_still_fails() {
+    let root = fixture();
+    fs::write(root.join("proof.txt"), b"before").unwrap();
+    let scope = Scope::new(&root, &root.join("evidence")).unwrap();
+    let before = scope.snapshot(&root).unwrap();
+    let mut same = scope.snapshot(&root).unwrap();
+    let original_json = same.to_json();
+    assert!(!std::sync::Arc::ptr_eq(&before.entries, &same.entries));
+    same.share_unchanged_entries(&before);
+    assert!(std::sync::Arc::ptr_eq(&before.entries, &same.entries));
+    assert_eq!(same.to_json(), original_json);
+
+    // 即使摘要字段被伪造成相同，条目不同也不能共用原结果。
+    let mut different_entries = before.entries.as_ref().clone();
+    different_entries[0].sha256 = Some("different-content-hash".into());
+    let mut forged_digest = Snapshot {
+        digest: before.digest.clone(),
+        entries: std::sync::Arc::new(different_entries),
+    };
+    let forged_json = forged_digest.to_json();
+    forged_digest.share_unchanged_entries(&before);
+    assert!(!std::sync::Arc::ptr_eq(
+        &before.entries,
+        &forged_digest.entries
+    ));
+    assert_eq!(forged_digest.to_json(), forged_json);
+
+    fs::write(root.join("proof.txt"), b"changed during verification").unwrap();
+    let mut changed = scope.snapshot(&root).unwrap();
+    changed.share_unchanged_entries(&before);
+    assert!(!std::sync::Arc::ptr_eq(&before.entries, &changed.entries));
+    assert_eq!(differences(&before, &changed), vec![hex(b"proof.txt")]);
+    fs::write(root.join("proof.txt"), b"before").unwrap();
+    let mut restored = scope.snapshot(&root).unwrap();
+    restored.share_unchanged_entries(&before);
+    assert!(std::sync::Arc::ptr_eq(&before.entries, &restored.entries));
+    assert!(!snapshots_stable(
+        &before,
+        &[("changed".into(), 0, Ok(changed))],
+        &Ok(restored)
+    ));
+
+    fs::remove_file(root.join("proof.txt")).unwrap();
+    // 未跟踪文件消失必须仍被完整重读发现，不能用已共用的旧结果代替本次核对。
+    let mut missing = scope.snapshot(&root).unwrap();
+    missing.share_unchanged_entries(&before);
+    assert!(!std::sync::Arc::ptr_eq(&before.entries, &missing.entries));
+    assert_eq!(differences(&before, &missing), vec![hex(b"proof.txt")]);
+    fs::remove_dir_all(root).unwrap();
+}
