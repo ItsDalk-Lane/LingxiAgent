@@ -157,3 +157,16 @@ desktop/native/LingxiSpeechPermissions/build/
 
 # R05 独立审查/终审探针隔离副本的 cargo 构建缓存（门禁惯例：CARGO_TARGET_DIR 仓库外）
 /artifacts/rust-tauri/R05/**/target/
+
+# R06 首跑正式门禁（2026-10-14，失败如实保留）与 route-a 执行窗口的原始证据：
+# 含测试自生成的临时令牌/设备记录、用户态数据库边车与大量嵌套绑定副本（约 1.3GB）；
+# 照 R02 先例保留本机取证，不把凭证或超大快照加入提交，复核以本机原件为准。
+/artifacts/rust-tauri/R06/verify-stage-final-20261014/
+/artifacts/rust-tauri/R06/route-a-20261014/archive-execution-r2/
+/artifacts/rust-tauri/R06/route-a-20261014/batch1-execution/
+/artifacts/rust-tauri/R06/route-a-20261014/batch2-execution/
+/artifacts/rust-tauri/R06/route-a-20261014/batch2-execution-isolated/
+/artifacts/rust-tauri/R06/route-a-20261014/dream-execution-r4/
+/artifacts/rust-tauri/R06/route-a-20261014/mood-execution-r2/
+/artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-execution-r1/
+/artifacts/rust-tauri/R06/route-a-20261014/w11-binding-execution/
