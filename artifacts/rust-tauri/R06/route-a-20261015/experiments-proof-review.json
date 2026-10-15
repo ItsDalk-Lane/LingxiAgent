@@ -1,0 +1,28 @@
+{
+  "status": "REGISTERED_WINDOW_PASS",
+  "newLeaves": [
+    "D8D47C4680C9",
+    "980C099F356F"
+  ],
+  "existingRegression": "B9DA1A584C6E",
+  "actualMainParents": 7,
+  "threeTypechecks": "PASS",
+  "rawLog": "/private/tmp/r06-experiments-main-r1.log",
+  "guiChecks": 9,
+  "screenshotsViewedByRoot": true,
+  "nativeUiReceipt": "/private/tmp/r06-experiments-main-env/tmp/lingxi-experiments-completion-e7106e79399059c2/home/native-ui-evidence/ui-receipt.json",
+  "stageAccepted": false,
+  "limitations": [
+    "macOS actual; Windows/Linux NOT_RUN",
+    "controlled provider actual HTTP; no paid provider",
+    "full computer-control engine unavailable explicitly"
+  ],
+  "original279AssertionsAndThenUnchanged": true,
+  "registeredBindings": 13,
+  "sourceCandidateSha256": "985dd1d24d63b16605c19fff9d31dd32ebf0ac7db7cd69c41419a2cefce31bc4",
+  "rawEvidence": "/private/tmp/r06-experiments-window-r2-20261015",
+  "allTargetsStrict": "PASS",
+  "registrationContracts": 20,
+  "migrationRegistry": "14 exact SQL fingerprints; old13 unchanged; original upgrade/fresh/restart checks PASS",
+  "firstContractFailure": "Missing V14 registry companion; 4 actual contract failures retained in /private/tmp/r06-experiments-contract.log; appended actual SQL fingerprint without changing checks, 20/20 pass r2"
+}

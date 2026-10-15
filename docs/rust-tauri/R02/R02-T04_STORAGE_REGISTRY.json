@@ -119,6 +119,12 @@
           "name": "r06_session_workspace_identity",
           "registered_by": "R06 C1 收尾：新增 sessions.workspace_mount_id / cwd 两个可空列（工作台处置与孤儿清扫叶面共用；现役锚点 server/routes/sessions.ts:2670 workspace-disposal 与 :2762 sweep-orphaned-workspaces；一条迁移两个 ALTER）。按当前实际 MIGRATIONS 的 SQL 字节登记（sha256 经 python hashlib 复算，v12 登记口径同法复验一致），契约测试 r06_ar_f14_migration_receipts 自动核对。",
           "fingerprint_sha256": "ffae0eb452ebb94df83667e22c4788f7f17b072f4190f4dc35e7419a27c38bd0"
+        },
+        {
+          "version": 14,
+          "name": "session_proactive_delegation_at_creation",
+          "registered_by": "R06 主动委派：仅追加 sessions.proactive_delegation 默认false列。按现有解析器读取当前实际SQL字节计算SHA256，旧版本指纹不变；迁移与真实数据库回执按原契约核对。",
+          "fingerprint_sha256": "4c3c36afd3f7f84e0168bdd12fcd3ebea38de6b12b1c566dac1407a1374712c6"
         }
       ],
       "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",

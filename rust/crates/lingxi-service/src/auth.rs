@@ -979,6 +979,25 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             RoutePolicy::LocalOnly
         };
     }
+    if p == "/lingxi/v1/preferences/computer-use" {
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("settings.read")
+        } else if m == "PUT" {
+            RoutePolicy::Scope("settings.write")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if p == "/lingxi/v1/preferences/computer-use/approvals" {
+        return if m == "POST" || m == "DELETE" {RoutePolicy::Scope("settings.write")} else {RoutePolicy::LocalOnly};
+    }
+    if p == "/lingxi/v1/preferences/computer-use/request-permissions" {
+        return if m == "POST" {
+            RoutePolicy::Scope("settings.write")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
     if p == "/lingxi/v1/experiments" {
         return if m == "GET" || m == "HEAD" {
             RoutePolicy::Scope("settings.read")

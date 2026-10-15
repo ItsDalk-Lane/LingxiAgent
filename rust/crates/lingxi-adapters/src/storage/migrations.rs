@@ -618,6 +618,12 @@ ALTER TABLE sessions ADD COLUMN workspace_mount_id TEXT;
 ALTER TABLE sessions ADD COLUMN cwd TEXT;
 "#;
 
+/// 新主会话创建时冻结主动委派；旧会话和非该入口创建的子会话默认关闭。
+pub const V14_NAME: &str = "session_proactive_delegation_at_creation";
+pub const V14_SQL: &str = r#"
+ALTER TABLE sessions ADD COLUMN proactive_delegation INTEGER NOT NULL DEFAULT 0 CHECK(proactive_delegation IN (0,1));
+"#;
+
 pub const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 1,
@@ -683,6 +689,11 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 13,
         name: V13_NAME,
         sql: V13_SQL,
+    },
+    Migration {
+        version: 14,
+        name: V14_NAME,
+        sql: V14_SQL,
     },
 ];
 

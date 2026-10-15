@@ -1,0 +1,17 @@
+{
+  "status": "COMPILABLE_RUNTIME_PREREQUISITE_NOT_FINAL_UI_PROOF",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "sha256": "e239aabddad9234ba6452905f2d28f9873068b2143256caeff9ced0f506a9eb7"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_tree.rs",
+      "sha256": "18d1a37e4ba4e7c59dc4be23999e8280f01f30bacd739843de967dce2199edba"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_ui.rs",
+      "sha256": "fdf10938aafe11cd9917437b2e09ef91b4cccd2368df09753583c4e29a3000c8"
+    }
+  ]
+}

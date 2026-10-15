@@ -357,7 +357,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
         const current = resolveServerConnection(useStore.getState());
         if (current && JSON.stringify(current) === JSON.stringify(connection)
           && typeof msg?.sessionId === 'string'
-          && ['subagent_stop_result', 'slash_result', 'session_user_message', 'input_rejected', 'status', 'stage',
+          && ['session_created', 'subagent_stop_result', 'slash_result', 'session_user_message', 'input_rejected', 'status', 'stage',
             'assistant_run_start', 'assistant_run_end', 'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
             'tool_start', 'tool_end', 'error', 'abort_result', 'stream_resume', 'steered', 'compaction_accepted', 'compaction_result', 'context_usage'].includes(msg.type)) {
           if (msg.historyCleared === true && msg.level === 'success' && msg.targetSessionId === msg.sessionId) {

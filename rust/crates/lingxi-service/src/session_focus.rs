@@ -330,6 +330,12 @@ async fn create(
                 memory_enabled: body.memory_enabled.unwrap_or(true),
                 now_unix_ms: state.clock.now_unix_ms(),
                 project_id: project,
+                proactive_delegation: state
+                    .context_compiler()
+                    .map(|compiler| compiler.new_session_proactive_delegation())
+                    .transpose()
+                    .map_err(|error| error.to_string())?
+                    .unwrap_or(false),
                 lineage: lineage
                     .as_ref()
                     .map(|(parent, depth)| (parent.as_str(), *depth)),

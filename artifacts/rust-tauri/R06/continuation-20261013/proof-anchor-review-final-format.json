@@ -1,6 +1,31 @@
 {
   "scope": "Assertion location review only; no coverage or verdict promotion.",
-  "checked": [],
+  "checked": [
+    {
+      "id": "R00-T02-LA-B9DA1A584C6E",
+      "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
+      "source": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-B9DA1A584C6E",
+      "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
+      "source": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-D901852E1B1A",
+      "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
+      "source": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+      "assertionsChecked": 6
+    },
+    {
+      "id": "R00-T02-LA-D901852E1B1A",
+      "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
+      "source": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+      "assertionsChecked": 6
+    }
+  ],
   "changedAssertionsReviewedInTests": [
     "a13_search_within_scope_returns_only_allowed_sources",
     "file_history_failures_and_conflict_preserve_user_bytes_and_snapshot_rows",
@@ -16,6 +41,6 @@
     "websocket_registration_and_foreign_messages_preserve_authorized_session_streams"
   ],
   "missing": [],
-  "eligibleAnchorUpdates": 0,
+  "eligibleAnchorUpdates": 4,
   "applied": true
 }

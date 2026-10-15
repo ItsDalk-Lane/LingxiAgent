@@ -1,0 +1,16 @@
+import React from 'react';import {createRoot} from 'react-dom/client';
+import { ExperimentsTab } from '../../tabs/ExperimentsTab';
+import {useSettingsStore} from '../../store';import {createLocalServerConnection} from '../../../services/server-connection';
+import zh from '../../../../locales/zh.json';
+const q=new URLSearchParams(location.search);const url=q.get('service')!;const token=q.get('token')!;const readonly=q.get('readonly')!;
+const translate=(key:string)=>key.split('.').reduce<any>((v,k)=>v?.[k],zh)??key;
+window.t=translate as never;window.i18n={locale:'zh-CN'} as never;
+const proof={requests:[] as Array<{path:string;method:string;status:number}>,toasts:[] as unknown[],events:[] as unknown[],errors:[] as string[],denyWrites:false,denyComputerReads:false,failNotification:false,permissionResponse:null as unknown};
+const original=window.fetch.bind(window);window.fetch=async(input,init)=>{const u=String(input),method=init?.method||'GET';const headers=new Headers(init?.headers);if(proof.denyWrites&&method!=='GET')headers.set('Authorization',`Bearer ${readonly}`);if(proof.denyComputerReads&&method==='GET'&&u.includes('/preferences/computer-use'))headers.set('Authorization','Bearer unavailable');const response=await original(input,{...init,headers});proof.requests.push({path:new URL(u).pathname,method,status:response.status});if(u.endsWith("/request-permissions")&&response.ok)proof.permissionResponse=await response.clone().json();return response;};
+window.platform={settingsChanged:(type:string,data:unknown)=>{if(proof.failNotification)throw Error('notification-delivery-failed');proof.events.push({type,data});}} as never;
+window.addEventListener('unhandledrejection',event=>{proof.errors.push(String(event.reason));event.preventDefault();});
+const connection=createLocalServerConnection({serverPort:new URL(url).port,serverToken:token,serverNodeKind:'lingxi-service',serverNodeTransport:'http'})!;
+useSettingsStore.setState({serverConnections:{local:connection},activeServerConnectionId:'local',activeServerConnection:connection,platformName:'darwin',agents:[{id:'agentA',name:'测试助手',isPrimary:true}],currentAgentId:'agentA',showToast:(message:string,type:"success"|"error")=>{proof.toasts.push({message,type});},settingsSnapshot:{key:null,status:'idle',data:null,error:null,requestId:0,updatedAt:null}} as never);
+const root=createRoot(document.getElementById('root')!);
+(window as any).__experiment={proof,t:translate,switchFor:(key:string)=>{let n=Array.from(document.querySelectorAll('div')).find(n=>n.textContent===translate(key)) as HTMLElement|null;while(n&&!n.querySelector('button[role=switch]'))n=n.parentElement;return n?.querySelector('button[role=switch]');},hydrate:async()=>{const r=await original(url+'/lingxi/v1/settings/snapshot?agentId=agentA',{headers:{Authorization:`Bearer ${token}`}});if(!r.ok)throw Error(String(r.status));useSettingsStore.setState({settingsSnapshot:{...useSettingsStore.getState().settingsSnapshot,data:await r.json(),status:'ready'}} as never);return true;},snapshot:()=>useSettingsStore.getState().settingsSnapshot.data};
+root.render(<main style={{fontFamily:'system-ui',padding:24,maxWidth:940,margin:'auto',color:'#252525',background:'#fafafa'}}><h1>实验设置</h1><ExperimentsTab/></main>);

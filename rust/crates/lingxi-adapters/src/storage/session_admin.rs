@@ -112,6 +112,7 @@ pub async fn create_session(
             now_unix_ms,
             project_id: None,
             lineage: None,
+            proactive_delegation: false,
         },
     )
     .await
@@ -129,6 +130,7 @@ pub struct SessionCreation<'a> {
     pub now_unix_ms: u64,
     pub project_id: Option<&'a str>,
     pub lineage: Option<(&'a str, u32)>,
+    pub proactive_delegation: bool,
 }
 pub async fn create_session_prepared(
     db: &RunDatabase,
@@ -145,6 +147,7 @@ pub async fn create_session_prepared(
         now_unix_ms,
         project_id,
         lineage,
+        proactive_delegation,
     } = creation;
     if session_id.starts_with(super::run_store::MOOD_STREAM_PREFIX) {
         return Err(StorageError::InvalidRequest {
@@ -211,8 +214,8 @@ pub async fn create_session_prepared(
                     "INSERT INTO sessions \
                  (session_id, agent_id, owner_user_id, title, created_at_unix_ms, \
                   lifecycle, lineage_depth, permission_mode, authorized_folders_json, \
-                  memory_enabled, last_activity_unix_ms, project_id, parent_session_id) \
-                 VALUES (?1,?2,?3,?4,?5,'active',?11,?6,?7,?8,?5,?9,?10)",
+                  memory_enabled, last_activity_unix_ms, project_id, parent_session_id, proactive_delegation) \
+                 VALUES (?1,?2,?3,?4,?5,'active',?11,?6,?7,?8,?5,?9,?10,?12)",
                     rusqlite::params![
                         sid,
                         aid,
@@ -224,7 +227,8 @@ pub async fn create_session_prepared(
                         mem,
                         project,
                         parent,
-                        depth
+                        depth,
+                        proactive_delegation
                     ],
                 )
                 .map_err(map_err)?;
@@ -1496,4 +1500,55 @@ pub async fn remove_unstarted_creation(
         connection.execute("DELETE FROM sessions WHERE session_id=?1 AND owner_user_id=?2", rusqlite::params![sid, owner]).map_err(map_err)?;
         Ok(())
     })).await
+}
+
+/// 管理面新会话使用同一个完整创建事务，避免两份插入语句分叉。
+#[allow(clippy::too_many_arguments)]
+pub async fn create_session_with_policy(
+    db: &RunDatabase,
+    session_id: &str,
+    agent_id: &str,
+    owner_user_id: &str,
+    title: &str,
+    permission_mode: Option<&str>,
+    authorized_folders: &[String],
+    memory_enabled: bool,
+    now_unix_ms: u64,
+    proactive_delegation: bool,
+) -> Result<(), StorageError> {
+    create_session_prepared(
+        db,
+        SessionCreation {
+            session_id,
+            agent_id,
+            owner_user_id,
+            title,
+            permission_mode,
+            authorized_folders,
+            memory_enabled,
+            now_unix_ms,
+            project_id: None,
+            lineage: None,
+            proactive_delegation,
+        },
+    )
+    .await
+}
+/// 缺失会话显式失败，不回退到当前全局开关。
+pub fn session_proactive_delegation(db: &RunDatabase, sid: &str) -> Result<bool, StorageError> {
+    let conn = rusqlite::Connection::open_with_flags(
+        db.db_path(),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .map_err(map_err)?;
+    conn.busy_timeout(std::time::Duration::from_millis(
+        db.options().busy_timeout_ms,
+    ))
+    .map_err(map_err)?;
+    conn.query_row(
+        "SELECT proactive_delegation FROM sessions WHERE session_id=?1",
+        [sid],
+        |row| row.get(0),
+    )
+    .map_err(map_err)
 }

@@ -37,6 +37,7 @@ pub mod chat_settings;
 pub mod chat_wire;
 pub mod checkpoint_store;
 pub mod compaction;
+pub mod computer_use_settings;
 pub mod config;
 pub mod context_compiler;
 pub mod conversation_map;
@@ -7557,6 +7558,18 @@ pub fn build_router(state: ServiceState) -> Router {
             get(settings_ui::snapshot_route),
         )
         .route("/lingxi/v1/settings/config", get(settings_ui::config_route))
+        .route(
+            "/lingxi/v1/preferences/computer-use",
+            get(computer_use_settings::get_route).put(computer_use_settings::put_route),
+        )
+        .route(
+            "/lingxi/v1/preferences/computer-use/approvals",
+            post(computer_use_settings::approve_route).delete(computer_use_settings::revoke_route),
+        )
+        .route(
+            "/lingxi/v1/preferences/computer-use/request-permissions",
+            post(computer_use_settings::request_route),
+        )
         .route(
             "/lingxi/v1/settings/avatar-health",
             get(settings_ui::avatars_health_route),

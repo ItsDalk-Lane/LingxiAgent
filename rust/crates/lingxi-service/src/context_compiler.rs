@@ -89,6 +89,10 @@ pub struct MaterialQuery {
 
 /// 材料采集端口（生产实现 = FileContextMaterialSource；测试可注入替身）。
 pub trait ContextMaterialSource: Send + Sync {
+    /// 只在新会话创建时采集；默认端口不启用实验。
+    fn new_session_proactive_delegation(&self) -> Result<bool, ContextMaterialError> {
+        Ok(false)
+    }
     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError>;
     fn publication_epoch(
         &self,
@@ -342,6 +346,16 @@ impl FileContextMaterialSource {
     pub fn from_home(home: &Path, product_dir: PathBuf, host: HostFacts) -> Self {
         Self::new(home.join("agents"), home.join("user"), product_dir, host)
     }
+}
+
+/// 新会话创建路径共用同一解析规则；坏文件显式失败。
+pub(crate) fn proactive_delegation_from_user_dir(
+    user_dir: &Path,
+) -> Result<bool, ContextMaterialError> {
+    Ok(
+        scan_preferences(parse_json_material(&user_dir.join("preferences.json"))?.as_ref())
+            .proactive_delegation,
+    )
 }
 
 /// 缺失 → 空串（现役 safeReadFile 语义）；其余错误响亮。
@@ -629,6 +643,9 @@ fn scan_roster(
 }
 
 impl ContextMaterialSource for FileContextMaterialSource {
+    fn new_session_proactive_delegation(&self) -> Result<bool, ContextMaterialError> {
+        proactive_delegation_from_user_dir(&self.user_dir)
+    }
     fn publication_epoch(
         &self,
     ) -> Option<Arc<lingxi_adapters::storage::agent_memory::ContextMaterialEpoch>> {
@@ -810,6 +827,9 @@ pub struct ContextCompilerService {
 }
 
 impl ContextCompilerService {
+    pub fn new_session_proactive_delegation(&self) -> Result<bool, ContextMaterialError> {
+        self.materials.new_session_proactive_delegation()
+    }
     pub fn new(materials: Arc<dyn ContextMaterialSource>) -> Self {
         Self {
             materials,
@@ -889,6 +909,7 @@ impl ContextCompilerService {
             session_started_unix_ms,
             session_memory_enabled,
             None,
+            None,
         )
     }
 
@@ -911,15 +932,30 @@ impl ContextCompilerService {
                 })
             })?
             .flatten();
+        let proactive = storage
+            .map(|db| {
+                lingxi_adapters::storage::session_admin::session_proactive_delegation(
+                    db, session_id,
+                )
+            })
+            .transpose()
+            .map_err(|error| {
+                ContextCompileFailure::Material(ContextMaterialError::SkillMaterial {
+                    detail: format!("session creation policy read failed: {error:?}"),
+                })
+            })?
+            .unwrap_or(false);
         self.compile_snapshot_with_workspace(
             agent_id,
             for_subagent,
             session_started_unix_ms,
             session_memory_enabled,
             workspace,
+            Some(proactive && !for_subagent),
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn compile_snapshot_with_workspace(
         &self,
         agent_id: &str,
@@ -927,6 +963,7 @@ impl ContextCompilerService {
         session_started_unix_ms: u64,
         session_memory_enabled: bool,
         workspace: Option<String>,
+        proactive: Option<bool>,
     ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
         let query = MaterialQuery {
             agent_id: agent_id.to_string(),
@@ -957,6 +994,9 @@ impl ContextCompilerService {
                 input.cwd = workspace.clone();
             }
             input.memory_enabled &= session_memory_enabled;
+            if let Some(proactive) = proactive {
+                input.proactive_delegation = proactive;
+            }
             let material_sha = sha256_hex(&format!("{input:?}"));
             let artifact =
                 ContextCompiler::compile(&input).map_err(ContextCompileFailure::Compile)?;

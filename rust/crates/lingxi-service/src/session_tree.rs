@@ -440,6 +440,78 @@ fn as_logic_nodes(rows: &[(String, Option<String>, String)]) -> Vec<logic::Branc
         .collect()
 }
 
+/// 分支初始化在同一新 SID 操作权内准备，数据库提交失败时只撤回自己的预备资料。
+struct PreparedForkUi {
+    home: std::path::PathBuf,
+    owner: String,
+    session: String,
+    metadata: bool,
+    choice: bool,
+}
+impl PreparedForkUi {
+    fn prepare(
+        storage: &RunDatabase,
+        home: &std::path::Path,
+        owner: &str,
+        source: &str,
+        session: &str,
+    ) -> Result<Self, StorageError> {
+        let io = |detail| StorageError::Io { detail };
+        if crate::session_ui::read(storage, session)?.is_some() {
+            return Err(StorageError::Conflict {
+                detail: format!("session_exists:{session}"),
+            });
+        }
+        let choice = crate::chat_settings::choice(home, owner, source).map_err(io)?;
+        let metadata = crate::session_ui::read(storage, source)?;
+        let mut prepared = Self {
+            home: home.into(),
+            owner: owner.into(),
+            session: session.into(),
+            metadata: false,
+            choice: false,
+        };
+        if let Some(mut metadata) = metadata {
+            metadata.session_id = session.into();
+            crate::session_ui::save(storage, &metadata)?;
+            prepared.metadata = true;
+        }
+        if let Err(error) =
+            crate::chat_settings::save_new_session_choice(home, owner, session, choice)
+        {
+            let cleanup = prepared.rollback(storage);
+            return Err(io(format!(
+                "分支设置初始化失败：{error}{}",
+                cleanup.map_or_else(|error| format!("；清理失败：{error}"), |_| String::new())
+            )));
+        }
+        prepared.choice = true;
+        Ok(prepared)
+    }
+    fn rollback(self, storage: &RunDatabase) -> Result<(), String> {
+        let mut errors = Vec::new();
+        if self.choice {
+            if let Err(error) = crate::chat_settings::remove_new_session_choice(
+                &self.home,
+                &self.owner,
+                &self.session,
+            ) {
+                errors.push(error);
+            }
+        }
+        if self.metadata {
+            if let Err(error) = crate::session_ui::remove_uncreated(storage, &self.session) {
+                errors.push(format!("{error:?}"));
+            }
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors.join("；"))
+        }
+    }
+}
+
 impl SessionService {
     pub fn new(storage: Arc<RunDatabase>, events: Arc<EventService>) -> Self {
         Self {
@@ -736,7 +808,43 @@ impl SessionService {
                 boundary_message_id,
             )
             .await?;
-        let (outcome, envelope) = store::fork_session_committed_with_files(
+        if store::get_session_row(&self.storage, new_session_id)
+            .await?
+            .is_some()
+        {
+            return Err(SessionTreeError::SessionExists {
+                session_id: new_session_id.into(),
+            });
+        }
+        let proactive = self
+            .session_files
+            .as_ref()
+            .map(|files| {
+                crate::context_compiler::proactive_delegation_from_user_dir(
+                    &files.home().join("user"),
+                )
+            })
+            .transpose()
+            .map_err(|error| {
+                SessionTreeError::Storage(StorageError::Io {
+                    detail: format!("new fork policy read failed: {error}"),
+                })
+            })?
+            .unwrap_or(false);
+        let prepared = self
+            .session_files
+            .as_ref()
+            .map(|files| {
+                PreparedForkUi::prepare(
+                    &self.storage,
+                    files.home(),
+                    &source.owner_user_id,
+                    source_session_id,
+                    new_session_id,
+                )
+            })
+            .transpose()?;
+        let committed = store::fork_session_committed_with_files_and_policy(
             &self.storage,
             store::ForkRequest {
                 source_session_id,
@@ -748,8 +856,34 @@ impl SessionService {
             self.session_files
                 .as_ref()
                 .map(|files| files.home().to_path_buf()),
+            proactive,
         )
-        .await?;
+        .await;
+        let (outcome, envelope) = match committed {
+            Ok(value) => value,
+            Err(error) => {
+                // 不确定是否已经落盘时保留初始化，不能抹掉可能成功会话的资料。
+                match store::get_session_row(&self.storage, new_session_id).await {
+                    Ok(None) => {
+                        if let Some(prepared) = prepared {
+                            if let Err(cleanup) = prepared.rollback(&self.storage) {
+                                return Err(SessionTreeError::Storage(StorageError::Io {
+                                    detail: format!(
+                                        "分支提交失败：{error:?}；初始化清理失败：{cleanup}"
+                                    ),
+                                }));
+                            }
+                        }
+                    }
+                    _ => {
+                        return Err(SessionTreeError::Storage(StorageError::Io {
+                            detail: format!("分支提交结果待核对，初始化已保留：{error:?}"),
+                        }))
+                    }
+                }
+                return Err(error.into());
+            }
+        };
         self.events.publish_committed(&[envelope]);
         Ok(ForkView {
             session_id: outcome.session_id,

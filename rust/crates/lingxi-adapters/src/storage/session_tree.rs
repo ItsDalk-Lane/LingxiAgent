@@ -24,7 +24,16 @@ use super::run_store::{with_write_txn, with_write_txn_guarded, RunDatabase};
 use super::session_operations::{self, Operation};
 
 /// fork 源会话行快照（agent/owner/title/权限档/授权目录 JSON/谱系深度）。
-type SourceSessionFacts = (String, String, String, Option<String>, String, i64);
+type SourceSessionFacts = (
+    String,
+    String,
+    String,
+    Option<String>,
+    String,
+    i64,
+    i64,
+    Option<String>,
+);
 /// fork 保留段消息行（id/旧 parent/run/角色/内容）。
 /// fork 保留段消息行（全字段保真复制：对照现役 session-manager.js:1113
 /// `createBranchedSession` 的 `{...entry, parentId}` 浅拷贝——除 session/seq/
@@ -605,6 +614,17 @@ pub async fn fork_session_committed_with_files(
     operation: Option<Operation>,
     home: Option<std::path::PathBuf>,
 ) -> Result<(ForkOutcome, EventEnvelope), StorageError> {
+    fork_session_committed_with_files_and_policy(db, req, operation, home, false).await
+}
+
+/// 新分支主会话的创建策略与行一起提交；包装入口保持旧行为默认关闭。
+pub async fn fork_session_committed_with_files_and_policy(
+    db: &RunDatabase,
+    req: ForkRequest<'_>,
+    operation: Option<Operation>,
+    home: Option<std::path::PathBuf>,
+    proactive_delegation: bool,
+) -> Result<(ForkOutcome, EventEnvelope), StorageError> {
     if req
         .new_session_id
         .starts_with(super::run_store::MOOD_STREAM_PREFIX)
@@ -632,7 +652,7 @@ pub async fn fork_session_committed_with_files(
         .submit(move |conn| {
             conn.query_row(
                 "SELECT agent_id, owner_user_id, title, permission_mode, \
-                 authorized_folders_json, lineage_depth FROM sessions WHERE session_id=?1",
+                 authorized_folders_json, lineage_depth, memory_enabled, project_id FROM sessions WHERE session_id=?1",
                 [&src],
                 |r| {
                     Ok((
@@ -642,6 +662,8 @@ pub async fn fork_session_committed_with_files(
                         r.get(3)?,
                         r.get(4)?,
                         r.get(5)?,
+                        r.get(6)?,
+                        r.get(7)?,
                     ))
                 },
             )
@@ -649,8 +671,8 @@ pub async fn fork_session_committed_with_files(
             .map_err(map_err)
         })
         .await?;
-    let (agent_id, owner, title, perm, folders_json, depth) =
-        found.ok_or(StorageError::InvalidRequest {
+    let (agent_id, owner, title, perm, folders_json, depth, memory_enabled, project_id) = found
+        .ok_or(StorageError::InvalidRequest {
             detail: format!("source session {src_label} not found"),
         })?;
 
@@ -776,8 +798,8 @@ pub async fn fork_session_committed_with_files(
                     "INSERT INTO sessions \
                  (session_id, agent_id, owner_user_id, title, created_at_unix_ms, \
                   parent_session_id, fork_point_message_id, lineage_depth, lifecycle, \
-                  permission_mode, authorized_folders_json) \
-                 VALUES (?1,?2,?3,?4,?5,?6,?7,?8,'active',?9,?10)",
+                  permission_mode, authorized_folders_json, memory_enabled, project_id, proactive_delegation) \
+                 VALUES (?1,?2,?3,?4,?5,?6,?7,?8,'active',?9,?10,?11,?12,?13)",
                     rusqlite::params![
                         new_id,
                         agent_id,
@@ -788,7 +810,10 @@ pub async fn fork_session_committed_with_files(
                         boundary,
                         child_depth as i64,
                         perm2,
-                        folders_json2
+                        folders_json2,
+                        memory_enabled,
+                        project_id,
+                        proactive_delegation
                     ],
                 )
                 .map_err(map_err)?;

@@ -1,0 +1,407 @@
+{
+  "status": "PASS",
+  "scope": "Two new experiment leaves and one already-complete focused-creation renderer regression; not stage acceptance",
+  "newLeafCount": 2,
+  "original279AssertionsAndThenUnchanged": true,
+  "bindingsExecuted": 13,
+  "leafIds": [
+    "R00-T02-LA-D8D47C4680C9",
+    "R00-T02-LA-980C099F356F",
+    "R00-T02-LA-B9DA1A584C6E"
+  ],
+  "sourceCandidateSha256": "985dd1d24d63b16605c19fff9d31dd32ebf0ac7db7cd69c41419a2cefce31bc4",
+  "rawEvidence": "/private/tmp/r06-experiments-window-r2-20261015",
+  "rollupExitCode": 0,
+  "results": [
+    {
+      "key": "r06_test_37d4a0b7cf7ac2257d73",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_experiments_completion",
+        "test": "current_experiment_persistence_events_observation_and_real_system_permissions",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_experiments_completion",
+          "current_experiment_persistence_events_observation_and_real_system_permissions",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_3fc1a3615b976c030631",
+      "binding": {
+        "package": "lingxi-kernel",
+        "suite": "lib",
+        "test": "subagent::tests::policy_defaults_preserve_the_incumbent_switch_values",
+        "kind": "rust_library_test",
+        "sourcePath": "rust/crates/lingxi-kernel/src/subagent.rs",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-kernel",
+          "--lib",
+          "subagent::tests::policy_defaults_preserve_the_incumbent_switch_values",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_44af26646c8f0cc1f41a",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_t03_session_tree",
+        "test": "duplicate_session_id_is_loud_409_on_fork_and_create",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t03_session_tree",
+          "duplicate_session_id_is_loud_409_on_fork_and_create",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_454f8fb45eb2ce14e809",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "subagent_permission_inheritance",
+        "test": "readonly_parent_write_access_request_is_refused_at_dispatch",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "subagent_permission_inheritance",
+          "readonly_parent_write_access_request_is_refused_at_dispatch",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_49283e4bc5379944d138",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r04_t03_approval_service",
+        "test": "sup01_ask_tier_subagent_matrix_on_the_real_chain",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r04_t03_approval_service",
+          "sup01_ask_tier_subagent_matrix_on_the_real_chain",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_653eff65f33f60ba3f3c",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_experiments_completion",
+        "test": "actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_experiments_completion",
+          "actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_96d8883dca3680c35545",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_session_focus_completion",
+        "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_session_focus_completion",
+          "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_a874e2c60d311136b900",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "subagent_permission_inheritance",
+        "test": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "subagent_permission_inheritance",
+          "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_b0c4cfbaddc18c62e24d",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_experiments_completion",
+        "test": "original_settings_container_experiments_computer_components_and_current_live_http",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_experiments_completion",
+          "original_settings_container_experiments_computer_components_and_current_live_http",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_ca16a20e181bb95e084c",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_experiments_completion",
+        "test": "original_experiments_current_tauri_window_real_service",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_experiments_completion",
+          "original_experiments_current_tauri_window_real_service",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_d224f66131be572514b5",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "subagent_permission_inheritance",
+        "test": "model_override_cannot_widen_the_readonly_grant",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "subagent_permission_inheritance",
+          "model_override_cannot_widen_the_readonly_grant",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_e13d69df8210c7981e70",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_experiments_completion",
+        "test": "new_main_session_policy_is_frozen_durable_and_never_grants_tools",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_experiments_completion",
+          "new_main_session_policy_is_frozen_durable_and_never_grants_tools",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_ec3dee985556a625fb8f",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_session_focus_completion",
+        "test": "current_rust_session_created_reaches_production_renderer_projection",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_session_focus_completion",
+          "current_rust_session_created_reaches_production_renderer_projection",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    }
+  ]
+}

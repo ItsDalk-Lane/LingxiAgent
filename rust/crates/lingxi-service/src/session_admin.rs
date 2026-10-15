@@ -397,7 +397,18 @@ impl SessionAdminService {
                 });
             }
         }
-        store::create_session(
+        let proactive = self
+            .context_compiler
+            .as_ref()
+            .map(|compiler| compiler.new_session_proactive_delegation())
+            .transpose()
+            .map_err(|error| {
+                SessionAdminError::Storage(StorageError::Io {
+                    detail: format!("new session policy read failed: {error}"),
+                })
+            })?
+            .unwrap_or(false);
+        store::create_session_with_policy(
             &self.storage,
             session_id,
             agent_id,
@@ -407,6 +418,7 @@ impl SessionAdminService {
             authorized_folders,
             memory_enabled,
             now_unix_ms,
+            proactive,
         )
         .await?;
         Ok(())

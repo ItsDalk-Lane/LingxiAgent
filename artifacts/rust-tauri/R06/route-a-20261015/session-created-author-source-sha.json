@@ -1,0 +1,42 @@
+{
+  "base": "Root current chat44+focus24",
+  "patchSHA256": "6eedf08e9d43fc668c93d69ab0f68aab7c521931f49f7d1a117f26045722de07",
+  "candidateSourceSetSHA256": "68cf83ba011b26c9a08224a5cdb52bcd92a42e813f64e7575baf05ab9c323200",
+  "files": [
+    {
+      "path": "desktop/src/react/services/websocket.ts",
+      "baseSHA256": "40a47e3595e99ef19631cff1ba2dfe7ee02127565a84de3161c6cfbf576a5f72",
+      "candidateSHA256": "d7ca72cbb9235814070dd3a360b3665693b2110c47593cc28f7e9bb2710759ba"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+      "baseSHA256": "a6a301d2dc89d232b244399455363a3bf1a568d39a02333582e19a9a7434b15b",
+      "candidateSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31"
+    },
+    {
+      "path": "tests/rust-native/session-created-dispatch-live.py",
+      "baseSHA256": null,
+      "candidateSHA256": "360b011af1988ac6460cee15713c1c4377c4b709e99a7df2ec9a343900295e8a"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-created-live/launch.mjs",
+      "baseSHA256": null,
+      "candidateSHA256": "60099dffd1d10a0eb4b9aa17ccc3f588b038cfb905db55426e557835e9f2fba0"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-created-live/main.cjs",
+      "baseSHA256": null,
+      "candidateSHA256": "4b4d3e37d171a5e97f939038a137e7b94444e0c160de4c3b231801b11ef4e581"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-created-live/preload.cjs",
+      "baseSHA256": null,
+      "candidateSHA256": "94720499d2133385d69c4b9ec68b8bbbd9dcdfce240145809a93a2c7c4536f72"
+    },
+    {
+      "path": "desktop/src/react/__tests__/session-created-live/surface.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "3d4beeb6dd170e0dc36197b14aaf6e6cdb2e0d0400191927df91dd6e45303227"
+    }
+  ]
+}

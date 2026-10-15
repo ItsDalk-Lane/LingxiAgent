@@ -2477,6 +2477,27 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "experiments": {
+      "status": "TWO_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-D8D47C4680C9",
+        "R00-T02-LA-980C099F356F"
+      ],
+      "completedInitialGaps": 71,
+      "remainingInitialGaps": 7,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 272,
+      "gapLeaves": 7,
+      "actualRegisteredBindings": 13,
+      "sourceCandidateSha256": "985dd1d24d63b16605c19fff9d31dd32ebf0ac7db7cd69c41419a2cefce31bc4",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/experiments-binding-window-summary.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

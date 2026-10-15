@@ -3507,16 +3507,13 @@ fn experiment_definitions() -> Vec<Value> {
     ]
 }
 
-fn stored_experiment_value(memory: &MemoryService, id: &str) -> Option<Value> {
-    memory
-        .read_preferences_root()
-        .ok()
-        .and_then(|prefs| prefs.get("experiments")?.get(id).cloned())
+fn stored_experiment_value(preferences: &Value, id: &str) -> Option<Value> {
+    preferences.get("experiments")?.get(id).cloned()
 }
 
 /// getResolvedInstantSimpleCompactionEnabled（shared/compaction-mode.ts）。
-fn resolved_instant_simple_compaction(memory: &MemoryService) -> Value {
-    let stored = stored_experiment_value(memory, INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID);
+fn resolved_instant_simple_compaction(preferences: &Value) -> Value {
+    let stored = stored_experiment_value(preferences, INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID);
     if let Some(stored) = stored {
         if stored.is_boolean() {
             return stored;
@@ -3524,20 +3521,20 @@ fn resolved_instant_simple_compaction(memory: &MemoryService) -> Value {
         return Value::Bool(false);
     }
     Value::Bool(
-        stored_experiment_value(memory, COMPACTION_MODE_EXPERIMENT_ID)
+        stored_experiment_value(preferences, COMPACTION_MODE_EXPERIMENT_ID)
             == Some(json!("lossy_local")),
     )
 }
 
-fn resolved_experiment_value(memory: &MemoryService, definition: &Value) -> Value {
+fn resolved_experiment_value(preferences: &Value, definition: &Value) -> Value {
     let id = definition["id"].as_str().unwrap_or_default();
     if id == CACHE_SNAPSHOT_EXPERIMENT_ID {
         return json!("off");
     }
     if id == INSTANT_SIMPLE_COMPACTION_EXPERIMENT_ID {
-        return resolved_instant_simple_compaction(memory);
+        return resolved_instant_simple_compaction(preferences);
     }
-    match stored_experiment_value(memory, id) {
+    match stored_experiment_value(preferences, id) {
         None => definition["defaultValue"].clone(),
         Some(stored) => normalize_experiment_value(definition, &stored)
             .unwrap_or_else(|_| definition["defaultValue"].clone()),
@@ -3581,10 +3578,14 @@ fn normalize_experiment_value(definition: &Value, value: &Value) -> Result<Value
 
 pub async fn experiments_list_route(State(state): State<ServiceState>) -> Response {
     let memory = state.memory();
+    let preferences = match memory.read_preferences_root() {
+        Ok(value) => value,
+        Err(error) => return internal_error(error),
+    };
     let experiments: Vec<Value> = experiment_definitions()
         .into_iter()
         .map(|mut definition| {
-            let value = resolved_experiment_value(memory, &definition);
+            let value = resolved_experiment_value(&preferences, &definition);
             definition
                 .as_object_mut()
                 .expect("定义为对象")
@@ -3657,6 +3658,10 @@ pub async fn experiment_patch_route(
             return internal_error(message);
         }
     }
+    state.app_events().publish(
+        "experiment-changed",
+        json!({"id": experiment_id, "value": normalized}),
+    );
     Json(json!({ "ok": true, "value": normalized })).into_response()
 }
 

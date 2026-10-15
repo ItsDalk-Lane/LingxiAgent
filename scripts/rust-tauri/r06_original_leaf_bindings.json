@@ -85098,7 +85098,7 @@
         "关闭无额外委派提示；已有会话和子代理不追溯更改；不能自动扩大工具权限"
       ],
       "then": "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -85119,9 +85119,19 @@
               "package": "lingxi-service",
               "suite": "subagent_permission_inheritance",
               "test": "r03_a11_readonly_parent_child_write_is_refused_by_the_real_boundary"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "new_main_session_policy_is_frozen_durable_and_never_grants_tools"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off"
             }
           ],
-          "meaning": "默认关闭和权限局部已受检；开启实验对新会话主Agent提示的修改入口没有接入。",
+          "meaning": "默认关闭，所有新会话创建入口在SQL插入时冻结策略；真实focused/detached/fork会话配置进入实际HTTP模型提示，关闭后旧会话保留原创建值，子代理不注入；真实subagent写请求仍拒绝且零子任务，权限列和授权目录不变。旧数据库默认false，重开持久一致，9请求/9账本。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-kernel/src/subagent.rs",
@@ -85249,12 +85259,100 @@
                   "quote": "assert!(\n        tool_rx.try_recv().is_err(),\n        \"the tool double was never invoked — the refusal came from the run-layer boundary, \\\n         not from an executor decision\"\n    );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "new_main_session_policy_is_frozen_durable_and_never_grants_tools",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 283,
+              "testEndLine": 365,
+              "assertions": [
+                {
+                  "line": 287,
+                  "quote": "assert!(!prompt(&h, \"old\", false).contains(hint))"
+                },
+                {
+                  "line": 289,
+                  "quote": "assert_eq!(status, 200, \"{v}\")"
+                },
+                {
+                  "line": 291,
+                  "quote": "assert!(prompt(&h, \"new\", false).contains(hint))"
+                },
+                {
+                  "line": 292,
+                  "quote": "assert!(!prompt(&h, \"old\", false).contains(hint))"
+                },
+                {
+                  "line": 293,
+                  "quote": "assert!(!prompt(&h, \"new\", true).contains(hint))"
+                },
+                {
+                  "line": 294,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 300,
+                  "quote": "assert!(prompt(&h, \"new\", false).contains(hint))"
+                },
+                {
+                  "line": 302,
+                  "quote": "assert!(!prompt(&h, \"after-off\", false).contains(hint))"
+                },
+                {
+                  "line": 314,
+                  "quote": "assert_eq!(status, 200, \"{result}\")"
+                },
+                {
+                  "line": 315,
+                  "quote": "assert!(h\n        .provider\n        .prompts\n        .lock()\n        .unwrap()\n        .iter()\n        .flatten()\n        .any(|p| p.contains(hint)))"
+                },
+                {
+                  "line": 332,
+                  "quote": "assert_eq!(outcome[\"ok\"], false, \"{outcome}\")"
+                },
+                {
+                  "line": 333,
+                  "quote": "assert!(\n        outcome.to_string().contains(\"write\") || outcome.to_string().contains(\"read\"),\n        \"不是实际权限拒绝：{outcome}\"\n    )"
+                },
+                {
+                  "line": 345,
+                  "quote": "assert_eq!(children, 0)"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert_eq!(\n        rows,\n        vec![\n            (\"after-off\".into(), 0, \"read_only\".into()),\n            (\"new\".into(), 1, \"read_only\".into()),\n            (\"old\".into(), 0, \"read_only\".into())\n        ]\n    )"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert!(h\n        .state\n        .context_compiler()\n        .unwrap()\n        .compile_session_snapshot(Some(h.state.storage()), \"missing\", \"agentA\", false, 1, true)\n        .is_err())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 708,
+              "testEndLine": 742,
+              "assertions": [
+                {
+                  "line": 731,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实CLI/模型请求失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 739,
+                  "quote": "assert_eq!(v[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 740,
+                  "quote": "assert_eq!(v[\"persistedModelCalls\"], 9)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -85268,9 +85366,19 @@
               "package": "lingxi-service",
               "suite": "subagent_permission_inheritance",
               "test": "readonly_parent_write_access_request_is_refused_at_dispatch"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "new_main_session_policy_is_frozen_durable_and_never_grants_tools"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off"
             }
           ],
-          "meaning": "换模型不扩权可局部保留；实验关闭不加提示以及旧会话/子代理不追溯更改未受检。",
+          "meaning": "默认关闭，所有新会话创建入口在SQL插入时冻结策略；真实focused/detached/fork会话配置进入实际HTTP模型提示，关闭后旧会话保留原创建值，子代理不注入；真实subagent写请求仍拒绝且零子任务，权限列和授权目录不变。旧数据库默认false，重开持久一致，9请求/9账本。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/subagent_permission_inheritance.rs",
@@ -85317,23 +85425,104 @@
                   "quote": "assert!(state.subagents().threads_of(\"sess_local_alpha\").is_empty());"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "new_main_session_policy_is_frozen_durable_and_never_grants_tools",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 283,
+              "testEndLine": 365,
+              "assertions": [
+                {
+                  "line": 287,
+                  "quote": "assert!(!prompt(&h, \"old\", false).contains(hint))"
+                },
+                {
+                  "line": 289,
+                  "quote": "assert_eq!(status, 200, \"{v}\")"
+                },
+                {
+                  "line": 291,
+                  "quote": "assert!(prompt(&h, \"new\", false).contains(hint))"
+                },
+                {
+                  "line": 292,
+                  "quote": "assert!(!prompt(&h, \"old\", false).contains(hint))"
+                },
+                {
+                  "line": 293,
+                  "quote": "assert!(!prompt(&h, \"new\", true).contains(hint))"
+                },
+                {
+                  "line": 294,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 300,
+                  "quote": "assert!(prompt(&h, \"new\", false).contains(hint))"
+                },
+                {
+                  "line": 302,
+                  "quote": "assert!(!prompt(&h, \"after-off\", false).contains(hint))"
+                },
+                {
+                  "line": 314,
+                  "quote": "assert_eq!(status, 200, \"{result}\")"
+                },
+                {
+                  "line": 315,
+                  "quote": "assert!(h\n        .provider\n        .prompts\n        .lock()\n        .unwrap()\n        .iter()\n        .flatten()\n        .any(|p| p.contains(hint)))"
+                },
+                {
+                  "line": 332,
+                  "quote": "assert_eq!(outcome[\"ok\"], false, \"{outcome}\")"
+                },
+                {
+                  "line": 333,
+                  "quote": "assert!(\n        outcome.to_string().contains(\"write\") || outcome.to_string().contains(\"read\"),\n        \"不是实际权限拒绝：{outcome}\"\n    )"
+                },
+                {
+                  "line": 345,
+                  "quote": "assert_eq!(children, 0)"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert_eq!(\n        rows,\n        vec![\n            (\"after-off\".into(), 0, \"read_only\".into()),\n            (\"new\".into(), 1, \"read_only\".into()),\n            (\"old\".into(), 0, \"read_only\".into())\n        ]\n    )"
+                },
+                {
+                  "line": 358,
+                  "quote": "assert!(h\n        .state\n        .context_compiler()\n        .unwrap()\n        .compile_session_snapshot(Some(h.state.storage()), \"missing\", \"agentA\", false, 1, true)\n        .is_err())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 708,
+              "testEndLine": 742,
+              "assertions": [
+                {
+                  "line": 731,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实CLI/模型请求失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 739,
+                  "quote": "assert_eq!(v[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 740,
+                  "quote": "assert_eq!(v[\"persistedModelCalls\"], 9)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "关闭无额外委派提示",
-            "已有会话和子代理不追溯更改",
-            "实验切换不能自动扩大工具权限"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件",
-        "关闭无额外委派提示",
-        "已有会话和子代理不追溯更改",
-        "实验切换不能自动扩大工具权限"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/experiments-proof-review.json"
     },
     {
       "id": "R00-T02-LA-98DDC94776F1",
@@ -102829,9 +103018,14 @@
               "package": "lingxi-service",
               "suite": "r06_session_focus_completion",
               "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_focus_completion",
+              "test": "current_rust_session_created_reaches_production_renderer_projection"
             }
           ],
-          "meaning": "真实当前CLI/HTTP按助手、工作目录、记忆、模型和思考等级创建焦点会话，统一SQL元数据与模型选择、偏好实际持久化；三个用户Run的read/ls/exec分别真消费所选目录，每Run精确3请求和3账本。成功后所属WS收到相同session_created，外主体零帧；无效输入/权限/真实偏好落盘失败明确拒绝，撤回新会话初始化，不冒称此前目录历史已回滚。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+          "meaning": "已完成焦点创建的生产renderer广播回归补充：真实CLI发出session_created，现役WS白名单实际分发，正确会话SID进入可见列表与locator；原负控真实收到帧但未消费，补一个类型token后消费成功。保留该叶所有先前创建/模型/目录/回滚证明。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -102865,7 +103059,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
               "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
-              "sourceSHA256": "a6a301d2dc89d232b244399455363a3bf1a568d39a02333582e19a9a7434b15b",
+              "sourceSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31",
               "testStartLine": 3,
               "testEndLine": 48,
               "assertions": [
@@ -102892,6 +103086,31 @@
                 {
                   "line": 46,
                   "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+              "test": "current_rust_session_created_reaches_production_renderer_projection",
+              "sourceSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31",
+              "testStartLine": 53,
+              "testEndLine": 92,
+              "assertions": [
+                {
+                  "line": 80,
+                  "quote": "assert!(\n        output.status.success(),\n        \"actual lifecycle projection failed: {}\",\n        root.display()\n    )"
+                },
+                {
+                  "line": 89,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 90,
+                  "quote": "assert_eq!(value[\"received\"], true)"
+                },
+                {
+                  "line": 91,
+                  "quote": "assert_eq!(value[\"consumed\"], true)"
                 }
               ]
             }
@@ -102911,9 +103130,14 @@
               "package": "lingxi-service",
               "suite": "r06_session_focus_completion",
               "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_focus_completion",
+              "test": "current_rust_session_created_reaches_production_renderer_projection"
             }
           ],
-          "meaning": "真实当前CLI/HTTP按助手、工作目录、记忆、模型和思考等级创建焦点会话，统一SQL元数据与模型选择、偏好实际持久化；三个用户Run的read/ls/exec分别真消费所选目录，每Run精确3请求和3账本。成功后所属WS收到相同session_created，外主体零帧；无效输入/权限/真实偏好落盘失败明确拒绝，撤回新会话初始化，不冒称此前目录历史已回滚。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
+          "meaning": "已完成焦点创建的生产renderer广播回归补充：真实CLI发出session_created，现役WS白名单实际分发，正确会话SID进入可见列表与locator；原负控真实收到帧但未消费，补一个类型token后消费成功。保留该叶所有先前创建/模型/目录/回滚证明。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -102947,7 +103171,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
               "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
-              "sourceSHA256": "a6a301d2dc89d232b244399455363a3bf1a568d39a02333582e19a9a7434b15b",
+              "sourceSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31",
               "testStartLine": 3,
               "testEndLine": 48,
               "assertions": [
@@ -102976,6 +103200,31 @@
                   "quote": "assert_eq!(value[\"ui\"][\"status\"], \"PASS\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
+              "test": "current_rust_session_created_reaches_production_renderer_projection",
+              "sourceSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31",
+              "testStartLine": 53,
+              "testEndLine": 92,
+              "assertions": [
+                {
+                  "line": 80,
+                  "quote": "assert!(\n        output.status.success(),\n        \"actual lifecycle projection failed: {}\",\n        root.display()\n    )"
+                },
+                {
+                  "line": 89,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 90,
+                  "quote": "assert_eq!(value[\"received\"], true)"
+                },
+                {
+                  "line": 91,
+                  "quote": "assert_eq!(value[\"consumed\"], true)"
+                }
+              ]
             }
           ],
           "coverage": "FULL",
@@ -102983,7 +103232,7 @@
         }
       ],
       "gaps": [],
-      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/interaction-focus-directory-proof-review.json"
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/experiments-proof-review.json"
     },
     {
       "id": "R00-T02-LA-BA490D930CA9",
@@ -113757,8 +114006,560 @@
         "电脑使用实验开关、系统权限状态与申请权限：成功核对 显示系统权限状态；启停 computer-use 偏好并可请求系统权限；批准列表仅展示已有状态。；启停偏好或申请系统权限成功后，ComputerUseSection.load 再 GET 状态并更新卡片；刷新按钮也 GET。；空态/未初始化核对 权限尚未授予时显示未授权或待请求，不提供批准/撤销记录操作按钮。；错误/无权限核对 偏好保存或系统权限申请失败按对应错误显示；批准/撤销 API 仅服务器路由存在，本页不调用。；启停/申请权限的写入已成功但随后的 GET 失败时 load 内部回退到快照并可能不提示，不能把展示旧状态当写入失败。"
       ],
       "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_experiments_current_tauri_window_real_service"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 367,
+              "testEndLine": 609,
+              "assertions": [
+                {
+                  "line": 372,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 374,
+                  "quote": "assert_eq!(list.len(), 4)"
+                },
+                {
+                  "line": 375,
+                  "quote": "assert!(!list\n        .iter()\n        .any(|v| v[\"id\"] == \"memory.cache_snapshot_reflection\"))"
+                },
+                {
+                  "line": 378,
+                  "quote": "assert_eq!(\n        list.iter()\n            .find(|v| v[\"id\"] == \"subagent.proactive_delegation\")\n            .unwrap()[\"value\"],\n        false\n    )"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(\n            h.request(\"PATCH\", EXP, json!({\"value\":value}), readonly)\n                .await\n                .0,\n            status\n        )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PATCH\",\n            \"/lingxi/v1/experiments/unknown\",\n            json!({\"value\":true}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.state.app_events().since(before)[\"events\"], json!([]))"
+                },
+                {
+                  "line": 407,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":true}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 414,
+                  "quote": "assert_eq!(events[\"events\"][0][\"type\"], \"experiment-changed\")"
+                },
+                {
+                  "line": 415,
+                  "quote": "assert_eq!(events[\"events\"][0][\"payload\"][\"value\"], true)"
+                },
+                {
+                  "line": 419,
+                  "quote": "assert_eq!(s, 200, \"{v}\")"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(v[\"observation\"].is_null())"
+                },
+                {
+                  "line": 421,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        200\n    )"
+                },
+                {
+                  "line": 431,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 432,
+                  "quote": "assert_eq!(\n        observed[\"observation\"][\"summaryPreview\"],\n        \"真实保存的观察记录\"\n    )"
+                },
+                {
+                  "line": 436,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, true).await.0,\n        403\n    )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert!(observation_file.is_file())"
+                },
+                {
+                  "line": 442,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(cleared[\"deleted\"], true)"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(!observation_file.exists())"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert_eq!(\n        h.request(\"GET\", observation, Value::Null, false).await.0,\n        400\n    )"
+                },
+                {
+                  "line": 450,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        500\n    )"
+                },
+                {
+                  "line": 454,
+                  "quote": "assert!(observation_file.is_dir())"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert_eq!(s, 200, \"{c}\")"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(c[\"settings\"][\"enabled\"], false)"
+                },
+                {
+                  "line": 466,
+                  "quote": "assert!(c[\"status\"][\"activeLease\"].is_null())"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(c[\"selectedProviderId\"], \"macos:cua\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(status[\"available\"], false)"
+                },
+                {
+                  "line": 472,
+                  "quote": "assert_eq!(status[\"reason\"], \"computer_control_engine_unavailable\")"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(\n            status[\"permissions\"],\n            json!(lingxi_service::computer_use_settings::system_permissions())\n        )"
+                },
+                {
+                  "line": 477,
+                  "quote": "assert_eq!(status[\"permissionSubject\"], \"service_process\")"
+                },
+                {
+                  "line": 479,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true}}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({\"providerId\":\"neighbor\"}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true,\"app_approvals\":[{\"appId\":\"bad\"}]}}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 524,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"user/preferences.json\")).unwrap(),\n        persisted_before\n    )"
+                },
+                {
+                  "line": 530,
+                  "quote": "assert_eq!(\n            h.request(\n                \"PUT\",\n                \"/lingxi/v1/preferences/computer-use\",\n                json!({\"settings\":{\"enabled\":true}}),\n                false\n            )\n            .await\n            .0,\n            200\n        )"
+                },
+                {
+                  "line": 549,
+                  "quote": "assert_eq!(enabled[\"settings\"][\"enabled\"], true)"
+                },
+                {
+                  "line": 550,
+                  "quote": "assert_eq!(\n            enabled[\"status\"][\"providers\"][0][\"status\"][\"available\"],\n            false\n        )"
+                },
+                {
+                  "line": 563,
+                  "quote": "assert_eq!(s, 200, \"{snapshot}\")"
+                },
+                {
+                  "line": 564,
+                  "quote": "assert!(snapshot[\"preferences\"][\"experiments\"].is_array())"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert!(snapshot[\"preferences\"][\"computerUse\"].is_object())"
+                },
+                {
+                  "line": 571,
+                  "quote": "assert_eq!(\n            h.request(\"POST\", route, approval.clone(), true).await.0,\n            403\n        )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(\n            added[\"settings\"][\"app_approvals\"][0][\"appName\"],\n            \"已有批准应用\"\n        )"
+                },
+                {
+                  "line": 582,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert_eq!(removed[\"settings\"][\"app_approvals\"], json!([]))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":false}}),\n            false\n        )\n        .await\n        .0,\n        500\n    )"
+                },
+                {
+                  "line": 601,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        500\n    )"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(h.state.app_events().since(cursor)[\"events\"], json!([]))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 611,
+              "testEndLine": 659,
+              "assertions": [
+                {
+                  "line": 617,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(\n        output.status.success(),\n        \"原页面/当前服务失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 657,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_experiments_current_tauri_window_real_service",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 661,
+              "testEndLine": 706,
+              "assertions": [
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 696,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实原生页失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前生产设置容器/实验页/电脑权限组件真实Rust HTTP和Tauri窗口核对冷启动、缓存、15秒就绪与错误；四实验目录/快照同份偏好，保存先落盘后广播，失败零广播/无假成功；观察记录真实读删与失败。cache snapshot当前已退役，遵守未注册无卡片，不复活原卡；原shadow条件分支保留并由原组件检查。系统权限实际查询和按钮请求返回当前布尔与待请求，既有批准只展示；写后GET失败回退快照不误当写失败；控制引擎当前明确不可用，不宣称已实现电脑控制。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_experiments_current_tauri_window_real_service"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 367,
+              "testEndLine": 609,
+              "assertions": [
+                {
+                  "line": 372,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 374,
+                  "quote": "assert_eq!(list.len(), 4)"
+                },
+                {
+                  "line": 375,
+                  "quote": "assert!(!list\n        .iter()\n        .any(|v| v[\"id\"] == \"memory.cache_snapshot_reflection\"))"
+                },
+                {
+                  "line": 378,
+                  "quote": "assert_eq!(\n        list.iter()\n            .find(|v| v[\"id\"] == \"subagent.proactive_delegation\")\n            .unwrap()[\"value\"],\n        false\n    )"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(\n            h.request(\"PATCH\", EXP, json!({\"value\":value}), readonly)\n                .await\n                .0,\n            status\n        )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PATCH\",\n            \"/lingxi/v1/experiments/unknown\",\n            json!({\"value\":true}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.state.app_events().since(before)[\"events\"], json!([]))"
+                },
+                {
+                  "line": 407,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":true}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 414,
+                  "quote": "assert_eq!(events[\"events\"][0][\"type\"], \"experiment-changed\")"
+                },
+                {
+                  "line": 415,
+                  "quote": "assert_eq!(events[\"events\"][0][\"payload\"][\"value\"], true)"
+                },
+                {
+                  "line": 419,
+                  "quote": "assert_eq!(s, 200, \"{v}\")"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(v[\"observation\"].is_null())"
+                },
+                {
+                  "line": 421,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        200\n    )"
+                },
+                {
+                  "line": 431,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 432,
+                  "quote": "assert_eq!(\n        observed[\"observation\"][\"summaryPreview\"],\n        \"真实保存的观察记录\"\n    )"
+                },
+                {
+                  "line": 436,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, true).await.0,\n        403\n    )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert!(observation_file.is_file())"
+                },
+                {
+                  "line": 442,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(cleared[\"deleted\"], true)"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(!observation_file.exists())"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert_eq!(\n        h.request(\"GET\", observation, Value::Null, false).await.0,\n        400\n    )"
+                },
+                {
+                  "line": 450,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        500\n    )"
+                },
+                {
+                  "line": 454,
+                  "quote": "assert!(observation_file.is_dir())"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert_eq!(s, 200, \"{c}\")"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(c[\"settings\"][\"enabled\"], false)"
+                },
+                {
+                  "line": 466,
+                  "quote": "assert!(c[\"status\"][\"activeLease\"].is_null())"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(c[\"selectedProviderId\"], \"macos:cua\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(status[\"available\"], false)"
+                },
+                {
+                  "line": 472,
+                  "quote": "assert_eq!(status[\"reason\"], \"computer_control_engine_unavailable\")"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(\n            status[\"permissions\"],\n            json!(lingxi_service::computer_use_settings::system_permissions())\n        )"
+                },
+                {
+                  "line": 477,
+                  "quote": "assert_eq!(status[\"permissionSubject\"], \"service_process\")"
+                },
+                {
+                  "line": 479,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true}}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({\"providerId\":\"neighbor\"}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true,\"app_approvals\":[{\"appId\":\"bad\"}]}}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 524,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"user/preferences.json\")).unwrap(),\n        persisted_before\n    )"
+                },
+                {
+                  "line": 530,
+                  "quote": "assert_eq!(\n            h.request(\n                \"PUT\",\n                \"/lingxi/v1/preferences/computer-use\",\n                json!({\"settings\":{\"enabled\":true}}),\n                false\n            )\n            .await\n            .0,\n            200\n        )"
+                },
+                {
+                  "line": 549,
+                  "quote": "assert_eq!(enabled[\"settings\"][\"enabled\"], true)"
+                },
+                {
+                  "line": 550,
+                  "quote": "assert_eq!(\n            enabled[\"status\"][\"providers\"][0][\"status\"][\"available\"],\n            false\n        )"
+                },
+                {
+                  "line": 563,
+                  "quote": "assert_eq!(s, 200, \"{snapshot}\")"
+                },
+                {
+                  "line": 564,
+                  "quote": "assert!(snapshot[\"preferences\"][\"experiments\"].is_array())"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert!(snapshot[\"preferences\"][\"computerUse\"].is_object())"
+                },
+                {
+                  "line": 571,
+                  "quote": "assert_eq!(\n            h.request(\"POST\", route, approval.clone(), true).await.0,\n            403\n        )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(\n            added[\"settings\"][\"app_approvals\"][0][\"appName\"],\n            \"已有批准应用\"\n        )"
+                },
+                {
+                  "line": 582,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert_eq!(removed[\"settings\"][\"app_approvals\"], json!([]))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":false}}),\n            false\n        )\n        .await\n        .0,\n        500\n    )"
+                },
+                {
+                  "line": 601,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        500\n    )"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(h.state.app_events().since(cursor)[\"events\"], json!([]))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 611,
+              "testEndLine": 659,
+              "assertions": [
+                {
+                  "line": 617,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(\n        output.status.success(),\n        \"原页面/当前服务失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 657,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_experiments_current_tauri_window_real_service",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 661,
+              "testEndLine": 706,
+              "assertions": [
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 696,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实原生页失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前生产设置容器/实验页/电脑权限组件真实Rust HTTP和Tauri窗口核对冷启动、缓存、15秒就绪与错误；四实验目录/快照同份偏好，保存先落盘后广播，失败零广播/无假成功；观察记录真实读删与失败。cache snapshot当前已退役，遵守未注册无卡片，不复活原卡；原shadow条件分支保留并由原组件检查。系统权限实际查询和按钮请求返回当前布尔与待请求，既有批准只展示；写后GET失败回退快照不误当写失败；控制引擎当前明确不可用，不宣称已实现电脑控制。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
         {
           "index": 2,
           "tests": [
@@ -113768,9 +114569,24 @@
               "test": "subagent::tests::policy_defaults_preserve_the_incumbent_switch_values",
               "kind": "rust_library_test",
               "sourcePath": "rust/crates/lingxi-kernel/src/subagent.rs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_experiments_current_tauri_window_real_service"
             }
           ],
-          "meaning": "原实验模式UI与experiment-changed事件、shadow观察读取未接；默认off仅局部已证。",
+          "meaning": "当前生产设置容器/实验页/电脑权限组件真实Rust HTTP和Tauri窗口核对冷启动、缓存、15秒就绪与错误；四实验目录/快照同份偏好，保存先落盘后广播，失败零广播/无假成功；观察记录真实读删与失败。cache snapshot当前已退役，遵守未注册无卡片，不复活原卡；原shadow条件分支保留并由原组件检查。系统权限实际查询和按钮请求返回当前布尔与待请求，既有批准只展示；写后GET失败回退快照不误当写失败；控制引擎当前明确不可用，不宣称已实现电脑控制。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-kernel/src/subagent.rs",
@@ -113784,51 +114600,817 @@
                   "quote": "        assert!(\n            !policy.proactive_delegation,\n            \"proactive_delegation default OFF\"\n        );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 367,
+              "testEndLine": 609,
+              "assertions": [
+                {
+                  "line": 372,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 374,
+                  "quote": "assert_eq!(list.len(), 4)"
+                },
+                {
+                  "line": 375,
+                  "quote": "assert!(!list\n        .iter()\n        .any(|v| v[\"id\"] == \"memory.cache_snapshot_reflection\"))"
+                },
+                {
+                  "line": 378,
+                  "quote": "assert_eq!(\n        list.iter()\n            .find(|v| v[\"id\"] == \"subagent.proactive_delegation\")\n            .unwrap()[\"value\"],\n        false\n    )"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(\n            h.request(\"PATCH\", EXP, json!({\"value\":value}), readonly)\n                .await\n                .0,\n            status\n        )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PATCH\",\n            \"/lingxi/v1/experiments/unknown\",\n            json!({\"value\":true}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.state.app_events().since(before)[\"events\"], json!([]))"
+                },
+                {
+                  "line": 407,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":true}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 414,
+                  "quote": "assert_eq!(events[\"events\"][0][\"type\"], \"experiment-changed\")"
+                },
+                {
+                  "line": 415,
+                  "quote": "assert_eq!(events[\"events\"][0][\"payload\"][\"value\"], true)"
+                },
+                {
+                  "line": 419,
+                  "quote": "assert_eq!(s, 200, \"{v}\")"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(v[\"observation\"].is_null())"
+                },
+                {
+                  "line": 421,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        200\n    )"
+                },
+                {
+                  "line": 431,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 432,
+                  "quote": "assert_eq!(\n        observed[\"observation\"][\"summaryPreview\"],\n        \"真实保存的观察记录\"\n    )"
+                },
+                {
+                  "line": 436,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, true).await.0,\n        403\n    )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert!(observation_file.is_file())"
+                },
+                {
+                  "line": 442,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(cleared[\"deleted\"], true)"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(!observation_file.exists())"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert_eq!(\n        h.request(\"GET\", observation, Value::Null, false).await.0,\n        400\n    )"
+                },
+                {
+                  "line": 450,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        500\n    )"
+                },
+                {
+                  "line": 454,
+                  "quote": "assert!(observation_file.is_dir())"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert_eq!(s, 200, \"{c}\")"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(c[\"settings\"][\"enabled\"], false)"
+                },
+                {
+                  "line": 466,
+                  "quote": "assert!(c[\"status\"][\"activeLease\"].is_null())"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(c[\"selectedProviderId\"], \"macos:cua\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(status[\"available\"], false)"
+                },
+                {
+                  "line": 472,
+                  "quote": "assert_eq!(status[\"reason\"], \"computer_control_engine_unavailable\")"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(\n            status[\"permissions\"],\n            json!(lingxi_service::computer_use_settings::system_permissions())\n        )"
+                },
+                {
+                  "line": 477,
+                  "quote": "assert_eq!(status[\"permissionSubject\"], \"service_process\")"
+                },
+                {
+                  "line": 479,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true}}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({\"providerId\":\"neighbor\"}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true,\"app_approvals\":[{\"appId\":\"bad\"}]}}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 524,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"user/preferences.json\")).unwrap(),\n        persisted_before\n    )"
+                },
+                {
+                  "line": 530,
+                  "quote": "assert_eq!(\n            h.request(\n                \"PUT\",\n                \"/lingxi/v1/preferences/computer-use\",\n                json!({\"settings\":{\"enabled\":true}}),\n                false\n            )\n            .await\n            .0,\n            200\n        )"
+                },
+                {
+                  "line": 549,
+                  "quote": "assert_eq!(enabled[\"settings\"][\"enabled\"], true)"
+                },
+                {
+                  "line": 550,
+                  "quote": "assert_eq!(\n            enabled[\"status\"][\"providers\"][0][\"status\"][\"available\"],\n            false\n        )"
+                },
+                {
+                  "line": 563,
+                  "quote": "assert_eq!(s, 200, \"{snapshot}\")"
+                },
+                {
+                  "line": 564,
+                  "quote": "assert!(snapshot[\"preferences\"][\"experiments\"].is_array())"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert!(snapshot[\"preferences\"][\"computerUse\"].is_object())"
+                },
+                {
+                  "line": 571,
+                  "quote": "assert_eq!(\n            h.request(\"POST\", route, approval.clone(), true).await.0,\n            403\n        )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(\n            added[\"settings\"][\"app_approvals\"][0][\"appName\"],\n            \"已有批准应用\"\n        )"
+                },
+                {
+                  "line": 582,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert_eq!(removed[\"settings\"][\"app_approvals\"], json!([]))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":false}}),\n            false\n        )\n        .await\n        .0,\n        500\n    )"
+                },
+                {
+                  "line": 601,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        500\n    )"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(h.state.app_events().since(cursor)[\"events\"], json!([]))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 611,
+              "testEndLine": 659,
+              "assertions": [
+                {
+                  "line": 617,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(\n        output.status.success(),\n        \"原页面/当前服务失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 657,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_experiments_current_tauri_window_real_service",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 661,
+              "testEndLine": 706,
+              "assertions": [
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 696,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实原生页失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "成功保存刷新实验状态与设置快照",
-            "PATCH成功广播experiment-changed、失败不广播、壳事件更新",
-            "shadow追加GET observation，其他模式不触发",
-            "未注册实验不显示",
-            "PATCH抛错不统一toast/回滚",
-            "通知/保存失败不可称完成",
-            "observation异常静默不能称观察已更新"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
+        },
+        {
+          "index": 3,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_experiments_current_tauri_window_real_service"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 367,
+              "testEndLine": 609,
+              "assertions": [
+                {
+                  "line": 372,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 374,
+                  "quote": "assert_eq!(list.len(), 4)"
+                },
+                {
+                  "line": 375,
+                  "quote": "assert!(!list\n        .iter()\n        .any(|v| v[\"id\"] == \"memory.cache_snapshot_reflection\"))"
+                },
+                {
+                  "line": 378,
+                  "quote": "assert_eq!(\n        list.iter()\n            .find(|v| v[\"id\"] == \"subagent.proactive_delegation\")\n            .unwrap()[\"value\"],\n        false\n    )"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(\n            h.request(\"PATCH\", EXP, json!({\"value\":value}), readonly)\n                .await\n                .0,\n            status\n        )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PATCH\",\n            \"/lingxi/v1/experiments/unknown\",\n            json!({\"value\":true}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.state.app_events().since(before)[\"events\"], json!([]))"
+                },
+                {
+                  "line": 407,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":true}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 414,
+                  "quote": "assert_eq!(events[\"events\"][0][\"type\"], \"experiment-changed\")"
+                },
+                {
+                  "line": 415,
+                  "quote": "assert_eq!(events[\"events\"][0][\"payload\"][\"value\"], true)"
+                },
+                {
+                  "line": 419,
+                  "quote": "assert_eq!(s, 200, \"{v}\")"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(v[\"observation\"].is_null())"
+                },
+                {
+                  "line": 421,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        200\n    )"
+                },
+                {
+                  "line": 431,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 432,
+                  "quote": "assert_eq!(\n        observed[\"observation\"][\"summaryPreview\"],\n        \"真实保存的观察记录\"\n    )"
+                },
+                {
+                  "line": 436,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, true).await.0,\n        403\n    )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert!(observation_file.is_file())"
+                },
+                {
+                  "line": 442,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(cleared[\"deleted\"], true)"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(!observation_file.exists())"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert_eq!(\n        h.request(\"GET\", observation, Value::Null, false).await.0,\n        400\n    )"
+                },
+                {
+                  "line": 450,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        500\n    )"
+                },
+                {
+                  "line": 454,
+                  "quote": "assert!(observation_file.is_dir())"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert_eq!(s, 200, \"{c}\")"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(c[\"settings\"][\"enabled\"], false)"
+                },
+                {
+                  "line": 466,
+                  "quote": "assert!(c[\"status\"][\"activeLease\"].is_null())"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(c[\"selectedProviderId\"], \"macos:cua\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(status[\"available\"], false)"
+                },
+                {
+                  "line": 472,
+                  "quote": "assert_eq!(status[\"reason\"], \"computer_control_engine_unavailable\")"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(\n            status[\"permissions\"],\n            json!(lingxi_service::computer_use_settings::system_permissions())\n        )"
+                },
+                {
+                  "line": 477,
+                  "quote": "assert_eq!(status[\"permissionSubject\"], \"service_process\")"
+                },
+                {
+                  "line": 479,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true}}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({\"providerId\":\"neighbor\"}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true,\"app_approvals\":[{\"appId\":\"bad\"}]}}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 524,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"user/preferences.json\")).unwrap(),\n        persisted_before\n    )"
+                },
+                {
+                  "line": 530,
+                  "quote": "assert_eq!(\n            h.request(\n                \"PUT\",\n                \"/lingxi/v1/preferences/computer-use\",\n                json!({\"settings\":{\"enabled\":true}}),\n                false\n            )\n            .await\n            .0,\n            200\n        )"
+                },
+                {
+                  "line": 549,
+                  "quote": "assert_eq!(enabled[\"settings\"][\"enabled\"], true)"
+                },
+                {
+                  "line": 550,
+                  "quote": "assert_eq!(\n            enabled[\"status\"][\"providers\"][0][\"status\"][\"available\"],\n            false\n        )"
+                },
+                {
+                  "line": 563,
+                  "quote": "assert_eq!(s, 200, \"{snapshot}\")"
+                },
+                {
+                  "line": 564,
+                  "quote": "assert!(snapshot[\"preferences\"][\"experiments\"].is_array())"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert!(snapshot[\"preferences\"][\"computerUse\"].is_object())"
+                },
+                {
+                  "line": 571,
+                  "quote": "assert_eq!(\n            h.request(\"POST\", route, approval.clone(), true).await.0,\n            403\n        )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(\n            added[\"settings\"][\"app_approvals\"][0][\"appName\"],\n            \"已有批准应用\"\n        )"
+                },
+                {
+                  "line": 582,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert_eq!(removed[\"settings\"][\"app_approvals\"], json!([]))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":false}}),\n            false\n        )\n        .await\n        .0,\n        500\n    )"
+                },
+                {
+                  "line": 601,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        500\n    )"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(h.state.app_events().since(cursor)[\"events\"], json!([]))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 611,
+              "testEndLine": 659,
+              "assertions": [
+                {
+                  "line": 617,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(\n        output.status.success(),\n        \"原页面/当前服务失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 657,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_experiments_current_tauri_window_real_service",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 661,
+              "testEndLine": 706,
+              "assertions": [
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 696,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实原生页失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前生产设置容器/实验页/电脑权限组件真实Rust HTTP和Tauri窗口核对冷启动、缓存、15秒就绪与错误；四实验目录/快照同份偏好，保存先落盘后广播，失败零广播/无假成功；观察记录真实读删与失败。cache snapshot当前已退役，遵守未注册无卡片，不复活原卡；原shadow条件分支保留并由原组件检查。系统权限实际查询和按钮请求返回当前布尔与待请求，既有批准只展示；写后GET失败回退快照不误当写失败；控制引擎当前明确不可用，不宣称已实现电脑控制。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
+        },
+        {
+          "index": 4,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_experiments_completion",
+              "test": "original_experiments_current_tauri_window_real_service"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "current_experiment_persistence_events_observation_and_real_system_permissions",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 367,
+              "testEndLine": 609,
+              "assertions": [
+                {
+                  "line": 372,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 374,
+                  "quote": "assert_eq!(list.len(), 4)"
+                },
+                {
+                  "line": 375,
+                  "quote": "assert!(!list\n        .iter()\n        .any(|v| v[\"id\"] == \"memory.cache_snapshot_reflection\"))"
+                },
+                {
+                  "line": 378,
+                  "quote": "assert_eq!(\n        list.iter()\n            .find(|v| v[\"id\"] == \"subagent.proactive_delegation\")\n            .unwrap()[\"value\"],\n        false\n    )"
+                },
+                {
+                  "line": 388,
+                  "quote": "assert_eq!(\n            h.request(\"PATCH\", EXP, json!({\"value\":value}), readonly)\n                .await\n                .0,\n            status\n        )"
+                },
+                {
+                  "line": 395,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PATCH\",\n            \"/lingxi/v1/experiments/unknown\",\n            json!({\"value\":true}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 406,
+                  "quote": "assert_eq!(h.state.app_events().since(before)[\"events\"], json!([]))"
+                },
+                {
+                  "line": 407,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":true}), false)\n            .await\n            .0,\n        200\n    )"
+                },
+                {
+                  "line": 414,
+                  "quote": "assert_eq!(events[\"events\"][0][\"type\"], \"experiment-changed\")"
+                },
+                {
+                  "line": 415,
+                  "quote": "assert_eq!(events[\"events\"][0][\"payload\"][\"value\"], true)"
+                },
+                {
+                  "line": 419,
+                  "quote": "assert_eq!(s, 200, \"{v}\")"
+                },
+                {
+                  "line": 420,
+                  "quote": "assert!(v[\"observation\"].is_null())"
+                },
+                {
+                  "line": 421,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        200\n    )"
+                },
+                {
+                  "line": 431,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 432,
+                  "quote": "assert_eq!(\n        observed[\"observation\"][\"summaryPreview\"],\n        \"真实保存的观察记录\"\n    )"
+                },
+                {
+                  "line": 436,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, true).await.0,\n        403\n    )"
+                },
+                {
+                  "line": 440,
+                  "quote": "assert!(observation_file.is_file())"
+                },
+                {
+                  "line": 442,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 443,
+                  "quote": "assert_eq!(cleared[\"deleted\"], true)"
+                },
+                {
+                  "line": 444,
+                  "quote": "assert!(!observation_file.exists())"
+                },
+                {
+                  "line": 446,
+                  "quote": "assert_eq!(\n        h.request(\"GET\", observation, Value::Null, false).await.0,\n        400\n    )"
+                },
+                {
+                  "line": 450,
+                  "quote": "assert_eq!(\n        h.request(\"DELETE\", observation, Value::Null, false).await.0,\n        500\n    )"
+                },
+                {
+                  "line": 454,
+                  "quote": "assert!(observation_file.is_dir())"
+                },
+                {
+                  "line": 464,
+                  "quote": "assert_eq!(s, 200, \"{c}\")"
+                },
+                {
+                  "line": 465,
+                  "quote": "assert_eq!(c[\"settings\"][\"enabled\"], false)"
+                },
+                {
+                  "line": 466,
+                  "quote": "assert!(c[\"status\"][\"activeLease\"].is_null())"
+                },
+                {
+                  "line": 469,
+                  "quote": "assert_eq!(c[\"selectedProviderId\"], \"macos:cua\")"
+                },
+                {
+                  "line": 471,
+                  "quote": "assert_eq!(status[\"available\"], false)"
+                },
+                {
+                  "line": 472,
+                  "quote": "assert_eq!(status[\"reason\"], \"computer_control_engine_unavailable\")"
+                },
+                {
+                  "line": 473,
+                  "quote": "assert_eq!(\n            status[\"permissions\"],\n            json!(lingxi_service::computer_use_settings::system_permissions())\n        )"
+                },
+                {
+                  "line": 477,
+                  "quote": "assert_eq!(status[\"permissionSubject\"], \"service_process\")"
+                },
+                {
+                  "line": 479,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true}}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 490,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({}),\n            true\n        )\n        .await\n        .0,\n        403\n    )"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/request-permissions\",\n            json!({\"providerId\":\"neighbor\"}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":true,\"app_approvals\":[{\"appId\":\"bad\"}]}}),\n            false\n        )\n        .await\n        .0,\n        400\n    )"
+                },
+                {
+                  "line": 524,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"user/preferences.json\")).unwrap(),\n        persisted_before\n    )"
+                },
+                {
+                  "line": 530,
+                  "quote": "assert_eq!(\n            h.request(\n                \"PUT\",\n                \"/lingxi/v1/preferences/computer-use\",\n                json!({\"settings\":{\"enabled\":true}}),\n                false\n            )\n            .await\n            .0,\n            200\n        )"
+                },
+                {
+                  "line": 549,
+                  "quote": "assert_eq!(enabled[\"settings\"][\"enabled\"], true)"
+                },
+                {
+                  "line": 550,
+                  "quote": "assert_eq!(\n            enabled[\"status\"][\"providers\"][0][\"status\"][\"available\"],\n            false\n        )"
+                },
+                {
+                  "line": 563,
+                  "quote": "assert_eq!(s, 200, \"{snapshot}\")"
+                },
+                {
+                  "line": 564,
+                  "quote": "assert!(snapshot[\"preferences\"][\"experiments\"].is_array())"
+                },
+                {
+                  "line": 565,
+                  "quote": "assert!(snapshot[\"preferences\"][\"computerUse\"].is_object())"
+                },
+                {
+                  "line": 571,
+                  "quote": "assert_eq!(\n            h.request(\"POST\", route, approval.clone(), true).await.0,\n            403\n        )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(\n            added[\"settings\"][\"app_approvals\"][0][\"appName\"],\n            \"已有批准应用\"\n        )"
+                },
+                {
+                  "line": 582,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 583,
+                  "quote": "assert_eq!(removed[\"settings\"][\"app_approvals\"], json!([]))"
+                },
+                {
+                  "line": 590,
+                  "quote": "assert_eq!(\n        h.request(\n            \"PUT\",\n            \"/lingxi/v1/preferences/computer-use\",\n            json!({\"settings\":{\"enabled\":false}}),\n            false\n        )\n        .await\n        .0,\n        500\n    )"
+                },
+                {
+                  "line": 601,
+                  "quote": "assert_eq!(\n        h.request(\"PATCH\", EXP, json!({\"value\":false}), false)\n            .await\n            .0,\n        500\n    )"
+                },
+                {
+                  "line": 607,
+                  "quote": "assert_eq!(h.state.app_events().since(cursor)[\"events\"], json!([]))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_settings_container_experiments_computer_components_and_current_live_http",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 611,
+              "testEndLine": 659,
+              "assertions": [
+                {
+                  "line": 617,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 649,
+                  "quote": "assert!(\n        output.status.success(),\n        \"原页面/当前服务失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 657,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_experiments_completion.rs",
+              "test": "original_experiments_current_tauri_window_real_service",
+              "sourceSHA256": "dcc3a802fda6d64da97e1367a4f64facd555ec0d3d1a74fc6d5cca40c7339f3a",
+              "testStartLine": 661,
+              "testEndLine": 706,
+              "assertions": [
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(\n        h.request(\n            \"POST\",\n            \"/lingxi/v1/preferences/computer-use/approvals\",\n            json!({\"providerId\":\"macos:cua\",\"appId\":\"fixture.app\",\"appName\":\"已有批准应用\"}),\n            false\n        )\n        .await\n        .0,\n        200\n    )"
+                },
+                {
+                  "line": 696,
+                  "quote": "assert!(\n        output.status.success(),\n        \"真实原生页失败 {}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(receipt[\"checks\"].as_array().unwrap().len() >= 5)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前生产设置容器/实验页/电脑权限组件真实Rust HTTP和Tauri窗口核对冷启动、缓存、15秒就绪与错误；四实验目录/快照同份偏好，保存先落盘后广播，失败零广播/无假成功；观察记录真实读删与失败。cache snapshot当前已退役，遵守未注册无卡片，不复活原卡；原shadow条件分支保留并由原组件检查。系统权限实际查询和按钮请求返回当前布尔与待请求，既有批准只展示；写后GET失败回退快照不误当写失败；控制引擎当前明确不可用，不宣称已实现电脑控制。 当前macOS合成资料实际运行；不声称外部付费供应商、其他系统或全阶段验收。"
         }
       ],
-      "gaps": [
-        "共用连接/语言/助手/快照/模型/供应商摘要初始化",
-        "冷启动ready和缓存旧数据后台刷新",
-        "供应商摘要不阻塞ready",
-        "无缓存loading mask",
-        "15秒超时强制ready、摘要可暂缺",
-        "初始化异常log并ready可能旧/空数据",
-        "摘要catch静默不能当空列表成功",
-        "实验模式/观察数据卡片显示",
-        "默认off、记录可空",
-        "目录GET异常finally结束loading且无专门错误",
-        "观察GET失败写null、不统一要求错误提示",
-        "成功保存刷新实验状态与设置快照",
-        "PATCH成功广播experiment-changed、失败不广播、壳事件更新",
-        "shadow追加GET observation，其他模式不触发",
-        "未注册实验不显示",
-        "PATCH抛错不统一toast/回滚",
-        "通知/保存失败不可称完成",
-        "observation异常静默不能称观察已更新",
-        "删除成功记录清零",
-        "无记录可无变化",
-        "DELETE抛错不统一toast、失败不可称清零",
-        "显示系统权限与启停computer-use并申请系统权限",
-        "批准列表只展示已有状态",
-        "保存/申请成功后GET刷新、刷新按钮GET",
-        "未授权/待请求且无批准撤销操作按钮",
-        "失败显示对应错误",
-        "批准/撤销API存在但本页不调用",
-        "写成功后GET失败回退快照可能不提示，不误当写失败"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/experiments-proof-review.json"
     },
     {
       "id": "R00-T02-LA-D901852E1B1A",
@@ -113852,7 +115434,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
               "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
-              "sourceSHA256": "a6a301d2dc89d232b244399455363a3bf1a568d39a02333582e19a9a7434b15b",
+              "sourceSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31",
               "testStartLine": 3,
               "testEndLine": 48,
               "assertions": [
@@ -113900,7 +115482,7 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_session_focus_completion.rs",
               "test": "focused_creation_consumes_pinned_model_workspace_and_native_input_drafts",
-              "sourceSHA256": "a6a301d2dc89d232b244399455363a3bf1a568d39a02333582e19a9a7434b15b",
+              "sourceSHA256": "5f6af75c0696d369b8cd604bae96c33d50a76b70a0de5b6ab422ca99bf71da31",
               "testStartLine": 3,
               "testEndLine": 48,
               "assertions": [

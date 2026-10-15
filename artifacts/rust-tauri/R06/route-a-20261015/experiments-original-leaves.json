@@ -1,0 +1,105 @@
+[
+  {
+    "id": "UPSTREAM:R03:R00-T02-LA-980C099F356F",
+    "kind": "inherited_stage_share",
+    "original_clause": {
+      "id": "R00-T02-LA-980C099F356F",
+      "featureId": "F-D05-EXPERIMENT-EXPERIMENT-SUBAGENT-PROACTIVE-DELEGATION-980C09",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R03-T03",
+        "R03-T06",
+        "R06-T03"
+      ],
+      "r00ExecutionStageIds": [
+        "R03",
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
+      "r00Assertions": [
+        "默认关闭；开启后新会话主 Agent 提示增加独立研究可用只读子代理的条件，工具依旧按权限执行",
+        "关闭无额外委派提示；已有会话和子代理不追溯更改；不能自动扩大工具权限"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "stage_share_satisfied",
+      "stageShare": "R03 份额=实验开关默认值与子代理衰减边界：subagent.proactive_delegation 默认关闭（frozen incumbent 默认）、只读父会话派生 write 档子代理被统一拒绝且零 child run（T06 权限衰减在真实运行层判定）",
+      "laterShare": "开启后的提示词条件注入与完整研究子代理行为（工具按权限执行的完整语义）= R06-T03",
+      "evidenceRequired": "本阶段份额由 a15_combo_and_leaves 生产者经真实服务链路逐案例机器核验（lingxi.leaf-case-results.v1，actual==图钉）；份额图钉全过即 R03 份额 PASS",
+      "evidenceCommandRefs": [
+        "a15_combo_and_leaves"
+      ],
+      "assertionContract": {
+        "producerCommand": "a15_combo_and_leaves",
+        "evidencePath": "{EVIDENCE}/A15/leaf-cases.json",
+        "cases": [
+          {
+            "case": "subagent-policy-proactive-delegation-default-off",
+            "expect": 1
+          },
+          {
+            "case": "subagent-escalation-write-denied-zero-children",
+            "expect": 0
+          }
+        ]
+      }
+    },
+    "task_ids": [],
+    "source": "rust/crates/xtask/src/stage_maps/R03.json",
+    "deadline": "R06 阶段验收前",
+    "related_findings": [],
+    "later_basis": null,
+    "status": "NOT_RUN",
+    "runtime_evidence": [],
+    "independent_review": "NOT_RUN",
+    "scope_disposition": "PENDING_REQUIREMENT_AND_RUNTIME_RECONCILIATION"
+  },
+  {
+    "id": "UPSTREAM:R03:R00-T02-LA-D8D47C4680C9",
+    "kind": "inherited_stage_share",
+    "original_clause": {
+      "id": "R00-T02-LA-D8D47C4680C9",
+      "featureId": "F-D05-UI-UI-SETTINGS-EXPERIMENTS-D8D47C",
+      "requirement": "REQUIRED_SUPPLEMENTAL",
+      "r00Kind": "supplemental",
+      "r00TaskIds": [
+        "R03-T03",
+        "R03-T06",
+        "R06-T03"
+      ],
+      "r00ExecutionStageIds": [
+        "R03",
+        "R06"
+      ],
+      "r00LedgerStatus": "SPECIFIED_NOT_EXECUTED",
+      "r00ResultIds": [],
+      "r00TestIds": [],
+      "r00Then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "r00Assertions": [
+        "打开设置容器自动初始化：连接、语言、助手、快照、模型和供应商摘要（各页共用）：成功核对 冷启动完成后 ready；已有缓存直接显示旧数据并后台刷新；供应商摘要不阻塞 ready；空态/未初始化核对 无缓存时显示 loading mask；15 秒超时强制 ready；供应商摘要可暂缺；错误/无权限核对 初始化异常会 log 并 ready=true，可能展示旧/空数据；供应商摘要失败被 catch 静默，不能当空列表成功",
+        "打开页自动读取实验目录和观察记录：成功核对 实验模式及观察数据按卡片显示；空态/未初始化核对 默认关闭的实验显示 off；观察记录可空；错误/无权限核对 目录 GET 未捕获异常，finally 结束 loading，页面无专门加载错误；观察记录 GET 失败写 null，不能一概要求错误提示。",
+        "启停或选择实验模式（含主动委派）：成功核对 保存后实验状态和设置快照刷新；实验 PATCH 成功后广播 experiment-changed；失败不广播，桌面壳据事件更新对应状态。；缓存快照模式改为 shadow 后追加 GET observation。；空态/未初始化核对 未注册实验不显示卡片；其它模式不触发这次观察读取。；错误/无权限核对 PATCH 抛错未由按钮处理成 toast，不能要求统一回滚/提示；主动委派仍默认关闭。；通知失败或保存失败不能冒充目标配置已完成。；observation 读取异常静默，不宣称观察记录已更新。",
+        "清除缓存快照观察记录：成功核对 记录清零；空态/未初始化核对 原本无记录可无变化；错误/无权限核对 DELETE 抛错未由按钮处理成 toast，清除失败不可称记录已清零。",
+        "电脑使用实验开关、系统权限状态与申请权限：成功核对 显示系统权限状态；启停 computer-use 偏好并可请求系统权限；批准列表仅展示已有状态。；启停偏好或申请系统权限成功后，ComputerUseSection.load 再 GET 状态并更新卡片；刷新按钮也 GET。；空态/未初始化核对 权限尚未授予时显示未授权或待请求，不提供批准/撤销记录操作按钮。；错误/无权限核对 偏好保存或系统权限申请失败按对应错误显示；批准/撤销 API 仅服务器路由存在，本页不调用。；启停/申请权限的写入已成功但随后的 GET 失败时 load 内部回退到快照并可能不提示，不能把展示旧状态当写入失败。"
+      ],
+      "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "basisKind": "deferred_to_later_stage",
+      "stageShare": "无 R03 叶专属门禁份额：实验设置页 UI 投影 = 纯客户端呈现；运行/取消/身份/事件基底由基础场景 R03-A01..A16 与 a15_combo_and_leaves 组合矩阵门禁承担，无叶专属份额需要图钉",
+      "laterShare": "R06-T03/R07（设置页）",
+      "evidenceRequired": "R03 不判本叶（DEFERRED，仍 REQUIRED）：验收归属 r00ExecutionStageIds 中的后续阶段（R06/R07/R08），后续阶段图必须消费本叶余款",
+      "evidenceCommandRefs": []
+    },
+    "task_ids": [],
+    "source": "rust/crates/xtask/src/stage_maps/R03.json",
+    "deadline": "R06 阶段验收前",
+    "related_findings": [],
+    "later_basis": null,
+    "status": "NOT_RUN",
+    "runtime_evidence": [],
+    "independent_review": "NOT_RUN",
+    "scope_disposition": "PENDING_REQUIREMENT_AND_RUNTIME_RECONCILIATION"
+  }
+]

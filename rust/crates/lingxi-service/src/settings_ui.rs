@@ -311,5 +311,19 @@ pub async fn snapshot_route(
         Ok(value) => value,
         Err(error) => return failure(error),
     };
+    let mut preferences = preferences;
+    let computer = match crate::computer_use_settings::projection(&state) {
+        Ok(value) => value,
+        Err(error) => return failure(error),
+    };
+    preferences["computerUse"] = computer;
+    let definitions =
+        crate::agents_admin::agent_config_readback::experiments_list_route(State(state.clone()))
+            .await;
+    let experiments = match response_value(definitions).await {
+        Ok(value) => value,
+        Err(response) => return *response,
+    };
+    preferences["experiments"] = experiments["experiments"].clone();
     Json(json!({"agentId": id, "config": config, "identity": identity["content"], "agents": agents["content"], "publicAgents": public_agents["content"], "userProfile": user["content"], "experience": experience, "globalModels": global_models, "preferences": preferences})).into_response()
 }
