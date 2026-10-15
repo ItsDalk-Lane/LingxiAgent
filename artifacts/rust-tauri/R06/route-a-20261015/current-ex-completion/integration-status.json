@@ -23,5 +23,13 @@
   "earlierReadyReopenedLeavesNowRegisteredPass": [
     "R00-T02-LA-8B48FD65CAFB",
     "R00-T02-LA-517E697740D9"
-  ]
+  ],
+  "latestFullWindow": {
+    "executed": 599,
+    "passed": 598,
+    "failed": 1,
+    "report": "artifacts/rust-tauri/R06/route-a-20261015/delete-skills-window-fix/result.json",
+    "failedBindingTargetedRepair": "PASS",
+    "freshFullWindowAndFormalStage": "PENDING"
+  }
 }

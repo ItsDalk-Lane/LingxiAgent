@@ -61312,120 +61312,120 @@
               {
                 "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
                 "test": "agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
-                "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-                "testStartLine": 127,
-                "testEndLine": 340,
+                "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+                "testStartLine": 147,
+                "testEndLine": 360,
                 "assertions": [
                   {
-                    "line": 135,
+                    "line": 155,
                     "quote": "assert_eq!(\n                ok(\n                    &server,\n                    \"POST\",\n                    \"/lingxi/v1/agents\",\n                    Some(&json!({\"id\":id,\"name\":name}))\n                )\n                .await\n                .0,\n                200\n            )"
                   },
                   {
-                    "line": 147,
+                    "line": 167,
                     "quote": "assert_eq!(\n            ok(\n                &server,\n                \"PUT\",\n                \"/lingxi/v1/agents/primary\",\n                Some(&json!({\"id\":\"survivor\"}))\n            )\n            .await\n            .0,\n            200\n        )"
                   },
                   {
-                    "line": 195,
+                    "line": 215,
                     "quote": "assert_eq!(\n            http(\n                &server,\n                \"DELETE\",\n                \"/lingxi/v1/agents/victim\",\n                Some(&json!({\"deleteSkills\":[\"demo-owned\"]})),\n                None\n            )\n            .await\n            .0,\n            401\n        )"
                   },
                   {
-                    "line": 207,
+                    "line": 227,
                     "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
                   },
                   {
-                    "line": 208,
+                    "line": 228,
                     "quote": "assert_eq!(\n            std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n            skill_before\n        )"
                   },
                   {
-                    "line": 240,
+                    "line": 260,
                     "quote": "assert!(\n            output.status.success(),\n            \"当前桌面入口真实HTTP/UI子用例失败：{scenario}\"\n        )"
                   },
                   {
-                    "line": 245,
+                    "line": 265,
                     "quote": "assert_eq!(proof[\"success\"], true)"
                   },
                   {
-                    "line": 246,
+                    "line": 266,
                     "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
                   },
                   {
-                    "line": 247,
+                    "line": 267,
                     "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
                   },
                   {
-                    "line": 248,
+                    "line": 268,
                     "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
                   },
                   {
-                    "line": 259,
+                    "line": 279,
                     "quote": "assert_eq!(results.len(), 1)"
                   },
                   {
-                    "line": 261,
+                    "line": 281,
                     "quote": "assert_eq!(assertions.len(), 1)"
                   },
                   {
-                    "line": 262,
+                    "line": 282,
                     "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
                   },
                   {
-                    "line": 263,
+                    "line": 283,
                     "quote": "assert_eq!(\n            assertions[0][\"fullName\"],\n            \"rust_agent_delete_current_settings_real_service\"\n        )"
                   },
                   {
-                    "line": 267,
+                    "line": 287,
                     "quote": "assert!(\n            server.home.join(\"skills/demo-keep/SKILL.md\").is_file(),\n            \"未勾选技能必须保留\"\n        )"
                   },
                   {
-                    "line": 272,
+                    "line": 292,
                     "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
-                  },
-                  {
-                    "line": 273,
-                    "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
-                  },
-                  {
-                    "line": 279,
-                    "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
-                  },
-                  {
-                    "line": 280,
-                    "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
                   },
                   {
                     "line": 293,
-                    "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                    "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
                   },
                   {
-                    "line": 296,
-                    "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                    "line": 299,
+                    "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
                   },
                   {
                     "line": 300,
-                    "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
-                  },
-                  {
-                    "line": 301,
-                    "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
-                  },
-                  {
-                    "line": 306,
-                    "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
-                  },
-                  {
-                    "line": 308,
-                    "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                    "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
                   },
                   {
                     "line": 313,
-                    "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                    "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                  },
+                  {
+                    "line": 316,
+                    "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                  },
+                  {
+                    "line": 320,
+                    "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
                   },
                   {
                     "line": 321,
+                    "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
+                  },
+                  {
+                    "line": 326,
+                    "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
+                  },
+                  {
+                    "line": 328,
+                    "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                  },
+                  {
+                    "line": 333,
+                    "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                  },
+                  {
+                    "line": 341,
                     "quote": "assert_eq!(deleted, scenario != \"last\")"
                   },
                   {
-                    "line": 331,
+                    "line": 351,
                     "quote": "assert!(\n                agent_position < skill_position,\n                \"先删除助手并发布事件，再完成连带技能删除\"\n            )"
                   }
                 ]
@@ -61433,64 +61433,64 @@
               {
                 "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
                 "test": "agent_delete_connection_changes_preserve_both_real_service_roots",
-                "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-                "testStartLine": 405,
-                "testEndLine": 539,
+                "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+                "testStartLine": 425,
+                "testEndLine": 559,
                 "assertions": [
                   {
-                    "line": 491,
+                    "line": 511,
                     "quote": "assert!(\n            output.status.success(),\n            \"真实连接切换保护子用例失败：{scenario}\"\n        )"
                   },
                   {
-                    "line": 496,
+                    "line": 516,
                     "quote": "assert_eq!(proof[\"success\"], true)"
                   },
                   {
-                    "line": 497,
+                    "line": 517,
                     "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
                   },
                   {
-                    "line": 498,
+                    "line": 518,
                     "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
                   },
                   {
-                    "line": 499,
+                    "line": 519,
                     "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
                   },
                   {
-                    "line": 501,
+                    "line": 521,
                     "quote": "assert_eq!(results.len(), 1)"
                   },
                   {
-                    "line": 503,
+                    "line": 523,
                     "quote": "assert_eq!(assertions.len(), 1)"
                   },
                   {
-                    "line": 504,
+                    "line": 524,
                     "quote": "assert_eq!(assertions[0][\"fullName\"], title)"
                   },
                   {
-                    "line": 505,
+                    "line": 525,
                     "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
                   },
                   {
-                    "line": 514,
+                    "line": 534,
                     "quote": "assert_eq!(\n            connection_material_snapshot(&other),\n            other_before,\n            \"另一真实服务同ID助手及技能必须全部不变\"\n        )"
                   },
                   {
-                    "line": 523,
+                    "line": 543,
                     "quote": "assert!(!original.home.join(\"agents/victim\").exists())"
                   },
                   {
-                    "line": 524,
+                    "line": 544,
                     "quote": "assert!(!original.home.join(\"skills/demo-owned\").exists())"
                   },
                   {
-                    "line": 525,
+                    "line": 545,
                     "quote": "assert!(original.home.join(\"skills/demo-keep/SKILL.md\").is_file())"
                   },
                   {
-                    "line": 527,
+                    "line": 547,
                     "quote": "assert_eq!(\n                connection_material_snapshot(&original),\n                original_before,\n                \"拒绝旧确认后原助手及技能全部不变\"\n            )"
                   }
                 ]
@@ -61688,120 +61688,120 @@
               {
                 "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
                 "test": "agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
-                "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-                "testStartLine": 127,
-                "testEndLine": 340,
+                "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+                "testStartLine": 147,
+                "testEndLine": 360,
                 "assertions": [
                   {
-                    "line": 135,
+                    "line": 155,
                     "quote": "assert_eq!(\n                ok(\n                    &server,\n                    \"POST\",\n                    \"/lingxi/v1/agents\",\n                    Some(&json!({\"id\":id,\"name\":name}))\n                )\n                .await\n                .0,\n                200\n            )"
                   },
                   {
-                    "line": 147,
+                    "line": 167,
                     "quote": "assert_eq!(\n            ok(\n                &server,\n                \"PUT\",\n                \"/lingxi/v1/agents/primary\",\n                Some(&json!({\"id\":\"survivor\"}))\n            )\n            .await\n            .0,\n            200\n        )"
                   },
                   {
-                    "line": 195,
+                    "line": 215,
                     "quote": "assert_eq!(\n            http(\n                &server,\n                \"DELETE\",\n                \"/lingxi/v1/agents/victim\",\n                Some(&json!({\"deleteSkills\":[\"demo-owned\"]})),\n                None\n            )\n            .await\n            .0,\n            401\n        )"
                   },
                   {
-                    "line": 207,
+                    "line": 227,
                     "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
                   },
                   {
-                    "line": 208,
+                    "line": 228,
                     "quote": "assert_eq!(\n            std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n            skill_before\n        )"
                   },
                   {
-                    "line": 240,
+                    "line": 260,
                     "quote": "assert!(\n            output.status.success(),\n            \"当前桌面入口真实HTTP/UI子用例失败：{scenario}\"\n        )"
                   },
                   {
-                    "line": 245,
+                    "line": 265,
                     "quote": "assert_eq!(proof[\"success\"], true)"
                   },
                   {
-                    "line": 246,
+                    "line": 266,
                     "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
                   },
                   {
-                    "line": 247,
+                    "line": 267,
                     "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
                   },
                   {
-                    "line": 248,
+                    "line": 268,
                     "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
                   },
                   {
-                    "line": 259,
+                    "line": 279,
                     "quote": "assert_eq!(results.len(), 1)"
                   },
                   {
-                    "line": 261,
+                    "line": 281,
                     "quote": "assert_eq!(assertions.len(), 1)"
                   },
                   {
-                    "line": 262,
+                    "line": 282,
                     "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
                   },
                   {
-                    "line": 263,
+                    "line": 283,
                     "quote": "assert_eq!(\n            assertions[0][\"fullName\"],\n            \"rust_agent_delete_current_settings_real_service\"\n        )"
                   },
                   {
-                    "line": 267,
+                    "line": 287,
                     "quote": "assert!(\n            server.home.join(\"skills/demo-keep/SKILL.md\").is_file(),\n            \"未勾选技能必须保留\"\n        )"
                   },
                   {
-                    "line": 272,
+                    "line": 292,
                     "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
-                  },
-                  {
-                    "line": 273,
-                    "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
-                  },
-                  {
-                    "line": 279,
-                    "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
-                  },
-                  {
-                    "line": 280,
-                    "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
                   },
                   {
                     "line": 293,
-                    "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                    "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
                   },
                   {
-                    "line": 296,
-                    "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                    "line": 299,
+                    "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
                   },
                   {
                     "line": 300,
-                    "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
-                  },
-                  {
-                    "line": 301,
-                    "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
-                  },
-                  {
-                    "line": 306,
-                    "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
-                  },
-                  {
-                    "line": 308,
-                    "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                    "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
                   },
                   {
                     "line": 313,
-                    "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                    "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                  },
+                  {
+                    "line": 316,
+                    "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                  },
+                  {
+                    "line": 320,
+                    "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
                   },
                   {
                     "line": 321,
+                    "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
+                  },
+                  {
+                    "line": 326,
+                    "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
+                  },
+                  {
+                    "line": 328,
+                    "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                  },
+                  {
+                    "line": 333,
+                    "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                  },
+                  {
+                    "line": 341,
                     "quote": "assert_eq!(deleted, scenario != \"last\")"
                   },
                   {
-                    "line": 331,
+                    "line": 351,
                     "quote": "assert!(\n                agent_position < skill_position,\n                \"先删除助手并发布事件，再完成连带技能删除\"\n            )"
                   }
                 ]
@@ -61809,64 +61809,64 @@
               {
                 "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
                 "test": "agent_delete_connection_changes_preserve_both_real_service_roots",
-                "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-                "testStartLine": 405,
-                "testEndLine": 539,
+                "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+                "testStartLine": 425,
+                "testEndLine": 559,
                 "assertions": [
                   {
-                    "line": 491,
+                    "line": 511,
                     "quote": "assert!(\n            output.status.success(),\n            \"真实连接切换保护子用例失败：{scenario}\"\n        )"
                   },
                   {
-                    "line": 496,
+                    "line": 516,
                     "quote": "assert_eq!(proof[\"success\"], true)"
                   },
                   {
-                    "line": 497,
+                    "line": 517,
                     "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
                   },
                   {
-                    "line": 498,
+                    "line": 518,
                     "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
                   },
                   {
-                    "line": 499,
+                    "line": 519,
                     "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
                   },
                   {
-                    "line": 501,
+                    "line": 521,
                     "quote": "assert_eq!(results.len(), 1)"
                   },
                   {
-                    "line": 503,
+                    "line": 523,
                     "quote": "assert_eq!(assertions.len(), 1)"
                   },
                   {
-                    "line": 504,
+                    "line": 524,
                     "quote": "assert_eq!(assertions[0][\"fullName\"], title)"
                   },
                   {
-                    "line": 505,
+                    "line": 525,
                     "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
                   },
                   {
-                    "line": 514,
+                    "line": 534,
                     "quote": "assert_eq!(\n            connection_material_snapshot(&other),\n            other_before,\n            \"另一真实服务同ID助手及技能必须全部不变\"\n        )"
                   },
                   {
-                    "line": 523,
+                    "line": 543,
                     "quote": "assert!(!original.home.join(\"agents/victim\").exists())"
                   },
                   {
-                    "line": 524,
+                    "line": 544,
                     "quote": "assert!(!original.home.join(\"skills/demo-owned\").exists())"
                   },
                   {
-                    "line": 525,
+                    "line": 545,
                     "quote": "assert!(original.home.join(\"skills/demo-keep/SKILL.md\").is_file())"
                   },
                   {
-                    "line": 527,
+                    "line": 547,
                     "quote": "assert_eq!(\n                connection_material_snapshot(&original),\n                original_before,\n                \"拒绝旧确认后原助手及技能全部不变\"\n            )"
                   }
                 ]
@@ -62064,120 +62064,120 @@
               {
                 "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
                 "test": "agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
-                "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-                "testStartLine": 127,
-                "testEndLine": 340,
+                "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+                "testStartLine": 147,
+                "testEndLine": 360,
                 "assertions": [
                   {
-                    "line": 135,
+                    "line": 155,
                     "quote": "assert_eq!(\n                ok(\n                    &server,\n                    \"POST\",\n                    \"/lingxi/v1/agents\",\n                    Some(&json!({\"id\":id,\"name\":name}))\n                )\n                .await\n                .0,\n                200\n            )"
                   },
                   {
-                    "line": 147,
+                    "line": 167,
                     "quote": "assert_eq!(\n            ok(\n                &server,\n                \"PUT\",\n                \"/lingxi/v1/agents/primary\",\n                Some(&json!({\"id\":\"survivor\"}))\n            )\n            .await\n            .0,\n            200\n        )"
                   },
                   {
-                    "line": 195,
+                    "line": 215,
                     "quote": "assert_eq!(\n            http(\n                &server,\n                \"DELETE\",\n                \"/lingxi/v1/agents/victim\",\n                Some(&json!({\"deleteSkills\":[\"demo-owned\"]})),\n                None\n            )\n            .await\n            .0,\n            401\n        )"
                   },
                   {
-                    "line": 207,
+                    "line": 227,
                     "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
                   },
                   {
-                    "line": 208,
+                    "line": 228,
                     "quote": "assert_eq!(\n            std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n            skill_before\n        )"
                   },
                   {
-                    "line": 240,
+                    "line": 260,
                     "quote": "assert!(\n            output.status.success(),\n            \"当前桌面入口真实HTTP/UI子用例失败：{scenario}\"\n        )"
                   },
                   {
-                    "line": 245,
+                    "line": 265,
                     "quote": "assert_eq!(proof[\"success\"], true)"
                   },
                   {
-                    "line": 246,
+                    "line": 266,
                     "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
                   },
                   {
-                    "line": 247,
+                    "line": 267,
                     "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
                   },
                   {
-                    "line": 248,
+                    "line": 268,
                     "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
                   },
                   {
-                    "line": 259,
+                    "line": 279,
                     "quote": "assert_eq!(results.len(), 1)"
                   },
                   {
-                    "line": 261,
+                    "line": 281,
                     "quote": "assert_eq!(assertions.len(), 1)"
                   },
                   {
-                    "line": 262,
+                    "line": 282,
                     "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
                   },
                   {
-                    "line": 263,
+                    "line": 283,
                     "quote": "assert_eq!(\n            assertions[0][\"fullName\"],\n            \"rust_agent_delete_current_settings_real_service\"\n        )"
                   },
                   {
-                    "line": 267,
+                    "line": 287,
                     "quote": "assert!(\n            server.home.join(\"skills/demo-keep/SKILL.md\").is_file(),\n            \"未勾选技能必须保留\"\n        )"
                   },
                   {
-                    "line": 272,
+                    "line": 292,
                     "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
-                  },
-                  {
-                    "line": 273,
-                    "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
-                  },
-                  {
-                    "line": 279,
-                    "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
-                  },
-                  {
-                    "line": 280,
-                    "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
                   },
                   {
                     "line": 293,
-                    "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                    "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
                   },
                   {
-                    "line": 296,
-                    "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                    "line": 299,
+                    "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
                   },
                   {
                     "line": 300,
-                    "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
-                  },
-                  {
-                    "line": 301,
-                    "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
-                  },
-                  {
-                    "line": 306,
-                    "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
-                  },
-                  {
-                    "line": 308,
-                    "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                    "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
                   },
                   {
                     "line": 313,
-                    "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                    "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                  },
+                  {
+                    "line": 316,
+                    "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                  },
+                  {
+                    "line": 320,
+                    "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
                   },
                   {
                     "line": 321,
+                    "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
+                  },
+                  {
+                    "line": 326,
+                    "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
+                  },
+                  {
+                    "line": 328,
+                    "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                  },
+                  {
+                    "line": 333,
+                    "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                  },
+                  {
+                    "line": 341,
                     "quote": "assert_eq!(deleted, scenario != \"last\")"
                   },
                   {
-                    "line": 331,
+                    "line": 351,
                     "quote": "assert!(\n                agent_position < skill_position,\n                \"先删除助手并发布事件，再完成连带技能删除\"\n            )"
                   }
                 ]
@@ -62185,64 +62185,64 @@
               {
                 "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
                 "test": "agent_delete_connection_changes_preserve_both_real_service_roots",
-                "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-                "testStartLine": 405,
-                "testEndLine": 539,
+                "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+                "testStartLine": 425,
+                "testEndLine": 559,
                 "assertions": [
                   {
-                    "line": 491,
+                    "line": 511,
                     "quote": "assert!(\n            output.status.success(),\n            \"真实连接切换保护子用例失败：{scenario}\"\n        )"
                   },
                   {
-                    "line": 496,
+                    "line": 516,
                     "quote": "assert_eq!(proof[\"success\"], true)"
                   },
                   {
-                    "line": 497,
+                    "line": 517,
                     "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
                   },
                   {
-                    "line": 498,
+                    "line": 518,
                     "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
                   },
                   {
-                    "line": 499,
+                    "line": 519,
                     "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
                   },
                   {
-                    "line": 501,
+                    "line": 521,
                     "quote": "assert_eq!(results.len(), 1)"
                   },
                   {
-                    "line": 503,
+                    "line": 523,
                     "quote": "assert_eq!(assertions.len(), 1)"
                   },
                   {
-                    "line": 504,
+                    "line": 524,
                     "quote": "assert_eq!(assertions[0][\"fullName\"], title)"
                   },
                   {
-                    "line": 505,
+                    "line": 525,
                     "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
                   },
                   {
-                    "line": 514,
+                    "line": 534,
                     "quote": "assert_eq!(\n            connection_material_snapshot(&other),\n            other_before,\n            \"另一真实服务同ID助手及技能必须全部不变\"\n        )"
                   },
                   {
-                    "line": 523,
+                    "line": 543,
                     "quote": "assert!(!original.home.join(\"agents/victim\").exists())"
                   },
                   {
-                    "line": 524,
+                    "line": 544,
                     "quote": "assert!(!original.home.join(\"skills/demo-owned\").exists())"
                   },
                   {
-                    "line": 525,
+                    "line": 545,
                     "quote": "assert!(original.home.join(\"skills/demo-keep/SKILL.md\").is_file())"
                   },
                   {
-                    "line": 527,
+                    "line": 547,
                     "quote": "assert_eq!(\n                connection_material_snapshot(&original),\n                original_before,\n                \"拒绝旧确认后原助手及技能全部不变\"\n            )"
                   }
                 ]
@@ -213303,120 +213303,120 @@
           {
             "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
             "test": "agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
-            "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-            "testStartLine": 127,
-            "testEndLine": 340,
+            "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+            "testStartLine": 147,
+            "testEndLine": 360,
             "assertions": [
               {
-                "line": 135,
+                "line": 155,
                 "quote": "assert_eq!(\n                ok(\n                    &server,\n                    \"POST\",\n                    \"/lingxi/v1/agents\",\n                    Some(&json!({\"id\":id,\"name\":name}))\n                )\n                .await\n                .0,\n                200\n            )"
               },
               {
-                "line": 147,
+                "line": 167,
                 "quote": "assert_eq!(\n            ok(\n                &server,\n                \"PUT\",\n                \"/lingxi/v1/agents/primary\",\n                Some(&json!({\"id\":\"survivor\"}))\n            )\n            .await\n            .0,\n            200\n        )"
               },
               {
-                "line": 195,
+                "line": 215,
                 "quote": "assert_eq!(\n            http(\n                &server,\n                \"DELETE\",\n                \"/lingxi/v1/agents/victim\",\n                Some(&json!({\"deleteSkills\":[\"demo-owned\"]})),\n                None\n            )\n            .await\n            .0,\n            401\n        )"
               },
               {
-                "line": 207,
+                "line": 227,
                 "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
               },
               {
-                "line": 208,
+                "line": 228,
                 "quote": "assert_eq!(\n            std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n            skill_before\n        )"
               },
               {
-                "line": 240,
+                "line": 260,
                 "quote": "assert!(\n            output.status.success(),\n            \"当前桌面入口真实HTTP/UI子用例失败：{scenario}\"\n        )"
               },
               {
-                "line": 245,
+                "line": 265,
                 "quote": "assert_eq!(proof[\"success\"], true)"
               },
               {
-                "line": 246,
+                "line": 266,
                 "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
               },
               {
-                "line": 247,
+                "line": 267,
                 "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
               },
               {
-                "line": 248,
+                "line": 268,
                 "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
               },
               {
-                "line": 259,
+                "line": 279,
                 "quote": "assert_eq!(results.len(), 1)"
               },
               {
-                "line": 261,
+                "line": 281,
                 "quote": "assert_eq!(assertions.len(), 1)"
               },
               {
-                "line": 262,
+                "line": 282,
                 "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
               },
               {
-                "line": 263,
+                "line": 283,
                 "quote": "assert_eq!(\n            assertions[0][\"fullName\"],\n            \"rust_agent_delete_current_settings_real_service\"\n        )"
               },
               {
-                "line": 267,
+                "line": 287,
                 "quote": "assert!(\n            server.home.join(\"skills/demo-keep/SKILL.md\").is_file(),\n            \"未勾选技能必须保留\"\n        )"
               },
               {
-                "line": 272,
+                "line": 292,
                 "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
-              },
-              {
-                "line": 273,
-                "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
-              },
-              {
-                "line": 279,
-                "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
-              },
-              {
-                "line": 280,
-                "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
               },
               {
                 "line": 293,
-                "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
               },
               {
-                "line": 296,
-                "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                "line": 299,
+                "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
               },
               {
                 "line": 300,
-                "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
-              },
-              {
-                "line": 301,
-                "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
-              },
-              {
-                "line": 306,
-                "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
-              },
-              {
-                "line": 308,
-                "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
               },
               {
                 "line": 313,
-                "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+              },
+              {
+                "line": 316,
+                "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+              },
+              {
+                "line": 320,
+                "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
               },
               {
                 "line": 321,
+                "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
+              },
+              {
+                "line": 326,
+                "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
+              },
+              {
+                "line": 328,
+                "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+              },
+              {
+                "line": 333,
+                "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+              },
+              {
+                "line": 341,
                 "quote": "assert_eq!(deleted, scenario != \"last\")"
               },
               {
-                "line": 331,
+                "line": 351,
                 "quote": "assert!(\n                agent_position < skill_position,\n                \"先删除助手并发布事件，再完成连带技能删除\"\n            )"
               }
             ]
@@ -213424,64 +213424,64 @@
           {
             "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
             "test": "agent_delete_connection_changes_preserve_both_real_service_roots",
-            "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-            "testStartLine": 405,
-            "testEndLine": 539,
+            "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+            "testStartLine": 425,
+            "testEndLine": 559,
             "assertions": [
               {
-                "line": 491,
+                "line": 511,
                 "quote": "assert!(\n            output.status.success(),\n            \"真实连接切换保护子用例失败：{scenario}\"\n        )"
               },
               {
-                "line": 496,
+                "line": 516,
                 "quote": "assert_eq!(proof[\"success\"], true)"
               },
               {
-                "line": 497,
+                "line": 517,
                 "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
               },
               {
-                "line": 498,
+                "line": 518,
                 "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
               },
               {
-                "line": 499,
+                "line": 519,
                 "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
               },
               {
-                "line": 501,
+                "line": 521,
                 "quote": "assert_eq!(results.len(), 1)"
               },
               {
-                "line": 503,
+                "line": 523,
                 "quote": "assert_eq!(assertions.len(), 1)"
               },
               {
-                "line": 504,
+                "line": 524,
                 "quote": "assert_eq!(assertions[0][\"fullName\"], title)"
               },
               {
-                "line": 505,
+                "line": 525,
                 "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
               },
               {
-                "line": 514,
+                "line": 534,
                 "quote": "assert_eq!(\n            connection_material_snapshot(&other),\n            other_before,\n            \"另一真实服务同ID助手及技能必须全部不变\"\n        )"
               },
               {
-                "line": 523,
+                "line": 543,
                 "quote": "assert!(!original.home.join(\"agents/victim\").exists())"
               },
               {
-                "line": 524,
+                "line": 544,
                 "quote": "assert!(!original.home.join(\"skills/demo-owned\").exists())"
               },
               {
-                "line": 525,
+                "line": 545,
                 "quote": "assert!(original.home.join(\"skills/demo-keep/SKILL.md\").is_file())"
               },
               {
-                "line": 527,
+                "line": 547,
                 "quote": "assert_eq!(\n                connection_material_snapshot(&original),\n                original_before,\n                \"拒绝旧确认后原助手及技能全部不变\"\n            )"
               }
             ]
@@ -213661,120 +213661,120 @@
           {
             "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
             "test": "agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
-            "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-            "testStartLine": 127,
-            "testEndLine": 340,
+            "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+            "testStartLine": 147,
+            "testEndLine": 360,
             "assertions": [
               {
-                "line": 135,
+                "line": 155,
                 "quote": "assert_eq!(\n                ok(\n                    &server,\n                    \"POST\",\n                    \"/lingxi/v1/agents\",\n                    Some(&json!({\"id\":id,\"name\":name}))\n                )\n                .await\n                .0,\n                200\n            )"
               },
               {
-                "line": 147,
+                "line": 167,
                 "quote": "assert_eq!(\n            ok(\n                &server,\n                \"PUT\",\n                \"/lingxi/v1/agents/primary\",\n                Some(&json!({\"id\":\"survivor\"}))\n            )\n            .await\n            .0,\n            200\n        )"
               },
               {
-                "line": 195,
+                "line": 215,
                 "quote": "assert_eq!(\n            http(\n                &server,\n                \"DELETE\",\n                \"/lingxi/v1/agents/victim\",\n                Some(&json!({\"deleteSkills\":[\"demo-owned\"]})),\n                None\n            )\n            .await\n            .0,\n            401\n        )"
               },
               {
-                "line": 207,
+                "line": 227,
                 "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
               },
               {
-                "line": 208,
+                "line": 228,
                 "quote": "assert_eq!(\n            std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n            skill_before\n        )"
               },
               {
-                "line": 240,
+                "line": 260,
                 "quote": "assert!(\n            output.status.success(),\n            \"当前桌面入口真实HTTP/UI子用例失败：{scenario}\"\n        )"
               },
               {
-                "line": 245,
+                "line": 265,
                 "quote": "assert_eq!(proof[\"success\"], true)"
               },
               {
-                "line": 246,
+                "line": 266,
                 "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
               },
               {
-                "line": 247,
+                "line": 267,
                 "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
               },
               {
-                "line": 248,
+                "line": 268,
                 "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
               },
               {
-                "line": 259,
+                "line": 279,
                 "quote": "assert_eq!(results.len(), 1)"
               },
               {
-                "line": 261,
+                "line": 281,
                 "quote": "assert_eq!(assertions.len(), 1)"
               },
               {
-                "line": 262,
+                "line": 282,
                 "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
               },
               {
-                "line": 263,
+                "line": 283,
                 "quote": "assert_eq!(\n            assertions[0][\"fullName\"],\n            \"rust_agent_delete_current_settings_real_service\"\n        )"
               },
               {
-                "line": 267,
+                "line": 287,
                 "quote": "assert!(\n            server.home.join(\"skills/demo-keep/SKILL.md\").is_file(),\n            \"未勾选技能必须保留\"\n        )"
               },
               {
-                "line": 272,
+                "line": 292,
                 "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
-              },
-              {
-                "line": 273,
-                "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
-              },
-              {
-                "line": 279,
-                "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
-              },
-              {
-                "line": 280,
-                "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
               },
               {
                 "line": 293,
-                "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
               },
               {
-                "line": 296,
-                "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                "line": 299,
+                "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
               },
               {
                 "line": 300,
-                "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
-              },
-              {
-                "line": 301,
-                "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
-              },
-              {
-                "line": 306,
-                "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
-              },
-              {
-                "line": 308,
-                "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
               },
               {
                 "line": 313,
-                "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+              },
+              {
+                "line": 316,
+                "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+              },
+              {
+                "line": 320,
+                "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
               },
               {
                 "line": 321,
+                "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
+              },
+              {
+                "line": 326,
+                "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
+              },
+              {
+                "line": 328,
+                "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+              },
+              {
+                "line": 333,
+                "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+              },
+              {
+                "line": 341,
                 "quote": "assert_eq!(deleted, scenario != \"last\")"
               },
               {
-                "line": 331,
+                "line": 351,
                 "quote": "assert!(\n                agent_position < skill_position,\n                \"先删除助手并发布事件，再完成连带技能删除\"\n            )"
               }
             ]
@@ -213782,64 +213782,64 @@
           {
             "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
             "test": "agent_delete_connection_changes_preserve_both_real_service_roots",
-            "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-            "testStartLine": 405,
-            "testEndLine": 539,
+            "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+            "testStartLine": 425,
+            "testEndLine": 559,
             "assertions": [
               {
-                "line": 491,
+                "line": 511,
                 "quote": "assert!(\n            output.status.success(),\n            \"真实连接切换保护子用例失败：{scenario}\"\n        )"
               },
               {
-                "line": 496,
+                "line": 516,
                 "quote": "assert_eq!(proof[\"success\"], true)"
               },
               {
-                "line": 497,
+                "line": 517,
                 "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
               },
               {
-                "line": 498,
+                "line": 518,
                 "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
               },
               {
-                "line": 499,
+                "line": 519,
                 "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
               },
               {
-                "line": 501,
+                "line": 521,
                 "quote": "assert_eq!(results.len(), 1)"
               },
               {
-                "line": 503,
+                "line": 523,
                 "quote": "assert_eq!(assertions.len(), 1)"
               },
               {
-                "line": 504,
+                "line": 524,
                 "quote": "assert_eq!(assertions[0][\"fullName\"], title)"
               },
               {
-                "line": 505,
+                "line": 525,
                 "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
               },
               {
-                "line": 514,
+                "line": 534,
                 "quote": "assert_eq!(\n            connection_material_snapshot(&other),\n            other_before,\n            \"另一真实服务同ID助手及技能必须全部不变\"\n        )"
               },
               {
-                "line": 523,
+                "line": 543,
                 "quote": "assert!(!original.home.join(\"agents/victim\").exists())"
               },
               {
-                "line": 524,
+                "line": 544,
                 "quote": "assert!(!original.home.join(\"skills/demo-owned\").exists())"
               },
               {
-                "line": 525,
+                "line": 545,
                 "quote": "assert!(original.home.join(\"skills/demo-keep/SKILL.md\").is_file())"
               },
               {
-                "line": 527,
+                "line": 547,
                 "quote": "assert_eq!(\n                connection_material_snapshot(&original),\n                original_before,\n                \"拒绝旧确认后原助手及技能全部不变\"\n            )"
               }
             ]
@@ -214019,120 +214019,120 @@
           {
             "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
             "test": "agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
-            "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-            "testStartLine": 127,
-            "testEndLine": 340,
+            "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+            "testStartLine": 147,
+            "testEndLine": 360,
             "assertions": [
               {
-                "line": 135,
+                "line": 155,
                 "quote": "assert_eq!(\n                ok(\n                    &server,\n                    \"POST\",\n                    \"/lingxi/v1/agents\",\n                    Some(&json!({\"id\":id,\"name\":name}))\n                )\n                .await\n                .0,\n                200\n            )"
               },
               {
-                "line": 147,
+                "line": 167,
                 "quote": "assert_eq!(\n            ok(\n                &server,\n                \"PUT\",\n                \"/lingxi/v1/agents/primary\",\n                Some(&json!({\"id\":\"survivor\"}))\n            )\n            .await\n            .0,\n            200\n        )"
               },
               {
-                "line": 195,
+                "line": 215,
                 "quote": "assert_eq!(\n            http(\n                &server,\n                \"DELETE\",\n                \"/lingxi/v1/agents/victim\",\n                Some(&json!({\"deleteSkills\":[\"demo-owned\"]})),\n                None\n            )\n            .await\n            .0,\n            401\n        )"
               },
               {
-                "line": 207,
+                "line": 227,
                 "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
               },
               {
-                "line": 208,
+                "line": 228,
                 "quote": "assert_eq!(\n            std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n            skill_before\n        )"
               },
               {
-                "line": 240,
+                "line": 260,
                 "quote": "assert!(\n            output.status.success(),\n            \"当前桌面入口真实HTTP/UI子用例失败：{scenario}\"\n        )"
               },
               {
-                "line": 245,
+                "line": 265,
                 "quote": "assert_eq!(proof[\"success\"], true)"
               },
               {
-                "line": 246,
+                "line": 266,
                 "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
               },
               {
-                "line": 247,
+                "line": 267,
                 "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
               },
               {
-                "line": 248,
+                "line": 268,
                 "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
               },
               {
-                "line": 259,
+                "line": 279,
                 "quote": "assert_eq!(results.len(), 1)"
               },
               {
-                "line": 261,
+                "line": 281,
                 "quote": "assert_eq!(assertions.len(), 1)"
               },
               {
-                "line": 262,
+                "line": 282,
                 "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
               },
               {
-                "line": 263,
+                "line": 283,
                 "quote": "assert_eq!(\n            assertions[0][\"fullName\"],\n            \"rust_agent_delete_current_settings_real_service\"\n        )"
               },
               {
-                "line": 267,
+                "line": 287,
                 "quote": "assert!(\n            server.home.join(\"skills/demo-keep/SKILL.md\").is_file(),\n            \"未勾选技能必须保留\"\n        )"
               },
               {
-                "line": 272,
+                "line": 292,
                 "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
-              },
-              {
-                "line": 273,
-                "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
-              },
-              {
-                "line": 279,
-                "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
-              },
-              {
-                "line": 280,
-                "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
               },
               {
                 "line": 293,
-                "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+                "quote": "assert!(!server.home.join(\"skills/demo-owned\").exists())"
               },
               {
-                "line": 296,
-                "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+                "line": 299,
+                "quote": "assert_eq!(enabled, vec![\"demo-keep\"])"
               },
               {
                 "line": 300,
-                "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
-              },
-              {
-                "line": 301,
-                "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
-              },
-              {
-                "line": 306,
-                "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
-              },
-              {
-                "line": 308,
-                "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+                "quote": "assert_eq!(\n                bundles.load_checked().unwrap()[0][\"skillNames\"],\n                json!([\"demo-keep\"])\n            )"
               },
               {
                 "line": 313,
-                "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+                "quote": "assert!(!enabled.contains(&\"demo-owned\".into()))"
+              },
+              {
+                "line": 316,
+                "quote": "assert_eq!(\n                std::fs::read(server.home.join(\"skills/demo-owned/SKILL.md\")).unwrap(),\n                skill_before\n            )"
+              },
+              {
+                "line": 320,
+                "quote": "assert_eq!(bundles.load_checked().unwrap(), bundle_before)"
               },
               {
                 "line": 321,
+                "quote": "assert_eq!(\n                std::fs::read(tombstone.join(\"config.yaml\")).unwrap(),\n                tombstone_before\n            )"
+              },
+              {
+                "line": 326,
+                "quote": "assert_eq!(std::fs::read(&victim_config).unwrap(), config_before)"
+              },
+              {
+                "line": 328,
+                "quote": "assert!(!server.home.join(\"agents/victim\").exists())"
+              },
+              {
+                "line": 333,
+                "quote": "assert_eq!(config[\"skills\"][\"enabled\"], json!([\"demo-owned\"]))"
+              },
+              {
+                "line": 341,
                 "quote": "assert_eq!(deleted, scenario != \"last\")"
               },
               {
-                "line": 331,
+                "line": 351,
                 "quote": "assert!(\n                agent_position < skill_position,\n                \"先删除助手并发布事件，再完成连带技能删除\"\n            )"
               }
             ]
@@ -214140,64 +214140,64 @@
           {
             "path": "rust/crates/lingxi-service/tests/r06_agent_delete_skills_live.rs",
             "test": "agent_delete_connection_changes_preserve_both_real_service_roots",
-            "sourceSHA256": "60c8652fc966da292635c826ee289164429d43adf59de732743c41a6e952236a",
-            "testStartLine": 405,
-            "testEndLine": 539,
+            "sourceSHA256": "0f98cbbfd37c1d7f0cc2c246353db84b0bed91dd354569562024747f2fbd4126",
+            "testStartLine": 425,
+            "testEndLine": 559,
             "assertions": [
               {
-                "line": 491,
+                "line": 511,
                 "quote": "assert!(\n            output.status.success(),\n            \"真实连接切换保护子用例失败：{scenario}\"\n        )"
               },
               {
-                "line": 496,
+                "line": 516,
                 "quote": "assert_eq!(proof[\"success\"], true)"
               },
               {
-                "line": 497,
+                "line": 517,
                 "quote": "assert_eq!(proof[\"numTotalTests\"], 1)"
               },
               {
-                "line": 498,
+                "line": 518,
                 "quote": "assert_eq!(proof[\"numPassedTests\"], 1)"
               },
               {
-                "line": 499,
+                "line": 519,
                 "quote": "assert_eq!(proof[\"numFailedTests\"], 0)"
               },
               {
-                "line": 501,
+                "line": 521,
                 "quote": "assert_eq!(results.len(), 1)"
               },
               {
-                "line": 503,
+                "line": 523,
                 "quote": "assert_eq!(assertions.len(), 1)"
               },
               {
-                "line": 504,
+                "line": 524,
                 "quote": "assert_eq!(assertions[0][\"fullName\"], title)"
               },
               {
-                "line": 505,
+                "line": 525,
                 "quote": "assert_eq!(assertions[0][\"status\"], \"passed\")"
               },
               {
-                "line": 514,
+                "line": 534,
                 "quote": "assert_eq!(\n            connection_material_snapshot(&other),\n            other_before,\n            \"另一真实服务同ID助手及技能必须全部不变\"\n        )"
               },
               {
-                "line": 523,
+                "line": 543,
                 "quote": "assert!(!original.home.join(\"agents/victim\").exists())"
               },
               {
-                "line": 524,
+                "line": 544,
                 "quote": "assert!(!original.home.join(\"skills/demo-owned\").exists())"
               },
               {
-                "line": 525,
+                "line": 545,
                 "quote": "assert!(original.home.join(\"skills/demo-keep/SKILL.md\").is_file())"
               },
               {
-                "line": 527,
+                "line": 547,
                 "quote": "assert_eq!(\n                connection_material_snapshot(&original),\n                original_before,\n                \"拒绝旧确认后原助手及技能全部不变\"\n            )"
               }
             ]

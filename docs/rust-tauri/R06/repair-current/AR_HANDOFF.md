@@ -817,3 +817,9 @@ EX12后续独立核对又发现一个原先201 READY中的旧漏项：8B48切助
 接着将实际候选提交并固定HEAD，先任务专属execute-all-current-bindings.py完整599绑定/无范围过滤合同汇总，另新根原verify-stage R06全链。release xtask内嵌阶段图，必须在最后generate之后重新build release；不使用先前旧图二进制。窗口和正式门禁期间源码、文档与HEAD不变，所有测试资料只入专项home/tmp，保留原用户HOME和仓库外构建缓存。
 
 最终启动前确认原生宿主是独立workspace且仓库内debug缓存已不存在；仅修正执行环境，复用既有LINGXI_SKILLS_NATIVE_TARGET到仓库外原生缓存，无界面缓存仍为native-write-clean。没有改Cargo命令、精确用例、超时、判定或源稳定性检查，20契约复验通过；避免按旧helper清空target变量后在仓库内重新生成大量缓存。该环境修正已获独立只读核对，必须在冻结前提交。
+
+### 2026-10-15 全599窗口结束：598通过/1失败，删除最后助手测试准备已补齐
+
+80819d685冻结窗口全599实际执行、来源稳定，598PASS/1FAIL；原687断言中3516的3断言因该绑定失败不能结算，完整汇总如实FAIL，正式阶段尚未开始。失败在last场景预备DELETE survivor，尚未进入真正最后victim删除拒绝检查；旧boot无模型，正确的替代助手会话创建需要可解析模型。仅补声明合成chat与CredentialService/gateway，原Rust测试正文、UI、生产代码及全部强断言逐字保留；不向合成端点发模型请求。
+
+先加workspace的本地诊断确实触发原配置字节断言，失败保留；去掉不必要workspace后原整套2/2和原失败注册绑定均通过。20契约、相关strictClippy和workspace fmt通过，另一代理只读复核原正文/UI不变；6锚点仅更新源码SHA与行号，不改原断言/命令/义务。紧凑证据见route-a-20261015/delete-skills-window-fix。原完整失败窗口和所有诊断不覆盖、不复用。接着提交修复、冻结新候选，从全新证据根重跑全部599，再另根原verify-stage R06全链；F14仍OPEN，R06未验收，R07不就绪。
