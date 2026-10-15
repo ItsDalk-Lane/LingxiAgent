@@ -143,3 +143,68 @@ pub async fn restore_route(
         Err(err) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &err.to_string()),
     }
 }
+
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UserEditBody {
+    file_path: String,
+    reason: String,
+}
+
+/// 用户开始编辑与自动保存的改前备份，独立于会话分支检查点。
+pub async fn user_edit_route(
+    State(state): State<ServiceState>,
+    body: Result<Json<UserEditBody>, axum::extract::rejection::JsonRejection>,
+) -> Response {
+    let Json(body) = match body {
+        Ok(body) => body,
+        Err(error) => return crate::EndpointError::from_json_rejection(&error).into_response(),
+    };
+    if !Path::new(&body.file_path).is_absolute()
+        || !matches!(body.reason.as_str(), "edit-start" | "autosave-interval")
+    {
+        return crate::EndpointError::invalid_message(
+            "absolute filePath and edit-start/autosave-interval reason required",
+        )
+        .into_response();
+    }
+    let home = state.config().data_home.clone();
+    let now = state.clock.now_unix_ms();
+    let saved = tokio::task::spawn_blocking(move || -> Result<Value, String> {
+        use std::io::Read;
+        let mut options = std::fs::OpenOptions::new();
+        options.read(true);
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::OpenOptionsExt;
+            options.custom_flags(libc::O_NOFOLLOW | libc::O_CLOEXEC | libc::O_NONBLOCK);
+        }
+        let mut file = options.open(&body.file_path).map_err(|error| format!("cannot read edited file: {error}"))?;
+        let before = file.metadata().map_err(|error| error.to_string())?;
+        if !before.is_file() { return Err("edited path is not a regular file".into()); }
+        let identity = crate::filetools::fsio::FileIdentity::of(&file).map_err(|error|error.to_string())?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes).map_err(|error|error.to_string())?;
+        if crate::filetools::fsio::FileIdentity::of(&file).map_err(|error|error.to_string())? != identity
+            || file.metadata().and_then(|meta|meta.modified()).ok() != before.modified().ok() {
+            return Err("edited file changed while capturing checkpoint".into());
+        }
+        let nonce = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_err(|error|error.to_string())?.as_nanos();
+        static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let id = format!("{now}_{:x}_{}_{}", nonce, std::process::id(), SEQ.fetch_add(1,std::sync::atomic::Ordering::Relaxed));
+        let mut value = json!({"ts":now,"sessionPath":null,"tool":"user-edit","source":"user-edit","reason":body.reason,"path":body.file_path,"size":bytes.len()});
+        match std::str::from_utf8(&bytes) {
+            Ok(text) => value["content"] = json!(text),
+            Err(_) => value["content_b64"] = json!(base64::engine::general_purpose::STANDARD.encode(&bytes)),
+        }
+        let target = home.join("checkpoints").join(format!("{id}.json"));
+        let encoded = serde_json::to_string(&value).map_err(|error|error.to_string())?;
+        lingxi_adapters::storage::agent_memory::atomic_write(&target,&encoded).map_err(|error|error.to_string())?;
+        Ok(json!({"id":id,"path":body.file_path,"reason":body.reason}))
+    }).await;
+    match saved {
+        Ok(Ok(checkpoint)) => Json(json!({"ok":true,"checkpoint":checkpoint})).into_response(),
+        Ok(Err(error)) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &error),
+        Err(error) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &error.to_string()),
+    }
+}

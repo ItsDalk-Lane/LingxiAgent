@@ -404,13 +404,12 @@ impl ApprovalService {
                     message: "review action is blocked in read-only mode".into(),
                 },
                 InvocationPermissionContext::UserSession { .. } => PolicyVerdict::NeedsApproval {
-                    reason: "review the exact matched items before deleting pinned memories".into(),
+                    reason: "review the exact scope before this destructive action".into(),
                 },
                 InvocationPermissionContext::Subagent { .. } => PolicyVerdict::Denied {
                     code: TOOL_APPROVAL_UNAVAILABLE.into(),
                     layer: "approval_policy".into(),
-                    message: "unattended subagents cannot confirm a pinned-memory deletion scope"
-                        .into(),
+                    message: "unattended subagents cannot confirm this destructive scope".into(),
                 },
             };
         }
@@ -501,6 +500,15 @@ impl ApprovalService {
     /// (the authenticated approver surface — R06+ wraps this in the real
     /// UI/bridge; nothing here leaks another session's records).
     pub fn pending_of(&self, principal: &RunContext, session_id: &str) -> Vec<PendingView> {
+        self.pending_for_principal(&principal.principal, session_id)
+    }
+
+    /// HTTP 面只使用真正认证主体，不虚构一个运行来查询确认记录。
+    pub fn pending_for_principal(
+        &self,
+        principal: &lingxi_kernel::Principal,
+        session_id: &str,
+    ) -> Vec<PendingView> {
         let state = self.lock_state();
         let mut views: Vec<PendingView> = state
             .records
@@ -508,8 +516,8 @@ impl ApprovalService {
             .filter(|record| {
                 record.state == RecordState::Pending
                     && record.session_id == session_id
-                    && record.principal_kind == principal.principal.storage_kind()
-                    && record.principal_subject == principal.principal.storage_subject()
+                    && record.principal_kind == principal.storage_kind()
+                    && record.principal_subject == principal.storage_subject()
             })
             .map(|record| PendingView {
                 approval_id: record.approval_id.clone(),
@@ -537,6 +545,16 @@ impl ApprovalService {
         approval_id: &str,
         answer: Answer,
     ) -> AnswerOutcome {
+        self.answer_for_principal(&principal.principal, session_id, approval_id, answer)
+    }
+
+    pub fn answer_for_principal(
+        &self,
+        principal: &lingxi_kernel::Principal,
+        session_id: &str,
+        approval_id: &str,
+        answer: Answer,
+    ) -> AnswerOutcome {
         let mut state = self.lock_state();
         let Some(record) = state.records.get_mut(approval_id) else {
             return AnswerOutcome::Refused {
@@ -546,8 +564,8 @@ impl ApprovalService {
                 ),
             };
         };
-        if record.principal_kind != principal.principal.storage_kind()
-            || record.principal_subject != principal.principal.storage_subject()
+        if record.principal_kind != principal.storage_kind()
+            || record.principal_subject != principal.storage_subject()
             || record.session_id != session_id
         {
             // An authenticated surface never even learns whether the id

@@ -30,6 +30,7 @@ impl MemoryService {
 
     #[allow(clippy::result_large_err)]
     fn merge_write(&self, key: &str, patch: Value) -> Result<Value, Response> {
+        let _lock = crate::agents_admin::preferences_locked();
         let mut root = self.read_root()?;
         if !patch.is_object() {
             return Err(
@@ -80,6 +81,36 @@ impl MemoryService {
             }
         }
         self.merge_write("autolearn", patch)
+    }
+
+    /// 目标预算为全局偏好；只读时返回默认值，不生成偏好文件。
+    #[allow(clippy::result_large_err)]
+    pub fn goal_preferences(&self) -> Result<Value, Response> {
+        let root = self.read_root()?;
+        match root.get("goal") {
+            None => Ok(
+                json!({"enabled":true,"default_token_budget":null,"default_time_budget_minutes":null}),
+            ),
+            Some(value) if value.is_object() => Ok(value.clone()),
+            Some(_) => Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({"error":"saved goal must be an object"})),
+            )
+                .into_response()),
+        }
+    }
+
+    #[allow(clippy::result_large_err)]
+    pub fn set_goal_preferences(&self, patch: Value) -> Result<Value, Response> {
+        if patch
+            .get("enabled")
+            .is_some_and(|value| !value.is_boolean())
+        {
+            return Err(
+                EndpointError::invalid_message("goal enabled must be a boolean").into_response(),
+            );
+        }
+        self.merge_write("goal", patch)
     }
 
     fn normalize_quick_chat(source: &Value) -> Value {
@@ -166,4 +197,13 @@ pref_pair!(
     "quickChat",
     quick_chat_preferences,
     set_quick_chat_preferences
+);
+
+pref_pair!(
+    goal_get_route,
+    goal_put_route,
+    "goal",
+    "goal",
+    goal_preferences,
+    set_goal_preferences
 );

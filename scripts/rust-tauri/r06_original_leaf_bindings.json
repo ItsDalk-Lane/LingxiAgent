@@ -11038,7 +11038,7 @@
         "创建、改名、删除、导出、排序组合及移动技能：成功核对 组合树及导出文件更新；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；导出返回 filePath 时打开文件管理器。；空态/未初始化核对 取消对话框无变更；导出无 filePath 不调用文件管理器，导出本身不重读双 GET。；错误/无权限核对 组合内多项移动用 Promise.all，可能部分成功；异常 toast 后不保证重载，不能承诺整体回滚或组合树完全一致。；写入失败不应把原有读取叶的成功结果当作本次写入完成。"
       ],
       "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -11047,9 +11047,14 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_bundles_agent_projection_update_order_delete_and_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
             }
           ],
-          "meaning": "后端按Agent组合投影局部证据",
+          "meaning": "现役SkillsPanel真实HTTP服务完成安装并启用、组合CRUD/成员/排序/导出及助手投影双GET；原界面加载/空态/loading/noUser/取消/错误toast及局部失败语义原断言保留，生产桥边界仅原生选择/显示替代。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -11075,12 +11080,39 @@
                   "quote": "assert_eq!(view_b[\"bundles\"][0][\"skills\"][0][\"enabled\"], false);\n    let (status, result) = server\n        .request(\n            \"PUT\","
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "当前候选缺该技能面板加载/empty/loading/noUser/错误toast/旧列表保留的界面证据；真实后端列表不证明页面状态。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -11089,9 +11121,14 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_global_manual_install_complete_package_without_agent_enable"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
             }
           ],
-          "meaning": "全局安装后Agent仍不启用，不能代替面板安装启用",
+          "meaning": "现役SkillsPanel真实HTTP服务完成安装并启用、组合CRUD/成员/排序/导出及助手投影双GET；原界面加载/空态/loading/noUser/取消/错误toast及局部失败语义原断言保留，生产桥边界仅原生选择/显示替代。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -11133,12 +11170,39 @@
                   "quote": "assert_eq!(skill[\"source\"], \"user\");\n    let before = file_snapshot(&server.home.join(\"skills\"));\n    let (status, error) = server\n        .request("
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "指定Agent安装后自动启用当前未实现，桌面取消选择/toast/后端双GET重载未有候选界面测试。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 2,
@@ -11147,9 +11211,14 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_skill_enable_disable_runtime_and_workspace_shadow_boundaries"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
             }
           ],
-          "meaning": "后端所属Agent启停与拒绝局部证据",
+          "meaning": "现役SkillsPanel真实HTTP服务完成安装并启用、组合CRUD/成员/排序/导出及助手投影双GET；原界面加载/空态/loading/noUser/取消/错误toast及局部失败语义原断言保留，生产桥边界仅原生选择/显示替代。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -11227,12 +11296,39 @@
                   "quote": "assert_eq!(file_snapshot(&server.home.join(\"agents\")), before);\n    let (status, error) = server\n        .request(\"GET\", \"/lingxi/v1/skills?runtime=1\", None)\n        .await;"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "后端技能PATCH存在，UI无助手禁写/失败回滚/toast和重载投影未有当前候选证据；组合disabled还存在明确行为缺口。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 3,
@@ -11241,9 +11337,14 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_bundles_agent_projection_update_order_delete_and_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
             }
           ],
-          "meaning": "后端改名/成员/order/delete的局部真实状态",
+          "meaning": "现役SkillsPanel真实HTTP服务完成安装并启用、组合CRUD/成员/排序/导出及助手投影双GET；原界面加载/空态/loading/noUser/取消/错误toast及局部失败语义原断言保留，生产桥边界仅原生选择/显示替代。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -11361,22 +11462,43 @@
                   "quote": "assert_eq!(store.load(), before);\n\n    // 正常技能删除须回读全部助手与仍在使用该技能的组合引用。\n    let (status, _) = server"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "后端组合CRUD有局部证据；当前候选缺UI组合树/导出showInFinder/取消/Promise.all部分成功后的实际页面证据，导出接口亦未迁移。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "当前候选缺原技能面板实际页面投影与失败状态证明；指定Agent手动安装不启用，组合停用已接入真实增量并验证，导出仍未实现。",
-        "当前候选缺该技能面板加载/empty/loading/noUser/错误toast/旧列表保留的界面证据；真实后端列表不证明页面状态。",
-        "指定Agent安装后自动启用当前未实现，桌面取消选择/toast/后端双GET重载未有候选界面测试。",
-        "后端技能PATCH存在，UI无助手禁写/失败回滚/toast和重载投影未有当前候选证据；组合disabled后端已修复，UI仍缺现行候选证明。",
-        "后端组合CRUD有局部证据；当前候选缺UI组合树/导出showInFinder/取消/Promise.all部分成功后的实际页面证据，导出接口亦未迁移。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-0EC4C0E2EB51",
@@ -62560,7 +62682,7 @@
         "无会话/无用户轮次或无效名字给错误；删除不存在检查点不伪报成功。"
       ],
       "then": "create保存会话锚点及可选工作区快照；list/drop反映记录变化。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -62574,9 +62696,24 @@
               "package": "lingxi-service",
               "suite": "r06_original_session_proofs",
               "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades"
             }
           ],
-          "meaning": "真实HTTP create后列表可见，删除后空；只证明HTTP，非原模型工具；真实HTTP删除不在项404、拒绝无写；不证明工具入口",
+          "meaning": "真实CLI模型发现与调用checkpoint create/list/drop；已有Run的可信许可复用，read_only只准list；无会话/无用户锚点/无效名字/缺失drop明确失败且零快照。实际版本表核对包含两份文件；声明的根路径别名规范化，目录内链接仍拒绝且显式degraded。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -62695,12 +62832,121 @@
                   "quote": "assert_eq!(status, 404);\n    println!(\n        \"{}\",\n        serde_json::json!({\"originalLeaf\":\"R00-T02-LA-1AEDB2670EB9\",\"invalid\":400,\"foreign\":403,\"storageFailure\":500,\"failedDeletePreservedBothCheckpoints\":true,\"successDeletedOnlyTarget\":true,\"secondDelete\":404})"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 671,
+              "testEndLine": 804,
+              "assertions": [
+                {
+                  "line": 775,
+                  "quote": "assert!(\n            matches!(&result.outcome, lingxi_kernel::ports::ToolOutcome::Failed { error } if error.message.contains(expected)),\n            \"{result:?}\"\n        )"
+                },
+                {
+                  "line": 779,
+                  "quote": "assert!(server\n            .state\n            .session_tree()\n            .list_checkpoints(\"without-user\")\n            .await\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 786,
+                  "quote": "assert_eq!(\n            std::fs::read_to_string(workspace.join(\"must-not-snapshot.txt\")).unwrap(),\n            \"原内容\"\n        )"
+                },
+                {
+                  "line": 800,
+                  "quote": "assert_eq!(count, \"0\", \"refused tool cannot write a workspace snapshot\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 808,
+              "testEndLine": 950,
+              "assertions": [
+                {
+                  "line": 840,
+                  "quote": "assert_eq!(status, 201, \"{text}\")"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(\n        row.authorized_folders,\n        vec![workspace.to_string_lossy().to_string()],\n        \"明确新授权先绑定真实根，之后不得重新扩大范围\"\n    )"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(details[\"snapshotDegraded\"], degraded)"
+                },
+                {
+                  "line": 918,
+                  "quote": "assert_eq!(details[\"fileCount\"], file_count)"
+                },
+                {
+                  "line": 920,
+                  "quote": "assert!(details[\"snapshotCommit\"].is_null())"
+                },
+                {
+                  "line": 921,
+                  "quote": "assert!(details[\"snapshotError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"symbolic link\"))"
+                },
+                {
+                  "line": 926,
+                  "quote": "assert_eq!(details[\"snapshotCommit\"], \"alias-session:root-alias\")"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(\n        count, \"2\",\n        \"根内新增链接只留下明确降级的会话锚点，不能存入额外文件版本\"\n    )"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&first).unwrap(),\n        \"明确授权根的真实资料\"\n    )"
+                },
+                {
+                  "line": 947,
+                  "quote": "assert_eq!(std::fs::read(&second).unwrap(), [0u8, 255, 7])"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "已有HTTP检查点create/list/delete，但模型目录未注册原checkpoint工具与无会话/无用户轮次工具拒绝；不同入口不能替代。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -62714,9 +62960,24 @@
               "package": "lingxi-service",
               "suite": "r06_original_session_proofs",
               "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades"
             }
           ],
-          "meaning": "真实HTTP create后列表可见，删除后空；只证明HTTP，非原模型工具；真实HTTP删除不在项404、拒绝无写；不证明工具入口",
+          "meaning": "真实CLI模型发现与调用checkpoint create/list/drop；已有Run的可信许可复用，read_only只准list；无会话/无用户锚点/无效名字/缺失drop明确失败且零快照。实际版本表核对包含两份文件；声明的根路径别名规范化，目录内链接仍拒绝且显式degraded。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -62835,12 +63096,121 @@
                   "quote": "assert_eq!(status, 404);\n    println!(\n        \"{}\",\n        serde_json::json!({\"originalLeaf\":\"R00-T02-LA-1AEDB2670EB9\",\"invalid\":400,\"foreign\":403,\"storageFailure\":500,\"failedDeletePreservedBothCheckpoints\":true,\"successDeletedOnlyTarget\":true,\"secondDelete\":404})"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 671,
+              "testEndLine": 804,
+              "assertions": [
+                {
+                  "line": 775,
+                  "quote": "assert!(\n            matches!(&result.outcome, lingxi_kernel::ports::ToolOutcome::Failed { error } if error.message.contains(expected)),\n            \"{result:?}\"\n        )"
+                },
+                {
+                  "line": 779,
+                  "quote": "assert!(server\n            .state\n            .session_tree()\n            .list_checkpoints(\"without-user\")\n            .await\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 786,
+                  "quote": "assert_eq!(\n            std::fs::read_to_string(workspace.join(\"must-not-snapshot.txt\")).unwrap(),\n            \"原内容\"\n        )"
+                },
+                {
+                  "line": 800,
+                  "quote": "assert_eq!(count, \"0\", \"refused tool cannot write a workspace snapshot\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 808,
+              "testEndLine": 950,
+              "assertions": [
+                {
+                  "line": 840,
+                  "quote": "assert_eq!(status, 201, \"{text}\")"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(\n        row.authorized_folders,\n        vec![workspace.to_string_lossy().to_string()],\n        \"明确新授权先绑定真实根，之后不得重新扩大范围\"\n    )"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(details[\"snapshotDegraded\"], degraded)"
+                },
+                {
+                  "line": 918,
+                  "quote": "assert_eq!(details[\"fileCount\"], file_count)"
+                },
+                {
+                  "line": 920,
+                  "quote": "assert!(details[\"snapshotCommit\"].is_null())"
+                },
+                {
+                  "line": 921,
+                  "quote": "assert!(details[\"snapshotError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"symbolic link\"))"
+                },
+                {
+                  "line": 926,
+                  "quote": "assert_eq!(details[\"snapshotCommit\"], \"alias-session:root-alias\")"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(\n        count, \"2\",\n        \"根内新增链接只留下明确降级的会话锚点，不能存入额外文件版本\"\n    )"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&first).unwrap(),\n        \"明确授权根的真实资料\"\n    )"
+                },
+                {
+                  "line": 947,
+                  "quote": "assert_eq!(std::fs::read(&second).unwrap(), [0u8, 255, 7])"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "已有HTTP检查点create/list/delete，但模型目录未注册原checkpoint工具与无会话/无用户轮次工具拒绝；不同入口不能替代。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 2,
@@ -62854,9 +63224,24 @@
               "package": "lingxi-service",
               "suite": "r06_original_session_proofs",
               "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades"
             }
           ],
-          "meaning": "真实HTTP create后列表可见，删除后空；只证明HTTP，非原模型工具；真实HTTP删除不在项404、拒绝无写；不证明工具入口",
+          "meaning": "真实CLI模型发现与调用checkpoint create/list/drop；已有Run的可信许可复用，read_only只准list；无会话/无用户锚点/无效名字/缺失drop明确失败且零快照。实际版本表核对包含两份文件；声明的根路径别名规范化，目录内链接仍拒绝且显式degraded。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -62975,12 +63360,121 @@
                   "quote": "assert_eq!(status, 404);\n    println!(\n        \"{}\",\n        serde_json::json!({\"originalLeaf\":\"R00-T02-LA-1AEDB2670EB9\",\"invalid\":400,\"foreign\":403,\"storageFailure\":500,\"failedDeletePreservedBothCheckpoints\":true,\"successDeletedOnlyTarget\":true,\"secondDelete\":404})"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 671,
+              "testEndLine": 804,
+              "assertions": [
+                {
+                  "line": 775,
+                  "quote": "assert!(\n            matches!(&result.outcome, lingxi_kernel::ports::ToolOutcome::Failed { error } if error.message.contains(expected)),\n            \"{result:?}\"\n        )"
+                },
+                {
+                  "line": 779,
+                  "quote": "assert!(server\n            .state\n            .session_tree()\n            .list_checkpoints(\"without-user\")\n            .await\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 786,
+                  "quote": "assert_eq!(\n            std::fs::read_to_string(workspace.join(\"must-not-snapshot.txt\")).unwrap(),\n            \"原内容\"\n        )"
+                },
+                {
+                  "line": 800,
+                  "quote": "assert_eq!(count, \"0\", \"refused tool cannot write a workspace snapshot\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 808,
+              "testEndLine": 950,
+              "assertions": [
+                {
+                  "line": 840,
+                  "quote": "assert_eq!(status, 201, \"{text}\")"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(\n        row.authorized_folders,\n        vec![workspace.to_string_lossy().to_string()],\n        \"明确新授权先绑定真实根，之后不得重新扩大范围\"\n    )"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(details[\"snapshotDegraded\"], degraded)"
+                },
+                {
+                  "line": 918,
+                  "quote": "assert_eq!(details[\"fileCount\"], file_count)"
+                },
+                {
+                  "line": 920,
+                  "quote": "assert!(details[\"snapshotCommit\"].is_null())"
+                },
+                {
+                  "line": 921,
+                  "quote": "assert!(details[\"snapshotError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"symbolic link\"))"
+                },
+                {
+                  "line": 926,
+                  "quote": "assert_eq!(details[\"snapshotCommit\"], \"alias-session:root-alias\")"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(\n        count, \"2\",\n        \"根内新增链接只留下明确降级的会话锚点，不能存入额外文件版本\"\n    )"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&first).unwrap(),\n        \"明确授权根的真实资料\"\n    )"
+                },
+                {
+                  "line": 947,
+                  "quote": "assert_eq!(std::fs::read(&second).unwrap(), [0u8, 255, 7])"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "已有HTTP检查点create/list/delete，但模型目录未注册原checkpoint工具与无会话/无用户轮次工具拒绝；不同入口不能替代。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 3,
@@ -62994,9 +63488,24 @@
               "package": "lingxi-service",
               "suite": "r06_original_session_proofs",
               "test": "original_checkpoint_delete_preserves_scope_after_invalid_foreign_and_storage_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades"
             }
           ],
-          "meaning": "真实HTTP create后列表可见，删除后空；只证明HTTP，非原模型工具；真实HTTP删除不在项404、拒绝无写；不证明工具入口",
+          "meaning": "真实CLI模型发现与调用checkpoint create/list/drop；已有Run的可信许可复用，read_only只准list；无会话/无用户锚点/无效名字/缺失drop明确失败且零快照。实际版本表核对包含两份文件；声明的根路径别名规范化，目录内链接仍拒绝且显式degraded。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -63115,18 +63624,125 @@
                   "quote": "assert_eq!(status, 404);\n    println!(\n        \"{}\",\n        serde_json::json!({\"originalLeaf\":\"R00-T02-LA-1AEDB2670EB9\",\"invalid\":400,\"foreign\":403,\"storageFailure\":500,\"failedDeletePreservedBothCheckpoints\":true,\"successDeletedOnlyTarget\":true,\"secondDelete\":404})"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "registered_checkpoint_tool_refuses_missing_session_and_user_anchor_before_snapshot",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 671,
+              "testEndLine": 804,
+              "assertions": [
+                {
+                  "line": 775,
+                  "quote": "assert!(\n            matches!(&result.outcome, lingxi_kernel::ports::ToolOutcome::Failed { error } if error.message.contains(expected)),\n            \"{result:?}\"\n        )"
+                },
+                {
+                  "line": 779,
+                  "quote": "assert!(server\n            .state\n            .session_tree()\n            .list_checkpoints(\"without-user\")\n            .await\n            .unwrap()\n            .is_empty())"
+                },
+                {
+                  "line": 786,
+                  "quote": "assert_eq!(\n            std::fs::read_to_string(workspace.join(\"must-not-snapshot.txt\")).unwrap(),\n            \"原内容\"\n        )"
+                },
+                {
+                  "line": 800,
+                  "quote": "assert_eq!(count, \"0\", \"refused tool cannot write a workspace snapshot\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 808,
+              "testEndLine": 950,
+              "assertions": [
+                {
+                  "line": 840,
+                  "quote": "assert_eq!(status, 201, \"{text}\")"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(\n        row.authorized_folders,\n        vec![workspace.to_string_lossy().to_string()],\n        \"明确新授权先绑定真实根，之后不得重新扩大范围\"\n    )"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(details[\"snapshotDegraded\"], degraded)"
+                },
+                {
+                  "line": 918,
+                  "quote": "assert_eq!(details[\"fileCount\"], file_count)"
+                },
+                {
+                  "line": 920,
+                  "quote": "assert!(details[\"snapshotCommit\"].is_null())"
+                },
+                {
+                  "line": 921,
+                  "quote": "assert!(details[\"snapshotError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"symbolic link\"))"
+                },
+                {
+                  "line": 926,
+                  "quote": "assert_eq!(details[\"snapshotCommit\"], \"alias-session:root-alias\")"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(\n        count, \"2\",\n        \"根内新增链接只留下明确降级的会话锚点，不能存入额外文件版本\"\n    )"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&first).unwrap(),\n        \"明确授权根的真实资料\"\n    )"
+                },
+                {
+                  "line": 947,
+                  "quote": "assert_eq!(std::fs::read(&second).unwrap(), [0u8, 255, 7])"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "已有HTTP检查点create/list/delete，但模型目录未注册原checkpoint工具与无会话/无用户轮次工具拒绝；不同入口不能替代。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "已有HTTP检查点create/list/delete，但模型目录未注册原checkpoint工具与无会话/无用户轮次工具拒绝；不同入口不能替代。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-628005EDFF37",
@@ -69420,16 +70036,427 @@
         "缺上下文、同名冲突或写入失败不生成伪课程；安全审核失败需用户明确接受和一次性token才可继续。"
       ],
       "then": "审核后把课程/技能文档写入Agent技能区，可在后续会话检索。",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "learn_lesson工具未注册，审核后写课程及后续检索链未实现。",
-        "learn_lesson不是当前已注册Rust工具；已有install_skill不能代替课程内容创建。",
-        "未有真实learn_lesson风险未确认零写入检查。",
-        "未有真实课程索引/Agent启用状态及后续召回一致检查。",
-        "缺上下文、同名、写失败及一次性风险确认均无该原工具专属实现/证据。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 315,
+              "testEndLine": 404,
+              "assertions": [
+                {
+                  "line": 322,
+                  "quote": "assert_eq!(warning[\"requiresRiskConfirmation\"], true)"
+                },
+                {
+                  "line": 323,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 324,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),\n        before\n    )"
+                },
+                {
+                  "line": 334,
+                  "quote": "assert_eq!(refusal[\"ok\"], false)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 340,
+                  "quote": "assert_eq!(success[\"ok\"], true, \"{success}\")"
+                },
+                {
+                  "line": 341,
+                  "quote": "assert_eq!(success[\"riskOverride\"], true)"
+                },
+                {
+                  "line": 342,
+                  "quote": "assert_eq!(success[\"experienceIndexed\"], true)"
+                },
+                {
+                  "line": 344,
+                  "quote": "assert!(std::fs::read_to_string(&file)\n        .unwrap()\n        .contains(\"先确认文件身份再执行。\"))"
+                },
+                {
+                  "line": 348,
+                  "quote": "assert!(text.contains(\"learned-pitfall\"))"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert!(\n        !std::fs::read_to_string(h.home.join(\"agents/agentB/config.yaml\"))\n            .unwrap()\n            .contains(\"learned-pitfall\")\n    )"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert!(experience\n        .index_text_checked()\n        .unwrap()\n        .contains(\"learned lessons\"))"
+                },
+                {
+                  "line": 360,
+                  "quote": "assert!(experience\n        .list_documents_checked()\n        .unwrap()\n        .iter()\n        .any(|doc| doc.body.contains(\"learned-pitfall\")))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert!(catalog[\"skills\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|skill| skill[\"name\"] == \"learned-pitfall\" && skill[\"enabled\"] == true))"
+                },
+                {
+                  "line": 379,
+                  "quote": "assert!(service.learn_lesson(\"agentA\", &accepted).await.is_err())"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), written)"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert!(service.learn_lesson(\"missing\", &args).await.is_err())"
+                },
+                {
+                  "line": 382,
+                  "quote": "assert!(service\n        .learn_lesson(\n            \"agentA\",\n            &json!({\"name\":\"../escape\",\"description\":\"x\",\"lesson\":\"y\"})\n        )\n        .await\n        .is_err())"
+                },
+                {
+                  "line": 399,
+                  "quote": "assert!(failed.is_err())"
+                },
+                {
+                  "line": 400,
+                  "quote": "assert!(!held.join(\"cannot-write\").exists())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实learn_lesson注册与写入，审核采用明确可控SkillGuardPort；风险拒绝无写、一次性token绑定正文且不可重用，冲突/缺助手/坏名称/写根错误拒绝；真实ExperienceStore正文/索引/助手启用和运行时读回一致，启用失败撤销本次新目录。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 315,
+              "testEndLine": 404,
+              "assertions": [
+                {
+                  "line": 322,
+                  "quote": "assert_eq!(warning[\"requiresRiskConfirmation\"], true)"
+                },
+                {
+                  "line": 323,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 324,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),\n        before\n    )"
+                },
+                {
+                  "line": 334,
+                  "quote": "assert_eq!(refusal[\"ok\"], false)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 340,
+                  "quote": "assert_eq!(success[\"ok\"], true, \"{success}\")"
+                },
+                {
+                  "line": 341,
+                  "quote": "assert_eq!(success[\"riskOverride\"], true)"
+                },
+                {
+                  "line": 342,
+                  "quote": "assert_eq!(success[\"experienceIndexed\"], true)"
+                },
+                {
+                  "line": 344,
+                  "quote": "assert!(std::fs::read_to_string(&file)\n        .unwrap()\n        .contains(\"先确认文件身份再执行。\"))"
+                },
+                {
+                  "line": 348,
+                  "quote": "assert!(text.contains(\"learned-pitfall\"))"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert!(\n        !std::fs::read_to_string(h.home.join(\"agents/agentB/config.yaml\"))\n            .unwrap()\n            .contains(\"learned-pitfall\")\n    )"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert!(experience\n        .index_text_checked()\n        .unwrap()\n        .contains(\"learned lessons\"))"
+                },
+                {
+                  "line": 360,
+                  "quote": "assert!(experience\n        .list_documents_checked()\n        .unwrap()\n        .iter()\n        .any(|doc| doc.body.contains(\"learned-pitfall\")))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert!(catalog[\"skills\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|skill| skill[\"name\"] == \"learned-pitfall\" && skill[\"enabled\"] == true))"
+                },
+                {
+                  "line": 379,
+                  "quote": "assert!(service.learn_lesson(\"agentA\", &accepted).await.is_err())"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), written)"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert!(service.learn_lesson(\"missing\", &args).await.is_err())"
+                },
+                {
+                  "line": 382,
+                  "quote": "assert!(service\n        .learn_lesson(\n            \"agentA\",\n            &json!({\"name\":\"../escape\",\"description\":\"x\",\"lesson\":\"y\"})\n        )\n        .await\n        .is_err())"
+                },
+                {
+                  "line": 399,
+                  "quote": "assert!(failed.is_err())"
+                },
+                {
+                  "line": 400,
+                  "quote": "assert!(!held.join(\"cannot-write\").exists())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实learn_lesson注册与写入，审核采用明确可控SkillGuardPort；风险拒绝无写、一次性token绑定正文且不可重用，冲突/缺助手/坏名称/写根错误拒绝；真实ExperienceStore正文/索引/助手启用和运行时读回一致，启用失败撤销本次新目录。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 2,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 315,
+              "testEndLine": 404,
+              "assertions": [
+                {
+                  "line": 322,
+                  "quote": "assert_eq!(warning[\"requiresRiskConfirmation\"], true)"
+                },
+                {
+                  "line": 323,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 324,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),\n        before\n    )"
+                },
+                {
+                  "line": 334,
+                  "quote": "assert_eq!(refusal[\"ok\"], false)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 340,
+                  "quote": "assert_eq!(success[\"ok\"], true, \"{success}\")"
+                },
+                {
+                  "line": 341,
+                  "quote": "assert_eq!(success[\"riskOverride\"], true)"
+                },
+                {
+                  "line": 342,
+                  "quote": "assert_eq!(success[\"experienceIndexed\"], true)"
+                },
+                {
+                  "line": 344,
+                  "quote": "assert!(std::fs::read_to_string(&file)\n        .unwrap()\n        .contains(\"先确认文件身份再执行。\"))"
+                },
+                {
+                  "line": 348,
+                  "quote": "assert!(text.contains(\"learned-pitfall\"))"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert!(\n        !std::fs::read_to_string(h.home.join(\"agents/agentB/config.yaml\"))\n            .unwrap()\n            .contains(\"learned-pitfall\")\n    )"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert!(experience\n        .index_text_checked()\n        .unwrap()\n        .contains(\"learned lessons\"))"
+                },
+                {
+                  "line": 360,
+                  "quote": "assert!(experience\n        .list_documents_checked()\n        .unwrap()\n        .iter()\n        .any(|doc| doc.body.contains(\"learned-pitfall\")))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert!(catalog[\"skills\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|skill| skill[\"name\"] == \"learned-pitfall\" && skill[\"enabled\"] == true))"
+                },
+                {
+                  "line": 379,
+                  "quote": "assert!(service.learn_lesson(\"agentA\", &accepted).await.is_err())"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), written)"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert!(service.learn_lesson(\"missing\", &args).await.is_err())"
+                },
+                {
+                  "line": 382,
+                  "quote": "assert!(service\n        .learn_lesson(\n            \"agentA\",\n            &json!({\"name\":\"../escape\",\"description\":\"x\",\"lesson\":\"y\"})\n        )\n        .await\n        .is_err())"
+                },
+                {
+                  "line": 399,
+                  "quote": "assert!(failed.is_err())"
+                },
+                {
+                  "line": 400,
+                  "quote": "assert!(!held.join(\"cannot-write\").exists())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实learn_lesson注册与写入，审核采用明确可控SkillGuardPort；风险拒绝无写、一次性token绑定正文且不可重用，冲突/缺助手/坏名称/写根错误拒绝；真实ExperienceStore正文/索引/助手启用和运行时读回一致，启用失败撤销本次新目录。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 3,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 315,
+              "testEndLine": 404,
+              "assertions": [
+                {
+                  "line": 322,
+                  "quote": "assert_eq!(warning[\"requiresRiskConfirmation\"], true)"
+                },
+                {
+                  "line": 323,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 324,
+                  "quote": "assert_eq!(\n        std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),\n        before\n    )"
+                },
+                {
+                  "line": 334,
+                  "quote": "assert_eq!(refusal[\"ok\"], false)"
+                },
+                {
+                  "line": 335,
+                  "quote": "assert!(!h.home.join(\"skills/learned-pitfall\").exists())"
+                },
+                {
+                  "line": 340,
+                  "quote": "assert_eq!(success[\"ok\"], true, \"{success}\")"
+                },
+                {
+                  "line": 341,
+                  "quote": "assert_eq!(success[\"riskOverride\"], true)"
+                },
+                {
+                  "line": 342,
+                  "quote": "assert_eq!(success[\"experienceIndexed\"], true)"
+                },
+                {
+                  "line": 344,
+                  "quote": "assert!(std::fs::read_to_string(&file)\n        .unwrap()\n        .contains(\"先确认文件身份再执行。\"))"
+                },
+                {
+                  "line": 348,
+                  "quote": "assert!(text.contains(\"learned-pitfall\"))"
+                },
+                {
+                  "line": 349,
+                  "quote": "assert!(\n        !std::fs::read_to_string(h.home.join(\"agents/agentB/config.yaml\"))\n            .unwrap()\n            .contains(\"learned-pitfall\")\n    )"
+                },
+                {
+                  "line": 356,
+                  "quote": "assert!(experience\n        .index_text_checked()\n        .unwrap()\n        .contains(\"learned lessons\"))"
+                },
+                {
+                  "line": 360,
+                  "quote": "assert!(experience\n        .list_documents_checked()\n        .unwrap()\n        .iter()\n        .any(|doc| doc.body.contains(\"learned-pitfall\")))"
+                },
+                {
+                  "line": 373,
+                  "quote": "assert!(catalog[\"skills\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|skill| skill[\"name\"] == \"learned-pitfall\" && skill[\"enabled\"] == true))"
+                },
+                {
+                  "line": 379,
+                  "quote": "assert!(service.learn_lesson(\"agentA\", &accepted).await.is_err())"
+                },
+                {
+                  "line": 380,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), written)"
+                },
+                {
+                  "line": 381,
+                  "quote": "assert!(service.learn_lesson(\"missing\", &args).await.is_err())"
+                },
+                {
+                  "line": 382,
+                  "quote": "assert!(service\n        .learn_lesson(\n            \"agentA\",\n            &json!({\"name\":\"../escape\",\"description\":\"x\",\"lesson\":\"y\"})\n        )\n        .await\n        .is_err())"
+                },
+                {
+                  "line": 399,
+                  "quote": "assert!(failed.is_err())"
+                },
+                {
+                  "line": 400,
+                  "quote": "assert!(!held.join(\"cannot-write\").exists())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实learn_lesson注册与写入，审核采用明确可控SkillGuardPort；风险拒绝无写、一次性token绑定正文且不可重用，冲突/缺助手/坏名称/写根错误拒绝；真实ExperienceStore正文/索引/助手启用和运行时读回一致，启用失败撤销本次新目录。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-778CBDA01964",
@@ -69585,14 +70612,163 @@
         "拒绝/边界：names 非数组/lang 空或 en 直接返回空对象；agentId 必填；不应错误扩大写入或披露范围"
       ],
       "then": "调用工具模型，返回目标语言名称映射",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "目标语言名称翻译入口未迁移。",
-        "当前未注册skills/translate模型翻译接口，无法证明目标语言名称映射。",
-        "names/lang/agentId的原翻译路由边界没有现行专属检查。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 407,
+              "testEndLine": 540,
+              "assertions": [
+                {
+                  "line": 425,
+                  "quote": "assert!(n > 0)"
+                },
+                {
+                  "line": 480,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 481,
+                  "quote": "assert_eq!(value, json!({}))"
+                },
+                {
+                  "line": 483,
+                  "quote": "assert!(requests.lock().unwrap().is_empty())"
+                },
+                {
+                  "line": 492,
+                  "quote": "assert_eq!(status, 400, \"{value}\")"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(status, 400, \"{value}\")"
+                },
+                {
+                  "line": 511,
+                  "quote": "assert_eq!(status, 200, \"{value}\")"
+                },
+                {
+                  "line": 512,
+                  "quote": "assert_eq!(value, json!({\"review-plan\":\"审阅计划\"}))"
+                },
+                {
+                  "line": 516,
+                  "quote": "assert!(status >= 400, \"{value}\")"
+                },
+                {
+                  "line": 520,
+                  "quote": "assert_eq!(captured.len(), 2)"
+                },
+                {
+                  "line": 521,
+                  "quote": "assert!(captured\n            .iter()\n            .all(|body| body[\"model\"] == \"actual-title-model\"))"
+                },
+                {
+                  "line": 535,
+                  "quote": "assert_eq!(records.len(), 2)"
+                },
+                {
+                  "line": 536,
+                  "quote": "assert!(records\n        .iter()\n        .all(|record| record.usage.is_some() && record.transport_attempts == Some(1)))"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实生产ProviderRegistry/ModelGateway/AuxiliaryExecutor经本地OpenAI SSE供应商，使用现役Title槽并记录quota/调用账本；完整目标名称映射、供应商/解析失败、必填助手、无效names/lang/en及跨助手目录拒绝。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 407,
+              "testEndLine": 540,
+              "assertions": [
+                {
+                  "line": 425,
+                  "quote": "assert!(n > 0)"
+                },
+                {
+                  "line": 480,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 481,
+                  "quote": "assert_eq!(value, json!({}))"
+                },
+                {
+                  "line": 483,
+                  "quote": "assert!(requests.lock().unwrap().is_empty())"
+                },
+                {
+                  "line": 492,
+                  "quote": "assert_eq!(status, 400, \"{value}\")"
+                },
+                {
+                  "line": 501,
+                  "quote": "assert_eq!(status, 400, \"{value}\")"
+                },
+                {
+                  "line": 511,
+                  "quote": "assert_eq!(status, 200, \"{value}\")"
+                },
+                {
+                  "line": 512,
+                  "quote": "assert_eq!(value, json!({\"review-plan\":\"审阅计划\"}))"
+                },
+                {
+                  "line": 516,
+                  "quote": "assert!(status >= 400, \"{value}\")"
+                },
+                {
+                  "line": 520,
+                  "quote": "assert_eq!(captured.len(), 2)"
+                },
+                {
+                  "line": 521,
+                  "quote": "assert!(captured\n            .iter()\n            .all(|body| body[\"model\"] == \"actual-title-model\"))"
+                },
+                {
+                  "line": 535,
+                  "quote": "assert_eq!(records.len(), 2)"
+                },
+                {
+                  "line": 536,
+                  "quote": "assert!(records\n        .iter()\n        .all(|record| record.usage.is_some() && record.transport_attempts == Some(1)))"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实生产ProviderRegistry/ModelGateway/AuxiliaryExecutor经本地OpenAI SSE供应商，使用现役Title槽并记录quota/调用账本；完整目标名称映射、供应商/解析失败、必填助手、无效names/lang/en及跨助手目录拒绝。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-78B18101F37D",
@@ -75159,14 +76335,263 @@
         "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
       ],
       "then": "安装包至 .agents/skills，刷新技能路径，返回 name/installedSkillSource",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "原desk/install-skill写.agents/skills入口未迁移，不能用全局技能安装替代。",
-        "当前没有desk/install-skill至.agents/skills的路由；全局home/skills手动安装不能冒称工作区安装。",
-        "无该原desk入口越权/非法来源原目录保全的专属检查。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skill_packages_workspace_source_global_and_agent_install_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skill_packages_workspace_source_global_and_agent_install_rejections",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 162,
+              "testEndLine": 296,
+              "assertions": [
+                {
+                  "line": 174,
+                  "quote": "assert_eq!(status, 200, \"{data}\")"
+                },
+                {
+                  "line": 183,
+                  "quote": "assert_eq!(a[\"skills\"][0][\"enabled\"], true)"
+                },
+                {
+                  "line": 192,
+                  "quote": "assert_eq!(b[\"skills\"][0][\"enabled\"], false)"
+                },
+                {
+                  "line": 203,
+                  "quote": "assert_eq!(status, 200, \"{data}\")"
+                },
+                {
+                  "line": 204,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(h.home.join(\"skills/global-zip/examples/中文.txt\")).unwrap(),\n        \"压缩配套正文\"\n    )"
+                },
+                {
+                  "line": 216,
+                  "quote": "assert_eq!(\n        a[\"skills\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .find(|s| s[\"name\"] == \"global-zip\")\n            .unwrap()[\"enabled\"],\n        false\n    )"
+                },
+                {
+                  "line": 235,
+                  "quote": "assert_eq!(status, 200, \"{data}\")"
+                },
+                {
+                  "line": 236,
+                  "quote": "assert_eq!(data[\"installedSkillSource\"][\"owner\"], \"workspace\")"
+                },
+                {
+                  "line": 237,
+                  "quote": "assert_eq!(data[\"name\"], \"workspace-zip\")"
+                },
+                {
+                  "line": 238,
+                  "quote": "assert!(h\n        .workspace\n        .join(\".agents/skills/workspace-zip/SKILL.md\")\n        .is_file())"
+                },
+                {
+                  "line": 250,
+                  "quote": "assert!(catalog.to_string().contains(\"workspace-zip\"), \"{catalog}\")"
+                },
+                {
+                  "line": 275,
+                  "quote": "assert!(status >= 400, \"{route}: {value}\")"
+                },
+                {
+                  "line": 276,
+                  "quote": "assert_eq!(\n            std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),\n            before\n        )"
+                },
+                {
+                  "line": 284,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 285,
+                  "quote": "assert!(reloaded[\"skills\"].is_null())"
+                },
+                {
+                  "line": 286,
+                  "quote": "assert!(reloaded[\"scanned\"].as_u64().unwrap() >= 2)"
+                },
+                {
+                  "line": 290,
+                  "quote": "assert!(events[\"events\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|event| event[\"type\"] == \"skills-changed\" && event[\"payload\"][\"agentId\"].is_null()))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实目录/zip/.skill/base64完整包安装到获准工作区.agents/skills，真实installedSkillSource和刷新；全局安装不自动启用，指定助手安装启用。越界压缩条目/链接/重复/坏包/无写权限/跨工作区明确错误，无伪持久化。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skill_packages_workspace_source_global_and_agent_install_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skill_packages_workspace_source_global_and_agent_install_rejections",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 162,
+              "testEndLine": 296,
+              "assertions": [
+                {
+                  "line": 174,
+                  "quote": "assert_eq!(status, 200, \"{data}\")"
+                },
+                {
+                  "line": 183,
+                  "quote": "assert_eq!(a[\"skills\"][0][\"enabled\"], true)"
+                },
+                {
+                  "line": 192,
+                  "quote": "assert_eq!(b[\"skills\"][0][\"enabled\"], false)"
+                },
+                {
+                  "line": 203,
+                  "quote": "assert_eq!(status, 200, \"{data}\")"
+                },
+                {
+                  "line": 204,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(h.home.join(\"skills/global-zip/examples/中文.txt\")).unwrap(),\n        \"压缩配套正文\"\n    )"
+                },
+                {
+                  "line": 216,
+                  "quote": "assert_eq!(\n        a[\"skills\"]\n            .as_array()\n            .unwrap()\n            .iter()\n            .find(|s| s[\"name\"] == \"global-zip\")\n            .unwrap()[\"enabled\"],\n        false\n    )"
+                },
+                {
+                  "line": 235,
+                  "quote": "assert_eq!(status, 200, \"{data}\")"
+                },
+                {
+                  "line": 236,
+                  "quote": "assert_eq!(data[\"installedSkillSource\"][\"owner\"], \"workspace\")"
+                },
+                {
+                  "line": 237,
+                  "quote": "assert_eq!(data[\"name\"], \"workspace-zip\")"
+                },
+                {
+                  "line": 238,
+                  "quote": "assert!(h\n        .workspace\n        .join(\".agents/skills/workspace-zip/SKILL.md\")\n        .is_file())"
+                },
+                {
+                  "line": 250,
+                  "quote": "assert!(catalog.to_string().contains(\"workspace-zip\"), \"{catalog}\")"
+                },
+                {
+                  "line": 275,
+                  "quote": "assert!(status >= 400, \"{route}: {value}\")"
+                },
+                {
+                  "line": 276,
+                  "quote": "assert_eq!(\n            std::fs::read(h.home.join(\"agents/agentA/config.yaml\")).unwrap(),\n            before\n        )"
+                },
+                {
+                  "line": 284,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 285,
+                  "quote": "assert!(reloaded[\"skills\"].is_null())"
+                },
+                {
+                  "line": 286,
+                  "quote": "assert!(reloaded[\"scanned\"].as_u64().unwrap() >= 2)"
+                },
+                {
+                  "line": 290,
+                  "quote": "assert!(events[\"events\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|event| event[\"type\"] == \"skills-changed\" && event[\"payload\"][\"agentId\"].is_null()))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实目录/zip/.skill/base64完整包安装到获准工作区.agents/skills，真实installedSkillSource和刷新；全局安装不自动启用，指定助手安装启用。越界压缩条目/链接/重复/坏包/无写权限/跨工作区明确错误，无伪持久化。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-8B48FD65CAFB",
@@ -80187,8 +81612,172 @@
         "点击已列出的技能行打开技能查看器：成功核对 有 baseDir 的技能行触发 openSkillViewer IPC；主窗口接收 show-skill-viewer 后显示查看器，查看器自动 listSkillFiles 并 readSkillFile 读取默认文件；此入口 installed:true，不显示“复制到技能”按钮。；空态/未初始化核对 技能缺 baseDir 时行点击无请求；文件列表返回空或正文返回 null 时查看器显示空文件树/空正文；删除和开关按钮阻止行点击。；错误/无权限核对 SkillRow 对 openSkillViewer fire-and-forget；查看器文件树/正文 IPC 异常未在该组件捕获，不能承诺错误 toast。"
       ],
       "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
         {
           "index": 2,
           "tests": [
@@ -80196,9 +81785,19 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_global_manual_install_complete_package_without_agent_enable"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
             }
           ],
-          "meaning": "真实全局包安装且不启用Agent，保留后端局部结果",
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -80276,12 +81875,72 @@
                   "quote": "assert_eq!(lists(&server, \"agentB\"), before_b);\n    server.stop_and_clean().await;\n}"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "全局完整包安装可证；文件选择/拖放path与base64分支、取消零请求、toast与runtime重载未有当前候选UI证据。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 3,
@@ -80290,9 +81949,19 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_bundles_agent_projection_update_order_delete_and_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
             }
           ],
-          "meaning": "真实删除目录、全部Agent和bundle引用回读，保留后端局部结果",
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -80342,12 +82011,72 @@
                   "quote": "assert_eq!(store.load(), before);\n\n    // 已存组合引用缺失的技能，真实读取必须显示missing而不是伪造技能。\n    let stale = store"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "实际删除与配置清理有后端局部证据，取消确认/无助手与重载和失败toast无当前候选界面证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 4,
@@ -80356,9 +82085,19 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_bundles_agent_projection_update_order_delete_and_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
             }
           ],
-          "meaning": "后端组合改名/成员/order/delete局部结果",
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -80476,12 +82215,72 @@
                   "quote": "assert_eq!(store.load(), before);\n\n    // 正常技能删除须回读全部助手与仍在使用该技能的组合引用。\n    let (status, _) = server"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "组合后端CRUD有局部证据，当前导出入口未迁移、showInFinder/非导出不IPC/弹窗取消/toast未证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 5,
@@ -80490,9 +82289,19 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_skill_enable_disable_runtime_and_workspace_shadow_boundaries"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
             }
           ],
-          "meaning": "真实普通/workspace技能后端启停和拒绝局部结果",
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -80570,12 +82379,72 @@
                   "quote": "assert_eq!(file_snapshot(&server.home.join(\"agents\")), before);\n    let (status, error) = server\n        .request(\"GET\", \"/lingxi/v1/skills?runtime=1\", None)\n        .await;"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "普通技能启停有后端证据，组合停用尚未正确实现；UI无助手禁用/失败回滚与提示未证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 6,
@@ -80584,9 +82453,19 @@
               "package": "lingxi-service",
               "suite": "r06_original_skills_bundle_proofs",
               "test": "original_external_paths_persist_readback_and_rejections_without_mutation"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
             }
           ],
-          "meaning": "真实路径PUT/GET/持久化/拒绝与清空局部结果",
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_skills_bundle_proofs.rs",
@@ -80664,29 +82543,404 @@
                   "quote": "assert!(!view(&server, \"agentA\", false).await[\"skills\"]\n        .as_array()\n        .unwrap()"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "外部目录PUT/GET及视图重扫有真实证据；原生选择取消不PUT/成功失败toast及重载失败catch的候选UI未证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
+        },
+        {
+          "index": 7,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 8,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 9,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 10,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "现役SkillsTab及原初始化/缓存/15秒/摘要不阻塞/能力确认/偏好GET和PUT回滚/查看器边界等32原界面断言保留；新增真实HTTP贯穿安装、组合、外部目录保存重载、翻译、启停、导出和goal/autolearn实际磁盘读回15项。外部目录PUT后重载失败传toast；独立Tauri查看器真实读取且不安装。原断言明确的console或静默未加载行为没有扩大承诺。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
         }
       ],
-      "gaps": [
-        "当前设置页面动作与投影缺完整证明；翻译、导出、原生查看器及全局目标/自动学习链存在未迁移功能。",
-        "当前候选设置容器冷启动、ready/cache/background/15秒及provider摘要失败的界面生命周期证据缺失。",
-        "按Agent加载/空助手清空/后台名称翻译及读取错误console/空态的实际UI未证明，翻译服务亦未迁移。",
-        "全局完整包安装可证；文件选择/拖放path与base64分支、取消零请求、toast与runtime重载未有当前候选UI证据。",
-        "实际删除与配置清理有后端局部证据，取消确认/无助手与重载和失败toast无当前候选界面证明。",
-        "组合后端CRUD有局部证据，当前导出入口未迁移、showInFinder/非导出不IPC/弹窗取消/toast未证明。",
-        "普通技能启停有后端证据，组合停用尚未正确实现；UI无助手禁用/失败回滚与提示未证明。",
-        "外部目录PUT/GET及视图重扫有真实证据；原生选择取消不PUT/成功失败toast及重载失败catch的候选UI未证明。",
-        "当前agent_config_patch_route只接T06布尔叶，不接受原learn_skills capability写入全局preferences；UI确认/autoSaveConfig后GET和保存部分失败分支未迁移或未证明。",
-        "原全局goal/autolearn GET界面显示和undefined保留未有当前候选证明；此条确为只读，没有伪造PUT负控。",
-        "目标预算与自动沉淀两个开关独立PUT/GET/失败回滚和toast未有该当前候选UI证明。",
-        "当前候选原生技能查看器/iframe文件树、openSkillViewer/fire-and-forget/默认文件与installed真值均未迁移或未有真实界面专属证明。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-9A47666127D3",
@@ -80818,14 +83072,107 @@
         "非绝对路径、非目录或超 2MB 文件返回空；不能把文件读取当安装"
       ],
       "then": "独立技能查看器列文件并显示所选文本",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "原生独立技能查看器列文件及读取所选文本未迁移。",
-        "独立技能查看器的Rust/Tauri原生界面与列/读文件入口尚未迁移，旧Electron源码不能代替当前候选运行。",
-        "原绝对路径、目录、2MB及读取不等于安装无该候选原生接口专属证明。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前Tauri真实独立窗口和真实WebView，树点击显示所选中文正文；非绝对/非目录/超2MiB/二进制空结果，绑定每窗根且拒绝另一根/写命令，原文件不变不安装。另在真实生产reader打开前替换外部链接，实际失败反例后修复并重跑：已打开文件身份/路径前后复核拒绝替换，外部字节保留。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_native_skill_viewer_current_tauri_window_and_read_boundaries",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 543,
+              "testEndLine": 646,
+              "assertions": [
+                {
+                  "line": 554,
+                  "quote": "assert!(\n        target.is_dir(),\n        \"需要已保留的原生构建缓存；此证明不创建新target\"\n    )"
+                },
+                {
+                  "line": 576,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 603,
+                  "quote": "assert!(\n        unit.status.success(),\n        \"实际读取替换/二进制边界未通过：{} {}\",\n        String::from_utf8_lossy(&unit.stdout),\n        String::from_utf8_lossy(&unit.stderr)\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(String::from_utf8_lossy(&unit.stdout)\n        .contains(\"test result: ok. 1 passed; 0 failed; 0 ignored;\"))"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前原生技能窗口失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 644,
+                  "quote": "assert!(proof.join(\"receipt.json\").is_file())"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "当前Tauri真实独立窗口和真实WebView，树点击显示所选中文正文；非绝对/非目录/超2MiB/二进制空结果，绑定每窗根且拒绝另一根/写命令，原文件不变不安装。另在真实生产reader打开前替换外部链接，实际失败反例后修复并重跑：已打开文件身份/路径前后复核拒绝替换，外部字节保留。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-9CC1B13F1787",
@@ -95493,7 +97840,7 @@
         "拒绝/边界：与安装/删除共用锁；不回传没有 agent 视角的列表；不应错误扩大写入或披露范围"
       ],
       "then": "重新扫描所有技能并广播 skills-changed；前端再按 agentId 取列表",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -95502,9 +97849,20 @@
               "package": "lingxi-service",
               "suite": "r06_t06_skills",
               "test": "skills_http_faces_whitelist_shadow_readonly_and_bundles"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "skills::completion::tests::original_reload_install_delete_wait_for_the_same_mutation_lock",
+              "sourcePath": "rust/crates/lingxi-service/src/skills_completion.rs"
             }
           ],
-          "meaning": "真实reload与随后指定Agent bundles GET成功",
+          "meaning": "真实重载重新扫描并广播skills-changed，现役界面按agentId重新GET；不回无助手视角列表。持有现役mutation_lock时，三个独立线程reload/install/delete真实等待，释放才结束；没有仅靠源码字符串证明锁。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t06_skills.rs",
@@ -95530,20 +97888,119 @@
                   "quote": "    assert_eq!(bundle[\"skills\"].as_array().unwrap().len(), 2);\n    // 未知技能进 bundle → 400\n    let (status, _) = server\n        .request("
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/skills_completion.rs",
+              "test": "skills::completion::tests::original_reload_install_delete_wait_for_the_same_mutation_lock",
+              "sourceSHA256": "923f3a3304b775cf6f995f1080196dc6cafa41a404c561033fce63919bcb2ca7",
+              "testStartLine": 581,
+              "testEndLine": 625,
+              "assertions": [
+                {
+                  "line": 611,
+                  "quote": "assert!(\n                matches!(\n                    done_rx.recv_timeout(std::time::Duration::from_millis(100)),\n                    Err(std::sync::mpsc::RecvTimeoutError::Timeout)\n                ),\n                \"操作 {action} 未等待共享锁\"\n            )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "实际reload扫描返回数量有检查，当前skills_reload_route不发skills-changed，前端联动未证明。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_skills_completion",
+              "test": "original_skills_settings_and_panel_current_real_service_projection"
+            },
+            {
+              "kind": "rust_library_test",
+              "package": "lingxi-service",
+              "test": "skills::completion::tests::original_reload_install_delete_wait_for_the_same_mutation_lock",
+              "sourcePath": "rust/crates/lingxi-service/src/skills_completion.rs"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+              "test": "original_skills_settings_and_panel_current_real_service_projection",
+              "sourceSHA256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e",
+              "testStartLine": 649,
+              "testEndLine": 714,
+              "assertions": [
+                {
+                  "line": 691,
+                  "quote": "assert!(\n        output.status.success(),\n        \"当前页面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                },
+                {
+                  "line": 698,
+                  "quote": "assert!(value[\"checks\"].as_array().unwrap().len() >= 12)"
+                },
+                {
+                  "line": 704,
+                  "quote": "assert!(\n        !h.home.join(\"skills/panel-ui\").exists(),\n        \"页面真实删除后不保留伪安装目录\"\n    )"
+                },
+                {
+                  "line": 708,
+                  "quote": "assert!(h.home.join(\"skills/global-ui/examples/中文.txt\").is_file())"
+                },
+                {
+                  "line": 712,
+                  "quote": "assert_eq!(prefs[\"learn_skills\"][\"enabled\"], false)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/src/skills_completion.rs",
+              "test": "skills::completion::tests::original_reload_install_delete_wait_for_the_same_mutation_lock",
+              "sourceSHA256": "923f3a3304b775cf6f995f1080196dc6cafa41a404c561033fce63919bcb2ca7",
+              "testStartLine": 581,
+              "testEndLine": 625,
+              "assertions": [
+                {
+                  "line": 611,
+                  "quote": "assert!(\n                matches!(\n                    done_rx.recv_timeout(std::time::Duration::from_millis(100)),\n                    Err(std::sync::mpsc::RecvTimeoutError::Timeout)\n                ),\n                \"操作 {action} 未等待共享锁\"\n            )"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实重载重新扫描并广播skills-changed，现役界面按agentId重新GET；不回无助手视角列表。持有现役mutation_lock时，三个独立线程reload/install/delete真实等待，释放才结束；没有仅靠源码字符串证明锁。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
         }
       ],
-      "gaps": [
-        "扫描重载可证，但skills-changed广播及前端按Agent联动未实现或证明。",
-        "实际reload扫描返回数量有检查，当前skills_reload_route不发skills-changed，前端联动未证明。",
-        "源实现reload与install/delete共享mutation_lock；缺真实并发互斥检查及回传非Agent目录否定断言。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/skills-bundles.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-BB0A168006D7",
@@ -95552,12 +98009,271 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "then": "只接受绝对文件路径和 edit-start/autosave-interval 原因，返回新检查点",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "原用户编辑检查点的edit-start/autosave-interval原因和专属接口未接入，普通checkpoint name/filePaths请求不可替代。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "user_edit_absolute_checkpoint_reasons_binary_bytes_and_failure_have_no_partial_archive"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "user_edit_absolute_checkpoint_reasons_binary_bytes_and_failure_have_no_partial_archive",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 490,
+              "testEndLine": 559,
+              "assertions": [
+                {
+                  "line": 504,
+                  "quote": "assert_eq!(status, 200, \"{body}\")"
+                },
+                {
+                  "line": 507,
+                  "quote": "assert_eq!(body[\"checkpoint\"][\"reason\"], reason)"
+                },
+                {
+                  "line": 508,
+                  "quote": "assert_eq!(body[\"checkpoint\"][\"path\"], json!(file))"
+                },
+                {
+                  "line": 512,
+                  "quote": "assert_eq!(saved[\"tool\"], \"user-edit\")"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(saved[\"source\"], \"user-edit\")"
+                },
+                {
+                  "line": 514,
+                  "quote": "assert!(saved[\"sessionPath\"].is_null())"
+                },
+                {
+                  "line": 519,
+                  "quote": "assert_eq!(status, 200, \"{body}\")"
+                },
+                {
+                  "line": 520,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), before)"
+                },
+                {
+                  "line": 543,
+                  "quote": "assert_eq!(status, expected, \"{body}\")"
+                },
+                {
+                  "line": 544,
+                  "quote": "assert_eq!(std::fs::read_dir(&archive).unwrap().count(), count)"
+                },
+                {
+                  "line": 545,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), before)"
+                },
+                {
+                  "line": 556,
+                  "quote": "assert_eq!(status, 403)"
+                },
+                {
+                  "line": 557,
+                  "quote": "assert_eq!(std::fs::read_dir(&archive).unwrap().count(), count)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 808,
+              "testEndLine": 950,
+              "assertions": [
+                {
+                  "line": 840,
+                  "quote": "assert_eq!(status, 201, \"{text}\")"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(\n        row.authorized_folders,\n        vec![workspace.to_string_lossy().to_string()],\n        \"明确新授权先绑定真实根，之后不得重新扩大范围\"\n    )"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(details[\"snapshotDegraded\"], degraded)"
+                },
+                {
+                  "line": 918,
+                  "quote": "assert_eq!(details[\"fileCount\"], file_count)"
+                },
+                {
+                  "line": 920,
+                  "quote": "assert!(details[\"snapshotCommit\"].is_null())"
+                },
+                {
+                  "line": 921,
+                  "quote": "assert!(details[\"snapshotError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"symbolic link\"))"
+                },
+                {
+                  "line": 926,
+                  "quote": "assert_eq!(details[\"snapshotCommit\"], \"alias-session:root-alias\")"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(\n        count, \"2\",\n        \"根内新增链接只留下明确降级的会话锚点，不能存入额外文件版本\"\n    )"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&first).unwrap(),\n        \"明确授权根的真实资料\"\n    )"
+                },
+                {
+                  "line": 947,
+                  "quote": "assert_eq!(std::fs::read(&second).unwrap(), [0u8, 255, 7])"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实HTTP只接受绝对文件及edit-start/autosave-interval；二进制快照和恢复逐字节一致；非法原因/相对/缺失/目录/读权限/磁盘失败无残留档案，根别名与内部链接分别验证。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "user_edit_absolute_checkpoint_reasons_binary_bytes_and_failure_have_no_partial_archive"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "user_edit_absolute_checkpoint_reasons_binary_bytes_and_failure_have_no_partial_archive",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 490,
+              "testEndLine": 559,
+              "assertions": [
+                {
+                  "line": 504,
+                  "quote": "assert_eq!(status, 200, \"{body}\")"
+                },
+                {
+                  "line": 507,
+                  "quote": "assert_eq!(body[\"checkpoint\"][\"reason\"], reason)"
+                },
+                {
+                  "line": 508,
+                  "quote": "assert_eq!(body[\"checkpoint\"][\"path\"], json!(file))"
+                },
+                {
+                  "line": 512,
+                  "quote": "assert_eq!(saved[\"tool\"], \"user-edit\")"
+                },
+                {
+                  "line": 513,
+                  "quote": "assert_eq!(saved[\"source\"], \"user-edit\")"
+                },
+                {
+                  "line": 514,
+                  "quote": "assert!(saved[\"sessionPath\"].is_null())"
+                },
+                {
+                  "line": 519,
+                  "quote": "assert_eq!(status, 200, \"{body}\")"
+                },
+                {
+                  "line": 520,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), before)"
+                },
+                {
+                  "line": 543,
+                  "quote": "assert_eq!(status, expected, \"{body}\")"
+                },
+                {
+                  "line": 544,
+                  "quote": "assert_eq!(std::fs::read_dir(&archive).unwrap().count(), count)"
+                },
+                {
+                  "line": 545,
+                  "quote": "assert_eq!(std::fs::read(&file).unwrap(), before)"
+                },
+                {
+                  "line": 556,
+                  "quote": "assert_eq!(status, 403)"
+                },
+                {
+                  "line": 557,
+                  "quote": "assert_eq!(std::fs::read_dir(&archive).unwrap().count(), count)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 808,
+              "testEndLine": 950,
+              "assertions": [
+                {
+                  "line": 840,
+                  "quote": "assert_eq!(status, 201, \"{text}\")"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(\n        row.authorized_folders,\n        vec![workspace.to_string_lossy().to_string()],\n        \"明确新授权先绑定真实根，之后不得重新扩大范围\"\n    )"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(details[\"snapshotDegraded\"], degraded)"
+                },
+                {
+                  "line": 918,
+                  "quote": "assert_eq!(details[\"fileCount\"], file_count)"
+                },
+                {
+                  "line": 920,
+                  "quote": "assert!(details[\"snapshotCommit\"].is_null())"
+                },
+                {
+                  "line": 921,
+                  "quote": "assert!(details[\"snapshotError\"]\n                .as_str()\n                .unwrap()\n                .contains(\"symbolic link\"))"
+                },
+                {
+                  "line": 926,
+                  "quote": "assert_eq!(details[\"snapshotCommit\"], \"alias-session:root-alias\")"
+                },
+                {
+                  "line": 939,
+                  "quote": "assert_eq!(\n        count, \"2\",\n        \"根内新增链接只留下明确降级的会话锚点，不能存入额外文件版本\"\n    )"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(\n        std::fs::read_to_string(&first).unwrap(),\n        \"明确授权根的真实资料\"\n    )"
+                },
+                {
+                  "line": 947,
+                  "quote": "assert_eq!(std::fs::read(&second).unwrap(), [0u8, 255, 7])"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实HTTP只接受绝对文件及edit-start/autosave-interval；二进制快照和恢复逐字节一致；非法原因/相对/缺失/目录/读权限/磁盘失败无残留档案，根别名与内部链接分别验证。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-BB1F5E0DE88E",
@@ -106313,7 +109029,7 @@
         "用户拒绝或会话忙时不立刻回退；外部改动不得被旧快照覆盖。"
       ],
       "then": "用户批准后回退会话分支；繁忙时延后到本轮结束并回报；文件恢复受版本检查。",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -106327,9 +109043,14 @@
               "package": "lingxi-service",
               "suite": "r06_t03_session_tree",
               "test": "busy_session_refuses_fork_retry_rewind_409"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
             }
           ],
-          "meaning": "真实HTTP回退restored/skipped/conflicted报告对应字节与分支，外部修改保留；忙会话409，不证明模型工具用户拒绝等待",
+          "meaning": "真实模型工具必须等用户确认，risk_accepted不可绕过；当前生产React界面拒绝零回退、确认后忙Run只排队，Run结束才按冻结锚点回退并持久回执；实际分支reset、文件v1恢复及外部conflicted不覆盖。A→B→A连接和同服务会话迟到响应不能解除新请求busy或跨会话批准。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -106488,12 +109209,47 @@
                   "quote": "assert_eq!(status, 200, \"释放后 fork 可行: {body}\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "真实HTTP rewind可以证明分支/文件回退及外部修改保护；模型rewind工具的用户批准/拒绝等待流程未接入，HTTP拒绝不能代替用户拒绝。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -106507,9 +109263,14 @@
               "package": "lingxi-service",
               "suite": "r06_t03_session_tree",
               "test": "busy_session_refuses_fork_retry_rewind_409"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
             }
           ],
-          "meaning": "真实HTTP回退restored/skipped/conflicted报告对应字节与分支，外部修改保留；忙会话409，不证明模型工具用户拒绝等待",
+          "meaning": "真实模型工具必须等用户确认，risk_accepted不可绕过；当前生产React界面拒绝零回退、确认后忙Run只排队，Run结束才按冻结锚点回退并持久回执；实际分支reset、文件v1恢复及外部conflicted不覆盖。A→B→A连接和同服务会话迟到响应不能解除新请求busy或跨会话批准。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -106668,12 +109429,47 @@
                   "quote": "assert_eq!(status, 200, \"释放后 fork 可行: {body}\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "真实HTTP rewind可以证明分支/文件回退及外部修改保护；模型rewind工具的用户批准/拒绝等待流程未接入，HTTP拒绝不能代替用户拒绝。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 2,
@@ -106687,9 +109483,14 @@
               "package": "lingxi-service",
               "suite": "r06_t03_session_tree",
               "test": "busy_session_refuses_fork_retry_rewind_409"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
             }
           ],
-          "meaning": "真实HTTP回退restored/skipped/conflicted报告对应字节与分支，外部修改保留；忙会话409，不证明模型工具用户拒绝等待",
+          "meaning": "真实模型工具必须等用户确认，risk_accepted不可绕过；当前生产React界面拒绝零回退、确认后忙Run只排队，Run结束才按冻结锚点回退并持久回执；实际分支reset、文件v1恢复及外部conflicted不覆盖。A→B→A连接和同服务会话迟到响应不能解除新请求busy或跨会话批准。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -106848,12 +109649,47 @@
                   "quote": "assert_eq!(status, 200, \"释放后 fork 可行: {body}\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "真实HTTP rewind可以证明分支/文件回退及外部修改保护；模型rewind工具的用户批准/拒绝等待流程未接入，HTTP拒绝不能代替用户拒绝。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 3,
@@ -106867,9 +109703,14 @@
               "package": "lingxi-service",
               "suite": "r06_t03_session_tree",
               "test": "busy_session_refuses_fork_retry_rewind_409"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
             }
           ],
-          "meaning": "真实HTTP回退restored/skipped/conflicted报告对应字节与分支，外部修改保留；忙会话409，不证明模型工具用户拒绝等待",
+          "meaning": "真实模型工具必须等用户确认，risk_accepted不可绕过；当前生产React界面拒绝零回退、确认后忙Run只排队，Run结束才按冻结锚点回退并持久回执；实际分支reset、文件v1恢复及外部conflicted不覆盖。A→B→A连接和同服务会话迟到响应不能解除新请求busy或跨会话批准。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t03_session_tree.rs",
@@ -107028,18 +109869,51 @@
                   "quote": "assert_eq!(status, 200, \"释放后 fork 可行: {body}\")"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "真实HTTP rewind可以证明分支/文件回退及外部修改保护；模型rewind工具的用户批准/拒绝等待流程未接入，HTTP拒绝不能代替用户拒绝。"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "真实HTTP rewind可以证明分支/文件回退及外部修改保护；模型rewind工具的用户批准/拒绝等待流程未接入，HTTP拒绝不能代替用户拒绝。"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     },
     {
       "id": "R00-T02-LA-E167298FD87C",
@@ -118971,12 +121845,231 @@
         "输入无效、权限不足或下游失败时应返回明确错误，不呈现成功结果"
       ],
       "then": "读取会话 sidecar 中冻结的系统提示词和工具名",
-      "status": "GAP",
-      "groups": [],
-      "gaps": [
-        "已有同一Run冻结上下文观察，但未从原会话sidecar读取冻结系统提示词与工具名的专属接口；不能拿另一个观察面替代。"
+      "status": "READY",
+      "groups": [
+        {
+          "index": 0,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "prompt_sidecar_reads_actual_sent_input_survives_restart_and_read_error_is_not_empty"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "prompt_sidecar_reads_actual_sent_input_survives_restart_and_read_error_is_not_empty",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 562,
+              "testEndLine": 625,
+              "assertions": [
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(status, 200, \"{body}\")"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(frozen[\"runId\"], run)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(frozen[\"sessionId\"], \"snapshot-a\")"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert!(frozen[\"promptSnapshot\"].is_null())"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert_eq!(frozen[\"toolNames\"], serde_json::json!([]))"
+                },
+                {
+                  "line": 584,
+                  "quote": "assert_eq!(\n        serde_json::from_str::<Value>(&empty).unwrap()[\"available\"],\n        false\n    )"
+                },
+                {
+                  "line": 604,
+                  "quote": "assert_eq!(status, 500)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(status, 403)"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), original)"
+                },
+                {
+                  "line": 622,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 623,
+                  "quote": "assert_eq!(serde_json::from_str::<Value>(&body).unwrap(), frozen)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实模型发送准备边界的系统提示词和工具名写入专属sidecar，和实际请求逐字核对；实际专属读接口只读该冻结文件，重启保留；跨主体/会话/损坏明确拒绝，不用另一个观察接口替代。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "prompt_sidecar_reads_actual_sent_input_survives_restart_and_read_error_is_not_empty"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_session_completion",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "prompt_sidecar_reads_actual_sent_input_survives_restart_and_read_error_is_not_empty",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 562,
+              "testEndLine": 625,
+              "assertions": [
+                {
+                  "line": 575,
+                  "quote": "assert_eq!(status, 200, \"{body}\")"
+                },
+                {
+                  "line": 577,
+                  "quote": "assert_eq!(frozen[\"runId\"], run)"
+                },
+                {
+                  "line": 578,
+                  "quote": "assert_eq!(frozen[\"sessionId\"], \"snapshot-a\")"
+                },
+                {
+                  "line": 579,
+                  "quote": "assert!(frozen[\"promptSnapshot\"].is_null())"
+                },
+                {
+                  "line": 580,
+                  "quote": "assert_eq!(frozen[\"toolNames\"], serde_json::json!([]))"
+                },
+                {
+                  "line": 584,
+                  "quote": "assert_eq!(\n        serde_json::from_str::<Value>(&empty).unwrap()[\"available\"],\n        false\n    )"
+                },
+                {
+                  "line": 604,
+                  "quote": "assert_eq!(status, 500)"
+                },
+                {
+                  "line": 615,
+                  "quote": "assert_eq!(status, 403)"
+                },
+                {
+                  "line": 616,
+                  "quote": "assert_eq!(std::fs::read(&path).unwrap(), original)"
+                },
+                {
+                  "line": 622,
+                  "quote": "assert_eq!(status, 200)"
+                },
+                {
+                  "line": 623,
+                  "quote": "assert_eq!(serde_json::from_str::<Value>(&body).unwrap(), frozen)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+              "test": "production_cli_checkpoint_tools_human_review_deferred_rewind_and_frozen_prompt",
+              "sourceSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd",
+              "testStartLine": 628,
+              "testEndLine": 668,
+              "assertions": [
+                {
+                  "line": 652,
+                  "quote": "assert!(\n        output.status.success(),\n        \"real CLI proof failed; evidence: {}\",\n        evidence.display()\n    )"
+                },
+                {
+                  "line": 659,
+                  "quote": "assert_eq!(value[\"status\"], \"PASS\")"
+                },
+                {
+                  "line": 660,
+                  "quote": "assert_eq!(\n        value[\"results\"].as_array().unwrap().len(),\n        if cfg!(target_os = \"macos\") { 10 } else { 9 }\n    )"
+                },
+                {
+                  "line": 664,
+                  "quote": "assert_eq!(value[\"deferred\"][\"status\"], \"completed\")"
+                },
+                {
+                  "line": 665,
+                  "quote": "assert_eq!(value[\"deferred\"][\"restoreFiles\"], true)"
+                },
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(value[\"chatCount\"], value[\"persistedModelCalls\"])"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert_eq!(value[\"embeddingCount\"], 0)"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实模型发送准备边界的系统提示词和工具名写入专属sidecar，和实际请求逐字核对；实际专属读接口只读该冻结文件，重启保留；跨主体/会话/损坏明确拒绝，不用另一个观察接口替代。 当前macOS实际运行；外部供应商、其他平台及全阶段验收未宣称通过。"
+        }
       ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/sessions.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-proof-review.json"
     }
   ]
 }

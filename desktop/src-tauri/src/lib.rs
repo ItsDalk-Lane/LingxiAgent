@@ -1,5 +1,6 @@
 pub mod files;
 pub mod resource_bridge;
+pub mod skills;
 
 use files::{FileInfo, FileVersion, SaveResult, TextSnapshot};
 use resource_bridge::ResourceConnection;
@@ -34,6 +35,7 @@ struct Subscription {
 #[derive(Default)]
 struct DesktopState {
     viewers: Mutex<HashMap<String, ViewerPayload>>,
+    skill_viewers: Mutex<HashMap<String, skills::SkillViewerPayload>>,
     subscriptions: Mutex<HashMap<String, Subscription>>,
     legacy_watches: Mutex<HashSet<(String, String)>>,
     next_viewer: AtomicU64,
@@ -423,11 +425,108 @@ fn viewer_close(window: WebviewWindow) -> Result<(), String> {
     window.close().map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn open_skill_viewer(
+    window: WebviewWindow,
+    state: State<'_, Arc<DesktopState>>,
+    data: skills::SkillViewerPayload,
+) -> Result<String, String> {
+    main_only(&window)?;
+    let base = skills::root(&data.base_dir).ok_or("技能目录无效")?;
+    let payload = skills::SkillViewerPayload {
+        base_dir: base.to_string_lossy().into_owned(),
+        ..data
+    };
+    let label = format!(
+        "skill-viewer-{}",
+        state.next_viewer.fetch_add(1, Ordering::Relaxed)
+    );
+    state
+        .skill_viewers
+        .lock()
+        .map_err(|_| "窗口状态不可用")?
+        .insert(label.clone(), payload.clone());
+    match tauri::WebviewWindowBuilder::new(
+        window.app_handle(),
+        &label,
+        tauri::WebviewUrl::App("index.html?skillViewer=1".into()),
+    )
+    .title(format!("{} · 技能", payload.name))
+    .inner_size(1000.0, 720.0)
+    .build()
+    {
+        Ok(_) => Ok(label),
+        Err(error) => {
+            state.skill_viewers.lock().unwrap().remove(&label);
+            Err(error.to_string())
+        }
+    }
+}
+#[tauri::command]
+fn skill_viewer_load(
+    window: WebviewWindow,
+    state: State<'_, Arc<DesktopState>>,
+) -> Option<skills::SkillViewerPayload> {
+    state
+        .skill_viewers
+        .lock()
+        .ok()?
+        .get(window.label())
+        .cloned()
+}
+#[tauri::command]
+fn list_skill_files(
+    window: WebviewWindow,
+    state: State<'_, Arc<DesktopState>>,
+    base_dir: String,
+) -> Result<Vec<skills::TreeItem>, String> {
+    if window.label() != "main"
+        && !state.skill_viewers.lock().ok().is_some_and(|viewers| {
+            viewers
+                .get(window.label())
+                .is_some_and(|payload| payload.base_dir == base_dir)
+        })
+    {
+        return Ok(vec![]);
+    }
+    skills::list(&base_dir)
+}
+#[tauri::command]
+fn read_skill_file(
+    window: WebviewWindow,
+    state: State<'_, Arc<DesktopState>>,
+    path: String,
+) -> Option<String> {
+    if window.label() == "main" {
+        return skills::read(&path, None);
+    }
+    let payload = state
+        .skill_viewers
+        .lock()
+        .ok()?
+        .get(window.label())
+        .cloned()?;
+    let root = skills::root(&payload.base_dir)?;
+    skills::read(&path, Some(&root))
+}
+#[tauri::command]
+fn skill_viewer_close(window: WebviewWindow) -> Result<(), String> {
+    if !window.label().starts_with("skill-viewer-") {
+        return Err("只允许关闭自己的技能窗口".into());
+    }
+    window.close().map_err(|error| error.to_string())
+}
+
 pub fn run() {
     let builder = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .manage(Arc::new(DesktopState::default()))
         .invoke_handler(tauri::generate_handler![
+            open_skill_viewer,
+            skill_viewer_load,
+            list_skill_files,
+            read_skill_file,
+            skill_viewer_close,
             select_files,
             read_file,
             read_file_snapshot,
@@ -453,6 +552,7 @@ pub fn run() {
             if matches!(event, tauri::WindowEvent::Destroyed) {
                 let state = window.state::<Arc<DesktopState>>();
                 state.viewers.lock().unwrap().remove(window.label());
+                state.skill_viewers.lock().unwrap().remove(window.label());
                 state
                     .legacy_watches
                     .lock()

@@ -6,6 +6,9 @@ import {
 } from '../services/server-connection';
 
 const DEFAULT_TIMEOUT = 30_000;
+function skillRoute(connection: { serverNodeKind?: string }, path: string): string {
+  return connection.serverNodeKind === 'lingxi-service' && (/^\/api\/skills(?:[/?]|$)/.test(path) || /^\/api\/agents\/[^/]+\/(?:skills|skill-bundles)\/[^/?]+(?:[?]|$)/.test(path)) ? `/lingxi/v1${path.slice('/api'.length)}` : path;
+}
 
 /**
  * 构建带认证的 LingxiAgent Server URL
@@ -15,7 +18,7 @@ export function lingxiUrl(path: string): string {
     useStore.getState(),
     `lingxiUrl ${path}: server connection not ready`,
   );
-  return buildConnectionUrl(connection, path, { includeTokenQuery: true });
+  return buildConnectionUrl(connection, skillRoute(connection, path), { includeTokenQuery: true });
 }
 
 /**
@@ -47,7 +50,7 @@ export async function lingxiFetch(
   }
 
   try {
-    const res = await fetch(buildConnectionUrl(connection, path), {
+    const res = await fetch(buildConnectionUrl(connection, skillRoute(connection, path)), {
       ...fetchOpts,
       headers,
       signal: controller.signal,

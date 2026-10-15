@@ -1,0 +1,64 @@
+{
+  "scope": "Root actual combined production tests and static review; author reports retained separately; not final stage acceptance",
+  "officialBefore": {
+    "completed": 42,
+    "remaining": 36
+  },
+  "candidateNewOriginalLeaves": 11,
+  "original279AssertionsThenUnchanged": true,
+  "actualCombinedTests": {
+    "passed": 11,
+    "log": "/private/tmp/r06-session-skills-main-r2.log"
+  },
+  "rootUiRegression": {
+    "passed": 13,
+    "log": "/private/tmp/r06-session-main-ui-r2.log",
+    "fixtureChange": "Old connection mock adapted only; original business assertions retained"
+  },
+  "rootFoundFailures": [
+    {
+      "kind": "CLI fixture temporary root alias",
+      "log": "/private/tmp/r06-session-main-final-r1.log",
+      "fix": "resolve declared synthetic root; production create normalizes explicitly authorized folders; internal links remain refused; assert exactly2 real file versions"
+    },
+    {
+      "kind": "native skill reader replacement symlink",
+      "log": "/private/tmp/r06-skills-reader-boundary-red.log",
+      "observed": "actual outside text returned before fix",
+      "fix": "check opened file identity and path before and after bounded read; refuse NUL binary; unit runs inside real native parent",
+      "fixedLog": "/private/tmp/r06-skills-reader-native-fixed-r4.log"
+    }
+  ],
+  "nativeReceipt": {
+    "checks": [
+      "actual_tauri_main_entry",
+      "invalid_relative_and_non_directory_empty",
+      "oversize_null",
+      "actual_separate_skill_window",
+      "default_document_content",
+      "actual_file_tree_selected_text",
+      "installed_true_no_copy",
+      "foreign_path_refused",
+      "write_command_refused",
+      "source_bytes_unchanged",
+      "read_never_installs"
+    ],
+    "main": "main",
+    "screenshot": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-skills-native-proof-2ef955ccb4dc93d3/skill-viewer.png",
+    "source": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-skills-native-proof-2ef955ccb4dc93d3/sample-skill/SKILL.md",
+    "viewer": "skill-viewer-0"
+  },
+  "rootViewedScreenshot": {
+    "path": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-skills-native-proof-2ef955ccb4dc93d3/skill-viewer.png",
+    "sha256": "2d038c921146106e5d77521a789bc260b7a1b1379cce9b8d8adeba01a338d818"
+  },
+  "nativeReaderUnitStdout": "\nrunning 1 test\ntest skills::tests::native_skill_reader_rejects_replacement_link_and_binary_content ... ok\n\nsuccesses:\n\nsuccesses:\n    skills::tests::native_skill_reader_rejects_replacement_link_and_binary_content\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+  "limits": {
+    "actualHost": "macOS",
+    "externalPaidProvider": "NOT_RUN",
+    "windowsLinux": "NOT_RUN",
+    "fullStage": "NOT_RUN",
+    "F14": "OPEN",
+    "R07Ready": false
+  }
+}

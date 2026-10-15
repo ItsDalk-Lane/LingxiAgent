@@ -1,3 +1,5 @@
+export type SkillPayload = { name: string; baseDir: string; filePath?: string | null; installed: boolean };
+export type SkillTree = { name: string; path: string; isDir: boolean; children: SkillTree[] };
 export type FileVersion = { mtimeMs: number; size: number; sha256: string };
 export type Snapshot = { content: string; version: FileVersion };
 export type SaveResult = { ok: boolean; conflict: boolean; version: FileVersion | null };
@@ -8,6 +10,11 @@ export type FileChangedListener = (callback: (path: string) => void) => Promise<
 
 export function createResourceBridge(invoke: Invoke, listenForFileChanges: FileChangedListener) {
   return {
+    openSkillViewer: (data: SkillPayload) => invoke<string>('open_skill_viewer', { data }),
+    skillViewerLoad: () => invoke<SkillPayload | null>('skill_viewer_load'),
+    listSkillFiles: (baseDir: string) => invoke<SkillTree[]>('list_skill_files', { baseDir }),
+    readSkillFile: (path: string) => invoke<string | null>('read_skill_file', { path }),
+    skillViewerClose: () => invoke<void>('skill_viewer_close'),
     selectFiles: (multiple = true) => invoke<string[]>('select_files', { multiple }),
     readFile: (path: string) => invoke<string | null>('read_file', { path }),
     readFileSnapshot: (path: string) => invoke<Snapshot | null>('read_file_snapshot', { path }),

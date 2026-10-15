@@ -1,0 +1,23 @@
+{
+  "patchSHA256": "98e58502325c85cd698dd679da514b6177ddf1202582719ed0d594fc52bf4244",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseSHA256": "2e81e5dbcc59bd4f81b8ebfc714a53d6c867272ce30d519ac71f8bfd0eec6345",
+      "candidateSHA256": "ab80a3e7c2620db05886ac501799c61702be574904e50dd9a6bf4ead034fd2ff"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_session_completion.rs",
+      "baseSHA256": "554f5a47c9b2412d91846d35a964f887baa63d80474c6792c87068bf0af1ae64",
+      "candidateSHA256": "4d50c34829fad14383b7494249118ad9f460e066089b483ae062159ac99354fd"
+    }
+  ],
+  "test": "explicitly_authorized_root_alias_captures_real_files_but_inner_symlink_degrades",
+  "result": "PASS 1/1",
+  "log": "/private/tmp/r06-session-completion-delivery/session-root-alias-test.log",
+  "rootOwnedFixture": {
+    "path": "tests/rust-native/session-checkpoint-live.py",
+    "SHA256": "2d38a96d1141919930912445f2c2358cb3fed2e43af1f284afeb8c5659878de7",
+    "reason": "Root整合时规范化合成根并增加实际存档2条与非降级强断言，作为后续前置，作者不重复交"
+  }
+}

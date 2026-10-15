@@ -754,13 +754,14 @@ impl ProcessTools {
         } else {
             workdir
         };
+        let actual_cwd = crate::toolgateway::workspace().unwrap_or_else(|| self.cwd.clone());
         self.access
             .authorize(
                 ctx.principal.storage_kind(),
                 &ctx.principal.storage_subject(),
                 &ctx.session_id.to_string(),
                 path,
-                &self.cwd,
+                &actual_cwd,
                 ResourceOp::Read,
             )
             .map_err(|refusal| failed(ErrorCode::Forbidden, format!("{refusal}")))
@@ -1422,6 +1423,7 @@ impl ProcessTools {
     pub fn resource_extractor(access: Arc<ResourceAccess>, cwd: PathBuf) -> ResourceExtractor {
         Arc::new(
             move |input: &ResourceExtractionInput, args: &EffectiveArguments| {
+                let actual_cwd = crate::toolgateway::workspace().unwrap_or_else(|| cwd.clone());
                 let workdir = args
                     .as_value()
                     .get("workdir")
@@ -1429,14 +1431,14 @@ impl ProcessTools {
                     .map(|s| s.trim())
                     .filter(|s| !s.is_empty())
                     .map(PathBuf::from)
-                    .unwrap_or_else(|| cwd.clone());
+                    .unwrap_or_else(|| actual_cwd.clone());
                 let scope = access
                     .authorize(
                         input.principal_kind,
                         &input.principal_subject,
                         &input.session_id,
                         &workdir,
-                        &cwd,
+                        &actual_cwd,
                         ResourceOp::Read,
                     )
                     .map_err(|refusal| format!("{refusal}"))?;

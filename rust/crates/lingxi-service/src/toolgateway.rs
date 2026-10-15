@@ -90,6 +90,7 @@ use crate::resourceaccess::ResourceScope;
 /// 监督器在真实工具子任务内注入生命周期；不从 arguments 读取。
 #[derive(Clone)]
 pub(crate) struct TrustedToolLifetime {
+    pub workspace: Option<std::path::PathBuf>,
     pub cancel: crate::cancel::CancelScope,
     pub deadline_unix_ms: u64,
     pub budget_ms: u64,
@@ -98,14 +99,45 @@ tokio::task_local! {
     pub(crate) static TOOL_LIFETIME: TrustedToolLifetime;
     static KNOWLEDGE_RUNTIME: crate::operations::EmbeddingCallRuntime;
     static REVIEW_SCOPE: Option<serde_json::Value>;
+    static PREPARE_WORKSPACE: Option<std::path::PathBuf>;
+}
+
+/// 准备和执行都使用实际运行冻结的工作区，模型不能通过参数替换默认目录。
+pub(crate) fn workspace() -> Option<std::path::PathBuf> {
+    PREPARE_WORKSPACE
+        .try_with(Clone::clone)
+        .ok()
+        .flatten()
+        .or_else(|| {
+            TOOL_LIFETIME
+                .try_with(|value| value.workspace.clone())
+                .ok()
+                .flatten()
+        })
+}
+pub(crate) fn with_workspace<T>(
+    workspace: Option<std::path::PathBuf>,
+    action: impl FnOnce() -> T,
+) -> T {
+    PREPARE_WORKSPACE.sync_scope(workspace, action)
 }
 
 /// 删除执行端只能消费网关已冻结并复核的范围，模型参数不能铸造该范围。
 pub(crate) fn review_scope() -> Option<serde_json::Value> {
     REVIEW_SCOPE.try_with(Clone::clone).ok().flatten()
 }
-pub type ReviewScopeExtractor =
-    Arc<dyn Fn(&str, &EffectiveArguments) -> Result<serde_json::Value, String> + Send + Sync>;
+/// 确认范围来自可信调用身份，模型不能指定待审会话或助手。
+pub struct ReviewInput<'a> {
+    pub agent_id: &'a str,
+    pub session_id: &'a str,
+    pub principal_kind: &'a str,
+    pub principal_subject: &'a str,
+}
+pub type ReviewScopeExtractor = Arc<
+    dyn Fn(&ReviewInput<'_>, &EffectiveArguments) -> Result<serde_json::Value, String>
+        + Send
+        + Sync,
+>;
 
 pub(crate) fn knowledge_runtime(
     ctx: &RunContext,
@@ -383,7 +415,8 @@ impl ToolPolicyPort for FailClosedPolicy {
             PermissionKind::Execute
             | PermissionKind::Review
             | PermissionKind::ArgumentAwareFile
-            | PermissionKind::ArgumentAwareSessionFolders => PolicyVerdict::NeedsApproval {
+            | PermissionKind::ArgumentAwareSessionFolders
+            | PermissionKind::ArgumentAwareCheckpoint => PolicyVerdict::NeedsApproval {
                 reason: format!(
                     "no tool policy service is configured; the gateway cannot safely \
                      adjudicate an execution-class invocation of {} ({}) and never \
@@ -937,6 +970,9 @@ impl ToolInvocationGateway {
         let (prepared_tool_call, entry, resources, policy, review_scope) =
             self.admission_checks(&request)?;
         let review_summary = review_scope.as_ref().map(|scope| {
+            if let Some(summary) = scope.get("summary").and_then(serde_json::Value::as_str) {
+                return summary.to_string();
+            }
             let items = scope["items"].as_array().expect("注册端给出条目列表");
             format!(
                 "删除 {} 条置顶原则（助手 {}）：\n{}",
@@ -1165,7 +1201,17 @@ impl ToolInvocationGateway {
             bindings
                 .get(&prepared_tool_call.target_id)
                 .and_then(|b| b.review.as_ref())
-                .map(|derive| derive(&request.agent_id, &prepared_tool_call.effective))
+                .map(|derive| {
+                    derive(
+                        &ReviewInput {
+                            agent_id: &request.agent_id,
+                            session_id: &request.session_id,
+                            principal_kind: request.principal.storage_kind(),
+                            principal_subject: &request.principal.storage_subject(),
+                        },
+                        &prepared_tool_call.effective,
+                    )
+                })
                 .transpose()
                 .map_err(|message| GatewayRefusal::ResourceScopeDenied {
                     code: "review_scope_refused".into(),
@@ -1532,11 +1578,18 @@ impl ToolInvocationGateway {
             }
         }
         if let Some(derive) = binding.review.as_ref() {
-            let current = derive(&record.agent_id, &record.effective).map_err(|message| {
-                GatewayRefusal::ResourceScopeDenied {
-                    code: "review_scope_refused".into(),
-                    message,
-                }
+            let current = derive(
+                &ReviewInput {
+                    agent_id: &record.agent_id,
+                    session_id: &record.session_id,
+                    principal_kind: record.principal_kind,
+                    principal_subject: &record.principal_subject,
+                },
+                &record.effective,
+            )
+            .map_err(|message| GatewayRefusal::ResourceScopeDenied {
+                code: "review_scope_refused".into(),
+                message,
             })?;
             if record.review_scope.as_ref() != Some(&current) {
                 return Err(GatewayRefusal::ResourceScopeChanged {
@@ -1580,6 +1633,7 @@ impl ToolInvocationGateway {
                         "host-tool:{}",
                         call_id.as_str()
                     )),
+                    workspace: None,
                     deadline_unix_ms: record.expires_at_unix_ms,
                     budget_ms: record
                         .expires_at_unix_ms

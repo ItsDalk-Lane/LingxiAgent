@@ -58,7 +58,7 @@ export function SkillsTab() {
     discovered: [],
   });
 
-  const loadSkills = useCallback(async () => {
+  const loadSkills = useCallback(async (propagateError = false) => {
     const agentId = skillsViewAgentIdRef.current;
     if (!agentId) {
       skillsListOwnerIdRef.current = null;
@@ -89,6 +89,7 @@ export function SkillsTab() {
       skillsListOwnerIdRef.current = snapshotAgentId;
     } catch (err) {
       console.error('[skills] load failed:', err);
+      if (propagateError) throw err;
     } finally {
       if (skillsViewAgentIdRef.current === agentId && ownerChanged) {
         setSkillsLoading(false);
@@ -96,7 +97,7 @@ export function SkillsTab() {
     }
   }, []);
 
-  const loadExternalPaths = useCallback(async () => {
+  const loadExternalPaths = useCallback(async (propagateError = false) => {
     try {
       const res = await lingxiFetch('/api/skills/external-paths');
       const data = await res.json();
@@ -106,6 +107,7 @@ export function SkillsTab() {
       });
     } catch (err) {
       console.error('[skills] load external paths failed:', err);
+      if (propagateError) throw err;
     }
   }, []);
 
@@ -489,8 +491,8 @@ export function SkillsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths: newPaths }),
       });
-      await loadExternalPaths();
-      await loadSkills();
+      await loadExternalPaths(true);
+      await loadSkills(true);
       showToast(t('settings.autoSaved'), 'success');
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : String(err), 'error');
@@ -505,8 +507,8 @@ export function SkillsTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paths: newPaths }),
       });
-      await loadExternalPaths();
-      await loadSkills();
+      await loadExternalPaths(true);
+      await loadSkills(true);
       showToast(t('settings.autoSaved'), 'success');
     } catch (err: unknown) {
       showToast(err instanceof Error ? err.message : String(err), 'error');

@@ -130,6 +130,7 @@ enum ToolKind {
     TenetPropose,
     ContextNotes,
     InstallSkill,
+    LearnLesson,
     RecordExperience,
     RecallExperience,
 }
@@ -884,6 +885,7 @@ impl ToolExecutorPort for MemoryTools {
             "tenet_propose" => ToolKind::TenetPropose,
             "context_notes" => ToolKind::ContextNotes,
             "install_skill" => ToolKind::InstallSkill,
+            "learn_lesson" => ToolKind::LearnLesson,
             "record_experience" => ToolKind::RecordExperience,
             "recall_experience" => ToolKind::RecallExperience,
             other => {
@@ -928,6 +930,19 @@ impl ToolExecutorPort for MemoryTools {
                 ToolKind::TenetPropose => self.run_tenet_propose(&args),
                 ToolKind::ContextNotes => self.run_context_notes(&ctx, &args),
                 ToolKind::InstallSkill => self.run_install_skill(&args).await,
+                ToolKind::LearnLesson => {
+                    match self.skills.learn_lesson(&self.agent_id, &args).await {
+                        Ok(value) => success_details(
+                            if value["ok"].as_bool() == Some(true) {
+                                "Lesson saved and enabled for this agent.".into()
+                            } else {
+                                "Safety review requires explicit user confirmation.".into()
+                            },
+                            value,
+                        ),
+                        Err(error) => failed(ErrorCode::InvalidMessage, error.to_string()),
+                    }
+                }
             };
             ToolExecutionResult::of_ctx(&ctx, outcome)
         })
@@ -1046,6 +1061,14 @@ pub fn register_memory_tools(
             "additionalProperties": false,
         }),
     );
+    let lesson_manifest = manifest(
+        "learn_lesson",
+        "Save a reusable lesson as a new shared skill enabled for this agent and index it in experience. A failed safety review requires explicit user acceptance and the returned one-shot token. Existing names are never overwritten.",
+        PermissionKind::Execute,
+        "learn_lesson.learn",
+        DeclaredPermission::Execute,
+        json!({"type":"object","properties":{"name":{"type":"string","minLength":1},"description":{"type":"string","minLength":1},"lesson":{"type":"string","minLength":1},"risk_accepted":{"type":"boolean"},"risk_confirmation_token":{"type":"string"}},"required":["name","description","lesson"],"additionalProperties":false}),
+    );
     let record_manifest = manifest(
         "record_experience",
         "Record a concise lesson in this agent's enabled experience library.",
@@ -1069,6 +1092,7 @@ pub fn register_memory_tools(
         ("tenet_propose", tenet_manifest),
         ("context_notes", notes_manifest),
         ("install_skill", install_manifest),
+        ("learn_lesson", lesson_manifest),
         ("record_experience", record_manifest),
         ("recall_experience", recall_manifest),
     ] {
@@ -1084,8 +1108,8 @@ pub fn register_memory_tools(
         });
         if name == "unpin_memory" {
             let scoped = Arc::clone(&tools);
-            gateway.bind_executor_with_review(receipt.target_id, executor, Arc::new(move |current_agent, args| {
-                if current_agent != scoped.agent_id {
+            gateway.bind_executor_with_review(receipt.target_id, executor, Arc::new(move |input, args| {
+                if input.agent_id != scoped.agent_id {
                     return Err("pinned-memory review belongs to another agent; no items were read".into());
                 }
                 let agent = scoped.bound_agent().map_err(|_| "agent is unavailable".to_string())?;

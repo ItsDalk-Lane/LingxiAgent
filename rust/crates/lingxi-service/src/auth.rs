@@ -729,6 +729,17 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 return RoutePolicy::Scope("chat");
             }
         }
+        if let Some(id) = rest.strip_suffix("/approvals") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") { return RoutePolicy::Scope("chat"); }
+        }
+        if let Some((id, approval)) = rest.split_once("/approvals/") {
+            if !id.is_empty() && !id.contains('/') && !approval.is_empty() && !approval.contains('/') && m == "POST" { return RoutePolicy::Scope("chat"); }
+        }
+        if let Some(id) = rest.strip_suffix("/prompt-snapshot").or_else(||rest.strip_suffix("/deferred-rewind")) {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
         // R06-T03: 具名检查点（创建/列举/删除）与记忆开关（读/写）。
         if let Some(id) = rest.strip_suffix("/checkpoints/delete") {
             if !id.is_empty() && !id.contains('/') && m == "POST" {
@@ -995,7 +1006,7 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         }
         // R06 用户偏好对：读 settings.read / 写 settings.write。
         if let Some(rest) = p.strip_prefix("/lingxi/v1/preferences/") {
-            if matches!(rest, "autolearn" | "quick-chat") {
+            if matches!(rest, "autolearn" | "quick-chat" | "goal") {
                 return if m == "GET" || m == "HEAD" {
                     RoutePolicy::Scope("settings.read")
                 } else {
@@ -1197,6 +1208,8 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         }
         let skill_write_exact = [
             "/lingxi/v1/skills/install",
+            "/lingxi/v1/skills/translate",
+            "/lingxi/v1/desk/install-skill",
             "/lingxi/v1/skills/reload",
             "/lingxi/v1/skills/external-paths",
             "/lingxi/v1/skills/bundles",

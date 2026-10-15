@@ -85,10 +85,14 @@ pub mod sandbox;
 mod security_audit;
 pub mod serve;
 pub mod session_admin;
+pub mod session_locator;
+pub mod session_prompt;
 pub mod session_supervisor;
 pub mod session_tree;
+pub mod session_ui;
 pub mod sessionfiles;
 pub mod sessions;
+pub mod sessiontools;
 pub mod settings_ui;
 pub mod shutdown;
 pub mod skills;
@@ -541,6 +545,8 @@ pub struct ServiceState {
     rollback_file_changes: Arc<std::sync::atomic::AtomicBool>,
     rollback_preferences_lock: Arc<tokio::sync::Mutex<()>>,
     input_drafts: Arc<input_drafts::InputDraftsService>,
+    session_tools: Arc<sessiontools::SessionTools>,
+    approvals: Option<Arc<approval_service::ApprovalService>>,
     /// Subagent runtime (R03-T06): child-run dispatch/reply/close through
     /// the same run supervisor.
     subagents: Arc<subagents::SubagentRuntime>,
@@ -1339,7 +1345,18 @@ impl ServiceState {
                 move || clock.now_unix_ms()
             },
         ));
+        let session_tree_handle = Arc::new(
+            session_tree::SessionService::new(Arc::clone(&storage), Arc::clone(&events))
+                .with_file_safety(
+                    Arc::clone(&file_safety),
+                    workspace_access
+                        .as_ref()
+                        .map(|(access, _)| Arc::clone(access)),
+                )
+                .with_session_files(Arc::clone(&session_files)),
+        );
         let mut tool_plane: Option<ToolPlaneHandles> = None;
+        let mut approval_service_handle = None;
         if let Some(model_gateway) = model_gateway_for_wiring {
             // R05-T02 (C01): the production chain dispatches through the
             // credential service — the SINGLE material exit. A configured
@@ -1357,6 +1374,7 @@ impl ServiceState {
             let approvals = Arc::new(approval_service::ApprovalService::new(Arc::clone(
                 &deps.clock,
             )));
+            approval_service_handle = Some(Arc::clone(&approvals));
             let budget = lingxi_kernel::toolcatalog::SchemaBudget::default();
             let gateway = Arc::new(toolgateway::ToolInvocationGateway::new(
                 Arc::clone(&registry),
@@ -1633,8 +1651,10 @@ impl ServiceState {
                             detail: format!("cannot construct the skill guard executor: {err}"),
                         })
                     })?;
+                let guard_executor = Arc::new(guard_executor);
+                skills_service.set_auxiliary(Arc::clone(&guard_executor));
                 skills_service.set_guard(Arc::new(skills::GatewaySkillGuard::new(
-                    Arc::new(guard_executor),
+                    guard_executor,
                     memory_service.resolve_primary_agent(),
                 )));
             }
@@ -1675,6 +1695,25 @@ impl ServiceState {
             Arc::clone(&storage),
         ))));
         let runs = Arc::new(runs.with_knowledge(Arc::clone(&knowledge_service)));
+        let session_tools = Arc::new(
+            sessiontools::SessionTools::new(sessiontools::Dependencies {
+                storage: Arc::clone(&storage),
+                tree: Arc::clone(&session_tree_handle),
+                tasks: Arc::clone(runs.task_supervisor()),
+                memory: Arc::clone(&memory_service),
+                clock: Arc::clone(&deps.clock),
+                intake: Arc::clone(&intake),
+            })
+            .map_err(|detail| ServiceStartupError::Storage(StorageError::Internal { detail }))?,
+        );
+        if let Some(gateway) = deps.tool_gateway.as_ref() {
+            sessiontools::register(
+                gateway.registry(),
+                gateway,
+                Arc::clone(&session_tools),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
+        }
         subagent_runtime.bind_supervisor(Arc::downgrade(&runs));
         // R05-T06: the worker model-callback port. An injected port always
         // wins (the test-seam rule of `turn_provider`); otherwise, when the
@@ -2088,16 +2127,9 @@ impl ServiceState {
             storage: Arc::clone(&storage),
             sessions: session_arc,
             slash: Arc::new(slash::SlashService::new(&data_home)),
-            session_tree: Arc::new(
-                session_tree::SessionService::new(Arc::clone(&storage), Arc::clone(&events))
-                    .with_file_safety(
-                        file_safety,
-                        workspace_access
-                            .as_ref()
-                            .map(|(access, _)| Arc::clone(access)),
-                    )
-                    .with_session_files(session_files.clone()),
-            ),
+            session_tree: session_tree_handle,
+            session_tools,
+            approvals: approval_service_handle,
             session_admin: Arc::new(
                 session_admin::SessionAdminService::new(Arc::clone(&storage))
                     .with_context_compiler(deps.context_compiler.clone())
@@ -4301,6 +4333,13 @@ async fn create_session_route(
         .user_id
         .clone()
         .unwrap_or_else(|| crate::auth::LOCAL_OWNER_USER_ID.to_string());
+    let mut normalized_folders = Vec::with_capacity(req.authorized_folders.len());
+    for folder in &req.authorized_folders {
+        match validate_authorized_folder(Some(folder)) {
+            Ok(folder) => normalized_folders.push(folder),
+            Err(response) => return response,
+        }
+    }
     match state
         .session_admin
         .create_session(
@@ -4309,7 +4348,7 @@ async fn create_session_route(
             &owner,
             req.title.trim(),
             req.permission_mode.as_deref(),
-            &req.authorized_folders,
+            &normalized_folders,
             req.memory_enabled,
             state.clock.now_unix_ms(),
         )
@@ -7003,6 +7042,22 @@ pub fn build_router(state: ServiceState) -> Router {
             post(rewind_preview_route),
         )
         .route(
+            "/lingxi/v1/sessions/{session_id}/approvals",
+            get(sessiontools::approvals_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/approvals/{approval_id}",
+            post(sessiontools::answer_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/deferred-rewind",
+            get(sessiontools::deferred_route),
+        )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/prompt-snapshot",
+            get(session_prompt::get_route),
+        )
+        .route(
             "/lingxi/v1/sessions/{session_id}/checkpoints",
             get(list_checkpoints_route).post(create_checkpoint_route),
         )
@@ -7180,6 +7235,10 @@ pub fn build_router(state: ServiceState) -> Router {
         // LocalOnly（auth.rs 分类：现役 /api/checkpoints/* 落 STUDIO_OWNER
         // 兜底，Rust 侧按既有口径映射最严格档）。
         .route(
+            "/lingxi/v1/checkpoints/user-edit",
+            post(checkpoint_store::user_edit_route),
+        )
+        .route(
             "/lingxi/v1/checkpoints/{checkpoint_id}/restore",
             post(checkpoint_store::restore_route),
         )
@@ -7287,6 +7346,10 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         // R06 app 级事件广播检索面（LocalOnly：助手名册不向远端设备披露）
         .route("/lingxi/v1/app-events", get(appevents::events_route))
+        .route(
+            "/lingxi/v1/preferences/goal",
+            get(userprefs::goal_get_route).put(userprefs::goal_put_route),
+        )
         // R06 用户偏好对（现役 /preferences/autolearn、/preferences/quick-chat）
         .route(
             "/lingxi/v1/preferences/autolearn",
@@ -7476,6 +7539,14 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         // ── R06-T06 skills 面 ──
         .route("/lingxi/v1/skills", get(skills::skills_list_route))
+        .route(
+            "/lingxi/v1/skills/translate",
+            post(skills::completion::translate_route),
+        )
+        .route(
+            "/lingxi/v1/desk/install-skill",
+            post(skills::completion::workspace_install_route),
+        )
         .route(
             "/lingxi/v1/skills/install",
             post(skills::skills_install_route),

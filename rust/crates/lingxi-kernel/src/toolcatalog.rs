@@ -433,6 +433,8 @@ pub enum PermissionKind {
     ArgumentAwareFile,
     /// Argument-aware (the `session_folders` tool).
     ArgumentAwareSessionFolders,
+    /// 会话检查点的 list 为只读，create/drop 为写入。
+    ArgumentAwareCheckpoint,
 }
 
 impl PermissionKind {
@@ -443,6 +445,7 @@ impl PermissionKind {
             PermissionKind::Review => "review",
             PermissionKind::ArgumentAwareFile => "file",
             PermissionKind::ArgumentAwareSessionFolders => "session-folders",
+            PermissionKind::ArgumentAwareCheckpoint => "checkpoint",
         }
     }
 }
@@ -2029,6 +2032,20 @@ impl ToolRegistry {
         let effective = EffectiveArguments::from_value(normalized, budget)?;
         let args_digest = effective.digest();
         let args_summary = summarize_arguments(&effective);
+        let mut permission = tool.manifest.permission.clone();
+        if permission.kind == PermissionKind::ArgumentAwareCheckpoint {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("create");
+            permission.kind = if action == "list" {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Execute
+            };
+            permission.capability_base = format!("checkpoint.{action}");
+        }
         let prepared = PreparedToolCall {
             target_id,
             origin: tool.manifest.origin.clone(),
@@ -2040,7 +2057,7 @@ impl ToolRegistry {
             effective,
             args_digest,
             args_summary,
-            permission: tool.manifest.permission.clone(),
+            permission,
             recovery: tool.manifest.recovery,
             timeout_ms: tool.manifest.timeout_ms,
         };

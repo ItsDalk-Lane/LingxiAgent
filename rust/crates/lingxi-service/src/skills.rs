@@ -40,6 +40,8 @@ use crate::ServiceState;
 // lib.rs 不动（R06 F 块叶子约束）：组合包导出作为 skills 的子模块挂载。
 // #[path] 基准是**所在文件的目录**（src/），不是隐式子模块目录
 // （src/skills/），故 "skill_export.rs" 即 src/skill_export.rs。
+#[path = "skills_completion.rs"]
+pub mod completion;
 #[path = "skill_export.rs"]
 pub mod skill_export;
 
@@ -174,6 +176,7 @@ pub struct SkillService {
     /// risk-confirmation store (one per service, mirroring the tool closure)
     risk_confirmations: Mutex<RiskConfirmationStore>,
     guard: Mutex<Option<Arc<dyn SkillGuardPort>>>,
+    auxiliary: Mutex<Option<Arc<lingxi_adapters::models::auxiliary::AuxiliaryExecutor>>>,
     clock: Mutex<Option<Arc<dyn inject::ServiceClock>>>,
     workspace_root: Mutex<Option<PathBuf>>,
 }
@@ -190,6 +193,7 @@ impl SkillService {
             mutation_lock: Mutex::new(()),
             risk_confirmations: Mutex::new(RiskConfirmationStore::default()),
             guard: Mutex::new(None),
+            auxiliary: Mutex::new(None),
             clock: Mutex::new(None),
             workspace_root: Mutex::new(None),
         }
@@ -910,7 +914,13 @@ impl SkillService {
         let _guard = self.mutation_lock.lock().unwrap();
         let _publication = am::ContextMaterialMutation::for_home(&self.home);
         let config = agent_id.map(|id| self.read_agent_config(id)).transpose()?;
-        let installed = sl::install_skill_package_from_path(source_path, &self.skills_dir(), None)?;
+        let prepared = completion::PreparedPackage::from_path(source_path)?;
+        let installed = sl::install_skill_package_from_directory(
+            prepared.path(),
+            &self.skills_dir(),
+            "",
+            None,
+        )?;
         if let (Some(id), Some((text, mut enabled, workspace_disabled, _))) = (agent_id, config) {
             if !enabled.contains(&installed.name) {
                 enabled.push(installed.name.clone());
@@ -1299,8 +1309,10 @@ impl SkillService {
         let prefs = am::read_json_file(&self.home.join("user").join("preferences.json"));
         let caps = prefs
             .as_ref()
-            .and_then(|p| p.get("capabilities"))
-            .and_then(|c| c.get("learn_skills"))
+            .and_then(|p| {
+                p.get("learn_skills")
+                    .or_else(|| p.get("capabilities").and_then(|c| c.get("learn_skills")))
+            })
             .cloned()
             .unwrap_or_else(|| json!({}));
         let enabled = caps.get("enabled").and_then(Value::as_bool) == Some(true);
@@ -1314,7 +1326,7 @@ impl SkillService {
     pub fn reload(&self) -> usize {
         let _guard = self.mutation_lock.lock().unwrap();
         let _publication = am::ContextMaterialMutation::for_home(&self.home);
-        self.scan_catalog().len()
+        self.scan_catalog().len() + self.scan_workspace(self.workspace_root().as_deref()).len()
     }
 
     /// Same-name registration used by install_skill tool parity checks.
@@ -1752,7 +1764,11 @@ pub async fn skills_install_route(
                 .into_response();
         }
     };
-    let Some(src) = payload.get("path").and_then(Value::as_str) else {
+    let prepared = match completion::PreparedPackage::from_payload(&payload, "path") {
+        Ok(prepared) => prepared,
+        Err(error) => return error_response(&error),
+    };
+    let Some(src) = prepared.path().to_str() else {
         return (
             StatusCode::BAD_REQUEST,
             Json(json!({ "error": "path must be an absolute skill package path" })),
@@ -1764,11 +1780,16 @@ pub async fn skills_install_route(
         .skills()
         .install_manual_for_agent(&source_path, agent_id.as_deref())
     {
-        Ok(installed) => Json(json!({
-            "ok": true,
-            "skill": { "name": installed.name, "type": "user" },
-        }))
-        .into_response(),
+        Ok(installed) => {
+            state
+                .app_events()
+                .publish("skills-changed", json!({"agentId":agent_id}));
+            Json(json!({
+                "ok": true,
+                "skill": { "name": installed.name, "type": "user" },
+            }))
+            .into_response()
+        }
         Err(err) => error_response(&err),
     }
 }

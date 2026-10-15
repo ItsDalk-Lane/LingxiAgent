@@ -1,0 +1,24 @@
+{
+  "actualRegisteredBindings": 20,
+  "originalLeaves": 11,
+  "rootCombinedRust": 11,
+  "rootUiRegression": 13,
+  "registrationContract": 20,
+  "threeTypescriptConfigurations": "PASS",
+  "strictClippyKernelAdaptersService": "PASS",
+  "strictClippyNative": "PASS",
+  "nativeReaderActualRedAndFix": "PASS_WITH_RED_RETAINED",
+  "windowsLinuxRuntime": "NOT_RUN",
+  "fullStage": "NOT_RUN",
+  "F14": "OPEN",
+  "R07Ready": false,
+  "limits": "Local synthetic provider only; original tests preserve their existing mocks; Root native screenshot reviewed; no claim of external paid provider or full-stage seal",
+  "logs": [
+    "/private/tmp/r06-session-skills-main-r2.log",
+    "/private/tmp/r06-session-main-ui-r2.log",
+    "/private/tmp/r06-session-skills-main-types-r1.log",
+    "/private/tmp/r06-session-skills-main-strict-r2.log",
+    "/private/tmp/r06-session-skills-native-strict-r1.log",
+    "/private/tmp/r06-session-skills-registration-contract.log"
+  ]
+}

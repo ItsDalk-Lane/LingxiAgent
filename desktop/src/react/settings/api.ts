@@ -20,6 +20,7 @@ function routeForConnection(connection: { serverNodeKind?: string }, path: strin
   if (/^\/api\/(?:agents|memories|character-cards)(?:[/?]|$)/.test(path) || /^\/api\/(?:settings\/snapshot|models|preferences\/models|providers\/summary|user-profile|agent-deletions)(?:[/?]|$)/.test(path)) {
     return `/lingxi/v1${path.slice('/api'.length)}`;
   }
+  if (/^\/api\/(?:skills|preferences\/(?:goal|autolearn))(?:[/?]|$)/.test(path)) return `/lingxi/v1${path.slice('/api'.length)}`;
   if (path === '/api/config') return '/lingxi/v1/settings/config';
   if (path === '/api/health') return '/lingxi/v1/settings/avatar-health';
   if (path.startsWith('/api/avatar/')) return `/lingxi/v1${path.slice('/api'.length)}`;

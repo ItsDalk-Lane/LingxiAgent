@@ -1,0 +1,134 @@
+{
+  "baseCommit": "c3989a6c9a8983d24b93e95e8faf832ca525affb",
+  "candidateKind": "uncommitted private source contents",
+  "files": [
+    {
+      "path": "desktop/src-tauri/build.rs",
+      "baseSHA256": "06a2e8152ffb9cfb5340c43d851f764c5f1b60bcc70a6cd3036b7ddcf568f50d",
+      "candidateSHA256": "72f7aeb58db5dba4b90f33442f08e22fa07333d38e9f8d3db81952766a3dc50e",
+      "new": false
+    },
+    {
+      "path": "desktop/src-tauri/capabilities/main.json",
+      "baseSHA256": "ab64797fda8421d0f475fa1b3d76274a346579ee9680049037c021ce73b06ba1",
+      "candidateSHA256": "2fc50238c2449244e2001d830abf6c267d8a3238eee9090dabe7b71d998e9bec",
+      "new": false
+    },
+    {
+      "path": "desktop/src-tauri/capabilities/skill-viewer.json",
+      "baseSHA256": null,
+      "candidateSHA256": "93467c70893af3862296f48a51c102027f28265fa397b312768a10814d75ecc4",
+      "new": true
+    },
+    {
+      "path": "desktop/src-tauri/src/lib.rs",
+      "baseSHA256": "abda014325d941b2a438ecbc65e5581cd4fae67ef2fdb59453c3641bd618e9fb",
+      "candidateSHA256": "1d4135e0c666ffaf68f5594af6625a21fc3b1135d1ed479a2bda0ffbc9946c02",
+      "new": false
+    },
+    {
+      "path": "desktop/src-tauri/src/skills.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "0b4b6f99ff7a70f04997023436c395116701abc8fa070a4210d1b55860c30199",
+      "new": true
+    },
+    {
+      "path": "desktop/src-tauri/tests/skill_viewer_host.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "24f8c101b79c8aee9569b31fe0d241959597a067253f28bf49ae559cfe176950",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/hooks/use-hana-fetch.ts",
+      "baseSHA256": "1db52fd5f20c9ccbb604b8f091c89224b9aeb023bf0c8d563e66a801eaaa6626",
+      "candidateSHA256": "4e23ec44e6f6e17f031ad0881412e2efd16b4d8a74172ab68751ef0969d4208a",
+      "new": false
+    },
+    {
+      "path": "desktop/src/react/settings/__tests__/R06SkillsRustLive.test.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "97f0abd2b6eeb6af855ed497edc4659db0410af5b5ed648d7104a089c237a14c",
+      "new": true
+    },
+    {
+      "path": "desktop/src/react/settings/api.ts",
+      "baseSHA256": "3bf72fd336b6329db93be69ef36e0a699c221fb46e708145a0d04afdbb7861db",
+      "candidateSHA256": "27bb9e6cb82fc5d72a1224d974dad7d562c94ad3bbf4bbffb515d1d809cb6452",
+      "new": false
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/SkillsTab.tsx",
+      "baseSHA256": "68743b4bae993f41f3baf391a70d9d5d74eae2b6ad98327e497f830bfc815102",
+      "candidateSHA256": "3855368033bc7b127fcf5623f9b1e7b72ece73f4646355ebfb32aaf05161cfb4",
+      "new": false
+    },
+    {
+      "path": "desktop/src/tauri-resources/App.tsx",
+      "baseSHA256": "3aa2b1ea1e83ab92df52c144ddfe35d582f65ff32438db2ceec3bfe98bb46093",
+      "candidateSHA256": "e29cd27ab3c5ff18ac65f26560c19ceb2b95c9fd0aea2ac5eefab4603298de36",
+      "new": false
+    },
+    {
+      "path": "desktop/src/tauri-resources/SkillViewer.tsx",
+      "baseSHA256": null,
+      "candidateSHA256": "754413e17dbc70753df5caae4a4c9fde36e525ae39a747493e598c085626a920",
+      "new": true
+    },
+    {
+      "path": "desktop/src/tauri-resources/bridge.ts",
+      "baseSHA256": "a9db4c4b9e0118cfe9c0a5e2e46a35226efeab7341af1232575a5d108c636626",
+      "candidateSHA256": "6737733bfb80f2fed6afe86ff8b9d004a1f7dc95eaee160bbc5e5822559ad9ca",
+      "new": false
+    },
+    {
+      "path": "desktop/src/tauri-resources/main.tsx",
+      "baseSHA256": "445148fc1612493eafc444b050dffb25cc9e0890bbafe40701770cbde23d5034",
+      "candidateSHA256": "c903e321014e5a84a4bf1e16100e98a552b67dc1d3f04552744610b5a93f16f4",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "baseSHA256": "f504614e9f7d1f4b8f5373a46bb37eab2119466520310bca22b7a1c2ec06dd0b",
+      "candidateSHA256": "7f57d7081a427be930833bf1e8487725662fa4749159391846e809736807dadd",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "baseSHA256": "691185f7c5c421f9f22ccd913d1680d1468c996305ee576b52a7a4f1ab932f9d",
+      "candidateSHA256": "f9454ede18926bee3e2163ecf4824495676ed3e73e63cbf339e9cc2a6d210ecf",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/memorytools.rs",
+      "baseSHA256": "25111d65f6e570270dea468217612a51af52f12fa863e11beb7676520f5f0b0c",
+      "candidateSHA256": "e96c4882a7df898abee3f7d451748cef9b6c450050a98e2841b1b909df784cf5",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "baseSHA256": "cbbd734afeced7899219fb69b97d568cfd7af5a4f18f22321713be6ebbfb2a7e",
+      "candidateSHA256": "d31961baa0b50a25237f75dc2c48aa807d966afe8f261067541e961d02e8e2ef",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills_completion.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "923f3a3304b775cf6f995f1080196dc6cafa41a404c561033fce63919bcb2ca7",
+      "new": true
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/userprefs.rs",
+      "baseSHA256": "18b3038b9e9d0a5241b982f979181d553d95e77cfd09aa5e296e052674ed590e",
+      "candidateSHA256": "ba4535d0ba5a9950bfe41243e805b38a11f521df846deb24c00ddadc9c9476be",
+      "new": false
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+      "baseSHA256": null,
+      "candidateSHA256": "6643939b307f4b4c04873b4ed0fe291019e56e8f26c77a35c75fe09726cdb980",
+      "new": true
+    }
+  ],
+  "candidateAggregateSHA256": "5d4daf9c8ea9bb353951d52fb70c30cb7d7e6bf4aa8d1fa6774d39ebb2dc33cf",
+  "patchSHA256": "6c6491514ea15e922bcade5307e62014402cc42b35c11df6823bc5f0b9473483"
+}

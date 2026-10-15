@@ -1,0 +1,14 @@
+{
+  "identifier": "skill-viewer",
+  "description": "技能只读窗口只读取自己的目录，不能写入或安装。",
+  "windows": [
+    "skill-viewer-*"
+  ],
+  "permissions": [
+    "core:default",
+    "allow-skill-viewer-load",
+    "allow-list-skill-files",
+    "allow-read-skill-file",
+    "allow-skill-viewer-close"
+  ]
+}

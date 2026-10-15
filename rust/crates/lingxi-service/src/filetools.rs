@@ -1739,13 +1739,14 @@ impl FileTools {
                 let Some(path) = args.as_value().get("path").and_then(|v| v.as_str()) else {
                     return Err("file tools require a string `path` argument".to_string());
                 };
+                let actual_cwd = crate::toolgateway::workspace().unwrap_or_else(|| cwd.clone());
                 let scope = access
                     .authorize(
                         input.principal_kind,
                         &input.principal_subject,
                         &input.session_id,
                         Path::new(path),
-                        &cwd,
+                        &actual_cwd,
                         op,
                     )
                     .map_err(|refusal| format!("{refusal}"))?;
@@ -1760,13 +1761,14 @@ impl FileTools {
         raw_path: &str,
         op: ResourceOp,
     ) -> Result<ResourceScope, ToolOutcome> {
+        let actual_cwd = crate::toolgateway::workspace().unwrap_or_else(|| self.cwd.clone());
         self.access
             .authorize(
                 ctx.principal.storage_kind(),
                 &ctx.principal.storage_subject(),
                 &ctx.session_id.to_string(),
                 Path::new(raw_path),
-                &self.cwd,
+                &actual_cwd,
                 op,
             )
             .map_err(|refusal| failed(ErrorCode::Forbidden, format!("{refusal}")))

@@ -1752,3 +1752,43 @@ pub async fn with_current_file_authorization<T: Send + 'static>(
         })
         .await
 }
+
+/// 确认阶段同步读取同一只读事务：不另开写通道，也不让模型指定归属。
+pub fn checkpoint_review(
+    db: &RunDatabase,
+    session_id: &str,
+    agent_id: &str,
+    principal_kind: &str,
+    principal_subject: &str,
+    name: &str,
+) -> Result<serde_json::Value, StorageError> {
+    let invalid = |detail: &str| StorageError::InvalidRequest {
+        detail: detail.into(),
+    };
+    let mut conn = rusqlite::Connection::open_with_flags(
+        db.db_path(),
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .map_err(map_err)?;
+    let tx = conn.transaction().map_err(map_err)?;
+    let row:Option<(String,String,String,Option<String>)>=tx.query_row("SELECT owner_user_id,agent_id,lifecycle,permission_mode FROM sessions WHERE session_id=?1",[session_id],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).optional().map_err(map_err)?;
+    let (owner, agent, life, mode) = row.ok_or_else(|| invalid("no active session"))?;
+    if (principal_kind != "local_user" && owner != principal_subject)
+        || agent != agent_id
+        || life != "active"
+        || mode.as_deref() == Some("read_only")
+    {
+        return Err(invalid(
+            "rewind scope is not available for this principal/session",
+        ));
+    }
+    let target:Option<(String,String,i64,i64)>=tx.query_row("SELECT checkpoint_id,target_message_id,message_count,created_at_unix_ms FROM checkpoints WHERE session_id=?1 AND name=?2",rusqlite::params![session_id,name],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).optional().map_err(map_err)?;
+    let target = target.ok_or_else(|| invalid("checkpoint not found"))?;
+    let mut stmt=tx.prepare("SELECT file_path,sha256,size_bytes FROM checkpoint_file_versions WHERE checkpoint_id=?1 ORDER BY file_path").map_err(map_err)?;
+    let files: Vec<(String, String, i64)> = stmt
+        .query_map([&target.0], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))
+        .map_err(map_err)?
+        .collect::<Result<_, _>>()
+        .map_err(map_err)?;
+    Ok(serde_json::json!({"target":target,"fileVersions":files}))
+}

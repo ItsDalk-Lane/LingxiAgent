@@ -2370,6 +2370,37 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "session_skills_current": {
+      "status": "ELEVEN_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-6207F7E8C697",
+        "R00-T02-LA-BB0A168006D7",
+        "R00-T02-LA-E1625F70C7CC",
+        "R00-T02-LA-FF4F06011B48",
+        "R00-T02-LA-0DDB5AA05072",
+        "R00-T02-LA-771296A194E0",
+        "R00-T02-LA-7803B231FC36",
+        "R00-T02-LA-8A69F0CFFFA1",
+        "R00-T02-LA-99F8CD228733",
+        "R00-T02-LA-9CA8A47BE208",
+        "R00-T02-LA-BA490D930CA9"
+      ],
+      "completedInitialGaps": 53,
+      "remainingInitialGaps": 25,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 254,
+      "gapLeaves": 25,
+      "actualRegisteredBindings": 20,
+      "sourceCandidateSha256": "7041f1954c4e7f983106b03ebb48014e370a6a5d6a00039d7607e23448506b48",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-binding-window-summary.json",
+      "validation": "artifacts/rust-tauri/R06/route-a-20261015/session-skills-validation.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

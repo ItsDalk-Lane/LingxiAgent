@@ -724,6 +724,7 @@ impl ContextMaterialSource for FileContextMaterialSource {
 
 /// 一次编译的冻结产物：发送文本与观测视图同源。
 pub struct CompiledContext {
+    workspace: Option<String>,
     artifact: ContextArtifact,
     observation: Value,
 }
@@ -759,12 +760,17 @@ impl CompiledContext {
         }
         observation["renderSha256"] = Value::String(sha256_hex(artifact.render()));
         Self {
+            workspace: None,
             artifact,
             observation,
         }
     }
 
     /// 发往模型的 system 文本（drive_run 的唯一来源）。
+    pub fn workspace(&self) -> Option<&str> {
+        self.workspace.as_deref()
+    }
+
     pub fn render(&self) -> &str {
         self.artifact.render()
     }
@@ -877,6 +883,51 @@ impl ContextCompilerService {
         session_started_unix_ms: u64,
         session_memory_enabled: bool,
     ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
+        self.compile_snapshot_with_workspace(
+            agent_id,
+            for_subagent,
+            session_started_unix_ms,
+            session_memory_enabled,
+            None,
+        )
+    }
+
+    /// 实际会话运行使用持久工作区；读取失败响亮退出，不偷偷使用另一目录。
+    pub fn compile_session_snapshot(
+        &self,
+        storage: Option<&lingxi_adapters::storage::RunDatabase>,
+        session_id: &str,
+        agent_id: &str,
+        for_subagent: bool,
+        session_started_unix_ms: u64,
+        session_memory_enabled: bool,
+    ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
+        let workspace = storage
+            .map(|storage| crate::session_ui::workspace(storage, session_id))
+            .transpose()
+            .map_err(|error| {
+                ContextCompileFailure::Material(ContextMaterialError::SkillMaterial {
+                    detail: format!("session workspace read failed: {error:?}"),
+                })
+            })?
+            .flatten();
+        self.compile_snapshot_with_workspace(
+            agent_id,
+            for_subagent,
+            session_started_unix_ms,
+            session_memory_enabled,
+            workspace,
+        )
+    }
+
+    fn compile_snapshot_with_workspace(
+        &self,
+        agent_id: &str,
+        for_subagent: bool,
+        session_started_unix_ms: u64,
+        session_memory_enabled: bool,
+        workspace: Option<String>,
+    ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
         let query = MaterialQuery {
             agent_id: agent_id.to_string(),
             for_subagent,
@@ -902,11 +953,15 @@ impl ContextCompilerService {
                 std::thread::yield_now();
                 continue;
             }
+            if let Some(workspace) = workspace.as_ref() {
+                input.cwd = workspace.clone();
+            }
             input.memory_enabled &= session_memory_enabled;
             let material_sha = sha256_hex(&format!("{input:?}"));
             let artifact =
                 ContextCompiler::compile(&input).map_err(ContextCompileFailure::Compile)?;
             let mut compiled = CompiledContext::new(artifact);
+            compiled.workspace = (!input.cwd.is_empty()).then(|| input.cwd.clone());
             compiled.observation["materialSha256"] = Value::String(material_sha);
             compiled.observation["materialRevision"] = Value::from(before);
             compiled.observation["sessionMemoryEnabled"] = Value::Bool(session_memory_enabled);

@@ -14,6 +14,7 @@ export function ResourceDesktop({ bridge, viewer = false }: { bridge: ResourceBr
   const [binaryData, setBinaryData] = useState('');
   const [cover, setCover] = useState('');
   const [openPath, setOpenPath] = useState('');
+  const [skillPath, setSkillPath] = useState('');
   const dirty = useRef(false);
   const baseline = useRef<Snapshot | null>(null);
   const generation = useRef(0);
@@ -83,6 +84,7 @@ export function ResourceDesktop({ bridge, viewer = false }: { bridge: ResourceBr
     </header>
     {!viewer && <aside aria-label="文件列表">{files.length === 0 ? <p>先选择文件，再点文件名查看。</p> : files.map(file => <button key={file} data-path={file} className={path === file ? 'selected' : ''} onClick={() => setPath(file)}>{file.split(/[\\/]/).pop()}<small>{file}</small></button>)}</aside>}
     <section>
+      {!viewer && <details><summary>技能查看器</summary><input aria-label="技能目录" value={skillPath} onChange={event => setSkillPath(event.target.value)} /><button data-testid="open-skill-viewer" onClick={() => action(async () => { await bridge.openSkillViewer({ name: '技能', baseDir: skillPath, installed: true }); })}>独立查看技能</button></details>}
       <h2 data-testid="file-path">{path || '尚未打开文件'}</h2>
       {!viewer && <div className="inline"><input aria-label="本地文件路径" value={openPath} onChange={e => setOpenPath(e.target.value)} placeholder="也可输入绝对文件路径" /><button data-testid="open-path" onClick={() => action(async () => {
         if (!await bridge.fileInfo(openPath)) throw new Error('文件路径无效或无法读取');

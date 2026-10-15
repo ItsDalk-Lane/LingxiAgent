@@ -1,12 +1,31 @@
 {
   "identifier": "resource-main",
   "description": "本地文件操作主窗口，不授予前端 shell 或任意 HTTP 权限。",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
-    "core:default", "allow-select-files", "allow-read-file", "allow-read-file-snapshot",
-    "allow-read-file-base64", "allow-file-info", "allow-write-file", "allow-write-file-binary",
-    "allow-copy-file", "allow-write-file-if-unchanged", "allow-open-file", "allow-trash-item",
-    "allow-run-edit-command", "allow-watch-file", "allow-unwatch-file", "allow-resource-subscribe",
-    "allow-resource-events", "allow-resource-unsubscribe", "allow-spawn-viewer"
+    "core:default",
+    "allow-select-files",
+    "allow-read-file",
+    "allow-read-file-snapshot",
+    "allow-read-file-base64",
+    "allow-file-info",
+    "allow-write-file",
+    "allow-write-file-binary",
+    "allow-copy-file",
+    "allow-write-file-if-unchanged",
+    "allow-open-file",
+    "allow-trash-item",
+    "allow-run-edit-command",
+    "allow-watch-file",
+    "allow-unwatch-file",
+    "allow-resource-subscribe",
+    "allow-resource-events",
+    "allow-resource-unsubscribe",
+    "allow-spawn-viewer",
+    "allow-open-skill-viewer",
+    "allow-list-skill-files",
+    "allow-read-skill-file"
   ]
 }

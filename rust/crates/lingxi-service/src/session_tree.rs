@@ -496,6 +496,7 @@ impl SessionService {
         input: serde_json::Value,
         _file_effects: bool,
         now: u64,
+        expected_review: Option<&serde_json::Value>,
     ) -> Result<(lingxi_kernel::session_admission::SessionPermit, Begin), SessionTreeError> {
         // 先按归属筛选，不向未授权主体泄漏忙状态；取得权后仍重读。
         let before = store::get_session_row(&self.storage, sid)
@@ -517,6 +518,26 @@ impl SessionService {
             .ok_or(SessionTreeError::NotFound)?;
         if !crate::sessions::SessionStore::can_access(principal, &row.owner_user_id) {
             return Err(SessionTreeError::Forbidden);
+        }
+        if let Some(expected) = expected_review {
+            let kernel = crate::sessions::kernel_principal_of(principal);
+            let current = crate::sessiontools::review(
+                &self.storage,
+                &crate::toolgateway::ReviewInput {
+                    agent_id: &row.agent_id,
+                    session_id: sid,
+                    principal_kind: kernel.storage_kind(),
+                    principal_subject: &kernel.storage_subject(),
+                },
+                &input,
+            )
+            .map_err(|detail| SessionTreeError::InvalidTarget { detail })?;
+            if &current != expected {
+                return Err(SessionTreeError::InvalidTarget {
+                    detail: "confirmed checkpoint changed; a fresh user confirmation is required"
+                        .into(),
+                });
+            }
         }
         let request_id = request_id
             .map(crate::dedup::validate_request_id)
@@ -629,6 +650,24 @@ impl SessionService {
         sid: &str,
         req: RewindRequest<'_>,
     ) -> Result<RewindReceipt, SessionTreeError> {
+        self.rewind_owned(sid, req, None).await
+    }
+
+    pub(crate) async fn rewind_reviewed(
+        &self,
+        sid: &str,
+        req: RewindRequest<'_>,
+        review: &serde_json::Value,
+    ) -> Result<RewindReceipt, SessionTreeError> {
+        self.rewind_owned(sid, req, Some(review.clone())).await
+    }
+
+    async fn rewind_owned(
+        &self,
+        sid: &str,
+        req: RewindRequest<'_>,
+        review: Option<serde_json::Value>,
+    ) -> Result<RewindReceipt, SessionTreeError> {
         let (svc, p, sid, checkpoint, rid) = (
             self.clone(),
             req.principal.clone(),
@@ -652,6 +691,7 @@ impl SessionService {
                     file_rollback_enabled,
                     now_unix_ms,
                 },
+                review,
             )
             .await
         })
@@ -674,7 +714,7 @@ impl SessionService {
         request_id: Option<&str>,
         now_unix_ms: u64,
     ) -> Result<ForkView, SessionTreeError> {
-        let (_permit,begin)=self.begin_command(principal,source_session_id,&[source_session_id,new_session_id],"fork",request_id,serde_json::json!({"newSessionId":new_session_id,"boundaryMessageId":boundary_message_id}),false,now_unix_ms).await?;
+        let (_permit,begin)=self.begin_command(principal,source_session_id,&[source_session_id,new_session_id],"fork",request_id,serde_json::json!({"newSessionId":new_session_id,"boundaryMessageId":boundary_message_id}),false,now_unix_ms,None).await?;
         let operation = match begin {
             Begin::Replay(value) => {
                 return serde_json::from_value(value).map_err(|e| {
@@ -744,7 +784,7 @@ impl SessionService {
         if file_rollback == FileRollbackMode::Workspace && !file_rollback_enabled {
             return Err(SessionTreeError::FileRollbackDisabled);
         }
-        let (_permit,begin)=self.begin_command(principal,session_id,&[session_id],"retry",request_id,serde_json::json!({"targetMessageId":target_message_id,"fileRollback":format!("{file_rollback:?}")}),file_rollback==FileRollbackMode::Workspace,now_unix_ms).await?;
+        let (_permit,begin)=self.begin_command(principal,session_id,&[session_id],"retry",request_id,serde_json::json!({"targetMessageId":target_message_id,"fileRollback":format!("{file_rollback:?}")}),file_rollback==FileRollbackMode::Workspace,now_unix_ms,None).await?;
         let operation = match begin {
             Begin::Replay(value) => {
                 return serde_json::from_value(value).map_err(|e| {
@@ -863,6 +903,7 @@ impl SessionService {
         &self,
         session_id: &str,
         req: RewindRequest<'_>,
+        expected_review: Option<serde_json::Value>,
     ) -> Result<RewindReceipt, SessionTreeError> {
         let RewindRequest {
             checkpoint_name,
@@ -885,6 +926,7 @@ impl SessionService {
                 serde_json::json!({"checkpoint":checkpoint_name,"restoreFiles":restore_files}),
                 restore_files,
                 now_unix_ms,
+                expected_review.as_ref(),
             )
             .await?;
         let operation = match begin {
@@ -1091,25 +1133,37 @@ impl SessionService {
         &self,
         principal: &Principal,
         session_id: &str,
-        name: &str,
-        target_message_id: &str,
+        point: (&str, &str),
         file_paths: &[String],
         now_unix_ms: u64,
+        inherited: Option<Arc<lingxi_kernel::session_admission::SessionPermit>>,
     ) -> Result<store::CheckpointRow, SessionTreeError> {
+        let (name, target_message_id) = point;
         let row = store::get_session_row(&self.storage, session_id)
             .await?
             .ok_or(SessionTreeError::NotFound)?;
         if !crate::sessions::SessionStore::can_access(principal, &row.owner_user_id) {
             return Err(SessionTreeError::Forbidden);
         }
-        let _permit = self
-            .storage
-            .session_admission()
-            .try_acquire(
-                &[session_id],
-                crate::session_supervisor::SessionConcurrencyLimits::DEFAULT_REGISTRY_CAP,
-            )
-            .map_err(|_| SessionTreeError::Busy)?;
+        // 工具只能继承可信当前 Run 的同一数据根会话门；HTTP 仍独立取得准入。
+        let _permit = match inherited {
+            Some(permit)
+                if permit.belongs_to(self.storage.session_admission())
+                    && permit.covers(session_id) =>
+            {
+                permit
+            }
+            Some(_) => return Err(SessionTreeError::Forbidden),
+            None => Arc::new(
+                self.storage
+                    .session_admission()
+                    .try_acquire(
+                        &[session_id],
+                        crate::session_supervisor::SessionConcurrencyLimits::DEFAULT_REGISTRY_CAP,
+                    )
+                    .map_err(|_| SessionTreeError::Busy)?,
+            ),
+        };
         let current = store::get_session_row(&self.storage, session_id)
             .await?
             .ok_or(SessionTreeError::NotFound)?;
@@ -1238,7 +1292,7 @@ impl SessionService {
             files.to_vec(),
         );
         tokio::spawn(async move {
-            svc.create_checkpoint_inner(&principal, &sid, &name, &target, &files, now)
+            svc.create_checkpoint_inner(&principal, &sid, (&name, &target), &files, now, None)
                 .await
         })
         .await
@@ -1248,6 +1302,71 @@ impl SessionService {
             })
         })?
     }
+    /// 当前工具由监督器核对 Run 身份并继承既有会话许可，不开放 HTTP 免锁入口。
+    pub(crate) async fn tool_create_checkpoint(
+        &self,
+        principal: &Principal,
+        ctx: &lingxi_kernel::RunContext,
+        tasks: &crate::task_supervisor::TaskSupervisor,
+        name: &str,
+        files: &[String],
+        now: u64,
+    ) -> Result<store::CheckpointRow, SessionTreeError> {
+        let row = store::get_session_row(&self.storage, ctx.session_id.as_str())
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        let permit = tasks
+            .parent_run_permit(
+                ctx.run_id.as_str(),
+                ctx.session_id.as_str(),
+                &row.agent_id,
+                &ctx.principal,
+                self.storage.session_admission(),
+            )?
+            .ok_or(SessionTreeError::Forbidden)?;
+        let nodes = branch_nodes(&self.storage, ctx.session_id.as_str()).await?;
+        let target = nodes
+            .iter()
+            .rev()
+            .find(|(_, _, role)| role == "user")
+            .map(|(id, _, _)| id.clone())
+            .ok_or_else(|| SessionTreeError::InvalidTarget {
+                detail: "no user turn on the active branch".into(),
+            })?;
+        self.create_checkpoint_inner(
+            principal,
+            ctx.session_id.as_str(),
+            (name, &target),
+            files,
+            now,
+            Some(permit),
+        )
+        .await
+    }
+
+    pub(crate) async fn tool_drop_checkpoint(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+        tasks: &crate::task_supervisor::TaskSupervisor,
+        name: &str,
+    ) -> Result<bool, SessionTreeError> {
+        let row = store::get_session_row(&self.storage, ctx.session_id.as_str())
+            .await?
+            .ok_or(SessionTreeError::NotFound)?;
+        let _permit = tasks
+            .parent_run_permit(
+                ctx.run_id.as_str(),
+                ctx.session_id.as_str(),
+                &row.agent_id,
+                &ctx.principal,
+                self.storage.session_admission(),
+            )?
+            .ok_or(SessionTreeError::Forbidden)?;
+        store::delete_checkpoint(&self.storage, ctx.session_id.as_str(), name)
+            .await
+            .map_err(SessionTreeError::from)
+    }
+
     pub async fn delete_checkpoint(&self, sid: &str, name: &str) -> Result<bool, SessionTreeError> {
         let (svc, sid, name) = (self.clone(), sid.to_string(), name.to_string());
         tokio::spawn(async move { svc.delete_checkpoint_inner(&sid, &name).await })

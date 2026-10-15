@@ -213,21 +213,52 @@ pub async fn put_route(
     let home = body.scope.as_deref() == Some("home");
     if (body.scope.is_some() && !home)
         || (home && (body.session_id.is_some() || body.session_path.is_some()))
-        || (!home
-            && body
-                .session_id
-                .as_ref()
-                .is_none_or(|id| id.trim().is_empty()))
-        || body.session_path.is_some()
     {
-        return EndpointError::invalid_message(
-            "draft requires home or a sessionId; sessionPath has no registered session locator",
-        )
-        .into_response();
+        return EndpointError::invalid_message("draft scope is invalid").into_response();
     }
+    // 路径仅是兼容定位输入，经过真实文件身份和数据库归属解析后才使用会话键。
+    let session_id = if home {
+        None
+    } else {
+        match crate::session_locator::resolve(
+            state.storage(),
+            body.session_id.as_deref(),
+            body.session_path.as_deref(),
+        )
+        .await
+        {
+            Ok(id) => Some(id),
+            Err(lingxi_kernel::ports::StorageError::InvalidRequest { .. }) => {
+                // 稳定 id 不存在保持原 404；非法/不一致的路径仍是 400。
+                if body.session_path.is_none() {
+                    if let Some(id) = body
+                        .session_id
+                        .as_deref()
+                        .map(str::trim)
+                        .filter(|id| !id.is_empty())
+                    {
+                        if let Err(response) =
+                            crate::gate_session_owned(&state, &principal, id).await
+                        {
+                            return response;
+                        }
+                    }
+                }
+                return EndpointError::invalid_message(
+                    "sessionPath/sessionId does not resolve to one session",
+                )
+                .into_response();
+            }
+            Err(lingxi_kernel::ports::StorageError::Conflict { detail })
+                if detail.starts_with("legacy_session_conflict:") =>
+            {
+                return EndpointError::invalid_message(detail).into_response()
+            }
+            Err(error) => return EndpointError::storage(&error).into_response(),
+        }
+    };
     let _guard = state.input_drafts.mutation.lock().await;
-    let session_id = body.session_id.as_deref().map(str::trim);
-    if let Some(id) = session_id {
+    if let Some(id) = session_id.as_deref() {
         if let Err(response) = crate::gate_session_owned(&state, &principal, id).await {
             return response;
         }
@@ -269,7 +300,7 @@ pub async fn put_route(
     let mut evicted = Vec::new();
     if home {
         bucket.home = entry;
-    } else if let Some(id) = session_id {
+    } else if let Some(id) = session_id.as_deref() {
         match entry {
             Some(entry) => {
                 bucket.sessions.insert(id.to_string(), entry);

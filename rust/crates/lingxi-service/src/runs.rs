@@ -1424,7 +1424,8 @@ impl RunSupervisor {
         let compiled_context = match self.context_compiler.as_ref() {
             Some(compiler) => {
                 let for_subagent = matches!(authorization.grant, RunGrant::Subagent { .. });
-                match compiler.compile_snapshot(
+                match compiler.compile_session_snapshot(
+                    self.context_session_store.as_deref(),
                     session_id,
                     agent_id,
                     for_subagent,
@@ -2101,6 +2102,16 @@ impl RunSupervisor {
             // F03-C04: re-check the tree before the dispatch itself — a
             // cancellation accepted while the driver waited for the
             // admission permit must not turn into a new provider call.
+            gate_cancel!();
+            if let Some(storage) = self.context_session_store.as_ref() {
+                if let Err(error) = crate::session_prompt::record(storage, session_id, run_id.as_str(), &turn_input).await {
+                    drop(model_permit.take());
+                    break RunFinish::Failed { cause: FailureCause::ProviderFailed {
+                        code: format!("session_prompt_snapshot:{error}"), retryable:false,
+                    }};
+                }
+            }
+            // 侧写期间接受取消时，绝不在取消后再发供应商请求。
             gate_cancel!();
             let call_scope = root.child(
                 format!("model_call:{}", call.as_str()),
@@ -3222,7 +3233,9 @@ impl RunSupervisor {
                                 // session mode) — the model never supplies
                                 // it.
                                 let permission = authorization.invocation_permission_context();
-                                match gateway.prepare_from_request_pinned(
+                                match crate::toolgateway::with_workspace(
+                                    compiled_context.as_ref().and_then(|value| value.workspace()).map(std::path::PathBuf::from),
+                                    || gateway.prepare_from_request_pinned(
                                     &ctx,
                                     surface,
                                     agent_id,
@@ -3230,7 +3243,7 @@ impl RunSupervisor {
                                     &call_id,
                                     request,
                                     request_pins[index],
-                                ) {
+                                )) {
                                     Ok(prepared) => Some(prepared),
                                     Err(refusal) => {
                                         tracing::warn!(
@@ -3933,6 +3946,7 @@ impl RunSupervisor {
                         let tool_ctx = ctx.clone();
                         let exec_call_id = call_id.clone();
                         let trusted_lifetime = crate::toolgateway::TrustedToolLifetime {
+                            workspace: compiled_context.as_ref().and_then(|value| value.workspace()).map(std::path::PathBuf::from),
                             cancel: tool_scope.clone(),
                             deadline_unix_ms: tool_deadline,
                             budget_ms: u64::try_from(

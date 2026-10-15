@@ -1,6 +1,11 @@
 fn main() {
     tauri_build::try_build(tauri_build::Attributes::new().app_manifest(
         tauri_build::AppManifest::new().commands(&[
+            "open_skill_viewer",
+            "skill_viewer_load",
+            "list_skill_files",
+            "read_skill_file",
+            "skill_viewer_close",
             "select_files",
             "read_file",
             "read_file_snapshot",
