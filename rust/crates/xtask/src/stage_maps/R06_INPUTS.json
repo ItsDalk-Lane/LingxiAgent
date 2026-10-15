@@ -7201,6 +7201,7 @@
         "r06_test_70dd69e48001cb1d0bad",
         "r06_test_71df6350c0b1af0e0660",
         "r06_test_72cd17b40f941daf8e8e",
+        "r06_test_72ee1108d3cd24e710f5",
         "r06_test_736966a249b108a882d8",
         "r06_test_747f0cfc89ff8acc1826",
         "r06_test_74cffd6e6418f1c2a5bc",
@@ -11548,9 +11549,35 @@
         "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_72ee1108d3cd24e710f5",
+        "r06_test_8e4827fb785d8282e02f",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-238267978DDA-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-238267978DDA-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-238267978DDA-assertion-00"
+        ],
+        [
+          "R00-T02-LA-238267978DDA-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-23AB8E0A2493",
@@ -13660,9 +13687,36 @@
         "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_72ee1108d3cd24e710f5",
+        "r06_test_8e4827fb785d8282e02f",
+        "r06_test_c1d66790f899675262f0",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-4173A08A51CC-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-4173A08A51CC-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-4173A08A51CC-assertion-00"
+        ],
+        [
+          "R00-T02-LA-4173A08A51CC-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-421EEA1AC8D5",
@@ -19479,9 +19533,35 @@
         "非法/缺失路径返回 false，不把永久删除混入"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_72ee1108d3cd24e710f5",
+        "r06_test_808ce6ca3819b4531be9",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-AF18F5CEA14F-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-AF18F5CEA14F-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-AF18F5CEA14F-assertion-00"
+        ],
+        [
+          "R00-T02-LA-AF18F5CEA14F-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-AF8E24A2F524",
@@ -47379,7 +47459,7 @@
           "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
         ],
         "then": "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -47388,9 +47468,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_resourceio",
                 "test": "watch_registry_refcount_diagnostics_and_polling_events"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_native_resource_completion",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
               }
             ],
-            "meaning": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
+            "meaning": "真实Tauri兼容watch_file只接受绝对路径并发送file-changed；当前renderer不调用旧监听启停且没有旧按钮，当前主/独立viewer真实订阅当前Rust ResourceIO resource.changed并重读。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -47488,12 +47573,63 @@
                     "quote": "    assert_eq!(err.status, 400);"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+                "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+                "testStartLine": 9,
+                "testEndLine": 139,
+                "assertions": [
+                  {
+                    "line": 10,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                  },
+                  {
+                    "line": 39,
+                    "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                  },
+                  {
+                    "line": 55,
+                    "quote": "assert!(target.is_absolute())"
+                  },
+                  {
+                    "line": 56,
+                    "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                  },
+                  {
+                    "line": 83,
+                    "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                  },
+                  {
+                    "line": 96,
+                    "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                  },
+                  {
+                    "line": 106,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                  },
+                  {
+                    "line": 116,
+                    "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                  },
+                  {
+                    "line": 123,
+                    "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           },
           {
             "index": 1,
@@ -47502,9 +47638,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_resourceio",
                 "test": "watch_registry_refcount_diagnostics_and_polling_events"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_native_resource_completion",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
               }
             ],
-            "meaning": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
+            "meaning": "真实Tauri兼容watch_file只接受绝对路径并发送file-changed；当前renderer不调用旧监听启停且没有旧按钮，当前主/独立viewer真实订阅当前Rust ResourceIO resource.changed并重读。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -47602,50 +47743,67 @@
                     "quote": "    assert_eq!(err.status, 400);"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+                "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+                "testStartLine": 9,
+                "testEndLine": 139,
+                "assertions": [
+                  {
+                    "line": 10,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                  },
+                  {
+                    "line": 39,
+                    "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                  },
+                  {
+                    "line": 55,
+                    "quote": "assert!(target.is_absolute())"
+                  },
+                  {
+                    "line": 56,
+                    "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                  },
+                  {
+                    "line": 83,
+                    "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                  },
+                  {
+                    "line": 96,
+                    "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                  },
+                  {
+                    "line": 106,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                  },
+                  {
+                    "line": 116,
+                    "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                  },
+                  {
+                    "line": 123,
+                    "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          {
-            "clause": "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-            "kind": "IMPLEMENTATION_GAP",
-            "reason": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
-            "sourceLocations": [
-              {
-                "endLine": 95,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-                "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-                "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-                "startLine": 85
-              },
-              {
-                "endLine": 78,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "独立桌面host建立阶段R09。",
-                "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-                "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-                "startLine": 75
-              },
-              {
-                "endLine": 63,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-                "path": "rust/Cargo.toml",
-                "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-                "startLine": 46
-              }
-            ]
-          },
-          "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-          "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-proof-review.json"
       },
       {
         "id": "R00-T02-LA-23AB8E0A2493",
@@ -65492,7 +65650,7 @@
           "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
         ],
         "then": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -65506,9 +65664,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_resourceio",
                 "test": "watch_registry_refcount_diagnostics_and_polling_events"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_native_resource_completion",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
               }
             ],
-            "meaning": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
+            "meaning": "当前原生WebView实际显示纯文本、Markdown、真实Word/首张Excel表格；sandbox iframe、二进制/大文件信息卡、损坏文件错误；真实独立只读窗口重读磁盘并拒绝读别的文件/写入，主窗未保存编辑保留。实际PNG保留供视觉复核。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
@@ -65715,12 +65878,63 @@
                     "quote": "    assert_eq!(err.status, 400);"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+                "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+                "testStartLine": 9,
+                "testEndLine": 139,
+                "assertions": [
+                  {
+                    "line": 10,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                  },
+                  {
+                    "line": 39,
+                    "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                  },
+                  {
+                    "line": 55,
+                    "quote": "assert!(target.is_absolute())"
+                  },
+                  {
+                    "line": 56,
+                    "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                  },
+                  {
+                    "line": 83,
+                    "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                  },
+                  {
+                    "line": 96,
+                    "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                  },
+                  {
+                    "line": 106,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                  },
+                  {
+                    "line": 116,
+                    "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                  },
+                  {
+                    "line": 123,
+                    "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           },
           {
             "index": 1,
@@ -65734,9 +65948,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_resourceio",
                 "test": "watch_registry_refcount_diagnostics_and_polling_events"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_native_resource_completion",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
               }
             ],
-            "meaning": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
+            "meaning": "当前原生WebView实际显示纯文本、Markdown、真实Word/首张Excel表格；sandbox iframe、二进制/大文件信息卡、损坏文件错误；真实独立只读窗口重读磁盘并拒绝读别的文件/写入，主窗未保存编辑保留。实际PNG保留供视觉复核。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
@@ -65943,50 +66162,67 @@
                     "quote": "    assert_eq!(err.status, 400);"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+                "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+                "testStartLine": 9,
+                "testEndLine": 139,
+                "assertions": [
+                  {
+                    "line": 10,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                  },
+                  {
+                    "line": 39,
+                    "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                  },
+                  {
+                    "line": 55,
+                    "quote": "assert!(target.is_absolute())"
+                  },
+                  {
+                    "line": 56,
+                    "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                  },
+                  {
+                    "line": 83,
+                    "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                  },
+                  {
+                    "line": 96,
+                    "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                  },
+                  {
+                    "line": 106,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                  },
+                  {
+                    "line": 116,
+                    "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                  },
+                  {
+                    "line": 123,
+                    "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          {
-            "clause": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-            "kind": "IMPLEMENTATION_GAP",
-            "reason": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
-            "sourceLocations": [
-              {
-                "endLine": 95,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-                "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-                "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-                "startLine": 85
-              },
-              {
-                "endLine": 78,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "独立桌面host建立阶段R09。",
-                "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-                "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-                "startLine": 75
-              },
-              {
-                "endLine": 63,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-                "path": "rust/Cargo.toml",
-                "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-                "startLine": 46
-              }
-            ]
-          },
-          "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-          "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-proof-review.json"
       },
       {
         "id": "R00-T02-LA-421EEA1AC8D5",
@@ -67813,7 +68049,7 @@
               {
                 "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
                 "test": "failure_results_never_register_copies_attachments_or_trash_success",
-                "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+                "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
                 "testStartLine": 169,
                 "testEndLine": 190,
                 "assertions": [
@@ -112274,7 +112510,7 @@
               {
                 "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
                 "test": "failure_results_never_register_copies_attachments_or_trash_success",
-                "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+                "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
                 "testStartLine": 169,
                 "testEndLine": 190,
                 "assertions": [
@@ -112304,7 +112540,7 @@
           "非法/缺失路径返回 false，不把永久删除混入"
         ],
         "then": "合法目标存在时 shell.trashItem 后书桌列表更新",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -112313,9 +112549,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_original_resource_proofs",
                 "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_native_resource_completion",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
               }
             ],
-            "meaning": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
+            "meaning": "当前Tauri生产trash_item调用真实系统废纸篓；macOS NsFileManager避免Finder自动化权限等待，无永久删除回退。界面只在真实成功后移除列表；相对/缺失路径false。本轮唯一合成文件通过真实Finder定位系统Trash并复制载荷，原字节逐字核对；不以源消失代替OS证明。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
@@ -112369,12 +112610,63 @@
                     "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+                "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+                "testStartLine": 9,
+                "testEndLine": 139,
+                "assertions": [
+                  {
+                    "line": 10,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                  },
+                  {
+                    "line": 39,
+                    "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                  },
+                  {
+                    "line": 55,
+                    "quote": "assert!(target.is_absolute())"
+                  },
+                  {
+                    "line": 56,
+                    "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                  },
+                  {
+                    "line": 83,
+                    "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                  },
+                  {
+                    "line": 96,
+                    "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                  },
+                  {
+                    "line": 106,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                  },
+                  {
+                    "line": 116,
+                    "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                  },
+                  {
+                    "line": 123,
+                    "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "合法目标存在时 shell.trashItem 后书桌列表更新"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           },
           {
             "index": 1,
@@ -112383,9 +112675,14 @@
                 "package": "lingxi-service",
                 "suite": "r06_original_resource_proofs",
                 "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_native_resource_completion",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
               }
             ],
-            "meaning": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
+            "meaning": "当前Tauri生产trash_item调用真实系统废纸篓；macOS NsFileManager避免Finder自动化权限等待，无永久删除回退。界面只在真实成功后移除列表；相对/缺失路径false。本轮唯一合成文件通过真实Finder定位系统Trash并复制载荷，原字节逐字核对；不以源消失代替OS证明。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
@@ -112439,50 +112736,67 @@
                     "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+                "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+                "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+                "testStartLine": 9,
+                "testEndLine": 139,
+                "assertions": [
+                  {
+                    "line": 10,
+                    "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                  },
+                  {
+                    "line": 39,
+                    "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                  },
+                  {
+                    "line": 55,
+                    "quote": "assert!(target.is_absolute())"
+                  },
+                  {
+                    "line": 56,
+                    "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                  },
+                  {
+                    "line": 83,
+                    "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                  },
+                  {
+                    "line": 96,
+                    "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                  },
+                  {
+                    "line": 106,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                  },
+                  {
+                    "line": 116,
+                    "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                  },
+                  {
+                    "line": 118,
+                    "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                  },
+                  {
+                    "line": 122,
+                    "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                  },
+                  {
+                    "line": 123,
+                    "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "非法/缺失路径返回 false，不把永久删除混入"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          {
-            "clause": "合法目标存在时 shell.trashItem 后书桌列表更新",
-            "kind": "IMPLEMENTATION_GAP",
-            "reason": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
-            "sourceLocations": [
-              {
-                "endLine": 95,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-                "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-                "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-                "startLine": 85
-              },
-              {
-                "endLine": 78,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "独立桌面host建立阶段R09。",
-                "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-                "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-                "startLine": 75
-              },
-              {
-                "endLine": 63,
-                "kind": "current_source_boundary_not_execution_proof",
-                "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-                "path": "rust/Cargo.toml",
-                "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-                "startLine": 46
-              }
-            ]
-          },
-          "合法目标存在时 shell.trashItem 后书桌列表更新",
-          "非法/缺失路径返回 false，不把永久删除混入"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-proof-review.json"
       },
       {
         "id": "R00-T02-LA-AF8E24A2F524",
@@ -128322,7 +128636,7 @@
               {
                 "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
                 "test": "failure_results_never_register_copies_attachments_or_trash_success",
-                "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+                "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
                 "testStartLine": 169,
                 "testEndLine": 190,
                 "assertions": [
@@ -148926,6 +149240,31 @@
         "--test",
         "r06_b7b_config_scope_prefs",
         "global_agent_leaf_split_cross_agent_readback_and_immediate_refilter",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_72ee1108d3cd24e710f5": {
+      "package": "lingxi-service",
+      "suite": "r06_native_resource_completion",
+      "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_native_resource_completion",
+        "current_native_resource_three_leaves_real_windows_and_os_trash",
         "--",
         "--exact",
         "--show-output"
@@ -176321,6 +176660,336 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-238267978DDA": [
+      {
+        "case": "R00-T02-LA-238267978DDA-assertion-00",
+        "expect": 1,
+        "assertion": "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
+        "commandRefs": [
+          "r06_test_72ee1108d3cd24e710f5",
+          "r06_test_8e4827fb785d8282e02f"
+        ],
+        "evidenceMeaning": "真实Tauri兼容watch_file只接受绝对路径并发送file-changed；当前renderer不调用旧监听启停且没有旧按钮，当前主/独立viewer真实订阅当前Rust ResourceIO resource.changed并重读。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
+            "test": "watch_registry_refcount_diagnostics_and_polling_events",
+            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+            "testStartLine": 897,
+            "testEndLine": 1013,
+            "assertions": [
+              {
+                "line": 906,
+                "quote": "    assert_eq!(err.status, 400);"
+              },
+              {
+                "line": 914,
+                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
+              },
+              {
+                "line": 930,
+                "quote": "    assert_ne!(w1, w2);"
+              },
+              {
+                "line": 932,
+                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 933,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
+              },
+              {
+                "line": 934,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
+              },
+              {
+                "line": 935,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
+              },
+              {
+                "line": 952,
+                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
+              },
+              {
+                "line": 970,
+                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
+              },
+              {
+                "line": 973,
+                "quote": "    assert!(fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 974,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 975,
+                "quote": "    assert!(fx.io.unwatch(&w2));"
+              },
+              {
+                "line": 976,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 977,
+                "quote": "    assert!(!fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 991,
+                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
+              },
+              {
+                "line": 992,
+                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
+              },
+              {
+                "line": 993,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
+              },
+              {
+                "line": 994,
+                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
+              },
+              {
+                "line": 995,
+                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
+              },
+              {
+                "line": 996,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
+              },
+              {
+                "line": 997,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 1000,
+                "quote": "    assert_eq!(err.status, 400);"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+            "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+            "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+            "testStartLine": 9,
+            "testEndLine": 139,
+            "assertions": [
+              {
+                "line": 10,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+              },
+              {
+                "line": 39,
+                "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+              },
+              {
+                "line": 55,
+                "quote": "assert!(target.is_absolute())"
+              },
+              {
+                "line": 56,
+                "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+              },
+              {
+                "line": 83,
+                "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+              },
+              {
+                "line": 96,
+                "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+              },
+              {
+                "line": 106,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+              },
+              {
+                "line": 116,
+                "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+              },
+              {
+                "line": 123,
+                "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-238267978DDA-assertion-01",
+        "expect": 1,
+        "assertion": "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听",
+        "commandRefs": [
+          "r06_test_72ee1108d3cd24e710f5",
+          "r06_test_8e4827fb785d8282e02f"
+        ],
+        "evidenceMeaning": "真实Tauri兼容watch_file只接受绝对路径并发送file-changed；当前renderer不调用旧监听启停且没有旧按钮，当前主/独立viewer真实订阅当前Rust ResourceIO resource.changed并重读。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
+            "test": "watch_registry_refcount_diagnostics_and_polling_events",
+            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+            "testStartLine": 897,
+            "testEndLine": 1013,
+            "assertions": [
+              {
+                "line": 906,
+                "quote": "    assert_eq!(err.status, 400);"
+              },
+              {
+                "line": 914,
+                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
+              },
+              {
+                "line": 930,
+                "quote": "    assert_ne!(w1, w2);"
+              },
+              {
+                "line": 932,
+                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 933,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
+              },
+              {
+                "line": 934,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
+              },
+              {
+                "line": 935,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
+              },
+              {
+                "line": 952,
+                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
+              },
+              {
+                "line": 970,
+                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
+              },
+              {
+                "line": 973,
+                "quote": "    assert!(fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 974,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 975,
+                "quote": "    assert!(fx.io.unwatch(&w2));"
+              },
+              {
+                "line": 976,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 977,
+                "quote": "    assert!(!fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 991,
+                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
+              },
+              {
+                "line": 992,
+                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
+              },
+              {
+                "line": 993,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
+              },
+              {
+                "line": 994,
+                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
+              },
+              {
+                "line": 995,
+                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
+              },
+              {
+                "line": 996,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
+              },
+              {
+                "line": 997,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 1000,
+                "quote": "    assert_eq!(err.status, 400);"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+            "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+            "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+            "testStartLine": 9,
+            "testEndLine": 139,
+            "assertions": [
+              {
+                "line": 10,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+              },
+              {
+                "line": 39,
+                "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+              },
+              {
+                "line": 55,
+                "quote": "assert!(target.is_absolute())"
+              },
+              {
+                "line": 56,
+                "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+              },
+              {
+                "line": 83,
+                "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+              },
+              {
+                "line": 96,
+                "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+              },
+              {
+                "line": 106,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+              },
+              {
+                "line": 116,
+                "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+              },
+              {
+                "line": 123,
+                "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-23AB8E0A2493": [
       {
         "case": "R00-T02-LA-23AB8E0A2493-assertion-00",
@@ -191817,6 +192486,556 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-4173A08A51CC": [
+      {
+        "case": "R00-T02-LA-4173A08A51CC-assertion-00",
+        "expect": 1,
+        "assertion": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
+        "commandRefs": [
+          "r06_test_72ee1108d3cd24e710f5",
+          "r06_test_8e4827fb785d8282e02f",
+          "r06_test_c1d66790f899675262f0"
+        ],
+        "evidenceMeaning": "当前原生WebView实际显示纯文本、Markdown、真实Word/首张Excel表格；sandbox iframe、二进制/大文件信息卡、损坏文件错误；真实独立只读窗口重读磁盘并拒绝读别的文件/写入，主窗未保存编辑保留。实际PNG保留供视觉复核。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
+            "test": "preview_route_faces_and_public_token_gate",
+            "sourceSHA256": "fb5a5ae4df31a8f3160b56da498e4e383651c41494b050bbe2d6f04bb2a494c7",
+            "testStartLine": 478,
+            "testEndLine": 621,
+            "assertions": [
+              {
+                "line": 492,
+                "quote": "    assert_eq!(resp.status, 401, \"chat scope required\");"
+              },
+              {
+                "line": 502,
+                "quote": "    assert_eq!(resp.status, 400, \"invalid json\");"
+              },
+              {
+                "line": 519,
+                "quote": "    assert_eq!(\n        resp.status,\n        200,\n        \"create: {:?}\",\n        resp.header(\"content-type\")\n    );"
+              },
+              {
+                "line": 529,
+                "quote": "    assert!(created[\"expiresAt\"].as_u64().expect(\"expiresAt\") > 0);"
+              },
+              {
+                "line": 539,
+                "quote": "    assert_eq!(resp.status, 200, \"public token read\");"
+              },
+              {
+                "line": 540,
+                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
+              },
+              {
+                "line": 544,
+                "quote": "    assert!(resp\n        .header(\"content-security-policy\")\n        .expect(\"csp\")\n        .contains(\"default-src 'none'\"));"
+              },
+              {
+                "line": 548,
+                "quote": "    assert_eq!(resp.header(\"referrer-policy\"), Some(\"no-referrer\"));"
+              },
+              {
+                "line": 549,
+                "quote": "    assert_eq!(resp.header(\"x-content-type-options\"), Some(\"nosniff\"));"
+              },
+              {
+                "line": 550,
+                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
+              },
+              {
+                "line": 551,
+                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"cross-origin\")\n    );"
+              },
+              {
+                "line": 555,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"route\"));"
+              },
+              {
+                "line": 558,
+                "quote": "    assert_eq!(resp.status, 200);"
+              },
+              {
+                "line": 559,
+                "quote": "    assert!(resp.body.is_empty(), \"HEAD carries no body\");"
+              },
+              {
+                "line": 560,
+                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
+              },
+              {
+                "line": 573,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 582,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 587,
+                "quote": "    assert_eq!(resp.status, 200, \"asset read: {:?}\", resp.status);"
+              },
+              {
+                "line": 588,
+                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
+              },
+              {
+                "line": 592,
+                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
+              },
+              {
+                "line": 593,
+                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"same-origin\")\n    );"
+              },
+              {
+                "line": 598,
+                "quote": "    assert_eq!(resp.status, 200);"
+              },
+              {
+                "line": 599,
+                "quote": "    assert!(resp.body.is_empty());"
+              },
+              {
+                "line": 609,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 618,
+                "quote": "    assert_eq!(resp.status, 404);"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
+            "test": "watch_registry_refcount_diagnostics_and_polling_events",
+            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+            "testStartLine": 897,
+            "testEndLine": 1013,
+            "assertions": [
+              {
+                "line": 906,
+                "quote": "    assert_eq!(err.status, 400);"
+              },
+              {
+                "line": 914,
+                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
+              },
+              {
+                "line": 930,
+                "quote": "    assert_ne!(w1, w2);"
+              },
+              {
+                "line": 932,
+                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 933,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
+              },
+              {
+                "line": 934,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
+              },
+              {
+                "line": 935,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
+              },
+              {
+                "line": 952,
+                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
+              },
+              {
+                "line": 970,
+                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
+              },
+              {
+                "line": 973,
+                "quote": "    assert!(fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 974,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 975,
+                "quote": "    assert!(fx.io.unwatch(&w2));"
+              },
+              {
+                "line": 976,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 977,
+                "quote": "    assert!(!fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 991,
+                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
+              },
+              {
+                "line": 992,
+                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
+              },
+              {
+                "line": 993,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
+              },
+              {
+                "line": 994,
+                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
+              },
+              {
+                "line": 995,
+                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
+              },
+              {
+                "line": 996,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
+              },
+              {
+                "line": 997,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 1000,
+                "quote": "    assert_eq!(err.status, 400);"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+            "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+            "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+            "testStartLine": 9,
+            "testEndLine": 139,
+            "assertions": [
+              {
+                "line": 10,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+              },
+              {
+                "line": 39,
+                "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+              },
+              {
+                "line": 55,
+                "quote": "assert!(target.is_absolute())"
+              },
+              {
+                "line": 56,
+                "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+              },
+              {
+                "line": 83,
+                "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+              },
+              {
+                "line": 96,
+                "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+              },
+              {
+                "line": 106,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+              },
+              {
+                "line": 116,
+                "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+              },
+              {
+                "line": 123,
+                "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-4173A08A51CC-assertion-01",
+        "expect": 1,
+        "assertion": "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态",
+        "commandRefs": [
+          "r06_test_72ee1108d3cd24e710f5",
+          "r06_test_8e4827fb785d8282e02f",
+          "r06_test_c1d66790f899675262f0"
+        ],
+        "evidenceMeaning": "当前原生WebView实际显示纯文本、Markdown、真实Word/首张Excel表格；sandbox iframe、二进制/大文件信息卡、损坏文件错误；真实独立只读窗口重读磁盘并拒绝读别的文件/写入，主窗未保存编辑保留。实际PNG保留供视觉复核。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
+            "test": "preview_route_faces_and_public_token_gate",
+            "sourceSHA256": "fb5a5ae4df31a8f3160b56da498e4e383651c41494b050bbe2d6f04bb2a494c7",
+            "testStartLine": 478,
+            "testEndLine": 621,
+            "assertions": [
+              {
+                "line": 492,
+                "quote": "    assert_eq!(resp.status, 401, \"chat scope required\");"
+              },
+              {
+                "line": 502,
+                "quote": "    assert_eq!(resp.status, 400, \"invalid json\");"
+              },
+              {
+                "line": 519,
+                "quote": "    assert_eq!(\n        resp.status,\n        200,\n        \"create: {:?}\",\n        resp.header(\"content-type\")\n    );"
+              },
+              {
+                "line": 529,
+                "quote": "    assert!(created[\"expiresAt\"].as_u64().expect(\"expiresAt\") > 0);"
+              },
+              {
+                "line": 539,
+                "quote": "    assert_eq!(resp.status, 200, \"public token read\");"
+              },
+              {
+                "line": 540,
+                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
+              },
+              {
+                "line": 544,
+                "quote": "    assert!(resp\n        .header(\"content-security-policy\")\n        .expect(\"csp\")\n        .contains(\"default-src 'none'\"));"
+              },
+              {
+                "line": 548,
+                "quote": "    assert_eq!(resp.header(\"referrer-policy\"), Some(\"no-referrer\"));"
+              },
+              {
+                "line": 549,
+                "quote": "    assert_eq!(resp.header(\"x-content-type-options\"), Some(\"nosniff\"));"
+              },
+              {
+                "line": 550,
+                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
+              },
+              {
+                "line": 551,
+                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"cross-origin\")\n    );"
+              },
+              {
+                "line": 555,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"route\"));"
+              },
+              {
+                "line": 558,
+                "quote": "    assert_eq!(resp.status, 200);"
+              },
+              {
+                "line": 559,
+                "quote": "    assert!(resp.body.is_empty(), \"HEAD carries no body\");"
+              },
+              {
+                "line": 560,
+                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
+              },
+              {
+                "line": 573,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 582,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 587,
+                "quote": "    assert_eq!(resp.status, 200, \"asset read: {:?}\", resp.status);"
+              },
+              {
+                "line": 588,
+                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
+              },
+              {
+                "line": 592,
+                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
+              },
+              {
+                "line": 593,
+                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"same-origin\")\n    );"
+              },
+              {
+                "line": 598,
+                "quote": "    assert_eq!(resp.status, 200);"
+              },
+              {
+                "line": 599,
+                "quote": "    assert!(resp.body.is_empty());"
+              },
+              {
+                "line": 609,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 618,
+                "quote": "    assert_eq!(resp.status, 404);"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
+            "test": "watch_registry_refcount_diagnostics_and_polling_events",
+            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
+            "testStartLine": 897,
+            "testEndLine": 1013,
+            "assertions": [
+              {
+                "line": 906,
+                "quote": "    assert_eq!(err.status, 400);"
+              },
+              {
+                "line": 914,
+                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
+              },
+              {
+                "line": 930,
+                "quote": "    assert_ne!(w1, w2);"
+              },
+              {
+                "line": 932,
+                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 933,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
+              },
+              {
+                "line": 934,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
+              },
+              {
+                "line": 935,
+                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
+              },
+              {
+                "line": 952,
+                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
+              },
+              {
+                "line": 970,
+                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
+              },
+              {
+                "line": 973,
+                "quote": "    assert!(fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 974,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
+              },
+              {
+                "line": 975,
+                "quote": "    assert!(fx.io.unwatch(&w2));"
+              },
+              {
+                "line": 976,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 977,
+                "quote": "    assert!(!fx.io.unwatch(&w1));"
+              },
+              {
+                "line": 991,
+                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
+              },
+              {
+                "line": 992,
+                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
+              },
+              {
+                "line": 993,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
+              },
+              {
+                "line": 994,
+                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
+              },
+              {
+                "line": 995,
+                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
+              },
+              {
+                "line": 996,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
+              },
+              {
+                "line": 997,
+                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
+              },
+              {
+                "line": 1000,
+                "quote": "    assert_eq!(err.status, 400);"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+            "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+            "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+            "testStartLine": 9,
+            "testEndLine": 139,
+            "assertions": [
+              {
+                "line": 10,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+              },
+              {
+                "line": 39,
+                "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+              },
+              {
+                "line": 55,
+                "quote": "assert!(target.is_absolute())"
+              },
+              {
+                "line": 56,
+                "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+              },
+              {
+                "line": 83,
+                "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+              },
+              {
+                "line": 96,
+                "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+              },
+              {
+                "line": 106,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+              },
+              {
+                "line": 116,
+                "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+              },
+              {
+                "line": 123,
+                "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-4338B197B6DF": [
       {
         "case": "R00-T02-LA-4338B197B6DF-assertion-00",
@@ -193383,7 +194602,7 @@
           {
             "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
             "test": "failure_results_never_register_copies_attachments_or_trash_success",
-            "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+            "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
             "testStartLine": 169,
             "testEndLine": 190,
             "assertions": [
@@ -231245,7 +232464,7 @@
           {
             "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
             "test": "failure_results_never_register_copies_attachments_or_trash_success",
-            "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+            "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
             "testStartLine": 169,
             "testEndLine": 190,
             "assertions": [
@@ -231258,6 +232477,248 @@
                 "line": 181,
                 "assertionKind": "vitest_expect",
                 "quote": "  expect(document.querySelector('[data-path=\"/proof/bad.bin\"]')).toBeNull();"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
+    "R00-T02-LA-AF18F5CEA14F": [
+      {
+        "case": "R00-T02-LA-AF18F5CEA14F-assertion-00",
+        "expect": 1,
+        "assertion": "合法目标存在时 shell.trashItem 后书桌列表更新",
+        "commandRefs": [
+          "r06_test_72ee1108d3cd24e710f5",
+          "r06_test_808ce6ca3819b4531be9"
+        ],
+        "evidenceMeaning": "当前Tauri生产trash_item调用真实系统废纸篓；macOS NsFileManager避免Finder自动化权限等待，无永久删除回退。界面只在真实成功后移除列表；相对/缺失路径false。本轮唯一合成文件通过真实Finder定位系统Trash并复制载荷，原字节逐字核对；不以源消失代替OS证明。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
+            "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes",
+            "sourceSHA256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
+            "testStartLine": 1165,
+            "testEndLine": 1215,
+            "assertions": [
+              {
+                "line": 1182,
+                "quote": "assert_eq!(result.0, 200, \"{operation}: {result:?}\");"
+              },
+              {
+                "line": 1183,
+                "quote": "assert!(!from.exists());"
+              },
+              {
+                "line": 1184,
+                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
+              },
+              {
+                "line": 1188,
+                "quote": "assert_eq!(conflict.0, 409, \"{operation}: {conflict:?}\");"
+              },
+              {
+                "line": 1184,
+                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
+              },
+              {
+                "line": 1190,
+                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
+              },
+              {
+                "line": 1198,
+                "quote": "assert_eq!(trash.0, 200, \"{trash:?}\");"
+              },
+              {
+                "line": 1199,
+                "quote": "assert!(!moved.exists());"
+              },
+              {
+                "line": 1205,
+                "quote": "assert_eq!(std::fs::read(retained).unwrap(), b\"original mutation bytes\");"
+              },
+              {
+                "line": 1212,
+                "quote": "assert_eq!(missing.0, 404);"
+              },
+              {
+                "line": 1190,
+                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+            "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+            "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+            "testStartLine": 9,
+            "testEndLine": 139,
+            "assertions": [
+              {
+                "line": 10,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+              },
+              {
+                "line": 39,
+                "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+              },
+              {
+                "line": 55,
+                "quote": "assert!(target.is_absolute())"
+              },
+              {
+                "line": 56,
+                "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+              },
+              {
+                "line": 83,
+                "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+              },
+              {
+                "line": 96,
+                "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+              },
+              {
+                "line": 106,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+              },
+              {
+                "line": 116,
+                "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+              },
+              {
+                "line": 123,
+                "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-AF18F5CEA14F-assertion-01",
+        "expect": 1,
+        "assertion": "非法/缺失路径返回 false，不把永久删除混入",
+        "commandRefs": [
+          "r06_test_72ee1108d3cd24e710f5",
+          "r06_test_808ce6ca3819b4531be9"
+        ],
+        "evidenceMeaning": "当前Tauri生产trash_item调用真实系统废纸篓；macOS NsFileManager避免Finder自动化权限等待，无永久删除回退。界面只在真实成功后移除列表；相对/缺失路径false。本轮唯一合成文件通过真实Finder定位系统Trash并复制载荷，原字节逐字核对；不以源消失代替OS证明。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
+            "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes",
+            "sourceSHA256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
+            "testStartLine": 1165,
+            "testEndLine": 1215,
+            "assertions": [
+              {
+                "line": 1182,
+                "quote": "assert_eq!(result.0, 200, \"{operation}: {result:?}\");"
+              },
+              {
+                "line": 1183,
+                "quote": "assert!(!from.exists());"
+              },
+              {
+                "line": 1184,
+                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
+              },
+              {
+                "line": 1188,
+                "quote": "assert_eq!(conflict.0, 409, \"{operation}: {conflict:?}\");"
+              },
+              {
+                "line": 1184,
+                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
+              },
+              {
+                "line": 1190,
+                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
+              },
+              {
+                "line": 1198,
+                "quote": "assert_eq!(trash.0, 200, \"{trash:?}\");"
+              },
+              {
+                "line": 1199,
+                "quote": "assert!(!moved.exists());"
+              },
+              {
+                "line": 1205,
+                "quote": "assert_eq!(std::fs::read(retained).unwrap(), b\"original mutation bytes\");"
+              },
+              {
+                "line": 1212,
+                "quote": "assert_eq!(missing.0, 404);"
+              },
+              {
+                "line": 1190,
+                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+            "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+            "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+            "testStartLine": 9,
+            "testEndLine": 139,
+            "assertions": [
+              {
+                "line": 10,
+                "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+              },
+              {
+                "line": 39,
+                "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+              },
+              {
+                "line": 55,
+                "quote": "assert!(target.is_absolute())"
+              },
+              {
+                "line": 56,
+                "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+              },
+              {
+                "line": 83,
+                "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+              },
+              {
+                "line": 96,
+                "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+              },
+              {
+                "line": 106,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+              },
+              {
+                "line": 116,
+                "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+              },
+              {
+                "line": 118,
+                "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+              },
+              {
+                "line": 122,
+                "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+              },
+              {
+                "line": 123,
+                "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
               }
             ]
           }
@@ -245041,7 +246502,7 @@
           {
             "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
             "test": "failure_results_never_register_copies_attachments_or_trash_success",
-            "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+            "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
             "testStartLine": 169,
             "testEndLine": 190,
             "assertions": [
@@ -257376,232 +258837,6 @@
         ]
       }
     ],
-    "R00-T02-LA-238267978DDA": [
-      {
-        "case": "R00-T02-LA-238267978DDA-assertion-00",
-        "expect": 1,
-        "assertion": "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-        "commandRefs": [
-          "r06_test_8e4827fb785d8282e02f"
-        ],
-        "evidenceMeaning": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
-            "test": "watch_registry_refcount_diagnostics_and_polling_events",
-            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
-            "testStartLine": 897,
-            "testEndLine": 1013,
-            "assertions": [
-              {
-                "line": 906,
-                "quote": "    assert_eq!(err.status, 400);"
-              },
-              {
-                "line": 914,
-                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
-              },
-              {
-                "line": 930,
-                "quote": "    assert_ne!(w1, w2);"
-              },
-              {
-                "line": 932,
-                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 933,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
-              },
-              {
-                "line": 934,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
-              },
-              {
-                "line": 935,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
-              },
-              {
-                "line": 952,
-                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
-              },
-              {
-                "line": 970,
-                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
-              },
-              {
-                "line": 973,
-                "quote": "    assert!(fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 974,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 975,
-                "quote": "    assert!(fx.io.unwatch(&w2));"
-              },
-              {
-                "line": 976,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 977,
-                "quote": "    assert!(!fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 991,
-                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
-              },
-              {
-                "line": 992,
-                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
-              },
-              {
-                "line": 993,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
-              },
-              {
-                "line": 994,
-                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
-              },
-              {
-                "line": 995,
-                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
-              },
-              {
-                "line": 996,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
-              },
-              {
-                "line": 997,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 1000,
-                "quote": "    assert_eq!(err.status, 400);"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-238267978DDA-assertion-01",
-        "expect": 1,
-        "assertion": "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听",
-        "commandRefs": [
-          "r06_test_8e4827fb785d8282e02f"
-        ],
-        "evidenceMeaning": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
-            "test": "watch_registry_refcount_diagnostics_and_polling_events",
-            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
-            "testStartLine": 897,
-            "testEndLine": 1013,
-            "assertions": [
-              {
-                "line": 906,
-                "quote": "    assert_eq!(err.status, 400);"
-              },
-              {
-                "line": 914,
-                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
-              },
-              {
-                "line": 930,
-                "quote": "    assert_ne!(w1, w2);"
-              },
-              {
-                "line": 932,
-                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 933,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
-              },
-              {
-                "line": 934,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
-              },
-              {
-                "line": 935,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
-              },
-              {
-                "line": 952,
-                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
-              },
-              {
-                "line": 970,
-                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
-              },
-              {
-                "line": 973,
-                "quote": "    assert!(fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 974,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 975,
-                "quote": "    assert!(fx.io.unwatch(&w2));"
-              },
-              {
-                "line": 976,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 977,
-                "quote": "    assert!(!fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 991,
-                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
-              },
-              {
-                "line": 992,
-                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
-              },
-              {
-                "line": 993,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
-              },
-              {
-                "line": 994,
-                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
-              },
-              {
-                "line": 995,
-                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
-              },
-              {
-                "line": 996,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
-              },
-              {
-                "line": 997,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 1000,
-                "quote": "    assert_eq!(err.status, 400);"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-        ]
-      }
-    ],
     "R00-T02-LA-3CBCAE9AD914": [
       {
         "case": "R00-T02-LA-3CBCAE9AD914-assertion-00",
@@ -258465,452 +259700,6 @@
         "coverage": "PARTIAL",
         "missingClauses": [
           "Rust正式工具注册没有file执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-        ]
-      }
-    ],
-    "R00-T02-LA-4173A08A51CC": [
-      {
-        "case": "R00-T02-LA-4173A08A51CC-assertion-00",
-        "expect": 1,
-        "assertion": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-        "commandRefs": [
-          "r06_test_8e4827fb785d8282e02f",
-          "r06_test_c1d66790f899675262f0"
-        ],
-        "evidenceMeaning": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
-            "test": "preview_route_faces_and_public_token_gate",
-            "sourceSHA256": "fb5a5ae4df31a8f3160b56da498e4e383651c41494b050bbe2d6f04bb2a494c7",
-            "testStartLine": 478,
-            "testEndLine": 621,
-            "assertions": [
-              {
-                "line": 492,
-                "quote": "    assert_eq!(resp.status, 401, \"chat scope required\");"
-              },
-              {
-                "line": 502,
-                "quote": "    assert_eq!(resp.status, 400, \"invalid json\");"
-              },
-              {
-                "line": 519,
-                "quote": "    assert_eq!(\n        resp.status,\n        200,\n        \"create: {:?}\",\n        resp.header(\"content-type\")\n    );"
-              },
-              {
-                "line": 529,
-                "quote": "    assert!(created[\"expiresAt\"].as_u64().expect(\"expiresAt\") > 0);"
-              },
-              {
-                "line": 539,
-                "quote": "    assert_eq!(resp.status, 200, \"public token read\");"
-              },
-              {
-                "line": 540,
-                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
-              },
-              {
-                "line": 544,
-                "quote": "    assert!(resp\n        .header(\"content-security-policy\")\n        .expect(\"csp\")\n        .contains(\"default-src 'none'\"));"
-              },
-              {
-                "line": 548,
-                "quote": "    assert_eq!(resp.header(\"referrer-policy\"), Some(\"no-referrer\"));"
-              },
-              {
-                "line": 549,
-                "quote": "    assert_eq!(resp.header(\"x-content-type-options\"), Some(\"nosniff\"));"
-              },
-              {
-                "line": 550,
-                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
-              },
-              {
-                "line": 551,
-                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"cross-origin\")\n    );"
-              },
-              {
-                "line": 555,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"route\"));"
-              },
-              {
-                "line": 558,
-                "quote": "    assert_eq!(resp.status, 200);"
-              },
-              {
-                "line": 559,
-                "quote": "    assert!(resp.body.is_empty(), \"HEAD carries no body\");"
-              },
-              {
-                "line": 560,
-                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
-              },
-              {
-                "line": 573,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 582,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 587,
-                "quote": "    assert_eq!(resp.status, 200, \"asset read: {:?}\", resp.status);"
-              },
-              {
-                "line": 588,
-                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
-              },
-              {
-                "line": 592,
-                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
-              },
-              {
-                "line": 593,
-                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"same-origin\")\n    );"
-              },
-              {
-                "line": 598,
-                "quote": "    assert_eq!(resp.status, 200);"
-              },
-              {
-                "line": 599,
-                "quote": "    assert!(resp.body.is_empty());"
-              },
-              {
-                "line": 609,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 618,
-                "quote": "    assert_eq!(resp.status, 404);"
-              }
-            ]
-          },
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
-            "test": "watch_registry_refcount_diagnostics_and_polling_events",
-            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
-            "testStartLine": 897,
-            "testEndLine": 1013,
-            "assertions": [
-              {
-                "line": 906,
-                "quote": "    assert_eq!(err.status, 400);"
-              },
-              {
-                "line": 914,
-                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
-              },
-              {
-                "line": 930,
-                "quote": "    assert_ne!(w1, w2);"
-              },
-              {
-                "line": 932,
-                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 933,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
-              },
-              {
-                "line": 934,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
-              },
-              {
-                "line": 935,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
-              },
-              {
-                "line": 952,
-                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
-              },
-              {
-                "line": 970,
-                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
-              },
-              {
-                "line": 973,
-                "quote": "    assert!(fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 974,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 975,
-                "quote": "    assert!(fx.io.unwatch(&w2));"
-              },
-              {
-                "line": 976,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 977,
-                "quote": "    assert!(!fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 991,
-                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
-              },
-              {
-                "line": 992,
-                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
-              },
-              {
-                "line": 993,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
-              },
-              {
-                "line": 994,
-                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
-              },
-              {
-                "line": 995,
-                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
-              },
-              {
-                "line": 996,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
-              },
-              {
-                "line": 997,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 1000,
-                "quote": "    assert_eq!(err.status, 400);"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-4173A08A51CC-assertion-01",
-        "expect": 1,
-        "assertion": "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态",
-        "commandRefs": [
-          "r06_test_8e4827fb785d8282e02f",
-          "r06_test_c1d66790f899675262f0"
-        ],
-        "evidenceMeaning": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
-            "test": "preview_route_faces_and_public_token_gate",
-            "sourceSHA256": "fb5a5ae4df31a8f3160b56da498e4e383651c41494b050bbe2d6f04bb2a494c7",
-            "testStartLine": 478,
-            "testEndLine": 621,
-            "assertions": [
-              {
-                "line": 492,
-                "quote": "    assert_eq!(resp.status, 401, \"chat scope required\");"
-              },
-              {
-                "line": 502,
-                "quote": "    assert_eq!(resp.status, 400, \"invalid json\");"
-              },
-              {
-                "line": 519,
-                "quote": "    assert_eq!(\n        resp.status,\n        200,\n        \"create: {:?}\",\n        resp.header(\"content-type\")\n    );"
-              },
-              {
-                "line": 529,
-                "quote": "    assert!(created[\"expiresAt\"].as_u64().expect(\"expiresAt\") > 0);"
-              },
-              {
-                "line": 539,
-                "quote": "    assert_eq!(resp.status, 200, \"public token read\");"
-              },
-              {
-                "line": 540,
-                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
-              },
-              {
-                "line": 544,
-                "quote": "    assert!(resp\n        .header(\"content-security-policy\")\n        .expect(\"csp\")\n        .contains(\"default-src 'none'\"));"
-              },
-              {
-                "line": 548,
-                "quote": "    assert_eq!(resp.header(\"referrer-policy\"), Some(\"no-referrer\"));"
-              },
-              {
-                "line": 549,
-                "quote": "    assert_eq!(resp.header(\"x-content-type-options\"), Some(\"nosniff\"));"
-              },
-              {
-                "line": 550,
-                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
-              },
-              {
-                "line": 551,
-                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"cross-origin\")\n    );"
-              },
-              {
-                "line": 555,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"route\"));"
-              },
-              {
-                "line": 558,
-                "quote": "    assert_eq!(resp.status, 200);"
-              },
-              {
-                "line": 559,
-                "quote": "    assert!(resp.body.is_empty(), \"HEAD carries no body\");"
-              },
-              {
-                "line": 560,
-                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
-              },
-              {
-                "line": 573,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 582,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 587,
-                "quote": "    assert_eq!(resp.status, 200, \"asset read: {:?}\", resp.status);"
-              },
-              {
-                "line": 588,
-                "quote": "    assert_eq!(\n        resp.header(\"content-type\"),\n        Some(\"text/html; charset=utf-8\")\n    );"
-              },
-              {
-                "line": 592,
-                "quote": "    assert_eq!(resp.header(\"cache-control\"), Some(\"no-store\"));"
-              },
-              {
-                "line": 593,
-                "quote": "    assert_eq!(\n        resp.header(\"cross-origin-resource-policy\"),\n        Some(\"same-origin\")\n    );"
-              },
-              {
-                "line": 598,
-                "quote": "    assert_eq!(resp.status, 200);"
-              },
-              {
-                "line": 599,
-                "quote": "    assert!(resp.body.is_empty());"
-              },
-              {
-                "line": 609,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 618,
-                "quote": "    assert_eq!(resp.status, 404);"
-              }
-            ]
-          },
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
-            "test": "watch_registry_refcount_diagnostics_and_polling_events",
-            "sourceSHA256": "012c5afacea845a84b9e7ab70920c395305bb5477abe6dcc1c4867e31a1b1c03",
-            "testStartLine": 897,
-            "testEndLine": 1013,
-            "assertions": [
-              {
-                "line": 906,
-                "quote": "    assert_eq!(err.status, 400);"
-              },
-              {
-                "line": 914,
-                "quote": "    assert_eq!((err.status, err.code.as_str()), (403, \"capability_denied\"));"
-              },
-              {
-                "line": 930,
-                "quote": "    assert_ne!(w1, w2);"
-              },
-              {
-                "line": 932,
-                "quote": "    assert_eq!(diag[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 933,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"resourceKey\"], key);"
-              },
-              {
-                "line": 934,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"refCount\"], 2);"
-              },
-              {
-                "line": 935,
-                "quote": "    assert_eq!(diag[\"watches\"][0][\"isDirectory\"], false);"
-              },
-              {
-                "line": 952,
-                "quote": "    assert!(saw_change, \"polling watcher emits resource.changed\");"
-              },
-              {
-                "line": 970,
-                "quote": "    assert!(saw_delete, \"polling watcher emits resource.deleted\");"
-              },
-              {
-                "line": 973,
-                "quote": "    assert!(fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 974,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 1);"
-              },
-              {
-                "line": 975,
-                "quote": "    assert!(fx.io.unwatch(&w2));"
-              },
-              {
-                "line": 976,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 977,
-                "quote": "    assert!(!fx.io.unwatch(&w1));"
-              },
-              {
-                "line": 991,
-                "quote": "    assert_eq!(sub_id.len(), 36, \"uuid v4 shape: {sub_id}\");"
-              },
-              {
-                "line": 992,
-                "quote": "    assert_eq!(sub[\"resourceKeys\"], serde_json::json!([key]));"
-              },
-              {
-                "line": 993,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 1);"
-              },
-              {
-                "line": 994,
-                "quote": "    assert!(!fx.io.unsubscribe(\"00000000-0000-0000-0000-000000000000\"));"
-              },
-              {
-                "line": 995,
-                "quote": "    assert!(fx.io.unsubscribe(sub_id));"
-              },
-              {
-                "line": 996,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"subscriptions\"], 0);"
-              },
-              {
-                "line": 997,
-                "quote": "    assert_eq!(fx.io.diagnostics()[\"watches\"].as_array().unwrap().len(), 0);"
-              },
-              {
-                "line": 1000,
-                "quote": "    assert_eq!(err.status, 400);"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
         ]
       }
     ],
@@ -262978,144 +263767,6 @@
         "coverage": "PARTIAL",
         "missingClauses": [
           "Rust正式工具注册没有materialize执行面；保留ResourceIO同类局部证明，但不能冒充原工具、来源字段和全部失败条件。"
-        ]
-      }
-    ],
-    "R00-T02-LA-AF18F5CEA14F": [
-      {
-        "case": "R00-T02-LA-AF18F5CEA14F-assertion-00",
-        "expect": 1,
-        "assertion": "合法目标存在时 shell.trashItem 后书桌列表更新",
-        "commandRefs": [
-          "r06_test_808ce6ca3819b4531be9"
-        ],
-        "evidenceMeaning": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
-            "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes",
-            "sourceSHA256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
-            "testStartLine": 1165,
-            "testEndLine": 1215,
-            "assertions": [
-              {
-                "line": 1182,
-                "quote": "assert_eq!(result.0, 200, \"{operation}: {result:?}\");"
-              },
-              {
-                "line": 1183,
-                "quote": "assert!(!from.exists());"
-              },
-              {
-                "line": 1184,
-                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
-              },
-              {
-                "line": 1188,
-                "quote": "assert_eq!(conflict.0, 409, \"{operation}: {conflict:?}\");"
-              },
-              {
-                "line": 1184,
-                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
-              },
-              {
-                "line": 1190,
-                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
-              },
-              {
-                "line": 1198,
-                "quote": "assert_eq!(trash.0, 200, \"{trash:?}\");"
-              },
-              {
-                "line": 1199,
-                "quote": "assert!(!moved.exists());"
-              },
-              {
-                "line": 1205,
-                "quote": "assert_eq!(std::fs::read(retained).unwrap(), b\"original mutation bytes\");"
-              },
-              {
-                "line": 1212,
-                "quote": "assert_eq!(missing.0, 404);"
-              },
-              {
-                "line": 1190,
-                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "合法目标存在时 shell.trashItem 后书桌列表更新"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-AF18F5CEA14F-assertion-01",
-        "expect": 1,
-        "assertion": "非法/缺失路径返回 false，不把永久删除混入",
-        "commandRefs": [
-          "r06_test_808ce6ca3819b4531be9"
-        ],
-        "evidenceMeaning": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
-            "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes",
-            "sourceSHA256": "b85e7def29087eefe5c68706b845fd7739acbcd56abf0c2012b7d286135d3217",
-            "testStartLine": 1165,
-            "testEndLine": 1215,
-            "assertions": [
-              {
-                "line": 1182,
-                "quote": "assert_eq!(result.0, 200, \"{operation}: {result:?}\");"
-              },
-              {
-                "line": 1183,
-                "quote": "assert!(!from.exists());"
-              },
-              {
-                "line": 1184,
-                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
-              },
-              {
-                "line": 1188,
-                "quote": "assert_eq!(conflict.0, 409, \"{operation}: {conflict:?}\");"
-              },
-              {
-                "line": 1184,
-                "quote": "assert_eq!(std::fs::read(to).unwrap(), b\"original mutation bytes\");"
-              },
-              {
-                "line": 1190,
-                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
-              },
-              {
-                "line": 1198,
-                "quote": "assert_eq!(trash.0, 200, \"{trash:?}\");"
-              },
-              {
-                "line": 1199,
-                "quote": "assert!(!moved.exists());"
-              },
-              {
-                "line": 1205,
-                "quote": "assert_eq!(std::fs::read(retained).unwrap(), b\"original mutation bytes\");"
-              },
-              {
-                "line": 1212,
-                "quote": "assert_eq!(missing.0, 404);"
-              },
-              {
-                "line": 1190,
-                "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "非法/缺失路径返回 false，不把永久删除混入"
         ]
       }
     ],

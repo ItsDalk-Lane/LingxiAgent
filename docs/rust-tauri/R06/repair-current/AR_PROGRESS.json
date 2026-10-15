@@ -2341,6 +2341,35 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "native_resource_current_preview": {
+      "status": "THREE_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-238267978DDA",
+        "R00-T02-LA-4173A08A51CC",
+        "R00-T02-LA-AF18F5CEA14F"
+      ],
+      "completedInitialGaps": 42,
+      "remainingInitialGaps": 36,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 243,
+      "gapLeaves": 36,
+      "actualRegisteredBindings": 4,
+      "sourceCandidateSha256": "b846d2a9cf977a94873a3310ba98d332f68f3d435ade845089807633fc6cfb25",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-binding-window-summary.json",
+      "rootNativeScreenshotsReviewed": 4,
+      "rootUiPassed": 6,
+      "rootTypesPassed": true,
+      "rootNativeStrictClippyPassed": true,
+      "rootServiceParentStrictClippyPassed": true,
+      "independentStaticReview": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-independent-static-review.json",
+      "independentRuntimeReview": "NOT_RUN",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

@@ -220,8 +220,21 @@ pub fn trash_item(path: &str) -> bool {
     if fs::symlink_metadata(path).is_err() {
         return false;
     }
-    // 这里只调用系统废纸篓，不提供永久删除回退。
-    trash::delete(path).is_ok() && fs::symlink_metadata(path).is_err()
+    // 这里只调用系统废纸篓，不提供永久删除回退。macOS 直接调用系统
+    // FileManager，避免经 Finder 自动化弹出额外权限请求或长期等待。
+    let context = {
+        let context = trash::TrashContext::new();
+        #[cfg(target_os = "macos")]
+        {
+            use trash::macos::{DeleteMethod, TrashContextExtMacos};
+            let mut context = context;
+            context.set_delete_method(DeleteMethod::NsFileManager);
+            context
+        }
+        #[cfg(not(target_os = "macos"))]
+        context
+    };
+    context.delete(path).is_ok() && fs::symlink_metadata(path).is_err()
 }
 
 pub fn edit_script(command: &str) -> Result<&'static str, String> {

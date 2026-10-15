@@ -8,7 +8,7 @@
 
 ## 当前分工
 
-- 主控：整合与逐批绑定；当前39/78完成、还39，26个仅属R06全部完成；继续共享原叶及EX义务。
+- 主控：整合与逐批绑定；当前42/78完成、还36，26个仅属R06全部完成；继续共享原叶及EX义务。
 - 文件工具：ls/find/grep真实三入口、反斜线名称、400层目录/取消与替换边界修后已绑定；主控继续原生桌面入口。
 - 设置/记忆代理：本批真实助手页19动作、待清理收据、角色卡与自动ticker已交付；当前并行推进Slash五叶及Bridge目标隔离。
 - 知识代理：继续EX09章节筛选/粒度/重排显式降级；Root已合旧缓存代际/NFKC/Jieba/真实regex/分块空隙及付费保全，不把这些局部通过当EX09整体验收。
@@ -46,14 +46,14 @@
 - [x] `R00-T02-LA-E4BEE8E6974A`（R06）：返回图片及 ETag；未设置返回 404，ETag 相符返回 304
 - [ ] `R00-T02-LA-0DDB5AA05072`（R06 / R07）：逐动作核对实际状态与页面投影；失败不伪装成空数据
 - [x] `R00-T02-LA-0FE8BED686E2`（R03 / R06 / R08）：先回复正在压缩，再返回 token 前后数或完成说明
-- [ ] `R00-T02-LA-238267978DDA`（R04 / R06）：旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新
+- [x] `R00-T02-LA-238267978DDA`（R04 / R06）：旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新
 - [x] `R00-T02-LA-2F2B6E173C1B`（R04 / R06）：返回转换的 HTML
 - [x] `R00-T02-LA-2FAA749DA790`（R03 / R06 / R08）：把命令交给同一 slash dispatcher 并以 slash_result 显示
 - [x] `R00-T02-LA-31CDA283A11A`（R06 / R08）：经路径和冲突校验后把归档文件及 sidecar 移回活跃目录并更新生命周期，返回新路径或错误
 - [x] `R00-T02-LA-3617DF5B23D5`（R04 / R06）：返回首张工作表 HTML 表格
 - [ ] `R00-T02-LA-3CBCAE9AD914`（R04 / R06）：stat返回元数据；copy在授权工作区落文件；extract返回文档文本与来源。
 - [x] `R00-T02-LA-3FCB259FF69C`（R06 / R08）：删除当前会话历史并提示已清除
-- [ ] `R00-T02-LA-4173A08A51CC`（R04 / R06 / R09）：文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口
+- [x] `R00-T02-LA-4173A08A51CC`（R04 / R06 / R09）：文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口
 - [ ] `R00-T02-LA-421EEA1AC8D5`（R03 / R06 / R08）：先回 compaction_accepted，再按实际结果回 succeeded/noop/failed
 - [x] `R00-T02-LA-4EA88B5073E4`（R03 / R06 / R08）：当前流中止；无活动流时返回已停止提示
 - [x] `R00-T02-LA-4F0466F7C090`（R04 / R06）：文件字节改变并登记会话文件产物。
@@ -78,7 +78,7 @@
 - [ ] `R00-T02-LA-9CA8A47BE208`（R06 / R07）：独立技能查看器列文件并显示所选文本
 - [ ] `R00-T02-LA-A2C385A33493`（R03 / R06 / R08）：悬浮窗口可见/尺寸改变；选择会话聚焦主窗并打开该会话
 - [ ] `R00-T02-LA-AD7FAE6288FA`（R04 / R06）：本地资源返回真实路径；远端资源先暂存本地副本再返回路径与resourceKey，不修改原资源。
-- [ ] `R00-T02-LA-AF18F5CEA14F`（R04 / R06）：合法目标存在时 shell.trashItem 后书桌列表更新
+- [x] `R00-T02-LA-AF18F5CEA14F`（R04 / R06）：合法目标存在时 shell.trashItem 后书桌列表更新
 - [ ] `R00-T02-LA-B34F2B298BFA`（R03 / R06 / R08）：会话流发出完整新清单，界面显示各项pending/in_progress/blocked/completed状态。
 - [ ] `R00-T02-LA-B47CAC08F418`（R03 / R06 / R08）：返回 aborted 或 already_stopped；找不到 404，非本会话拥有 403
 - [x] `R00-T02-LA-B97D0D4296FA`（R04 / R06）：返回目录项与元数据，不改文件。
@@ -187,3 +187,11 @@ Word与首张Excel工作表由实际Rust授权文件快照/ZIP/XML转换为HTML�
 主控最终6真实检查、独立6复跑及原创标准Office探针、原fs2、既有预览/错误桥36、三TS和严格Clippy均通过。最终7个实际注册绑定和两叶完整汇总PASS，源码窗口前后一致，279原断言/Then逐字未改。累计39/78，240READY/39GAP；onlyR06仍26/26。全R06门禁/封印、Windows/Linux运行和完整Tauri Office预览未宣称通过。
 
 下一批四路并行：聊天7原叶（含真实发送/流/中止/恢复/媒体/模型思考和页面）、会话8原叶（检查点/批准回退/草稿/焦点/历史/图谱）、技能7原叶（安装/创建审核/翻译/查看/重扫/设置）、主控资源工具与原生文件界面。复用原已结束Windows审阅子代理，不新建用户聊天；现有必要编译缓存按演员分配复用，不再复制历史材料或完整target。
+
+## 2026-10-15 原生资源窗口三叶
+
+当前Tauri真实兼容绝对路径watch_file注册及file-changed事件保持；现行renderer删除不符合原断言的旧监听用户启停按钮，实际主/独立viewer走当前Rust ResourceIO resource.changed重读。真实WebView纯文本、Markdown、Word、首张Excel、二进制/大文件信息卡、损坏错误以及独立只读读写边界通过；外部变化后主窗未保存的正文仍保留。Root亲读4张当前WebView PNG，Office正文与表格真实显示，转义脚本只呈文本。
+
+默认TrashContext通过Finder自动化引起真实挂起反例保留；macOS生产转用同一既有依赖的NsFileManager，直接调用系统废纸篓，无永久删除回退。本轮唯一合成文件在真实Finder废纸篓定位，再只复制该载荷到本轮合成观察目录逐字核验；相对/缺失路径false、实际成功后列表移除。未读/删除其它用户废纸篓内容。子代理独立只读源码复核未见确定缺陷，明确不把静态复核记为独立运行。
+
+最终4/4实际绑定及三原叶完整rollup PASS，源码候选b846d2a9cf977a94873a3310ba98d332f68f3d435ade845089807633fc6cfb25跨绑定前后稳定；原279断言/Then逐字未变。当前6界面回归、Root类型检查、服务父与原生严格Clippy通过。累计42/78、243READY/36GAP；onlyR06仍26/26。此macOS局部窗口不代替全阶段门禁、最终提交封印或Windows/Linux运行；F14仍OPEN。

@@ -1,0 +1,12 @@
+{
+  "status": "INDEPENDENT_STATIC_REVIEW_NO_CONFIRMED_DEFECT",
+  "reviewer": "/root/review_persona_native/windows_ffi_check",
+  "runtimeRerunByReviewer": false,
+  "screenshotsReadByReviewer": false,
+  "finding": "App current refresh remains ResourceIO; legacy native absolute registration retained without renderer toggle; macOS TrashContext uses NsFileManager with no permanent deletion fallback; real parent requires current native subprocess, exact scenario markers, payload source identity and recovered bytes.",
+  "limits": [
+    "Static review only; runtime evidence belongs to Root current run",
+    "macOS real execution only; Windows/Linux runtime not run",
+    "R06 remains unaccepted"
+  ]
+}

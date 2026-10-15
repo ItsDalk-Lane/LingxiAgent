@@ -107,17 +107,12 @@ test('viewer_consumes_resource_events_and_is_independent_readonly', async () => 
   await watch.ready; watch.release(); expect(refreshes).toBe(0);
 });
 
-test('legacy_file_watch_can_be_started_stopped_and_refreshes_matching_path', async () => {
-  let live = 'before';
+test('legacy_registration_remains_host_compatible_but_current_renderer_uses_resource_events', async () => {
   let changed: ((path: string) => void) | undefined;
   let unlistened = false;
-  const port = adapter((command) => {
-    if (command === 'file_info') return { path: '/proof/file.md', size: live.length, isFile: true };
-    if (command === 'read_file_snapshot') return snapshot(live, live);
-    if (command === 'resource_subscribe') return { subscriptionId: 's1', resourceKeys: ['local_fs:/proof/file.md'] };
-    if (command === 'resource_events') return { events: [], latestSequence: 0 };
+  const port = adapter(command => {
     if (command === 'watch_file' || command === 'unwatch_file') return true;
-    throw new Error(`测试没有配置该调用：${command}`);
+    return readable(command);
   }, async callback => {
     changed = callback;
     return () => { unlistened = true; };
@@ -125,17 +120,20 @@ test('legacy_file_watch_can_be_started_stopped_and_refreshes_matching_path', asy
   render(<ResourceDesktop bridge={port.bridge} />);
   fireEvent.change(screen.getByLabelText('本地文件路径'), { target: { value: '/proof/file.md' } });
   fireEvent.click(screen.getByTestId('open-path'));
-  await waitFor(() => expect((screen.getByTestId('file-editor') as HTMLTextAreaElement).value).toBe('before'));
-  fireEvent.click(screen.getByTestId('legacy-watch-toggle'));
-  await screen.findByTestId('legacy-watch-status');
-  expect(port.calls.some(call => call.command === 'watch_file' && call.args.path === '/proof/file.md')).toBe(true);
-  live = 'after external change';
+  await waitFor(() => expect((screen.getByTestId('file-editor') as HTMLTextAreaElement).value).toBe('# 原文\n'));
+  expect(screen.queryByTestId('legacy-watch-toggle')).toBeNull();
+  expect(screen.queryByText('启动文件监听')).toBeNull();
+  expect(port.calls.some(call => call.command === 'watch_file' || call.command === 'unwatch_file')).toBe(false);
+  expect(port.calls.some(call => call.command === 'resource_subscribe')).toBe(true);
+  // 旧注册仍可供宿主兼容消费者使用，但不是当前页面的用户操作。
+  const observed: string[] = [];
+  const unlisten = await port.bridge.listenFileChanged(path => observed.push(path));
+  expect(await port.bridge.watchFile('/proof/file.md')).toBe(true);
   changed?.('/proof/file.md');
-  await waitFor(() => expect((screen.getByTestId('file-editor') as HTMLTextAreaElement).value).toBe(live));
-  fireEvent.click(screen.getByTestId('legacy-watch-toggle'));
-  await waitFor(() => expect(port.calls.some(call => call.command === 'unwatch_file' && call.args.path === '/proof/file.md')).toBe(true));
+  expect(observed).toEqual(['/proof/file.md']);
+  expect(await port.bridge.unwatchFile('/proof/file.md')).toBe(true);
+  unlisten();
   expect(unlistened).toBe(true);
-  expect(screen.queryByTestId('legacy-watch-status')).toBeNull();
 });
 
 test('saves_show_conflicts_and_cover_retries_only_once', async () => {

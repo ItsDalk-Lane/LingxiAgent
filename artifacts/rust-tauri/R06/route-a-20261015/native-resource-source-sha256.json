@@ -1,0 +1,10 @@
+{
+  "scope": "production and actual current parent/child test sources; not full stage seal",
+  "files": {
+    "desktop/src-tauri/src/files.rs": "955cbfc0bd428a1195fea4a0f82624d479ecddc9b2f2c5537619a54c498e9a80",
+    "desktop/src-tauri/tests/resource_current_host.rs": "83826b6c91e87c9dc6166aff42192adfa077c022b51b7ef447fa7c69a7a0d4e4",
+    "desktop/src/tauri-resources/App.tsx": "f9f363e2e93775d1bc6a7c9b61081353825a6300d99b8913b7d11ba43e693f26",
+    "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
+    "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b"
+  }
+}

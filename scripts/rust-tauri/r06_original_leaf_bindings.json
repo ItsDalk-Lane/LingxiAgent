@@ -23944,7 +23944,7 @@
         "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
       ],
       "then": "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -23953,9 +23953,14 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "watch_registry_refcount_diagnostics_and_polling_events"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_native_resource_completion",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
             }
           ],
-          "meaning": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
+          "meaning": "真实Tauri兼容watch_file只接受绝对路径并发送file-changed；当前renderer不调用旧监听启停且没有旧按钮，当前主/独立viewer真实订阅当前Rust ResourceIO resource.changed并重读。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -24053,12 +24058,63 @@
                   "quote": "    assert_eq!(err.status, 400);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+              "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+              "testStartLine": 9,
+              "testEndLine": 139,
+              "assertions": [
+                {
+                  "line": 10,
+                  "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                },
+                {
+                  "line": 39,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert!(target.is_absolute())"
+                },
+                {
+                  "line": 56,
+                  "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                },
+                {
+                  "line": 83,
+                  "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                },
+                {
+                  "line": 96,
+                  "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                },
+                {
+                  "line": 106,
+                  "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                },
+                {
+                  "line": 116,
+                  "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                },
+                {
+                  "line": 118,
+                  "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                },
+                {
+                  "line": 122,
+                  "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                },
+                {
+                  "line": 123,
+                  "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -24067,9 +24123,14 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "watch_registry_refcount_diagnostics_and_polling_events"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_native_resource_completion",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
             }
           ],
-          "meaning": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
+          "meaning": "真实Tauri兼容watch_file只接受绝对路径并发送file-changed；当前renderer不调用旧监听启停且没有旧按钮，当前主/独立viewer真实订阅当前Rust ResourceIO resource.changed并重读。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_resourceio.rs",
@@ -24167,50 +24228,67 @@
                   "quote": "    assert_eq!(err.status, 400);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+              "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+              "testStartLine": 9,
+              "testEndLine": 139,
+              "assertions": [
+                {
+                  "line": 10,
+                  "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                },
+                {
+                  "line": 39,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert!(target.is_absolute())"
+                },
+                {
+                  "line": 56,
+                  "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                },
+                {
+                  "line": 83,
+                  "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                },
+                {
+                  "line": 96,
+                  "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                },
+                {
+                  "line": 106,
+                  "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                },
+                {
+                  "line": 116,
+                  "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                },
+                {
+                  "line": 118,
+                  "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                },
+                {
+                  "line": 122,
+                  "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                },
+                {
+                  "line": 123,
+                  "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        {
-          "clause": "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-          "kind": "IMPLEMENTATION_GAP",
-          "reason": "当前Rust/Tauri候选未实现watch-file/file-changed桌面接线和viewer消费resource.changed重读；后端监听/refcount/订阅事件仅是局部证明，没有renderer启停/刷新链。",
-          "sourceLocations": [
-            {
-              "endLine": 95,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-              "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-              "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-              "startLine": 85
-            },
-            {
-              "endLine": 78,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "独立桌面host建立阶段R09。",
-              "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-              "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-              "startLine": 75
-            },
-            {
-              "endLine": 63,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-              "path": "rust/Cargo.toml",
-              "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-              "startLine": 46
-            }
-          ]
-        },
-        "旧 IPC 监听注册可发 file-changed；现行 viewer 通过 ResourceIO resource.changed 刷新",
-        "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-proof-review.json"
     },
     {
       "id": "R00-T02-LA-23AB8E0A2493",
@@ -42057,7 +42135,7 @@
         "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
       ],
       "then": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -42071,9 +42149,14 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "watch_registry_refcount_diagnostics_and_polling_events"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_native_resource_completion",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
             }
           ],
-          "meaning": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
+          "meaning": "当前原生WebView实际显示纯文本、Markdown、真实Word/首张Excel表格；sandbox iframe、二进制/大文件信息卡、损坏文件错误；真实独立只读窗口重读磁盘并拒绝读别的文件/写入，主窗未保存编辑保留。实际PNG保留供视觉复核。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
@@ -42280,12 +42363,63 @@
                   "quote": "    assert_eq!(err.status, 400);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+              "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+              "testStartLine": 9,
+              "testEndLine": 139,
+              "assertions": [
+                {
+                  "line": 10,
+                  "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                },
+                {
+                  "line": 39,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert!(target.is_absolute())"
+                },
+                {
+                  "line": 56,
+                  "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                },
+                {
+                  "line": 83,
+                  "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                },
+                {
+                  "line": 96,
+                  "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                },
+                {
+                  "line": 106,
+                  "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                },
+                {
+                  "line": 116,
+                  "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                },
+                {
+                  "line": 118,
+                  "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                },
+                {
+                  "line": 122,
+                  "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                },
+                {
+                  "line": 123,
+                  "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -42299,9 +42433,14 @@
               "package": "lingxi-service",
               "suite": "r06_t05_resourceio",
               "test": "watch_registry_refcount_diagnostics_and_polling_events"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_native_resource_completion",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
             }
           ],
-          "meaning": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
+          "meaning": "当前原生WebView实际显示纯文本、Markdown、真实Word/首张Excel表格；sandbox iframe、二进制/大文件信息卡、损坏文件错误；真实独立只读窗口重读磁盘并拒绝读别的文件/写入，主窗未保存编辑保留。实际PNG保留供视觉复核。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t05_preview.rs",
@@ -42508,50 +42647,67 @@
                   "quote": "    assert_eq!(err.status, 400);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+              "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+              "testStartLine": 9,
+              "testEndLine": 139,
+              "assertions": [
+                {
+                  "line": 10,
+                  "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                },
+                {
+                  "line": 39,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert!(target.is_absolute())"
+                },
+                {
+                  "line": 56,
+                  "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                },
+                {
+                  "line": 83,
+                  "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                },
+                {
+                  "line": 96,
+                  "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                },
+                {
+                  "line": 106,
+                  "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                },
+                {
+                  "line": 116,
+                  "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                },
+                {
+                  "line": 118,
+                  "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                },
+                {
+                  "line": 122,
+                  "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                },
+                {
+                  "line": 123,
+                  "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        {
-          "clause": "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-          "kind": "IMPLEMENTATION_GAP",
-          "reason": "当前Rust/Tauri候选未实现文本/Markdown/Office viewer界面、二进制/过大信息卡、错误显示、变化重读及独立只读窗口；HTML/资源后端预览不能替代界面行为。",
-          "sourceLocations": [
-            {
-              "endLine": 95,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-              "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-              "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-              "startLine": 85
-            },
-            {
-              "endLine": 78,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "独立桌面host建立阶段R09。",
-              "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-              "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-              "startLine": 75
-            },
-            {
-              "endLine": 63,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-              "path": "rust/Cargo.toml",
-              "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-              "startLine": 46
-            }
-          ]
-        },
-        "文本/Markdown/Office 等显示相应预览；资源改变事件后重读；可派生只读窗口",
-        "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-proof-review.json"
     },
     {
       "id": "R00-T02-LA-421EEA1AC8D5",
@@ -44378,7 +44534,7 @@
             {
               "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
               "test": "failure_results_never_register_copies_attachments_or_trash_success",
-              "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+              "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
               "testStartLine": 169,
               "testEndLine": 190,
               "assertions": [
@@ -88839,7 +88995,7 @@
             {
               "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
               "test": "failure_results_never_register_copies_attachments_or_trash_success",
-              "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+              "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
               "testStartLine": 169,
               "testEndLine": 190,
               "assertions": [
@@ -88869,7 +89025,7 @@
         "非法/缺失路径返回 false，不把永久删除混入"
       ],
       "then": "合法目标存在时 shell.trashItem 后书桌列表更新",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -88878,9 +89034,14 @@
               "package": "lingxi-service",
               "suite": "r06_original_resource_proofs",
               "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_native_resource_completion",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
             }
           ],
-          "meaning": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
+          "meaning": "当前Tauri生产trash_item调用真实系统废纸篓；macOS NsFileManager避免Finder自动化权限等待，无永久删除回退。界面只在真实成功后移除列表；相对/缺失路径false。本轮唯一合成文件通过真实Finder定位系统Trash并复制载荷，原字节逐字核对；不以源消失代替OS证明。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
@@ -88934,12 +89095,63 @@
                   "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+              "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+              "testStartLine": 9,
+              "testEndLine": 139,
+              "assertions": [
+                {
+                  "line": 10,
+                  "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                },
+                {
+                  "line": 39,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert!(target.is_absolute())"
+                },
+                {
+                  "line": 56,
+                  "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                },
+                {
+                  "line": 83,
+                  "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                },
+                {
+                  "line": 96,
+                  "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                },
+                {
+                  "line": 106,
+                  "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                },
+                {
+                  "line": 116,
+                  "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                },
+                {
+                  "line": 118,
+                  "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                },
+                {
+                  "line": 122,
+                  "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                },
+                {
+                  "line": 123,
+                  "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "合法目标存在时 shell.trashItem 后书桌列表更新"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -88948,9 +89160,14 @@
               "package": "lingxi-service",
               "suite": "r06_original_resource_proofs",
               "test": "local_resource_rename_move_trash_and_conflicts_match_real_bytes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_native_resource_completion",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash"
             }
           ],
-          "meaning": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
+          "meaning": "当前Tauri生产trash_item调用真实系统废纸篓；macOS NsFileManager避免Finder自动化权限等待，无永久删除回退。界面只在真实成功后移除列表；相对/缺失路径false。本轮唯一合成文件通过真实Finder定位系统Trash并复制载荷，原字节逐字核对；不以源消失代替OS证明。 当前macOS实跑；独立复核仅静态，不冒称Windows/Linux运行或R06全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_original_resource_proofs.rs",
@@ -89004,50 +89221,67 @@
                   "quote": "assert_eq!(std::fs::read(&occupied).unwrap(), b\"existing target bytes\");"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_native_resource_completion.rs",
+              "test": "current_native_resource_three_leaves_real_windows_and_os_trash",
+              "sourceSHA256": "e4bdce746b649c88d247e1eb4fe935cff37b93f44ff0d5030ac7ebcb5df0330b",
+              "testStartLine": 9,
+              "testEndLine": 139,
+              "assertions": [
+                {
+                  "line": 10,
+                  "quote": "assert_eq!(\n        std::env::consts::OS,\n        \"macos\",\n        \"本腿必须实际运行macOS窗口，其他平台不能冒充通过\"\n    )"
+                },
+                {
+                  "line": 39,
+                  "quote": "assert!(\n        frontend.status.success(),\n        \"{}\",\n        String::from_utf8_lossy(&frontend.stderr)\n    )"
+                },
+                {
+                  "line": 55,
+                  "quote": "assert!(target.is_absolute())"
+                },
+                {
+                  "line": 56,
+                  "quote": "assert!(!target.starts_with(&repo), \"禁止在仓库中堆积构建副本\")"
+                },
+                {
+                  "line": 83,
+                  "quote": "assert!(\n        child.status.success(),\n        \"当前原生检查失败，证据{}\\n{}\\n{}\",\n        output.display(),\n        String::from_utf8_lossy(&child.stdout),\n        String::from_utf8_lossy(&child.stderr)\n    )"
+                },
+                {
+                  "line": 96,
+                  "quote": "assert!(\n            stdout.contains(&format!(\"NATIVE_RESOURCE_CASE {marker} PASS\")),\n            \"遗漏真实原叶场景：{marker}\"\n        )"
+                },
+                {
+                  "line": 106,
+                  "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_TAURI_ACTUAL\")"
+                },
+                {
+                  "line": 116,
+                  "quote": "assert_eq!(receipt[field], true, \"{field}\")"
+                },
+                {
+                  "line": 118,
+                  "quote": "assert_eq!(\n        receipt[\"trashRecoveredBytes\"],\n        \"当前原生OS废纸篓唯一合成内容\"\n    )"
+                },
+                {
+                  "line": 122,
+                  "quote": "assert!(!Path::new(receipt[\"trashSource\"].as_str().unwrap()).exists())"
+                },
+                {
+                  "line": 123,
+                  "quote": "assert!(\n        receipt[\"actualSystemTrashPath\"]\n            .as_str()\n            .unwrap()\n            .contains(\"/.Trash/\")\n            || receipt[\"actualSystemTrashPath\"]\n                .as_str()\n                .unwrap()\n                .contains(\"/.Trashes/\")\n    )"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "非法/缺失路径返回 false，不把永久删除混入"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        {
-          "clause": "合法目标存在时 shell.trashItem 后书桌列表更新",
-          "kind": "IMPLEMENTATION_GAP",
-          "reason": "当前Rust/Tauri候选未实现OS回收站入口与书桌列表刷新；ResourceIO自有回收区不是OS shell.trashItem，不可替代。",
-          "sourceLocations": [
-            {
-              "endLine": 95,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前tauri-host登记planned/R09，独立manifest为desktop/src-tauri；旧Electron桥不可代替当前候选。",
-              "path": "docs/rust-tauri/R01/DEPENDENCY_RULES.json",
-              "quote": "  {\n   \"module\": \"tauri-host\",\n   \"kind\": \"desktop-host\",\n   \"crate_path\": \"desktop/src-tauri\",\n   \"status\": \"planned\",\n   \"establish_stage\": \"R09\",\n   \"responsibility\": \"独立桌面构建；依赖协议，不嵌入业务内核\",\n   \"note\": \"独立 manifest，与 headless workspace 分开，避免 cargo test --workspace 被迫安装 WebView 依赖\"\n  }\n ],\n \"dependency_rules\": [",
-              "startLine": 85
-            },
-            {
-              "endLine": 78,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "独立桌面host建立阶段R09。",
-              "path": "docs/rust-tauri/R01/ADR-001-ownership.md",
-              "quote": "**模块归属（建立阶段）**：lingxi-protocol（R01-T01 已建）／lingxi-kernel（R01-T01\n已建）／lingxi-adapters（R02）／lingxi-service（R02）／lingxi-cli（R07）／\nxtask（R02）。tauri-host 为独立 manifest（desktop/src-tauri，R09），不进 headless\nworkspace，避免 `cargo test --workspace` 被迫安装 WebView 依赖。",
-              "startLine": 75
-            },
-            {
-              "endLine": 63,
-              "kind": "current_source_boundary_not_execution_proof",
-              "meaning": "当前Rust工作区只有headless模块，不含当前桌面host。",
-              "path": "rust/Cargo.toml",
-              "quote": "[workspace]\nresolver = \"2\"\nmembers = [\n    \"crates/lingxi-protocol\",\n    \"crates/lingxi-kernel\",\n    \"crates/lingxi-spike\",\n    \"crates/lingxi-browser-spike\",\n    \"crates/lingxi-service\",\n    \"crates/lingxi-adapters\",\n    \"crates/xtask\",\n    # R06-T06: test-only memory/wall-clock guard (pre-main ctor). Not a\n    # product module: it enters test builds exclusively through the\n    # `test-guard` feature edge declared by the crates under test, so\n    # `cargo build` / release graphs never link it.\n    \"crates/lingxi-test-guard\",\n]\n\n[workspace.package]",
-              "startLine": 46
-            }
-          ]
-        },
-        "合法目标存在时 shell.trashItem 后书桌列表更新",
-        "非法/缺失路径返回 false，不把永久删除混入"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/native-resource-proof-review.json"
     },
     {
       "id": "R00-T02-LA-AF8E24A2F524",
@@ -104887,7 +105121,7 @@
             {
               "path": "desktop/src/tauri-resources/__tests__/resource-desktop.test.tsx",
               "test": "failure_results_never_register_copies_attachments_or_trash_success",
-              "sourceSHA256": "fb104352817a7688f7ebc26513c807f12ee6d66074071e0cac2f9840e5b44a1e",
+              "sourceSHA256": "eae2a4debc8e9e0d9fd08c6adfba0769ca11ef9b097d65d22cf60525c4b54a28",
               "testStartLine": 169,
               "testEndLine": 190,
               "assertions": [

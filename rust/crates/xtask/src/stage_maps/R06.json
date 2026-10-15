@@ -4103,6 +4103,21 @@
         "{EVIDENCE}/R06_BINDINGS/r06_test_f9e3a7f080e3ef8f2ef3/binding-result.json"
       ]
     },
+    "r06_test_72ee1108d3cd24e710f5": {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/rust-tauri/r06_stage_inputs.py",
+        "--binding",
+        "r06_test_72ee1108d3cd24e710f5",
+        "--evidence",
+        "{EVIDENCE}/R06_BINDINGS/r06_test_72ee1108d3cd24e710f5"
+      ],
+      "timeoutSecs": 1020,
+      "evidencePaths": [
+        "{EVIDENCE}/R06_BINDINGS/r06_test_72ee1108d3cd24e710f5/binding-result.json"
+      ]
+    },
     "r06_test_eccec3420d023451da78": {
       "argv": [
         "python3",
@@ -8161,6 +8176,7 @@
         "r06_test_70dd69e48001cb1d0bad",
         "r06_test_71df6350c0b1af0e0660",
         "r06_test_72cd17b40f941daf8e8e",
+        "r06_test_72ee1108d3cd24e710f5",
         "r06_test_736966a249b108a882d8",
         "r06_test_747f0cfc89ff8acc1826",
         "r06_test_74cffd6e6418f1c2a5bc",
@@ -11057,9 +11073,35 @@
         "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_72ee1108d3cd24e710f5",
+        "r06_test_8e4827fb785d8282e02f",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-238267978DDA-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-238267978DDA-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-238267978DDA-assertion-00"
+        ],
+        [
+          "R00-T02-LA-238267978DDA-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-23AB8E0A2493",
@@ -13169,9 +13211,36 @@
         "二进制/过大文件显示信息卡；读取失败错误；独立 viewer 不回写主编辑状态"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_72ee1108d3cd24e710f5",
+        "r06_test_8e4827fb785d8282e02f",
+        "r06_test_c1d66790f899675262f0",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-4173A08A51CC-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-4173A08A51CC-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-4173A08A51CC-assertion-00"
+        ],
+        [
+          "R00-T02-LA-4173A08A51CC-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-421EEA1AC8D5",
@@ -18988,9 +19057,35 @@
         "非法/缺失路径返回 false，不把永久删除混入"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_72ee1108d3cd24e710f5",
+        "r06_test_808ce6ca3819b4531be9",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-AF18F5CEA14F-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-AF18F5CEA14F-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-AF18F5CEA14F-assertion-00"
+        ],
+        [
+          "R00-T02-LA-AF18F5CEA14F-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-AF8E24A2F524",
@@ -22940,5 +23035,5 @@
       "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
     }
   ],
-  "inputDigestSha256": "851df1addfbb26110c3f646e2be86fc423a7fd92feb61de207f3efc87132566e"
+  "inputDigestSha256": "637b6010ef9d56efe3964322857cd837312046296e562e794e3926ea8660aea8"
 }
