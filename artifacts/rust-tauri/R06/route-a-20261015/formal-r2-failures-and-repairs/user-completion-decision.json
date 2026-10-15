@@ -1,0 +1,29 @@
+{
+  "schema": "lingxi.r06.user-completion-decision.v1",
+  "recordedAtUtc": "2026-10-15T14:32:58.922195+00:00",
+  "userInstruction": "不需要整轮重新跑，现在可以标R06已经完成了",
+  "decision": "R06_COMPLETED_AND_ACCEPTED_BY_USER",
+  "acceptanceBasis": "此前完整执行记录、已发现问题的针对性复验全部通过及独立交叉复核，用户明确不要求整轮重跑并确认完成。",
+  "acceptedImplementationCommit": "1be9107555629c8ea62abd1701c1e4b565c62419",
+  "stageCompleted": true,
+  "acceptanceAuthority": "EXPLICIT_USER_DECISION",
+  "fullStageRerunRequired": false,
+  "newFullStageRunExecuted": false,
+  "lastActualFullFormalResult": "FAIL_PRESERVED",
+  "lastActualFullFormalCandidate": "14453cd05b8aeec7951f27c4dbd021ad2a21d486",
+  "fullFormalExitZeroClaimed": false,
+  "targetedRepairValidation": "PASS",
+  "repairEvidence": {
+    "path": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/repair-result.json",
+    "sha256": "df3a56320a4cd8340e5916c0432f2bb3c4752b4ba6bd032a1747d1e750e2d4be"
+  },
+  "originalFormalEvidence": {
+    "path": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/formal-r2-final-readback.json",
+    "sha256": "8403a0ecf041ae5dcd3883cd66081e7023a746068752e2a2d7dc32a459901398"
+  },
+  "F14": "DONE_BY_USER_ACCEPTANCE",
+  "R07WorkStarted": false,
+  "acceptanceCommandsAssertionsAndMachineVerdictRulesChanged": false,
+  "syncAuditChanged": false,
+  "copilotCoauthorAllowed": false
+}

@@ -1,6 +1,6 @@
 {
   "audited_base": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
-  "current_status": "R06_NOT_ACCEPTED_TARGETED_REPAIRS_VALIDATION_COMPLETE",
+  "current_status": "R06_ACCEPTED",
   "historical_acceptance": {
     "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
     "status": "SUPERSEDED_BY_AR_SCOPE_CHALLENGE",
@@ -26,71 +26,87 @@
   ],
   "closed_count": 15,
   "open_count": 0,
-  "original_steps_status": "IMPLEMENTED_CURRENT_CANDIDATE_STAGE_ACCEPTANCE_PENDING",
+  "original_steps_status": "COMPLETED_BY_USER_ACCEPTANCE",
   "original_acceptance": [
     {
       "id": "R06-A01",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A02",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A03",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A04",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A05",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A06",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A07",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A08",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A09",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A10",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A11",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A12",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A13",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A14",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A15",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "id": "R06-A16",
-      "status": "NOT_RUN"
+      "status": "ACCEPTED_BY_USER",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     }
   ],
   "due_leaves_status": "ALL_279_ORIGINAL_BEHAVIOR_LEAVES_READY_FRESH_WHOLE_CANDIDATE_WINDOW_PENDING",
@@ -604,7 +620,7 @@
     }
   ],
   "entry_evidence": "artifacts/rust-tauri/R06/AR/ENTRY-01",
-  "stage_gate": "PREVIOUS_FORMAL_FAIL_PRESERVED_NEW_FULL_STAGE_EXCLUDED_BY_USER",
+  "stage_gate": "CLOSED_BY_USER_ACCEPTANCE_FULL_RERUN_NOT_REQUIRED",
   "upstream_gates": "NOT_RUN",
   "entry_checks": [
     {
@@ -658,7 +674,7 @@
     "obligation_records": 1234,
     "agent_avatar_r06_only_scope_conflict_leaves": 28
   },
-  "extra_obligations_status": "12根因簇待生产实验/范围裁决，未减少15F或60C",
+  "extra_obligations_status": "12根因簇实现及修复证据已完成，用户明确确认R06收口，不要求整轮重跑。",
   "spec_gaps": [
     {
       "id": "SPEC_GAP-2026-10-08-EXECUTION-PROMPT",
@@ -696,77 +712,89 @@
     {
       "work_id": "R06-EX-W01",
       "obligation_id": "R06-EX-01",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W02",
       "obligation_id": "R06-EX-02",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W03",
       "obligation_id": "R06-EX-03",
-      "status": "ACTUAL_ORIGINAL_SERVICE_INSTALL_GAPS_RECORDED_FULL_FRESH_EX_TASK_REQUIRED",
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
       "independent_review": "NO_EX03_TASK_REVIEW_W05_REVIEW_PARTIAL_ONLY",
       "runtime_evidence": [
         "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/ex03-original-install-observed-red-01.json"
-      ]
+      ],
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W04",
       "obligation_id": "R06-EX-04",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W05",
       "obligation_id": "R06-EX-05",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W06",
       "obligation_id": "R06-EX-06",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W07",
       "obligation_id": "R06-EX-07",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W08",
       "obligation_id": "R06-EX-08",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W09",
       "obligation_id": "R06-EX-09",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W10",
       "obligation_id": "R06-EX-10",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W11",
       "obligation_id": "R06-EX-11",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     },
     {
       "work_id": "R06-EX-W12",
       "obligation_id": "R06-EX-12",
-      "status": "PENDING_SOURCE_AND_RUNTIME_CONFIRMATION",
-      "independent_review": "NOT_RUN"
+      "status": "CLOSED_BY_USER_ACCEPTANCE",
+      "independent_review": "NOT_RUN",
+      "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     }
   ],
   "independent_review_workspace": {
@@ -779,9 +807,9 @@
     "product_patch": "15_EXACT_HASHED_FILES"
   },
   "count_scope": "15命名F完整各自修复份额：F08独立PASS且远端核验已交付1；不等于原Steps/16A/281叶/12EX阶段完成",
-  "extra_open_count": 12,
-  "extra_closed_count": 0,
-  "stage_release_formula_status": "NOT_SATISFIED",
+  "extra_open_count": 0,
+  "extra_closed_count": 12,
+  "stage_release_formula_status": "CLOSED_BY_EXPLICIT_USER_DECISION_AFTER_TARGETED_REPAIRS",
   "independent_review_workspaces": [
     {
       "path": "/Users/study_superior/.codex/worktrees/r06-w12-review/LingxiAgent",
@@ -1167,19 +1195,12 @@
     }
   ],
   "last_delivery": {
-    "finding": "ALL-14-REVIEWED-F14-BY-GATE",
-    "commits": [
-      "844a10b2b",
-      "556c19a4e",
-      "0987f72fb",
-      "7302a03cd",
-      "180abc207",
-      "eb1d73750"
-    ],
-    "receipt": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/independent-reviews/",
-    "note": "2026-10-14 收口轮：14 项独立审查 PASS（RV1-RV7 全新空历史子代理于冻结候选独立克隆亲跑），F14 由正式门禁关闭；GUI 真实链路证据在案（两叶待阶段裁定）；192 READY / 87 GAP"
+    "finding": "R06_COMPLETED_BY_EXPLICIT_USER_ACCEPTANCE",
+    "acceptedImplementationCommit": "1be9107555629c8ea62abd1701c1e4b565c62419",
+    "receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json",
+    "note": "用户确认刚修复问题的针对性验收及已有完整执行证据足以收口，无需整轮重跑；保留原正式FAIL，不虚构verify-stage exit0。"
   },
-  "last_updated_utc": "2026-10-15T14:20:19.234088+00:00",
+  "last_updated_utc": "2026-10-15T14:32:58.922195+00:00",
   "control_corrections": [
     {
       "at": "2026-10-11T09:48:29.816963+00:00",
@@ -2100,13 +2121,15 @@
     }
   ],
   "latest_user_execution_scope": {
-    "instruction": "不要全部验收，只验收刚刚修复的问题。",
-    "scope": "ONLY_NEWLY_REPAIRED_FAILURES",
-    "result": "TARGETED_REPAIRS_VALIDATION_PASS",
-    "fullStageReexecution": "NOT_STARTED_EXPLICITLY_EXCLUDED",
-    "stageAccepted": false,
-    "F14": "OPEN",
-    "R07Ready": false
+    "instruction": "不需要整轮重新跑，现在可以标R06已经完成了",
+    "scope": "R06_COMPLETE_BY_USER_ACCEPTANCE_AFTER_TARGETED_REPAIRS",
+    "result": "R06_ACCEPTED",
+    "fullStageReexecution": "NOT_REQUIRED_AND_NOT_STARTED",
+    "stageAccepted": true,
+    "acceptanceAuthority": "EXPLICIT_USER_DECISION",
+    "actualFullFormalPassClaimed": false,
+    "F14": "DONE_BY_USER_ACCEPTANCE",
+    "R07WorkStarted": false
   },
   "route_a_continuation_20261014": {
     "user_route": "A_IMPLEMENT_ALL_78_NO_GOVERNANCE_CHANGE",
@@ -2611,12 +2634,15 @@
       "report": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/formal-r2-final-readback.json",
       "repairStatus": "TARGETED_REPAIRS_VALIDATION_COMPLETE_PASS",
       "repeatedFullPrecheck": "CANCELLED_BY_USER_DO_NOT_RUN",
-      "nextAcceptance": "NONE_IN_CURRENT_SCOPE_FULL_STAGE_EXPLICITLY_EXCLUDED",
-      "stageAccepted": false,
+      "nextAcceptance": "NONE_REQUIRED_BY_USER",
+      "stageAccepted": true,
       "R07Ready": false,
-      "F14": "OPEN",
+      "F14": "DONE_BY_USER_ACCEPTANCE",
       "futureCopilotCoauthor": "FORBIDDEN_BY_LATEST_USER_INSTRUCTION",
-      "repairReport": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/repair-result.json"
+      "repairReport": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/repair-result.json",
+      "acceptanceAuthority": "EXPLICIT_USER_DECISION",
+      "actualFullFormalResult": "FAIL_PRESERVED",
+      "completionReceipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
     }
   },
   "ex12_additional_reopen": {
@@ -2639,5 +2665,211 @@
     "registeredBindingsPassed": 9,
     "bindingWindow": "artifacts/rust-tauri/R06/route-a-20261015/ex12-current-binding-window-summary.json"
   },
-  "stage_gate_previous_executed_failure": "FAIL_EXECUTED_14453CD05_FORMAL_R2"
+  "stage_gate_previous_executed_failure": "FAIL_EXECUTED_14453CD05_FORMAL_R2",
+  "status_before_user_completion_20261015": {
+    "current_status": "R06_NOT_ACCEPTED_TARGETED_REPAIRS_VALIDATION_COMPLETE",
+    "stage_gate": "PREVIOUS_FORMAL_FAIL_PRESERVED_NEW_FULL_STAGE_EXCLUDED_BY_USER",
+    "original_steps_status": "IMPLEMENTED_CURRENT_CANDIDATE_STAGE_ACCEPTANCE_PENDING",
+    "original_acceptance": [
+      {
+        "id": "R06-A01",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A02",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A03",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A04",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A05",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A06",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A07",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A08",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A09",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A10",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A11",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A12",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A13",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A14",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A15",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "id": "R06-A16",
+        "status": "ACCEPTED_BY_USER",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      }
+    ],
+    "extra_obligations_status": "12根因簇待生产实验/范围裁决，未减少15F或60C",
+    "extra_tasks": [
+      {
+        "work_id": "R06-EX-W01",
+        "obligation_id": "R06-EX-01",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W02",
+        "obligation_id": "R06-EX-02",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W03",
+        "obligation_id": "R06-EX-03",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NO_EX03_TASK_REVIEW_W05_REVIEW_PARTIAL_ONLY",
+        "runtime_evidence": [
+          "artifacts/rust-tauri/R06/AR/W05-REVIEW-PREP-01/ex03-original-install-observed-red-01.json"
+        ],
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W04",
+        "obligation_id": "R06-EX-04",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W05",
+        "obligation_id": "R06-EX-05",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W06",
+        "obligation_id": "R06-EX-06",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W07",
+        "obligation_id": "R06-EX-07",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W08",
+        "obligation_id": "R06-EX-08",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W09",
+        "obligation_id": "R06-EX-09",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W10",
+        "obligation_id": "R06-EX-10",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W11",
+        "obligation_id": "R06-EX-11",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      },
+      {
+        "work_id": "R06-EX-W12",
+        "obligation_id": "R06-EX-12",
+        "status": "CLOSED_BY_USER_ACCEPTANCE",
+        "independent_review": "NOT_RUN",
+        "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json"
+      }
+    ],
+    "extra_open_count": 12,
+    "extra_closed_count": 0,
+    "stage_release_formula_status": "NOT_SATISFIED",
+    "latest_user_execution_scope": {
+      "instruction": "不要全部验收，只验收刚刚修复的问题。",
+      "scope": "ONLY_NEWLY_REPAIRED_FAILURES",
+      "result": "TARGETED_REPAIRS_VALIDATION_PASS",
+      "fullStageReexecution": "NOT_STARTED_EXPLICITLY_EXCLUDED",
+      "stageAccepted": false,
+      "F14": "OPEN",
+      "R07Ready": false
+    },
+    "last_delivery": {
+      "finding": "ALL-14-REVIEWED-F14-BY-GATE",
+      "commits": [
+        "844a10b2b",
+        "556c19a4e",
+        "0987f72fb",
+        "7302a03cd",
+        "180abc207",
+        "eb1d73750"
+      ],
+      "receipt": "artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/independent-reviews/",
+      "note": "2026-10-14 收口轮：14 项独立审查 PASS（RV1-RV7 全新空历史子代理于冻结候选独立克隆亲跑），F14 由正式门禁关闭；GUI 真实链路证据在案（两叶待阶段裁定）；192 READY / 87 GAP"
+    }
+  },
+  "completion_authority": "EXPLICIT_USER_ACCEPTANCE_AFTER_TARGETED_REPAIR_VALIDATION",
+  "completion_receipt": "artifacts/rust-tauri/R06/route-a-20261015/formal-r2-failures-and-repairs/user-completion-decision.json",
+  "last_actual_formal_stage_result": "FAIL_PRESERVED_NOT_REWRITTEN",
+  "F14": "DONE_BY_USER_ACCEPTANCE"
 }
