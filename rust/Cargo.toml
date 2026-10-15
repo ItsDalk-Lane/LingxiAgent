@@ -66,6 +66,8 @@ license = "UNLICENSED"
 publish = false
 
 [workspace.dependencies]
+# 有限 Office XML 转换，沿用独立桌面锁树已使用的纯 Rust 版本。
+quick-xml = "=0.42.0"
 # 助手角色卡使用成熟 ZIP 实现，仅启用纯 Rust 的 Deflate，不引入桌面或加密堆栈。
 zip = { version = "=9.0.3", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 # 原有 HTTP 版本保持不变，仅启用角色卡文件上传所需的标准 multipart 提取器。

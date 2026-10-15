@@ -18,8 +18,7 @@
 //!   "file too large"——与现役 docx/xlsx 面（:128/:149）上限词汇一致；
 //!   现役 read/read-base64 无上限。
 //! - D12 延展：query 未知键/重复键 → 400。
-//! - docx-html/xlsx-html 依赖 mammoth/ExcelJS，不在叶 #23-24 范围
-//!   （叶图 deferred）。
+//! - docx-html/xlsx-html 通过受限纯 Rust Office 解析器转换；沿同一授权根。
 
 use std::path::{Component, Path, PathBuf};
 
@@ -241,4 +240,73 @@ pub async fn fs_read_base64_route(
         }
         Err(_) => json_error(StatusCode::NOT_FOUND, "file not found"),
     }
+}
+
+async fn office_html(state: ServiceState, query: Option<String>, word: bool) -> Response {
+    let raw = match extract_path(query.as_deref()) {
+        Ok(path) => path,
+        Err(error) => return error,
+    };
+    let Some(path) = state.fs_read().resolve(&raw) else {
+        return json_error(StatusCode::FORBIDDEN, "path not allowed");
+    };
+    let meta = match std::fs::metadata(&path) {
+        Ok(meta) => meta,
+        Err(_) => return json_error(StatusCode::NOT_FOUND, "file not found"),
+    };
+    if !meta.is_file() {
+        return json_error(StatusCode::BAD_REQUEST, "not a file");
+    }
+    if meta.len() > MAX_FS_READ_BYTES {
+        return json_error(StatusCode::PAYLOAD_TOO_LARGE, "file too large");
+    }
+    let source = state.fs_read().clone();
+    // 解析只访问已打开文件的受限字节，不阻塞服务的异步请求线程。
+    let result = tokio::task::spawn_blocking(move || {
+        if source.resolve(&raw).as_ref() != Some(&path) {
+            return Err("path changed before read".to_string());
+        }
+        let snapshot = crate::file_safety::Snapshot::read(&path).map_err(|e| e.to_string())?;
+        if snapshot.bytes.len() as u64 > MAX_FS_READ_BYTES {
+            return Err("file too large".into());
+        }
+        if source.resolve(&raw).as_ref() != Some(&path) {
+            return Err("path changed during read".into());
+        }
+        if word {
+            crate::office::docx(&snapshot.bytes)
+        } else {
+            crate::office::xlsx(&snapshot.bytes)
+        }
+    })
+    .await;
+    match result {
+        Ok(Ok(document)) => text_response(document.html),
+        Ok(Err(error)) if error == "xlsx has no rows" => {
+            json_error(StatusCode::UNPROCESSABLE_ENTITY, "xlsx has no rows")
+        }
+        Ok(Err(error)) if error == "file too large" => {
+            json_error(StatusCode::PAYLOAD_TOO_LARGE, "file too large")
+        }
+        _ => json_error(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            if word {
+                "docx parse failed"
+            } else {
+                "xlsx parse failed"
+            },
+        ),
+    }
+}
+pub async fn fs_docx_html_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    office_html(state, query, true).await
+}
+pub async fn fs_xlsx_html_route(
+    State(state): State<ServiceState>,
+    RawQuery(query): RawQuery,
+) -> Response {
+    office_html(state, query, false).await
 }

@@ -7056,6 +7056,7 @@
         "r06_test_228c53c8659f49a87fdf",
         "r06_test_22f609da55faca0dbedd",
         "r06_test_22f6120165c4c84f6ca9",
+        "r06_test_238ffa504f5b15d5edbb",
         "r06_test_24b99b07405d8d6ab03d",
         "r06_test_250d00ac042cd6a5d6cc",
         "r06_test_258d2e6c395b0bda7051",
@@ -7094,6 +7095,7 @@
         "r06_test_3886c50eb8efe2cc6d11",
         "r06_test_389f81a5c0c7fe5f0823",
         "r06_test_392d8457e909539f0cc9",
+        "r06_test_392de9222af76ac50997",
         "r06_test_39530e4fa56dc3bc81c7",
         "r06_test_3b84cb4be5b6952ea66c",
         "r06_test_3c65047a74d1640916bb",
@@ -7124,6 +7126,7 @@
         "r06_test_4780689eedd2834ab458",
         "r06_test_4864520b589b7712f000",
         "r06_test_49283e4bc5379944d138",
+        "r06_test_492f0dbdf2028bfd611a",
         "r06_test_49b4e33ff410b6b19542",
         "r06_test_4aa6977626f14303cec3",
         "r06_test_4c625c25525d4d70e007",
@@ -7182,6 +7185,7 @@
         "r06_test_6815f309acf5754281a6",
         "r06_test_6895a2059d694c85faf7",
         "r06_test_68e0accf860884608603",
+        "r06_test_6a73ba4d83376d5c9ed2",
         "r06_test_6aa5156db27be9a5331b",
         "r06_test_6acda3a265c23c2e8d90",
         "r06_test_6b6232a7d614fb31587b",
@@ -7294,9 +7298,11 @@
         "r06_test_a88ac189f1653cd149c1",
         "r06_test_a98ecdf93d75da9039cb",
         "r06_test_a9ed2d50143bcb36309e",
+        "r06_test_aa09e0a8f37bb63a0fb8",
         "r06_test_abd0aa24f7a27f2633e6",
         "r06_test_abe6397b5f2671e1b210",
         "r06_test_ac227fc0b0fdd306ffbf",
+        "r06_test_ac4093080de1f861e163",
         "r06_test_ac6e21b981a75cd90d7d",
         "r06_test_adc30b79a5fa2344dd11",
         "r06_test_ae7440724d90c6dcce75",
@@ -12270,9 +12276,38 @@
         "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_238ffa504f5b15d5edbb",
+        "r06_test_26ae52ecfb36b6298487",
+        "r06_test_392de9222af76ac50997",
+        "r06_test_492f0dbdf2028bfd611a",
+        "r06_test_6a73ba4d83376d5c9ed2",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-2F2B6E173C1B-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-2F2B6E173C1B-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-2F2B6E173C1B-assertion-00"
+        ],
+        [
+          "R00-T02-LA-2F2B6E173C1B-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-2FAA749DA790",
@@ -12759,9 +12794,39 @@
         "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
       ],
       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
-      "basisKind": "required_behavior_pending",
-      "evidenceCommandRefs": [],
-      "evidenceRequired": "保持原条款和原到期阶段；当前修复未执行逐叶完整验收。必须为每条原断言绑定真实专属正反行为证据后才能改为完成；登记或套件通过不得代替。"
+      "basisKind": "full_original_behavior",
+      "evidenceCommandRefs": [
+        "r06_test_238ffa504f5b15d5edbb",
+        "r06_test_26ae52ecfb36b6298487",
+        "r06_test_492f0dbdf2028bfd611a",
+        "r06_test_6a73ba4d83376d5c9ed2",
+        "r06_test_aa09e0a8f37bb63a0fb8",
+        "r06_test_ac4093080de1f861e163",
+        "r06_z_leaf_evidence"
+      ],
+      "evidenceRequired": "仅完整原断言登记可用于整叶验收；本轮实际具名检查及原始日志必须与同一候选一致。",
+      "assertionContract": {
+        "producerCommand": "r06_z_leaf_evidence",
+        "evidencePath": "{EVIDENCE}/R06_LEAVES/leaf-cases.json",
+        "cases": [
+          {
+            "case": "R00-T02-LA-3617DF5B23D5-assertion-00",
+            "expect": 1
+          },
+          {
+            "case": "R00-T02-LA-3617DF5B23D5-assertion-01",
+            "expect": 1
+          }
+        ]
+      },
+      "originalAssertionCases": [
+        [
+          "R00-T02-LA-3617DF5B23D5-assertion-00"
+        ],
+        [
+          "R00-T02-LA-3617DF5B23D5-assertion-01"
+        ]
+      ]
     },
     {
       "id": "R00-T02-LA-3818ADEAFA7A",
@@ -52766,7 +52831,7 @@
           "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
         ],
         "then": "返回转换的 HTML",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -52775,9 +52840,24 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_fsread",
                 "test": "fs_read_routes_faces_and_error_vocabulary"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "current_docx_html_route_converts_actual_archive_and_preserves_file"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "current_native_office_preview_and_visible_real_rust_errors"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals"
               }
             ],
-            "meaning": "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。",
+            "meaning": "真实授权文件ZIP/XML转换，实际当前Rust服务HTTP返回HTML；生产Electron main/preload→当前openFilePreview/PreviewPanel显示真实正文/表格。Word标题/表格/实体转义；Excel按首表关系而非文件名，保留共享富文本/稀疏列/公式缓存/错误与日期。日期按1900/1904与styles转明确ISO8601 UTC，独立ExcelJS原日期反例保留后修复，不把序号当日期；不声称排版字体或公式重算。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
@@ -52875,12 +52955,105 @@
                     "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "current_docx_html_route_converts_actual_archive_and_preserves_file",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 245,
+                "testEndLine": 261,
+                "assertions": [
+                  {
+                    "line": 251,
+                    "quote": "assert_eq!(response.0, 200, \"{response:?}\")"
+                  },
+                  {
+                    "line": 252,
+                    "quote": "assert!(response\n        .1\n        .contains(\"<h1>实际中文 &amp; &lt;script&gt;拒绝脚本&lt;/script&gt; 🙂</h1>\"))"
+                  },
+                  {
+                    "line": 255,
+                    "quote": "assert!(response\n        .1\n        .contains(\"<table><tr><td><p>表格原文</p></td></tr></table>\"))"
+                  },
+                  {
+                    "line": 258,
+                    "quote": "assert!(!response.1.contains(\"<script>\"))"
+                  },
+                  {
+                    "line": 259,
+                    "quote": "assert_eq!(std::fs::read(&file).unwrap(), bytes)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "current_native_office_preview_and_visible_real_rust_errors",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 359,
+                "testEndLine": 421,
+                "assertions": [
+                  {
+                    "line": 360,
+                    "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+                  },
+                  {
+                    "line": 396,
+                    "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+                  },
+                  {
+                    "line": 406,
+                    "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                  },
+                  {
+                    "line": 414,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+                  },
+                  {
+                    "line": 415,
+                    "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+                  },
+                  {
+                    "line": 416,
+                    "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 317,
+                "testEndLine": 356,
+                "assertions": [
+                  {
+                    "line": 322,
+                    "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+                  },
+                  {
+                    "line": 330,
+                    "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+                  },
+                  {
+                    "line": 335,
+                    "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+                  },
+                  {
+                    "line": 341,
+                    "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+                  },
+                  {
+                    "line": 348,
+                    "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+                  },
+                  {
+                    "line": 351,
+                    "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           },
           {
             "index": 1,
@@ -52889,9 +53062,24 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_fsread",
                 "test": "fs_read_routes_faces_and_error_vocabulary"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "current_native_office_preview_and_visible_real_rust_errors"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals"
               }
             ],
-            "meaning": "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。",
+            "meaning": "真实缺凭证401、根外/链接403、缺失404、目录400、超限413、损坏/实体500；实际生产错误总线与Toast显示真实500/403且不打开假预览；所有原文件SHA不变，无越权内容或写出归档成员。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
@@ -52989,18 +53177,141 @@
                     "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 276,
+                "testEndLine": 315,
+                "assertions": [
+                  {
+                    "line": 290,
+                    "quote": "assert_eq!(denied.0, 403, \"{denied:?}\")"
+                  },
+                  {
+                    "line": 291,
+                    "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+                  },
+                  {
+                    "line": 292,
+                    "quote": "assert_eq!(h.get(kind, &outside, false).await.0, 401)"
+                  },
+                  {
+                    "line": 293,
+                    "quote": "assert_eq!(h.get(kind, &missing, true).await.0, 404)"
+                  },
+                  {
+                    "line": 294,
+                    "quote": "assert_eq!(h.get(kind, &h.workspace, true).await.0, 400)"
+                  },
+                  {
+                    "line": 295,
+                    "quote": "assert_eq!(h.get(kind, &large, true).await.0, 413)"
+                  },
+                  {
+                    "line": 297,
+                    "quote": "assert_eq!(bad.0, 500)"
+                  },
+                  {
+                    "line": 298,
+                    "quote": "assert!(bad.1.contains(\"parse failed\"))"
+                  },
+                  {
+                    "line": 304,
+                    "quote": "assert_eq!(denied.0, 403)"
+                  },
+                  {
+                    "line": 305,
+                    "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+                  },
+                  {
+                    "line": 308,
+                    "quote": "assert_eq!(std::fs::read(&corrupt).unwrap(), b\"not a zip\")"
+                  },
+                  {
+                    "line": 309,
+                    "quote": "assert!(missing.symlink_metadata().is_err())"
+                  },
+                  {
+                    "line": 310,
+                    "quote": "assert_eq!(\n        std::fs::metadata(&large).unwrap().len(),\n        20 * 1024 * 1024 + 1\n    )"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "current_native_office_preview_and_visible_real_rust_errors",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 359,
+                "testEndLine": 421,
+                "assertions": [
+                  {
+                    "line": 360,
+                    "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+                  },
+                  {
+                    "line": 396,
+                    "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+                  },
+                  {
+                    "line": 406,
+                    "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                  },
+                  {
+                    "line": 414,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+                  },
+                  {
+                    "line": 415,
+                    "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+                  },
+                  {
+                    "line": 416,
+                    "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 317,
+                "testEndLine": 356,
+                "assertions": [
+                  {
+                    "line": 322,
+                    "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+                  },
+                  {
+                    "line": 330,
+                    "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+                  },
+                  {
+                    "line": 335,
+                    "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+                  },
+                  {
+                    "line": 341,
+                    "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+                  },
+                  {
+                    "line": 348,
+                    "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+                  },
+                  {
+                    "line": 351,
+                    "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/office-proof-review.json"
       },
       {
         "id": "R00-T02-LA-2FAA749DA790",
@@ -58463,7 +58774,7 @@
           "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见"
         ],
         "then": "返回首张工作表 HTML 表格",
-        "status": "GAP",
+        "status": "READY",
         "groups": [
           {
             "index": 0,
@@ -58472,9 +58783,29 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_fsread",
                 "test": "fs_read_routes_faces_and_error_vocabulary"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "current_xlsx_html_route_uses_first_relationship_and_real_cells"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "real_excel_dates_keep_time_in_both_calendars_and_never_show_serials"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "current_native_office_preview_and_visible_real_rust_errors"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals"
               }
             ],
-            "meaning": "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。",
+            "meaning": "真实授权文件ZIP/XML转换，实际当前Rust服务HTTP返回HTML；生产Electron main/preload→当前openFilePreview/PreviewPanel显示真实正文/表格。Word标题/表格/实体转义；Excel按首表关系而非文件名，保留共享富文本/稀疏列/公式缓存/错误与日期。日期按1900/1904与styles转明确ISO8601 UTC，独立ExcelJS原日期反例保留后修复，不把序号当日期；不声称排版字体或公式重算。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
@@ -58572,12 +58903,126 @@
                     "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "current_xlsx_html_route_uses_first_relationship_and_real_cells",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 263,
+                "testEndLine": 274,
+                "assertions": [
+                  {
+                    "line": 269,
+                    "quote": "assert_eq!(response.0, 200, \"{response:?}\")"
+                  },
+                  {
+                    "line": 270,
+                    "quote": "assert_eq!(response.1,\"<table><tr><td>第一张 &lt;script&gt;alert(1)&lt;/script&gt; &amp; 原文</td><td></td><td>42</td></tr><tr><td></td><td>富文本尾部</td><td>true</td></tr></table>\")"
+                  },
+                  {
+                    "line": 271,
+                    "quote": "assert!(!response.1.contains(\"不许返回第二张\"))"
+                  },
+                  {
+                    "line": 272,
+                    "quote": "assert_eq!(std::fs::read(&file).unwrap(), bytes)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "real_excel_dates_keep_time_in_both_calendars_and_never_show_serials",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 199,
+                "testEndLine": 242,
+                "assertions": [
+                  {
+                    "line": 232,
+                    "quote": "assert_eq!(response.0, 200, \"{response:?}\")"
+                  },
+                  {
+                    "line": 233,
+                    "quote": "assert_eq!(\n            response.1,\n            format!(\"<table><tr><td>{expected}</td></tr></table>\")\n        )"
+                  },
+                  {
+                    "line": 237,
+                    "quote": "assert_eq!(std::fs::read(file).unwrap(), bytes)"
+                  },
+                  {
+                    "line": 240,
+                    "quote": "assert!(lingxi_service::office::xlsx(&invalid).is_err())"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "current_native_office_preview_and_visible_real_rust_errors",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 359,
+                "testEndLine": 421,
+                "assertions": [
+                  {
+                    "line": 360,
+                    "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+                  },
+                  {
+                    "line": 396,
+                    "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+                  },
+                  {
+                    "line": 406,
+                    "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                  },
+                  {
+                    "line": 414,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+                  },
+                  {
+                    "line": 415,
+                    "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+                  },
+                  {
+                    "line": 416,
+                    "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 317,
+                "testEndLine": 356,
+                "assertions": [
+                  {
+                    "line": 322,
+                    "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+                  },
+                  {
+                    "line": 330,
+                    "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+                  },
+                  {
+                    "line": 335,
+                    "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+                  },
+                  {
+                    "line": 341,
+                    "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+                  },
+                  {
+                    "line": 348,
+                    "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+                  },
+                  {
+                    "line": 351,
+                    "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           },
           {
             "index": 1,
@@ -58586,9 +59031,24 @@
                 "package": "lingxi-service",
                 "suite": "r06_t05_fsread",
                 "test": "fs_read_routes_faces_and_error_vocabulary"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "current_native_office_preview_and_visible_real_rust_errors"
+              },
+              {
+                "package": "lingxi-service",
+                "suite": "r06_office_completion",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals"
               }
             ],
-            "meaning": "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。",
+            "meaning": "真实缺凭证401、根外/链接403、缺失404、目录400、超限413、损坏/实体500；实际生产错误总线与Toast显示真实500/403且不打开假预览；所有原文件SHA不变，无越权内容或写出归档成员。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
             "proofLocations": [
               {
                 "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
@@ -58686,18 +59146,141 @@
                     "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
                   }
                 ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 276,
+                "testEndLine": 315,
+                "assertions": [
+                  {
+                    "line": 290,
+                    "quote": "assert_eq!(denied.0, 403, \"{denied:?}\")"
+                  },
+                  {
+                    "line": 291,
+                    "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+                  },
+                  {
+                    "line": 292,
+                    "quote": "assert_eq!(h.get(kind, &outside, false).await.0, 401)"
+                  },
+                  {
+                    "line": 293,
+                    "quote": "assert_eq!(h.get(kind, &missing, true).await.0, 404)"
+                  },
+                  {
+                    "line": 294,
+                    "quote": "assert_eq!(h.get(kind, &h.workspace, true).await.0, 400)"
+                  },
+                  {
+                    "line": 295,
+                    "quote": "assert_eq!(h.get(kind, &large, true).await.0, 413)"
+                  },
+                  {
+                    "line": 297,
+                    "quote": "assert_eq!(bad.0, 500)"
+                  },
+                  {
+                    "line": 298,
+                    "quote": "assert!(bad.1.contains(\"parse failed\"))"
+                  },
+                  {
+                    "line": 304,
+                    "quote": "assert_eq!(denied.0, 403)"
+                  },
+                  {
+                    "line": 305,
+                    "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+                  },
+                  {
+                    "line": 308,
+                    "quote": "assert_eq!(std::fs::read(&corrupt).unwrap(), b\"not a zip\")"
+                  },
+                  {
+                    "line": 309,
+                    "quote": "assert!(missing.symlink_metadata().is_err())"
+                  },
+                  {
+                    "line": 310,
+                    "quote": "assert_eq!(\n        std::fs::metadata(&large).unwrap().len(),\n        20 * 1024 * 1024 + 1\n    )"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "current_native_office_preview_and_visible_real_rust_errors",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 359,
+                "testEndLine": 421,
+                "assertions": [
+                  {
+                    "line": 360,
+                    "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+                  },
+                  {
+                    "line": 396,
+                    "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+                  },
+                  {
+                    "line": 406,
+                    "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+                  },
+                  {
+                    "line": 414,
+                    "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+                  },
+                  {
+                    "line": 415,
+                    "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+                  },
+                  {
+                    "line": 416,
+                    "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+                  }
+                ]
+              },
+              {
+                "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+                "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+                "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+                "testStartLine": 317,
+                "testEndLine": 356,
+                "assertions": [
+                  {
+                    "line": 322,
+                    "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+                  },
+                  {
+                    "line": 330,
+                    "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+                  },
+                  {
+                    "line": 335,
+                    "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+                  },
+                  {
+                    "line": 341,
+                    "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+                  },
+                  {
+                    "line": 348,
+                    "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+                  },
+                  {
+                    "line": 351,
+                    "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+                  }
+                ]
               }
             ],
-            "coverage": "PARTIAL",
-            "missingClauses": [
-              "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。"
-            ]
+            "coverage": "FULL",
+            "missingClauses": []
           }
         ],
-        "gaps": [
-          "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。"
-        ],
-        "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/resources.json"
+        "gaps": [],
+        "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/office-proof-review.json"
       },
       {
         "id": "R00-T02-LA-3818ADEAFA7A",
@@ -148598,6 +149181,106 @@
         "--show-output"
       ]
     },
+    "r06_test_392de9222af76ac50997": {
+      "package": "lingxi-service",
+      "suite": "r06_office_completion",
+      "test": "current_docx_html_route_converts_actual_archive_and_preserves_file",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_office_completion",
+        "current_docx_html_route_converts_actual_archive_and_preserves_file",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_6a73ba4d83376d5c9ed2": {
+      "package": "lingxi-service",
+      "suite": "r06_office_completion",
+      "test": "current_native_office_preview_and_visible_real_rust_errors",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_office_completion",
+        "current_native_office_preview_and_visible_real_rust_errors",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_238ffa504f5b15d5edbb": {
+      "package": "lingxi-service",
+      "suite": "r06_office_completion",
+      "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_office_completion",
+        "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_492f0dbdf2028bfd611a": {
+      "package": "lingxi-service",
+      "suite": "r06_office_completion",
+      "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_office_completion",
+        "office_http_refusals_are_visible_and_never_publish_or_modify_files",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
     "r06_test_936c40db130105556118": {
       "package": "lingxi-service",
       "suite": "r06_slash_completion",
@@ -149468,6 +150151,56 @@
         "--test",
         "r06_conversation_map_and_checkpoint",
         "checkpoint_restore_route",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_ac4093080de1f861e163": {
+      "package": "lingxi-service",
+      "suite": "r06_office_completion",
+      "test": "current_xlsx_html_route_uses_first_relationship_and_real_cells",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_office_completion",
+        "current_xlsx_html_route_uses_first_relationship_and_real_cells",
+        "--",
+        "--exact",
+        "--show-output"
+      ]
+    },
+    "r06_test_aa09e0a8f37bb63a0fb8": {
+      "package": "lingxi-service",
+      "suite": "r06_office_completion",
+      "test": "real_excel_dates_keep_time_in_both_calendars_and_never_show_serials",
+      "kind": "rust_integration_test",
+      "timeoutSecs": 900,
+      "argv": [
+        "rustup",
+        "run",
+        "1.98.1",
+        "cargo",
+        "test",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "-p",
+        "lingxi-service",
+        "--test",
+        "r06_office_completion",
+        "real_excel_dates_keep_time_in_both_calendars_and_never_show_serials",
         "--",
         "--exact",
         "--show-output"
@@ -180498,6 +181231,456 @@
         "missingClauses": []
       }
     ],
+    "R00-T02-LA-2F2B6E173C1B": [
+      {
+        "case": "R00-T02-LA-2F2B6E173C1B-assertion-00",
+        "expect": 1,
+        "assertion": "成功时核对：返回转换的 HTML",
+        "commandRefs": [
+          "r06_test_238ffa504f5b15d5edbb",
+          "r06_test_26ae52ecfb36b6298487",
+          "r06_test_392de9222af76ac50997",
+          "r06_test_6a73ba4d83376d5c9ed2"
+        ],
+        "evidenceMeaning": "真实授权文件ZIP/XML转换，实际当前Rust服务HTTP返回HTML；生产Electron main/preload→当前openFilePreview/PreviewPanel显示真实正文/表格。Word标题/表格/实体转义；Excel按首表关系而非文件名，保留共享富文本/稀疏列/公式缓存/错误与日期。日期按1900/1904与styles转明确ISO8601 UTC，独立ExcelJS原日期反例保留后修复，不把序号当日期；不声称排版字体或公式重算。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
+            "test": "fs_read_routes_faces_and_error_vocabulary",
+            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
+            "testStartLine": 276,
+            "testEndLine": 469,
+            "assertions": [
+              {
+                "line": 282,
+                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
+              },
+              {
+                "line": 291,
+                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
+              },
+              {
+                "line": 302,
+                "quote": "    assert_eq!(resp.status, 400);"
+              },
+              {
+                "line": 303,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
+              },
+              {
+                "line": 314,
+                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
+              },
+              {
+                "line": 323,
+                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
+              },
+              {
+                "line": 336,
+                "quote": "    assert_eq!(resp.status, 403);"
+              },
+              {
+                "line": 337,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
+              },
+              {
+                "line": 354,
+                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
+              },
+              {
+                "line": 360,
+                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
+              },
+              {
+                "line": 361,
+                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
+              },
+              {
+                "line": 362,
+                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
+              },
+              {
+                "line": 381,
+                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
+              },
+              {
+                "line": 382,
+                "quote": "    assert_eq!(resp.body, b\"home\");"
+              },
+              {
+                "line": 393,
+                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
+              },
+              {
+                "line": 394,
+                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
+              },
+              {
+                "line": 412,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 413,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
+              },
+              {
+                "line": 427,
+                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
+              },
+              {
+                "line": 446,
+                "quote": "    assert_eq!(resp.status, 413);"
+              },
+              {
+                "line": 447,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
+              },
+              {
+                "line": 463,
+                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "current_docx_html_route_converts_actual_archive_and_preserves_file",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 245,
+            "testEndLine": 261,
+            "assertions": [
+              {
+                "line": 251,
+                "quote": "assert_eq!(response.0, 200, \"{response:?}\")"
+              },
+              {
+                "line": 252,
+                "quote": "assert!(response\n        .1\n        .contains(\"<h1>实际中文 &amp; &lt;script&gt;拒绝脚本&lt;/script&gt; 🙂</h1>\"))"
+              },
+              {
+                "line": 255,
+                "quote": "assert!(response\n        .1\n        .contains(\"<table><tr><td><p>表格原文</p></td></tr></table>\"))"
+              },
+              {
+                "line": 258,
+                "quote": "assert!(!response.1.contains(\"<script>\"))"
+              },
+              {
+                "line": 259,
+                "quote": "assert_eq!(std::fs::read(&file).unwrap(), bytes)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "current_native_office_preview_and_visible_real_rust_errors",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 359,
+            "testEndLine": 421,
+            "assertions": [
+              {
+                "line": 360,
+                "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+              },
+              {
+                "line": 396,
+                "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+              },
+              {
+                "line": 406,
+                "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+              },
+              {
+                "line": 414,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+              },
+              {
+                "line": 415,
+                "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+              },
+              {
+                "line": 416,
+                "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 317,
+            "testEndLine": 356,
+            "assertions": [
+              {
+                "line": 322,
+                "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+              },
+              {
+                "line": 330,
+                "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+              },
+              {
+                "line": 335,
+                "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+              },
+              {
+                "line": 341,
+                "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+              },
+              {
+                "line": 348,
+                "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+              },
+              {
+                "line": 351,
+                "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-2F2B6E173C1B-assertion-01",
+        "expect": 1,
+        "assertion": "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见",
+        "commandRefs": [
+          "r06_test_238ffa504f5b15d5edbb",
+          "r06_test_26ae52ecfb36b6298487",
+          "r06_test_492f0dbdf2028bfd611a",
+          "r06_test_6a73ba4d83376d5c9ed2"
+        ],
+        "evidenceMeaning": "真实缺凭证401、根外/链接403、缺失404、目录400、超限413、损坏/实体500；实际生产错误总线与Toast显示真实500/403且不打开假预览；所有原文件SHA不变，无越权内容或写出归档成员。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
+            "test": "fs_read_routes_faces_and_error_vocabulary",
+            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
+            "testStartLine": 276,
+            "testEndLine": 469,
+            "assertions": [
+              {
+                "line": 282,
+                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
+              },
+              {
+                "line": 291,
+                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
+              },
+              {
+                "line": 302,
+                "quote": "    assert_eq!(resp.status, 400);"
+              },
+              {
+                "line": 303,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
+              },
+              {
+                "line": 314,
+                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
+              },
+              {
+                "line": 323,
+                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
+              },
+              {
+                "line": 336,
+                "quote": "    assert_eq!(resp.status, 403);"
+              },
+              {
+                "line": 337,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
+              },
+              {
+                "line": 354,
+                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
+              },
+              {
+                "line": 360,
+                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
+              },
+              {
+                "line": 361,
+                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
+              },
+              {
+                "line": 362,
+                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
+              },
+              {
+                "line": 381,
+                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
+              },
+              {
+                "line": 382,
+                "quote": "    assert_eq!(resp.body, b\"home\");"
+              },
+              {
+                "line": 393,
+                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
+              },
+              {
+                "line": 394,
+                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
+              },
+              {
+                "line": 412,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 413,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
+              },
+              {
+                "line": 427,
+                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
+              },
+              {
+                "line": 446,
+                "quote": "    assert_eq!(resp.status, 413);"
+              },
+              {
+                "line": 447,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
+              },
+              {
+                "line": 463,
+                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 276,
+            "testEndLine": 315,
+            "assertions": [
+              {
+                "line": 290,
+                "quote": "assert_eq!(denied.0, 403, \"{denied:?}\")"
+              },
+              {
+                "line": 291,
+                "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+              },
+              {
+                "line": 292,
+                "quote": "assert_eq!(h.get(kind, &outside, false).await.0, 401)"
+              },
+              {
+                "line": 293,
+                "quote": "assert_eq!(h.get(kind, &missing, true).await.0, 404)"
+              },
+              {
+                "line": 294,
+                "quote": "assert_eq!(h.get(kind, &h.workspace, true).await.0, 400)"
+              },
+              {
+                "line": 295,
+                "quote": "assert_eq!(h.get(kind, &large, true).await.0, 413)"
+              },
+              {
+                "line": 297,
+                "quote": "assert_eq!(bad.0, 500)"
+              },
+              {
+                "line": 298,
+                "quote": "assert!(bad.1.contains(\"parse failed\"))"
+              },
+              {
+                "line": 304,
+                "quote": "assert_eq!(denied.0, 403)"
+              },
+              {
+                "line": 305,
+                "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+              },
+              {
+                "line": 308,
+                "quote": "assert_eq!(std::fs::read(&corrupt).unwrap(), b\"not a zip\")"
+              },
+              {
+                "line": 309,
+                "quote": "assert!(missing.symlink_metadata().is_err())"
+              },
+              {
+                "line": 310,
+                "quote": "assert_eq!(\n        std::fs::metadata(&large).unwrap().len(),\n        20 * 1024 * 1024 + 1\n    )"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "current_native_office_preview_and_visible_real_rust_errors",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 359,
+            "testEndLine": 421,
+            "assertions": [
+              {
+                "line": 360,
+                "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+              },
+              {
+                "line": 396,
+                "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+              },
+              {
+                "line": 406,
+                "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+              },
+              {
+                "line": 414,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+              },
+              {
+                "line": 415,
+                "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+              },
+              {
+                "line": 416,
+                "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 317,
+            "testEndLine": 356,
+            "assertions": [
+              {
+                "line": 322,
+                "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+              },
+              {
+                "line": 330,
+                "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+              },
+              {
+                "line": 335,
+                "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+              },
+              {
+                "line": 341,
+                "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+              },
+              {
+                "line": 348,
+                "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+              },
+              {
+                "line": 351,
+                "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
     "R00-T02-LA-2FAA749DA790": [
       {
         "case": "R00-T02-LA-2FAA749DA790-assertion-00",
@@ -185135,6 +186318,478 @@
               {
                 "line": 575,
                 "quote": "assert_eq!(status, 401, \"无凭证 401\")"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      }
+    ],
+    "R00-T02-LA-3617DF5B23D5": [
+      {
+        "case": "R00-T02-LA-3617DF5B23D5-assertion-00",
+        "expect": 1,
+        "assertion": "成功时核对：返回首张工作表 HTML 表格",
+        "commandRefs": [
+          "r06_test_238ffa504f5b15d5edbb",
+          "r06_test_26ae52ecfb36b6298487",
+          "r06_test_6a73ba4d83376d5c9ed2",
+          "r06_test_aa09e0a8f37bb63a0fb8",
+          "r06_test_ac4093080de1f861e163"
+        ],
+        "evidenceMeaning": "真实授权文件ZIP/XML转换，实际当前Rust服务HTTP返回HTML；生产Electron main/preload→当前openFilePreview/PreviewPanel显示真实正文/表格。Word标题/表格/实体转义；Excel按首表关系而非文件名，保留共享富文本/稀疏列/公式缓存/错误与日期。日期按1900/1904与styles转明确ISO8601 UTC，独立ExcelJS原日期反例保留后修复，不把序号当日期；不声称排版字体或公式重算。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
+            "test": "fs_read_routes_faces_and_error_vocabulary",
+            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
+            "testStartLine": 276,
+            "testEndLine": 469,
+            "assertions": [
+              {
+                "line": 282,
+                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
+              },
+              {
+                "line": 291,
+                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
+              },
+              {
+                "line": 302,
+                "quote": "    assert_eq!(resp.status, 400);"
+              },
+              {
+                "line": 303,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
+              },
+              {
+                "line": 314,
+                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
+              },
+              {
+                "line": 323,
+                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
+              },
+              {
+                "line": 336,
+                "quote": "    assert_eq!(resp.status, 403);"
+              },
+              {
+                "line": 337,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
+              },
+              {
+                "line": 354,
+                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
+              },
+              {
+                "line": 360,
+                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
+              },
+              {
+                "line": 361,
+                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
+              },
+              {
+                "line": 362,
+                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
+              },
+              {
+                "line": 381,
+                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
+              },
+              {
+                "line": 382,
+                "quote": "    assert_eq!(resp.body, b\"home\");"
+              },
+              {
+                "line": 393,
+                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
+              },
+              {
+                "line": 394,
+                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
+              },
+              {
+                "line": 412,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 413,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
+              },
+              {
+                "line": 427,
+                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
+              },
+              {
+                "line": 446,
+                "quote": "    assert_eq!(resp.status, 413);"
+              },
+              {
+                "line": 447,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
+              },
+              {
+                "line": 463,
+                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "current_xlsx_html_route_uses_first_relationship_and_real_cells",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 263,
+            "testEndLine": 274,
+            "assertions": [
+              {
+                "line": 269,
+                "quote": "assert_eq!(response.0, 200, \"{response:?}\")"
+              },
+              {
+                "line": 270,
+                "quote": "assert_eq!(response.1,\"<table><tr><td>第一张 &lt;script&gt;alert(1)&lt;/script&gt; &amp; 原文</td><td></td><td>42</td></tr><tr><td></td><td>富文本尾部</td><td>true</td></tr></table>\")"
+              },
+              {
+                "line": 271,
+                "quote": "assert!(!response.1.contains(\"不许返回第二张\"))"
+              },
+              {
+                "line": 272,
+                "quote": "assert_eq!(std::fs::read(&file).unwrap(), bytes)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "real_excel_dates_keep_time_in_both_calendars_and_never_show_serials",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 199,
+            "testEndLine": 242,
+            "assertions": [
+              {
+                "line": 232,
+                "quote": "assert_eq!(response.0, 200, \"{response:?}\")"
+              },
+              {
+                "line": 233,
+                "quote": "assert_eq!(\n            response.1,\n            format!(\"<table><tr><td>{expected}</td></tr></table>\")\n        )"
+              },
+              {
+                "line": 237,
+                "quote": "assert_eq!(std::fs::read(file).unwrap(), bytes)"
+              },
+              {
+                "line": 240,
+                "quote": "assert!(lingxi_service::office::xlsx(&invalid).is_err())"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "current_native_office_preview_and_visible_real_rust_errors",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 359,
+            "testEndLine": 421,
+            "assertions": [
+              {
+                "line": 360,
+                "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+              },
+              {
+                "line": 396,
+                "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+              },
+              {
+                "line": 406,
+                "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+              },
+              {
+                "line": 414,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+              },
+              {
+                "line": 415,
+                "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+              },
+              {
+                "line": 416,
+                "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 317,
+            "testEndLine": 356,
+            "assertions": [
+              {
+                "line": 322,
+                "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+              },
+              {
+                "line": 330,
+                "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+              },
+              {
+                "line": 335,
+                "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+              },
+              {
+                "line": 341,
+                "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+              },
+              {
+                "line": 348,
+                "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+              },
+              {
+                "line": 351,
+                "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
+              }
+            ]
+          }
+        ],
+        "coverage": "FULL",
+        "missingClauses": []
+      },
+      {
+        "case": "R00-T02-LA-3617DF5B23D5-assertion-01",
+        "expect": 1,
+        "assertion": "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见",
+        "commandRefs": [
+          "r06_test_238ffa504f5b15d5edbb",
+          "r06_test_26ae52ecfb36b6298487",
+          "r06_test_492f0dbdf2028bfd611a",
+          "r06_test_6a73ba4d83376d5c9ed2"
+        ],
+        "evidenceMeaning": "真实缺凭证401、根外/链接403、缺失404、目录400、超限413、损坏/实体500；实际生产错误总线与Toast显示真实500/403且不打开假预览；所有原文件SHA不变，无越权内容或写出归档成员。 当前macOS实际执行；Windows/Linux/Tauri完整预览和全阶段仍不宣称通过。",
+        "proofLocations": [
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
+            "test": "fs_read_routes_faces_and_error_vocabulary",
+            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
+            "testStartLine": 276,
+            "testEndLine": 469,
+            "assertions": [
+              {
+                "line": 282,
+                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
+              },
+              {
+                "line": 291,
+                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
+              },
+              {
+                "line": 302,
+                "quote": "    assert_eq!(resp.status, 400);"
+              },
+              {
+                "line": 303,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
+              },
+              {
+                "line": 314,
+                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
+              },
+              {
+                "line": 323,
+                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
+              },
+              {
+                "line": 336,
+                "quote": "    assert_eq!(resp.status, 403);"
+              },
+              {
+                "line": 337,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
+              },
+              {
+                "line": 354,
+                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
+              },
+              {
+                "line": 360,
+                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
+              },
+              {
+                "line": 361,
+                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
+              },
+              {
+                "line": 362,
+                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
+              },
+              {
+                "line": 381,
+                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
+              },
+              {
+                "line": 382,
+                "quote": "    assert_eq!(resp.body, b\"home\");"
+              },
+              {
+                "line": 393,
+                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
+              },
+              {
+                "line": 394,
+                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
+              },
+              {
+                "line": 412,
+                "quote": "    assert_eq!(resp.status, 404);"
+              },
+              {
+                "line": 413,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
+              },
+              {
+                "line": 427,
+                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
+              },
+              {
+                "line": 446,
+                "quote": "    assert_eq!(resp.status, 413);"
+              },
+              {
+                "line": 447,
+                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
+              },
+              {
+                "line": 463,
+                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "office_http_refusals_are_visible_and_never_publish_or_modify_files",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 276,
+            "testEndLine": 315,
+            "assertions": [
+              {
+                "line": 290,
+                "quote": "assert_eq!(denied.0, 403, \"{denied:?}\")"
+              },
+              {
+                "line": 291,
+                "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+              },
+              {
+                "line": 292,
+                "quote": "assert_eq!(h.get(kind, &outside, false).await.0, 401)"
+              },
+              {
+                "line": 293,
+                "quote": "assert_eq!(h.get(kind, &missing, true).await.0, 404)"
+              },
+              {
+                "line": 294,
+                "quote": "assert_eq!(h.get(kind, &h.workspace, true).await.0, 400)"
+              },
+              {
+                "line": 295,
+                "quote": "assert_eq!(h.get(kind, &large, true).await.0, 413)"
+              },
+              {
+                "line": 297,
+                "quote": "assert_eq!(bad.0, 500)"
+              },
+              {
+                "line": 298,
+                "quote": "assert!(bad.1.contains(\"parse failed\"))"
+              },
+              {
+                "line": 304,
+                "quote": "assert_eq!(denied.0, 403)"
+              },
+              {
+                "line": 305,
+                "quote": "assert!(!denied.1.contains(\"路径外秘密\"))"
+              },
+              {
+                "line": 308,
+                "quote": "assert_eq!(std::fs::read(&corrupt).unwrap(), b\"not a zip\")"
+              },
+              {
+                "line": 309,
+                "quote": "assert!(missing.symlink_metadata().is_err())"
+              },
+              {
+                "line": 310,
+                "quote": "assert_eq!(\n        std::fs::metadata(&large).unwrap().len(),\n        20 * 1024 * 1024 + 1\n    )"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "current_native_office_preview_and_visible_real_rust_errors",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 359,
+            "testEndLine": 421,
+            "assertions": [
+              {
+                "line": 360,
+                "quote": "assert_eq!(std::env::consts::OS, \"macos\", \"本真实窗口检查仅代表macOS\")"
+              },
+              {
+                "line": 396,
+                "quote": "assert!(build.status.success(), \"当前preload必须实际构建\")"
+              },
+              {
+                "line": 406,
+                "quote": "assert!(\n        output.status.success(),\n        \"真实Office界面失败：{}\\n{}\",\n        String::from_utf8_lossy(&output.stdout),\n        String::from_utf8_lossy(&output.stderr)\n    )"
+              },
+              {
+                "line": 414,
+                "quote": "assert_eq!(receipt[\"status\"], \"PASS_MAC_CURRENT_RUST_OFFICE_UI\")"
+              },
+              {
+                "line": 415,
+                "quote": "assert_eq!(receipt[\"sourcePreserved\"], true)"
+              },
+              {
+                "line": 416,
+                "quote": "assert_eq!(receipt[\"failed\"].as_array().unwrap().len(), 2)"
+              }
+            ]
+          },
+          {
+            "path": "rust/crates/lingxi-service/tests/r06_office_completion.rs",
+            "test": "office_xml_external_entities_and_expansion_limits_are_explicit_refusals",
+            "sourceSHA256": "47bcd65cf1c9afe21a3257c44bfb53a3336e49409fc7474f8cc84d0e257843d9",
+            "testStartLine": 317,
+            "testEndLine": 356,
+            "assertions": [
+              {
+                "line": 322,
+                "quote": "assert!(lingxi_service::office::docx(&dtd)\n        .err()\n        .unwrap()\n        .contains(\"document types\"))"
+              },
+              {
+                "line": 330,
+                "quote": "assert!(lingxi_service::office::docx(&corrupt).is_err())"
+              },
+              {
+                "line": 335,
+                "quote": "assert!(\n        lingxi_service::office::docx(&package(&[(\"word/document.xml\", &huge)]))\n            .err()\n            .unwrap()\n            .contains(\"limit\")\n    )"
+              },
+              {
+                "line": 341,
+                "quote": "assert_eq!(\n        lingxi_service::office::docx(&word(\"真实&amp;文本\"))\n            .unwrap()\n            .text,\n        \"真实&文本\\n表格原文\\n\\t\\n\"\n    )"
+              },
+              {
+                "line": 348,
+                "quote": "assert!(parsed\n        .text\n        .contains(\"第一张 <script>alert(1)</script> & 原文\\t\\t42\"))"
+              },
+              {
+                "line": 351,
+                "quote": "assert!(parsed.text.contains(\"富文本尾部\\ttrue\"))"
               }
             ]
           }
@@ -255944,458 +257599,6 @@
         "coverage": "PARTIAL",
         "missingClauses": [
           "watch-file 仅绝对路径；无 renderer 直接调用，不能声称用户直接启停旧 IPC 监听"
-        ]
-      }
-    ],
-    "R00-T02-LA-2F2B6E173C1B": [
-      {
-        "case": "R00-T02-LA-2F2B6E173C1B-assertion-00",
-        "expect": 1,
-        "assertion": "成功时核对：返回转换的 HTML",
-        "commandRefs": [
-          "r06_test_26ae52ecfb36b6298487"
-        ],
-        "evidenceMeaning": "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
-            "test": "fs_read_routes_faces_and_error_vocabulary",
-            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
-            "testStartLine": 276,
-            "testEndLine": 469,
-            "assertions": [
-              {
-                "line": 282,
-                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
-              },
-              {
-                "line": 291,
-                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
-              },
-              {
-                "line": 302,
-                "quote": "    assert_eq!(resp.status, 400);"
-              },
-              {
-                "line": 303,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
-              },
-              {
-                "line": 323,
-                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!(resp.status, 403);"
-              },
-              {
-                "line": 337,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
-              },
-              {
-                "line": 354,
-                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
-              },
-              {
-                "line": 360,
-                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
-              },
-              {
-                "line": 361,
-                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
-              },
-              {
-                "line": 362,
-                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
-              },
-              {
-                "line": 381,
-                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
-              },
-              {
-                "line": 382,
-                "quote": "    assert_eq!(resp.body, b\"home\");"
-              },
-              {
-                "line": 393,
-                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
-              },
-              {
-                "line": 394,
-                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
-              },
-              {
-                "line": 412,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 413,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
-              },
-              {
-                "line": 427,
-                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
-              },
-              {
-                "line": 446,
-                "quote": "    assert_eq!(resp.status, 413);"
-              },
-              {
-                "line": 447,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
-              },
-              {
-                "line": 463,
-                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-2F2B6E173C1B-assertion-01",
-        "expect": 1,
-        "assertion": "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见",
-        "commandRefs": [
-          "r06_test_26ae52ecfb36b6298487"
-        ],
-        "evidenceMeaning": "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
-            "test": "fs_read_routes_faces_and_error_vocabulary",
-            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
-            "testStartLine": 276,
-            "testEndLine": 469,
-            "assertions": [
-              {
-                "line": 282,
-                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
-              },
-              {
-                "line": 291,
-                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
-              },
-              {
-                "line": 302,
-                "quote": "    assert_eq!(resp.status, 400);"
-              },
-              {
-                "line": 303,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
-              },
-              {
-                "line": 323,
-                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!(resp.status, 403);"
-              },
-              {
-                "line": 337,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
-              },
-              {
-                "line": 354,
-                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
-              },
-              {
-                "line": 360,
-                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
-              },
-              {
-                "line": 361,
-                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
-              },
-              {
-                "line": 362,
-                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
-              },
-              {
-                "line": 381,
-                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
-              },
-              {
-                "line": 382,
-                "quote": "    assert_eq!(resp.body, b\"home\");"
-              },
-              {
-                "line": 393,
-                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
-              },
-              {
-                "line": 394,
-                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
-              },
-              {
-                "line": 412,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 413,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
-              },
-              {
-                "line": 427,
-                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
-              },
-              {
-                "line": 446,
-                "quote": "    assert_eq!(resp.status, 413);"
-              },
-              {
-                "line": 447,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
-              },
-              {
-                "line": 463,
-                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "fsread.rs明确未接入docx-html转换，文本读取不能冒充Office转换成功/失败。"
-        ]
-      }
-    ],
-    "R00-T02-LA-3617DF5B23D5": [
-      {
-        "case": "R00-T02-LA-3617DF5B23D5-assertion-00",
-        "expect": 1,
-        "assertion": "成功时核对：返回首张工作表 HTML 表格",
-        "commandRefs": [
-          "r06_test_26ae52ecfb36b6298487"
-        ],
-        "evidenceMeaning": "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
-            "test": "fs_read_routes_faces_and_error_vocabulary",
-            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
-            "testStartLine": 276,
-            "testEndLine": 469,
-            "assertions": [
-              {
-                "line": 282,
-                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
-              },
-              {
-                "line": 291,
-                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
-              },
-              {
-                "line": 302,
-                "quote": "    assert_eq!(resp.status, 400);"
-              },
-              {
-                "line": 303,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
-              },
-              {
-                "line": 323,
-                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!(resp.status, 403);"
-              },
-              {
-                "line": 337,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
-              },
-              {
-                "line": 354,
-                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
-              },
-              {
-                "line": 360,
-                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
-              },
-              {
-                "line": 361,
-                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
-              },
-              {
-                "line": 362,
-                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
-              },
-              {
-                "line": 381,
-                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
-              },
-              {
-                "line": 382,
-                "quote": "    assert_eq!(resp.body, b\"home\");"
-              },
-              {
-                "line": 393,
-                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
-              },
-              {
-                "line": 394,
-                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
-              },
-              {
-                "line": 412,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 413,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
-              },
-              {
-                "line": 427,
-                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
-              },
-              {
-                "line": 446,
-                "quote": "    assert_eq!(resp.status, 413);"
-              },
-              {
-                "line": 447,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
-              },
-              {
-                "line": 463,
-                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。"
-        ]
-      },
-      {
-        "case": "R00-T02-LA-3617DF5B23D5-assertion-01",
-        "expect": 1,
-        "assertion": "拒绝/无效输入时核对：无越权或错误持久化，且错误对用户可见",
-        "commandRefs": [
-          "r06_test_26ae52ecfb36b6298487"
-        ],
-        "evidenceMeaning": "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。",
-        "proofLocations": [
-          {
-            "path": "rust/crates/lingxi-service/tests/r06_t05_fsread.rs",
-            "test": "fs_read_routes_faces_and_error_vocabulary",
-            "sourceSHA256": "ab3603402a1045487440f20dab69fea0fcc49732fe5a705f7d1c5abbbd2d94b3",
-            "testStartLine": 276,
-            "testEndLine": 469,
-            "assertions": [
-              {
-                "line": 282,
-                "quote": "    assert_eq!(resp.status, 401, \"read no token\");"
-              },
-              {
-                "line": 291,
-                "quote": "    assert_eq!(resp.status, 401, \"read-base64 no token\");"
-              },
-              {
-                "line": 302,
-                "quote": "    assert_eq!(resp.status, 400);"
-              },
-              {
-                "line": 303,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"missing path\"));"
-              },
-              {
-                "line": 314,
-                "quote": "    assert_eq!(resp.status, 400, \"unknown query key\");"
-              },
-              {
-                "line": 323,
-                "quote": "    assert_eq!(resp.status, 400, \"duplicate query key\");"
-              },
-              {
-                "line": 336,
-                "quote": "    assert_eq!(resp.status, 403);"
-              },
-              {
-                "line": 337,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"path not allowed\"));"
-              },
-              {
-                "line": 354,
-                "quote": "    assert_eq!(resp.status, 200, \"read ok\");"
-              },
-              {
-                "line": 360,
-                "quote": "    assert!(text.starts_with(\"直读内容\\n\"), \"body: {text:?}\");"
-              },
-              {
-                "line": 361,
-                "quote": "    assert!(text.contains('\\u{FFFD}'), \"lossy replacement: {text:?}\");"
-              },
-              {
-                "line": 362,
-                "quote": "    assert!(\n        content_type.starts_with(\"text/plain\"),\n        \"c.text → text/plain\"\n    );"
-              },
-              {
-                "line": 381,
-                "quote": "    assert_eq!(resp.status, 200, \"data_home readable\");"
-              },
-              {
-                "line": 382,
-                "quote": "    assert_eq!(resp.body, b\"home\");"
-              },
-              {
-                "line": 393,
-                "quote": "    assert_eq!(resp.status, 200, \"read-base64 ok\");"
-              },
-              {
-                "line": 394,
-                "quote": "    assert_eq!(\n        String::from_utf8(resp.body).expect(\"b64 text\"),\n        \"55u06K+75YaF5a65Cv/+\"\n    );"
-              },
-              {
-                "line": 412,
-                "quote": "    assert_eq!(resp.status, 404);"
-              },
-              {
-                "line": 413,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file not found\"));"
-              },
-              {
-                "line": 427,
-                "quote": "    assert_eq!(resp.status, 404, \"dir reads as not found\");"
-              },
-              {
-                "line": 446,
-                "quote": "    assert_eq!(resp.status, 413);"
-              },
-              {
-                "line": 447,
-                "quote": "    assert!(String::from_utf8_lossy(&resp.body).contains(\"file too large\"));"
-              },
-              {
-                "line": 463,
-                "quote": "    assert_eq!(resp.status, 403, \"symlink refused\");"
-              }
-            ]
-          }
-        ],
-        "coverage": "PARTIAL",
-        "missingClauses": [
-          "fsread.rs明确未接入xlsx-html转换，文本读取不能冒充Office转换成功/失败。"
         ]
       }
     ],

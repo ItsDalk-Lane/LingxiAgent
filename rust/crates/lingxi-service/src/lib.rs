@@ -49,6 +49,7 @@ pub mod filehistory;
 pub mod filemeta;
 pub mod filetools;
 pub mod fsread;
+pub mod office;
 pub mod history;
 pub mod history_projection;
 pub mod hooks;
@@ -7185,6 +7186,8 @@ pub fn build_router(state: ServiceState) -> Router {
         // R06-T05 Round 5 fs 直读面（server/routes/fs.ts :89-115，D5
         // 前缀）：LocalOnly，授权根 = data_home + workspace。
         .route("/lingxi/v1/fs/read", get(fsread::fs_read_route))
+        .route("/lingxi/v1/fs/docx-html", get(fsread::fs_docx_html_route))
+        .route("/lingxi/v1/fs/xlsx-html", get(fsread::fs_xlsx_html_route))
         .route(
             "/lingxi/v1/fs/read-base64",
             get(fsread::fs_read_base64_route),

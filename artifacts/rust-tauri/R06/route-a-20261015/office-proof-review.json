@@ -1,0 +1,23 @@
+{
+  "status": "INDEPENDENT_R2_AND_SEVEN_ACTUAL_BINDINGS_PASS_NOT_STAGE_ACCEPTANCE",
+  "stageAccepted": false,
+  "originalIndependentDateFailure": "office-independent-review-r1.json",
+  "finalIndependentReview": "office-independent-review-r2.json",
+  "sourceManifest": "office-source-sha256-r2.json",
+  "raw": "/private/tmp/r06-office-main-20261015",
+  "actual": {
+    "rootCurrentSix": 6,
+    "independentCurrentSix": 6,
+    "oldFsRegression": 2,
+    "oldPreviewRegression": 36,
+    "strictClippy": true,
+    "threeTs": true
+  },
+  "limits": [
+    "macOS current Electron and actual Rust; Windows/Linux runtime not run",
+    "ISO8601 UTC is explicit display change, same instant, not old JS DateString byte equality",
+    "Office content conversion, not font/layout rendering or formula recalculation",
+    "not Tauri full previews or entire R06 verdict"
+  ],
+  "bindingSummary": "office-binding-window-summary.json"
+}

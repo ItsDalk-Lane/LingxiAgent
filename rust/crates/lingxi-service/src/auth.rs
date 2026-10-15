@@ -877,7 +877,7 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     }
     // R06-T05 Round 5 fs 直读面（server/routes/fs.ts：本地 API 鉴权链内，
     // bearer 即边界）：两叶面一律 LocalOnly。
-    if p == "/lingxi/v1/fs/read" || p == "/lingxi/v1/fs/read-base64" {
+    if matches!(p, "/lingxi/v1/fs/read" | "/lingxi/v1/fs/read-base64" | "/lingxi/v1/fs/docx-html" | "/lingxi/v1/fs/xlsx-html") {
         return RoutePolicy::LocalOnly;
     }
     // R06 收口：独立改前存档 restore 面（现役 /api/checkpoints/:id/restore

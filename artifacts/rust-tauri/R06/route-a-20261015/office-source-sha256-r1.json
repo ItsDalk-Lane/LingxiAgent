@@ -1,0 +1,73 @@
+{
+  "baseHead": "c3989a6c9a8983d24b93e95e8faf832ca525affb",
+  "scope": "Office two original leaves; frozen exact source files; not full R06 sourceDigest",
+  "files": {
+    "desktop/main.cjs": {
+      "base": "26485d1ff7dc32ea1156864aa7f2331c7a3dc6c9be9c35247dae82bf01745070",
+      "candidate": "4e9d29d487f0f0a49c2236c9c5e4de76e18474582a9961b2cdd094a971124536"
+    },
+    "desktop/src/react/__tests__/office-live/launch.mjs": {
+      "base": null,
+      "candidate": "3a5cca9ee94a3db038b15c6e422eb8eba97a94604026f95977b09bc027187a5e"
+    },
+    "desktop/src/react/__tests__/office-live/main.cjs": {
+      "base": null,
+      "candidate": "198d6b544510db9f63feb01e547099810f3e2a392218492e958e2d260e3b590a"
+    },
+    "desktop/src/react/__tests__/office-live/surface.tsx": {
+      "base": null,
+      "candidate": "055f24d83de3b3c24cbbbe2a32e6778d4446c07ed5aa327ebff58df66c3275f8"
+    },
+    "docs/rust-tauri/R01/DEPENDENCY_DECISIONS.md": {
+      "base": "5fa5e175fefa1f5472b2af4d08847847234f48bc0b9445842c0379b198229b11",
+      "candidate": "7001be6f9ac94b16e1e9635c47db93be094ea29daff9fb4236d6bbe7668b164c"
+    },
+    "rust/Cargo.lock": {
+      "base": "6a0fefc98d9ccb6683f51c19a164e95e32a32e2b38af1b22e09f5287d080c4d7",
+      "candidate": "f594885dad008696ee1655a3c64a69f74970a6183b26e1e2697f425b910c4707"
+    },
+    "rust/Cargo.toml": {
+      "base": "aef43620bf7cee39669b2ece83d78a08192c4b28cac2e3130afb54019174b185",
+      "candidate": "9b6a3bf45c3c5343bccbffc36f6571a6a5234aebf8e4ae28f1236a07c1604a71"
+    },
+    "rust/crates/lingxi-service/Cargo.toml": {
+      "base": "88a08ef80858d5f75d9793fe65effc65cafb187050c592d19fec37daa8ea41b3",
+      "candidate": "a2e5d5f876d568059fdf1843691abf9aad3c5040885ea1d9c9d616708147c718"
+    },
+    "rust/crates/lingxi-service/src/auth.rs": {
+      "base": "f504614e9f7d1f4b8f5373a46bb37eab2119466520310bca22b7a1c2ec06dd0b",
+      "candidate": "36b4fb271cf76d9690e3d215444a4d19ee179ca34c27119bf9419e6f7428561a"
+    },
+    "rust/crates/lingxi-service/src/fsread.rs": {
+      "base": "cc1b32aa8053c9683aec8f45fb1cf8a1b6257e0fbf6a673a727ffac54e380621",
+      "candidate": "9d612ec761ab2b5853b354c6f5bd807460a749f76ebfbc56b6f58bec93755505"
+    },
+    "rust/crates/lingxi-service/src/lib.rs": {
+      "base": "691185f7c5c421f9f22ccd913d1680d1468c996305ee576b52a7a4f1ab932f9d",
+      "candidate": "5f4f2a901753b537458b04d02ca175700123bc97a898ff5feac80bd1b9d10e95"
+    },
+    "rust/crates/lingxi-service/src/office.rs": {
+      "base": null,
+      "candidate": "bfc162a066b7f0997b12b8163a9664b2011593dfdd9b842c686bc3f3955ffc33"
+    },
+    "rust/crates/lingxi-service/tests/r06_office_completion.rs": {
+      "base": null,
+      "candidate": "dbd8d3166c1d5e128efac07b5e618a38650a9974f186b6ea40b61922d1708a7e"
+    }
+  },
+  "actualTestBin": "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/deps/r06_office_completion-cf5992a0b343d13f",
+  "actualServiceBin": "/Users/study_superior/.cache/lingxi-r06-builds/native-write-clean/debug/lingxi-service",
+  "rawEvidence": "/private/tmp/r06-office-main-20261015",
+  "actualChecks": {
+    "fiveCurrentR6": "PASS",
+    "typecheck": "PASS",
+    "strictClippyServiceAndTest": "PASS"
+  },
+  "knownFixtureDiagnostics": [
+    "before-routes-red.log is compile-only: missing reqwest; do not call it product red",
+    "before-routes-actual-red.log actual current HTTP404 to200 expectation failed",
+    "four-current-r1.log str_as_str compile error corrected",
+    "five-current-r3.log omitted production errorBus bridge in fixture; current production initialized bridge restored",
+    "five-current-r5.log overly specific localization expectation corrected to actual error wording, no production/errorBus assertions changed"
+  ]
+}

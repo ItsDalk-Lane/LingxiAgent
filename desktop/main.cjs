@@ -6346,8 +6346,25 @@ wrapIpcHandler("read-file-base64", (_event, filePath) => {
   } catch { return null; }
 });
 
-// 读取 docx 文件并转为 HTML（mammoth）
+async function readRustOfficePreview(kind, filePath) {
+  if (typeof filePath !== "string" || !path.isAbsolute(filePath)) return null;
+  const connection = { port: serverPort, token: serverToken };
+  if (!connection.port || !connection.token) throw new Error("文档服务尚未就绪");
+  const response = await fetch(`http://127.0.0.1:${connection.port}/lingxi/v1/fs/${kind}-html?path=${encodeURIComponent(filePath)}`, {
+    headers: { Authorization: `Bearer ${connection.token}` },
+    signal: AbortSignal.timeout(10000),
+  });
+  const content = await response.text();
+  if (serverNodeKind !== "lingxi-service" || serverPort !== connection.port || serverToken !== connection.token) {
+    throw new Error("文档服务已切换，请重新打开文件");
+  }
+  if (!response.ok) throw new Error(`文档预览失败（${response.status}）`);
+  return content;
+}
+
+// Rust 连接交给当前服务转换；原 Node 连接保留现役转换链。
 wrapIpcHandler("read-docx-html", async (_event, filePath) => {
+  if (serverNodeKind === "lingxi-service") return readRustOfficePreview("docx", filePath);
   if (!filePath || !path.isAbsolute(filePath)) return null;
   try {
     const stat = fs.statSync(filePath);
@@ -6361,6 +6378,7 @@ wrapIpcHandler("read-docx-html", async (_event, filePath) => {
 
 // 读取 xlsx 文件并转为 HTML 表格（ExcelJS）
 wrapIpcHandler("read-xlsx-html", async (_event, filePath) => {
+  if (serverNodeKind === "lingxi-service") return readRustOfficePreview("xlsx", filePath);
   if (!filePath || !path.isAbsolute(filePath)) return null;
   try {
     const stat = fs.statSync(filePath);

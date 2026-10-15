@@ -2314,6 +2314,33 @@
         "root resource tools and native previews"
       ],
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "office_current_preview": {
+      "status": "TWO_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-2F2B6E173C1B",
+        "R00-T02-LA-3617DF5B23D5"
+      ],
+      "completedInitialGaps": 39,
+      "remainingInitialGaps": 39,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 240,
+      "gapLeaves": 39,
+      "actualRegisteredBindings": 7,
+      "sourceCandidateSha256": "ff3dd604bdcaf6351a0c3ae2a5ef3ee5a5fc1f5734f9b27f91236fd4d8a6cffb",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/office-binding-window-summary.json",
+      "rootActualRustPassed": 6,
+      "independentActualRustPassed": 6,
+      "oldFsPassed": 2,
+      "oldUiPassed": 36,
+      "dateFailureRetained": "artifacts/rust-tauri/R06/route-a-20261015/office-independent-review-r1.json",
+      "independentR2Review": "artifacts/rust-tauri/R06/route-a-20261015/office-independent-review-r2.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }
