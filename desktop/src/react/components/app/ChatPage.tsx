@@ -3,8 +3,8 @@ import { useStore } from '../../stores';
 import { InputArea, type InputAreaProps } from '../InputArea';
 import { WelcomeScreen } from '../WelcomeScreen';
 import { ChatArea } from '../chat/ChatArea';
-import { RustMoodPanel } from '../chat/RustMoodPanel';
 import RustSessionReviewPanel from '../session/RustSessionReviewPanel';
+import { RustMoodPanel } from '../chat/RustMoodPanel';
 import { RegionalErrorBoundary } from '../RegionalErrorBoundary';
 
 // 运行信息胶囊仅桌面 chat 使用；懒加载避免移动端主包吃进运行卡模块树
@@ -35,9 +35,11 @@ export function ChatPage({
   return (
     <>
       {inputSurface === 'desktop' && (
-        <Suspense fallback={null}>
-          <LazyRuntimeInfoCapsule />
-        </Suspense>
+        <RegionalErrorBoundary region={`${regionPrefix}runtime`} resetKeys={[currentSessionPath]}>
+          <Suspense fallback={null}>
+            <LazyRuntimeInfoCapsule />
+          </Suspense>
+        </RegionalErrorBoundary>
       )}
       <div className={`chat-area${hasPanels ? ' has-panels' : ''}`}>
         <WelcomeContainer />

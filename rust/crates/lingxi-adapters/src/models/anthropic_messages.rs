@@ -423,6 +423,13 @@ pub fn render_messages_request(
     }
     for item in &input.prior {
         match item {
+            ExchangeItem::UserMediaTurn { text, images } => {
+                let mut content = vec![serde_json::json!({"type":"text","text":text})];
+                for image in images {
+                    content.push(serde_json::json!({"type":"image","source":{"type":"base64","media_type":image.mime,"data":super::image_base64(image)}}));
+                }
+                messages.push(serde_json::json!({"role":"user","content":content}));
+            }
             ExchangeItem::UserTurn { text } => {
                 messages.push(serde_json::json!({"role":"user","content":text}))
             }

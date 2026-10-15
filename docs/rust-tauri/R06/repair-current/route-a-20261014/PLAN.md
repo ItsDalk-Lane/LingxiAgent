@@ -205,3 +205,10 @@ Word与首张Excel工作表由实际Rust授权文件快照/ZIP/XML转换为HTML�
 2026-10-15 后台任务四叶：正式check_pending_tasks/stop_task、真实HTTP及typed WS子代理stop共享稳定会话定位/owner闸/Run取消树。真实模型pending/resolved/failed过滤、旧线程续接保留旧结果、no_handler与not_found/已结束区分、跨会话与真实外主体零取消均已执行。媒体宿主显式归属不从模型参数猜测；实际视频供应商轮询挂起后本地停止交付，零下载/注册，另一会话不受影响，remoteCancel明确unsupported。会话媒体taskId用不可复用随机身份，供应商复用ID后旧停止不影响新任务；独立无会话operation保留原合同且不冒称当前会话任务。
 
 两项旧子代理夹具真实失败已保留：全局占用数不识别占槽方；子任务结束不表示父会话门已释放。改真实邻会话先排队占唯一槽、以及等待上一父任务实际退出，保留全部原业务断言并增强邻会话独立检查，相关15旧检查通过。新3集成与真实供应商组件1通过；最终13实际绑定及四叶原断言rollup PASS，源码候选 cc11a25b19c7be94b68806f30c1a7b570a243c984a714883b3afbea0bc1d6528 前后一致，原279 assertions/Then未改。累计57/78、258READY/21GAP；onlyR06仍26/26，F14 OPEN、R06未验收，其他平台/外部付费供应商未运行。
+
+## 2026-10-15 聊天后台六叶实证收口
+
+- 初始78个缺口已完成63，剩15；仅R06的26个已全部完成。原279项assertions/Then逐字不变，未改门禁或白名单。
+- 当前生产Rust/ChatPage/InputArea/Tiptap真窗口27检查；14新父证明及3后台回归通过；三TS、strict Clippy与三crate全部测试目标编译通过。
+- 冻结窗口25个原有及新增登记检查全部实际通过，逐断言6项汇总通过；证据见 `artifacts/rust-tauri/R06/route-a-20261015/chat-backend-binding-window-summary.json`，候选内容SHA `f094d02d619300496f7fae9441c5dfd47a42342efe0a1b473f801f52e04b64fb`。
+- 原端口争用、旧夹具媒体类型未穷尽两次窗口失败保留，分别修启动器独立端口和旧夹具分类；原业务断言未删改。完整聊天页81B仍未计入，R06_NOT_ACCEPTED / F14 OPEN / 无R07_READY。

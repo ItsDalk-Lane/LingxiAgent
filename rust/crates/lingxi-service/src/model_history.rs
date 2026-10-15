@@ -132,6 +132,11 @@ fn manual_replacement(
     let context = &body["refreshedContext"];
     let method = match context["fresh"].as_bool() {
         Some(true) => "fresh-compact",
+        Some(false)
+            if context["runtimeMode"] == "lossy_local" && context["zeroModelRequest"] == true =>
+        {
+            "instant_simple"
+        }
         Some(false) => "compact",
         None => return Err(corrupt("manual action fresh/method binding missing")),
     };
@@ -766,7 +771,11 @@ impl ModelHistory {
                 serde_json::from_str(&row.content_json).map_err(|e| corrupt(e.to_string()))?;
             match row.role.as_str() {
                 "user" => {
-                    let text = if let Some(text) = value["text"].as_str() {
+                    let text = if let Some(text) = value
+                        .get("modelText")
+                        .or_else(|| value.get("text"))
+                        .and_then(Value::as_str)
+                    {
                         text.to_string()
                     } else {
                         let msg: NormalizedMessage = decode(&value)?;
@@ -775,7 +784,15 @@ impl ModelHistory {
                         }
                         plain_user_text(&msg.content)?
                     };
-                    exchange.push(ExchangeItem::UserTurn { text });
+                    if let Some(images) = value.get("images") {
+                        let images = decode_images(images)?;
+                        if images.is_empty() {
+                            return Err(corrupt("empty historical media"));
+                        }
+                        exchange.push(ExchangeItem::UserMediaTurn { text, images });
+                    } else {
+                        exchange.push(ExchangeItem::UserTurn { text });
+                    }
                 }
                 "assistant" => {
                     if row
@@ -1198,6 +1215,9 @@ fn decode_declaration_binding(
 
 pub(crate) fn encode_item(item: &ExchangeItem) -> Result<Value, StorageError> {
     Ok(match item {
+        ExchangeItem::UserMediaTurn { text, images } => {
+            json!({"kind":"user_media","text":text,"images":encode_images(images)})
+        }
         ExchangeItem::UserTurn { text } => json!({"kind":"user","text":text}),
         ExchangeItem::AssistantTurn {
             call,
@@ -1302,6 +1322,10 @@ fn decode_outcome(v: &Value) -> Result<ToolOutcome, StorageError> {
 }
 pub(crate) fn decode_item(v: &Value) -> Result<ExchangeItem, StorageError> {
     Ok(match str_field(v, "kind")? {
+        "user_media" => ExchangeItem::UserMediaTurn {
+            text: str_field(v, "text")?.into(),
+            images: decode_images(&v["images"])?,
+        },
         "user" => ExchangeItem::UserTurn {
             text: str_field(v, "text")?.into(),
         },
@@ -1750,4 +1774,48 @@ mod tests {
         forged["calls"][0]["declarationBinding"] = json!({"catalogGeneration":8,"declaration":{"target":"tool:first-party:other","wireName":"read","description":"伪造目标","inputSchema":{"dialect":"json-schema/2020-12","schema":{"type":"object"}}},"execution":null});
         assert!(decode_item(&forged).is_err());
     }
+}
+
+/// 图片事实只由服务适配层编解码，内核保持不依赖序列化框架。
+pub(crate) fn encode_images(images: &[lingxi_kernel::model_exchange::InputImage]) -> Value {
+    {
+        use base64::Engine as _;
+        json!(images.iter().map(|image|json!({"mime":image.mime,"data":base64::engine::general_purpose::STANDARD.encode(&image.bytes)})).collect::<Vec<_>>())
+    }
+}
+pub(crate) fn decode_images(
+    value: &Value,
+) -> Result<Vec<lingxi_kernel::model_exchange::InputImage>, StorageError> {
+    let rows = value
+        .as_array()
+        .ok_or_else(|| corrupt("historical images array"))?;
+    if rows.is_empty() || rows.len() > 10 {
+        return Err(corrupt("historical image count"));
+    }
+    rows.iter()
+        .map(|row| {
+            let mime = str_field(row, "mime")?.to_string();
+            if !matches!(
+                mime.as_str(),
+                "image/png" | "image/jpeg" | "image/gif" | "image/webp"
+            ) {
+                return Err(corrupt("historical image mime"));
+            }
+            let bytes: Vec<u8> = if let Some(data) = row.get("data").and_then(Value::as_str) {
+                use base64::Engine as _;
+                if data.len() > 20 * 1024 * 1024 {
+                    return Err(corrupt("historical image encoded size"));
+                }
+                base64::engine::general_purpose::STANDARD
+                    .decode(data)
+                    .map_err(|_| corrupt("historical image encoding"))?
+            } else {
+                decode(&row["bytes"])?
+            };
+            if bytes.is_empty() || bytes.len() > 20 * 1024 * 1024 {
+                return Err(corrupt("historical image bytes"));
+            }
+            Ok(lingxi_kernel::model_exchange::InputImage { bytes, mime })
+        })
+        .collect()
 }

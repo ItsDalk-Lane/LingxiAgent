@@ -1214,6 +1214,34 @@ pub trait TurnDeltaSink: Send + Sync {
 /// `Arc<dyn TurnProviderPort>` (one injection point, doubles in tests /
 /// real adapters in R05).
 pub trait TurnProviderPort: Send + Sync {
+    /// 只允许明确实现的供应商消费会话选择；旧替身不能悄悄忽略配置冒充成功。
+    fn next_turn_with_options<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        call: &'a ModelCallId,
+        input: &'a ModelTurnInput,
+        deltas: &'a dyn TurnDeltaSink,
+        options: &'a crate::model_exchange::ModelTurnOptions,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        if options.model.is_none() && options.thinking_level.is_none() {
+            return self.next_turn(ctx, call, input, deltas);
+        }
+        Box::pin(async move {
+            ProviderTurnResult::of_ctx(
+                ctx,
+                ProviderTurn::Failed {
+                    error: lingxi_protocol::ProtocolError::new(
+                        lingxi_protocol::ErrorCode::InvalidMessage,
+                        "provider cannot consume session model/thinking options",
+                        false,
+                    ),
+                    retryable: false,
+                },
+            )
+            .mark_not_sent()
+        })
+    }
+
     /// Stable identity of what this provider simulates / serves.
     fn descriptor(&self) -> ProviderDescriptor;
 

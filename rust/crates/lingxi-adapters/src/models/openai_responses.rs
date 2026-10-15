@@ -287,6 +287,11 @@ pub(crate) fn render_input_items(
     }
     for item in &input.prior {
         match item {
+            ExchangeItem::UserMediaTurn { text, images } => {
+                let mut content = vec![serde_json::json!({"type":"input_text","text":text})];
+                for image in images { content.push(serde_json::json!({"type":"input_image","image_url":super::image_data_url(image)})); }
+                items.push(serde_json::json!({"type":"message","role":"user","content":content}));
+            }
             ExchangeItem::UserTurn { text } => items.push(serde_json::json!({"type":"message","role":"user","content":[{"type":"input_text","text":text}]})),
             ExchangeItem::CurrentSubmission => items.push(serde_json::json!({"type":"message","role":"user","content":submission_content.clone()})),
             ExchangeItem::AssistantTurn {

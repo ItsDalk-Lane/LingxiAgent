@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { chatFetch as lingxiFetch } from '../../services/chat-client';
 import { useI18n } from '../../hooks/use-i18n';
 import { useStore } from '../../stores';
 import { useScopedSessionPath } from '../session-scope-context';

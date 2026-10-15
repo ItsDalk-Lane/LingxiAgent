@@ -207,6 +207,11 @@ pub fn estimate_exchange_item_tokens(item: &ExchangeItem) -> u64 {
             }
             tokens
         }
+        ExchangeItem::UserMediaTurn { text, images } => {
+            // 图片字节也计入保守预算，不能因为不是正文就当成零成本。
+            u64::from(estimate_text_tokens(text))
+                .saturating_add(images.iter().map(|i| i.bytes.len() as u64).sum::<u64>())
+        }
         ExchangeItem::CompactionInstruction { text } | ExchangeItem::UserTurn { text } => {
             u64::from(estimate_text_tokens(text))
         }
@@ -585,6 +590,7 @@ pub fn plan_compaction(
             }
             ExchangeItem::AssistantTurn { .. }
             | ExchangeItem::CompactionSummary { .. }
+            | ExchangeItem::UserMediaTurn { .. }
             | ExchangeItem::UserTurn { .. }
             | ExchangeItem::CurrentSubmission => {}
             ExchangeItem::CompactionInstruction { .. } => {
@@ -618,6 +624,7 @@ pub fn plan_compaction(
             exchange[index],
             ExchangeItem::AssistantTurn { .. }
                 | ExchangeItem::CompactionSummary { .. }
+                | ExchangeItem::UserMediaTurn { .. }
                 | ExchangeItem::UserTurn { .. }
                 | ExchangeItem::CurrentSubmission
         ) && index > 0

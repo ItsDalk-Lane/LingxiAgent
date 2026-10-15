@@ -630,6 +630,7 @@ async fn subagent_run(harness: &Harness, session: &str, tier: ToolAccessTier) ->
     let run_id = RunDatabase::allocate_run_id(harness.state.storage(), NOW_MS)
         .expect("allocate child run id");
     let authorization = DriveAuthorization {
+        chat_input: None,
         knowledge_selection: None,
         lineage: RunLineage {
             parent_run_id: None,
@@ -1935,6 +1936,7 @@ async fn subagent_run_legacy(
     let run_id = RunDatabase::allocate_run_id(legacy.state.storage(), NOW_MS)
         .expect("allocate child run id");
     let authorization = DriveAuthorization {
+        chat_input: None,
         knowledge_selection: None,
         lineage: RunLineage {
             parent_run_id: None,

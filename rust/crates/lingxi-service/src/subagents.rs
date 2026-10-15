@@ -1353,6 +1353,7 @@ impl SubagentRuntime {
         // is what the tool-policy plane needs to reproduce the
         // incumbent's ask-tier deny_on_prompt semantics (R04-SUP-01).
         let grant = DriveAuthorization {
+            chat_input: None,
             knowledge_selection: None,
             lineage,
             grant: RunGrant::Subagent { tier },

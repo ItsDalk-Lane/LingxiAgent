@@ -153,7 +153,7 @@ export interface SessionHistoryEvidencePage {
   hasMore: boolean;
   oldestId?: string;
   reconciliation?: {sessionId: string; sessionPath: string; complete: boolean; snapshotId: string;
-    runRevision: number; runStatus: 'running' | 'reconciled_idle' | 'unknown'};
+    runRevision: number | string; runStatus: 'running' | 'reconciled_idle' | 'unknown'};
 }
 /** 只读对账：认证/URL取自捕获连接，不水合编辑器、文件列表或当前会话。 */
 export async function fetchSessionHistoryPage(
@@ -161,6 +161,18 @@ export async function fetchSessionHistoryPage(
   sessionRef: {sessionId: string; sessionPath: string},
   options: {before?: string; signal: AbortSignal},
 ): Promise<SessionHistoryEvidencePage> {
+  if (connection.serverNodeKind === 'lingxi-service') {
+    const { readRustChatHistory } = await import('../services/rust-chat-history');
+    // 协调证明要求覆盖完整分支；不把半页 unknown 冒称空闲。
+    const page = await readRustChatHistory(connection, sessionRef.sessionId, {all:true,reconciliation:true,signal:options.signal});
+    if (page.notModified === true) throw new Error('reconciliation cannot use a cached 304');
+    if (sessionRef.sessionPath !== `native:${sessionRef.sessionId}`) throw new Error('reconciliation requires the canonical session locator');
+    return {messages:page.rawItems.flatMap(value=>{
+      if (!value || typeof value !== 'object' || (value as {kind?:unknown}).kind !== 'user_message') return [];
+      const row=value as {messageId:string;legacyFields?:{clientMessageId?:string;snapshotVersion?:number}};
+      return [{id:row.messageId,sourceEntryId:row.messageId,role:'user',clientMessageId:row.legacyFields?.clientMessageId,snapshotVersion:row.legacyFields?.snapshotVersion}];
+    }),hasMore:false,reconciliation:page.reconciliation};
+  }
   const params = new URLSearchParams({sessionId:sessionRef.sessionId,path:sessionRef.sessionPath,reconciliation:'1'});
   if (options.before) params.set('before', options.before);
   const response = await fetch(buildConnectionUrl(connection, `/api/sessions/messages?${params}`), {

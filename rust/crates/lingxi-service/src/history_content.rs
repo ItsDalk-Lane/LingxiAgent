@@ -1426,12 +1426,125 @@ fn current_tools(
         None => Ok(lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty()),
     }
 }
+/// 仅重建较早区域的可见文字；工具双方、推理与非文字载荷一起省略，尾部逐项保留。
+fn local_compaction(
+    exchange: &[lingxi_kernel::model_exchange::ExchangeItem],
+    keep: u64,
+    tokens_before: u64,
+) -> Result<CompactionOutcome, StorageError> {
+    use lingxi_kernel::model_exchange::ExchangeItem;
+    let Some(plan) = lingxi_kernel::compaction::plan_compaction(exchange, keep).map_err(|e| {
+        StorageError::InvalidRequest {
+            detail: e.to_string(),
+        }
+    })?
+    else {
+        return Ok(CompactionOutcome::NotTriggered);
+    };
+    let mut sections=vec!["# Instant Simple Compaction Checkpoint".to_string(),"This checkpoint was rebuilt locally without a model request. Tool calls, tool results, hidden reasoning, and non-text payloads from the reconstructed region were omitted. The recent tail after this checkpoint remains verbatim.".to_string(),"## Reconstructed Verbatim Text".to_string()];
+    for item in &exchange[..plan.cut_index] {
+        match item {
+            ExchangeItem::UserTurn { text } | ExchangeItem::UserMediaTurn { text, .. }
+                if !text.is_empty() =>
+            {
+                sections.push(format!("### User\n{text}"))
+            }
+            ExchangeItem::AssistantTurn { content, .. } => {
+                let text = content
+                    .iter()
+                    .filter_map(|b| match b {
+                        lingxi_protocol::ContentBlock::Text { text } => Some(text.as_str()),
+                        _ => None,
+                    })
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                if !text.is_empty() {
+                    sections.push(format!("### Assistant\n{text}"));
+                }
+            }
+            ExchangeItem::CompactionSummary { summary, .. } => {
+                sections.push(format!("### Earlier Compaction Checkpoint\n{summary}"))
+            }
+            _ => {}
+        }
+    }
+    sections.extend([
+        "## In Progress".into(),
+        "- Continue the active task from this checkpoint and the unchanged recent tail.".into(),
+        "## Next Steps".into(),
+        "1. Follow the newest retained user message and do not repeat completed work.".into(),
+    ]);
+    let mut after = vec![ExchangeItem::CompactionSummary {
+        summary: sections.join("\n\n"),
+        covered_items: u32::try_from(plan.cut_index).map_err(|_| StorageError::InvalidRequest {
+            detail: "local compaction cut exceeds bound".into(),
+        })?,
+        mid_run: false,
+    }];
+    after.extend_from_slice(&exchange[plan.cut_index..]);
+    Ok(CompactionOutcome::Compacted {
+        exchange: after,
+        plan,
+        report: lingxi_kernel::compaction::TurnBudgetReport {
+            system_tokens: 0,
+            submission_tokens: 0,
+            tool_declaration_tokens: 0,
+            history_estimate_tokens: tokens_before,
+            tail_estimate_tokens: 0,
+            output_reserve_tokens: 0,
+            usage_context_tokens: None,
+            context_tokens: tokens_before,
+            context_window: 0,
+            ratio_bp: 0,
+        },
+    })
+}
 pub(crate) async fn manual_compact(
     state: &ServiceState,
     principal: &Principal,
     session_id: &str,
     body: &[u8],
     fresh: bool,
+) -> Response {
+    compact_with_method(state, principal, session_id, body, fresh, false).await
+}
+/// 实验动作复用相同的归属、admission、取消及原子历史提交。
+pub(crate) async fn instant_compact(
+    state: &ServiceState,
+    principal: &Principal,
+    session_id: &str,
+) -> Response {
+    let preferences = match state.memory().read_preferences_root() {
+        Ok(value) => value,
+        Err(error) => {
+            return storage_error_response(&StorageError::InvalidRequest { detail: error })
+        }
+    };
+    if preferences["experiments"]["session.instant_simple_compaction"] != true {
+        return EndpointError::resource_failure(
+            StatusCode::CONFLICT,
+            "experiment_disabled",
+            "instant simple compaction experiment is disabled",
+        )
+        .into_response();
+    }
+    compact_with_method(
+        state,
+        principal,
+        session_id,
+        br#"{"method":"instant_simple"}"#,
+        false,
+        true,
+    )
+    .await
+}
+async fn compact_with_method(
+    state: &ServiceState,
+    principal: &Principal,
+    session_id: &str,
+    body: &[u8],
+    fresh: bool,
+    instant: bool,
 ) -> Response {
     let facts = match gate_owned(state, principal, session_id).await {
         Ok(facts) => facts,
@@ -1460,7 +1573,13 @@ pub(crate) async fn manual_compact(
         )
         .into_response();
     };
-    let method = if fresh { "fresh-compact" } else { "compact" };
+    let method = if instant {
+        "instant_simple"
+    } else if fresh {
+        "fresh-compact"
+    } else {
+        "compact"
+    };
     if map
         .keys()
         .any(|key| !matches!(key.as_str(), "customInstructions" | "method"))
@@ -1604,27 +1723,34 @@ pub(crate) async fn manual_compact(
         .saturating_add(u64::from(lingxi_kernel::context::estimate_text_tokens(
             &system_prompt,
         )));
-    let outcome = match compaction
-        .compact_now_with_focus(
-            &ctx,
-            state.storage().as_ref(),
-            &facts.agent_id,
-            if fresh {
-                "session.fresh_compact"
-            } else {
-                "session.manual_compact"
-            },
-            None,
-            Some(action_id.clone()),
-            &input,
-            &cancel,
-            0,
-            payload["customInstructions"].as_str(),
-        )
-        .await
-    {
-        Ok(outcome) => outcome,
-        Err(error) => return storage_error_response(&error),
+    let outcome = if instant {
+        match local_compaction(&exchange, settings.keep_recent_tokens, tokens_before) {
+            Ok(value) => value,
+            Err(error) => return storage_error_response(&error),
+        }
+    } else {
+        match compaction
+            .compact_now_with_focus(
+                &ctx,
+                state.storage().as_ref(),
+                &facts.agent_id,
+                if fresh {
+                    "session.fresh_compact"
+                } else {
+                    "session.manual_compact"
+                },
+                None,
+                Some(action_id.clone()),
+                &input,
+                &cancel,
+                0,
+                payload["customInstructions"].as_str(),
+            )
+            .await
+        {
+            Ok(outcome) => outcome,
+            Err(error) => return storage_error_response(&error),
+        }
     };
     let (tokens_after, context_window, noop_reason, degraded) = match &outcome {
         CompactionOutcome::Compacted {
@@ -1682,6 +1808,7 @@ pub(crate) async fn manual_compact(
                 .into_response();
             }
             let final_compiler = Arc::clone(compiler);
+            let final_memory = Arc::clone(state.memory());
             let final_compaction = Arc::clone(&compaction);
             let final_registry = state
                 .tool_gateway()
@@ -1703,6 +1830,15 @@ pub(crate) async fn manual_compact(
                     };
                     let mut save = || {
                         final_compiler.with_material_commit(|| {
+                            if instant
+                                && final_memory
+                                    .read_preferences_root()
+                                    .map_err(|_| refused())?["experiments"]
+                                    ["session.instant_simple_compaction"]
+                                    != true
+                            {
+                                return Err(refused());
+                            }
                             // 在拿到真实数据库写锁之后采集；栅栏一直保留到COMMIT结束。
                             // 直接文件编辑按既有双采集的最终稳定快照裁决，不沿用HTTP复检。
                             let snapshot = final_compiler
@@ -1746,7 +1882,7 @@ pub(crate) async fn manual_compact(
                 pre_revision,
                 before: &exchange,
                 after,
-                refreshed_context: json!({"render":system_prompt,"observation":observation,"tools":tool_receipt,"fresh":fresh,"request":{"method":method,"customInstructions":payload["customInstructions"]}}),
+                refreshed_context: json!({"render":system_prompt,"observation":observation,"tools":tool_receipt,"fresh":fresh,"request":{"method":method,"customInstructions":payload["customInstructions"]},"runtimeMode":if instant{"lossy_local"}else{"cache_preserving"},"zeroModelRequest":instant}),
                 cancel: cancel.clone(),
                 commit_phase: commit_phase.clone(),
                 now: state.clock().now_unix_ms(),

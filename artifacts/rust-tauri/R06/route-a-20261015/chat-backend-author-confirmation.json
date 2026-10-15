@@ -1,0 +1,67 @@
+{
+  "status": "PASS_SCOPED",
+  "scope": [
+    "D483E4CD0935",
+    "7CBF6F4A6760",
+    "81664285F927",
+    "C1FB9C92E813",
+    "92620BF2264F",
+    "421EEA1AC8D5"
+  ],
+  "notClosed": [
+    "81B217A7E581"
+  ],
+  "patchSHA256": "36028a1b91260cc815833f0c02208b6fc2be66b527aefae24b20ba8eb9d9b436",
+  "sourceManifestSHA256": "dc5d6053e7b41219230413b1670ef456d5b8c583c7d5f2f5a99379bbeba69734",
+  "testPackage": "lingxi-service",
+  "testSuite": "r06_chat_wire",
+  "testsForLeaf": {
+    "D483E4CD0935": [
+      "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals",
+      "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal"
+    ],
+    "7CBF6F4A6760": [
+      "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit",
+      "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard",
+      "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject"
+    ],
+    "81664285F927": [
+      "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty",
+      "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail",
+      "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
+    ],
+    "C1FB9C92E813": [
+      "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+      "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session"
+    ],
+    "92620BF2264F": [
+      "ws_interject_interrupts_only_target_and_preserves_real_user_receipt",
+      "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+      "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
+    ],
+    "421EEA1AC8D5": [
+      "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative",
+      "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run"
+    ]
+  },
+  "currentCoreTests": {
+    "passed": 14,
+    "failed": 0,
+    "log": "/private/tmp/r06-chat-wire-delivery/backend-six/frozen-core-real-2.log"
+  },
+  "nativeChecks": 27,
+  "strictClippy": "PASS",
+  "rootTypes": "PASS",
+  "jsTestsPassed": 39,
+  "mainModified": false,
+  "gatesModified": false,
+  "originalAssertionsModified": false,
+  "notVerified": [
+    "完整产品启动",
+    "Tauri",
+    "Windows/Linux动态",
+    "商业供应商",
+    "81B完整装配与全量/多图历史"
+  ],
+  "report": "/private/tmp/r06-chat-wire-delivery/backend-six/REPORT.md"
+}

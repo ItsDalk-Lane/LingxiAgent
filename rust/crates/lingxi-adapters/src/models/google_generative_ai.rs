@@ -445,6 +445,13 @@ pub fn render_generate_request(
     let mut call_names: HashMap<String, (String, Option<String>)> = HashMap::new();
     for item in &input.prior {
         match item {
+            ExchangeItem::UserMediaTurn { text, images } => {
+                let mut parts = vec![serde_json::json!({"text":text})];
+                for image in images {
+                    parts.push(serde_json::json!({"inlineData":{"mimeType":image.mime,"data":super::image_base64(image)}}));
+                }
+                contents.push(serde_json::json!({"role":"user","parts":parts}));
+            }
             ExchangeItem::UserTurn { text } => {
                 contents.push(serde_json::json!({"role":"user","parts":[{"text":text}]}))
             }

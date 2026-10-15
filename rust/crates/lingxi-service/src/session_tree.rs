@@ -1426,6 +1426,17 @@ impl crate::runs::UserMessageRecorder for DbUserMessageRecorder {
         session_id: &'a str,
         run_id: &'a str,
         input: &'a str,
+        now: u64,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), StorageError>> + Send + 'a>>
+    {
+        self.record_user_message_with_chat(session_id, run_id, input, None, now)
+    }
+    fn record_user_message_with_chat<'a>(
+        &'a self,
+        session_id: &'a str,
+        run_id: &'a str,
+        input: &'a str,
+        chat: Option<&'a crate::runs::ChatRunInput>,
         now_unix_ms: u64,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), StorageError>> + Send + 'a>>
     {
@@ -1435,7 +1446,25 @@ impl crate::runs::UserMessageRecorder for DbUserMessageRecorder {
                 .await?
                 .last()
                 .map(|m| m.message_id.clone());
-            let content_json = serde_json::json!({ "text": input }).to_string();
+            let mut content = serde_json::json!({"text":chat.and_then(|value|value.display_text.as_deref()).unwrap_or(input)});
+            if let Some(chat) = chat {
+                if content["text"] != input {
+                    content["modelText"] = serde_json::json!(input);
+                }
+                if !chat.images.is_empty() {
+                    content["images"] = crate::model_history::encode_images(&chat.images);
+                }
+                if !chat.files.is_empty() {
+                    content["attachments"] = serde_json::json!(chat.files);
+                }
+                if let Some(id) = &chat.client_message_id {
+                    content["clientMessageId"] = serde_json::json!(id);
+                }
+                if let Some(version) = chat.snapshot_version {
+                    content["snapshotVersion"] = serde_json::json!(version);
+                }
+            }
+            let content_json = content.to_string();
             // run_id = NULL：用户输入消息不归属任何 run 行（v8 run_id 可空但
             // 保 REFERENCES——REPAIR-R1 FINDING-06）；run 归属经消息 id
             // `user:{run_id}` 保持可追溯，裸 run_id 证据查询

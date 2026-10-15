@@ -1356,7 +1356,17 @@ async fn read_thinking_level(
             return e.into_response();
         }
     }
-    model_state_unavailable().into_response()
+    if state.model_gateway().is_none() {
+        return model_state_unavailable().into_response();
+    }
+    crate::chat_wire::thinking_get_route(
+        Extension(principal),
+        State(state),
+        Query(crate::chat_wire::ThinkingQuery {
+            session_id: session.map(str::to_string),
+        }),
+    )
+    .await
 }
 
 async fn write_thinking_level(
@@ -1386,8 +1396,18 @@ async fn write_thinking_level(
             return e.into_response();
         }
     }
-    let _ = level;
-    model_state_unavailable().into_response()
+    if state.model_gateway().is_none() {
+        return model_state_unavailable().into_response();
+    }
+    crate::chat_wire::thinking_set_route(
+        Extension(principal),
+        State(state),
+        Ok(Json(crate::chat_wire::ThinkingRequest {
+            session_id: session.map(str::to_string),
+            level: level.into(),
+        })),
+    )
+    .await
 }
 
 #[derive(Deserialize)]

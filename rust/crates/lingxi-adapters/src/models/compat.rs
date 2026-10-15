@@ -17,15 +17,8 @@
 //!   port and the incumbent breaks the suite loudly.
 //!
 //! Registered scope decisions (R05-T05 ledger, INTERFACE_EVOLUTION §25):
-//! - `longcat` is NOT ported: its only action is DISABLING thinking
-//!   (utility mode / `reasoningLevel` off / pre-existing thinking controls
-//!   in the payload) and stripping replayed reasoning
-//!   (core/provider-compat/longcat.ts `shouldDisableThinking` /
-//!   `disableThinking`). None of those triggers can fire on this pipeline —
-//!   production `CompatOptions` carry `reasoning_level: None` (the session
-//!   thinking level is the T07 owner) and the Rust renderers never emit
-//!   `thinking` / `enable_thinking` / `reasoning_effort` fields — so the
-//!   module is the identity function here.
+//! - `longcat` 的显式会话思考关闭现由 apply_for_call 接入当前 TS 相同
+//!   的 thinking.disabled 与历史推理清理；未提供会话选项的旧调用保持原路径。
 //! - `openai-input-audio` is NOT ported: it normalizes `input_audio`
 //!   message parts (core/provider-compat/input-audio.ts), and
 //!   `ModelTurnInput` carries text-only content blocks today (media and
@@ -2956,6 +2949,57 @@ pub fn apply_for_call(
     match call {
         Some(call) => {
             let view = ModelView::of_route(route, call.hints.as_ref());
+            let mut payload = payload;
+            if let Some(level) = call.options.reasoning_level.as_deref() {
+                let host = view_host(&view);
+                let longcat = view
+                    .hints
+                    .and_then(|h| h.thinking_format.as_deref())
+                    .is_some_and(|v| v.eq_ignore_ascii_case("longcat"))
+                    || matches!(
+                        view.provider.to_ascii_lowercase().as_str(),
+                        "longcat" | "longcat-coding"
+                    )
+                    || host == "api.longcat.chat"
+                    || host.ends_with(".longcat.chat");
+                if longcat {
+                    if matches!(level, "off" | "none" | "disabled")
+                        || call.options.mode == CompatMode::Utility
+                    {
+                        if let Some(map) = payload.as_object_mut() {
+                            map.remove("reasoning_effort");
+                            map.remove("enable_thinking");
+                        }
+                        payload["thinking"] = json!({"type":"disabled"});
+                        if let Some(messages) =
+                            payload.get_mut("messages").and_then(Value::as_array_mut)
+                        {
+                            strip_reasoning_content(messages);
+                        }
+                    }
+                } else if view.hints.and_then(|h| h.reasoning) == Some(true)
+                    && matched_module(&view).is_none()
+                {
+                    let effort = match level {
+                        "off" => "none",
+                        "max" => "xhigh",
+                        other => other,
+                    };
+                    match route.protocol {
+                        lingxi_kernel::model_exchange::ProtocolFamily::OpenAiCompletions => {
+                            payload["reasoning_effort"] = json!(effort)
+                        }
+                        lingxi_kernel::model_exchange::ProtocolFamily::OpenAiResponses => {
+                            payload["reasoning"] = json!({"effort":effort})
+                        }
+                        _ => {
+                            return Err(refusal(
+                                "selected protocol has no configured reasoning-level mapping",
+                            ))
+                        }
+                    }
+                }
+            }
             normalize_provider_payload(payload, &view, &call.options)
         }
         None => Ok(payload),
@@ -3442,5 +3486,59 @@ mod tests {
         assert_eq!(out["response_format"]["type"], json!("json_schema"));
         assert_eq!(out["response_format"]["json_schema"]["strict"], json!(true));
         assert_eq!(out["options"]["num_ctx"], json!(32_768));
+    }
+    #[test]
+    fn session_thinking_options_use_wire_fields_and_longcat_off_without_changing_absent_options() {
+        use lingxi_kernel::model_exchange::{
+            CredentialAuthKind, CredentialReference, ProtocolFamily,
+        };
+        let mut route = ResolvedModelRoute {
+            provider: "generic".into(),
+            model: "reasoner".into(),
+            operation: ModelOperation::Chat,
+            protocol: ProtocolFamily::OpenAiCompletions,
+            endpoint: "https://example.test/v1".into(),
+            credential: CredentialReference {
+                provider: "generic".into(),
+                auth: CredentialAuthKind::None,
+            },
+            config_generation: 1,
+            group_id: None,
+        };
+        let payload = json!({"model":"reasoner","messages":[{"role":"assistant","content":"answer","reasoning_content":"old thinking"}]});
+        let call = CompatCall {
+            hints: Some(RouteCompatHints {
+                reasoning: Some(true),
+                ..Default::default()
+            }),
+            options: chat_options(Some("high")),
+        };
+        assert_eq!(
+            apply_for_call(payload.clone(), &route, Some(&call)).unwrap()["reasoning_effort"],
+            "high"
+        );
+        let absent = CompatCall {
+            hints: call.hints.clone(),
+            options: CompatOptions::default(),
+        };
+        assert_eq!(
+            apply_for_call(payload.clone(), &route, Some(&absent)).unwrap(),
+            normalize_provider_payload(
+                payload.clone(),
+                &ModelView::of_route(&route, absent.hints.as_ref()),
+                &absent.options
+            )
+            .unwrap()
+        );
+        route.provider = "longcat".into();
+        route.endpoint = "https://api.longcat.chat/openai".into();
+        let off = CompatCall {
+            options: chat_options(Some("off")),
+            ..call
+        };
+        let patched = apply_for_call(payload.clone(), &route, Some(&off)).unwrap();
+        assert_eq!(patched["thinking"]["type"], "disabled");
+        assert!(patched.get("reasoning_effort").is_none());
+        assert!(patched["messages"][0].get("reasoning_content").is_none());
     }
 }

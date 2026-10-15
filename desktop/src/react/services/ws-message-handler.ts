@@ -1497,6 +1497,10 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
     }
 
     case 'abort_result': {
+      if (msg.status !== 'accepted' && msg.status !== 'already_stopped') {
+        if (msg.status === 'rejected') console.warn('[ws] abort refused:', msg.reason);
+        break;
+      }
       const spAbort = msg.sessionPath || null;
       // 停止是用户显式终局：无论本次是否命中活跃 run（already_stopped 同样成立），
       // 都结算该会话账本（盖终局章 + 触发对账），不能只清忙闲状态。

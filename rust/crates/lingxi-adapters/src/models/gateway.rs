@@ -303,17 +303,35 @@ fn resolve_in_snapshot(
                     provider: provider.clone(),
                 });
             }
-            super::config::RouteBinding {
+            // 会话选择只继承同一快照中已明确配置的同一对元数据；
+            // 未配置模型仍没有能力声明，真实派发继续在发送前拒绝。
+            let models = &snapshot.models;
+            [
+                models.chat.as_ref(),
+                models.title.as_ref(),
+                models.summarize.as_ref(),
+                models.memory.as_ref(),
+                models.vision.as_ref(),
+                models.approval.as_ref(),
+                models.guard.as_ref(),
+                models.embedding.as_ref(),
+                models.rerank.as_ref(),
+                models.image.as_ref(),
+                models.video.as_ref(),
+                models.speech.as_ref(),
+                models.speech_recognition.as_ref(),
+            ]
+            .into_iter()
+            .flatten()
+            .find(|binding| &binding.provider == provider && &binding.model == model)
+            .cloned()
+            .unwrap_or_else(|| super::config::RouteBinding {
                 provider: provider.clone(),
                 model: model.clone(),
-                // An explicit pair pin onto an unconfigured model carries
-                // no declared hints or capabilities (derivation-only
-                // compat; the undeclared capability state — R05 RR1 F01)
-                // and no binding-scoped group id.
                 compat: None,
                 group_id: None,
                 capabilities: None,
-            }
+            })
         }
         (Some(provider), None) => match configured {
             Some(binding) if &binding.provider == provider => binding.clone(),
@@ -588,5 +606,39 @@ mod tests {
             .expect("resolves");
         assert_eq!(route.model, "gpt-test-v2");
         assert_eq!(route.config_generation, 2);
+    }
+    #[test]
+    fn explicit_pair_inherits_only_current_exact_binding_and_never_a_retired_generation() {
+        let mut config: serde_json::Value = serde_json::from_str(&config_json("old")).unwrap();
+        config["models"]["chat"]["capabilities"] =
+            serde_json::json!({"tools":true,"imageInput":true});
+        config["models"]["chat"]["compat"] =
+            serde_json::json!({"reasoning":true,"contextWindow":12345});
+        let gateway = ConfigModelGateway::from_validated(
+            ModelPlaneConfig::from_value(config.clone()).unwrap(),
+        );
+        let pin = |model: &str| ModelRouteRequest {
+            operation: ModelOperation::Chat,
+            provider: Some("main".into()),
+            model: Some(model.into()),
+        };
+        let known = gateway.resolve_dispatch(&pin("old")).unwrap();
+        assert_eq!(known.capabilities.tools, Some(true));
+        assert_eq!(known.compat.as_ref().unwrap().context_window, Some(12345));
+        assert_eq!(known.route.config_generation, 1);
+        let unknown = gateway.resolve_dispatch(&pin("unconfigured")).unwrap();
+        assert_eq!(unknown.capabilities.tools, None);
+        assert!(unknown.compat.is_none());
+        config["models"]["chat"]["model"] = serde_json::json!("new");
+        config["models"]["chat"]["compat"]["contextWindow"] = serde_json::json!(54321);
+        gateway.reload(ModelPlaneConfig::from_value(config).unwrap());
+        let retired = gateway.resolve_dispatch(&pin("old")).unwrap();
+        assert_eq!(retired.capabilities.tools, None);
+        assert!(retired.compat.is_none());
+        assert_eq!(retired.route.config_generation, 2);
+        let current = gateway.resolve_dispatch(&pin("new")).unwrap();
+        assert_eq!(current.capabilities.tools, Some(true));
+        assert_eq!(current.compat.unwrap().context_window, Some(54321));
+        assert_eq!(current.route.config_generation, 2);
     }
 }

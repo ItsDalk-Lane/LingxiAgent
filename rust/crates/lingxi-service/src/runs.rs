@@ -383,6 +383,7 @@ impl TurnDeltaSink for ChannelDeltaSink {
 /// lifetime — neither a model swap nor an executor swap can widen it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct DriveAuthorization {
+    pub chat_input: Option<ChatRunInput>,
     pub knowledge_selection: Option<crate::sessions::KnowledgeSelection>,
     /// parentRunId / origin / sourceMessageId / causeId — durably recorded
     /// right after the run row is created.
@@ -421,7 +422,29 @@ pub enum RunGrant {
     Subagent { tier: ToolAccessTier },
 }
 
+/// 从真实聊天入口校验后冻结的媒体和模型选项，不能由工具/模型扩大。
+#[derive(Debug, Clone, PartialEq)]
+pub struct ChatRunInput {
+    pub images: Vec<lingxi_kernel::model_exchange::InputImage>,
+    pub files: Vec<serde_json::Value>,
+    pub client_message_id: Option<String>,
+    pub snapshot_version: Option<u64>,
+    pub display_text: Option<String>,
+    pub options: lingxi_kernel::model_exchange::ModelTurnOptions,
+}
+
+impl ChatRunInput {
+    pub fn canonical_value(&self) -> serde_json::Value {
+        serde_json::json!({"images":crate::model_history::encode_images(&self.images),"files":self.files,"clientMessageId":self.client_message_id,"snapshotVersion":self.snapshot_version,"displayText":self.display_text,"model":self.options.model,"thinkingLevel":self.options.thinking_level})
+    }
+}
+
 impl DriveAuthorization {
+    pub fn with_chat(mut self, input: Option<ChatRunInput>) -> Self {
+        self.chat_input = input;
+        self
+    }
+
     /// The authorization of a plain user submission (origin=user; the
     /// cause anchor is the explicit requestId when present).
     ///
@@ -446,6 +469,7 @@ impl DriveAuthorization {
             );
         }
         Self {
+            chat_input: None,
             knowledge_selection: None,
             lineage: RunLineage::user_submission(request_id),
             grant: RunGrant::Full,
@@ -626,6 +650,7 @@ pub struct RunSupervisor {
     /// run failure (the run finalizes Failed; nothing pretends the input
     /// landed). `None` keeps the pre-T03 shape exactly (no user-message row).
     user_message_recorder: Option<Arc<dyn UserMessageRecorder>>,
+    chat_settings_home: Option<std::path::PathBuf>,
     knowledge: Option<Arc<crate::knowledge::KnowledgeService>>,
     model_history: Option<Arc<crate::model_history::ModelHistory>>,
 }
@@ -635,6 +660,25 @@ pub struct RunSupervisor {
 /// trait object (not a concrete adapter) keeps `lingxi-service`'s run driver
 /// decoupled from the storage module's shape.
 pub trait UserMessageRecorder: Send + Sync {
+    /// 接收身份、图片和附件必须与用户消息同一次真实写入。
+    fn record_user_message_with_chat<'a>(
+        &'a self,
+        session_id: &'a str,
+        run_id: &'a str,
+        input: &'a str,
+        chat: Option<&'a ChatRunInput>,
+        now: u64,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), StorageError>> + Send + 'a>>
+    {
+        if chat.is_none() {
+            return self.record_user_message(session_id, run_id, input, now);
+        }
+        Box::pin(async {
+            Err(StorageError::InvalidRequest {
+                detail: "user message recorder cannot persist chat context".into(),
+            })
+        })
+    }
     fn record_user_message<'a>(
         &'a self,
         session_id: &'a str,
@@ -701,6 +745,7 @@ impl RunSupervisor {
             compaction: None,
             extension_hooks: false,
             user_message_recorder: None,
+            chat_settings_home: None,
             model_history: None,
             knowledge: None,
         }
@@ -746,6 +791,7 @@ impl RunSupervisor {
             compaction: None,
             extension_hooks: false,
             user_message_recorder: None,
+            chat_settings_home: None,
             model_history: None,
             knowledge: None,
         })
@@ -822,6 +868,12 @@ impl RunSupervisor {
         storage: Arc<lingxi_adapters::storage::RunDatabase>,
     ) -> Self {
         self.context_session_store = Some(storage);
+        self
+    }
+
+    /// 所有真实用户入口共用同一会话选择，CLI 不另造默认模型真相。
+    pub fn with_chat_settings_home(mut self, home: std::path::PathBuf) -> Self {
+        self.chat_settings_home = Some(home);
         self
     }
 
@@ -1354,7 +1406,13 @@ impl RunSupervisor {
         if authorization.lineage.origin == RunOrigin::User {
             if let Some(recorder) = &self.user_message_recorder {
                 if let Err(error) = recorder
-                    .record_user_message(session_id, run_id.as_str(), input, now_ms)
+                    .record_user_message_with_chat(
+                        session_id,
+                        run_id.as_str(),
+                        input,
+                        authorization.chat_input.as_ref(),
+                        now_ms,
+                    )
                     .await
                 {
                     // 已承诺的任务必须留下真实失败终态；缺附件的消息和引用事务已回滚。
@@ -1420,6 +1478,47 @@ impl RunSupervisor {
             || principal.storage_subject(),
             |row| row.owner_user_id.clone(),
         );
+        let frozen_model_options = if let Some(chat) = authorization.chat_input.as_ref() {
+            Some(chat.options.clone())
+        } else if authorization.lineage.origin == RunOrigin::User {
+            match self
+                .chat_settings_home
+                .as_ref()
+                .map(|home| crate::chat_settings::choice(home, &session_owner, session_id))
+                .transpose()
+            {
+                Ok(Some(choice)) if choice.model.is_some() || choice.thinking_level.is_some() => {
+                    Some(lingxi_kernel::model_exchange::ModelTurnOptions {
+                        model: choice.model,
+                        thinking_level: choice.thinking_level,
+                    })
+                }
+                Ok(_) => None,
+                Err(error) => {
+                    let finish = RunFinish::Failed {
+                        cause: FailureCause::ProviderFailed {
+                            code: format!("chat_settings: {error}"),
+                            retryable: false,
+                        },
+                    };
+                    let finish = self
+                        .adjudicated_finalize(
+                            port,
+                            events,
+                            &ctx,
+                            &entry,
+                            RunStatus::Running,
+                            finish,
+                            now_ms,
+                        )
+                        .await?;
+                    guard.disarm();
+                    return Ok(finish);
+                }
+            }
+        } else {
+            None
+        };
         // 每 Run 新采集；此 Arc 与 system 材料在运行内不再漂移。
         let compiled_context = match self.context_compiler.as_ref() {
             Some(compiler) => {
@@ -2021,7 +2120,11 @@ impl RunSupervisor {
                 // R05-T06: the chat path never carries aux-slot image
                 // inputs or a per-call output-token bound (the family
                 // defaults hold) — the incumbent wire is unchanged.
-                images: Vec::new(),
+                images: authorization
+                    .chat_input
+                    .as_ref()
+                    .map(|c| c.images.clone())
+                    .unwrap_or_default(),
                 max_output_tokens: None,
             };
             // R05-T05: an already-exhausted call budget fails BEFORE the
@@ -2104,11 +2207,17 @@ impl RunSupervisor {
             // admission permit must not turn into a new provider call.
             gate_cancel!();
             if let Some(storage) = self.context_session_store.as_ref() {
-                if let Err(error) = crate::session_prompt::record(storage, session_id, run_id.as_str(), &turn_input).await {
+                if let Err(error) =
+                    crate::session_prompt::record(storage, session_id, run_id.as_str(), &turn_input)
+                        .await
+                {
                     drop(model_permit.take());
-                    break RunFinish::Failed { cause: FailureCause::ProviderFailed {
-                        code: format!("session_prompt_snapshot:{error}"), retryable:false,
-                    }};
+                    break RunFinish::Failed {
+                        cause: FailureCause::ProviderFailed {
+                            code: format!("session_prompt_snapshot:{error}"),
+                            retryable: false,
+                        },
+                    };
                 }
             }
             // 侧写期间接受取消时，绝不在取消后再发供应商请求。
@@ -2120,6 +2229,15 @@ impl RunSupervisor {
             let call_ctx = ctx.clone();
             let call_id = call.clone();
             let provider_clone = Arc::clone(&provider);
+            let turn_options = frozen_model_options.clone().unwrap_or_default();
+            let call_descriptor = match turn_options.model.as_ref() {
+                Some((provider, model)) => lingxi_kernel::ports::ProviderDescriptor {
+                    provider: provider.clone(),
+                    model: model.clone(),
+                    operation: "chat".into(),
+                },
+                None => provider.descriptor(),
+            };
             // R05-T04 (D6/D7): the live-delta channel of this call. The sink
             // moves INTO the supervised child future, so the sender drops
             // exactly when the turn resolves — the driver's receiver then
@@ -2192,7 +2310,13 @@ impl RunSupervisor {
                     async move {
                         let sink = ChannelDeltaSink { tx: delta_tx };
                         provider_clone
-                            .next_turn(&call_ctx, &call_id, &turn_input, &sink)
+                            .next_turn_with_options(
+                                &call_ctx,
+                                &call_id,
+                                &turn_input,
+                                &sink,
+                                &turn_options,
+                            )
                             .await
                     },
                 )
@@ -2202,15 +2326,8 @@ impl RunSupervisor {
             // started fact carries the driver-moment descriptor (a mid-call
             // reload micro-window vs the result's `served_by` is documented
             // in R05_INTERFACE_EVOLUTION).
-            self.persist_model_call_started(
-                port,
-                events,
-                &ctx,
-                &call,
-                &provider.descriptor(),
-                now_ms,
-            )
-            .await?;
+            self.persist_model_call_started(port, events, &ctx, &call, &call_descriptor, now_ms)
+                .await?;
             if let (Some(compiler), Some(observation)) =
                 (self.context_compiler.as_ref(), call_observation)
             {
@@ -2246,7 +2363,7 @@ impl RunSupervisor {
                                 usage: None,
                                 usage_report:
                                     lingxi_kernel::usage::ReportedUsage::Unknown,
-                                served_by: Some(provider.descriptor()),
+                                served_by: Some(call_descriptor.clone()),
                                 served_protocol: None,
                                 transport_attempts: None,
                                 outcome:
@@ -2440,7 +2557,7 @@ impl RunSupervisor {
                                 served_by: provider_turn
                                     .served_by
                                     .clone()
-                                    .or_else(|| Some(provider.descriptor())),
+                                    .or_else(|| Some(call_descriptor.clone())),
                                 served_protocol: provider_turn.served_protocol.clone(),
                                 transport_attempts: Some(provider_turn.transport_attempts),
                                 outcome: lingxi_kernel::usage::CallOutcome::Cancelled,
@@ -2548,7 +2665,7 @@ impl RunSupervisor {
                 served_by: provider_result
                     .served_by
                     .clone()
-                    .or_else(|| Some(provider.descriptor())),
+                    .or_else(|| Some(call_descriptor.clone())),
                 served_protocol: provider_result.served_protocol.clone(),
                 // A resolved turn always observed its physical count (F38:
                 // None is exclusively the dropped-before-settlement shape).
@@ -3234,16 +3351,22 @@ impl RunSupervisor {
                                 // it.
                                 let permission = authorization.invocation_permission_context();
                                 match crate::toolgateway::with_workspace(
-                                    compiled_context.as_ref().and_then(|value| value.workspace()).map(std::path::PathBuf::from),
-                                    || gateway.prepare_from_request_pinned(
-                                    &ctx,
-                                    surface,
-                                    agent_id,
-                                    permission,
-                                    &call_id,
-                                    request,
-                                    request_pins[index],
-                                )) {
+                                    compiled_context
+                                        .as_ref()
+                                        .and_then(|value| value.workspace())
+                                        .map(std::path::PathBuf::from),
+                                    || {
+                                        gateway.prepare_from_request_pinned(
+                                            &ctx,
+                                            surface,
+                                            agent_id,
+                                            permission,
+                                            &call_id,
+                                            request,
+                                            request_pins[index],
+                                        )
+                                    },
+                                ) {
                                     Ok(prepared) => Some(prepared),
                                     Err(refusal) => {
                                         tracing::warn!(
@@ -3946,7 +4069,10 @@ impl RunSupervisor {
                         let tool_ctx = ctx.clone();
                         let exec_call_id = call_id.clone();
                         let trusted_lifetime = crate::toolgateway::TrustedToolLifetime {
-                            workspace: compiled_context.as_ref().and_then(|value| value.workspace()).map(std::path::PathBuf::from),
+                            workspace: compiled_context
+                                .as_ref()
+                                .and_then(|value| value.workspace())
+                                .map(std::path::PathBuf::from),
                             cancel: tool_scope.clone(),
                             deadline_unix_ms: tool_deadline,
                             budget_ms: u64::try_from(

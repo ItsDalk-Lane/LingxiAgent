@@ -33,6 +33,8 @@ pub struct SessionTools {
     deps: Dependencies,
     process: String,
     pending: Mutex<()>,
+    // 与调度锁分开，串行本进程的回执原子替换和授权快照读取。
+    receipt_io: Mutex<()>,
     latest: Mutex<std::collections::HashMap<String, Value>>,
 }
 fn failed(message: impl Into<String>) -> ToolOutcome {
@@ -92,6 +94,7 @@ impl SessionTools {
             deps,
             process: crate::auth::hex_random_public(16).map_err(|e| e.to_string())?,
             pending: Mutex::new(()),
+            receipt_io: Mutex::new(()),
             latest: Mutex::new(std::collections::HashMap::new()),
         })
     }
@@ -108,6 +111,7 @@ impl SessionTools {
             ))
     }
     fn save(&self, sid: &str, value: &Value) -> Result<(), String> {
+        let _guard = self.receipt_io.lock().unwrap_or_else(|p| p.into_inner());
         lingxi_adapters::storage::agent_memory::atomic_write(
             &self.path(sid),
             &serde_json::to_string(value).map_err(|e| e.to_string())?,
@@ -115,6 +119,7 @@ impl SessionTools {
         .map_err(|e| e.to_string())
     }
     pub fn receipt(&self, sid: &str) -> Result<Option<Value>, String> {
+        let _guard = self.receipt_io.lock().unwrap_or_else(|p| p.into_inner());
         if let Some(value) = self
             .latest
             .lock()
@@ -588,5 +593,66 @@ pub async fn answer_route(
     match outcome {
         crate::approval_service::AnswerOutcome::Settled(decision)|crate::approval_service::AnswerOutcome::AlreadySettled(decision)=>axum::Json(json!({"ok":true,"decision":if matches!(decision,crate::approval_service::Answer::Approve){"confirmed"}else{"rejected"}})).into_response(),
         crate::approval_service::AnswerOutcome::Refused{reason}=>crate::EndpointError::new(axum::http::StatusCode::CONFLICT,ErrorCode::Conflict,reason).into_response(),
+    }
+}
+
+#[cfg(test)]
+mod receipt_tests {
+    use super::*;
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn concurrent_atomic_receipts_never_expose_a_partial_or_changed_snapshot() {
+        let home = std::env::temp_dir().join(format!(
+            "r06-receipt-io-{}",
+            crate::auth::hex_random_public(12).unwrap()
+        ));
+        let layout = crate::prepare_layout(&home).unwrap();
+        let state = crate::ServiceState::bootstrap_with_deps(
+            crate::ServiceConfig {
+                bind_addr: "127.0.0.1:0".parse().unwrap(),
+                data_home: home,
+                home_source: crate::HomeSource::Cli,
+                network_mode: crate::NetworkMode::Loopback,
+                shutdown_timeout_ms: 10000,
+            },
+            &layout,
+            Default::default(),
+        )
+        .await
+        .unwrap();
+        let tools = Arc::clone(&state.session_tools);
+        let value = |version: usize| json!({"sessionId":"sess_local_alpha","operationId":format!("receipt-{version}"),"process":tools.process,"status":"completed","version":version,"payload":format!("{version}:完整回执").repeat(256)});
+        tools.save("sess_local_alpha", &value(0)).unwrap();
+        let start = Arc::new(std::sync::Barrier::new(2));
+        let writer = std::thread::spawn({
+            let tools = Arc::clone(&tools);
+            let start = Arc::clone(&start);
+            move || {
+                start.wait();
+                for version in 1..=128usize {
+                    let value=json!({"sessionId":"sess_local_alpha","operationId":format!("receipt-{version}"),"process":tools.process,"status":"completed","version":version,"payload":format!("{version}:完整回执").repeat(256)});
+                    tools.save("sess_local_alpha", &value).unwrap();
+                }
+            }
+        });
+        let reader = std::thread::spawn({
+            let tools = Arc::clone(&tools);
+            move || {
+                start.wait();
+                let mut previous = 0;
+                for _ in 0..512 {
+                    let value = tools.receipt("sess_local_alpha").unwrap().unwrap();
+                    let version = value["version"].as_u64().unwrap();
+                    assert!(version >= previous, "回执版本不能倒退");
+                    assert_eq!(value["operationId"], format!("receipt-{version}"));
+                    assert_eq!(value["payload"], format!("{version}:完整回执").repeat(256));
+                    previous = version;
+                }
+            }
+        });
+        writer.join().unwrap();
+        reader.join().unwrap();
+        assert_eq!(tools.receipt("sess_local_alpha").unwrap().unwrap()["version"], 128);
+        state.storage().close().await.unwrap();
     }
 }

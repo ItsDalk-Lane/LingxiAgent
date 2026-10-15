@@ -61,7 +61,7 @@ let _resourceForegroundCatchUpCleanup: (() => void) | null = null;
 
 // 注入循环依赖的 handlers
 injectHandlers(handleServerMessage, applyStreamingStatus);
-injectWebSocketGetter(() => _ws);
+injectWebSocketGetter(getWebSocket);
 configureTerminalClientWebSocketGetter(() => _ws);
 configureBackgroundProcessWebSocketGetter(() => _ws);
 
@@ -140,7 +140,7 @@ export function disconnectWebSocketForRestart(): void {
     _ws = null;
     previous.onclose = null;
     try { previous.close(); } catch { /* 已关闭的旧连接 */ }
-    if (!_wsConnectionIsRust) noteComposerConnectionClosed();
+    noteComposerConnectionClosed();
   }
   _wsRetryCount = 0;
   _wsRetryDelay = 1000;
@@ -150,6 +150,10 @@ export function disconnectWebSocketForRestart(): void {
 
 /** 获取当前 WebSocket 实例 */
 export function getWebSocket(): WebSocket | null {
+  if (_wsConnectionIsRust) {
+    const current = resolveServerConnection(useStore.getState());
+    if (!_rustSlashReady || !_rustSlashConnection || !current || JSON.stringify(current) !== JSON.stringify(_rustSlashConnection)) return null;
+  }
   return _ws;
 }
 
@@ -219,7 +223,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
   clearRustHandshakeTimer();
   if (_ws) {
     try { _ws.onclose = null; _ws.close(); } catch { /* 已失效的旧连接 */ }
-    if (!_wsConnectionIsRust) noteComposerConnectionClosed();
+    noteComposerConnectionClosed();
     _ws = null;
   }
   if (connection.kind === 'local' && connection.credentialKind === 'loopback_token' && !connection.token) {
@@ -257,19 +261,24 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
     const recovered = _wsRetryCount > 0 || Boolean(useStore.getState().wsFailureReasonKey);
     _wsRetryDelay = 1000;
     _wsRetryCount = 0;
-    setStatus(isRustService ? 'status.rustCoreUnavailable' : 'status.connected', !isRustService);
+    setStatus('status.connected', true);
     useStore.setState({
       wsState: 'connected',
       wsReconnectAttempt: 0,
-      wsFailureReasonKey: isRustService ? 'status.rustCoreUnavailable' : null,
+      wsFailureReasonKey: null,
       wsRecoveryNotice: recovered,
       compactingSessions: [],
       compactionModeBySession: {},
     });
 
-    if (isRustService) return;
-    // 只有旧服务协议可接收当前桌面聊天发送，Rust 仅声明其 wire 连接已就绪。
     noteComposerConnectionOpened();
+    if (isRustService) {
+      const state = useStore.getState();
+      const paths = [...new Set([...resolveStreamingSessionResumeTargets(state), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
+      reconcilePendingComposerSessions();
+      for (const path of paths) requestStreamResume(path);
+      return;
+    }
     const s = useStore.getState();
     requestTerminalSnapshotForCurrentSession(s);
     const streamingPaths = [...new Set([...resolveStreamingSessionResumeTargets(s), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
@@ -347,8 +356,10 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
         // 只桥接已实现的命令回执，其他 Rust 事件仍走各自正式订阅面。
         const current = resolveServerConnection(useStore.getState());
         if (current && JSON.stringify(current) === JSON.stringify(connection)
-          && msg?.type === 'slash_result' && typeof msg.sessionId === 'string'
-          && typeof msg.text === 'string' && ['success', 'error'].includes(msg.level)) {
+          && typeof msg?.sessionId === 'string'
+          && ['subagent_stop_result', 'slash_result', 'session_user_message', 'input_rejected', 'status', 'stage',
+            'assistant_run_start', 'assistant_run_end', 'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
+            'tool_start', 'tool_end', 'error', 'abort_result', 'stream_resume', 'steered', 'compaction_accepted', 'compaction_result', 'context_usage'].includes(msg.type)) {
           if (msg.historyCleared === true && msg.level === 'success' && msg.targetSessionId === msg.sessionId) {
             const state = useStore.getState();
             const path = state.currentSessionId === msg.sessionId ? state.currentSessionPath
@@ -384,7 +395,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
     useStore.getState().clearAllTurnPending?.();
     // 在途发送的回执随连接消失：标记 delivery_unknown（禁止自动重发），
     // 连接代次递增使旧代次的准备任务在提交时被拒绝。
-    if (!isRustService) noteComposerConnectionClosed();
+    noteComposerConnectionClosed();
     scheduleReconnect();
   };
 

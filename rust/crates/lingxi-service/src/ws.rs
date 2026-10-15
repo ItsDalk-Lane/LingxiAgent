@@ -546,6 +546,12 @@ pub enum WsClientRequest {
         #[serde(default, rename = "requestId")]
         request_id: Option<String>,
     },
+    Prompt(crate::chat_wire::PromptRequest),
+    Interject(crate::chat_wire::PromptRequest),
+    Abort(crate::chat_wire::AbortRequest),
+    ResumeStream(crate::chat_wire::ResumeRequest),
+    Steer(crate::chat_wire::SteerRequest),
+    Compact(crate::chat_wire::CompactRequest),
     Slash {
         #[serde(rename = "sessionId")]
         session_id: String,

@@ -428,6 +428,12 @@ pub fn render_chat_request(
     }
     for item in &input.prior {
         match item {
+            ExchangeItem::UserMediaTurn { text, images } => {
+                let mut historical = input.clone();
+                historical.submission = text.clone();
+                historical.images = images.clone();
+                messages.push(submission_user_message(&historical));
+            }
             ExchangeItem::UserTurn { text } => messages.push(RequestMessage::User {
                 content: text.clone(),
             }),

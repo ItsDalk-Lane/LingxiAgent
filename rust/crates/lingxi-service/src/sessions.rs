@@ -1122,6 +1122,26 @@ impl SessionStore {
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_background_chat_for(
+            storage, events, supervisor, background, principal, session_id, submission, now_ms,
+            None,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn execute_background_chat_for(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+        chat_input: Option<crate::runs::ChatRunInput>,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
         // R03 RR2/F05-01 — the background surface canonicalizes through the
         // SAME single boundary as the foreground one: the dedup key, the
         // cross-restart anchor lookup and the DriveAuthorization lineage
@@ -1133,7 +1153,14 @@ impl SessionStore {
             request_id: canonical_request_id.as_deref(),
         };
         let (run_id, lease, _agent_id, binding) = match self
-            .admit_submission(storage.as_ref(), principal, session_id, &submission, now_ms)
+            .admit_submission_with_chat(
+                storage.as_ref(),
+                principal,
+                session_id,
+                &submission,
+                now_ms,
+                chat_input.as_ref(),
+            )
             .await?
         {
             AdmissionOutcome::Replayed { accepted } => return Ok(accepted),
@@ -1171,7 +1198,8 @@ impl SessionStore {
                 submission.request_id,
                 self.gate.permission_mode(session_id),
             )
-            .with_knowledge(submission.knowledge.cloned()),
+            .with_knowledge(submission.knowledge.cloned())
+            .with_chat(chat_input),
             binding,
             now_ms,
             lease,
@@ -1237,6 +1265,20 @@ impl SessionStore {
         session_id: &str,
         submission: &ExecuteSubmission<'_>,
         now_ms: u64,
+    ) -> Result<AdmissionOutcome, SessionExecuteError> {
+        self.admit_submission_with_chat(port, principal, session_id, submission, now_ms, None)
+            .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    async fn admit_submission_with_chat<P: StoragePort>(
+        &self,
+        port: &P,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+        chat_input: Option<&crate::runs::ChatRunInput>,
     ) -> Result<AdmissionOutcome, SessionExecuteError> {
         // R03 repair G05/F06 — the OFFICIAL input budget, enforced at the
         // very head of the admission chain (BOTH submission surfaces),
@@ -1349,6 +1391,17 @@ impl SessionStore {
             request_id: request_id.clone(),
         };
         let input_digest = crate::dedup::normalized_request_digest_hex(submission.input);
+        let input_digest = if let Some(chat) = chat_input {
+            let encoded =
+                serde_json::to_string(&(input_digest, chat.canonical_value())).map_err(|e| {
+                    SessionExecuteError::Storage(StorageError::InvalidRequest {
+                        detail: e.to_string(),
+                    })
+                })?;
+            crate::dedup::normalized_request_digest_hex(&encoded)
+        } else {
+            input_digest
+        };
         let digest = match submission.knowledge {
             None => input_digest,
             Some(selection) => {

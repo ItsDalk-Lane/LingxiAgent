@@ -281,17 +281,31 @@ impl GatewayedProvider {
         input: &'a ModelTurnInput,
         deltas: &'a dyn TurnDeltaSink,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        self.next_turn_for_operation_with_options(ctx, call, operation, input, deltas, &None)
+    }
+
+    pub fn next_turn_for_operation_with_options<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        call: &'a ModelCallId,
+        operation: ModelOperation,
+        input: &'a ModelTurnInput,
+        deltas: &'a dyn TurnDeltaSink,
+        options: &'a Option<lingxi_kernel::model_exchange::ModelTurnOptions>,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
         Box::pin(async move {
+            let mut request = ModelRouteRequest::for_operation(operation);
+            if let Some((provider, model)) = options.as_ref().and_then(|o| o.model.as_ref()) {
+                request.provider = Some(provider.clone());
+                request.model = Some(model.clone());
+            }
             // R05 RR1 F02: ONE snapshot read resolves everything this
             // dispatch consumes — route, compat hints and capabilities all
             // carry the same `config_generation` (the old
             // resolve-then-`compat_hints` sequence read the CURRENT
             // snapshot a second time and could mix generations under a
             // concurrent reload).
-            let dispatch = match self
-                .gateway
-                .resolve_dispatch(&ModelRouteRequest::for_operation(operation))
-            {
+            let dispatch = match self.gateway.resolve_dispatch(&request) {
                 Ok(dispatch) => dispatch,
                 Err(error) => {
                     let code = gateway_error_code(&error);
@@ -321,7 +335,7 @@ impl GatewayedProvider {
             // choke point for every turn-shaped operation (chat, the six
             // auxiliary slots, worker callbacks).
             let needs_tools = !input.tools.declarations.is_empty();
-            let needs_image_input = !input.images.is_empty();
+            let needs_image_input = !input.images.is_empty() || input.prior.iter().any(|item|matches!(item,lingxi_kernel::model_exchange::ExchangeItem::UserMediaTurn{images,..} if !images.is_empty()));
             if (needs_tools && dispatch.capabilities.tools != Some(true))
                 || (needs_image_input && dispatch.capabilities.image_input != Some(true))
             {
@@ -379,7 +393,10 @@ impl GatewayedProvider {
             // no hints (derivation only).
             let compat = super::compat::CompatCall {
                 hints: dispatch.compat,
-                options: super::compat::CompatOptions::for_operation(&operation),
+                options: super::compat::CompatOptions {
+                    reasoning_level: options.as_ref().and_then(|o| o.thinking_level.clone()),
+                    ..super::compat::CompatOptions::for_operation(&operation)
+                },
             };
             let result = sanitize_result_at_host_boundary(
                 self.execute_route(ctx, call, input, &route, &auth, Some(&compat), deltas)
@@ -512,6 +529,27 @@ impl TurnProviderPort for GatewayedProvider {
                 operation: "chat".to_string(),
             },
         }
+    }
+
+    fn next_turn_with_options<'a>(
+        &'a self,
+        ctx: &'a RunContext,
+        call: &'a ModelCallId,
+        input: &'a ModelTurnInput,
+        deltas: &'a dyn TurnDeltaSink,
+        options: &'a lingxi_kernel::model_exchange::ModelTurnOptions,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ProviderTurnResult> + Send + 'a>> {
+        Box::pin(async move {
+            self.next_turn_for_operation_with_options(
+                ctx,
+                call,
+                ModelOperation::Chat,
+                input,
+                deltas,
+                &Some(options.clone()),
+            )
+            .await
+        })
     }
 
     fn next_turn<'a>(

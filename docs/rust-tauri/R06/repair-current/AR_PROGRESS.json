@@ -2425,6 +2425,32 @@
       "R07Ready": false,
       "F14": "OPEN",
       "windowsLinuxRuntime": "NOT_RUN"
+    },
+    "chat_backend": {
+      "status": "SIX_ORIGINAL_LEAVES_BOUND_PASS_NOT_STAGE_ACCEPTANCE",
+      "leaves": [
+        "R00-T02-LA-D483E4CD0935",
+        "R00-T02-LA-7CBF6F4A6760",
+        "R00-T02-LA-81664285F927",
+        "R00-T02-LA-C1FB9C92E813",
+        "R00-T02-LA-92620BF2264F",
+        "R00-T02-LA-421EEA1AC8D5"
+      ],
+      "completedInitialGaps": 63,
+      "remainingInitialGaps": 15,
+      "onlyR06Completed": 26,
+      "onlyR06Remaining": 0,
+      "readyLeaves": 264,
+      "gapLeaves": 15,
+      "actualRegisteredBindings": 25,
+      "sourceCandidateSha256": "f094d02d619300496f7fae9441c5dfd47a42342efe0a1b473f801f52e04b64fb",
+      "bindingSummary": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-binding-window-summary.json",
+      "proofReview": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json",
+      "original279AssertionsThenUnchanged": true,
+      "stageAccepted": false,
+      "R07Ready": false,
+      "F14": "OPEN",
+      "windowsLinuxRuntime": "NOT_RUN"
     }
   }
 }

@@ -1,0 +1,769 @@
+{
+  "status": "PASS",
+  "scope": "Six original chat protocol leaves only; not full chat assembly or stage acceptance",
+  "original279AssertionsAndThenUnchanged": true,
+  "bindingsExecuted": 25,
+  "leafIds": [
+    "R00-T02-LA-D483E4CD0935",
+    "R00-T02-LA-7CBF6F4A6760",
+    "R00-T02-LA-81664285F927",
+    "R00-T02-LA-C1FB9C92E813",
+    "R00-T02-LA-92620BF2264F",
+    "R00-T02-LA-421EEA1AC8D5"
+  ],
+  "sourceCandidateSha256": "f094d02d619300496f7fae9441c5dfd47a42342efe0a1b473f801f52e04b64fb",
+  "rawEvidence": "/private/tmp/r06-chat-window-r3-20261015",
+  "rollupExitCode": 0,
+  "results": [
+    {
+      "key": "r06_test_0c1fe78ac0c818a410ed",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "background_steering",
+        "test": "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "background_steering",
+          "c02_steering_stays_in_the_authorized_session_across_parallel_runs",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_120b9f240b02ef99b472",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_159a8c7eab43e921ff83",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_1694c49562719ed0d4bb",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_198d03c56f739841765d",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_29a29c049d9b847614e7",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "ws_interject_interrupts_only_target_and_preserves_real_user_receipt",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "ws_interject_interrupts_only_target_and_preserves_real_user_receipt",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_3286f2f4559d2d7d9254",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "event_subscription",
+        "test": "ws_subscribe_snapshot_live_and_rejections",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "event_subscription",
+          "ws_subscribe_snapshot_live_and_rejections",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_361795edd7b3dec5d821",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_52b6e7d279fcc7a1ec37",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_5cd824f40cc06c7d0f0d",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_5ea677d0e6c557c1d77d",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_t02_compaction",
+        "test": "provider_failure_keeps_the_original_exchange_and_accounts_it",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t02_compaction",
+          "provider_failure_keeps_the_original_exchange_and_accounts_it",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_613f3334749c7a99b82e",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "leaf_cancel_outcome_shapes",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "leaf_cancel_outcome_shapes",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_7c901480b0e357e87be0",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_t02_compaction",
+        "test": "manual_compaction_skips_the_threshold_and_compacts",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_t02_compaction",
+          "manual_compaction_skips_the_threshold_and_compacts",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_7dc005c29430fe9e30fc",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_8e15022f61096de0e856",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "combo_multi_tool_three_calls",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "combo_multi_tool_three_calls",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_9b90230193acc2bca412",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "combo_cancel_during_stream_read",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "combo_cancel_during_stream_read",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_a0fe1ddb44dd16fcff94",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "event_subscription",
+        "test": "a10_negative_rejections_are_loud",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "event_subscription",
+          "a10_negative_rejections_are_loud",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_a459b82041faf80117f3",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_b8f060153b1d1f72c5b9",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_cbb897328dad8d16cdf9",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_e09baadd908275cb16b4",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_e0ad828de9c0d53b3baf",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r06_chat_wire",
+        "test": "actual_model_switch_default_thinking_and_image_survive_restart_into_provider",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r06_chat_wire",
+          "actual_model_switch_default_thinking_and_image_survive_restart_into_provider",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_e777035e6dad14cae11c",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "combo_normal_completes_with_final",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "combo_normal_completes_with_final",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_fd17217c5619c3dc4301",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "r03_t08_acceptance_matrix",
+        "test": "leaf_steer_semantics_busy_miss_and_drain",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "r03_t08_acceptance_matrix",
+          "leaf_steer_semantics_busy_miss_and_drain",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    },
+    {
+      "key": "r06_test_fe66688eb4d1fb720f6a",
+      "binding": {
+        "package": "lingxi-service",
+        "suite": "auth_matrix",
+        "test": "a05_cross_principal_session_misuse_is_forbidden_without_side_effects",
+        "kind": "rust_integration_test",
+        "timeoutSecs": 900,
+        "argv": [
+          "rustup",
+          "run",
+          "1.98.1",
+          "cargo",
+          "test",
+          "--manifest-path",
+          "rust/Cargo.toml",
+          "--locked",
+          "-p",
+          "lingxi-service",
+          "--test",
+          "auth_matrix",
+          "a05_cross_principal_session_misuse_is_forbidden_without_side_effects",
+          "--",
+          "--exact",
+          "--show-output"
+        ]
+      },
+      "exitCode": 0,
+      "sourceStable": true
+    }
+  ]
+}

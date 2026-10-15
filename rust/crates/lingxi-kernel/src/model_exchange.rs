@@ -312,6 +312,11 @@ impl TurnOrigin {
 pub enum ExchangeItem {
     /// 已完成用户回合，始终保持普通用户角色。
     UserTurn { text: String },
+    /// 已授权并真实保存的历史图片输入；重启后仍按原顺序送到相同用户回合。
+    UserMediaTurn {
+        text: String,
+        images: Vec<InputImage>,
+    },
     /// 当前输入的位置；渲染器在这里插入submission，旧调用者无标记时仍沿原形状。
     CurrentSubmission,
 
@@ -412,6 +417,13 @@ pub struct ModelTurnInput {
     /// callbacks / aux slots). `None` = the family default (the incumbent
     /// chat path behavior; anthropic keeps its required 16384 constant).
     pub max_output_tokens: Option<u32>,
+}
+
+/// 宿主在会话提交时冻结的模型与思考选择；不接受模型输出冒认这些字段。
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ModelTurnOptions {
+    pub model: Option<(String, String)>,
+    pub thinking_level: Option<String>,
 }
 
 /// One host-authorized image input of a model call (R05-T06). The bytes

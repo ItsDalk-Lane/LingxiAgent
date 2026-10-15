@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { chatFetch as lingxiFetch } from '../../services/chat-client';
 import { useI18n } from '../../hooks/use-i18n';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
@@ -60,7 +60,11 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
       const targetSessionPath = sessionPath ?? state.currentSessionPath;
       const sessionHasMessages = !!(targetSessionPath && sessionScopedValue(state, chatSessions, targetSessionPath)?.items?.length);
 
-      if (sessionHasMessages && targetSessionPath) {
+      const useExistingSession = sessionHasMessages && !!targetSessionPath && (!!sessionPath || !pendingNewSession);
+      const selected = useExistingSession ? (sessionPath ? sessionModel : sessionScopedValue(state, sessionModelsByPath, targetSessionPath!)) : undefined;
+      const effective = selected?.id && selected.provider ? selected : models.find(m => m.isCurrent);
+      if (effective?.id === modelId && effective.provider === provider && selected?.available !== false) return;
+      if (useExistingSession && targetSessionPath) {
         // Same-model guard：严格复合键比较。sm 缺 provider 时视为不可比，走 global 当前。
         const sm = sessionPath
           ? sessionModel
@@ -120,6 +124,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
           body: JSON.stringify({ modelId, provider }),
         });
         const setData = await setRes.json().catch(() => ({}));
+        if (!setRes.ok || setData?.ok === false) throw new Error(setData.error || 'failed to save default model');
         if (setData.thinkingLevel) {
           useStore.getState().setThinkingLevel(setData.thinkingLevel);
           useStore.getState().setPendingNewSessionThinkingLevel(setData.thinkingLevel);
@@ -132,6 +137,7 @@ export function ModelSelector({ models, sessionModel, isStreaming = false, sessi
         }
         const res = await lingxiFetch('/api/models');
         const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || 'failed to load models');
         useStore.setState({ models: data.models || [] });
       }
     } catch (err) {

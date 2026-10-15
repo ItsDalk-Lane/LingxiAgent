@@ -576,6 +576,9 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if p == "/lingxi/v1/sessions" && (m == "GET" || m == "HEAD" || m == "POST") {
         return RoutePolicy::Scope("chat");
     }
+    if matches!(p, "/lingxi/v1/models/set" | "/lingxi/v1/models/switch") && m == "POST" {
+        return RoutePolicy::Scope("chat");
+    }
     if let Some(rest) = p.strip_prefix("/lingxi/v1/sessions/") {
         if rest == "workspace-rollback" {
             return if m == "GET" || m == "HEAD" || m == "PUT" {

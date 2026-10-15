@@ -12136,53 +12136,53 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "manual_compaction_skips_the_threshold_and_compacts",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 1116,
-              "testEndLine": 1193,
+              "testEndLine": 1191,
               "assertions": [
                 {
                   "line": 1157,
-                  "quote": "    assert_eq!(compacted.len(), exchange.len() - plan.cut_index + 1);"
+                  "quote": "assert_eq!(compacted.len(), exchange.len() - plan.cut_index + 1);"
                 },
                 {
                   "line": 1163,
-                  "quote": "    assert!(!mid_run, \"manual compaction carries NO mid-run notice\");"
+                  "quote": "assert!(!mid_run, \"manual compaction carries NO mid-run notice\");"
                 },
                 {
                   "line": 1165,
-                  "quote": "    assert_eq!(report.output_reserve_tokens, 16_384);"
+                  "quote": "assert_eq!(report.output_reserve_tokens, 16_384);"
                 },
                 {
                   "line": 1166,
-                  "quote": "    assert_eq!(report.context_window, 0);"
+                  "quote": "assert_eq!(report.context_window, 0);"
                 },
                 {
                   "line": 1167,
-                  "quote": "    assert_eq!(report.usage_context_tokens, None);"
+                  "quote": "assert_eq!(report.usage_context_tokens, None);"
                 },
                 {
                   "line": 1172,
-                  "quote": "    assert_eq!(bodies.len(), 1);"
+                  "quote": "assert_eq!(bodies.len(), 1);"
                 },
                 {
                   "line": 1174,
-                  "quote": "    assert!(\n        body.get(\"max_tokens\").is_none()\n            && body.get(\"max_output_tokens\").is_none()\n            && body.get(\"max_completion_tokens\").is_none(),\n        \"the optional-cap family sends NO output cap field on the wire: {body}\"\n    );"
+                  "quote": "assert!(\n        body.get(\"max_tokens\").is_none()\n            && body.get(\"max_output_tokens\").is_none()\n            && body.get(\"max_completion_tokens\").is_none(),\n        \"the optional-cap family sends NO output cap field on the wire: {body}\"\n    );"
                 },
                 {
                   "line": 1181,
-                  "quote": "    assert_eq!(messages[0][\"content\"], \"SYS-MANUAL\");"
+                  "quote": "assert_eq!(messages[0][\"content\"], \"SYS-MANUAL\");"
                 },
                 {
                   "line": 1182,
-                  "quote": "    assert_eq!(messages[1][\"content\"], \"手动压缩这段历史\");"
+                  "quote": "assert_eq!(messages[1][\"content\"], \"手动压缩这段历史\");"
                 },
                 {
                   "line": 1185,
-                  "quote": "    assert_eq!(rows.len(), 1, \"manual calls account the same way\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"manual calls account the same way\");"
                 },
                 {
                   "line": 1186,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
                 }
               ]
             },
@@ -12290,37 +12290,37 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 599,
-              "testEndLine": 662,
+              "testEndLine": 658,
               "assertions": [
                 {
                   "line": 634,
-                  "quote": "    assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
+                  "quote": "assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
                 },
                 {
                   "line": 639,
-                  "quote": "    assert_eq!(exchange.len(), 12);"
+                  "quote": "assert_eq!(exchange.len(), 12);"
                 },
                 {
                   "line": 640,
-                  "quote": "    assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
+                  "quote": "assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
                 },
                 {
                   "line": 649,
-                  "quote": "    assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
                 },
                 {
                   "line": 650,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Failed);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Failed);"
                 },
                 {
                   "line": 651,
-                  "quote": "    assert_eq!(rows[0].transport_attempts, Some(1));"
+                  "quote": "assert_eq!(rows[0].transport_attempts, Some(1));"
                 },
                 {
                   "line": 653,
-                  "quote": "    assert_eq!(chat_rows.len(), 0);"
+                  "quote": "assert_eq!(chat_rows.len(), 0);"
                 }
               ]
             },
@@ -42838,7 +42838,7 @@
         "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
       ],
       "then": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -42852,106 +42852,239 @@
               "package": "lingxi-service",
               "suite": "r06_t02_compaction",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run"
             }
           ],
-          "meaning": "手动摘要服务受检，但没有WS compact请求及compaction_accepted回执。",
+          "meaning": "真实WS先accepted再succeeded/noop/failed；失败模型调用账本保留，未知method/实验关闭/缺会话/流式中拒绝且历史不改；instant_simple开启后真实本地checkpoint零新增模型/费用，重启下一Run实际消费。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "manual_compaction_skips_the_threshold_and_compacts",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 1116,
-              "testEndLine": 1193,
+              "testEndLine": 1191,
               "assertions": [
                 {
                   "line": 1157,
-                  "quote": "    assert_eq!(compacted.len(), exchange.len() - plan.cut_index + 1);"
+                  "quote": "assert_eq!(compacted.len(), exchange.len() - plan.cut_index + 1);"
                 },
                 {
                   "line": 1163,
-                  "quote": "    assert!(!mid_run, \"manual compaction carries NO mid-run notice\");"
+                  "quote": "assert!(!mid_run, \"manual compaction carries NO mid-run notice\");"
                 },
                 {
                   "line": 1165,
-                  "quote": "    assert_eq!(report.output_reserve_tokens, 16_384);"
+                  "quote": "assert_eq!(report.output_reserve_tokens, 16_384);"
                 },
                 {
                   "line": 1166,
-                  "quote": "    assert_eq!(report.context_window, 0);"
+                  "quote": "assert_eq!(report.context_window, 0);"
                 },
                 {
                   "line": 1167,
-                  "quote": "    assert_eq!(report.usage_context_tokens, None);"
+                  "quote": "assert_eq!(report.usage_context_tokens, None);"
                 },
                 {
                   "line": 1172,
-                  "quote": "    assert_eq!(bodies.len(), 1);"
+                  "quote": "assert_eq!(bodies.len(), 1);"
                 },
                 {
                   "line": 1174,
-                  "quote": "    assert!(\n        body.get(\"max_tokens\").is_none()\n            && body.get(\"max_output_tokens\").is_none()\n            && body.get(\"max_completion_tokens\").is_none(),\n        \"the optional-cap family sends NO output cap field on the wire: {body}\"\n    );"
+                  "quote": "assert!(\n        body.get(\"max_tokens\").is_none()\n            && body.get(\"max_output_tokens\").is_none()\n            && body.get(\"max_completion_tokens\").is_none(),\n        \"the optional-cap family sends NO output cap field on the wire: {body}\"\n    );"
                 },
                 {
                   "line": 1181,
-                  "quote": "    assert_eq!(messages[0][\"content\"], \"SYS-MANUAL\");"
+                  "quote": "assert_eq!(messages[0][\"content\"], \"SYS-MANUAL\");"
                 },
                 {
                   "line": 1182,
-                  "quote": "    assert_eq!(messages[1][\"content\"], \"手动压缩这段历史\");"
+                  "quote": "assert_eq!(messages[1][\"content\"], \"手动压缩这段历史\");"
                 },
                 {
                   "line": 1185,
-                  "quote": "    assert_eq!(rows.len(), 1, \"manual calls account the same way\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"manual calls account the same way\");"
                 },
                 {
                   "line": 1186,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
                 }
               ]
             },
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 599,
-              "testEndLine": 662,
+              "testEndLine": 658,
               "assertions": [
                 {
                   "line": 634,
-                  "quote": "    assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
+                  "quote": "assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
                 },
                 {
                   "line": 639,
-                  "quote": "    assert_eq!(exchange.len(), 12);"
+                  "quote": "assert_eq!(exchange.len(), 12);"
                 },
                 {
                   "line": 640,
-                  "quote": "    assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
+                  "quote": "assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
                 },
                 {
                   "line": 649,
-                  "quote": "    assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
                 },
                 {
                   "line": 650,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Failed);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Failed);"
                 },
                 {
                   "line": 651,
-                  "quote": "    assert_eq!(rows[0].transport_attempts, Some(1));"
+                  "quote": "assert_eq!(rows[0].transport_attempts, Some(1));"
                 },
                 {
                   "line": 653,
-                  "quote": "    assert_eq!(chat_rows.len(), 0);"
+                  "quote": "assert_eq!(chat_rows.len(), 0);"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1501,
+              "testEndLine": 1565,
+              "assertions": [
+                {
+                  "line": 1515,
+                  "quote": "assert_eq!(result[\"status\"], \"succeeded\", \"{result}\")"
+                },
+                {
+                  "line": 1516,
+                  "quote": "assert!(\n        frames\n            .iter()\n            .position(|v| v[\"type\"] == \"compaction_accepted\")\n            .unwrap()\n            < frames.len() - 1\n    )"
+                },
+                {
+                  "line": 1524,
+                  "quote": "assert!(archive.to_string().contains(\"EX01-SUMMARY\"))"
+                },
+                {
+                  "line": 1527,
+                  "quote": "assert_eq!(result[\"status\"], \"noop\", \"{result}\")"
+                },
+                {
+                  "line": 1528,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 1533,
+                  "quote": "assert_eq!(result[\"status\"], \"failed\", \"{result}\")"
+                },
+                {
+                  "line": 1534,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 1535,
+                  "quote": "assert_eq!(h.snapshot(\"failure\").await, before)"
+                },
+                {
+                  "line": 1536,
+                  "quote": "assert!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE session_id='failure' AND model='summary'\",vec![]).await.unwrap().unwrap().parse::<u64>().unwrap()>0)"
+                },
+                {
+                  "line": 1548,
+                  "quote": "assert_eq!(result[\"reason\"], \"session_streaming\")"
+                },
+                {
+                  "line": 1549,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 1550,
+                  "quote": "assert_eq!(h.snapshot(\"active\").await, before)"
+                },
+                {
+                  "line": 1557,
+                  "quote": "assert_eq!(result[\"status\"], \"failed\")"
+                },
+                {
+                  "line": 1558,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 894,
+              "testEndLine": 963,
+              "assertions": [
+                {
+                  "line": 914,
+                  "quote": "assert_eq!(result[\"status\"], \"failed\")"
+                },
+                {
+                  "line": 915,
+                  "quote": "assert_eq!(result[\"reason\"], reason)"
+                },
+                {
+                  "line": 916,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(h.snapshot(\"compact\").await, before)"
+                },
+                {
+                  "line": 933,
+                  "quote": "assert!(\n        frames\n            .iter()\n            .position(|v| v[\"type\"] == \"compaction_accepted\")\n            .unwrap()\n            < frames.len() - 1,\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 941,
+                  "quote": "assert_eq!(result[\"status\"], \"succeeded\", \"{result}\")"
+                },
+                {
+                  "line": 942,
+                  "quote": "assert_eq!(result[\"mode\"], \"lossy_local\")"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 944,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT json_group_array(json_object('id',model_call_id,'provider',provider,'model',model,'input',input_tokens,'output',output_tokens,'outcome',outcome,'attempts',transport_attempts,'recorded',recorded_at_unix_ms)) FROM (SELECT * FROM model_call_usage ORDER BY model_call_id)\",vec![]).await.unwrap().unwrap(),usage)"
+                },
+                {
+                  "line": 946,
+                  "quote": "assert!(\n        matches!(after.first(),Some(lingxi_kernel::model_exchange::ExchangeItem::CompactionSummary{summary,..}) if summary.contains(\"Instant Simple\")&&summary.contains(\"OLD-USER-0\")&&summary.contains(\"without a model request\"))\n    )"
+                },
+                {
+                  "line": 950,
+                  "quote": "assert_eq!(original_rows, \"8\")"
+                },
+                {
+                  "line": 956,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"Instant Simple\"))"
+                },
+                {
+                  "line": 959,
+                  "quote": "assert_eq!(remote.captured().len(), calls + 1)"
                 }
               ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "先回 compaction_accepted",
-            "按实际结果回 succeeded/noop/failed"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -42960,64 +43093,190 @@
               "package": "lingxi-service",
               "suite": "r06_t02_compaction",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run"
             }
           ],
-          "meaning": "原WSmethod/实验开关/会话流式入口未接，不可用摘要服务失败替代拒绝矩阵。",
+          "meaning": "真实WS先accepted再succeeded/noop/failed；失败模型调用账本保留，未知method/实验关闭/缺会话/流式中拒绝且历史不改；instant_simple开启后真实本地checkpoint零新增模型/费用，重启下一Run实际消费。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 599,
-              "testEndLine": 662,
+              "testEndLine": 658,
               "assertions": [
                 {
                   "line": 634,
-                  "quote": "    assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
+                  "quote": "assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
                 },
                 {
                   "line": 639,
-                  "quote": "    assert_eq!(exchange.len(), 12);"
+                  "quote": "assert_eq!(exchange.len(), 12);"
                 },
                 {
                   "line": 640,
-                  "quote": "    assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
+                  "quote": "assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
                 },
                 {
                   "line": 649,
-                  "quote": "    assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
                 },
                 {
                   "line": 650,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Failed);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Failed);"
                 },
                 {
                   "line": 651,
-                  "quote": "    assert_eq!(rows[0].transport_attempts, Some(1));"
+                  "quote": "assert_eq!(rows[0].transport_attempts, Some(1));"
                 },
                 {
                   "line": 653,
-                  "quote": "    assert_eq!(chat_rows.len(), 0);"
+                  "quote": "assert_eq!(chat_rows.len(), 0);"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_compaction_real_accepted_success_noop_failure_and_streaming_negative",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1501,
+              "testEndLine": 1565,
+              "assertions": [
+                {
+                  "line": 1515,
+                  "quote": "assert_eq!(result[\"status\"], \"succeeded\", \"{result}\")"
+                },
+                {
+                  "line": 1516,
+                  "quote": "assert!(\n        frames\n            .iter()\n            .position(|v| v[\"type\"] == \"compaction_accepted\")\n            .unwrap()\n            < frames.len() - 1\n    )"
+                },
+                {
+                  "line": 1524,
+                  "quote": "assert!(archive.to_string().contains(\"EX01-SUMMARY\"))"
+                },
+                {
+                  "line": 1527,
+                  "quote": "assert_eq!(result[\"status\"], \"noop\", \"{result}\")"
+                },
+                {
+                  "line": 1528,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 1533,
+                  "quote": "assert_eq!(result[\"status\"], \"failed\", \"{result}\")"
+                },
+                {
+                  "line": 1534,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 1535,
+                  "quote": "assert_eq!(h.snapshot(\"failure\").await, before)"
+                },
+                {
+                  "line": 1536,
+                  "quote": "assert!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM model_call_usage WHERE session_id='failure' AND model='summary'\",vec![]).await.unwrap().unwrap().parse::<u64>().unwrap()>0)"
+                },
+                {
+                  "line": 1548,
+                  "quote": "assert_eq!(result[\"reason\"], \"session_streaming\")"
+                },
+                {
+                  "line": 1549,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 1550,
+                  "quote": "assert_eq!(h.snapshot(\"active\").await, before)"
+                },
+                {
+                  "line": 1557,
+                  "quote": "assert_eq!(result[\"status\"], \"failed\")"
+                },
+                {
+                  "line": 1558,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 894,
+              "testEndLine": 963,
+              "assertions": [
+                {
+                  "line": 914,
+                  "quote": "assert_eq!(result[\"status\"], \"failed\")"
+                },
+                {
+                  "line": 915,
+                  "quote": "assert_eq!(result[\"reason\"], reason)"
+                },
+                {
+                  "line": 916,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"compaction_accepted\"))"
+                },
+                {
+                  "line": 917,
+                  "quote": "assert_eq!(h.snapshot(\"compact\").await, before)"
+                },
+                {
+                  "line": 933,
+                  "quote": "assert!(\n        frames\n            .iter()\n            .position(|v| v[\"type\"] == \"compaction_accepted\")\n            .unwrap()\n            < frames.len() - 1,\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 941,
+                  "quote": "assert_eq!(result[\"status\"], \"succeeded\", \"{result}\")"
+                },
+                {
+                  "line": 942,
+                  "quote": "assert_eq!(result[\"mode\"], \"lossy_local\")"
+                },
+                {
+                  "line": 943,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 944,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT json_group_array(json_object('id',model_call_id,'provider',provider,'model',model,'input',input_tokens,'output',output_tokens,'outcome',outcome,'attempts',transport_attempts,'recorded',recorded_at_unix_ms)) FROM (SELECT * FROM model_call_usage ORDER BY model_call_id)\",vec![]).await.unwrap().unwrap(),usage)"
+                },
+                {
+                  "line": 946,
+                  "quote": "assert!(\n        matches!(after.first(),Some(lingxi_kernel::model_exchange::ExchangeItem::CompactionSummary{summary,..}) if summary.contains(\"Instant Simple\")&&summary.contains(\"OLD-USER-0\")&&summary.contains(\"without a model request\"))\n    )"
+                },
+                {
+                  "line": 950,
+                  "quote": "assert_eq!(original_rows, \"8\")"
+                },
+                {
+                  "line": 956,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"Instant Simple\"))"
+                },
+                {
+                  "line": 959,
+                  "quote": "assert_eq!(remote.captured().len(), calls + 1)"
                 }
               ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "未知 method 明确失败且不能改历史",
-            "实验关闭明确失败且不能改历史",
-            "会话不存在/正在流式明确失败且不能改历史"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "先回 compaction_accepted",
-        "按实际结果回 succeeded/noop/failed",
-        "未知 method 明确失败且不能改历史",
-        "实验关闭明确失败且不能改历史",
-        "会话不存在/正在流式明确失败且不能改历史"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json"
     },
     {
       "id": "R00-T02-LA-4338B197B6DF",
@@ -57070,53 +57329,53 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "manual_compaction_skips_the_threshold_and_compacts",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 1116,
-              "testEndLine": 1193,
+              "testEndLine": 1191,
               "assertions": [
                 {
                   "line": 1157,
-                  "quote": "    assert_eq!(compacted.len(), exchange.len() - plan.cut_index + 1);"
+                  "quote": "assert_eq!(compacted.len(), exchange.len() - plan.cut_index + 1);"
                 },
                 {
                   "line": 1163,
-                  "quote": "    assert!(!mid_run, \"manual compaction carries NO mid-run notice\");"
+                  "quote": "assert!(!mid_run, \"manual compaction carries NO mid-run notice\");"
                 },
                 {
                   "line": 1165,
-                  "quote": "    assert_eq!(report.output_reserve_tokens, 16_384);"
+                  "quote": "assert_eq!(report.output_reserve_tokens, 16_384);"
                 },
                 {
                   "line": 1166,
-                  "quote": "    assert_eq!(report.context_window, 0);"
+                  "quote": "assert_eq!(report.context_window, 0);"
                 },
                 {
                   "line": 1167,
-                  "quote": "    assert_eq!(report.usage_context_tokens, None);"
+                  "quote": "assert_eq!(report.usage_context_tokens, None);"
                 },
                 {
                   "line": 1172,
-                  "quote": "    assert_eq!(bodies.len(), 1);"
+                  "quote": "assert_eq!(bodies.len(), 1);"
                 },
                 {
                   "line": 1174,
-                  "quote": "    assert!(\n        body.get(\"max_tokens\").is_none()\n            && body.get(\"max_output_tokens\").is_none()\n            && body.get(\"max_completion_tokens\").is_none(),\n        \"the optional-cap family sends NO output cap field on the wire: {body}\"\n    );"
+                  "quote": "assert!(\n        body.get(\"max_tokens\").is_none()\n            && body.get(\"max_output_tokens\").is_none()\n            && body.get(\"max_completion_tokens\").is_none(),\n        \"the optional-cap family sends NO output cap field on the wire: {body}\"\n    );"
                 },
                 {
                   "line": 1181,
-                  "quote": "    assert_eq!(messages[0][\"content\"], \"SYS-MANUAL\");"
+                  "quote": "assert_eq!(messages[0][\"content\"], \"SYS-MANUAL\");"
                 },
                 {
                   "line": 1182,
-                  "quote": "    assert_eq!(messages[1][\"content\"], \"手动压缩这段历史\");"
+                  "quote": "assert_eq!(messages[1][\"content\"], \"手动压缩这段历史\");"
                 },
                 {
                   "line": 1185,
-                  "quote": "    assert_eq!(rows.len(), 1, \"manual calls account the same way\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"manual calls account the same way\");"
                 },
                 {
                   "line": 1186,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Succeeded);"
                 }
               ]
             },
@@ -57254,37 +57513,37 @@
             {
               "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
               "test": "provider_failure_keeps_the_original_exchange_and_accounts_it",
-              "sourceSHA256": "8441644aa324cf004b2ef5e35ed4665847c03d7af7aa0b61443cee23aa7c0a85",
+              "sourceSHA256": "b0be9be91d5ed9b74ad159f1e1ec0c1c79580cf45e1b3a6e659e6f0f1715a5c7",
               "testStartLine": 599,
-              "testEndLine": 662,
+              "testEndLine": 658,
               "assertions": [
                 {
                   "line": 634,
-                  "quote": "    assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
+                  "quote": "assert!(\n        detail.contains(\"content filter\") || detail.contains(\"refused\"),\n        \"diagnosable detail: {detail}\"\n    );"
                 },
                 {
                   "line": 639,
-                  "quote": "    assert_eq!(exchange.len(), 12);"
+                  "quote": "assert_eq!(exchange.len(), 12);"
                 },
                 {
                   "line": 640,
-                  "quote": "    assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
+                  "quote": "assert!(\n        !exchange\n            .iter()\n            .any(|item| matches!(item, ExchangeItem::CompactionSummary { .. })),\n        \"no summary ever lands in the original exchange\"\n    );"
                 },
                 {
                   "line": 649,
-                  "quote": "    assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
+                  "quote": "assert_eq!(rows.len(), 1, \"the failed call accounts too\");"
                 },
                 {
                   "line": 650,
-                  "quote": "    assert_eq!(rows[0].outcome, CallOutcome::Failed);"
+                  "quote": "assert_eq!(rows[0].outcome, CallOutcome::Failed);"
                 },
                 {
                   "line": 651,
-                  "quote": "    assert_eq!(rows[0].transport_attempts, Some(1));"
+                  "quote": "assert_eq!(rows[0].transport_attempts, Some(1));"
                 },
                 {
                   "line": 653,
-                  "quote": "    assert_eq!(chat_rows.len(), 0);"
+                  "quote": "assert_eq!(chat_rows.len(), 0);"
                 }
               ]
             },
@@ -72639,7 +72898,7 @@
         "旧 streamId 返回 stale_stream 且不取消新流；无活动任务为 already_stopped"
       ],
       "then": "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -72648,9 +72907,24 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "combo_cancel_during_stream_read"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject"
             }
           ],
-          "meaning": "run取消迟到结果受检；旧WS abort_result与提交队列UI未接。",
+          "meaning": "真实准备阶段取消后释放文件读租约仍零迟到Run；真实窗口中邻会话占唯一模型槽，当前排队取消后UI立即闲、邻会话继续，释放槽后取消输入零供应商调用；旧流ID不取消新流、无任务already_stopped。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -72676,13 +72950,125 @@
                   "quote": "    assert_eq!(\n        completed, 0,\n        \"the late turn never lands in the cancelled run's stream\"\n    );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1374,
+              "testEndLine": 1418,
+              "assertions": [
+                {
+                  "line": 1405,
+                  "quote": "assert_eq!(accepted[\"status\"], \"accepted\")"
+                },
+                {
+                  "line": 1407,
+                  "quote": "assert_eq!(idle[\"isStreaming\"], false)"
+                },
+                {
+                  "line": 1408,
+                  "quote": "assert_eq!(h.snapshot(\"preparing\").await, before)"
+                },
+                {
+                  "line": 1409,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1412,
+                  "quote": "assert_eq!(rejected[\"code\"], \"user_abort\")"
+                },
+                {
+                  "line": 1413,
+                  "quote": "assert_eq!(h.snapshot(\"preparing\").await, before)"
+                },
+                {
+                  "line": 1414,
+                  "quote": "assert!(remote.captured().is_empty())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 656,
+              "testEndLine": 711,
+              "assertions": [
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(delta[\"delta\"], \"LIVE-FIRST\")"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"assistant_run_end\"))"
+                },
+                {
+                  "line": 675,
+                  "quote": "assert_eq!(stale[\"reason\"], \"stale_stream\")"
+                },
+                {
+                  "line": 676,
+                  "quote": "assert_eq!(stale[\"streamId\"], stream)"
+                },
+                {
+                  "line": 677,
+                  "quote": "assert_eq!(h.state.storage().list_active_runs().await.unwrap().len(), 1)"
+                },
+                {
+                  "line": 684,
+                  "quote": "assert_eq!(accepted[\"status\"], \"accepted\")"
+                },
+                {
+                  "line": 686,
+                  "quote": "assert_eq!(idle[\"isStreaming\"], false)"
+                },
+                {
+                  "line": 700,
+                  "quote": "assert!(h\n        .state\n        .storage()\n        .list_active_runs()\n        .await\n        .unwrap()\n        .is_empty())"
+                },
+                {
+                  "line": 707,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id='live' AND role='assistant'\",vec![]).await.unwrap().unwrap(),\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1192,
+              "testEndLine": 1263,
+              "assertions": [
+                {
+                  "line": 1235,
+                  "quote": "assert!(\n        output.status.success(),\n        \"{}\",\n        std::fs::read_to_string(h.home.join(\"chat-ui-failure.txt\")).unwrap_or_default()\n    )"
+                },
+                {
+                  "line": 1243,
+                  "quote": "assert_eq!(receipt[\"checks\"].as_array().unwrap().len(), 27, \"{receipt}\")"
+                },
+                {
+                  "line": 1244,
+                  "quote": "assert!(remote.captured().iter().any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"NATIVE-REAL-FILE-CONSUMER\")))"
+                },
+                {
+                  "line": 1247,
+                  "quote": "assert!(remote\n        .captured()\n        .iter()\n        .any(|v| v[\"messages\"].to_string().contains(\"QUEUED-NEXT\")))"
+                },
+                {
+                  "line": 1251,
+                  "quote": "assert!(remote.captured().iter().any(|v| v[\"model\"] == \"second\"\n        && v[\"reasoning_effort\"] == \"high\"\n        && v[\"messages\"]\n            .as_array()\n            .and_then(|m| m.iter().rfind(|m| m[\"role\"] == \"user\"))\n            .is_some_and(|m| m[\"content\"].to_string().contains(\"MODEL-THINKING-CHOICE\"))))"
+                },
+                {
+                  "line": 1257,
+                  "quote": "assert!(!remote.captured().iter().any(|v| v[\"messages\"]\n        .as_array()\n        .and_then(|m| m.iter().rfind(|m| m[\"role\"] == \"user\"))\n        .is_some_and(|m| m[\"content\"].to_string().contains(\"MODEL-QUOTA-WAIT\"))))"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "已接收中止返回 abort_result accepted",
-            "排队提交停止后 UI 立即恢复空闲"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -72691,9 +73077,24 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "leaf_cancel_outcome_shapes"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject"
             }
           ],
-          "meaning": "runId终态检查不能替代streamId身份/旧流原收据。",
+          "meaning": "真实准备阶段取消后释放文件读租约仍零迟到Run；真实窗口中邻会话占唯一模型槽，当前排队取消后UI立即闲、邻会话继续，释放槽后取消输入零供应商调用；旧流ID不取消新流、无任务already_stopped。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -72719,22 +73120,129 @@
                   "quote": "    assert!(matches!(\n        missing,\n        lingxi_service::SessionExecuteError::NotFound\n    ));"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1374,
+              "testEndLine": 1418,
+              "assertions": [
+                {
+                  "line": 1405,
+                  "quote": "assert_eq!(accepted[\"status\"], \"accepted\")"
+                },
+                {
+                  "line": 1407,
+                  "quote": "assert_eq!(idle[\"isStreaming\"], false)"
+                },
+                {
+                  "line": 1408,
+                  "quote": "assert_eq!(h.snapshot(\"preparing\").await, before)"
+                },
+                {
+                  "line": 1409,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1412,
+                  "quote": "assert_eq!(rejected[\"code\"], \"user_abort\")"
+                },
+                {
+                  "line": 1413,
+                  "quote": "assert_eq!(h.snapshot(\"preparing\").await, before)"
+                },
+                {
+                  "line": 1414,
+                  "quote": "assert!(remote.captured().is_empty())"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 656,
+              "testEndLine": 711,
+              "assertions": [
+                {
+                  "line": 666,
+                  "quote": "assert_eq!(delta[\"delta\"], \"LIVE-FIRST\")"
+                },
+                {
+                  "line": 667,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"assistant_run_end\"))"
+                },
+                {
+                  "line": 675,
+                  "quote": "assert_eq!(stale[\"reason\"], \"stale_stream\")"
+                },
+                {
+                  "line": 676,
+                  "quote": "assert_eq!(stale[\"streamId\"], stream)"
+                },
+                {
+                  "line": 677,
+                  "quote": "assert_eq!(h.state.storage().list_active_runs().await.unwrap().len(), 1)"
+                },
+                {
+                  "line": 684,
+                  "quote": "assert_eq!(accepted[\"status\"], \"accepted\")"
+                },
+                {
+                  "line": 686,
+                  "quote": "assert_eq!(idle[\"isStreaming\"], false)"
+                },
+                {
+                  "line": 700,
+                  "quote": "assert!(h\n        .state\n        .storage()\n        .list_active_runs()\n        .await\n        .unwrap()\n        .is_empty())"
+                },
+                {
+                  "line": 707,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id='live' AND role='assistant'\",vec![]).await.unwrap().unwrap(),\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1192,
+              "testEndLine": 1263,
+              "assertions": [
+                {
+                  "line": 1235,
+                  "quote": "assert!(\n        output.status.success(),\n        \"{}\",\n        std::fs::read_to_string(h.home.join(\"chat-ui-failure.txt\")).unwrap_or_default()\n    )"
+                },
+                {
+                  "line": 1243,
+                  "quote": "assert_eq!(receipt[\"checks\"].as_array().unwrap().len(), 27, \"{receipt}\")"
+                },
+                {
+                  "line": 1244,
+                  "quote": "assert!(remote.captured().iter().any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"NATIVE-REAL-FILE-CONSUMER\")))"
+                },
+                {
+                  "line": 1247,
+                  "quote": "assert!(remote\n        .captured()\n        .iter()\n        .any(|v| v[\"messages\"].to_string().contains(\"QUEUED-NEXT\")))"
+                },
+                {
+                  "line": 1251,
+                  "quote": "assert!(remote.captured().iter().any(|v| v[\"model\"] == \"second\"\n        && v[\"reasoning_effort\"] == \"high\"\n        && v[\"messages\"]\n            .as_array()\n            .and_then(|m| m.iter().rfind(|m| m[\"role\"] == \"user\"))\n            .is_some_and(|m| m[\"content\"].to_string().contains(\"MODEL-THINKING-CHOICE\"))))"
+                },
+                {
+                  "line": 1257,
+                  "quote": "assert!(!remote.captured().iter().any(|v| v[\"messages\"]\n        .as_array()\n        .and_then(|m| m.iter().rfind(|m| m[\"role\"] == \"user\"))\n        .is_some_and(|m| m[\"content\"].to_string().contains(\"MODEL-QUOTA-WAIT\"))))"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "旧 streamId 返回 stale_stream 且不取消新流",
-            "无活动任务为 already_stopped"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "已接收中止返回 abort_result accepted",
-        "排队提交停止后 UI 立即恢复空闲",
-        "旧 streamId 返回 stale_stream 且不取消新流",
-        "无活动任务为 already_stopped"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json"
     },
     {
       "id": "R00-T02-LA-7D05B144AE21",
@@ -73496,7 +74004,7 @@
         "无活动流返回空事件与运行态；越权会话不泄露旧帧"
       ],
       "then": "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -73510,9 +74018,24 @@
               "package": "lingxi-service",
               "suite": "event_subscription",
               "test": "a10_negative_rejections_are_loud"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
             }
           ],
-          "meaning": "新subscribe_events的cursor补发与截断检查真实存在，但原resume_stream(streamId/sinceSeq)未接，不能替换字段或原重置语义。",
+          "meaning": "真实断连恢复补齐连续遗漏seq和终局；错误ID reset，无活动流空事件与运行态，真实4200个delta触发有界缓存truncated且完整持久正文不丢；外主体零旧帧。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/event_subscription.rs",
@@ -73675,13 +74198,197 @@
                   "quote": "        .subscribe(&foreign_principal(), \"sess_local_alpha\", None)\n        .await\n    {\n        Err(SubscribeReject::Forbidden { .. }) => {}\n        other => panic!(\"cross-principal subscribe must be forbidden, got {other:?}\"),\n    }"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 723,
+              "testEndLine": 790,
+              "assertions": [
+                {
+                  "line": 740,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"assistant_run_end\"))"
+                },
+                {
+                  "line": 758,
+                  "quote": "assert_eq!(replay[\"reset\"], false)"
+                },
+                {
+                  "line": 759,
+                  "quote": "assert_eq!(replay[\"truncated\"], false)"
+                },
+                {
+                  "line": 760,
+                  "quote": "assert_eq!(replay[\"runtimeIsStreaming\"], false)"
+                },
+                {
+                  "line": 761,
+                  "quote": "assert_eq!(replay[\"resumeToken\"], \"same\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert!(!events.is_empty())"
+                },
+                {
+                  "line": 768,
+                  "quote": "assert_eq!(seqs[0], since + 1)"
+                },
+                {
+                  "line": 769,
+                  "quote": "assert!(seqs.windows(2).all(|v| v[1] == v[0] + 1))"
+                },
+                {
+                  "line": 770,
+                  "quote": "assert!(events.iter().any(|v| v[\"event\"][\"delta\"] == \"-FINAL\"))"
+                },
+                {
+                  "line": 771,
+                  "quote": "assert_eq!(events.last().unwrap()[\"event\"][\"isStreaming\"], false)"
+                },
+                {
+                  "line": 774,
+                  "quote": "assert_eq!(reset[\"reset\"], true)"
+                },
+                {
+                  "line": 775,
+                  "quote": "assert_eq!(reset[\"sinceSeq\"], 0)"
+                },
+                {
+                  "line": 782,
+                  "quote": "assert_eq!(empty[\"events\"], json!([]))"
+                },
+                {
+                  "line": 783,
+                  "quote": "assert_eq!(empty[\"runtimeIsStreaming\"], false)"
+                },
+                {
+                  "line": 786,
+                  "quote": "assert_eq!(stopped[\"status\"], \"already_stopped\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1568,
+              "testEndLine": 1677,
+              "assertions": [
+                {
+                  "line": 1612,
+                  "quote": "assert_eq!(head[1] & 0x80, 0)"
+                },
+                {
+                  "line": 1626,
+                  "quote": "assert!(n < 10 * 1024 * 1024)"
+                },
+                {
+                  "line": 1632,
+                  "quote": "assert_eq!(head[0] & 0xf, 1)"
+                },
+                {
+                  "line": 1648,
+                  "quote": "assert_eq!(replay[\"type\"], \"stream_resume\")"
+                },
+                {
+                  "line": 1649,
+                  "quote": "assert_eq!(\n        replay[\"truncated\"],\n        true,\n        \"nextSeq={} frames={}\",\n        replay[\"nextSeq\"],\n        replay[\"events\"].as_array().unwrap().len()\n    )"
+                },
+                {
+                  "line": 1656,
+                  "quote": "assert_eq!(replay[\"reset\"], false)"
+                },
+                {
+                  "line": 1657,
+                  "quote": "assert_eq!(replay[\"runtimeIsStreaming\"], false)"
+                },
+                {
+                  "line": 1659,
+                  "quote": "assert!(frames.len() <= 4096)"
+                },
+                {
+                  "line": 1660,
+                  "quote": "assert!(frames.first().unwrap()[\"seq\"].as_u64().unwrap() > 1)"
+                },
+                {
+                  "line": 1661,
+                  "quote": "assert!(frames\n        .windows(2)\n        .all(|v| v[1][\"seq\"].as_u64().unwrap() == v[0][\"seq\"].as_u64().unwrap() + 1))"
+                },
+                {
+                  "line": 1664,
+                  "quote": "assert_eq!(frames.last().unwrap()[\"event\"][\"isStreaming\"], false)"
+                },
+                {
+                  "line": 1665,
+                  "quote": "assert_eq!(\n        frames.last().unwrap()[\"seq\"].as_u64().unwrap() + 1,\n        replay[\"nextSeq\"].as_u64().unwrap()\n    )"
+                },
+                {
+                  "line": 1673,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1674,
+                  "quote": "assert!(history[\"items\"].to_string().contains(&\"x\".repeat(4200)))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 966,
+              "testEndLine": 1053,
+              "assertions": [
+                {
+                  "line": 981,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert_eq!(error[\"code\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert!(!error.to_string().contains(\"CHAT-FINAL\"))"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert_eq!(h.snapshot(\"owned\").await, snapshot)"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1019,
+                  "quote": "assert_eq!(steered[\"sessionId\"], \"owned\")"
+                },
+                {
+                  "line": 1024,
+                  "quote": "assert!(remote.captured().iter().skip(1).any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"ACTUAL-STEERING-NEXT-TURN\")))"
+                },
+                {
+                  "line": 1035,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                },
+                {
+                  "line": 1036,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"IDLE-STEER-PROMPT\"))"
+                },
+                {
+                  "line": 1047,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 1048,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "按 streamId/sinceSeq 补发遗漏事件",
-            "按原resume协议返回重置/截断标记"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -73695,9 +74402,24 @@
               "package": "lingxi-service",
               "suite": "auth_matrix",
               "test": "a05_cross_principal_session_misuse_is_forbidden_without_side_effects"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
             }
           ],
-          "meaning": "新订阅服务的跨principal拒绝受检，但未知stream是拒绝而非原无活动流返回空事件/运行态；原入口越权帧保护未受检。",
+          "meaning": "真实断连恢复补齐连续遗漏seq和终局；错误ID reset，无活动流空事件与运行态，真实4200个delta触发有界缓存truncated且完整持久正文不丢；外主体零旧帧。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/event_subscription.rs",
@@ -73776,22 +74498,201 @@
                   "quote": "assert_eq!(\n        before, after,\n        \"cross-principal denial must not mutate state\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 723,
+              "testEndLine": 790,
+              "assertions": [
+                {
+                  "line": 740,
+                  "quote": "assert!(!frames.iter().any(|v| v[\"type\"] == \"assistant_run_end\"))"
+                },
+                {
+                  "line": 758,
+                  "quote": "assert_eq!(replay[\"reset\"], false)"
+                },
+                {
+                  "line": 759,
+                  "quote": "assert_eq!(replay[\"truncated\"], false)"
+                },
+                {
+                  "line": 760,
+                  "quote": "assert_eq!(replay[\"runtimeIsStreaming\"], false)"
+                },
+                {
+                  "line": 761,
+                  "quote": "assert_eq!(replay[\"resumeToken\"], \"same\")"
+                },
+                {
+                  "line": 763,
+                  "quote": "assert!(!events.is_empty())"
+                },
+                {
+                  "line": 768,
+                  "quote": "assert_eq!(seqs[0], since + 1)"
+                },
+                {
+                  "line": 769,
+                  "quote": "assert!(seqs.windows(2).all(|v| v[1] == v[0] + 1))"
+                },
+                {
+                  "line": 770,
+                  "quote": "assert!(events.iter().any(|v| v[\"event\"][\"delta\"] == \"-FINAL\"))"
+                },
+                {
+                  "line": 771,
+                  "quote": "assert_eq!(events.last().unwrap()[\"event\"][\"isStreaming\"], false)"
+                },
+                {
+                  "line": 774,
+                  "quote": "assert_eq!(reset[\"reset\"], true)"
+                },
+                {
+                  "line": 775,
+                  "quote": "assert_eq!(reset[\"sinceSeq\"], 0)"
+                },
+                {
+                  "line": 782,
+                  "quote": "assert_eq!(empty[\"events\"], json!([]))"
+                },
+                {
+                  "line": 783,
+                  "quote": "assert_eq!(empty[\"runtimeIsStreaming\"], false)"
+                },
+                {
+                  "line": 786,
+                  "quote": "assert_eq!(stopped[\"status\"], \"already_stopped\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1568,
+              "testEndLine": 1677,
+              "assertions": [
+                {
+                  "line": 1612,
+                  "quote": "assert_eq!(head[1] & 0x80, 0)"
+                },
+                {
+                  "line": 1626,
+                  "quote": "assert!(n < 10 * 1024 * 1024)"
+                },
+                {
+                  "line": 1632,
+                  "quote": "assert_eq!(head[0] & 0xf, 1)"
+                },
+                {
+                  "line": 1648,
+                  "quote": "assert_eq!(replay[\"type\"], \"stream_resume\")"
+                },
+                {
+                  "line": 1649,
+                  "quote": "assert_eq!(\n        replay[\"truncated\"],\n        true,\n        \"nextSeq={} frames={}\",\n        replay[\"nextSeq\"],\n        replay[\"events\"].as_array().unwrap().len()\n    )"
+                },
+                {
+                  "line": 1656,
+                  "quote": "assert_eq!(replay[\"reset\"], false)"
+                },
+                {
+                  "line": 1657,
+                  "quote": "assert_eq!(replay[\"runtimeIsStreaming\"], false)"
+                },
+                {
+                  "line": 1659,
+                  "quote": "assert!(frames.len() <= 4096)"
+                },
+                {
+                  "line": 1660,
+                  "quote": "assert!(frames.first().unwrap()[\"seq\"].as_u64().unwrap() > 1)"
+                },
+                {
+                  "line": 1661,
+                  "quote": "assert!(frames\n        .windows(2)\n        .all(|v| v[1][\"seq\"].as_u64().unwrap() == v[0][\"seq\"].as_u64().unwrap() + 1))"
+                },
+                {
+                  "line": 1664,
+                  "quote": "assert_eq!(frames.last().unwrap()[\"event\"][\"isStreaming\"], false)"
+                },
+                {
+                  "line": 1665,
+                  "quote": "assert_eq!(\n        frames.last().unwrap()[\"seq\"].as_u64().unwrap() + 1,\n        replay[\"nextSeq\"].as_u64().unwrap()\n    )"
+                },
+                {
+                  "line": 1673,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1674,
+                  "quote": "assert!(history[\"items\"].to_string().contains(&\"x\".repeat(4200)))"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 966,
+              "testEndLine": 1053,
+              "assertions": [
+                {
+                  "line": 981,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert_eq!(error[\"code\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert!(!error.to_string().contains(\"CHAT-FINAL\"))"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert_eq!(h.snapshot(\"owned\").await, snapshot)"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1019,
+                  "quote": "assert_eq!(steered[\"sessionId\"], \"owned\")"
+                },
+                {
+                  "line": 1024,
+                  "quote": "assert!(remote.captured().iter().skip(1).any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"ACTUAL-STEERING-NEXT-TURN\")))"
+                },
+                {
+                  "line": 1035,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                },
+                {
+                  "line": 1036,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"IDLE-STEER-PROMPT\"))"
+                },
+                {
+                  "line": 1047,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 1048,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "无活动流返回空事件与运行态",
-            "原resume_stream越权会话不泄露旧帧"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "按 streamId/sinceSeq 补发遗漏事件",
-        "按原resume协议返回重置/截断标记",
-        "无活动流返回空事件与运行态",
-        "原resume_stream越权会话不泄露旧帧"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json"
     },
     {
       "id": "R00-T02-LA-81B217A7E581",
@@ -80287,7 +81188,7 @@
         "媒体超限/不支持、会话身份无效时拒绝且不写空消息"
       ],
       "then": "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -80301,9 +81202,24 @@
               "package": "lingxi-service",
               "suite": "background_steering",
               "test": "c02_steering_stays_in_the_authorized_session_across_parallel_runs"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_interject_interrupts_only_target_and_preserves_real_user_receipt"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
             }
           ],
-          "meaning": "服务steer_for只证明本会话下一轮收到输入；没有WS interject媒体检验、插入队列/打断策略和输入回执。",
+          "meaning": "真实并行两会话只打断目标并保留新用户收据与回复；授权和媒体校验先于中断，非法媒体/会话路径/外主体/fileId归属拒绝、无空消息且原Run不取消。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -80358,13 +81274,177 @@
                   "quote": "    assert_eq!(\n        state\n            .sessions()\n            .session_supervisor()\n            .steering_pending(\"sess_local_alpha\"),\n        0,\n        \"the steer was fully consumed by its own session\"\n    );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_interject_interrupts_only_target_and_preserves_real_user_receipt",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1056,
+              "testEndLine": 1188,
+              "assertions": [
+                {
+                  "line": 1079,
+                  "quote": "assert_eq!(live.len(), 2)"
+                },
+                {
+                  "line": 1095,
+                  "quote": "assert_eq!(rejected[\"outcome\"], \"not_accepted\")"
+                },
+                {
+                  "line": 1096,
+                  "quote": "assert_eq!(h.snapshot(\"target\").await, before)"
+                },
+                {
+                  "line": 1097,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1098,
+                  "quote": "assert_eq!(h.state.storage().list_active_runs().await.unwrap().len(), 2)"
+                },
+                {
+                  "line": 1130,
+                  "quote": "assert!(new_receipt && final_seen)"
+                },
+                {
+                  "line": 1131,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .load_run(&lingxi_protocol::RunId::new(&old))\n            .await\n            .unwrap()\n            .unwrap()\n            .status,\n        lingxi_protocol::RunStatus::Cancelled\n    )"
+                },
+                {
+                  "line": 1141,
+                  "quote": "assert!(!h\n        .state\n        .storage()\n        .load_run(&lingxi_protocol::RunId::new(&neighbour))\n        .await\n        .unwrap()\n        .unwrap()\n        .status\n        .is_terminal())"
+                },
+                {
+                  "line": 1163,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .load_run(&lingxi_protocol::RunId::new(&neighbour))\n            .await\n            .unwrap()\n            .unwrap()\n            .status,\n        lingxi_protocol::RunStatus::Completed\n    )"
+                },
+                {
+                  "line": 1177,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1178,
+                  "quote": "assert!(history[\"items\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|v| v[\"kind\"] == \"user_message\" && v[\"text\"] == \"NEW-INTERJECT\"))"
+                },
+                {
+                  "line": 1183,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id='target' AND message_id=?1\",vec![format!(\"{old}-final\")]).await.unwrap().unwrap(),\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1421,
+              "testEndLine": 1498,
+              "assertions": [
+                {
+                  "line": 1441,
+                  "quote": "assert_eq!(code, 201, \"{view}\")"
+                },
+                {
+                  "line": 1447,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1448,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1449,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1452,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_not_owned\")"
+                },
+                {
+                  "line": 1453,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1457,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1458,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1459,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1481,
+                  "quote": "assert_eq!(bytes.len(), 9 * 1024 * 1024)"
+                },
+                {
+                  "line": 1482,
+                  "quote": "assert!(bytes.starts_with(b\"\\x89PNG\\r\\n\\x1a\\n\"))"
+                },
+                {
+                  "line": 1483,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE session_id='image'\",\n                vec![]\n            )\n            .await\n            .unwrap()\n            .unwrap(),\n        \"1\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 966,
+              "testEndLine": 1053,
+              "assertions": [
+                {
+                  "line": 981,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert_eq!(error[\"code\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert!(!error.to_string().contains(\"CHAT-FINAL\"))"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert_eq!(h.snapshot(\"owned\").await, snapshot)"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1019,
+                  "quote": "assert_eq!(steered[\"sessionId\"], \"owned\")"
+                },
+                {
+                  "line": 1024,
+                  "quote": "assert!(remote.captured().iter().skip(1).any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"ACTUAL-STEERING-NEXT-TURN\")))"
+                },
+                {
+                  "line": 1035,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                },
+                {
+                  "line": 1036,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"IDLE-STEER-PROMPT\"))"
+                },
+                {
+                  "line": 1047,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 1048,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "会话授权和媒体校验后走插入队列/打断策略",
-            "收到输入回执和新回复（真实interject入口）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -80373,9 +81453,24 @@
               "package": "lingxi-service",
               "suite": "auth_matrix",
               "test": "a05_cross_principal_session_misuse_is_forbidden_without_side_effects"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_interject_interrupts_only_target_and_preserves_real_user_receipt"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
             }
           ],
-          "meaning": "原WS interject入口未接，不能用HTTP认证或通用body上限代替附件数量/格式/大小型别拒绝。",
+          "meaning": "真实并行两会话只打断目标并保留新用户收据与回复；授权和媒体校验先于中断，非法媒体/会话路径/外主体/fileId归属拒绝、无空消息且原Run不取消。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/auth_matrix.rs",
@@ -80425,22 +81520,181 @@
                   "quote": "assert_eq!(\n        before, after,\n        \"cross-principal denial must not mutate state\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_interject_interrupts_only_target_and_preserves_real_user_receipt",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1056,
+              "testEndLine": 1188,
+              "assertions": [
+                {
+                  "line": 1079,
+                  "quote": "assert_eq!(live.len(), 2)"
+                },
+                {
+                  "line": 1095,
+                  "quote": "assert_eq!(rejected[\"outcome\"], \"not_accepted\")"
+                },
+                {
+                  "line": 1096,
+                  "quote": "assert_eq!(h.snapshot(\"target\").await, before)"
+                },
+                {
+                  "line": 1097,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1098,
+                  "quote": "assert_eq!(h.state.storage().list_active_runs().await.unwrap().len(), 2)"
+                },
+                {
+                  "line": 1130,
+                  "quote": "assert!(new_receipt && final_seen)"
+                },
+                {
+                  "line": 1131,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .load_run(&lingxi_protocol::RunId::new(&old))\n            .await\n            .unwrap()\n            .unwrap()\n            .status,\n        lingxi_protocol::RunStatus::Cancelled\n    )"
+                },
+                {
+                  "line": 1141,
+                  "quote": "assert!(!h\n        .state\n        .storage()\n        .load_run(&lingxi_protocol::RunId::new(&neighbour))\n        .await\n        .unwrap()\n        .unwrap()\n        .status\n        .is_terminal())"
+                },
+                {
+                  "line": 1163,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .load_run(&lingxi_protocol::RunId::new(&neighbour))\n            .await\n            .unwrap()\n            .unwrap()\n            .status,\n        lingxi_protocol::RunStatus::Completed\n    )"
+                },
+                {
+                  "line": 1177,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1178,
+                  "quote": "assert!(history[\"items\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|v| v[\"kind\"] == \"user_message\" && v[\"text\"] == \"NEW-INTERJECT\"))"
+                },
+                {
+                  "line": 1183,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id='target' AND message_id=?1\",vec![format!(\"{old}-final\")]).await.unwrap().unwrap(),\"0\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1421,
+              "testEndLine": 1498,
+              "assertions": [
+                {
+                  "line": 1441,
+                  "quote": "assert_eq!(code, 201, \"{view}\")"
+                },
+                {
+                  "line": 1447,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1448,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1449,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1452,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_not_owned\")"
+                },
+                {
+                  "line": 1453,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1457,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1458,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1459,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1481,
+                  "quote": "assert_eq!(bytes.len(), 9 * 1024 * 1024)"
+                },
+                {
+                  "line": 1482,
+                  "quote": "assert!(bytes.starts_with(b\"\\x89PNG\\r\\n\\x1a\\n\"))"
+                },
+                {
+                  "line": 1483,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE session_id='image'\",\n                vec![]\n            )\n            .await\n            .unwrap()\n            .unwrap(),\n        \"1\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 966,
+              "testEndLine": 1053,
+              "assertions": [
+                {
+                  "line": 981,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert_eq!(error[\"code\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert!(!error.to_string().contains(\"CHAT-FINAL\"))"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert_eq!(h.snapshot(\"owned\").await, snapshot)"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1019,
+                  "quote": "assert_eq!(steered[\"sessionId\"], \"owned\")"
+                },
+                {
+                  "line": 1024,
+                  "quote": "assert!(remote.captured().iter().skip(1).any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"ACTUAL-STEERING-NEXT-TURN\")))"
+                },
+                {
+                  "line": 1035,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                },
+                {
+                  "line": 1036,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"IDLE-STEER-PROMPT\"))"
+                },
+                {
+                  "line": 1047,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 1048,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "媒体超限/不支持拒绝且不写空消息",
-            "会话身份无效拒绝且不写空消息"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "会话授权和媒体校验后走插入队列/打断策略",
-        "收到输入回执和新回复（真实interject入口）",
-        "媒体超限/不支持拒绝且不写空消息",
-        "会话身份无效拒绝且不写空消息"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json"
     },
     {
       "id": "R00-T02-LA-9283371CDAD8",
@@ -103692,7 +104946,7 @@
         "已删除 Agent 或未获会话权限时拒绝，不能混入别人的流"
       ],
       "then": "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -103701,9 +104955,19 @@
               "package": "lingxi-service",
               "suite": "r03_t08_acceptance_matrix",
               "test": "leaf_steer_semantics_busy_miss_and_drain"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session"
             }
           ],
-          "meaning": "真实steer_for支持busy accepted与idle Miss；WS steered回执和idle作为普通prompt重新提交未接。",
+          "meaning": "真实活动工具回合steer进入下一轮模型请求，闲时成为普通真实输入；真实删除助手后拒绝且零新消息/调用，不改变邻会话活动流；外主体拒绝。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -103729,13 +104993,96 @@
                   "quote": "    assert_eq!(idle, SteerOutcome::Miss);"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 966,
+              "testEndLine": 1053,
+              "assertions": [
+                {
+                  "line": 981,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert_eq!(error[\"code\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert!(!error.to_string().contains(\"CHAT-FINAL\"))"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert_eq!(h.snapshot(\"owned\").await, snapshot)"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1019,
+                  "quote": "assert_eq!(steered[\"sessionId\"], \"owned\")"
+                },
+                {
+                  "line": 1024,
+                  "quote": "assert!(remote.captured().iter().skip(1).any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"ACTUAL-STEERING-NEXT-TURN\")))"
+                },
+                {
+                  "line": 1035,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                },
+                {
+                  "line": 1036,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"IDLE-STEER-PROMPT\"))"
+                },
+                {
+                  "line": 1047,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 1048,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1680,
+              "testEndLine": 1751,
+              "assertions": [
+                {
+                  "line": 1700,
+                  "quote": "assert_eq!(code, 201, \"{v}\")"
+                },
+                {
+                  "line": 1705,
+                  "quote": "assert_eq!(code, 200, \"{v}\")"
+                },
+                {
+                  "line": 1733,
+                  "quote": "assert_eq!(error[\"code\"], \"agent_unavailable\", \"{error}\")"
+                },
+                {
+                  "line": 1734,
+                  "quote": "assert_eq!(h.snapshot(\"deleted\").await, before)"
+                },
+                {
+                  "line": 1735,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1736,
+                  "quote": "assert!(h\n        .state\n        .storage()\n        .list_active_runs()\n        .await\n        .unwrap()\n        .iter()\n        .any(|r| r.run_id == active))"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "活动流被steer后收到steered",
-            "流已停则作为普通prompt提交（实际fallback执行）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         },
         {
           "index": 1,
@@ -103749,9 +105096,19 @@
               "package": "lingxi-service",
               "suite": "auth_matrix",
               "test": "a05_cross_principal_session_misuse_is_forbidden_without_side_effects"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session"
             }
           ],
-          "meaning": "真实服务steering对旁观会话隔离已有检查；原WS删除Agent/会话无权限入口未接。",
+          "meaning": "真实活动工具回合steer进入下一轮模型请求，闲时成为普通真实输入；真实删除助手后拒绝且零新消息/调用，不改变邻会话活动流；外主体拒绝。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/background_steering.rs",
@@ -103830,22 +105187,100 @@
                   "quote": "assert_eq!(\n        before, after,\n        \"cross-principal denial must not mutate state\"\n    )"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 966,
+              "testEndLine": 1053,
+              "assertions": [
+                {
+                  "line": 981,
+                  "quote": "assert_eq!(code, 201)"
+                },
+                {
+                  "line": 1000,
+                  "quote": "assert_eq!(error[\"code\"], \"session_forbidden\")"
+                },
+                {
+                  "line": 1001,
+                  "quote": "assert!(!error.to_string().contains(\"CHAT-FINAL\"))"
+                },
+                {
+                  "line": 1003,
+                  "quote": "assert_eq!(h.snapshot(\"owned\").await, snapshot)"
+                },
+                {
+                  "line": 1004,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1019,
+                  "quote": "assert_eq!(steered[\"sessionId\"], \"owned\")"
+                },
+                {
+                  "line": 1024,
+                  "quote": "assert!(remote.captured().iter().skip(1).any(|v| v[\"messages\"]\n        .to_string()\n        .contains(\"ACTUAL-STEERING-NEXT-TURN\")))"
+                },
+                {
+                  "line": 1035,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                },
+                {
+                  "line": 1036,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"IDLE-STEER-PROMPT\"))"
+                },
+                {
+                  "line": 1047,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 1048,
+                  "quote": "assert_eq!(remote.captured().len(), oldcalls + 1)"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "deleted_agent_steer_is_rejected_without_cancelling_neighbour_session",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1680,
+              "testEndLine": 1751,
+              "assertions": [
+                {
+                  "line": 1700,
+                  "quote": "assert_eq!(code, 201, \"{v}\")"
+                },
+                {
+                  "line": 1705,
+                  "quote": "assert_eq!(code, 200, \"{v}\")"
+                },
+                {
+                  "line": 1733,
+                  "quote": "assert_eq!(error[\"code\"], \"agent_unavailable\", \"{error}\")"
+                },
+                {
+                  "line": 1734,
+                  "quote": "assert_eq!(h.snapshot(\"deleted\").await, before)"
+                },
+                {
+                  "line": 1735,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1736,
+                  "quote": "assert!(h\n        .state\n        .storage()\n        .list_active_runs()\n        .await\n        .unwrap()\n        .iter()\n        .any(|r| r.run_id == active))"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "已删除Agent或未获会话权限时拒绝（原WS steer）",
-            "不能混入别人的流（原WS入口）"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
         }
       ],
-      "gaps": [
-        "活动流被steer后收到steered",
-        "流已停则作为普通prompt提交（实际fallback执行）",
-        "已删除Agent或未获会话权限时拒绝（原WS steer）",
-        "不能混入别人的流（原WS入口）"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json"
     },
     {
       "id": "R00-T02-LA-C3FB70F9925E",
@@ -108487,7 +109922,7 @@
         "空内容不提交；图片数量/大小/格式不合法时发送类型化拒绝回执"
       ],
       "then": "经授权进入会话 Run，流式返回阶段、工具和最终回复",
-      "status": "GAP",
+      "status": "READY",
       "groups": [
         {
           "index": 0,
@@ -108506,9 +109941,29 @@
               "package": "lingxi-service",
               "suite": "event_subscription",
               "test": "ws_subscribe_snapshot_live_and_rejections"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "actual_model_switch_default_thinking_and_image_survive_restart_into_provider"
             }
           ],
-          "meaning": "真实HTTP execute/运行内部事件与final有局部检查，但WS prompt接收词汇未接，不能将HTTP链当原WS输入证据。",
+          "meaning": "真实WS授权后进入正式Run，工具真实读取与模型下一轮消费、阶段/实时正文/最终消息均可核对；空输入和非法数量/格式/空字节/超限图片零Run，跨会话fileId拒绝，实际9MiB文件引用图片进入模型。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。",
           "proofLocations": [
             {
               "path": "rust/crates/lingxi-service/tests/r03_t08_acceptance_matrix.rs",
@@ -108684,22 +110139,556 @@
                   "quote": "    assert_eq!(\n        status, 403,\n        \"cross-principal page must be forbidden: {body}\"\n    );"
                 }
               ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 581,
+              "testEndLine": 653,
+              "assertions": [
+                {
+                  "line": 591,
+                  "quote": "assert!(frames.iter().any(|v|v[\"type\"]==\"session_user_message\"&&v[\"clientMessageId\"]==\"wire-client-1\"),\"{frames:?}\")"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"stage\"), \"{frames:?}\")"
+                },
+                {
+                  "line": 593,
+                  "quote": "assert!(\n        frames.iter().any(|v| v[\"type\"] == \"tool_start\"),\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert!(\n        frames.iter().any(|v| v[\"type\"] == \"tool_end\"\n            && v[\"success\"] == true\n            && v[\"status\"] == \"succeeded\"\n            && v[\"name\"].as_str().is_some()),\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 604,
+                  "quote": "assert!(\n        frames.iter().any(|v| v[\"type\"] == \"assistant_segment_delta\"\n            && v[\"delta\"].as_str().unwrap_or(\"\").contains(\"CHAT-FINAL\")),\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"CHAT-ACTUAL-READ-BYTES\"))"
+                },
+                {
+                  "line": 636,
+                  "quote": "assert_eq!(rejected[\"outcome\"], \"not_accepted\")"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 639,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id='chat'\",\n                vec![]\n            )\n            .await\n            .unwrap(),\n        count\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1421,
+              "testEndLine": 1498,
+              "assertions": [
+                {
+                  "line": 1441,
+                  "quote": "assert_eq!(code, 201, \"{view}\")"
+                },
+                {
+                  "line": 1447,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1448,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1449,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1452,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_not_owned\")"
+                },
+                {
+                  "line": 1453,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1457,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1458,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1459,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1481,
+                  "quote": "assert_eq!(bytes.len(), 9 * 1024 * 1024)"
+                },
+                {
+                  "line": 1482,
+                  "quote": "assert!(bytes.starts_with(b\"\\x89PNG\\r\\n\\x1a\\n\"))"
+                },
+                {
+                  "line": 1483,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE session_id='image'\",\n                vec![]\n            )\n            .await\n            .unwrap()\n            .unwrap(),\n        \"1\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1278,
+              "testEndLine": 1371,
+              "assertions": [
+                {
+                  "line": 1315,
+                  "quote": "assert_eq!(rejected[\"outcome\"], \"not_accepted\")"
+                },
+                {
+                  "line": 1316,
+                  "quote": "assert_eq!(h.snapshot(\"files\").await, before)"
+                },
+                {
+                  "line": 1317,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1322,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"session_user_message\"\n        && v[\"message\"][\"attachments\"]\n            .as_array()\n            .is_some_and(|a| a.len() == 2)))"
+                },
+                {
+                  "line": 1327,
+                  "quote": "assert!(sent[\"messages\"]\n        .to_string()\n        .contains(\"CHAT-REAL-TEXT-ATTACHMENT\"))"
+                },
+                {
+                  "line": 1330,
+                  "quote": "assert!(sent[\"messages\"]\n        .to_string()\n        .contains(\"CHAT-OFFICE-REAL-TEXT\"))"
+                },
+                {
+                  "line": 1341,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1348,
+                  "quote": "assert_eq!(user[\"text\"], \"READ-MY-FILES\")"
+                },
+                {
+                  "line": 1349,
+                  "quote": "assert_eq!(user[\"legacyFields\"][\"clientMessageId\"], \"file-client\")"
+                },
+                {
+                  "line": 1350,
+                  "quote": "assert_eq!(user[\"legacyFields\"][\"snapshotVersion\"], 2)"
+                },
+                {
+                  "line": 1351,
+                  "quote": "assert_eq!(\n        user[\"legacyFields\"][\"attachments\"]\n            .as_array()\n            .unwrap()\n            .len(),\n        2\n    )"
+                },
+                {
+                  "line": 1358,
+                  "quote": "assert_eq!(history[\"reconciliation\"][\"complete\"], true)"
+                },
+                {
+                  "line": 1359,
+                  "quote": "assert_eq!(history[\"reconciliation\"][\"runStatus\"], \"reconciled_idle\")"
+                },
+                {
+                  "line": 1360,
+                  "quote": "assert_eq!(\n        history[\"reconciliation\"][\"snapshotId\"]\n            .as_str()\n            .unwrap()\n            .len(),\n        64\n    )"
+                },
+                {
+                  "line": 1367,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_file_refs WHERE session_id='files' AND ref_kind='message_marker'\",vec![]).await.unwrap().unwrap(),\"2\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "actual_model_switch_default_thinking_and_image_survive_restart_into_provider",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 793,
+              "testEndLine": 891,
+              "assertions": [
+                {
+                  "line": 811,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 821,
+                  "quote": "assert_eq!(code, 200, \"{choice}\")"
+                },
+                {
+                  "line": 830,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 839,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 855,
+                  "quote": "assert_eq!(sent[\"model\"], \"second\")"
+                },
+                {
+                  "line": 856,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"high\")"
+                },
+                {
+                  "line": 857,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(&image))"
+                },
+                {
+                  "line": 860,
+                  "quote": "assert_eq!(sent[\"model\"], \"chat\")"
+                },
+                {
+                  "line": 861,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"low\")"
+                },
+                {
+                  "line": 862,
+                  "quote": "assert!(!sent[\"messages\"].to_string().contains(&image))"
+                },
+                {
+                  "line": 867,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 868,
+                  "quote": "assert!(history[\"items\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|v| v[\"kind\"] == \"user_message\"\n            && v[\"legacyFields\"][\"images\"][0][\"mime\"] == \"image/png\"))"
+                },
+                {
+                  "line": 880,
+                  "quote": "assert_eq!(sent[\"model\"], \"second\")"
+                },
+                {
+                  "line": 881,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"high\")"
+                },
+                {
+                  "line": 882,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(&image))"
+                },
+                {
+                  "line": 883,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(\"with-image\"))"
+                },
+                {
+                  "line": 887,
+                  "quote": "assert_eq!(sent[\"model\"], \"second\")"
+                },
+                {
+                  "line": 888,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"high\")"
+                }
+              ]
             }
           ],
-          "coverage": "PARTIAL",
-          "missingClauses": [
-            "经授权WS prompt进入会话Run",
-            "WS流式返回阶段、工具和最终回复"
-          ]
+          "coverage": "FULL",
+          "missingClauses": []
+        },
+        {
+          "index": 1,
+          "tests": [
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run"
+            },
+            {
+              "package": "lingxi-service",
+              "suite": "r06_chat_wire",
+              "test": "actual_model_switch_default_thinking_and_image_survive_restart_into_provider"
+            }
+          ],
+          "proofLocations": [
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 581,
+              "testEndLine": 653,
+              "assertions": [
+                {
+                  "line": 591,
+                  "quote": "assert!(frames.iter().any(|v|v[\"type\"]==\"session_user_message\"&&v[\"clientMessageId\"]==\"wire-client-1\"),\"{frames:?}\")"
+                },
+                {
+                  "line": 592,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"stage\"), \"{frames:?}\")"
+                },
+                {
+                  "line": 593,
+                  "quote": "assert!(\n        frames.iter().any(|v| v[\"type\"] == \"tool_start\"),\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 597,
+                  "quote": "assert!(\n        frames.iter().any(|v| v[\"type\"] == \"tool_end\"\n            && v[\"success\"] == true\n            && v[\"status\"] == \"succeeded\"\n            && v[\"name\"].as_str().is_some()),\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 604,
+                  "quote": "assert!(\n        frames.iter().any(|v| v[\"type\"] == \"assistant_segment_delta\"\n            && v[\"delta\"].as_str().unwrap_or(\"\").contains(\"CHAT-FINAL\")),\n        \"{frames:?}\"\n    )"
+                },
+                {
+                  "line": 609,
+                  "quote": "assert!(remote.captured().last().unwrap()[\"messages\"]\n        .to_string()\n        .contains(\"CHAT-ACTUAL-READ-BYTES\"))"
+                },
+                {
+                  "line": 636,
+                  "quote": "assert_eq!(rejected[\"outcome\"], \"not_accepted\")"
+                },
+                {
+                  "line": 638,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 639,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM messages WHERE session_id='chat'\",\n                vec![]\n            )\n            .await\n            .unwrap(),\n        count\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1421,
+              "testEndLine": 1498,
+              "assertions": [
+                {
+                  "line": 1441,
+                  "quote": "assert_eq!(code, 201, \"{view}\")"
+                },
+                {
+                  "line": 1447,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1448,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1449,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1452,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_not_owned\")"
+                },
+                {
+                  "line": 1453,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1457,
+                  "quote": "assert_eq!(rejected[\"code\"], \"image_too_large\")"
+                },
+                {
+                  "line": 1458,
+                  "quote": "assert_eq!(h.snapshot(\"image\").await, before)"
+                },
+                {
+                  "line": 1459,
+                  "quote": "assert!(remote.captured().is_empty())"
+                },
+                {
+                  "line": 1481,
+                  "quote": "assert_eq!(bytes.len(), 9 * 1024 * 1024)"
+                },
+                {
+                  "line": 1482,
+                  "quote": "assert!(bytes.starts_with(b\"\\x89PNG\\r\\n\\x1a\\n\"))"
+                },
+                {
+                  "line": 1483,
+                  "quote": "assert_eq!(\n        h.state\n            .storage()\n            .query_one_text(\n                \"SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE session_id='image'\",\n                vec![]\n            )\n            .await\n            .unwrap()\n            .unwrap(),\n        \"1\"\n    )"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 1278,
+              "testEndLine": 1371,
+              "assertions": [
+                {
+                  "line": 1315,
+                  "quote": "assert_eq!(rejected[\"outcome\"], \"not_accepted\")"
+                },
+                {
+                  "line": 1316,
+                  "quote": "assert_eq!(h.snapshot(\"files\").await, before)"
+                },
+                {
+                  "line": 1317,
+                  "quote": "assert_eq!(remote.captured().len(), calls)"
+                },
+                {
+                  "line": 1322,
+                  "quote": "assert!(frames.iter().any(|v| v[\"type\"] == \"session_user_message\"\n        && v[\"message\"][\"attachments\"]\n            .as_array()\n            .is_some_and(|a| a.len() == 2)))"
+                },
+                {
+                  "line": 1327,
+                  "quote": "assert!(sent[\"messages\"]\n        .to_string()\n        .contains(\"CHAT-REAL-TEXT-ATTACHMENT\"))"
+                },
+                {
+                  "line": 1330,
+                  "quote": "assert!(sent[\"messages\"]\n        .to_string()\n        .contains(\"CHAT-OFFICE-REAL-TEXT\"))"
+                },
+                {
+                  "line": 1341,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 1348,
+                  "quote": "assert_eq!(user[\"text\"], \"READ-MY-FILES\")"
+                },
+                {
+                  "line": 1349,
+                  "quote": "assert_eq!(user[\"legacyFields\"][\"clientMessageId\"], \"file-client\")"
+                },
+                {
+                  "line": 1350,
+                  "quote": "assert_eq!(user[\"legacyFields\"][\"snapshotVersion\"], 2)"
+                },
+                {
+                  "line": 1351,
+                  "quote": "assert_eq!(\n        user[\"legacyFields\"][\"attachments\"]\n            .as_array()\n            .unwrap()\n            .len(),\n        2\n    )"
+                },
+                {
+                  "line": 1358,
+                  "quote": "assert_eq!(history[\"reconciliation\"][\"complete\"], true)"
+                },
+                {
+                  "line": 1359,
+                  "quote": "assert_eq!(history[\"reconciliation\"][\"runStatus\"], \"reconciled_idle\")"
+                },
+                {
+                  "line": 1360,
+                  "quote": "assert_eq!(\n        history[\"reconciliation\"][\"snapshotId\"]\n            .as_str()\n            .unwrap()\n            .len(),\n        64\n    )"
+                },
+                {
+                  "line": 1367,
+                  "quote": "assert_eq!(h.state.storage().query_one_text(\"SELECT CAST(COUNT(*) AS TEXT) FROM session_file_refs WHERE session_id='files' AND ref_kind='message_marker'\",vec![]).await.unwrap().unwrap(),\"2\")"
+                }
+              ]
+            },
+            {
+              "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+              "test": "actual_model_switch_default_thinking_and_image_survive_restart_into_provider",
+              "sourceSHA256": "cc8c478dd1ad1bb8fefd30c432f006cfec539c43ffd8781adc55fa560c296bbe",
+              "testStartLine": 793,
+              "testEndLine": 891,
+              "assertions": [
+                {
+                  "line": 811,
+                  "quote": "assert_eq!(code, 400)"
+                },
+                {
+                  "line": 821,
+                  "quote": "assert_eq!(code, 200, \"{choice}\")"
+                },
+                {
+                  "line": 830,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 839,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 848,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 855,
+                  "quote": "assert_eq!(sent[\"model\"], \"second\")"
+                },
+                {
+                  "line": 856,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"high\")"
+                },
+                {
+                  "line": 857,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(&image))"
+                },
+                {
+                  "line": 860,
+                  "quote": "assert_eq!(sent[\"model\"], \"chat\")"
+                },
+                {
+                  "line": 861,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"low\")"
+                },
+                {
+                  "line": 862,
+                  "quote": "assert!(!sent[\"messages\"].to_string().contains(&image))"
+                },
+                {
+                  "line": 867,
+                  "quote": "assert_eq!(code, 200)"
+                },
+                {
+                  "line": 868,
+                  "quote": "assert!(history[\"items\"]\n        .as_array()\n        .unwrap()\n        .iter()\n        .any(|v| v[\"kind\"] == \"user_message\"\n            && v[\"legacyFields\"][\"images\"][0][\"mime\"] == \"image/png\"))"
+                },
+                {
+                  "line": 880,
+                  "quote": "assert_eq!(sent[\"model\"], \"second\")"
+                },
+                {
+                  "line": 881,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"high\")"
+                },
+                {
+                  "line": 882,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(&image))"
+                },
+                {
+                  "line": 883,
+                  "quote": "assert!(sent[\"messages\"].to_string().contains(\"with-image\"))"
+                },
+                {
+                  "line": 887,
+                  "quote": "assert_eq!(sent[\"model\"], \"second\")"
+                },
+                {
+                  "line": 888,
+                  "quote": "assert_eq!(sent[\"reasoning_effort\"], \"high\")"
+                }
+              ]
+            }
+          ],
+          "coverage": "FULL",
+          "missingClauses": [],
+          "meaning": "真实WS授权后进入正式Run，工具真实读取与模型下一轮消费、阶段/实时正文/最终消息均可核对；空输入和非法数量/格式/空字节/超限图片零Run，跨会话fileId拒绝，实际9MiB文件引用图片进入模型。 当前macOS合成资料和本地供应商实际运行；不宣称完整产品启动、外部付费供应商、其他系统或全阶段验收。"
         }
       ],
-      "gaps": [
-        "经授权WS prompt进入会话Run",
-        "WS流式返回阶段、工具和最终回复",
-        "空内容不提交",
-        "图片数量/大小/格式不合法发送类型化拒绝回执"
-      ],
-      "reviewSource": "artifacts/rust-tauri/R06/original-proofs-20261012/mappings/chat-subagent.json"
+      "gaps": [],
+      "reviewSource": "artifacts/rust-tauri/R06/route-a-20261015/chat-backend-proof-review.json"
     },
     {
       "id": "R00-T02-LA-D5128ABAABCF",

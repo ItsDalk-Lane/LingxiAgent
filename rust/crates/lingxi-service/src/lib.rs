@@ -33,6 +33,8 @@ pub mod bridgemedia;
 pub mod cancel;
 pub mod cardguide;
 pub mod character_cards;
+pub mod chat_settings;
+pub mod chat_wire;
 pub mod checkpoint_store;
 pub mod compaction;
 pub mod config;
@@ -475,6 +477,7 @@ pub struct ServiceState {
     storage: Arc<RunDatabase>,
     sessions: Arc<sessions::SessionStore>,
     slash: Arc<slash::SlashService>,
+    chat_wire: Arc<chat_wire::ChatWire>,
     events: Arc<events::EventService>,
     app_events: Arc<appevents::AppEventLog>,
     session_projects: Arc<projects::SessionProjectsService>,
@@ -1680,7 +1683,8 @@ impl ServiceState {
         // keeps the pre-R06 shape exactly.
         let runs = runs
             .with_context_compiler(deps.context_compiler.clone())
-            .with_context_session_store(Arc::clone(&storage));
+            .with_context_session_store(Arc::clone(&storage))
+            .with_chat_settings_home(config.data_home.clone());
         // R06-T06: the Pi extension hooks port — production ON (the
         // agent-loop-guard + tool_result guard pipeline). The loop guard's
         // block/warn behavior mirrors lib/extensions/agent-loop-guard-ext.ts;
@@ -2135,6 +2139,7 @@ impl ServiceState {
             storage: Arc::clone(&storage),
             sessions: session_arc,
             slash: Arc::new(slash::SlashService::new(&data_home)),
+            chat_wire: Arc::new(chat_wire::ChatWire::new(&data_home)),
             session_tree: session_tree_handle,
             session_tools,
             approvals: approval_service_handle,
@@ -3195,6 +3200,11 @@ fn browser_cors_response(
     headers.insert(
         header::ACCESS_CONTROL_ALLOW_HEADERS,
         HeaderValue::from_static("Content-Type, Authorization, If-None-Match"),
+    );
+    // 已授权浏览器必须能读取实际历史修订，供条件 GET 对账。
+    headers.insert(
+        header::ACCESS_CONTROL_EXPOSE_HEADERS,
+        HeaderValue::from_static("ETag"),
     );
     headers.insert(header::VARY, HeaderValue::from_static("Origin"));
     response
@@ -6421,6 +6431,9 @@ async fn run_ws_session<IO>(
     let mut subscription: Option<events::SubscriptionGuard> = None;
     let (slash_tx, mut slash_rx) = tokio::sync::mpsc::channel::<slash::SlashResult>(8);
     let mut slash_tasks = tokio::task::JoinSet::new();
+    let (chat_tx, mut chat_rx)=tokio::sync::mpsc::channel::<serde_json::Value>(64);
+    let mut chat_jobs=tokio::task::JoinSet::new();
+    let mut chat_events=state.chat_wire.subscribe();
     loop {
         let sub_mailbox = subscription.as_ref().map(|s| s.mailbox().clone());
         let sub_frame = async {
@@ -6430,6 +6443,29 @@ async fn run_ws_session<IO>(
             }
         };
         tokio::select! {
+            Some(result)=chat_rx.recv()=> {
+                if !ensure_ws_principal_current(&mut writer,&state,&principal,secure_transport).await{return;}
+                if ws::write_ws_text(&mut writer,&canon::canonical_bytes(&result)).await.is_err(){return;}
+            }
+            frame=chat_events.recv()=>{
+                if !ensure_ws_principal_current(&mut writer,&state,&principal,secure_transport).await{return;}
+                match frame {
+                    Ok(frame)=>{
+                        if let Some(id)=frame["sessionId"].as_str(){
+                            if get_session_owned(&state,&principal,id).await.is_ok() && ws::write_ws_text(&mut writer,&canon::canonical_bytes(&frame)).await.is_err(){return;}
+                        }
+                    },
+                    Err(tokio::sync::broadcast::error::RecvError::Lagged(_))=>{
+                        let error=ProtocolError::new(ErrorCode::Conflict,"chat event gap: reconnect and resume current stream",true);
+                        let _=ws::write_ws_text(&mut writer,&canon::canonical_bytes(&error)).await;
+                        let _=ws::write_ws_close(&mut writer,1013,"chat_resume_required").await;return;
+                    },
+                    Err(tokio::sync::broadcast::error::RecvError::Closed)=>return,
+                }
+            }
+            Some(result)=chat_jobs.join_next(), if !chat_jobs.is_empty()=>{
+                if let Err(error)=result {tracing::error!(%error,"chat request task failed");let error=ProtocolError::new(ErrorCode::Internal,"chat request task failed",false);let _=ws::write_ws_text(&mut writer,&canon::canonical_bytes(&error)).await;}
+            }
             Some(result) = slash_rx.recv() => {
                 if !ensure_ws_principal_current(&mut writer, &state, &principal, secure_transport).await { return; }
                 if ws::write_ws_text(&mut writer, &canon::canonical_bytes(&result)).await.is_err() { return; }
@@ -6482,10 +6518,26 @@ async fn run_ws_session<IO>(
                             }
                         };
                         let mood_request = matches!(&request, ws::WsClientRequest::SubscribeMood { .. });
+                        let chat_interject=matches!(&request,ws::WsClientRequest::Interject(_));
                         match request {
                             ws::WsClientRequest::SubagentStopRequest {session_id, session_path, task_id, request_id} => {
                                 let result = background_tasks::ws_stop(&state, &principal, background_tasks::StopBody {session_id,session_path}, &task_id, request_id).await;
                                 if ws::write_ws_text(&mut writer, &canon::canonical_json_bytes(&result)).await.is_err() {return;}
+                            }
+                            ws::WsClientRequest::Prompt(req)|ws::WsClientRequest::Interject(req)=>{
+                                if chat_jobs.len()>=32 {let error=ProtocolError::new(ErrorCode::Conflict,"chat request capacity exceeded",true);let _=ws::write_ws_text(&mut writer,&canon::canonical_bytes(&error)).await;continue;}
+                                let (state,principal,tx)=(state.clone(),principal.clone(),chat_tx.clone());
+                                chat_jobs.spawn(async move {chat_wire::prompt(state,principal,req,chat_interject,tx).await;});
+                            }
+                            ws::WsClientRequest::Abort(req)=>{chat_wire::abort(&state,&principal,req,&chat_tx).await;}
+                            ws::WsClientRequest::ResumeStream(req)=>{chat_wire::resume(&state,&principal,req,&chat_tx).await;}
+                            ws::WsClientRequest::Steer(req)=>{
+                                if chat_jobs.len()>=32 {let error=ProtocolError::new(ErrorCode::Conflict,"chat request capacity exceeded",true);let _=ws::write_ws_text(&mut writer,&canon::canonical_bytes(&error)).await;continue;}
+                                let (state,principal,tx)=(state.clone(),principal.clone(),chat_tx.clone());chat_jobs.spawn(async move {chat_wire::steer(state,principal,req,tx).await;});
+                            }
+                            ws::WsClientRequest::Compact(req)=>{
+                                if chat_jobs.len()>=32 {let error=ProtocolError::new(ErrorCode::Conflict,"chat request capacity exceeded",true);let _=ws::write_ws_text(&mut writer,&canon::canonical_bytes(&error)).await;continue;}
+                                let (state,principal,tx)=(state.clone(),principal.clone(),chat_tx.clone());chat_jobs.spawn(async move {chat_wire::compact(&state,&principal,req,&tx).await;});
                             }
                             ws::WsClientRequest::Slash { session_id, text, agent_id } => {
                                 if !slash_tasks.is_empty() {
@@ -7436,7 +7488,12 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/settings/avatar-health",
             get(settings_ui::avatars_health_route),
         )
-        .route("/lingxi/v1/models", get(settings_ui::models_route))
+        .route("/lingxi/v1/models", get(chat_wire::models_route))
+        .route("/lingxi/v1/models/set", post(chat_wire::model_set_route))
+        .route(
+            "/lingxi/v1/models/switch",
+            post(chat_wire::model_switch_route),
+        )
         .route(
             "/lingxi/v1/preferences/models",
             get(settings_ui::preferences_models_route),

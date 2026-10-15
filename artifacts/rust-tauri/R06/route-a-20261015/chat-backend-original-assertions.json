@@ -1,0 +1,50 @@
+[
+  {
+    "id": "R00-T02-LA-421EEA1AC8D5",
+    "assertions": [
+      "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed",
+      "未知 method、实验关闭、会话不存在/正在流式时明确失败，不能改历史"
+    ],
+    "then": "先回 compaction_accepted，再按实际结果回 succeeded/noop/failed"
+  },
+  {
+    "id": "R00-T02-LA-7CBF6F4A6760",
+    "assertions": [
+      "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲",
+      "旧 streamId 返回 stale_stream 且不取消新流；无活动任务为 already_stopped"
+    ],
+    "then": "已接收中止返回 abort_result accepted；排队提交停止后 UI 立即恢复空闲"
+  },
+  {
+    "id": "R00-T02-LA-81664285F927",
+    "assertions": [
+      "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记",
+      "无活动流返回空事件与运行态；越权会话不泄露旧帧"
+    ],
+    "then": "按 streamId/sinceSeq 补发遗漏事件和重置/截断标记"
+  },
+  {
+    "id": "R00-T02-LA-92620BF2264F",
+    "assertions": [
+      "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复",
+      "媒体超限/不支持、会话身份无效时拒绝且不写空消息"
+    ],
+    "then": "经会话授权和媒体校验后走插入队列/打断策略，收到输入回执和新回复"
+  },
+  {
+    "id": "R00-T02-LA-C1FB9C92E813",
+    "assertions": [
+      "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交",
+      "已删除 Agent 或未获会话权限时拒绝，不能混入别人的流"
+    ],
+    "then": "活动流被 steer 后收到 steered；流已停则作为普通 prompt 提交"
+  },
+  {
+    "id": "R00-T02-LA-D483E4CD0935",
+    "assertions": [
+      "经授权进入会话 Run，流式返回阶段、工具和最终回复",
+      "空内容不提交；图片数量/大小/格式不合法时发送类型化拒绝回执"
+    ],
+    "then": "经授权进入会话 Run，流式返回阶段、工具和最终回复"
+  }
+]

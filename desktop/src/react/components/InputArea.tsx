@@ -1,3 +1,4 @@
+import { chatFetch } from '../services/chat-client';
 /**
  * InputArea — 聊天输入区域 React 组件
  *
@@ -1705,13 +1706,13 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
   // ── Load thinking level once server port is ready + listen for plan mode sync ──
   const activeServerConnection = useStore(s => s.activeServerConnection);
   useEffect(() => {
-    if (activeServerConnection && surface !== 'mobile') {
+    if (activeServerConnection && connected && surface !== 'mobile') {
       const query = pendingNewSession
         ? '?pendingNewSession=1'
         : currentSessionPath
           ? `?sessionPath=${encodeURIComponent(currentSessionPath)}`
           : '';
-      lingxiFetch(`/api/session-thinking-level${query}`)
+      chatFetch(`/api/session-thinking-level${query}`)
         .then(r => r.json())
         .then(d => { if (d.thinkingLevel) setThinkingLevel(d.thinkingLevel as ThinkingLevel); })
         .catch((err: unknown) => console.warn('[InputArea] load thinking level failed', err));
@@ -1724,7 +1725,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
     };
     window.addEventListener('hana-plan-mode', handler);
     return () => window.removeEventListener('hana-plan-mode', handler);
-  }, [activeServerConnection, currentSessionPath, isSideChatScope, pendingNewSession, setPermissionMode, setThinkingLevel, surface]);
+  }, [activeServerConnection, connected, currentSessionPath, isSideChatScope, pendingNewSession, setPermissionMode, setThinkingLevel, surface]);
 
   // ── Handle slash selection (builtin vs skill) ──
   const handleSlashSelect = useCallback((item: SlashItem) => {

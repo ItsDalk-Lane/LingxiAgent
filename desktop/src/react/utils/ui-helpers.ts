@@ -5,7 +5,8 @@
  */
 
 import { useStore } from '../stores';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { chatFetch as lingxiFetch } from '../services/chat-client';
+import { resolveServerConnection } from '../services/server-connection';
 import { errorBus } from '../../../../shared/error-bus.ts';
 import { AppError } from '../../../../shared/errors.ts';
 
@@ -45,6 +46,10 @@ export async function loadModels(): Promise<void> {
       models,
       currentModel: currentModelObj ? { id: currentModelObj.id, provider: currentModelObj.provider } : null,
     });
-  } catch { /* silent */ }
+  } catch (error) {
+    if (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service') {
+      showError(error instanceof Error ? error.message : '模型列表读取失败');
+    }
+  }
 }
 

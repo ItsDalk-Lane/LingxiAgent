@@ -28,6 +28,7 @@ impl From<std::io::Error> for WriteError {
 }
 
 pub const MAX_RECOVERABLE_FILE_BYTES: u64 = 8 * 1024 * 1024;
+pub(crate) const READ_BOUND_EXCEEDED: &str = "file_read_bound_exceeded";
 
 pub struct Snapshot {
     dir: DirFd,
@@ -53,6 +54,16 @@ fn stamp(file: &std::fs::File, bytes: &[u8]) -> std::io::Result<Value> {
 }
 impl Snapshot {
     pub fn read(path: &Path) -> Result<Self, WriteError> {
+        Self::read_bounded(path, MAX_RECOVERABLE_FILE_BYTES).map_err(|error| match error {
+            WriteError::Failed(ref text) if text == READ_BOUND_EXCEEDED => WriteError::Conflict,
+            other => other,
+        })
+    }
+    /// 只扩大受权读取的字节预算；恢复和写入仍调用固定 8MiB 的 read。
+    pub(crate) fn read_bounded(path: &Path, max_bytes: u64) -> Result<Self, WriteError> {
+        if max_bytes > 20 * 1024 * 1024 {
+            return Err(WriteError::Conflict);
+        }
         // 拒绝任何路径组件已被换成链接；恢复不自动转向链接的新目标。
         if path.canonicalize().ok().as_deref() != Some(path) {
             return Err(WriteError::Conflict);
@@ -67,16 +78,14 @@ impl Snapshot {
             return Err(WriteError::Conflict);
         }
         let identity = FileIdentity::of(&file)?;
-        if identity.size > MAX_RECOVERABLE_FILE_BYTES {
-            return Err(WriteError::Conflict);
+        if identity.size > max_bytes {
+            return Err(WriteError::Failed(READ_BOUND_EXCEEDED.into()));
         }
         let before_stamp = stamp(&file, &[])?;
         let mut bytes = Vec::new();
-        (&mut file)
-            .take(MAX_RECOVERABLE_FILE_BYTES + 1)
-            .read_to_end(&mut bytes)?;
-        if bytes.len() as u64 > MAX_RECOVERABLE_FILE_BYTES {
-            return Err(WriteError::Conflict);
+        (&mut file).take(max_bytes + 1).read_to_end(&mut bytes)?;
+        if bytes.len() as u64 > max_bytes {
+            return Err(WriteError::Failed(READ_BOUND_EXCEEDED.into()));
         }
         if FileIdentity::of(&file)? != identity || stamp(&file, &[])? != before_stamp {
             return Err(WriteError::Conflict);

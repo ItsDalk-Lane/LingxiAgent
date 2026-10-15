@@ -523,10 +523,17 @@ async fn history_page_response(
         } else {
             "reconciled_idle"
         };
+        // 证明绑定这次真实双采样、历史修订和分页完整度，不以客户端编号代替。
+        let snapshot = serde_json::json!({"sessionId":session_id,"historyRevision":etag,
+            "beforeRunRevision":before.revision.to_string(),"afterRunRevision":after.revision.to_string(),
+            "beforeActive":before.active,"afterActive":after.active,"complete":page_complete,"runStatus":run_status});
+        let snapshot_id = lingxi_protocol::canon::canonical_sha256_hex(&snapshot);
         object.insert(
             "reconciliation".into(),
             serde_json::json!({
                 "sessionId": session_id,
+                "sessionPath": crate::session_locator::native(&session_id),
+                "snapshotId": snapshot_id,
                 "runRevision": after.revision.to_string(),
                 "complete": page_complete,
                 "runStatus": run_status,

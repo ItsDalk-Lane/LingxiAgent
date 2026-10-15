@@ -788,6 +788,7 @@ async fn c02_background_subagent_and_worker_rows_carry_true_parentage() {
     let child_run =
         lingxi_protocol::RunId::new(format!("run-subagent-child-{}", std::process::id()));
     let authorization = DriveAuthorization {
+        chat_input: None,
         knowledge_selection: None,
         lineage: RunLineage {
             parent_run_id: Some(lingxi_protocol::RunId::new(main_run.clone())),
