@@ -1,3 +1,4 @@
+import { applyBrowserStatus } from './browser-events';
 /**
  * ws-message-handler.ts — WebSocket 消息分发（从 app-ws-shim.ts 迁移）
  *
@@ -15,16 +16,11 @@ import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from 
 import { browserStateForPath, setBrowserStateForPath } from '../stores/browser-slice';
 import { scheduleSessionsRefresh } from './session-refresh-scheduler';
 import { handleLegacyArtifactBlock } from '../stores/preview-actions';
-import {
-  appendChannelMessage as appendChannelMessageAction,
-  loadChannels as loadChannelsAction,
-  markChannelMessagesDirty as markChannelMessagesDirtyAction,
-  openChannel as openChannelAction,
-  upsertConversationAgentActivity as upsertConversationAgentActivityAction,
-} from '../stores/channel-actions';
+import { handleConversationEvent } from './conversation-events';
 import { showError } from '../utils/ui-helpers';
 import { errorWithCode, presentError } from '../errors/error-presenter';
 import { handleAppEvent } from './app-event-actions';
+import { readLoopRuntimeError, warnLoopRuntimeError } from './loop-runtime-error';
 import { openSettingsModal } from '../stores/settings-modal-actions';
 import {
   PREVIEW_DOCUMENT_CHANGE_REFRESH_OPTIONS,
@@ -252,30 +248,6 @@ function hasOptimisticCurrentSession(): boolean {
   return !!state.sessions.find((s: any) => s.path === sessionPath && s._optimistic);
 }
 
-function resolvePrimaryAgentId(state: any): string | null {
-  const primary = Array.isArray(state.agents)
-    ? state.agents.find((agent: any) => agent?.isPrimary === true)
-    : null;
-  return typeof primary?.id === 'string' && primary.id ? primary.id : null;
-}
-
-function resolveDmPeerIdForEvent(state: any, msg: any): string | null {
-  const channels = Array.isArray(state.channels) ? state.channels : [];
-  const known = channels.find((channel: any) => {
-    if (!channel?.isDM || !channel.dmOwnerId || !channel.peerId) return false;
-    return (
-      (msg.from === channel.dmOwnerId && msg.to === channel.peerId)
-      || (msg.to === channel.dmOwnerId && msg.from === channel.peerId)
-    );
-  });
-  if (known?.peerId) return known.peerId;
-
-  const ownerId = resolvePrimaryAgentId(state) || state.currentAgentId || null;
-  if (!ownerId) return typeof msg.from === 'string' ? msg.from : null;
-  if (msg.from === ownerId && typeof msg.to === 'string') return msg.to;
-  if (msg.to === ownerId && typeof msg.from === 'string') return msg.from;
-  return null;
-}
 
 function applyTodoToolEnd(msg: any): void {
   if (msg.type !== 'tool_end' || !TODO_TOOL_NAMES.includes(msg.name as TodoToolName)) return;
@@ -869,33 +841,10 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       scheduleSessionsRefresh('session_created');
       break;
 
-    case 'browser_status': {
-      const bsp = msg.sessionPath;
-      if (!bsp) { console.warn('[ws] event missing sessionPath:', msg.type); break; }
-      const bRunning = !!msg.running;
-      const bUrl = msg.url || null;
-      const prev = browserStateForPath(state, bsp);
-      const hasFreshThumbnail = bRunning && typeof msg.thumbnail === 'string' && msg.thumbnail.length > 0;
-      const bThumbnail = bRunning ? (hasFreshThumbnail ? msg.thumbnail : prev?.thumbnail ?? null) : null;
-      const thumbnailCapturedAt = bRunning
-        ? hasFreshThumbnail
-          ? (typeof msg.thumbnailCapturedAt === 'number' ? msg.thumbnailCapturedAt : Date.now())
-          : prev?.thumbnailCapturedAt ?? null
-        : null;
-      const thumbnailUrl = bRunning
-        ? hasFreshThumbnail
-          ? (typeof msg.thumbnailUrl === 'string' ? msg.thumbnailUrl : bUrl)
-          : prev?.thumbnailUrl ?? null
-        : null;
-      const thumbnailFresh = bRunning && hasFreshThumbnail;
-      // 卡片的"收起"是用户意图，状态更新不该把它抹掉；只有浏览器重新启用（running false→true）
-      // 才算新一轮会话，卡片回归。
-      const collapsed = bRunning && !prev?.running ? false : (prev?.collapsed ?? false);
-      // 记录最近活跃时间：切到其他会话时，聊天区卡片接力显示「最近在用」的浏览器
-      const lastActiveAt = bRunning ? Date.now() : (prev?.lastActiveAt ?? null);
-      setBrowserStateForPath(bsp, { running: bRunning, url: bUrl, thumbnail: bThumbnail, thumbnailCapturedAt, thumbnailUrl, thumbnailFresh, collapsed, lastActiveAt });
+    case 'browser_status':
+    case 'browser_update':
+      applyBrowserStatus(msg);
       break;
-    }
 
     case 'todo_update': {
       const sp = msg.sessionPath;
@@ -1169,13 +1118,16 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       // 循环状态机变更（start/stop/pause/resume/complete/轮次刷新）。按 sessionId 写 store，
       // 驱动会话列表徽章与 interlude 控制按钮态。stopped/completed 经 setLoopStatus 自动清除。
       if (msg.sessionId) {
+        const runtimeError = readLoopRuntimeError(msg.runtimeError);
         useStore.getState().setLoopStatus(msg.sessionId, {
           status: msg.status,
           turnCount: msg.turnCount ?? 0,
           maxTurns: msg.maxTurns ?? null,
           pausedReason: msg.pausedReason ?? null,
           prompt: msg.prompt ?? null,
+          ...(runtimeError ? { runtimeError } : {}),
         });
+        warnLoopRuntimeError(msg.sessionId, runtimeError);
       }
       break;
     }
@@ -1284,54 +1236,12 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       break;
     }
 
-    case 'channel_new_message': {
-      const store = useStore.getState();
-      const knownChannel = store.channels.some((channel) => channel.id === msg.channelName);
-      const isVisibleCurrentChannel =
-        store.currentTab === 'channels'
-        && store.currentChannel === msg.channelName
-        && document.visibilityState === 'visible';
-      if (msg.channelName && msg.message) {
-        if (!knownChannel) loadChannelsAction();
-        appendChannelMessageAction(msg.channelName, msg.message, { markRead: isVisibleCurrentChannel });
-      } else if (msg.channelName && isVisibleCurrentChannel) {
-        markChannelMessagesDirtyAction(msg.channelName);
-        openChannelAction(msg.channelName);
-      } else if (msg.channelName) {
-        markChannelMessagesDirtyAction(msg.channelName);
-        loadChannelsAction();
-      }
+    case 'channel_new_message':
+    case 'channel_created':
+    case 'dm_new_message':
+    case 'conversation_agent_activity':
+      handleConversationEvent(msg);
       break;
-    }
-
-    case 'channel_created': {
-      loadChannelsAction();
-      break;
-    }
-
-    case 'dm_new_message': {
-      const store2 = useStore.getState();
-      const peerId = resolveDmPeerIdForEvent(store2, msg);
-      if (!peerId) {
-        loadChannelsAction();
-        break;
-      }
-      const dmId = `dm:${peerId}`;
-      const isViewingDM = store2.currentTab === 'channels' && store2.currentChannel === dmId && document.visibilityState === 'visible';
-      if (isViewingDM) {
-        openChannelAction(dmId, true);
-      } else {
-        loadChannelsAction();
-      }
-      break;
-    }
-
-    case 'conversation_agent_activity': {
-      if (msg.activity) {
-        upsertConversationAgentActivityAction(msg.activity);
-      }
-      break;
-    }
 
     case 'compaction_auto': {
       // 80% 强制压缩完成通知：告知用户上下文已被自动压缩。

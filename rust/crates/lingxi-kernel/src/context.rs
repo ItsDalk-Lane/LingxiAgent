@@ -567,6 +567,18 @@ pub struct ContextCompiler;
 
 impl ContextCompiler {
     pub fn compile(input: &ContextCompileInput) -> Result<ContextArtifact, ContextCompileError> {
+        Self::compile_selected(input, false)
+    }
+    /// 访客只得到公开人格材料，沿相同段预算与观测工件输出。
+    pub fn compile_bridge_guest(
+        input: &ContextCompileInput,
+    ) -> Result<ContextArtifact, ContextCompileError> {
+        Self::compile_selected(input, true)
+    }
+    fn compile_selected(
+        input: &ContextCompileInput,
+        guest: bool,
+    ) -> Result<ContextArtifact, ContextCompileError> {
         let zh = input.locale.to_lowercase().starts_with("zh");
 
         // 现役对齐：yuan 为空即 throw（buildSystemPromptArtifact L1572）。
@@ -579,6 +591,9 @@ impl ContextCompiler {
         // 按注册表顺序构建各段内容；None = 该段本次不注入。
         let mut built: Vec<(&'static SegmentSpec, String)> = Vec::new();
         for spec in SEGMENT_SPECS {
+            if guest && spec.id != "persona" {
+                continue;
+            }
             if let Some(content) = build_segment(spec, input, zh) {
                 let tokens = estimate_text_tokens(&content);
                 if tokens > spec.token_budget {

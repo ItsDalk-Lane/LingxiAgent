@@ -513,8 +513,14 @@ async fn original_interactive_tools_current_tauri_components_real_http_and_ifram
         .canonicalize()
         .unwrap();
     let proof = h.home.join("interactive-ui-evidence");
-    let target = PathBuf::from(std::env::var_os("HOME").unwrap())
-        .join(".cache/lingxi-r06-builds/tauri-resources");
+    // 原生构建缓存位置与 directory_picker/skills_completion 同一环境合同
+    // （LINGXI_SKILLS_NATIVE_TARGET 优先），HOME 推导默认值仅作历史回退。
+    let target = std::env::var_os("LINGXI_SKILLS_NATIVE_TARGET")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(std::env::var_os("HOME").unwrap())
+                .join(".cache/lingxi-r06-builds/tauri-resources")
+        });
     assert!(target.is_dir(), "只复用现有native target");
     let output = tokio::process::Command::new("node")
         .arg(repo.join("desktop/src/react/components/interactive/__tests__/run-live-ui.mjs"))

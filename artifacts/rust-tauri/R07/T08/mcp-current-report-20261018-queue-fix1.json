@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "status": "DEVELOPMENT_EVIDENCE_PRESENT_NOT_FINAL_ACCEPTANCE",
+  "recordedAt": "2026-10-18T10:24:37.236243+00:00",
+  "failureHistoryPreserved": true,
+  "originalFailures": [
+    {
+      "case": "rejected_update_must_not_cancel_an_accepted_background_sdk_start",
+      "reproduced": "坏update返回400且saved/runtimeApplied=false，但先取消了原已接受SDK后台启动。",
+      "fix": "统一短锁内先核原授权、scope、明确助手、冻结批准与完整共享编辑规则，取消后正式写锁再次核验。"
+    },
+    {
+      "case": "explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting",
+      "reproduced": "原owner在真实initialize等待期间已轮换，旧请求仍返回200/applied、运行态true。",
+      "fix": "显式start/refresh仍同步返回真实结果；连接等待使用原SettingsAuthority并在登记live前再次复验，撤权先checked清理再返403，保留已保存事实。"
+    },
+    {
+      "case": "global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining",
+      "reproduced": "停用已取消旧启动、等待真实binder清理期间，新的正式manager调用仍加入慢SDK任务，停用无法正常完成。",
+      "fix": "已完整预检的disable持RAII启动暂停栅栏；新的add保存仍可完成，但不接纳启动，明确saved=true/mcp_start_paused；停用必须真实完成，不以shutdown兜底当成功。"
+    }
+  ],
+  "runs": [
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-queue-review-reproduce1.json",
+      "receiptSha256": "50e54fd9f0e1c72c9e0c79210cb33b77ebdd8c74fa050d63ad5e1c2143b2e997",
+      "exitCode": 101,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-queue-review-reproduce1.log",
+      "logSha256": "655caf555487e425d0f4aed646dabaef2c250ed8c1e63732d1d36dc647715c00",
+      "sourceUnchanged": true,
+      "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-queue-review-reproduce2.json",
+      "receiptSha256": "7caa4ca6c9d14e4c0f33048dad70fdc9c34fdd5fb72d02ee85304d8f449280f1",
+      "exitCode": 101,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-queue-review-reproduce2.log",
+      "logSha256": "ff2de59389533691b052374fe078befedc6eba4b6c7358b97519231bfa0e5640",
+      "sourceUnchanged": false,
+      "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-queue-review-fixed1.json",
+      "receiptSha256": "314f154365277c1bf4f2b6d4e40aeee3bfb4bf956471d8c4bea4f1bd525e5a34",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-queue-review-fixed1.log",
+      "logSha256": "8166d1956d850ae516881776723c2927117db30d2fab99aff520da96945dd860",
+      "sourceUnchanged": false,
+      "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-rust-page-types-fixed1.json",
+      "receiptSha256": "4b6baf8d672c1c780792034b7392deebd7839f50a9e6936194f3e0e688ff8a44",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-rust-page-types-fixed1.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "sourceUnchanged": null,
+      "scope": "Node mechanism/typecheck only"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-rust-page-node-types-fixed1.json",
+      "receiptSha256": "cd660af10c57a0b069170a9b348494e95c93c9f28a26e0557f70d012a8836a9d",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-rust-page-node-types-fixed1.log",
+      "logSha256": "4ee5292cb16d68f0f944314a0a3166895fe61613c752ab52e4f0ae24dca1bb63",
+      "sourceUnchanged": null,
+      "scope": "仅Node组件/消费者机制"
+    }
+  ],
+  "fixedRustTarget": {
+    "target": "r07_t08_mcp_settings",
+    "actualPassed": 22,
+    "actualFailed": 0,
+    "actualIgnored": 0,
+    "namedCases": [
+      "an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service",
+      "global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining",
+      "occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained",
+      "an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential",
+      "invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore",
+      "rejected_update_must_not_cancel_an_accepted_background_sdk_start",
+      "explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting",
+      "concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent",
+      "restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes",
+      "http_saved_start_is_immediate_and_duplicate_start_uses_one_actual_sdk_connection",
+      "http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures",
+      "editing_a_queued_connector_cleans_old_generation_before_new_sdk_start",
+      "a_real_pending_settings_approval_does_not_survive_local_credential_replacement",
+      "http_bulk_pending_start_does_not_block_other_saves_and_stop_disable_reap_real_groups",
+      "cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent",
+      "queued_original_authority_revocation_and_shutdown_cancel_and_reap_owned_sdk_start",
+      "actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources",
+      "http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material",
+      "stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group",
+      "real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers",
+      "management_rejects_other_identities_corrupt_files_links_and_replaced_parent",
+      "a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool"
+    ],
+    "limitations": [
+      "本批全局sourceUnchanged=false，包含并行TS修改，不能冒充固定候选。",
+      "Rust测试由根端唯一Cargo执行，未在子代理重跑。",
+      "三个反例与原十九场景均保留；首次编译失败和真实反例失败未覆盖。"
+    ]
+  },
+  "frontend": {
+    "actualNodePassed": 30,
+    "files": 4,
+    "typecheck": [
+      "tsc --noEmit",
+      "tsc --noEmit -p tsconfig.node.json",
+      "tsc --noEmit -p tsconfig.test.json"
+    ],
+    "emptyAgent": "真实global DTO消费；不带agentId query，允许global/defer/add/import；详情须明确助手，不扩大无助手的命令/参数/秘密投影。",
+    "pending": "saved成功、runtime尚未完成不自动重提；导入行显示连接中，列表只在connecting期间刷新，连接变更/离开回收定时器。",
+    "scope": "Node机制检查使用HTTP响应替身，不代表真实Rust/stdio/原生窗口；实际SDK由Rust具名case另证。"
+  },
+  "runtimeSemantics": {
+    "addAndBulk": "保存后立即回执，同一TaskSupervisor后台受监督连接，不等待每个10秒握手。",
+    "explicitStartAndRefresh": "保留原同步结果含义，并复验原授权。",
+    "cleanup": "stop/edit/remove/global-disable/exit取消并等待真实SDK清理；不可确认按未知/失败回执，不冒称完成。",
+    "restore": "按持久化既有意图启动，不伪造原用户请求身份；lazy模式不自动启动。"
+  },
+  "remainingNotAccepted": [
+    "尚未取得同一后继固定候选完整门禁。",
+    "真实SettingsContent导航到MCP页的全部动作尚未由此Node或Rust目标证明。",
+    "原35中的OAuth/apps/resources/session细分职责由另位独立审阅对账，未接通部分不得据22绿计完成。",
+    "远程HTTP/SSE/MCP OAuth当前明确不支持，未执行真实账号授权；是否后续T11仅按原分配证据，不擅自整项递延。",
+    "其它OS及真实用户外部MCP服务未验证。"
+  ]
+}

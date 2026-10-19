@@ -1,0 +1,33 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05c",
+  "name": "ui-beautify",
+  "purpose": "final_acceptance",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/components/ActivityPanel.test.tsx",
+    "desktop/src/react/__tests__/components/FloatingActions.cover-gallery.test.tsx",
+    "desktop/src/react/__tests__/components/PreviewEditor.cover-drop.test.tsx",
+    "desktop/src/react/__tests__/components/PreviewRenderer.html.test.tsx",
+    "desktop/src/react/__tests__/services/rust-automation.test.ts",
+    "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+    "desktop/src/react/__tests__/services/rust-media-http.test.tsx"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:55:55.499604+00:00",
+  "sourceFingerprint": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "log": "t05c-ui-beautify.log",
+  "endedAt": "2026-10-16T04:56:02.183186+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "logSha256": "6da84b0a9dee0d54987e25b920b0a8d3b6b11fe9373c968164307844109f2e41",
+  "sourceUnchanged": true
+}

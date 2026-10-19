@@ -1,0 +1,333 @@
+--- a/rust/crates/lingxi-service/src/file_safety.rs
++++ b/rust/crates/lingxi-service/src/file_safety.rs
+@@ -29,6 +29,28 @@
+ 
+ pub const MAX_RECOVERABLE_FILE_BYTES: u64 = 8 * 1024 * 1024;
+ pub(crate) const READ_BOUND_EXCEEDED: &str = "file_read_bound_exceeded";
++const MAX_ARTIFACT_FILE_BYTES: u64 = 50 * 1024 * 1024;
++
++/// 预算只能由正式内部入口选定，模型和普通文字接口不能传入上限。
++#[derive(Clone, Copy)]
++enum WriteBudget {
++    Text,
++    Artifact,
++}
++impl WriteBudget {
++    fn limit(self) -> u64 {
++        match self {
++            Self::Text => MAX_RECOVERABLE_FILE_BYTES,
++            Self::Artifact => MAX_ARTIFACT_FILE_BYTES,
++        }
++    }
++    fn read(self, path: &Path) -> Result<Snapshot, WriteError> {
++        match self {
++            Self::Text => Snapshot::read(path),
++            Self::Artifact => Snapshot::read_artifact(path),
++        }
++    }
++}
+ 
+ pub struct Snapshot {
+     dir: DirFd,
+@@ -64,6 +86,13 @@
+         if max_bytes > 20 * 1024 * 1024 {
+             return Err(WriteError::Conflict);
+         }
++        Self::read_with_limit(path, max_bytes)
++    }
++    /// 仅用于受权办公字节快照；不放宽 read_bounded 的普通20MiB边界。
++    pub(crate) fn read_artifact(path: &Path) -> Result<Self, WriteError> {
++        Self::read_with_limit(path, MAX_ARTIFACT_FILE_BYTES)
++    }
++    fn read_with_limit(path: &Path, max_bytes: u64) -> Result<Self, WriteError> {
+         // 拒绝任何路径组件已被换成链接；恢复不自动转向链接的新目标。
+         if path.canonicalize().ok().as_deref() != Some(path) {
+             return Err(WriteError::Conflict);
+@@ -206,7 +235,17 @@
+         file: &std::fs::File,
+         bytes: &[u8],
+     ) -> Result<(), WriteError> {
+-        let snapshot = Snapshot::read(path)?;
++        self.record_written_with_budget(session, path, file, bytes, WriteBudget::Text)
++    }
++    fn record_written_with_budget(
++        &self,
++        session: &str,
++        path: &Path,
++        file: &std::fs::File,
++        bytes: &[u8],
++        budget: WriteBudget,
++    ) -> Result<(), WriteError> {
++        let snapshot = budget.read(path)?;
+         let written_stamp = stamp(file, bytes)?;
+         if snapshot.bytes != bytes || snapshot.stamp != written_stamp {
+             return Err(WriteError::Unknown(
+@@ -244,8 +283,27 @@
+         bytes: &[u8],
+         authorize: impl Fn() -> bool,
+     ) -> Result<(), WriteError> {
++        self.create_with_budget(session, path, bytes, authorize, WriteBudget::Text)
++    }
++    pub(crate) fn create_artifact(
++        &self,
++        session: &str,
++        path: &Path,
++        bytes: &[u8],
++        authorize: impl Fn() -> bool,
++    ) -> Result<(), WriteError> {
++        self.create_with_budget(session, path, bytes, authorize, WriteBudget::Artifact)
++    }
++    fn create_with_budget(
++        &self,
++        session: &str,
++        path: &Path,
++        bytes: &[u8],
++        authorize: impl Fn() -> bool,
++        budget: WriteBudget,
++    ) -> Result<(), WriteError> {
+         let _guard = self.lock.lock().unwrap();
+-        if bytes.len() as u64 > MAX_RECOVERABLE_FILE_BYTES || self.is_protected(path) {
++        if bytes.len() as u64 > budget.limit() || self.is_protected(path) {
+             return Err(WriteError::Failed(
+                 "file is protected or exceeds recoverable write limit".into(),
+             ));
+@@ -276,7 +334,7 @@
+                 .map_err(|e| WriteError::Unknown(e.to_string()))?;
+             self.step(path, "after_replace")
+                 .map_err(|e| WriteError::Unknown(e.to_string()))?;
+-            self.record_written(session, path, &temp, bytes)
++            self.record_written_with_budget(session, path, &temp, bytes, budget)
+                 .map_err(|e| WriteError::Unknown(e.to_string()))?;
+             Ok(())
+         })();
+@@ -304,8 +362,39 @@
+         bytes: &[u8],
+         authorize: impl Fn() -> bool,
+     ) -> Result<(), WriteError> {
++        self.replace_with_budget(session, path, snapshot, bytes, authorize, WriteBudget::Text)
++    }
++    pub(crate) fn replace_artifact(
++        &self,
++        session: &str,
++        path: &Path,
++        snapshot: &Snapshot,
++        bytes: &[u8],
++        authorize: impl Fn() -> bool,
++    ) -> Result<(), WriteError> {
++        self.replace_with_budget(
++            session,
++            path,
++            snapshot,
++            bytes,
++            authorize,
++            WriteBudget::Artifact,
++        )
++    }
++    fn replace_with_budget(
++        &self,
++        session: &str,
++        path: &Path,
++        snapshot: &Snapshot,
++        bytes: &[u8],
++        authorize: impl Fn() -> bool,
++        budget: WriteBudget,
++    ) -> Result<(), WriteError> {
++        if snapshot.bytes.len() as u64 > budget.limit() {
++            return Err(WriteError::Conflict);
++        }
+         let _guard = self.lock.lock().unwrap();
+-        if bytes.len() as u64 > MAX_RECOVERABLE_FILE_BYTES || self.is_protected(path) {
++        if bytes.len() as u64 > budget.limit() || self.is_protected(path) {
+             return Err(WriteError::Failed(
+                 "file is protected or exceeds recoverable write limit".into(),
+             ));
+@@ -322,7 +411,7 @@
+             .parent()
+             .ok_or(WriteError::Conflict)?
+             .join(&recovery_name);
+-        let mut record = json!({"id":random,"filePath":path,"retainedPath":recovery_path,"temporaryPath":path.parent().unwrap().join(&name),"scope":session,"status":"prepared","expected":snapshot.stamp,"replacementSha256":lingxi_kernel::session_tree::sha256_hex(bytes)});
++        let mut record = json!({"id":random,"filePath":path,"retainedPath":recovery_path,"temporaryPath":path.parent().unwrap().join(&name),"scope":session,"status":"prepared","expected":snapshot.stamp,"replacementSha256":lingxi_kernel::session_tree::sha256_hex(bytes),"writeBudgetBytes":budget.limit()});
+         let mut prepared = false;
+         let mut exchanged = false;
+         let result = (|| -> Result<(), WriteError> {
+@@ -344,7 +433,7 @@
+             {
+                 return Err(WriteError::Conflict);
+             }
+-            let current = Snapshot::read(path)?;
++            let current = budget.read(path)?;
+             if current.identity != snapshot.identity
+                 || current.stamp != snapshot.stamp
+                 || current.bytes != snapshot.bytes
+@@ -379,9 +468,12 @@
+                     return Err(WriteError::Conflict);
+                 }
+                 let identity = FileIdentity::of(&f)?;
++                if identity.size > budget.limit() {
++                    return Err(WriteError::Conflict);
++                }
+                 let mut contents = Vec::new();
+                 (&mut f)
+-                    .take(MAX_RECOVERABLE_FILE_BYTES + 1)
++                    .take(budget.limit() + 1)
+                     .read_to_end(&mut contents)?;
+                 Ok((identity, contents))
+             })();
+@@ -393,7 +485,7 @@
+                 .unwrap_or(false);
+             if !displaced_matches || !authorize() {
+                 // 回换前只接受仍属于本操作的新对象；未知目标绝不删、不盲写。
+-                let new_current = Snapshot::read(path).ok();
++                let new_current = budget.read(path).ok();
+                 let ours = new_current
+                     .as_ref()
+                     .map(|s| {
+@@ -425,7 +517,7 @@
+                         .map_err(|e| WriteError::Unknown(e.to_string()))?;
+                     let mut actual = Vec::new();
+                     (&mut displaced_new)
+-                        .take(MAX_RECOVERABLE_FILE_BYTES + 1)
++                        .take(budget.limit() + 1)
+                         .read_to_end(&mut actual)
+                         .map_err(|e| WriteError::Unknown(e.to_string()))?;
+                     if actual != bytes
+@@ -449,7 +541,7 @@
+             }
+             self.step(path, "after_replace")
+                 .map_err(|e| WriteError::Unknown(e.to_string()))?;
+-            self.record_written(session, path, &temp, bytes)
++            self.record_written_with_budget(session, path, &temp, bytes, budget)
+                 .map_err(|e| WriteError::Unknown(e.to_string()))?;
+             record["status"] = json!("completed_original_retained");
+             self.journal(&random, &record)
+@@ -480,3 +572,130 @@
+         result
+     }
+ }
++
++#[cfg(test)]
++mod artifact_budget_tests {
++    use super::*;
++    fn temp() -> PathBuf {
++        let path = std::env::temp_dir().join(format!(
++            "lingxi-artifact-budget-{}",
++            crate::auth::hex_random_public(8).unwrap()
++        ));
++        std::fs::create_dir(&path).unwrap();
++        path.canonicalize().unwrap()
++    }
++    #[test]
++    fn artifact_exact_fifty_mib_succeeds_without_expanding_text_or_json_limits() {
++        let root = temp();
++        let safety = FileSafety::new(&root);
++        let path = root.join("exact.bin");
++        let bytes = vec![7; MAX_ARTIFACT_FILE_BYTES as usize];
++        safety
++            .create_artifact("scope", &path, &bytes, || true)
++            .unwrap();
++        let snapshot = Snapshot::read_artifact(&path).unwrap();
++        assert_eq!(snapshot.bytes, bytes);
++        assert!(safety.witnessed("scope", &path, &snapshot));
++        assert!(matches!(Snapshot::read(&path), Err(WriteError::Conflict)));
++        assert!(Snapshot::read_bounded(&path, 20 * 1024 * 1024).is_err());
++        let text_path = root.join("ordinary.txt");
++        assert!(safety
++            .create(
++                "scope",
++                &text_path,
++                &vec![0; MAX_RECOVERABLE_FILE_BYTES as usize + 1],
++                || true
++            )
++            .is_err());
++        assert!(!text_path.exists());
++        std::fs::remove_dir_all(root).unwrap();
++    }
++    #[test]
++    fn artifact_over_limit_is_rejected_before_target_or_witness_creation() {
++        let root = temp();
++        let path = root.join("too-large.bin");
++        let safety = FileSafety::new(&root);
++        assert!(safety
++            .create_artifact(
++                "scope",
++                &path,
++                &vec![0; MAX_ARTIFACT_FILE_BYTES as usize + 1],
++                || true
++            )
++            .is_err());
++        assert!(!path.exists());
++        assert_eq!(std::fs::read_dir(&root).unwrap().count(), 0);
++        std::fs::File::create(&path)
++            .unwrap()
++            .set_len(MAX_ARTIFACT_FILE_BYTES + 1)
++            .unwrap();
++        assert!(
++            matches!(Snapshot::read_artifact(&path), Err(WriteError::Failed(ref text)) if text == READ_BOUND_EXCEEDED)
++        );
++        assert_eq!(
++            std::fs::metadata(&path).unwrap().len(),
++            MAX_ARTIFACT_FILE_BYTES + 1
++        );
++        std::fs::remove_dir_all(root).unwrap();
++    }
++    #[test]
++    fn artifact_replacement_keeps_large_original_and_unknown_recovery_facts() {
++        let root = temp();
++        let path = root.join("replace.bin");
++        let old = vec![1; 9 * 1024 * 1024];
++        let new = vec![2; 10 * 1024 * 1024];
++        std::fs::write(&path, &old).unwrap();
++        let snapshot = Snapshot::read_artifact(&path).unwrap();
++        let safety = FileSafety::new(&root);
++        safety.set_test_hook(Some(Arc::new(|_, step| {
++            if step == "after_replace" {
++                Err("synthetic post-exchange fault".into())
++            } else {
++                Ok(())
++            }
++        })));
++        assert!(matches!(
++            safety.replace_artifact("scope", &path, &snapshot, &new, || true),
++            Err(WriteError::Unknown(_))
++        ));
++        assert_eq!(std::fs::read(&path).unwrap(), new);
++        let record = safety.last_recovery(&path).unwrap();
++        assert_eq!(record["writeBudgetBytes"], MAX_ARTIFACT_FILE_BYTES);
++        assert_eq!(record["status"], "unknown_original_retained");
++        assert_eq!(
++            std::fs::read(record["retainedPath"].as_str().unwrap()).unwrap(),
++            old
++        );
++        std::fs::remove_dir_all(root).unwrap();
++    }
++    #[test]
++    fn large_conflict_rollback_uses_artifact_budget_and_preserves_external_original() {
++        let root = temp();
++        let path = root.join("race.bin");
++        let old = vec![1; 9 * 1024 * 1024];
++        let replacement = vec![2; 9 * 1024 * 1024];
++        let external = Arc::new(vec![3; 9 * 1024 * 1024]);
++        std::fs::write(&path, &old).unwrap();
++        let snapshot = Snapshot::read_artifact(&path).unwrap();
++        let safety = FileSafety::new(&root);
++        let changed = external.clone();
++        safety.set_test_hook(Some(Arc::new(move |path, step| {
++            if step == "commit_boundary" {
++                std::fs::write(path, changed.as_slice()).map_err(|e| e.to_string())?;
++            }
++            Ok(())
++        })));
++        assert!(matches!(
++            safety.replace_artifact("scope", &path, &snapshot, &replacement, || true),
++            Err(WriteError::Conflict)
++        ));
++        assert_eq!(std::fs::read(&path).unwrap(), *external);
++        let record = safety.last_recovery(&path).unwrap();
++        assert_eq!(record["status"], "conflict_restored");
++        assert_eq!(
++            std::fs::read(record["retainedPath"].as_str().unwrap()).unwrap(),
++            replacement
++        );
++        std::fs::remove_dir_all(root).unwrap();
++    }
++}

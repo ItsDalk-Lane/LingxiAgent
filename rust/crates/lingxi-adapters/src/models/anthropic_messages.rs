@@ -545,6 +545,9 @@ pub fn render_messages_request(
                 }
             }
             // R06-T02: 请求作用域的压缩指令（仅摘要调用自身的 prior 末尾）。
+            ExchangeItem::HostNotice { delivery_id, text } => {
+                messages.push(serde_json::json!({"role":"user","content":lingxi_kernel::model_exchange::render_host_notice(delivery_id,text)}));
+            }
             ExchangeItem::CompactionInstruction { text } => {
                 messages.push(serde_json::json!({"role": "user", "content": text}));
             }

@@ -466,6 +466,7 @@ pub(crate) fn render_input_items(
                 }
             }
             // R06-T02: 请求作用域的压缩指令（仅摘要调用自身的 prior 末尾）。
+            ExchangeItem::HostNotice {delivery_id,text} => {items.push(serde_json::json!({"type":"message","role":"user","content":[{"type":"input_text","text":lingxi_kernel::model_exchange::render_host_notice(delivery_id,text)}]}));}
             ExchangeItem::CompactionInstruction { text } => {
                 items.push(serde_json::json!({
                     "type": "message",

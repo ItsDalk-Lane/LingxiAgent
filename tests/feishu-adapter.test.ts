@@ -1011,6 +1011,7 @@ describe("createFeishuAdapter", () => {
 
   it("declares Feishu CardKit rich streaming and updates markdown content by sequence", async () => {
     mockCardCreate.mockResolvedValue({ data: { card_id: "card_stream_001" } });
+    mockMessageCreate.mockResolvedValue({ data: { message_id: "actual_stream_message" } });
     const adapter = createFeishuAdapter({
       appId: "app-id",
       appSecret: "app-secret",
@@ -1035,6 +1036,8 @@ describe("createFeishuAdapter", () => {
       cardId: "card_stream_001",
       elementId: "hana_stream_markdown",
       sequence: 5,
+      messageId: "actual_stream_message",
+      missingMessageId: false,
     });
     const createCardPayload = mockCardCreate.mock.calls[0][0];
     expect(createCardPayload).toEqual({

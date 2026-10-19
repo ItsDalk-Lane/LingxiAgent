@@ -140,7 +140,8 @@ try:
   row=db.execute('SELECT agent_id,permission_mode,authorized_folders_json,memory_enabled FROM sessions WHERE session_id=?',(sid,)).fetchone();assert row==(agent,mode,json.dumps([str(cwd)],separators=(',',':')),0),row
   assert value['authorizedFolders']==[str(cwd)] and value['workspaceFolders']==[] and value['memoryMasterEnabled'] is False,value
   return sid
- assert json.loads((home/'chat-input-settings.json').read_text())['sessions'][existing_b]['model']==['global-provider','global-model']
+ # 会话创建钉入所属助手自己的模型（T08 起 agent 感知选择链）：switch-b 的既有会话钉 target，不再借服务焦点落 global。
+ assert json.loads((home/'chat-input-settings.json').read_text())['sessions'][existing_b]['model']==['target-provider','target-model']
  assert first['currentModelProvider']=='target-provider' and first['currentModelId']=='target-model'
  first_sid=check_context(first,'switch-b',selected,'read_only');assert first_sid not in [existing_a,existing_b]
  # 切换后首次真实Run必须使用新助手/新会话/新工作目录，不能落到已有B会话或全局目录。

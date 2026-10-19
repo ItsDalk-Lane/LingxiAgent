@@ -1,0 +1,50 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts (39 tests | 1 failed) 95ms
+       × 切换serverPort后迟到的目录不覆盖新目录 2ms
+ ❯ desktop/src/react/__tests__/services/channel-new-message-ws.test.ts (9 tests | 1 failed) 39ms
+     × routes a DM event to the peer of the current agent when the current agent is the sender 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/channel-new-message-ws.test.ts > dm_new_message websocket routing > routes a DM event to the peer of the current agent when the current agent is the sender
+AssertionError: expected "vi.fn()" to be called with arguments: [ 'dm:bob', true ]
+
+Number of calls: 0
+
+ ❯ desktop/src/react/__tests__/services/channel-new-message-ws.test.ts:218:29
+    216|     });
+    217|
+    218|     expect(openChannelMock).toHaveBeenCalledWith('dm:bob', true);
+       |                             ^
+    219|     expect(loadChannelsMock).not.toHaveBeenCalled();
+    220|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > 请求失败与切换保护 > 切换serverPort后迟到的目录不覆盖新目录
+Error: invalid local server port: new-selection
+ ❯ normalizePort desktop/src/react/services/server-connection.ts:128:11
+    126|   const value = Number(text);
+    127|   if (!Number.isInteger(value) || value <= 0 || value > 65535) {
+    128|     throw new Error(`invalid local server port: ${text}`);
+       |           ^
+    129|   }
+    130|   return text;
+ ❯ createLocalServerConnection desktop/src/react/services/server-connection.ts:209:16
+ ❯ resolveServerConnection desktop/src/react/services/server-connection.ts:572:10
+ ❯ key desktop/src/react/services/conversation-request-scope.ts:12:7
+ ❯ Object.isCurrent desktop/src/react/services/conversation-request-scope.ts:22:33
+ ❯ isCurrent desktop/src/react/stores/channel-actions.ts:73:33
+ ❯ loadChannels desktop/src/react/stores/channel-actions.ts:109:9
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts:810:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 5 passed (7)
+      Tests  2 failed | 100 passed (102)
+   Start at  03:59:05
+   Duration  1.55s (transform 2.10s, setup 86ms, import 3.30s, tests 722ms, environment 1.58s)
+

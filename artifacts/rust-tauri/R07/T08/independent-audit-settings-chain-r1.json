@@ -1,0 +1,69 @@
+{
+  "scope": "独立只读当前源码，未运行Cargo/未修改生产源",
+  "status": "ONE_CONFIRMED_REMAINING_CONSUMER_GAP",
+  "sourceHashes": [
+    {
+      "path": "rust/crates/lingxi-service/src/settings_configuration.rs",
+      "sha256": "a53d4f8b3c580dc735cf04e24c8997d539be583c1f6433d96306ed0d334af8f0"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agent_config_readback.rs",
+      "sha256": "e9ccc0b5c72f0576d1fc04c7592938e36e8706a27614fa13256aca0b43fc5087"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "sha256": "30e4f936a1833f2423c72138b069fbb886c5cde845b749778a4021a3c0b6b25e"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/file_safety.rs",
+      "sha256": "0e8f2d622bfc91bbba5ae9749dd62e8da438cb745679a54b60bbce0330f6d6b8"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filetools.rs",
+      "sha256": "65de7ec880afd431d0ea69d02f19f91ba1a0563ec115d27e4962e21dd820cc3e"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "sha256": "93a7add6364a0300a0bbd24995df8a7d021d2870428b2145407a912083f7bf69"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "07b98a7d051d9dd7e5a80b3d8b29d786a7e92317f0d6f8b87df05aeac0ba7486"
+    }
+  ],
+  "findings": [
+    {
+      "id": "T08-AUDIT-CHAT-CHOICE-1",
+      "priority": "P2",
+      "title": "旧会话思考设置仍读取全局模型并将其写成会话选择",
+      "source": "chat_wire.rs setting_choice/thinking_set_route",
+      "basis": "Some(id)通过owned取回会话事实却只保留owner，随后effective_choice无agent_id；thinking_set_route改变thinking_level后save_choice保存整个choice。新read_session_choice与RunService此时已通过目标agent选择models.chat。",
+      "consequence": "既有无显式会话选择、无owner草稿模型的助手b默认chat2，全局chat1：真实Run读chat2；用户仅修改thinking会在会话保存chat1，下一Run换回chat1。",
+      "minimumFix": "setting_choice的Some分支沿owned返回事实调用read_session_choice或effective_choice_for_agent(Some(agent_id))；None继续全局草稿。",
+      "requiredProof": "真实既有b会话/真实HTTP thinking GET+PUT，改变thinking后下一真实Run仍派发b默认模型；明确会话模型选择优先且不受其他agent影响。",
+      "notifiedRoot": true
+    }
+  ],
+  "checked": [
+    {
+      "area": "R2A事件",
+      "conclusion": "原遗漏分支源码已补：configPUT globals落盘后立即emit；model_error按report.applied广播；import/models prefs在实际模型applied而后续prefs失败时广播；agent配置失败只广播已完成global/model部分。新真实HTTP事件检查已存在，当前审阅不冒充已运行。"
+    },
+    {
+      "area": "R2B明确目标",
+      "conclusion": "Some(id)不再回落focus；None才focus；最终同一save_agent_config_merge重读/验证目标。新missing/invalid/legacy None测试有实际磁盘断言，待root统一运行。"
+    },
+    {
+      "area": "R2C Unix目录与私密保留",
+      "conclusion": "agent_dir_checked逐组件无跟随打开并核最终普通文件、删除标志；save固定home/agent目录句柄并复核快照。replace_private新temp0600，交换保留实际移出对象，核原identity+内容后用已打开原inode收紧权限并记retainedPrivateStamp；提交后失败转换Unknown marker，HTTP agentConfigurationSaved=null/writeMayHaveOccurred=true。未找到除上述thinking链之外的确证必修问题。"
+    },
+    {
+      "area": "跨平台限制",
+      "conclusion": "非Unix DirFd无同等目录句柄；安全状态目录写入显式Unsupported，不能把Unix代码核对或本机测试说成Windows完整通过。"
+    }
+  ]
+}

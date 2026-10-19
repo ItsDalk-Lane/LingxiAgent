@@ -75,11 +75,19 @@ fn row(file_id: &str, owner_session_id: &str, source_key: Option<&str>) -> sf::S
 
 #[test]
 fn supported_tip_matches_the_current_migration_registry() {
-    // 当前顶端固定为 v14；历史 v9、v13 的独立身份不能随顶端被改名。
-    assert_eq!(supported_version(), 14);
+    // 当前顶端固定为 v23；历史 v9、v13 的独立身份不能随顶端被改名。
+    assert_eq!(supported_version(), 23);
     let tip = MIGRATIONS.iter().last().expect("tip");
-    assert_eq!(tip.version, 14);
-    assert_eq!(tip.name, "session_proactive_delegation_at_creation");
+    assert_eq!(tip.version, 23);
+    assert_eq!(tip.name, "r07_media_gallery");
+    let v22 = MIGRATIONS.iter().find(|m| m.version == 22).expect("v22");
+    assert_eq!(v22.name, "r07_beautify_jobs");
+    let v21 = MIGRATIONS.iter().find(|m| m.version == 21).expect("v21");
+    assert_eq!(v21.name, "r07_media_jobs");
+    let v20 = MIGRATIONS.iter().find(|m| m.version == 20).expect("v20");
+    assert_eq!(v20.name, "r07_browser_authority");
+    let v19 = MIGRATIONS.iter().find(|m| m.version == 19).expect("v19");
+    assert_eq!(v19.name, "r07_conversation_phone_collab_receipts");
     let v9 = MIGRATIONS.iter().find(|m| m.version == 9).expect("v9");
     assert_eq!(v9.name, "r06_t05_session_files_resources");
     let v13 = MIGRATIONS.iter().find(|m| m.version == 13).expect("v13");
@@ -131,10 +139,13 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     .expect("seed session");
 
     let old_receipts = migration_receipts(&conn);
-    let out = apply_all(&conn, "test", 2_000).expect("apply v8..=v14");
-    assert_eq!(out.applied, vec![8, 9, 10, 11, 12, 13, 14]);
-    assert_eq!(out.current_version, 14);
-    assert_eq!(out.supported_version, 14);
+    let out = apply_all(&conn, "test", 2_000).expect("apply v8..=v23");
+    assert_eq!(
+        out.applied,
+        vec![8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+    );
+    assert_eq!(out.current_version, 23);
+    assert_eq!(out.supported_version, 23);
 
     // 旧数据零损耗。
     let title: String = conn
@@ -173,7 +184,18 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     let user_version: i64 = conn
         .pragma_query_value(None, "user_version", |r| r.get(0))
         .expect("user_version");
-    assert_eq!(user_version, 14);
+    // 当前顶端 v23（v21 r07_media_jobs、v22 r07_beautify_jobs、v23 r07_media_gallery），与
+    // supported_tip_matches_the_current_migration_registry 的登记断言一致。
+    assert_eq!(user_version, 23);
+    // v23 工作台媒体任务投影表存在且挂在媒体作业的外键上。
+    let gallery_table: i64 = conn
+        .query_row(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='media_gallery_v1'",
+            [],
+            |r| r.get(0),
+        )
+        .expect("gallery table probe");
+    assert_eq!(gallery_table, 1, "missing v23 table media_gallery_v1");
 
     // 升级前的旧会话默认关闭主动委派，且列本身有非空与默认值约束。
     let delegation: i64 = conn
@@ -200,8 +222,8 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     let registered = registry["new_persistence_points"][0]["migrations"]
         .as_array()
         .expect("registered migrations");
-    assert_eq!(registered.len(), 14);
-    assert_eq!(receipts.len(), 14);
+    assert_eq!(registered.len(), 23);
+    assert_eq!(receipts.len(), 23);
     for (receipt, registered) in receipts.iter().zip(registered) {
         assert_eq!(
             receipt.0,
@@ -225,8 +247,8 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
         .expect("schema version");
     let again = apply_all(&conn, "second-open", 3_000).expect("idempotent reopen");
     assert!(again.applied.is_empty());
-    assert_eq!(again.current_version, 14);
-    assert_eq!(again.supported_version, 14);
+    assert_eq!(again.current_version, 23);
+    assert_eq!(again.supported_version, 23);
     assert_eq!(migration_receipts(&conn), receipts);
     assert_eq!(
         conn.pragma_query_value(None, "schema_version", |r| r.get::<_, i64>(0))
@@ -236,7 +258,7 @@ fn v7_to_tip_chain_preserves_prior_data_and_creates_new_tables() {
     assert_eq!(
         conn.pragma_query_value(None, "user_version", |r| r.get::<_, i64>(0))
             .expect("unchanged version"),
-        14
+        23
     );
     let old_row: (String, String, String, i64, String, i64) = conn.query_row(
         "SELECT agent_id, owner_user_id, title, created_at_unix_ms, lifecycle, proactive_delegation FROM sessions WHERE session_id = 's-old'",

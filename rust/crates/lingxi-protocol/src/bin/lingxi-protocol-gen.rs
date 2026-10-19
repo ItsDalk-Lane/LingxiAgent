@@ -34,6 +34,241 @@ fn root_schema<T: JsonSchema>() -> Value {
 /// deterministic registration order.
 fn schema_registry() -> Vec<(&'static str, Value)> {
     vec![
+        (
+            "KeybindingsPreferences",
+            root_schema::<KeybindingsPreferences>(),
+        ),
+        ("KeybindingsUpdate", root_schema::<KeybindingsUpdate>()),
+        (
+            "SidebarProjectViewPreferences",
+            root_schema::<SidebarProjectViewPreferences>(),
+        ),
+        (
+            "SidebarSessionListRowMode",
+            root_schema::<SidebarSessionListRowMode>(),
+        ),
+        (
+            "SidebarSessionListPreferences",
+            root_schema::<SidebarSessionListPreferences>(),
+        ),
+        (
+            "SidebarUiPreferences",
+            root_schema::<SidebarUiPreferences>(),
+        ),
+        ("SidebarUiResponse", root_schema::<SidebarUiResponse>()),
+        ("SidebarUiUpdate", root_schema::<SidebarUiUpdate>()),
+        (
+            "CheckpointArchiveMetadata",
+            root_schema::<CheckpointArchiveMetadata>(),
+        ),
+        (
+            "CheckpointArchiveList",
+            root_schema::<CheckpointArchiveList>(),
+        ),
+        (
+            "McpSessionPermissionRequest",
+            root_schema::<McpSessionPermissionRequest>(),
+        ),
+        (
+            "McpSessionPermissionResponse",
+            root_schema::<McpSessionPermissionResponse>(),
+        ),
+        ("McpAppsQuery", root_schema::<McpAppsQuery>()),
+        ("McpResourceQuery", root_schema::<McpResourceQuery>()),
+        ("McpAppLaunchRequest", root_schema::<McpAppLaunchRequest>()),
+        ("McpAppDescriptor", root_schema::<McpAppDescriptor>()),
+        (
+            "McpOAuthStartResponse",
+            root_schema::<McpOAuthStartResponse>(),
+        ),
+        (
+            "McpOAuthPollResponse",
+            root_schema::<McpOAuthPollResponse>(),
+        ),
+        (
+            "McpOAuthCancelResponse",
+            root_schema::<McpOAuthCancelResponse>(),
+        ),
+        ("McpAppsResponse", root_schema::<McpAppsResponse>()),
+        (
+            "McpAppLaunchResponse",
+            root_schema::<McpAppLaunchResponse>(),
+        ),
+        (
+            "McpOAuthLogoutResponse",
+            root_schema::<McpOAuthLogoutResponse>(),
+        ),
+        ("McpSettingsAction", root_schema::<McpSettingsAction>()),
+        ("McpSettingsRequest", root_schema::<McpSettingsRequest>()),
+        ("McpSettingsStatus", root_schema::<McpSettingsStatus>()),
+        ("McpSettingsFailure", root_schema::<McpSettingsFailure>()),
+        ("McpSettingsChange", root_schema::<McpSettingsChange>()),
+        ("McpSettingsUpdate", root_schema::<McpSettingsUpdate>()),
+        ("McpSettingsResult", root_schema::<McpSettingsResult>()),
+        ("McpSettingsState", root_schema::<McpSettingsState>()),
+        (
+            "McpConnectorImportResult",
+            root_schema::<McpConnectorImportResult>(),
+        ),
+        (
+            "McpConnectorBulkResult",
+            root_schema::<McpConnectorBulkResult>(),
+        ),
+        ("InteractiveCardPut", root_schema::<InteractiveCardPut>()),
+        (
+            "InteractiveCardPutResponse",
+            root_schema::<InteractiveCardPutResponse>(),
+        ),
+        (
+            "SettingsArchiveFormat",
+            root_schema::<SettingsArchiveFormat>(),
+        ),
+        ("SettingsArchive", root_schema::<SettingsArchive>()),
+        (
+            "ModelConfigurationApplyReport",
+            root_schema::<ModelConfigurationApplyReport>(),
+        ),
+        ("AgentActivityKind", root_schema::<AgentActivityKind>()),
+        ("AgentActivityStatus", root_schema::<AgentActivityStatus>()),
+        ("WorkflowStepKind", root_schema::<WorkflowStepKind>()),
+        ("AgentActivityEntry", root_schema::<AgentActivityEntry>()),
+        (
+            "AgentActivitySnapshot",
+            root_schema::<AgentActivitySnapshot>(),
+        ),
+        (
+            "ActivitySummaryRequest",
+            root_schema::<ActivitySummaryRequest>(),
+        ),
+        (
+            "ActivitySummaryResponse",
+            root_schema::<ActivitySummaryResponse>(),
+        ),
+        ("LoopState", root_schema::<LoopState>()),
+        ("LoopStatusSnapshot", root_schema::<LoopStatusSnapshot>()),
+        (
+            "AutomationNotificationStatus",
+            root_schema::<AutomationNotificationStatus>(),
+        ),
+        (
+            "AutomationNotificationReceipt",
+            root_schema::<AutomationNotificationReceipt>(),
+        ),
+        (
+            "AutomationNotificationClaim",
+            root_schema::<AutomationNotificationClaim>(),
+        ),
+        (
+            "AutomationDisplayReceipt",
+            root_schema::<AutomationDisplayReceipt>(),
+        ),
+        (
+            "AutomationNotificationCommand",
+            root_schema::<AutomationNotificationCommand>(),
+        ),
+        (
+            "BeautifyWorkbenchTarget",
+            root_schema::<BeautifyWorkbenchTarget>(),
+        ),
+        (
+            "BeautifyUploadedImage",
+            root_schema::<BeautifyUploadedImage>(),
+        ),
+        (
+            "BeautifyApplyRequest",
+            root_schema::<BeautifyApplyRequest>(),
+        ),
+        (
+            "BeautifyPresetRequest",
+            root_schema::<BeautifyPresetRequest>(),
+        ),
+        (
+            "BeautifyGenerateRequest",
+            root_schema::<BeautifyGenerateRequest>(),
+        ),
+        ("MediaKind", root_schema::<MediaKind>()),
+        ("MediaJobPhase", root_schema::<MediaJobPhase>()),
+        ("MediaRemoteOutcome", root_schema::<MediaRemoteOutcome>()),
+        ("MediaRemoteCancel", root_schema::<MediaRemoteCancel>()),
+        ("MediaArtifact", root_schema::<MediaArtifact>()),
+        ("MediaJobReceipt", root_schema::<MediaJobReceipt>()),
+        (
+            "MediaJobListResponse",
+            root_schema::<MediaJobListResponse>(),
+        ),
+        ("MediaJobResponse", root_schema::<MediaJobResponse>()),
+        (
+            "MediaGenerationUpdate",
+            root_schema::<MediaGenerationUpdate>(),
+        ),
+        (
+            "MediaJobCancelRequest",
+            root_schema::<MediaJobCancelRequest>(),
+        ),
+        ("BrowserAction", root_schema::<BrowserAction>()),
+        ("BrowserCommand", root_schema::<BrowserCommand>()),
+        ("BrowserSettings", root_schema::<BrowserSettings>()),
+        ("BrowserOpenBehavior", root_schema::<BrowserOpenBehavior>()),
+        ("BrowserTab", root_schema::<BrowserTab>()),
+        ("BrowserWorkspace", root_schema::<BrowserWorkspace>()),
+        ("BrowserReply", root_schema::<BrowserReply>()),
+        ("BridgeRole", root_schema::<BridgeRole>()),
+        (
+            "BridgeConversationKind",
+            root_schema::<BridgeConversationKind>(),
+        ),
+        (
+            "BridgeAttachmentKind",
+            root_schema::<BridgeAttachmentKind>(),
+        ),
+        ("BridgeAttachment", root_schema::<BridgeAttachment>()),
+        ("BridgeReplyContext", root_schema::<BridgeReplyContext>()),
+        ("BridgeTargetType", root_schema::<BridgeTargetType>()),
+        ("BridgeReceiptStatus", root_schema::<BridgeReceiptStatus>()),
+        (
+            "BridgeConnectionStatus",
+            root_schema::<BridgeConnectionStatus>(),
+        ),
+        ("BridgeWorkerCommand", root_schema::<BridgeWorkerCommand>()),
+        ("BridgeWorkerEvent", root_schema::<BridgeWorkerEvent>()),
+        ("BridgeTakeoverScope", root_schema::<BridgeTakeoverScope>()),
+        (
+            "BridgeDiagnosticCommand",
+            root_schema::<BridgeDiagnosticCommand>(),
+        ),
+        ("BridgeQrcodeStatus", root_schema::<BridgeQrcodeStatus>()),
+        (
+            "BridgeDiagnosticInfo",
+            root_schema::<BridgeDiagnosticInfo>(),
+        ),
+        (
+            "BridgeDiagnosticResult",
+            root_schema::<BridgeDiagnosticResult>(),
+        ),
+        (
+            "BridgeEffectOperation",
+            root_schema::<BridgeEffectOperation>(),
+        ),
+        ("BridgeEffectStatus", root_schema::<BridgeEffectStatus>()),
+        (
+            "BridgeWaitingReceiptMode",
+            root_schema::<BridgeWaitingReceiptMode>(),
+        ),
+        ("BridgeStreamMode", root_schema::<BridgeStreamMode>()),
+        (
+            "BridgeWaitingReceiptCapability",
+            root_schema::<BridgeWaitingReceiptCapability>(),
+        ),
+        (
+            "BridgeStreamCapability",
+            root_schema::<BridgeStreamCapability>(),
+        ),
+        (
+            "BridgeEffectCapabilities",
+            root_schema::<BridgeEffectCapabilities>(),
+        ),
+        ("BridgeEffectRequest", root_schema::<BridgeEffectRequest>()),
+        ("BridgeEffectReceipt", root_schema::<BridgeEffectReceipt>()),
         ("SessionId", root_schema::<SessionId>()),
         ("RunId", root_schema::<RunId>()),
         ("AttemptId", root_schema::<AttemptId>()),
@@ -74,6 +309,24 @@ fn schema_registry() -> Vec<(&'static str, Value)> {
         ("EventPayload", root_schema::<EventPayload>()),
         ("EventEnvelope", root_schema::<EventEnvelope>()),
         ("ToolSchemaDocument", root_schema::<ToolSchemaDocument>()),
+        // R07-T09：聊天客户端只读上下文（CLI/mobile 共享；无供应商地址/凭据）。
+        ("ClientContextQuery", root_schema::<ClientContextQuery>()),
+        (
+            "ClientModelSelection",
+            root_schema::<ClientModelSelection>(),
+        ),
+        ("ClientModelState", root_schema::<ClientModelState>()),
+        ("ClientModelSummary", root_schema::<ClientModelSummary>()),
+        ("ClientModelContext", root_schema::<ClientModelContext>()),
+        ("ClientAgentSummary", root_schema::<ClientAgentSummary>()),
+        (
+            "ClientAvatarAvailability",
+            root_schema::<ClientAvatarAvailability>(),
+        ),
+        (
+            "MobileBootstrapResponse",
+            root_schema::<MobileBootstrapResponse>(),
+        ),
     ]
 }
 
@@ -320,6 +573,649 @@ const LONG_TOOL_CALL_ID: &str =
 
 fn golden_samples() -> Vec<Golden> {
     let mut out: Vec<Golden> = Vec::new();
+    push(
+        &mut out,
+        "user-preferences-KeybindingsPreferences.json",
+        "KeybindingsPreferences",
+        &serde_json::from_value::<KeybindingsPreferences>(
+            json!({"keybindings":{"app.new-session":["Alt+N"]}}),
+        )
+        .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "user-preferences-KeybindingsUpdate.json",
+        "KeybindingsUpdate",
+        &serde_json::from_value::<KeybindingsUpdate>(json!({"ok":true,"keybindings":{}}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "user-preferences-SidebarProjectViewPreferences.json",
+        "SidebarProjectViewPreferences",
+        &serde_json::from_value::<SidebarProjectViewPreferences>(
+            json!({"collapsedProjectIds":[],"collapsedFolderIds":[],"showAllProjectIds":[]}),
+        )
+        .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "user-preferences-SidebarSessionListRowMode.json",
+        "SidebarSessionListRowMode",
+        &serde_json::from_value::<SidebarSessionListRowMode>(json!("single-line"))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "user-preferences-SidebarSessionListPreferences.json",
+        "SidebarSessionListPreferences",
+        &serde_json::from_value::<SidebarSessionListPreferences>(json!({"rowMode":"single-line"}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(&mut out, "user-preferences-SidebarUiPreferences.json", "SidebarUiPreferences", &serde_json::from_value::<SidebarUiPreferences>(json!({"projectView":{"collapsedProjectIds":[],"collapsedFolderIds":[],"showAllProjectIds":[]},"sessionList":{"rowMode":"two-line"}})).expect("内置协议样本必须有效"), vec![]);
+    push(&mut out, "user-preferences-SidebarUiResponse.json", "SidebarUiResponse", &serde_json::from_value::<SidebarUiResponse>(json!({"sidebarUi":{"projectView":{"collapsedProjectIds":[],"collapsedFolderIds":[],"showAllProjectIds":[]},"sessionList":{"rowMode":"two-line"}}})).expect("内置协议样本必须有效"), vec![]);
+    push(&mut out, "user-preferences-SidebarUiUpdate.json", "SidebarUiUpdate", &serde_json::from_value::<SidebarUiUpdate>(json!({"ok":true,"sidebarUi":{"projectView":{"collapsedProjectIds":[],"collapsedFolderIds":[],"showAllProjectIds":[]},"sessionList":{"rowMode":"two-line"}}})).expect("内置协议样本必须有效"), vec![]);
+    push(&mut out, "user-preferences-CheckpointArchiveMetadata.json", "CheckpointArchiveMetadata", &serde_json::from_value::<CheckpointArchiveMetadata>(json!({"id":"fixture-archive","ts":1000,"tool":"user-edit","source":"user-edit","reason":"edit-start","path":"/owned/fixture.txt","size":3,"sessionPath":null})).expect("内置协议样本必须有效"), vec![]);
+    push(
+        &mut out,
+        "user-preferences-CheckpointArchiveList.json",
+        "CheckpointArchiveList",
+        &serde_json::from_value::<CheckpointArchiveList>(json!({"checkpoints":[]}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+
+    push(
+        &mut out,
+        "mcp-session-permission-request.json",
+        "McpSessionPermissionRequest",
+        &McpSessionPermissionRequest {
+            session_id: "session-a".into(),
+            target_id: "tool:mcp:fixture:echo".into(),
+            capability: "mcp.echo.invoke".into(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-session-permission-response.json",
+        "McpSessionPermissionResponse",
+        &McpSessionPermissionResponse {
+            ok: true,
+            session_id: "session-a".into(),
+            target_id: "tool:mcp:fixture:echo".into(),
+            capability: "mcp.echo.invoke".into(),
+            persisted: false,
+        },
+        vec![],
+    );
+
+    push(
+        &mut out,
+        "mcp-apps-McpAppsQuery.json",
+        "McpAppsQuery",
+        &serde_json::from_value::<McpAppsQuery>(json!({"agentId":null,"connectorId":null}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-apps-McpResourceQuery.json",
+        "McpResourceQuery",
+        &serde_json::from_value::<McpResourceQuery>(json!({"uri":"ui://fixture","agentId":null}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-apps-McpAppLaunchRequest.json",
+        "McpAppLaunchRequest",
+        &serde_json::from_value::<McpAppLaunchRequest>(
+            json!({"launchInput":{"query":"fixture"},"input":null,"agentId":null}),
+        )
+        .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(&mut out, "mcp-apps-McpAppDescriptor.json", "McpAppDescriptor", &serde_json::from_value::<McpAppDescriptor>(json!({"connectorId":"fixture","serverId":"fixture","toolName":"view","title":"View","description":"fixture","resourceUri":"ui://fixture","visibility":["app"],"inputSchema":{"type":"object"}})).expect("内置协议样本必须有效"), vec![]);
+    push(&mut out, "mcp-apps-McpOAuthStartResponse.json", "McpOAuthStartResponse", &serde_json::from_value::<McpOAuthStartResponse>(json!({"sessionId":"opaque-fixture-state","url":"http://127.0.0.1/authorize?state=opaque-fixture-state"})).expect("内置协议样本必须有效"), vec![]);
+    push(
+        &mut out,
+        "mcp-apps-McpOAuthPollResponse.json",
+        "McpOAuthPollResponse",
+        &serde_json::from_value::<McpOAuthPollResponse>(json!({"status":"pending"}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-apps-McpOAuthCancelResponse.json",
+        "McpOAuthCancelResponse",
+        &serde_json::from_value::<McpOAuthCancelResponse>(json!({"cancelled":1}))
+            .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(&mut out, "mcp-apps-McpAppsResponse.json", "McpAppsResponse", &serde_json::from_value::<McpAppsResponse>(json!({"apps":[{"connectorId":"fixture","serverId":"fixture","toolName":"view","title":"View","description":"fixture","resourceUri":"ui://fixture","visibility":["app"],"inputSchema":{"type":"object"}}],"state":{"config":{"enabled":false,"connectors":[]},"agentId":null,"agentConfig":{"connectors":{}},"settingsResults":[]}})).expect("内置协议样本必须有效"), vec![]);
+    push(&mut out, "mcp-apps-McpAppLaunchResponse.json", "McpAppLaunchResponse", &serde_json::from_value::<McpAppLaunchResponse>(json!({"connectorId":"fixture","serverId":"fixture","toolName":"view","title":"View","description":"fixture","resourceUri":"ui://fixture","visibility":["app"],"type":"mcp_app","launchInput":{},"binding":{"kind":"mcp-app"},"app":{"connectorId":"fixture","serverId":"fixture","toolName":"view","title":"View","description":"fixture","resourceUri":"ui://fixture","visibility":["app"],"inputSchema":{"type":"object"}}})).expect("内置协议样本必须有效"), vec![]);
+    push(&mut out, "mcp-apps-McpOAuthLogoutResponse.json", "McpOAuthLogoutResponse", &serde_json::from_value::<McpOAuthLogoutResponse>(json!({"connector":{"id":"fixture","authStatus":"needs_auth"},"state":{"config":{"enabled":false,"connectors":[]},"agentId":null,"agentConfig":{"connectors":{}},"settingsResults":[]}})).expect("内置协议样本必须有效"), vec![]);
+
+    push(
+        &mut out,
+        "mcp-settings-action.json",
+        "McpSettingsAction",
+        &McpSettingsAction::ConnectorStop,
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-status.json",
+        "McpSettingsStatus",
+        &McpSettingsStatus::Cancelled,
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-failure.json",
+        "McpSettingsFailure",
+        &McpSettingsFailure {
+            code: "mcp_connect_failed".into(),
+            message: "连接未完成".into(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-change.json",
+        "McpSettingsChange",
+        &McpSettingsChange {
+            key: "mcp.connector.stop".into(),
+            label: "fixture".into(),
+            before: "运行中".into(),
+            after: "已停用，重启后仍停用".into(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-update.json",
+        "McpSettingsUpdate",
+        &McpSettingsUpdate {
+            status: McpSettingsStatus::Applied,
+            action: "mcp.connector.stop".into(),
+            key: "mcp.connector.stop".into(),
+            title: "连接器已停用".into(),
+            summary: "fixture 已停止，重启应用后仍保持停用。".into(),
+            saved: true,
+            runtime_applied: true,
+            connector_id: Some("fixture".into()),
+            agent_id: Some("b".into()),
+            changes: vec![McpSettingsChange {
+                key: "mcp.connector.stop".into(),
+                label: "fixture".into(),
+                before: "运行中".into(),
+                after: "已停用，重启后仍停用".into(),
+            }],
+            error: None,
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-request.json",
+        "McpSettingsRequest",
+        &McpSettingsRequest {
+            action: McpSettingsAction::AgentToolEnable,
+            agent_id: Some("b".into()),
+            payload: json!({"connectorId":"fixture","toolName":"echo","enabled":false}),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-partial-failure.json",
+        "McpSettingsResult",
+        &McpSettingsResult {
+            settings_update: McpSettingsUpdate {
+                status: McpSettingsStatus::Failed,
+                action: "mcp.connector.start".into(),
+                key: "mcp.connector.start".into(),
+                title: "连接未完成".into(),
+                summary: "启动意图已保存".into(),
+                saved: true,
+                runtime_applied: false,
+                connector_id: Some("fixture".into()),
+                agent_id: None,
+                changes: vec![],
+                error: Some(McpSettingsFailure {
+                    code: "mcp_connect_failed".into(),
+                    message: "连接未完成".into(),
+                }),
+            },
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-defer-request.json",
+        "McpSettingsRequest",
+        &McpSettingsRequest {
+            action: McpSettingsAction::GlobalDefer,
+            agent_id: None,
+            payload: json!({"builtinDeferEnabled":true}),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-bulk-request.json",
+        "McpSettingsRequest",
+        &McpSettingsRequest {
+            action: McpSettingsAction::ConnectorAddBulk,
+            agent_id: None,
+            payload: json!({"connectors":[{"name":"fixture","transport":"stdio","command":"owned-fixture"}]}),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-settings-state.json",
+        "McpSettingsState",
+        &McpSettingsState {
+            config: json!({"enabled":false,"connectors":[],"builtinDeferEnabled":true}),
+            agent_id: Some("a".into()),
+            agent_config: json!({"connectors":{}}),
+            settings_results: vec![],
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-import-row.json",
+        "McpConnectorImportResult",
+        &McpConnectorImportResult {
+            ok: false,
+            id: Some("fixture".into()),
+            error: Some("启动未完成".into()),
+            saved: true,
+            runtime_applied: false,
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mcp-import-result.json",
+        "McpConnectorBulkResult",
+        &McpConnectorBulkResult {
+            settings_update: McpSettingsUpdate {
+                status: McpSettingsStatus::Failed,
+                action: "mcp.connector.add_bulk".into(),
+                key: "mcp.connector.add_bulk".into(),
+                title: "连接器已保存，部分启动未完成".into(),
+                summary: "1项已保存；启动失败不回滚配置".into(),
+                saved: true,
+                runtime_applied: false,
+                connector_id: None,
+                agent_id: None,
+                changes: vec![],
+                error: None,
+            },
+            results: vec![McpConnectorImportResult {
+                ok: false,
+                id: Some("fixture".into()),
+                error: Some("启动未完成".into()),
+                saved: true,
+                runtime_applied: false,
+            }],
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "interactive-card-put.json",
+        "InteractiveCardPut",
+        &InteractiveCardPut {
+            code: "<p>你好</p>".into(),
+            title: Some("卡片".into()),
+            vars_css: String::new(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "interactive-card-put-response.json",
+        "InteractiveCardPutResponse",
+        &InteractiveCardPutResponse {
+            ok: true,
+            frame_url: format!("/lingxi/v1/cards/example/frame/{}", "a".repeat(64)),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "settings-archive-format.json",
+        "SettingsArchiveFormat",
+        &SettingsArchiveFormat::LingxiSettings,
+        vec![],
+    );
+    push(
+        &mut out,
+        "settings-archive.json",
+        "SettingsArchive",
+        &SettingsArchive {
+            format: SettingsArchiveFormat::LingxiSettings,
+            version: 1,
+            config: json!({"locale":"zh-CN"}),
+            model_preferences: json!({"models":{"title":null}}),
+            experiments: BTreeMap::new(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "model-configuration-apply-report.json",
+        "ModelConfigurationApplyReport",
+        &ModelConfigurationApplyReport {
+            saved: true,
+            applied: true,
+            generation: 9_007_199_254_740_993,
+            activated: true,
+            cleared_bindings: vec!["knowledge".into()],
+            audit_recorded: true,
+            projection_confirmed: true,
+        },
+        vec![],
+    );
+    let activity: AgentActivityEntry = serde_json::from_value(json!({
+        "id":"workflow-owned", "kind":"workflow", "status":"running",
+        "sessionId":"session-owned", "sessionPath":"native:session-owned",
+        "agentId":null, "agentName":null, "summary":"真实后台任务",
+        "childSessionPath":null, "startedAt":1_700_000_000_000_i64, "finishedAt":null,
+        "resumeSafe":false, "futureCompatible":{"kept":true}
+    }))
+    .expect("固定活动样本");
+    push(
+        &mut out,
+        "agent-activity-snapshot.json",
+        "AgentActivitySnapshot",
+        &AgentActivitySnapshot {
+            entries: vec![activity],
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "loop-status-unconfirmed.json",
+        "LoopStatusSnapshot",
+        &LoopStatusSnapshot {
+            status: LoopState::Running,
+            turn_count: 2,
+            max_turns: Some(20),
+            paused_reason: None,
+            prompt: Some("核对文件".into()),
+            runtime_error: Some("保存失败，自动推进已停止，状态尚未确认".into()),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "activity-summary-request.json",
+        "ActivitySummaryRequest",
+        &ActivitySummaryRequest {
+            id: Some("activity-owned".into()),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "activity-summary-null.json",
+        "ActivitySummaryResponse",
+        &ActivitySummaryResponse::Summary { summary: None },
+        vec![],
+    );
+    push(
+        &mut out,
+        "activity-summary-error.json",
+        "ActivitySummaryResponse",
+        &ActivitySummaryResponse::Error {
+            error: "remote result unknown".into(),
+        },
+        vec![],
+    );
+    let target = BeautifyWorkbenchTarget {
+        kind: "workbench-file".into(),
+        mount_id: Some("mount-owned".into()),
+        root_id: None,
+        subdir: "notes".into(),
+        name: "文档.md".into(),
+    };
+    push(
+        &mut out,
+        "beautify-workbench-target.json",
+        "BeautifyWorkbenchTarget",
+        &target,
+        vec![],
+    );
+    let uploaded = BeautifyUploadedImage {
+        filename: Some("cover.png".into()),
+        content_base64: "YWJj".into(),
+    };
+    push(
+        &mut out,
+        "beautify-uploaded-image.json",
+        "BeautifyUploadedImage",
+        &uploaded,
+        vec![],
+    );
+    push(
+        &mut out,
+        "beautify-apply-request.json",
+        "BeautifyApplyRequest",
+        &BeautifyApplyRequest {
+            file_path: None,
+            target: Some(target.clone()),
+            image_file_path: None,
+            image: Some(uploaded),
+            request_id: Some("request-stable".into()),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "beautify-preset-request.json",
+        "BeautifyPresetRequest",
+        &BeautifyPresetRequest {
+            file_path: None,
+            target: Some(target.clone()),
+            preset_id: "landscape".into(),
+            request_id: Some("request-stable".into()),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "beautify-generate-request.json",
+        "BeautifyGenerateRequest",
+        &BeautifyGenerateRequest {
+            file_path: None,
+            target: Some(target),
+            executor_agent_id: Some("agent-selected".into()),
+            agent_id: None,
+            theme_tone: Some("light".into()),
+            user_guidance: Some("自然风景".into()),
+            request_id: Some("request-stable".into()),
+        },
+        vec![],
+    );
+
+    let media_job = MediaJobReceipt {
+        task_id: "media-stable-operation".into(),
+        kind: MediaKind::Image,
+        provider: "configured-provider".into(),
+        status: MediaJobPhase::Completed,
+        source_run_id: "run-source".into(),
+        execution_run_id: Some("run-media".into()),
+        revision: 9_007_199_254_740_993,
+        files: vec![MediaArtifact {
+            file_id: "file-actual".into(),
+            filename: "图片.png".into(),
+            mime: "image/png".into(),
+            size_bytes: 9_007_199_254_740_993,
+        }],
+        remote_outcome: MediaRemoteOutcome::Completed,
+        remote_cancel: None,
+        local_delivery_stopped: false,
+        message: Some("已生成并交付实际文件".into()),
+        error_code: None,
+        created_at_ms: 1_700_000_000_000,
+        updated_at_ms: 1_700_000_001_000,
+    };
+    for (file, phase) in [
+        ("media-submitting.json", MediaJobPhase::Submitting),
+        ("media-submitted.json", MediaJobPhase::Submitted),
+        ("media-generating.json", MediaJobPhase::Generating),
+        ("media-downloading.json", MediaJobPhase::Downloading),
+        ("media-completed.json", MediaJobPhase::Completed),
+        ("media-failed.json", MediaJobPhase::Failed),
+        ("media-cancelled.json", MediaJobPhase::Cancelled),
+        ("media-unknown.json", MediaJobPhase::Unknown),
+    ] {
+        let mut job = media_job.clone();
+        job.status = phase;
+        if phase != MediaJobPhase::Completed {
+            job.files.clear();
+        }
+        if phase == MediaJobPhase::Failed {
+            job.remote_outcome = MediaRemoteOutcome::Failed;
+        }
+        if phase == MediaJobPhase::Cancelled {
+            job.local_delivery_stopped = true;
+            job.remote_cancel = Some(MediaRemoteCancel::Unsupported);
+            job.message = Some("已停止本地交付；远端可能仍在运行".into());
+        }
+        push(&mut out, file, "MediaJobReceipt", &job, vec![]);
+    }
+    push(
+        &mut out,
+        "media-artifact.json",
+        "MediaArtifact",
+        &media_job.files[0],
+        vec![],
+    );
+    push(
+        &mut out,
+        "media-job-list.json",
+        "MediaJobListResponse",
+        &MediaJobListResponse {
+            jobs: vec![media_job.clone()],
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "media-job-response.json",
+        "MediaJobResponse",
+        &MediaJobResponse {
+            job: media_job.clone(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "media-generation-update.json",
+        "MediaGenerationUpdate",
+        &MediaGenerationUpdate {
+            session_id: "session-owned".into(),
+            media_generation: media_job,
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "media-cancel-request.json",
+        "MediaJobCancelRequest",
+        &MediaJobCancelRequest {},
+        vec![],
+    );
+
+    push(
+        &mut out,
+        "browser-action.json",
+        "BrowserAction",
+        &BrowserAction::Navigate,
+        vec![],
+    );
+    push(
+        &mut out,
+        "browser-settings.json",
+        "BrowserSettings",
+        &BrowserSettings::default(),
+        vec![],
+    );
+    push(
+        &mut out,
+        "browser-open-behavior.json",
+        "BrowserOpenBehavior",
+        &BrowserOpenBehavior::Smart,
+        vec![],
+    );
+    let tab = BrowserTab {
+        tab_id: "controlled-tab-1".into(),
+        title: "本地样本页面".into(),
+        url: Some("http://127.0.0.1/fixture".into()),
+        can_go_back: false,
+        can_go_forward: false,
+        created_at: "2026-10-16T00:00:00Z".into(),
+        updated_at: "2026-10-16T00:00:01Z".into(),
+    };
+    push(&mut out, "browser-tab.json", "BrowserTab", &tab, vec![]);
+    let workspace = BrowserWorkspace {
+        session_id: "sample-session".into(),
+        session_path: "native:sample-session".into(),
+        execution_node: "actual-service-node".into(),
+        running: true,
+        resumable: true,
+        unavailable_reason: None,
+        url: tab.url.clone(),
+        title: Some(tab.title.clone()),
+        active_tab_id: Some(tab.tab_id.clone()),
+        tabs: vec![tab],
+        suspended: false,
+        user_takeover: false,
+        revoked: false,
+        visible_capable: true,
+    };
+    push(
+        &mut out,
+        "browser-workspace.json",
+        "BrowserWorkspace",
+        &workspace,
+        vec![],
+    );
+    let mut browser_command = BrowserCommand::new(BrowserAction::Navigate);
+    browser_command.url = Some("http://127.0.0.1/fixture".into());
+    push(
+        &mut out,
+        "browser-command.json",
+        "BrowserCommand",
+        &browser_command,
+        vec![],
+    );
+    push(
+        &mut out,
+        "browser-reply.json",
+        "BrowserReply",
+        &BrowserReply {
+            state: workspace,
+            files: vec![],
+            downloads: vec![],
+            result: json!({"url":"http://127.0.0.1/fixture","title":"本地样本页面"}),
+        },
+        vec![],
+    );
 
     fn push<T: Serialize>(
         out: &mut Vec<Golden>,
@@ -649,6 +1545,653 @@ fn golden_samples() -> Vec<Golden> {
             "kind": "schema_verbatim",
             "note": "schema must round-trip byte-identically, x-vendor-extension included",
         })],
+    );
+
+    // 后台通知逐状态保存；领取和真实显示回执各自拥有独立的跨语言样本。
+    let display = AutomationDisplayReceipt {
+        delivery_id: "delivery-automation-1".into(),
+        channel: "desktop".into(),
+        displayed: true,
+    };
+    let mut started_receipt = None;
+    for (file, status) in [
+        (
+            "automation-notification-queued.json",
+            AutomationNotificationStatus::Queued,
+        ),
+        (
+            "automation-notification-started.json",
+            AutomationNotificationStatus::Started,
+        ),
+        (
+            "automation-notification-confirmed.json",
+            AutomationNotificationStatus::Confirmed,
+        ),
+        (
+            "automation-notification-unknown.json",
+            AutomationNotificationStatus::Unknown,
+        ),
+        (
+            "automation-notification-failed.json",
+            AutomationNotificationStatus::Failed,
+        ),
+    ] {
+        let receipt = AutomationNotificationReceipt {
+            delivery_id:"delivery-automation-1".into(),trigger_id:Some("trigger-automation-1".into()),run_id:Some("run-automation-1".into()),
+            channel:"desktop".into(),recipient:"user_local".into(),
+            payload_json:json!({"title":"合成提醒","body":"任务完成","sessionId":"activity-1","runId":"run-automation-1"}).to_string(),
+            status,platform_receipt:if status==AutomationNotificationStatus::Confirmed {Some(serde_json::to_value(&display).unwrap())}else{None},
+            error:match status {AutomationNotificationStatus::Unknown=>Some("显示结果未确认，禁止重发".into()),AutomationNotificationStatus::Failed=>Some("桌面系统未确认显示".into()),_=>None},
+            created_at:1_800_000_000_000,updated_at:1_800_000_000_001,
+        };
+        if status == AutomationNotificationStatus::Started {
+            started_receipt = Some(receipt.clone());
+        }
+        push(
+            &mut out,
+            file,
+            "AutomationNotificationReceipt",
+            &receipt,
+            vec![],
+        );
+    }
+    push(
+        &mut out,
+        "bridge-connection-status.json",
+        "BridgeConnectionStatus",
+        &BridgeConnectionStatus::Disconnected,
+        vec![],
+    );
+    for (file, status) in [
+        (
+            "bridge-worker-connecting.json",
+            BridgeConnectionStatus::Connecting,
+        ),
+        (
+            "bridge-worker-connected.json",
+            BridgeConnectionStatus::Connected,
+        ),
+        (
+            "bridge-worker-disconnected.json",
+            BridgeConnectionStatus::Disconnected,
+        ),
+    ] {
+        push(
+            &mut out,
+            file,
+            "BridgeWorkerEvent",
+            &BridgeWorkerEvent::ConnectionStatus {
+                connector_id: "connector-1".into(),
+                generation: 7,
+                status,
+                error: (status == BridgeConnectionStatus::Disconnected)
+                    .then(|| "platform_connection_unavailable".into()),
+            },
+            vec![],
+        );
+    }
+    push(
+        &mut out,
+        "automation-notification-status.json",
+        "AutomationNotificationStatus",
+        &AutomationNotificationStatus::Started,
+        vec![],
+    );
+    push(
+        &mut out,
+        "automation-notification-claim.json",
+        "AutomationNotificationClaim",
+        &AutomationNotificationClaim {
+            reserved: true,
+            receipt: started_receipt.unwrap(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "automation-display-receipt.json",
+        "AutomationDisplayReceipt",
+        &display,
+        vec![],
+    );
+    for (file, command) in [
+        (
+            "automation-command-claim.json",
+            AutomationNotificationCommand::Claim {
+                delivery_id: display.delivery_id.clone(),
+            },
+        ),
+        (
+            "automation-command-ack.json",
+            AutomationNotificationCommand::Ack {
+                delivery_id: display.delivery_id.clone(),
+                platform_receipt: display.clone(),
+            },
+        ),
+        (
+            "automation-command-failed.json",
+            AutomationNotificationCommand::Failed {
+                delivery_id: display.delivery_id.clone(),
+                error: "桌面系统未确认显示".into(),
+            },
+        ),
+        (
+            "automation-command-unknown.json",
+            AutomationNotificationCommand::Unknown {
+                delivery_id: display.delivery_id.clone(),
+                error: "展示结果未确认，禁止重发".into(),
+            },
+        ),
+    ] {
+        command.validate().expect("生成的通知命令必须满足回执约束");
+        push(
+            &mut out,
+            file,
+            "AutomationNotificationCommand",
+            &command,
+            vec![],
+        );
+    }
+
+    // 五个平台的回发上下文、附件事实和三种真实回执都经过同一闭合类型。
+    let context: BridgeReplyContext = serde_json::from_value(json!({"messageId":"platform-msg","messageThreadId":42,"contextToken":"微信上下文","targetChatId":"actual-user","isGroup":false,"targetType":"user","guildId":"guild","channelId":"channel","rootId":"root","parentId":"parent","text":"原消息","senderId":"sender"})).unwrap();
+    let attachment = BridgeAttachment {
+        attachment_id: "bytes-1".into(),
+        kind: BridgeAttachmentKind::File,
+        platform_ref: Some("platform-file".into()),
+        filename: Some("资料.txt".into()),
+        mime: Some("text/plain".into()),
+        size_bytes: Some(12),
+    };
+    push(
+        &mut out,
+        "bridge-role.json",
+        "BridgeRole",
+        &BridgeRole::Owner,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-conversation.json",
+        "BridgeConversationKind",
+        &BridgeConversationKind::Dm,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-attachment-kind.json",
+        "BridgeAttachmentKind",
+        &BridgeAttachmentKind::File,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-target-type.json",
+        "BridgeTargetType",
+        &BridgeTargetType::User,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-attachment.json",
+        "BridgeAttachment",
+        &attachment,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-context.json",
+        "BridgeReplyContext",
+        &context,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-command-send.json",
+        "BridgeWorkerCommand",
+        &BridgeWorkerCommand::Send {
+            connector_id: "connector-1".into(),
+            generation: 7,
+            dispatch_seq: Some(1),
+            delivery_id: "delivery-1".into(),
+            conversation_id: "dm-1".into(),
+            text: "真实回复".into(),
+            reply_context: Some(context.clone()),
+            attachments: vec!["bytes-1".into()],
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-message.json",
+        "BridgeWorkerEvent",
+        &BridgeWorkerEvent::Message {
+            connector_id: "connector-1".into(),
+            generation: 7,
+            message_id: "platform-msg".into(),
+            conversation_id: "dm-1".into(),
+            conversation_kind: BridgeConversationKind::Dm,
+            sender_id: "sender".into(),
+            display_name: Some("平台公开昵称".into()),
+            avatar_url: Some("https://example.invalid/public-avatar.png".into()),
+            text: "请读取附件".into(),
+            attachments: vec![attachment],
+            reply_context: Some(Box::new(context)),
+        },
+        vec![],
+    );
+    for (file, status) in [
+        (
+            "bridge-receipt-confirmed.json",
+            BridgeReceiptStatus::Confirmed,
+        ),
+        ("bridge-receipt-failed.json", BridgeReceiptStatus::Failed),
+        ("bridge-receipt-unknown.json", BridgeReceiptStatus::Unknown),
+    ] {
+        push(
+            &mut out,
+            file,
+            "BridgeWorkerEvent",
+            &BridgeWorkerEvent::Receipt {
+                connector_id: "connector-1".into(),
+                generation: 7,
+                delivery_id: "delivery-1".into(),
+                status,
+                platform_message_ids: if status == BridgeReceiptStatus::Confirmed {
+                    vec!["actual-platform-id".into()]
+                } else {
+                    vec![]
+                },
+                error: if status == BridgeReceiptStatus::Confirmed {
+                    None
+                } else {
+                    Some("未取得真实确认".into())
+                },
+            },
+            vec![],
+        );
+    }
+    push(
+        &mut out,
+        "bridge-receipt-status.json",
+        "BridgeReceiptStatus",
+        &BridgeReceiptStatus::Unknown,
+        vec![],
+    );
+
+    let takeover = BridgeTakeoverScope {
+        actor_subject: bridge_subject("telegram", "connector-1", "sender").unwrap(),
+        session_id: "desktop-selected-1".into(),
+    };
+    push(
+        &mut out,
+        "bridge-takeover-scope.json",
+        "BridgeTakeoverScope",
+        &takeover,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-diagnostic-command.json",
+        "BridgeDiagnosticCommand",
+        &BridgeDiagnosticCommand::Verify {
+            platform: "telegram".into(),
+            config: json!({"botToken":"synthetic-only"}),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-qrcode-status.json",
+        "BridgeQrcodeStatus",
+        &BridgeQrcodeStatus::Waiting,
+        vec![],
+    );
+    let info = BridgeDiagnosticInfo {
+        username: Some("synthetic_bot".into()),
+        name: Some("测试机器人".into()),
+        msg: None,
+        credential_ok: Some(true),
+        auth_mode: Some("token".into()),
+    };
+    push(
+        &mut out,
+        "bridge-diagnostic-info.json",
+        "BridgeDiagnosticInfo",
+        &info,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-diagnostic-result.json",
+        "BridgeDiagnosticResult",
+        &BridgeDiagnosticResult::DiagnosticResult {
+            ok: true,
+            info: Some(info),
+            qrcode_url: None,
+            qrcode_id: None,
+            status: None,
+            bot_token: None,
+            bot_id: None,
+            user_id: None,
+            base_url: None,
+            error: None,
+        },
+        vec![],
+    );
+
+    let receipt_cap = BridgeWaitingReceiptCapability {
+        mode: BridgeWaitingReceiptMode::NativeTyping,
+        scopes: vec![BridgeConversationKind::Dm, BridgeConversationKind::Group],
+        refresh_interval_ms: 4000,
+        cancellable: false,
+    };
+    let stream_cap = BridgeStreamCapability {
+        mode: BridgeStreamMode::RichDraft,
+        scopes: vec![BridgeConversationKind::Dm],
+        min_interval_ms: 500,
+        max_chars: 32768,
+        rich: true,
+        receipt_folded: false,
+    };
+    let capabilities = BridgeEffectCapabilities {
+        receipt: receipt_cap.clone(),
+        streams: vec![stream_cap.clone()],
+    };
+    let effect_context: BridgeReplyContext =
+        serde_json::from_value(json!({"isGroup":false,"messageId":"actual-inbound"})).unwrap();
+    let effect = BridgeEffectRequest {
+        effect_id: "effect-1".into(),
+        stream_id: "stream-1".into(),
+        inbox_id: "actual-inbox".into(),
+        run_id: "actual-run".into(),
+        sequence: 1,
+        operation: BridgeEffectOperation::StreamUpdate,
+        delivery_id: None,
+        conversation_id: "actual-dm".into(),
+        reply_context: effect_context,
+        text: "未经最终确认的预览".into(),
+        rich: true,
+    };
+    push(
+        &mut out,
+        "bridge-effect-operation.json",
+        "BridgeEffectOperation",
+        &BridgeEffectOperation::StreamUpdate,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-effect-status.json",
+        "BridgeEffectStatus",
+        &BridgeEffectStatus::Unknown,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-waiting-receipt-mode.json",
+        "BridgeWaitingReceiptMode",
+        &BridgeWaitingReceiptMode::NativeTyping,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-stream-mode.json",
+        "BridgeStreamMode",
+        &BridgeStreamMode::RichDraft,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-waiting-receipt-capability.json",
+        "BridgeWaitingReceiptCapability",
+        &receipt_cap,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-stream-capability.json",
+        "BridgeStreamCapability",
+        &stream_cap,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-effect-capabilities.json",
+        "BridgeEffectCapabilities",
+        &capabilities,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-worker-ready-capabilities.json",
+        "BridgeWorkerEvent",
+        &BridgeWorkerEvent::Ready {
+            connector_id: "connector-1".into(),
+            generation: 7,
+            capabilities: Some(capabilities),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-effect-request.json",
+        "BridgeEffectRequest",
+        &effect,
+        vec![],
+    );
+    push(
+        &mut out,
+        "bridge-worker-effect.json",
+        "BridgeWorkerCommand",
+        &BridgeWorkerCommand::Effect {
+            connector_id: "connector-1".into(),
+            generation: 7,
+            dispatch_seq: Some(2),
+            effect,
+        },
+        vec![],
+    );
+    for (file, status, ack, ids, error) in [
+        (
+            "bridge-effect-confirmed.json",
+            BridgeEffectStatus::Confirmed,
+            true,
+            vec!["actual-native-message".into()],
+            None,
+        ),
+        (
+            "bridge-effect-unknown.json",
+            BridgeEffectStatus::Unknown,
+            false,
+            vec![],
+            Some("native_outcome_unconfirmed".into()),
+        ),
+        (
+            "bridge-effect-skipped.json",
+            BridgeEffectStatus::Skipped,
+            false,
+            vec![],
+            Some("native_cleanup_not_supported".into()),
+        ),
+    ] {
+        let receipt = BridgeEffectReceipt {
+            effect_id: "effect-final".into(),
+            stream_id: "stream-1".into(),
+            sequence: 3,
+            operation: BridgeEffectOperation::StreamFinish,
+            delivery_id: Some("real-final-outbox".into()),
+            status,
+            platform_ack: ack,
+            platform_message_ids: ids,
+            error,
+        };
+        receipt.validate().unwrap();
+        push(&mut out, file, "BridgeEffectReceipt", &receipt, vec![]);
+        if status == BridgeEffectStatus::Confirmed {
+            push(
+                &mut out,
+                "bridge-worker-effect-receipt.json",
+                "BridgeWorkerEvent",
+                &BridgeWorkerEvent::EffectReceipt {
+                    connector_id: "connector-1".into(),
+                    generation: 7,
+                    receipt,
+                },
+                vec![],
+            );
+        }
+    }
+
+    // R07-T09：聊天客户端只读上下文样本。代次必须是十进制字符串；
+    // nullable defaultThinkingLevel 保持 null，不得省略或改写为 "auto"。
+    let client_model = ClientModelSummary {
+        id: "claude-example-1".into(),
+        name: "示例对话模型".into(),
+        provider: "anthropic".into(),
+        is_current: true,
+        reasoning: true,
+        xhigh: true,
+        thinking_levels: vec!["off".into(), "medium".into(), "high".into()],
+        default_thinking_level: None,
+        audio: false,
+        audio_transport: None,
+        audio_transport_supported: false,
+        input: vec!["text".into(), "image".into()],
+    };
+    push(
+        &mut out,
+        "client-context-query.json",
+        "ClientContextQuery",
+        &serde_json::from_value::<ClientContextQuery>(
+            json!({"agentId":"agent-owned","sessionId":null}),
+        )
+        .expect("内置协议样本必须有效"),
+        vec![],
+    );
+    push(
+        &mut out,
+        "client-model-selection.json",
+        "ClientModelSelection",
+        &ClientModelSelection {
+            id: client_model.id.clone(),
+            provider: client_model.provider.clone(),
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "client-model-state.json",
+        "ClientModelState",
+        &ClientModelState::Ready,
+        vec![],
+    );
+    push(
+        &mut out,
+        "client-model-summary.json",
+        "ClientModelSummary",
+        &client_model,
+        vec![json!({
+            "kind": "nullable_default_thinking_level",
+            "field": "defaultThinkingLevel",
+            "note": "null must round-trip as null; consumers normalize it, never fabricate a level",
+        })],
+    );
+    push(
+        &mut out,
+        "client-model-context.json",
+        "ClientModelContext",
+        &ClientModelContext {
+            models: vec![client_model.clone()],
+            active_model: Some(ClientModelSelection {
+                id: client_model.id.clone(),
+                provider: client_model.provider.clone(),
+            }),
+            model_state: ClientModelState::Ready,
+            // 超过 2^53-1 的真实代次：TS 不得用 Number 承载。
+            model_generation: "9007199254740993".into(),
+            thinking_level: "medium".into(),
+        },
+        vec![json!({
+            "kind": "decimal_string_generation",
+            "field": "modelGeneration",
+            "note": "generation exceeds 2^53-1; TS must keep it a string, never a Number",
+        })],
+    );
+    push(
+        &mut out,
+        "client-agent-summary.json",
+        "ClientAgentSummary",
+        &ClientAgentSummary {
+            id: "agent-owned".into(),
+            name: "灵犀助手".into(),
+            yuan: "lingxi".into(),
+            is_primary: true,
+            is_current: true,
+            has_avatar: true,
+            home_folder: None,
+            effective_home_folder: None,
+            memory_master_enabled: true,
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "client-avatar-availability.json",
+        "ClientAvatarAvailability",
+        &ClientAvatarAvailability {
+            agent: true,
+            user: false,
+        },
+        vec![],
+    );
+    push(
+        &mut out,
+        "mobile-bootstrap-response.json",
+        "MobileBootstrapResponse",
+        &MobileBootstrapResponse {
+            locale: "zh-CN".into(),
+            agent_name: "灵犀助手".into(),
+            user_name: "本机用户".into(),
+            current_agent_id: Some("agent-owned".into()),
+            agent_yuan: "lingxi".into(),
+            home_folder: None,
+            cwd_history: vec![],
+            memory_master_enabled: true,
+            memory_enabled: true,
+            thinking_level: "medium".into(),
+            permission_mode: "ask".into(),
+            appearance: json!({"theme":"dark"}),
+            editor: json!({"fontSize":14}),
+            chat: json!({"layout":"bubbles"}),
+            avatars: ClientAvatarAvailability {
+                agent: true,
+                user: false,
+            },
+            agents: vec![ClientAgentSummary {
+                id: "agent-owned".into(),
+                name: "灵犀助手".into(),
+                yuan: "lingxi".into(),
+                is_primary: true,
+                is_current: true,
+                has_avatar: true,
+                home_folder: None,
+                effective_home_folder: None,
+                memory_master_enabled: true,
+            }],
+            models: vec![client_model.clone()],
+            active_model: Some(ClientModelSelection {
+                id: client_model.id.clone(),
+                provider: client_model.provider.clone(),
+            }),
+            current_model: Some(ClientModelSelection {
+                id: client_model.id.clone(),
+                provider: client_model.provider.clone(),
+            }),
+            model_state: ClientModelState::Ready,
+            model_generation: "9007199254740993".into(),
+        },
+        vec![],
     );
 
     out

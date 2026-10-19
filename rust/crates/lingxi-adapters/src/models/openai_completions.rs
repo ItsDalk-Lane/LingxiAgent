@@ -574,6 +574,11 @@ pub fn render_chat_request(
             // R06-T02: 请求作用域的压缩指令（仅出现在摘要调用自身的
             // prior 末尾；永不进入 run 的 live exchange——kernel planner
             // 对携带它的交换响亮拒绝）。
+            ExchangeItem::HostNotice { delivery_id, text } => {
+                messages.push(RequestMessage::User {
+                    content: lingxi_kernel::model_exchange::render_host_notice(delivery_id, text),
+                });
+            }
             ExchangeItem::CompactionInstruction { text } => {
                 messages.push(RequestMessage::User {
                     content: text.clone(),

@@ -1,0 +1,53 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running tests/r04_t06_sandbox.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t06_sandbox-0d038693f3adb00b)
+
+running 10 tests
+test r04_a11_missing_helper_at_composition_is_a_loud_refusal ... ok
+test seatbelt_helper_trust_and_capabilities_are_recorded ... ok
+test r04_a11_unsupported_backend_refuses_through_the_real_chain ... ok
+test r04_a12_environment_whitelist_holds_through_the_sandbox_wrapper ... ok
+test r04_a11_replaced_helper_is_refused_and_the_impostor_never_runs ... ok
+test adversarial_policy_injection_is_refused_at_both_layers ... ok
+test r04_a12_filesystem_write_isolation_holds_with_real_sentinels ... FAILED
+test adversarial_tty_terminals_are_honestly_not_claimed_as_contained ... ok
+test r04_a12_network_isolation_against_the_registered_loopback_service ... ok
+test r04_a12_sandboxed_process_tree_still_honors_the_cancellation_chain ... ok
+
+failures:
+
+---- r04_a12_filesystem_write_isolation_holds_with_real_sentinels stdout ----
+
+thread 'r04_a12_filesystem_write_isolation_holds_with_real_sentinels' (4789184) panicked at crates/lingxi-service/tests/r04_t06_sandbox.rs:553:5:
+the write must fail: (no output)
+
+sandbox: seatbelt (contained; filesystem writes scoped to the authorized roots, network denied)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r04_a12_filesystem_write_isolation_holds_with_real_sentinels
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.66s
+
+error: test failed, to rerun pass `-p lingxi-service --test r04_t06_sandbox`

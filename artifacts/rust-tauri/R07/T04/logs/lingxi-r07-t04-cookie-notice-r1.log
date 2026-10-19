@@ -1,0 +1,818 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx (10 tests | 5 failed) 248ms
+     × shows the real Cookie policy restart impact beside the toggle in zh 94ms
+     × shows the real Cookie policy restart impact beside the toggle in en 12ms
+     × shows the real Cookie policy restart impact beside the toggle in ja 12ms
+     × shows the real Cookie policy restart impact beside the toggle in ko 9ms
+     × shows the real Cookie policy restart impact beside the toggle in zh-TW 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx > Rust browser settings UI with actual HTTP mapping > shows the real Cookie policy restart impact beside the toggle in zh
+TestingLibraryElementError: Unable to find an element with the text: 更改 Cookie 策略会关闭当前受控页面。网址和已有登录资料会保留，未提交的表单内容可能丢失；重新打开后生效。. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"browser"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_0_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_0_-title"[39m
+          [36m>[39m
+            [0msettings.browser.cookiesTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookiesHint[0m
+                [36m<br />[39m
+                [0m更改 Cookie 策略会关闭当前受控页面。网址和已有登录资料会保留，未提交的表单内容可能丢失；重新打开后生效。[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-checked[39m=[32m"true"[39m
+                [33maria-label[39m=[32m"settings.browser.acceptCookies"[39m
+                [33mrole[39m=[32m"switch"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_quick-chat-reset-button_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesButton[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_1_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_1_-title"[39m
+          [36m>[39m
+            [0msettings.browser.agentTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehavior[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehaviorHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<select[39m
+                [33maria-label[39m=[32m"behavior"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"current_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorCurrentTab[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"new_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorNewTab[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx:34:25
+     32|     render(<BrowserTab />);
+     33|     await waitFor(() => expect(screen.getByRole('switch')).toBeEnabled…
+     34|     const hint = screen.getByText(notice);
+       |                         ^
+     35|     expect(hint).toBeVisible();
+     36|     expect(hint.parentElement?.parentElement).toContainElement(screen.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx > Rust browser settings UI with actual HTTP mapping > shows the real Cookie policy restart impact beside the toggle in en
+TestingLibraryElementError: Unable to find an element with the text: Changing the Cookie policy closes the current controlled pages. URLs and existing sign-in data are kept, but unsubmitted form changes may be lost. Reopen the pages to use the new policy.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"browser"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_2_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_2_-title"[39m
+          [36m>[39m
+            [0msettings.browser.cookiesTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookiesHint[0m
+                [36m<br />[39m
+                [0mChanging the Cookie policy closes the current controlled pages. URLs and existing sign-in data are kept, but unsubmitted form changes may be lost. Reopen the pages to use the new policy.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-checked[39m=[32m"true"[39m
+                [33maria-label[39m=[32m"settings.browser.acceptCookies"[39m
+                [33mrole[39m=[32m"switch"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_quick-chat-reset-button_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesButton[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_3_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_3_-title"[39m
+          [36m>[39m
+            [0msettings.browser.agentTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehavior[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehaviorHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<select[39m
+                [33maria-label[39m=[32m"behavior"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"current_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorCurrentTab[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"new_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorNewTab[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx:34:25
+     32|     render(<BrowserTab />);
+     33|     await waitFor(() => expect(screen.getByRole('switch')).toBeEnabled…
+     34|     const hint = screen.getByText(notice);
+       |                         ^
+     35|     expect(hint).toBeVisible();
+     36|     expect(hint.parentElement?.parentElement).toContainElement(screen.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx > Rust browser settings UI with actual HTTP mapping > shows the real Cookie policy restart impact beside the toggle in ja
+TestingLibraryElementError: Unable to find an element with the text: Cookie 方針を変更すると、現在の操作対象ページが閉じます。URL と既存のログイン情報は保持されますが、未送信のフォーム内容は失われる場合があります。ページを開き直すと新しい方針が適用されます。. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"browser"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_4_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_4_-title"[39m
+          [36m>[39m
+            [0msettings.browser.cookiesTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookiesHint[0m
+                [36m<br />[39m
+                [0mCookie 方針を変更すると、現在の操作対象ページが閉じます。URL と既存のログイン情報は保持されますが、未送信のフォーム内容は失われる場合があります。ページを開き直すと新しい方針が適用されます。[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-checked[39m=[32m"true"[39m
+                [33maria-label[39m=[32m"settings.browser.acceptCookies"[39m
+                [33mrole[39m=[32m"switch"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_quick-chat-reset-button_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesButton[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_5_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_5_-title"[39m
+          [36m>[39m
+            [0msettings.browser.agentTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehavior[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehaviorHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<select[39m
+                [33maria-label[39m=[32m"behavior"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"current_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorCurrentTab[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"new_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorNewTab[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx:34:25
+     32|     render(<BrowserTab />);
+     33|     await waitFor(() => expect(screen.getByRole('switch')).toBeEnabled…
+     34|     const hint = screen.getByText(notice);
+       |                         ^
+     35|     expect(hint).toBeVisible();
+     36|     expect(hint.parentElement?.parentElement).toContainElement(screen.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx > Rust browser settings UI with actual HTTP mapping > shows the real Cookie policy restart impact beside the toggle in ko
+TestingLibraryElementError: Unable to find an element with the text: Cookie 정책을 바꾸면 현재 제어 중인 페이지가 닫힙니다. URL과 기존 로그인 정보는 유지되지만, 제출하지 않은 양식 내용은 사라질 수 있습니다. 페이지를 다시 열면 새 정책이 적용됩니다.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"browser"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_6_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_6_-title"[39m
+          [36m>[39m
+            [0msettings.browser.cookiesTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookiesHint[0m
+                [36m<br />[39m
+                [0mCookie 정책을 바꾸면 현재 제어 중인 페이지가 닫힙니다. URL과 기존 로그인 정보는 유지되지만, 제출하지 않은 양식 내용은 사라질 수 있습니다. 페이지를 다시 열면 새 정책이 적용됩니다.[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-checked[39m=[32m"true"[39m
+                [33maria-label[39m=[32m"settings.browser.acceptCookies"[39m
+                [33mrole[39m=[32m"switch"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_quick-chat-reset-button_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesButton[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_7_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_7_-title"[39m
+          [36m>[39m
+            [0msettings.browser.agentTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehavior[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehaviorHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<select[39m
+                [33maria-label[39m=[32m"behavior"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"current_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorCurrentTab[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"new_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorNewTab[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx:34:25
+     32|     render(<BrowserTab />);
+     33|     await waitFor(() => expect(screen.getByRole('switch')).toBeEnabled…
+     34|     const hint = screen.getByText(notice);
+       |                         ^
+     35|     expect(hint).toBeVisible();
+     36|     expect(hint.parentElement?.parentElement).toContainElement(screen.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx > Rust browser settings UI with actual HTTP mapping > shows the real Cookie policy restart impact beside the toggle in zh-TW
+TestingLibraryElementError: Unable to find an element with the text: 更改 Cookie 策略會關閉目前受控的頁面。網址和既有登入資料會保留，未送出的表單內容可能遺失；重新開啟後生效。. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_settings-tab-content_4045f0 _active_4045f0"[39m
+      [33mdata-tab[39m=[32m"browser"[39m
+    [36m>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_8_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_8_-title"[39m
+          [36m>[39m
+            [0msettings.browser.cookiesTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.acceptCookiesHint[0m
+                [36m<br />[39m
+                [0m更改 Cookie 策略會關閉目前受控的頁面。網址和既有登入資料會保留，未送出的表單內容可能遺失；重新開啟後生效。[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-checked[39m=[32m"true"[39m
+                [33maria-label[39m=[32m"settings.browser.acceptCookies"[39m
+                [33mrole[39m=[32m"switch"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookies[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_quick-chat-reset-button_4045f0"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.browser.clearCookiesButton[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_9_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_9_-title"[39m
+          [36m>[39m
+            [0msettings.browser.agentTitle[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehavior[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.browser.agentOpenBehaviorHint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<select[39m
+                [33maria-label[39m=[32m"behavior"[39m
+              [36m>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"current_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorCurrentTab[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"new_tab"[39m
+                [36m>[39m
+                  [0msettings.browser.agentOpenBehaviorNewTab[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx:34:25
+     32|     render(<BrowserTab />);
+     33|     await waitFor(() => expect(screen.getByRole('switch')).toBeEnabled…
+     34|     const hint = screen.getByText(notice);
+       |                         ^
+     35|     expect(hint).toBeVisible();
+     36|     expect(hint.parentElement?.parentElement).toContainElement(screen.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 5 passed (10)
+   Start at  06:02:31
+   Duration  1.26s (transform 349ms, setup 22ms, import 565ms, tests 248ms, environment 365ms)
+

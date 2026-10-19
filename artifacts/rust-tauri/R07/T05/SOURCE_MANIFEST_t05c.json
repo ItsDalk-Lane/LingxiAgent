@@ -1,0 +1,2211 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05c",
+  "supersedes": "t05b",
+  "supersedeReason": "新增 apply-cover-candidate 直调集成用例（叶 3F4FF7BA0528 覆盖缺口）；t05a/t05b 回执全部保留",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "frozenAt": "2026-10-16T04:52:23.704553+00:00",
+  "workingTreeCodeFingerprint": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+  "baseCandidate": "T04/r7",
+  "files": [
+    {
+      "path": "contracts/generated/MANIFEST.json",
+      "sha256": "507039be327f0f099407ec13cb1d48bd6dfe08475624727aa6fa4e14d5d4b668",
+      "bytes": 18831
+    },
+    {
+      "path": "contracts/generated/golden/automation-command-ack.json",
+      "sha256": "521dac958318544f9f1771aeb863ac17a5988c681532fdde88ef3c03035c47d9",
+      "bytes": 147
+    },
+    {
+      "path": "contracts/generated/golden/automation-command-claim.json",
+      "sha256": "d7f1f3d3f7fea51e8a1d267d652c464e79e6245a4a2fd56ded7bda5c80b71cd0",
+      "bytes": 55
+    },
+    {
+      "path": "contracts/generated/golden/automation-command-failed.json",
+      "sha256": "d5d89d63cfdfbee022ae854278e4f4f9c0d239ad91b274943732d7d1b2d51d34",
+      "bytes": 94
+    },
+    {
+      "path": "contracts/generated/golden/automation-command-unknown.json",
+      "sha256": "f9c30300a6a9f29a65aea1871b1faacdb54fc92599d5bb1aaa189a43ac4aabbb",
+      "bytes": 104
+    },
+    {
+      "path": "contracts/generated/golden/automation-display-receipt.json",
+      "sha256": "d1506755e6a47d349da4f41a2bf2f031c28761179b680c61f265c397f33b2a2d",
+      "bytes": 75
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-claim.json",
+      "sha256": "31bf403b24b919bbe51c0d8811c91af0c7d25f22fad331928ea1c6c571556592",
+      "bytes": 411
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-confirmed.json",
+      "sha256": "aae0e6fbd3023ea084ab9958a5d635115621f71a30267ba1e7d6e66cd31862cc",
+      "bytes": 456
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-failed.json",
+      "sha256": "c2dea337d5d3ef64d1e83ae1124c3b3a3a625b14fb98037832ffe34e838e63d8",
+      "bytes": 407
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-queued.json",
+      "sha256": "18302a9ada7e69a979e67dd0d7a1af60a6b7858cf90a9d723bba3a111820fd90",
+      "bytes": 382
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-started.json",
+      "sha256": "a892b17c91b279d9186afd9982a10783bc43820b426dc2addc1df7ad22451c33",
+      "bytes": 383
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-status.json",
+      "sha256": "66967c3c8be87735db13483ffcf1634b42ed82f19718e488c07e01322ef6d23b",
+      "bytes": 9
+    },
+    {
+      "path": "contracts/generated/golden/automation-notification-unknown.json",
+      "sha256": "3cb273ddb633b87d5481384c6b8e94c6404e3afce1228b86331d6273f4fa17a5",
+      "bytes": 417
+    },
+    {
+      "path": "contracts/generated/golden/bridge-attachment-kind.json",
+      "sha256": "bfdde6f5651ac5e4e6711f3c2836d5f8c5c4b381a50eb87c51d990b7eb36501b",
+      "bytes": 6
+    },
+    {
+      "path": "contracts/generated/golden/bridge-attachment.json",
+      "sha256": "c34c454cb906bdb090795010c3685e0f7224f6181f387b6444c2507a751116a1",
+      "bytes": 129
+    },
+    {
+      "path": "contracts/generated/golden/bridge-command-send.json",
+      "sha256": "be706a318275a45c9436d0895108bff1619e77e531b5f3849f5fd9fe365ff6b4",
+      "bytes": 450
+    },
+    {
+      "path": "contracts/generated/golden/bridge-connection-status.json",
+      "sha256": "47bbb290d0c629cb5eab53b5dce4a1447f043488c56d6ca02ab3241f23b715b8",
+      "bytes": 14
+    },
+    {
+      "path": "contracts/generated/golden/bridge-context.json",
+      "sha256": "a4ffe088061c95c3f12cbd18ad408323cb0ce8ad79688fd886e73268e027fc66",
+      "bytes": 262
+    },
+    {
+      "path": "contracts/generated/golden/bridge-conversation.json",
+      "sha256": "c5890db8f49cbeba598adf6b91a1f65a26e519a945095616d3f7559509e3b301",
+      "bytes": 4
+    },
+    {
+      "path": "contracts/generated/golden/bridge-diagnostic-command.json",
+      "sha256": "177ffa1fe2345d86996db746e6368856054d8c28e1ff9cfc49eccdb1f9decfdf",
+      "bytes": 78
+    },
+    {
+      "path": "contracts/generated/golden/bridge-diagnostic-info.json",
+      "sha256": "9793c2a6aa80ecef4175c811ca3481b0cbde9f9b82589cc26dbdc263e2df4b29",
+      "bytes": 103
+    },
+    {
+      "path": "contracts/generated/golden/bridge-diagnostic-result.json",
+      "sha256": "2b45e2073e782d346004d9b979090b75a5abeee1638661eca48d22490ad3be5b",
+      "bytes": 267
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-capabilities.json",
+      "sha256": "f98a512c21561b5105ec88e03f3f83b7ad294448546584927e79546729ce2a04",
+      "bytes": 226
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-confirmed.json",
+      "sha256": "f8cff6338b590850670dc2992df8db703249f4223fd3e6cac9dbf4d3261d0bb2",
+      "bytes": 223
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-operation.json",
+      "sha256": "58d64d54fc15241a56556adf73d6ae97317fec3402168e708c9a83c1d7efbe2e",
+      "bytes": 15
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-request.json",
+      "sha256": "d5ed64c4ee8593e80e9893e1fec2d1ee8e3d4636488d57a5429403a0f70cf43e",
+      "bytes": 461
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-skipped.json",
+      "sha256": "1df4a10acc1b49f53d3323d8c579fad4bc66237714503881bb80ac9090112b43",
+      "bytes": 225
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-status.json",
+      "sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+      "bytes": 9
+    },
+    {
+      "path": "contracts/generated/golden/bridge-effect-unknown.json",
+      "sha256": "9d27b128fb25fbd37c0961d10e61529c9a5a3ead98ae019d4b3f343eec944296",
+      "bytes": 223
+    },
+    {
+      "path": "contracts/generated/golden/bridge-message.json",
+      "sha256": "f61a17f3b3026c12447161703ffbaf6710b2c26ae9a5ddca502159877496b0bd",
+      "bytes": 696
+    },
+    {
+      "path": "contracts/generated/golden/bridge-qrcode-status.json",
+      "sha256": "71ce8ff4c179188015b1c36fa4d86d9581a3e9f2b2fad8a879d8cc2538d6b475",
+      "bytes": 9
+    },
+    {
+      "path": "contracts/generated/golden/bridge-receipt-confirmed.json",
+      "sha256": "f40e42c61c5d32a493e50e81edd834b29fb5e535ee03988feb730bf58efef621",
+      "bytes": 165
+    },
+    {
+      "path": "contracts/generated/golden/bridge-receipt-failed.json",
+      "sha256": "2523651d3ded881a73dd8a70b33780182b6a69ae13167cdf64790f06d8345514",
+      "bytes": 161
+    },
+    {
+      "path": "contracts/generated/golden/bridge-receipt-status.json",
+      "sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+      "bytes": 9
+    },
+    {
+      "path": "contracts/generated/golden/bridge-receipt-unknown.json",
+      "sha256": "67832d4cf6a1d2fe028ea2ac61b624d1bac894c9f3190be8330c3f9fbc64c9d9",
+      "bytes": 162
+    },
+    {
+      "path": "contracts/generated/golden/bridge-role.json",
+      "sha256": "622f06cbcd2e7e61637e17212e714e6c721d2dd5a9f7bc1aec911b65b34edcf5",
+      "bytes": 7
+    },
+    {
+      "path": "contracts/generated/golden/bridge-stream-capability.json",
+      "sha256": "d600c11e8c017f1d3bb19fa1b6894fd54788092470e3cc97b0001a6b72087b70",
+      "bytes": 108
+    },
+    {
+      "path": "contracts/generated/golden/bridge-stream-mode.json",
+      "sha256": "f1248531666f30c1e9d239b837e8a94f488636960d5bddd5fb32e5b7fa3883f5",
+      "bytes": 12
+    },
+    {
+      "path": "contracts/generated/golden/bridge-takeover-scope.json",
+      "sha256": "72c3568c435beef1d012bbe4e0f96a6b1b641afb1af159ab1d19aa03802b0eab",
+      "bytes": 123
+    },
+    {
+      "path": "contracts/generated/golden/bridge-target-type.json",
+      "sha256": "3190d261d186aeead3a8deec202737c7775af5c8d455a9e5ba958c48b5fd3f59",
+      "bytes": 6
+    },
+    {
+      "path": "contracts/generated/golden/bridge-waiting-receipt-capability.json",
+      "sha256": "a2132c6f739215f990ceba6172732c611fd335de33aeee6b5ecf7b403dca8095",
+      "bytes": 93
+    },
+    {
+      "path": "contracts/generated/golden/bridge-waiting-receipt-mode.json",
+      "sha256": "a816b7974b00ec18505bb5b4df585536de711c46ebbb12ad9f88b35d6a50e3e2",
+      "bytes": 15
+    },
+    {
+      "path": "contracts/generated/golden/bridge-worker-connected.json",
+      "sha256": "6a7aba2bb707d93a035ab72f86cf959bfc1af6bb1a8d9ad4e8f6b48f5805b812",
+      "bytes": 92
+    },
+    {
+      "path": "contracts/generated/golden/bridge-worker-connecting.json",
+      "sha256": "e6117090d1dc2b1bf1c9b68df966b99a831e6a222d6f7d4ecb54c6c29f7c6d88",
+      "bytes": 93
+    },
+    {
+      "path": "contracts/generated/golden/bridge-worker-disconnected.json",
+      "sha256": "52fb803f386c647ed5e280988336f6d7153c44fe3b77b7bcf0a293ac6ce04aaa",
+      "bytes": 137
+    },
+    {
+      "path": "contracts/generated/golden/bridge-worker-effect-receipt.json",
+      "sha256": "d69f82cd3a13d0e4bccfa8fb7370d1642ae74618354095f343857f24f8beef57",
+      "bytes": 302
+    },
+    {
+      "path": "contracts/generated/golden/bridge-worker-effect.json",
+      "sha256": "09e98ed3e4761aa9d48b9fd05bbdf658edcbe048c45f65f8c0caca478bb08d95",
+      "bytes": 547
+    },
+    {
+      "path": "contracts/generated/golden/bridge-worker-ready-capabilities.json",
+      "sha256": "a24383f1422eadeb424ff85787cd9a29b0463d54fdd999c0d277f8ce2a55f3a4",
+      "bytes": 301
+    },
+    {
+      "path": "contracts/generated/golden/browser-action.json",
+      "sha256": "5c3374f812f8f9f8bafd73f7f850a76a16b736e52390d80e4aa7a7436b93e3e1",
+      "bytes": 10
+    },
+    {
+      "path": "contracts/generated/golden/browser-command.json",
+      "sha256": "5755293f062f5c6f0672ae47ef4c689d463e640d8a42087d2d52554b439430ab",
+      "bytes": 54
+    },
+    {
+      "path": "contracts/generated/golden/browser-open-behavior.json",
+      "sha256": "bf45832557d68946799a70ce9791111b3dfbd258ceb9639a1c9ce97a94451f1a",
+      "bytes": 7
+    },
+    {
+      "path": "contracts/generated/golden/browser-reply.json",
+      "sha256": "3c22c124d21ebd4081ee40fad0ef9103c80a2f040a406627cd05ea976ee40b5e",
+      "bytes": 653
+    },
+    {
+      "path": "contracts/generated/golden/browser-settings.json",
+      "sha256": "8f7755fe318dff02747b81cff9f86fca3f81872a93be0174e5bcb01b3883ef05",
+      "bytes": 50
+    },
+    {
+      "path": "contracts/generated/golden/browser-tab.json",
+      "sha256": "c94c35b37b4a2ebe7c25a17d8b10585df1a2799df28a1cf51dcb0f096c01325d",
+      "bytes": 199
+    },
+    {
+      "path": "contracts/generated/golden/browser-workspace.json",
+      "sha256": "a0e767f3a64abb0c3b3a7a8f88269ce018110eda025d9bec60fb7d10d9be2b40",
+      "bytes": 544
+    },
+    {
+      "path": "contracts/generated/golden/index.json",
+      "sha256": "aa71be1d8160d6a31aee7557566fe589a028ce3f60ea776774333701a6286c62",
+      "bytes": 16647
+    },
+    {
+      "path": "contracts/generated/golden/media-artifact.json",
+      "sha256": "9db4dbb125331d98f8b58a79d7997876b4135e41fdf0169b92576e050cb097b4",
+      "bytes": 98
+    },
+    {
+      "path": "contracts/generated/golden/media-cancel-request.json",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "bytes": 2
+    },
+    {
+      "path": "contracts/generated/golden/media-cancelled.json",
+      "sha256": "6dac0421f4f90dcee1c6a39be5143f9fcb6521363179220dc90b634f59746487",
+      "bytes": 424
+    },
+    {
+      "path": "contracts/generated/golden/media-completed.json",
+      "sha256": "3213347db4aa90d55dbfbd453d1651a0da681aed81f13f61bfc3da430e4ad91f",
+      "bytes": 496
+    },
+    {
+      "path": "contracts/generated/golden/media-downloading.json",
+      "sha256": "f0fc372c75145f65f0154f64ac2176f212fc68e4fc6cc879f285e0b622029db2",
+      "bytes": 400
+    },
+    {
+      "path": "contracts/generated/golden/media-failed.json",
+      "sha256": "fbc7e13bc90fbc99ba795c542f86f6a708a0320c94c0f945f50b6680a40f6133",
+      "bytes": 395
+    },
+    {
+      "path": "contracts/generated/golden/media-generating.json",
+      "sha256": "0af5c0fedc7d4c1d31c7a1775d237f7d7890fa413d51fbcceea7fad6653c95d3",
+      "bytes": 399
+    },
+    {
+      "path": "contracts/generated/golden/media-generation-update.json",
+      "sha256": "577ee35c4f05e71792e592046257c3075fb80e7030b113133f4cc4930c70e2ee",
+      "bytes": 544
+    },
+    {
+      "path": "contracts/generated/golden/media-job-list.json",
+      "sha256": "20a5eded24a8ab189aad8caa3a3df8467e3da66e5cbbe6d0ec2cfd30c74e27c2",
+      "bytes": 507
+    },
+    {
+      "path": "contracts/generated/golden/media-job-response.json",
+      "sha256": "01908f7669e92fc3ede1cbb277f3595f4509b6b602b98b955a11078d11436a84",
+      "bytes": 504
+    },
+    {
+      "path": "contracts/generated/golden/media-submitted.json",
+      "sha256": "6767cedf64e538cf3f040ee61843d429a50dc3066f96c9a699edc13279797608",
+      "bytes": 398
+    },
+    {
+      "path": "contracts/generated/golden/media-submitting.json",
+      "sha256": "f1fb91e2acbedfce64766a6c2e168394b60c00ff0efbe81ee6613b5cf9d72fe1",
+      "bytes": 399
+    },
+    {
+      "path": "contracts/generated/golden/media-unknown.json",
+      "sha256": "6c28b1ebafe5a308d3cfb8f19d435470ecc223ed85243d9ffc04458d642ec697",
+      "bytes": 396
+    },
+    {
+      "path": "contracts/generated/jsonschema/ApprovalRequest.schema.json",
+      "sha256": "fcab394166c3f9c268bb4180a18735d554e346170bd93055166a3c097025b0e8",
+      "bytes": 4935
+    },
+    {
+      "path": "contracts/generated/jsonschema/AutomationDisplayReceipt.schema.json",
+      "sha256": "79e07c58e2539d624229f17c66d82e6440e69f83c7c9ecc9f2a4c0bfd18778c3",
+      "bytes": 395
+    },
+    {
+      "path": "contracts/generated/jsonschema/AutomationNotificationClaim.schema.json",
+      "sha256": "07321e1d9b0a5329bf5c197d6bfa7d3aecd2df7b1659ffaf99bbfbb11a0faa08",
+      "bytes": 1733
+    },
+    {
+      "path": "contracts/generated/jsonschema/AutomationNotificationCommand.schema.json",
+      "sha256": "927599e4b9a374f8338de7897d24a329d176fc684de3dd6dcedd0758a66e7cc4",
+      "bytes": 2091
+    },
+    {
+      "path": "contracts/generated/jsonschema/AutomationNotificationReceipt.schema.json",
+      "sha256": "6ce7dd4eeb703dfd49fce58f5662096653de847d62fe2ad45c28c5468ad9e083",
+      "bytes": 1217
+    },
+    {
+      "path": "contracts/generated/jsonschema/AutomationNotificationStatus.schema.json",
+      "sha256": "001042d00e92690a5e059d5428946fda254b0208843f61b2eb16ef06ee1dbe02",
+      "bytes": 218
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeAttachment.schema.json",
+      "sha256": "f6ee9e45d94112400616d279e1b648d3ba29211e663d050c1bb7af33a382eebe",
+      "bytes": 883
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeAttachmentKind.schema.json",
+      "sha256": "a1af6cab09bfdedb5f894f3a6c2d908a904024e8e06f1cf5990feb0d17af1915",
+      "bytes": 186
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeConnectionStatus.schema.json",
+      "sha256": "bee690d19b258a84cb2c813b0c4527bc1fd2178486dae730ee5f7e5ce4a7c9a2",
+      "bytes": 192
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeConversationKind.schema.json",
+      "sha256": "1bc79d9a61c4b260ae5b6ae8f56e97e6efc69c3936394ac1be93eea7c8f1a0d3",
+      "bytes": 160
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeDiagnosticCommand.schema.json",
+      "sha256": "e16225a05dd60fa4d86335f092ba0864c9d3f8d7d884e59e2f6c746fca3ee31c",
+      "bytes": 1038
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeDiagnosticInfo.schema.json",
+      "sha256": "191dc6f29e3493cae3d473dd6ab963da7ecc8ff933e887c59ede70865e87b29b",
+      "bytes": 580
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeDiagnosticResult.schema.json",
+      "sha256": "7a044178ab2dff029ed0e4650eaa68d4d8053f2c48f8f618bdfae38633218576",
+      "bytes": 2413
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeEffectCapabilities.schema.json",
+      "sha256": "34e9f487b503aea1e0ee8c14a1ae575b3541c1da3f374323e4052ec5d8ee0ad5",
+      "bytes": 2412
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeEffectOperation.schema.json",
+      "sha256": "731fe39116946614b93e1b803743e02c70a5a41b868a8c723f1c211b61e226c0",
+      "bytes": 240
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeEffectReceipt.schema.json",
+      "sha256": "25f3fcf5f7dc1a96ed35ec74caa36436822b41fe112a158d55f7c42c1fdfe590",
+      "bytes": 1383
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeEffectRequest.schema.json",
+      "sha256": "e23a22a611ee7220807ccdaf686f87a1ab5ddab16f7c28ae367642dfec1a2b65",
+      "bytes": 2952
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeEffectStatus.schema.json",
+      "sha256": "6d88bab7d9ec58ae42aff6dbf865aa699d6fee9202ef71558fc22ac3a476a8f5",
+      "bytes": 194
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeQrcodeStatus.schema.json",
+      "sha256": "b32147690205f3418438c963269e861155375085f705874b42cb0202630a52c4",
+      "bytes": 208
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeReceiptStatus.schema.json",
+      "sha256": "dfce8e70653408cd997af7a118975d6f47f0d2c8b1feecff699b7ba87ac9aeaa",
+      "bytes": 180
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeReplyContext.schema.json",
+      "sha256": "3fc7f439f86adc6c61ccaaac43fe992ac470d6be085888be99efa8479dc1a8d2",
+      "bytes": 1443
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeRole.schema.json",
+      "sha256": "bc68241de431e4ebaaf2e03c5d536f1700fd88f49063ebb257d38adcfd870b72",
+      "bytes": 151
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeStreamCapability.schema.json",
+      "sha256": "fcd2f90a9092851667a57988590f14bf10a94a6ac74cb495db41eaf55f3a38e7",
+      "bytes": 1105
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeStreamMode.schema.json",
+      "sha256": "2bb1f58e20a3ec8ff446df84193eb76827ed8bd5188609803f4c58a2166c206f",
+      "bytes": 230
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeTakeoverScope.schema.json",
+      "sha256": "e24ae2b1975c64499324e84ee5589cdc893e36f4f37806b27ea5460ab0943e50",
+      "bytes": 451
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeTargetType.schema.json",
+      "sha256": "4781c996ab15324a18f87fdfb213bafa4f7ae6f3164a84915c62ac1509be5e97",
+      "bytes": 171
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeWaitingReceiptCapability.schema.json",
+      "sha256": "dec6d84aaf990d1c9c9bf83708d6207c377108e85ffab964a8e9ac28484c3dbf",
+      "bytes": 883
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeWaitingReceiptMode.schema.json",
+      "sha256": "b4b45bfeda3002a8e9e0b72ffc842cd204c39f0ae53eb044f3ddeac8069906cf",
+      "bytes": 172
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeWorkerCommand.schema.json",
+      "sha256": "7bc9990aff015fcf363dccd9bb0065cc139e0a49879bae8e6308759e622bfa53",
+      "bytes": 9007
+    },
+    {
+      "path": "contracts/generated/jsonschema/BridgeWorkerEvent.schema.json",
+      "sha256": "7906a967a0b64a1814a878bb97fdac59722124cf91ff0eea63e2c6ba73ba0d82",
+      "bytes": 14905
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserAction.schema.json",
+      "sha256": "e5299cbc6516fedbd678d1e09325f60a23ea0c71ab6a0838e7c2156ea10f2604",
+      "bytes": 473
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserCommand.schema.json",
+      "sha256": "1d93beae0f96878604ee930361335067c7551ec35ffe7910a9fb6a89da4e5bbc",
+      "bytes": 1877
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserOpenBehavior.schema.json",
+      "sha256": "40c6bbf84efdb1c70888b54bf2cd678a01fef0169e47a84af17a121a517aaa11",
+      "bytes": 181
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserReply.schema.json",
+      "sha256": "dab90c12045a4c554c7cdb0e0bb2f273a8219757d808c9185ec257ce3b57b7fd",
+      "bytes": 2914
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserSettings.schema.json",
+      "sha256": "60e78b96609b45ccf963551c51eb33de58dfb717dff38c39a02affd731d1b5da",
+      "bytes": 526
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserTab.schema.json",
+      "sha256": "76db67d51ad53b087b7c78b330ec8f8f77c9eb3dda5d3fd4511285185fd351e9",
+      "bytes": 649
+    },
+    {
+      "path": "contracts/generated/jsonschema/BrowserWorkspace.schema.json",
+      "sha256": "f8ce2d482955ee164c0bef8c8b5ebbcfecca2bdc8bb2c9495c16bf172a3b43e1",
+      "bytes": 2007
+    },
+    {
+      "path": "contracts/generated/jsonschema/EventEnvelope.schema.json",
+      "sha256": "7e92ba13e8a1ce03e64e492376606d46b5cb4c481bee33d8263c18d01e55be0e",
+      "bytes": 25376
+    },
+    {
+      "path": "contracts/generated/jsonschema/EventPayload.schema.json",
+      "sha256": "9f4aca3c84b705f414a6616d630f95b2e6fd2dbb6f043af47c2cd1b90143a8d8",
+      "bytes": 22701
+    },
+    {
+      "path": "contracts/generated/jsonschema/KnownEventPayload.schema.json",
+      "sha256": "ad4ae480e1f1105c6f3d3cdfdd22119ee6b0cdc17fa24b9d3c5b7710646bb244",
+      "bytes": 21199
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaArtifact.schema.json",
+      "sha256": "9f8f413eab1876171234fd5d6ea34ef0a6a6facfbd5294ed68a019337024d34f",
+      "bytes": 433
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaGenerationUpdate.schema.json",
+      "sha256": "077f565563c83aafe7f54850133a13ed55a68d4a98701cb0f799292a09c03983",
+      "bytes": 3254
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaJobCancelRequest.schema.json",
+      "sha256": "ef6175f884cb41adc9421758daf182057776127dd76b33e2a9d2c93a81f6bd24",
+      "bytes": 153
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaJobListResponse.schema.json",
+      "sha256": "27d24443708ce55c497ed4c86b26841148afabecf10dec2567efefbb86874bce",
+      "bytes": 3215
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaJobPhase.schema.json",
+      "sha256": "d18ecb44cc0be669d47fbfa6077a230b196073168ae5824845b7fba3410860a9",
+      "bytes": 263
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaJobReceipt.schema.json",
+      "sha256": "be896abe3ed520bf60220b2aab861b21c573cd16234e7a9237a631c0258d5a1b",
+      "bytes": 2637
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaJobResponse.schema.json",
+      "sha256": "856d71a6a895643592ae243c03636471ddfd6d25c16da40f1ca8c45abc29dd5f",
+      "bytes": 3159
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaKind.schema.json",
+      "sha256": "7d85393cfa4e3abab8b67d04f6f1d913ca9aecd4f97af51efe3ed77ff6962d16",
+      "bytes": 164
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaRemoteCancel.schema.json",
+      "sha256": "f6a38b82816a0202d99066abddda65b474f9e844472f85fe56c88f39ad669e22",
+      "bytes": 183
+    },
+    {
+      "path": "contracts/generated/jsonschema/MediaRemoteOutcome.schema.json",
+      "sha256": "d25cf211396d58c8803cc94d508730eda7b678579d3d8f61f2791ff98b0ce3f1",
+      "bytes": 227
+    },
+    {
+      "path": "contracts/generated/jsonschema/ModelRequest.schema.json",
+      "sha256": "066b4b2e4a8de955269cf2dffa9fbe875f8a05e1d18e590de90d7f9d38218246",
+      "bytes": 3498
+    },
+    {
+      "path": "contracts/generated/jsonschema/PrincipalKind.schema.json",
+      "sha256": "a1f6fa70bbe90b896b2d8e814a47ace17303f1ce2f694b4dd11d821a3c2d67e5",
+      "bytes": 234
+    },
+    {
+      "path": "contracts/generated/jsonschema/PrincipalRef.schema.json",
+      "sha256": "e9a8444e0bfafe09382f62dee7c8ae67f91c46f4925141ec0f8637de8fca9107",
+      "bytes": 685
+    },
+    {
+      "path": "contracts/generated/jsonschema/index.json",
+      "sha256": "11d232d57ced96ae3859ae7ea821cab269ce286e26d34308295b5ee04e3987e7",
+      "bytes": 2166
+    },
+    {
+      "path": "contracts/generated/ts/lingxi-protocol.ts",
+      "sha256": "890c3932de30c6fbda501d5d31bb5f6e68ed40009ac6472300fd61d0a75bf3a5",
+      "bytes": 22263
+    },
+    {
+      "path": "desktop/main.cjs",
+      "sha256": "106bd34106eac6bdd155ba3374ecbf27d916b680fe8aa7b2a86cefbc5b8f33ff",
+      "bytes": 289713
+    },
+    {
+      "path": "desktop/preload.cjs",
+      "sha256": "10df7f00a0f1a1182dd6eb2e23bf88a9d48d22b8dcd9a17b0f980870e6d93bcf",
+      "bytes": 13525
+    },
+    {
+      "path": "desktop/src/browser-viewer.html",
+      "sha256": "16e4a34d3b7df8b0bea3d246db6f73b3f1e3de7e26873f787bdde75e968e9062",
+      "bytes": 9177
+    },
+    {
+      "path": "desktop/src/global.d.ts",
+      "sha256": "dc817b54cf7432c53a7c9714e087da7422e2a691c7dad0a6e672f111b114dc27",
+      "bytes": 3194
+    },
+    {
+      "path": "desktop/src/locales/en.json",
+      "sha256": "d5f5033bd851200b46f97603cfc8673cd5205c0e8bcf53d56a8e4cf0c14cf7c9",
+      "bytes": 291771
+    },
+    {
+      "path": "desktop/src/locales/ja.json",
+      "sha256": "34173a4556be2ac24bda43a496dd9543a7d036ac9c14c4f6938d2d245ade53f3",
+      "bytes": 360320
+    },
+    {
+      "path": "desktop/src/locales/ko.json",
+      "sha256": "04dd388987c460ab7d9d5189fa494adf326a41331ad3a8733ca30b10ef7d1d64",
+      "bytes": 327385
+    },
+    {
+      "path": "desktop/src/locales/zh-TW.json",
+      "sha256": "ca309c4ebf05e6f20aa26b1f93de54690b29a69d708218c2e22f7a7e8b152c22",
+      "bytes": 280524
+    },
+    {
+      "path": "desktop/src/locales/zh.json",
+      "sha256": "36545a701aad7e03a63ae458b089f5071752f7ce93375c0944c188a1054f4e1b",
+      "bytes": 284001
+    },
+    {
+      "path": "desktop/src/react/__tests__/browser-viewer/BrowserViewerApp.test.tsx",
+      "sha256": "b4e62026dbdff6705a76dfdde7e08f5f6fddcc00495546d1b1a4e3ebc5630a79",
+      "bytes": 2365
+    },
+    {
+      "path": "desktop/src/react/__tests__/browser-viewer/RustBrowserViewer.test.tsx",
+      "sha256": "d3a97cda8469c748307062f2fd238103745b1e11b79ee42ca36d4e2f2722ae5d",
+      "bytes": 4594
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/ActivityPanel.test.tsx",
+      "sha256": "9d56bd0c7c346d2541496f4c0e23e79a8909942068ce7a6592fa1157b7884e40",
+      "bytes": 4175
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/AutomationPanel.test.tsx",
+      "sha256": "22b61ba4b06eb05284baecab4ce1186d9c672b1ef6ff0b1530ace7b39d8c0fcd",
+      "bytes": 4600
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx",
+      "sha256": "9d42a889df11d5feb86c0fca6eb9f3de2ddfe14d07b4869cd98282cb81c36c9b",
+      "bytes": 6635
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/RustBrowserCard.test.tsx",
+      "sha256": "deaf36b9000dfaa429ca0bba76df0d03d9fe17e7012a7819fc94c92434a3f7f9",
+      "bytes": 4290
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx",
+      "sha256": "742bd972a525cd95ee041f3aa7d4874975cc9dc06db1625a40f3e2f64e78dc47",
+      "bytes": 19967
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/SessionListContextMenu.test.tsx",
+      "sha256": "7960123788f84ad04b6075ac29ef62a539de2108323e73bd70fd20ff7596e3dc",
+      "bytes": 31789
+    },
+    {
+      "path": "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+      "sha256": "13982637b6c9dabb6c01e90e3ea0dfc1c9bb2d7880de9ef62f66086f3fb8e7e4",
+      "bytes": 5626
+    },
+    {
+      "path": "desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts",
+      "sha256": "3b3fc17fd4f4f47107465ad18e0376e6c0f3bed2dc42c5e884edc15cbfd42f80",
+      "bytes": 7221
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+      "sha256": "93b73ac993fde8f743f2dae424683afa834acd365643346eb78555cc16a2f640",
+      "bytes": 21028
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/channel-new-message-ws.test.ts",
+      "sha256": "6dde27b4ce244e269e7203b77e9da267955e6315181a4ee1d28d6a8b5fa068e5",
+      "bytes": 8232
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/conversation-request-scope.test.ts",
+      "sha256": "fbdd5be4545f29d1933ba7a015c6853b70c64dbe510205f36f2e69b052a65afd",
+      "bytes": 1163
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-automation.test.ts",
+      "sha256": "2d1929156cbd9957f0232ee689666796e5e8d27e5bdb0fffb535011cf3507175",
+      "bytes": 28226
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-browser-events-http.test.ts",
+      "sha256": "aabc793636e0411d643257da1e64c11600280deb4283245d4b0bf69f919d71db",
+      "bytes": 11493
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-browser.test.ts",
+      "sha256": "48b2cade780a02cb9a2ce40c7561efeaf966c3065befb25fbb17fe2531981989",
+      "bytes": 6019
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-chat-history.test.ts",
+      "sha256": "e1c56cc252cea38d949d73a5dbc33fb8f046d29881ab98be00638312f0dcba00",
+      "bytes": 6254
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts",
+      "sha256": "7f6998f12e5a0d3788ca15186d4b45a500f5a71cf22b7b140926a48ae08ced75",
+      "bytes": 7739
+    },
+    {
+      "path": "desktop/src/react/__tests__/services/rust-media-http.test.tsx",
+      "sha256": "1ea4e8d824b43569a3a8d440f663c77fd4b41e9c3f6264a1745b1d037492492c",
+      "bytes": 21618
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx",
+      "sha256": "fec438ecfbdb937f469d1bd424355f7fb7fcdbdb7c9c2849d316aa10710f7b70",
+      "bytes": 15433
+    },
+    {
+      "path": "desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx",
+      "sha256": "97207e79a4742f3e81570d9eb875b2081922d5eee0c5f7b22512340ab7f8ac5b",
+      "bytes": 7940
+    },
+    {
+      "path": "desktop/src/react/__tests__/stores/channel-actions.test.ts",
+      "sha256": "af6625b0dd7197586a0719b23f3d142cafee2e4e73ace8262e713081ab6cbbab",
+      "bytes": 38823
+    },
+    {
+      "path": "desktop/src/react/__tests__/utils/link-open.test.ts",
+      "sha256": "dea2ddc3c81c5e131826e7fbc99c8d2286437f957a1a8d996febb8a61ee185c1",
+      "bytes": 5538
+    },
+    {
+      "path": "desktop/src/react/browser-viewer/BrowserViewerApp.tsx",
+      "sha256": "0dedfeb916a19b86d3dba81789d991ba6fd4dc7170aa1c3b203dcaf8b453cbed",
+      "bytes": 9906
+    },
+    {
+      "path": "desktop/src/react/browser-viewer/RustBrowserViewer.tsx",
+      "sha256": "f6bf658a29573691c1fd35da35bafce122afe2acc7d55035ae15a0844e8dd63b",
+      "bytes": 6310
+    },
+    {
+      "path": "desktop/src/react/components/ActivityPanel.tsx",
+      "sha256": "e4d2c6a3e2dc77a7906d1afa66211f833c0f341b22857615b704783c4df08f1f",
+      "bytes": 18483
+    },
+    {
+      "path": "desktop/src/react/components/AutomationPanel.tsx",
+      "sha256": "dc0512225d6cd250cfb7a90eecb3185cc014d05b18bb26f9d8cfc2b95cc65e83",
+      "bytes": 12479
+    },
+    {
+      "path": "desktop/src/react/components/BridgePanel.tsx",
+      "sha256": "2e9efa2e5c06f2b2deda9d779acf4a8a1ac8d469c4b62989a62afd263f788165",
+      "bytes": 24916
+    },
+    {
+      "path": "desktop/src/react/components/BrowserCard.tsx",
+      "sha256": "067f45205ea1ecf48a36578b93fa269cc3363e77fb6b3baf928f035bf2ffe992",
+      "bytes": 6085
+    },
+    {
+      "path": "desktop/src/react/components/ChannelsPanel.tsx",
+      "sha256": "570875372ead814978efd2e96079a7e83702c1c65720beab4cdd817e1c7f1534",
+      "bytes": 54103
+    },
+    {
+      "path": "desktop/src/react/components/SessionList.tsx",
+      "sha256": "d2e8c0e7225b031edec7b298dc6350e79b290956baafed2ad7f0cce7c96230d6",
+      "bytes": 59371
+    },
+    {
+      "path": "desktop/src/react/components/channels/ChannelList.tsx",
+      "sha256": "303950790cf8baa9596333743244515b49da3dd4e880377ed88351dcaade4520",
+      "bytes": 12867
+    },
+    {
+      "path": "desktop/src/react/components/chat/AssistantMessage.tsx",
+      "sha256": "208486db7f208e688212daf0e6c68576a0c0fff9ebf623bf667ec6ea2e7ba9e6",
+      "bytes": 62403
+    },
+    {
+      "path": "desktop/src/react/components/chat/SessionCollabDraftCard.tsx",
+      "sha256": "d2e781a10e45021dbdc78e217419490d15e5af8e8061ad02fc1f20fdaa1c3ec4",
+      "bytes": 18592
+    },
+    {
+      "path": "desktop/src/react/components/right-workspace/SessionRegistryFilesPanel.tsx",
+      "sha256": "c4192df159f3d7d460958e5fb6002bf406d5faa501f46347f4ae054feca62892",
+      "bytes": 35787
+    },
+    {
+      "path": "desktop/src/react/hooks/use-hana-fetch.ts",
+      "sha256": "cdd1fad5165e741897bed8abdcc9a03c7911eff72c25196b1cdafc9601d5f1f6",
+      "bytes": 2675
+    },
+    {
+      "path": "desktop/src/react/hooks/use-stream-buffer.ts",
+      "sha256": "7aecb7714398dfbe676e797db0e494b1aab513023068069bc9aabb17305177cd",
+      "bytes": 45840
+    },
+    {
+      "path": "desktop/src/react/services/app-event-actions.ts",
+      "sha256": "eb57a1477ab66e125b381789711c2d44a5ec1867638207ec33203d0d01737048",
+      "bytes": 15313
+    },
+    {
+      "path": "desktop/src/react/services/bridge-media-action.ts",
+      "sha256": "31e4bd14dbfcbaf184ecabaa447bbce4c93720898e2c4b23fdaf5798bb076892",
+      "bytes": 1515
+    },
+    {
+      "path": "desktop/src/react/services/bridge-response.ts",
+      "sha256": "402745e42b08cb21e96760564b03af65db0e76b38b159efe2a03967945aeda94",
+      "bytes": 1618
+    },
+    {
+      "path": "desktop/src/react/services/browser-events.ts",
+      "sha256": "ee29eb37d3ac0324b3a8af4ffae33d2ef876de95cd92b2216cdd7e93460cfb06",
+      "bytes": 1975
+    },
+    {
+      "path": "desktop/src/react/services/conversation-events.ts",
+      "sha256": "00d75143146cec16cf4a3c34c4e60796e2ba3197fad887bd2cdab8b38bacf547",
+      "bytes": 3570
+    },
+    {
+      "path": "desktop/src/react/services/conversation-request-scope.ts",
+      "sha256": "31b3de135bcadec788e9c2e9a5bfa7c70e3c9245b200c42839bfe409f50ec160",
+      "bytes": 877
+    },
+    {
+      "path": "desktop/src/react/services/conversation-suggestion.ts",
+      "sha256": "7942a29f119ebc68aaa6a1487056558d980576a65873d9384e339e4b09adb9cc",
+      "bytes": 1715
+    },
+    {
+      "path": "desktop/src/react/services/resource-url.ts",
+      "sha256": "9fff3f330fe75de3f9fdbe99590e01b665234bc20a820b4b0661bf4d3c951714",
+      "bytes": 2964
+    },
+    {
+      "path": "desktop/src/react/services/rust-automation.ts",
+      "sha256": "0a5f8871ce675103fde317f3a83235b3f477e22a30e37d2fe265b7c2aead5467",
+      "bytes": 18163
+    },
+    {
+      "path": "desktop/src/react/services/rust-bridge.ts",
+      "sha256": "40031e5b62d234960146d3f2031cd0dfb0f00fa9b6a00b95224ad63ae16fda3e",
+      "bytes": 503
+    },
+    {
+      "path": "desktop/src/react/services/rust-browser.ts",
+      "sha256": "a51c40d4974394aeb02aef37e3ba3b32cfb5e4ee93fa814dea75814a0b5461e8",
+      "bytes": 6080
+    },
+    {
+      "path": "desktop/src/react/services/rust-chat-history.ts",
+      "sha256": "068a4ec7484ed4e7ef991f5193101f0cba01e9487cd8b8f2342c310a1b8af052",
+      "bytes": 18207
+    },
+    {
+      "path": "desktop/src/react/services/rust-media.ts",
+      "sha256": "fde2ea30e50539a55e078d6aa77ef9cfa9124cbbede1305da0cbadce01837db1",
+      "bytes": 12373
+    },
+    {
+      "path": "desktop/src/react/services/websocket.ts",
+      "sha256": "9434f37c3e45483f7cf20582e333a0f60b683b5d5f370ca0356e9c5aec61c2f4",
+      "bytes": 17736
+    },
+    {
+      "path": "desktop/src/react/services/ws-message-handler.ts",
+      "sha256": "f83b74debb27722fdf5427fad8576d26084c087ef315f0c66403f741ed194406",
+      "bytes": 67813
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsContent.tsx",
+      "sha256": "8a6c39bdbf0abed26dc458c07ec70cbfd394afd70a412c3c8bd312d6e8d1df2d",
+      "bytes": 23845
+    },
+    {
+      "path": "desktop/src/react/settings/api.ts",
+      "sha256": "3c9d442fd92efb65a0fbd6186b65304c993bf8e7ed417f5be8cb29388013441d",
+      "bytes": 7032
+    },
+    {
+      "path": "desktop/src/react/settings/overlays/WechatQrcodeOverlay.tsx",
+      "sha256": "f7cb95f19a6d43c99b681f06cad7d4528213efc9f76628a337642b0967255cb9",
+      "bytes": 7289
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/BridgeTab.tsx",
+      "sha256": "207a465ffba55a09655e203f4ff6a8ff476d95492a555b209ce22f46f0286018",
+      "bytes": 15811
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/BrowserTab.tsx",
+      "sha256": "1e18c1ffef226087facf743af8e067c5540f5d17e01610363a3f7e2efd6b2e65",
+      "bytes": 7499
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/bridge/WechatSection.tsx",
+      "sha256": "69934877620b8119d08a90b15e4382a8e5aca995209115f30bdb8011fbfdfaac",
+      "bytes": 4347
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/bridge/useBridgeState.ts",
+      "sha256": "1cff52473864b3e4e632cb6d4b30341d6c0912dcedb8d4846dede874e3fa2d40",
+      "bytes": 23710
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/providers/SearchApiKeyConfig.tsx",
+      "sha256": "3467b024976dfadb9f97c933348279bac1fc2398892d857d0028d66a2b397caa",
+      "bytes": 6220
+    },
+    {
+      "path": "desktop/src/react/stores/browser-slice.ts",
+      "sha256": "61cd2671e0050e9ea1fb8fa1f284c22cb6686dc5241d6a7e9ae1dcb071788909",
+      "bytes": 5073
+    },
+    {
+      "path": "desktop/src/react/stores/channel-actions.ts",
+      "sha256": "e3fc19410fb68fe009c954b7aef598ae758d74045079138b190129cfe73a3a12",
+      "bytes": 32529
+    },
+    {
+      "path": "desktop/src/react/stores/channel-slice.ts",
+      "sha256": "7ee63472733fbb84ff5a7b005bf74725686bdcdceb7d30c05e3e58d7e8f4a800",
+      "bytes": 2823
+    },
+    {
+      "path": "desktop/src/react/stores/chat-slice.ts",
+      "sha256": "0bcc9734eb12fdf19ec0aeb03c7bc0dcc858faca3b7629ef998e81464743af10",
+      "bytes": 43326
+    },
+    {
+      "path": "desktop/src/react/stores/chat-types.ts",
+      "sha256": "2746ea6b5d6927cba132572151451ff785e5d9c8f02c2ccbca59e5bb7dddf35a",
+      "bytes": 22281
+    },
+    {
+      "path": "desktop/src/react/stores/session-actions.ts",
+      "sha256": "ce5396a7b91b50b582832cdc3fede2e901a97bf6e9828d6e41c75e60c64043d3",
+      "bytes": 107703
+    },
+    {
+      "path": "desktop/src/react/types.ts",
+      "sha256": "bf2b2977adf26748260789b5e19094b51423f0e66780a7c2c623ebc5c2c54b74",
+      "bytes": 27200
+    },
+    {
+      "path": "desktop/src/react/utils/link-open.ts",
+      "sha256": "6f6b69eee5dd48bf253dff9973918ac7976ac6f9a6fe8172fdcc81ce2e2f8865",
+      "bytes": 7203
+    },
+    {
+      "path": "desktop/src/shared/desktop-notification-delivery.cjs",
+      "sha256": "ba94e9506b618111b44fceb16c7861f8631bb54dcbea8e25313f814cf7d2185e",
+      "bytes": 1217
+    },
+    {
+      "path": "desktop/src/shared/rust-browser-control.cjs",
+      "sha256": "2cbcdf5f046d16b7fc28e2707cd4c0351f461021efc03b18307b16adca9687af",
+      "bytes": 4579
+    },
+    {
+      "path": "docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json",
+      "sha256": "fce62d625ed27bc25eaedc8bd09e8416d3f80aaa1df8ab02a0339cee8d9a3fcf",
+      "bytes": 17531
+    },
+    {
+      "path": "lib/bridge/dingtalk-adapter.ts",
+      "sha256": "d3a3a63de6b7f753759fc879befba380008ae48248a782309f7dc89c28ed74ee",
+      "bytes": 17853
+    },
+    {
+      "path": "lib/bridge/feishu-adapter.ts",
+      "sha256": "33ddce1aff3c3d3ab1517bb0290377d1666ad3333176a79fd882b8029d1a912d",
+      "bytes": 34336
+    },
+    {
+      "path": "lib/bridge/qq-adapter.ts",
+      "sha256": "1ddbcec373927c7af9f7bb0ce7b497574145460e12949014b34ddb72c878315f",
+      "bytes": 27582
+    },
+    {
+      "path": "lib/bridge/sdk-diagnostic.ts",
+      "sha256": "5ca8019806ca94606fe312848b0f241be9b2bf7e5fe30009abbc66725050831f",
+      "bytes": 7943
+    },
+    {
+      "path": "lib/bridge/sdk-dispatch-window.ts",
+      "sha256": "439c0b713c69fc6b29c85f11651ee4ebfc4e8421a525cde2ff8e01b84b6e054f",
+      "bytes": 1775
+    },
+    {
+      "path": "lib/bridge/sdk-effects.ts",
+      "sha256": "98814893ca13abd822ffb3c5d2e41c7a317db66fbe09159bad1a95e4990efe8b",
+      "bytes": 15863
+    },
+    {
+      "path": "lib/bridge/sdk-worker.ts",
+      "sha256": "d8705c20c626ae0e735bca044482c06860c322402c7fb81f77ff3333282e2b8e",
+      "bytes": 28806
+    },
+    {
+      "path": "lib/bridge/telegram-adapter.ts",
+      "sha256": "69d08977d7da71284a0f3627b80e1cb34124690f858e1d1f0f9783082e6b41c6",
+      "bytes": 15493
+    },
+    {
+      "path": "lib/bridge/wechat-adapter.ts",
+      "sha256": "1d7aec7aab13e1564e0d18f406f017e89c62fb434924c4f63724f6e9f739d3f1",
+      "bytes": 27144
+    },
+    {
+      "path": "lib/bridge/wechat-login.ts",
+      "sha256": "0ab16b9e93e1ae89ef15563dd90be8894f5839b9d9624f18ec60a783a8cedde2",
+      "bytes": 4286
+    },
+    {
+      "path": "plugins/jimeng-cli/adapters/dreamina.ts",
+      "sha256": "84f919bebb576208ca52a0d646bab41684f3ffef99742ade1dc8d62f4852bc97",
+      "bytes": 26240
+    },
+    {
+      "path": "plugins/office/lib/read-document.ts",
+      "sha256": "80f7039bf1f0e000aac90439a849cfabe0ba62c9d1b0ce605afd84fb91425949",
+      "bytes": 7854
+    },
+    {
+      "path": "plugins/office/lib/read-pdf.ts",
+      "sha256": "3061eb26195ea66b8aff17152a90a65a48a6e2f7832876683e062977984a9057",
+      "bytes": 6130
+    },
+    {
+      "path": "rust/Cargo.lock",
+      "sha256": "3f2ca736726d8ae87e222448eb88187de1b229442fa591c260ddfc741a838555",
+      "bytes": 100184
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/cdp.rs",
+      "sha256": "272af850aa41cc27e46ed7de3d0bdcb8bacc59ae831240ed0242cecfa1451f6f",
+      "bytes": 20099
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/host.rs",
+      "sha256": "9077fe9a98181e246f266d06e500172b06e0af613984ece662a82c33ec61ae9e",
+      "bytes": 74798
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/launcher.rs",
+      "sha256": "214f0e5b65d8038fff5827893eb38abc12ff23898b29992c78bad6995999a1f3",
+      "bytes": 13116
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/managed_files.rs",
+      "sha256": "4d11dc6d7b299f7ba3f411de1b2772cabbe324189314a668b323b0038c99441f",
+      "bytes": 19716
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/manual_capture.rs",
+      "sha256": "2b99309fc5a419a2867ebdcac76da0a2c52c71e6eaea914c569626c0d66db72e",
+      "bytes": 20365
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/mod.rs",
+      "sha256": "68fe11c4d3ef51406296b9bafaaf382a32946a81438896abf2326c1b50945513",
+      "bytes": 666
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/ops.rs",
+      "sha256": "7f81f8eea5831cb7e4d85f316bda33c3b1198f2b4f8393f1c123fc8b3b09bffa",
+      "bytes": 31148
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/pdf.rs",
+      "sha256": "202c77de42bff4f4efdcd59a4afbc93781202975576a41c97a7dc8605357274f",
+      "bytes": 37583
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/pdf_lifecycle_tests.rs",
+      "sha256": "3a4c155428f2d5b846489097f9f8b8e42183c2b1f94b068144a3b7eeffef7da1",
+      "bytes": 7657
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+      "sha256": "e64f784c1ea9a06309c4a6dc6a4b2bb61945d3ece9417cf6bfb0bbd1cb59de01",
+      "bytes": 35411
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/snapshot.js",
+      "sha256": "08c2da0f1803ab7c43fc457cd495ca91a3686e137cbb442083ce1b1b3f1578d6",
+      "bytes": 6982
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/startup_tests.rs",
+      "sha256": "e49f3e91defe637445b9ba2a99f3364886390537c245b9cfa3d5488beebf55ac",
+      "bytes": 17928
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/unavailable.rs",
+      "sha256": "0456ce7b4cef8cf4624243e55d3a468f98134b9d482a38cce785f5a6e32a69af",
+      "bytes": 2169
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/conversation_files.rs",
+      "sha256": "36079ae9326f8240234db5ec8a48de010e891492622dbd3b1173ba53f38e2c76",
+      "bytes": 61420
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/lib.rs",
+      "sha256": "da6356ef7030898bc74f2c37f5d60124ddae8a910f8a39b33d6ad590e416e226",
+      "bytes": 860
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/anthropic_messages.rs",
+      "sha256": "76350b2990fc328b7fa02646ba8024276193433d7297c53986cad832a5504b87",
+      "bytes": 79106
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/google_generative_ai.rs",
+      "sha256": "8a4bda25b9bc4dabe145fa5b90b774f9a9d4b5dec34847e6d9d16e3d406e46e7",
+      "bytes": 68254
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_completions.rs",
+      "sha256": "81589a0f4f83e23871ca4e3b7a8bf8dd31eae4efd15593cf492cec2b39d408a6",
+      "bytes": 73475
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/openai_responses.rs",
+      "sha256": "d288c1d4f80505c63950c37d05c9a4fa914c62806daf5f14cfc2c25c4911aca0",
+      "bytes": 57922
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/automation.rs",
+      "sha256": "4c884203be80597584674610ec9252709652f6a4ede24dd7cfc705be3aeef5c2",
+      "bytes": 33784
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/automation_activity.rs",
+      "sha256": "5c1c16d997fe00b75c6b1bb2a0820abbb904597a130f72510271526bcb9c7cf5",
+      "bytes": 11078
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/automation_import.rs",
+      "sha256": "14d701ba1b6771cd47c66942f8d207500a12e4080955ef9df0d383cc410a6a04",
+      "bytes": 2136
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/automation_suggestions.rs",
+      "sha256": "f2b12e572a14fc7fe21eee683031a1e222723fd9d75f54d6be32de5c851d180b",
+      "bytes": 15195
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/beautify.rs",
+      "sha256": "24f63cc00d0220beb040ac2b5c879bb1b63a6b08d49a6a59b6fef9cebc97a2c3",
+      "bytes": 12548
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/bridge.rs",
+      "sha256": "665607866e004bae3959909d3597dd04d4f22888ce429459b5d348d347e5b646",
+      "bytes": 79050
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/bridge_effect.rs",
+      "sha256": "7b9583d0087f56f8afbd759581d8b6fa988594c6d5740cef18fd7e79a091331b",
+      "bytes": 21963
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/bridge_notice.rs",
+      "sha256": "49a74d414b075c6eb318d76a835dfbed9d13dd6e5dd173f83341d092dacb0a0b",
+      "bytes": 9636
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/bridge_reads.rs",
+      "sha256": "857edaf9d253e7f181d58e560058b10939fc77f19562390fd5439244576df734",
+      "bytes": 12785
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/browser.rs",
+      "sha256": "b08d8f6e002ff1ade8c1cf0ddd951d9587a89cfefb64b9dc5da3a67fd360e27b",
+      "bytes": 17783
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/conversation_discovery.rs",
+      "sha256": "7078ea720b7ce9eb129cc6a1e751d55c5cb8eb194ede5f88be7d3f1d07e61d21",
+      "bytes": 2986
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/conversation_status.rs",
+      "sha256": "ace526991f48cbb8979fed5411cf5769fd9d87ce8d2c758895a6ca145df84113",
+      "bytes": 6497
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/conversations.rs",
+      "sha256": "803bacac3b2760f4c873817d40f99ce5f0179adf9f981ea2a9b0ac2b471fb235",
+      "bytes": 40872
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/conversations_collab.rs",
+      "sha256": "d61fe41eb78c062f81ce3fb2f2a96e5070ddfe502ae0da480e1bc3b7d6ef3e30",
+      "bytes": 30498
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/media.rs",
+      "sha256": "cd948fe171d550313cf2cb824b79c42e200d48d8ff08d0170c8ee86e4235d3d4",
+      "bytes": 19836
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/migrations.rs",
+      "sha256": "02414dc5790c775346c2c6eb169976cda439742bcbd45149df613fea6b28fe6f",
+      "bytes": 72104
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/mod.rs",
+      "sha256": "d56b20ad1c711de4bfdbb743264261a4dfc1c9bbbbebb818235f9e51494b347a",
+      "bytes": 2054
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/run_store.rs",
+      "sha256": "13ce723989726c16b27c9ac9583b22d8035692a848041f1c7fcee3bbcabde6d6",
+      "bytes": 171797
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_admin.rs",
+      "sha256": "93998d557d32d3ea53a0a572f20621ef1afc450e531785e49ecafc4c6b315971",
+      "bytes": 63852
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_files.rs",
+      "sha256": "fa37f0a8784b27a0132fa362c60687e0e8ff91dc862fadb6b9c30558732a05c5",
+      "bytes": 83666
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/session_tree.rs",
+      "sha256": "1b8a32f7728760a4cc067d14faaf0bf99dc84117713a51205cbf50104626d3a4",
+      "bytes": 82436
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_activity_store.rs",
+      "sha256": "69b5893042e2e4e9e280fd88b206dad840b29cd0275d1875b272ba6b4df32b48",
+      "bytes": 12245
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_automation_store.rs",
+      "sha256": "7892fd02c6d4cfb4c5a9d36f4b6dfd51c44a1e88292a4a30ee734be6cb11d6c3",
+      "bytes": 23201
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_automation_suggestions.rs",
+      "sha256": "28bfa1b8f2ff2925a42e197543747941173d440ceb0b943bac54a9366f5d3717",
+      "bytes": 19352
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_bridge_effect_store.rs",
+      "sha256": "e488bc4aaa438084c32e5eb82fa8e8164607d9ac831ea8e2adc962c6a9f5da07",
+      "bytes": 28170
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_bridge_message_projection.rs",
+      "sha256": "b848d31412ed33076820e8711b952e41c03695f41a69cab15d976dabd0006028",
+      "bytes": 7898
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_bridge_notice_render.rs",
+      "sha256": "90719c3760992ca8ac16edc1d2105a864baf73ba371bb1a118b10e13841ef89b",
+      "bytes": 3832
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_bridge_store.rs",
+      "sha256": "81dc85874f160b920e71eb83b3658e6562a2102ac7c523ca6a1cc14c9d7fc255",
+      "bytes": 44076
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs",
+      "sha256": "2d3a2a2c8b3cadd443f5dfab2a8f26011d7fb998f18eaae3ef6530145780b315",
+      "bytes": 30439
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_store.rs",
+      "sha256": "4f177688d7cc8a42eba365b3e6df8a1cc2ec73f6d3f6cd9d0407b927b641a0e5",
+      "bytes": 6598
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_conversation_files.rs",
+      "sha256": "1b96dc7f83d51482b88990b89858718f05b7aa8a06d4c5ca39910c55ebdece19",
+      "bytes": 19829
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_media_store/mod.rs",
+      "sha256": "f656654874c4ef14f60852ad248aac0b9aef404791102fa056172d6ea152536c",
+      "bytes": 9993
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_pdf_chromium.rs",
+      "sha256": "2579d58d3a571c756fbda5fd7184a212e058981ae7f2ac7e83df858b1283778c",
+      "bytes": 27715
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_phone_store.rs",
+      "sha256": "0df5d46ea056434d2c25e4de89948e81400ed39eafc9b2fad822954170b8e623",
+      "bytes": 26405
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_session_collab_store.rs",
+      "sha256": "7de37864efe47b7bcd76b49ee69afa43f5b84c06308c9de3e8023601c5a6d626",
+      "bytes": 18847
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_t05_media_store.rs",
+      "sha256": "5ed927d0db03c259d5f677c7a0bcc64e6e87827baf4b2832c893a491d1ec3b2e",
+      "bytes": 117
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/session_file_store.rs",
+      "sha256": "525e401846949dd47cf2d1e97803dfad0bfe80ac7026f9ac3294fd8ff9fedbed",
+      "bytes": 22605
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/browser.rs",
+      "sha256": "b84ba4a8aa520ce8b107d2ee3ee8db74d9bd6bf4ef624416de69a08729acdd84",
+      "bytes": 5082
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/compaction.rs",
+      "sha256": "a020e6ee60199210f695cf2500f58502589d624581706ace45e2cec28e1a0ebe",
+      "bytes": 53679
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/context.rs",
+      "sha256": "d304dfec1cd8cc135c4497fa12ee09d6cc3b2c6665164c77402537a0fea83a8d",
+      "bytes": 49305
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/lib.rs",
+      "sha256": "a803be9abc9e6ee3721382b48f0626e9a36b850aed6548208a2758e4634d46ea",
+      "bytes": 43584
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/model_exchange.rs",
+      "sha256": "8cb040c7d03b79d83a5da929a419878e55799ce286a4829b5984fffb1befabbd",
+      "bytes": 50043
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/recovery.rs",
+      "sha256": "15acd8e4498e66ad5fa2abe8d77aafe02918d78d8e3a6edbf0817457550b33ad",
+      "bytes": 19511
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/subagent.rs",
+      "sha256": "557c6baf13c600dbf0d7b552c29cbc4ef50bafdf4f899b95b424fa1349b8cc37",
+      "bytes": 38748
+    },
+    {
+      "path": "rust/crates/lingxi-kernel/src/toolcatalog.rs",
+      "sha256": "bfad9ae86e97c20f00b3e967fd2b087be05a0de0a413e5bdf5960e8aad49f91f",
+      "bytes": 132920
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/automation.rs",
+      "sha256": "6e7a0d55a431248614122f67a091f374c5aff446da0cca9b1466e90a036e3fc0",
+      "bytes": 7347
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs",
+      "sha256": "82afb19999bd3522deab573e6b3725c1e65b65e9ae1e97a7851872f2fbd61d65",
+      "bytes": 57339
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs",
+      "sha256": "39845328c408ad951f9d33220b8920827c3ecac25e96ae95f61b6a26404461b1",
+      "bytes": 12742
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/bridge.rs",
+      "sha256": "3eb228d31d016f8fb554384521564ac5a2be8e1256870883d6b53b4e2e66b569",
+      "bytes": 16986
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/bridge_effect.rs",
+      "sha256": "161d6b354334fcbec231ac03013d2487e4a72e3a78f78eaeff8589d3003c1730",
+      "bytes": 9587
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/browser.rs",
+      "sha256": "06d37c99f78a98d1eba836b9d7acddb0a967bd2c65a3e6d806fcf24b5bd8f8f7",
+      "bytes": 7914
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/lib.rs",
+      "sha256": "0a8ea40ae3d2d61d94b4c8ae3cbe1faaca67da79a6162d4fad7976d4b489252f",
+      "bytes": 18875
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/media.rs",
+      "sha256": "50f8fa0678c41e66f0177c5483704ff4cf1b7b0171a07d435c58a149f9b369a9",
+      "bytes": 4120
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/office.rs",
+      "sha256": "03cc8cd0192bed3842aa57155b0a72b6d234a758ea05950e5bd9c03d2b357b4f",
+      "bytes": 2869
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/wire.rs",
+      "sha256": "5ebecc7741c5a6686fe8f75f047535deac579969953971f7e27152e76df695cc",
+      "bytes": 31768
+    },
+    {
+      "path": "rust/crates/lingxi-service/Cargo.toml",
+      "sha256": "2446f5dec3fcd483eb0e1aab397f96a60dd8e23471a7da3f247d919b70ac71e4",
+      "bytes": 9482
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agent_config_readback.rs",
+      "sha256": "26484a128331b8e9ce30e45841c1e0a5ea58b0c80a6b523aa50d7c18076557d5",
+      "bytes": 142568
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "sha256": "fb8ad96defe8d152b5fbe10cb6fe00365ee39214968c9a4148fa08c484594c7d",
+      "bytes": 38993
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/approval_service.rs",
+      "sha256": "3203c4ead7b8ab7264cc9588f26a4971b662b681cd20e05f4876776af82afe21",
+      "bytes": 55485
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "90038b66354817f924218722eab8f944d51bd67648033a2923b78362fe4ca108",
+      "bytes": 158627
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation.rs",
+      "sha256": "ec4e02e381dc3c1834b40dfdae0c0ed788304870da8a0033fa982a35e7e1f8e6",
+      "bytes": 61511
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_activity.rs",
+      "sha256": "c997567442ffc724a24e7434931c2b64dd2b4d75ef53a5ac3d318879a08fbbaf",
+      "bytes": 15881
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_daily.rs",
+      "sha256": "01d40eacb8edb5feb275457da88585cd626fc2fbe5e14718a1e19a16dbfc9340",
+      "bytes": 16576
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_heartbeat.rs",
+      "sha256": "094c7a15e7cbf2d1971489b727887b5b9f3f7a192e06e88433e6b018c40442cb",
+      "bytes": 29181
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_import.rs",
+      "sha256": "8ac2a63027d4418b3db2e8c82da485c0003e2d4228ce558edaf1ee0e2ed1ed3e",
+      "bytes": 26648
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_patrol.rs",
+      "sha256": "5fe19d5b0d8a33863d7e04acbdea4bcf9349d293a321c249bc61ad2857062df9",
+      "bytes": 50493
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_permission.rs",
+      "sha256": "13e07f306a0d2942af4cc24d52d3766b9401488ebf18d3822eec3ad39da15c57",
+      "bytes": 7143
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_review.rs",
+      "sha256": "ee53582418885a96cab8d44e5539ba1f2754c0d0d341192d93d07bd5b6a62999",
+      "bytes": 29171
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_schedule.rs",
+      "sha256": "ef2be29eec1528455d4e0f316e509847102d19f1243bade805ae59e080be85db",
+      "bytes": 23608
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/automation_tools.rs",
+      "sha256": "823cd6c3c4800a065af69d878884d6561652e4cf7266d26db73ffa8ee6288858",
+      "bytes": 17654
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/background_tasks.rs",
+      "sha256": "0100ed80e8a2767d1fa880c29a1c2aa31505d9a8c5f5484ccb07dbe65ed17211",
+      "bytes": 25037
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/beautify_generation.rs",
+      "sha256": "b133e6eff008879e8c3587c8dec1bb20b2069184f5593c9d9ccb121b25340f27",
+      "bytes": 31918
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/beautify_run.rs",
+      "sha256": "6e9d165c8d553e572a5f6c8bf9872494edad821bea7b44c7eb9a83664fe6c4ea",
+      "bytes": 11669
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge.rs",
+      "sha256": "f641230694ab945f516a250e044640370f3e14c6246a0d15b7729bbfe15f81da",
+      "bytes": 56577
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_child_revoke_tests.rs",
+      "sha256": "1c94af72ff79e36040efe32a1b73a92836bd1341a655ebc8d4cd6a00f0a4b2c2",
+      "bytes": 20341
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_effect_text.rs",
+      "sha256": "5214bfbed660c745daa8bc3ae195463a30c3e80053cd91a3472150473a106962",
+      "bytes": 3284
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_effects.rs",
+      "sha256": "39fe869c7794da886683a6e90172f251881fbc84cd52a6c827a9d2699367b94d",
+      "bytes": 34095
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_media_pipe.rs",
+      "sha256": "84dd37cccd0a42dea3a43a41e0c2bb62a04fa3318d037c9d31f96adea24fd5fd",
+      "bytes": 11337
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_permission.rs",
+      "sha256": "0907c8b91f0c2838017b44afdc1244cdccd920bcfe51023ea54f9874112b607d",
+      "bytes": 3525
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_revoke_tests.rs",
+      "sha256": "4093f712b54c319e068f61f5eaf22e1d69febd7873a8c47aa34eb0ba4227f646",
+      "bytes": 15480
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_routes.rs",
+      "sha256": "11474bb683cac25eba706cee02bc190e6a1fe96fd9efdbf6b9577ce7a85e335f",
+      "bytes": 29047
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_run_authority.rs",
+      "sha256": "c1a3ceefd4540944ed4e1a1b353b5b820c03996c610efa06d6bc575841da43d5",
+      "bytes": 5716
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_session_routes.rs",
+      "sha256": "6a43f1b408bc3ea1eee7db390a548e1eab94dd47b2d5f67cb4732086a2da8163",
+      "bytes": 21933
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/bridge_worker.rs",
+      "sha256": "8d8b5588e5052d139bdfab02c6ba4a33371d57a77a0f00b47d7d0401e4453aa8",
+      "bytes": 10966
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/browser.rs",
+      "sha256": "1b70852555281dba8f21e5b6733f748cf20bccb8b2068530cdb7021bd82480ce",
+      "bytes": 52704
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/browser_routes.rs",
+      "sha256": "852dd19f60b89a4f39cd2e4d8954eeec94fc8fd99eddab4de2e38b2575b7265f",
+      "bytes": 8801
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/browser_tools.rs",
+      "sha256": "dc625d4013ba9ba4c62be5acabb172195c049b58304b61d68dad6063a2ec77da",
+      "bytes": 11664
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "91df2d4660bc90a8860a60f9f8ec210fe792cae33ae47987a3390c5b662201af",
+      "bytes": 79693
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/context_compiler.rs",
+      "sha256": "a4150874108abc90848d991948994675b5f5464b109745a7525632a7d09a4eb6",
+      "bytes": 46475
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/conversation_routes.rs",
+      "sha256": "445adfefde90761615b5b964f17f7827c588c6e3d4002f57934467a1d897705c",
+      "bytes": 16556
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/conversation_runtime.rs",
+      "sha256": "9db791814311dafb641e6226f9f868f248f85e4aae5a41e9ecba422d03897959",
+      "bytes": 46784
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/conversation_status.rs",
+      "sha256": "3cec4ad1e9c0347509edd40dff305007b92b306120e84227e789bda571c85fa3",
+      "bytes": 3365
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/conversation_tools.rs",
+      "sha256": "3c43b6ceb266f585e1d5adfab16253d854f7e519abf0f2a24c81374427ed6eee",
+      "bytes": 25495
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/conversations.rs",
+      "sha256": "3c378f7b50f97e14cce31837e70efc9b780606113027f16218af9e863b39ac4f",
+      "bytes": 34326
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/credentials/mod.rs",
+      "sha256": "7c472217ad848d4609f731b00228dd8057de160ec81f61a098226dd56fa339db",
+      "bytes": 75056
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/credentials/search.rs",
+      "sha256": "77768abad4c99f1c66cee9aec34a3fe50f8b495fd5daabf81731a70fad73eec3",
+      "bytes": 5844
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/file_safety.rs",
+      "sha256": "5c33a94265a0da39e4ec0b748a965a3c9bd27ed84ddf8035810d1ee06de488c0",
+      "bytes": 28238
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filetools.rs",
+      "sha256": "2d5cacdcf1e28acc11aae9b0bcc260d365974d871745fc7446fdc70d1d075915",
+      "bytes": 124343
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history.rs",
+      "sha256": "ef3ffc1dd4068d83e05c24cfd88402b52762a2d3131f2df67c10fcc383f6ec70",
+      "bytes": 24847
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history_content.rs",
+      "sha256": "c29c8b02fb51faab08772eb67def420944b366d1fc2b74b909d69d5ab69c844e",
+      "bytes": 105882
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/history_projection.rs",
+      "sha256": "3768e767d7d575ce7bbbe4449b91a6074ef3f1ad71805d391fba48215c15f2e8",
+      "bytes": 45806
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/host_auxiliary.rs",
+      "sha256": "8b68e1e31e25ce3b167bed1247991cde90db2895e1f9b59697ca3cc783e79388",
+      "bytes": 4384
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "cdbb39e773884a7ed63a6cddb5161d063fb3e1d151502ff6a4688c4597caa21f",
+      "bytes": 399027
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/main.rs",
+      "sha256": "1e2605f743869279aab4811898e76aa4ee1add2688f2580aaf7cd79824f9b94a",
+      "bytes": 47729
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media.rs",
+      "sha256": "c8e3dd6d71986b1121c25c516e5b699992171934751cc1bd66d9d94327c3921a",
+      "bytes": 82687
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_jimeng.rs",
+      "sha256": "113c538d288cadaf13e232eac4579f779668695be6377717792428a340e86d42",
+      "bytes": 28277
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_metadata.rs",
+      "sha256": "b74984fb3bb8808f6f5b2ef67416a452ae10fedaff35149239f8296644d9d4e5",
+      "bytes": 30058
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_operations.rs",
+      "sha256": "8b81184f4de14e15cd2eb203230319a1e7a345d492c0599f1347e1d52ba7b65e",
+      "bytes": 26180
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_routes.rs",
+      "sha256": "3a98e8cf8cece7859c3541da51bb4c3a7566b808fdd1020211fa4951f0d64e0a",
+      "bytes": 3578
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_run.rs",
+      "sha256": "be4def8b48decab0c316741055d5e5deb78e602424d05b9b4d94472330455c7a",
+      "bytes": 12013
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_source_authority.rs",
+      "sha256": "11529ca59d924e384305de8800839e7f3a4ed5fdc9b3fbd12c5d08e978909a53",
+      "bytes": 13436
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_tools.rs",
+      "sha256": "4d25752493a60b72eafdd4067b4db7089742eef72b229fcbe7133439b245975a",
+      "bytes": 8827
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/model_history.rs",
+      "sha256": "8765ec6a756c87391813f4b01d50ae5535211cf3e3d0db980232c27605feeb81",
+      "bytes": 100292
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/office_pdf.rs",
+      "sha256": "c24c7d907d5eb4cc31898bf4c595704c9c7c5217aa9e02ad96638195d343c192",
+      "bytes": 16065
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/office_routes.rs",
+      "sha256": "293adb748ed65dbca9e8aa289014075b9dd0c0c32e7bb007bf9ee67af0b0e2e8",
+      "bytes": 13068
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/office_tools.rs",
+      "sha256": "f2f0b94fe240a0d2e82c6ce801a02ed9525551f2e17fc7ba5fe096c95dece789",
+      "bytes": 56849
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/operations.rs",
+      "sha256": "e978825fbbe929d1c0989723ddaa67e97b04bce9648ad61e887b5ead55b3e484",
+      "bytes": 112918
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/phone_run_authority.rs",
+      "sha256": "0228befa4497cee86e873c1c25226da9062c98d8af53dccfa42f125ae860f8e2",
+      "bytes": 8843
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/phone_settings.rs",
+      "sha256": "be09e109cc5083aa17a233ca5d211a1775ba5aae3833fd38395aba6a8a04ac48",
+      "bytes": 6749
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/phone_tools.rs",
+      "sha256": "d7c0d50743df5232f76161d1794ac7c9c99aab735527621ea8b9bb2ed23201d3",
+      "bytes": 9100
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/procsupervisor.rs",
+      "sha256": "f31911012fe04edd7335df8f050d006def0c15e0141de0e844ffecc3d6a88778",
+      "bytes": 160561
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resource_artifacts.rs",
+      "sha256": "7f8a5c2c381845ba6998f38088d91553c6653f569f0afe6d08ec4c0cc2f13ce8",
+      "bytes": 55180
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resource_tools.rs",
+      "sha256": "91fdc52c53b13cdf8429bf5cc8ce5680713fb362be68e98350c17cbfd177a911",
+      "bytes": 30062
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resource_url.rs",
+      "sha256": "40df35d55eb049482b1529b8bc6cd2daf98be23832394daf6f5e23db57b5de87",
+      "bytes": 8912
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/resourceio.rs",
+      "sha256": "31de89ef6e075f30ba3f0e88ba30048b8597eb9d598e183e660988d31abf7a0d",
+      "bytes": 163033
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "4a8eab29bfac0519249cfdbf30468ddd425b8f81228206c1a9bb7bbdc784a296",
+      "bytes": 291844
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/search_routes.rs",
+      "sha256": "796d27cc975c4e8cc9c7cb27b6a809d7e4da05753dbb405ed938f25c4823c229",
+      "bytes": 2584
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_admin.rs",
+      "sha256": "01cdc43284a9f99f6efff173d4d6971f5fcac96f61c102e6319af5ac698d537b",
+      "bytes": 58937
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_collab.rs",
+      "sha256": "8c196dee66948109eccb895142a66b74f506d100393c007a4323bbe6cf3c2692",
+      "bytes": 37076
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessionfiles.rs",
+      "sha256": "db0eddd32a48955e82582ee7d5061b62b6d5fe3895587ce9e7a6513c12746236",
+      "bytes": 86104
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "sha256": "2d8040da2897b0ce4fda6cc8007c93fe0cd9bbe49c32f0dfe9c37922d314d864",
+      "bytes": 150422
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/settings_ui.rs",
+      "sha256": "85ccfd365212955b3f0683fcd90a927a29b5a72835c1a55f97d54226490b1fe8",
+      "bytes": 13162
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/skills_github_tests.rs",
+      "sha256": "9c20f4435af6703315230dfa0978c3a8f8db7c0912fb4da131efb37b1a6fa13c",
+      "bytes": 25482
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/slash.rs",
+      "sha256": "63091151d5a0a3ee95964bfac4c331f4aceab3fea039a45f1eb10b689fd002d1",
+      "bytes": 42355
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/task_supervisor.rs",
+      "sha256": "5c79ec7d4acbf35c06ac2f6ccf1750fe8a7fdd4253731e536b187cbc8ff9181f",
+      "bytes": 71966
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/toolgateway.rs",
+      "sha256": "8febb734d749bb28ce4c6e51fc2730509871dedacfccd9e9d26fe781e457465e",
+      "bytes": 126969
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/web_tools.rs",
+      "sha256": "6746cc665de2119ca272536cc45167e88abf3b86234ab6c4ba0fc786f9677488",
+      "bytes": 53090
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t02_tool_gateway.rs",
+      "sha256": "f0b80d5730737c2e16267210723f89cb59b73987de10fafb47c6937c0144a889",
+      "bytes": 78010
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r04_t07_mcp_and_workers.rs",
+      "sha256": "911f0c08e736c089f94abc2235158aecd9fd8387f86f98b9def35c9555490ba5",
+      "bytes": 84092
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r05_t05_timeouts.rs",
+      "sha256": "562cb67380570691d7ef9ae1b9955ea7f8f585f10669dbdf542f1aeba3f060b4",
+      "bytes": 31716
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_resource_tools_completion.rs",
+      "sha256": "ea6f599e11d5a6c02dcf10aa41c019eccf9eed7e7556d3bf65d7a9181eee1db5",
+      "bytes": 28238
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_session_history_content.rs",
+      "sha256": "4d2223a89d1e737b49d14494136a62956c88ba8acc4037bf8d137bb9b7ea8f63",
+      "bytes": 84691
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_t02_compaction.rs",
+      "sha256": "a372332adf5d0123e9aab8639554fc0e20225bb9e46b33e6b9d85b16774be7b5",
+      "bytes": 96047
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_activity_promotion.rs",
+      "sha256": "9531d5486eeb3e26f55775ef989b0ebc47d3b93c49be209cd91337b758a048e6",
+      "bytes": 5082
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_automation_activity.rs",
+      "sha256": "cd127022e75023ca02e432a9e67aac70cabe801f8c6f5f71c45b76e429550155",
+      "bytes": 20354
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_automation_flow.rs",
+      "sha256": "8e54ef78d2376fced600773bc10823616c8344a3adb2b73bff6ee88b2d878173",
+      "bytes": 34100
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_automation_import.rs",
+      "sha256": "01467dd7729ac39e9bb0bd1c8ae12fe22b2c92b70c04cf91c11d0ba1c49d8fbc",
+      "bytes": 17748
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_automation_permission.rs",
+      "sha256": "169cc8447891e92f350dc500ccedbef03b68c9a028e75976c108401b781e3d5c",
+      "bytes": 34383
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_diagnostic.rs",
+      "sha256": "03cf9231b93a0ff8368305169541cafd4d0c689550b5328b6b370c8de26785dc",
+      "bytes": 3691
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_flow.rs",
+      "sha256": "57cd77d4a9b9709d77c5a23b8b541ba1aaa92a3ab7a04b01c687f130c01ccd0a",
+      "bytes": 26470
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_guest_context.rs",
+      "sha256": "5a4b5725463aa8e58f4deea75e9dee7ff7b296851e7fda8794ffb7c6a25bba00",
+      "bytes": 3651
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_native_flow.rs",
+      "sha256": "e103b3a169307b896d762f42f69a84003ed474d93200caa8267f99de9aad8944",
+      "bytes": 17872
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_notice.rs",
+      "sha256": "5428d2705fde7d337aa14740287a02d2c94ac643a09e6963b603ac456427f12b",
+      "bytes": 11905
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_permission.rs",
+      "sha256": "dc8c27bba7584dd2eee172a8c5b394fa96ffc6ee476330bd164628a57c5fb017",
+      "bytes": 7049
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs",
+      "sha256": "560ddbd01a6ac1622c7c18df5ce970b862e522afa89347382c3ff9f80591367c",
+      "bytes": 34469
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_session_routes.rs",
+      "sha256": "c005df9b829be01be0901eb872f9b94f9629c410946bb0c66fab6daece2a0590",
+      "bytes": 19224
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_bridge_worker.rs",
+      "sha256": "bed37976baaf007dc9d590edf57ca03fb232d8d8b0fc6b05de7d521bef02b0a7",
+      "bytes": 3896
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_browser_routes.rs",
+      "sha256": "44154499ddd538297a5371913fc57e0e742b8696c39938853a3fbfdc3d7591e1",
+      "bytes": 35926
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_browser_tools.rs",
+      "sha256": "61ea9f3d3acc3ac274ca9cc31253584c6455b24e1fd61bd14f543ae2a5cfef45",
+      "bytes": 60446
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_conversation_tools.rs",
+      "sha256": "c0d0f8d0f13298bd2c058924b9a54b6cab45380ad092b045ec6b72c554f76cf8",
+      "bytes": 22963
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_daily_fresh_compact.rs",
+      "sha256": "969026364a6e84890181d43c5f5ee1afd6ea56fc7d0cc44567d263d3615098f2",
+      "bytes": 23380
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_heartbeat_plan.rs",
+      "sha256": "19694711f4e8484f7254d4acc04b3293d5fae8eb5c94ee7bc2c2d94f638779f0",
+      "bytes": 13160
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_heartbeat_runtime.rs",
+      "sha256": "93009f371d8bd4f9c8465274f625672685f806ac5f6dfb0f9848e23214f08c86",
+      "bytes": 23772
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_media/mod.rs",
+      "sha256": "e183761f4e0124cb4cf8a5d97be8973c6f3f3a74feba3407cc8f3a5aa35ae1d5",
+      "bytes": 39611
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_office/mod.rs",
+      "sha256": "f37b897873669bd0d6d9b924fc774e4bdbc8f90f5447e7a6cb66203c4e85da75",
+      "bytes": 50042
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_office_tools.rs",
+      "sha256": "02df18fdb4a8833484df7f0a135548e0e4438fd4bdd802b23e5791e786d42ec7",
+      "bytes": 132
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_phone_runtime.rs",
+      "sha256": "a5dae11550151a55c93d9964f1e2a0b39bcf6951f16c4d079d0f09bd66a4f360",
+      "bytes": 56338
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_scheduler.rs",
+      "sha256": "9f8f938d3c2ada9ff1a6d916c4c2befdf274320889527475b172b938a97bd3b1",
+      "bytes": 21915
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_session_collab.rs",
+      "sha256": "6d8c16488ce4cce1db72ef84112e1194236eb657d82444367f6fd646edab7f04",
+      "bytes": 37748
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t05_media.rs",
+      "sha256": "eb0b1c186c1599909404768ae1839d155b8c0ae01feeec41e4fa476058fb141a",
+      "bytes": 114
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_web_tools.rs",
+      "sha256": "1c383010a46098d351056be43228b07d738b96af55eff2fdd6bc8a112f549295",
+      "bytes": 36088
+    },
+    {
+      "path": "scripts/bridge-sdk-diagnostic.ts",
+      "sha256": "bf67b404e864f072bc62a5371972ee815e51cadde106ae6474c54918898707fe",
+      "bytes": 559
+    },
+    {
+      "path": "scripts/bridge-sdk-worker.ts",
+      "sha256": "87a560ac4805492372308bfde5f841d5f15bdc3d9e9879a03bede77995e377d2",
+      "bytes": 404
+    },
+    {
+      "path": "scripts/build-bridge-sdk-workers.mjs",
+      "sha256": "a4af7550fe426031670f32699c9bb1f9128114c8442378210201798a27852c69",
+      "bytes": 998
+    },
+    {
+      "path": "scripts/build-media-worker.mjs",
+      "sha256": "546e9f631d4f2e74cef39b3354a03205651027f696607611dbc75cf65cf780c9",
+      "bytes": 939
+    },
+    {
+      "path": "scripts/build-office-worker.mjs",
+      "sha256": "9ccd6843cef611554a3af308701cbb1bd7f397840a3f63c55b239cb95b23b30a",
+      "bytes": 809
+    },
+    {
+      "path": "scripts/build-server-open.mjs",
+      "sha256": "e6b004809da07a88f795337f8253798ce3c0e8e12325a5395eabafcde8db54e0",
+      "bytes": 8962
+    },
+    {
+      "path": "scripts/build-server-phases.mjs",
+      "sha256": "924ab1137ae02588b37db963a5bb71201e69e8b5f22feff20c2396e4d707027d",
+      "bytes": 33358
+    },
+    {
+      "path": "scripts/build-server.mjs",
+      "sha256": "14fbda469c4fd578155ee26adf7ff1c40b90c414b0ba2032a4940ae12b918bb5",
+      "bytes": 10703
+    },
+    {
+      "path": "scripts/generate-media-metadata.mjs",
+      "sha256": "945e6d7ef0c184677fe77a7e8d2f5d789efcc9eb5dbb1088c31318605a78746d",
+      "bytes": 3082
+    },
+    {
+      "path": "scripts/media-jimeng-worker.ts",
+      "sha256": "aedf50b2f182255fd7e5f5b08263840397f7513346cecd5bc1e742a854c78381",
+      "bytes": 5578
+    },
+    {
+      "path": "scripts/office-document-worker.ts",
+      "sha256": "8601339dd911753a728bdd7cf03c1281c027c38687464b80e2c989361c73dc6d",
+      "bytes": 3801
+    },
+    {
+      "path": "tests/desktop-notification-delivery.test.ts",
+      "sha256": "37e8c2e44d30bfc277c131cd2a58bfd8a3c4889799310137d70159a54c9409a5",
+      "bytes": 2252
+    },
+    {
+      "path": "tests/feishu-adapter.test.ts",
+      "sha256": "c07e0174f048c3b9de369d2b2a9847396b5156703f273aaaef89d766c4111cbe",
+      "bytes": 36788
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/README.md",
+      "sha256": "4102ca852f5c6b7a367004e40dc74fffc898e95a3f55efe4f7da27e5892de7ad",
+      "bytes": 966
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/external-feishu.mjs",
+      "sha256": "d6d7e54ea6c0f2da935857324fdd7cf789780a92a66bb90e82af366e635aab92",
+      "bytes": 1724
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/external-telegram.mjs",
+      "sha256": "8b4e49ed20d480e32928afed98e657d97db75435ff98481ef9473111043ed3bd",
+      "bytes": 1368
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/external-ws.mjs",
+      "sha256": "e713289437b244c18ea07619e071cc04a8300a816385daa6fb51dc60ad28b8d9",
+      "bytes": 2106
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/loader.mjs",
+      "sha256": "2b8b50c7e4e705d0f1e8b993fb8578cd522521dbd23121aad526708666048817",
+      "bytes": 689
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/platform-http.mjs",
+      "sha256": "4a185930498b8da90911eba108e37387147e55e66037af6785c90cefbbf9bee2",
+      "bytes": 3273
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/state.mjs",
+      "sha256": "3170cbc6ff6458c31ce6e2eecdf2aa7e3f3119d4cedcd66068abaf648340d885",
+      "bytes": 1286
+    },
+    {
+      "path": "tests/fixtures/r07-bridge-platforms/undici-facade.mjs",
+      "sha256": "d6bb5e190b859376097e5b429bf62a761182bd340025e1e114340972344dc78e",
+      "bytes": 168
+    },
+    {
+      "path": "tests/migration/r01-t02/automation-contract.test.mjs",
+      "sha256": "b219f8f1bbbd37be9d4e938a3e739ea57642928f0b314d6a619862e3889054f4",
+      "bytes": 2646
+    },
+    {
+      "path": "tests/migration/r01-t02/bridge-contract.test.mjs",
+      "sha256": "f79190279ce9b8a30072b204a61731beff855121658f498794444d45f135bb32",
+      "bytes": 6150
+    },
+    {
+      "path": "tests/migration/r01-t02/browser-contract.test.mjs",
+      "sha256": "79f30f1d6cc68bea73fb558e21039e6fd930b867770e7495c2e87d37bccf1e62",
+      "bytes": 2749
+    },
+    {
+      "path": "tests/migration/r01-t02/type-usage.ts",
+      "sha256": "b6e6f0f0a9a8415481542108cca7199a661965c3789118d0922d34b44ad55713",
+      "bytes": 8183
+    },
+    {
+      "path": "tests/migration/r01-t02/validator.mjs",
+      "sha256": "13a9b5fdc23485427d62be8c8435bd822aad65371ba03ea662a75669c4c61e02",
+      "bytes": 8297
+    },
+    {
+      "path": "tests/r07-bridge-sdk-worker.test.ts",
+      "sha256": "579e123171c8e9fab7778d996b414c24e1dd43e19235e6dfaf88cf2b56988217",
+      "bytes": 60230
+    },
+    {
+      "path": "tests/r07-media-sdk-worker.test.ts",
+      "sha256": "efe8db0b03b35e0abd642438941ac47c5871ec63d295d8f47fa5d9b08ace3950",
+      "bytes": 4441
+    },
+    {
+      "path": "tests/r07-office-document-worker.test.ts",
+      "sha256": "46ffce0523ce04611373bf1d403a6fa3a66173ea65dc0ed50e1129a6c8f62b21",
+      "bytes": 4843
+    },
+    {
+      "path": "tests/rust-browser-control.test.ts",
+      "sha256": "f97beae35f1630f5c5c98f5ca48ddf07436bfe746e477395bb17cf6ce12ce6db",
+      "bytes": 3292
+    },
+    {
+      "path": "tests/rust-browser-ipc.test.ts",
+      "sha256": "5755b0b0feb155078779ee4363ef59303d721a8fba8b3e1bbb1c036b595d81d9",
+      "bytes": 6382
+    }
+  ],
+  "archive": {
+    "path": "source-t05c.tar.gz",
+    "sha256": "478c9d33df66b4628951895e8d00179f46adeb130880d16ae1c337c4e4e7b7b8"
+  }
+}

@@ -1,0 +1,46 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:643:5
+    |
+641 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+642 |     #[serde(default)]
+643 |     limit: Option<u32>,
+    |     ^^^^^
+644 |     #[serde(default)]
+645 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (test "r07_t10_observability") generated 1 warning
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 42.21s
+     Running tests/r07_t10_observability.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t10_observability-6c7e6183c0005d95)
+
+running 1 test
+test r07_t10_query_page_aggregate_detail_export_import ... FAILED
+
+failures:
+
+---- r07_t10_query_page_aggregate_detail_export_import stdout ----
+
+thread 'r07_t10_query_page_aggregate_detail_export_import' (4490313) panicked at crates/lingxi-service/tests/r07_t10_observability.rs:266:5:
+assertion `left == right` failed
+  left: ["new-n2", "legacy-c4"]
+ right: ["legacy-c4", "new-n2"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    r07_t10_query_page_aggregate_detail_export_import
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t10_observability`

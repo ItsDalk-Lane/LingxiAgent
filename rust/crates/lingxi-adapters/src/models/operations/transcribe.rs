@@ -149,13 +149,7 @@ pub fn build_transcription(
                 format!("{}/chat/completions", route.endpoint.trim_end_matches('/')),
                 body,
             );
-            Ok(match auth {
-                ApplicableAuth::None => plan,
-                ApplicableAuth::Bearer(token) => plan.with_header("api-key", &token.clone()),
-                ApplicableAuth::Header { name, value } => {
-                    plan.with_header(&name.clone(), &value.clone())
-                }
-            })
+            Ok(plan.with_auth(auth, BearerStyle::NamedHeader("api-key")))
         }
         ProtocolFamily::DashscopeQwenAsrChat => {
             // Bearer + the chat-completions envelope with stream:false and
@@ -197,6 +191,10 @@ pub fn build_transcription(
             let token = match auth {
                 ApplicableAuth::Bearer(token) => token.clone(),
                 ApplicableAuth::Header { value, .. } => value.clone(),
+                ApplicableAuth::WithHeaders { base, .. } => base
+                    .primary_material()
+                    .ok_or_else(|| parse::invalid("BigASR requires a primary API key".into()))?
+                    .to_string(),
                 ApplicableAuth::None => {
                     return Err(parse::invalid(format!(
                         "provider {} (volcengine-bigasr) resolved with auth kind none — the \
@@ -240,7 +238,8 @@ pub fn build_transcription(
             .with_header("x-api-key", &token)
             .with_header("x-api-resource-id", "volc.bigasr.auc_turbo")
             .with_header("x-api-request-id", &request_id)
-            .with_header("x-api-sequence", "-1"))
+            .with_header("x-api-sequence", "-1")
+            .with_auth(auth, BearerStyle::NamedHeader("x-api-key")))
         }
         other => Err(parse::invalid(format!(
             "protocol family {} does not serve speech recognition (wiring bug: the gateway \

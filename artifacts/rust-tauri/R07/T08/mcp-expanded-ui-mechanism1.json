@@ -1,0 +1,35 @@
+{
+  "scope": "DEVELOPMENT_CONSUMER_MECHANISM_NOT_MCP_SDK_OR_NATIVE_PROOF",
+  "observedAt": "2026-10-18T10:57:51.650333+00:00",
+  "checks": [
+    {
+      "command": "npx vitest run desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx --reporter=default",
+      "exitCode": 0,
+      "files": 2,
+      "passed": 17,
+      "rawOutput": "Captured in tool output only; no fabricated standalone raw log."
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 2,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-types1.log",
+      "reason": "New formal optional nullable error field was wider than old local poll response type."
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-types2.log",
+      "fix": "Public poll method now returns the generated formal McpOAuthPollResponse."
+    }
+  ],
+  "sourceSha256": {
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "95015aa1a32781f34c88aee21fa5455ecca1422ebf5c5dc14d38f7702fe157f1",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "cfaa04edc880632f90b122140ce49ed27ff9c7d4da8f097ce364a064f322cf6e",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts": "0b242725f665d116d4109f04bfe5412476cf0537cafd9824c92fe30d3b8964bd"
+  },
+  "limitations": [
+    "No real OAuth/MCP external server has run in these checks.",
+    "No frozen acceptance result.",
+    "Rust/protocol sources remain paused for root SDK compile and separate session permission counterexamples."
+  ]
+}

@@ -1,0 +1,47 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.47s
+     Running tests/r06_session_map_browser_completion.rs (rust/target-r07/debug/deps/r06_session_map_browser_completion-791a001c1551a21a)
+
+running 1 test
+test current_map_seven_groups_real_storage_models_and_receipts ... FAILED
+
+failures:
+
+---- current_map_seven_groups_real_storage_models_and_receipts stdout ----
+SESSION-map-ERR: Traceback (most recent call last):
+SESSION-map-ERR:   File "/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/../../../tests/rust-native/session-map-live.py", line 203, in <module>
+SESSION-map-ERR:     assert ui.wait(timeout=120)==0,'actual map production window failed'
+SESSION-map-ERR:            ^^^^^^^^^^^^^^^^^^^^^^^
+SESSION-map-ERR: AssertionError: actual map production window failed
+
+thread 'current_map_seven_groups_real_storage_models_and_receipts' (6360936) panicked at crates/lingxi-service/tests/r06_session_map_browser_completion.rs:33:5:
+当前生产检查失败：/private/tmp/lingxi-r07-tests/tmp/lingxi-r06-map-91074-1792382620041440000
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    current_map_seven_groups_real_storage_models_and_receipts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 14.02s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_session_map_browser_completion`

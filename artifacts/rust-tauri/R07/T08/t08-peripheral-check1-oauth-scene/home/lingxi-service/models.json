@@ -1,0 +1,38 @@
+{
+  "models": {
+    "chat": {
+      "capabilities": {
+        "tools": true
+      },
+      "model": "alias-model",
+      "provider": "openai-codex"
+    }
+  },
+  "providers": {
+    "openai-codex": {
+      "auth": {
+        "authorizeEndpoint": "http://127.0.0.1:58545/authorize",
+        "clientId": "local-alias-client",
+        "flow": "authorizationCodePkce",
+        "kind": "oauth",
+        "tokenEndpoint": "http://127.0.0.1:58545/token"
+      },
+      "endpoint": "http://127.0.0.1:58545/v1",
+      "metadata": {
+        "future": {
+          "preserve": 19
+        }
+      },
+      "protocol": "openai-codex-responses"
+    },
+    "unrelated": {
+      "auth": {
+        "apiKey": "synthetic-unrelated-key",
+        "kind": "apiKey"
+      },
+      "endpoint": "http://127.0.0.1:9/v1",
+      "models": [],
+      "protocol": "openai-completions"
+    }
+  }
+}

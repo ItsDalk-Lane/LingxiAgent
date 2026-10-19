@@ -1,0 +1,30 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.22s
+     Running tests/r06_ar_f01_history.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f01_history-5fa2a1eb3bade70f)
+
+running 8 tests
+test f01_all_five_families_actual_wire_roles ... ok
+test f01_archive_child_append_race_and_reset_foreign_writer_controls ... ok
+test f01_c01_real_authenticated_history_and_isolation ... ok
+test f01_c02_fork_restart_retry_rewind_source_delete ... ok
+test f01_c03_projected_tools_opaque_origins_corruption ... ok
+test f01_c04_cross_run_compaction_failure_restart ... ok
+test f01_child_inherits_authorized_material_only ... ok
+test f01_unknown_outcome_actual_crash_wire_diagnostic ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.77s
+
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 7 tests
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test revoked_source_is_rejected_without_a_run ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+

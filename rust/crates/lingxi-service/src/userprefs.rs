@@ -229,3 +229,377 @@ pub async fn session_permission_default_get_route(State(state): State<ServiceSta
             .into_response(),
     }
 }
+
+// 与 shared/keybindings-preferences.cjs 的注册表和规范一致；只存显式覆盖，PUT全量替换。
+const KEYBINDING_DEFAULTS: &[(&str, &str)] = &[
+    ("quick-chat.toggle", "Alt+Space"),
+    ("app.restart", "CommandOrControl+Alt+R"),
+    ("app.open-settings", "CommandOrControl+,"),
+    ("app.new-session", "CommandOrControl+N"),
+    ("app.toggle-sidebar", "CommandOrControl+Shift+S"),
+    ("voice.record-toggle", "CommandOrControl+Shift+M"),
+];
+fn preference_error(status: StatusCode, message: &str) -> Response {
+    (status, Json(json!({"error":message}))).into_response()
+}
+fn js_trim(text: &str) -> &str {
+    text.trim_matches(|c| matches!(c, '\u{0009}'..='\u{000d}' | '\u{0020}' | '\u{00a0}' | '\u{1680}' | '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' | '\u{205f}' | '\u{3000}' | '\u{feff}'))
+}
+fn normalize_binding(value: &Value) -> String {
+    let Some(text) = value.as_str() else {
+        return String::new();
+    };
+    let raw = text.replace('\u{00a0}', " ");
+    if js_trim(&raw).is_empty() {
+        return String::new();
+    }
+    raw.split('+')
+        .filter_map(|part| {
+            if part == "Spacebar" || (!part.is_empty() && js_trim(part).is_empty()) {
+                return Some("Space".to_owned());
+            }
+            let part = js_trim(part);
+            if part.is_empty() {
+                return None;
+            }
+            let normalized = match part.to_ascii_lowercase().as_str() {
+                "shift" => "Shift",
+                "control" | "ctrl" => "Control",
+                "alt" | "option" => "Alt",
+                "meta" => "Meta",
+                "cmd" | "command" => "Command",
+                "commandorcontrol" | "cmdorctrl" | "ctrlorcommand" => "CommandOrControl",
+                "space" => "Space",
+                _ if part == "Esc" => "Escape",
+                _ => "",
+            };
+            Some(if !normalized.is_empty() {
+                normalized.to_owned()
+            } else if part.encode_utf16().count() == 1 {
+                part.to_uppercase()
+            } else {
+                part.to_owned()
+            })
+        })
+        .collect::<Vec<_>>()
+        .join("+")
+}
+fn normalize_keybindings(source: &Value) -> Value {
+    let mut result = serde_json::Map::new();
+    for (id, default) in KEYBINDING_DEFAULTS {
+        let Some(raw) = source.get(*id).filter(|v| !v.is_null()) else {
+            continue;
+        };
+        let values = raw.as_array().cloned().unwrap_or_else(|| vec![raw.clone()]);
+        let mut keys = Vec::new();
+        for value in values {
+            let key = normalize_binding(&value);
+            if !key.is_empty() && !keys.contains(&key) {
+                keys.push(key);
+            }
+            if keys.len() == 3 {
+                break;
+            }
+        }
+        if keys.len() != 1 || keys[0] != *default {
+            result.insert((*id).to_owned(), json!(keys));
+        }
+    }
+    Value::Object(result)
+}
+fn sidebar_ids(source: &Value) -> Value {
+    let mut ids = Vec::<String>::new();
+    if let Some(values) = source.as_array() {
+        for value in values {
+            let Some(id) = value
+                .as_str()
+                .map(js_trim)
+                .filter(|id| !id.is_empty() && id.encode_utf16().count() <= 240)
+            else {
+                continue;
+            };
+            if !ids.iter().any(|existing| existing == id) {
+                ids.push(id.to_owned());
+            }
+            if ids.len() == 256 {
+                break;
+            }
+        }
+    }
+    json!(ids)
+}
+fn normalize_sidebar(source: &Value) -> Value {
+    json!({"projectView":{
+        "collapsedProjectIds":sidebar_ids(&source["projectView"]["collapsedProjectIds"]),
+        "collapsedFolderIds":sidebar_ids(&source["projectView"]["collapsedFolderIds"]),
+        "showAllProjectIds":sidebar_ids(&source["projectView"]["showAllProjectIds"])
+    },"sessionList":{"rowMode":if source["sessionList"]["rowMode"] == "single-line" {"single-line"}else{"two-line"}}})
+}
+fn merge_sidebar(current: &Value, patch: &Value) -> Value {
+    let mut value = normalize_sidebar(current);
+    for field in [
+        "collapsedProjectIds",
+        "collapsedFolderIds",
+        "showAllProjectIds",
+    ] {
+        if let Some(raw) = patch.get("projectView").and_then(|v| v.get(field)) {
+            value["projectView"][field] = sidebar_ids(raw);
+        }
+    }
+    if let Some(mode) = patch
+        .get("sessionList")
+        .and_then(|v| v.get("rowMode"))
+        .and_then(Value::as_str)
+    {
+        if matches!(mode, "single-line" | "two-line") {
+            value["sessionList"]["rowMode"] = json!(mode);
+        }
+    }
+    value
+}
+#[derive(Clone, Copy)]
+enum InterfacePreference {
+    Keybindings,
+    Sidebar,
+}
+impl InterfacePreference {
+    fn key(self) -> &'static str {
+        match self {
+            Self::Keybindings => "keybindings",
+            Self::Sidebar => "sidebar_ui",
+        }
+    }
+    fn scope(self) -> &'static str {
+        match self {
+            Self::Keybindings => "settings.write",
+            Self::Sidebar => "chat",
+        }
+    }
+    fn wrapper(self) -> &'static str {
+        match self {
+            Self::Keybindings => "keybindings",
+            Self::Sidebar => "sidebarUi",
+        }
+    }
+    fn normalize(self, value: &Value) -> Value {
+        match self {
+            Self::Keybindings => normalize_keybindings(value),
+            Self::Sidebar => normalize_sidebar(value),
+        }
+    }
+}
+fn current_preference_authority(
+    state: &ServiceState,
+    principal: &crate::auth::Principal,
+    scope: &str,
+) -> bool {
+    principal.has_scope(scope)
+        && state.auth().validate_principal(principal).is_ok()
+        && (principal.credential_kind != crate::auth::CredentialKind::WebSession
+            || state
+                .management
+                .web_session_current(principal, state.clock.now_unix_ms(), true)
+                .unwrap_or(false))
+}
+impl MemoryService {
+    // 读写同一MemoryService/preferences锁和原子写口，绝不另建偏好文件或持久化缓存。
+    #[allow(clippy::result_large_err)]
+    fn interface_preferences(&self, kind: InterfacePreference) -> Result<Value, Response> {
+        let root = self.read_root()?;
+        let raw = root
+            .get(kind.key())
+            .filter(|v| !v.is_null())
+            .cloned()
+            .unwrap_or_else(|| json!({}));
+        if !raw.is_object() {
+            return Err(preference_error(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "saved interface preferences must be an object",
+            ));
+        }
+        Ok(kind.normalize(&raw))
+    }
+    #[allow(clippy::result_large_err)]
+    fn set_interface_preferences(
+        &self,
+        kind: InterfacePreference,
+        patch: Value,
+        authorized: impl Fn() -> bool,
+    ) -> Result<Value, Response> {
+        let _lock = crate::agents_admin::preferences_locked();
+        let revoked = || preference_error(StatusCode::FORBIDDEN, "preference_authority_revoked");
+        if !authorized() {
+            return Err(revoked());
+        }
+        let mut root = self.read_root()?;
+        let current = root
+            .get(kind.key())
+            .filter(|v| !v.is_null())
+            .cloned()
+            .unwrap_or_else(|| json!({}));
+        if !current.is_object() {
+            return Err(preference_error(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "saved interface preferences must be an object",
+            ));
+        }
+        let value = match kind {
+            InterfacePreference::Keybindings => normalize_keybindings(&patch),
+            InterfacePreference::Sidebar => merge_sidebar(&current, &patch),
+        };
+        root[kind.key()] = value.clone();
+        if !authorized() {
+            return Err(revoked());
+        }
+        self.write_preferences_root_authorized(&root, &authorized)
+            .map_err(|_| {
+                if !authorized() {
+                    revoked()
+                } else {
+                    preference_error(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "cannot save interface preferences",
+                    )
+                }
+            })?;
+        Ok(value)
+    }
+}
+#[allow(clippy::result_large_err)]
+fn interface_body(body: axum::body::Bytes, kind: InterfacePreference) -> Result<Value, Response> {
+    let value: Value = serde_json::from_slice(&body)
+        .map_err(|_| preference_error(StatusCode::BAD_REQUEST, "invalid JSON body"))?;
+    let value = value.get(kind.wrapper()).unwrap_or(&value);
+    if !value.is_object() {
+        return Err(preference_error(
+            StatusCode::BAD_REQUEST,
+            "interface preferences must be an object",
+        ));
+    }
+    if matches!(kind, InterfacePreference::Sidebar) {
+        for key in ["projectView", "sessionList"] {
+            if value.get(key).is_some_and(|v| !v.is_object()) {
+                return Err(preference_error(
+                    StatusCode::BAD_REQUEST,
+                    "sidebar preference sections must be objects",
+                ));
+            }
+        }
+    }
+    Ok(value.clone())
+}
+fn interface_response(kind: InterfacePreference, value: Value, saved: bool) -> Response {
+    // 统一协议类型限定返回字段；额外的偏好/秘密绝不顺着整个root返回。
+    match kind {
+        InterfacePreference::Keybindings => match serde_json::from_value(value) {
+            Ok(keybindings) => {
+                if saved {
+                    Json(lingxi_protocol::KeybindingsUpdate {
+                        ok: true,
+                        keybindings,
+                    })
+                    .into_response()
+                } else {
+                    Json(lingxi_protocol::KeybindingsPreferences { keybindings }).into_response()
+                }
+            }
+            Err(_) => preference_error(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "invalid normalized keybindings",
+            ),
+        },
+        InterfacePreference::Sidebar => match serde_json::from_value(value) {
+            Ok(sidebar_ui) => {
+                if saved {
+                    Json(lingxi_protocol::SidebarUiUpdate {
+                        ok: true,
+                        sidebar_ui,
+                    })
+                    .into_response()
+                } else {
+                    Json(lingxi_protocol::SidebarUiResponse { sidebar_ui }).into_response()
+                }
+            }
+            Err(_) => preference_error(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "invalid normalized sidebar preferences",
+            ),
+        },
+    }
+}
+async fn interface_get(
+    state: ServiceState,
+    principal: crate::auth::Principal,
+    kind: InterfacePreference,
+) -> Response {
+    let scope = if matches!(kind, InterfacePreference::Keybindings) {
+        "settings.read"
+    } else {
+        "chat"
+    };
+    if !current_preference_authority(&state, &principal, scope) {
+        return preference_error(StatusCode::FORBIDDEN, "preference_authority_revoked");
+    }
+    match state.memory().interface_preferences(kind) {
+        Ok(value) if current_preference_authority(&state, &principal, scope) => {
+            interface_response(kind, value, false)
+        }
+        Ok(_) => preference_error(StatusCode::FORBIDDEN, "preference_authority_revoked"),
+        Err(error) => error,
+    }
+}
+async fn interface_put(
+    state: ServiceState,
+    principal: crate::auth::Principal,
+    kind: InterfacePreference,
+    body: axum::body::Bytes,
+) -> Response {
+    let patch = match interface_body(body, kind) {
+        Ok(patch) => patch,
+        Err(error) => return error,
+    };
+    // 阻塞文件锁不占HTTP执行线程；排队后与写入前都核对原主体和原scope。
+    match tokio::task::spawn_blocking(move || {
+        state
+            .memory()
+            .set_interface_preferences(kind, patch, || {
+                current_preference_authority(&state, &principal, kind.scope())
+            })
+            .map_err(Box::new)
+    })
+    .await
+    {
+        Ok(Ok(value)) => interface_response(kind, value, true),
+        Ok(Err(error)) => *error,
+        Err(_) => preference_error(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "interface preference task failed",
+        ),
+    }
+}
+pub async fn keybindings_get_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+) -> Response {
+    interface_get(state, principal, InterfacePreference::Keybindings).await
+}
+pub async fn keybindings_put_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+    body: axum::body::Bytes,
+) -> Response {
+    interface_put(state, principal, InterfacePreference::Keybindings, body).await
+}
+pub async fn sidebar_ui_get_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+) -> Response {
+    interface_get(state, principal, InterfacePreference::Sidebar).await
+}
+pub async fn sidebar_ui_put_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+    body: axum::body::Bytes,
+) -> Response {
+    interface_put(state, principal, InterfacePreference::Sidebar, body).await
+}

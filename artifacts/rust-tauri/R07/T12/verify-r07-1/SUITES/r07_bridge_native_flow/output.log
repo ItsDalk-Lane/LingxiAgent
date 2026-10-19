@@ -1,0 +1,28 @@
+
+running 4 tests
+test disabling_connector_cancels_actual_run_and_cleans_the_original_native_draft ... ok
+test actual_platform_document_bytes_are_extracted_into_the_real_model_submission ... ok
+test actual_settings_disable_waiting_receipt_and_choose_plain_native_draft ... ok
+test actual_sdk_native_receipt_rich_draft_and_final_have_separate_durable_proofs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.04s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.91s
+     Running tests/r07_bridge_native_flow.rs (rust/target-r07/debug/deps/r07_bridge_native_flow-9d86fb33d5bf4dd8)

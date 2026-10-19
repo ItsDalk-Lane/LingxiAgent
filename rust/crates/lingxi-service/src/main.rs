@@ -384,6 +384,10 @@ async fn main() -> ExitCode {
         },
         ..lingxi_service::ServiceDeps::default()
     };
+    if let Err(error) = lingxi_service::host_auxiliary::configure(&mut deps) {
+        eprintln!("error: {error}");
+        return ExitCode::from(2);
+    }
     // The environment is read HERE, at the composition root only (DEP-08
     // keeps the domain free of std::env by machine-checked rule).
     let env_home = std::env::var(HOME_ENV_VAR).ok();
@@ -470,9 +474,19 @@ async fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
-    if let Some((source, plane)) = model_plane {
+    let active = model_plane.is_some();
+    let (source, plane) = model_plane
+        .map(|(source, plane)| (Some(source), plane))
+        .unwrap_or((
+            None,
+            lingxi_adapters::models::config::ModelPlaneConfig::default(),
+        ));
+    deps.model_plane_activation = Some(std::sync::Arc::new(std::sync::atomic::AtomicBool::new(
+        active,
+    )));
+    {
         tracing::info!(
-            model_plane_source = %source.path().display(),
+            model_plane_source = ?source.as_ref().map(|source|source.path().display().to_string()),
             providers = plane.providers.len(),
             "model plane resolved (credentials never logged)"
         );
@@ -484,7 +498,10 @@ async fn main() -> ExitCode {
         // management reload surface on every plane reload.
         let network_plane =
             std::sync::Arc::new(lingxi_adapters::models::network::NetworkPlane::new(
-                lingxi_adapters::models::network::NetworkPolicy::from_config(&plane.network),
+                match lingxi_service::model_configuration::ModelConfiguration::initial_network_policy(&layout.home, &plane.network) {
+                    Ok(policy) => policy,
+                    Err(error) => { eprintln!("error: network preferences: {error}"); return ExitCode::from(2); }
+                },
             ));
         deps.network_plane = Some(network_plane.clone());
         // R05-T02 (C01): the credential service — the single material exit
@@ -509,7 +526,7 @@ async fn main() -> ExitCode {
         deps.model_gateway = Some(std::sync::Arc::new(
             lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
         ));
-        deps.model_plane_source = Some(source);
+        deps.model_plane_source = source;
     }
 
     // ---- context compiler (R06-T01) ----

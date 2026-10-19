@@ -1,0 +1,42 @@
+{
+  "status": "IMPLEMENTED_NOT_EXECUTED",
+  "change": "ModelConfiguration公开canonical_provider_id(&self,requested:&str)->String异步只读入口，使用同发布锁与provider_in_document精确Codex双别名；保留Source原键，未匹配的其它身份仍交原CredentialService按自身拒绝。",
+  "routes": [
+    "credentials revoke",
+    "login start",
+    "manual callback",
+    "device poll",
+    "logout",
+    "OAuth model list",
+    "OAuth custom model add",
+    "OAuth custom model remove"
+  ],
+  "preserved": "原principal/local-only/scope、JSON错误和审计流程不变；登录写面unknown/nonOAuth沿原409，列表两者沿原最小404。响应、审计和模型列表均使用真实canonical provider。",
+  "regression": {
+    "path": "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs",
+    "test": "oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source",
+    "cases": [
+      "Source openai-codex，界面请求openai-codex-oauth，真实本地PKCE start+错state零交换+callback成功",
+      "Source openai-codex-oauth，请求openai-codex，真实本地device start+poll成功"
+    ],
+    "checks": [
+      "无token401、只读device403、近似名字未知/非OAuth不借凭证，零外发token请求",
+      "canonical列表登录前空/登录后真实原绑定模型，凭证文件仅原Source键",
+      "下一次真实ModelHealth到本地OpenAI协议端，Bearer与model一致，真实usage provider与physical1",
+      "自定义模型add/list/remove、logout清登录与可用模型、再次真实登录后revoke；原审计事件均canonical且无token",
+      "整个往返Source原始字节未改、正常服务/本地响应端退出"
+    ]
+  },
+  "validation": {
+    "cargo": "未运行；root统一编译及执行",
+    "rustfmt": "仅三个自有文件，退出0",
+    "diffCheck": "仅三个文件，退出0",
+    "realAccounts": "未使用",
+    "externalRequests": "本回合未执行测试；回归只允许127.0.0.1合成OAuth/model响应"
+  },
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/model_configuration.rs": "b51a560153606f91a9d3db619b31b23e93f44ab24f3b6957c337c8ab7874cf9a",
+    "rust/crates/lingxi-service/src/management.rs": "0a3c56df581d730d876a79d6c2b959fa3c5ca11a59ae889d406fe4ad18c89c83",
+    "rust/crates/lingxi-service/tests/r07_t08_oauth_alias.rs": "e5e4d1408ad883dd5ef343a52b4e96e671290365e3cf0bebfb6a461875d4a60b"
+  }
+}

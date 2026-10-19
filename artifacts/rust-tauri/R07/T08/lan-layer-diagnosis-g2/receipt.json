@@ -1,0 +1,613 @@
+{
+  "scope": "OWNED_FIXED_G_BUILD_LAN_HEALTH_THEN_FOREIGN_ORIGIN_DIFFERENCE_NOT_ACCEPTANCE",
+  "startedAt": "2026-10-18T12:37:25.371722+00:00",
+  "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/isolated/owned-service",
+  "isolatedHome": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/isolated/home",
+  "originalStableCopy": "/private/tmp/lingxi-r07-lan-layer-g1-d6n8vwz1/owned-service",
+  "previousReceiptSha256": "828fb70cdfee2926a33827c751ba8f7dd86e4b3bd4a7c798988a283a310799f2",
+  "buildReceiptSha256": "a30181a04cf896bfb8b2b833cbf7743ae5593596590c05f4b6107d9b5dbb18b6",
+  "sourceFingerprint": "6d00d82b598ad23f9cbbc05f61e9514cf8e7f771a8434f9f5884672b3782cf2f",
+  "binarySha256Before": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "interface": "en0",
+  "lanIp": "192.168.3.96",
+  "networkSettingsChanged": false,
+  "credentialsUsed": false,
+  "manualClockInjected": false,
+  "requests": [
+    {
+      "label": "lan-health",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "destination": [
+        "192.168.3.96",
+        53631
+      ],
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 251,
+      "startedAt": "2026-10-18T12:37:27.549358+00:00",
+      "startedElapsed": 2.053855,
+      "localSocket": [
+        "192.168.3.96",
+        53632
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        53631
+      ],
+      "connectedElapsedSeconds": 0.004636,
+      "requestBytes": 79,
+      "requestWrittenElapsedSeconds": 0.004662,
+      "firstResponseByteElapsedSeconds": 0.014549,
+      "responseEof": true,
+      "status": 200,
+      "responseSha256": "a4a0aa9bcb2b63c3fb29928d436b885c2944545954300707a4f6b90317c21d9d",
+      "elapsedSeconds": 0.014597,
+      "endedElapsed": 2.068454,
+      "endedAt": "2026-10-18T12:37:27.564018+00:00",
+      "postResponseSamples": 2
+    },
+    {
+      "label": "lan-foreign-origin-login",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "destination": [
+        "192.168.3.96",
+        53631
+      ],
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 341,
+      "startedAt": "2026-10-18T12:37:28.140295+00:00",
+      "startedElapsed": 2.644806,
+      "localSocket": [
+        "192.168.3.96",
+        53633
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        53631
+      ],
+      "connectedElapsedSeconds": 0.000431,
+      "requestBytes": 241,
+      "requestWrittenElapsedSeconds": 0.000468,
+      "firstResponseByteElapsedSeconds": 0.00976,
+      "responseEof": true,
+      "status": 403,
+      "responseSha256": "a351cc035ae94a8f0d8bf0e12995c6a88c1d5d9ef5ffbdde0aa3c37d568139cd",
+      "elapsedSeconds": 0.009806,
+      "endedElapsed": 2.654615,
+      "endedAt": "2026-10-18T12:37:28.150155+00:00",
+      "postResponseSamples": 2
+    },
+    {
+      "label": "same-process-loopback-foreign-origin-login",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "destination": [
+        "127.0.0.1",
+        53631
+      ],
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 341,
+      "startedAt": "2026-10-18T12:37:28.696145+00:00",
+      "startedElapsed": 3.200646,
+      "localSocket": [
+        "127.0.0.1",
+        53634
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        53631
+      ],
+      "connectedElapsedSeconds": 0.000266,
+      "requestBytes": 238,
+      "requestWrittenElapsedSeconds": 0.000304,
+      "firstResponseByteElapsedSeconds": 0.001527,
+      "responseEof": true,
+      "status": 403,
+      "responseSha256": "2b7d2f7692b70520562abe7118f278052fc55ae2ae7a6a971daac91422a2d7b9",
+      "elapsedSeconds": 0.001555,
+      "endedElapsed": 3.202205,
+      "endedAt": "2026-10-18T12:37:28.697748+00:00",
+      "postResponseSamples": 2
+    }
+  ],
+  "samples": [
+    {
+      "stage": "startup",
+      "startedElapsed": 2.053806,
+      "startedAt": "2026-10-18T12:37:27.549320+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 2.053826,
+        "endedElapsed": 2.10366,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.103664,
+        "endedElapsed": 2.11179,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.111796,
+        "endedElapsed": 2.115964,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 2.115968
+    },
+    {
+      "stage": "lan-health",
+      "startedElapsed": 2.318425,
+      "startedAt": "2026-10-18T12:37:27.813950+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 2.318467,
+        "endedElapsed": 2.36759,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.367597,
+        "endedElapsed": 2.375723,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.375728,
+        "endedElapsed": 2.379783,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 2.379789
+    },
+    {
+      "stage": "lan-health",
+      "startedElapsed": 2.583013,
+      "startedAt": "2026-10-18T12:37:28.078536+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 2.58305,
+        "endedElapsed": 2.632668,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.632674,
+        "endedElapsed": 2.640897,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.640901,
+        "endedElapsed": 2.644649,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 2.644653
+    },
+    {
+      "stage": "lan-foreign-origin-login",
+      "startedElapsed": 2.848344,
+      "startedAt": "2026-10-18T12:37:28.343865+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 2.848381,
+        "endedElapsed": 2.898147,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.898154,
+        "endedElapsed": 2.906191,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53633     TIME_WAIT            586          341  408128  146988    owned-service:64639  02131 00000004 00000000002a38cc 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 2.906194,
+        "endedElapsed": 2.910197,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 2.9102
+    },
+    {
+      "stage": "lan-foreign-origin-login",
+      "startedElapsed": 3.115173,
+      "startedAt": "2026-10-18T12:37:28.610719+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 3.115249,
+        "endedElapsed": 3.181984,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 3.182001,
+        "endedElapsed": 3.193493,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53633     TIME_WAIT            586          341  408128  146988    owned-service:64639  02131 00000004 00000000002a38cc 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 3.193505,
+        "endedElapsed": 3.200418,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 3.200428
+    },
+    {
+      "stage": "same-process-loopback-foreign-origin-login",
+      "startedElapsed": 3.405524,
+      "startedAt": "2026-10-18T12:37:28.901052+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 3.405586,
+        "endedElapsed": 3.464235,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 3.464246,
+        "endedElapsed": 3.474131,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53633     TIME_WAIT            586          341  408128  146988    owned-service:64639  02131 00000004 00000000002a38cc 00000081 01000800      0      0 000000",
+          "tcp4       0      0  127.0.0.1.53631        127.0.0.1.53634        TIME_WAIT            580          341  408128  146988    owned-service:64639  02131 00000004 00000000002a3911 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 3.474138,
+        "endedElapsed": 3.479413,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 3.47942
+    },
+    {
+      "stage": "same-process-loopback-foreign-origin-login",
+      "startedElapsed": 3.681792,
+      "startedAt": "2026-10-18T12:37:29.177326+00:00",
+      "ownedTcpFds": {
+        "argv": [
+          "/usr/sbin/lsof",
+          "-nP",
+          "-a",
+          "-p",
+          "64639,64637",
+          "-iTCP"
+        ],
+        "startedElapsed": 3.681873,
+        "endedElapsed": 3.730399,
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "owned-ser 64639 study_superior   32u  IPv4 0xce20e2895d9733e7      0t0  TCP *:53631 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-anv",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 3.730406,
+        "endedElapsed": 3.738465,
+        "exitCode": 0,
+        "stdout": [
+          "Active Internet connections (including servers)",
+          "Proto Recv-Q Send-Q  Local Address          Foreign Address        (state)          rxbytes      txbytes  rhiwat  shiwat          process:pid    state  options           gencnt    flags   flags1 usecnt rtncnt fltrs",
+          "tcp4       0      0  *.53631                *.*                    LISTEN                 0            0  131072  131072    owned-service:64639  00100 00000006 00000000002a38b8 00000001 00000800      1      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53632     TIME_WAIT            262          251  408256  146988    owned-service:64639  02131 00000004 00000000002a38be 00000081 01000800      0      0 000000",
+          "tcp4       0      0  192.168.3.96.53631     192.168.3.96.53633     TIME_WAIT            586          341  408128  146988    owned-service:64639  02131 00000004 00000000002a38cc 00000081 01000800      0      0 000000",
+          "tcp4       0      0  127.0.0.1.53631        127.0.0.1.53634        TIME_WAIT            580          341  408128  146988    owned-service:64639  02131 00000004 00000000002a3911 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "argv": [
+          "/usr/sbin/netstat",
+          "-Lan",
+          "-p",
+          "tcp"
+        ],
+        "startedElapsed": 3.738471,
+        "endedElapsed": 3.742327,
+        "exitCode": 0,
+        "stdout": [
+          "Current listen queue sizes (qlen/incqlen/maxqlen)",
+          "Listen         Local Address                          ",
+          "0/0/128        *.53631                "
+        ],
+        "stderr": []
+      },
+      "endedElapsed": 3.742331
+    }
+  ],
+  "budgetSeconds": 20,
+  "servicePid": 64639,
+  "clientPid": 64637,
+  "port": 53631,
+  "route": {
+    "argv": [
+      "/sbin/route",
+      "-n",
+      "get",
+      "192.168.3.96"
+    ],
+    "startedElapsed": 2.046538,
+    "endedElapsed": 2.050854,
+    "exitCode": 0,
+    "stdout": [
+      "   route to: 192.168.3.96",
+      "destination: 192.168.3.96",
+      "  interface: lo0",
+      "      flags: <UP,HOST,DONE,LLINFO,WASCLONED,LOCAL,IFSCOPE,IFREF>",
+      " recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire",
+      "       0         0         0         0         0         0     16384         0 "
+    ],
+    "stderr": []
+  },
+  "soqlencomp": {
+    "argv": [
+      "/usr/sbin/sysctl",
+      "-n",
+      "kern.ipc.soqlencomp"
+    ],
+    "startedElapsed": 2.050865,
+    "endedElapsed": 2.053691,
+    "exitCode": 0,
+    "stdout": [
+      "0"
+    ],
+    "stderr": []
+  },
+  "samplerStopped": true,
+  "serviceExitCode": 0,
+  "stdoutSha256": "1e401555269e84b3b519113ff5f653d4bcf2f21f58f298581e7c03134d8d8831",
+  "stderrSha256": "f90cb0eb88515ac31cb30d258b8ea09b89f5ac32f4fdae8a2d372940b66ff42e",
+  "binarySha256After": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "originalStableCopySha256After": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "probeSha256": "66b42450b4c7ad18621a03a926a7502805e8fc7a9d6af29ddb8e2390772636c0",
+  "endedAt": "2026-10-18T12:37:29.497599+00:00",
+  "serviceGone": true,
+  "listenerAfterCleanup": {
+    "argv": [
+      "/usr/sbin/lsof",
+      "-nP",
+      "-iTCP:53631",
+      "-sTCP:LISTEN"
+    ],
+    "startedElapsed": 4.002101,
+    "endedElapsed": 4.063379,
+    "exitCode": 1,
+    "stdout": [],
+    "stderr": []
+  },
+  "expectedResults": [
+    200,
+    403,
+    403
+  ],
+  "observedResults": [
+    200,
+    403,
+    403
+  ],
+  "diagnosticSucceeded": true,
+  "conclusion": "仅记录同固定g程序的一次health与foreign-Origin拒绝区别，不替代原真实账号登录/LAN门禁，不自动归因任何过滤器。"
+}

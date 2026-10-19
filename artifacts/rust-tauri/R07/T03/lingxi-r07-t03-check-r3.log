@@ -1,0 +1,262 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `crate::history_content`
+ --> crates/lingxi-service/src/session_collab.rs:2:13
+  |
+2 | use crate::{history_content::SessionCollabTools, Principal, ServiceState};
+  |             ^^^^^^^^^^^^^^^ unresolved import
+  |
+help: a similar path exists
+  |
+2 | use crate::{history::history_content::SessionCollabTools, Principal, ServiceState};
+  |             +++++++++
+
+error[E0425]: cannot find function `unpublished_decisions` in module `store`
+  --> crates/lingxi-service/src/conversation_runtime.rs:38:19
+   |
+38 |   for d in store::unpublished_decisions(state.storage()).await?{
+   |                   ^^^^^^^^^^^^^^^^^^^^^ not found in `store`
+
+error[E0425]: cannot find function `message_operation_source` in module `store`
+   --> crates/lingxi-service/src/conversation_runtime.rs:120:22
+    |
+120 |    let source=store::message_operation_source(&self.storage,&op).await?;
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^ not found in `store`
+
+error[E0433]: cannot find module or crate `history_content` in this scope
+   --> crates/lingxi-service/src/lib.rs:522:49
+    |
+522 |     session_collab: Arc<std::sync::OnceLock<Arc<history_content::SessionCollabTools>>>,
+    |                                                 ^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `history_content`
+    |
+help: to make use of source file crates/lingxi-service/src/history_content.rs, use `mod history_content` in this file to declare the module
+    |
+ 24 + mod history_content;
+    |
+help: consider importing this module
+    |
+153 + use crate::history::history_content;
+    |
+
+error[E0433]: cannot find module or crate `history_content` in this scope
+    --> crates/lingxi-service/src/lib.rs:2776:47
+     |
+2776 |     pub fn session_collab(&self)->Option<&Arc<history_content::SessionCollabTools>>{self.session_collab.get()}
+     |                                               ^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `history_content`
+     |
+help: to make use of source file crates/lingxi-service/src/history_content.rs, use `mod history_content` in this file to declare the module
+     |
+  24 + mod history_content;
+     |
+help: consider importing this module
+     |
+ 153 + use crate::history::history_content;
+     |
+
+error[E0277]: `?` couldn't convert the error to `SessionExecuteError`
+    --> crates/lingxi-service/src/conversation_runtime.rs:147:55
+     |
+ 147 |   let d=store::get_delivery(storage,delivery_id).await?.ok_or(E::Forbidden)?;
+     |         ----------------------------------------------^ the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `SessionExecuteError`
+     |         |
+     |         this can't be annotated with `?` because it has type `Result<_, lingxi_kernel::ports::StorageError>`
+     |
+note: `SessionExecuteError` needs to implement `From<lingxi_kernel::ports::StorageError>`
+    --> crates/lingxi-service/src/sessions.rs:210:1
+     |
+ 210 | pub enum SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+help: the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `SessionExecuteError`
+      but trait `From<DriveError>` is implemented for it
+    --> crates/lingxi-service/src/runs.rs:5390:1
+     |
+5390 | impl From<DriveError> for crate::sessions::SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `DriveError`, found `lingxi_kernel::ports::StorageError`
+
+error[E0277]: `?` couldn't convert the error to `SessionExecuteError`
+    --> crates/lingxi-service/src/conversation_runtime.rs:149:120
+     |
+ 149 | ... binding=store::get_phone_binding(storage,&d.input.actor_id,&d.input.conversation_id,&d.input.owner_subject).await?.ok_or(E::Fo...
+     |             ---------------------------------------------------------------------------------------------------------^ the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `SessionExecuteError`
+     |             |
+     |             this can't be annotated with `?` because it has type `Result<_, lingxi_kernel::ports::StorageError>`
+     |
+note: `SessionExecuteError` needs to implement `From<lingxi_kernel::ports::StorageError>`
+    --> crates/lingxi-service/src/sessions.rs:210:1
+     |
+ 210 | pub enum SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+help: the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `SessionExecuteError`
+      but trait `From<DriveError>` is implemented for it
+    --> crates/lingxi-service/src/runs.rs:5390:1
+     |
+5390 | impl From<DriveError> for crate::sessions::SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `DriveError`, found `lingxi_kernel::ports::StorageError`
+
+error[E0277]: `?` couldn't convert the error to `SessionExecuteError`
+    --> crates/lingxi-service/src/conversation_runtime.rs:152:79
+     |
+ 152 |   if let Some((run_id,_,_))=store::get_delivery_run(storage,delivery_id).await?{return Err(E::RequestIdBoundToEarlierRun{request_i...
+     |                             --------------------------------------------------^ the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `SessionExecuteError`
+     |                             |
+     |                             this can't be annotated with `?` because it has type `Result<_, lingxi_kernel::ports::StorageError>`
+     |
+note: `SessionExecuteError` needs to implement `From<lingxi_kernel::ports::StorageError>`
+    --> crates/lingxi-service/src/sessions.rs:210:1
+     |
+ 210 | pub enum SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+help: the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `SessionExecuteError`
+      but trait `From<DriveError>` is implemented for it
+    --> crates/lingxi-service/src/runs.rs:5390:1
+     |
+5390 | impl From<DriveError> for crate::sessions::SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `DriveError`, found `lingxi_kernel::ports::StorageError`
+
+error[E0599]: `SessionAdminError` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/src/session_collab.rs:431:32
+    |
+431 |                 .map_err(|e| e.to_string())?,
+    |                                ^^^^^^^^^ method cannot be called on `SessionAdminError` due to unsatisfied trait bounds
+    |
+   ::: crates/lingxi-service/src/session_admin.rs:25:1
+    |
+ 25 | pub enum SessionAdminError {
+    | -------------------------- method `to_string` not found for this enum because it doesn't satisfy `SessionAdminError: ToString` or `SessionAdminError: std::fmt::Display`
+    |
+    = note: the following trait bounds were not satisfied:
+            `SessionAdminError: std::fmt::Display`
+            which is required by `SessionAdminError: ToString`
+note: the trait `std::fmt::Display` must be implemented
+   --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/fmt/mod.rs:1187:0
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `to_string`, perhaps you need to implement it:
+            candidate #1: `ToString`
+
+error[E0277]: the trait bound `RunId: From<&str>` is not satisfied
+   --> crates/lingxi-service/src/session_collab.rs:713:51
+    |
+713 |                 parent_run_id: Some(source_run_id.into()),
+    |                                                   ^^^^ the trait `From<&str>` is not implemented for `RunId`
+    |
+help: the trait `From<&str>` is not implemented for `RunId`
+      but trait `From<std::string::String>` is implemented for it
+   --> crates/lingxi-protocol/src/lib.rs:81:9
+    |
+ 81 |           impl From<String> for $name {
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 93 | / opaque_id! {
+ 94 | |     /// Identity of one user task execution (one Run).
+ 95 | |     RunId
+ 96 | | }
+    | |_- in this macro invocation
+    = help: for that trait implementation, expected `std::string::String`, found `&str`
+    = note: required for `&str` to implement `Into<RunId>`
+    = note: this error originates in the macro `opaque_id` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `?` couldn't convert the error to `sessions::SessionExecuteError`
+    --> crates/lingxi-service/src/conversation_runtime.rs:147:55
+     |
+ 147 |   let d=store::get_delivery(storage,delivery_id).await?.ok_or(E::Forbidden)?;
+     |         ----------------------------------------------^ the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `sessions::SessionExecuteError`
+     |         |
+     |         this can't be annotated with `?` because it has type `Result<_, lingxi_kernel::ports::StorageError>`
+     |
+note: `sessions::SessionExecuteError` needs to implement `From<lingxi_kernel::ports::StorageError>`
+    --> crates/lingxi-service/src/sessions.rs:210:1
+     |
+ 210 | pub enum SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+help: the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `sessions::SessionExecuteError`
+      but trait `From<DriveError>` is implemented for it
+    --> crates/lingxi-service/src/runs.rs:5390:1
+     |
+5390 | impl From<DriveError> for crate::sessions::SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `DriveError`, found `lingxi_kernel::ports::StorageError`
+
+error[E0277]: `?` couldn't convert the error to `sessions::SessionExecuteError`
+    --> crates/lingxi-service/src/conversation_runtime.rs:149:120
+     |
+ 149 | ... binding=store::get_phone_binding(storage,&d.input.actor_id,&d.input.conversation_id,&d.input.owner_subject).await?.ok_or(E::Fo...
+     |             ---------------------------------------------------------------------------------------------------------^ the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `sessions::SessionExecuteError`
+     |             |
+     |             this can't be annotated with `?` because it has type `Result<_, lingxi_kernel::ports::StorageError>`
+     |
+note: `sessions::SessionExecuteError` needs to implement `From<lingxi_kernel::ports::StorageError>`
+    --> crates/lingxi-service/src/sessions.rs:210:1
+     |
+ 210 | pub enum SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+help: the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `sessions::SessionExecuteError`
+      but trait `From<DriveError>` is implemented for it
+    --> crates/lingxi-service/src/runs.rs:5390:1
+     |
+5390 | impl From<DriveError> for crate::sessions::SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `DriveError`, found `lingxi_kernel::ports::StorageError`
+
+error[E0277]: `?` couldn't convert the error to `sessions::SessionExecuteError`
+    --> crates/lingxi-service/src/conversation_runtime.rs:152:79
+     |
+ 152 |   if let Some((run_id,_,_))=store::get_delivery_run(storage,delivery_id).await?{return Err(E::RequestIdBoundToEarlierRun{request_i...
+     |                             --------------------------------------------------^ the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `sessions::SessionExecuteError`
+     |                             |
+     |                             this can't be annotated with `?` because it has type `Result<_, lingxi_kernel::ports::StorageError>`
+     |
+note: `sessions::SessionExecuteError` needs to implement `From<lingxi_kernel::ports::StorageError>`
+    --> crates/lingxi-service/src/sessions.rs:210:1
+     |
+ 210 | pub enum SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = note: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait
+help: the trait `From<lingxi_kernel::ports::StorageError>` is not implemented for `sessions::SessionExecuteError`
+      but trait `From<DriveError>` is implemented for it
+    --> crates/lingxi-service/src/runs.rs:5390:1
+     |
+5390 | impl From<DriveError> for crate::sessions::SessionExecuteError {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: for that trait implementation, expected `DriveError`, found `lingxi_kernel::ports::StorageError`
+
+error[E0277]: the trait bound `lingxi_protocol::RunId: From<&str>` is not satisfied
+   --> crates/lingxi-service/src/session_collab.rs:713:51
+    |
+713 |                 parent_run_id: Some(source_run_id.into()),
+    |                                                   ^^^^ the trait `From<&str>` is not implemented for `lingxi_protocol::RunId`
+    |
+help: the trait `From<&str>` is not implemented for `lingxi_protocol::RunId`
+      but trait `From<std::string::String>` is implemented for it
+   --> crates/lingxi-protocol/src/lib.rs:81:9
+    |
+ 81 |           impl From<String> for $name {
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+ 93 | / opaque_id! {
+ 94 | |     /// Identity of one user task execution (one Run).
+ 95 | |     RunId
+ 96 | | }
+    | |_- in this macro invocation
+    = help: for that trait implementation, expected `std::string::String`, found `&str`
+    = note: required for `&str` to implement `Into<lingxi_protocol::RunId>`
+    = note: this error originates in the macro `opaque_id` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0609]: no field `message` on type `lingxi_adapters::storage::agent_memory::MemoryError`
+   --> crates/lingxi-service/src/session_collab.rs:259:24
+    |
+259 |         .map_err(|e| e.message)?
+    |                        ^^^^^^^ unknown field
+
+Some errors have detailed explanations: E0277, E0425, E0432, E0433, E0599, E0609.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (lib) due to 11 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 11 previous errors

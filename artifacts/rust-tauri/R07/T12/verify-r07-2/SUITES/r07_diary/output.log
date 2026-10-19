@@ -1,0 +1,40 @@
+
+running 16 tests
+test r07_diary::write_memory_and_chat_both_unconfigured_maps_500 ... ok
+test r07_diary::list_uses_locale_diary_dir_label ... ok
+test r07_diary::list_missing_dir_then_utf16_descending ... ok
+test r07_diary::write_zero_materials_english_when_locale_en ... ok
+test r07_diary::write_llm_failure_maps_400_with_localized_message ... ok
+test r07_diary::write_strips_mood_blocks_and_fallback_title ... ok
+test r07_diary::write_title_date_prefix_and_illegal_chars_shape_filename ... ok
+test r07_diary::write_with_summary_material_produces_diary_file ... ok
+test r07_diary::write_zero_materials_localized_and_target_date_fallback ... ok
+test r07_diary::write_temporary_failure_surfaces_warning_envelope ... ok
+test r07_diary::write_for_yesterday_ignores_todays_session ... ok
+test r07_diary::write_memory_slot_unconfigured_falls_back_to_chat ... ok
+test r07_diary::write_session_without_summary_uses_temporary_material ... ok
+test r07_diary::write_stale_summary_appends_supplement_with_previous ... ok
+test r07_diary::diary_includes_same_agent_real_cron_activity_but_excludes_promoted_activity ... ok
+test r07_diary::diary_routes_require_local_owner ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.44s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.41s
+     Running tests/r07_diary.rs (rust/target-r07/debug/deps/r07_diary-62931f60e4f6be5a)

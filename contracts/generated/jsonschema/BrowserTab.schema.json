@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "canGoBack": {
+      "type": "boolean"
+    },
+    "canGoForward": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "tabId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string"
+    },
+    "url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "tabId",
+    "title",
+    "canGoBack",
+    "canGoForward",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "BrowserTab",
+  "type": "object"
+}

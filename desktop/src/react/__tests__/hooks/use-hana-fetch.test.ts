@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+const routing = vi.hoisted(() => ({ nodeKind: undefined as string | undefined }));
+
 // Mock useStore before importing lingxiFetch
 vi.mock('../../stores', () => ({
   useStore: {
@@ -8,6 +10,7 @@ vi.mock('../../stores', () => ({
       serverToken: 'test-token-123',
       activeServerConnection: {
         kind: 'local',
+        serverNodeKind: routing.nodeKind,
         serverId: 'local',
         studioId: 'local',
         label: 'Local Hana',
@@ -111,5 +114,59 @@ describe('lingxiFetch', () => {
 
     const [, opts] = mockFetch.mock.calls[0];
     expect(opts.signal).toBeInstanceOf(AbortSignal);
+  });
+});
+
+
+describe('Rust 频道与协作正式路由', () => {
+  const fetchMock = vi.fn();
+  beforeEach(() => {
+    routing.nodeKind = 'lingxi-service';
+    fetchMock.mockReset().mockResolvedValue({ ok: true });
+    vi.stubGlobal('fetch', fetchMock);
+  });
+  afterEach(() => { routing.nodeKind = undefined; vi.unstubAllGlobals(); });
+
+  it.each([
+    '/api/channels', '/api/channels?limit=10', '/api/channels/toggle',
+    '/api/channels/ch%2Fone', '/api/channels/ch1/messages', '/api/channels/ch1/read',
+    '/api/channels/ch1/members', '/api/channels/ch1/members/agent%20one',
+    '/api/dm', '/api/dm/bob?agentId=alice',
+    '/api/conversations/dm%3Abob/agent-phone-settings?agentId=alice',
+    '/api/conversations/ch1/agent-phone-tool-mode', '/api/conversations/ch1/agent-activities',
+    '/api/conversations/dm%3Abob/export?agentId=alice',
+    '/api/session-collab/apply', '/api/session-collab/reject',
+    '/api/desk/beautify/status?agentId=alice', '/api/desk/beautify/cover',
+    '/api/desk/beautify/cover/apply', '/api/desk/beautify/cover/preset/apply',
+    '/api/media/generate', '/api/media/image/generate', '/api/media/speech/generate',
+    '/api/media/tasks?sessionId=native%3Aabc', '/api/media/tasks/task-1',
+    '/api/media/tasks/batch/batch-1', '/api/media/tasks/task-1/retry',
+    '/api/media/generated/open/image-abc.png', '/api/media/generated/image-abc.png',
+    '/api/media/image/providers', '/api/media/video/config', '/api/media/speech/models',
+    '/api/media/speech/models/model-1', '/api/speech-recognition/providers',
+    '/api/speech-recognition/config', '/api/speech-recognition/models',
+    '/api/speech-recognition/models/whisper-1',
+  ])('旧页面%s实际请求Rust路径并保留参数', async path => {
+    await lingxiFetch(path, { method: 'POST', body: JSON.stringify({ example: '原参数' }) });
+    expect(fetchMock).toHaveBeenCalledWith(`http://127.0.0.1:3210/lingxi/v1${path.slice(4)}`, expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ example: '原参数' }),
+      headers: expect.objectContaining({ Authorization: 'Bearer test-token-123' }),
+    }));
+    expect(lingxiUrl(path)).toContain(`/lingxi/v1${path.slice(4)}`);
+  });
+
+  it('不为尚未实现的相似路由猜测Rust入口', async () => {
+    await expect(lingxiFetch('/api/conversations/ch1/activities')).rejects.toThrow(/no migrated endpoint/);
+    await expect(lingxiFetch('/api/session-collab/create')).rejects.toThrow(/no migrated endpoint/);
+    // 前缀相近但不是媒体/语音识别正式面的路径不得被前缀规则误吞。
+    await expect(lingxiFetch('/api/mediax')).rejects.toThrow(/no migrated endpoint/);
+    await expect(lingxiFetch('/api/speech-recognitionx/config')).rejects.toThrow(/no migrated endpoint/);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('Node连接保持现役路径', async () => {
+    routing.nodeKind = undefined;
+    await lingxiFetch('/api/channels/ch1/messages');
+    expect(fetchMock.mock.calls[0][0]).toBe('http://127.0.0.1:3210/api/channels/ch1/messages');
   });
 });

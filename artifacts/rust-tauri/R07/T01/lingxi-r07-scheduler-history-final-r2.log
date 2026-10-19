@@ -1,0 +1,28 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.39s
+     Running tests/r06_interactive_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_interactive_completion-274bed375ddd833d)
+
+running 7 tests
+test original_batched_question_real_answers_timeout_dismiss_abort_and_refusals ... ok
+test original_card_persisted_session_result_and_real_review_refusal_without_source_write ... ok
+test original_fixed_ui_types_refuse_missing_run_foreign_owner_and_missing_user_anchor_before_model ... ok
+test original_full_todo_list_persists_all_states_emits_full_stream_and_invalid_preserves ... ok
+test original_interactive_tools_current_tauri_components_real_http_and_iframe_sandbox ... FAILED
+test original_question_real_run_cancellation_clears_pending_without_fabricating_answers ... ok
+test original_tool_ui_transaction_refuses_stale_attempt_generation_owner_and_terminal_before_write ... ok
+
+failures:
+
+---- original_interactive_tools_current_tauri_components_real_http_and_iframe_sandbox stdout ----
+
+thread 'original_interactive_tools_current_tauri_components_real_http_and_iframe_sandbox' (202896) panicked at crates/lingxi-service/tests/r06_interactive_completion.rs:518:5:
+只复用现有native target
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    original_interactive_tools_current_tauri_components_real_http_and_iframe_sandbox
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_interactive_completion`

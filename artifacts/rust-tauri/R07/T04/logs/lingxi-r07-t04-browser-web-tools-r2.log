@@ -1,0 +1,28 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.07s
+     Running tests/r07_browser_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_tools-dfd1908d7da3d362)
+
+running 6 tests
+test external_unknown_effect_is_persisted_and_never_reported_as_success ... ok
+test actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url ... ok
+test actual_run_cancellation_reaches_external_cleanup_and_settles_both_records ... ok
+test page_change_and_foreign_tab_invalidate_approval_before_external_dispatch ... ok
+test actual_readonly_snapshot_persists_receipt_but_write_never_dispatches ... ok
+test new_actual_user_submission_releases_emergency_stop_with_a_new_epoch ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/r07_web_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_web_tools-25ed53d11b0cce5c)
+
+running 7 tests
+test public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request ... ok
+test auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics ... ok
+test provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics ... ok
+test auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back ... ok
+test all_five_http_providers_use_real_gateway_and_distinct_authentication ... ok
+test public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file ... ok
+test verification_real_http_masks_same_provider_and_only_persists_after_success ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+

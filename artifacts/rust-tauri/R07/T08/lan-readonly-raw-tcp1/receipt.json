@@ -1,0 +1,45 @@
+{
+  "scope": "OWNED_RAW_TCP_NOT_PRODUCT_ACCEPTANCE",
+  "networkSettingsChanged": false,
+  "actualInterface": "en0",
+  "actualLanIp": "192.168.3.96",
+  "requests": [
+    {
+      "destination": "192.168.3.96:64210",
+      "addressKind": "actual-lan-interface",
+      "budgetSeconds": 5,
+      "connected": true,
+      "receivedBytes": 21,
+      "exactEcho": true,
+      "elapsedSeconds": 0.016
+    },
+    {
+      "destination": "127.0.0.1:64210",
+      "addressKind": "loopback",
+      "budgetSeconds": 5,
+      "connected": true,
+      "receivedBytes": 21,
+      "exactEcho": true,
+      "elapsedSeconds": 0.0
+    }
+  ],
+  "serverAccepted": [
+    {
+      "peer": [
+        "192.168.3.96",
+        64211
+      ],
+      "receivedBytes": 21
+    },
+    {
+      "peer": [
+        "127.0.0.1",
+        64212
+      ],
+      "receivedBytes": 21
+    }
+  ],
+  "listenerClosed": true,
+  "workerStopped": true,
+  "probeSourceSha256": "75f8cdff724e54f05142ddba347167981f070efd1b98c176ea95416367a611d2"
+}

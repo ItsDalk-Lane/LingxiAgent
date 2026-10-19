@@ -9,6 +9,7 @@ use axum::{
 use lingxi_adapters::storage::agent_memory as am;
 use serde_json::{json, Value};
 use std::{
+    collections::BTreeMap,
     io::Write,
     path::{Path, PathBuf},
     sync::{Arc, Mutex, MutexGuard},
@@ -81,27 +82,63 @@ pub enum DeletionPhase {
     AfterMoved,
 }
 type Hook = Arc<dyn Fn(DeletionPhase, &Path) + Send + Sync>;
-static HOOK: Mutex<Option<(PathBuf, Hook)>> = Mutex::new(None);
+struct RegisteredHook {
+    token: Arc<()>,
+    hook: Hook,
+}
+static HOOKS: Mutex<BTreeMap<PathBuf, Vec<RegisteredHook>>> = Mutex::new(BTreeMap::new());
 /// 可信时序探针只在真实持久准备/真实rename之后调用，HTTP没有注入入口。
 #[doc(hidden)]
-pub struct DeletionTestHookGuard(Option<(PathBuf, Hook)>);
+pub struct DeletionTestHookGuard {
+    home: PathBuf,
+    token: Arc<()>,
+}
 impl Drop for DeletionTestHookGuard {
     fn drop(&mut self) {
-        *HOOK.lock().unwrap() = self.0.take();
+        let removed = {
+            let mut hooks = HOOKS
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            let Some(entries) = hooks.get_mut(&self.home) else {
+                return;
+            };
+            let removed = entries
+                .iter()
+                .position(|entry| Arc::ptr_eq(&entry.token, &self.token))
+                .map(|index| entries.remove(index));
+            if entries.is_empty() {
+                hooks.remove(&self.home);
+            }
+            removed
+        };
+        // 捕获对象的释放也留在锁外，不能因其持有其它探针而重入登记锁。
+        drop(removed);
     }
 }
 #[doc(hidden)]
 pub fn deletion_test_hook(home: &Path, hook: Hook) -> DeletionTestHookGuard {
-    let previous = HOOK.lock().unwrap().replace((home.to_path_buf(), hook));
-    DeletionTestHookGuard(previous)
+    let token = Arc::new(());
+    HOOKS
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .entry(home.to_path_buf())
+        .or_default()
+        .push(RegisteredHook {
+            token: Arc::clone(&token),
+            hook,
+        });
+    DeletionTestHookGuard {
+        home: home.to_path_buf(),
+        token,
+    }
 }
 fn probe(home: &Path, phase: DeletionPhase, transaction: &Path) {
-    let hook = HOOK
+    let hook = HOOKS
         .lock()
-        .unwrap()
-        .as_ref()
-        .filter(|(root, _)| root == home)
-        .map(|(_, h)| h.clone());
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .get(home)
+        .and_then(|entries| entries.last())
+        .map(|entry| Arc::clone(&entry.hook));
     if let Some(hook) = hook {
         hook(phase, transaction);
     }
@@ -556,5 +593,139 @@ pub async fn deletion_cleanup_route(
     match state.memory().retry_agent_deletion_cleanup(&id) {
         Ok(value) => Json(value).into_response(),
         Err(error) => error.response(),
+    }
+}
+
+#[cfg(test)]
+mod hook_tests {
+    use super::*;
+    use std::sync::{
+        atomic::{AtomicUsize, Ordering},
+        Barrier,
+    };
+
+    fn home(label: &str) -> PathBuf {
+        static SEQUENCE: AtomicUsize = AtomicUsize::new(0);
+        std::env::temp_dir().join(format!(
+            "lingxi-deletion-hook-{}-{}-{label}",
+            std::process::id(),
+            SEQUENCE.fetch_add(1, Ordering::Relaxed)
+        ))
+    }
+
+    #[test]
+    fn concurrent_homes_keep_their_own_registered_probe() {
+        let homes = [home("parallel-a"), home("parallel-b")];
+        let calls = [AtomicUsize::new(0), AtomicUsize::new(0)];
+        let registered = Barrier::new(2);
+        let probed = Barrier::new(2);
+        std::thread::scope(|threads| {
+            for (root, calls) in homes.iter().zip(calls.iter()) {
+                let registered = &registered;
+                let probed = &probed;
+                threads.spawn(move || {
+                    let transaction = root.join("transaction");
+                    let expected = transaction.clone();
+                    let count = Arc::new(AtomicUsize::new(0));
+                    let hook_count = Arc::clone(&count);
+                    let _guard = deletion_test_hook(
+                        root,
+                        Arc::new(move |_, actual| {
+                            assert_eq!(actual, expected.as_path());
+                            hook_count.fetch_add(1, Ordering::SeqCst);
+                        }),
+                    );
+                    // 两个目录的注册必须同时存活，不能靠调度顺序避开原覆盖问题。
+                    registered.wait();
+                    probe(root, DeletionPhase::AfterPrepared, &transaction);
+                    probe(root, DeletionPhase::AfterMoved, &transaction);
+                    calls.store(count.load(Ordering::SeqCst), Ordering::SeqCst);
+                    probed.wait();
+                });
+            }
+        });
+        assert_eq!(calls[0].load(Ordering::SeqCst), 2);
+        assert_eq!(calls[1].load(Ordering::SeqCst), 2);
+        let hooks = HOOKS.lock().unwrap();
+        assert!(homes.iter().all(|root| !hooks.contains_key(root)));
+    }
+
+    #[test]
+    fn dropping_older_same_home_guard_never_deletes_newer_or_revives_old_hook() {
+        let root = home("drop-older-first");
+        let old_calls = Arc::new(AtomicUsize::new(0));
+        let newer_calls = Arc::new(AtomicUsize::new(0));
+        let old_count = Arc::clone(&old_calls);
+        let older = deletion_test_hook(
+            &root,
+            Arc::new(move |_, _| {
+                old_count.fetch_add(1, Ordering::SeqCst);
+            }),
+        );
+        let newer_count = Arc::clone(&newer_calls);
+        let newer = deletion_test_hook(
+            &root,
+            Arc::new(move |_, _| {
+                newer_count.fetch_add(1, Ordering::SeqCst);
+            }),
+        );
+        drop(older);
+        probe(&root, DeletionPhase::AfterMoved, &root);
+        assert_eq!(old_calls.load(Ordering::SeqCst), 0);
+        assert_eq!(newer_calls.load(Ordering::SeqCst), 1);
+        drop(newer);
+        probe(&root, DeletionPhase::AfterMoved, &root);
+        assert_eq!(old_calls.load(Ordering::SeqCst), 0);
+        assert_eq!(newer_calls.load(Ordering::SeqCst), 1);
+        assert!(!HOOKS.lock().unwrap().contains_key(&root));
+    }
+
+    #[test]
+    fn dropping_newer_same_home_guard_restores_only_still_live_older_hook() {
+        let root = home("drop-newer-first");
+        let old_calls = Arc::new(AtomicUsize::new(0));
+        let old_count = Arc::clone(&old_calls);
+        let older = deletion_test_hook(
+            &root,
+            Arc::new(move |_, _| {
+                old_count.fetch_add(1, Ordering::SeqCst);
+            }),
+        );
+        let newer = deletion_test_hook(&root, Arc::new(|_, _| {}));
+        probe(&root, DeletionPhase::AfterPrepared, &root);
+        assert_eq!(old_calls.load(Ordering::SeqCst), 0);
+        drop(newer);
+        probe(&root, DeletionPhase::AfterMoved, &root);
+        assert_eq!(old_calls.load(Ordering::SeqCst), 1);
+        drop(older);
+        probe(&root, DeletionPhase::AfterMoved, &root);
+        assert_eq!(old_calls.load(Ordering::SeqCst), 1);
+        assert!(!HOOKS.lock().unwrap().contains_key(&root));
+    }
+
+    #[test]
+    fn probe_callback_can_register_and_release_another_hook_outside_registry_lock() {
+        let root = home("callback");
+        let nested_root = home("nested-callback");
+        let calls = Arc::new(AtomicUsize::new(0));
+        let hook_calls = Arc::clone(&calls);
+        let guard = deletion_test_hook(
+            &root,
+            Arc::new(move |_, _| {
+                let nested_calls = Arc::clone(&hook_calls);
+                let nested = deletion_test_hook(
+                    &nested_root,
+                    Arc::new(move |_, _| {
+                        nested_calls.fetch_add(1, Ordering::SeqCst);
+                    }),
+                );
+                probe(&nested_root, DeletionPhase::AfterMoved, &nested_root);
+                drop(nested);
+            }),
+        );
+        probe(&root, DeletionPhase::AfterMoved, &root);
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+        drop(guard);
+        assert!(!HOOKS.lock().unwrap().contains_key(&root));
     }
 }

@@ -37,6 +37,29 @@ pub struct Scenario {
     pub id: String,
     pub requirement: String,
     pub command_refs: Vec<String>,
+    /// R07-T12：R00 原规格镜像（可选）。地图一旦有任何场景声明镜像，
+    /// verify 即按「地图声称全量基础保真」处理：R00 基础集合求全等、
+    /// 每个基础场景都必须带镜像、镜像逐字段对照原账（见 verify.rs）。
+    /// 未声明镜像的地图（R02—R06）行为不变。
+    pub spec_mirror: Option<ScenarioSpecMirror>,
+    /// R07-T12：基础场景逐断言合同（与叶项同一机制；可选）。命令全绿
+    /// 只证明套件退出 0，合同案例才证明原断言被真实观察到。
+    pub assertion_contract: Option<LeafAssertionContract>,
+}
+
+/// 基础场景的 R00 原规格镜像（R07-T12）：verify 时逐字段对照 R00 账本，
+/// 漂移即硬失败——地图不能悄悄改写原验收条款。
+#[derive(Debug, Clone, PartialEq)]
+pub struct ScenarioSpecMirror {
+    pub name: String,
+    pub given: String,
+    pub when: String,
+    pub then: String,
+    pub evidence: String,
+    pub environment: String,
+    pub task_ids: Vec<String>,
+    pub feature_ids: Vec<String>,
+    pub ledger_status: String,
 }
 
 /// Basis kinds for `supplementalLeafScenarios` entries (R13-F01: the R00
@@ -208,6 +231,30 @@ pub struct SupplementalLeaf {
     pub early_evidence_command_refs: Vec<String>,
 }
 
+/// 扩展边界项（R07-T12）：不属于 408 补充叶集合的独立 REQUIRED 项，
+/// 由真实命令证据闭合；任一引用命令不过即 FAIL 并阻断 overall。
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExtensionBoundary {
+    pub feature_id: String,
+    pub requirement: String,
+    pub command_refs: Vec<String>,
+    pub note: String,
+}
+
+/// 前阶段移交项（R07-T12）：权威 35 项（handoverItems）与 R02—R06 地图
+/// 递延（priorStageDeferred）两类来源共用同一承载；每项 id 必须指向
+/// 本图已声明的补充叶（指向集合之外即硬失败——移交不能虚构范围）。
+#[derive(Debug, Clone, PartialEq)]
+pub struct HandoverItem {
+    pub id: String,
+    /// 35 项来源携带；priorStageDeferred 来源无此字段（None）。
+    pub feature_id: Option<String>,
+    pub execution_stage_ids: Vec<String>,
+    /// priorStageDeferred 来源携带；35 项来源为空数组。
+    pub source_stages: Vec<String>,
+    pub note: String,
+}
+
 /// A parsed stage map.
 #[derive(Debug, Clone, PartialEq)]
 pub struct StageMap {
@@ -222,6 +269,14 @@ pub struct StageMap {
     /// R00 acceptance ledger at verify time, so dropping required leaves
     /// (or inventing unknown ones) is a hard failure, never a silent pass.
     pub supplemental_leaves: Vec<SupplementalLeaf>,
+    /// R07-T12：扩展边界（独立于补充叶集合；可选段，缺失=无扩展项）。
+    pub extension_boundaries: Vec<ExtensionBoundary>,
+    /// R07-T12：用户承诺的 35 项移交（R04 规划继承的权威来源清单登记）。
+    /// 声明即必须恰好 35 项，数量不符即硬失败（verify 核对）。
+    pub handover_items: Vec<HandoverItem>,
+    /// R07-T12：R02—R06 地图递延到本阶段的叶（另一类移交来源）。声明
+    /// 即必须恰好 43 项（前图递延声明的实际合并数；verify 核对）。
+    pub prior_stage_deferred: Vec<HandoverItem>,
 }
 
 const DEFAULT_TIMEOUT_SECS: u64 = 1200;
@@ -437,10 +492,146 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
             }
             command_refs.push(key);
         }
+        // R07-T12：可选 R00 原规格镜像——存在时 9 字段全必须非空；
+        // 逐字段对照发生在 verify（对照 R00 账本），此处只管形状。
+        let spec_mirror = match object.get("specMirror") {
+            None => None,
+            Some(value) => {
+                let mirror = value.as_object().ok_or_else(|| {
+                    err(&format!("scenario {id:?} specMirror must be an object"))
+                })?;
+                let field = |key: &str| -> Result<String, String> {
+                    non_empty_string(
+                        mirror
+                            .get(key)
+                            .ok_or_else(|| err(&format!("scenario {id:?} specMirror missing {key}")))?,
+                        &format!("scenario {id:?} specMirror {key}"),
+                    )
+                };
+                Some(ScenarioSpecMirror {
+                    name: field("name")?,
+                    given: field("given")?,
+                    when: field("when")?,
+                    then: field("then")?,
+                    evidence: field("evidence")?,
+                    environment: field("environment")?,
+                    task_ids: string_array_field(
+                        mirror,
+                        "taskIds",
+                        &format!("scenario {id:?} specMirror taskIds"),
+                        false,
+                    )?,
+                    feature_ids: string_array_field(
+                        mirror,
+                        "featureIds",
+                        &format!("scenario {id:?} specMirror featureIds"),
+                        true,
+                    )?,
+                    ledger_status: field("ledgerStatus")?,
+                })
+            }
+        };
+        // R07-T12：可选场景逐断言合同——与叶合同同构（producer 必须在
+        // commandRefs 内）。独立解析而非复用叶分支：叶的未豁免 kind 规则
+        // 不适用于场景，保持两条路径各自的错误文案与既有行为。
+        let assertion_contract = match object.get("assertionContract") {
+            None => None,
+            Some(value) => {
+                let contract = value.as_object().ok_or_else(|| {
+                    err(&format!("scenario {id:?} assertionContract must be an object"))
+                })?;
+                let producer_command = non_empty_string(
+                    contract.get("producerCommand").ok_or_else(|| {
+                        err(&format!(
+                            "scenario {id:?} assertionContract missing producerCommand"
+                        ))
+                    })?,
+                    &format!("scenario {id:?} assertionContract producerCommand"),
+                )?;
+                if !commands_value.contains_key(&producer_command) {
+                    return Err(err(&format!(
+                        "scenario {id:?} assertionContract references unknown producer \
+                         command {producer_command:?}"
+                    )));
+                }
+                if !command_refs.contains(&producer_command) {
+                    return Err(err(&format!(
+                        "scenario {id:?} assertionContract producer {producer_command:?} \
+                         is not in the scenario's commandRefs — a producer that never \
+                         runs can never write the scenario's evidence"
+                    )));
+                }
+                let evidence_path = non_empty_string(
+                    contract.get("evidencePath").ok_or_else(|| {
+                        err(&format!("scenario {id:?} assertionContract missing evidencePath"))
+                    })?,
+                    &format!("scenario {id:?} assertionContract evidencePath"),
+                )?;
+                let cases_value = contract
+                    .get("cases")
+                    .ok_or_else(|| {
+                        err(&format!("scenario {id:?} assertionContract missing cases"))
+                    })?
+                    .as_array()
+                    .ok_or_else(|| {
+                        err(&format!(
+                            "scenario {id:?} assertionContract cases must be an array"
+                        ))
+                    })?;
+                if cases_value.is_empty() {
+                    return Err(err(&format!(
+                        "scenario {id:?} assertionContract cases must not be empty (a \
+                         scenario with no machine-checkable case is exactly the \
+                         exit-0-only fake-green path R14-F01 closes)"
+                    )));
+                }
+                let mut cases = Vec::with_capacity(cases_value.len());
+                for case_value in cases_value {
+                    let case_object = case_value.as_object().ok_or_else(|| {
+                        err(&format!(
+                            "scenario {id:?} assertionContract case must be an object"
+                        ))
+                    })?;
+                    let case = non_empty_string(
+                        case_object.get("case").ok_or_else(|| {
+                            err(&format!(
+                                "scenario {id:?} assertionContract case missing case name"
+                            ))
+                        })?,
+                        &format!("scenario {id:?} assertionContract case name"),
+                    )?;
+                    if cases
+                        .iter()
+                        .any(|pinned: &LeafCaseExpect| pinned.case == case)
+                    {
+                        return Err(err(&format!(
+                            "scenario {id:?} assertionContract repeats case name {case:?}"
+                        )));
+                    }
+                    let expect = case_object
+                        .get("expect")
+                        .and_then(Value::as_i64)
+                        .ok_or_else(|| {
+                            err(&format!(
+                                "scenario {id:?} assertionContract case {case:?} must \
+                                 have an integer expect value"
+                            ))
+                        })?;
+                    cases.push(LeafCaseExpect { case, expect });
+                }
+                Some(LeafAssertionContract {
+                    producer_command,
+                    evidence_path,
+                    cases,
+                })
+            }
+        };
         scenarios.push(Scenario {
             id,
             requirement,
             command_refs,
+            spec_mirror,
+            assertion_contract,
         });
     }
 
@@ -1144,6 +1335,157 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
         }
     };
 
+    // R07-T12：扩展边界段（可选）。声明时非空、featureId 唯一、
+    // commandRefs 非空且全部可解析。
+    let extension_boundaries = match object.get("extensionBoundaries") {
+        None => Vec::new(),
+        Some(value) => {
+            let list = value
+                .as_array()
+                .ok_or_else(|| err("extensionBoundaries must be an array"))?;
+            if list.is_empty() {
+                return Err(err("extensionBoundaries must not be empty when declared"));
+            }
+            let mut items: Vec<ExtensionBoundary> = Vec::with_capacity(list.len());
+            for (index, value) in list.iter().enumerate() {
+                let entry = value.as_object().ok_or_else(|| {
+                    err(&format!("extensionBoundaries #{index} must be an object"))
+                })?;
+                let feature_id = non_empty_string(
+                    entry.get("featureId").ok_or_else(|| {
+                        err(&format!("extensionBoundaries #{index} missing featureId"))
+                    })?,
+                    &format!("extensionBoundaries #{index} featureId"),
+                )?;
+                if items.iter().any(|item| item.feature_id == feature_id) {
+                    return Err(err(&format!(
+                        "extensionBoundaries repeats featureId {feature_id:?}"
+                    )));
+                }
+                let requirement = non_empty_string(
+                    entry.get("requirement").ok_or_else(|| {
+                        err(&format!("extensionBoundaries {feature_id:?} missing requirement"))
+                    })?,
+                    &format!("extensionBoundaries {feature_id:?} requirement"),
+                )?;
+                let refs_value = entry
+                    .get("commandRefs")
+                    .ok_or_else(|| {
+                        err(&format!("extensionBoundaries {feature_id:?} missing commandRefs"))
+                    })?
+                    .as_array()
+                    .ok_or_else(|| {
+                        err(&format!(
+                            "extensionBoundaries {feature_id:?} commandRefs must be an array"
+                        ))
+                    })?;
+                if refs_value.is_empty() {
+                    return Err(err(&format!(
+                        "extensionBoundaries {feature_id:?} commandRefs must not be empty \
+                         (an extension bound to no command is a hole, not a pass)"
+                    )));
+                }
+                let mut command_refs = Vec::with_capacity(refs_value.len());
+                for reference in refs_value {
+                    let key = non_empty_string(
+                        reference,
+                        &format!("extensionBoundaries {feature_id:?} commandRefs element"),
+                    )?;
+                    if !commands_value.contains_key(&key) {
+                        return Err(err(&format!(
+                            "extensionBoundaries {feature_id:?} references unknown \
+                             command {key:?}"
+                        )));
+                    }
+                    command_refs.push(key);
+                }
+                let note = non_empty_string(
+                    entry.get("note").ok_or_else(|| {
+                        err(&format!("extensionBoundaries {feature_id:?} missing note"))
+                    })?,
+                    &format!("extensionBoundaries {feature_id:?} note"),
+                )?;
+                items.push(ExtensionBoundary {
+                    feature_id,
+                    requirement,
+                    command_refs,
+                    note,
+                });
+            }
+            items
+        }
+    };
+
+    // R07-T12：两段移交（可选）。每项 id 必须指向本图已声明的补充叶；
+    // executionStageIds 非空。数量承诺（35/43）由 verify 核对。
+    let parse_handovers = |key: &str,
+                           exec_key: &str,
+                           leaves: &[SupplementalLeaf]|
+     -> Result<Vec<HandoverItem>, String> {
+        match object.get(key) {
+            None => Ok(Vec::new()),
+            Some(value) => {
+                let list = value
+                    .as_array()
+                    .ok_or_else(|| err(&format!("{key} must be an array")))?;
+                let mut items = Vec::with_capacity(list.len());
+                for (index, value) in list.iter().enumerate() {
+                    let entry = value.as_object().ok_or_else(|| {
+                        err(&format!("{key} #{index} must be an object"))
+                    })?;
+                    let id = non_empty_string(
+                        entry
+                            .get("id")
+                            .ok_or_else(|| err(&format!("{key} #{index} missing id")))?,
+                        &format!("{key} #{index} id"),
+                    )?;
+                    if !leaves.iter().any(|leaf| leaf.id == id) {
+                        return Err(err(&format!(
+                            "{key} {id:?} is not a declared supplemental leaf of this \
+                             map — a handover cannot invent scope"
+                        )));
+                    }
+                    let feature_id = match entry.get("featureId") {
+                        None => None,
+                        Some(v) => Some(non_empty_string(v, &format!("{key} {id:?} featureId"))?),
+                    };
+                    let execution_stage_ids = string_array_field(
+                        entry,
+                        exec_key,
+                        &format!("{key} {id:?} {exec_key}"),
+                        false,
+                    )?;
+                    let source_stages = match entry.get("sourceStages") {
+                        None => Vec::new(),
+                        Some(_) => string_array_field(
+                            entry,
+                            "sourceStages",
+                            &format!("{key} {id:?} sourceStages"),
+                            false,
+                        )?,
+                    };
+                    let note = non_empty_string(
+                        entry
+                            .get("note")
+                            .ok_or_else(|| err(&format!("{key} {id:?} missing note")))?,
+                        &format!("{key} {id:?} note"),
+                    )?;
+                    items.push(HandoverItem {
+                        id,
+                        feature_id,
+                        execution_stage_ids,
+                        source_stages,
+                        note,
+                    });
+                }
+                Ok(items)
+            }
+        }
+    };
+    let handover_items = parse_handovers("handoverItems", "executionStageIds", &supplemental_leaves)?;
+    let prior_stage_deferred =
+        parse_handovers("priorStageDeferred", "r00ExecutionStageIds", &supplemental_leaves)?;
+
     Ok(StageMap {
         stage,
         result_version,
@@ -1151,6 +1493,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
         commands,
         scenarios,
         supplemental_leaves,
+        extension_boundaries,
+        handover_items,
+        prior_stage_deferred,
     })
 }
 

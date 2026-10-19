@@ -1,0 +1,73 @@
+{
+  "status": "DEVELOPMENT_CHECKS_PASSED_PENDING_UNIFIED_GENERATION_AND_FROZEN_ACCEPTANCE",
+  "createdAt": "2026-10-18T10:48:06.110900+00:00",
+  "scope": [
+    "Keybindings save/reset original connection ownership after every network/OS await and before global effects",
+    "Sidebar save response ownership before local state/host/window effects",
+    "Transfer capture revision plus operation identity, reset current busy/download on source change, guard file/network/reload await boundaries"
+  ],
+  "cases": {
+    "firstRealReproduction": {
+      "passed": 0,
+      "failed": 4
+    },
+    "deliveryObservationRefinedSameOriginalProduct": {
+      "passed": 0,
+      "failed": 4
+    },
+    "finalConsumers": {
+      "passed": 36,
+      "failed": 0,
+      "pending": 0
+    },
+    "existingPositiveImportExportConfigured": {
+      "passed": 1,
+      "intentionallyUnselected": 7
+    },
+    "globalTypes": {
+      "exitCode": 2,
+      "onlyErrors": [
+        "mcp-session-permissions.ts missing generated McpSessionPermissionRequest",
+        "mcp-session-permissions.ts missing generated McpSessionPermissionResponse"
+      ],
+      "assignedTo": "workflow/root official generation; no generated files edited here"
+    }
+  },
+  "evidence": {
+    "interface-late-write-reproduce1/receipt.json": "c776e729a4d91212e31fe1eb275a537361b63822af85d536b3b260c5d4e63c31",
+    "interface-late-write-reproduce2/receipt.json": "c54bfd9b93f5fca1e60f9c5e4bd32687a5b70c83965ea240347128a5488ffdf6",
+    "interface-late-write-fixed1/receipt.json": "5d4e7c64fb0ca52c10cb6915c124faa685233ef2f4d147699e146378c85aa2ae",
+    "interface-late-write-fixed2/receipt.json": "fa35918150ffe8c7e9556fc92c94a254c26f71141a75c6ceba29e64b9f835fa8",
+    "interface-transfer-positive1/receipt.json": "7f924a6ccf615ca91e1f72a9684c1325d1a34d581b8482069250c5f245f05cb2"
+  },
+  "ownedFilesStopped": {
+    "desktop/src/react/settings/tabs/SecurityTab.tsx": "8347ade051eb75c4fcb5d66d8dc17c123ecb69f35cb6091f382dbbc13f5f7144",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "0d5ea0e10b96d38972a82d0a6acee33ca067e65309e6baa38f19de703800e5c0",
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "c87478150b59c4f35a196e664a792d63df905442b3a06e99d9520681cdcb40bd",
+    "desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx": "62f89284674b024b1fa2d6d391968dda7c9e02aab2ab367b97df7bf3127217ba",
+    "desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx": "4eb3be0fb2f12cc2f510ee8708f2d37eef88d2dfc44565893d45af69f0e2edfe",
+    "desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx": "d0abfa595398324b0b0bbee77ea6e54cecaa14f37b072877ee3c7f7acfdb1260",
+    "desktop/src/react/__tests__/services/r07-interface-preferences-real-service.test.tsx": "eb22d8a48e7b3fcfb780496d094edc536f1b69522ab5e47e42974e6f94b08823",
+    "desktop/src/locales/zh.json": "201b88845a8e40946c8bb8e15aad0edadaa706bcefe2ace71604f6bd091f7b20",
+    "desktop/src/locales/en.json": "3e70c1b491b314307ce90a0aea8d14daf39b4900656b4e0d5362dfd36113ee85",
+    "desktop/src/locales/ja.json": "4659b4be8b63a21fa1fe2e9b47fb82d7646a4f38b4591b8c536c8371de10f003",
+    "desktop/src/locales/ko.json": "21712f89a8b76ea232d87f538626dd237266b7bbdfe17564a13a968882520816",
+    "desktop/src/locales/zh-TW.json": "f95779ae71d2902d19fb32de5ac050ab03e79f906275b83d5f6fb53262eab6a5",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "12299c0bc6b5987684002cfd0a231e1f36113b3680874fbfb6ffbb3e5189f639",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "19332d5fd9fc761aa1434e03bda456124b3a3365bb4fb37f2b9a857996bdaab1"
+  },
+  "binary": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binarySha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryUnchanged": true,
+  "trackedSourceUnchanged": true,
+  "preservedFailureScenes": "preserved-scenes.json",
+  "preservedFailureScenesSha256": "5005d8ed4cbd8a6a2eda1dbade7774746a7d6e35b6d235b97970d35794a4aabf",
+  "limits": [
+    "No Cargo, accounts, paid requests or external network",
+    "Actual localhost service/HTTP, real SettingsContent/store/navigation; jsdom platform event and OS reload observer remain owned external boundaries",
+    "Existing A writes stay saved; stale delivery is not rollback",
+    "Global type check not green until official MCP generated DTOs arrive",
+    "No T08/R07 leaf PASS or formal f acceptance claimed",
+    "An erroneous ASCII-bracket positive selector skipped all 8; retained NOT_RUN and superseded only by new exact configured selection"
+  ]
+}

@@ -3647,8 +3647,9 @@ mod tests {
             },
             kind: ProcessKind::OneShot,
             argv: vec!["unit".to_string()],
-            pid: 1234,
-            pgid: 1234,
+            // 当前进程的真实组号必为正数，0 故意不匹配；固定假 PID 可能碰到无关程序。
+            pid: std::process::id() as i32,
+            pgid: 0,
             spawned_at_unix_ms: 0,
             inner: Mutex::new(RecordInner {
                 phase: RecordPhase::Running,
@@ -3793,8 +3794,7 @@ mod tests {
     fn group_signal_is_skipped_when_the_kernel_identity_disagrees() {
         let supervisor = test_supervisor(1);
         let id = ProcessHandleId::mint().expect("mint");
-        // A record whose pid provably does not exist anymore (dummy pid
-        // never spawned): the send-time getpgid recheck must refuse.
+        // 使用当前进程的真实身份和不可能匹配的组号，派发前必须拒绝，绝不发送信号。
         let record = dummy_record(id);
         assert!(!record.snapshot().child_reaped);
         assert!(supervisor.mark_terminating(

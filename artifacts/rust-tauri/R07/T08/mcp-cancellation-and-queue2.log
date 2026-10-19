@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 46s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-15cf71a69d3ae192)
+
+running 7 tests
+test mcpbridge::tests::remote_resource_uris_never_map_to_local_refs ... ok
+test mcpbridge::tests::mcp_target_ids_are_origin_namespaced ... ok
+test mcpbridge::tests::server_annotations_never_soften_the_permission_or_recovery ... ok
+test mcpbridge::tests::structured_output_validation_uses_the_catalog_rules ... ok
+test mcpbridge::tests::macos_exited_unreaped_child_is_confirmed_empty_without_hiding_live_groups ... ok
+MCP 真实背压现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-real-backpressure-0cc024c920ff54f8
+test mcpbridge::tests::real_stdio_request_cancel_deadline_and_future_drop_keep_shared_connection_usable ... ok
+MCP 真实背压：accepted=1024 pending=76 payloadBytes=65536 deadlineMs=80 elapsedMs=2086；取消请求在满队列同轮返回，外端仍未读取
+test mcpbridge::request_tests::real_sdk_full_queue_honors_request_deadline_and_scope_cancel_without_replay ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 641 filtered out; finished in 4.18s
+

@@ -1,0 +1,48 @@
+[
+  {
+    "name": "ui",
+    "command": [
+      "./node_modules/.bin/vitest",
+      "run",
+      "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+      "desktop/src/react/__tests__/stores/channel-actions.test.ts",
+      "desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx",
+      "desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx",
+      "desktop/src/react/__tests__/services/conversation-request-scope.test.ts",
+      "desktop/src/react/__tests__/components/ChannelInput.focus.test.tsx",
+      "desktop/src/react/__tests__/components/ChannelMessages.scroll.test.tsx",
+      "desktop/src/react/__tests__/components/ChannelCreateOverlay.test.tsx",
+      "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+      "desktop/src/react/__tests__/services/channel-new-message-ws.test.ts",
+      "desktop/src/react/__tests__/services/rust-chat-history.test.ts",
+      "desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T20:54:57.936576+00:00",
+    "endedAt": "2026-10-15T20:55:00.793742+00:00",
+    "log": "/private/tmp/lingxi-r07-t03-final-ui.log"
+  },
+  {
+    "name": "typecheck",
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T20:55:00.794116+00:00",
+    "endedAt": "2026-10-15T20:55:26.748071+00:00",
+    "log": "/private/tmp/lingxi-r07-t03-final-typecheck.log"
+  },
+  {
+    "name": "ownership",
+    "command": [
+      "python3",
+      "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T20:55:26.751667+00:00",
+    "endedAt": "2026-10-15T20:55:27.804440+00:00",
+    "log": "/private/tmp/lingxi-r07-t03-final-ownership.log"
+  }
+]

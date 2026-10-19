@@ -1,4 +1,10 @@
 import { useStore } from '../stores';
+import { rustAutomationRoute } from '../services/rust-automation';
+import { rustBridgeRoute } from '../services/rust-bridge';
+import { rustBrowserRoute } from '../services/rust-browser';
+import { rustObservabilityRoute } from '../services/rust-observability';
+import { rustWorkbenchRoute } from '../services/rust-workbench';
+import { rustSettingsRoute } from '../services/rust-settings';
 import {
   appendConnectionAuth,
   buildConnectionUrl,
@@ -6,8 +12,18 @@ import {
 } from '../services/server-connection';
 
 const DEFAULT_TIMEOUT = 30_000;
-function skillRoute(connection: { serverNodeKind?: string }, path: string): string {
-  return connection.serverNodeKind === 'lingxi-service' && (/^\/api\/skills(?:[/?]|$)/.test(path) || /^\/api\/agents\/[^/]+\/(?:skills|skill-bundles)\/[^/?]+(?:[?]|$)/.test(path)) ? `/lingxi/v1${path.slice('/api'.length)}` : path;
+function serviceRoute(connection: { serverNodeKind?: string }, path: string): string {
+  if (connection.serverNodeKind === 'lingxi-service' && (
+    /^\/api\/skills(?:[/?]|$)/.test(path)
+    || /^\/api\/agents\/[^/]+\/(?:skills|skill-bundles)\/[^/?]+(?:[?]|$)/.test(path)
+    || /^\/api\/(?:channels|dm)(?:[/?]|$)/.test(path)
+    || /^\/api\/desk\/beautify(?:[/?]|$)/.test(path)
+    || /^\/api\/conversations\/[^/?]+\/(?:agent-phone-settings|agent-phone-tool-mode|agent-activities|export)(?:\?|$)/.test(path)
+    || /^\/api\/session-collab\/(?:apply|reject)(?:\?|$)/.test(path)
+    || /^\/api\/media(?:[/?]|$)/.test(path)
+    || /^\/api\/speech-recognition(?:[/?]|$)/.test(path)
+  )) return `/lingxi/v1${path.slice('/api'.length)}`;
+  return rustSettingsRoute(connection, rustWorkbenchRoute(connection, rustBrowserRoute(connection, rustBridgeRoute(connection, rustObservabilityRoute(connection, rustAutomationRoute(connection, path))))));
 }
 
 /**
@@ -18,7 +34,7 @@ export function lingxiUrl(path: string): string {
     useStore.getState(),
     `lingxiUrl ${path}: server connection not ready`,
   );
-  return buildConnectionUrl(connection, skillRoute(connection, path), { includeTokenQuery: true });
+  return buildConnectionUrl(connection, serviceRoute(connection, path), { includeTokenQuery: true });
 }
 
 /**
@@ -50,7 +66,7 @@ export async function lingxiFetch(
   }
 
   try {
-    const res = await fetch(buildConnectionUrl(connection, skillRoute(connection, path)), {
+    const res = await fetch(buildConnectionUrl(connection, serviceRoute(connection, path)), {
       ...fetchOpts,
       headers,
       signal: controller.signal,

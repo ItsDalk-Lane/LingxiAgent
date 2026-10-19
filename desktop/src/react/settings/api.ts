@@ -3,6 +3,9 @@
  * 从 settings store 读 port/token，独立于主窗口
  */
 import { useSettingsStore } from './store';
+import { rustBridgeRoute } from '../services/rust-bridge';
+import { rustBrowserRoute } from '../services/rust-browser';
+import { rustSettingsRoute } from '../services/rust-settings';
 import {
   appendConnectionAuth,
   buildConnectionUrl,
@@ -11,24 +14,13 @@ import {
 } from '../services/server-connection';
 import { errorWithCode } from '../errors/error-presenter';
 import { normalizeSessionRouteError } from '../../../../shared/error-user-messages.ts';
+import { captureSettingsConnection, ownsSettingsConnection } from './connection-owner';
 
 const DEFAULT_TIMEOUT = 30_000;
 
 function routeForConnection(connection: { serverNodeKind?: string }, path: string): string {
   if (connection.serverNodeKind !== 'lingxi-service') return path;
-  // 只映射已在原生服务注册的助手设置接口，保留其他设置页的明确不可用边界。
-  if (/^\/api\/(?:agents|memories|character-cards)(?:[/?]|$)/.test(path) || /^\/api\/(?:settings\/snapshot|models|preferences\/models|providers\/summary|user-profile|agent-deletions)(?:[/?]|$)/.test(path)) {
-    return `/lingxi/v1${path.slice('/api'.length)}`;
-  }
-  if (/^\/api\/(?:skills|preferences\/(?:goal|autolearn))(?:[/?]|$)/.test(path)) return `/lingxi/v1${path.slice('/api'.length)}`;
-  if (/^\/api\/(?:experiments|preferences\/computer-use)(?:[/?]|$)/.test(path)) return `/lingxi/v1${path.slice('/api'.length)}`;
-  if (path === '/api/config') return '/lingxi/v1/settings/config';
-  if (path === '/api/health') return '/lingxi/v1/settings/avatar-health';
-  if (path.startsWith('/api/avatar/')) return `/lingxi/v1${path.slice('/api'.length)}`;
-  if (path.startsWith('/api/access/') || path.startsWith('/api/devices/')) {
-    return `/lingxi/v1${path.slice('/api'.length)}`;
-  }
-  return path;
+  return rustSettingsRoute(connection, rustBrowserRoute(connection, rustBridgeRoute(connection, path)));
 }
 
 /** 原生设置读写的资料所有者必须与 fetch 使用同一有效连接坐标。 */
@@ -56,15 +48,17 @@ export async function lingxiFetch(
     `settings lingxiFetch ${path}: server connection not ready`,
   );
   const headers = appendConnectionAuth(connection, opts.headers);
+  const requestOwner = captureSettingsConnection();
 
   const { timeout = DEFAULT_TIMEOUT, signal: callerSignal, ...fetchOpts } = opts;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
+  const forwardAbort = () => controller.abort();
 
   // If caller provided a signal, forward its abort to our controller
   if (callerSignal) {
     if (callerSignal.aborted) { controller.abort(); }
-    else { callerSignal.addEventListener('abort', () => controller.abort(), { once: true }); }
+    else { callerSignal.addEventListener('abort', forwardAbort, { once: true }); }
   }
 
   try {
@@ -74,14 +68,19 @@ export async function lingxiFetch(
       signal: controller.signal,
     });
     if (!res.ok) {
+      if (res.status === 401 && connection.serverNodeKind === 'lingxi-service' && ownsSettingsConnection(requestOwner)) {
+        // 仅当前连接的凭证失效撤回页面身份；旧连接迟到响应不能清掉新身份。
+        useSettingsStore.setState({ settingsIdentityOwner: null, rustSettingsUnavailable: true });
+      }
       // 错误码在这里就得挂到异常上。调用方拿到的是抛出来的 Error，不是响应体——
       // 一旦这里只带走那句英文，后面再想把失败翻成人话就没有依据了。
-      const { message, code } = await readErrorResponse(res);
-      throw errorWithCode(message || `lingxiFetch ${path}: ${res.status} ${res.statusText}`, code);
+      const { message, code, mcp } = await readErrorResponse(res);
+      throw Object.assign(errorWithCode(message || `lingxiFetch ${path}: ${res.status} ${res.statusText}`, code), mcp || {});
     }
     return res;
   } finally {
     clearTimeout(timer);
+    callerSignal?.removeEventListener('abort', forwardAbort);
   }
 }
 
@@ -97,9 +96,26 @@ export async function lingxiFetchJson<T = Record<string, unknown>>(
   const data = await res.json() as T & { error?: unknown };
   if (data && typeof data === 'object' && 'error' in data && data.error) {
     const message = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
-    throw new Error(message || `lingxiFetch ${path}: request failed`);
+    throw new Error(withSavedSettingsFacts(data, message || `lingxiFetch ${path}: request failed`));
   }
   return data;
+}
+
+/** 部分成功也必须传到页面文案，不能把已经生效的设置显示成从未保存。 */
+function withSavedSettingsFacts(data: unknown, message: string): string {
+  if (!data || typeof data !== 'object') return message;
+  const facts = data as { preferencesSaved?: unknown; settingsUpdate?: { saved?: unknown; runtimeApplied?: unknown }; result?: { saved?: unknown; applied?: unknown }; modelConfiguration?: { saved?: unknown; applied?: unknown } };
+  const model = facts.result || facts.modelConfiguration || (facts.settingsUpdate && { saved: facts.settingsUpdate.saved, applied: facts.settingsUpdate.runtimeApplied });
+  const prefix = model?.applied === true
+    ? ['settings.transfer.partialApplied', '设置已生效，但后续步骤未完成。']
+    : model?.saved === true
+      ? ['settings.transfer.savedNotApplied', '设置已保存，但尚未生效。']
+      : facts.preferencesSaved === true
+        ? ['settings.transfer.partialSaved', '部分设置已保存，请重新读取后再操作。']
+        : null;
+  if (!prefix) return message;
+  const translated = typeof window !== 'undefined' ? window.t?.(prefix[0]) : null;
+  return `${typeof translated === 'string' && translated !== prefix[0] ? translated : prefix[1]} ${message}`;
 }
 
 /**
@@ -114,7 +130,7 @@ export async function lingxiFetchJson<T = Record<string, unknown>>(
  * 归一取不到消息时才往下退：先看 `{message}` 这种不带 error 字段的写法，
  * 最后退回整段响应文本。body 读不出来或根本不是 JSON 时没有码，文案跟以前一样。
  */
-async function readErrorResponse(res: Response): Promise<{ message: string | null; code: string | null }> {
+async function readErrorResponse(res: Response): Promise<{ message: string | null; code: string | null; mcp?: { settingsUpdate: unknown; results?: unknown[] } }> {
   let text: string;
   try {
     text = await res.text();
@@ -132,12 +148,21 @@ async function readErrorResponse(res: Response): Promise<{ message: string | nul
     return { message: text.trim() || null, code: null };
   }
 
+  const mcp = data && typeof data === 'object' ? data as { settingsUpdate?: { status?: unknown; summary?: unknown; error?: { message?: unknown; code?: unknown } }; results?: unknown[] } : null;
+  if (mcp?.settingsUpdate && ['failed', 'cancelled'].includes(String(mcp.settingsUpdate.status))) {
+    const update = mcp.settingsUpdate;
+    const message = typeof update.error?.message === 'string' ? update.error.message
+      : typeof update.summary === 'string' ? update.summary : 'MCP 设置未完成';
+    return { message: withSavedSettingsFacts(data, message), code: typeof update.error?.code === 'string' ? update.error.code : null,
+      mcp: { settingsUpdate: update, ...(Array.isArray(mcp.results) ? { results: mcp.results } : {}) } };
+  }
+
   const routeError = normalizeSessionRouteError(data);
-  if (routeError.message) return { message: routeError.message, code: routeError.code };
+  if (routeError.message) return { message: withSavedSettingsFacts(data, routeError.message), code: routeError.code };
 
   const legacyMessage = (data as { message?: unknown } | null)?.message;
   if (typeof legacyMessage === 'string' && legacyMessage.trim()) {
-    return { message: legacyMessage.trim(), code: routeError.code };
+    return { message: withSavedSettingsFacts(data, legacyMessage.trim()), code: routeError.code };
   }
   return { message: text.trim() || null, code: routeError.code };
 }

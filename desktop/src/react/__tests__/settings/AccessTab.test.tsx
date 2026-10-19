@@ -385,6 +385,7 @@ describe('AccessTab', () => {
         displayName: 'Desktop Frontend',
         scopes: [
           'chat',
+          'sessions.write',
           'resources.read',
           'files.read',
           'files.write',

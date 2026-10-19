@@ -1,0 +1,580 @@
+{
+  "checks": [
+    "app-empty-preview-and-side",
+    "app-automatic-current-thinking-get"
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/studio/workspaces"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/experiments"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/skills?agentId=lingxi&runtime=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/studio/workspaces"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/experiments"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/skills?agentId=lingxi&runtime=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/desk/DeskEditor.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/right-workspace/WorkflowCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/right-workspace/AgentActivityCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/right-workspace/SessionStatusCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/runtime/RuntimeInfoCapsule.module.css"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/session-thinking-level"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/session-thinking-level"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/history?all=1"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/approvals"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/deferred-rewind"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/interactions?sessionId=desktop"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/session-thinking-level?sessionPath=desktop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/history?all=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/approvals"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/deferred-rewind"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/interactions?sessionId=desktop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/experiments"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/skills?agentId=lingxi&runtime=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/session-thinking-level?sessionPath=desktop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/right-workspace/WorkflowCard.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/desk/Desk.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/right-workspace/AgentActivityCard.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/react/components/right-workspace/SessionStatusCard.module.css"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/models"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/models"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/mood-history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/sessions/desktop/mood-history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50892/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:50892/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "GET",
+      "url": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%2220%22%20fill%3D%22%23f0eee9%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2224%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%20fill%3D%22%232f6f8f%22%3EU%3C%2Ftext%3E%3C%2Fsvg%3E"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/assets/Lingxi.png"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:50893/themes/fonts/ebgaramond-9947e6f6e128.woff2"
+    }
+  ],
+  "frames": [
+    {
+      "direction": "Network.webSocketFrameSent",
+      "body": {
+        "protocol": "lingxi.wire",
+        "clientKind": "desktop",
+        "clientVersion": "0.1.43",
+        "protocolMin": 1,
+        "protocolMax": 1,
+        "caps": []
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "dataEpoch": 1,
+        "protocol": "lingxi.wire",
+        "selectedProtocol": 1,
+        "serverKind": "lingxi-service",
+        "serverVersion": "0.0.0",
+        "wireProtocolMax": 1,
+        "wireProtocolMin": 1
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameSent",
+      "body": {
+        "protocol": "lingxi.wire",
+        "clientKind": "desktop",
+        "clientVersion": "0.1.43",
+        "protocolMin": 1,
+        "protocolMax": 1,
+        "caps": []
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "dataEpoch": 1,
+        "protocol": "lingxi.wire",
+        "selectedProtocol": 1,
+        "serverKind": "lingxi-service",
+        "serverVersion": "0.0.0",
+        "wireProtocolMax": 1,
+        "wireProtocolMin": 1
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameSent",
+      "body": {
+        "type": "subscribe_mood",
+        "sessionId": "desktop"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "frameKind": "control",
+        "fromSeq": "0",
+        "mode": "snapshot",
+        "snapshotSeq": "0",
+        "streamId": "lingxi.mood/68693d02ab4fbb2331b8cc39915322e48e61f06d4d1b31e7d19913202857bc8a",
+        "type": "subscribed"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameSent",
+      "body": {
+        "type": "prompt",
+        "clientMessageId": "client-user-64e9eb67-ba5b-42c2-b3b9-4dbfb86ba8c8",
+        "snapshotVersion": 1,
+        "text": "APP-FIRST",
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "uiContext": null,
+        "displayMessage": {
+          "text": "APP-FIRST"
+        },
+        "clientAttemptId": "client-attempt-ca4556c4-6f3b-4001-8458-5dc2e94d3077"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "clientMessageId": "client-user-64e9eb67-ba5b-42c2-b3b9-4dbfb86ba8c8",
+        "message": {
+          "attachments": [],
+          "clientMessageId": "client-user-64e9eb67-ba5b-42c2-b3b9-4dbfb86ba8c8",
+          "hasImages": false,
+          "id": "user:run_000001a14e346d6b_000002",
+          "quotedText": null,
+          "sessionRefs": null,
+          "snapshotVersion": 1,
+          "sourceEntryId": "user:run_000001a14e346d6b_000002",
+          "text": "APP-FIRST",
+          "timestamp": 1792313421177
+        },
+        "seq": 1,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "snapshotVersion": 1,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421177,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "session_user_message"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "clientMessageId": "client-user-64e9eb67-ba5b-42c2-b3b9-4dbfb86ba8c8",
+        "message": {
+          "attachments": [],
+          "clientMessageId": "client-user-64e9eb67-ba5b-42c2-b3b9-4dbfb86ba8c8",
+          "hasImages": false,
+          "id": "user:run_000001a14e346d6b_000002",
+          "quotedText": null,
+          "sessionRefs": null,
+          "snapshotVersion": 1,
+          "sourceEntryId": "user:run_000001a14e346d6b_000002",
+          "text": "APP-FIRST",
+          "timestamp": 1792313421177
+        },
+        "seq": 1,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "snapshotVersion": 1,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421177,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "session_user_message"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "isStreaming": true,
+        "seq": 2,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421177,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "status"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "isStreaming": true,
+        "seq": 2,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421177,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "status"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "runId": "run_000001a14e346d6b_000002",
+        "seq": 3,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421177,
+        "turnId": "run_000001a14e346d6b_000002",
+        "turnInputEntryId": "user:run_000001a14e346d6b_000002",
+        "type": "assistant_run_start"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "runId": "run_000001a14e346d6b_000002",
+        "seq": 3,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421177,
+        "turnId": "run_000001a14e346d6b_000002",
+        "turnInputEntryId": "user:run_000001a14e346d6b_000002",
+        "type": "assistant_run_start"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "modelCallId": "run_000001a14e346d6b_000002-mc0001",
+        "phase": "model",
+        "seq": 4,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421193,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "stage"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "modelCallId": "run_000001a14e346d6b_000002-mc0001",
+        "phase": "model",
+        "seq": 4,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421193,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "stage"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "kind": "text",
+        "segmentId": "assistant:1:text:default",
+        "semanticPhase": "unresolved",
+        "seq": 5,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "assistant_segment_start"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "kind": "text",
+        "segmentId": "assistant:1:text:default",
+        "semanticPhase": "unresolved",
+        "seq": 5,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "assistant_segment_start"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "delta": "CHAT-FINAL-1",
+        "segmentId": "assistant:1:text:default",
+        "semanticPhase": "unresolved",
+        "seq": 6,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "assistant_segment_delta"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "segmentId": "assistant:1:text:default",
+        "semanticPhase": "final_answer",
+        "seq": 7,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "assistant_segment_end"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "runId": "run_000001a14e346d6b_000002",
+        "seq": 8,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "turnInputEntryId": "user:run_000001a14e346d6b_000002",
+        "type": "assistant_run_end"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "isStreaming": false,
+        "seq": 9,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "status"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "delta": "CHAT-FINAL-1",
+        "segmentId": "assistant:1:text:default",
+        "semanticPhase": "unresolved",
+        "seq": 6,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "assistant_segment_delta"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "segmentId": "assistant:1:text:default",
+        "semanticPhase": "final_answer",
+        "seq": 7,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "assistant_segment_end"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "runId": "run_000001a14e346d6b_000002",
+        "seq": 8,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "turnInputEntryId": "user:run_000001a14e346d6b_000002",
+        "type": "assistant_run_end"
+      }
+    },
+    {
+      "direction": "Network.webSocketFrameReceived",
+      "body": {
+        "isStreaming": false,
+        "seq": 9,
+        "sessionId": "desktop",
+        "sessionPath": "native:desktop",
+        "sessionRefVersion": 2,
+        "streamId": "run_000001a14e346d6b_000002",
+        "ts": 1792313421201,
+        "turnId": "run_000001a14e346d6b_000002",
+        "type": "status"
+      }
+    }
+  ],
+  "errors": [
+    "[InputArea] load thinking level failed Error: 连接已切换，本次旧连接结果已丢弃"
+  ],
+  "state": {
+    "attachedFiles": [],
+    "attachedFilesBySession": {},
+    "toasts": [],
+    "sideChat": {
+      "open": false,
+      "sessionPath": null,
+      "sessionId": null,
+      "agentId": null,
+      "status": "idle",
+      "error": null,
+      "seedQuote": null,
+      "memoryEnabled": false,
+      "createdAt": 0
+    }
+  },
+  "visible": "暂无情绪轨迹\n\nUser\n\nAPP-FIRST\n\n16:50\nLingxi\n\nCHAT-FINAL-1\n\n16:50\n\n\n\n\nchat.send\nchat"
+}

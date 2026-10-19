@@ -1,0 +1,27 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error[E0061]: this function takes 5 arguments but 4 arguments were supplied
+   --> crates/lingxi-adapters/tests/r07_bridge_store.rs:535:5
+    |
+535 |     session_files::update_session_file_status(
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+539 |         7,
+    |         - argument #4 of type `Option<u64>` is missing
+    |
+note: function defined here
+   --> crates/lingxi-adapters/src/storage/session_files.rs:688:14
+    |
+688 | pub async fn update_session_file_status(
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: provide the argument
+    |
+535 |     session_files::update_session_file_status(
+...
+538 |         session_files::SessionFileStatus::Missing,
+539 ~         /* Option<u64> */,
+540 ~         7,
+    |
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `lingxi-adapters` (test "r07_bridge_store") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

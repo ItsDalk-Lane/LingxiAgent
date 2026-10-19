@@ -1,0 +1,216 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:18:46.600531+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08c",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprint": "b942c6d4ee882eaea5249cd49242ec6fa3d434505b09ff9af6064d413a2d40e0",
+  "sourceManifestSha256": "b62ce332d97422aee1353599582d5561dd35f1f73738dbf5fb6586a61777f6cb",
+  "gatePlanSha256": "15d583f903a6d37dfcc8b7fd564cfc0ec7045835c1a365d4b66d5cb8acb19128",
+  "finalAcceptance": "pending",
+  "scope": "Independent read-only implementation and actual-evidence audit; not full R07 acceptance",
+  "sourceVerification": {
+    "fileCount": 644,
+    "allCurrentManifestRowsMatch": true,
+    "recomputedFingerprintMatches": true,
+    "archiveSha256Matches": true,
+    "allArchiveMemberBytesAndModesMatch": true,
+    "currentAndSnapshotPlanMatch": true,
+    "mainRunnerMatches": true,
+    "allThreeVerificationWrappersMatch": true,
+    "archivedABRunnerMatchesOriginalManifests": true
+  },
+  "fixReview": {
+    "headersMalformedInput": "FIXED; same-source development failure and real passing followup preserved; formal c service gate pending",
+    "queuedModelAuthority": "FIXED; same Auth Arc, original-principal queue and atomic save recheck, real five-case followup passed; formal c service gate pending",
+    "malformedEndpoint": "FIXED; rejects explicit non-string endpoint/base_url while preserving empty endpoint compatibility; real10-case config followup passed",
+    "unknownCardAsset": "FIXED; safe optional map lookup returns404, original panic and subsequent real8-case pass preserved",
+    "mediaCatalogPublisher": "FIXED_IN_SOURCE_AND_REAL_DEV_RECHECK_PASSED; four-class CRUD now uses unique Source, precise conflict checks and lock-internal expected generation; same Operation image/speech actual generated files/usage, restart and failed compatibility projection facts; c service gate pending",
+    "mediaOperationCustomModel": "FIXED; actual Source catalog authorizes selected model; optional static alias must map to same-provider Source key, no arbitrary static allowance",
+    "searchKeyClear": "current code distinguishes omitted/mask/empty/null and updates only selected provider; three actual test cases preserve other key and verify restart",
+    "speechPageCoverage": "ModelsTab direct tests cover TTS default save/clear/failure with ASR independent; only network response substituted, separate actual backend/operation checks retained"
+  },
+  "nativeEvidenceReuse": {
+    "contract": "Exact same native binary and35-file closure binds prior real manual selection/cancel IPC proof; does not claim c reran manual steps",
+    "sameManualBinarySha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+    "proof": "native-picker-ipc2/binding-proof-v2.json",
+    "formalBindingGatePending": true,
+    "verifierOriginalBoundaryLinkNowChecked": true,
+    "applicationRawExitCode": "NOT_CAPTURED; do not infer from test exit0"
+  },
+  "newBlockingSourceFindings": [],
+  "gates": [
+    {
+      "name": "fmt",
+      "status": "PASS",
+      "receipt": "t08c-fmt.json",
+      "receiptSha256": "e7db7bf3644983e88cc84fdb2733f26b08618a052a3dfe79349760a1ef19af69",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "diff",
+      "status": "PASS",
+      "receipt": "t08c-diff.json",
+      "receiptSha256": "d2291c83b6e20c76389ad72086b588d3cc4c077417eff6e3a42f5ee6885fe361",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "clippy",
+      "status": "PASS",
+      "receipt": "t08c-clippy.json",
+      "receiptSha256": "b7005f1b2fd778f4f80307f0e04fd267cd38209f12b9f53780fe8f7f3743b5cb",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "protocol",
+      "status": "PASS",
+      "receipt": "t08c-protocol.json",
+      "receiptSha256": "e8e79cf63c65ef969623ea82397ce4774e5481097b7d6f01818a827844cf27d9",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "protocol-roundtrip",
+      "status": "PASS",
+      "receipt": "t08c-protocol-roundtrip.json",
+      "receiptSha256": "d32676c8ea911a395f007ee36f4b2cf16ec16e6fc50baff36c55fe195ad4e11b",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "protocol-tests",
+      "status": "PASS",
+      "receipt": "t08c-protocol-tests.json",
+      "receiptSha256": "dfbd3aa2ced5bd4b6a44e5646b860b934814dbe2c5375d2b3c471f7434b454da",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "kernel",
+      "status": "PASS",
+      "receipt": "t08c-kernel.json",
+      "receiptSha256": "79d5cafc44188ae0cd3493c5e87391fe6a6a36f7fefd7fc414a922f035ab798a",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "boundaries",
+      "status": "PASS",
+      "receipt": "t08c-boundaries.json",
+      "receiptSha256": "a234ae9ac84f99c4424ccdefd8415d5b3b0c2e50e6dad7379c2ae3308b73031b",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "adapter",
+      "status": "PASS",
+      "receipt": "t08c-adapter.json",
+      "receiptSha256": "1003fdbb170408dfce4c4cf3bf5713d2a1396ef3804d54043aaf27e277ef5b3a",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "service",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "model-regression",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "native-skills",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "native-picker-binding",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "skills-current",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "build",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "ui",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "types",
+      "status": "PASS",
+      "receipt": "t08c-types.json",
+      "receiptSha256": "923c347e39e01044588b4cf6b4dcd147e798fe2eb3a9a9f5a10bc2b1d35d4ba8",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "logSha256Matches": true
+    },
+    {
+      "name": "card-navigation-desktop",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "name": "card-navigation-mobile",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    }
+  ],
+  "remainingAcceptanceConditions": [
+    "All19 frozen gate completions must independently match source/plan/command/wrapper/log; missing/cancelled counts as not passed",
+    "UI and desktop/mobile navigation each need fresh c build binary SHA binding before/after",
+    "Actual leaf/343 assertion mapping must use named case outcomes and specific claims, not suite counts; outdated draft referring a/c-not-frozen cannot be final",
+    "Video/ASR new media-source target proves catalog mutation/deletion; actual generation/transcription responsibilities require their separately applicable actual-operation proof"
+  ],
+  "preservedPriorCandidates": {
+    "t08a": "FAILED_PROTOCOL_NOT_ACCEPTED",
+    "t08b": "CANCELLED_NOT_ACCEPTED; kernel raw -2 is root SIGINT for confirmed Source gap, not a kernel business failure"
+  },
+  "boundaries": [
+    "True accounts/paid providers/other operating systems/release package unverified",
+    "T11 MCP HTTP/SSE/OAuth, full lazy/idle/pinned and old settings page remain separately tracked",
+    "T07 browser failures remain T12 responsibility; R06 accepted status unchanged",
+    "No commit/push/release/real outbound sends performed by reviewer"
+  ]
+}

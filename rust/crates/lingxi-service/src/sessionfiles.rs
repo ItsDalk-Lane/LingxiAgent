@@ -884,6 +884,208 @@ impl SessionFileService {
         if !filemeta::is_allowed_upload_blob_mime(mime) {
             return Err(SessionFileError::UnsupportedMedia(mime.to_string()));
         }
+        self.register_blob_materialized(
+            session_id,
+            name,
+            mime,
+            bytes,
+            origin,
+            "upload:blob-content:v1",
+        )
+        .await
+    }
+
+    /// 现役 stageFile（plugin-context.ts:121-126）：插件/agent 产物登记不走
+    /// upload.ts 的用户上传媒体白名单。调用方必须已核验字节来源与内容
+    /// （如 office html-to-pdf 的 %PDF- 魔数、%%EOF 尾、sha256 与 50MiB 上界），
+    /// 本入口只做内容寻址登记，不信任调用方自报的磁盘路径。
+    pub async fn register_artifact_blob(
+        &self,
+        session_id: &str,
+        name: Option<&str>,
+        mime: &str,
+        bytes: &[u8],
+    ) -> Result<SessionFileView, SessionFileError> {
+        self.register_blob_materialized(
+            session_id,
+            name,
+            mime,
+            bytes,
+            "agent_artifact",
+            "artifact:blob-content:v1",
+        )
+        .await
+    }
+
+    /// Bridge 宿主接收的有界字节登记为真实会话文件；不接收平台自报的磁盘路径。
+    /// 普通上传仍沿原媒体白名单，本入口只供已经核验来源的宿主调用。
+    pub async fn register_bridge_blob(
+        &self,
+        session_id: &str,
+        name: Option<&str>,
+        mime: &str,
+        bytes: &[u8],
+        origin: &str,
+    ) -> Result<SessionFileView, SessionFileError> {
+        let invalid = |detail: &str| {
+            SessionFileError::Storage(StorageError::InvalidRequest {
+                detail: detail.into(),
+            })
+        };
+        if bytes.len() > 50 * 1024 * 1024 {
+            return Err(invalid("bridge attachment exceeds 50 MiB"));
+        }
+        if name.is_some_and(|name| {
+            name.is_empty()
+                || name.len() > 255
+                || name == "."
+                || name == ".."
+                || name.ends_with('.')
+                || name.ends_with(' ')
+                || name
+                    .chars()
+                    .any(|ch| ch.is_control() || "/\\:*?\"<>|".contains(ch))
+        }) {
+            return Err(invalid(
+                "bridge attachment filename must be a safe basename",
+            ));
+        }
+        let valid_token = |part: &str| {
+            !part.is_empty()
+                && part
+                    .bytes()
+                    .all(|ch| ch.is_ascii_alphanumeric() || b"!#$&^_.+-".contains(&ch))
+        };
+        if mime.len() > 127
+            || !mime
+                .split_once('/')
+                .is_some_and(|(kind, subtype)| valid_token(kind) && valid_token(subtype))
+        {
+            return Err(invalid(
+                "bridge attachment MIME must be a concrete type/subtype",
+            ));
+        }
+        let session = lingxi_adapters::storage::session_tree::get_session_row(&self.db, session_id)
+            .await?
+            .ok_or_else(|| invalid("bridge attachment session missing"))?;
+        if session.lifecycle != "active" {
+            return Err(invalid("bridge attachment session is not active"));
+        }
+        let mime = mime.to_ascii_lowercase();
+        self.register_blob_materialized(
+            session_id,
+            name.or(Some("attachment.bin")),
+            &mime,
+            bytes,
+            origin,
+            "bridge:blob-content:v1",
+        )
+        .await
+    }
+
+    /// 网页全文是正式会话产物，继续阅读沿现有文件权限和单一写入通道。
+    pub async fn register_web_text(
+        &self,
+        session_id: &str,
+        name: &str,
+        bytes: &[u8],
+    ) -> Result<SessionFileView, SessionFileError> {
+        self.register_blob_materialized(
+            session_id,
+            Some(name),
+            "text/plain",
+            bytes,
+            "agent_artifact",
+            "web:content:v1",
+        )
+        .await
+    }
+
+    /// 只供已核验的浏览器宿主交付有界字节，不接受页面自报的宿主路径。
+    pub async fn register_browser_artifact(
+        &self,
+        session_id: &str,
+        name: &str,
+        mime: &str,
+        bytes: &[u8],
+        screenshot: bool,
+    ) -> Result<SessionFileView, SessionFileError> {
+        self.register_blob_materialized(
+            session_id,
+            Some(name),
+            mime,
+            bytes,
+            if screenshot {
+                "browser_screenshot"
+            } else {
+                "agent_artifact"
+            },
+            "browser:artifact:v1",
+        )
+        .await
+    }
+
+    /// 媒体只发布到现有会话；文件与媒体作业摘要由统一写事务一起登记。
+    pub(crate) async fn register_media_blob(
+        &self,
+        guard: lingxi_adapters::storage::media::MediaPublicationGuard,
+        name: Option<&str>,
+        mime: &str,
+        bytes: &[u8],
+    ) -> Result<SessionFileView, SessionFileError> {
+        if !filemeta::is_allowed_upload_blob_mime(mime) {
+            return Err(SessionFileError::UnsupportedMedia(mime.into()));
+        }
+        let session = guard.job.session_id.clone();
+        let namespace = format!(
+            "media-job:{}:{}",
+            sha256_hex(guard.job.operation_id.as_bytes()),
+            guard.artifact_index
+        );
+        self.register_blob_materialized_inner(
+            &session,
+            name,
+            mime,
+            bytes,
+            "agent_artifact",
+            &namespace,
+            Some(guard),
+        )
+        .await
+    }
+
+    async fn register_blob_materialized(
+        &self,
+        session_id: &str,
+        name: Option<&str>,
+        mime: &str,
+        bytes: &[u8],
+        origin: &str,
+        source_namespace: &str,
+    ) -> Result<SessionFileView, SessionFileError> {
+        self.register_blob_materialized_inner(
+            session_id,
+            name,
+            mime,
+            bytes,
+            origin,
+            source_namespace,
+            None,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    async fn register_blob_materialized_inner(
+        &self,
+        session_id: &str,
+        name: Option<&str>,
+        mime: &str,
+        bytes: &[u8],
+        origin: &str,
+        source_namespace: &str,
+        media: Option<lingxi_adapters::storage::media::MediaPublicationGuard>,
+    ) -> Result<SessionFileView, SessionFileError> {
         // 现役 presentation：voice-input 否则 attachment（normalizePresentation
         // + originForPresentation，upload.ts:206-220 的反向）。
         let presentation = if origin == "voice_input" {
@@ -892,12 +1094,15 @@ impl SessionFileService {
             "attachment"
         };
         let source_key = build_session_file_source_key(
-            "upload:blob-content:v1",
+            source_namespace,
             &[presentation, mime, &sha256_hex(bytes)],
         );
         let now = self.now_ms();
         let lease = self.payload_lease().await;
-        store::record_current_activity(&self.db, session_id, now).await?;
+        let bridge = source_namespace == "bridge:blob-content:v1";
+        if !bridge && media.is_none() {
+            store::record_current_activity(&self.db, session_id, now).await?;
+        }
         let sanitized = filemeta::sanitize_blob_name(name, mime);
         let ext = filemeta::ext_of_name(&sanitized);
         let (base, ext_with_dot) = if ext.is_empty() {
@@ -943,7 +1148,13 @@ impl SessionFileService {
             legacy_file_ids: vec![],
             legacy_file_paths: vec![],
         };
-        let stored = store::register_owned_blob(&self.db, row, bytes.to_vec(), lease).await?;
+        let stored = if let Some(guard) = media {
+            store::register_owned_media_blob(&self.db, row, bytes.to_vec(), lease, guard).await?
+        } else if bridge {
+            store::register_owned_bridge_blob(&self.db, row, bytes.to_vec(), lease).await?
+        } else {
+            store::register_owned_blob(&self.db, row, bytes.to_vec(), lease).await?
+        };
         Ok(SessionFileView::from_row(&stored))
     }
 

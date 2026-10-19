@@ -1,0 +1,268 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: constant `PAGE_MAX_LIMIT` is never used
+  --> crates/lingxi-service/src/observability.rs:29:7
+   |
+29 | const PAGE_MAX_LIMIT: u32 = 200;
+   |       ^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `PAGE_DEFAULT_LIMIT` is never used
+  --> crates/lingxi-service/src/observability.rs:30:7
+   |
+30 | const PAGE_DEFAULT_LIMIT: u32 = 50;
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `EXPORT_DEFAULT_MAX` is never used
+  --> crates/lingxi-service/src/observability.rs:32:7
+   |
+32 | const EXPORT_DEFAULT_MAX: u32 = 50_000;
+   |       ^^^^^^^^^^^^^^^^^^
+
+warning: constant `EXPORT_HARD_MAX` is never used
+  --> crates/lingxi-service/src/observability.rs:33:7
+   |
+33 | const EXPORT_HARD_MAX: u32 = 100_000;
+   |       ^^^^^^^^^^^^^^^
+
+warning: constant `EXPORT_SCHEMA_VERSION` is never used
+  --> crates/lingxi-service/src/observability.rs:34:7
+   |
+34 | const EXPORT_SCHEMA_VERSION: u32 = 1;
+   |       ^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `routes` is never used
+  --> crates/lingxi-service/src/observability.rs:36:15
+   |
+36 | pub(crate) fn routes() -> Router<ServiceState> {
+   |               ^^^^^^
+
+warning: enum `OneOrMany` is never used
+  --> crates/lingxi-service/src/observability.rs:54:6
+   |
+54 | enum OneOrMany {
+   |      ^^^^^^^^^
+
+warning: method `into_vec` is never used
+  --> crates/lingxi-service/src/observability.rs:60:8
+   |
+59 | impl OneOrMany {
+   | -------------- method in this implementation
+60 |     fn into_vec(self) -> Vec<String> {
+   |        ^^^^^^^^
+
+warning: struct `ObservabilityFilterInput` is never constructed
+  --> crates/lingxi-service/src/observability.rs:70:8
+   |
+70 | struct ObservabilityFilterInput {
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `bad_query` is never used
+   --> crates/lingxi-service/src/observability.rs:109:4
+    |
+109 | fn bad_query(field: &'static str, detail: impl Into<String>) -> Response {
+    |    ^^^^^^^^^
+
+warning: function `parse_instant` is never used
+   --> crates/lingxi-service/src/observability.rs:122:4
+    |
+122 | fn parse_instant(value: &serde_json::Value, field: &'static str) -> Result<u64, Response> {
+    |    ^^^^^^^^^^^^^
+
+warning: function `map_outcome` is never used
+   --> crates/lingxi-service/src/observability.rs:140:4
+    |
+140 | fn map_outcome(word: &str) -> Result<CallOutcome, Response> {
+    |    ^^^^^^^^^^^
+
+warning: function `native_session_id` is never used
+   --> crates/lingxi-service/src/observability.rs:151:4
+    |
+151 | fn native_session_id(raw: String) -> String {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: method `into_filter` is never used
+   --> crates/lingxi-service/src/observability.rs:156:8
+    |
+155 | impl ObservabilityFilterInput {
+    | ----------------------------- method in this implementation
+156 |     fn into_filter(self) -> Result<UsageFilter, Response> {
+    |        ^^^^^^^^^^^
+
+warning: function `filter_fingerprint` is never used
+   --> crates/lingxi-service/src/observability.rs:224:4
+    |
+224 | fn filter_fingerprint(filter: &UsageFilter) -> String {
+    |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `encode_cursor` is never used
+   --> crates/lingxi-service/src/observability.rs:240:4
+    |
+240 | fn encode_cursor(filter: &UsageFilter, last_rowid: i64) -> String {
+    |    ^^^^^^^^^^^^^
+
+warning: function `decode_cursor` is never used
+   --> crates/lingxi-service/src/observability.rs:249:4
+    |
+249 | fn decode_cursor(filter: &UsageFilter, raw: &str) -> Result<Option<i64>, Response> {
+    |    ^^^^^^^^^^^^^
+
+warning: function `iso` is never used
+   --> crates/lingxi-service/src/observability.rs:274:4
+    |
+274 | fn iso(ms: u64) -> String {
+    |    ^^^
+
+warning: function `terminal_status` is never used
+   --> crates/lingxi-service/src/observability.rs:280:4
+    |
+280 | fn terminal_status(outcome: CallOutcome) -> Option<&'static str> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `record_to_list_item` is never used
+   --> crates/lingxi-service/src/observability.rs:289:4
+    |
+289 | fn record_to_list_item(record: &ModelCallUsageRecord, legacy_trace: Option<&(String, Option<String>)>) -> serde_json::Value {
+    |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `load_legacy_trace` is never used
+   --> crates/lingxi-service/src/observability.rs:362:10
+    |
+362 | async fn load_legacy_trace(
+    |          ^^^^^^^^^^^^^^^^^
+
+warning: struct `QueryCallsInput` is never constructed
+   --> crates/lingxi-service/src/observability.rs:379:8
+    |
+379 | struct QueryCallsInput {
+    |        ^^^^^^^^^^^^^^^
+
+warning: function `query_calls` is never used
+   --> crates/lingxi-service/src/observability.rs:388:10
+    |
+388 | async fn query_calls(
+    |          ^^^^^^^^^^^
+
+warning: struct `QueryAggregateInput` is never constructed
+   --> crates/lingxi-service/src/observability.rs:444:8
+    |
+444 | struct QueryAggregateInput {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: function `parse_group_by` is never used
+   --> crates/lingxi-service/src/observability.rs:452:4
+    |
+452 | fn parse_group_by(raw: &[String]) -> Result<Vec<UsageGroupBy>, Response> {
+    |    ^^^^^^^^^^^^^^
+
+warning: function `query_aggregate` is never used
+   --> crates/lingxi-service/src/observability.rs:467:10
+    |
+467 | async fn query_aggregate(
+    |          ^^^^^^^^^^^^^^^
+
+warning: function `accumulate` is never used
+   --> crates/lingxi-service/src/observability.rs:528:4
+    |
+528 | fn accumulate(overall: &mut serde_json::Value, agg: &lingxi_adapters::storage::run_store::UsageAggregate) {
+    |    ^^^^^^^^^^
+
+warning: function `finalize_overall` is never used
+   --> crates/lingxi-service/src/observability.rs:551:4
+    |
+551 | fn finalize_overall(
+    |    ^^^^^^^^^^^^^^^^
+
+warning: function `call_detail` is never used
+   --> crates/lingxi-service/src/observability.rs:580:10
+    |
+580 | async fn call_detail(
+    |          ^^^^^^^^^^^
+
+warning: function `load_call_by_id` is never used
+   --> crates/lingxi-service/src/observability.rs:628:10
+    |
+628 | async fn load_call_by_id(
+    |          ^^^^^^^^^^^^^^^
+
+warning: struct `QueryTracesInput` is never constructed
+   --> crates/lingxi-service/src/observability.rs:641:8
+    |
+641 | struct QueryTracesInput {
+    |        ^^^^^^^^^^^^^^^^
+
+warning: function `query_traces` is never used
+   --> crates/lingxi-service/src/observability.rs:648:10
+    |
+648 | async fn query_traces(
+    |          ^^^^^^^^^^^^
+
+warning: function `trace_detail` is never used
+   --> crates/lingxi-service/src/observability.rs:674:10
+    |
+674 | async fn trace_detail(
+    |          ^^^^^^^^^^^^
+
+warning: struct `ExportInput` is never constructed
+   --> crates/lingxi-service/src/observability.rs:724:8
+    |
+724 | struct ExportInput {
+    |        ^^^^^^^^^^^
+
+warning: function `export_calls` is never used
+   --> crates/lingxi-service/src/observability.rs:731:10
+    |
+731 | async fn export_calls(
+    |          ^^^^^^^^^^^^
+
+warning: struct `ImportInput` is never constructed
+   --> crates/lingxi-service/src/observability.rs:830:8
+    |
+830 | struct ImportInput {
+    |        ^^^^^^^^^^^
+
+warning: function `import_legacy` is never used
+   --> crates/lingxi-service/src/observability.rs:835:10
+    |
+835 | async fn import_legacy(
+    |          ^^^^^^^^^^^^^
+
+warning: function `read_legacy_store` is never used
+   --> crates/lingxi-service/src/observability.rs:873:4
+    |
+873 | fn read_legacy_store(path: &Path) -> Result<Vec<LegacyUsageImportRow>, Response> {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: function `parse_legacy_instant` is never used
+   --> crates/lingxi-service/src/observability.rs:964:4
+    |
+964 | fn parse_legacy_instant(raw: &str) -> Result<u64, Response> {
+    |    ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `observability_health` is never used
+   --> crates/lingxi-service/src/observability.rs:971:10
+    |
+971 | async fn observability_health(State(state): State<ServiceState>) -> Response {
+    |          ^^^^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (lib) generated 40 warnings
+error[E0277]: `Vec<serde_json::Value>` doesn't implement `std::fmt::Display`
+   --> crates/lingxi-service/tests/r07_t10_observability.rs:377:41
+    |
+377 |     assert_eq!(edges.len(), 2, "父子链不断裂: {edges}");
+    |                                               ^^^^^^^ `Vec<serde_json::Value>` cannot be formatted with the default formatter
+    |
+    = help: the trait `std::fmt::Display` is not implemented for `Vec<serde_json::Value>`
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: required for `&Vec<serde_json::Value>` to implement `std::fmt::Display`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (test "r07_t10_observability") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning

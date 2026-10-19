@@ -184,7 +184,7 @@ fn extension(source: &str) -> String {
 pub(crate) fn blocked(ip: IpAddr) -> bool {
     lingxi_adapters::models::egress::socket_addr_is_guarded(&SocketAddr::new(ip, 0))
 }
-async fn public_addresses(url: &reqwest::Url) -> Result<Vec<SocketAddr>, String> {
+pub(crate) async fn public_addresses(url: &reqwest::Url) -> Result<Vec<SocketAddr>, String> {
     if !["http", "https"].contains(&url.scheme())
         || !url.username().is_empty()
         || url.password().is_some()

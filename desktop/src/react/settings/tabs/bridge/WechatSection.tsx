@@ -8,6 +8,8 @@ import { Toggle } from '@/ui';
 import { BridgeStatusDot, BridgeStatusText } from './BridgeWidgets';
 import { SettingsSection } from '../../components/SettingsSection';
 import bridgeStyles from '../BridgeTab.module.css';
+import { bridgeConnectionKey, readBridgeResponse } from '../../../services/bridge-response';
+import { useSettingsStore } from '../../store';
 
 interface WechatSectionProps {
   // undefined 表示 bridge status 还未加载完成；让 Toggle 走加载态而不是"假关"
@@ -20,20 +22,22 @@ interface WechatSectionProps {
 
 export function WechatSection({ status, showToast, onSaveConfig, onReload, agentId }: WechatSectionProps) {
   const unbind = async () => {
+    const sourceKey = bridgeConnectionKey(useSettingsStore.getState());
     try {
       const agentQuery = agentId ? `?agentId=${encodeURIComponent(agentId)}` : '';
-      await Promise.all([
-        lingxiFetch(`/api/bridge/config${agentQuery}`, {
+      const response = await lingxiFetch(`/api/bridge/config${agentQuery}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ platform: 'wechat', credentials: { botToken: '' }, enabled: false }),
-        }),
-        lingxiFetch(`/api/bridge/owner${agentQuery}`, {
+        });
+      await readBridgeResponse(response);
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
+      await readBridgeResponse(await lingxiFetch(`/api/bridge/owner${agentQuery}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ platform: 'wechat', userId: null }),
-        }),
-      ]);
+        }));
+      if (sourceKey !== bridgeConnectionKey(useSettingsStore.getState())) return;
       showToast(t('settings.bridge.wechatUnbound'), 'success');
     } catch {
       showToast(t('settings.saveFailed'), 'error');

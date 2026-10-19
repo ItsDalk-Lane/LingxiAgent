@@ -1,0 +1,83 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.45s
+     Running tests/r07_t08_card_previews.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_card_previews-0f6ecfbc1e58b536)
+
+running 3 tests
+test oversized_theme_variables_clear_by_utf8_bytes_while_valid_card_still_registers ... ok
+test export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset ... FAILED
+test plan_assets_read_real_bytes_and_refuse_missing_invalid_and_escape_without_mutation ... ok
+
+failures:
+
+---- export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset stdout ----
+T08角色卡预览现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-card-previews-4fd05c6500fbfa84
+LINGXI_AUTH_REJECTED request_id="req-11e4b7e4a1e8b7b4b1e82454948f7285" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:65059
+LINGXI_AUTH_REJECTED request_id="req-8db4871dbf078b4303040ac6245e79a7" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:65067
+
+thread 'export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset' (2649795) panicked at crates/lingxi-service/src/character_cards.rs:1190:17:
+no entry found for key
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset' (2649795) panicked at crates/lingxi-service/tests/r07_t08_card_previews.rs:114:30:
+called `Result::unwrap()` on an `Err` value: reqwest::Error { kind: Request, url: "http://127.0.0.1:65048/lingxi/v1/character-cards/export/a/assets/unknown", source: hyper_util::client::legacy::Error(SendRequest, hyper::Error(IncompleteMessage)) }
+
+
+failures:
+    export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.01s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_card_previews`
+     Running tests/r07_t08_model_authority.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_authority-39fcc141373617fa)
+
+running 5 tests
+test real_http_reload_revalidates_replaced_local_token_after_actual_mutation_queue ... ok
+test real_http_web_session_save_revalidates_logout_after_actual_mutation_queue ... ok
+test real_http_device_model_save_revalidates_again_at_filesafety_atomic_authorization ... ok
+test real_http_device_model_save_revalidates_revocation_after_actual_mutation_queue ... ok
+test real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.45s
+
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 10 tests
+test malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address ... ok
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... ok
+test malformed_headers_never_clear_saved_settings_or_publish_a_generation ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.77s
+
+     Running tests/r07_t08_provider_http.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_http-9597e57d2d7c2a07)
+
+running 7 tests
+test health_pins_catalog_model_and_anthropic_connection_have_real_usage ... ok
+test catalog_draft_mask_and_cache_never_publish_remote_models_or_count_usage ... ok
+test provider_edits_deletes_and_reload_notify_real_applied_state_even_when_projection_fails ... ok
+test model_patch_and_removal_preserve_other_settings_and_stop_new_dispatch ... ok
+test actual_local_run_settings_search_apply_target_agent_and_security_refusals ... ok
+test api_key_reveal_requires_both_scopes_and_discovery_secret_drafts_cannot_bypass ... ok
+test auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.49s
+
+     Running tests/r07_t08_skills_cards.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_skills_cards-788c585009d5655d)
+
+running 5 tests
+test external_skill_paths_reject_bad_input_and_corrupt_preferences_without_mutation ... ok
+test external_paths_and_other_preferences_share_real_read_merge_write_and_restart ... ok
+test character_card_default_zip_contains_no_configuration_secrets_and_bad_zip_creates_no_agent ... ok
+test real_run_show_card_reaches_real_component_registration_and_http_document ... ok
+test card_http_is_bounded_local_only_sandboxed_and_rebuilt_after_real_restart ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.12s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_card_previews`

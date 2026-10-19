@@ -1,0 +1,50 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:21:01.531174+00:00",
+  "finalAcceptance": "pending",
+  "scope": "真实组合根与失败/恢复追加检查的只读独审；不Cargo、不改产品或旧证据。",
+  "sourceHashesAtRead": {
+    "desktop/src/react/settings/SettingsContent.tsx": "cd7db8b154cf2b8ef3732739c4501d63c59d2647c13473de7740c38e4b3ffaf8",
+    "desktop/src/react/settings/store.ts": "dae037d69d0bd4be4300546b3aaaeec90edaa63e09f168a437fc4a010b695e0d",
+    "desktop/src/react/settings/connection-owner.ts": "496ebb69a866af4c133a05afcb719332d5af45c7ecfb5b8bfbe83c56d5ce4010",
+    "desktop/src/react/settings/api.ts": "9526f3f06e23958979ff60087a629b8464a23e0afef27bf656a2c995f5a10dcb",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "76d9cdedc9750339cbd658c63d20cbdc97e7023ca7be824f3eb01577f86de8ec",
+    "desktop/src/react/settings/__tests__/R06AgentDeleteRustLive.test.tsx": "a17c905a19eb612a87cb6d331cd0248d66ec5df7427233281aa578ee6d3292e2",
+    "desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx": "3b68e3fd87d17779f514fa304cd64e1cda1d5310e1a35d8f30b3abba6a4654cd",
+    "desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx": "45b680c358c2b39d7a1e223a76357d808de21f098ee15fa5ce6ec52e3bca4f67"
+  },
+  "sourceReview": [
+    "冷启动/重启/切换连接共享identity owner，connection-owner同步撤销旧身份，所有await后复验原owner；API仅当前requestOwner的真实401清身份。",
+    "identity仅在真实identity及locale核验后设置，资源返回后的最终解除不可用要求身份仍owned；资源401撤销后迟到普通结果不复活，ready=true仍可保持不可用。",
+    "单资源错误有可见alert且允许配置修复；正常未配置模型/无助手不要求所有资源ready，未复制测试夹具的严格完整数据准入。",
+    "入口test从实际SettingsContent导航，实际export/import/endpoint写和文件读回；不是直挂组件代组合根。",
+    "嵌套finally保证pending等待失败仍恢复global/window/URL/store、恢复故意损坏的隔离配置并finally回收子进程和隔离目录；退出0由实际child exit观测。",
+    "主R06AgentDelete尾段现在要求skills实际页体及导航后真实GET200；原删除与guard分支保留。另两个guard helper早退后的尾段未执行不计通过。"
+  ],
+  "runtimeReceipt": {
+    "path": "settings-entry-compound2.json",
+    "exitCode": 0,
+    "logSha256": "2e5b49689d399d7cd5302e65fbcd83b69e9df05b88c33ce47229ba65ef6df220",
+    "logHashIndependentlyVerified": true,
+    "actualNamedCases": 7,
+    "sourceUnchanged": false,
+    "scope": "开发实际7/7日志成立；整工作区执行期间变化，不是同一冻结后继候选或新backend构建验收。"
+  },
+  "actualSevenCaseClaims": {
+    "configured": "真实容器general→脱敏exportBlob→File input import→真实prefs/store保留未知字段/旧secret、URL释放",
+    "without-model": "真实models错误可见且配置页可进入修复",
+    "without-agent": "合法空助手仍可进入设置",
+    "restart": "真实服务停止0、同home新token启动、实际重启事件→新连接重新核identity及资料owner、General可见",
+    "rejected-restart": "真实新服务启动后给旧token的重启事件被客户端拒绝；不是本例额外实际旧tokenHTTP401证明",
+    "invalid-resource-credential": "只将一次models请求凭证改坏，真实服务返回401，readytrue仍blocked；不是实际设备撤权或所有旧调用失效的证明",
+    "provider-refresh-failure": "同容器两次真实endpoint保存，第二次PUT200后损坏隔离agent文件令随后真实GET500；源config.json实际仍保存新endpoint，store error/refreshFailed且后续summary/media零调用"
+  },
+  "limits": [
+    "归档选择为jsdom合成File输入与anchor click spy，不是OS chooser/实际磁盘下载。",
+    "d91fbf82生产binary为既有构建，不称本轮新backend；新增backend端点与整体候选仍须root正式fresh build。",
+    "实际old HTTP401在切换后迟到的consumer组合尚未具名执行；source owner判断已静态核，不能记运行PASS。",
+    "17页允许名单不是17页全部真实效果；其余配套端点/动作仍待具体检查。",
+    "compound1错误Source路径和transfer1新home缺preferences的夹具失败原样保留，不改判产品失败/成功。"
+  ],
+  "remaining": "后继完整冻结候选仍须实际运行所有适用检查并独立核验，不能从开发7例外推T08完成。"
+}

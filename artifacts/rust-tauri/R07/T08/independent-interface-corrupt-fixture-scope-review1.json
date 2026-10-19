@@ -1,0 +1,33 @@
+{
+  "schema": "r07-t08-independent-interface-corrupt-fixture-scope-review-v1",
+  "recordedAt": "2026-10-18T12:28:29.671020+00:00",
+  "mode": "read-only scope and existing control-flow review, proposed test-only preparation not executed",
+  "finalAcceptance": "pending",
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977",
+    "rust/crates/lingxi-service/src/bridge.rs": "f641230694ab945f516a250e044640370f3e14c6246a0d15b7729bbfe15f81da",
+    "rust/crates/lingxi-service/src/lib.rs": "5cfb5da1c3c717908ef7784bf9095e7002d71b090c19366177038929ecb320b5"
+  },
+  "selectedScope": "Only the malformed-preferences test: after current production on_ready, call real state.bridge().stop() and await real wait_stopped under the existing five-second service cleanup budget before corrupting preferences.json. Retain actual HTTP, original storage/writer and final service close.",
+  "blockingFinding": null,
+  "whyOriginalAssertionsArePreserved": [
+    "Original case asserts actual keybindings/sidebar GET and PUT return500 for each malformed stored input and preserve original bytes. These remain actual HTTP requests against unchanged production handlers.",
+    "Original direct atomic_write_authorized still revokes a real device at the second callback before rename, asserts write error, original bytes and no tmp. No fake response or alternate writer is introduced.",
+    "Original final close sends production shutdown, awaits the actual run Result and asserts no drain timeout; it is not weakened or replaced.",
+    "There was no original assertion that Bridge remains active while unrelated preferences are corrupt. The selected setup narrows no tested preference behavior; it prevents an unrelated startup read from racing an intentionally damaged fixture."
+  ],
+  "realStartupAndCleanupProof": [
+    "Production run invokes BridgeHost.start before on_ready, so after ready its task is registered under the same host.",
+    "BridgeHost.run unconditionally performs import_existing and recover steps before it subscribes/checks its stop flag. Calling stop after on_ready does not bypass import.",
+    "wait_stopped awaits registered real task results and retains failures; actual import failure still causes Err instead of being hidden. Its original task handles are retained if the wait times out.",
+    "The five-second condition-based wait must complete successfully before any damaged bytes are injected; do not use fixed sleep or accept timeout."
+  ],
+  "executionBoundary": [
+    "Only this corrupt-input case should stop the unrelated Bridge host early; do not alter all test boot defaults or product startup semantics.",
+    "The result proves preference corrupted-input handling and resource shutdown. It must not be described as Bridge surviving continued operation with corrupt preferences.",
+    "Prior g failure and first development timing-dependent passes remain retained; proposed setup requires new version-specific actual verification and successor full gate evidence."
+  ],
+  "relationshipToPriorPlan": "The earlier independent-interface-corrupt-startup-fixture-plan1 proposed a real recovery sentinel if continuous Bridge hosting were required. That broader fixture is unnecessary for this case and is not the selected approach. Prior evidence remains unchanged.",
+  "reviewerExecutions": [],
+  "productOrTestChangesByReviewer": []
+}

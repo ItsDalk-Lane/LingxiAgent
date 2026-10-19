@@ -1,0 +1,32 @@
+[
+  {
+    "model_call_id": "run_000001a14de50e02_000001-mc0001",
+    "session_id": "mcp-inflight-stop",
+    "run_id": "run_000001a14de50e02_000001",
+    "attempt": "run_000001a14de50e02_000001#a1",
+    "purpose": "chat",
+    "origin": "user",
+    "parent_run_id": null,
+    "cause_ref": null,
+    "provider": "fixture",
+    "model": "fixture-chat",
+    "protocol": "unknown",
+    "usage_state": "reported",
+    "input_tokens": 3,
+    "output_tokens": 1,
+    "cache_read_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null,
+    "missing_fields": null,
+    "estimate_basis": null,
+    "invalid_detail": null,
+    "transport_attempts": 1,
+    "cost_basis": null,
+    "recorded_at_unix_ms": 1792308219394,
+    "outcome": "failed",
+    "started_at_unix_ms": 1792308219398,
+    "settled_at_unix_ms": 1792308219394,
+    "parent_tool_call_id": null,
+    "emitted_tool_calls": null
+  }
+]

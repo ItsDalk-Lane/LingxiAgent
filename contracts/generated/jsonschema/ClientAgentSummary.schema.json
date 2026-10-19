@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "effectiveHomeFolder": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hasAvatar": {
+      "type": "boolean"
+    },
+    "homeFolder": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "isCurrent": {
+      "type": "boolean"
+    },
+    "isPrimary": {
+      "type": "boolean"
+    },
+    "memoryMasterEnabled": {
+      "type": "boolean"
+    },
+    "name": {
+      "type": "string"
+    },
+    "yuan": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "yuan",
+    "isPrimary",
+    "isCurrent",
+    "hasAvatar",
+    "memoryMasterEnabled"
+  ],
+  "title": "ClientAgentSummary",
+  "type": "object"
+}

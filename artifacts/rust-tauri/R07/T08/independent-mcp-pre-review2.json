@@ -1,0 +1,142 @@
+{
+  "recordedAt": "2026-10-18T07:03:23.656752+00:00",
+  "status": "INDEPENDENT_READONLY_PRE_REVIEW2_MOVING_SOURCE_NOT_FINAL",
+  "previous": "artifacts/rust-tauri/R07/T08/independent-mcp-pre-review1.json",
+  "noProductChanges": true,
+  "noCargoOrGui": true,
+  "previousFindingsCurrentDisposition": [
+    {
+      "id": "WIN-MCP-EMPTY-BOOT",
+      "state": "STATIC_CLOSED_WAITING_FINAL_CURRENT_PLATFORM_EVIDENCE",
+      "evidence": "独立readonly_directory按组件无reparse读取；缺失返回disabled empty_document，不触发写目录创建；Windows复用已存在只读DirFd。"
+    },
+    {
+      "id": "MCP-PROTOCOL-VERIFY-REGISTRATION",
+      "state": "STATIC_CLOSED_ROOT_REPORTS_ROUNDTRIP_PASSED",
+      "evidence": "verify::reencode_typed现已登记全部七种McpSettings类型；不重复当未修问题。"
+    },
+    {
+      "id": "BIND-ERROR-CLEANUP-ORDER",
+      "state": "STATIC_CLOSED",
+      "evidence": "cleanup_before_listen_failure先统一发停止，再分别等待MCP/knowledge，收集错误，无旧先?跳过。"
+    },
+    {
+      "id": "QUEUED-APPROVAL-REVISION",
+      "state": "STATIC_CLOSED_TARGETED_REAL_INTERLEAVING_PENDING",
+      "evidence": "锁内重验传入的真实冻结review scope，configRevision+settingsEpoch共同拒绝同ID ABA。"
+    },
+    {
+      "id": "AGENT-WHOLE-MCP-REPLAY",
+      "state": "STATIC_CLOSED_TARGETED_CONCURRENCY_PENDING",
+      "evidence": "仅connectors[id].enabled/tools[name]补丁交统一写方，legacy按字段回退，其他字段不整副本重放。"
+    },
+    {
+      "id": "PERSIST-ANCESTRY",
+      "state": "STATIC_CLOSED_PENDING_CONTROLLED_SWAP_CHECK",
+      "evidence": "authorize现同时重验home/plugin-data/最终mcp目录，保存/读取同1MiB预算。"
+    }
+  ],
+  "newFindings": [
+    {
+      "id": "MCP-SEND-ADMISSION-BUDGET",
+      "kind": "CONFIRMED_STATIC_BUDGET_OMISSION_NOT_EXECUTED",
+      "evidence": [
+        "mcpbridge::call_raw先await Peer.send_cancellable_request(no_options())",
+        "请求handle返回后才建立McpRequestCancellation、读取TOOL_LIFETIME.cancel并开始deadline timeout/select",
+        "rmcp3.4.1 service.rs send_request_with_option_and_subscription在返回handle前await self.tx.send(...)，该队列可能背压"
+      ],
+      "effect": "真实SDK出站堵塞时，等待入队期间尚未受deadline_ms或Run取消约束。现有等待响应的3种取消测试不能证明该窗口。",
+      "suggestion": "从发送开始覆盖总预算/取消；迟到取得的真实RequestHandle须按精确requestId取消，不能为超时留下未护送的已投递调用。",
+      "validation": "外端停止读stdin制造真实SDK背压，验证截止/取消返回、取消通知精确、原连接仍可明确新调用且旧请求不重放。",
+      "communicatedToRoot": true
+    },
+    {
+      "id": "WEB-ORIGINAL-SETTINGS-AUTHORITY",
+      "kind": "REQUIRES_REAL_AUTHORITY_TEST_NOT_ASSERTED_EXPLOIT",
+      "evidence": [
+        "management::web_login普通client返回kind=LocalUser且仅chat/resources/files scopes",
+        "sessions::kernel_principal_of把LocalUser含WebSession投影成KernelPrincipal::LocalUser",
+        "普通user submission的RunGrant::Full映射UserSession",
+        "auth::mint_local_settings_tool_principal仅核KernelLocalUser与非只读UserSession后新铸settings.write，不持原credential/connection/scopes",
+        "MCP管理HTTP明确只允许loopback-token is_local_owner"
+      ],
+      "risk": "当前这些局部事实不足以证明无settings.write网页会话不能经聊天+审批修改MCP；Device拒绝不能代替WebSession。需实际执行链确认其它门是否已拒绝。",
+      "suggestion": "真实普通WebSession chat→模型请求MCP update_settings→按实际批准通路尝试，证明零写；若能写，沿Run冻结原主体设置权限/来源，不凭KernelLocalUser补铸权限。",
+      "communicatedToRoot": true
+    }
+  ],
+  "fixedDuringThisReview": [
+    {
+      "id": "MCP-PER-REQUEST-CANCEL",
+      "state": "STATIC_CLOSED_FOR_RESPONSE_WAIT_ROOT_RUNNING_NEW_TESTS",
+      "evidence": "官方send_cancellable_request+精确RequestId取消guard，超时、scope取消及futureDrop发送官方notify_cancelled，2秒有界；结果仍unknown，不杀共享server；正常真实响应disarm。",
+      "remaining": "发送入队前预算窗口见新发现；完整实证由root执行。"
+    },
+    {
+      "id": "LISTEN-FAILURE-LOOP-RESOURCES",
+      "state": "STATIC_CLOSED_AFTER_REPORTED_ROOT_CHANGE_PENDING_REAL_PROOF",
+      "evidence": "本轮发现旧helper只停止MCP/knowledge而bootstrap先recover loop；root已新增begin_background_shutdown统一signal/listen-failure的loop idle注销、alarm/controller dispose、workflows/media/资源等停止。",
+      "remaining": "真实保留state clone的恢复Running loop交错由作者补，未称已跑。"
+    }
+  ],
+  "currentPositiveStaticAssessment": [
+    {
+      "area": "first publish",
+      "evidence": "register_mcp_server_with_binding首次逐target绑定ScopedExecutor/review；不先公开裸SDK执行器再覆盖；manager.live直到完整注册才置位；正在发布时调用保守拒绝。"
+    },
+    {
+      "area": "revocation and reinstall",
+      "evidence": "stop先清live再uninstall并SDK取消/子进程回收，新connectorEpoch进入review；助手改开关使registry target代次更新，ScopedExecutor再次按冻结agent读当前开关。"
+    },
+    {
+      "area": "process resource ownership",
+      "evidence": "Unix process_group(0)+killpg、Child kill_on_drop，connect future中McpChild RAII覆盖初始化取消；显式disconnect_checked等待child和RunningService.cancel，is_connected已使用RunningService.is_closed。",
+      "limit": "Unix组回收不扩大为Windows后代进程实证。"
+    }
+  ],
+  "existingLoopProofApis": [
+    {
+      "api": "retained.loop_services().controller.is_disposed()",
+      "claim": "公开真实停止状态。"
+    },
+    {
+      "api": "retained.loop_services().alarm.schedule(session,1,\"after failed listen\",false)",
+      "expect": "真实Running记录上必须Err.code=loop_alarm_stopped；未dispose时会成功，可证伪遗漏停止。"
+    },
+    {
+      "api": "retained.storage().session_admission().register_release_listener(noop)",
+      "expect": "注册成功证明原单槽idle监听已注销，随后drop新registration。"
+    },
+    {
+      "api": "alarm.armed_keys()",
+      "limit": "cfg(test)；integration不可使用，避免猜不存在接口。"
+    },
+    {
+      "template": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+      "claim": "真实首轮→落盘running+alarm→同home bootstrap恢复；不要把正常停机伪写成paused。"
+    }
+  ],
+  "queueProofCaution": "HTTP发出、yield或固定sleep不能证明已进入runtime mutex FIFO。无现成外部排队观测时，可以窄unit直接poll私有handle至Pending证明真实锁排队，但不能将该unit称完整HTTP/Run验收。",
+  "sourceHashes": {
+    "rust/crates/lingxi-service/src/mcp_settings.rs": "af707b80fc97e012049fa17a3b3261f6c1d744b7f4ba7227cfcafb271805573a",
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "2aa5d2a6cd90f452db4f02daf2f51544b2ccd09287be2e187b0a2a82939b4e7f",
+    "rust/crates/lingxi-service/src/settings_tools.rs": "45966ed559079a3ff56d146c60cc8958afa88e97f7052bb9b2338e09f12b7a71",
+    "rust/crates/lingxi-service/src/lib.rs": "c49f4d41ca104a1e25e678b96bbf6fd7fba323e57f8d92031b06465bb19e3ba1",
+    "rust/crates/lingxi-service/src/auth.rs": "3a27f7a7b3d7cc79078687ae1cd016b179e753de944f68b0f75ff8079ccaa562",
+    "rust/crates/lingxi-service/src/management.rs": "0a3c56df581d730d876a79d6c2b959fa3c5ca11a59ae889d406fe4ad18c89c83",
+    "rust/crates/lingxi-service/src/sessions.rs": "636c398a06c6bdf9ce9471177bfc68761404e417ae40ddabe4cf372b65a84cbb",
+    "rust/crates/lingxi-service/src/runs.rs": "07b98a7d051d9dd7e5a80b3d8b29d786a7e92317f0d6f8b87df05aeac0ba7486",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "06adc5358f23b122666f7c0fc01628f1fa51e8f9d5e77ec7dcd0728e47e28839",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": "8c511ac8ca41c5f3a501a8f5ade92a1678b265aa1ae9ed20386f8c9c0744debf",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs": "886789950361c498e5bd45ed9267de28d339e4f5cd5c11eee3e6e0f9520d6814",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_process.rs": "30083b92f56f2dd8c66544561aad7c4684316123aad3a71b36a18bed6a65ac42"
+  },
+  "sdkSource": {
+    "path": "/Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rmcp-3.4.1/src/service.rs",
+    "sha256": "47b23231e6c851b67c6cd048ed05040092b11626d7709cb00a472382731bdb2c"
+  },
+  "notes": [
+    "只读开发预审，不是固定候选验收；root/作者仍在并行修实现与检查。",
+    "不重复旧已闭合问题，不将缺运行证据自动定为实现缺失；真实账号/外网供应商未触及。"
+  ]
+}

@@ -1,0 +1,24 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.50s
+     Running tests/r07_browser_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69)
+
+running 1 test
+test same_real_target_input_snapshot_generations_and_empty_workspace ... FAILED
+
+failures:
+
+---- same_real_target_input_snapshot_generations_and_empty_workspace stdout ----
+
+thread 'same_real_target_input_snapshot_generations_and_empty_workspace' (775417) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:259:5:
+assertion `left == right` failed: 真实重载回执: {"currentUrl":"http://127.0.0.1:53660/slow","snapshot":"Page: Local browser fixture\nURL: http://127.0.0.1:53660/slow\n\n[393217] input \"Identity\" (text)\n[393218] select \"Choice\"\n[393219] button \"Popup\"\n[393220] button \"Dialog\"\n[393221] a \"Download\" (href=\"http://127.0.0.1:53660/download\")\ntext: fixture text\n","tabId":"96BD0B99E51DBD5FF6372DD1B23598D9","text":"Page: Local browser fixture\nURL: http://127.0.0.1:53660/slow\n\n[393217] input \"Identity\" (text)\n[393218] select \"Choice\"\n[393219] button \"Popup\"\n[393220] button \"Dialog\"\n[393221] a \"Download\" (href=\"http://127.0.0.1:53660/download\")\ntext: fixture text\n","title":"Local browser fixture","url":"http://127.0.0.1:53660/slow"}
+  left: String("Local browser fixture")
+ right: "Delayed browser fixture"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    same_real_target_input_snapshot_generations_and_empty_workspace
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 1.23s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_browser_chromium`

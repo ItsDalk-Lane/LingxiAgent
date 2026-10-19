@@ -1,0 +1,118 @@
+{
+  "sourceHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-oauth-alias-10ed863013eba99d",
+  "runId": "run_000001a14de98fad_000001",
+  "sourceReceipt": "t08-peripheral-check1.json",
+  "scope": "OWNED_SYNTHETIC_OAUTH_FAILURE_SCENE_NOT_REAL_ACCOUNT",
+  "files": [
+    {
+      "path": "home/agents/a/config.yaml",
+      "bytes": 93,
+      "sha256": "06129622dea801f7a69ebd433ba2659d1b61fcb8c3cbe800e5435d514f7cf31b"
+    },
+    {
+      "path": "home/knowledge/ingestion-worker.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "home/knowledge/knowledge.db",
+      "bytes": 139264,
+      "sha256": "c4c32fa33cb7ba12e05390e55e90efc5e9049e2ed686b46655e10eba544600a8"
+    },
+    {
+      "path": "home/knowledge/knowledge_index.db",
+      "bytes": 57344,
+      "sha256": "cbf283b8ac6a10675d6985e55057b87247265393b262559db2782cb2aabcd251"
+    },
+    {
+      "path": "home/knowledge/knowledge_index.db.guard",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "home/knowledge/knowledge_index.db.owner",
+      "bytes": 54,
+      "sha256": "8fc7caa64e7649e221b77b26d17d2349e9bf89d9430a967d2792988cd6bd3be6"
+    },
+    {
+      "path": "home/knowledge/knowledge_vector.db",
+      "bytes": 45056,
+      "sha256": "42c6bba4f70db9040fa93603f42f013b3ade419adbc38b7f8577bf14fc6e2fe5"
+    },
+    {
+      "path": "home/knowledge/knowledge_vector.db.guard",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "home/knowledge/knowledge_vector.db.owner",
+      "bytes": 55,
+      "sha256": "d7d63ae76aaf07a42538267a77658ab27241d12a76102da1f04e4ce8f2df6dd7"
+    },
+    {
+      "path": "home/lingxi-service/credentials.json",
+      "bytes": 261,
+      "sha256": "c628d7d5310c0cf07fedeafa4fcd03a643a159b38091cde052d13e511aaee008"
+    },
+    {
+      "path": "home/lingxi-service/data/runs.db",
+      "bytes": 335872,
+      "sha256": "4f4b30c2d3c8de0b747cf6d3d559ad29fee7bdf478b9d1750b82481d539399b2"
+    },
+    {
+      "path": "home/lingxi-service/data/runs.db-shm",
+      "bytes": 32768,
+      "sha256": "bdab1117f2bd1fe4de91a9ff5a44ea3c99075c9d25e6910360efd417ff62363c"
+    },
+    {
+      "path": "home/lingxi-service/data/runs.db-wal",
+      "bytes": 1462632,
+      "sha256": "7e339e1175a5a12bceb659057566bbe655504d856329f2bc057215d125e33d1e"
+    },
+    {
+      "path": "home/lingxi-service/data/session-prompt-snapshots/2d8304931d7ff51980541ebfe672d25c788c59bb477e4db9674c6516a243fedf.json",
+      "bytes": 447,
+      "sha256": "db9dedab2b1689eb1ae7042614265857acd4772a0fce7a6d9e60f9d0167abc9a"
+    },
+    {
+      "path": "home/lingxi-service/device-credentials.json",
+      "bytes": 970,
+      "sha256": "62c707074426b68a415d549692bf65abe5d99de99c79f67510816a9d69c0a997"
+    },
+    {
+      "path": "home/lingxi-service/devices.json",
+      "bytes": 433,
+      "sha256": "f6d9b0f844f3172cb91ddee7f42f967ecf7ca26dc6c0fb53193d62181229f5b9"
+    },
+    {
+      "path": "home/lingxi-service/local-token.json",
+      "bytes": 184,
+      "sha256": "3c7b81f7de3848e5f6c74e033801267f7c9f69763fc4c28fe72b964ed848dd79"
+    },
+    {
+      "path": "home/lingxi-service/management.json",
+      "bytes": 916,
+      "sha256": "401526bb8cad08153cceeb1ad410760991ee6d384ae0f5c0fe17403db100e868"
+    },
+    {
+      "path": "home/lingxi-service/models.json",
+      "bytes": 860,
+      "sha256": "05ffa4e0b473dc7ad5bae9e31a18c263dda592ccbba726559cafc33e2ddb1b3a"
+    },
+    {
+      "path": "home/logs/security-audit.jsonl",
+      "bytes": 2255,
+      "sha256": "deb20bacef56359332456f6f0b8b5fe7dd777aaed7081e65a114c0a9eae22859"
+    },
+    {
+      "path": "home/user/preferences.json",
+      "bytes": 24,
+      "sha256": "4b985eb3c0e10ce8a6de2b7e51a01f3200345928085e326371de91ddbeab32c5"
+    },
+    {
+      "path": "runs-consistent.db",
+      "bytes": 802816,
+      "sha256": "c0f39ac6069e972ff4e8d6596bc2db067fc24b56c1a7a6043ebb77628014ea38"
+    }
+  ]
+}

@@ -106,6 +106,8 @@ pub struct ResumeRequest {
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct SteerRequest {
+    #[serde(default)]
+    pub request_id: Option<String>,
     pub session_id: String,
     #[serde(default)]
     pub session_path: Option<String>,
@@ -181,6 +183,38 @@ impl ChatWire {
             "type": "session_created", "sessionId": id,
             "sessionPath": crate::session_locator::native(id), "sessionRefVersion": 2,
             "ts": at_unix_ms, "session": session
+        }));
+    }
+    /// R07-T07-δ6：循环状态机变更广播（现役 chat.ts 的 loop_status 分支）。
+    /// 循环状态不属于任何一条流——纯 broadcast，不进 replay 缓存，前端按
+    /// sessionId 写 loopStatusBySession。fields 携带扁平业务字段
+    /// （status/turnCount/maxTurns/pausedReason/prompt）。
+    pub(crate) fn publish_loop_status(
+        &self,
+        id: &str,
+        snapshot: lingxi_protocol::LoopStatusSnapshot,
+        at_unix_ms: u64,
+    ) {
+        let mut fields = serde_json::to_value(snapshot).expect("循环状态只包含可序列化字段");
+        fields["type"] = json!("loop_status");
+        fields["sessionId"] = json!(id);
+        fields["sessionPath"] = json!(crate::session_locator::native(id));
+        fields["sessionRefVersion"] = json!(2);
+        fields["ts"] = json!(at_unix_ms);
+        let _ = self.tx.send(fields);
+    }
+    /// R07-T07-δ6：循环任务 prompt 的展示气泡（现役 session-coordinator
+    /// recordLoopUserPrompt 的 session_user_message 事件）。无 run 上下文，
+    /// 不占流序号；clientMessageId 恒 null（非客户端发起）。
+    pub(crate) fn publish_loop_user_prompt(&self, id: &str, text: &str, at_unix_ms: u64) {
+        let _ = self.tx.send(json!({
+            "type": "session_user_message",
+            "sessionId": id,
+            "sessionPath": crate::session_locator::native(id),
+            "sessionRefVersion": 2,
+            "ts": at_unix_ms,
+            "clientMessageId": Value::Null,
+            "message": {"text": text, "timestamp": at_unix_ms},
         }));
     }
     fn publish(&self, id: &str, run: &str, mut frame: Value) {
@@ -330,7 +364,7 @@ async fn reject(tx: &mpsc::Sender<Value>, req: &PromptRequest, error: Value) {
 }
 // 与现役 shared/image-mime.ts 的 20MiB base64 字符上限一致。
 const MAX_IMAGE_BYTES: u64 = 15 * 1024 * 1024;
-fn image_bytes(id: &str, mime: &str, bytes: Vec<u8>) -> Result<InputImage, Value> {
+pub(crate) fn image_bytes(id: &str, mime: &str, bytes: Vec<u8>) -> Result<InputImage, Value> {
     let error = |code, reason| protocol_error(id, code, reason);
     if bytes.is_empty() || bytes.len() as u64 > MAX_IMAGE_BYTES {
         return Err(error(
@@ -401,7 +435,7 @@ fn validate_images(req: &PromptRequest) -> Result<(), Value> {
                 return Err(error(
                     "invalid_image_reference",
                     "exactly one of data or fileId is required",
-                ))
+                ));
             }
         }
     }
@@ -532,7 +566,7 @@ fn prompt_from_steer(req: SteerRequest) -> PromptRequest {
         videos: vec![],
         audios: vec![],
         skills: vec![],
-        client_message_id: None,
+        client_message_id: req.request_id,
         snapshot_version: None,
         client_attempt_id: None,
         ui_context: None,
@@ -1061,7 +1095,7 @@ pub async fn prompt(
     }
     let accepted = state
         .sessions
-        .execute_background_chat_for(
+        .execute_foreground_chat_for(
             state.storage(),
             state.events(),
             state.runs(),
@@ -1440,22 +1474,139 @@ pub async fn steer(state: ServiceState, p: Principal, req: SteerRequest, tx: mps
         return;
     }
     match state
-        .sessions
-        .steer_for(&p, &req.session_id, &req.text)
+        .browsers()
+        .replay_human_steer(&p, &req.session_id, &req.text, req.request_id.as_deref())
         .await
     {
+        Ok(true) => {
+            let _=tx.send(json!({"type":"steered","sessionId":req.session_id,"sessionPath":format!("native:{}",req.session_id),"replayed":true})).await;
+            return;
+        }
+        Ok(false) => {}
+        Err(error) => {
+            let _ = tx
+                .send(protocol_error(
+                    &req.session_id,
+                    "steering_refused",
+                    error.to_string(),
+                ))
+                .await;
+            return;
+        }
+    }
+    let active = match state.storage().list_active_runs().await {
+        Ok(runs) => runs.into_iter().find(|run| {
+            run.session_id.as_str() == req.session_id
+                && matches!(
+                    run.status,
+                    lingxi_protocol::RunStatus::Running
+                        | lingxi_protocol::RunStatus::WaitingApproval
+                )
+        }),
+        Err(error) => {
+            let _ = tx
+                .send(protocol_error(
+                    &req.session_id,
+                    "steering_refused",
+                    error.to_string(),
+                ))
+                .await;
+            return;
+        }
+    };
+    let mut browser_steer = None;
+    if let Some(run) = active {
+        let lineage = match state
+            .storage()
+            .load_run_lineage(&lingxi_protocol::RunId::new(&run.run_id))
+            .await
+        {
+            Ok(lineage) => lineage,
+            Err(error) => {
+                let _ = tx
+                    .send(protocol_error(
+                        &req.session_id,
+                        "steering_refused",
+                        error.to_string(),
+                    ))
+                    .await;
+                return;
+            }
+        };
+        if lineage.as_ref().is_some_and(|lineage| {
+            lineage.origin == lingxi_kernel::subagent::RunOrigin::User
+                && lineage.parent_run_id.is_none()
+        }) {
+            match state
+                .browsers()
+                .begin_human_steer(
+                    &p,
+                    &req.session_id,
+                    run.run_id.as_str(),
+                    &req.text,
+                    req.request_id.as_deref(),
+                )
+                .await
+            {
+                Ok(crate::browser::HumanSteerClaim::New { row, operation }) => {
+                    browser_steer = Some((*row, operation, run.run_id.to_string()))
+                }
+                Ok(crate::browser::HumanSteerClaim::Replayed) => {
+                    let _ = tx
+                        .send(json!({"type":"steered","sessionId":req.session_id,"replayed":true}))
+                        .await;
+                    return;
+                }
+                Err(error) => {
+                    let _ = tx
+                        .send(protocol_error(
+                            &req.session_id,
+                            "steering_refused",
+                            error.to_string(),
+                        ))
+                        .await;
+                    return;
+                }
+            }
+        }
+    }
+    let outcome = state
+        .sessions
+        .steer_for(&p, &req.session_id, &req.text)
+        .await;
+    if let Some((row, operation, run)) = browser_steer {
+        let accepted = matches!(
+            &outcome,
+            Ok(crate::session_supervisor::SteerOutcome::Accepted)
+        );
+        if let Err(error) = state
+            .browsers()
+            .finish_human_steer(row, &run, &operation, accepted)
+            .await
+        {
+            let mut message = protocol_error(
+                &req.session_id,
+                "steering_browser_authority_unconfirmed",
+                error.to_string(),
+            );
+            message["inputAccepted"] = json!(accepted);
+            let _ = tx.send(message).await;
+            return;
+        }
+    }
+    match outcome {
         Ok(crate::session_supervisor::SteerOutcome::Accepted) => {
             let _=tx.send(json!({"type":"steered","sessionId":req.session_id,"sessionPath":format!("native:{}",req.session_id)})).await;
         }
         Ok(crate::session_supervisor::SteerOutcome::Miss) => {
             prompt(state, p, prompt_from_steer(req), false, tx).await
         }
-        Err(e) => {
+        Err(error) => {
             let _ = tx
                 .send(protocol_error(
                     &req.session_id,
                     "steering_refused",
-                    format!("{e:?}"),
+                    format!("{error:?}"),
                 ))
                 .await;
         }
@@ -1643,17 +1794,23 @@ async fn setting_choice(
             "chat scope required",
         ));
     }
-    let owner = match id {
+    let (owner, agent_id) = match id {
         Some(id) => {
-            owned(state, p, id, None, true)
+            let facts = owned(state, p, id, None, true)
                 .await
-                .map_err(|e| setting_failure(StatusCode::FORBIDDEN, e.to_string()))?
-                .owner_user_id
+                .map_err(|e| setting_failure(StatusCode::FORBIDDEN, e.to_string()))?;
+            (facts.owner_user_id, Some(facts.agent_id))
         }
-        None => owner_key(p).into(),
+        None => (owner_key(p).into(), None),
     };
-    let choice = crate::chat_settings::effective_choice(state, &owner, id.unwrap_or(""))
-        .map_err(|e| setting_failure(StatusCode::INTERNAL_SERVER_ERROR, e))?;
+    let choice = crate::chat_settings::effective_choice_for_agent(
+        state,
+        &owner,
+        id.unwrap_or(""),
+        agent_id.as_deref(),
+        None,
+    )
+    .map_err(|e| setting_failure(StatusCode::INTERNAL_SERVER_ERROR, e))?;
     Ok((owner, choice))
 }
 #[allow(clippy::result_large_err)]
@@ -1787,7 +1944,7 @@ pub async fn model_switch_route(
     {
         Ok(permit) => permit,
         Err(_) => {
-            return setting_failure(StatusCode::CONFLICT, "cannot switch model while streaming")
+            return setting_failure(StatusCode::CONFLICT, "cannot switch model while streaming");
         }
     };
     if state
@@ -1803,7 +1960,7 @@ pub async fn model_switch_route(
     }
     match state.storage().list_active_runs().await {
         Ok(rows) if rows.iter().any(|r| r.session_id == req.session_id) => {
-            return setting_failure(StatusCode::CONFLICT, "cannot switch model while streaming")
+            return setting_failure(StatusCode::CONFLICT, "cannot switch model while streaming");
         }
         Err(e) => return setting_failure(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
         _ => {}
@@ -1873,7 +2030,7 @@ pub async fn thinking_set_route(
 }
 
 /// 引用只认当前会话登记的文件；模型材料来自受租约保护、前后身份校验的真实字节。
-async fn prepare_files(
+pub(crate) async fn prepare_files(
     state: &ServiceState,
     req: &PromptRequest,
     cancelled: &Arc<AtomicBool>,

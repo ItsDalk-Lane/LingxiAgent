@@ -1,0 +1,31 @@
+{
+ "stage": "R07-T06",
+ "purpose": "candidate_gate",
+ "candidate": "t06b",
+ "label": "t06b-ui",
+ "command": [
+  "npx",
+  "vitest",
+  "run",
+  "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+  "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+  "desktop/src/react/__tests__/services/rust-automation.test.ts",
+  "desktop/src/react/__tests__/services/rust-media-http.test.tsx",
+  "desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts",
+  "desktop/src/react/__tests__/services/rust-browser-events-http.test.ts",
+  "tests/r07-media-sdk-worker.test.ts"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "manifestFingerprintBefore": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintAfter": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintMatchesCandidate": true,
+ "exitCode": 0,
+ "durationSec": 7.1,
+ "logSha256": "5f4b7f2826fe936bc54fd9fdce96dc06d926a739ac0aa7d415ecb6c9d3b1273e"
+}

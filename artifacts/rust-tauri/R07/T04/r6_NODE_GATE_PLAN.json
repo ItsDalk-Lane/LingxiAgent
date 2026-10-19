@@ -1,0 +1,109 @@
+{
+  "status": "PLANNED_NOT_EXECUTED",
+  "gates": [
+    {
+      "name": "ui",
+      "command": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+        "desktop/src/react/__tests__/stores/channel-actions.test.ts",
+        "desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx",
+        "desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx",
+        "desktop/src/react/__tests__/services/conversation-request-scope.test.ts",
+        "desktop/src/react/__tests__/components/ChannelInput.focus.test.tsx",
+        "desktop/src/react/__tests__/components/ChannelMessages.scroll.test.tsx",
+        "desktop/src/react/__tests__/components/ChannelCreateOverlay.test.tsx",
+        "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+        "desktop/src/react/__tests__/services/channel-new-message-ws.test.ts",
+        "desktop/src/react/__tests__/services/rust-chat-history.test.ts",
+        "desktop/src/react/__tests__/hooks/use-stream-buffer-dedupe.test.ts",
+        "tests/rust-browser-control.test.ts",
+        "tests/rust-browser-ipc.test.ts",
+        "desktop/src/react/__tests__/browser-viewer/BrowserViewerApp.test.tsx",
+        "desktop/src/react/__tests__/browser-viewer/RustBrowserViewer.test.tsx",
+        "desktop/src/react/__tests__/services/rust-browser.test.ts",
+        "desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx",
+        "desktop/src/react/__tests__/components/RustBrowserCard.test.tsx",
+        "desktop/src/react/__tests__/components/BrowserCard.test.tsx",
+        "desktop/src/react/__tests__/components/SessionListContextMenu.test.tsx",
+        "desktop/src/react/__tests__/settings/api.test.ts",
+        "desktop/src/react/__tests__/services/rust-automation.test.ts",
+        "desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts",
+        "desktop/src/react/__tests__/services/rust-browser-events-http.test.ts",
+        "desktop/src/react/__tests__/utils/link-open.test.ts"
+      ]
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ]
+    },
+    {
+      "name": "ts-roundtrip",
+      "command": [
+        "node",
+        "tests/migration/r01-t02/roundtrip.mjs",
+        "--generated",
+        "contracts/generated",
+        "--out",
+        "/private/tmp/lingxi-r07-t04-r6-roundtrip"
+      ]
+    },
+    {
+      "name": "browser-contract",
+      "command": [
+        "./node_modules/.bin/vitest",
+        "run",
+        "tests/migration/r01-t02/browser-contract.test.mjs"
+      ]
+    },
+    {
+      "name": "contract-types",
+      "command": [
+        "./node_modules/.bin/tsc",
+        "-p",
+        "tests/migration/r01-t02/tsconfig.json"
+      ]
+    },
+    {
+      "name": "ownership",
+      "command": [
+        "python3",
+        "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+      ]
+    },
+    {
+      "name": "dependency-boundaries",
+      "command": [
+        "node",
+        "scripts/check-dependency-boundaries.mjs"
+      ]
+    },
+    {
+      "name": "main-build",
+      "command": [
+        "./node_modules/.bin/vite",
+        "build",
+        "--config",
+        "vite.config.main.js",
+        "--outDir",
+        "/private/tmp/lingxi-r07-t04-r6-main"
+      ]
+    },
+    {
+      "name": "preload-build",
+      "command": [
+        "./node_modules/.bin/vite",
+        "build",
+        "--config",
+        "vite.config.preload.js",
+        "--outDir",
+        "/private/tmp/lingxi-r07-t04-r6-preload"
+      ]
+    }
+  ]
+}

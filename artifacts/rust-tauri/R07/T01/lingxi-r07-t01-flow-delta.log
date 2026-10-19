@@ -1,0 +1,19 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.52s
+     Running tests/r07_automation_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_flow-2ab8cb00acd1866c)
+
+running 11 tests
+test notification_preference_updates_preserve_other_settings_and_reject_damage ... ok
+test existing_global_switch_and_agent_setting_roundtrip_preserve_other_fields ... ok
+test real_tool_suggestion_requires_apply_and_replays_after_expiry ... ok
+test slash_apply_uses_frozen_owned_suggestion ... ok
+test management_preserves_minute_strings_and_millisecond_numbers_from_real_ui ... ok
+test unsupported_future_schema_is_preserved_and_does_not_block_later_jobs ... ok
+test started_display_with_no_receipt_becomes_unknown_without_resend ... ok
+test real_notify_tool_claim_and_receipt_survive_restart_without_resend ... ok
+test scheduled_reminder_keeps_trigger_run_and_confirmed_delivery_after_restart ... ok
+test completion_preference_only_queues_real_terminal_results_and_keeps_focus_policy ... ok
+test restart_between_real_run_completion_and_receipt_settlement_catches_up_once ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+

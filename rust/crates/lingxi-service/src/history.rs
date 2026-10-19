@@ -428,11 +428,55 @@ async fn project_items(
         lineage: &lineage,
         user_anchors_on_branch: &user_anchors_on_branch,
     };
-    Ok(if mood_only {
+    let mut items = if mood_only {
         crate::history_projection::project_mood_history(&input)
     } else {
         project_history_with_audits(&input, &audit_anchors)
-    })
+    };
+    // 决策可能在另一页，按正式全会话回执覆盖工具卡，绝不从正文猜状态。
+    let decisions = lingxi_adapters::storage::conversations_collab::collab_decisions_for_session(
+        db, session_id,
+    )
+    .await?;
+    overlay_collaboration_decisions(&mut items, &decisions);
+    Ok(items)
+}
+
+pub(crate) fn overlay_collaboration_decisions(
+    items: &mut [lingxi_protocol::history::HistoryItem],
+    decisions: &[serde_json::Value],
+) {
+    for item in items {
+        if let lingxi_protocol::history::HistoryItem::ToolCall {
+            result: Some(result),
+            ..
+        } = item
+        {
+            let Some(details) = result.details.as_mut() else {
+                continue;
+            };
+            if !matches!(
+                details.get("kind").and_then(serde_json::Value::as_str),
+                Some("session_send_draft" | "session_create_draft")
+            ) {
+                continue;
+            }
+            let Some(id) = details
+                .get("suggestionId")
+                .and_then(serde_json::Value::as_str)
+            else {
+                continue;
+            };
+            if let Some(decision) = decisions.iter().find(|d| d["suggestionId"] == id) {
+                for key in ["status", "result", "resultSessionId", "frozenApply"] {
+                    if let Some(v) = decision.get(key) {
+                        details.insert(key.into(), v.clone());
+                    }
+                }
+                details.insert("decisionPersisted".into(), serde_json::json!(true));
+            }
+        }
+    }
 }
 
 // ── 响应构造 ──

@@ -144,23 +144,106 @@ pub(crate) fn read_session_choice(
     state: &ServiceState,
     facts: &crate::sessions::SessionFacts,
 ) -> Result<ChatChoice, String> {
-    effective_choice(state, &facts.owner_user_id, &facts.session_id)
+    effective_choice_for_agent(
+        state,
+        &facts.owner_user_id,
+        &facts.session_id,
+        Some(&facts.agent_id),
+        None,
+    )
 }
-pub(crate) fn effective_choice(
-    state: &ServiceState,
+/// 所有前台执行入口共同读取明确助手的默认模型；不依赖当前界面焦点。
+pub(crate) fn choice_for_agent(
+    home: &Path,
     owner: &str,
     session: &str,
+    agent_id: Option<&str>,
 ) -> Result<ChatChoice, String> {
-    effective_choice_with_model(state, owner, session, None)
+    let mut choice = choice(home, owner, session)?;
+    if choice.model.is_none() {
+        if let Some(agent_id) = agent_id {
+            lingxi_adapters::storage::agent_memory::validate_agent_id(agent_id)
+                .map_err(|e| e.to_string())?;
+            let path = home.join("agents").join(agent_id).join("config.yaml");
+            #[cfg(windows)]
+            use crate::discovery_tools::windows_readonly::DirFd as ReadonlyDir;
+            #[cfg(windows)]
+            let root = ReadonlyDir::open(home).map_err(|e| e.to_string())?;
+            #[cfg(not(windows))]
+            let root = crate::filetools::fsio::DirFd::open(home).map_err(|e| e.to_string())?;
+            // Windows复用现有只读实现逐组件拒绝reparse并保留祖先句柄，不触碰写入边界。
+            #[cfg(windows)]
+            let agents = match ReadonlyDir::open(&home.join("agents")) {
+                Ok(dir) => dir,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(choice),
+                Err(error) => return Err(error.to_string()),
+            };
+            #[cfg(not(windows))]
+            let agents = match root.child_directory(std::ffi::OsStr::new("agents"), false) {
+                Ok(dir) => dir,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(choice),
+                Err(error) => return Err(error.to_string()),
+            };
+            #[cfg(windows)]
+            let directory = match ReadonlyDir::open(&home.join("agents").join(agent_id)) {
+                Ok(dir) => dir,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(choice),
+                Err(error) => return Err(error.to_string()),
+            };
+            #[cfg(not(windows))]
+            let directory = match agents.child_directory(std::ffi::OsStr::new(agent_id), false) {
+                Ok(dir) => dir,
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(choice),
+                Err(error) => return Err(error.to_string()),
+            };
+            let directory_is_current = || {
+                root.same_directory(home).unwrap_or(false)
+                    && agents.same_directory(&home.join("agents")).unwrap_or(false)
+                    && directory
+                        .same_directory(path.parent().expect("固定助手配置路径"))
+                        .unwrap_or(false)
+            };
+            // 只有数据库历史的旧会话可能没有助手文件；沿既有全局模型规则读取，绝不转到焦点助手。
+            match std::fs::symlink_metadata(&path) {
+                Err(error)
+                    if error.kind() == std::io::ErrorKind::NotFound && directory_is_current() =>
+                {
+                    return Ok(choice)
+                }
+                Err(error) => return Err(error.to_string()),
+                Ok(_) => {}
+            }
+            let snapshot = crate::file_safety::Snapshot::read_bounded(&path, 1024 * 1024)
+                .map_err(|e| e.to_string())?;
+            let text = std::str::from_utf8(&snapshot.bytes).map_err(|e| e.to_string())?;
+            let document =
+                lingxi_adapters::storage::agent_memory::config::AgentConfigDocument::parse(text)
+                    .map_err(|e| e.to_string())?;
+            let selected = document
+                .model_reference("models", "chat")
+                .map_err(|e| e.to_string())?;
+            if !snapshot.path_is_current(&path) || !directory_is_current() {
+                return Err("agent configuration changed while selecting model".into());
+            }
+            choice.model = selected;
+        }
+    }
+    Ok(choice)
 }
-/// 显式目标模型在推导思考档位之前生效；无显式模型时保留原默认选择规则。
-pub(crate) fn effective_choice_with_model(
+
+/// 明确目标助手的默认模型不能借服务焦点切换到另一位助手。
+pub(crate) fn effective_choice_for_agent(
     state: &ServiceState,
     owner: &str,
     session: &str,
+    agent_id: Option<&str>,
     model: Option<(String, String)>,
 ) -> Result<ChatChoice, String> {
-    let mut choice = choice(state.memory().home(), owner, session)?;
+    let mut choice = if model.is_some() {
+        choice(state.memory().home(), owner, session)?
+    } else {
+        choice_for_agent(state.memory().home(), owner, session, agent_id)?
+    };
     if let Some(model) = model {
         choice.model = Some(model);
     }
@@ -273,4 +356,89 @@ pub(crate) fn selected_thinking(
             "off".into()
         },
     )
+}
+
+#[cfg(test)]
+mod agent_default_tests {
+    use super::*;
+    #[test]
+    fn explicit_session_and_owner_choices_precede_exact_agent_and_missing_legacy_never_uses_focus()
+    {
+        let scratch = std::env::temp_dir().join(format!(
+            "lingxi-t08-chat-choice-{}",
+            lingxi_adapters::storage::agent_memory::random_token_suffix()
+        ));
+        std::fs::create_dir_all(scratch.join("agents/a")).unwrap();
+        std::fs::create_dir_all(scratch.join("agents/b")).unwrap();
+        let home = scratch.canonicalize().unwrap();
+        for agent in ["a", "b"] {
+            std::fs::write(
+                home.join(format!("agents/{agent}/config.yaml")),
+                format!("models:\n  chat:\n    provider: fixture\n    id: agent-{agent}\n"),
+            )
+            .unwrap();
+        }
+        assert_eq!(
+            choice_for_agent(&home, "owner", "new", Some("b"))
+                .unwrap()
+                .model,
+            Some(("fixture".into(), "agent-b".into()))
+        );
+        assert_eq!(
+            choice_for_agent(&home, "owner", "legacy", Some("missing"))
+                .unwrap()
+                .model,
+            None
+        );
+        #[cfg(unix)]
+        {
+            // 最终文件不存在也必须检查父链，悬空链接不能冒充旧会话的正常缺失。
+            std::os::unix::fs::symlink(home.join("no-such-target"), home.join("agents/dangling"))
+                .unwrap();
+            assert!(choice_for_agent(&home, "owner", "legacy", Some("dangling")).is_err());
+            std::fs::create_dir(home.join("outside-empty")).unwrap();
+            std::os::unix::fs::symlink(home.join("outside-empty"), home.join("agents/linked"))
+                .unwrap();
+            assert!(choice_for_agent(&home, "owner", "legacy", Some("linked")).is_err());
+        }
+        std::fs::write(
+            home.join("agents/b/config.yaml"),
+            "models: [broken-shape]\n",
+        )
+        .unwrap();
+        assert!(choice_for_agent(&home, "owner", "new", Some("b")).is_err());
+        save_choice(
+            &home,
+            "owner",
+            None,
+            ChatChoice {
+                model: Some(("fixture".into(), "user-default".into())),
+                thinking_level: None,
+            },
+        )
+        .unwrap();
+        assert_eq!(
+            choice_for_agent(&home, "owner", "new", Some("a"))
+                .unwrap()
+                .model,
+            Some(("fixture".into(), "user-default".into()))
+        );
+        save_choice(
+            &home,
+            "owner",
+            Some("explicit"),
+            ChatChoice {
+                model: Some(("fixture".into(), "session-choice".into())),
+                thinking_level: Some("off".into()),
+            },
+        )
+        .unwrap();
+        let chosen = choice_for_agent(&home, "owner", "explicit", Some("b")).unwrap();
+        assert_eq!(
+            chosen.model,
+            Some(("fixture".into(), "session-choice".into()))
+        );
+        assert_eq!(chosen.thinking_level.as_deref(), Some("off"));
+        std::fs::remove_dir_all(home).unwrap();
+    }
 }

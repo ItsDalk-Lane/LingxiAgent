@@ -1,0 +1,5 @@
+  [check] event-assistant-segment-delta.json (EventEnvelope): seq=9007199254741003 kept as string; Number() would lose precision (Number→9007199254741004, BigInt roundtrip mismatch proven)
+  [check] event-tool-call-started.json (EventEnvelope): args digest parity sha256=0e7018f10d17014509aadb62038f1f3f84ad3d3d8178bdfe1db1a0cd6b34d6e0
+  [check] event-unknown-future.json (EventEnvelope): unknown event "future_recall_started" preserved with 3 top-level fields (incl. permissionHint)
+  [check] tool-schema-document.json (ToolSchemaDocument): third-party schema verbatim, vendor extension intact
+OK: 55 golden samples decoded, schema-validated and re-encoded byte-identically by the TS consumer; re-encoded copies written to /private/tmp/lingxi-r07-t02-effects-ts-roundtrip

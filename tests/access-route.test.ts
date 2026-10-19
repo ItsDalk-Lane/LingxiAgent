@@ -280,6 +280,7 @@ describe("access route", () => {
       credential: {
         scopes: [
           "chat",
+          "sessions.write",
           "resources.read",
           "files.read",
           "files.write",

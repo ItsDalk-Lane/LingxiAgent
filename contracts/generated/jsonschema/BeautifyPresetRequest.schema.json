@@ -1,0 +1,70 @@
+{
+  "$defs": {
+    "BeautifyWorkbenchTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "mountId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "rootId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "subdir": {
+          "default": "",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "filePath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "presetId": {
+      "type": "string"
+    },
+    "requestId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BeautifyWorkbenchTarget"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "presetId"
+  ],
+  "title": "BeautifyPresetRequest",
+  "type": "object"
+}

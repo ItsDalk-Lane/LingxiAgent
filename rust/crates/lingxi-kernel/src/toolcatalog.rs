@@ -435,6 +435,15 @@ pub enum PermissionKind {
     ArgumentAwareSessionFolders,
     /// 会话检查点的 list 为只读，create/drop 为写入。
     ArgumentAwareCheckpoint,
+    /// 频道 list/read 为只读，post/create 必须逐次确认实际目标。
+    ArgumentAwareChannel,
+    /// 浏览器按实际动作区分只读、常规生命周期和精确目标确认。
+    ArgumentAwareBrowser,
+    /// 预算目标（goal 工具）：status 或缺省 action 为只读，
+    /// create/pause/resume/complete/drop 为写（会话侧车账本）。
+    ArgumentAwareGoal,
+    /// 设置查询只读；实际修改必须按具体参数复核。
+    ArgumentAwareSettings,
 }
 
 impl PermissionKind {
@@ -446,6 +455,10 @@ impl PermissionKind {
             PermissionKind::ArgumentAwareFile => "file",
             PermissionKind::ArgumentAwareSessionFolders => "session-folders",
             PermissionKind::ArgumentAwareCheckpoint => "checkpoint",
+            PermissionKind::ArgumentAwareChannel => "channel",
+            PermissionKind::ArgumentAwareBrowser => "browser",
+            PermissionKind::ArgumentAwareGoal => "goal",
+            PermissionKind::ArgumentAwareSettings => "update-settings",
         }
     }
 }
@@ -1609,6 +1622,8 @@ pub struct ToolRegistry {
 struct RegistryState {
     catalog_generation: u64,
     model_residents: Option<std::collections::BTreeSet<ToolTargetId>>,
+    /// 首次默认目录初始化前，保留可信宿主明确要求常驻的已注册目标。
+    pending_model_residents: std::collections::BTreeSet<ToolTargetId>,
     targets: BTreeMap<ToolTargetId, RegisteredTool>,
     /// Every name/alias → (owner, role). A PRIMARY name may have several
     /// owners (one per source); an ALIAS has exactly one owner, enforced
@@ -1735,8 +1750,11 @@ impl ToolRegistry {
     }
 
     /// 常驻策略只控制发送给模型的声明，不改变注册或执行授权。
-    pub fn configure_model_residents(&self, targets: std::collections::BTreeSet<ToolTargetId>) {
+    pub fn configure_model_residents(&self, mut targets: std::collections::BTreeSet<ToolTargetId>) {
         let mut state = self.lock();
+        if state.model_residents.is_none() {
+            targets.append(&mut state.pending_model_residents);
+        }
         if state.model_residents.as_ref() != Some(&targets) {
             state.model_residents = Some(targets);
             state.catalog_generation += 1;
@@ -1754,6 +1772,25 @@ impl ToolRegistry {
         // 未配置筛选时原本已声明全部可用目标，不将其收窄为单个目标。
         if let Some(residents) = state.model_residents.as_mut() {
             if residents.insert(target.clone()) {
+                state.catalog_generation += 1;
+            }
+        } else {
+            state.pending_model_residents.insert(target.clone());
+        }
+        Ok(())
+    }
+
+    /// 撤销单个目标的常驻声明资格，保留注册、来源、可用性和执行授权。
+    pub fn remove_model_resident(&self, target: &ToolTargetId) -> Result<(), ToolCatalogError> {
+        let mut state = self.lock();
+        if !state.targets.contains_key(target) {
+            return Err(ToolCatalogError::TargetNotFound {
+                reference: format!("target {target}"),
+            });
+        }
+        state.pending_model_residents.remove(target);
+        if let Some(residents) = state.model_residents.as_mut() {
+            if residents.remove(target) {
                 state.catalog_generation += 1;
             }
         }
@@ -1983,6 +2020,7 @@ impl ToolRegistry {
                 .ok_or_else(|| ToolCatalogError::TargetNotFound {
                     reference: format!("target {target_id}"),
                 })?;
+        state.pending_model_residents.remove(target_id);
         let mut names = vec![tool.manifest.local_name.clone()];
         names.extend(tool.manifest.aliases.iter().cloned());
         for name in &names {
@@ -2050,6 +2088,31 @@ impl ToolRegistry {
         let args_digest = effective.digest();
         let args_summary = summarize_arguments(&effective);
         let mut permission = tool.manifest.permission.clone();
+        if permission.kind == PermissionKind::ArgumentAwareBrowser {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("unknown");
+            permission.kind = match action {
+                "snapshot" | "screenshot" | "scroll" | "wait" | "show" => PermissionKind::Read,
+                "start" | "stop" => PermissionKind::Execute,
+                _ => PermissionKind::Review,
+            };
+            permission.capability_base = format!("browser.{action}");
+        }
+        if permission.kind == PermissionKind::ArgumentAwareChannel {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str);
+            permission.kind = if matches!(action, Some("list" | "read")) {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Review
+            };
+            permission.capability_base = format!("channel.{}", action.unwrap_or("unknown"));
+        }
         if permission.kind == PermissionKind::ArgumentAwareCheckpoint {
             let action = effective
                 .as_value()
@@ -2075,6 +2138,34 @@ impl ToolRegistry {
                 PermissionKind::Execute
             };
             permission.capability_base = format!("file.{action}");
+        }
+        // goal（现役 goal-tool.ts sessionPermission.resolveInvocation）：
+        // action 缺省或 "status" → read/goal.status；其余 → 写类（现役
+        // routine 对应 Execute）+ goal.<action>。
+        if permission.kind == PermissionKind::ArgumentAwareGoal {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str);
+            permission.kind = if action.is_none() || action == Some("status") {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Execute
+            };
+            permission.capability_base = format!("goal.{}", action.unwrap_or("status"));
+        }
+        if permission.kind == PermissionKind::ArgumentAwareSettings {
+            let action = effective
+                .as_value()
+                .get("action")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or("unknown");
+            permission.kind = if action == "search" {
+                PermissionKind::Read
+            } else {
+                PermissionKind::Review
+            };
+            permission.capability_base = format!("update_settings.{action}");
         }
         let prepared = PreparedToolCall {
             target_id,
@@ -2357,6 +2448,38 @@ mod tests {
     fn register_one(manifest: ToolManifest) -> Result<MutationReceipt, ToolCatalogError> {
         let registry = ToolRegistry::new();
         registry.register(manifest, &budget())
+    }
+
+    #[test]
+    fn update_settings_freezes_permission_from_effective_action() {
+        let registry = ToolRegistry::new();
+        let mut manifest = read_manifest(ToolOrigin::FirstParty, "update_settings", "设置");
+        manifest.input_schema = schema(
+            json!({"type":"object","properties":{"action":{"type":"string"}},"required":["action"],"additionalProperties":false}),
+        );
+        manifest.permission.kind = PermissionKind::ArgumentAwareSettings;
+        registry.register(manifest, &budget()).unwrap();
+        for (action, kind) in [
+            ("search", PermissionKind::Read),
+            ("apply", PermissionKind::Review),
+            ("unexpected", PermissionKind::Review),
+        ] {
+            let prepared = registry
+                .prepare_invocation(
+                    &ToolTargetRef::ByName {
+                        name: "update_settings".into(),
+                    },
+                    None,
+                    &json!({"action":action}),
+                    &budget(),
+                )
+                .unwrap();
+            assert_eq!(prepared.permission.kind, kind);
+            assert_eq!(
+                prepared.permission.capability_base,
+                format!("update_settings.{action}")
+            );
+        }
     }
 
     #[test]
@@ -3247,6 +3370,72 @@ mod tests {
     /// Adversarial probe: a schema with no required properties accepts an
     /// empty object (explicitly passing NOTHING is a legitimate call), and
     /// the result is still immutable, digest-bearing effective arguments.
+    #[test]
+    fn first_catalog_initialization_preserves_explicit_host_promotions_only_once() {
+        let registry = ToolRegistry::new();
+        let mut targets = Vec::new();
+        for name in ["default", "promoted", "on_demand"] {
+            targets.push(
+                registry
+                    .register(read_manifest(ToolOrigin::FirstParty, name, name), &budget())
+                    .unwrap()
+                    .target_id,
+            );
+        }
+        let names = || {
+            registry
+                .model_declaration_snapshot()
+                .1
+                .into_iter()
+                .map(|tool| tool.listing.target_id)
+                .collect::<std::collections::BTreeSet<_>>()
+        };
+        registry.add_model_resident(&targets[1]).unwrap();
+        assert_eq!(
+            names().len(),
+            3,
+            "未初始化时仍沿用全部已注册声明，不提前收窄"
+        );
+        let retired = registry
+            .register(
+                read_manifest(ToolOrigin::FirstParty, "retired", "Retired"),
+                &budget(),
+            )
+            .unwrap()
+            .target_id;
+        registry.add_model_resident(&retired).unwrap();
+        registry.uninstall(&retired).unwrap();
+        registry.configure_model_residents([targets[0].clone()].into_iter().collect());
+        registry
+            .register(
+                read_manifest(ToolOrigin::FirstParty, "retired", "Retired"),
+                &budget(),
+            )
+            .unwrap();
+        assert_eq!(
+            names(),
+            [targets[0].clone(), targets[1].clone()]
+                .into_iter()
+                .collect()
+        );
+        registry.configure_model_residents([targets[0].clone()].into_iter().collect());
+        assert_eq!(
+            names(),
+            [targets[0].clone()].into_iter().collect(),
+            "后续显式设置可撤销晋升，旧待办不能复活"
+        );
+        registry.add_model_resident(&targets[2]).unwrap();
+        assert_eq!(
+            names(),
+            [targets[0].clone(), targets[2].clone()]
+                .into_iter()
+                .collect()
+        );
+        assert!(registry
+            .add_model_resident(&ToolTargetId::parse("tool:first-party:not_registered"))
+            .is_err());
+    }
+
     #[test]
     fn empty_arguments_on_defaultless_schema_are_legal() {
         let registry = ToolRegistry::new();

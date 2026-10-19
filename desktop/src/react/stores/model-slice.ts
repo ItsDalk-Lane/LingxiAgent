@@ -28,6 +28,10 @@ export function getModelThinkingLevels(model: { thinkingLevels?: readonly Thinki
 export interface ModelSlice {
   models: Model[];
   currentModel: { id: string; provider: string } | null;
+  /** Rust 模型面投影的只读镜像：未配置/不可用与空列表必须可区分，
+      代次是十进制字符串（客户端数值精度会丢归属）。null = 尚未读取。 */
+  modelState: string | null;
+  modelGeneration: string | null;
   thinkingLevel: ThinkingLevel;
   /**
    * 按 session path 存储的思考级别（权威源）。
@@ -50,6 +54,8 @@ export const createModelSlice = (
 ): ModelSlice => ({
   models: [],
   currentModel: null,
+  modelState: null,
+  modelGeneration: null,
   thinkingLevel: 'medium',
   thinkingLevelBySession: {},
   setModels: (models) => set({ models }),

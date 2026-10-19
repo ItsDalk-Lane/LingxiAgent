@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "T08C_NATIVE_FAILURE_SELECTED_SCENE",
+  "createdAt": "2026-10-18T08:35:51.415363+00:00",
+  "sourceScene": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-79319-1792311821753937000/home",
+  "sourceSceneUnmodified": true,
+  "candidate": "t08c",
+  "status": "FAILURE_RETAINED",
+  "purpose": "保全原始失败回执、实际请求序列及原则写入事实；不以该材料推断DOM已更新或整项通过。",
+  "files": [
+    {
+      "path": "ui-result.json",
+      "sourceSha256": "e0ab4015d2750e12ff2cf9e9221eb3934f38b99c15fccc7b82053bedaea5f74c",
+      "preservedSha256": "e0ab4015d2750e12ff2cf9e9221eb3934f38b99c15fccc7b82053bedaea5f74c",
+      "bytes": 3583,
+      "copiedByteForByte": true
+    },
+    {
+      "path": "electron-failure-trace.json",
+      "sourceSha256": "c681922aaccceadf31525baaebab507aefa77a1dbe6d978d1c00cf173e236523",
+      "preservedSha256": "c681922aaccceadf31525baaebab507aefa77a1dbe6d978d1c00cf173e236523",
+      "bytes": 8270,
+      "copiedByteForByte": true
+    },
+    {
+      "path": "agents/agentA/config.yaml",
+      "sourceSha256": "a900a81efcfaa490d806d80df338b1bfc9c8ab8004f0df7dacb8916be61fb3b6",
+      "preservedSha256": "a900a81efcfaa490d806d80df338b1bfc9c8ab8004f0df7dacb8916be61fb3b6",
+      "bytes": 90,
+      "copiedByteForByte": true
+    },
+    {
+      "path": "agents/agentA/identity.md",
+      "sourceSha256": "6e20b3b08cc672a451bb68d5e7297d8dadcd775b9c6f8c394610ce7aecd29c5d",
+      "preservedSha256": "6e20b3b08cc672a451bb68d5e7297d8dadcd775b9c6f8c394610ce7aecd29c5d",
+      "bytes": 21,
+      "copiedByteForByte": true
+    },
+    {
+      "path": "agents/agentA/AGENTS.md",
+      "sourceSha256": "2743e1040c5e3110e714ec86779e337d1138f08561c1f21ffe98ffb80e009bca",
+      "preservedSha256": "2743e1040c5e3110e714ec86779e337d1138f08561c1f21ffe98ffb80e009bca",
+      "bytes": 21,
+      "copiedByteForByte": true
+    },
+    {
+      "path": "agents/agentA/memory/tenets.json",
+      "sourceSha256": "48340cd799bab7e702e5ae5ff73de96ee259ed9acc548052d31091bf7a0d36ae",
+      "preservedSha256": "48340cd799bab7e702e5ae5ff73de96ee259ed9acc548052d31091bf7a0d36ae",
+      "bytes": 632,
+      "copiedByteForByte": true
+    }
+  ],
+  "excluded": [
+    "lingxi-service/*凭证与管理材料",
+    "数据库",
+    "浏览器profile/cookies",
+    "构建缓存",
+    "无关记忆文件"
+  ],
+  "credentialProtection": "只复制故障白名单，复制前核对当前隔离home凭证值与Bearer头未进入材料；原文件与凭证均未修改。",
+  "originalReceipt": "artifacts/rust-tauri/R07/T08/t08c-service.json",
+  "originalLog": "artifacts/rust-tauri/R07/T08/t08c-service.log",
+  "diagnosis": "artifacts/rust-tauri/R07/T08/t08c-native-boundaries-lan-diagnosis1.json"
+}

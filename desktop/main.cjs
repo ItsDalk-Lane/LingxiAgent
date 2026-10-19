@@ -492,6 +492,7 @@ app.on("gpu-info-update", () => {
 // 普通界面文本无选区，Electron 默认上下文菜单中的“复制”项在非编辑区域永远无效。
 // 因此在非可编辑区域直接拦截默认菜单；输入框等可编辑区域保留系统菜单（右键粘贴可用）。
 app.on("web-contents-created", (_event, contents) => {
+  require("./src/shared/card-frame-navigation.cjs").installCardFrameNavigationGuard(contents);
   contents.on("context-menu", (event, params) => {
     if (!params.isEditable) event.preventDefault();
   });
@@ -507,6 +508,16 @@ let registeredQuickChatShortcuts = [];
 let settingsWindow = null;
 
 let browserViewerWindow = null;
+let rustBrowserViewerWindow = null;
+let rustBrowserViewerTarget = null;
+const rustBrowserControl = require("./src/shared/rust-browser-control.cjs").createRustBrowserControl({
+  fetch: (...args) => require("electron").net.fetch(...args),
+  onChange: () => {
+    rustBrowserViewerTarget = null;
+    if (rustBrowserViewerWindow && !rustBrowserViewerWindow.isDestroyed()) rustBrowserViewerWindow.destroy();
+    rustBrowserViewerWindow = null;
+  },
+});
 let _browserWebView = null;        // 当前活跃的 WebContentsView
 const _browserViews = new Map();   // sessionPath -> BrowserWorkspace; BrowserWorkspace.tabs: tabId -> WebContentsView
 let _currentBrowserSession = null; // 当前浏览器绑定的 sessionPath
@@ -1342,8 +1353,9 @@ async function startRustServer() {
   });
   // 安装包里的页面由签名 seed 激活；Rust 模式也必须先取得同一份页面。
   // 这一步同时阻止损坏的 seed 在服务复用后仍显示旧页面。
+  let rustArtifactBootContext = null;
   if (app.isPackaged) {
-    await resolvePackagedArtifactBoot();
+    rustArtifactBootContext = await resolvePackagedArtifactBoot();
     if (_currentContentVersion !== app.getVersion()) {
       throw new Error(`Rust desktop requires matching installed renderer ${app.getVersion()}; active content is ${_currentContentVersion}. Update the app shell before using Rust mode.`);
     }
@@ -1363,9 +1375,40 @@ async function startRustServer() {
     serverProcess = null;
     return;
   }
+  const bridgeRuntimeEnv = {};
+  if (rustArtifactBootContext) {
+    const sdkRoot = rustArtifactBootContext.serverRoot;
+    const sdkNode = path.join(sdkRoot, process.platform === 'win32' ? 'hana-server.exe' : 'node');
+    const sdkWorker = path.join(sdkRoot, 'bundle', 'bridge-sdk-worker.mjs');
+    for (const file of [sdkNode, sdkWorker, path.join(sdkRoot, 'bundle', 'bridge-sdk-diagnostic.mjs')]) {
+      const stat = fs.lstatSync(file);
+      if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('Rust Bridge SDK runtime is missing or unsafe');
+    }
+    bridgeRuntimeEnv.LINGXI_BRIDGE_NODE = sdkNode;
+    bridgeRuntimeEnv.LINGXI_BRIDGE_WORKER = sdkWorker;
+    const officeWorker = path.join(sdkRoot, 'bundle', 'office-document-worker.mjs');
+    const mediaHelper = path.join(sdkRoot, 'bundle', 'media-jimeng-worker.mjs');
+    const themesDir = path.join(_distRenderer, 'themes');
+    const coversDir = path.join(sdkRoot, 'desktop', 'src', 'assets', 'cover-gallery');
+    for (const file of [officeWorker, mediaHelper]) {
+      const stat = fs.lstatSync(file);
+      if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('Rust document/media runtime is missing or unsafe');
+    }
+    for (const directory of [themesDir, coversDir]) {
+      const stat = fs.lstatSync(directory);
+      if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error('Rust document assets are missing or unsafe');
+    }
+    bridgeRuntimeEnv.LINGXI_OFFICE_NODE = sdkNode;
+    bridgeRuntimeEnv.LINGXI_OFFICE_WORKER = officeWorker;
+    bridgeRuntimeEnv.LINGXI_OFFICE_THEMES = themesDir;
+    bridgeRuntimeEnv.LINGXI_OFFICE_COVERS = coversDir;
+    bridgeRuntimeEnv.LINGXI_MEDIA_NODE = sdkNode;
+    bridgeRuntimeEnv.LINGXI_MEDIA_HELPER = mediaHelper;
+
+  }
   const child = spawn(binary, ['--home', lingxiHome], {
     cwd: path.dirname(binary),
-    env: { ...process.env, LINGXI_HOME: lingxiHome },
+    env: { ...process.env, LINGXI_HOME: lingxiHome, ...bridgeRuntimeEnv },
     detached: process.platform !== 'win32',
     windowsHide: true,
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -4713,6 +4756,11 @@ function _sendBrowserUserActivity(sessionPath) {
 function setupBrowserCommands() {
   if (!serverPort || !serverToken) return;
   const rustHost = serverNodeKind === 'lingxi-service';
+  // 原生服务直接控制 Chromium；禁止注册旧 Electron 执行宿主。
+  if (rustHost) {
+    if (_browserCmdWs) { const previous = _browserCmdWs; _browserCmdWs = null; previous.close(); }
+    return;
+  }
   const WebSocket = require("ws");
   // 原生服务的浏览器宿主使用本机令牌头，避免将凭证写入地址或日志。
   const url = rustHost
@@ -4721,6 +4769,7 @@ function setupBrowserCommands() {
   let ws;
 
   function connect() {
+    if (serverNodeKind === 'lingxi-service') return;
     ws = new WebSocket(url, rustHost ? { headers: { Authorization: `Bearer ${serverToken}` } } : undefined);
     _browserCmdWs = ws;
     ws.on("open", () => {
@@ -4752,7 +4801,7 @@ function setupBrowserCommands() {
     });
     ws.on("close", () => {
       if (_browserCmdWs === ws) _browserCmdWs = null;
-      if (!isQuitting) {
+      if (!isQuitting && serverNodeKind !== 'lingxi-service') {
         setTimeout(connect, 2000);
       }
     });
@@ -5648,8 +5697,38 @@ wrapIpcHandler("quick-chat-open-session-ack", (event, result) => quickChatSessio
 
 wrapIpcBestEffortHandler("open-settings", (_event, tab, theme) => createSettingsWindow(tab, theme));
 
+// 原生浏览器状态窗口独立创建，绝不挂载本机 WebContentsView。
+wrapIpcHandler("set-browser-connection", (event, connection) => {
+  if (!mainWindow || event.sender !== mainWindow.webContents) throw new Error("browser_connection_sender_denied");
+  return rustBrowserControl.setConnection(connection);
+});
+wrapIpcHandler("get-browser-viewer-context", (event) => {
+  if (!rustBrowserViewerWindow || event.sender !== rustBrowserViewerWindow.webContents) return null;
+  return rustBrowserControl.context(rustBrowserViewerTarget);
+});
+wrapIpcHandler("rust-browser-request", (event, target, action, options) => {
+  const fromMain = mainWindow && event.sender === mainWindow.webContents;
+  const fromViewer = rustBrowserViewerWindow && event.sender === rustBrowserViewerWindow.webContents;
+  if (!fromMain && !fromViewer) throw new Error("browser_sender_denied");
+  if (fromViewer && target?.sessionPath !== rustBrowserViewerTarget?.sessionPath) throw new Error("browser_session_changed");
+  return rustBrowserControl.call(target, action, options || {});
+});
 // 浏览器查看器窗口
-wrapIpcBestEffortHandler("open-browser-viewer", async (_event, theme, payload) => {
+wrapIpcHandler("open-browser-viewer", async (event, theme, payload) => {
+  if (payload?.connectionKey) {
+    if (!mainWindow || event.sender !== mainWindow.webContents) throw new Error("browser_sender_denied");
+    rustBrowserControl.context(payload);
+    if (rustBrowserViewerWindow && !rustBrowserViewerWindow.isDestroyed()) rustBrowserViewerWindow.destroy();
+    rustBrowserViewerTarget = { connectionKey: payload.connectionKey, sessionPath: payload.sessionPath };
+    const win = new BrowserWindow({ width: 1100, height: 760, minWidth: 620, minHeight: 420, title: "Lingxi Browser", ...titleBarOpts({ x: 16, y: 16 }), backgroundColor: getThemeBackgroundColor(theme || themeRegistry.DEFAULT_THEME), webPreferences: { preload: path.join(__dirname, "preload.bundle.cjs"), contextIsolation: true, nodeIntegration: false } });
+    rustBrowserViewerWindow = win;
+    applyWindowThemeColors(win, theme || themeRegistry.DEFAULT_THEME);
+    attachRendererArtifactCrashSentinel(win, "browser-viewer");
+    loadWindowURL(win, "browser-viewer", { query: { mode: "native" } });
+    win.on("closed", () => { if (rustBrowserViewerWindow === win) { rustBrowserViewerWindow = null; rustBrowserViewerTarget = null; } });
+    return { opened: true };
+  }
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   if (theme) _browserViewerTheme = theme;
   const { url, sessionPath: sp } = _normalizeBrowserViewerOpenPayload(payload);
   createBrowserViewerWindow();
@@ -5683,36 +5762,42 @@ wrapIpcBestEffortHandler("open-browser-viewer", async (_event, theme, payload) =
   }
 });
 wrapIpcBestEffortHandler("browser-go-back", (_event, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   _sendBrowserUserActivity(sp);
   const view = _getViewForSession(sp);
   if (view) view.webContents.goBack();
 });
 wrapIpcBestEffortHandler("browser-go-forward", (_event, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   _sendBrowserUserActivity(sp);
   const view = _getViewForSession(sp);
   if (view) view.webContents.goForward();
 });
 wrapIpcBestEffortHandler("browser-reload", (_event, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   _sendBrowserUserActivity(sp);
   const view = _getViewForSession(sp);
   if (view) view.webContents.reload();
 });
 wrapIpcBestEffortHandler("browser-new-tab", async (_event, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   _sendBrowserUserActivity(sp);
   await _openUrlInNewBrowserTab(sp, null);
   _syncWorkspaceToServer(sp);
 });
 wrapIpcBestEffortHandler("browser-switch-tab", (_event, tabId, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   if (typeof tabId !== "string" || !tabId) return;
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   _sendBrowserUserActivity(sp);
   _switchActiveBrowserTab(sp, tabId);
 });
 wrapIpcBestEffortHandler("browser-close-tab", async (_event, tabId, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   if (typeof tabId !== "string" || !tabId) return;
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   _sendBrowserUserActivity(sp);
@@ -5723,10 +5808,12 @@ wrapIpcBestEffortHandler("browser-close-tab", async (_event, tabId, sessionPath)
   _syncWorkspaceToServer(sp);
   return result;
 });
-wrapIpcBestEffortHandler("close-browser-viewer", () => {
+wrapIpcBestEffortHandler("close-browser-viewer", (event) => {
+  if (rustBrowserViewerWindow && event.sender === rustBrowserViewerWindow.webContents) { rustBrowserViewerWindow.close(); return; }
   if (browserViewerWindow && !browserViewerWindow.isDestroyed()) browserViewerWindow.close();
 });
 wrapIpcBestEffortHandler("browser-emergency-stop", (_event, sessionPath) => {
+  if (serverNodeKind === "lingxi-service" || rustBrowserControl.isActive()) throw new Error("browser_connection_required");
   const sp = _resolveBrowserIpcSessionPath(sessionPath);
   // 有 session 归属时必须经过 server 的 BrowserManager，保持 UI 和运行时状态一致。
   if (sp) {
@@ -6156,14 +6243,18 @@ wrapIpcBestEffortHandler("open-file", (_event, filePath) => {
   shell.openPath(filePath);
 });
 
-wrapIpcBestEffortHandler("open-external", (_event, url) => {
-  if (!url) return;
+wrapIpcHandler("open-external", async (_event, url) => {
   try {
     const parsed = new URL(url);
-    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-      shell.openExternal(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return { ok: false, error: "只支持 HTTP 或 HTTPS 浏览器地址" };
     }
-  } catch {}
+    // 等系统确认接收请求；失败回执也正常返回，兼容原来的不等待调用方。
+    await shell.openExternal(url);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
 });
 
 // 读取文件内容（仅文本文件，用于 Artifacts 预览）
@@ -6407,6 +6498,8 @@ wrapIpcBestEffortHandler("reload-main-window", () => {
   }
 });
 
+const { showNotificationWithReceipt } = require("./src/shared/desktop-notification-delivery.cjs");
+
 // 系统通知（由 agent 的 notify 工具或定时任务触发）
 // agentId 标识触发的助手；据此读取该 agent 头像作为通知 icon，让多 agent 并发通知可分辨身份。
 // agentId 缺失或头像不存在时退回无 icon，禁止用当前焦点 agent 兜底（会张冠李戴）。
@@ -6437,8 +6530,7 @@ wrapIpcBestEffortHandler("show-notification", (_event, title, body, agentId, raw
       mainWindow.focus();
     }
   });
-  notif.show();
-  return { shown: true };
+  return showNotificationWithReceipt(notif);
 });
 
 // Debug: 打开 Onboarding 窗口（DevTools 用）

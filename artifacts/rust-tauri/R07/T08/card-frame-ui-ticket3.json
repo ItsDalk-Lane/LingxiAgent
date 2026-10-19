@@ -1,0 +1,26 @@
+{
+  "status": "DEVELOPMENT_ONLY",
+  "exitCode": 0,
+  "log": "artifacts/rust-tauri/R07/T08/card-frame-ui-ticket3.log",
+  "logSha256": "0322f85ad4b0abafc3af8512a60c24d9778fc713b41f9ed692a4f899315834ca",
+  "command": "npx vitest run desktop/src/react/__tests__/components/InteractiveCard.test.tsx desktop/src/react/__tests__/components/card-frame-navigation.test.ts --maxWorkers=1",
+  "endedSourceHashes": [
+    {
+      "path": "desktop/src/shared/card-frame-navigation.cjs",
+      "sha256": "8dbff1a6b7459f3f1f488eab0c05cdb5c8cf676a6b10c88a643d0c124e4a05cd"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/card-frame-navigation.test.ts",
+      "sha256": "31130621547850e64b1661bff6ad77984bd84dbd536d68aa47898f6c2d16551b"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "87071669a03054d52ca6493f606b49b0c122de815fd57ff94d1682f1df1dd385"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/InteractiveCard.test.tsx",
+      "sha256": "7014f4a9a621d4afbc3ad5dc4f753df053df759127306f23db465f46e810bb10"
+    }
+  ],
+  "bindingNote": "仅事后快照；未记录前后封闭候选，不能替代最终门禁。"
+}

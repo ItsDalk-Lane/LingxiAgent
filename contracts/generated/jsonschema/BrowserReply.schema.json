@@ -1,0 +1,143 @@
+{
+  "$defs": {
+    "BrowserTab": {
+      "additionalProperties": false,
+      "properties": {
+        "canGoBack": {
+          "type": "boolean"
+        },
+        "canGoForward": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "tabId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "tabId",
+        "title",
+        "canGoBack",
+        "canGoForward",
+        "createdAt",
+        "updatedAt"
+      ],
+      "type": "object"
+    },
+    "BrowserWorkspace": {
+      "additionalProperties": false,
+      "properties": {
+        "activeTabId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "executionNode": {
+          "type": "string"
+        },
+        "resumable": {
+          "type": "boolean"
+        },
+        "revoked": {
+          "type": "boolean"
+        },
+        "running": {
+          "type": "boolean"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "sessionPath": {
+          "type": "string"
+        },
+        "suspended": {
+          "type": "boolean"
+        },
+        "tabs": {
+          "items": {
+            "$ref": "#/$defs/BrowserTab"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unavailableReason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "userTakeover": {
+          "type": "boolean"
+        },
+        "visibleCapable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "sessionId",
+        "sessionPath",
+        "executionNode",
+        "running",
+        "resumable",
+        "tabs",
+        "suspended",
+        "userTakeover",
+        "revoked",
+        "visibleCapable"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "downloads": {
+      "default": [],
+      "description": "下载是否完成与是否登记为文件分别保留真实回执。",
+      "items": true,
+      "type": "array"
+    },
+    "files": {
+      "default": [],
+      "description": "文件已通过正式会话登记；元数据保留兼容字段，不含原始字节。",
+      "items": true,
+      "type": "array"
+    },
+    "result": true,
+    "state": {
+      "$ref": "#/$defs/BrowserWorkspace"
+    }
+  },
+  "required": [
+    "state",
+    "result"
+  ],
+  "title": "BrowserReply",
+  "type": "object"
+}

@@ -1,0 +1,143 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T07:41:38.750972+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08a",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+  "sourceManifestSha256": "a76a3b8525f0f79b2e6d61faade1d9939752ec280908e7cb5bdb587afae3c1a4",
+  "finalAcceptance": "pending",
+  "candidateGateDisposition": "FAILED_PROTOCOL_GENERATION; remaining frozen gates NOT_RUN",
+  "reviewMode": "READ_ONLY_SOURCE_AND_RECEIPTS; no Cargo, GUI, real account, external message, commit or push",
+  "sourceVerification": {
+    "fileCount": 634,
+    "allManifestRowsMatchedCurrentAtInspection": true,
+    "archiveSha256Matches": true,
+    "allArchiveMembersMatchedManifestAtInspection": true,
+    "comparisonBase": "T07/SOURCE_MANIFEST_t07d.json"
+  },
+  "reviewedAreas": [
+    "唯一 ModelConfiguration 发布者、权威 Source、凭证和 Operation 即时应用",
+    "单项配置合并、未知字段、默认无秘密导出与有版本导入",
+    "原始交互身份、后台来源、助手隔离、排队授权复验",
+    "技能路径与资源回收、卡片短能力/CSP/框架导航边界",
+    "MCP 九工具设置动作、首次受限绑定、同 ID epoch、全源 defer 门槛、单请求取消与退出清理",
+    "冻结清单、归档、命令绑定、日志及二进制绑定运行器"
+  ],
+  "findings": [
+    {
+      "id": "T08-REVIEW-MODEL-HEADERS-SHAPE",
+      "priority": "P2",
+      "status": "STATIC_CONFIRMED_RUNTIME_NOT_RUN",
+      "file": "rust/crates/lingxi-service/src/model_configuration.rs",
+      "line": 1239,
+      "title": "损坏的 headers 输入会被保存为空映射",
+      "trigger": "已保存供应商包含请求头，向设置保存入口提交该供应商 patch.headers=false、[] 或字符串。",
+      "evidence": "extract_legacy_provider_changes 只确认 provider patch 为对象；normalize_provider 对 headers.as_object().into_iter().flatten() 为空时仍写入 headers={}，随后模型配置结构校验可通过。",
+      "impact": "损坏输入会清空现有请求头并发布新配置，不应视为成功设置。",
+      "requiredVerification": "显式拒绝不支持的类型；真实服务反例验证返回错误且 Source 字节、网关代次和已保存请求头保持不变。"
+    },
+    {
+      "id": "T08-REVIEW-MODEL-REVOKED-QUEUED-WRITE",
+      "priority": "P2",
+      "status": "STATIC_AUTHORITY_GAP_RUNTIME_REPRODUCTION_REQUIRED",
+      "file": "rust/crates/lingxi-service/src/model_configuration.rs",
+      "line": 251,
+      "title": "模型保存排队后缺少原始权限重验",
+      "trigger": "合法设备请求通过入口后等待 mutation 锁；等待期间撤销其设备凭证；随后释放锁。",
+      "evidence": "save 的 require 仅查询快照 scopes 并发生在 mutex.await 之前；锁内无 auth.validate_principal，FileSafety authorize 使用 || true。auth_guard 仅在 next.run 前认证，revoke_device_credential 会独立改变授权账本。MCP 对应路径已在实际锁内重验。",
+      "impact": "原授权失效后，排队模型保存仍可能写入 Source 并发布。",
+      "requiredVerification": "根端用真实授权账本、模型发布锁和设置调用定向复现；确认后在保存边界重验原授权，覆盖配置、探测和相关等待入口。"
+    }
+  ],
+  "verifiedReceipts": [
+    {
+      "name": "fmt",
+      "receipt": "t08a-fmt.json",
+      "receiptSha256": "421e8ee606678e966a7954d17949e97af55db91444ae47a86f10ea7d1251b82a",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+      "logSha256Matches": true,
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "fmt",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--all",
+        "--",
+        "--check"
+      ]
+    },
+    {
+      "name": "diff",
+      "receipt": "t08a-diff.json",
+      "receiptSha256": "bce5db8c8402ba6e2dd9b1c407cf07f835939eec1fa9e945691de22a4013c4f5",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+      "logSha256Matches": true,
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ]
+    },
+    {
+      "name": "clippy",
+      "receipt": "t08a-clippy.json",
+      "receiptSha256": "3b33ddd0a87a66fddaaf44c21e9d9337c4a48ecfffa4b1ee52a8617da66e0977",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+      "logSha256Matches": true,
+      "command": [
+        "/Users/study_superior/.cargo/bin/cargo",
+        "clippy",
+        "--manifest-path",
+        "rust/Cargo.toml",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "name": "types",
+      "receipt": "t08a-types.json",
+      "receiptSha256": "a907cc20f108f710804a7adfa59b1a331f48b6e63270a2616f2c5cbb0e8e389f",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+      "logSha256Matches": true,
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ]
+    },
+    {
+      "name": "protocol",
+      "receipt": "t08a-protocol.json",
+      "receiptSha256": "d85305c563399b12eb57c385143af25cf7b38f8a23fa6395890e7256917405b6",
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "sourceFingerprint": "cde9214ec9ea667afccdb5f5fd3819ff0eb114690f365b82520d2f1ff63f2134",
+      "logSha256Matches": true,
+      "command": [
+        "bash",
+        "scripts/rust-tauri/r01-t02-check-generated.sh"
+      ]
+    }
+  ],
+  "explicitBoundaries": [
+    "未因开发轮通过声明冻结候选全通过",
+    "T11 的 MCP HTTP/SSE/OAuth、完整 lazy/idle/pinned 生命周期及旧设置页接线不计为 T08 九工具动作证明",
+    "真实账号、付费供应商、其他操作系统、正式包未验证",
+    "T07 两个浏览器失败仍待 T12，R06 用户接受状态不变",
+    "109 个 T08 叶项及 343 条断言不得仅由套件总数批量标为通过"
+  ],
+  "nextStep": "根端处理两个审阅发现、保留 t08a 的协议失败后冻结新候选；独立复核新源码和完整回执后另存后续证据，禁止改写本次记录。"
+}

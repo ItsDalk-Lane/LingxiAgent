@@ -1,0 +1,25 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.81s
+     Running tests/r07_bridge_sdk_platforms.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_sdk_platforms-4f9ae88f63a02c9a)
+
+running 4 tests
+test actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent ... FAILED
+test actual_wechat_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_dingtalk_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_feishu_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+
+failures:
+
+---- actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent stdout ----
+
+thread 'actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent' (483708) panicked at crates/lingxi-service/tests/r07_bridge_sdk_platforms.rs:332:5:
+assertion failed: sends[0]["text"].as_str().unwrap().contains(REPLY)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.71s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_bridge_sdk_platforms`

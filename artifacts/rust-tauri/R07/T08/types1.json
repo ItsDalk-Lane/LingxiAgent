@@ -1,0 +1,26 @@
+{
+  "label": "types1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T04:14:12.198717+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "8c20440416fa02e4088cf98088e80c423ccf81d992f733801cc2283f463a7f27",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T04:14:38.419280+00:00",
+  "sourceFingerprintAfter": "0180863a64dbea793146afc10e0802d9d04e49d84f82f879ddaea64da110640d",
+  "log": "artifacts/rust-tauri/R07/T08/types1.log",
+  "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+  "sourceUnchanged": false
+}

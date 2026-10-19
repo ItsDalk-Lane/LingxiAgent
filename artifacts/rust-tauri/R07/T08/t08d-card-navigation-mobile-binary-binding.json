@@ -1,0 +1,18 @@
+{
+  "candidate": "t08d",
+  "gate": "card-navigation-mobile",
+  "wrapperSha256": "77a507461d37c22e82fcc9941e4860b462e28d67288421c1ee276fddf3490134",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256Before": "d91fbf82e0dd91f80b71264a66570e08972c3c0d1f0cfadaaa41a9c417a6821c",
+  "binarySha256After": "d91fbf82e0dd91f80b71264a66570e08972c3c0d1f0cfadaaa41a9c417a6821c",
+  "binaryUnchanged": true,
+  "buildReceipt": "t08d-build.json",
+  "buildReceiptSha256": "e84f233f4357107bc4fd442ba708164891d30e3ae91cb1e7f0d8fd7316a8d7f0",
+  "uiReceipt": "t08d-card-navigation-mobile.json",
+  "uiReceiptSha256": "e09e0da6b2b4eca008aeaad5bd55b6c3ccba47fc3cd6fc6662f2093258f83919",
+  "sourceFingerprint": "ce4642863c79eaa2d15dedff7c579b56649a9bc2c4cf133e6647faa70879664b",
+  "startedAt": "2026-10-18T09:01:19.141554+00:00",
+  "endedAt": "2026-10-18T09:01:25.010179+00:00",
+  "wrapperExitCode": 0,
+  "scope": "fresh same-candidate build used by actual service UI test; build success does not imply other platforms or manual browser takeover"
+}

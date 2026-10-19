@@ -78,7 +78,11 @@ fn project_history_impl(input: &ProjectionInput<'_>, include_mood: bool) -> Vec<
     let mut items = Vec::new();
     for message in input.messages {
         // 模型档案仅供协议恢复，正文/工具卡仍由原统一投影产生。
-        if message.entry_type == crate::model_history::ENTRY_TYPE {
+        if message.entry_type == crate::model_history::ENTRY_TYPE
+            || message.entry_type == lingxi_adapters::storage::bridge_notice::ENTRY_TYPE
+            || message.entry_type
+                == lingxi_adapters::storage::conversations_collab::DECISION_ENTRY_TYPE
+        {
             continue;
         }
         match classify_message(message) {
@@ -104,6 +108,9 @@ fn project_history_impl(input: &ProjectionInput<'_>, include_mood: bool) -> Vec<
             }
             MessageClass::LegacyAssistant => {
                 items.push(project_legacy_assistant_message(message));
+            }
+            MessageClass::LoopUserPrompt => {
+                items.push(project_loop_user_prompt(message));
             }
             MessageClass::Unknown => items.push(project_legacy_raw(
                 message,
@@ -279,12 +286,19 @@ enum MessageClass {
     LegacyUser,
     FinalAnchor(String),
     LegacyAssistant,
+    /// R07-T07-δ6：循环启动时用户任务 prompt 的展示气泡（entry_type
+    /// = loop-user-prompt，永不进模型上下文；加载层投影成用户气泡，
+    /// 对照现役 message-utils.ts 的 LOOP_USER_PROMPT_MESSAGE_TYPE 臂）。
+    LoopUserPrompt,
     Unknown,
 }
 
 fn classify_message(message: &MessageRow) -> MessageClass {
     if message.entry_type == "hana-session-branch-reset" {
         return MessageClass::ResetMarker;
+    }
+    if message.entry_type == crate::loopx::LOOP_USER_PROMPT_MESSAGE_TYPE {
+        return MessageClass::LoopUserPrompt;
     }
     if message.entry_type != "message" {
         return MessageClass::Unknown;
@@ -539,6 +553,38 @@ fn project_legacy_user_message(message: &MessageRow) -> HistoryItem {
             seq: message.seq as u64,
             raw,
             reason: "legacy user message body is not a JSON object".to_string(),
+        },
+    }
+}
+
+/// 循环任务 prompt 气泡（R07-T07-δ6）：文本取 content.prompt（现役
+/// data.prompt），无 run 归属——它锚定的循环轮 run 在气泡之后到达。
+fn project_loop_user_prompt(message: &MessageRow) -> HistoryItem {
+    let association = RunAssociation::unknown("loop user prompt display bubble has no run linkage");
+    match parse_message_body(&message.content_json) {
+        Ok(mut map) => {
+            let text = map
+                .remove("prompt")
+                .and_then(|v| v.as_str().map(str::to_string))
+                .unwrap_or_default();
+            let mut legacy_fields = serde_json::Map::new();
+            for (key, value) in map {
+                legacy_fields.insert(key, value);
+            }
+            HistoryItem::UserMessage {
+                message_id: message.message_id.clone(),
+                seq: message.seq as u64,
+                committed_at_unix_ms: message.committed_at_unix_ms,
+                text,
+                run: association,
+                legacy_fields,
+            }
+        }
+        Err(raw) => HistoryItem::LegacyRaw {
+            message_id: message.message_id.clone(),
+            seq: message.seq as u64,
+            raw,
+            reason: "loop user prompt body is not a JSON object".to_string(),
         },
     }
 }
@@ -802,6 +848,28 @@ mod tests {
             model_call_id: None,
             committed_at_unix_ms: seq,
         }
+    }
+
+    #[test]
+    fn delivered_host_notice_is_model_context_not_a_fabricated_chat_bubble() {
+        let mut notice = msg(
+            "notice",
+            None,
+            None,
+            "host_context",
+            r#"{"deliveryId":"actual-delivery","text":"已送达"}"#,
+            1,
+        );
+        notice.entry_type = lingxi_adapters::storage::bridge_notice::ENTRY_TYPE.into();
+        let empty = HashSet::new();
+        assert!(project_history(&ProjectionInput {
+            messages: &[notice],
+            events: &[],
+            existing_runs: &empty,
+            lineage: &[],
+            user_anchors_on_branch: &empty
+        })
+        .is_empty());
     }
 
     fn event(seq: u64, run_id: &str, payload: KnownEventPayload) -> StoredEventRow {

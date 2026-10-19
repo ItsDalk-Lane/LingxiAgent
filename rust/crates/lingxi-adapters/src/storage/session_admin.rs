@@ -755,6 +755,7 @@ pub async fn delete_archived_session(
                 }
                 // FK 顺序：子表 file_checkpoints（REFERENCES checkpoints）必须先于
                 // checkpoints 删除（REPAIR-R1 FINDING-07 激活 FK 后的硬性顺序）。
+                super::automation_activity::cleanup_deleted_session(conn,&sid)?;
                 conn.execute("DELETE FROM file_checkpoints WHERE session_id=?1", [&sid])
                     .map_err(map_err)?;
                 conn.execute("DELETE FROM checkpoints WHERE session_id=?1", [&sid])
@@ -1497,6 +1498,9 @@ pub async fn remove_unstarted_creation(
     db.queue().submit(move |connection| with_write_txn(connection, busy, |connection| {
         let used: bool = connection.query_row("SELECT EXISTS(SELECT 1 FROM runs WHERE session_id=?1) OR EXISTS(SELECT 1 FROM messages WHERE session_id=?1)", [&sid], |row| row.get(0)).map_err(map_err)?;
         if used { return Err(StorageError::Conflict { detail: "new session already has durable activity; initialization cleanup refused".into() }); }
+        let owned:bool=connection.query_row("SELECT EXISTS(SELECT 1 FROM sessions WHERE session_id=?1 AND owner_user_id=?2)",rusqlite::params![sid,owner],|row|row.get(0)).map_err(map_err)?;
+        if !owned{return Err(StorageError::Conflict{detail:"unstarted creation ownership changed".into()});}
+        super::automation_activity::cleanup_deleted_session(connection,&sid)?;
         connection.execute("DELETE FROM sessions WHERE session_id=?1 AND owner_user_id=?2", rusqlite::params![sid, owner]).map_err(map_err)?;
         Ok(())
     })).await

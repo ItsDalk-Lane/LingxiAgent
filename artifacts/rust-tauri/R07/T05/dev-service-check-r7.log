@@ -1,0 +1,21 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: future cannot be sent between threads safely
+   --> crates/lingxi-service/src/beautify_generation.rs:746:9
+    |
+746 |         Box::pin(self.submit(request))
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ future returned by `submit` is not `Send`
+    |
+    = help: within `impl std::future::Future<Output = std::result::Result<serde_json::Value, OfficeError>>`, the trait `std::marker::Send` is not implemented for `std::sync::MutexGuard<'_, std::option::Option<CoverExecutionPermit>>`
+note: future is not `Send` as this value is used across an await
+   --> crates/lingxi-service/src/beautify_generation.rs:474:22
+    |
+466 |                 if let Some(p) = cell.lock().map_err(|_| "封面许可锁损坏")?.take() {
+    |                                  ------------------------------------------ has type `std::sync::MutexGuard<'_, std::option::Option<CoverExecutionPermit>>` which is not `Send`
+...
+474 |                     .await?;
+    |                      ^^^^^ await occurs here, with `cell.lock().map_err(|_| "封面许可锁损坏")?` maybe used later
+    = note: required for the cast from `Pin<Box<impl Future<Output = Result<Value, OfficeError>>>>` to `Pin<Box<dyn Future<Output = Result<Value, OfficeError>> + Send>>`
+    = note: the full name for the type has been written to '/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-a61278a3cfce38cb.long-type-14370651290478037055.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error: could not compile `lingxi-service` (lib) due to 1 previous error

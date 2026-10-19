@@ -108,6 +108,7 @@ async function apiPost(baseUrl, endpoint, body, token, timeoutMs, parentSignal) 
   // 如果有父 signal，联动 abort
   const onParentAbort = () => controller.abort();
   parentSignal?.addEventListener("abort", onParentAbort, { once: true });
+  if (parentSignal?.aborted) controller.abort();
 
   try {
     const res = await fetch(url.toString(), {
@@ -115,11 +116,32 @@ async function apiPost(baseUrl, endpoint, body, token, timeoutMs, parentSignal) 
       headers: buildHeaders(token),
       body: JSON.stringify(body),
       signal: controller.signal,
+      redirect: "error",
     });
+    let text: string;
+    if (res.body) {
+      const chunks: Buffer[] = []; let size = 0;
+      for await (const chunk of res.body) {
+        const bytes = Buffer.from(chunk); size += bytes.length;
+        if (size > 4 * 1024 * 1024) throw new Error("微信响应超过大小限制");
+        chunks.push(bytes);
+      }
+      text = Buffer.concat(chunks, size).toString("utf8");
+    } else {
+      text = await res.text();
+      if (Buffer.byteLength(text) > 4 * 1024 * 1024) throw new Error("微信响应超过大小限制");
+    }
     clearTimeout(timer);
-    const text = await res.text();
     if (!res.ok) throw new Error(`${endpoint} HTTP ${res.status}: ${text}`);
-    const json = JSON.parse(text);
+    // 微信消息编号是 uint64；从原始数字文本取值，避免先转 number 后丢失精度。
+    const json = JSON.parse(text, (key: string, value: any, context?: { source?: string }) => {
+      if (["message_id", "msg_id", "svr_id"].includes(key) && typeof value === "number") {
+        if (context?.source && /^\d+$/.test(context.source)) return context.source;
+        if (Number.isSafeInteger(value) && value >= 0) return String(value);
+        throw new Error("微信消息编号无效");
+      }
+      return value;
+    });
     // iLink API 业务错误：HTTP 200 但 ret != 0
     if (json.ret !== undefined && json.ret !== 0) {
       throw new Error(`${endpoint} ret=${json.ret} errcode=${json.errcode ?? ""} errmsg=${json.errmsg ?? ""}`);
@@ -322,19 +344,37 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
   async function downloadEncryptedMedia(platformRef) {
     const { encrypt_query_param, aes_key } = JSON.parse(platformRef);
     const cdnUrl = buildCdnDownloadUrl(encrypt_query_param);
-    const res = await fetch(cdnUrl);
+    const res = await fetch(cdnUrl, { signal: AbortSignal.any([abortController.signal, AbortSignal.timeout(30_000)]), redirect: "error" });
     if (!res.ok) throw new Error(`CDN download failed: ${res.status}`);
-    const encrypted = Buffer.from(await res.arrayBuffer());
-    if (!aes_key) return encrypted;
+    // 加密会多一个填充块；流式限额避免在校验前完整分配超大附件。
+    const limit = 50 * 1024 * 1024;
+    const chunks: Buffer[] = [];
+    let size = 0;
+    if (res.body) {
+      for await (const chunk of res.body) {
+        const bytes = Buffer.from(chunk);
+        size += bytes.length;
+        if (size > limit + 16) throw new Error("微信附件超过大小限制");
+        chunks.push(bytes);
+      }
+    } else {
+      const bytes = Buffer.from(await res.arrayBuffer());
+      if (bytes.length > limit + 16) throw new Error("微信附件超过大小限制");
+      chunks.push(bytes); size = bytes.length;
+    }
+    const encrypted = Buffer.concat(chunks, size);
+    if (!aes_key) { if (encrypted.length > limit) throw new Error("微信附件超过大小限制"); return encrypted; }
     const key = decodeIlinkMediaAesKey(aes_key);
-    return decryptAesEcb(encrypted, key);
+    const decrypted = decryptAesEcb(encrypted, key);
+    if (decrypted.length > limit) throw new Error("微信附件超过大小限制");
+    return decrypted;
   }
 
   // ── 发送消息 ──
 
   async function sendText(chatId, text, contextToken) {
     if (!contextToken) throw new Error("微信: 需要对方最近发过消息才能回复");
-    await api("ilink/bot/sendmessage", {
+    return api("ilink/bot/sendmessage", {
       msg: {
         from_user_id: "",
         to_user_id: chatId,
@@ -348,8 +388,8 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
     });
   }
 
-  async function getTypingTicket(chatId) {
-    const contextToken = getContextToken(chatId);
+  async function getTypingTicket(chatId, suppliedContextToken = null) {
+    const contextToken = suppliedContextToken || getContextToken(chatId);
     if (!contextToken) throw new Error("微信: 需要对方最近发过消息才能发送正在输入状态");
     const cached = typingTicketCache.get(chatId);
     if (cached?.contextToken === contextToken && cached.ticket) return cached.ticket;
@@ -364,9 +404,9 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
     return ticket;
   }
 
-  async function sendTypingStatus(chatId, status) {
-    const typingTicket = await getTypingTicket(chatId);
-    await api("ilink/bot/sendtyping", {
+  async function sendTypingStatus(chatId, status, contextToken = null) {
+    const typingTicket = await getTypingTicket(chatId, contextToken);
+    return await api("ilink/bot/sendtyping", {
       ilink_user_id: chatId,
       typing_ticket: typingTicket,
       status,
@@ -408,6 +448,7 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
   }
 
   async function sendImageMessage(chatId, uploaded, contextToken, caption) {
+    const results = [];
     const items = [];
     if (caption) items.push({ type: MessageItemType.TEXT, text_item: { text: caption } });
     items.push({
@@ -422,7 +463,7 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
       },
     });
     for (const item of items) {
-      await api("ilink/bot/sendmessage", {
+      results.push(await api("ilink/bot/sendmessage", {
         msg: {
           from_user_id: "", to_user_id: chatId,
           client_id: crypto.randomUUID(),
@@ -430,12 +471,13 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
           item_list: [item], context_token: contextToken,
         },
         base_info: { channel_version: "1.0.0" },
-      });
+      }));
     }
+    return results;
   }
 
   async function sendFileMessage(chatId, uploaded, contextToken, filename) {
-    await api("ilink/bot/sendmessage", {
+    return api("ilink/bot/sendmessage", {
       msg: {
         from_user_id: "", to_user_id: chatId,
         client_id: crypto.randomUUID(),
@@ -534,6 +576,8 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
 
     onMessage({
       platform: "wechat",
+      messageId: msg.message_id ?? msg.msg_id ?? null,
+      replyContext: { contextToken: msg.context_token || null },
       agentId,
       chatId: fromUserId,
       userId: fromUserId,
@@ -607,21 +651,23 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
       return !!getContextToken(chatId);
     },
 
-    async sendReply(chatId, text) {
-      const ctx = getContextToken(chatId);
+    async sendReply(chatId, text, options: Record<string, any> = {}) {
+      const ctx = options.replyContext?.contextToken || options.contextToken || getContextToken(chatId);
       if (!ctx) throw new Error("微信: 需要对方最近发过消息才能回复");
       // 长文本分段
+      const results = [];
       for (let i = 0; i < text.length; i += MSG_CHUNK_LIMIT) {
-        await sendText(chatId, text.slice(i, i + MSG_CHUNK_LIMIT), ctx);
+        results.push(await sendText(chatId, text.slice(i, i + MSG_CHUNK_LIMIT), ctx));
       }
+      return results;
     },
 
-    async sendTypingIndicator(chatId) {
-      await sendTypingStatus(chatId, 1);
+    async sendTypingIndicator(chatId, options: Record<string, any> = {}) {
+      return await sendTypingStatus(chatId, 1, options.replyContext?.contextToken || options.contextToken || null);
     },
 
-    async cancelTypingIndicator(chatId) {
-      await sendTypingStatus(chatId, 2);
+    async cancelTypingIndicator(chatId, options: Record<string, any> = {}) {
+      return await sendTypingStatus(chatId, 2, options.replyContext?.contextToken || options.contextToken || null);
     },
 
     // 不提供 sendBlockReply：iLink API 对连续发消息有速率限制，
@@ -645,20 +691,19 @@ export function createWechatAdapter({ botToken, lingxiHome, agentId, onMessage, 
       }
     },
 
-    async sendMediaBuffer(chatId, buffer, { mime, filename }) {
-      const ctx = getContextToken(chatId);
+    async sendMediaBuffer(chatId, buffer, { mime, filename, replyContext }: Record<string, any>) {
+      const ctx = replyContext?.contextToken || getContextToken(chatId);
       if (!ctx) throw new Error("微信: 需要对方最近发过消息才能回复");
       const isImage = mime?.startsWith("image/");
       const mediaType = isImage ? UploadMediaType.IMAGE : UploadMediaType.FILE;
       debugLog()?.log("bridge", `[wechat] sendMediaBuffer: mime=${mime}, filename=${filename}, size=${buffer.length}, mediaType=${mediaType}, isImage=${isImage}`);
       const uploaded = await uploadMedia(buffer, chatId, mediaType);
       debugLog()?.log("bridge", `[wechat] uploaded: filekey=${uploaded.filekey}, downloadParam=${!!uploaded.downloadParam}`);
-      if (isImage) {
-        await sendImageMessage(chatId, uploaded, ctx, "");
-      } else {
-        await sendFileMessage(chatId, uploaded, ctx, filename || "file");
-      }
+      const result = isImage
+        ? await sendImageMessage(chatId, uploaded, ctx, "")
+        : await sendFileMessage(chatId, uploaded, ctx, filename || "file");
       debugLog()?.log("bridge", `[wechat] sendMediaBuffer done: ${filename}`);
+      return result;
     },
 
     async downloadImage(platformRef) {

@@ -3,6 +3,12 @@ import path from "path";
 import { execFileSync } from "child_process";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import WebSocket from "ws";
+import type { ClientHello, MobileBootstrapResponse, ServerHello } from "../contracts/generated/ts/lingxi-protocol.ts";
+import { createRequire } from "node:module";
+const require_ = createRequire(import.meta.url);
+const { DATA_EPOCH } = require_("../shared/contract-versions.cjs");
+const CLI_VERSION: string = require_("../package.json").version;
 
 type RustInstanceRecord = {
   serverKind: string;
@@ -287,13 +293,15 @@ export class RustCliClient {
     this.source = connection.source;
   }
 
-  async request(endpoint: string): Promise<any> {
+  async request(endpoint: string, options: { method?: string; body?: unknown } = {}): Promise<any> {
+    if (!endpoint.startsWith("/lingxi/v1/") || endpoint.startsWith("//")) throw new Error("Invalid Rust service route");
     const headers: Record<string, string> = {};
     if (this.token) headers.Authorization = `Bearer ${this.token}`;
+    if (options.body !== undefined) headers["Content-Type"] = "application/json";
     let response: Response;
     try {
       response = await fetch(`${this.baseUrl}${endpoint}`, {
-        headers, redirect: "error", signal: AbortSignal.timeout(5000),
+        headers, method: options.method || "GET", body: options.body === undefined ? undefined : JSON.stringify(options.body), redirect: "error", signal: AbortSignal.timeout(5000),
       });
     } catch (err) {
       throw new Error(`Rust service at ${this.baseUrl} is unreachable: ${err instanceof Error ? err.message : String(err)}`);
@@ -341,9 +349,104 @@ export class RustCliClient {
     return body.sessions;
   }
 
+  async context(target: { agentId?: string; sessionId?: string } = {}): Promise<RustClientContext> {
+    const query = new URLSearchParams();
+    if (target.agentId) query.set("agentId", target.agentId);
+    if (target.sessionId) query.set("sessionId", target.sessionId);
+    const value = await this.request(`/lingxi/v1/mobile/bootstrap${query.size ? `?${query}` : ""}`) as MobileBootstrapResponse;
+    if (!(value.currentAgentId === null || value.currentAgentId === undefined || typeof value.currentAgentId === "string")
+      || !["ready", "unconfigured", "unavailable"].includes(value.modelState)
+      || (value.currentModel != null && (!isRecord(value.currentModel) || typeof value.currentModel.id !== "string" || typeof value.currentModel.provider !== "string"))) {
+      throw new Error("Rust client context response is incomplete");
+    }
+    return value as unknown as RustClientContext;
+  }
+
+  async newSession(agentId: string) {
+    if (!agentId) throw new Error("No configured Agent is selected");
+    const value = await this.request("/lingxi/v1/sessions/new", { method: "POST", body: { agentId } });
+    if (typeof value.sessionId !== "string" || value.path !== `native:${value.sessionId}` || value.agentId !== agentId) throw new Error("Rust new session identity response is invalid");
+    return value as RustSession;
+  }
+
+  async history(sessionId: string) {
+    validateRustSessionId(sessionId);
+    const value = await this.request(`/lingxi/v1/sessions/${encodeURIComponent(sessionId)}/history?all=1&reconciliation=1`);
+    if (value.schemaVersion !== "lingxi.canonical-history.v1" || value.sessionId !== sessionId || !Array.isArray(value.items)
+      || !isRecord(value.reconciliation) || value.reconciliation.sessionId !== sessionId || value.reconciliation.sessionPath !== `native:${sessionId}`
+      || !["running", "unknown", "reconciled_idle"].includes(value.reconciliation.runStatus) || value.reconciliation.complete !== true) {
+      throw new Error("Rust canonical session history response is incomplete");
+    }
+    return value;
+  }
+
+  async approvals(sessionId: string): Promise<RustPendingApproval[]> {
+    validateRustSessionId(sessionId);
+    const value = await this.request(`/lingxi/v1/sessions/${encodeURIComponent(sessionId)}/approvals`);
+    if (!Array.isArray(value.approvals) || value.approvals.some((row: any) => !isRecord(row) || typeof row.approvalId !== "string" || typeof row.runId !== "string" || typeof row.target !== "string")) throw new Error("Rust approval list is incomplete");
+    return value.approvals;
+  }
+
+  async answerApproval(sessionId: string, approvalId: string, action: "confirmed" | "rejected") {
+    validateRustSessionId(sessionId);
+    if (!approvalId || /[\r\n]/.test(approvalId)) throw new Error("Invalid approval ID");
+    return this.request(`/lingxi/v1/sessions/${encodeURIComponent(sessionId)}/approvals/${encodeURIComponent(approvalId)}`, { method: "POST", body: { action } });
+  }
+
+  async openWire(onFrame: (frame: any) => void, onDisconnect: (error: Error) => void): Promise<WebSocket> {
+    const ticket = await this.request("/lingxi/v1/ws-ticket", { method: "POST", body: {} });
+    if (typeof ticket.ticket !== "string" || !ticket.ticket || typeof ticket.expiresAtUnixMs !== "number") throw new Error("Rust WebSocket ticket response is incomplete");
+    const url = new URL(this.baseUrl); url.protocol = url.protocol === "https:" ? "wss:" : "ws:"; url.pathname = "/lingxi/v1/ws"; url.searchParams.set("wsTicket", ticket.ticket);
+    return new Promise((resolve, reject) => {
+      const socket = new WebSocket(url, { followRedirects: false, maxPayload: 8 * 1024 * 1024, handshakeTimeout: 5000 });
+      let ready = false;
+      const timer = setTimeout(() => { socket.terminate(); reject(new Error("Rust wire handshake timed out")); }, 5000);
+      socket.on("open", () => {
+        const hello: ClientHello = { protocol: "lingxi.wire", clientKind: "cli", clientVersion: CLI_VERSION, protocolMin: 1, protocolMax: 1, caps: [] };
+        socket.send(JSON.stringify(hello));
+      });
+      socket.on("message", data => {
+        let frame: any;
+        try { frame = JSON.parse(data.toString()); } catch { socket.terminate(); if (!ready) reject(new Error("Rust wire response is not JSON")); else onDisconnect(new Error("Rust wire response is not JSON")); return; }
+        if (!ready) {
+          const hello = frame as ServerHello;
+          if (hello.protocol !== "lingxi.wire" || hello.selectedProtocol !== 1
+            || !Number.isInteger(hello.wireProtocolMin) || !Number.isInteger(hello.wireProtocolMax)
+            || hello.wireProtocolMin > 1 || hello.wireProtocolMax < 1
+            || hello.dataEpoch !== DATA_EPOCH || hello.serverKind !== "lingxi-service" || typeof hello.serverVersion !== "string" || !hello.serverVersion.trim()) {
+            clearTimeout(timer); socket.terminate(); reject(new Error("Rust wire handshake identity or contract does not match")); return;
+          }
+          ready = true; clearTimeout(timer); resolve(socket); return;
+        }
+        onFrame(frame);
+      });
+      socket.on("error", error => { if (!ready) { clearTimeout(timer); reject(new Error(this.redact(error.message))); } });
+      socket.on("close", (code) => { clearTimeout(timer); if (!ready) reject(new Error(`Rust wire closed before handshake (${code})`)); else onDisconnect(new Error(`Rust wire disconnected (${code})`)); });
+    });
+  }
+
+  redact(value: unknown) { return safeRustTerminalText(this.token ? String(value).replaceAll(this.token, "[redacted]") : value, 4096); }
+
   async session(sessionId: string) {
     if (!sessionId || /[/?#]/.test(sessionId)) throw new Error("Invalid session ID");
     if (this.source === "rust-local-token") await this.identity();
     return this.request(`/lingxi/v1/sessions/${encodeURIComponent(sessionId)}`);
   }
+}
+
+
+// 共享 bootstrap 的消费形状；正式类型是 contracts/generated 的 MobileBootstrapResponse。
+export interface RustClientContext {
+  currentAgentId: string | null;
+  agentName?: string;
+  currentModel: { id: string; provider: string } | null;
+  modelState: "ready" | "unconfigured" | "unavailable";
+  thinkingLevel?: string;
+  agentYuan?: string;
+  userName?: string;
+}
+export interface RustSession { sessionId: string; agentId: string; title?: string; path?: string; }
+export interface RustPendingApproval { approvalId: string; target: string; runId: string; summary?: string; }
+function validateRustSessionId(value: string) {
+  if (!value || /[/?#\r\n]/.test(value)) throw new Error("Invalid session ID");
 }

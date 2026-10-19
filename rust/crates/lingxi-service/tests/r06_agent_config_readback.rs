@@ -22,6 +22,7 @@ struct Server {
     addr: String,
     token: String,
     home: PathBuf,
+    source: PathBuf,
     stop: tokio::sync::oneshot::Sender<()>,
     handle: tokio::task::JoinHandle<()>,
 }
@@ -76,9 +77,17 @@ async fn boot() -> Server {
         shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
     // 真实切换会创建会话；读回夹具声明可派发模型，不执行外部供应商请求。
-    let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
-        &json!({"providers":{"readback-fixture":{"protocol":"openai-completions","endpoint":"http://127.0.0.1:1/v1","auth":{"kind":"none"}}},"models":{"chat":{"provider":"readback-fixture","model":"synthetic","capabilities":{"tools":true}}}}).to_string()
-    ).unwrap();
+    let plane_document = json!({"providers":{"readback-fixture":{"protocol":"openai-completions","endpoint":"http://127.0.0.1:1/v1","auth":{"kind":"none"}}},"models":{"chat":{"provider":"readback-fixture","model":"synthetic","capabilities":{"tools":true}}}});
+    let plane =
+        lingxi_adapters::models::config::ModelPlaneConfig::from_value(plane_document.clone())
+            .unwrap();
+    let source = layout.runtime_dir.join("models.json");
+    std::fs::write(&source, serde_json::to_vec_pretty(&plane_document).unwrap()).unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(&source, std::fs::Permissions::from_mode(0o600)).unwrap();
+    }
     let credentials = std::sync::Arc::new(
         lingxi_service::credentials::CredentialService::bootstrap(
             &plane,
@@ -92,6 +101,13 @@ async fn boot() -> Server {
             lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
         )),
         credential_service: Some(credentials),
+        network_plane: Some(lingxi_adapters::models::network::NetworkPlane::direct_isolated()),
+        model_plane_source: Some(lingxi_service::config::ModelPlaneSource::ModelsFile {
+            path: source.clone(),
+        }),
+        model_plane_activation: Some(std::sync::Arc::new(std::sync::atomic::AtomicBool::new(
+            true,
+        ))),
         ..ServiceDeps::default()
     };
     let state = ServiceState::bootstrap_with_deps(config, &layout, deps)
@@ -153,6 +169,7 @@ async fn boot() -> Server {
         addr: addr.to_string(),
         token,
         home,
+        source,
         stop,
         handle,
     }
@@ -281,10 +298,11 @@ async fn put_config_provider_save_readback() {
     make_agents(&server).await;
     let home = &server.home;
     let a_config = home.join("agents/agreada/config.yaml");
-    let _b_config = home.join("agents/agreadb/config.yaml");
+    let b_config = home.join("agents/agreadb/config.yaml");
 
     // ── 保存（9E3981A9BFCA）：纯供应商请求 → 目录/插件/投影/焦点 YAML ──
     let a_before = std::fs::read(&a_config).unwrap();
+    let b_before = std::fs::read(&b_config).unwrap();
     let (status, body) = ok(
         &server,
         "PUT",
@@ -302,7 +320,7 @@ async fn put_config_provider_save_readback() {
     .await;
     assert_eq!(status, 200, "供应商保存：{body}");
 
-    // 权威目录：自定义 provider 的用户数据（含明文 key）以 catalog 为准。
+    // 兼容目录仍须正确投影；实际运行以统一模型Source为准。
     let catalog = read_catalog(&server);
     assert_eq!(
         catalog["providers"]["my-custom"]["api_key"],
@@ -364,10 +382,15 @@ async fn put_config_provider_save_readback() {
         assert_eq!(mode, 0o600, "秘密投影 0600");
     }
 
-    // 焦点 B 的 config.yaml 被刷新重写（纯供应商成功不经 A 的显式保存）。
-    assert!(
-        yaml_of(&server, "agreadb").contains("name: B"),
-        "B 语义不变（仍叫 B）"
+    // 纯供应商设置不重写焦点B；按YAML语义确认姓名，不能依赖引号格式。
+    assert_eq!(
+        std::fs::read(&b_config).unwrap(),
+        b_before,
+        "焦点B字节完全不变"
+    );
+    assert_eq!(
+        lingxi_adapters_yaml_json(&server, "agreadb")["agent"]["name"],
+        "B"
     );
     assert!(
         !yaml_of(&server, "agreadb").contains("my-custom"),
@@ -415,9 +438,9 @@ async fn put_config_provider_save_readback() {
         "内容不变且权限正确时不重写 models.json"
     );
 
-    // ── 同请求多项：后项失败保留前项（部分成功，不把 HTTP 错误当回滚）──
-    // 注：serde_json 无 preserve_order，providers 键按字典序处理
-    // （aa-first 先于 zz-bad）——逐项顺序处理语义与现役一致。
+    // ── 整批纯校验先于写入：坏元数据不能让同批前项或秘密进入Source ──
+    let source_before_invalid = std::fs::read(&server.source).unwrap();
+    let catalog_before_invalid = std::fs::read(home.join("provider-catalog.json")).unwrap();
     let (status, body) = ok(
         &server,
         "PUT",
@@ -430,11 +453,21 @@ async fn put_config_provider_save_readback() {
         })),
     )
     .await;
-    assert_eq!(status, 500, "后项校验失败如实报错：{body}");
+    assert_eq!(status, 400, "模型元数据在整批写入前拒绝：{body}");
+    assert_eq!(body["result"]["saved"], false);
+    assert_eq!(body["result"]["applied"], false);
+    assert_eq!(
+        std::fs::read(&server.source).unwrap(),
+        source_before_invalid
+    );
+    assert_eq!(
+        std::fs::read(home.join("provider-catalog.json")).unwrap(),
+        catalog_before_invalid
+    );
     let catalog = read_catalog(&server);
     assert!(
-        catalog["providers"]["aa-first"]["api_key"] == json!("k1"),
-        "前项保留（部分成功）"
+        catalog["providers"].get("aa-first").is_none(),
+        "尚未验证完的整批前项也不能抢先写入"
     );
     assert!(
         catalog["providers"].get("zz-bad").is_none(),
@@ -443,6 +476,51 @@ async fn put_config_provider_save_readback() {
     assert!(
         catalog["providers"]["my-custom"].is_object(),
         "先前保存不受影响"
+    );
+
+    // ── 真正保存后投影失败：已发布的Source和新目录不能冒称回滚 ──
+    let damaged = b"{damaged compatibility projection";
+    std::fs::write(home.join("provider-catalog.json"), damaged).unwrap();
+    let committed_patch = json!({"providers":{"aa-first":{"api_key":"k1","base_url":"https://first.example/v1","models":["a"]}}});
+    let (status, body) = ok(
+        &server,
+        "PUT",
+        "/lingxi/v1/agents/agreada/config",
+        Some(&committed_patch),
+    )
+    .await;
+    assert_eq!(status, 500, "真实投影故障应如实报告：{body}");
+    assert_eq!(body["code"], "model_projection_unconfirmed");
+    assert_eq!(body["result"]["saved"], true);
+    assert_eq!(body["result"]["applied"], true);
+    let source = read_json(&server.source);
+    assert_eq!(source["providers"]["aa-first"]["auth"]["apiKey"], "k1");
+    assert_eq!(
+        source["models"]["chat"]["model"], "synthetic",
+        "单项设置保留原聊天绑定"
+    );
+    let (status, current) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200, "{current}");
+    assert_eq!(current["providers"]["aa-first"]["models"][0]["id"], "a");
+    assert_eq!(current["providers"]["aa-first"]["api_key"], "********");
+    assert!(!current.to_string().contains("\"k1\""));
+    assert_eq!(
+        std::fs::read(home.join("provider-catalog.json")).unwrap(),
+        damaged,
+        "读面不修复或回灌损坏的兼容目录"
+    );
+    std::fs::write(home.join("provider-catalog.json"), &catalog_before_invalid).unwrap();
+    let (status, body) = ok(
+        &server,
+        "PUT",
+        "/lingxi/v1/agents/agreada/config",
+        Some(&committed_patch),
+    )
+    .await;
+    assert_eq!(status, 200, "修复自有故障后重发确认投影：{body}");
+    assert_eq!(
+        read_catalog(&server)["providers"]["aa-first"]["api_key"],
+        "k1"
     );
 
     // ── 全局字段：另含 locale 才写 preferences ──
@@ -561,7 +639,7 @@ async fn put_config_provider_save_readback() {
         })),
     )
     .await;
-    assert_eq!(status, 500, "保留模型 id 拒绝");
+    assert_eq!(status, 400, "保留模型 id 在写入前拒绝");
     assert!(
         read_catalog(&server)["providers"]["deepseek"]["api_key"] == json!("sk-ds2"),
         "拒绝后目录保持先前值"
@@ -575,6 +653,16 @@ async fn put_config_inline_credential_transfer_readback() {
     let server = boot().await;
     make_agents(&server).await;
     let home = &server.home;
+
+    // 只有key的旧兼容补丁编辑已存在供应商，真实Source先声明其可执行地址。
+    let (status, body) = ok(
+        &server,
+        "PUT",
+        "/lingxi/v1/agents/agreada/config",
+        Some(&json!({"providers":{"myprov":{"base_url":"https://a.example/v1","models":[]}}})),
+    )
+    .await;
+    assert_eq!(status, 200, "准备真实已配置供应商：{body}");
 
     // ── 转存（464E58DEC9E2）：api 块凭证 → 目录；A YAML 清空不留明文 ──
     let (status, body) = ok(
@@ -686,7 +774,7 @@ async fn put_config_inline_credential_transfer_readback() {
         })),
     )
     .await;
-    assert_eq!(status, 500, "providers 段失败：{status}");
+    assert_eq!(status, 400, "providers 段写前校验失败：{status}");
     assert!(
         read_catalog(&server)["providers"].get("keptprov").is_none(),
         "失败请求里 api 段未执行（顺序：providers 在 api 前）"
@@ -696,7 +784,7 @@ async fn put_config_inline_credential_transfer_readback() {
         &server,
         "PUT",
         "/lingxi/v1/agents/agreada/config",
-        Some(&json!({ "api": { "provider": "keptprov", "api_key": "kept-key" } })),
+        Some(&json!({ "api": { "provider": "keptprov", "api_key": "kept-key", "base_url":"https://kept.example/v1" } })),
     )
     .await;
     assert_eq!(status, 200);
@@ -714,7 +802,7 @@ async fn put_config_inline_credential_transfer_readback() {
         })),
     )
     .await;
-    assert_eq!(status, 500, "后续失败");
+    assert_eq!(status, 400, "后续输入在写入前拒绝");
     assert_eq!(
         read_catalog(&server)["providers"]["keptprov"]["api_key"],
         json!("kept-key"),
@@ -1717,7 +1805,10 @@ async fn get_config_provider_registry_failure_gives_empty_providers_not_an_error
         "agent:\n  name: A\napi:\n  provider: pa\n  api_key: sk-still-masked\n",
     )
     .unwrap();
-    // 损坏的权威目录：供应商读取失败。
+    let (status, before) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
+    assert_eq!(status, 200, "{before}");
+    let source_before = std::fs::read(&server.source).unwrap();
+    // 损坏的旧兼容目录不能抹掉已发布的权威模型。
     let catalog_path = server.home.join("provider-catalog.json");
     std::fs::write(&catalog_path, "{ this is not json").unwrap();
     let broken = std::fs::read(&catalog_path).unwrap();
@@ -1725,11 +1816,14 @@ async fn get_config_provider_registry_failure_gives_empty_providers_not_an_error
     let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
     assert_eq!(status, 200, "供应商失败不致整体失败：{body}");
     assert_eq!(
-        body["providers"],
-        json!({}),
-        "失败 → 空对象（非 null/数组）"
+        body["providers"], before["providers"],
+        "兼容目录损坏仍保留真实已发布目录，不能伪装成空对象"
     );
     assert!(body["providers"].is_object());
+    assert_eq!(
+        body["providers"]["readback-fixture"]["models"][0]["id"],
+        "synthetic"
+    );
     // 其余内容照常：yaml、全局注入、availableTools、掩码。
     assert_eq!(body["agent"]["name"], json!("A"));
     assert_eq!(body["api"]["api_key"], json!("********"));
@@ -1739,6 +1833,7 @@ async fn get_config_provider_registry_failure_gives_empty_providers_not_an_error
     assert!(!body.to_string().contains("sk-still-masked"));
     // 读面不修复/改写损坏目录。
     assert_eq!(std::fs::read(&catalog_path).unwrap(), broken);
+    assert_eq!(std::fs::read(&server.source).unwrap(), source_before);
 
     shutdown(server).await;
 }
@@ -1748,13 +1843,19 @@ async fn get_config_without_catalog_reads_without_creating_it() {
     let server = boot().await;
     make_agents(&server).await;
     assert!(!server.home.join("provider-catalog.json").exists());
+    let source_before = std::fs::read(&server.source).unwrap();
     let (status, body) = ok(&server, "GET", "/lingxi/v1/agents/agreada/config", None).await;
     assert_eq!(status, 200, "{body}");
-    assert_eq!(body["providers"], json!({}));
+    assert!(body["providers"].is_object());
+    assert_eq!(
+        body["providers"]["readback-fixture"]["models"][0]["id"],
+        "synthetic"
+    );
     assert!(
         !server.home.join("provider-catalog.json").exists(),
         "读面不因遗留目录迁移而落盘"
     );
+    assert_eq!(std::fs::read(&server.source).unwrap(), source_before);
     shutdown(server).await;
 }
 

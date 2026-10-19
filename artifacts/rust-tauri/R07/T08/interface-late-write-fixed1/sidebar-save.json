@@ -1,0 +1,152 @@
+{
+  "scenario": "sidebar-save",
+  "aSaved": true,
+  "bSnapshotUnchanged": true,
+  "bToastUnchanged": true,
+  "noHostOrWindowEvents": true,
+  "noOsReload": true,
+  "aPersistenceUnchangedAfterLateResponse": true,
+  "requests": [
+    {
+      "server": "A",
+      "path": "/lingxi/v1/access/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/agents",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/models",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/sidebar-ui",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/sessions/workspace-rollback",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "A",
+      "path": "/lingxi/v1/preferences/sidebar-ui",
+      "method": "PUT",
+      "status": 200,
+      "delayed": true
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/server/identity",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/config",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/agents",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/snapshot",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/models",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/settings/avatar-health",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/providers/summary",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/preferences/sidebar-ui",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    },
+    {
+      "server": "B",
+      "path": "/lingxi/v1/sessions/workspace-rollback",
+      "method": "GET",
+      "status": 200,
+      "delayed": false
+    }
+  ],
+  "desktopBoundary": "owned reload spy; no OS registration"
+}

@@ -1,0 +1,76 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "candidate": "t08e",
+  "reviewedAt": "2026-10-18T09:27:41.253659+00:00",
+  "method": "只读复核冻结归档、原始回执和日志；不运行Cargo/GUI，不修改产品、测试、计划和验证工具。仅新建本报告。",
+  "finalAcceptance": "FAILED",
+  "result": {
+    "executedGates": 20,
+    "passedGates": 19,
+    "failedGates": 1,
+    "notRun": [],
+    "service": {
+      "targets": 34,
+      "passedCases": 876,
+      "failedCases": 3
+    },
+    "ui": {
+      "files": 66,
+      "passedCases": 552,
+      "failedCases": 0,
+      "namedCasesFromAggregateNotClaimed": true
+    }
+  },
+  "bindings": {
+    "sourceFingerprint": "f8b3924db2d194834f38efcdbbf231762a9f057d0b8c2f70361b37dd6ddb5a1e",
+    "manifestSha256": "2edd22bf548ad7978d23a0ab096ecbd11d8b9c2d7892d6f8c1ff9924a905ff80",
+    "archiveSha256": "4058522c9783f2d975a15dfe4e40623c51a47e67e55fa4d074703b3d859f2416",
+    "gatePlanSha256": "44f6d6007d5de63f1058363b788aeda7154dfb071c3722b6ef69366991d80ba1",
+    "resultsSha256": "c31d4fd9f37e853b9ed173aa65dee13df92ed407662072f93795166625d844b3",
+    "archiveRowsVerified": 651,
+    "all20ReceiptAndLogHashesVerified": true,
+    "all20ExactFrozenCommandsExitCodesAndSourceBeforeAfterVerified": true,
+    "all20VerificationToolsUnchangedAndPlanHashVerified": true,
+    "freshBuildBinarySha256": "d91fbf82e0dd91f80b71264a66570e08972c3c0d1f0cfadaaa41a9c417a6821c",
+    "all4BuildBoundGateLinksAndBeforeAfterBinaryHashesVerified": true,
+    "buildBoundGates": [
+      "ui",
+      "card-navigation-desktop",
+      "card-navigation-mobile",
+      "metadata-redaction-binary"
+    ],
+    "currentWorkingTreeAfterRepairReleaseNotUsedAsCandidate": true,
+    "closeStateScope": "root的关闭记录为源码和工具关闭时匹配；本审阅独立验证归档及各门禁前后记录，不将之后f修改误判为e执行期间漂移。"
+  },
+  "failures": [
+    {
+      "target": "r06_agent_delete_skills_live::agent_delete_connection_changes_preserve_both_real_service_roots",
+      "actual": "guard-original首个子场景真实UI子进程失败；原JSON报告指向R06AgentDeleteConnectionReview.test.tsx:48的ready等待断言false。",
+      "scope": "尚未进入该子场景后续删除与双服务守卫断言，不计这些子场景通过。原日志没有完整初始化HTTP时序，不断言唯一原因是一秒等待。"
+    },
+    {
+      "target": "r06_agent_delete_skills_live::agent_delete_orphan_skills_current_desktop_rust_api_and_ui",
+      "actual": "complete首个真实UI子场景失败；原JSON报告指向R06AgentDeleteRustLive.test.tsx:50的ready等待断言false。",
+      "scope": "服务预先的缺凭证DELETE 401是预期权限反例，不作为本次失败根因。后续删除/孤立技能结果尚未执行，不计通过。"
+    },
+    {
+      "target": "r06_chat_wire::native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject",
+      "actual": "真实Electron子进程runtime-capsule-mounted断言false，native child exit1，Rust父目标失败。",
+      "scope": "最终正文等待不证明lazy胶囊DOM挂载；没有证据证明原失败后必然自行挂载。需同一原等待界限观察胶囊再实跑，不改业务判断。"
+    }
+  ],
+  "nextRepairReviewRequirements": [
+    "不使用ready单独放行：当前正常与错误/watchdog路径都可ready；必须实际identity、请求成功、agents/model/snapshot/config及owner有效。",
+    "不能以正常Rust成功路径本来为true的rustSettingsUnavailable要求false，亦不能借其兼容分支吞掉真正error。",
+    "保留原15秒初始化边界及60秒父预算、原删除/撤权/连接变化/失败断言；失败收据记录真实错误，不伪造数据或手动ready。",
+    "聊天胶囊检查加入原20秒最终正文until，不重置等待预算，保留其后立即断言和全部网络/交互动作。",
+    "后继f必须完整同候选实跑；本轮19个通过不得与后继局部绿拼成完整通过。"
+  ],
+  "retainedBoundaries": [
+    "本轮原management LAN目标通过，先前c/owned副本LAN问题原因未明；不声明已修根因。",
+    "原a/b/c/d/e失败和未执行记录保留；e仍FAILED，T08/R07未完成。",
+    "native-picker-binding只验证同字节原生产物和闭包下先前实际人工检查证据复用；不声称e重复人工接管。",
+    "新增stream消费者检查是Node producer加实际handler/store/WS机制回归，非Rust全链，未新测reset/hydrate同流尾帧。",
+    "真实账号、其他操作系统、正式包与T11远程MCP全生命周期等原范围限制仍保留。"
+  ]
+}

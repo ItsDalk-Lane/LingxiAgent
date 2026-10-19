@@ -1,0 +1,66 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:40:18.297014+00:00",
+  "stage": "R07-T08",
+  "candidate": null,
+  "finalAcceptance": "pending",
+  "sourceDisposition": "FIX_PRESENT_STATIC_REVIEW_PASSED_RUNTIME_AND_NEXT_FROZEN_GATES_PENDING",
+  "sourceHashes": [
+    {
+      "path": "rust/crates/lingxi-service/src/model_configuration.rs",
+      "sha256": "8762fdd86907ca5be273b9b1ef403111f359eae8dfc96f44e6f0455e49ee9b49"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agent_config_readback.rs",
+      "sha256": "3a0044ca2d12748d3499dac5e8a8b518ffc7f277d0160aad6a40dfe56f6e7ac9"
+    },
+    {
+      "path": "shared/secret-custody.ts",
+      "sha256": "ba91d1e574f9ddfe7b0f8360a2a449b80370e8b23f68aceb2fe8ddf59d1f278b"
+    },
+    {
+      "path": "tests/secret-custody.test.ts",
+      "sha256": "76c22e64a42241b4d2b71145b5c2ed452ae7b1765c20bf9586c18feef4810378"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_metadata_redaction.rs",
+      "sha256": "860b2b90ff50a0d63ba7661cc7772e8f68be9a5ab406e04f8bca5ffe7f1464f0"
+    }
+  ],
+  "originalActualReproduction": {
+    "receipt": "metadata-redaction-reproduce4.json",
+    "receiptSha256": "d8de315ca847d80eb2eb37598b89bd6529c2e126b6e1e2eceb98ae57f527e751",
+    "exitCode": 1,
+    "sourceUnchanged": true,
+    "logSha256Matches": true,
+    "fact": "Actual isolated production binary HTTP ProviderPatch save200; summary exposes api_key/access_token/refresh_token, config/export expose snake-case access_token/refresh_token; ordinary metadata/source preserved. Binary hash unchanged and shutdown0. No claim that whole candidate passed."
+  },
+  "fixReview": [
+    "Final snapshot.providers recursive exact-key mask occurs after catalog/live credential overlay",
+    "Rust18-key and TS exact known-key vocabularies add snake-case access_token/refresh_token without suffix matching",
+    "Save authorization reuses same recursive known-secret collector, preserving existing authHeader.value permission rule",
+    "Known-secret mask markers resolve against same field path; model arrays first associate same model ID, never another provider/model positional row",
+    "Missing original known secret resolves empty, not borrowed secret or stars",
+    "Provider metadata and auth.apiKey masks restore same original path; ordinary metadata remains intact",
+    "authHeader.value special preservation requires same prior authHeader kind and case-insensitively identical header name, rejects mismatches; ordinary metadata.value mask remains literal",
+    "Normal model/provider parsing, credential field restrictions, ModelPlane schema checks and preflight remain downstream after normalization; no validation bypass observed"
+  ],
+  "testSourceReview": {
+    "target": "r07_t08_metadata_redaction",
+    "cases": 3,
+    "covers": [
+      "Actual Source+owner and read-only HTTP summary/config/export; registered secrets masked and ordinary metadata retained",
+      "Masked whole model-list HTTP save via actual preserving /agents/a/config route, reorder by ID, new ID no secret borrowing, authorized empty/null clears",
+      "Actual device without secrets.write denied via real HTTP preserving payload route and separately unique publisher, Source bytes/generation remain unchanged",
+      "authHeader same-name case-insensitive mask preserves real CredentialService material; changed header denies zero-write; ordinary metadata.value literal stars retained"
+    ],
+    "correctedEarlierTestPremise": "Filtered extension on ordinary provider model-patch HTTP route is no longer misused as a mandatory403 proof; test sends ProviderPatch.models through actual agent config entry",
+    "executedByReviewer": false
+  },
+  "newBlockingFindings": [],
+  "limitations": [
+    "Root must execute new three-case target and applicable shared TS tests",
+    "Next frozen candidate must rerun applicable full gates against exact current source; prior c evidence cannot serve modified source",
+    "This report does not erase earlier static findings, actual reproduce4 failure, prior candidate failures/cancellation"
+  ]
+}

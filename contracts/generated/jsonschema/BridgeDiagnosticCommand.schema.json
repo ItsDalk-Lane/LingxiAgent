@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "config": true,
+        "kind": {
+          "const": "verify",
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "platform",
+        "config"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "wechat_qrcode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "wechat_qrcode_status",
+          "type": "string"
+        },
+        "qrcodeId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "qrcodeId"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "BridgeDiagnosticCommand"
+}

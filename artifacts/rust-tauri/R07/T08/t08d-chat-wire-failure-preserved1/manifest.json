@@ -1,0 +1,63 @@
+{
+  "createdAt": "2026-10-18T08:53:29.379125+00:00",
+  "candidate": "t08d",
+  "scope": "SAFE_WHITELIST_FAILURE_SCENES_NO_PRODUCT_MUTATION",
+  "originalScenesUnmodified": true,
+  "records": [
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-app-native-95726-1792313417388740000/chat-app-failure.png",
+      "sha256": "4090d2b174fb3164ed4033d58411ce18589bcfb6f1af2b365cfb05a92ba6f0f9",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/chat-app-failure.png",
+      "preservedSha256": "4090d2b174fb3164ed4033d58411ce18589bcfb6f1af2b365cfb05a92ba6f0f9",
+      "byteExact": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-app-native-95726-1792313417388740000/chat-app-failure.txt",
+      "sha256": "d82556b3d0b9d7a386e2076354cc53b6e72edb6ecdc18f9b2aa9ee8916122f66",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/chat-app-failure.txt",
+      "preservedSha256": "d82556b3d0b9d7a386e2076354cc53b6e72edb6ecdc18f9b2aa9ee8916122f66",
+      "byteExact": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-app-native-95726-1792313417388740000/app-proxy-receipt.json",
+      "sha256": "947d1069b264130aabaa3942911fdc4c0507a71c3f3647fbe797ac4fde8ddf3a",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/app-proxy-receipt.json",
+      "preservedSha256": "947d1069b264130aabaa3942911fdc4c0507a71c3f3647fbe797ac4fde8ddf3a",
+      "byteExact": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-app-native-95726-1792313417388740000/chat-app-failure.json",
+      "sha256": "21764a277cd93361f8d7c5d709b012836f0f22a18256f19818bf9794d36b3fca",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/chat-app-failure.safe.json",
+      "preservedSha256": "70c22cbc79de8b2694e7fe60d16cacb0e491752be75e7d649831f38b11003d46",
+      "byteExact": false,
+      "transformation": "仅精确凭证字段名遮盖，保留本夹具合成请求/帧/错误与可见文字；未复制HTTP头或身份store"
+    },
+    {
+      "source": "artifacts/rust-tauri/R07/T08/t08d-service.log",
+      "sourceSnapshotSha256": "736b690366e98835eb885b96aefafdbaa093e10aea6f130512bae6fd2c080ff3",
+      "sourceLogStillRunning": true,
+      "lineStart": 788,
+      "lineEnd": 864,
+      "preserved": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/t08d-service-chat-wire-extract.log",
+      "preservedSha256": "6559191ad539e3eb713c267c9ac5aff5370d92ed7a37191340d3717ad42f5fd6",
+      "byteExact": false,
+      "transformation": "仅原始完整r06_chat_wire运行段摘录，未替换原日志；总service日志仍在后续目标追加"
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-resume-95726-1792313417388784000/lingxi-service/data/runs.db",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08d-chat-wire-failure-preserved1/resume-persisted-event-facts.json",
+      "preservedSha256": "f8830852129bb7b680c5231c98e471a0e104ca3cfcd190c53732d0b128d0d53d",
+      "byteExact": false,
+      "transformation": "只读白名单导出run状态和事件顺序/固定synthetic delta布尔，排除正文及配置上下文"
+    }
+  ],
+  "excluded": [
+    "local-token.json及设备/凭据/管理store",
+    "完整数据库/WAL/SHM",
+    "浏览器profile/Vite cache",
+    "原fixture之外任何目录"
+  ],
+  "sourceModified": false,
+  "cargoExecutedByThisAgent": false
+}

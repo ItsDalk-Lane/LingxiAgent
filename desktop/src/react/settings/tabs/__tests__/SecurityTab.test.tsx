@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSettingsStore } from '../../store';
@@ -56,6 +56,7 @@ vi.mock('../../../stores/session-actions', () => ({
 }));
 
 import { SecurityTab } from '../SecurityTab';
+import { lingxiFetch } from '../../api';
 
 describe('SecurityTab Windows sandbox network control', () => {
   beforeEach(() => {
@@ -130,5 +131,30 @@ describe('SecurityTab Windows sandbox network control', () => {
     }
     expect(autoSaveConfigMock).not.toHaveBeenCalled();
     expect(loadSettingsConfigMock).not.toHaveBeenCalled();
+  });
+});
+
+
+describe('SecurityTab archive read failures', () => {
+  afterEach(() => { cleanup(); vi.mocked(lingxiFetch).mockReset(); });
+  it('shows the first archive read failure with retry instead of no backups', async () => {
+    vi.mocked(lingxiFetch).mockRejectedValueOnce(new Error('archive denied')).mockResolvedValueOnce({ json: async () => ({ checkpoints: [] }) } as Response);
+    render(<SecurityTab />);
+    fireEvent.click(screen.getByRole('button', { name: /settings.security.viewBackups/ }));
+    await screen.findByRole('alert');
+    expect(screen.queryByText('settings.security.noBackups')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'action.retry' }));
+    await waitFor(() => expect(screen.getByText('settings.security.noBackups')).toBeTruthy());
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+  it('keeps the last actual archive list when a later read fails', async () => {
+    vi.mocked(lingxiFetch).mockResolvedValueOnce({ json: async () => ({ checkpoints: [{ id: 'old', ts: 1000, path: '/owned/old.txt', size: 3 }] }) } as Response).mockRejectedValueOnce(new Error('archive read failed'));
+    render(<SecurityTab />);
+    const toggle = () => screen.getByRole('button', { name: /settings.security.viewBackups/ });
+    fireEvent.click(toggle()); await screen.findByText('/owned/old.txt');
+    fireEvent.click(toggle()); fireEvent.click(toggle());
+    await screen.findByRole('alert');
+    expect(screen.getByText('/owned/old.txt')).toBeTruthy();
+    expect(screen.queryByText('settings.security.noBackups')).toBeNull();
   });
 });

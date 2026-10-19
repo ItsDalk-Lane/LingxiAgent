@@ -4,8 +4,8 @@ use base64::Engine as _;
 use lingxi_kernel::{
     model_exchange::{ExchangeItem, ModelTurnInput},
     ports::{
-        ProviderDescriptor, ProviderTurn, ProviderTurnResult, ToolOutcome, ToolRequest,
-        TurnDeltaSink, TurnProviderPort,
+        ProviderDescriptor, ProviderTurn, ProviderTurnResult, StoragePort, ToolOutcome,
+        ToolRequest, TurnDeltaSink, TurnProviderPort,
     },
     toolcatalog::{SchemaBudget, ToolRegistry},
 };
@@ -406,8 +406,36 @@ async fn current_file_copy_extract_stat_and_real_permission_failures_preserve_ta
         let result = h.tool(sid, tool, args).await;
         assert_eq!(result["ok"], false, "{result}");
     }
+    let source_before = std::fs::read(&source).unwrap();
+    let dest_before = std::fs::read(&dest).unwrap();
+    let owner_file_before = serde_json::to_value(
+        h.state
+            .session_files()
+            .get_file("own", file_id)
+            .await
+            .unwrap()
+            .unwrap(),
+    )
+    .unwrap();
+    let owner_refs_before =
+        lingxi_adapters::storage::session_files::list_refs_for_session(h.state.storage(), "own")
+            .await
+            .unwrap();
+    assert!(h
+        .state
+        .session_files()
+        .list_files("other")
+        .await
+        .unwrap()
+        .is_empty());
+    assert!(
+        lingxi_adapters::storage::session_files::list_refs_for_session(h.state.storage(), "other")
+            .await
+            .unwrap()
+            .is_empty()
+    );
     let foreign_command=json!({"tool":"file","argsBase64":base64::engine::general_purpose::STANDARD.encode(serde_json::to_vec(&json!({"action":"extract","fileId":file_id})).unwrap())}).to_string();
-    let (status, error) = h
+    let (status, accepted) = h
         .request(
             "POST",
             "/lingxi/v1/sessions/other/execute",
@@ -415,16 +443,106 @@ async fn current_file_copy_extract_stat_and_real_permission_failures_preserve_ta
             false,
         )
         .await;
+    // 模型请求不等于用户交付附件：正常归档，再由真实资源执行器拒绝归属。
+    assert_eq!(status, 200, "{accepted}");
+    let foreign_run = lingxi_protocol::RunId::new(accepted["runId"].as_str().unwrap());
+    let actual = h
+        .state
+        .storage()
+        .load_run(&foreign_run)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(actual.status, lingxi_protocol::RunStatus::Completed);
+    let journal = h
+        .state
+        .storage()
+        .load_invocation_journal(&foreign_run)
+        .await
+        .unwrap();
+    assert_eq!(journal.len(), 1);
+    assert_eq!(journal[0].target, "tool:first-party:file");
     assert_eq!(
-        status, 500,
-        "当前存储在模型工具记录阶段先拒绝外会话身份：{error}"
+        journal[0].phase,
+        lingxi_kernel::ports::InvocationPhase::Failed
+    );
+    let receipt = journal[0].receipt.as_ref().unwrap();
+    assert_eq!(
+        receipt.outcome,
+        lingxi_kernel::ports::ReceiptOutcome::Failed
     );
     assert!(
-        error
-            .to_string()
-            .contains("session_file_reference_not_owned"),
-        "{error}"
+        receipt.dispatched,
+        "真实资源执行器已收到请求并拒绝外会话归属"
     );
+    assert!(
+        receipt
+            .detail
+            .contains("file is unavailable in this session"),
+        "{receipt:?}"
+    );
+    let result = h
+        .provider
+        .results
+        .lock()
+        .unwrap()
+        .get(&format!("other|{foreign_command}"))
+        .cloned()
+        .unwrap();
+    assert_eq!(result["ok"], false);
+    assert_eq!(result["error"], "file is unavailable in this session");
+    let events = h.state.storage().query_one_text("SELECT COALESCE(json_group_array(json(payload_json)), '[]') FROM key_events WHERE run_id=?1 AND event_type='tool_call_completed'", vec![foreign_run.to_string()]).await.unwrap().unwrap();
+    let events: Value = serde_json::from_str(&events).unwrap();
+    assert_eq!(events.as_array().unwrap().len(), 1);
+    assert_eq!(events[0]["result"]["status"], "failed");
+    assert_eq!(
+        events[0]["result"]["error"]["message"],
+        "file is unavailable in this session"
+    );
+    for private_text in ["来源中文正文", "新的来源"] {
+        assert!(!events.to_string().contains(private_text));
+        assert!(!result.to_string().contains(private_text));
+    }
+    assert!(h
+        .state
+        .session_files()
+        .get_file("other", file_id)
+        .await
+        .unwrap()
+        .is_none());
+    assert!(h
+        .state
+        .session_files()
+        .list_files("other")
+        .await
+        .unwrap()
+        .is_empty());
+    assert!(
+        lingxi_adapters::storage::session_files::list_refs_for_session(h.state.storage(), "other")
+            .await
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(
+        serde_json::to_value(
+            h.state
+                .session_files()
+                .get_file("own", file_id)
+                .await
+                .unwrap()
+                .unwrap()
+        )
+        .unwrap(),
+        owner_file_before
+    );
+    assert_eq!(
+        lingxi_adapters::storage::session_files::list_refs_for_session(h.state.storage(), "own")
+            .await
+            .unwrap(),
+        owner_refs_before
+    );
+    assert_eq!(std::fs::read(&source).unwrap(), source_before);
+    assert_eq!(std::fs::read(&dest).unwrap(), dest_before);
     assert!(!cwd.join("forbidden.txt").exists());
     assert!(!h.home.parent().unwrap().join("outside.txt").exists());
     let ro = h

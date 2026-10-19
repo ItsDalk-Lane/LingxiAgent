@@ -377,7 +377,22 @@ async fn real_submission_freezes_selected_sources_and_rejects_old_or_foreign_sco
         assert_eq!(next_run.status, RunStatus::Completed);
         let capture = captures.lock().unwrap().requests.last().unwrap().clone();
         let declarations = capture["body"]["tools"].as_array().unwrap();
-        assert_eq!(declarations.len(), 7);
+        // 默认工具面按名钉住（1be910755 恢复可信工具曝光后由 7 扩到 18；
+        // 后续有意增减默认面时必须显式更新本清单，不许静默漂移）。
+        let mut names: Vec<&str> = declarations
+            .iter()
+            .filter_map(|tool| tool["function"]["name"].as_str())
+            .collect();
+        names.sort_unstable();
+        assert_eq!(
+            names,
+            [
+                "automation", "browser", "channel", "dm", "edit", "exec_command",
+                "jian_update_status", "mcp_call", "mcp_describe_tool", "mcp_search_tools",
+                "notify", "patrol_update_log", "read", "update_settings", "web_fetch",
+                "web_search", "write", "write_stdin",
+            ]
+        );
         assert!(!declarations
             .iter()
             .any(|tool| tool["function"]["name"] == "knowledge_search"));

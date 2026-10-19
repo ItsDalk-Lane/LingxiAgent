@@ -22,6 +22,7 @@ import { ChatTranscript } from './chat/ChatTranscript';
 import { RunningStatusLine } from './chat/RunningStatusLine';
 import fp from './FloatingPanels.module.css';
 import chatStyles from './chat/Chat.module.css';
+import { bridgeConnectionKey, bridgeSessions, readBridgeResponse } from '../services/bridge-response';
 
 interface BridgeSession {
   sessionKey: string;
@@ -70,6 +71,12 @@ export function BridgePanel() {
   const [statusData, setStatusData] = useState<StatusData>({});
   const [bridgeAgentId, setBridgeAgentId] = useState<string | null>(null);
   const [agentMenuOpen, setAgentMenuOpen] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const connectionKey = useStore(state => bridgeConnectionKey(state));
+  const platformRef = useRef(platform);
+  platformRef.current = platform;
+  const requestSeq = useRef(0);
+  const sessionSeq = useRef(0);
 
   const agentMenuRef = useRef<HTMLDivElement>(null);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -82,20 +89,26 @@ export function BridgePanel() {
   const loadStatus = useCallback(async () => {
     const snapshotId = bridgeAgentId;
     if (!snapshotId) return;
+    const sourceKey = bridgeConnectionKey(useStore.getState());
+    const current = () => bridgeAgentIdRef.current === snapshotId && sourceKey === bridgeConnectionKey(useStore.getState());
     try {
       const res = await lingxiFetch(`/api/bridge/status?agentId=${encodeURIComponent(snapshotId)}`);
       if (bridgeAgentIdRef.current !== snapshotId) return; // stale
-      const data = await res.json();
-      if (bridgeAgentIdRef.current !== snapshotId) return; // stale
+      const data = await readBridgeResponse(res);
+      if (!current()) return;
+      if (data.agentId && data.agentId !== snapshotId) throw new Error('返回的助手与当前选择不一致');
       setStatusData(data);
       updateSidebarDot(data);
-    } catch {}
+    } catch (error) { if (current()) setLoadError(error instanceof Error ? error.message : '消息平台状态读取失败'); }
   }, [bridgeAgentId]);
 
   // 加载平台数据（按 agent 过滤，stale-guard via ref）
   const loadPlatformData = useCallback(async (plat: BridgePlatform) => {
     const snapshotId = bridgeAgentId;
     if (!snapshotId) return;
+    const sourceKey = bridgeConnectionKey(useStore.getState());
+    const seq = ++requestSeq.current;
+    const current = () => seq === requestSeq.current && bridgeAgentIdRef.current === snapshotId && platformRef.current === plat && sourceKey === bridgeConnectionKey(useStore.getState());
     try {
       const agentQuery = `&agentId=${encodeURIComponent(snapshotId)}`;
       const [statusRes, sessionsRes] = await Promise.all([
@@ -103,15 +116,20 @@ export function BridgePanel() {
         lingxiFetch(`/api/bridge/sessions?platform=${plat}${agentQuery}`),
       ]);
       if (bridgeAgentIdRef.current !== snapshotId) return; // stale
-      const sData = await statusRes.json();
-      const sessData = await sessionsRes.json();
-      if (bridgeAgentIdRef.current !== snapshotId) return; // stale
+      const sData = await readBridgeResponse(statusRes);
+      const sessData = await readBridgeResponse(sessionsRes);
+      const rows = bridgeSessions(sessData);
+      if (sData.agentId && sData.agentId !== snapshotId) throw new Error('返回的助手与当前选择不一致');
+      if (!sData[plat] || typeof sData[plat] !== 'object') throw new Error('消息平台状态返回内容无效');
+      if (!current()) return;
       setStatusData(sData);
       updateSidebarDot(sData);
       setShowOverlay(!sData[plat]?.configured);
-      setSessions(sessData.sessions || []);
+      setSessions(rows);
+      setLoadError('');
     } catch (err) {
       console.error('[bridge] load platform data failed:', err);
+      if (current()) setLoadError(err instanceof Error ? err.message : '消息平台会话读取失败');
     }
   }, [bridgeAgentId]);
 
@@ -140,6 +158,8 @@ export function BridgePanel() {
 
   // Reload when bridgeAgentId changes
   useEffect(() => {
+    requestSeq.current++; sessionSeq.current++;
+    setSessions([]); setStatusData({}); setLoadError(''); setShowOverlay(false);
     if (bridgeAgentId && visible) {
       loadPlatformData(platform);
       setChatOpen(false);
@@ -149,7 +169,7 @@ export function BridgePanel() {
       setCurrentIsOwner(false);
       setCurrentSessionPath(null);
     }
-  }, [bridgeAgentId]);
+  }, [bridgeAgentId, connectionKey]);
 
   // Close agent menu on click outside
   useEffect(() => {
@@ -198,6 +218,10 @@ export function BridgePanel() {
   }, [bridgeLatestMessage, visible, platform, loadPlatformData]);
 
   const switchTab = useCallback((plat: BridgePlatform) => {
+    sessionSeq.current++;
+    if (platformRef.current !== plat) setSessions([]);
+    platformRef.current = plat;
+    setLoadError('');
     setPlatform(plat);
     setCurrentKey(null);
     setCurrentName('');
@@ -211,20 +235,24 @@ export function BridgePanel() {
 
   const openSession = useCallback(async (session: BridgeSession) => {
     const snapshotId = bridgeAgentId;
+    const sourceKey = bridgeConnectionKey(useStore.getState());
+    const seq = ++sessionSeq.current;
+    const current = () => seq === sessionSeq.current && bridgeAgentIdRef.current === snapshotId && sourceKey === bridgeConnectionKey(useStore.getState());
     const identity = getBridgeSessionIdentity(session, systemUserName, systemUserAvatarUrl);
-    setCurrentKey(session.sessionKey);
-    setCurrentName(identity.name);
-    setCurrentAvatarUrl(identity.avatarUrl);
-    setCurrentIsOwner(!!session.isOwner);
-    setCurrentSessionPath(session.sessionPath || null);
     try {
       if (!session.sessionPath) throw new Error('bridge sessionPath missing');
       await loadMessages(session.sessionPath);
-      if (bridgeAgentIdRef.current !== snapshotId) return; // stale
+      if (!current()) return;
+      setCurrentKey(session.sessionKey);
+      setCurrentName(identity.name);
+      setCurrentAvatarUrl(identity.avatarUrl);
+      setCurrentIsOwner(!!session.isOwner);
+      setCurrentSessionPath(session.sessionPath || null);
       setChatOpen(true);
+      setLoadError('');
     } catch (err) {
       console.error('[bridge] open session failed:', err);
-      if (bridgeAgentIdRef.current === snapshotId) setChatOpen(false);
+      if (current()) setLoadError(err instanceof Error ? err.message : '会话读取失败');
     }
   }, [bridgeAgentId, systemUserName, systemUserAvatarUrl]);
 
@@ -232,9 +260,12 @@ export function BridgePanel() {
     if (!currentKey) return;
     const snapshotId = bridgeAgentId;
     if (!snapshotId) return;
+    const sourceKey = bridgeConnectionKey(useStore.getState());
+    const seq = sessionSeq.current;
+    const current = () => seq === sessionSeq.current && bridgeAgentIdRef.current === snapshotId && sourceKey === bridgeConnectionKey(useStore.getState());
     try {
-      await lingxiFetch(`/api/bridge/sessions/${encodeURIComponent(currentKey)}/reset?agentId=${encodeURIComponent(snapshotId)}`, { method: 'POST' });
-      if (bridgeAgentIdRef.current !== snapshotId) return; // stale
+      await readBridgeResponse(await lingxiFetch(`/api/bridge/sessions/${encodeURIComponent(currentKey)}/reset?agentId=${encodeURIComponent(snapshotId)}`, { method: 'POST' }));
+      if (!current()) return;
       if (currentSessionPath) useStore.getState().clearSession(currentSessionPath);
       setChatOpen(false);
       setCurrentKey(null);
@@ -245,6 +276,7 @@ export function BridgePanel() {
       await loadPlatformData(platform);
     } catch (err) {
       console.error('[bridge] reset session failed:', err);
+      if (current()) setLoadError(err instanceof Error ? err.message : '会话重置失败');
     }
   }, [currentKey, currentSessionPath, loadPlatformData, platform, bridgeAgentId]);
 
@@ -323,6 +355,7 @@ export function BridgePanel() {
             </svg>
           </button>
         </div>
+        {loadError && <div role="alert" style={{ padding: '8px 16px', color: 'var(--text-error, #c44)' }}>{loadError}</div>}
         <div className={fp.bridgeBody}>
           {showOverlay && (
             <div className={fp.bridgeOverlay} id="bridgeOverlay">

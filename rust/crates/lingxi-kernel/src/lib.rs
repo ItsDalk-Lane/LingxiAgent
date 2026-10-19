@@ -27,6 +27,7 @@ use lingxi_protocol::{AttemptId, NormalizedMessage, RunId, RunStatus, SessionId,
 #[allow(unused_imports)]
 use lingxi_test_guard as _;
 
+pub mod browser;
 pub mod compaction;
 pub mod context;
 pub mod invocation;
@@ -74,6 +75,15 @@ pub enum Principal {
     WebSession {
         account_id: String,
     },
+    /// 外部桥接发送者的独立归属键；角色只由宿主的运行授权提供。
+    Bridge {
+        subject: String,
+    },
+    /// 真实 owner 私聊授予的单个桌面会话范围，保留桥接身份与工具限制。
+    BridgeTakeover {
+        subject: String,
+        session_id: String,
+    },
     /// No user principal; narrowed, fixed permission surface.
     Automation {
         surface: String,
@@ -84,11 +94,39 @@ impl Principal {
     /// Stable storage vocabulary for ownership columns of the new run
     /// database (kind half). Mirrors the incumbent wire names; changing a
     /// value is a data migration, not a rename.
+    pub fn bridge_actor_subject(&self) -> Option<&str> {
+        match self {
+            Self::Bridge { subject } | Self::BridgeTakeover { subject, .. } => Some(subject),
+            _ => None,
+        }
+    }
+    /// 共享的精确会话边界；接管不能读取另一条本机所有者会话。
+    pub fn can_access_session(&self, owner: &str, session_id: &str) -> bool {
+        match self {
+            Self::LocalUser => true,
+            Self::Device { user_id, .. } => user_id == owner,
+            Self::WebSession { account_id } => account_id == owner,
+            Self::Bridge { subject } => {
+                lingxi_protocol::valid_bridge_subject(subject) && subject == owner
+            }
+            Self::BridgeTakeover {
+                subject,
+                session_id: bound,
+            } => {
+                lingxi_protocol::bridge_takeover_subject(subject, bound).is_ok()
+                    && ((bound == session_id && owner == LOCAL_OWNER_SUBJECT)
+                        || self.storage_subject() == owner)
+            }
+            Self::Automation { .. } => false,
+        }
+    }
     pub fn storage_kind(&self) -> &'static str {
         match self {
             Principal::LocalUser => "local_user",
             Principal::Device { .. } => "device",
             Principal::WebSession { .. } => "web_session",
+            Principal::Bridge { .. } => "bridge",
+            Principal::BridgeTakeover { .. } => "bridge_takeover",
             Principal::Automation { .. } => "automation",
         }
     }
@@ -101,6 +139,17 @@ impl Principal {
             Principal::LocalUser => LOCAL_OWNER_SUBJECT.to_string(),
             Principal::Device { user_id, .. } => user_id.clone(),
             Principal::WebSession { account_id } => account_id.clone(),
+            Principal::Bridge { subject } => subject.clone(),
+            Principal::BridgeTakeover {
+                subject,
+                session_id,
+            } => String::from_utf8(lingxi_protocol::canon::canonical_bytes(
+                &lingxi_protocol::BridgeTakeoverScope {
+                    actor_subject: subject.clone(),
+                    session_id: session_id.clone(),
+                },
+            ))
+            .expect("JSON 是 UTF-8"),
             Principal::Automation { surface } => surface.to_string(),
         }
     }

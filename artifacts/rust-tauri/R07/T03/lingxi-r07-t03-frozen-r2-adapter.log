@@ -1,0 +1,169 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.45s
+     Running tests/r06_ar_f14_migration_receipts.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f14_migration_receipts-fe46dcb901f1aa80)
+
+running 3 tests
+test c01_fresh_database_receipts_equal_registry_and_inspector ... ok
+test c01_v8_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+test c01_v7_upgrade_preserves_receipts_and_restarts_are_idempotent ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
+     Running tests/r07_activity_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_activity_store-526b91227c4168bd)
+
+running 6 tests
+test busy_wrong_target_and_revoked_owner_cannot_promote ... ok
+test internal_registration_hides_pre_dispatch_and_verified_heartbeat_scope_only ... ok
+test legitimate_session_deletion_cleans_new_foreign_keys_and_preserves_job_history ... ok
+test real_activity_hidden_until_promotion_and_user_named_prefixes_stay_visible ... ok
+test receipt_failure_rolls_back_without_changing_trigger_or_session ... ok
+test parallel_promotion_is_one_fact_and_heartbeat_resource_scope_cannot_be_promoted ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/r07_automation_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_store-b26ebe760eb2497c)
+
+running 12 tests
+test concurrent_claims_and_configuration_updates_have_one_winner ... ok
+test ordinary_user_notification_uses_real_run_without_fabricated_trigger ... ok
+test crash_before_binding_recovers_only_unique_durable_causal_run ... ok
+test notification_claim_is_unique_and_unacknowledged_delivery_never_requeues ... ok
+test malformed_configuration_and_owner_changes_leave_original_job_untouched ... ok
+test one_shot_old_revision_cannot_disable_edited_configuration ... ok
+test one_shot_terminal_states_disable_same_revision_but_skip_does_not_advance ... ok
+test stale_trigger_cannot_overwrite_edited_or_deleted_job_and_history_survives ... ok
+test daily_concurrent_claim_has_one_attempt_and_unknown_never_retries ... ok
+test cursor_write_failure_rolls_back_trigger_settlement_as_one_transaction ... ok
+test reopen_preserves_raw_configuration_trigger_and_confirmed_delivery ... ok
+test daily_known_failure_retries_after_one_hour_but_started_and_success_survive_restart ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/r07_automation_suggestions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_suggestions-1fb2363d8d18ec1f)
+
+running 10 tests
+test forged_suggestion_cannot_change_frozen_target_actor_source_or_operation ... ok
+test prepared_job_cannot_replace_frozen_identity_source_or_unknown_fields ... ok
+test malformed_or_nonlocal_proposals_cannot_persist_and_duplicate_id_cannot_overwrite ... ok
+test session_revocation_or_archival_blocks_even_a_previously_loaded_suggestion ... ok
+test stale_update_cannot_forge_new_revision_or_turn_into_creation ... ok
+test concurrent_apply_and_late_replay_create_one_job_and_one_receipt ... ok
+test two_distinct_update_suggestions_cannot_overwrite_each_others_version ... ok
+test pending_expiry_and_every_identity_dimension_are_enforced_at_get_and_apply ... ok
+test proposal_creates_no_job_and_explicit_application_preserves_source_and_unknown_fields ... ok
+test receipt_failure_rolls_back_both_new_job_and_existing_job_update ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/r07_bridge_effect_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_effect_store-433f0ce7588e767b)
+
+running 8 tests
+test concurrent_claims_have_one_external_lease_and_revisions_can_return_to_prior_text ... ok
+test restart_marks_confirmed_but_open_native_stream_unknown_without_recreating_it ... ok
+test one_connector_exit_does_not_abandon_other_live_workers_and_receipt_unknown_allows_batch_final ... ok
+test native_update_unknown_blocks_new_content_and_plain_mode_downgrade_but_allows_frozen_cleanup ... ok
+test receipt_refresh_keys_and_sequence_survive_restart_and_cleanup_remains_scoped_after_revoke ... ok
+test native_finish_and_actual_outbox_receipt_commit_atomically_or_both_roll_back ... ok
+test independent_typing_unknown_does_not_poison_native_content_but_text_receipts_remain_conservative ... ok
+test v17_candidate_upgrade_keeps_all_old_receipts_and_defaults_typing_independence_to_false ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/r07_bridge_message_projection.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_message_projection-320d2b1300135ed0)
+
+running 1 test
+test messages_share_canonical_identity_and_preserve_inbound_and_all_delivery_states ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/r07_bridge_notice_render.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_notice_render-63a0d75597e740ef)
+
+running 1 test
+test five_transports_keep_host_notice_at_its_real_position_and_out_of_system ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r07_bridge_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_store-b62578fad13edb50)
+
+running 14 tests
+test delivery_context_is_frozen_in_enqueue_transaction_and_duplicate_does_not_follow_reset ... ok
+test run_binding_checks_frozen_subject_and_exact_real_message_lineage ... ok
+test authority_role_changes_isolate_context_and_unproven_legacy_context_is_never_reused ... ok
+test started_manual_delivery_rechecks_live_authority_without_reclaiming_or_mutating_receipt ... ok
+test concurrent_claims_and_config_edits_are_atomic ... ok
+test explicit_owner_takeover_is_one_inbox_scope_and_never_relaxes_ordinary_bridge_binding ... ok
+test conversation_reset_is_atomic_keeps_metadata_and_pins_replayed_inbox_to_original_epoch ... ok
+test attachments_need_real_owned_files_and_failed_prepare_rolls_back ... ok
+test restart_preserves_prepared_queue_and_recovers_durable_run_before_bind_without_replay ... ok
+test owner_notification_target_and_context_are_frozen_from_actual_owner_dm_and_revoke_stops_queue ... ok
+test outbox_has_one_send_lease_and_requires_real_receipt_or_stays_unknown_after_restart ... ok
+test commands_use_durable_receipts_without_fake_runs_and_recover_unqueued_reply ... ok
+test manual_send_has_real_user_file_authority_and_atomic_outbox_without_fake_run_or_inbound ... ok
+test five_platform_roles_are_host_derived_and_message_replays_survive_reconfiguration ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running tests/r07_conversation_files.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_files-e95a00e082c56d57)
+
+running 10 tests
+test legacy_channel_identity_comes_from_safe_filename_without_rewriting_frontmatter ... ok
+test dm_partial_success_preserves_first_copy_and_never_overwrites_changed_second ... ok
+test forged_sender_headers_and_separators_round_trip_as_one_body ... ok
+test malformed_authority_and_symlink_paths_fail_closed ... ok
+test legacy_metadata_history_and_bookmarks_survive_real_patch ... ok
+test same_request_is_frozen_and_concurrent_retries_never_append_twice ... ok
+test phone_reset_keeps_history_unknown_metadata_and_dm_bytes ... ok
+test restart_recognizes_written_postimage_without_blind_reappend ... ok
+test user_bookmarks_use_the_legacy_user_directory_without_aliasing_an_agent ... ok
+test revoked_member_cannot_resume_old_prepared_append ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.74s
+
+     Running tests/r07_phone_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_store-7a62e66228c1729c)
+
+running 9 tests
+test binding_uses_actual_owned_session_cas_expiry_and_persistent_epoch_after_reset ... ok
+test message_source_precedes_file_receipt_and_is_an_immutable_real_started_call ... ok
+test descendants_share_root_budget_and_cancellation_scope_includes_child_runs ... ok
+test only_actual_causal_run_can_bind_or_decide_and_each_run_decides_once ... ok
+test delivery_binding_is_atomic_across_first_claim_reset_and_actual_unbound_run ... ok
+test concurrent_claims_spend_one_frozen_budget_across_restart ... ok
+test dm_three_rounds_directional_cooldown_and_five_minute_lock_are_persistent ... ok
+test accepted_unbound_run_recovers_from_lineage_and_never_creates_another ... ok
+test completed_real_reply_remains_publishable_until_same_file_operation_is_applied ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+     Running tests/r07_session_collab_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab_store-665c6a884346e623)
+
+running 8 tests
+test suggestions_are_inert_and_real_source_identity_and_payload_are_required ... ok
+test rejection_never_uses_a_caller_supplied_source_or_reopens_a_started_draft ... ok
+test concurrent_apply_and_delivery_have_one_durable_lease ... ok
+test apply_auth_expiry_read_only_and_frozen_edits_cannot_be_bypassed ... ok
+test create_reservation_and_partial_failure_retry_only_the_same_real_target ... ok
+test started_unknown_survives_restart_and_only_real_lineage_can_confirm_it ... ok
+test accepted_receipt_rolls_back_on_storage_error_and_cannot_be_requeued ... ok
+test decisions_are_atomic_immutable_host_facts_and_repeated_polling_does_not_append ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-bff2eccd9b14bcc7)
+
+running 13 tests
+test supported_tip_matches_the_current_migration_registry ... ok
+test v7_to_tip_chain_preserves_prior_data_and_creates_new_tables ... ok
+test upsert_session_activity_marks_coldness_for_cleanup_probe ... ok
+test file_history_prune_enforces_age_and_total_bytes ... ok
+test insert_and_get_roundtrip_preserves_all_fields ... ok
+test v14_delegation_accepts_only_boolean_values_and_rejects_null ... ok
+test alias_resolution_maps_legacy_ids_to_canonical ... ok
+test source_key_dedup_is_scoped_to_owner ... ok
+test refs_roundtrip_and_session_scoped_delete ... ok
+test status_transitions_record_expiry_timestamp ... ok
+test list_for_owner_orders_by_registration_then_id ... ok
+test file_history_store_lists_files_versions_and_reads_content ... ok
+test delete_session_file_removes_row_and_aliases ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

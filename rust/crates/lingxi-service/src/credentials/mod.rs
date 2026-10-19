@@ -51,6 +51,7 @@ use lingxi_kernel::model_exchange::{CredentialAuthKind, ResolvedModelRoute};
 use crate::inject::ServiceClock;
 
 pub mod login;
+pub mod search;
 pub mod store;
 use store::CredentialStore;
 
@@ -178,6 +179,7 @@ struct ProviderCell {
     /// The auth config this cell was seeded from (reload keeps the cell —
     /// its tokens, its in-flight flight — only when this is unchanged).
     seed: AuthConfig,
+    custom_headers: BTreeMap<String, String>,
     /// R05 RR1 F02: the model-plane configuration generation this cell's
     /// SEED was installed at. Cells whose seed survives a reload KEEP
     /// their epoch (the material is unchanged — still the current
@@ -353,6 +355,7 @@ impl CredentialService {
                 Arc::new(tokio::sync::Mutex::new(seed_cell(
                     id,
                     &provider.auth,
+                    &provider.headers,
                     store.as_ref(),
                     1,
                     next_instance,
@@ -513,8 +516,12 @@ impl CredentialService {
                     });
                 }
                 match &guard.material {
-                    ProviderMaterial::None => return Ok(ApplicableAuth::None),
-                    ProviderMaterial::Static(auth) => return Ok(auth.clone()),
+                    ProviderMaterial::None => {
+                        return Ok(ApplicableAuth::None.with_headers(&guard.custom_headers, false))
+                    }
+                    ProviderMaterial::Static(auth) => {
+                        return Ok(auth.clone().with_headers(&guard.custom_headers, false))
+                    }
                     ProviderMaterial::Revoked => {
                         return Err(CredentialError::Revoked {
                             provider: route.provider.clone(),
@@ -527,7 +534,8 @@ impl CredentialService {
                             });
                         }
                         Some(tokens) if !self.is_expired(tokens) => {
-                            return Ok(ApplicableAuth::Bearer(tokens.access_token.clone()));
+                            return Ok(ApplicableAuth::Bearer(tokens.access_token.clone())
+                                .with_headers(&guard.custom_headers, true));
                         }
                         // Locally expired (the ledger says so — the server
                         // may still accept it, but the incumbent's rule is
@@ -633,12 +641,7 @@ impl CredentialService {
                             provider: route.provider.clone(),
                         });
                     };
-                    let still_current = match used {
-                        ApplicableAuth::Bearer(token) => token == &tokens.access_token,
-                        // The material kind moved under the caller (a reload
-                        // swapped the shape) — that IS a rotation.
-                        _ => false,
-                    };
+                    let still_current = used.bearer_token() == Some(tokens.access_token.as_str());
                     if !still_current {
                         // Someone else already refreshed: reuse, never burn
                         // the fresh refresh token (the incumbent
@@ -729,7 +732,7 @@ impl CredentialService {
             let kept = match current.get(id) {
                 Some(cell) => {
                     let guard = cell.lock().await;
-                    if guard.seed == provider.auth {
+                    if guard.seed == provider.auth && guard.custom_headers == provider.headers {
                         Some(Arc::clone(cell))
                     } else {
                         None
@@ -749,6 +752,7 @@ impl CredentialService {
                 Arc::new(tokio::sync::Mutex::new(seed_cell(
                     id,
                     &provider.auth,
+                    &provider.headers,
                     self.inner.store.as_ref(),
                     config_generation,
                     instance,
@@ -800,6 +804,7 @@ impl CredentialService {
                         ApplicableAuth::Bearer(_) => CredentialAuthKind::ApiKey,
                         ApplicableAuth::Header { .. } => CredentialAuthKind::AuthHeader,
                         ApplicableAuth::None => CredentialAuthKind::None,
+                        ApplicableAuth::WithHeaders { .. } => guard.seed.kind(),
                     },
                     "ready",
                     None,
@@ -986,8 +991,12 @@ impl CredentialService {
             ));
         }
         match &guard.material {
-            ProviderMaterial::None => Ok(ApplicableAuth::None),
-            ProviderMaterial::Static(auth) => Ok(auth.clone()),
+            ProviderMaterial::None => {
+                Ok(ApplicableAuth::None.with_headers(&guard.custom_headers, false))
+            }
+            ProviderMaterial::Static(auth) => {
+                Ok(auth.clone().with_headers(&guard.custom_headers, false))
+            }
             ProviderMaterial::Revoked => Err(CredentialError::Revoked {
                 provider: entry.provider.clone(),
             }),
@@ -999,7 +1008,8 @@ impl CredentialService {
                     "the credential expired after the handle was minted; re-resolve through \
                      the credential port",
                 )),
-                Some(tokens) => Ok(ApplicableAuth::Bearer(tokens.access_token.clone())),
+                Some(tokens) => Ok(ApplicableAuth::Bearer(tokens.access_token.clone())
+                    .with_headers(&guard.custom_headers, true)),
             },
         }
     }
@@ -1045,6 +1055,7 @@ fn auth_kind_name(kind: CredentialAuthKind) -> &'static str {
 fn seed_cell(
     provider: &str,
     auth: &AuthConfig,
+    custom_headers: &BTreeMap<String, String>,
     store: Option<&CredentialStore>,
     seed_epoch: u64,
     instance: u64,
@@ -1068,6 +1079,7 @@ fn seed_cell(
     ProviderCell {
         instance,
         seed: auth.clone(),
+        custom_headers: custom_headers.clone(),
         seed_epoch,
         generation: 1,
         material,
@@ -1095,6 +1107,7 @@ fn config_models_of(config: &ModelPlaneConfig) -> BTreeMap<String, Vec<String>> 
     push(&models.title);
     push(&models.summarize);
     push(&models.memory);
+    push(&models.knowledge);
     push(&models.vision);
     push(&models.approval);
     push(&models.guard);
@@ -1104,6 +1117,14 @@ fn config_models_of(config: &ModelPlaneConfig) -> BTreeMap<String, Vec<String>> 
     push(&models.video);
     push(&models.speech);
     push(&models.speech_recognition);
+    for (provider, entry) in &config.providers {
+        if let Some(models) = &entry.models {
+            out.insert(
+                provider.clone(),
+                models.iter().map(|m| m.id.clone()).collect(),
+            );
+        }
+    }
     out
 }
 

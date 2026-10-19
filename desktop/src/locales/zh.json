@@ -144,6 +144,8 @@
     "settingsVectorRetentionHint": "换模型或重新嵌入产生的旧版向量，超过设定天数未被查询使用即自动清理（1–3650）；正在使用的最新版本不受影响"
   },
   "channel": {
+    "loadFailed": "加载失败，已有内容已保留",
+    "retry": "重试",
     "tab": "频道",
     "chatTab": "聊天",
     "moreTabs": "更多标签",
@@ -301,7 +303,8 @@
     "projectMore": "更多",
     "projectNewChat": "新建对话",
     "projectRemove": "移除工作目录",
-    "runningGroup": "执行中"
+    "runningGroup": "执行中",
+    "ungroupedChats": "未归组"
   },
   "titlebar": {
     "currentChatTitle": "当前对话标题",
@@ -512,7 +515,31 @@
       "retryFailed": "重新生成失败",
       "submitting": "提交中",
       "retryLabel": "重新生成{kind}",
-      "kindSpeech": "语音"
+      "kindSpeech": "语音",
+      "phase": {
+        "submitting": "正在提交生成请求",
+        "submitted": "已提交，等待生成",
+        "generating": "正在生成",
+        "downloading": "生成完成，正在下载",
+        "completed": "已生成并交付文件",
+        "failed": "生成失败",
+        "cancelled": "已停止本地等待",
+        "unknown": "结果尚未确认"
+      },
+      "stopWaiting": "停止等待",
+      "stopFailed": "停止等待失败",
+      "taskFailed": "媒体任务未完成",
+      "localDeliveryStopped": "已停止向本机会话继续交付文件。",
+      "remoteOutcome": {
+        "failed": "远端已确认生成失败。",
+        "completed": "远端已生成，已交付的文件仍可打开。",
+        "unknown": "远端结果尚未确认，可能仍在生成。"
+      },
+      "remoteCancel": {
+        "confirmed": "已确认远端取消。",
+        "unsupported": "远端不支持取消，可能仍会完成。",
+        "unknown": "远端是否取消尚未确认。"
+      }
     },
     "turnStatus": {
       "missingFinalAnswer": "未生成最终回复",
@@ -1062,7 +1089,20 @@
       "failed": "📎 文件没准备好"
     },
     "browser": {
+      "stateReadFailed": "无法读取浏览器状态",
+      "controlledWindow": "受控浏览器",
+      "executionNode": "执行位置",
+      "sameWindowHint": "网页在该服务的受控 Chromium 窗口中。显示、接管和恢复会操作同一页面。",
+      "userTakeover": "你正在接管",
+      "suspended": "已暂停",
       "running": "🌐 {name} 正在操作浏览器",
+      "stopped": "已停止",
+      "revoked": "助手权限已撤销",
+      "showControlled": "显示浏览器",
+      "takeover": "接管",
+      "release": "交还助手",
+      "noVisibleWindow": "该服务不支持显示网页窗口，无法在这里手动接管。",
+      "workspaceUnavailable": "此聊天没有可用的浏览器状态",
       "done": "🌐 {name} 操作完了",
       "failed": "🌐 {name} 浏览器不听使唤"
     },
@@ -1119,6 +1159,7 @@
       "failed": "⚙️ 设置没改成"
     },
     "automation": {
+      "importBlocked": "有 {count} 项旧任务未能导入，已暂停这些任务。请检查原始任务资料。",
       "running": "🤖 {name} 正在安排自动化任务",
       "done": "🤖 {name} 安排好自动化任务了",
       "failed": "🤖 自动化任务没安排上"
@@ -1562,6 +1603,7 @@
       "cookiesTitle": "Cookies",
       "acceptCookies": "接受 Cookies",
       "acceptCookiesHint": "打开后，内置浏览器会像普通浏览器一样保存和发送网站 Cookies。",
+      "cookiePolicyChangeHint": "更改 Cookie 策略会关闭当前受控页面。网址和已有登录资料会保留，未提交的表单内容可能丢失；重新打开后生效。",
       "clearCookies": "清除 Cookies",
       "clearCookiesHint": "清除内置浏览器已经保存的 Cookies 和站点数据。",
       "clearCookiesButton": "清除",
@@ -1701,6 +1743,7 @@
       "hardwareAcceleration": "硬件加速",
       "hardwareAccelerationHint": "使用显卡渲染窗口内容。关闭后会在下次启动使用软件渲染，可用于恢复 Windows 显卡驱动导致的启动闪退。",
       "sidebar": "侧边栏",
+      "sidebarLoadFailed": "侧栏设置读取失败，请重试。",
       "sessionListSingleLine": "会话列表单行显示",
       "sessionListSingleLineHint": "打开后，每条会话只占一行；鼠标悬停时右侧按钮出现，标题自动缩短并显示省略号。",
       "rollbackFileChanges": "回退时撤销文件改动",
@@ -2129,6 +2172,7 @@
       "retention7d": "7 天",
       "maxFileSize": "忽略大于",
       "viewBackups": "查看备份",
+      "backupsLoadFailed": "备份列表读取失败，请重试。",
       "hideBackups": "收起",
       "restoreBtn": "恢复",
       "noBackups": "暂无备份记录",
@@ -2252,6 +2296,11 @@
       "globalDefaults": "全局默认"
     },
     "oauth": {
+      "notPersisted": "本次已登录，但登录信息未保存，重启后可能需要重新登录。",
+      "loginRefreshFailed": "已登录，但页面状态刷新失败，请重新读取。",
+      "logoutRefreshFailed": "已登出，但页面状态刷新失败，请重新读取。",
+      "browserUnavailable": "当前窗口无法打开授权网页。",
+      "waitCancelled": "已停止本地等待；供应商端授权可能仍会完成。",
       "title": "快速登录",
       "login": "登录",
       "logout": "登出",
@@ -2641,6 +2690,7 @@
       "disabled": "未启用",
       "noSkills": "暂无可用技能",
       "noUser": "暂无自定义技能",
+      "loadFailed": "技能读取失败，请重试。",
       "workspaceBadge": "项目",
       "copyToSkills": "复制到我的技能",
       "copied": "已复制 ✓",
@@ -2725,6 +2775,7 @@
       "goalToggleDesc": "给长任务挂 token/时间预算，超支时提醒一次并交还决定"
     },
     "mcp": {
+      "selectAgentForDetails": "请先创建或选择助手，再查看连接详情和助手权限。",
       "masterTitle": "总开关",
       "masterName": "启用连接器",
       "masterDesc": "关闭后，新会话不会暴露任何 MCP 连接器工具；已冻结的旧会话调用时会收到明确错误。",
@@ -4047,6 +4098,7 @@
       "recordingModifierOnly": "松开修饰键本身不算按键，请再按一个字母、数字或功能键",
       "recordingNeedsModifier": "组合键需要包含 ⌘/Ctrl 或 Alt（F1–F12 功能键可单独使用）",
       "registrationFailed": "快捷键注册失败，可能已被其他应用占用",
+      "savedReloadFailed": "键位已保存，但快捷键更新未完成。请重试或重启应用。",
       "removeBinding": "移除该绑定",
       "resetAll": "全部恢复默认",
       "resetDone": "已全部恢复默认",
@@ -4094,6 +4146,17 @@
       "formatError": "删除进度返回格式不正确",
       "connectionChanged": "连接已改变，请重新打开删除进度",
       "resultChanged": "连接已改变，原服务的清理结果尚未在此页刷新"
+    },
+    "transfer": {
+      "title": "导入与导出设置",
+      "hint": "导出会隐藏密钥。导入按项目合并，未包含的设置保持原样。",
+      "export": "导出设置",
+      "import": "导入设置",
+      "tooLarge": "设置文件不能超过 2 MiB。",
+      "connectionChanged": "连接已切换，请重新操作。",
+      "partialApplied": "设置已生效，但后续步骤未完成。",
+      "savedNotApplied": "设置已保存，但尚未生效。",
+      "partialSaved": "部分设置已保存，请重新读取后再操作。"
     }
   },
   "onboarding": {
@@ -4215,6 +4278,11 @@
     }
   },
   "activity": {
+    "listLoadFailed": "活动读取失败，已保留上次结果。",
+    "actionFailed": "操作未完成，请重试。",
+    "unconfirmed": "结果尚未确认",
+    "cancelled": "已停止",
+    "skipped": "本次已跳过",
     "title": "助手活动",
     "empty": "暂时没有活动记录，日常巡检或定时任务执行后会出现在这里",
     "back": "返回",
@@ -5055,6 +5123,8 @@
     }
   },
   "devtools": {
+    "cardWindowUnsupported": "当前窗口暂不支持安全互动卡片",
+    "cardServiceUnsupported": "当前服务暂不支持安全互动卡片",
     "heartbeat": "心跳巡检",
     "memoryExport": "记忆导出",
     "onboarding": "Onboarding",
@@ -5553,6 +5623,12 @@
     "openInSystemBrowser": "用系统浏览器打开"
   },
   "sessionCollab": {
+    "decisionNotPersisted": "操作已完成，但确认结果未保存。重新打开后请勿重复操作。",
+    "queued": "已排队",
+    "queuedHint": "已确认排队，目标会话空闲后再发送。",
+    "unknown": "结果待确认",
+    "deliveryUnknown": "无法确认是否已送达，请先检查目标会话，勿重复发送。",
+    "retryMessage": "重试首条消息",
     "messagePrefix": "[来自 Agent「{name}」的消息，非用户本人]",
     "fromAgent": "来自 {name} 的消息",
     "expand": "展开",

@@ -1,0 +1,23 @@
+{
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "--pretty",
+    "false"
+  ],
+  "exitCode": 2,
+  "developmentOnly": true,
+  "ownedFilesForNextExecution": {
+    "desktop/src/react/settings/tabs/SkillsTab.tsx": "ea080696cb459024c5aa791361dde305c51fb3a264a789c1621ba753b8b82751",
+    "desktop/src/react/components/SkillsPanel.tsx": "673e1f046aeabc682dca6597de7b7a46af44865010526461b281064d58401ded",
+    "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx": "bf9e33d8d0a9951c9f60050fe4105ef41768577e38ade9e39d595d83c161126c",
+    "rust/crates/lingxi-service/tests/r06_skills_completion.rs": "1c7cda6338c8d0399b871c59c42dd8b4d3162e7568e6f00f102cffa279d594ef",
+    "desktop/src/locales/zh.json": "43da0a28f7140ab9376b4665039d6afe1827e558f627d710df258482faa0832c",
+    "desktop/src/locales/en.json": "c642077fd4b2e11d566307eb27534bdcb078f8ee132371ac215027c40b9d9ab4",
+    "desktop/src/locales/ja.json": "4816fba6d19ccd596faf80a50af2180122ec8319dd7b44c3464c9582341bf5e5",
+    "desktop/src/locales/ko.json": "58d5f0443c0df5f13e950c36aba1572ac8da2b94478f2d81654ac39b7eed84ff",
+    "desktop/src/locales/zh-TW.json": "e9812c1e287cd610df5b82f3d2c41f9104245bfb36c52ff5ec7665b886fe7898"
+  },
+  "logSha256": "97d7dcd4b60051411b06bec9e8324b6d2c473785867ee6a7e425a65fab2c146f"
+}

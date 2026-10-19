@@ -1,0 +1,28 @@
+{
+  "$defs": {
+    "BrowserOpenBehavior": {
+      "enum": [
+        "smart",
+        "current_tab",
+        "new_tab"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acceptCookies": {
+      "type": "boolean"
+    },
+    "agentOpenBehavior": {
+      "$ref": "#/$defs/BrowserOpenBehavior"
+    }
+  },
+  "required": [
+    "acceptCookies",
+    "agentOpenBehavior"
+  ],
+  "title": "BrowserSettings",
+  "type": "object"
+}

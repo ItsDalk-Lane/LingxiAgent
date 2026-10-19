@@ -215,6 +215,9 @@ pub fn estimate_exchange_item_tokens(item: &ExchangeItem) -> u64 {
         ExchangeItem::CompactionInstruction { text } | ExchangeItem::UserTurn { text } => {
             u64::from(estimate_text_tokens(text))
         }
+        ExchangeItem::HostNotice { delivery_id, text } => u64::from(estimate_text_tokens(
+            &crate::model_exchange::render_host_notice(delivery_id, text),
+        )),
         ExchangeItem::CurrentSubmission => 0,
     }
 }
@@ -592,6 +595,7 @@ pub fn plan_compaction(
             | ExchangeItem::CompactionSummary { .. }
             | ExchangeItem::UserMediaTurn { .. }
             | ExchangeItem::UserTurn { .. }
+            | ExchangeItem::HostNotice { .. }
             | ExchangeItem::CurrentSubmission => {}
             ExchangeItem::CompactionInstruction { .. } => {
                 return Err(CompactionPlanError::UnprovableToolPairs {
@@ -625,6 +629,7 @@ pub fn plan_compaction(
             ExchangeItem::AssistantTurn { .. }
                 | ExchangeItem::CompactionSummary { .. }
                 | ExchangeItem::UserMediaTurn { .. }
+                | ExchangeItem::HostNotice { .. }
                 | ExchangeItem::UserTurn { .. }
                 | ExchangeItem::CurrentSubmission
         ) && index > 0

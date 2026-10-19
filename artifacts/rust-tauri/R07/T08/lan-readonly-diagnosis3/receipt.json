@@ -1,0 +1,172 @@
+{
+  "scope": "OWNED_EMPTY_HOME_LAN_TCP_DIAGNOSIS_NOT_GATE_PASS",
+  "requests": [
+    {
+      "label": "loopback-issue-mobile",
+      "destination": "127.0.0.1:64225",
+      "addressKind": "loopback",
+      "method": "POST",
+      "path": "/lingxi/v1/access/mobile-credentials",
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 809,
+      "localSocket": [
+        "127.0.0.1",
+        64226
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        64225
+      ],
+      "status": 200,
+      "responseSha256": "7e2aa6ce8ba801b5e5a615140e962b2817f67d3672839f3318e951b6bc0c8731",
+      "setCookiePresent": false,
+      "elapsedSeconds": 1.277
+    },
+    {
+      "label": "lan-first-foreign-origin-login",
+      "destination": "192.168.3.96:64225",
+      "addressKind": "actual-lan-interface",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 0,
+      "localSocket": [
+        "192.168.3.96",
+        64228
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        64225
+      ],
+      "serviceTcpObservation": [
+        "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+        "owned-ser 91190 study_superior   32u  IPv4 0x26e044c6290b419f      0t0  TCP *:64225 (LISTEN)"
+      ],
+      "lsofExitCode": 0,
+      "errorType": "TimeoutError",
+      "timedOut": true,
+      "elapsedSeconds": 20.004
+    },
+    {
+      "label": "loopback-foreign-origin-control",
+      "destination": "127.0.0.1:64225",
+      "addressKind": "loopback",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 341,
+      "localSocket": [
+        "127.0.0.1",
+        64304
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        64225
+      ],
+      "status": 403,
+      "responseSha256": "356fe78013992473543e8562a8b05dd7ba7f9ed34ae2041485a5ebc50108ae8e",
+      "setCookiePresent": false,
+      "elapsedSeconds": 0.002
+    },
+    {
+      "label": "lan-health",
+      "destination": "192.168.3.96:64225",
+      "addressKind": "actual-lan-interface",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 0,
+      "localSocket": [
+        "192.168.3.96",
+        64305
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        64225
+      ],
+      "serviceTcpObservation": [
+        "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+        "owned-ser 91190 study_superior   32u  IPv4 0x26e044c6290b419f      0t0  TCP *:64225 (LISTEN)"
+      ],
+      "lsofExitCode": 0,
+      "errorType": "TimeoutError",
+      "timedOut": true,
+      "elapsedSeconds": 5.004
+    },
+    {
+      "label": "loopback-health-control",
+      "destination": "127.0.0.1:64225",
+      "addressKind": "loopback",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 251,
+      "localSocket": [
+        "127.0.0.1",
+        64367
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        64225
+      ],
+      "status": 200,
+      "responseSha256": "53184e820c7a76d51b64746a53cd89790d04afd91e04e4ef8e5694f01cd32e3a",
+      "setCookiePresent": false,
+      "elapsedSeconds": 0.001
+    },
+    {
+      "label": "lan-correct-origin-login",
+      "destination": "192.168.3.96:64225",
+      "addressKind": "actual-lan-interface",
+      "method": "POST",
+      "path": "/lingxi/v1/web-auth/login",
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 0,
+      "localSocket": [
+        "192.168.3.96",
+        64368
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        64225
+      ],
+      "serviceTcpObservation": [
+        "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+        "owned-ser 91190 study_superior   32u  IPv4 0x26e044c6290b419f      0t0  TCP *:64225 (LISTEN)"
+      ],
+      "lsofExitCode": 0,
+      "errorType": "TimeoutError",
+      "timedOut": true,
+      "elapsedSeconds": 5.003
+    }
+  ],
+  "networkSettingsChanged": false,
+  "manualClockInjected": false,
+  "isolatedHomeRoot": "/private/tmp/lingxi-r07-lan-readonly-don4644e",
+  "originalBinaryPath": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "ownedBinaryPath": "/private/tmp/lingxi-r07-lan-readonly-don4644e/owned-service",
+  "binarySha256Before": "21458f19bdc4f1becc1366c3e395ed63dd60a769357713cf77fca97196479383",
+  "originalPathSha256AfterCopy": "21458f19bdc4f1becc1366c3e395ed63dd60a769357713cf77fca97196479383",
+  "actualInterface": "en0",
+  "actualLanIp": "192.168.3.96",
+  "readyAddress": "0.0.0.0:64225",
+  "serviceExitCode": 0,
+  "stdoutSha256": "880e9a27a5885326b31c246e86a84a5c61692b2889f8dbcb8b08d0e96eb88789",
+  "stderrSha256": "bb5650fc21427ceaafba83d4d2d6e14822e90f0592a76e665096f70b2565920c",
+  "binarySha256After": "21458f19bdc4f1becc1366c3e395ed63dd60a769357713cf77fca97196479383",
+  "binaryUnchanged": true,
+  "probeSourceSha256": "c712cffa2ea799decc267ee79f5d0b2ca7c77067449cf4876a6ef2983cc7b8d3",
+  "credentialFilesNotCopied": true
+}

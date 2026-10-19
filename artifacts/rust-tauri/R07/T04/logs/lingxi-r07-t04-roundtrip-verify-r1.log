@@ -1,0 +1,4 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.82s
+     Running `/private/tmp/lingxi-r07-build/debug/lingxi-protocol-verify --ts /private/tmp/lingxi-r07-t04-roundtrip-r3`
+OK: 66 golden samples verified (Rust decode→encode byte-stable; TS re-encoded copies byte-identical)

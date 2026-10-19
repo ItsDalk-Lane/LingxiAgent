@@ -15,6 +15,7 @@ import {
 } from '../services/server-connection';
 import { t } from './helpers';
 import { loadAgents, loadAvatars, loadProvidersSummary, loadSettingsModels, loadSettingsSnapshot } from './actions';
+import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from './connection-owner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { SettingsNav } from './SettingsNav';
 import { Toast } from './Toast';
@@ -72,6 +73,12 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   about: AboutTab,
 };
 
+// 只开放本阶段已接真实服务的设置；用量和环境检查分别由T10/T12接入。
+const RUST_SETTINGS_TABS = new Set([
+  'agent', 'access', 'me', 'interface', 'keybindings', 'general', 'browser', 'work',
+  'skills', 'mcp', 'bridge', 'providers', 'models', 'sharing', 'experiments', 'security', 'about',
+]);
+
 function connectionState(connection: ServerConnection | null) {
   const persisted = readPersistedServerConnectionState();
   const serverConnections = connection
@@ -92,6 +99,7 @@ function markRustCoreUnavailable(store: SettingsStore): void {
   const reason = t('settings.rustCoreUnavailable');
   store.set({
     rustSettingsUnavailable: true,
+    settingsIdentityOwner: null,
     activeTab: 'access',
     agents: [],
     currentAgentId: null,
@@ -152,9 +160,17 @@ export function SettingsContent({
   onActiveTabChange,
   listenToWindowTabSwitch = false,
 }: SettingsContentProps) {
-  const { activeTab, ready, rustSettingsUnavailable, rustConnection } = useSettingsStore(
-    useShallow(s => ({ activeTab: s.activeTab, ready: s.ready, rustSettingsUnavailable: s.rustSettingsUnavailable, rustConnection: resolveServerConnection(s)?.serverNodeKind === 'lingxi-service' }))
+  const { activeTab, ready, rustSettingsUnavailable, rustConnection, rustIdentityVerified } = useSettingsStore(
+    useShallow(s => ({ activeTab: s.activeTab, ready: s.ready, rustSettingsUnavailable: s.rustSettingsUnavailable,
+      rustConnection: resolveServerConnection(s)?.serverNodeKind === 'lingxi-service',
+      rustIdentityVerified: ownsSettingsConnection(s.settingsIdentityOwner) }))
   );
+  const rustConnectionKey = useSettingsStore(s => {
+    const connection = resolveServerConnection(s);
+    return connection?.serverNodeKind === 'lingxi-service' ? JSON.stringify(connection) : null;
+  });
+  const rustDataError = useSettingsStore(s => s.agentsError
+    || (s.agents.length > 0 ? s.settingsConfigError : null) || s.runtimeModelsError);
   const set = useSettingsStore(s => s.set);
   const lastReportedActiveTabRef = useRef<string | null>(null);
   const settingsMainRef = useRef<HTMLDivElement>(null);
@@ -162,6 +178,10 @@ export function SettingsContent({
   useEffect(() => {
     initSettings();
   }, []);
+
+  useEffect(() => {
+    if (rustConnectionKey) void initializeRustSettings();
+  }, [rustConnectionKey]);
 
   useEffect(() => {
     if (!listenToWindowTabSwitch) return;
@@ -178,6 +198,10 @@ export function SettingsContent({
     const platform = window.platform;
     if (!platform?.onSettingsChanged) return;
     const unsubscribe = platform.onSettingsChanged((type: string, data: unknown) => {
+      if (type === 'bridge-status-changed') {
+        window.dispatchEvent(new CustomEvent('hana-bridge-reload', { detail: data }));
+        return;
+      }
       if (type === 'skills-changed') {
         window.dispatchEvent(new CustomEvent('hana-skills-changed', { detail: data || {} }));
       } else if (type === 'models-changed') {
@@ -224,6 +248,7 @@ export function SettingsContent({
       const expectedRust = previousLocal?.serverNodeKind === 'lingxi-service';
       if (previousLocal) lastLocalIdentity = { ...previousLocal, token: null };
       const previousActiveId = store.activeServerConnectionId;
+      const localWasSelected = previousActiveId === LOCAL_CONNECTION_ID;
       const cleared = refreshLocalServerConnectionState({
         serverConnections: store.serverConnections,
         activeServerConnectionId: previousActiveId,
@@ -255,10 +280,7 @@ export function SettingsContent({
         });
         current.set({ serverPort: Number(transport.port), serverToken: transport.token, ...next });
         if (verified.serverNodeKind === 'lingxi-service') {
-          current.set({ rustSettingsUnavailable: true });
-          void loadAgents().then(() => Promise.all([loadSettingsSnapshot(), loadAvatars()])).catch(error => current.showToast(String(error), 'error'));
-          void loadSettingsModels().catch(error => current.showToast(String(error), 'error'));
-          void loadProvidersSummary().catch(error => current.showToast(String(error), 'error'));
+          void initializeRustSettings();
           return;
         }
         current.set({ rustSettingsUnavailable: false });
@@ -276,6 +298,7 @@ export function SettingsContent({
         } catch { /* 拒绝坏协议字段 */ }
       }
       store.showToast(t('status.serverRestartInvalid'), 'error');
+      if (expectedRust && localWasSelected) markRustCoreUnavailable(useSettingsStore.getState());
       // 桥事件缺字段或仍给旧令牌时保持断开，等待下一次有效重启事件。
     });
     return () => {
@@ -359,11 +382,12 @@ export function SettingsContent({
                 </div>
               )}
               <ErrorBoundary region={effectiveActiveTab} resetKeys={[effectiveActiveTab]}>
-                {rustConnection && ready && effectiveActiveTab === 'agent' ? (
+                {rustConnection && ready && rustIdentityVerified && !rustSettingsUnavailable && effectiveActiveTab === 'agent' ? (
                   <SettingsPage tab={effectiveActiveTab} layout="flow">
                     <RustAgentTab />
                   </SettingsPage>
-                ) : rustSettingsUnavailable && effectiveActiveTab !== 'access' ? (
+                ) : effectiveActiveTab !== 'access' && (rustSettingsUnavailable
+                  || (rustConnection && (!rustIdentityVerified || !RUST_SETTINGS_TABS.has(effectiveActiveTab)))) ? (
                   // Rust core 不可用时整页内容替换为提示条。提示条仍走同一个页面
                   // 原语（同 padding/布局），只是页体从 <ActiveTab /> 换成 alert——
                   // SettingsContent 的页面清单契约要求每个 tab 的页体都是
@@ -373,6 +397,7 @@ export function SettingsContent({
                   </SettingsPage>
                 ) : (
                   <SettingsPage tab={effectiveActiveTab} layout={effectiveActiveTab === 'providers' ? 'fill' : 'flow'}>
+                    {rustConnection && rustDataError && <div role="alert">{t('settings.refreshFailed')}: {rustDataError}</div>}
                     <ActiveTab />
                   </SettingsPage>
                 )}
@@ -405,6 +430,78 @@ export function SettingsContent({
   );
 }
 
+let rustInitialization: { owner: SettingsConnectionOwner; promise: Promise<void> } | null = null;
+
+/** 冷启动、切换连接和重启共用真实身份核验；单项配置错误仍允许用户进入设置修复。 */
+function initializeRustSettings(): Promise<void> {
+  const connection = resolveServerConnection(useSettingsStore.getState());
+  if (connection?.serverNodeKind !== 'lingxi-service') return Promise.resolve();
+  if (rustInitialization && ownsSettingsConnection(rustInitialization.owner)) return rustInitialization.promise;
+  const owner = captureSettingsConnection();
+  const store = useSettingsStore.getState();
+  if (!ownsSettingsConnection(store.settingsIdentityOwner)) store.set({ rustSettingsUnavailable: true });
+  const timeout = setTimeout(() => {
+    if (!ownsSettingsConnection(owner)) return;
+    if (!useSettingsStore.getState().ready) {
+      console.warn('[settings] init timeout (15s), forcing ready');
+      useSettingsStore.getState().set({ ready: true, rustSettingsUnavailable: true });
+    }
+  }, 15_000);
+  const promise = (async () => {
+    try {
+      await window.i18n.load('zh-CN');
+      if (!ownsSettingsConnection(owner)) return;
+      const identity = await (await lingxiFetch('/lingxi/v1/server/identity')).json();
+      if (!ownsSettingsConnection(owner)) return;
+      if (identity?.serverNodeKind !== 'lingxi-service'
+        || identity.serverNodeTransport !== (connection.serverNodeTransport || 'http')
+        || typeof identity.serverId !== 'string' || !identity.serverId
+        || typeof identity.studioId !== 'string' || !identity.studioId
+        || !['user', 'paired'].includes(identity.authState)
+        || !Array.isArray(identity.capabilities)) {
+        throw new Error('Rust settings server identity does not match');
+      }
+      const localeConfig = await (await lingxiFetch('/api/config')).json();
+      if (!ownsSettingsConnection(owner)) return;
+      if (localeConfig.error) throw new Error(localeConfig.error);
+      await window.i18n.load(localeConfig.locale || 'zh-CN');
+      if (!ownsSettingsConnection(owner)) return;
+      useSettingsStore.getState().set({ settingsIdentityOwner: owner });
+      // 供应商未配置、尚无助手或某个资料读取失败由各页显示，不能堵住修复它们的入口。
+      const agentsReady = loadAgents();
+      await Promise.all([
+        agentsReady,
+        agentsReady.then(() => ownsSettingsConnection(owner) ? loadSettingsSnapshot({ retainSameKeyData: true }) : undefined),
+        agentsReady.then(() => ownsSettingsConnection(owner) ? loadAvatars() : undefined),
+        loadSettingsModels(),
+      ]);
+      if (!ownsSettingsConnection(owner)) return;
+      if (!ownsSettingsConnection(useSettingsStore.getState().settingsIdentityOwner)) {
+        // 本轮读取期间撤销了身份，也要结束加载，保留可见的恢复入口。
+        useSettingsStore.getState().set({ ready: true, rustSettingsUnavailable: true });
+        return;
+      }
+      // 期间的真实401会撤销身份；迟到的普通资源结果不能复活它。
+      useSettingsStore.getState().set({ ready: true, rustSettingsUnavailable: false });
+      void loadProvidersSummary().catch(error => console.error('[settings] providers summary failed:', error));
+    } catch (error) {
+      if (!ownsSettingsConnection(owner)) return;
+      const reason = error instanceof Error ? error.message : String(error);
+      console.error('[settings] init failed:', error);
+      const current = useSettingsStore.getState();
+      current.set({ ready: true, settingsIdentityOwner: null, rustSettingsUnavailable: true,
+        settingsConfigStatus: 'error', settingsConfigError: reason });
+      current.showToast(reason, 'error');
+    } finally {
+      clearTimeout(timeout);
+    }
+  })();
+  const active = { owner, promise };
+  rustInitialization = active;
+  void promise.finally(() => { if (rustInitialization === active) rustInitialization = null; });
+  return promise;
+}
+
 /** 初始化：连接三要素并行 → 连接就绪后全部数据加载并行（含供应商摘要） */
 async function initSettings() {
   const platform = window.platform;
@@ -418,6 +515,7 @@ async function initSettings() {
 
   // 超时保护：15 秒后强制显示，防止无限白屏
   const timeout = setTimeout(() => {
+    if (requestedRust) return;
     if (!useSettingsStore.getState().ready) {
       console.warn('[settings] init timeout (15s), forcing ready');
       useSettingsStore.getState().set({ ready: true });
@@ -460,22 +558,7 @@ async function initSettings() {
     requestedRust = useSettingsStore.getState().activeServerConnection?.serverNodeKind === 'lingxi-service';
 
     if (requestedRust) {
-      await window.i18n.load('zh-CN');
-      // 助手设置已有真实读写面；其他尚未接入的导航页仍明确显示不可用。
-      store.set({ rustSettingsUnavailable: true });
-      const identityResponse = await lingxiFetch('/lingxi/v1/server/identity');
-      const identity = await identityResponse.json();
-      if (identity?.serverNodeKind !== 'lingxi-service') {
-        throw new Error('Rust settings server identity does not match');
-      }
-      const localeResponse = await lingxiFetch('/api/config');
-      const localeConfig = await localeResponse.json();
-      if (localeConfig.error) throw new Error(localeConfig.error);
-      await window.i18n.load(localeConfig.locale || 'zh-CN');
-      const agentsReady = loadAgents();
-      await Promise.all([agentsReady, agentsReady.then(() => loadSettingsSnapshot({ retainSameKeyData: true })), agentsReady.then(() => loadAvatars()), loadSettingsModels()]);
-      store.set({ ready: true });
-      void loadProvidersSummary().catch(error => console.error('[settings] providers summary failed:', error));
+      await initializeRustSettings();
       return;
     }
     store.set({ rustSettingsUnavailable: false });

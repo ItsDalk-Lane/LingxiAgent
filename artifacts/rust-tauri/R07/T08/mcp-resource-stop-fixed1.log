@@ -1,0 +1,17 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_mcp_remote") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 25s
+     Running tests/r07_t08_mcp_remote.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_remote-238415c6ba6a30d9)
+
+running 1 test
+MCP远端隔离现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-remote-5e55f7ba8892eaaa
+自有官方SDK远端资源实际观测：{"deleteRequests":1,"handlerCancelNotifications":1,"handlerCtBranch":1,"handlerCtCancelled":true,"handlerDropCtCancelled":1,"protocolVersions":["2025-11-25"],"remoteActive":0,"remoteHandlerDropped":1,"wireCancelNotifications":1}
+test actual_http_apps_visibility_launch_input_resources_and_generation_cancellation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 2.04s
+

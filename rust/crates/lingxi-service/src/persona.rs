@@ -48,6 +48,11 @@ impl PersonaService {
     fn store(&self) -> am::PersonaFiles {
         am::PersonaFiles::new(&self.agents_root, &self.product_dir)
     }
+
+    /// 日记等后台面的纯人格材料根（不触发 dream 恢复等 gather 副作用）。
+    pub(crate) fn material_roots(&self) -> (PathBuf, PathBuf) {
+        (self.agents_root.clone(), self.product_dir.clone())
+    }
 }
 
 // 路径必须仍在真实助手目录内；拒绝链接，不借头像或人格地址读写外部文件。

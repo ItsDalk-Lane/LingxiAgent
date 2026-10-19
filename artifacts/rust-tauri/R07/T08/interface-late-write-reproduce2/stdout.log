@@ -1,0 +1,15 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx (4 tests | 4 failed) 1956ms
+   × actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-save) 572ms
+   × actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-reset) 426ms
+   × actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (sidebar-save) 449ms
+   × actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (archive-import-aba) 508ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  18:44:07
+   Duration  3.68s (transform 1.11s, setup 20ms, import 1.42s, tests 1.96s, environment 228ms)
+
+JSON report written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/interface-late-write-reproduce2/vitest-results.json

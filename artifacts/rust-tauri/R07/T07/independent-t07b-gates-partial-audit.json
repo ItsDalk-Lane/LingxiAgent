@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "status": "EIGHT_GATES_VERIFIED_FINAL_GATES_PENDING",
+  "checkedAt": "2026-10-18T03:03:01.135337+00:00",
+  "expectedFinalGates": [
+    "fmt",
+    "clippy",
+    "service",
+    "adapter",
+    "kernel",
+    "protocol",
+    "boundaries",
+    "build",
+    "ui",
+    "types",
+    "protocol-tests"
+  ],
+  "verifiedGates": [
+    "fmt",
+    "clippy",
+    "protocol",
+    "protocol-tests",
+    "kernel",
+    "boundaries",
+    "adapter",
+    "types"
+  ],
+  "pendingGates": [
+    "service",
+    "build",
+    "ui"
+  ],
+  "results": [
+    {
+      "gate": "fmt",
+      "receipt": "t07b-fmt.json",
+      "receiptSha256": "c11a113c1d585360673d6fe4683070cf59416ac0665edbcbabd73be8a8d2fbea",
+      "log": "t07b-fmt.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": []
+    },
+    {
+      "gate": "clippy",
+      "receipt": "t07b-clippy.json",
+      "receiptSha256": "2192b6d84ee5fc02d26bef7e14e9254ae944941fad68d8c4191077eef7382ad3",
+      "log": "t07b-clippy.log",
+      "logSha256": "d4d93431f74d05b4838127b17e86c69fb7297ba77d802cf6f605cfc79fb0ab17",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": [
+        "    Finished `dev` profile [unoptimized + debuginfo] target(s) in 59.23s"
+      ]
+    },
+    {
+      "gate": "protocol",
+      "receipt": "t07b-protocol.json",
+      "receiptSha256": "1aa07c9c789e7dab851937c313f1e1e69fa38a7b773a9b4e04bcfa4ba3d06b88",
+      "log": "t07b-protocol.log",
+      "logSha256": "41aa43acf572a22b07245f608695a7f66dbb8f1312b1fa2e3bff87ffeab261f0",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": []
+    },
+    {
+      "gate": "protocol-tests",
+      "receipt": "t07b-protocol-tests.json",
+      "receiptSha256": "cb01fde05146ac15ebd5291feb7a718dfff171befad880a50855e0648035c321",
+      "log": "t07b-protocol-tests.log",
+      "logSha256": "0f0fab5d36b979d4a0d9f0f122a93e4db50c4c170cf87912c4f30ec2e283c204",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s",
+        "test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "gate": "kernel",
+      "receipt": "t07b-kernel.json",
+      "receiptSha256": "2eea5da31f43d30426164e6321b58655d2a694a387ea98b0f985b8faac4c103f",
+      "log": "t07b-kernel.log",
+      "logSha256": "c38facba57279e8211726f1640e4d4f5b9b3c1a8f4a5cf1c1a7a231e979753fb",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": [
+        "    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.93s",
+        "test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s",
+        "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "gate": "boundaries",
+      "receipt": "t07b-boundaries.json",
+      "receiptSha256": "d967da3dffcabbeea7e88dd0efbfac3aec981126b5b38a2a19f179a5906705a7",
+      "log": "t07b-boundaries.log",
+      "logSha256": "639c14da4d4db5655ec2449ed7c401ab077a13e2a5255019489a41ea88a20dc6",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": [
+        "PASS rule DEP-02 OK for module lingxi-kernel",
+        "PASS rule DEP-03 OK for module lingxi-kernel",
+        "PASS rule DEP-04 OK for module lingxi-protocol",
+        "PASS rule DEP-05 OK for module tauri-host",
+        "PASS rule DEP-09 OK for module lingxi-adapters",
+        "PASS rule DEP-06 OK for module lingxi-kernel",
+        "PASS rule DEP-07 OK for module lingxi-protocol",
+        "PASS rule DEP-07 OK for module lingxi-kernel",
+        "PASS rule DEP-07 OK for module lingxi-adapters",
+        "PASS rule DEP-07 OK for module lingxi-service",
+        "PASS rule DEP-07 OK for module xtask",
+        "PASS rule DEP-07 OK for module lingxi-spike",
+        "PASS rule DEP-07 OK for module lingxi-browser-spike",
+        "PASS rule DEP-07 OK for module lingxi-test-guard",
+        "PASS rule DEP-08 OK for module lingxi-kernel",
+        "PASS D5-reverse OK: every cargo workspace member is a registered module"
+      ]
+    },
+    {
+      "gate": "adapter",
+      "receipt": "t07b-adapter.json",
+      "receiptSha256": "f721409540cb32c4b2da2ab29398c7c3d3100875cad56f428201ff0f63fe3325",
+      "log": "t07b-adapter.log",
+      "logSha256": "e6d846d383e3b9aac7df6b218bb34e947e1b6fa6e6d3a20ef073ca8114ef1371",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": [
+        "test result: ok. 138 passed; 0 failed; 13 ignored; 0 measured; 0 filtered out; finished in 0.37s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s",
+        "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.45s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s",
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s"
+      ]
+    },
+    {
+      "gate": "types",
+      "receipt": "t07b-types.json",
+      "receiptSha256": "491adc0ab841d99276ff8c71b9c16c0bd82a272b7afc1f0742e377c000eef317",
+      "log": "t07b-types.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "checks": {
+        "candidate": true,
+        "name": true,
+        "command": true,
+        "exitCode": true,
+        "sourceFingerprint": true,
+        "sourceFingerprintAfter": true,
+        "sourceUnchanged": true,
+        "baseCommitAfter": true,
+        "logSha256": true,
+        "cwd": true,
+        "timeOrdered": true
+      },
+      "allChecksPass": true,
+      "summaries": []
+    }
+  ],
+  "errors": [],
+  "currentSourceMismatches": [],
+  "allAvailableChecksPass": true,
+  "cargoExecutedByReviewer": false,
+  "ignoredTests": {
+    "adapter": [
+      "test browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted ... ignored, 需要可见Chrome窗口，单独执行原生恢复与回收检查",
+      "test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... ignored, 需要显式提供证据目录，并在原生Chrome测试表单中手动输入",
+      "test browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "test browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap ... ignored, 需要真实Chromium；R07门禁显式运行"
+    ],
+    "count": 13,
+    "interpretation": "未执行，不计通过；2项需要可见Chrome或人工输入，11项需要真实Chromium且标注应在R07单独运行。现有8门禁回执未证明这11项已执行。"
+  }
+}

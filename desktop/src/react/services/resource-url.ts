@@ -23,7 +23,7 @@ export function resolveFileRefUrl(ref: FileRef, {
 }): FileRefUrlResult {
   const isLocalTransport = !connection || isLocalOwnerConnection(connection);
   const getFileUrl = platform?.getFileUrl;
-  const canUseLocalFile = preferLocalFile
+  const canUseLocalFile = connection?.serverNodeKind !== 'lingxi-service' && preferLocalFile
     && isLocalTransport
     && !!ref.path
     && typeof getFileUrl === 'function';
@@ -51,7 +51,7 @@ export function resolveFileRefUrl(ref: FileRef, {
     };
   }
 
-  if (ref.path && isLocalTransport) {
+  if (ref.path && isLocalTransport && connection?.serverNodeKind !== 'lingxi-service') {
     if (typeof getFileUrl !== 'function') {
       throw new Error('platform.getFileUrl not available and resource content link missing');
     }

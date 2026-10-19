@@ -1,0 +1,7 @@
+HTTP/1.1 403 Forbidden
+content-type: application/json
+content-length: 206
+connection: close
+date: Sun, 18 Oct 2026 12:37:28 GMT
+
+{"code":"forbidden","details":{"causeId":"transport.bad_origin","reason":"bad_origin","requestId":"req-e332cf2e994890f079208dd07b69c55a"},"message":"transport policy rejected the request","retryable":false}

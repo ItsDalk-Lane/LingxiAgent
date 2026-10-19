@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSettingsStore } from '../../store';
 import { lingxiFetch } from '../../api';
+import { captureSettingsConnection, ownsSettingsConnection } from '../../connection-owner';
 import { t } from '../../helpers';
 import { loadSettingsConfig } from '../../actions';
 import { KeyInput } from '../../widgets/KeyInput';
@@ -26,13 +27,17 @@ function searchProviderNeedsApiKey(provider: string): boolean {
 }
 
 export function SearchApiKeyConfig() {
+  const connection = useSettingsStore(s => s.activeServerConnection);
   const globalModelsConfig = useSettingsStore(s => s.globalModelsConfig);
   const showToast = useSettingsStore(s => s.showToast);
   const savedSearchApiKeys = normalizeSearchApiKeys(globalModelsConfig?.search?.api_keys || {});
   const savedLegacySearchKey = globalModelsConfig?.search?.api_key || '';
+  const keyOwner = useRef(captureSettingsConnection());
   const [searchApiKeys, setSearchApiKeys] = useState<Record<string, string>>({});
   const [searchKeyEdited, setSearchKeyEdited] = useState<Record<string, boolean>>({});
   const [verifyingProviders, setVerifyingProviders] = useState<Record<string, boolean>>({});
+
+  useEffect(() => { keyOwner.current = captureSettingsConnection(); setSearchApiKeys({}); setSearchKeyEdited({}); setVerifyingProviders({}); }, [connection]);
 
   // 从后端同步已保存的 key
   useEffect(() => {
@@ -54,6 +59,8 @@ export function SearchApiKeyConfig() {
 
   const verifySearch = async (provider: string) => {
     if (verifyingProviders[provider]) return;
+    const owner = keyOwner.current;
+    if (!ownsSettingsConnection(owner)) return;
     const apiKey = (searchApiKeys[provider] || '').trim();
     if (!provider) { showToast(t('settings.search.noProvider'), 'error'); return; }
     if (searchProviderNeedsApiKey(provider) && !apiKey) { showToast(t('settings.search.noKey'), 'error'); return; }
@@ -65,6 +72,7 @@ export function SearchApiKeyConfig() {
         body: JSON.stringify({ provider, api_key: apiKey, search_provider: searchProvider }),
       });
       const data = await res.json();
+      if (!ownsSettingsConnection(owner)) return;
       if (data.ok) {
         showToast(t('settings.search.verified'), 'success');
         setSearchKeyEdited((prev) => ({ ...prev, [provider]: false }));
@@ -73,10 +81,11 @@ export function SearchApiKeyConfig() {
         showToast(t('settings.search.verifyFailed') + (data.error ? ': ' + data.error : ''), 'error');
       }
     } catch (err: unknown) {
+      if (!ownsSettingsConnection(owner)) return;
       const msg = err instanceof Error ? err.message : String(err);
       showToast(t('settings.saveFailed') + ': ' + msg, 'error');
     } finally {
-      setVerifyingProviders(prev => ({ ...prev, [provider]: false }));
+      if (ownsSettingsConnection(owner)) setVerifyingProviders(prev => ({ ...prev, [provider]: false }));
     }
   };
 

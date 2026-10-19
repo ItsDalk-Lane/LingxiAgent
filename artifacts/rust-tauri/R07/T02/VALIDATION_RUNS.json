@@ -1,0 +1,267 @@
+[
+  {
+    "name": "service",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-service",
+      "--lib",
+      "--test",
+      "r07_bridge_flow",
+      "--test",
+      "r07_bridge_guest_context",
+      "--test",
+      "r07_bridge_notice",
+      "--test",
+      "r07_bridge_permission",
+      "--test",
+      "r07_bridge_session_routes",
+      "--test",
+      "r07_bridge_worker",
+      "--test",
+      "r07_bridge_diagnostic",
+      "--test",
+      "r07_bridge_native_flow",
+      "--test",
+      "r07_bridge_sdk_platforms",
+      "--test",
+      "r07_automation_permission",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "log": "lingxi-r07-t02-service-frozen-r3.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "passed": 523,
+    "basis": "Tool process completion exit0 and explicit per-target test results; source pre/post fingerprints identical.",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "protocol-tests",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-protocol",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T19:43:00.054625+00:00",
+    "endedAt": "2026-10-15T19:43:04.308384+00:00",
+    "log": "lingxi-r07-t02-frozen-r3-protocol-tests.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "protocol-generated",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-protocol",
+      "--bin",
+      "lingxi-protocol-gen",
+      "--locked",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T19:43:04.308687+00:00",
+    "endedAt": "2026-10-15T19:43:05.754130+00:00",
+    "log": "lingxi-r07-t02-frozen-r3-protocol-generated.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "protocol-roundtrip",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "run",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-protocol",
+      "--bin",
+      "lingxi-protocol-verify",
+      "--locked",
+      "--",
+      "--ts",
+      "/private/tmp/lingxi-r07-t02-connection-ts-roundtrip"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T19:43:05.754493+00:00",
+    "endedAt": "2026-10-15T19:43:06.761897+00:00",
+    "log": "lingxi-r07-t02-frozen-r3-protocol-roundtrip.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "adapter",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "-p",
+      "lingxi-adapters",
+      "--test",
+      "r07_bridge_store",
+      "--test",
+      "r07_bridge_effect_store",
+      "--test",
+      "r07_bridge_message_projection",
+      "--test",
+      "r07_bridge_notice_render",
+      "--test",
+      "session_file_store",
+      "--test",
+      "r06_ar_f14_migration_receipts",
+      "--locked"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T19:43:06.762195+00:00",
+    "endedAt": "2026-10-15T19:43:15.020319+00:00",
+    "log": "lingxi-r07-t02-frozen-r3-adapter.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "clippy",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--workspace",
+      "--all-targets",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T19:43:15.020606+00:00",
+    "endedAt": "2026-10-15T19:43:15.399776+00:00",
+    "log": "lingxi-r07-t02-frozen-r3-clippy.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "format",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "fmt",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exitCode": 0,
+    "startedAt": "2026-10-15T19:43:15.400048+00:00",
+    "endedAt": "2026-10-15T19:43:17.846564+00:00",
+    "log": "lingxi-r07-t02-frozen-r3-format.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "typescript",
+    "command": [
+      "npm",
+      "run",
+      "typecheck"
+    ],
+    "exitCode": 0,
+    "log": "lingxi-r07-t02-typecheck-final.log",
+    "sourceBinding": "Completed before final Rust-only lint fixes; consumed TypeScript/runtime/rules inputs unchanged in frozen-r3. Historical snapshots retained; not retroactively asserting full-worktree identity.",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "ui-sdk",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "tests/r07-bridge-sdk-worker.test.ts",
+      "tests/migration/r01-t02/bridge-contract.test.mjs",
+      "tests/migration/r01-t02/automation-contract.test.mjs",
+      "tests/feishu-adapter.test.ts",
+      "tests/dingtalk-adapter.test.ts",
+      "tests/wechat-adapter.test.ts",
+      "desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx",
+      "desktop/src/react/__tests__/settings/BridgeTab.credentials.test.tsx",
+      "desktop/src/react/__tests__/settings/BridgeTab.permission-mode.test.tsx",
+      "desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx",
+      "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+      "desktop/src/react/__tests__/services/server-connection.test.ts",
+      "desktop/src/react/__tests__/services/websocket.test.ts",
+      "desktop/src/react/__tests__/stores/bridge-slice.test.ts",
+      "--maxWorkers=2"
+    ],
+    "exitCode": 0,
+    "log": "lingxi-r07-t02-ui-sdk-final.log",
+    "sourceBinding": "Completed before final Rust-only lint fixes; consumed TypeScript/runtime/rules inputs unchanged in frozen-r3. Historical snapshots retained; not retroactively asserting full-worktree identity.",
+    "environment": {
+      "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+      "CARGO_BUILD_JOBS": "4",
+      "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+      "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+    }
+  },
+  {
+    "name": "ownership",
+    "command": [
+      "python3",
+      "docs/rust-tauri/R01/r01_t01_check_ownership.py"
+    ],
+    "exitCode": 0,
+    "log": "lingxi-r07-t02-frozen-r3-ownership.log",
+    "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9"
+  }
+]

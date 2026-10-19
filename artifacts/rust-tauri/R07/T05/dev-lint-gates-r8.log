@@ -1,0 +1,45 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:869:
+ async fn bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets() {
+     let h = Harness::boot("read_only").await;
+     let path = h.workspace.join("article.md");
+-    let body = json!({"filePath":path,"presetId":"blue-island-watercolor","requestId":"human-preset-one"});
++    let body =
++        json!({"filePath":path,"presetId":"blue-island-watercolor","requestId":"human-preset-one"});
+     let (status, value) = h
+         .http(
+             reqwest::Method::POST,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:881:
+     assert_eq!(value["ok"], true);
+     let gallery = repo().join("desktop/src/assets/cover-gallery/blue-island-watercolor.jpg");
+     let copied = value["beautifyCover"]["attachmentPath"].as_str().unwrap();
+-    assert_eq!(std::fs::read(copied).unwrap(), std::fs::read(&gallery).unwrap());
++    assert_eq!(
++        std::fs::read(copied).unwrap(),
++        std::fs::read(&gallery).unwrap()
++    );
+     let markdown = std::fs::read_to_string(&path).unwrap();
+     assert!(markdown.contains("title: Kept"));
+     assert!(markdown.contains("keep: 7"));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:895:
+         .await;
+     assert_eq!(status, 200, "{replayed}");
+     assert_eq!(
+-        replayed["beautifyCover"]["attachmentPath"],
+-        value["beautifyCover"]["attachmentPath"],
++        replayed["beautifyCover"]["attachmentPath"], value["beautifyCover"]["attachmentPath"],
+         "同一 requestId 只读原收据"
+     );
+     let before = std::fs::read(&path).unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:908:
+         )
+         .await;
+     assert_eq!(status, 400, "{refused}");
+-    assert_eq!(std::fs::read(&path).unwrap(), before, "未知预设不得触碰文档");
++    assert_eq!(
++        std::fs::read(&path).unwrap(),
++        before,
++        "未知预设不得触碰文档"
++    );
+     h.close().await;
+ }
+ 

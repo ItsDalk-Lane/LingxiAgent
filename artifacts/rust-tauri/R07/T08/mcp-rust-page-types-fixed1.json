@@ -1,0 +1,24 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "typecheck"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 26.97745108604431,
+  "sourceBefore": {
+    "desktop/src/react/settings/tabs/McpTab.tsx": "7dd258b9130afdbab4576ef4ebbeddfa5d7126c6ee1e8ce7fc97dd58a20f5eec",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "2ef756206da8deadcaed7e9904dee0fc0389710aa4fb1441b4cfba81463a9f8a",
+    "desktop/src/react/settings/tabs/mcp/ConnectorImport.tsx": "1f31743dbd2b302ba91fdd5739ed922b81353503b4bd1cd64e337d696c2c3f65",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "a4f8f7dd208ec8a087a79f1cc182388ad25887871289265c7441441098a94dee",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts": "0d78cdf970f159f7870d254c303715c36ff948f4c8afff3a407f412b877dab7f"
+  },
+  "sourceAfter": {
+    "desktop/src/react/settings/tabs/McpTab.tsx": "7dd258b9130afdbab4576ef4ebbeddfa5d7126c6ee1e8ce7fc97dd58a20f5eec",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "2ef756206da8deadcaed7e9904dee0fc0389710aa4fb1441b4cfba81463a9f8a",
+    "desktop/src/react/settings/tabs/mcp/ConnectorImport.tsx": "1f31743dbd2b302ba91fdd5739ed922b81353503b4bd1cd64e337d696c2c3f65",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "a4f8f7dd208ec8a087a79f1cc182388ad25887871289265c7441441098a94dee",
+    "desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts": "0d78cdf970f159f7870d254c303715c36ff948f4c8afff3a407f412b877dab7f"
+  },
+  "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+}

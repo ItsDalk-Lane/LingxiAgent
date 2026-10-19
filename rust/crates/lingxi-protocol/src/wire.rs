@@ -213,6 +213,8 @@ pub enum PrincipalKind {
     LocalUser,
     Device,
     WebSession,
+    Bridge,
+    BridgeTakeover,
     Automation,
 }
 

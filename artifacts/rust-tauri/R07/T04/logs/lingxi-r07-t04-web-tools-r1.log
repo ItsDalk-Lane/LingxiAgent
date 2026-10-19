@@ -1,0 +1,31 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 58.36s
+     Running tests/r07_web_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_web_tools-25ed53d11b0cce5c)
+
+running 7 tests
+test auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics ... ok
+test public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request ... ok
+test public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file ... FAILED
+test provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics ... ok
+test auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back ... ok
+test all_five_http_providers_use_real_gateway_and_distinct_authentication ... ok
+test verification_real_http_masks_same_provider_and_only_persists_after_success ... ok
+
+failures:
+
+---- public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file stdout ----
+
+thread 'public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file' (760781) panicked at crates/lingxi-service/tests/r07_web_tools.rs:426:18:
+正式工具意外失败：Failed { error: ProtocolError { code: NotFound, message: "tool target \"target tool:first-party:read\" is not registered on this gateway", retryable: false, details: None } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_web_tools`

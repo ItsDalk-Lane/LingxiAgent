@@ -777,6 +777,10 @@ impl ProcessTools {
             Ok(params) => params,
             Err(outcome) => return outcome,
         };
+        let workflow_scope = crate::toolgateway::workflow_scope();
+        if workflow_scope.is_some() && (params.tty || self.sandbox.is_none()) {
+            return failed(ErrorCode::Forbidden, "workflow nodes require contained execution; interactive or unsandboxed execution is unavailable".to_string());
+        }
         let cwd_scope = match self.authorize_cwd(ctx, &params.workdir) {
             Ok(scope) => scope,
             Err(outcome) => return outcome,
@@ -799,13 +803,18 @@ impl ProcessTools {
         let mut argv = params.argv.clone();
         let mut contained_by: Option<&'static str> = None;
         if let Some(port) = self.sandbox.as_ref().filter(|_| !params.tty) {
-            match port.wrap(SandboxCommandRequest {
+            let request = SandboxCommandRequest {
                 argv: params.argv.clone(),
                 // The incumbent's model-facing one-shot path is the
                 // CONTAINED variant (defaultSandboxExec denies network).
                 network: SandboxNetworkRequest::Contained,
                 cwd: Some(cwd.clone()),
-            }) {
+            };
+            let wrapped = match workflow_scope.as_ref() {
+                Some(scope) => port.wrap_scoped(request, &scope.write_roots),
+                None => port.wrap(request),
+            };
+            match wrapped {
                 Ok(wrapped) => {
                     argv = wrapped.argv;
                     contained_by = Some(port.backend());

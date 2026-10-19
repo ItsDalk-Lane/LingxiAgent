@@ -113,6 +113,9 @@ fn describe_prior(input: &ModelTurnInput) -> Vec<String> {
             lingxi_kernel::model_exchange::ExchangeItem::CompactionSummary { .. } => {
                 "compaction_summary".to_string()
             }
+            lingxi_kernel::model_exchange::ExchangeItem::HostNotice { .. } => {
+                "host_notice".to_string()
+            }
             lingxi_kernel::model_exchange::ExchangeItem::CompactionInstruction { .. } => {
                 "compaction_instruction".to_string()
             }

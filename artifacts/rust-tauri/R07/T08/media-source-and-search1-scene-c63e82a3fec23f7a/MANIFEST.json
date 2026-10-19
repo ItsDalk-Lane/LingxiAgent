@@ -1,0 +1,237 @@
+{
+  "ownedFixtureHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-media-source-c63e82a3fec23f7a",
+  "receipt": "artifacts/rust-tauri/R07/T08/media-source-and-search1.json",
+  "scope": "仅本次失败自有合成Source/兼容文件/数据库/产物，命令退出后复制；不含用户真实数据",
+  "files": [
+    {
+      "path": ".lingxi-recovery-00b67845cc631e48772b1789047c9749.original",
+      "bytes": 2164,
+      "sha256": "38aee39669ac172548b650bf12ecc6dc4e184fb99bd947dc4baeb9d962a1992f"
+    },
+    {
+      "path": ".lingxi-recovery-4e65df46a066b68364f60283faed8ad2.original",
+      "bytes": 1493,
+      "sha256": "528d2135aabff7b5e0ca484ca5084010e75d5546f242a65236d2df9a38425b94"
+    },
+    {
+      "path": ".lingxi-recovery-564d5224c93536be5bd1ebeda2ce6705.original",
+      "bytes": 1176,
+      "sha256": "b9117c443a21d26415e88e50b06c7cf490935b6c199deb0986f02d3c3dbd1aab"
+    },
+    {
+      "path": ".lingxi-recovery-5c24774268531a1bf9e865137ec27a59.original",
+      "bytes": 835,
+      "sha256": "86bb765c113da19c2489553b12876891007e8693ed11597ef9246b06c31d60c0"
+    },
+    {
+      "path": ".lingxi-recovery-79c30c3f24ffc6e8b1b608a44362f3d1.original",
+      "bytes": 2176,
+      "sha256": "ce05e7686f2f5baa57ee7c357e85c4ed5a1993fb739c93c7d81ec9405f61dc70"
+    },
+    {
+      "path": ".lingxi-recovery-9d9432835a6116e84d8e4280ee9f65f4.original",
+      "bytes": 1804,
+      "sha256": "3b18eff79227d06c0da4669a6fe60080cf29817219f99c94d76b7e83fe54c070"
+    },
+    {
+      "path": ".lingxi-recovery-a4d43a3a2062450c5368968cf7eb3dc6.original",
+      "bytes": 2161,
+      "sha256": "547d3760c05833fc47c04a1b1c8b269432d6eae62ad96400a26165a8e9f46dfd"
+    },
+    {
+      "path": ".lingxi-recovery-abc645a3e2c22d5d4d0bc0019f1b6826.original",
+      "bytes": 1173,
+      "sha256": "cc6f292aeb789fdffc853bd038702d1695b73efe88de81f2c1b2e28b57a58bc1"
+    },
+    {
+      "path": ".lingxi-recovery-d0dc6b2bc5e8389ad6981ce677ddaaa9.original",
+      "bytes": 1490,
+      "sha256": "ac69adfd792be806b83b4161667ad719867b6c54dfc0b5537dba6197fc86fea0"
+    },
+    {
+      "path": ".lingxi-recovery-dc3ca91715895585bf3aa5ed00636529.original",
+      "bytes": 1807,
+      "sha256": "2007e4f00b7b777b2d4854b0d2b2d6f5bd4a473ddf182a3ae0c8a339863b9cd2"
+    },
+    {
+      "path": "agents/a/config.yaml",
+      "bytes": 42,
+      "sha256": "d9c13312a3b336f6ad4f1e54ccea77f3de5cf53db13f8a0771b34736c54a5577"
+    },
+    {
+      "path": "file-recovery-records/00b67845cc631e48772b1789047c9749.json",
+      "bytes": 1125,
+      "sha256": "be4c029508159e22843020535e96594a8303ec0ea7f31ea212927a5adf89375b"
+    },
+    {
+      "path": "file-recovery-records/4e65df46a066b68364f60283faed8ad2.json",
+      "bytes": 1125,
+      "sha256": "226bf01db93b8002a0005f23688e572ab96dc8f6fc06ccbb9aa0a78fe06d1358"
+    },
+    {
+      "path": "file-recovery-records/564d5224c93536be5bd1ebeda2ce6705.json",
+      "bytes": 1125,
+      "sha256": "1cc9969cf71d1c42e3acf6b643253e33794ec8bf5c66a34c3de7ac02ab668692"
+    },
+    {
+      "path": "file-recovery-records/5c24774268531a1bf9e865137ec27a59.json",
+      "bytes": 1123,
+      "sha256": "43b12940e1897faff7deb7a171e566f380422fb2942c6e9b245ef01af0922cb6"
+    },
+    {
+      "path": "file-recovery-records/79c30c3f24ffc6e8b1b608a44362f3d1.json",
+      "bytes": 1125,
+      "sha256": "c8a40794a4c76ebf3edc6e5763ebc1931ca914258ca3d43077a000df96d4a1c1"
+    },
+    {
+      "path": "file-recovery-records/9d9432835a6116e84d8e4280ee9f65f4.json",
+      "bytes": 1125,
+      "sha256": "9e1a6d6ca848dd3652f32a87374ace1f19bfa4774b265ca77d9fd0d4e601db1c"
+    },
+    {
+      "path": "file-recovery-records/a4d43a3a2062450c5368968cf7eb3dc6.json",
+      "bytes": 1125,
+      "sha256": "532e9ef024f94d285c24062728f4bf85206d8fc414259ed9591023d3e8eff95b"
+    },
+    {
+      "path": "file-recovery-records/abc645a3e2c22d5d4d0bc0019f1b6826.json",
+      "bytes": 1125,
+      "sha256": "7403361c7d8cb40a5ffbdd3f5c969d8fdec4e4610404621ef0856ad33d21e4a1"
+    },
+    {
+      "path": "file-recovery-records/d0dc6b2bc5e8389ad6981ce677ddaaa9.json",
+      "bytes": 1125,
+      "sha256": "735c4e14f948e19cb2c1267f2498d1e69afcc981c6cf56b024c79df283c74cff"
+    },
+    {
+      "path": "file-recovery-records/dc3ca91715895585bf3aa5ed00636529.json",
+      "bytes": 1125,
+      "sha256": "abf2998e105b90d07e80eecc4e91f4b5c59d16a17288e584ad37655d36f504db"
+    },
+    {
+      "path": "file-write-witnesses/aa0ef9c59615e05a3a1c2049acade4e1cae45c15426a725f0a5fd39d1eb966a6.json",
+      "bytes": 218,
+      "sha256": "741094a461cd35b4fe0cfc8938299d5eff0fbad3ead4c0bd86f1f2dc618e1f6f"
+    },
+    {
+      "path": "knowledge/ingestion-worker.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "knowledge/knowledge.db",
+      "bytes": 139264,
+      "sha256": "94683d152eec80c6d35d9f61179de25da19f8ba3895702772b5d932950cda8a6"
+    },
+    {
+      "path": "knowledge/knowledge_index.db",
+      "bytes": 57344,
+      "sha256": "9b402e2ff9130daf4d75368859ae50d7688bccaec4e57ddf92a8414463930d4b"
+    },
+    {
+      "path": "knowledge/knowledge_index.db.guard",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "knowledge/knowledge_index.db.owner",
+      "bytes": 54,
+      "sha256": "710034ea1d688a68ce451748ca6d67d774fc09e279f7a43ba128c29b712940a2"
+    },
+    {
+      "path": "knowledge/knowledge_vector.db",
+      "bytes": 45056,
+      "sha256": "f7c778ac9b2e42df98377f22993d4f9e0016da1f87452e0a5dce2b6e1f4aa36b"
+    },
+    {
+      "path": "knowledge/knowledge_vector.db.guard",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "knowledge/knowledge_vector.db.owner",
+      "bytes": 55,
+      "sha256": "2c77fc5ee8fa211a2e35da97f68bef6c049f6d56ccabe1d7ebc99afc9139e217"
+    },
+    {
+      "path": "lingxi-service/data/runs.db",
+      "bytes": 802816,
+      "sha256": "6eef1768a3955f449bd5575765854868678649673c29fd0b5382796f11695797"
+    },
+    {
+      "path": "lingxi-service/device-credentials.json",
+      "bytes": 157,
+      "sha256": "741b2959cf9449cbf96f8d4ab5319fd4e1c93f512bb90764ed32dcf9fb7b7743"
+    },
+    {
+      "path": "lingxi-service/devices.json",
+      "bytes": 113,
+      "sha256": "7cbda55c8bf53312dcea360b9dcb4d3dfbd1f464b870ad9ad3ba07c2f794858d"
+    },
+    {
+      "path": "lingxi-service/local-token.json",
+      "bytes": 184,
+      "sha256": "c179d2a06958457f18ad2270a35e4b64a64309caa6ed4832c8a42861b88a2e98"
+    },
+    {
+      "path": "lingxi-service/management.json",
+      "bytes": 1813,
+      "sha256": "da91ba7e051963b8a4e0e40d47f99586202af3829508771a160b1f3dd626037a"
+    },
+    {
+      "path": "lingxi-service/media-products/image-1792311039744-16f179d5de541325",
+      "bytes": 68,
+      "sha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460"
+    },
+    {
+      "path": "lingxi-service/media-products/speech-1792311038902-3c3bcbfa86cb4448",
+      "bytes": 28,
+      "sha256": "54e4e0fcee3e26eb9bd2767dc7d965035b0cfad8a31b11c45cf55cc5aa0e54e0"
+    },
+    {
+      "path": "logs/security-audit.jsonl",
+      "bytes": 5528,
+      "sha256": "d2b55413f307471d6039cc38b0db8af39ebdc38b5ee26f1aa4d22d09230b2341"
+    },
+    {
+      "path": "model-plane.json",
+      "bytes": 1823,
+      "sha256": "fba05c09ffc27a85f1e08f43b85e8753f3e3a2b6fa13ed78196a74c465538915"
+    },
+    {
+      "path": "models.json",
+      "bytes": 1427,
+      "sha256": "d35e10b94eea26780d9ab1607db906dd77491c6a3ed6824b684ece5fe18a4ae9"
+    },
+    {
+      "path": "provider-catalog.json",
+      "bytes": 16,
+      "sha256": "9aecf438c3f923ce02f488be25cae648068d632535d5ec4d38b0fa6abb6b055f"
+    },
+    {
+      "path": "provider-plugins/fixture/manifest.json",
+      "bytes": 98,
+      "sha256": "e4321a39d7bc68ae36df75ec3d6a70bb49214ebc372e881542d1c659f197426a"
+    },
+    {
+      "path": "provider-plugins/fixture/providers/fixture.json",
+      "bytes": 1607,
+      "sha256": "52a3b03ac72a029168a7b2d054a9f9181ccd3c2fbd5825dfac51834c9433aec8"
+    },
+    {
+      "path": "session-files/a5e6798b8039f4ee24137ec0/image-18bc8f980c1d0e2d-0_mvdjpt6r_3868069d.jpg",
+      "bytes": 68,
+      "sha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460"
+    },
+    {
+      "path": "session-files/a5e6798b8039f4ee24137ec0/speech-b88743a99ae7b9a2-0_mvdjpsjd_96693117.mp3",
+      "bytes": 28,
+      "sha256": "54e4e0fcee3e26eb9bd2767dc7d965035b0cfad8a31b11c45cf55cc5aa0e54e0"
+    },
+    {
+      "path": "user/preferences.json",
+      "bytes": 24,
+      "sha256": "4b985eb3c0e10ce8a6de2b7e51a01f3200345928085e326371de91ddbeab32c5"
+    }
+  ]
+}

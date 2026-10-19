@@ -1359,6 +1359,7 @@ async fn adversarial_mcp_pagination_walks_all_pages() {
 async fn mcp_unsupported_endpoint_refuses_loudly() {
     let root = unique_dir("adv-unsupported");
     let h = service_harness(&root).await;
+    let generation_before = h.registry.catalog_generation();
     let server = McpServer::new(
         "remote",
         McpEndpoint::Unsupported {
@@ -1388,9 +1389,14 @@ async fn mcp_unsupported_endpoint_refuses_loudly() {
         "{}",
         err.message()
     );
-    // Nothing registered from the refused endpoint (a fresh registry sits
-    // at its initial generation).
-    assert_eq!(h.registry.catalog_generation(), 0);
+    // 正式宿主已有内置工具；拒绝外部端点不能改变原目录或加入该来源。
+    assert_eq!(h.registry.catalog_generation(), generation_before);
+    assert!(h
+        .registry
+        .snapshot()
+        .tools
+        .iter()
+        .all(|tool| !tool.target_id.as_str().starts_with("tool:mcp:remote:")));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -1669,14 +1675,13 @@ async fn worker_sandbox_binding_denies_out_of_boundary_writes() {
     let home = unique_dir("sandbox-home");
     let agent_dir = home.join("agent");
     std::fs::create_dir_all(&agent_dir).expect("agent dir");
-    // The escape target: a file OUTSIDE the sandbox's writable roots. The
-    // parent lives under cargo's CARGO_TARGET_TMPDIR — deliberately NOT
-    // the OS $TMPDIR (the frozen sandbox contract legitimately allows
-    // writes there as temporary resources, so rooting the escape target
-    // under $TMPDIR would make the denial probe degenerate — the same
-    // lesson T06's own harness recorded). It does NOT exist yet: if the
-    // sandbox fails, the hostile write creates it and the test fails.
-    let escape_parent = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
+    // 构建目录可以设在 /private/tmp，不能将它当作禁止写入区域。
+    // 负例固定放在仓库的独立缓存目录，不借用用户已有文件。
+    let probe_root =
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../.cache/r07-sandbox-probes");
+    std::fs::create_dir_all(&probe_root).expect("probe root");
+    let probe_root = probe_root.canonicalize().expect("canonical probe root");
+    let escape_parent = probe_root.join(format!(
         "r04t07-escape-{}-{}",
         std::process::id(),
         std::time::SystemTime::now()
@@ -1684,7 +1689,19 @@ async fn worker_sandbox_binding_denies_out_of_boundary_writes() {
             .expect("clock")
             .as_nanos()
     ));
-    std::fs::create_dir_all(&escape_parent).expect("escape parent");
+    std::fs::create_dir(&escape_parent).expect("unique escape parent");
+    struct ProbeCleanup(PathBuf);
+    impl Drop for ProbeCleanup {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+    let _cleanup = ProbeCleanup(escape_parent.clone());
+    assert!(!escape_parent.starts_with(std::env::temp_dir().canonicalize().unwrap()));
+    #[cfg(unix)]
+    assert!(!escape_parent.starts_with(Path::new("/tmp").canonicalize().unwrap()));
+    assert!(!escape_parent.starts_with(home.canonicalize().unwrap()));
+    assert!(!escape_parent.starts_with(h.ws.canonicalize().unwrap()));
     let escape = escape_parent.join("sandbox-escape.txt");
 
     // The REAL platform sandbox (macOS: seatbelt behind the pinned system

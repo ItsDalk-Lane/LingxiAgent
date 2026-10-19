@@ -1,0 +1,49 @@
+{
+  "started": "2026-10-18T13:00:19.500Z",
+  "finished": "2026-10-18T13:00:20.857Z",
+  "scratch": "/private/tmp/lingxi-card-nav-sMNWdA",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "exitCode": 0,
+  "outcome": {
+    "count": 0,
+    "observed": []
+  },
+  "sourceOverride": null,
+  "diagnosticSources": [
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-navigation-probe.mjs",
+      "sha256": "47b2946c24238ac99a33b2a1581ff6d5866717de7478ae3e78c03507d811bb01"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-electron-launch.mjs",
+      "sha256": "e3ca4ef24ba7feef64addeb63a739a90e505d5e23abe3f937f81a12a88a80f33"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-electron-main.cjs",
+      "sha256": "845fb5fa3822685c26e9bddfcac9fdd570fbd85cb59157d28b38d30101bd0937"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-electron-preload.cjs",
+      "sha256": "1fffd00b6f4d5357a3d7472cb46315291254562fac4e229040121a8b56f1fc0f"
+    },
+    {
+      "path": "desktop/src/react/__tests__/components/r07-t08-card-fixture.tsx",
+      "sha256": "f8275f85b5dc6f374fad6ae3a9cb9c650123c0e6edc7644d260dbadbc06a2fe9"
+    },
+    {
+      "path": "desktop/src/shared/card-frame-navigation.cjs",
+      "sha256": "8dbff1a6b7459f3f1f488eab0c05cdb5c8cf676a6b10c88a643d0c124e4a05cd"
+    }
+  ],
+  "sources": [
+    {
+      "path": "rust/crates/lingxi-service/src/cards.rs",
+      "sha256": "631bdf2536ee233b4b87383f860431c7b02ef4c8f1552b90711c97e7b6158dd8"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "6bff4e0d927d8f15df1f59043e7593b13dbae6f0fe75ae4482bcf802fe56bac3"
+    }
+  ]
+}

@@ -25,7 +25,7 @@ export function installMobilePlatform(): void {
       const url = browserSafeUrl(value);
       if (url) window.open(url, '_blank', 'noopener,noreferrer');
     },
-    openExternal: (url: string) => window.open(url, '_blank', 'noopener,noreferrer'),
+    openExternal: (url: string) => { window.open(url, '_blank', 'noopener,noreferrer'); },
     settingsChanged: () => {},
     syncWindowTheme: () => {},
     onSettingsChanged: () => noopUnsubscribe,
@@ -46,5 +46,7 @@ function browserSafeUrl(value: string): string {
   if (!value) return '';
   if (/^(https?:|data:|blob:)/i.test(value)) return value;
   if (value.startsWith('/api/')) return value;
+  // 只放行正式资源内容地址，本机绝对路径仍不可用于浏览器。
+  if (/^\/lingxi\/v1\/(?:resources\/[^/?#]+\/content|sessions\/[^/?#]+\/files\/[^/?#]+\/content)(?:[?#]|$)/.test(value)) return value;
   return '';
 }

@@ -1,0 +1,59 @@
+{
+  "agents": {
+    "legacy": {
+      "keep": true
+    }
+  },
+  "global": {
+    "keep": "global",
+    "mcp": {
+      "connectors": [
+        {
+          "args": [
+            "--mcp-stdio-server"
+          ],
+          "authorizationToken": "fixture-private-token",
+          "autoStart": true,
+          "command": "/private/tmp/lingxi-r07-build/debug/r04_t07_fixture",
+          "enabled": true,
+          "env": {
+            "LINGXI_T07_SECRET_A": "fixture-private-env"
+          },
+          "id": "fixture",
+          "name": "fixture",
+          "transport": "stdio",
+          "unknownConnector": {
+            "preserve": 83
+          }
+        }
+      ],
+      "deferEnabled": false,
+      "deferThreshold": 17,
+      "enabled": false,
+      "servers": [
+        {
+          "args": [
+            "--mcp-stdio-server"
+          ],
+          "authorizationToken": "fixture-private-token",
+          "autoStart": true,
+          "command": "/private/tmp/lingxi-r07-build/debug/r04_t07_fixture",
+          "enabled": true,
+          "env": {
+            "LINGXI_T07_SECRET_A": "fixture-private-env"
+          },
+          "id": "fixture",
+          "name": "fixture",
+          "transport": "stdio",
+          "unknownConnector": {
+            "preserve": 83
+          }
+        }
+      ],
+      "unknownMcp": 79
+    }
+  },
+  "schemaVersion": 1,
+  "sessions": {},
+  "unknownRoot": 73
+}

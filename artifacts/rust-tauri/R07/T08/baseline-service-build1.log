@@ -1,0 +1,20 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: function `merged_catalog_providers` is never used
+   --> crates/lingxi-service/src/agent_config_readback.rs:865:4
+    |
+865 | fn merged_catalog_providers(home: &Path) -> Result<Map<String, Value>, String> {
+    |    ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `field` is never used
+   --> crates/lingxi-service/src/settings_tools.rs:168:4
+    |
+168 | fn field<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
+    |    ^^^^^
+
+warning: `lingxi-service` (lib) generated 2 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 18s

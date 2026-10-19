@@ -1,0 +1,36 @@
+{
+  "label": "mobile-unit5",
+  "stage": "R07-T09",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "env",
+    "TMPDIR=/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_HOME=/private/tmp/lingxi-r07-tests/home",
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/mobile/R07RustMobileRuntime.test.ts",
+    "desktop/src/react/__tests__/mobile/MobileApp.test.tsx",
+    "desktop/src/react/__tests__/stores/model-slice.test.ts",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "PATH": "/Users/study_superior/.cargo/bin:/Users/study_superior/Desktop/Code/LingxiAgent/.venv/bin:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/.local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/usr/local/share/dotnet:/Users/study_superior/.kimi-code/bin:/Users/study_superior/.local/bin:/Users/study_superior/.bun/bin:/Users/study_superior/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/study_superior/.nvm/versions/node/v24.16.0/bin:/Users/study_superior/.lmstudio/bin:/Users/study_superior/.lmstudio/bin",
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+    "LINGXI_PRODUCT_DIR": "/Users/study_superior/Desktop/Code/LingxiAgent/lib"
+  },
+  "startedAt": "2026-10-18T14:30:46.398444+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "866c89fd9425dd42ba95eb12ba73228b1e46411440e3360bd5595436c80c9616",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T14:30:51.228013+00:00",
+  "sourceFingerprintAfter": "866c89fd9425dd42ba95eb12ba73228b1e46411440e3360bd5595436c80c9616",
+  "log": "artifacts/rust-tauri/R07/T09/mobile-unit5.log",
+  "logSha256": "ea0bc04dca8efdc75f154afefe6be1053e0a968d1ec8ff11909b135bc48ad2de",
+  "sourceUnchanged": true
+}

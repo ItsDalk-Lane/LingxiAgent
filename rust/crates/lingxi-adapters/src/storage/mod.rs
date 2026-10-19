@@ -13,10 +13,25 @@
 //!   restores (R02-T06; never a plain copy of the active main file).
 
 pub mod agent_memory;
+pub mod automation;
+pub mod automation_activity;
+pub mod automation_import;
+pub mod automation_suggestions;
 pub mod backup;
+pub mod beautify;
+pub mod bridge;
+pub mod bridge_effect;
+pub mod bridge_notice;
+pub mod browser;
 pub mod canonical_message_store;
+pub mod conversation_discovery;
+pub mod conversation_status;
+pub mod conversations;
+pub mod conversations_collab;
 pub mod knowledge;
 pub mod legacy_session_files;
+pub mod media;
+pub mod media_gallery;
 pub mod migrations;
 pub mod queue;
 pub mod run_store;
@@ -44,3 +59,5 @@ pub use run_store::{
 };
 
 pub mod session_operations;
+
+pub mod bridge_reads;

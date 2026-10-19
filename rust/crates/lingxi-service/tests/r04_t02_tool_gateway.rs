@@ -630,6 +630,10 @@ async fn subagent_run(harness: &Harness, session: &str, tier: ToolAccessTier) ->
     let run_id = RunDatabase::allocate_run_id(harness.state.storage(), NOW_MS)
         .expect("allocate child run id");
     let authorization = DriveAuthorization {
+        foreground_mcp_session_permissions: false,
+        settings_principal: None,
+        loop_identity: None,
+        workflow_scope: None,
         chat_input: None,
         knowledge_selection: None,
         lineage: RunLineage {
@@ -1936,6 +1940,10 @@ async fn subagent_run_legacy(
     let run_id = RunDatabase::allocate_run_id(legacy.state.storage(), NOW_MS)
         .expect("allocate child run id");
     let authorization = DriveAuthorization {
+        foreground_mcp_session_permissions: false,
+        settings_principal: None,
+        loop_identity: None,
+        workflow_scope: None,
         chat_input: None,
         knowledge_selection: None,
         lineage: RunLineage {
@@ -2010,4 +2018,140 @@ async fn journal_of_legacy(
 async fn legacy_teardown(legacy: &LegacyHarness) {
     legacy.state.storage().close().await.expect("close storage");
     let _ = std::fs::remove_dir_all(&legacy.home);
+}
+
+// 无父入口仅兼容真实预登记；有父但来源损坏时，不能退回该兼容分支。
+async fn drive_subagent_authority_probe(
+    harness: &Harness,
+    parent: Option<&str>,
+    registered: bool,
+) -> (String, Result<(), lingxi_service::runs::DriveError>) {
+    let session = "sess_local_alpha";
+    let run =
+        lingxi_adapters::storage::RunDatabase::allocate_run_id(harness.state.storage(), NOW_MS)
+            .unwrap();
+    let authorization = DriveAuthorization {
+        foreground_mcp_session_permissions: false,
+        settings_principal: None,
+        loop_identity: None,
+        workflow_scope: None,
+        chat_input: None,
+        knowledge_selection: None,
+        lineage: RunLineage {
+            parent_run_id: parent.map(lingxi_protocol::RunId::new),
+            origin: RunOrigin::Subagent,
+            source_message_id: None,
+            cause_id: None,
+        },
+        grant: RunGrant::Subagent {
+            tier: ToolAccessTier::Operate,
+        },
+        session_mode: lingxi_kernel::subagent::SessionPermissionMode::Operate,
+    };
+    let registration = if registered {
+        let permit = Arc::new(
+            harness
+                .state
+                .storage()
+                .session_admission()
+                .try_acquire(&[session], usize::MAX)
+                .unwrap(),
+        );
+        Some(
+            harness
+                .state
+                .runs()
+                .task_supervisor()
+                .retain_authorized_run_permit(
+                    &run,
+                    session,
+                    "agent-default",
+                    &lingxi_kernel::Principal::LocalUser,
+                    &authorization,
+                    permit,
+                )
+                .unwrap(),
+        )
+    } else {
+        None
+    };
+    let result = harness
+        .state
+        .runs()
+        .drive_run(
+            harness.state.storage().as_ref(),
+            harness.state.events(),
+            &lingxi_kernel::Principal::LocalUser,
+            session,
+            "agent-default",
+            &run,
+            "child authority probe",
+            1,
+            NOW_MS,
+            None,
+            None,
+            authorization,
+            None,
+            "sess_local_alpha::subagent::authority-probe",
+        )
+        .await
+        .map(|_| ());
+    drop(registration);
+    (run, result)
+}
+
+#[tokio::test]
+async fn parentless_subagent_still_requires_real_admission_before_creating_a_run() {
+    let harness = harness_with(
+        Arc::new(VerdictPolicy(PolicyVerdict::Allowed)),
+        None,
+        vec![
+            tool_request("tool:first-party:probe_read", json!({"path":"/data/probe"})),
+            final_turn("done"),
+        ],
+    )
+    .await;
+    let (run, result) = drive_subagent_authority_probe(&harness, None, false).await;
+    assert!(matches!(
+        result,
+        Err(lingxi_service::runs::DriveError::Storage(
+            lingxi_kernel::ports::StorageError::Conflict { detail }
+        )) if detail == "run_authorization_not_admitted"
+    ));
+    assert!(harness
+        .state
+        .storage()
+        .load_run(&lingxi_protocol::RunId::new(run))
+        .await
+        .unwrap()
+        .is_none());
+    assert_eq!(harness.executor.total(), 0);
+    teardown(&harness).await;
+}
+
+#[tokio::test]
+async fn admitted_subagent_with_missing_parent_is_cancelled_without_tool_dispatch() {
+    let harness = harness_with(
+        Arc::new(VerdictPolicy(PolicyVerdict::Allowed)),
+        None,
+        vec![
+            tool_request("tool:first-party:probe_read", json!({"path":"/data/probe"})),
+            final_turn("done"),
+        ],
+    )
+    .await;
+    let (run, result) =
+        drive_subagent_authority_probe(&harness, Some("run_missing_parent"), true).await;
+    result.unwrap();
+    let actual = harness
+        .state
+        .storage()
+        .load_run(&lingxi_protocol::RunId::new(&run))
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(actual.status, lingxi_protocol::RunStatus::Cancelled);
+    assert!(journal_of(&harness, &run).await.is_empty());
+    assert_eq!(harness.executor.total(), 0);
+    teardown(&harness).await;
 }

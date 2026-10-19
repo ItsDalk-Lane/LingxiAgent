@@ -740,19 +740,41 @@ async fn real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty()
     assert!(!frames.iter().any(|v| v["type"] == "assistant_run_end"));
     drop(ws);
     let mut ws = ws_connect(&h).await;
-    remote.release.add_permits(1);
-    for _ in 0..1000 {
-        if h.state
+    // 持久终态与独立WS投影不是同一时点；在原总预算内同时核对两者。
+    tokio::time::timeout(Duration::from_secs(5), async {
+        remote.release.add_permits(1);
+        for _ in 0..1000 {
+            if h.state
+                .storage()
+                .list_active_runs()
+                .await
+                .unwrap()
+                .is_empty()
+            {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+        assert!(h
+            .state
             .storage()
             .list_active_runs()
             .await
             .unwrap()
-            .is_empty()
-        {
-            break;
+            .is_empty());
+        loop {
+            let frame = ws_json(&mut ws).await;
+            if frame["type"] == "status"
+                && frame["sessionId"] == "resume"
+                && frame["streamId"] == stream
+                && frame["isStreaming"].as_bool() == Some(false)
+            {
+                break;
+            }
         }
-        tokio::time::sleep(Duration::from_millis(5)).await;
-    }
+    })
+    .await
+    .expect("同一流须在原5秒总预算内持久结束并真实投递WS空闲状态");
     ws_send(&mut ws,json!({"type":"resume_stream","sessionId":"resume","streamId":stream,"sinceSeq":since,"resumeToken":"same"})).await;
     let (replay, _) = until_frame(&mut ws, "stream_resume").await;
     assert_eq!(replay["reset"], false);

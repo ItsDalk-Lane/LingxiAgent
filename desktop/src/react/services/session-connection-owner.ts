@@ -43,7 +43,8 @@ function observe(): void {
       pendingProjectId: null, pendingNewSessionThinkingLevel: null, pendingNewSessionPermissionMode: null,
       models: [], currentModel: null, sessionModelsByPath: {}, thinkingLevelBySession: {}, thinkingLevel: 'medium', currentAgentId: null,
       selectedFolder: null, selectedWorkspaceMountId: null, selectedAgentId: null, workspaceFolders: [],
-      deskFiles: [], deskTreeFilesByPath: {}, deskBasePath: '', deskWorkspaceMountId: null });
+      deskFiles: [], deskTreeFilesByPath: {}, deskBasePath: '', deskWorkspaceMountId: null,
+      agentActivitiesBySession: {} });
     }
     for (const listener of listeners) listener();
   });

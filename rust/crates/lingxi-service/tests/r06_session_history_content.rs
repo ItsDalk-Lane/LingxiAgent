@@ -1947,8 +1947,7 @@ async fn fresh_compact_returns_409_while_session_streaming() {
 
 // ═══════════════ 5DCB0352EB08：SessionCollabTools ═══════════════
 
-/// 测试投递器（SessionCollabDelivery 的测试缝）：记录投递与建会话调用；
-/// 可配置「对指定会话 id 的首次投递失败」以制造 create 半成功。
+/// 保留旧构造接口的旁路哨兵；正式链路必须不调用这里的投递或建会话。
 /// create 调用记录：(agent_id, model, title)。
 type CreateCall = (String, Option<String>, Option<String>);
 
@@ -1975,10 +1974,6 @@ impl RecordingDelivery {
 
     fn creates(&self) -> Vec<CreateCall> {
         self.creates.lock().unwrap().clone()
-    }
-
-    fn arm_fail_first_deliver_to(&self, session_id: &str) {
-        *self.fail_first_deliver_to.lock().unwrap() = Some(session_id.to_string());
     }
 }
 
@@ -2057,6 +2052,20 @@ fn draft_id_of(text: &str) -> String {
     text[start..end].to_string()
 }
 
+async fn wait_collab_accepted(
+    server: &Server,
+    id: &str,
+) -> lingxi_adapters::storage::conversations_collab::CollabDraft {
+    tokio::time::timeout(Duration::from_secs(8), async {
+        loop {
+            let draft = lingxi_adapters::storage::conversations_collab::get_collab_draft(server.state.storage(), id).await.unwrap().unwrap();
+            if draft.delivery_status == lingxi_adapters::storage::conversations_collab::CollabDeliveryStatus::Accepted { return draft; }
+            assert!(matches!(draft.delivery_status, lingxi_adapters::storage::conversations_collab::CollabDeliveryStatus::Queued | lingxi_adapters::storage::conversations_collab::CollabDeliveryStatus::Started), "真实协作受理失败: {draft:?}");
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    }).await.expect("协作确认后真实受理")
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn session_collab_tools_scope_drafts_and_delivery_semantics() {
     let provider =
@@ -2071,7 +2080,7 @@ async fn session_collab_tools_scope_drafts_and_delivery_semantics() {
     .await;
     create_session(&server, "src-s", "agent", "协作源").await;
     execute_wait(&server, "src-s", "源会话问题一").await;
-    execute_wait(&server, "src-s", "源会话问题二").await;
+    let source_run_id = execute_wait(&server, "src-s", "源会话问题二").await;
     create_session(&server, "peer-s", "agent", "协作目标").await;
     // 他人会话（跨主体范围受控测试）。
     lingxi_adapters::storage::session_admin::create_session(
@@ -2120,7 +2129,8 @@ async fn session_collab_tools_scope_drafts_and_delivery_semantics() {
             "stub.provider/model-b".to_string(),
         ],
     );
-    let local = collab_ctx("src-s", lingxi_kernel::Principal::LocalUser);
+    let mut local = collab_ctx("src-s", lingxi_kernel::Principal::LocalUser);
+    local.run_id = lingxi_protocol::RunId::new(source_run_id);
     let device_other = collab_ctx(
         "device-s",
         lingxi_kernel::Principal::Device {
@@ -2233,24 +2243,26 @@ async fn session_collab_tools_scope_drafts_and_delivery_semantics() {
     let text = outcome_text(&outcome);
     assert!(text.contains("Draft created"), "send 产确认草稿: {text}");
     let send_draft = draft_id_of(&text);
+    assert!(
+        matches!(
+            tools.apply_draft(&send_draft).await,
+            DraftApplyOutcome::Queued { .. }
+        ),
+        "确认先持久排队"
+    );
+    lingxi_service::session_collab::tick(&server.state)
+        .await
+        .unwrap();
+    let sent = wait_collab_accepted(&server, &send_draft).await;
+    assert_eq!(sent.target_session_id.as_deref(), Some("peer-s"));
+    wait_terminal(&server, sent.accepted_run_id.as_deref().unwrap()).await;
+    assert!(delivery.deliveries().is_empty(), "生产链不调用内存投递器");
     assert_eq!(
         tools.apply_draft(&send_draft).await,
         DraftApplyOutcome::Sent {
-            target_session_id: "peer-s".to_string(),
+            target_session_id: "peer-s".into()
         },
-        "apply 投递到指定目标"
-    );
-    assert_eq!(
-        delivery.deliveries(),
-        vec![("peer-s".to_string(), "给目标的第一条消息".to_string())],
-        "发送只达指定目标"
-    );
-    // 一次性草稿：apply 后不可重放。
-    assert_eq!(
-        tools.apply_draft(&send_draft).await,
-        DraftApplyOutcome::Rejected {
-            reason: "not-found".to_string(),
-        }
+        "重复确认返回同一真实回执"
     );
     // 拒绝向当前会话自身发送。
     let outcome = tools
@@ -2315,7 +2327,7 @@ async fn session_collab_tools_scope_drafts_and_delivery_semantics() {
     let outcome = tools
         .run_action(
             &local,
-            &json!({"action": "create", "agent": "协作助手", "model": "stub.provider/model-b", "title": "新协作会话", "message": "首条消息"}),
+            &json!({"action": "create", "agent": "协作助手", "title": "新协作会话", "message": "首条消息"}),
         )
         .await;
     let text = outcome_text(&outcome);
@@ -2324,40 +2336,33 @@ async fn session_collab_tools_scope_drafts_and_delivery_semantics() {
         "{text}"
     );
     let create_draft = draft_id_of(&text);
-    // 半成功：会话建成，但首条投递失败 → 保留新会话 id，草稿转重试。
-    delivery.arm_fail_first_deliver_to("new-collab-session-0");
-    assert_eq!(
+    assert!(matches!(
         tools.apply_draft(&create_draft).await,
-        DraftApplyOutcome::PartialSuccess {
-            session_id: "new-collab-session-0".to_string(),
-            detail: "deliver to new-collab-session-0 failed (first attempt)".to_string(),
-        },
-        "半成功保留新会话 id"
-    );
-    assert_eq!(delivery.creates().len(), 1, "会话只建一次");
-    // 重试草稿 → 只补投首条消息，不再建会话。
+        DraftApplyOutcome::Queued { .. }
+    ));
+    lingxi_service::session_collab::tick(&server.state)
+        .await
+        .unwrap();
+    let created = wait_collab_accepted(&server, &create_draft).await;
+    let created_sid = created.target_session_id.unwrap();
+    assert!(created.target_created);
+    wait_terminal(&server, created.accepted_run_id.as_deref().unwrap()).await;
+    let row = lingxi_adapters::storage::session_tree::get_session_row(
+        server.state.storage(),
+        &created_sid,
+    )
+    .await
+    .unwrap()
+    .unwrap();
+    assert_eq!(row.agent_id, "collabA");
+    assert_eq!(row.title, "新协作会话");
+    assert!(delivery.creates().is_empty(), "创建走真实SessionAdmin");
     assert_eq!(
         tools.apply_draft(&create_draft).await,
         DraftApplyOutcome::Created {
-            session_id: "new-collab-session-0".to_string(),
+            session_id: created_sid
         },
-        "重试投递到保留的新会话"
-    );
-    assert_eq!(delivery.creates().len(), 1, "重试不重建会话");
-    assert_eq!(
-        delivery.deliveries().last(),
-        Some(&("new-collab-session-0".to_string(), "首条消息".to_string())),
-        "首条消息送达新会话"
-    );
-    let creates = delivery.creates();
-    assert_eq!(
-        creates[0],
-        (
-            "collabA".to_string(),
-            Some("stub.provider/model-b".to_string()),
-            Some("新协作会话".to_string()),
-        ),
-        "create 经 name 解析 roster，携带 model/title"
+        "重复确认不另建会话"
     );
 
     // 未知 action。

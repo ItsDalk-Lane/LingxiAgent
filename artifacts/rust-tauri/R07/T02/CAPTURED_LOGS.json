@@ -1,0 +1,1260 @@
+{
+  "capturedAt": "2026-10-15T19:46:55.066393+00:00",
+  "sourceFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+  "logs": [
+    {
+      "file": "lingxi-r07-t02-adapter-final-r2.log",
+      "sha256": "9ea0f84ae4eabc6c249f013c1d9df5fdeb5da82c35cb600220aa30f236a04b60",
+      "bytes": 5120,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-adapter-final.log",
+      "sha256": "0ce0351dabc536530a82739723bccb2648967f1b8cbda55920ec460e4c3b4790",
+      "bytes": 1297,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-adapter-v18-r1.log",
+      "sha256": "0e4647a154ad2a07d94e25b9c6e1433305b4e2ede5897de93d4c1309e6a6995c",
+      "bytes": 4510,
+      "testSummaries": [
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s",
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s",
+        "test result: FAILED. 12 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-adapter-v18-r2.log",
+      "sha256": "a9c432656aae62b504b2c2dd6ad26262044ee443ae9e43e51e7af6c9f454bbf1",
+      "bytes": 1751,
+      "testSummaries": [
+        "test result: FAILED. 12 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-adapter-v18-r3.log",
+      "sha256": "b0c8e19fb70a62d009c97c4d475b9c49201d1d71eebad19554c39f70517547fd",
+      "bytes": 1215,
+      "testSummaries": [
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-bridge-permission-r1.log",
+      "sha256": "df383b265affc8b23c0eb1a9a1cdcaa592cbce9af2a476544108e05e07d9c73b",
+      "bytes": 4267,
+      "testSummaries": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-child-revoke-r1.log",
+      "sha256": "b08ee7b2c513011cfb0511c2e0ba4441c85d06bd946a912346b5d8b43888448b",
+      "bytes": 2023,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-child-revoke-r2.log",
+      "sha256": "7beaeb8236d5ca9f768fa314965112a03b15f649f5d518aa3ae26e1c4b3c22ac",
+      "bytes": 750,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 463 filtered out; finished in 0.45s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-child-revoke-r3.log",
+      "sha256": "998bfe60c79c82aeef96b803aff1578e250357a070b76645e9039d5c42c6f126",
+      "bytes": 995,
+      "testSummaries": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 463 filtered out; finished in 0.47s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final-r2.log",
+      "sha256": "90d85ec0c600956f62f33460c38ebc6fb4dc51817e9052415f4297f6c6a4a6a5",
+      "bytes": 6346,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final-r3.log",
+      "sha256": "078af0c3a48addd18b614eebd8c45d89ebe587d4a1202cb91820b3fdb8daad45",
+      "bytes": 1399,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final-r4.log",
+      "sha256": "389e62780bcee1034bc9e2bb48050b54d2573020de2971948ae97134b0bac144",
+      "bytes": 1119,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final-r5.log",
+      "sha256": "83e4829f4ad835458699a92a790123cc6c81d54e255833a2130ef473698df84b",
+      "bytes": 4969,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final-r6.log",
+      "sha256": "b8ae84b0cacda44b217a207fba9fecdc51e64d4a2e65f9feba493aa8c574a91a",
+      "bytes": 1043,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final-r7.log",
+      "sha256": "438fc425499f492f1f72bf618e708709b2a6a83e39be3872af3434549af8f4c1",
+      "bytes": 183,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-clippy-final.log",
+      "sha256": "23eac3e44fde852753c2f5a8011492c9fdd6762fef48ea93437c0070a4afeb1f",
+      "bytes": 2621,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-connection-protocol-gen-r1.log",
+      "sha256": "49d8cca08229af12ad8580e4ccfeb6238781e3eb432a0fe0276d88fede4d9020",
+      "bytes": 355,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-contract-tests-r1.log",
+      "sha256": "af97bd188a8704a1c027cde44ea3fb91d52dfcd09be29684e979f97b3111b919",
+      "bytes": 1909,
+      "testSummaries": [
+        "Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "Test Files  2 failed | 1 passed (3)",
+        "Tests  1 failed | 5 passed (6)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-contract-tests-r2.log",
+      "sha256": "d400ee46a06bd92a4ed3db57e69d733742f61c29b124b2e7df1f03ad5cbb0938",
+      "bytes": 229,
+      "testSummaries": [
+        "Test Files  2 passed (2)",
+        "Tests  6 passed (6)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-contract-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-dispatch-protocol-gen-r1.log",
+      "sha256": "16b17d413b53a2d65b851fa15c9c3fce5f7202cc8c21c966351310b4c3629127",
+      "bytes": 355,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effect-store-r1.log",
+      "sha256": "32b8b6756657e8eab1cb1c48dc124162ebfd0150a40f9a4dc981a900ed934304",
+      "bytes": 3210,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s",
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-adapters-regression-r1.log",
+      "sha256": "fb18189a969c9a31dcd2b9d3952fab323d22f2b1892219c1769a4d99cc1b469f",
+      "bytes": 1280,
+      "testSummaries": [
+        "Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "Test Files  1 failed | 2 passed (3)",
+        "Tests  1 failed | 56 passed (57)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-adapters-regression-r2.log",
+      "sha256": "ed7a140473c0ba3e53687a42d9bac7eac5b417d8f422c3b0c73bb6b678fcf18a",
+      "bytes": 234,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  57 passed (57)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-protocol-check-r1.log",
+      "sha256": "306328ceaed134151ae1b406b2cceb0b3bcba7fc71dd9638ac0445b949dcdc5f",
+      "bytes": 126,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-protocol-check-r2.log",
+      "sha256": "04af268a0af6551270b421768426c7917921849873886eee139e615ef74d48f9",
+      "bytes": 126,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-protocol-gen-r1.log",
+      "sha256": "96d8619b986451cf573d4a1249794452d56de8ba70a224274b2e66dfbaa52dac",
+      "bytes": 409,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-protocol-gen-r2.log",
+      "sha256": "961aadb17556386a0f8d14140d60643382a0a4c7a39ba77afe7c79d0f32e56f4",
+      "bytes": 99,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-protocol-tests-r1.log",
+      "sha256": "95ad16cd3d8630ea7d5e076ee4c600760eddc18d8134d54e28f8c61444f26c52",
+      "bytes": 4009,
+      "testSummaries": [
+        "test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-protocol-verify-r1.log",
+      "sha256": "6f0b21b0dc121547e2bd85536f984eb28cd59d3d2c39b118b244525346c8296e",
+      "bytes": 103,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-sdk-contract-r3.log",
+      "sha256": "fe2bc83b3b44c2f3e63035b36cd06d330217471e56bd83b1606a24c326b0f65e",
+      "bytes": 234,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  54 passed (54)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-sdk-contract-r4.log",
+      "sha256": "49f111608e66a37381d1842ba76f70aea670dd9bedb031e941ced3e6135e550c",
+      "bytes": 235,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  58 passed (58)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-sdk-contract-r5.log",
+      "sha256": "4a36a60fe79cbf38e55c051ba23c6af86e02a3ba032bb67c74b4377cd697caf6",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  59 passed (59)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-sdk-contract-r6.log",
+      "sha256": "58e7d07ee31cb78e5d97c95904f636aae1a9e53f7560ea334b8561d711f0a3a5",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  59 passed (59)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-ts-roundtrip-r1.log",
+      "sha256": "fc05a4daeca35d769905e8e7b281e7cd55ecd071125c3ce7d6af99572508dfe3",
+      "bytes": 775,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-ts-roundtrip-r2.log",
+      "sha256": "5e0a926147cb7090a682cfdd14790e9559ce689a1d550b5e6a90e9b030f235d9",
+      "bytes": 775,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-contract-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-contract-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-node-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-node-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-node-r4.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-root-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-tests-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-tests-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-effects-types-tests-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-final-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-final-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-final-r4.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-final-r5.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-final.log",
+      "sha256": "a0e6a46d181647226ce7174bbc1bf341e167422b5479a927b9d4052d1092ead0",
+      "bytes": 1241,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-frozen-r3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-fmt-r3.log",
+      "sha256": "0088771072e92107c8b2b0a227adb621721060973f4cad939b502dda4c96e266",
+      "bytes": 6035,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-adapter.log",
+      "sha256": "451ac1525b6533bee7291b035f11510cac7c41b1fee04822c7cd209d5e002e94",
+      "bytes": 5119,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-clippy.log",
+      "sha256": "2461b00c8697c4189b2de92ca6fb05b5d72273c78a0a47b1ce4e83ccca077b70",
+      "bytes": 72,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-protocol-generated.log",
+      "sha256": "cd297e355d3ab7c5ee0be26c2c17610b63867885ba9f900cadf64488ce6542a6",
+      "bytes": 390,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-protocol-roundtrip.log",
+      "sha256": "c651aee1e240565875dc052c0ca8dbe2e7e5b68ba461024d33c9e4fb97a984e6",
+      "bytes": 419,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-protocol-tests.log",
+      "sha256": "7808a99ea53be1b42707b86cb02ad0df95954788cceb42cf5226a89ca82e64c5",
+      "bytes": 4009,
+      "testSummaries": [
+        "test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-generated-final.log",
+      "sha256": "a24599394bc1e7c0146ebbaa81f1a60fecc4547278071234bfbd0be70501afc1",
+      "bytes": 277,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-host-units-r1.log",
+      "sha256": "f2369ca3802474b2f38c24bd895c5b55541d46e4ce6acff099e001fe22dc055a",
+      "bytes": 1163,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-host-units-r2.log",
+      "sha256": "27187b260454b48422e2100e70032cbf07beeeb15993caabf10d6142f0898166",
+      "bytes": 3321,
+      "testSummaries": [
+        "test result: FAILED. 17 passed; 2 failed; 0 ignored; 0 measured; 439 filtered out; finished in 0.36s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-host-units-r3.log",
+      "sha256": "2c009b374261c6c84cefec060fd0ef0bf5248772f93000a5eab4ae23aa25bb6e",
+      "bytes": 2192,
+      "testSummaries": [
+        "test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 439 filtered out; finished in 0.37s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-host-units-r4.log",
+      "sha256": "eaf95099f6d2696c724ce494ad2681495b318c55c28c20044e84b38e827dccd5",
+      "bytes": 2897,
+      "testSummaries": [
+        "test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 439 filtered out; finished in 0.39s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-identity-check-r1.log",
+      "sha256": "28c2385e00143af206746e97d22ec91033ca0e47d49197c15436c4e7cf11a1f3",
+      "bytes": 9291,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-identity-check-r2.log",
+      "sha256": "5dc4fa81902f86f3d70ea084c4fc9fc61caa1544287bf063136d36055bc254c0",
+      "bytes": 3850,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-identity-recovery-r1.log",
+      "sha256": "c975f2c894f0db89d6bf9391a8b74e8906745090439276982bca79921f7616c8",
+      "bytes": 601,
+      "testSummaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 124 filtered out; finished in 0.00s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-native-flow-r1.log",
+      "sha256": "f94afa174f34b76030c4ce69d2c87cb2fa2d070e78ff7085f6129f888f5e3a9c",
+      "bytes": 772,
+      "testSummaries": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.33s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-native-platforms-r3.log",
+      "sha256": "30efdf387fda2cc24eb7153bf5e793d5c3907e3fcd06011479fc2d2bedcb851e",
+      "bytes": 1508,
+      "testSummaries": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.34s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.26s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-ownership-final.log",
+      "sha256": "7946f1f012a9a5a8994eb67a11337229801ea14b5076fd65222fa67c3a4bc16f",
+      "bytes": 1552,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-check-r1.log",
+      "sha256": "a9d55349fafcf3132f59898bd1f6204182d4873fb2172b21988da00cf937d872",
+      "bytes": 277,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-final.log",
+      "sha256": "e37278b1aad17aab3f3b62e737a9acbb38bed0922413a8b59ebff37413d7c34d",
+      "bytes": 4009,
+      "testSummaries": [
+        "test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-gen-r1.log",
+      "sha256": "b2158ff8b74327fe92b7c94664b84428de0675c8d2e25975d080ea037c61a6bc",
+      "bytes": 355,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-gen-r2.log",
+      "sha256": "cfd011e4e5497eeb01668da9d6d4a38f46f79a05e2ae62e3c1821da969e3de0b",
+      "bytes": 242,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-gen-r3.log",
+      "sha256": "cd441a8ede9d7ec7ca36a3ccd33b429b2a2bc898bbdf2faaa210de3981a65e95",
+      "bytes": 355,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-roundtrip-r1.log",
+      "sha256": "ae2654845242ee9227b292baad4aead3d96ee53392e8b19019153e1c1802881a",
+      "bytes": 764,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-tests-r1.log",
+      "sha256": "1b3101b4c5ba208888530151407f8687bd76c345212fb9613144f54be8bc2ed7",
+      "bytes": 2746,
+      "testSummaries": [
+        "test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-verify-final.log",
+      "sha256": "d1b46618e8ee038aed4c9c254f265bd053747763d40b4710c1d4753098c3cfcd",
+      "bytes": 419,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-protocol-verify-r1.log",
+      "sha256": "d513d3d564ea1a3253451284f6382475ddc2c56c54f61f83a93e7759ca0c8245",
+      "bytes": 405,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-bundle-final.log",
+      "sha256": "802f23aad849a3c0f0b5b2b5bb7a33397b1df67abd4cd4fca2d2a4fa495069fb",
+      "bytes": 143,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-bundle-r1.log",
+      "sha256": "802f23aad849a3c0f0b5b2b5bb7a33397b1df67abd4cd4fca2d2a4fa495069fb",
+      "bytes": 143,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-bundle-r2.log",
+      "sha256": "802f23aad849a3c0f0b5b2b5bb7a33397b1df67abd4cd4fca2d2a4fa495069fb",
+      "bytes": 143,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-bundle-smoke-final.log",
+      "sha256": "60c094d71d331e45cbb84eb6a7b5ce19457cc7c73629cd307148c0d26d86f9d8",
+      "bytes": 294,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-bundle-smoke-r1.log",
+      "sha256": "074a9bc8689e8b963bbd0bbcdd553030c01bfa12fdeec63c86697d7eb59876b9",
+      "bytes": 320,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-contract-r2.log",
+      "sha256": "3c9ac8d23b9e04ec73e2cf6eba352b80bee0669c3fab1b966d5403c9bb0ad85a",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  72 passed (72)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-independent-r1.log",
+      "sha256": "4f278c86f09891911b00270971e58ee5f8880fdb9d40622ee693bde5c0393f4e",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  1 passed (1)",
+        "Tests  64 passed (64)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-ts-roundtrip-r1.log",
+      "sha256": "cafc9637c4c70c14adda3b82a9c79d5b077e7b37faa9e7eb983fc97279adfdf9",
+      "bytes": 778,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-types-contract-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-types-node-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-types-root-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-connection-types-test-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-effects-r1.log",
+      "sha256": "a5001a8a4b10170e9685605a7cc99aff164f746d258c3dc0318f5e09f43592e5",
+      "bytes": 3087,
+      "testSummaries": [
+        "Tests 3 ⎯⎯⎯⎯⎯⎯⎯",
+        "Test Files  1 failed (1)",
+        "Tests  3 failed | 44 passed (47)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-effects-r2.log",
+      "sha256": "b88bded342e4c687308ee7580b11c820e03a70cfdb9a70f1497690b489c0288d",
+      "bytes": 234,
+      "testSummaries": [
+        "Test Files  1 passed (1)",
+        "Tests  47 passed (47)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-contract-r4.log",
+      "sha256": "91751d7d3b724d4eef3bbde53330da2a6904e190f8ad85ac9d0d470b67ca53a5",
+      "bytes": 871,
+      "testSummaries": [
+        "Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "Test Files  1 failed | 2 passed (3)",
+        "Tests  1 failed | 67 passed (68)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-contract-r5.log",
+      "sha256": "e7ce06d476cdba45c0983b9f96d1175485d12cf41bfb994fe110fe7052aaa2e6",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  68 passed (68)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-contract-r6.log",
+      "sha256": "059f61c01f0cfad7de8bc319a05ce46f650260121acd50dbd419f53187d35891",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  3 passed (3)",
+        "Tests  68 passed (68)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-r1.log",
+      "sha256": "d518528e3bd1d54ea21eb355f058161ff83bbab04bf4b9dd5beb5e0844998330",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  1 passed (1)",
+        "Tests  52 passed (52)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-r2.log",
+      "sha256": "407c4698027fb9abd57a57269d634bfad6728c50c84ec85ecd69347f4e91e9d4",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  1 passed (1)",
+        "Tests  60 passed (60)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-r3.log",
+      "sha256": "ee1ab2a9de6679dbe08223d56435e4538c8baeca25b781131eebefec640da2bc",
+      "bytes": 236,
+      "testSummaries": [
+        "Test Files  1 passed (1)",
+        "Tests  61 passed (61)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-ts-roundtrip-r1.log",
+      "sha256": "ad74897e6d98885ff71af13203fae59bdc08a83287be28805cd580b678444a26",
+      "bytes": 777,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-types-contract-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-types-node-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-lifecycle-types-test-r1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-platforms-r1.log",
+      "sha256": "007915b21fa44ba764c3f2cd077fc2f032c73fafd5c33032e876ab2a5cf1e0a1",
+      "bytes": 1284,
+      "testSummaries": [
+        "test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.71s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-platforms-r2.log",
+      "sha256": "14df2e079e2c11dd4185aae3b8694651e0f8ed1e738f43b85dcc9195f23cfb14",
+      "bytes": 616,
+      "testSummaries": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.64s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-sdk-safety-r1.log",
+      "sha256": "377dd62f54dfd045f858c2fb6d9d7de4dbe9af363e889c5b0ee979fb389d8787",
+      "bytes": 1683,
+      "testSummaries": [
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.54s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-final-r2.log",
+      "sha256": "4b98b0366c18ec5ce60ac96f762ca89ba7da696a3d9588efa3608220dbb8e007",
+      "bytes": 43645,
+      "testSummaries": [
+        "test result: ok. 467 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.97s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.06s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.40s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.29s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-final.log",
+      "sha256": "6a9a487a34cfdb06e86e3032119f71c7343bdf72d5e6da331b10d8e659589bad",
+      "bytes": 39598,
+      "testSummaries": [
+        "test result: FAILED. 466 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.39s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-first.log",
+      "sha256": "235e036d0fcdef1f9618ef60cd1f0edeeebef3b0300fcad9df5b23424e869da6",
+      "bytes": 6383,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-frozen-r3.log",
+      "sha256": "bd717f6348c7ca6a83bf56ba8a86d9c1c8a1cc4d0b48f73463ecdb410e103760",
+      "bytes": 45463,
+      "testSummaries": [
+        "test result: ok. 467 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.95s",
+        "test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.05s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.34s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.65s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r2.log",
+      "sha256": "9247c9a1fe4a765318c33c394a4740cc62993937d579ce1fa1031cd2035861fc",
+      "bytes": 1282,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r3.log",
+      "sha256": "5ca9536eafa9eb608220df411772c566699894f3ca0ecb55f70a6dc9b1de55c6",
+      "bytes": 1555,
+      "testSummaries": [
+        "test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.27s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r4.log",
+      "sha256": "0573622e47100be06c286e601b6ff7278f206ea270d99aa30a10064cfb4ed2af",
+      "bytes": 950,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r5.log",
+      "sha256": "899edca5a5ccd826887c59cbddcb31a3e9d58fbeb793febed4eff5facafedec5",
+      "bytes": 1296,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r6.log",
+      "sha256": "2ef2c7ac9c15e55b40517f3356d2420795d638c3e504debfa0861f019c05aa32",
+      "bytes": 855,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r7.log",
+      "sha256": "c8147390e6f91ef45c6bda656c7fbce70fd0ab86af594c8f3a1ccaf5ee2e8140",
+      "bytes": 1735,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.51s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r8.log",
+      "sha256": "08b41b27c453dfafdf0567e7ffe36ad6eae492f3646ed5612af8810320daf0d8",
+      "bytes": 2926,
+      "testSummaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.05s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-service-r9.log",
+      "sha256": "832855495dd4d17218ea6dc89848ed502c8e13788ba22029b26ce199c971abac",
+      "bytes": 4332,
+      "testSummaries": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.04s",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.98s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-session-routes-r1.log",
+      "sha256": "8dabfe4656eb450d13b31f9e353f423135728f0e9d034bca77bf3cffc191b171",
+      "bytes": 2573,
+      "testSummaries": [
+        "test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-storage-expanded-r1.log",
+      "sha256": "ea160b7d4daa18a9e0f69e438b897d72d1620c94a23d4c1b12d20497b6e13a7b",
+      "bytes": 2481,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s",
+        "test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-storage-expanded-r2.log",
+      "sha256": "6900d9552f143febf2bc9e283412a062c1ae2b15311861e401f0cfb5982b48ca",
+      "bytes": 1772,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-storage-first.log",
+      "sha256": "0b7c1d3609597d4061febc0e641a6572194c7edd906b0aa7a2b224b56db08f20",
+      "bytes": 1298,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-storage-manual-r1.log",
+      "sha256": "e1d4d8418f6c6a7eada16a810a6dcf715a02d4f35741bbd2b41a4e5896360a6d",
+      "bytes": 2290,
+      "testSummaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s",
+        "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-storage-r2.log",
+      "sha256": "df9f0cd79095f55444c52924d05521dbd5e916a1b9c4cdaba1b9cfd63363547b",
+      "bytes": 1067,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-storage-r3.log",
+      "sha256": "0777db4817816b16b84ba5148b911ca50c30626858ca1179bbc11b5bf920c80d",
+      "bytes": 1238,
+      "testSummaries": [
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-typecheck-final.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-typecheck-r4.log",
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "bytes": 119,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-ui-sdk-final.log",
+      "sha256": "de40b33dfbc18751c9de022d94c2b62d8adceee15edc348e2e31a3e337897c4b",
+      "bytes": 242,
+      "testSummaries": [
+        "Test Files  14 passed (14)",
+        "Tests  233 passed (233)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-ui-sdk-r4.log",
+      "sha256": "5be0b24ada9be87264dd0df87d38122649779f3e2ffce189271d081db238d90d",
+      "bytes": 240,
+      "testSummaries": [
+        "Test Files  9 passed (9)",
+        "Tests  166 passed (166)"
+      ],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-worker-first.log",
+      "sha256": "89c040aad315be6ea289cd69a0684de560c1c4f4699087fc2e5e1e8a3f99dbb9",
+      "bytes": 1413,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-hang-sample.txt",
+      "sha256": "cd1a0ed952ce4bd0546854f9897c73bc566eba41d41aa42870a050e883687375",
+      "bytes": 111564,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-hang-readonly.sample.txt",
+      "sha256": "2da0aa9e7f9c42098ff5d4ec3a9f077fab55943c7d43bfe3b7b5c97b642e76c8",
+      "bytes": 120947,
+      "testSummaries": [],
+      "historicalExitCode": null,
+      "note": "Raw retained evidence; no command/exit inferred from an empty or partial log. Authoritative final command receipts are in VALIDATION_RUNS.json."
+    },
+    {
+      "file": "lingxi-r07-t02-frozen-r3-ownership.log",
+      "sha256": "7946f1f012a9a5a8994eb67a11337229801ea14b5076fd65222fa67c3a4bc16f",
+      "bytes": 1552,
+      "exitCode": 0,
+      "note": "Frozen-r3 ownership/dependency negative battery."
+    }
+  ]
+}

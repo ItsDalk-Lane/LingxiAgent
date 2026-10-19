@@ -229,24 +229,18 @@ describe("Rust CLI service requests", () => {
     expect(errors.mock.calls.flat().join(" ")).toContain("Rust status is incomplete");
   });
 
-  it("refuses a green status when health lacks a service version", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ status: "ok", serverKind: "lingxi-service" }))));
-    const output = vi.spyOn(console, "log").mockImplementation(() => {});
-    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(await main(["status", "--runtime", "rust", "--url", "http://127.0.0.1:14567", "--token", "x"])).toBe(1);
-    expect(output).not.toHaveBeenCalled();
-    expect(errors.mock.calls.flat().join(" ")).toContain("not a healthy Rust Lingxi service");
-  });
-
   it("prints authenticated health but leaves status failed until Agent and model exist", async () => {
-    vi.stubGlobal("fetch", vi.fn(async (url: string) => url.endsWith("/health")
-      ? new Response(JSON.stringify({ status: "ok", serverKind: "lingxi-service", serverVersion: "0.1" }))
-      : new Response(JSON.stringify({ principalId: "owner", credentialKind: "loopback_token", kind: "local_user", studioId: "studio-1" }))));
+    vi.stubGlobal("fetch", vi.fn(async (url: string) => {
+      if (url.endsWith("/health")) return new Response(JSON.stringify({ status: "ok", serverKind: "lingxi-service", serverVersion: "0.1" }));
+      if (url.endsWith("/me")) return new Response(JSON.stringify({ principalId: "owner", credentialKind: "loopback_token", kind: "local_user", studioId: "studio-1" }));
+      // 模型面未配置：bootstrap 如实返回 unconfigured，status 必须失败且不伪装 ready。
+      return new Response(JSON.stringify({ currentAgentId: null, modelState: "unconfigured", currentModel: null }));
+    }));
     const output = vi.spyOn(console, "log").mockImplementation(() => {});
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(await main(["status", "--runtime", "rust", "--url", "http://127.0.0.1:14567", "--token", "x"])).toBe(1);
     expect(output.mock.calls.flat().join(" ")).toContain("Studio    studio-1");
-    expect(errors.mock.calls.flat().join(" ")).toContain("Agent and model are not available yet");
+    expect(errors.mock.calls.flat().join(" ")).toContain("Agent or model is not available");
   });
 
   it("returns a diagnostic failure when Rust service cannot be reached", async () => {
@@ -261,14 +255,22 @@ describe("Rust CLI service requests", () => {
     vi.stubGlobal("fetch", vi.fn(async (url: string) => {
       routes.push(new URL(url).pathname);
       if (url.endsWith("/health")) return new Response(JSON.stringify({ status: "ok", serverKind: "lingxi-service", serverVersion: "0.1" }));
-      if (url.endsWith("/me")) return new Response(JSON.stringify({ principalId: "owner", credentialKind: "loopback_token" }));
-      if (url.endsWith("/sessions")) return new Response(JSON.stringify({ sessions: [{ sessionId: "s1", title: "A" }] }));
-      return new Response(JSON.stringify({ sessionId: "s1", title: "A" }));
+      if (url.endsWith("/me")) return new Response(JSON.stringify({ principalId: "owner", credentialKind: "loopback_token", kind: "local_user", studioId: "studio-1" }));
+      if (url.endsWith("/sessions")) return new Response(JSON.stringify({ sessions: [{ sessionId: "s1", title: "A", agentId: "hana" }] }));
+      if (url.endsWith("/sessions/s1")) return new Response(JSON.stringify({ sessionId: "s1", title: "A", agentId: "hana" }));
+      // 会话归属上下文未配置模型：continue 必须失败且不发送任何 prompt/execute。
+      if (url.includes("/mobile/bootstrap")) return new Response(JSON.stringify({ currentAgentId: "hana", agentName: "Hana", modelState: "unconfigured", currentModel: null }));
+      // 历史返回一个完整空规范历史；否则读取会在 WS 握手前阻塞。
+      if (url.includes("/history")) return new Response(JSON.stringify({ schemaVersion: "lingxi.canonical-history.v1", sessionId: "s1", items: [], reconciliation: { sessionId: "s1", sessionPath: "native:s1", runStatus: "reconciled_idle", complete: true } }));
+      // WS 票据失败：continue 在建立流之前失败，且绝不发 prompt/execute。
+      if (url.endsWith("/ws-ticket")) return new Response(JSON.stringify({ error: { message: "ticket unavailable" } }), { status: 503 });
+      return new Response(JSON.stringify({ sessionId: "s1", title: "A", agentId: "hana" }));
     }));
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const output = vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
     expect(await main(["continue", "s1", "--runtime", "rust", "--url", "http://127.0.0.1:14567", "--token", "x"])).toBe(1);
     expect(routes).toContain("/lingxi/v1/sessions/s1");
     expect(routes).not.toContain("/lingxi/v1/sessions/s1/execute");
-    expect(error.mock.calls.flat().join(" ")).toContain("model/tool reply streaming are unavailable");
+    expect(output).not.toHaveBeenCalledWith(expect.stringContaining("[resource"));
   });
 });

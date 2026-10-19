@@ -1,0 +1,87 @@
+{
+  "steps": [
+    {
+      "label": "consumers",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx",
+        "desktop/src/react/__tests__/services/r07-interface-preferences-real-service.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=artifacts/rust-tauri/R07/T08/interface-late-write-fixed2/vitest-results.json"
+      ],
+      "exitCode": 0,
+      "stdoutSha256": "bdeb496ec652aec1cdf074a29c0a55470ff9fd0decd65f1487a69a4add6d7b64",
+      "stderrSha256": "27dd7175ec0b99e580cab3c632703ec96790de5fcce8608e354e21d1a5aa7a12"
+    },
+    {
+      "label": "transfer-positive",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx",
+        "--testNamePattern=\\(configured\\)",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=artifacts/rust-tauri/R07/T08/interface-late-write-fixed2/transfer-positive-results.json"
+      ],
+      "exitCode": 0,
+      "stdoutSha256": "a745a82d06cd01faf1585ec10fdf58bc6c2e1d69e20d566499e8e154cb6db534",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "types",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 2,
+      "stdoutSha256": "f2b82149e63b2d04febbba3f3a206c16e65ea9431cb6bd757c6fa633c04f5086",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "developmentOnly": true,
+  "formalAcceptance": false,
+  "binary": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binaryBeforeSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryAfterSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryUnchanged": true,
+  "sourceBefore": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "c87478150b59c4f35a196e664a792d63df905442b3a06e99d9520681cdcb40bd",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "0d5ea0e10b96d38972a82d0a6acee33ca067e65309e6baa38f19de703800e5c0",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "12299c0bc6b5987684002cfd0a231e1f36113b3680874fbfb6ffbb3e5189f639",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "19332d5fd9fc761aa1434e03bda456124b3a3365bb4fb37f2b9a857996bdaab1",
+    "desktop/src/react/__tests__/services/r07-interface-preferences-real-service.test.tsx": "eb22d8a48e7b3fcfb780496d094edc536f1b69522ab5e47e42974e6f94b08823",
+    "desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx": "d0abfa595398324b0b0bbee77ea6e54cecaa14f37b072877ee3c7f7acfdb1260",
+    "desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx": "4eb3be0fb2f12cc2f510ee8708f2d37eef88d2dfc44565893d45af69f0e2edfe",
+    "desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx": "62f89284674b024b1fa2d6d391968dda7c9e02aab2ab367b97df7bf3127217ba",
+    "desktop/src/react/settings/SettingsContent.tsx": "cd7db8b154cf2b8ef3732739c4501d63c59d2647c13473de7740c38e4b3ffaf8",
+    "desktop/src/react/settings/api.ts": "9526f3f06e23958979ff60087a629b8464a23e0afef27bf656a2c995f5a10dcb",
+    "desktop/src/react/settings/connection-owner.ts": "496ebb69a866af4c133a05afcb719332d5af45c7ecfb5b8bfbe83c56d5ce4010",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "4b3f42514447ea22d51fdc01c414d28cc18d73a956c89f4371ac8bb61d7c7292"
+  },
+  "sourceAfter": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "c87478150b59c4f35a196e664a792d63df905442b3a06e99d9520681cdcb40bd",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "0d5ea0e10b96d38972a82d0a6acee33ca067e65309e6baa38f19de703800e5c0",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "12299c0bc6b5987684002cfd0a231e1f36113b3680874fbfb6ffbb3e5189f639",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "19332d5fd9fc761aa1434e03bda456124b3a3365bb4fb37f2b9a857996bdaab1",
+    "desktop/src/react/__tests__/services/r07-interface-preferences-real-service.test.tsx": "eb22d8a48e7b3fcfb780496d094edc536f1b69522ab5e47e42974e6f94b08823",
+    "desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx": "d0abfa595398324b0b0bbee77ea6e54cecaa14f37b072877ee3c7f7acfdb1260",
+    "desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx": "4eb3be0fb2f12cc2f510ee8708f2d37eef88d2dfc44565893d45af69f0e2edfe",
+    "desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx": "62f89284674b024b1fa2d6d391968dda7c9e02aab2ab367b97df7bf3127217ba",
+    "desktop/src/react/settings/SettingsContent.tsx": "cd7db8b154cf2b8ef3732739c4501d63c59d2647c13473de7740c38e4b3ffaf8",
+    "desktop/src/react/settings/api.ts": "9526f3f06e23958979ff60087a629b8464a23e0afef27bf656a2c995f5a10dcb",
+    "desktop/src/react/settings/connection-owner.ts": "496ebb69a866af4c133a05afcb719332d5af45c7ecfb5b8bfbe83c56d5ce4010",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "4b3f42514447ea22d51fdc01c414d28cc18d73a956c89f4371ac8bb61d7c7292"
+  },
+  "trackedSourceUnchanged": true
+}

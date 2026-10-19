@@ -1,0 +1,244 @@
+--- t07d/rust/crates/lingxi-adapters/src/browser/ops.rs
++++ working/rust/crates/lingxi-adapters/src/browser/ops.rs
+@@ -15,6 +15,20 @@
+ };
+ 
+ const SNAPSHOT: &str = include_str!("snapshot.js");
++fn navigation_error_text(raw: &str) -> &str {
++    // Chrome的标准网络错误编号可保留；地址、页面文字和其他任意详情一律隐藏。
++    raw.split_whitespace()
++        .find(|part| {
++            part.len() <= 128
++                && part.strip_prefix("net::ERR_").is_some_and(|suffix| {
++                    !suffix.is_empty()
++                        && suffix
++                            .bytes()
++                            .all(|c| c.is_ascii_uppercase() || c.is_ascii_digit() || c == b'_')
++                })
++        })
++        .unwrap_or("非标准导航错误详情已隐藏")
++}
+ pub(super) fn evaluate(
+     live: &Live,
+     sid: &str,
+@@ -196,10 +210,13 @@
+             std::thread::sleep(Duration::from_millis(20));
+         }
+     }
+-    if nav["errorText"].is_string() {
++    if let Some(cause) = nav["errorText"].as_str() {
+         return Err(error(
+             "browser_navigation",
+-            "浏览器导航失败，未回退其他网络路径",
++            &format!(
++                "浏览器导航失败，未回退其他网络路径 [{}]",
++                navigation_error_text(cause)
++            ),
+             false,
+         ));
+     }
+@@ -221,6 +238,34 @@
+         )?;
+     }
+     Ok(nav)
++}
++
++#[cfg(test)]
++mod navigation_diagnostics_tests {
++    use super::navigation_error_text;
++
++    #[test]
++    fn navigation_diagnostic_keeps_network_code_without_urls_credentials_or_arbitrary_text() {
++        assert_eq!(
++            navigation_error_text(
++                "net::ERR_FAILED https://fixture.invalid/path?password=synthetic-private-marker"
++            ),
++            "net::ERR_FAILED"
++        );
++        assert_eq!(
++            navigation_error_text("net::ERR_CONNECTION_CLOSED"),
++            "net::ERR_CONNECTION_CLOSED"
++        );
++        for raw in [
++            "https://user:synthetic-private-marker@fixture.invalid/body",
++            "arbitrary page text synthetic-private-marker",
++            "net::ERR_FAILED/synthetic-private-marker",
++            "net::ERR_",
++            "",
++        ] {
++            assert_eq!(navigation_error_text(raw), "非标准导航错误详情已隐藏");
++        }
++    }
+ }
+ fn loader(
+     live: &Live,
+--- t07d/rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs
++++ working/rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs
+@@ -242,9 +242,17 @@
+     }
+ }
+ async fn navigate(h: &ChromiumHost, s: &BrowserScope, url: String) -> BrowserOutput {
++    navigate_checked(h, s, url, None).await
++}
++async fn navigate_checked(
++    h: &ChromiumHost,
++    s: &BrowserScope,
++    url: String,
++    context: Option<(&std::path::Path, &Site, &str)>,
++) -> BrowserOutput {
+     let mut c = BrowserCommand::new(A::Navigate);
+     c.url = Some(url);
+-    execute(h, s.clone(), c).await
++    execute_checked(h, s.clone(), c, context).await
+ }
+ async fn eval(
+     h: &ChromiumHost,
+@@ -368,17 +376,35 @@
+     let (h, _network_guard) = host(&root);
+     let a = scope("owner-a");
+     let b = scope("owner-b");
+-    let first = navigate(&h, &a, format!("{}/login", site.url)).await;
++    let first = navigate_checked(
++        &h,
++        &a,
++        format!("{}/login", site.url),
++        Some((&root, &site, "initial_login")),
++    )
++    .await;
+     let tab = first.reply.state.active_tab_id.clone().unwrap();
+     assert!(eval(&h, &a, &tab, "document.cookie")
+         .await
+         .as_str()
+         .unwrap()
+         .contains("login=fixture"));
+-    let second = navigate(&h, &b, format!("{}/form", site.url)).await;
++    let second = navigate_checked(
++        &h,
++        &b,
++        format!("{}/form", site.url),
++        Some((&root, &site, "isolated_owner_b_form")),
++    )
++    .await;
+     let other = second.reply.state.active_tab_id.unwrap();
+     assert_eq!(eval(&h, &b, &other, "document.cookie").await, "");
+-    navigate(&h, &a, format!("{}/form", site.url)).await;
++    navigate_checked(
++        &h,
++        &a,
++        format!("{}/form", site.url),
++        Some((&root, &site, "owner_a_form_before_restore")),
++    )
++    .await;
+     let saved = h
+         .workspaces()
+         .unwrap()
+@@ -387,7 +413,13 @@
+         .unwrap();
+     execute(&h, a.clone(), BrowserCommand::new(A::Stop)).await;
+     h.restore(a.clone(), saved).unwrap();
+-    let resumed = execute(&h, a.clone(), BrowserCommand::new(A::Resume)).await;
++    let resumed = execute_checked(
++        &h,
++        a.clone(),
++        BrowserCommand::new(A::Resume),
++        Some((&root, &site, "restore_saved_profile_cookies_allowed")),
++    )
++    .await;
+     let mut tab = resumed.reply.state.active_tab_id.unwrap();
+     assert!(eval(&h, &a, &tab, "document.cookie")
+         .await
+@@ -420,14 +452,25 @@
+             .all(|workspace| !workspace.running),
+         "原生Cookie策略切换后应保留冷态，不自动重开或假称DOM保留"
+     );
+-    tab = execute(&h, a.clone(), BrowserCommand::new(A::Resume))
+-        .await
+-        .reply
+-        .state
+-        .active_tab_id
+-        .unwrap();
++    tab = execute_checked(
++        &h,
++        a.clone(),
++        BrowserCommand::new(A::Resume),
++        Some((&root, &site, "resume_cookies_disabled")),
++    )
++    .await
++    .reply
++    .state
++    .active_tab_id
++    .unwrap();
+     assert_eq!(eval(&h, &a, &tab, "document.cookie").await, "");
+-    let echo = navigate(&h, &a, format!("{}/echo", site.url)).await;
++    let echo = navigate_checked(
++        &h,
++        &a,
++        format!("{}/echo", site.url),
++        Some((&root, &site, "echo_cookies_disabled")),
++    )
++    .await;
+     let actual_echo_body = eval(&h, &a, &tab, "document.body.innerText").await;
+     assert!(
+         echo.reply.result["text"]
+@@ -443,21 +486,38 @@
+         .as_str()
+         .unwrap()
+         .contains("login=fixture"));
+-    navigate(&h, &a, format!("{}/blocked-cookie", site.url)).await;
++    navigate_checked(
++        &h,
++        &a,
++        format!("{}/blocked-cookie", site.url),
++        Some((&root, &site, "set_cookie_while_disabled")),
++    )
++    .await;
+     // 重开时恢复的页面本身不得再次合法设置同名Cookie，否则会混淆禁用期间的因果。
+-    navigate(&h, &a, format!("{}/echo", site.url)).await;
++    navigate_checked(
++        &h,
++        &a,
++        format!("{}/echo", site.url),
++        Some((&root, &site, "echo_before_reenable")),
++    )
++    .await;
+     h.configure(BrowserSettings::default()).await.unwrap();
+     assert!(h
+         .workspaces()
+         .unwrap()
+         .iter()
+         .all(|workspace| !workspace.running));
+-    tab = execute(&h, a.clone(), BrowserCommand::new(A::Resume))
+-        .await
+-        .reply
+-        .state
+-        .active_tab_id
+-        .unwrap();
++    tab = execute_checked(
++        &h,
++        a.clone(),
++        BrowserCommand::new(A::Resume),
++        Some((&root, &site, "resume_cookies_reenabled")),
++    )
++    .await
++    .reply
++    .state
++    .active_tab_id
++    .unwrap();
+     let restored_cookie = eval(&h, &a, &tab, "document.cookie").await;
+     let restored_cookie = restored_cookie.as_str().unwrap();
+     assert!(
+@@ -470,7 +530,13 @@
+     );
+     h.clear_site_data().await.unwrap();
+     h.configure(BrowserSettings::default()).await.unwrap();
+-    let resumed = execute(&h, a.clone(), BrowserCommand::new(A::Resume)).await;
++    let resumed = execute_checked(
++        &h,
++        a.clone(),
++        BrowserCommand::new(A::Resume),
++        Some((&root, &site, "resume_after_clear_site_data")),
++    )
++    .await;
+     let tab = resumed.reply.state.active_tab_id.unwrap();
+     assert_eq!(eval(&h, &a, &tab, "document.cookie").await, "");
+     h.shutdown().await.unwrap();

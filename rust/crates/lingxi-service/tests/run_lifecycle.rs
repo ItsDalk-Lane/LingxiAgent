@@ -436,8 +436,9 @@ async fn r03_a01_three_model_calls_produce_exactly_one_task_terminal() {
     assert!(content.contains("final answer after tool"), "{content}");
 
     // Full durable event chain of the run (ordering witness):
-    // start, mc1 started/done, tool start/done, mc2 started/done,
-    // mc3 started/done, terminal, final message.
+    // start, mc1 started/done, tool start/done, model projection archive
+    // (R07 起直注执行器路径也统一归档模型投影——历史恢复消费此记录),
+    // mc2 started/done, mc3 started/done, terminal, final message.
     let types: Vec<&str> = events.iter().map(|e| e.payload.event_type()).collect();
     assert_eq!(
         types,
@@ -447,6 +448,7 @@ async fn r03_a01_three_model_calls_produce_exactly_one_task_terminal() {
             "model_call_completed",
             "tool_call_started",
             "tool_call_completed",
+            "tool_result_model_projection",
             "model_call_started",
             "model_call_completed",
             "model_call_started",
@@ -458,7 +460,7 @@ async fn r03_a01_three_model_calls_produce_exactly_one_task_terminal() {
     );
 
     // Live hub observation: every durable event of this run was published
-    // post-commit (11 frames).
+    // post-commit (12 frames，含模型投影归档).
     let mut live = 0;
     while subscription
         .mailbox()
@@ -468,7 +470,7 @@ async fn r03_a01_three_model_calls_produce_exactly_one_task_terminal() {
     {
         live += 1;
     }
-    assert_eq!(live, 11, "hub delivered the whole committed chain");
+    assert_eq!(live, 12, "hub delivered the whole committed chain");
 
     teardown(&state, &home).await;
 }

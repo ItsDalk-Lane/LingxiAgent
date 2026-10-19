@@ -1,0 +1,97 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-bridge-sdk-worker.test.ts (47 tests | 3 failed) 8147ms
+     × Telegram 原生输入和富草稿不冒充最终送达，重复效果不重复外发 55ms
+     × 飞书富回复使用真实 CardKit 创建、内容更新和关闭回执 675ms
+     × 原生 Node 诊断入口单次退出且无额外日志 54ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-bridge-sdk-worker.test.ts > R07 持久授权效果的真实 SDK 边界 > Telegram 原生输入和富草稿不冒充最终送达，重复效果不重复外发
+AssertionError: expected { Object (receipt, streams) } to match object { …(2) }
+
+- Expected
++ Received
+
+@@ -4,10 +4,20 @@
+    },
+    "streams": [
+      {
+        "maxChars": 4096,
+        "minIntervalMs": 500,
++       "mode": "draft",
++       "receiptFolded": false,
++       "rich": false,
++       "scopes": [
++         "dm",
++       ],
++     },
++     {
++       "maxChars": 32768,
++       "minIntervalMs": 500,
+        "mode": "rich_draft",
+        "receiptFolded": false,
+        "rich": true,
+        "scopes": [
+          "dm",
+
+ ❯ tests/r07-bridge-sdk-worker.test.ts:244:69
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/r07-bridge-sdk-worker.test.ts > R07 持久授权效果的真实 SDK 边界 > 飞书富回复使用真实 CardKit 创建、内容更新和关闭回执
+AssertionError: expected [ { config: { …(1) } }, …(1) ] to deeply equal [ { streaming_mode: true }, …(1) ]
+
+- Expected
++ Received
+
+  [
+    {
++     "config": {
+        "streaming_mode": true,
++     },
+    },
+    {
++     "config": {
+        "streaming_mode": false,
++     },
+    },
+  ]
+
+ ❯ tests/r07-bridge-sdk-worker.test.ts:307:22
+    305|     expect(platform.contentFeishuCard).toHaveBeenCalledTimes(2); expec…
+    306|     const settings = platform.settingsFeishuCard.mock.calls.map(([call…
+    307|     expect(settings).toEqual([{ streaming_mode: true }, { streaming_mo…
+       |                      ^
+    308|   });
+    309|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/r07-bridge-sdk-worker.test.ts > R07 单次诊断真实平台调用 > 原生 Node 诊断入口单次退出且无额外日志
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/r07-bridge-sdk-worker.test.ts:523:26
+    521|     const closed = new Promise<number>(resolve => child.on("close", re…
+    522|     child.stdin.end('{"kind":"verify","platform":"telegram","config":{…
+    523|     expect(await closed).toBe(0); expect(stderr).toBe("");
+       |                          ^
+    524|     expect(JSON.parse(stdout)).toEqual({ kind: "diagnostic_result", ok…
+    525|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 44 passed (47)
+   Start at  02:47:59
+   Duration  8.40s (transform 161ms, setup 18ms, import 172ms, tests 8.15s, environment 0ms)
+

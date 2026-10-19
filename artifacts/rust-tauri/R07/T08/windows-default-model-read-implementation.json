@@ -1,0 +1,28 @@
+{
+  "status": "IMPLEMENTED_STATIC_API_REVIEW_ONLY",
+  "date": "2026-10-18T06:12:27.584700+00:00",
+  "changedByThisAgent": [
+    "rust/crates/lingxi-service/src/chat_settings.rs"
+  ],
+  "sourceHashes": [
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "sha256": "2ac01f59c6391dcd1d45bc71e2334d6326f7d296160e8371d7300e7aa1ad3c92"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/discovery_tools.rs",
+      "sha256": "3e9e516c4ea182d3164777ecf507be20b97beb765a3c27b002a7de3c1ba1f14c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/discovery_windows.rs",
+      "sha256": "6178b954d4b83e983e8ff81503f704ad293905d2db1b92b6662569e22864e909"
+    }
+  ],
+  "implementation": "cfg(windows) root/agents/agent目录各复用既有windows_readonly::DirFd::open，保持全部读取祖先句柄至snapshot及当前目录身份复核结束；cfg(not(windows))原逻辑不变。",
+  "apiReview": "现有DirFd::open(&Path)->io::Result<Self>，same_directory(&self,&Path)->io::Result<bool>；逐组件open_relative拒reparse，chain:Vec<File>留存，FILE_SHARE_READ不授予祖先移动删除共享。缺失只接受NotFound；其他错误传播。root已最小pub(crate)暴露既有模块。",
+  "boundaries": [
+    "未新造Win FFI，未改filetools/FileSafety写入语义。",
+    "未运行Cargo或Windows编译/实机，不能将此兼容实现称Windows验证通过。",
+    "Unix源码分支保留；实际本机回归由root统一执行。"
+  ]
+}

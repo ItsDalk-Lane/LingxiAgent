@@ -1,0 +1,47 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0425]: cannot find value `result` in this scope
+   --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:607:20
+    |
+607 |     for change in &result.settings_update.changes {
+    |                    ^^^^^^ not found in this scope
+
+warning: unused import: `ports::StoragePort as _`
+  --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:13:5
+   |
+13 |     ports::StoragePort as _,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0716]: temporary value dropped while borrowed
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:1118:37
+     |
+1118 |         tokio::select! {_ = marker(&root.join("call.json"))=>{},result=&mut run=>panic!("外端未返回前Run不应完成：{result}")};
+     |         ----------------------------^^^^^^^^^^^^^^^^^^^^^^-------------------------------------------------------------------
+     |         |                           |
+     |         |                           creates a temporary value which is freed while still in use
+     |         temporary value is freed at the end of this statement
+     |         borrow later used here
+     |
+     = note: consider using a `let` binding to create a longer lived value
+
+error[E0716]: temporary value dropped while borrowed
+    --> crates/lingxi-service/tests/r07_t08_mcp_settings.rs:1157:37
+     |
+1157 | ...   tokio::select! {_ = marker(&root.join("initialize.json"))=>{},result=&mut run=>panic!("初始化未返回前Run不应完成：{result}")};
+     |       ----------------------------^^^^^^^^^^^^^^^^^^^^^^^^^^^^---------------------------------------------------------------------
+     |       |                           |
+     |       |                           creates a temporary value which is freed while still in use
+     |       temporary value is freed at the end of this statement
+     |       borrow later used here
+     |
+     = note: consider using a `let` binding to create a longer lived value
+
+Some errors have detailed explanations: E0425, E0716.
+For more information about an error, try `rustc --explain E0425`.
+warning: `lingxi-service` (test "r07_t08_mcp_settings") generated 1 warning
+error: could not compile `lingxi-service` (test "r07_t08_mcp_settings") due to 3 previous errors; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...

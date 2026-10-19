@@ -2231,7 +2231,10 @@ async fn r00_access_devices_pairing_thinking_qr_and_static_boundaries() {
     assert_eq!(status, 400);
     let (status, _) = http(server.addr, "GET", "/mobile/assets/missing.js", &[], None).await;
     assert_eq!(status, 404);
-    let (status, body) = http(server.addr, "GET", "/mobile", &[], None).await;
+    // R07-T09：页面用相对路径引用资源，无尾斜杠入口重定向到 /mobile/。
+    let (status, _) = http(server.addr, "GET", "/mobile", &[], None).await;
+    assert_eq!(status, 308);
+    let (status, body) = http(server.addr, "GET", "/mobile/", &[], None).await;
     assert_eq!(status, 200);
     assert!(body.contains("网页界面"));
     server.stop_and_assert_clean().await;

@@ -575,7 +575,11 @@ async fn branch_id_chain(
                         rusqlite::params![sid, id],
                         |r| r.get::<_, String>(0),
                     )
-                    .map(|t| t == "message" || t == "lingxi-model-exchange-v1")
+                    .map(|t| {
+                        t == "message"
+                            || t == "lingxi-model-exchange-v1"
+                            || t == super::bridge_notice::ENTRY_TYPE
+                    })
                     .unwrap_or(false)
                 });
             }
@@ -826,7 +830,10 @@ pub async fn fork_session_committed_with_files_and_policy(
                             serde_json::from_str(&row.4).map_err(|e| StorageError::Corrupted {
                                 detail: e.to_string(),
                             })?;
-                        identities.extend(super::session_files::reference_identities(&value));
+                        let references = if row.3 == "model_history" && row.7 == "lingxi-model-exchange-v1" {
+                            super::session_files::model_history_reference_value(&value)
+                        } else { value };
+                        identities.extend(super::session_files::reference_identities(&references));
                     }
                     super::session_files::fork_files_on_connection(
                         conn,
@@ -890,9 +897,7 @@ pub async fn fork_session_committed_with_files_and_policy(
                                 }
                             })?,
                         )?;
-                        if !matches!(actor, lingxi_kernel::Principal::LocalUser)
-                            && actor.storage_subject() != owner
-                        {
+                        if !actor.can_access_session(&owner,body["sourceSession"].as_str().ok_or_else(||StorageError::Corrupted{detail:"model_history fork source session missing".into()})?) {
                             return Err(StorageError::Corrupted {
                                 detail: "model_history fork actor/session owner mismatch".into(),
                             });
@@ -945,7 +950,7 @@ pub async fn fork_session_committed_with_files_and_policy(
                                     items.iter().any(|item| {
                                         !matches!(
                                             item["kind"].as_str(),
-                                            Some("user" | "assistant" | "tool" | "summary")
+                                            Some("user" | "assistant" | "tool" | "summary" | "host_notice")
                                         )
                                     })
                                 })
@@ -984,8 +989,8 @@ pub async fn fork_session_committed_with_files_and_policy(
                     )
                     .map_err(map_err)?;
                     if home.is_some() {
-                        super::session_files::sync_message_refs(
-                            conn, &new_id, mid, content, now as u64,
+                        super::session_files::sync_forked_message_refs(
+                            conn, &src3, &new_id, mid, content, now as u64,
                         )?;
                     }
                     prev = Some(mid.clone());

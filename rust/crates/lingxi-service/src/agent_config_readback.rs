@@ -1,46 +1,14 @@
-//! R06 A 块剩余后端叶子：`GET/PUT /agents/{id}/config`（GET 为完整设置读面）、
-//! `PUT /agents/{id}/config` 供应商读回链、
-//! current_status 只读面、experiments 读/写、cache-snapshot observation 读。
+//! 助手配置、全局设置、实验与状态的现役读写面。
 //!
-//! 语义源（端口式移植，不猜造）：
-//! - `server/routes/agents.ts:636-799` — PUT config 主链（scope 分流 →
-//!   providers 目录写 → 内联凭证转存 → onProviderChanged（models.json 投影
-//!   + 焦点刷新）→ agentPartial 落盘 → updateConfig 运行时刷新）。
-//! - `core/provider-catalog.ts` / `core/local-provider-plugin-store.ts` /
-//!   `core/provider-registry.ts`（saveProvider/removeProvider）— 权威目录
-//!   `provider-catalog.json`、条件 `provider-plugins/` 插件文件。
-//! - `core/model-sync.ts` syncModels — `models.json` 派生投影。
-//! - `shared/config-scope.ts` + `core/preferences-manager.ts` — 全局字段经
-//!   setter 写 `user/preferences.json`。
-//! - `lib/tools/current-status-tool.ts` — list/get 协议的状态键目录。
-//! - `server/routes/agents.ts:557-634` — GET config（GC 工作区历史 → 读盘
-//!   → experience 归一 → `_raw` → 全局字段注入 → 供应商摘要 → availableTools
-//!   → 递归掩码）。端口边界：无运行时 agent/插件注册表，availableTools =
-//!   core+standard+可选开关（beautify/office 需插件工具注册，端口无 → 不列；
-//!   computer 需 Computer Use 启用，端口无 → 隐藏）；供应商 base_url/api 取目录
-//!   与插件定义值，无内置默认 URL 表（不回退 registry 默认）；config.yaml
-//!   违反端口配置校验时显式 500（不静默降级）；目录读取失败 → `providers: {}`
-//!   并记 warn 日志；读目录不触发遗留迁移落盘。
-//! - `server/routes/experiments.ts` + `lib/experiments/registry.ts` +
-//!   `lib/memory/cache-snapshot-observation.ts`。
+//! 全局偏好使用 agents_admin::preferences_locked 共用读改写通道；助手配置
+//! 在写入前完整校验，按明确 agentId 保存，不把失效目标回退到焦点助手。
+//! R07 供应商修改统一交给 model_configuration 发布到真实模型与凭证链；
+//! provider-catalog、provider-plugins 与旧 models.json 仅保留兼容投影。
+//! 返回值保留实际保存、应用与投影结果，后续失败不能掩盖已发生的修改。
+//! 读取面递归脱敏；损坏配置显式失败，不以空配置覆盖用户内容。
 //!
-//! 端口边界（显式声明，不冒充完整）：
-//! - `models.json` 投影只含结构性决策（哪些 provider 进入、baseUrl/api/
-//!   apiKey 字段形状、显式 type/outputs 的 chat 过滤、模型条目显式字段）；
-//!   known-models.json / Pi 内置目录元数据、模态兼容层不在本端口
-//!   （模型平面属 R05 语义源）。与现役一致：内容不变且权限正确不重写。
-//! - 运行时 agent 实例在端口中不存在："已加载" ≡ config.yaml 在磁盘上可
-//!   解析（现役启动即全量 config-load）。`updateConfig({agentId})` 在命名
-//!   agent 的 config 消失时回退焦点，无焦点显式失败——与现役
-//!   `getAgentById(id) || getAgent()` 的回退链同构，但不存在"懒加载未注
-//!   册"分支。
-//! - `recordSecurityAuditEvent` 无端口侧路由级审计汇（security_audit.rs
-//!   尚无 route 事件面），本路由不记录审计事件，不伪造。
-//! - 迁移遗留 `added-models.yaml` 时不写 migration-backups 备份目录
-//!   （全新 home 无遗留文件；备份面不在本叶子范围）。
-//! - 命名时区算术（chrono-tz 不在锁内）沿用 context_compiler 的已知差距：
-//!   localDateTime/utcOffset 用系统本地时区计算，timezone 返回偏好里配置
-//!   的名字、缺失时为 null（显式未知，不猜造系统 IANA 名）。
+//! 命名时区的状态显示仍沿用系统本地时区计算，timezone 返回已保存名字；
+//! 此兼容边界并不表示已经支持所有 IANA 时区的日期算术。
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -65,27 +33,6 @@ fn is_masked_secret_value(value: &Value) -> bool {
     value
         .as_str()
         .is_some_and(|text| text.trim() == MASKED_SECRET)
-}
-
-/// resolveSecretPatch（agents.ts:700-705，secretKeys 固定 ["api_key"]）：
-/// 掩码值解析回既有密文，其余键原样。
-fn resolve_secret_patch(patch: &Value, existing: &Value) -> Value {
-    let empty = Map::new();
-    let source = patch.as_object().unwrap_or(&empty);
-    let saved = existing.as_object().unwrap_or(&empty);
-    let mut out = Map::new();
-    for (key, value) in source {
-        let resolved = if key == "api_key" && is_masked_secret_value(value) {
-            saved
-                .get(key)
-                .cloned()
-                .unwrap_or(Value::String(String::new()))
-        } else {
-            value.clone()
-        };
-        out.insert(key.clone(), resolved);
-    }
-    Value::Object(out)
 }
 
 /// writeSecretFileSync（shared/secret-fs.ts）：tmp（0600）→ rename。权限
@@ -185,7 +132,7 @@ fn normalize_provider_map(value: Option<&Value>) -> Map<String, Value> {
     providers
 }
 
-struct ProviderCatalog {
+pub(crate) struct ProviderCatalog {
     providers: Map<String, Value>,
     meta: Map<String, Value>,
 }
@@ -223,7 +170,7 @@ impl ProviderCatalog {
 /// load（provider-catalog.ts:117-121）：读现役目录；缺失走遗留迁移
 /// （added-models.yaml → catalog；无遗留则物化空目录——与现役 load 的
 /// 副作用一致：首次读取即建立 provider-catalog.json）。
-fn load_catalog(home: &Path) -> Result<ProviderCatalog, String> {
+pub(crate) fn load_catalog(home: &Path) -> Result<ProviderCatalog, String> {
     load_catalog_with(home, true)
 }
 
@@ -756,7 +703,11 @@ const BUILTIN_PROVIDER_IDS: [&str; 39] = [
 /// saveProvider（provider-registry.ts:2160-2192）：合并既有 → 内置不写插件
 /// 文件，本地自定义/未注册插件把定义字段写进 provider-plugins 并只在目录
 /// 留 overlay；从 deletedProviders 摘除后整目录落盘。
-fn registry_save_provider(home: &Path, provider_id: &str, data: &Value) -> Result<(), String> {
+pub(crate) fn registry_save_provider(
+    home: &Path,
+    provider_id: &str,
+    data: &Value,
+) -> Result<(), String> {
     let mut catalog = load_catalog(home)?;
     let existing = catalog
         .providers
@@ -854,13 +805,26 @@ fn registry_remove_provider(home: &Path, provider_id: &str) -> Result<(), String
     catalog.save(home)
 }
 
+/// 运行配置发布后的旧格式投影；只删除调用方明确证明已移除的供应商。
+/// 未纳入现役配置的其他历史条目保留，不能因单项编辑全量清空用户旧目录。
+pub(crate) fn publish_legacy_provider_projection(
+    home: &Path,
+    providers: &Map<String, Value>,
+    removed: &[String],
+) -> Result<(), String> {
+    for provider in removed {
+        registry_remove_provider(home, provider)?;
+    }
+    for (provider, value) in providers {
+        registry_save_provider(home, provider, value)?;
+    }
+    // 执行投影只取本次发布的完整快照，旧目录遗留项不能回流成执行权威。
+    sync_models_json(home, providers).map(|_| ())
+}
+
 /// getAllProvidersRaw 的读侧合并（provider-registry.ts reload +
 /// _mergeRawProviderConfig）：本地插件的定义字段（display_name/base_url/
 /// api/models…）与目录 overlay 合并，模型表按 id merge。内置条目即目录值。
-fn merged_catalog_providers(home: &Path) -> Result<Map<String, Value>, String> {
-    merged_catalog_providers_with(home, true)
-}
-
 pub(crate) fn merged_catalog_providers_with(
     home: &Path,
     persist: bool,
@@ -945,7 +909,7 @@ fn is_valid_modality_list(value: &Value) -> bool {
             .all(|item| matches!(item.as_str(), Some("text" | "image" | "video" | "audio")))
 }
 
-fn validate_model_metadata(provider_id: &str, model: &Value) -> Result<(), String> {
+pub(crate) fn validate_model_metadata(provider_id: &str, model: &Value) -> Result<(), String> {
     let Some(entry) = model.as_object() else {
         return Ok(());
     };
@@ -1442,7 +1406,10 @@ fn build_model_entry(
 
 /// syncModels：单向投影 catalog providers → models.json。内容不变且权限
 /// 正确时不重写（返回 false）；有变化或权限错误时重写（0600）。
-fn sync_models_json(home: &Path, providers: &Map<String, Value>) -> Result<bool, String> {
+pub(crate) fn sync_models_json(
+    home: &Path,
+    providers: &Map<String, Value>,
+) -> Result<bool, String> {
     let mut new_providers = Map::new();
     for (name, provider) in providers {
         let base_url = provider
@@ -1543,7 +1510,7 @@ fn sync_models_json(home: &Path, providers: &Map<String, Value>) -> Result<bool,
 
 /// CONFIG_SCHEMA 中 scope=global 且有 setter 的全部字段（config-schema.ts
 /// 单一事实来源的逐条移植；未列出字段默认 agent scope）。
-const GLOBAL_FIELDS: &[&str] = &[
+pub(crate) const GLOBAL_FIELDS: &[&str] = &[
     "locale",
     "user.name",
     "timezone",
@@ -1568,7 +1535,7 @@ const GLOBAL_FIELDS: &[&str] = &[
 ];
 
 /// splitByScope：全局字段抽走（返回 schema 键与值），剩余为 agent partial。
-fn split_by_scope(payload: &Value) -> (Vec<(&'static str, Value)>, Value) {
+pub(crate) fn split_by_scope(payload: &Value) -> (Vec<(&'static str, Value)>, Value) {
     let mut agent = payload.as_object().cloned().unwrap_or_default();
     let mut global = Vec::new();
     for field in GLOBAL_FIELDS {
@@ -1689,21 +1656,21 @@ fn normalize_content_width(value: Option<&Value>, fallback: Value) -> Value {
 
 /// normalizeEditorTypography + mergeEditorTypography（shared/editor-typography.ts）。
 fn merge_editor_typography(base: Option<&Value>, patch: Option<&Value>) -> Value {
-    let current = normalize_editor_typography(base);
-    let source = patch
-        .filter(|v| v.is_object())
-        .cloned()
-        .unwrap_or(json!({}));
-    let merged_top = {
-        let mut out = current.clone();
-        if let (Some(target), Some(src)) = (out.as_object_mut(), source.as_object()) {
-            for (key, value) in src {
-                target.insert(key.clone(), value.clone());
-            }
+    let mut merged = normalize_editor_typography(base);
+    if let Some(markdown_patch) = patch
+        .and_then(Value::as_object)
+        .and_then(|source| source.get("markdown"))
+        .and_then(Value::as_object)
+    {
+        let markdown = merged["markdown"]
+            .as_object_mut()
+            .expect("排版归一结果包含markdown对象");
+        // 只覆盖明确给出的排版项，单改字号不能重置字体、标题和间距。
+        for (key, value) in markdown_patch {
+            markdown.insert(key.clone(), value.clone());
         }
-        out
-    };
-    normalize_editor_typography(Some(&merged_top))
+    }
+    normalize_editor_typography(Some(&merged))
 }
 
 fn normalize_editor_typography(value: Option<&Value>) -> Value {
@@ -1878,7 +1845,11 @@ fn normalize_network_proxy(value: &Value, strict: bool) -> Result<Value, String>
 
 /// 逐字段调用 preferences-manager 对应 setter（写入前的内存偏好树）。
 /// 返回 Err 时对应现役 setter 抛错 → 路由 500。
-fn apply_global_setter(prefs: &mut Value, key: &str, value: &Value) -> Result<(), String> {
+pub(crate) fn apply_global_setter(
+    prefs: &mut Value,
+    key: &str,
+    value: &Value,
+) -> Result<(), String> {
     fn ensure_object<'a>(prefs: &'a mut Value, key: &str) -> &'a mut Map<String, Value> {
         if !prefs.get(key).is_some_and(Value::is_object) {
             prefs[key] = json!({});
@@ -2024,7 +1995,39 @@ fn apply_global_setter(prefs: &mut Value, key: &str, value: &Value) -> Result<()
             automation.insert("permissionMode".into(), json!(normalized));
         }
         "network_proxy" => {
-            prefs["network_proxy"] = normalize_network_proxy_strict(value)?;
+            let fields = value.as_object().ok_or("network_proxy must be object")?;
+            if fields.keys().any(|key| {
+                ![
+                    "mode",
+                    "httpProxy",
+                    "httpsProxy",
+                    "wsProxy",
+                    "wssProxy",
+                    "noProxy",
+                ]
+                .contains(&key.as_str())
+            }) {
+                return Err("unknown network proxy field".into());
+            }
+            let mut merged = prefs.get("network_proxy").cloned().unwrap_or(json!({}));
+            let target = merged
+                .as_object_mut()
+                .ok_or("saved network_proxy must be object")?;
+            for (key, value) in fields {
+                target.insert(key.clone(), value.clone());
+            }
+            let normalized = normalize_network_proxy_strict(&merged)?;
+            let mut validation = json!({"network_proxy":normalized});
+            // 共享出口不支持URL内凭证；明确拒绝，不能把仅存盘说成服务已生效。
+            crate::settings_configuration::effective_network_policy(
+                &Default::default(),
+                &validation,
+            )?;
+            prefs["network_proxy"] = validation
+                .as_object_mut()
+                .expect("固定对象")
+                .remove("network_proxy")
+                .expect("固定字段");
         }
         other => return Err(format!("unknown global config key: {other}")),
     }
@@ -2093,15 +2096,17 @@ const OPTIONAL_TOOL_NAMES: [&str; 19] = [
 
 fn has_inline_provider_credential_patch(block: Option<&Value>) -> bool {
     block.is_some_and(|block| {
-        block
-            .as_object()
-            .is_some_and(|map| map.contains_key("api_key") || map.contains_key("base_url"))
+        block.as_object().is_some_and(|map| {
+            map.contains_key("api_key")
+                || map.contains_key("base_url")
+                || map.contains_key("headers")
+        })
     })
 }
 
 /// hasProviderMutationPatch（agents.ts:124-128）：providers 块或 api /
 /// embedding_api 内联凭证补丁。
-fn has_provider_mutation_patch(partial: &Value) -> bool {
+pub(crate) fn has_provider_mutation_patch(partial: &Value) -> bool {
     if partial.get("providers").is_some() {
         return true;
     }
@@ -2112,7 +2117,13 @@ fn has_provider_mutation_patch(partial: &Value) -> bool {
 
 /// collectSecretPatchPaths（secretKeys=["api_key"]）：未掩码 api_key 的
 /// 补丁路径（越权即 403，路径随错误返回）。
-fn collect_secret_patch_paths(value: &Value, prefix: &str, paths: &mut Vec<String>) {
+pub(crate) fn collect_secret_patch_paths(value: &Value, prefix: &str, paths: &mut Vec<String>) {
+    if let Some(items) = value.as_array() {
+        for (index, item) in items.iter().enumerate() {
+            collect_secret_patch_paths(item, &format!("{prefix}[{index}]"), paths);
+        }
+        return;
+    }
     let Some(map) = value.as_object() else {
         return;
     };
@@ -2122,9 +2133,23 @@ fn collect_secret_patch_paths(value: &Value, prefix: &str, paths: &mut Vec<Strin
         } else {
             format!("{prefix}.{key}")
         };
-        if key == "api_key" {
+        if is_secret_key(key) {
             if !is_masked_secret_value(entry) {
                 paths.push(path);
+            }
+            continue;
+        }
+        if matches!(key.as_str(), "headers" | "api_keys" | "search_api_keys") {
+            match entry.as_object() {
+                Some(entries) => {
+                    for (name, secret) in entries {
+                        if !is_masked_secret_value(secret) {
+                            paths.push(format!("{path}.{name}"));
+                        }
+                    }
+                }
+                // 清空也是一次秘密修改，不能借 null 绕开权限。
+                None => paths.push(path),
             }
             continue;
         }
@@ -2132,55 +2157,35 @@ fn collect_secret_patch_paths(value: &Value, prefix: &str, paths: &mut Vec<Strin
     }
 }
 
-fn scope_denied(principal: Option<&crate::auth::Principal>, scope: &str) -> bool {
+pub(crate) fn scope_denied(principal: Option<&crate::auth::Principal>, scope: &str) -> bool {
     principal.is_some_and(|principal| !principal.has_scope(scope))
-}
-
-/// buildInlineProviderCredentialUpdate（server/routes/provider-credentials.ts）。
-fn build_inline_provider_credential_update(
-    block: &Value,
-    fallback_provider: &str,
-    existing_provider: &Value,
-) -> (String, Value) {
-    let provider = block
-        .get("provider")
-        .and_then(Value::as_str)
-        .map(str::trim)
-        .filter(|p| !p.is_empty())
-        .map(str::to_string)
-        .unwrap_or_else(|| fallback_provider.trim().to_string());
-    let mut update = Map::new();
-    if let Some(api_key) = block.get("api_key") {
-        update.insert(
-            "api_key".into(),
-            if is_masked_secret_value(api_key) {
-                existing_provider
-                    .get("api_key")
-                    .cloned()
-                    .unwrap_or(Value::String(String::new()))
-            } else {
-                api_key
-                    .as_str()
-                    .map(|v| Value::String(v.to_string()))
-                    .unwrap_or(Value::String(String::new()))
-            },
-        );
-    }
-    if let Some(base_url) = block.get("base_url") {
-        update.insert(
-            "base_url".into(),
-            Value::String(base_url.as_str().unwrap_or("").to_string()),
-        );
-    }
-    (provider, Value::Object(update))
 }
 
 /// saveConfig（config-loader.ts:114-134）：读盘 → deepMerge partial → 渲染
 /// → 0600 原子写。partial 为空对象时仍重渲染落盘（焦点刷新路径）。
 fn save_agent_config_merge(config_path: &Path, partial: &Value) -> Result<(), String> {
-    let text = std::fs::read_to_string(config_path)
-        .map_err(|err| format!("cannot read config.yaml: {err}"))?;
-    let mut document = am::config::AgentConfigDocument::parse(&text)
+    if config_path.file_name() != Some(std::ffi::OsStr::new("config.yaml")) {
+        return Err("agent configuration must use config.yaml".into());
+    }
+    let agent_dir = config_path
+        .parent()
+        .ok_or("agent configuration parent missing")?;
+    let agent_id = agent_dir
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or("agent identity missing")?;
+    validate_agent_id(agent_id).map_err(|e| e.to_string())?;
+    let agents = agent_dir
+        .parent()
+        .filter(|path| path.file_name() == Some(std::ffi::OsStr::new("agents")))
+        .ok_or("agent configuration must stay in the agents directory")?;
+    let home = agents.parent().ok_or("agent configuration home missing")?;
+    let root = crate::filetools::fsio::DirFd::open(home).map_err(|e| e.to_string())?;
+    let parent = crate::filetools::fsio::DirFd::open(agent_dir).map_err(|e| e.to_string())?;
+    let snapshot = crate::file_safety::Snapshot::read(config_path).map_err(|e| e.to_string())?;
+    let text = std::str::from_utf8(&snapshot.bytes)
+        .map_err(|_| "agent configuration must be valid UTF-8")?;
+    let mut document = am::config::AgentConfigDocument::parse(text)
         .map_err(|err| format!("invalid config.yaml: {err}"))?;
     document
         .deep_merge(partial)
@@ -2188,7 +2193,20 @@ fn save_agent_config_merge(config_path: &Path, partial: &Value) -> Result<(), St
     let rendered = document
         .render()
         .map_err(|err| format!("cannot render config.yaml: {err}"))?;
-    write_secret_file(config_path, &rendered)
+    let _publication = am::ContextMaterialMutation::for_home(home);
+    let authorize = || {
+        root.same_directory(home).unwrap_or(false)
+            && parent.same_directory(agent_dir).unwrap_or(false)
+            && matches!(std::fs::symlink_metadata(agent_dir.join(".deleted-agent.json")), Err(error) if error.kind() == std::io::ErrorKind::NotFound)
+    };
+    crate::file_safety::FileSafety::new(home)
+        .replace_private(
+            "agent-config",
+            config_path,
+            &snapshot,
+            rendered.as_bytes(),
+            authorize,
+        )
         .map_err(|err| format!("cannot write config.yaml: {err}"))
 }
 
@@ -2231,29 +2249,24 @@ fn assert_patch_yuan(state: &ServiceState, agent_partial: &Value) -> Result<(), 
 
 /// 焦点助手解析：current_agent_id → primary_agent_id → None（引擎焦点指针
 /// 的磁盘投影）。
-fn focus_agent_id(memory: &MemoryService) -> Result<Option<String>, String> {
+pub(crate) fn focus_agent_id(memory: &MemoryService) -> Result<Option<String>, String> {
     memory.current_agent_preference().map_err(|err| err.message)
 }
 
-/// updateConfig({agentId}) 端口：命名 agent 的 config 可解析 → 目标即它；
-/// 否则回退焦点；两者皆无 → 显式失败（现役 getAgentById || getAgent 链）。
-fn update_config_for_agent(
+/// 明确目标始终绑定该助手；未给目标时才保留旧焦点选择，失效目标明确失败。
+pub(crate) fn update_config_for_agent(
     memory: &MemoryService,
     agent_id: Option<&str>,
     partial: &Value,
 ) -> Result<(), String> {
     let target = match agent_id {
-        Some(id) if memory.agents_root().join(id).join("config.yaml").is_file() => id.to_string(),
-        _ => match focus_agent_id(memory)? {
-            Some(focus) => focus,
-            None => {
-                return Err(
-                    "no agent runtime available for config refresh (no focus agent)".to_string(),
-                );
-            }
-        },
+        Some(id) => id.to_string(),
+        None => focus_agent_id(memory)?
+            .ok_or("no agent runtime available for config refresh (no focus agent)")?,
     };
-    let config_path = memory.agents_root().join(&target).join("config.yaml");
+    // 只有未指定目标才允许旧焦点语义；失效的明确目标绝不能改到另一位助手。
+    let dir = memory.agent_dir_checked(&target).map_err(|e| e.message)?;
+    let config_path = dir.join("config.yaml");
     save_agent_config_merge(&config_path, partial)
 }
 
@@ -2263,6 +2276,8 @@ pub async fn agent_config_put_route(
     principal_extension: Option<axum::Extension<crate::auth::Principal>>,
     body: Bytes,
 ) -> Response {
+    // 配置保存与媒体文件发布共用次序：保存返回后，旧插件许可不能再落文件。
+    let _publication_authority = state.media().authority_mutation_lease().await;
     let principal = principal_extension.map(|axum::Extension(principal)| principal);
     if validate_agent_id(&agent_id).is_err() {
         return bad_request(format!("Invalid agent ID: {agent_id}"));
@@ -2385,7 +2400,47 @@ pub async fn agent_config_put_route(
     }
 
     // ── schema 驱动的全局字段分流：全局 setter 写 preferences.json ──
-    let (global_fields, mut agent_partial) = split_by_scope(&partial);
+    let (mut global_fields, mut agent_partial) = split_by_scope(&partial);
+    // 供应商与独立辅助模型只通过唯一发布入口生效，旧目录仅由该入口投影。
+    let focus_config = match am::config::read_yaml_mapping_as_json(&agent_dir.join("config.yaml")) {
+        Ok(Some(value)) => value,
+        Ok(None) => return internal_error("agent config missing"),
+        Err(error) => return internal_error(error.to_string()),
+    };
+    let extracted = match crate::provider_routes::extract_legacy_provider_changes(
+        &agent_partial,
+        &focus_config,
+    ) {
+        Ok(value) => value,
+        Err(error) => return bad_request(error),
+    };
+    agent_partial = extracted.agent_patch;
+    if let Err(response) = assert_patch_yuan(&state, &agent_partial) {
+        return response;
+    }
+    // 所有纯校验先于第一笔写入；损坏补丁不能留下未说明的半笔设置。
+    let config_path = agent_dir.join("config.yaml");
+    let preview = (|| -> Result<(), String> {
+        let text = std::fs::read_to_string(&config_path).map_err(|e| e.to_string())?;
+        let mut doc = am::config::AgentConfigDocument::parse(&text).map_err(|e| e.to_string())?;
+        doc.deep_merge(&agent_partial).map_err(|e| e.to_string())?;
+        let rendered = doc.render().map_err(|e| e.to_string())?;
+        am::config::AgentConfigDocument::parse(&rendered).map_err(|e| e.to_string())?;
+        Ok(())
+    })();
+    if let Err(error) = preview {
+        return bad_request(error);
+    }
+    if (!extracted.changes.is_empty()
+        || global_fields.iter().any(|(key, _)| *key == "network_proxy"))
+        && principal.is_none()
+    {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(json!({"error":"authenticated_principal_required"})),
+        )
+            .into_response();
+    }
     if !global_fields.is_empty() {
         let _guard = crate::agents_admin::preferences_locked();
         let mut preferences = match memory.read_preferences_root() {
@@ -2400,119 +2455,67 @@ pub async fn agent_config_put_route(
         if let Err(message) = memory.write_preferences_root(&preferences) {
             return internal_error(message);
         }
-    }
-
-    let home = memory.home().to_path_buf();
-
-    // ── providers 块 → 全局 provider 目录（逐项处理，后项失败保留前项）──
-    let mut providers_changed = false;
-    let requested_providers = agent_partial
-        .get("providers")
-        .and_then(Value::as_object)
-        .cloned();
-    if let Some(requested) = requested_providers {
-        // 转存前的既有目录快照（getAllProvidersRaw 的读取时机）。
-        let existing_catalog = load_catalog(&home);
-        for (name, data) in &requested {
-            let existing = existing_catalog
-                .as_ref()
-                .ok()
-                .and_then(|catalog| catalog.providers.get(name).cloned())
-                .unwrap_or_else(|| json!({}));
-            let outcome = if data.is_null() {
-                registry_remove_provider(&home, name)
-            } else {
-                let resolved = resolve_secret_patch(data, &existing);
-                registry_save_provider(&home, name, &resolved)
-            };
-            // 部分成功语义：先前目录/插件变更保留，HTTP 如实报错。
-            if let Err(message) = outcome {
-                return internal_error(message);
-            }
+        // 通知携带本次锁内刚保存的完整值；单项补丁不能令桌面丢失其它选项。
+        for (key, value) in &mut global_fields {
+            *value = global_field_value(&preferences, key);
         }
-        agent_partial
-            .as_object_mut()
-            .expect("分流后仍是对象")
-            .remove("providers");
-        providers_changed = true;
     }
 
-    // ── 内联 API 凭证 → 目录转存，请求助手 YAML 只留清空值 ──
-    for block_name in ["api", "embedding_api"] {
-        let Some(block) = agent_partial.get(block_name).cloned() else {
-            continue;
+    let providers_changed = !extracted.changes.is_empty();
+    let model_report = if providers_changed {
+        let Some(principal) = principal.as_ref() else {
+            return (
+                StatusCode::FORBIDDEN,
+                Json(json!({"error":"authenticated_principal_required"})),
+            )
+                .into_response();
         };
-        if !has_inline_provider_credential_patch(Some(&block)) {
-            continue;
+        match state
+            .model_configuration()
+            .save(principal, &extracted.changes)
+            .await
+        {
+            Ok(report) => Some(report),
+            Err(error) => {
+                emit_agent_config_app_events(
+                    &state,
+                    &agent_id,
+                    &global_fields,
+                    &json!({}),
+                    error.report.applied,
+                );
+                return (StatusCode::from_u16(error.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
+                    Json(json!({"error":error.message,"code":error.code,"result":error.report,"preferencesSaved":!global_fields.is_empty()}))).into_response();
+            }
         }
-        // fallback provider：请求助手 config.yaml 同名块的 provider 值
-        // （agentCfg[blockName]?.provider，agents.ts:717-721）。
-        let fallback_provider =
-            am::config::read_yaml_mapping_as_json(&agent_dir.join("config.yaml"))
-                .ok()
-                .flatten()
-                .and_then(|config| {
-                    config
-                        .get(block_name)?
-                        .get("provider")?
-                        .as_str()
-                        .map(str::to_string)
-                })
-                .unwrap_or_default();
-        let provider_key = block
-            .get("provider")
-            .and_then(Value::as_str)
-            .map(str::trim)
-            .filter(|p| !p.is_empty())
-            .map(str::to_string)
-            .unwrap_or_else(|| fallback_provider.trim().to_string());
-        if provider_key.is_empty() {
-            return bad_request(format!(
-                "{block_name}.provider is required when saving credentials"
-            ));
-        }
-        let existing = merged_catalog_providers(&home)
-            .ok()
-            .and_then(|mut merged| merged.remove(&provider_key))
-            .unwrap_or_else(|| json!({}));
-        let (_, update) =
-            build_inline_provider_credential_update(&block, &fallback_provider, &existing);
-        if let Err(message) = registry_save_provider(&home, &provider_key, &update) {
-            return internal_error(message);
-        }
-        // clearInlineProviderCredentialFields：请求助手 YAML 的内联秘密清空。
-        let cleared = agent_partial
-            .get_mut(block_name)
-            .and_then(Value::as_object_mut)
-            .expect("已判对象");
-        cleared.insert("api_key".into(), Value::String(String::new()));
-        cleared.insert("base_url".into(), Value::String(String::new()));
-        providers_changed = true;
-    }
-
-    // ── providers 变更后：models.json 投影 + 焦点刷新（onProviderChanged +
-    //    engine.updateConfig({})）。失败时目录已变，不宣称原子回滚。──
-    if providers_changed {
-        let merged = match merged_catalog_providers(&home) {
-            Ok(merged) => merged,
-            Err(message) => return internal_error(message),
+    } else if global_fields.iter().any(|(key, _)| *key == "network_proxy") {
+        let Some(principal) = principal.as_ref() else {
+            return (
+                StatusCode::FORBIDDEN,
+                Json(json!({"error":"authenticated_principal_required","preferencesSaved":true})),
+            )
+                .into_response();
         };
-        if let Err(message) = sync_models_json(&home, &merged) {
-            return internal_error(message);
-        }
-        match focus_agent_id(memory) {
-            Ok(Some(_)) => {
-                if let Err(message) = update_config_for_agent(memory, None, &json!({})) {
-                    return internal_error(message);
-                }
+        match state
+            .model_configuration()
+            .refresh_network_preferences(principal)
+            .await
+        {
+            Ok(report) => Some(report),
+            Err(error) => {
+                emit_agent_config_app_events(
+                    &state,
+                    &agent_id,
+                    &global_fields,
+                    &json!({}),
+                    error.report.applied,
+                );
+                return (StatusCode::from_u16(error.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),Json(json!({"error":error.message,"code":error.code,"result":error.report,"preferencesSaved":true}))).into_response();
             }
-            Ok(None) => {
-                // 无焦点时无 ID 刷新可失败：显式报错，不静默跳过。
-                return internal_error("provider refresh has no focus agent to update config for");
-            }
-            Err(message) => return internal_error(message),
         }
-    }
+    } else {
+        None
+    };
 
     if agent_partial.as_object().is_some_and(|map| map.is_empty()) {
         emit_agent_config_app_events(
@@ -2522,7 +2525,7 @@ pub async fn agent_config_put_route(
             &agent_partial,
             providers_changed,
         );
-        return Json(json!({ "ok": true })).into_response();
+        return Json(json!({ "ok": true, "modelConfiguration": model_report })).into_response();
     }
 
     // 记忆总开关时间戳。
@@ -2540,12 +2543,7 @@ pub async fn agent_config_put_route(
         }
     }
 
-    if let Err(response) = assert_patch_yuan(&state, &agent_partial) {
-        return response;
-    }
-
-    // 显式保存请求助手 A。
-    let config_path = agent_dir.join("config.yaml");
+    // 显式保存已经验证的目标助手；失败时保留并说明此前已完成的全局/模型修改。
     if let Err(message) = memory.dream().save_config(
         &agent_id,
         agent_partial
@@ -2553,12 +2551,17 @@ pub async fn agent_config_put_route(
             .and_then(Value::as_bool),
         || save_agent_config_merge(&config_path, &agent_partial),
     ) {
-        return internal_error(message);
+        emit_agent_config_app_events(
+            &state,
+            &agent_id,
+            &global_fields,
+            &json!({}),
+            providers_changed,
+        );
+        let write_unknown = message.contains("write_may_have_occurred");
+        return (StatusCode::INTERNAL_SERVER_ERROR,Json(json!({"error":message,"preferencesSaved":!global_fields.is_empty(),"agentConfigurationSaved":if write_unknown { Value::Null } else { json!(false) },"writeMayHaveOccurred":write_unknown,"modelConfiguration":model_report}))).into_response();
     }
-    // updateConfig(agentPartial, {agentId})：运行时刷新（端口=重读合并）。
-    if let Err(message) = update_config_for_agent(memory, Some(&agent_id), &agent_partial) {
-        return internal_error(message);
-    }
+    // 现役上下文按调用读取同一配置，梦境服务也已在上述统一保存链更新；不再回退焦点重写。
 
     emit_agent_config_app_events(
         &state,
@@ -2567,7 +2570,7 @@ pub async fn agent_config_put_route(
         &agent_partial,
         providers_changed,
     );
-    Json(json!({ "ok": true })).into_response()
+    Json(json!({ "ok": true, "modelConfiguration": model_report })).into_response()
 }
 
 /// emitAgentConfigAppEvents（agents.ts:195-263）的端口：models-changed /
@@ -2662,7 +2665,7 @@ fn emit_agent_config_app_events(
 
 /// DEFAULT_SECRET_KEYS（shared/secret-custody.ts）：精确键名注册表，不做
 /// 后缀/子串匹配。
-const SECRET_KEYS: [&str; 16] = [
+const SECRET_KEYS: [&str; 18] = [
     "api_key",
     "apiKey",
     "token",
@@ -2679,7 +2682,13 @@ const SECRET_KEYS: [&str; 16] = [
     "password",
     "accessToken",
     "refreshToken",
+    "access_token",
+    "refresh_token",
 ];
+
+pub(crate) fn is_secret_key(key: &str) -> bool {
+    SECRET_KEYS.contains(&key) || key == "search_api_key"
+}
 
 /// maskSecretValue：非空字符串 → `********`，其余（含空串/非字符串）→ ""。
 fn mask_secret_value(value: &Value) -> Value {
@@ -2690,14 +2699,45 @@ fn mask_secret_value(value: &Value) -> Value {
 }
 
 /// maskObjectSecrets：递归掩码全部密钥字段（数组逐项递归）。
-fn mask_object_secrets(value: &Value) -> Value {
+pub(crate) fn mask_object_secrets(value: &Value) -> Value {
     match value {
         Value::Array(items) => Value::Array(items.iter().map(mask_object_secrets).collect()),
         Value::Object(map) => Value::Object(
             map.iter()
                 .map(|(key, entry)| {
-                    let masked = if SECRET_KEYS.contains(&key.as_str()) {
+                    let masked = if is_secret_key(key) {
                         mask_secret_value(entry)
+                    } else if matches!(
+                        key.as_str(),
+                        "httpProxy" | "httpsProxy" | "wsProxy" | "wssProxy"
+                    ) {
+                        match entry.as_str() {
+                            Some("") => json!(""),
+                            Some(raw) => match reqwest::Url::parse(raw) {
+                                Ok(mut url) => {
+                                    if !url.username().is_empty() {
+                                        let _ = url.set_username(MASKED_SECRET);
+                                    }
+                                    if url.password().is_some() {
+                                        let _ = url.set_password(Some(MASKED_SECRET));
+                                    }
+                                    json!(url.as_str().trim_end_matches('/'))
+                                }
+                                Err(_) => json!("[invalid proxy URL]"),
+                            },
+                            None => Value::Null,
+                        }
+                    } else if matches!(key.as_str(), "headers" | "api_keys" | "search_api_keys") {
+                        // 自定义头和搜索密钥的键名不固定，值一律按秘密处理。
+                        match entry.as_object() {
+                            Some(entries) => Value::Object(
+                                entries
+                                    .iter()
+                                    .map(|(name, secret)| (name.clone(), mask_secret_value(secret)))
+                                    .collect(),
+                            ),
+                            None => mask_secret_value(entry),
+                        }
                     } else {
                         mask_object_secrets(entry)
                     };
@@ -2820,7 +2860,9 @@ fn prune_missing_workspace_config(config: &Value) -> Option<Value> {
 /// 历史 + preferences.json 的 workspace_ui_state 里已消失的根目录。
 /// workspace_ui_state 只删 workspaces 的已消失键（端口没有该状态的
 /// 写入面，不重新归一化其余内容）。无变化不落盘。
-fn gc_workspace_persistence(memory: &MemoryService, agent_dir: &Path) -> Result<(), String> {
+/// 过期工作区持久化的真实清理器（R07-T09 起 pub(crate)：mobile bootstrap
+/// 与配置读取共用同一清理路径；失败由调用方明确上抛，不虚报已清理）。
+pub(crate) fn gc_workspace_persistence(memory: &MemoryService, agent_dir: &Path) -> Result<(), String> {
     let config_path = agent_dir.join("config.yaml");
     let config = am::config::read_yaml_mapping_as_json(&config_path)
         .map_err(|err| format!("cannot read config.yaml: {err}"))?
@@ -2873,7 +2915,7 @@ fn permission_mode_from(block: Option<&Value>, allow_read_only_flag: bool) -> Va
 
 /// CONFIG_SCHEMA 全局字段 getter（core/preferences-manager.ts 各 getter
 /// 的读侧口径，默认值/归一一致）。
-fn global_field_value(prefs: &Value, key: &str) -> Value {
+pub(crate) fn global_field_value(prefs: &Value, key: &str) -> Value {
     match key {
         "locale" => or_empty_string(prefs.get("locale")),
         "user.name" => or_empty_string(prefs.get("userName")),
@@ -2942,7 +2984,7 @@ fn global_field_value(prefs: &Value, key: &str) -> Value {
 
 /// injectGlobalFields（shared/config-scope.ts）：全局字段覆盖到 config
 /// 对象（嵌套父节点不是对象时先置为 {}）。
-fn inject_global_fields(config: &mut Map<String, Value>, prefs: &Value) {
+pub(crate) fn inject_global_fields(config: &mut Map<String, Value>, prefs: &Value) {
     for field in GLOBAL_FIELDS {
         let value = global_field_value(prefs, field);
         match field.split_once('.') {
@@ -2975,39 +3017,6 @@ fn normalize_experience_for_response(config: &mut Map<String, Value>) {
     let enabled = experience.get("enabled") == Some(&Value::Bool(true));
     experience.insert("enabled".into(), Value::Bool(enabled));
     config.insert("experience".into(), Value::Object(experience));
-}
-
-/// 供应商摘要（base_url / api / 掩码 api_key / models / model_count）。
-/// 目录读取失败 → `{}`（现役 catch 分支），失败原因记日志而不伪装成空目录。
-fn providers_summary(home: &Path) -> Value {
-    let providers = match merged_catalog_providers_with(home, false) {
-        Ok(providers) => providers,
-        Err(message) => {
-            tracing::warn!(%message, "provider catalog unreadable; GET agent config returns empty providers");
-            return json!({});
-        }
-    };
-    let mut entries = Map::new();
-    for (name, raw) in &providers {
-        let models = raw.get("models").and_then(Value::as_array);
-        let text = |key: &str| {
-            raw.get(key)
-                .filter(|v| js_truthy(Some(v)))
-                .cloned()
-                .unwrap_or_else(|| Value::String(String::new()))
-        };
-        entries.insert(
-            name.clone(),
-            json!({
-                "base_url": text("base_url"),
-                "api": text("api"),
-                "api_key": mask_secret_value(raw.get("api_key").unwrap_or(&Value::Null)),
-                "models": models.cloned().unwrap_or_default(),
-                "model_count": models.map_or(0, Vec::len),
-            }),
-        );
-    }
-    Value::Object(entries)
 }
 
 const CORE_TOOL_NAMES: [&str; 12] = [
@@ -3099,6 +3108,7 @@ fn agent_not_found() -> Response {
 pub async fn agent_config_get_route(
     State(state): State<ServiceState>,
     AxumPath(agent_id): AxumPath<String>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
 ) -> Response {
     if validate_agent_id(&agent_id).is_err() {
         return agent_not_found();
@@ -3139,7 +3149,29 @@ pub async fn agent_config_get_route(
     };
     inject_global_fields(&mut config, &preferences);
 
-    config.insert("providers".into(), providers_summary(memory.home()));
+    let snapshot = match state.model_configuration().snapshot(&principal).await {
+        Ok(value) => value,
+        Err(error) => return error.into_response(),
+    };
+    let Some(mut providers) = snapshot
+        .get("providers")
+        .and_then(Value::as_object)
+        .cloned()
+    else {
+        return internal_error("published providers snapshot is invalid");
+    };
+    for provider in providers.values_mut() {
+        let Some(models) = provider.get("models").and_then(Value::as_array) else {
+            return internal_error("published provider model catalog is invalid");
+        };
+        // 只补现役摘要计数；模型元数据取同一已发布快照，兼容投影不能反向覆盖。
+        provider["model_count"] = json!(models.len());
+    }
+    config.insert("providers".into(), Value::Object(providers));
+    config.insert(
+        "modelConfiguration".into(),
+        json!({"activated":snapshot["activated"],"generation":snapshot["generation"]}),
+    );
     config.insert(
         "availableTools".into(),
         json!(settings_available_tools(&state)),
@@ -3446,7 +3478,7 @@ const DEEPSEEK_ROLEPLAY_EXPERIMENT_ID: &str = "provider.deepseek_roleplay_reason
 const PROACTIVE_SUBAGENT_EXPERIMENT_ID: &str = "subagent.proactive_delegation";
 const CACHE_SNAPSHOT_EXPERIMENT_ID: &str = "memory.cache_snapshot_reflection";
 
-fn experiment_definitions() -> Vec<Value> {
+pub(crate) fn experiment_definitions() -> Vec<Value> {
     vec![
         json!({
             "id": COMPACTION_MODE_EXPERIMENT_ID,
@@ -3526,7 +3558,7 @@ fn resolved_instant_simple_compaction(preferences: &Value) -> Value {
     )
 }
 
-fn resolved_experiment_value(preferences: &Value, definition: &Value) -> Value {
+pub(crate) fn resolved_experiment_value(preferences: &Value, definition: &Value) -> Value {
     let id = definition["id"].as_str().unwrap_or_default();
     if id == CACHE_SNAPSHOT_EXPERIMENT_ID {
         return json!("off");
@@ -3542,7 +3574,10 @@ fn resolved_experiment_value(preferences: &Value, definition: &Value) -> Value {
 }
 
 /// normalizeExperimentValue（shared/experiments-schema.ts）。
-fn normalize_experiment_value(definition: &Value, value: &Value) -> Result<Value, String> {
+pub(crate) fn normalize_experiment_value(
+    definition: &Value,
+    value: &Value,
+) -> Result<Value, String> {
     let id = definition["id"].as_str().unwrap_or_default();
     let schema_type = definition
         .pointer("/valueSchema/type")
@@ -3851,5 +3886,53 @@ pub async fn cache_snapshot_observation_delete_route(
             Json(json!({ "error": format!("delete observation failed: {err}") })),
         )
             .into_response(),
+    }
+}
+
+#[cfg(all(test, unix))]
+mod explicit_agent_target_tests {
+    use super::*;
+    #[test]
+    fn explicit_missing_target_never_borrows_focus_while_none_keeps_legacy_focus() {
+        let root = std::env::temp_dir().join(format!(
+            "lingxi-t08-explicit-agent-{}",
+            am::random_token_suffix()
+        ));
+        std::fs::create_dir_all(root.join("agents/a")).unwrap();
+        std::fs::create_dir_all(root.join("agents/b")).unwrap();
+        std::fs::create_dir_all(root.join("user")).unwrap();
+        let root = root.canonicalize().unwrap();
+        let a = root.join("agents/a/config.yaml");
+        let b = root.join("agents/b/config.yaml");
+        std::fs::write(&a, "agent:\n  name: A\ncustom:\n  keep: 19\n").unwrap();
+        std::fs::write(&b, "agent:\n  name: B\n").unwrap();
+        std::fs::write(
+            root.join("user/preferences.json"),
+            br#"{"current_agent_id":"a"}"#,
+        )
+        .unwrap();
+        let memory = MemoryService::new(root.clone(), root.join("runtime"));
+        let before = std::fs::read(&a).unwrap();
+        std::fs::remove_file(&b).unwrap();
+        assert!(update_config_for_agent(
+            &memory,
+            Some("b"),
+            &json!({"agent":{"name":"must-not-reach-A"}})
+        )
+        .is_err());
+        assert!(update_config_for_agent(
+            &memory,
+            Some("../a"),
+            &json!({"agent":{"name":"must-not-reach-A"}})
+        )
+        .is_err());
+        assert_eq!(std::fs::read(&a).unwrap(), before);
+        assert!(!b.exists());
+        update_config_for_agent(&memory, None, &json!({"agent":{"name":"legacy-focus-A"}}))
+            .unwrap();
+        let changed = am::config::read_yaml_mapping_as_json(&a).unwrap().unwrap();
+        assert_eq!(changed["agent"]["name"], "legacy-focus-A");
+        assert_eq!(changed["custom"]["keep"], 19);
+        std::fs::remove_dir_all(root).unwrap();
     }
 }

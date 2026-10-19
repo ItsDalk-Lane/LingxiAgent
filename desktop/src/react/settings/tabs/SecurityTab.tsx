@@ -77,6 +77,7 @@ export function SecurityTab() {
 
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [loading, setLoading] = useState(false);
+  const [checkpointLoadFailed, setCheckpointLoadFailed] = useState(false);
   const [proxyDraft, setProxyDraft] = useState<NetworkProxyConfig>(
     () => normalizeNetworkProxyDraft(settingsConfig?.network_proxy),
   );
@@ -121,12 +122,14 @@ export function SecurityTab() {
 
   const loadCheckpoints = useCallback(async () => {
     setLoading(true);
+    setCheckpointLoadFailed(false);
     try {
       const res = await lingxiFetch('/api/checkpoints');
       const data = await res.json();
-      setCheckpoints(data.checkpoints || []);
+      if (data?.error || !Array.isArray(data?.checkpoints)) throw new Error('invalid archive list');
+      setCheckpoints(data.checkpoints);
     } catch {
-      setCheckpoints([]);
+      setCheckpointLoadFailed(true);
     } finally {
       setLoading(false);
     }
@@ -201,10 +204,14 @@ export function SecurityTab() {
             if (expanded) loadCheckpoints();
           }}
         >
-          {loading ? (
+          {checkpointLoadFailed && <div role="alert">
+            <span>{t('settings.security.backupsLoadFailed')}</span>
+            <button type="button" onClick={() => void loadCheckpoints()}>{t('action.retry')}</button>
+          </div>}
+          {loading && checkpoints.length === 0 ? (
             <span className={styles['capability-row-desc']}>...</span>
           ) : checkpoints.length === 0 ? (
-            <span className={styles['capability-row-desc']}>{t('settings.security.noBackups')}</span>
+            checkpointLoadFailed ? null : <span className={styles['capability-row-desc']}>{t('settings.security.noBackups')}</span>
           ) : (
             checkpoints.map(cp => (
               <div key={cp.id} className={styles['settings-backup-item']}>

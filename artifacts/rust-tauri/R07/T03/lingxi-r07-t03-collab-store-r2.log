@@ -1,0 +1,16 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.75s
+     Running tests/r07_session_collab_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab_store-665c6a884346e623)
+
+running 8 tests
+test suggestions_are_inert_and_real_source_identity_and_payload_are_required ... ok
+test concurrent_apply_and_delivery_have_one_durable_lease ... ok
+test rejection_never_uses_a_caller_supplied_source_or_reopens_a_started_draft ... ok
+test apply_auth_expiry_read_only_and_frozen_edits_cannot_be_bypassed ... ok
+test create_reservation_and_partial_failure_retry_only_the_same_real_target ... ok
+test started_unknown_survives_restart_and_only_real_lineage_can_confirm_it ... ok
+test accepted_receipt_rolls_back_on_storage_error_and_cannot_be_requeued ... ok
+test decisions_are_atomic_immutable_host_facts_and_repeated_polling_does_not_append ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+

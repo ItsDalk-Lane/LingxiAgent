@@ -1,0 +1,215 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T09:07:31.105008+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08e",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprint": "f8b3924db2d194834f38efcdbbf231762a9f057d0b8c2f70361b37dd6ddb5a1e",
+  "sourceManifestSha256": "2edd22bf548ad7978d23a0ab096ecbd11d8b9c2d7892d6f8c1ff9924a905ff80",
+  "gatePlanSha256": "44f6d6007d5de63f1058363b788aeda7154dfb071c3722b6ef69366991d80ba1",
+  "finalAcceptance": "pending",
+  "sourceVerification": {
+    "fileCount": 651,
+    "allCurrentRowsAndModesMatch": true,
+    "recomputedFingerprintMatches": true,
+    "archiveSha256Matches": true,
+    "allArchiveMemberBytesModesMatch": true,
+    "currentAndSnapshotPlanMatch": true,
+    "runnerAndAllFourVerificationHelpersMatch": true
+  },
+  "deltaReview": {
+    "productionCodeChangedSinceD": false,
+    "changedFiles": [
+      "desktop/src/react/__tests__/chat-app-live/main.cjs",
+      "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx",
+      "desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx",
+      "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+      "tests/stream-route-consumer-isolation.test.ts"
+    ],
+    "why651Not647": "Four previously unchanged tracked test/fixture paths newly enter changed-source manifest; same baseCommit provides previous unchanged versions",
+    "changes": [
+      "Rust replay check now observes actual same-session/same-stream terminal WS status plus DB terminal within original5s budget before requiring full final replay, retaining all exact sequence/text/tail assertions",
+      "Native AppPages existing15s wait predicate now includes same welcome/runtime DOM conditions immediately checked afterward, preserving original checks and timeout",
+      "OAuth test exposes current JSON helper over same mocked response plus actual browser-open request assertion and restores original window platform descriptor",
+      "Bridge UI mock adds exactly new actual media/jobs empty response while unknown routes still reject, retaining real history/reset failure assertions",
+      "One actual WS→actual handler/resume→actual buffer/store mid-snapshot consumer regression added with idle runtime/streaming prefix then consecutive live completion and idempotent redelivery"
+    ]
+  },
+  "consumerScope": {
+    "producer": "Existing Node createChatRoute harness",
+    "historyBoundary": "HTTP history mock returns controlled empty history; incremental new case uses real consumed prefix",
+    "actualComponents": [
+      "local WebSocket transmission",
+      "handleServerMessage",
+      "replay/admission",
+      "streamBufferManager",
+      "Zustand/live projection"
+    ],
+    "notClaimed": [
+      "Rust complete upstream chain",
+      "only external platform responses replaced",
+      "reset/hydrate same-stream mid-snapshot branch newly tested"
+    ],
+    "observableAssertions": [
+      "one assistant message exact prefix+tail text",
+      "no remaining live assistant buffer after real end",
+      "actual lastSeq and all consumed seqs reach terminal",
+      "idle runtime clears busy but preserves active buffer until end",
+      "duplicate live tail does not duplicate text or change watermark"
+    ]
+  },
+  "developmentChecks": {
+    "chat-readiness-fixed1": "actual17/17 exit0, whole development source unchanged and log hash checked",
+    "ui-consumer-fixtures2": "actual23/23 across3 targets exit0, owned3 source hashes unchanged and log hash checked; not whole candidate acceptance"
+  },
+  "planReview": {
+    "gateCount": 20,
+    "wholeConsumerFileExplicitlySelectedInUI": true,
+    "newNavigationEvidenceDirectoriesPerCandidate": true,
+    "postBuildFourGatesStillRequireBuildBinaryBindings": true,
+    "nativeReuseStillExactArtifactNotNewManualRun": true,
+    "existingLANServiceLibNativeLiveTargetsRetained": true
+  },
+  "currentGateReceipts": [
+    {
+      "gate": "fmt",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "9df3ee3136e5a7f478b0097c58ba5829ad037628b6b818bdc0a0104c860772d5",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "diff",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "96a1ecee85c1ddc11803fd5a99fc42d9ee2ac7909ee478e58e2f526cef37a734",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "clippy",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "38dcd0bd1fffacc5cab4c879f264a8b0b1afbcf728a2f8e4927abf8c37866e87",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "protocol",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "4adc546d585e4857840525b6a5e2a891477daeed905e060ed69ae99b8055c37e",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "protocol-roundtrip",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "6219ae7d797baed0981845a06a1f324ad97952c7f80208887d0f40567cc76c9c",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "protocol-tests",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "a5a561a48d4e86526aad59ccc5da1a889861e78a566b44c68a71a4739b237b41",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "kernel",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "c4552d1dab2801ba89f3a6ca8b6ee7fb12003445a15536cd6a8f72ea9ed72634",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "boundaries",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "adapter",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "service",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "model-regression",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "native-skills",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "native-picker-binding",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "skills-current",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "build",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "ui",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "types",
+      "status": "PASS",
+      "exitCode": 0,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true,
+      "receiptSha256": "fc73094da072afb146225450363175cfc4dae5a586d2abf72bc46d99e5dc4c6b",
+      "logSha256Matches": true
+    },
+    {
+      "gate": "card-navigation-desktop",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "card-navigation-mobile",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    },
+    {
+      "gate": "metadata-redaction-binary",
+      "status": "PENDING_NO_COMPLETION_RECEIPT"
+    }
+  ],
+  "newBlockingFindings": [],
+  "remainingAcceptance": "All20 completed actual gates plus4 postbuild binary bindings and named leaf responsibility reconciliation required; do not borrow d18 passes or development targeted runs. Frozen e must remain unchanged.",
+  "priorResults": "d full20 FAILED with18 pass/2 fail remains immutable, including4 premature postbuild NOT_RUN orchestration attempts separately recorded. Older failures and evidence scope corrections retained.",
+  "reviewerActions": "Read-only source/archive/evidence inspection and this new evidence file; no Cargo/GUI/product/test/plan/tool changes"
+}

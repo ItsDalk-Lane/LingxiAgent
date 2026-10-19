@@ -1,4 +1,4 @@
-//! R06 收口：独立改前存档的 restore 面（原 checkpoints 路由的 restore 叶）。
+//! R06独立改前存档恢复与T08全局元数据列表；不混入会话分支检查点。
 //!
 //! 语义源（端口式移植，不猜造）：
 //! - `server/routes/checkpoints.ts:33-44` `POST /checkpoints/:id/restore`：
@@ -45,6 +45,61 @@ impl CheckpointStore {
         Self {
             dir: home.join("checkpoints"),
         }
+    }
+
+    /// 现役 CheckpointStore.save（lib/checkpoint-store.ts:19-59）的用户编辑
+    /// 面（engine.ts createUserEditCheckpoint :2987-2995：sessionPath=null、
+    /// tool/source="user-edit"）。读不到/非文件 → None（现役 statSync 失败
+    /// 或 readFileSync 抛错被调用方 .catch(()=>null) 吞掉）；写盘失败同样
+    /// None（调用方不感知存档失败，主写入照旧）。
+    pub fn save_user_edit(&self, file_path: &Path, reason: &str, now_ms: u64) -> Option<String> {
+        let meta = std::fs::metadata(file_path).ok()?;
+        if !meta.is_file() {
+            return None;
+        }
+        let bytes = std::fs::read(file_path).ok()?;
+        // 全量 round-trip：损坏字节序列经替换字符往返后与原始不同 → 判二进制
+        // 走 base64；文本继续内嵌字符串。
+        let roundtrip = String::from_utf8_lossy(&bytes);
+        let is_text = roundtrip.as_bytes() == bytes.as_slice();
+        std::fs::create_dir_all(&self.dir).ok()?;
+        let suffix = {
+            let mut buf = [0u8; 2];
+            let filled = std::fs::File::open("/dev/urandom")
+                .and_then(|mut f| {
+                    use std::io::Read as _;
+                    f.read_exact(&mut buf)
+                })
+                .is_ok();
+            if filled {
+                format!("{:02x}{:02x}", buf[0], buf[1])
+            } else {
+                let nanos = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.subsec_nanos())
+                    .unwrap_or(0);
+                format!("{:04x}", nanos & 0xffff)
+            }
+        };
+        let id = format!("{now_ms}_{suffix}");
+        let mut data = json!({
+            "ts": now_ms,
+            "sessionPath": Value::Null,
+            "tool": "user-edit",
+            "source": "user-edit",
+            "reason": reason,
+            "path": file_path.to_string_lossy(),
+            "size": meta.len(),
+        });
+        if is_text {
+            data["content"] = Value::String(roundtrip.into_owned());
+        } else {
+            data["content_b64"] =
+                Value::String(base64::engine::general_purpose::STANDARD.encode(&bytes));
+        }
+        let text = serde_json::to_string(&data).ok()?;
+        crate::paths::atomic_write(&self.dir.join(format!("{id}.json")), text.as_bytes()).ok()?;
+        Some(id)
     }
 
     /// restore（checkpoint-store.ts:94-108）：存档字节写回 `obj.path`，
@@ -206,5 +261,162 @@ pub async fn user_edit_route(
         Ok(Ok(checkpoint)) => Json(json!({"ok":true,"checkpoint":checkpoint})).into_response(),
         Ok(Err(error)) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &error),
         Err(error) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &error.to_string()),
+    }
+}
+
+#[cfg(windows)]
+type ArchiveReadDirectory = crate::discovery_tools::windows_readonly::DirFd;
+#[cfg(not(windows))]
+type ArchiveReadDirectory = crate::filetools::fsio::DirFd;
+
+// serde流式跳过content/content_b64及未知字段，不把存档正文复制到列表或返回值中。
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ArchiveMetadataOnly {
+    ts: u64,
+    tool: String,
+    #[serde(default)]
+    source: Option<String>,
+    #[serde(default)]
+    reason: Option<String>,
+    path: String,
+    size: u64,
+    #[serde(default)]
+    session_path: Option<String>,
+}
+impl CheckpointStore {
+    /// 全局改前存档列表，复用既有checkpoints目录；缺失不创建，损坏/链接明确失败。
+    pub fn list(
+        &self,
+    ) -> Result<Vec<lingxi_protocol::CheckpointArchiveMetadata>, CheckpointRestoreError> {
+        let directory = match ArchiveReadDirectory::open(&self.dir) {
+            Ok(directory) => directory,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+            Err(_) => {
+                return Err(CheckpointRestoreError::Io(
+                    "checkpoint archive directory is unsafe or unreadable".into(),
+                ))
+            }
+        };
+        let names = directory.entry_names(|| false).map_err(|_| {
+            CheckpointRestoreError::Io("cannot list checkpoint archive directory".into())
+        })?;
+        let mut output = Vec::new();
+        for name in names {
+            let Some(name_text) = name.to_str() else {
+                return Err(CheckpointRestoreError::Corrupt(
+                    "checkpoint archive name is not UTF-8".into(),
+                ));
+            };
+            let Some(id) = name_text.strip_suffix(".json") else {
+                continue;
+            };
+            let mut file = directory
+                .open_attachment_nofollow(&name)
+                .ok_or_else(|| {
+                    CheckpointRestoreError::Io("checkpoint archive changed while listing".into())
+                })?
+                .map_err(|_| {
+                    CheckpointRestoreError::Io(
+                        "checkpoint archive is not a safe regular file".into(),
+                    )
+                })?;
+            let before = file
+                .metadata()
+                .map_err(|_| CheckpointRestoreError::Io("cannot stat checkpoint archive".into()))?;
+            if !before.is_file() {
+                return Err(CheckpointRestoreError::Corrupt(
+                    "checkpoint archive is not a regular file".into(),
+                ));
+            }
+            #[cfg(windows)]
+            let identity = crate::discovery_tools::windows_readonly::file_identity(&file);
+            #[cfg(not(windows))]
+            let identity = crate::filetools::fsio::file_identity(&file);
+            let identity = identity.map_err(|_| {
+                CheckpointRestoreError::Io("cannot identify checkpoint archive".into())
+            })?;
+            let metadata: ArchiveMetadataOnly =
+                serde_json::from_reader(std::io::BufReader::new(&mut file)).map_err(|_| {
+                    CheckpointRestoreError::Corrupt(
+                        "invalid checkpoint archive metadata or JSON".into(),
+                    )
+                })?;
+            let after = file.metadata().map_err(|_| {
+                CheckpointRestoreError::Io("cannot restat checkpoint archive".into())
+            })?;
+            #[cfg(windows)]
+            let final_identity = crate::discovery_tools::windows_readonly::file_identity(&file);
+            #[cfg(not(windows))]
+            let final_identity = crate::filetools::fsio::file_identity(&file);
+            if final_identity.ok() != Some(identity)
+                || before.len() != after.len()
+                || before.modified().ok() != after.modified().ok()
+                || !directory.same_directory(&self.dir).unwrap_or(false)
+            {
+                return Err(CheckpointRestoreError::Io(
+                    "checkpoint archive changed while listing".into(),
+                ));
+            }
+            if metadata.tool.is_empty() || metadata.path.is_empty() {
+                return Err(CheckpointRestoreError::Corrupt(
+                    "checkpoint archive metadata is incomplete".into(),
+                ));
+            }
+            output.push(lingxi_protocol::CheckpointArchiveMetadata {
+                id: id.to_owned(),
+                ts: metadata.ts,
+                tool: metadata.tool.clone(),
+                source: metadata
+                    .source
+                    .filter(|v| !v.is_empty())
+                    .unwrap_or_else(|| "llm".into()),
+                reason: metadata
+                    .reason
+                    .filter(|v| !v.is_empty())
+                    .unwrap_or_else(|| format!("tool-{}", metadata.tool)),
+                path: metadata.path,
+                size: metadata.size,
+                session_path: metadata.session_path,
+            });
+        }
+        if !directory.same_directory(&self.dir).unwrap_or(false) {
+            return Err(CheckpointRestoreError::Io(
+                "checkpoint archive directory changed while listing".into(),
+            ));
+        }
+        output.sort_by(|a, b| b.ts.cmp(&a.ts).then_with(|| a.id.cmp(&b.id)));
+        Ok(output)
+    }
+}
+
+/// 安全页的全局存档面；与sessions/{id}/checkpoints的分支检查点分开。
+pub async fn list_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+) -> Response {
+    let authorized = |state: &ServiceState| {
+        principal.is_local_owner() && state.auth().validate_principal(&principal).is_ok()
+    };
+    if !authorized(&state) {
+        return json_error(StatusCode::FORBIDDEN, "checkpoint_archive_owner_required");
+    }
+    let home = state.config().data_home.clone();
+    let result = tokio::task::spawn_blocking(move || CheckpointStore::new(&home).list()).await;
+    if !authorized(&state) {
+        return json_error(
+            StatusCode::FORBIDDEN,
+            "checkpoint_archive_authority_revoked",
+        );
+    }
+    match result {
+        Ok(Ok(checkpoints)) => {
+            Json(lingxi_protocol::CheckpointArchiveList { checkpoints }).into_response()
+        }
+        Ok(Err(error)) => json_error(StatusCode::INTERNAL_SERVER_ERROR, &error.to_string()),
+        Err(_) => json_error(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "checkpoint archive listing task failed",
+        ),
     }
 }

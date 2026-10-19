@@ -13,8 +13,8 @@ export async function chatFetch(path: string, options: Options = {}): Promise<Re
   const authority = JSON.stringify(connection);
   const owner = captureSessionConnection();
   const selectionRevision = sessionSelectionRevision();
-  const scope = JSON.stringify([state.currentSessionId,state.currentSessionPath,state.pendingNewSession]);
-  const ownsSelection = () => { const current=useStore.getState(); return sessionSelectionRevision()===selectionRevision && JSON.stringify([current.currentSessionId,current.currentSessionPath,current.pendingNewSession])===scope; };
+  const scope = JSON.stringify([state.currentSessionId,state.currentSessionPath,state.pendingNewSession,state.currentAgentId,state.selectedAgentId]);
+  const ownsSelection = () => { const current=useStore.getState(); return sessionSelectionRevision()===selectionRevision && JSON.stringify([current.currentSessionId,current.currentSessionPath,current.pendingNewSession,current.currentAgentId,current.selectedAgentId])===scope; };
   const url = new URL(path, 'http://chat.invalid');
   let nextPath: string;
   let nextOptions = options;
@@ -40,7 +40,14 @@ export async function chatFetch(path: string, options: Options = {}): Promise<Re
       };
       break;
     }
-    case '/api/models': nextPath = '/lingxi/v1/models'; break;
+    case '/api/models': {
+      const query = new URLSearchParams();
+      const agentId = state.pendingNewSession ? state.selectedAgentId || state.currentAgentId : state.currentAgentId;
+      if (agentId) query.set('agentId', agentId);
+      if (!state.pendingNewSession && state.currentSessionId) query.set('sessionId', state.currentSessionId);
+      nextPath = `/lingxi/v1/chat/models${query.size ? `?${query}` : ''}`;
+      break;
+    }
     case '/api/models/set': nextPath = '/lingxi/v1/models/set'; break;
     case '/api/models/switch': {
       const body = JSON.parse(String(options.body || '{}')) as Record<string, unknown>;

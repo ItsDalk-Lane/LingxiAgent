@@ -1,0 +1,35 @@
+
+running 11 tests
+test actual_wechat_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_wechat_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_dingtalk_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_qq_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_telegram_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_dingtalk_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_feishu_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_feishu_folded_preview_unknown_does_not_resend_content_as_a_new_final_reply ... ok
+test actual_feishu_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_dingtalk_adapter_recovers_from_a_transient_socket_error_without_reconfiguration ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.02s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.85s
+     Running tests/r07_bridge_sdk_platforms.rs (rust/target-r07/debug/deps/r07_bridge_sdk_platforms-fb022e0f3f8e6032)

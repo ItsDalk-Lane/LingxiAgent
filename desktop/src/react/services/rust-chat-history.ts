@@ -5,6 +5,8 @@ import { renderMarkdown } from '../utils/markdown';
 import { projectAssistantTurn } from '../utils/turn-projector';
 import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from './server-connection';
 import { useStore } from '../stores';
+import { conversationSuggestionFromDetails } from './conversation-suggestion';
+import { rustMediaBlocksFromDetails } from './rust-media';
 import { captureSessionConnection, ownsSessionConnection } from './session-connection-owner';
 
 type Row = Record<string, unknown>;
@@ -111,6 +113,9 @@ export function projectRustHistoryItems(items: unknown[], sessionId: string): Ch
         const result = row.result == null ? undefined : record(row.result, 'result');
         const error = result?.error == null ? undefined : record(result.error, 'error');
         turnFor(runId(row) || `unknown-tool:${id}`).blocks.push({ type: 'tool_group', id: `native-tool:${id}`, collapsed: true, processOrder: order, tools: [{ id, name: string(row.target, 'target'), done: status !== 'started', success: status === 'success', status: status === 'started' ? 'running' : status === 'success' ? 'succeeded' : status === 'unknown' ? 'unknown' : 'failed', ...(row.argsSummary == null ? {} : { args: { summary: string(row.argsSummary, 'argsSummary') } }), ...(error ? { error: string(error.message, 'error.message') } : {}), ...(result ? { details: result } : {}) }] });
+        if (status === 'success') turnFor(runId(row) || `unknown-tool:${id}`).blocks.push(...rustMediaBlocksFromDetails(result?.details, sessionId));
+        const suggestion = status === 'success' ? conversationSuggestionFromDetails(result?.details) : null;
+        if (suggestion) turnFor(runId(row) || `unknown-tool:${id}`).blocks.push({ ...suggestion, id: `native-suggestion:${id}`, processOrder: order });
         break;
       }
       case 'final_message': {

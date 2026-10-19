@@ -1,0 +1,29 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:51:50.472921+00:00",
+  "finalAcceptance": "pending",
+  "scope": "root允许的三组件owned最小修与真实A/B反例只读审阅；不Cargo/改源。",
+  "summarySha256": "9cc855e46c8294b907967687d4fa4074e7001b9fb37e3ca44099d08856ae4147",
+  "all14OwnedCurrentHashesMatch": true,
+  "allFiveEvidenceReceiptHashesMatch": true,
+  "sourceReview": [
+    "Keybindings save/reset在操作起点capture原owner，网络与OS await后及snapshot/host/reload前复验；旧回复不更新当前B快照、toast或系统动作，原A已保存事实不回滚。",
+    "Keybindings换revision释放旧saving/recording/availability并重读当前归属；能力占用探测的迟到结果同样owner复验。",
+    "Sidebar GET与save带原owner；save迟到不回填本地状态，不发window/host事件，window事件同步可能换源后再核owner才发host。",
+    "SettingsTransfer用owner revision+独立operation ref保护File.text/HTTP/loadConfig后续，换源释放旧busy/下载URL，旧finally不能释放新操作，A→B→A也不复活旧导入。"
+  ],
+  "runtimeEvidence": {
+    "reproduce1": "实际0/4失败保留。",
+    "reproduce2": "同原产品修正消费观测后仍实际0/4，未把坏观测夹具当产品通过。",
+    "fixed2": "三个原组件31+原真实导航1+四真实A/B反例，共36/36；binary d7前后同字节、tracked源码未变。",
+    "positiveImportExport": "另interface-transfer-positive1确切configured选择实际1pass/7主动未选，延续正常导入导出。",
+    "wrongSelector": "fixed2旧ASCII括号选择实际全8skip/0pass，仍保留NOT_RUN，不当其exit0是正向已跑。",
+    "types": "fixed2 tsc实际exit2，仅尚未官方生成的两MCP session DTO类型，保留未绿，待root生成；不称整批全0。"
+  },
+  "boundaries": [
+    "实际A/B服务、SettingsContent/store/HTTP以及当前真实B snapshot；桥事件与OS reload观察仍是受控外部边界。",
+    "三页新回复隔离通过不代表真实OS快捷键注册、所有设置页或T08完成。",
+    "同一个固定copy d7为开发构建，不称已包含之后MCP/session的新backend；需后继统一fresh build和完整候选。"
+  ],
+  "newFindings": "对本次capture/owns/ref最小修未见新增阻断；不延伸到其它未审消费者。"
+}

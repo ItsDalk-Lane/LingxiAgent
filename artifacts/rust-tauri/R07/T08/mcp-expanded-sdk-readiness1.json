@@ -1,0 +1,46 @@
+{
+  "scope": "DEVELOPMENT_IMPLEMENTATION_READY_NOT_ACCEPTANCE",
+  "createdAt": "2026-10-18T11:07:59.396385+00:00",
+  "newRustTarget": {
+    "command": "cargo test -p lingxi-service --locked --test r07_t08_mcp_remote",
+    "status": "NOT_RUN",
+    "cases": [
+      "actual_http_apps_visibility_launch_input_resources_and_generation_cancellation",
+      "actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout",
+      "oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials",
+      "actual_session_run_http_404_never_replays_the_posted_mcp_tool_call"
+    ],
+    "externalMcp": "Official rmcp 3.4.1 StreamableHttpService; HTTP auth/inspection only wraps SDK, no handwritten MCP responder.",
+    "externalOAuth": "Owned loopback metadata/DCR/authorization/token endpoints, PKCE verifier checked against authorization challenge."
+  },
+  "mechanismChecks": {
+    "node": {
+      "exitCode": 0,
+      "passed": 19,
+      "files": 2,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-owner1.log"
+    },
+    "types": {
+      "exitCode": 0,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-owner-types1.log"
+    }
+  },
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "ccd7efe5558f703d78c8a2e9ec15e3ca717ba4e6a87bc2c4630a3662ba8f633f",
+    "desktop/src/react/settings/tabs/McpTab.tsx": "dc493feb2de09f59a7c819ee949693035d523e5aa285f3f56939105001e7893d",
+    "desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx": "d079eabfc0592e5945232d158cc485f1d2c7e77e1c4bf5b9711c2145acd91a16",
+    "desktop/src/react/settings/tabs/mcp/mcp-api.ts": "95015aa1a32781f34c88aee21fa5455ecca1422ebf5c5dc14d38f7702fe157f1"
+  },
+  "logSha256": {
+    "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-owner1.log": "77818f1d5ab4ebd3aa6f903b9e6e6a682192ef594e77f164119dd151e957e892",
+    "artifacts/rust-tauri/R07/T08/mcp-expanded-ui-owner-types1.log": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+  },
+  "limitations": [
+    "New remote SDK tests have not compiled or executed.",
+    "No real account or external supplier contacted.",
+    "Application launch is the original descriptor/input binding; it is not a tool execution.",
+    "Legacy standalone SSE remains explicitly unsupported.",
+    "SDK JSON response preparse byte limit is not proven; current resource/list caps apply after SDK parsing.",
+    "No frozen candidate acceptance or bulk leaf PASS."
+  ]
+}

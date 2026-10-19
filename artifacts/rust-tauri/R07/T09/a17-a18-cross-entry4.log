@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 479ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+Error: ENOENT: no such file or directory, open '/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-66VhHK/workspace/a17-xentry-output.txt'
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:198:21
+    196|     assert.ok(cli.stdout.includes(FINAL), `CLI 未输出模型最终答复\nstdout:\n${c…
+    197|     assert.ok(cli.stdout.includes('◇'), `CLI 未展示工具执行\nstdout:\n${cli.s…
+    198|     assert.equal(fs.readFileSync(ctx.targetFile, 'utf8'), PAYLOAD, 'wr…
+       |                     ^
+    199|
+    200|     // 会话与资源身份（服务内此家只有一个会话）。
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  23:15:08
+   Duration  579ms (transform 19ms, setup 17ms, import 18ms, tests 479ms, environment 0ms)
+

@@ -16,7 +16,7 @@ pub mod agent_config_readback;
 #[path = "agent_deletions.rs"]
 pub mod agent_deletions;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
 use axum::body::Bytes;
@@ -108,13 +108,33 @@ impl MemoryService {
         self.read_preferences_strict().map_err(|err| err.message)
     }
 
+    /// 执行前撤权检查复用同一严格读法，只返回宿主状态，不把偏好正文交给模型。
+    pub(crate) fn read_preferences_root_at_home(home: &Path) -> Result<Value, String> {
+        Self::read_preferences_strict_path(&home.join("user").join("preferences.json"))
+            .map_err(|err| err.message)
+    }
+
     pub(crate) fn write_preferences_root(&self, value: &Value) -> Result<(), String> {
         self.write_preferences(value).map_err(|err| err.message)
     }
 
+    /// 复用同一偏好writer，在实际文件队列等待后和rename提交前重验原始授权。
+    pub(crate) fn write_preferences_root_authorized(
+        &self,
+        value: &Value,
+        authorize: impl Fn() -> bool,
+    ) -> Result<(), String> {
+        self.write_preferences_authorized(value, authorize)
+            .map_err(|err| err.message)
+    }
+
     fn read_preferences_strict(&self) -> Result<Value, AgentLifecycleError> {
         let path = self.user_dir().join("preferences.json");
-        let value = match std::fs::read(&path) {
+        Self::read_preferences_strict_path(&path)
+    }
+
+    fn read_preferences_strict_path(path: &Path) -> Result<Value, AgentLifecycleError> {
+        let value = match std::fs::read(path) {
             Ok(bytes) => serde_json::from_slice::<Value>(&bytes).map_err(|err| {
                 AgentLifecycleError::internal(format!("invalid preferences.json: {err}"))
             })?,
@@ -157,12 +177,21 @@ impl MemoryService {
     }
 
     fn write_preferences(&self, value: &Value) -> Result<(), AgentLifecycleError> {
+        self.write_preferences_authorized(value, || true)
+    }
+
+    fn write_preferences_authorized(
+        &self,
+        value: &Value,
+        authorize: impl Fn() -> bool,
+    ) -> Result<(), AgentLifecycleError> {
         let text = serde_json::to_string_pretty(value).map_err(|err| {
             AgentLifecycleError::internal(format!("cannot encode preferences.json: {err}"))
         })?;
-        am::atomic_write(&self.user_dir().join("preferences.json"), &text).map_err(|err| {
-            AgentLifecycleError::internal(format!("cannot save preferences.json: {err}"))
-        })
+        am::atomic_write_authorized(&self.user_dir().join("preferences.json"), &text, authorize)
+            .map_err(|err| {
+                AgentLifecycleError::internal(format!("cannot save preferences.json: {err}"))
+            })
     }
 
     /// 已登记且未删除的助手（目录名 + 目录路径），按目录名稳定排序。
@@ -206,9 +235,23 @@ impl MemoryService {
     pub(crate) fn agent_dir_checked(&self, agent_id: &str) -> Result<PathBuf, AgentLifecycleError> {
         validate_agent_id(agent_id)?;
         let dir = self.agents_root().join(agent_id);
-        if !dir.join("config.yaml").is_file() {
+        // 名字合法不代表路径仍属于原home；逐组件不跟随链接并核对最终普通文件。
+        let checked = (|| -> std::io::Result<()> {
+            if dir.canonicalize()? != dir {
+                return Err(std::io::Error::other("agent directory contains a link"));
+            }
+            let held = crate::filetools::fsio::DirFd::open(&dir)?;
+            let file = held
+                .open_file_nofollow(std::ffi::OsStr::new("config.yaml"))
+                .ok_or_else(|| std::io::Error::from(std::io::ErrorKind::NotFound))??;
+            if !file.metadata()?.is_file() || !held.same_directory(&dir)? {
+                return Err(std::io::Error::other("agent configuration path changed"));
+            }
+            Ok(())
+        })();
+        if checked.is_err() {
             return Err(AgentLifecycleError::from(am::MemoryError::AgentNotFound(
-                format!("agent not found: {agent_id}"),
+                format!("agent not found or unsafe configuration path: {agent_id}"),
             )));
         }
         if dir.join(".deleted-agent.json").symlink_metadata().is_ok() {

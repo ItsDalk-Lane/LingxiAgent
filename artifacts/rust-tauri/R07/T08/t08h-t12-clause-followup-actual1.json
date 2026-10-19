@@ -1,0 +1,682 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R07_T08_H_TO_T12_EXACT_CLAUSE_RECHECK_PREPARATION_01",
+  "createdAt": "2026-10-18T12:57:29.985907+00:00",
+  "status": "H_CHECKS_PASSED_EXACT_T12_SCOPE_RETAINED",
+  "inputs": {
+    "gAudit": "artifacts/rust-tauri/R07/T08/t08g-partial-clause-audit1.json",
+    "gAuditSha256": "eaea0e3454b0f236b6983a39c2bcca70eb18ca0475ad02578e0a1efdbb5a1d50",
+    "hManifest": "artifacts/rust-tauri/R07/T08/SOURCE_MANIFEST_t08h.json",
+    "hManifestSha256": "dfed102c2fd8eff025c8c64df378fbf18ebb8b113ab10b338b171719f789c8aa"
+  },
+  "counts": {
+    "gAuditSpecificConsumerRows": 18,
+    "mixedSearchRowsNowNewHNamedWaiting": 0,
+    "remainingUiConsumerRows": 17,
+    "otherNarrowNegativeRows": 4,
+    "specConflictRows": 1,
+    "mixedSearchRowsCoveredByHNamedChecks": 1
+  },
+  "source18Disposition": [
+    {
+      "originalID": "R00-T02-LA-4629FFC0E72A",
+      "originalAssertionIndex": 2,
+      "originalText": "混合 patch 失败时分别读回 models/search 和运行时状态，避免把 400/500 当作整体回滚",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "原三search-clear具体empty/null/active/inactive key及重启不复活真实通过。",
+        "partial_global_save仅locale+invalid provider，确有preferencesSaved和event，但不是models/search混合。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_settings.rs::invalid_import_and_unknown_global_fields_never_write_any_preferences",
+        "rust/crates/lingxi-service/tests/r07_t08_settings.rs::partial_global_save_still_emits_only_the_changes_that_really_happened"
+      ],
+      "specificNotDirectlyInputInG": [
+        "g缺同一models+search失败patch后分别读models/search/runtime；原partial_global_save只是locale+invalid provider；三search-clear是成功清除。"
+      ],
+      "disposition": "COVERED_BY_H_NAMED_MIXED_400_AND_500_CHECKPOINTS",
+      "hStatus": "PASS_NAMED_SCOPE_NOT_FULL_R07_ACCEPTANCE",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hEvidenceCaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs::mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime",
+        "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs::mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart"
+      ],
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r07_t08_settings.rs::invalid_import_and_unknown_global_fields_never_write_any_preferences": "PASS",
+        "rust/crates/lingxi-service/tests/r07_t08_settings.rs::partial_global_save_still_emits_only_the_changes_that_really_happened": "PASS"
+      },
+      "hNewCaseRefs": [
+        "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs::mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime",
+        "rust/crates/lingxi-service/tests/r07_t08_search_clear.rs::mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart"
+      ]
+    },
+    {
+      "originalID": "R00-T02-LA-0DDB5AA05072",
+      "originalAssertionIndex": 2,
+      "originalText": "安装文件技能并对助手启用：成功核对 安装后重载并显示启用；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；空态/未初始化核对 取消文件选择无变更；错误/无权限核对 安装失败 toast；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "Panel真实安装服务拒绝→error未输入；无agent零写不是服务安装失败。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-0DDB5AA05072",
+      "originalAssertionIndex": 3,
+      "originalText": "删除技能/按助手启停技能与组合：成功核对 树状态与列表更新；相关成功路径重读当前助手的技能及组合列表以投影最新状态。；空态/未初始化核对 无助手不允许写；错误/无权限核对 失败 toast/回滚；写入失败不应把原有读取叶的成功结果当作本次写入完成。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "Panel完整包真实安装后当前Agent enabled/runtime GET、无Agent零写/error。",
+        "Panel真实删除确认取消/成功runtime读回、bundle双向启停。",
+        "Panel组合创建/成员移动/改名/两个组合排序正式读回、导出真实文件/零额外GET。",
+        "新两surface首次skills/bundles GET403 error非空成功、同owner保旧、换身份隐藏。",
+        "新两个PUT200/404+真实磁盘部分提交/error已直接覆盖Promise.all失败。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "Panel toggle自身实际失败→乐观回滚未输入；Tab toggle403和Panel move404不是相同消费动作。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 3,
+      "originalText": "七个辅助槽分别选模型/跟随主模型：成功核对 title/summarize/memory/knowledge/vision/approval/guard 各自保存 provider+id；经 autoSaveGlobalModels 保存后重读模型偏好。；空态/未初始化核对 空引用依槽位回退主模型或关闭；错误/无权限核对 保存失败需显示；不能由 Anthropic 单项代替；后续重读失败需与 PUT 是否持久化分开裁决。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::renders one model widget per auxiliary slot (7 slots; knowledgeDistill removed with the distill path) and no operation pickers",
+        "desktop/src/react/__tests__/settings/ModelWidget.test.tsx::renders the follow option and calls onSelect(null) when clicked",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart",
+        "rust/crates/lingxi-service/tests/r07_t08_network_preferences.rs::saved_network_proxy_reaches_actual_next_model_dispatch_without_restart_or_loopback_bypass"
+      ],
+      "specificNotDirectlyInputInG": [
+        "七槽直接组件case只断言7个widget；未逐槽UI保存→同Rust读回provider/id，Knowledge真实操作不是7槽UI逐一输入。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::renders one model widget per auxiliary slot (7 slots; knowledgeDistill removed with the distill path) and no operation pickers": "PASS",
+        "desktop/src/react/__tests__/settings/ModelWidget.test.tsx::renders the follow option and calls onSelect(null) when clicked": "PASS",
+        "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs::first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart": "PASS",
+        "rust/crates/lingxi-service/tests/r07_t08_network_preferences.rs::saved_network_proxy_reaches_actual_next_model_dispatch_without_restart_or_loopback_bypass": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 4,
+      "originalText": "视觉辅助开关：成功核对 vision_enabled 保存；经 autoSaveGlobalModels 保存后重读模型偏好。；空态/未初始化核对 未配置模型时展示缺省提示；错误/无权限核对 保存失败提示；后续重读失败需与 PUT 是否持久化分开裁决。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::renders the auxiliary vision toggle above the vision model picker and saves it as a global model preference"
+      ],
+      "specificNotDirectlyInputInG": [
+        "vision具体保存拒绝/重读失败显示未输入；helper spy与真HTTP分别证明。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx::renders the auxiliary vision toggle above the vision model picker and saves it as a global model preference": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 6,
+      "originalText": "图片默认模型选择：成功核对 图片默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 图片配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the default image model through the generic config envelope",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::sends null to clear the default image model",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::does not offer image models with missing runtime adapters as selectable defaults"
+      ],
+      "specificNotDirectlyInputInG": [
+        "image默认PUT拒绝保旧/error未直接输入；TTS同helper失败是共享代表。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the default image model through the generic config envelope": "PASS",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::sends null to clear the default image model": "PASS",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::does not offer image models with missing runtime adapters as selectable defaults": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 7,
+      "originalText": "视频默认模型选择：成功核对 视频默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；错误/无权限核对 视频配置 GET 失败只留在 hook.error，页面初次加载呈禁用/占位且没有专门错误提示；HTTP 非 2xx 或网络异常由 lingxiFetch 抛错，hook 显示错误 toast；200 响应无 values/config 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the default video model through the video config endpoint"
+      ],
+      "specificNotDirectlyInputInG": [
+        "video独立默认PUT拒绝/首GET失败显示未直接输入。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves the default video model through the video config endpoint": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 9,
+      "originalText": "语音转录默认模型选择：成功核对 语音转录默认值PUT 返回的配置值或本地 patch 用于更新当前显示；不追加独立 GET；空态/未初始化核对 加载中占位；无凭据或 adapter 不可用选项禁用；语音转录总开关关闭时默认模型下拉禁用。；错误/无权限核对 语音转录配置 GET 失败由 hook 显示错误 toast，页面初次加载仍呈禁用/占位；PUT 保存失败也由 hook 显示错误 toast。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves speech-recognition enabled state and default model"
+      ],
+      "specificNotDirectlyInputInG": [
+        "ASR默认PUT拒绝/首GET失败显示未在该成功case输入。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves speech-recognition enabled state and default model": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-F92121640419",
+      "originalAssertionIndex": 10,
+      "originalText": "语音转录开关：成功核对 PUT 返回 config/values 或本地 patch 更新语音转录开关显示，不追加独立 GET。；空态/未初始化核对 配置加载前禁用；错误/无权限核对 HTTP 非 2xx 或网络异常显示错误 toast；200 响应无 config/values 时本地 patch 更新并显示成功，未追加 GET 校验。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "7槽widget数量、follow(null)、同名model区分provider/vision filter；真实Knowledge/Summarize后端操作另证。",
+        "aux busy→success→3秒复位；failed-result/request-error失败图标；换模型丢旧结果与卸载abort均g具名。",
+        "useMedia三路独立读，单路失败不拖全局、失败保last-known-good、序列化写防迟到；ModelsTab focus刷新目录合同已有。",
+        "image null/选择/adapter缺失禁用，video独立PUT，ASR enabled/default包均有组件。",
+        "TTS select/clear两拒绝保旧error、ASR零写独立/adapter缺失和后端真roundtrip已有。",
+        "四模态真实Source CRUD/生成/重启/queued revoke与BigASR真Operation另外已跑。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves speech-recognition enabled state and default model"
+      ],
+      "specificNotDirectlyInputInG": [
+        "ASR开关独立PUT拒绝/error未输入；不新增原文未承诺的回滚要求。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx::saves speech-recognition enabled state and default model": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 3,
+      "originalText": "选择已有供应商、挑选未配置项临时草稿、提交自定义供应商表单三个阶段：成功核对 选择已有项只切换所见详情，不发保存请求；挑选未配置项只在页面内形成临时草稿；提交自定义表单才 PUT /api/config，成功后刷新摘要并可重开读回。；自定义提交成功时只执行一次 loadSettingsConfig；状态 ready 才选中新供应商、调用 onDone 拉摘要并关闭弹窗，摘要读取失败在 onDone 内被吞掉而仍关闭弹窗。；空态/未初始化核对 未配置项草稿未保存，重开页面不当作已持久配置；提交表单名称或 URL 空时显示表单错误。；错误/无权限核对 本地选择无网络保存失败；真正提交保存失败显示 toast，不能把临时草稿视为持久配置。；写入已成功而设置重读失败时 loadSettingsConfig 标 error，后续摘要刷新不执行，可能显示操作失败但服务端已持久化。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::keeps persisted providers when a draft is added, and drops only the draft after remount",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::saves registry-only non-preset providers through the initial setup payload",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "specificNotDirectlyInputInG": [
+        "自定义provider空name/URL表单错误未定位g具名；APIkey preset setup不是自定义空表单。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::keeps persisted providers when a draft is added, and drops only the draft after remount": "PASS",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::saves registry-only non-preset providers through the initial setup payload": "PASS",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 4,
+      "originalText": "移除临时供应商草稿或删除持久自定义供应商：成功核对 临时草稿点击删除直接从本地列表移除并清所选项，不发请求；持久自定义且 can_delete 时先确认，再 PUT /api/config 删除，成功后 loadSettingsConfig 六项/条件经验及供应商摘要，读取 ready 后才清所选项并提示删除成功。；空态/未初始化核对 不可删除的持久条目不显示删除按钮；临时草稿可直接删除且不弹确认；持久自定义条目未确认不发 PUT。；错误/无权限核对 草稿本地移除无网络失败路径；持久条目 PUT 失败显示错误 toast 并保留条目。PUT 已成功但后续设置重读失败时 loadSettingsConfig 标 error，摘要刷新与清选中不执行，服务端删除可能已持久化。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::removes an unsaved draft without touching persisted providers",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::removes a deleted configured provider from the list and keeps a built-in provider in the picker",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::keeps a configured provider and skips authoritative reload when deletion returns an error",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "specificNotDirectlyInputInG": [
+        "删除已成功后重读失败未在真实页面直接输入；BaseURL更新不写成删除也实跑。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::removes an unsaved draft without touching persisted providers": "PASS",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::removes a deleted configured provider from the list and keeps a built-in provider in the picker": "PASS",
+        "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx::keeps a configured provider and skips authoritative reload when deletion returns an error": "PASS",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-D50161CE274A",
+      "originalAssertionIndex": 5,
+      "originalText": "供应商页保存 API Key、Header、Base URL 或 API Format：成功核对 API Key/Header/Base URL/API Format 的独立输入控件经 saveProviderConfigPatch 写 /api/config；非首次预设配置的 API Format 变更立即保存，首次预设配置先保留草稿、随首次凭据保存带入。连接测试由 #06 单独验收。；有选中助手且设置重读 ready 时才继续刷新供应商摘要及媒体可用性。；空态/未初始化核对 无凭据显示 needs_setup；无助手时 loadSettingsConfig 不发设置读取；无媒体详情或未触发对应操作时不重读媒体集合。；Base URL 未编辑或修剪后与现值相同不写；API Format 未变不写；预设首次配置的 API Format 只更新本地草稿，等待首次保存。；错误/无权限核对 保存失败显示 toast，保留旧配置；连接测试失败由 #06 检查，不能混作保存失败。；四类读取分别处理失败，不能把某一类失败伪装为全部成功。；无选中助手或设置重读未 ready 时 ProviderTab.onRefresh 抛错，后续供应商摘要和媒体刷新不会执行；先前写入可能已成功。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "真实初始化/cache/摘要失败/15秒+rootentry all-pages/无model/无agent/重启通过。",
+        "持久provider重挂保留、草稿不丢持久项/重挂丢草稿、草稿零config写、持久删/JSONerror保条目合同。",
+        "key blur/清除/拒绝保draft、BaseURL/API Format合同；rootentry172–201真实BaseURL PUT200落Source→Agent config GET500→error且零summary/media续读。",
+        "模型发现只候选、enable才metadata/删media/JSONerror不refresh合同；后端真实四模态Source及消费者另证。",
+        "key保存后验证失败保已存、清空/shouldVerify，真health/Anthropic及ledger；search busy/success/failure/rejection合同。",
+        "mode参数provider/model/runtime/mode包与modal，g额外无schema/无models两空态也已执行。",
+        "g真实OAuth按钮→生产Rust→自有PKCE/device→state/summary/私密落盘/logout；slowDown/失败/迟到/已生效刷新失败组件分支另证。",
+        "masked key显式读取/隐藏清临时state/无普通state或clipboard秘密，后端双scope reveal真实验证。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::lets preset setup edit and save the Base URL immediately (gateway/proxy override)",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::shows an actionable refresh failure after the server accepts an API type change",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::persists edited Kimi API keys on input blur without requiring connection verification",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）"
+      ],
+      "specificNotDirectlyInputInG": [
+        "Header输入控件实际修改保存未定位g UI动作；后端headers null/credential消费为独立真handler。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::lets preset setup edit and save the Base URL immediately (gateway/proxy override)": "PASS",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::shows an actionable refresh failure after the server accepts an API type change": "PASS",
+        "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx::persists edited Kimi API keys on input blur without requiring connection verification": "PASS",
+        "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx::真实设置容器的导航、恢复及失败处理（%s）": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 3,
+      "originalText": "拖入文件或选文件安装全局技能：成功核对 安装成功 toast 并重载当前 agentId、runtime=1 的技能视角；不会自动为当前助手启用。桌面选择器选路径安装；拖入文件若能取得路径也用 path，只有无路径才提交 base64 file。；空态/未初始化核对 取消文件选择无变更；系统文件选择取消不发安装请求。；错误/无权限核对 错误 toast",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "无本机路径上传只有mock组件合同；真实上传→Rust落文件链不在该live。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 4,
+      "originalText": "删除技能：成功核对 确认后删除并重载；空态/未初始化核对 无助手或取消确认无变更；错误/无权限核对 失败 toast",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "Tab删除按钮自身服务拒绝后提示未在live输入，后端删除拒绝/Panel删除是不同事实。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 7,
+      "originalText": "添加或移除外部兼容目录：成功核对 选择目录后发送外部路径 PUT，随后重载目录与技能并显示成功 toast；移除目录走同样路径。；空态/未初始化核对 取消选目录不变；目录选择取消不发 PUT。；错误/无权限核对 外部目录 PUT 的非 2xx 由 lingxiFetch 抛错；网络或后续重载异常也进入 catch，显示失败 toast。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "live目录操作是取消/添加成功；页面移除路径、PUT成功后重载失败提示未输入。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 8,
+      "originalText": "技能创建/远端拉取/安全审查三种能力开关：成功核对 capabilities.learn_skills 的 enabled/allow_github_fetch/safety_review 通过每助手配置接口写入全局 preferences 并重载；高风险开启/关闭须确认；经 autoSaveConfig 的保存成功后立即重读助手 config 快照。；该组能力开关保存尝试后仍重读助手设置，经验启用时追加读取经验。；空态/未初始化核对 配置未就绪开关为未加载态；错误/无权限核对 autoSaveConfig 失败须按返回值/提示核对，不能自动认为已保存；PUT 已成功但快照 GET 失败时 helper 仍报保存失败，不能据 toast 断言未持久化。；helper PUT 已成功但后续快照 GET 失败可能提示保存失败，需读回判实际状态。；SkillCapabilities 未检查 autoSaveConfig 返回值，保存失败后仍尝试 loadSettingsConfig。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "live line50只点learnCreate/enabled总开关，allow_github_fetch/safety_review的风险确认取消/保存未点。",
+        "本能力组保存后重读失败未输入；BaseURL真实刷新失败是共享调用者代表。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 9,
+      "originalText": "自动读取 goal/autolearn 全局偏好：成功核对 只从 GET 读取并展示 goal/autolearn 全局偏好；保存由后续 #09 控件执行。；空态/未初始化核对 读取失败保持 undefined 未加载态；错误/无权限核对 GET 失败静默保留未加载态；此自动读取动作没有 PUT 保存失败。",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "goal/autolearn各自GET失败保持undefined未加载无此页面具名输入。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-99F8CD228733",
+      "originalAssertionIndex": 10,
+      "originalText": "目标预算/踩坑自动沉淀开关：成功核对 两个全局偏好独立显示并保存；空态/未初始化核对 读取失败保持 undefined 未加载态；错误/无权限核对 PUT 失败回滚开关并 toast；GET 失败目前静默保留未加载态",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "独立native初始化冷启动/缓存/摘要失败/15秒实预算通过，不受另两drag失败倒算。",
+        "真实空技能noUser、选文件取消零写、完整包全局安装不自动启用。",
+        "Tab真实单PATCH403回滚enabled/error；切选择丢旧响应g组件合同。",
+        "真实组合CRUD/导出文件、Panel两个组合排序、新真实200/404部分写；Tab drag/order合同。",
+        "真实目录选择取消/添加成功，外部路径重启另后端真case。",
+        "真实goal/autolearn独立GET+各自PUT200；learn.enabled实际PUT后config读回false。",
+        "真实技能行viewer installed:true与按钮不误开；独立native viewer文件树正文边界。"
+      ],
+      "gAlreadyNamedCaseRefs": [
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection"
+      ],
+      "specificNotDirectlyInputInG": [
+        "goal/autolearn各自PUT失败回滚/error未输入；live47–48仅两次成功PUT200。"
+      ],
+      "disposition": "T12_CONSUMER_BRANCH_RECHECK_NO_PRODUCT_BUG_CLAIM",
+      "hCaseRefsWaiting": [],
+      "hStatus": "RETAINED_T12_DIRECT_BRANCH_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "autoDeferAuthorizationClaimed": false,
+      "hAllApplicableGatesPass": true,
+      "hSameNamedReferenceResults": {
+        "rust/crates/lingxi-service/tests/r06_skills_completion.rs::original_skills_settings_and_panel_current_real_service_projection": "PASS"
+      }
+    }
+  ],
+  "otherNarrowNegativeFollowups": [
+    {
+      "originalID": "R00-T02-LA-43DDCE21A45C",
+      "originalAssertionIndex": 4,
+      "originalText": "本地Ollama未启动、模型未拉取或端点不通时明确失败；不要求API Key。",
+      "providerIdentity": "ollama",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "g此identity无key实际正例；通用错误/其它identity未知模型是代表。"
+      ],
+      "specificUnprovenCondition": [
+        "原句Ollama未启动/未拉取/端点不通没有此identity直接失败输入；不能换成要求无key拒绝。"
+      ],
+      "hAddedCoverageNotAssumed": "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::builtin_ollama_rejects_invalid_requests",
+      "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+      "status": "RETAINED_T12_NARROW_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "hAllApplicableGatesPass": true,
+      "hAddedCaseActualResult": {
+        "caseRef": "rust/crates/lingxi-service/tests/r07_t08_provider_matrix.rs::builtin_ollama_rejects_invalid_requests",
+        "status": "PASS",
+        "coveredScope": [
+          "keyless保存后34身份真实401/Failed usage，Ollama免key成功",
+          "空/未登记模型400且无额外调用/用量，Source/代次不变",
+          "非法protocol仅保存层400，单列不冒生成拒绝",
+          "本identity已登记embedding专用模型在真实Chat resolve+HTTP400拒绝，供应商默认协议不变"
+        ],
+        "remainingOriginalCondition": "本Ollama原句未启动/模型未拉取/端点不通未被此次无key成功/空未知模型/能力拒绝全部代证"
+      }
+    },
+    {
+      "originalID": "R00-T02-LA-ABAC28922F7A",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 auth.json键为openai-codex，缺登录时不可借其他OpenAI API Key。",
+      "providerIdentity": "openai-codex-oauth",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "g未登录标记+未登记not-logged-in-model拒绝；真实Codex alias/PKCE和UI的PKCE/xai device、summary/私密落盘/logout已有。",
+        "通用c07缺登录fixture只代表机制，不是该identity有效模型缺登录。"
+      ],
+      "specificUnprovenCondition": [
+        "该identity有效已登记模型只缺自己OAuth的隔离负例未输入；g未登录与未登记模型同时存在。",
+        "该identity空模型选择未直接输入。"
+      ],
+      "hAddedCoverageNotAssumed": null,
+      "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+      "status": "RETAINED_T12_NARROW_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "hAllApplicableGatesPass": true
+    },
+    {
+      "originalID": "R00-T02-LA-A9ACB7418FC4",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 BigASR为独立语音凭证与协议，不可拿Ark聊天凭证替代。",
+      "providerIdentity": "volcengine-speech",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "真实HTTP→原Operation BigASR独立key/header/WAV、转写/ledger；generic probe unavailable。"
+      ],
+      "specificUnprovenCondition": [
+        "专用speech key缺失且不能借Ark key、空模型/不支持能力没有在此成功typed场景输入。"
+      ],
+      "hAddedCoverageNotAssumed": null,
+      "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+      "status": "RETAINED_T12_NARROW_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "hAllApplicableGatesPass": true
+    },
+    {
+      "originalID": "R00-T02-LA-3D8337A8088F",
+      "originalAssertionIndex": 4,
+      "originalText": "无凭证/未登录、空模型、协议或能力不支持时明确拒绝；目录登记和测试探测都不能代替真实调用。 OAuth资源URL仅允许指定HTTPS来源，不能改成任意主机。",
+      "providerIdentity": "xai-oauth",
+      "gActuallyCoveredSharedHandlerOrConsumerScope": [
+        "g未登录标记+未登记not-logged-in-model拒绝；真实Codex alias/PKCE和UI的PKCE/xai device、summary/私密落盘/logout已有。",
+        "通用c07缺登录fixture只代表机制，不是该identity有效模型缺登录。"
+      ],
+      "specificUnprovenCondition": [
+        "该identity有效已登记模型只缺自己OAuth的隔离负例未输入；g未登录与未登记模型同时存在。",
+        "该identity空模型选择未直接输入。",
+        "xai资源URL非允许主机/非HTTPS专用g断言未定位；通用redirect不是精确allowlist。"
+      ],
+      "hAddedCoverageNotAssumed": null,
+      "disposition": "T12_NARROW_NEGATIVE_RECHECK_NOT_IMPLEMENTATION_BUG",
+      "status": "RETAINED_T12_NARROW_SCOPE_NOT_PRODUCT_BUG",
+      "isKnownProductFailure": false,
+      "hAllApplicableGatesPass": true
+    }
+  ],
+  "originalSpecConflict": {
+    "originalID": "R00-T02-LA-9194C0F0D909",
+    "originalAssertionIndex": 3,
+    "originalText": "仅宣称源码登记的聊天模型能力",
+    "specificIssue": "原chat-only文字与既有imageGeneration runtime=minimax/lane=minimax-token-plan矛盾；保原文/原能力，不因声明或负例通过自动消掉。",
+    "disposition": "T12_SPEC_CONFLICT_EXPLICIT_REVIEW",
+    "isKnownProductFailure": false,
+    "status": "SPEC_CONFLICT_RETAINED"
+  },
+  "accountAndPlatformBoundariesNotProductGaps": [
+    "官方Streamable HTTP正例不证明旧独立SSE；旧SSE明确拒绝保范围，不充正例。",
+    "真实账号/付费/外网门户、其它OS选择器/系统语音/快捷键注册未验不转成当前本地实现故障。",
+    "Tauri资源壳不宣称完整聊天/设置宿主；既有picker精确绑定不是本候选重新手点。",
+    "launch描述/资源binding不等同实际tools/call，不引入新viewer或无会话执行接口。"
+  ],
+  "handoffRules": [
+    "T12只按每条原ID/原assertion核具体仍未直接输入的分支，并保已经测到的共享handler/组件范围。",
+    "h结果齐前不可关闭任何条目；mixed通过后应从开放清账项转已具名覆盖，而不是机械保留18个UI缺口。",
+    "T12准备不证明功能错误，也不把局部代表检查提升为每品牌/每组合全PASS。",
+    "需要后续实现或新增检查时按原到期责任判断；本摘要没有自行延期本轮必需工作或停止正在跑的h。"
+  ],
+  "centralEdited": false,
+  "sourceEdited": false,
+  "cargoRun": false,
+  "finalAcceptanceClaimed": false,
+  "sourceHResults": {
+    "path": "artifacts/rust-tauri/R07/T08/RESULTS_t08h.json",
+    "sha256": "ca6866e8c7f8a4fcb39ed9da093e7117b463e5f33778665872bec03a63645b33"
+  }
+}

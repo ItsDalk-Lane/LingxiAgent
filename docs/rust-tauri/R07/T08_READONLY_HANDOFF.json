@@ -1,0 +1,2653 @@
+{
+  "schemaVersion": 1,
+  "stage": "R07",
+  "task": "T08",
+  "status": "READONLY_IMPLEMENTATION_NOT_STARTED",
+  "createdAt": "2026-10-18T03:05:32.973152+00:00",
+  "scope": "只读当前技能/角色卡/身份设备/导入导出链及责任原条目；未运行Cargo、未发外部请求、未改源码或R07_LEAF_MAP。",
+  "sourceLeafMap": {
+    "path": "docs/rust-tauri/R07/R07_LEAF_MAP.json",
+    "sha256": "80ebd469b63dd7fcec275fa4a575dd42068e46ec38c3241ec323f6258e46625d",
+    "copiedVerbatim": true
+  },
+  "counts": {
+    "D10": 67,
+    "D21": 42,
+    "total": 109,
+    "providerDefinitions": 39
+  },
+  "originalResponsibilityGroups": {
+    "D10": {
+      "R00-T02-LA-C4EFBA7711E1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-AGNES-C4EFBA",
+        "then": "注册 id=agnes、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、视频生成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-AGNES-C4EFBA"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-D86616980926": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-ANTHROPIC-D86616",
+        "then": "注册 id=anthropic、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-ANTHROPIC-D86616"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-BA4BDB7F7338": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-BAICHUAN-BA4BDB",
+        "then": "注册 id=baichuan、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-BAICHUAN-BA4BDB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-71738E50BACA": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-BAIDUCLOUD-71738E",
+        "then": "注册 id=baidu-cloud、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-BAIDUCLOUD-71738E"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-39733312E5F4": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPE-397333",
+        "then": "注册 id=dashscope、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、语音合成、语音识别。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-DASHSCOPE-397333"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-89707E479335": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DASHSCOPECODING-89707E",
+        "then": "注册 id=dashscope-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-DASHSCOPECODING-89707E"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-ED13EB6D0FA6": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEK-ED13EB",
+        "then": "注册 id=deepseek、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-DEEPSEEK-ED13EB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-419F19D7AA64": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-DEEPSEEKRESPONSES-419F19",
+        "then": "注册 id=deepseek-responses、auth=api-key、api=openai-responses；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-DEEPSEEKRESPONSES-419F19"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-184E03F012D5": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-FIREWORKS-184E03",
+        "then": "注册 id=fireworks、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-FIREWORKS-184E03"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-BFD9531DEA41": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-GEMINI-BFD953",
+        "then": "注册 id=gemini、auth=api-key、api=google-generative-ai；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-GEMINI-BFD953"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FBCFA99A89A2": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-GROQ-FBCFA9",
+        "then": "注册 id=groq、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音合成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-GROQ-FBCFA9"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-2097E172B42B": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-HUNYUAN-2097E1",
+        "then": "注册 id=hunyuan、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-HUNYUAN-2097E1"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-477D944DF19B": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-INFINI-477D94",
+        "then": "注册 id=infini、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-INFINI-477D94"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-B70FCDCAC1ED": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-KIMICODING-B70FCD",
+        "then": "注册 id=kimi-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-KIMICODING-B70FCD"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-0DFFAB20A40B": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MIMO-0DFFAB",
+        "then": "注册 id=mimo、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音识别。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MIMO-0DFFAB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-D61616CAF15F": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MIMOTOKENPLAN-D61616",
+        "then": "注册 id=mimo-token-plan、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音识别。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MIMOTOKENPLAN-D61616"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FE9588171A23": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAX-FE9588",
+        "then": "注册 id=minimax、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、语音合成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MINIMAX-FE9588"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-9194C0F0D909": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MINIMAXTOKENPLAN-9194C0",
+        "then": "注册 id=minimax-token-plan、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MINIMAXTOKENPLAN-9194C0"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-77812804951F": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MISTRAL-778128",
+        "then": "注册 id=mistral、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MISTRAL-778128"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-DE0309EF3F56": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MODELSCOPE-DE0309",
+        "then": "注册 id=modelscope、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MODELSCOPE-DE0309"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-565BE3400DAC": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-MOONSHOT-565BE3",
+        "then": "注册 id=moonshot、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-MOONSHOT-565BE3"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-43DDCE21A45C": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OLLAMA-43DDCE",
+        "then": "注册 id=ollama、auth=none、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-OLLAMA-43DDCE"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-03E1121574A1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAI-03E112",
+        "then": "注册 id=openai、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成、语音合成、语音识别。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-OPENAI-03E112"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-ABAC28922F7A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENAICODEXOAUTH-ABAC28",
+        "then": "注册 id=openai-codex-oauth、auth=oauth、api=openai-codex-responses；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-OPENAICODEXOAUTH-ABAC28"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-80DB4026AF13": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODE-80DB40",
+        "then": "注册 id=opencode、auth=api-key、api=anthropic-messages；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-OPENCODE-80DB40"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-668EEC15C958": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENCODEGO-668EEC",
+        "then": "注册 id=opencode-go、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-OPENCODEGO-668EEC"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-9871F51BE25B": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-OPENROUTER-9871F5",
+        "then": "注册 id=openrouter、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-OPENROUTER-9871F5"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-00A769DD0FA3": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-PERPLEXITY-00A769",
+        "then": "注册 id=perplexity、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-PERPLEXITY-00A769"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-2EDB69DA3AE2": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-SILICONFLOW-2EDB69",
+        "then": "注册 id=siliconflow、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行语音合成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-SILICONFLOW-2EDB69"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-7D969CDBF21C": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-STEPFUN-7D969C",
+        "then": "注册 id=stepfun、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-STEPFUN-7D969C"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-22A8DCD792BE": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-SYSTEMSPEECH-22A8DC",
+        "then": "注册 id=system-speech 的语音合成、语音识别能力；凭证/适配器满足条件时，经系统语音运行时得到相应音频或转写结果，配置页如实显示能力状态。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-SYSTEMSPEECH-22A8DC"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-AC352BFA3D82": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-TOGETHER-AC352B",
+        "then": "注册 id=together、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-TOGETHER-AC352B"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-CCD6BA30F9ED": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCEGINECODING-CCD6BA",
+        "then": "注册 id=volcengine-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-VOLCEGINECODING-CCD6BA"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-E06C7DDB93D2": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCENGINE-E06C7D",
+        "then": "注册 id=volcengine、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复；另可按能力执行图片生成。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-VOLCENGINE-E06C7D"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-A9ACB7418FC4": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T06"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-VOLCENGINESPEECH-A9ACB7",
+        "then": "注册 id=volcengine-speech 的语音识别能力；凭证/适配器满足条件时，经volcengine-bigasr 协议的供应商端点得到相应音频或转写结果，配置页如实显示能力状态。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-VOLCENGINESPEECH-A9ACB7"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-D79C2E204AFB": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-XAI-D79C2E",
+        "then": "注册 id=xai、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-XAI-D79C2E"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-3D8337A8088F": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-XAIOAUTH-3D8337",
+        "then": "注册 id=xai-oauth、auth=oauth、api=openai-responses；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-XAIOAUTH-3D8337"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FF3AD97F8429": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPU-FF3AD9",
+        "then": "注册 id=zhipu、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-ZHIPU-FF3AD9"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-834034527694": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08",
+          "R05-T02",
+          "R05-T03"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-PROVIDER-PROVIDER-ZHIPUCODING-834034",
+        "then": "注册 id=zhipu-coding、auth=api-key、api=openai-completions；配置/选择后仅已允许的模型参与调用，凭证按provider+model隔离，真实调用返回该端点的回复。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-PROVIDER-PROVIDER-ZHIPUCODING-834034"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-0BD9E0FFDCF8": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-CONFIG-WORKSPACES-RECENT-DELETE-0BD9E0",
+        "then": "从当前 Agent 的 cwd_history 移除指定路径并返回新列表；不删除目录",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-CONFIG-WORKSPACES-RECENT-DELETE-0BD9E0"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FE1D56A67D39": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-CONFIG-WORKSPACES-RECENT-ALL-DEL-FE1D56",
+        "then": "清空当前 Agent 的 cwd_history 并返回空列表；不删除目录",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-CONFIG-CONFIG-WORKSPACES-RECENT-ALL-DEL-FE1D56"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-A524D3723654": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3",
+        "then": "返回脱敏供应商目录和全局字段",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-READ-A524D3"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-885BA80F4F96": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-DEFAULT-WORKSPACE--885BA8",
+        "then": "返回机器级默认目录路径",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-DEFAULT-WORKSPACE--885BA8"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-75DFB815753B": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-DEFAULT-WORKSPACE--75DFB8",
+        "then": "确保目录存在并返回路径",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-DEFAULT-WORKSPACE--75DFB8"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-8F775B4AA30F": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-WORKSPACES-RECENT--8F775B",
+        "then": "写指定智能体 cwd_history",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-CONFIG-WORKSPACES-RECENT--8F775B"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FBB9392CF926": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-GLOBAL-UPDATE-FBB939",
+        "then": "全局值生效",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CONFIG-GLOBAL-UPDATE-FBB939"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-9FBBC275BD34": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-SAVE-9FBBC2",
+        "then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-SAVE-9FBBC2"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-DBBDA23AB24F": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-REMOVE-DBBDA2",
+        "then": "逐处读回权威目录、条件插件文件、条件模型投影、焦点 YAML 与仅另含全局字段才变化的 preferences；失败后记录可能的部分成功，不把 HTTP 错误当回滚",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDER-GLOBAL-REMOVE-DBBDA2"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-EB074679FAE5": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746",
+        "then": "返回模型列表、默认模型与当前会话模型",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-EB0746"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-7BFFEC690DC3": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-AUXILIARY-VISION-7BFFEC",
+        "then": "仅返回辅助视觉状态，不暴露模型凭证配置",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-AUXILIARY-VISION-7BFFEC"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-990A225D8A35": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-HEALTH-990A22",
+        "then": "解析复合模型引用与凭证；一般模型真实试调用，Codex Responses 明示 skipped",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-HEALTH-990A22"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-05A57775857D": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-SET-05A577",
+        "then": "保存 pending 模型，活跃会话不切换，返回新模型及思考强度",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-SET-05A577"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-A48BCE9716A7": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-SWITCH-A48BCE",
+        "then": "更新该会话模型并返回适配和思考强度；流式中返回 409",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODELS-MODELS-SWITCH-A48BCE"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-7EC5F0F2FF7C": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0",
+        "then": "返回共享模型、操作模型、思考级别和掩码后的搜索密钥",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-PREFERENCES-MODELS-R-7EC5F0"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-A1F51A12AD61": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A",
+        "then": "models patch 持久保存；必要时同步运行中模型并发 models-changed",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SHARED-MODELS-UPDATE-A1F51A"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-7BD0C2A8039E": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SEARCH-UPDATE-7BD0C2",
+        "then": "search.provider/api_key/api_keys 持久保存，秘密按作用域审计",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SEARCH-UPDATE-7BD0C2"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-4629FFC0E72A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SEARCH-SECRET-CLEAR-4629FF",
+        "then": "显式空值由 resolveSearchPreferencePatch 清除已保存值",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PREFERENCES-SEARCH-SECRET-CLEAR-4629FF"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-835CCD55115A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-MODELS--835CCD",
+        "then": "从目录移除模型并刷新运行时",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-MODELS--835CCD"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-7ADA0D0848E0": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-API-KEY-7ADA0D",
+        "then": "双权限通过后返回已保存 API Key",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-API-KEY-7ADA0D"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-51DD4E37E5F4": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-DISCOVE-51DD4E",
+        "then": "返回筛选后的缓存模型与时间",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-DISCOVE-51DD4E"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-766F5F3C47C3": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F",
+        "then": "返回模型、OAuth 状态与媒体能力摘要",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-SUMMARY-READ-766F5F"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-CABCB5355784": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-PROVIDERS-PROVIDERS-FETCH-MODELS-POST-CABCB5",
+        "then": "经 providers.manage 和凭证边界探测远端模型目录；API key 远端失败明确报错，OAuth 目录按现行规则回落",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-ROUTE_BEHAVIOR-BEHAVIOR-PROVIDERS-PROVIDERS-FETCH-MODELS-POST-CABCB5"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-E80885395AE1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-TEST-POST-E80885",
+        "then": "向供应商发探测并返回结果，不保存配置",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-TEST-POST-E80885"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-F1491D612E5D": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-MODELS--F1491D",
+        "then": "写目录并刷新 model-sync",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-SEMANTIC_EFFECT-SEMANTIC-EFFECT-PROVIDERS-PROVIDERS-NAME-MODELS--F1491D"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-B30DA03C8576": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-TOOL-TOOL-UPDATE-SETTINGS-B30DA0",
+        "then": "search返回键/描述；apply对普通配置写入目标；用户专属MCP设置经bus执行并返回结果。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-TOOL-TOOL-UPDATE-SETTINGS-B30DA0"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-F92121640419": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-UI-UI-SETTINGS-MODELS-F92121",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-UI-UI-SETTINGS-MODELS-F92121"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-D50161CE274A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R05",
+          "R07"
+        ],
+        "task_ids": [
+          "R05-T01",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D10-UI-UI-SETTINGS-PROVIDERS-D50161",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D10-UI-UI-SETTINGS-PROVIDERS-D50161"
+        ],
+        "test_ids": []
+      }
+    },
+    "D21": {
+      "R00-T02-LA-9CA8A47BE208": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SKILL-VIEWER-9CA8A4",
+        "then": "独立技能查看器列文件并显示所选文本",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SKILL-VIEWER-9CA8A4"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-52A5D1660088": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1",
+        "then": "系统目录对话框返回路径，供技能安装/配置后续处理",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-SELECT-SKILL-52A5D1"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-6EA03AC48851": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-SKILLS-CLEANUP--6EA03A",
+        "then": "返回仅此助手启用且可删的用户技能清单，不修改技能",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENTS-AGENTS-ID-SKILLS-CLEANUP--6EA03A"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-B03F2C42EFF1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CARDS-CARDS-CARDID-READ-B03F2C",
+        "then": "从进程 LRU 缓存构建沙箱 HTML，设置禁止联网/导航等 CSP",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CARDS-CARDS-CARDID-READ-B03F2C"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-62F23BAAA609": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CARDS-CARDS-CARDID-PUT-62F23B",
+        "then": "将 code/varsCss 放入进程 LRU 缓存供 iframe 读取",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CARDS-CARDS-CARDID-PUT-62F23B"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-3CCABBB77EB9": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--3CCABB",
+        "then": "返回导出预览资源字节与 MIME",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--3CCABB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-53C84372F21E": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--53C843",
+        "then": "按 token/asset 取暂存图片字节与 MIME",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--53C843"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-4F37B6412FEE": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--4F37B6",
+        "then": "打包助手资料并返回包位置/元数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--4F37B6"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-AAECFB8AE7E0": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--AAECFB",
+        "then": "调用同一个 createExportPreview，返回计划；与 preview 同效别名",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--AAECFB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FFF3E2044D0E": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--FFF3E2",
+        "then": "返回不写包的导出预览计划",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--FFF3E2"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-1ED782F8B4C1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-ROUTE_BEHAVIOR-BEHAVIOR-CHARACTER-CARDS-CHARACTER-CARDS-IMPORT--1ED782",
+        "then": "用预览令牌提交导入计划，创建 Agent，可选导入记忆与技能，并发出变更事件",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-ROUTE_BEHAVIOR-BEHAVIOR-CHARACTER-CARDS-CHARACTER-CARDS-IMPORT--1ED782"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FC999E28C11A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R07"
+        ],
+        "task_ids": [
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--FC999E",
+        "then": "解析上传包或本地路径，产生可预览计划 token，不立即创建助手",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-CHARACTER-CARDS-CHARACTER-CARDS--FC999E"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-B383AB7B553C": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-SKILLS-READ-B383AB",
+        "then": "返回扫描出的技能及策略",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-SKILLS-READ-B383AB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-337738D5D233": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-ROUTE_BEHAVIOR-BEHAVIOR-DESK-DESK-DELETE-SKILL-POST-337738",
+        "then": "只允许当前工作区已知技能目录；递归删除后重新同步目录，失败返回错误",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-ROUTE_BEHAVIOR-BEHAVIOR-DESK-DESK-DELETE-SKILL-POST-337738"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-8A69F0CFFFA1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-INSTALL-SKILL-POST-8A69F0",
+        "then": "安装包至 .agents/skills，刷新技能路径，返回 name/installedSkillSource",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-DESK-DESK-INSTALL-SKILL-POST-8A69F0"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-2CAF7E2573D8": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-NAME-DELETE-2CAF7E",
+        "then": "删除用户技能目录，并尝试清理所有助手 enabled 和 bundle 引用后重载；引用清理异常可能只记日志",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-NAME-DELETE-2CAF7E"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-B0D4073E6AEB": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-DELETE-B0D407",
+        "then": "删除组合定义并广播，不删除组合内技能",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-DELETE-B0D407"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-8E11FAF4CC01": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA",
+        "then": "返回全量或运行时技能及 enabled/source 等状态",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-READ-8E11FA"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-0D8358645191": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-READ-0D8358",
+        "then": "返回组合及该 agent 视角每技能 enabled/source/missing",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-READ-0D8358"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-295F9F22981B": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-EXTERNAL-PATHS-REA-295F9F",
+        "then": "返回当前兼容外部目录列表",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-EXTERNAL-PATHS-REA-295F9F"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-52055FF0CAC2": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-BUNDLE-ENABLE-52055F",
+        "then": "将组合内当前可见技能写入该助手 enabled，并返回 changed",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-BUNDLE-ENABLE-52055F"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-A7B51C282C77": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-BUNDLE-DISABLE-A7B51C",
+        "then": "将组合内当前可见技能从 enabled 移除，并返回 changed",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-BUNDLE-DISABLE-A7B51C"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-D5128ABAABCF": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-ENABLE-D5128A",
+        "then": "将技能加入该助手 config.skills.enabled，刷新运行时/prompt",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-ENABLE-D5128A"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-9A47666127D3": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-DISABLE-9A4766",
+        "then": "将技能移出 config.skills.enabled，刷新运行时/prompt",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-SKILL-DISABLE-9A4766"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-268C221DAB82": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-WORKSPACE-SKILL-ENABLE-268C22",
+        "then": "从 config.skills.workspace_disabled 移出该技能",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-WORKSPACE-SKILL-ENABLE-268C22"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-778CBDA01964": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-WORKSPACE-SKILL-DISABLE-778CBD",
+        "then": "加入 config.skills.workspace_disabled，运行时不再提供",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-AGENT-WORKSPACE-SKILL-DISABLE-778CBD"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-EFEEEFFCD60A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-POST-EFEEEF",
+        "then": "持久保存组合，发 skills-changed，返回组合及技能状态",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-POST-EFEEEF"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-FAE2BDEFDB04": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-EXPORT--FAE2BD",
+        "then": "构建可下载组合包及结果元数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-EXPORT--FAE2BD"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-A3FE8FD26CB4": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILL-INSTALL-GLOBAL-A3FE8F",
+        "then": "技能目录新增并重载；尚未为任何助手启用",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILL-INSTALL-GLOBAL-A3FE8F"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-0F7D128E01B1": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILL-INSTALL-AND-ENABLE-AGENT-0F7D12",
+        "then": "技能目录新增；指定助手 enabled 包含该技能，运行时技能列表更新",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILL-INSTALL-AND-ENABLE-AGENT-0F7D12"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-BA490D930CA9": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-RELOAD-POST-BA490D",
+        "then": "重新扫描所有技能并广播 skills-changed；前端再按 agentId 取列表",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-RELOAD-POST-BA490D"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-7803B231FC36": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-TRANSLATE-POST-7803B2",
+        "then": "调用工具模型，返回目标语言名称映射",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-TRANSLATE-POST-7803B2"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-B097BDDC1E10": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-AGENTS-ID-SKILLS-PUT-B097BD",
+        "then": "写该助手 config.skills.enabled 并同步运行时/prompt，广播 skills-changed",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-AGENTS-ID-SKILLS-PUT-B097BD"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-F54ED990E939": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-PUT-F54ED9",
+        "then": "更新名称或成员并返回新组合",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ID-PUT-F54ED9"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-6E205433F474": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ORDER-PUT-6E2054",
+        "then": "保存 bundleIds 顺序并返回全部组合",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-BUNDLES-ORDER-PUT-6E2054"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-BDEDEF118670": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-EXTERNAL-PATHS-PUT-BDEDEF",
+        "then": "保存路径清单、重载来源并广播 skills-changed",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-SEMANTIC_EFFECT-SEMANTIC-EFFECT-SKILLS-SKILLS-EXTERNAL-PATHS-PUT-BDEDEF"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-D51B2A1FA68A": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-TOOL-TOOL-HANA-CARD-GUIDE-D51B2A",
+        "then": "返回指南文本，供后续show_card/文件编辑使用；本调用不创建卡片。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-TOOL-TOOL-HANA-CARD-GUIDE-D51B2A"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-3236B05B284F": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-TOOL-TOOL-INSTALL-SKILL-3236B0",
+        "then": "审核后把技能文件写入Agent技能区，清单/目录可见。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-TOOL-TOOL-INSTALL-SKILL-3236B0"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-771296A194E0": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-TOOL-TOOL-LEARN-LESSON-771296",
+        "then": "审核后把课程/技能文档写入Agent技能区，可在后续会话检索。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-TOOL-TOOL-LEARN-LESSON-771296"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-EE2ACB390FCE": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-TOOL-TOOL-SHOW-CARD-EE2ACB",
+        "then": "生成cardId并把title/code存入会话结果，前端在隔离iframe渲染卡片。",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-TOOL-TOOL-SHOW-CARD-EE2ACB"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-0DDB5AA05072": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-UI-UI-PANEL-SKILLS-0DDB5A",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-UI-UI-PANEL-SKILLS-0DDB5A"
+        ],
+        "test_ids": []
+      },
+      "R00-T02-LA-99F8CD228733": {
+        "kind": "supplemental",
+        "stage_id": "R00",
+        "execution_stage_ids": [
+          "R06",
+          "R07"
+        ],
+        "task_ids": [
+          "R06-T06",
+          "R07-T08"
+        ],
+        "requirement": "REQUIRED_SUPPLEMENTAL",
+        "feature_id": "F-D21-UI-UI-SETTINGS-SKILLS-99F8CD",
+        "then": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+        "formalization_task_id": "R00-T07",
+        "ledger_status": "SPECIFIED_NOT_EXECUTED",
+        "result_ids": [],
+        "feature_ids": [
+          "F-D21-UI-UI-SETTINGS-SKILLS-99F8CD"
+        ],
+        "test_ids": []
+      }
+    }
+  },
+  "currentEvidence": [
+    {
+      "area": "skills",
+      "chain": "SkillsTab/SkillsPanel → settings/api映射skills → lib真实路由/auth策略 → SkillService/MemoryService/ContextMaterialMutation → agent config/技能目录及skills-changed；R06原始真实服务测试可复用，但当前R07责任仍NOT_RUN。",
+      "existingTests": [
+        "r06_t06_skills::skills_http_faces_whitelist_shadow_readonly_and_bundles",
+        "r06_t06_skill_context::enabled_skill_catalog_reaches_the_production_system_prompt",
+        "r06_t06_skill_context::disabled_skill_never_reaches_the_production_system_prompt",
+        "r06_original_skills_bundle_proofs",
+        "r06_skills_completion::original_skills_settings_and_panel_current_real_service_projection"
+      ]
+    },
+    {
+      "area": "character_cards",
+      "chain": "AgentCreateOverlay/AgentTab → settings/api映射character-cards → plan/import/export/asset真实HTTP → 暂存token+CARD_APPLICATION_GATE+素材预验证 → 创建Agent/人格/可选记忆与技能；默认exportMemory=false，导出白名单agent元数据而非provider配置。导入创建后局部失败明确incomplete，不虚称回滚。",
+      "existingTests": [
+        "r06_agent_settings_live::native_character_card_zip_roundtrip_real_materials_and_memory_choice",
+        "r06_agent_settings_live::native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents",
+        "r06_agent_settings_live::native_character_card_duplicate_skill_source_and_sparse_path_refuse_without_public_mutation",
+        "r06_agent_settings_live::native_character_card_application_and_http_delete_never_recreate_deleted_directory"
+      ],
+      "stillRequired": "T08候选实际打包解压合成秘密零泄露、权限/重复token/重启/坏包零预创建及已创建后诚实回执；不凭源代码领PASS。"
+    },
+    {
+      "area": "identity_devices",
+      "chain": "SettingsContent/RustAgentTab实际GET /lingxi/v1/server/identity；AccessTab /api/access/*与/devices/*映射真实management路由。identity按当前principal投影，设备凭证实际auth注册簿；WS业务帧和1秒空闲检查重验现行凭证。",
+      "existingTests": [
+        "r00_management_leaves::r00_management_positive_and_negative_branches_on_real_service"
+      ],
+      "responsibilityBoundary": "109原条目不含另新增identity/device叶；它们作为管理基础/扩展边界复用，不擅加责任或凭旧通过自动领R07通过。"
+    },
+    {
+      "area": "native_skill_picker_viewer",
+      "chain": "现役platform.selectSkill/openSkillViewer/listSkillFiles/readSkillFile桥与Tauri技能窗口/读取边界存在。R06 completion测试会构建现行资源并实际运行reader unit、skill_viewer_host且要求receipt.json。",
+      "existingTests": [
+        "r06_skills_completion::original_native_skill_viewer_current_tauri_window_and_read_boundaries"
+      ],
+      "stillRequired": "不能沿早期T08_STATUS一句递延R09直接宣称未实现；先核历史回执，再按R07实际候选验证，人工平台限制如实登记。"
+    }
+  ],
+  "minimumFixes": [
+    {
+      "id": "T08-SKILLS-PREFERENCES-STRICT-MERGE",
+      "source": "rust/crates/lingxi-service/src/skills.rs:1296",
+      "evidence": "persist_external_paths使用am::read_json_file(...).unwrap_or_else({})，损坏/不可读当空对象写回preferences；未取agents_admin::preferences_locked，和userprefs等写方不是同一写锁。",
+      "impact": "单项外部技能路径保存可能覆盖其他设置、损坏原件；并发读改写可能丢更新。",
+      "minimalChange": "严格根读取：缺失才空对象，损坏/不可读明确失败；在既有全局偏好写锁内读合并写，再更新内存/事件，保留未知字段。",
+      "leafIds": [
+        "R00-T02-LA-BDEDEF118670"
+      ],
+      "proofRequired": "真实HTTP损坏/不可读保持原bytes，外部路径与goal/config并发写都保存，单键/未知字段及重启回读。"
+    },
+    {
+      "id": "T08-SKILLS-PATHS-INVALID-INPUT",
+      "source": "rust/crates/lingxi-service/src/skills.rs:1883",
+      "evidence": "paths.iter().filter_map(Value::as_str)静默丢弃非字符串；paths:[123]变成合法空清单并成功保存。",
+      "impact": "坏输入可误清已配置路径。",
+      "minimalChange": "全数组逐项验证字符串及既有路径规范，失败前不持久化、不广播、不更新内存。",
+      "leafIds": [
+        "R00-T02-LA-BDEDEF118670"
+      ],
+      "proofRequired": "真实HTTP混合/纯非字符串/超长/相对路径失败且磁盘、内存、事件不变；合法空数组仍明确清空。"
+    },
+    {
+      "id": "T08-INTERACTIVE-CARD-HTTP-MISSING",
+      "source": "desktop/src/react/components/chat/InteractiveCard.tsx:82",
+      "evidence": "show_card正式工具返回interactive_card，但组件PUT/GET /api/cards/{id}；service/src全文仅character-cards路由，未见cards缓存/GET/PUT，use-hana-fetch及rust-*也未见该映射。",
+      "impact": "工具成功后iframe不能加载；两条原叶要求缓存和沙箱HTML尚断链。",
+      "minimalChange": "复用现役server/routes/cards.ts行为补有界进程LRU、受权GET/PUT和HTML/CSP；同步原生URL映射及生成接口，连接切换不泄露旧卡。",
+      "leafIds": [
+        "R00-T02-LA-B03F2C42EFF1",
+        "R00-T02-LA-62F23BAAA609",
+        "R00-T02-LA-EE2ACB390FCE"
+      ],
+      "proofRequired": "实际Run show_card结果→真实组件PUT→GET HTML可加载；CSP禁止联网/导航，LRU淘汰/体积上限、缺id、撤权和重启重新注册。"
+    },
+    {
+      "id": "T08-SNAPSHOT-REDACTION",
+      "source": "rust/crates/lingxi-service/src/settings_ui.rs",
+      "evidence": "既有准备文档已确认snapshot透传preferences根对象，search.api_keys可泄露；本轮不重复改源码。",
+      "minimalChange": "明确脱敏投影；仅有专门双权限接口可读已保存API key；角色卡/导出默认无provider或search秘密。",
+      "proofRequired": "合成秘密走真实HTTP settings.read/完整snapshot/解包导出，扫描响应与日志不含原文。"
+    }
+  ],
+  "configurationImportExportBoundary": "已查现役Settings General/WorkTab及config routes，未发现通用配置import/export按钮/服务路径；确有memories import/export和character-cards包导入导出。A14正式导入联动须在T08明确采用实际入口证明，不为检查虚构原来不存在的入口，也不把快照只读、直接改fixture当导入已验证。",
+  "t07GateReadonlyCheck": {
+    "candidate": "t07b",
+    "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+    "observedReceipts": [
+      "fmt",
+      "clippy",
+      "protocol",
+      "protocol-tests",
+      "kernel",
+      "boundaries",
+      "adapter",
+      "types"
+    ],
+    "allObservedExitZero": true,
+    "allObservedSourceUnchanged": true,
+    "allObservedLogHashesMatch": true,
+    "serviceBuildUi": "等待实际完整回执，开发649不当候选。"
+  },
+  "sources": [
+    {
+      "path": "rust/crates/lingxi-service/src/skills.rs",
+      "sha256": "b587eca9e42504ae311142b9c603da65d65a41c040a4c1e4c440a9e0dc779500"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/userprefs.rs",
+      "sha256": "0699aac1016a723b7d4b7a5ff2b87a3e04482bbd96c511f33c934a67bcf7ae50"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+      "sha256": "fb8ad96defe8d152b5fbe10cb6fe00365ee39214968c9a4148fa08c484594c7d"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/character_cards.rs",
+      "sha256": "2bfb561ad5ba3b0b63d21a4c440d2233848e3d3b19844010259403935c3528f5"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/interactive_tools.rs",
+      "sha256": "3cdf5ea747f1c821c41ab195638742b64eaa98024042b1b7a984ed84fbef7703"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/management.rs",
+      "sha256": "2820dc5d3527a708096d3637805e93a8f46a8162ed51e1c2a0bfb714b0c3dfb5"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "4d5a1283d9dc66f323b739b94a2425ecd02520221c0253baac95568433190226"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "2879510a0ab2d1bca3f9dbe86a89fceffe93ab74cc21d8d851df99381e9b0e04"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_skills_completion.rs",
+      "sha256": "64fadb86823cf411e4ccee06c6c974317b32f0c0551cd8cffb65995a24edb82e"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_agent_settings_live.rs",
+      "sha256": "69271bffcc8f59fb24f83e3f4769137914e66e7669a5ed7fb203bc9eb41af044"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r00_management_leaves.rs",
+      "sha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453"
+    },
+    {
+      "path": "desktop/src/react/settings/api.ts",
+      "sha256": "3c9d442fd92efb65a0fbd6186b65304c993bf8e7ed417f5be8cb29388013441d"
+    },
+    {
+      "path": "desktop/src/react/components/chat/InteractiveCard.tsx",
+      "sha256": "d11f6ca3de8056ddceb4b5939fc59c9db56dcf280e326d60629a0451860e689a"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/SkillsTab.tsx",
+      "sha256": "3855368033bc7b127fcf5623f9b1e7b72ece73f4646355ebfb32aaf05161cfb4"
+    }
+  ]
+}

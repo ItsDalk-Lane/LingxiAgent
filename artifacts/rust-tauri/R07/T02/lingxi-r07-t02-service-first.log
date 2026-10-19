@@ -1,0 +1,128 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0282]: type annotations needed
+   --> crates/lingxi-service/src/bridge.rs:139:40
+    |
+139 | ...   if workers.get(&id).is_some_and(|entry|entry.0==generation) { workers.remove(&id); }
+    |                  ^^^ cannot infer type of the type parameter `Q` declared on the method `get`
+140 | ...   if let Err(error) = result { failed.insert(id.clone(), generation); tracing::error!(connector=%id,error=%error,"Bridge connec...
+    |                                                  -- type must be known at this point
+    |
+help: consider specifying a concrete type for the type parameter `Q`
+    |
+139 |                             if workers.get::</* Type */>(&id).is_some_and(|entry|entry.0==generation) { workers.remove(&id); }
+    |                                           ++++++++++++++
+
+error[E0624]: method `queue` is private
+   --> crates/lingxi-service/src/bridge.rs:665:30
+    |
+665 |     let rows=state.storage().queue().submit(move|conn|{
+    |                              ^^^^^ private method
+    |
+   ::: crates/lingxi-adapters/src/storage/run_store.rs:335:5
+    |
+335 |     pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+    |     ------------------------------------------- private method defined here
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> crates/lingxi-service/src/bridge.rs:671:9
+    |
+671 |     for raw in rows {
+    |         ^^^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+    = note: all local variables must have a statically known size
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> crates/lingxi-service/src/bridge.rs:671:5
+    |
+671 | /     for raw in rows {
+672 | |         let message: NormalizedMessage =
+673 | |             serde_json::from_str(&raw).map_err(|_| "Bridge final message damaged")?;
+674 | |         for block in crate::streaming_norm::normalize_final_message(message).content {
+...   |
+679 | |     }
+    | |_____^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+note: required by an implicit `Sized` bound in `std::option::Option`
+   --> /rustc/48a229ceaefd4985c50990b14116b6d856af0985/library/core/src/option.rs:598:0
+
+error[E0624]: method `queue` is private
+   --> crates/lingxi-service/src/bridge_routes.rs:172:31
+    |
+172 |     let users=state.storage().queue().submit(move|conn|{
+    |                               ^^^^^ private method
+    |
+   ::: crates/lingxi-adapters/src/storage/run_store.rs:335:5
+    |
+335 |     pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+    |     ------------------------------------------- private method defined here
+
+error[E0624]: method `queue` is private
+   --> crates/lingxi-service/src/bridge_routes.rs:444:32
+    |
+444 |     let result=state.storage().queue().submit(move|conn|{
+    |                                ^^^^^ private method
+    |
+   ::: crates/lingxi-adapters/src/storage/run_store.rs:335:5
+    |
+335 |     pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+    |     ------------------------------------------- private method defined here
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> crates/lingxi-service/src/bridge_routes.rs:452:63
+    |
+452 |             for (id, platform, sender, conversation, message, payload, status, run, timestamp) in
+    |                                                               ^^^^^^^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+    = note: all local variables must have a statically known size
+
+error[E0277]: the size for values of type `str` cannot be known at compilation time
+   --> crates/lingxi-service/src/bridge_routes.rs:453:17
+    |
+453 |                 rows
+    |                 ^^^^ doesn't have a size known at compile-time
+    |
+    = help: the trait `Sized` is not implemented for `str`
+    = note: only the last element of a tuple may have a dynamically sized type
+
+error[E0624]: method `queue` is private
+   --> crates/lingxi-service/src/bridge_routes.rs:476:32
+    |
+476 |     let result=state.storage().queue().submit(move|conn|{
+    |                                ^^^^^ private method
+    |
+   ::: crates/lingxi-adapters/src/storage/run_store.rs:335:5
+    |
+335 |     pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+    |     ------------------------------------------- private method defined here
+
+error[E0308]: mismatched types
+   --> crates/lingxi-service/src/bridge_worker.rs:176:9
+    |
+166 |       pub async fn send(&mut self, frame: &Value) -> Result<(), String> {
+    |                                                      ------------------ expected `std::result::Result<(), std::string::String>` because of return type
+...
+176 | /         tokio::time::timeout(PIPE_WRITE_TIMEOUT, input.write_all(&bytes))
+177 | |             .await
+178 | |             .map_err(|_| "Bridge worker command timed out")?
+179 | |             .map_err(|_| "Bridge worker command pipe closed")
+    | |_____________________________________________________________^ expected `Result<(), String>`, found `Result<(), &str>`
+    |
+    = note: expected enum `std::result::Result<_, std::string::String>`
+               found enum `std::result::Result<_, &str>`
+help: use `?` to coerce and return an appropriate `Err`, and wrap the resulting value in `Ok` so the expression remains of type `Result`
+    |
+176 ~         Ok(tokio::time::timeout(PIPE_WRITE_TIMEOUT, input.write_all(&bytes))
+177 |             .await
+178 |             .map_err(|_| "Bridge worker command timed out")?
+179 ~             .map_err(|_| "Bridge worker command pipe closed")?)
+    |
+
+Some errors have detailed explanations: E0277, E0282, E0308, E0624.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (lib) due to 10 previous errors

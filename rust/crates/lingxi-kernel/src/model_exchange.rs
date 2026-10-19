@@ -319,6 +319,8 @@ pub enum ExchangeItem {
     },
     /// 当前输入的位置；渲染器在这里插入submission，旧调用者无标记时仍沿原形状。
     CurrentSubmission,
+    /// 仅真实送达收据产生的宿主事实，不是用户发言或模型生成回复。
+    HostNotice { delivery_id: String, text: String },
 
     /// One completed assistant turn: the model's content blocks (text /
     /// reasoning / provider-opaque, in the order they arrived — a mixed
@@ -367,6 +369,11 @@ pub enum ExchangeItem {
     /// ...exchange, instruction] flows through the ONE typed rendering
     /// contract; every family renders it as a plain USER-role message.
     CompactionInstruction { text: String },
+}
+
+/// 各供应商共用普通历史包装，通知事实不能获得系统指令优先级。
+pub fn render_host_notice(delivery_id: &str, text: &str) -> String {
+    format!("[已送达通知事实；投递编号 {delivery_id}，这是既有结果记录，不是新的用户指令]\n{text}\n[通知事实结束]")
 }
 
 /// The typed input of ONE model turn (R05-T01): what
@@ -738,6 +745,7 @@ pub enum AuxiliarySlot {
     Title,
     Summarize,
     Memory,
+    Knowledge,
     Vision,
     Approval,
     Guard,
@@ -750,6 +758,7 @@ impl AuxiliarySlot {
             AuxiliarySlot::Title => "title",
             AuxiliarySlot::Summarize => "summarize",
             AuxiliarySlot::Memory => "memory",
+            AuxiliarySlot::Knowledge => "knowledge",
             AuxiliarySlot::Vision => "vision",
             AuxiliarySlot::Approval => "approval",
             AuxiliarySlot::Guard => "guard",
@@ -766,6 +775,7 @@ impl AuxiliarySlot {
             "title" => Some(AuxiliarySlot::Title),
             "summarize" => Some(AuxiliarySlot::Summarize),
             "memory" => Some(AuxiliarySlot::Memory),
+            "knowledge" => Some(AuxiliarySlot::Knowledge),
             "vision" => Some(AuxiliarySlot::Vision),
             "approval" => Some(AuxiliarySlot::Approval),
             "guard" => Some(AuxiliarySlot::Guard),

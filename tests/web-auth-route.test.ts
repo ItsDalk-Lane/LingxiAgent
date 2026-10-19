@@ -178,6 +178,7 @@ describe("web auth route", () => {
         userId: "user_local",
         scopes: [
           "chat",
+          "sessions.write",
           "resources.read",
           "files.read",
           "files.write",

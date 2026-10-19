@@ -100,11 +100,16 @@ fn spec(key: &str, argv: &[&str], evidence: &[&str], timeout: u64) -> CommandSpe
 
 fn one_command_map(command: CommandSpec) -> StageMap {
     StageMap {
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
         stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec![command.key.clone()],
         }],
@@ -268,7 +273,10 @@ fn stage_rollup_fails_when_one_scenario_fails_and_reports_real_codes() {
     write_minimal_r00_ledger(&root, &[]);
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![
@@ -284,12 +292,16 @@ fn stage_rollup_fails_when_one_scenario_fails_and_reports_real_codes() {
         ],
         scenarios: vec![
             crate::stage_map::Scenario {
-                id: "RX-A01".into(),
+                spec_mirror: None,
+                assertion_contract: None,
+id: "RX-A01".into(),
                 requirement: "REQUIRED".into(),
                 command_refs: vec!["good".into()],
             },
             crate::stage_map::Scenario {
-                id: "RX-A02".into(),
+                spec_mirror: None,
+                assertion_contract: None,
+id: "RX-A02".into(),
                 requirement: "REQUIRED".into(),
                 command_refs: vec!["bad".into()],
             },
@@ -363,7 +375,10 @@ fn non_empty_evidence_root_is_refused_before_any_command_runs() {
     std::fs::create_dir_all(&evidence).unwrap();
     std::fs::write(evidence.join("leftover.txt"), b"old").unwrap();
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -373,7 +388,9 @@ fn non_empty_evidence_root_is_refused_before_any_command_runs() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -715,7 +732,10 @@ fn supplemental_leaf_rollup_keeps_partial_evidence_out_of_overall_pass() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![
@@ -738,7 +758,9 @@ fn supplemental_leaf_rollup_keeps_partial_evidence_out_of_overall_pass() {
             spec("bad", &["sh", "-c", "exit 9"], &["{EVIDENCE}/never.txt"], 60),
         ],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["good".into()],
         }],
@@ -1085,7 +1107,10 @@ fn green_exit_with_wrong_case_actual_fails_the_leaf() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1101,7 +1126,9 @@ fn green_exit_with_wrong_case_actual_fails_the_leaf() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["ok".into()],
         }],
@@ -1146,7 +1173,10 @@ fn producer_softening_its_own_expectation_fails_the_leaf() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1162,7 +1192,9 @@ fn producer_softening_its_own_expectation_fails_the_leaf() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["ok".into()],
         }],
@@ -1204,7 +1236,10 @@ fn missing_leaf_case_file_or_declared_case_fails_the_leaf() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1220,7 +1255,9 @@ fn missing_leaf_case_file_or_declared_case_fails_the_leaf() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["ok".into()],
         }],
@@ -1284,7 +1321,10 @@ fn r00_mirror_drift_aborts_the_gate_before_any_command_runs() {
     );
     drifted.r00_then = "a DIFFERENT original then".into();
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1294,7 +1334,9 @@ fn r00_mirror_drift_aborts_the_gate_before_any_command_runs() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["ok".into()],
         }],
@@ -1330,7 +1372,10 @@ fn stale_leaf_evidence_aborts_the_gate() {
     std::fs::write(stale_dir.join("leaf-cases.json"), b"old").unwrap();
     let stale_pin = format!("{}/leaf-cases.json", stale_dir.display());
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1340,7 +1385,9 @@ fn stale_leaf_evidence_aborts_the_gate() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -1371,7 +1418,10 @@ fn r00_ledger_cross_check_refuses_dropped_leaves() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1381,7 +1431,9 @@ fn r00_ledger_cross_check_refuses_dropped_leaves() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -1407,7 +1459,10 @@ fn missing_r00_ledger_aborts_the_gate() {
     // zero obligations.
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1417,7 +1472,9 @@ fn missing_r00_ledger_aborts_the_gate() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -1776,7 +1833,10 @@ fn share_and_deferred_coverage_makes_overall_pass() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![
@@ -1803,7 +1863,9 @@ fn share_and_deferred_coverage_makes_overall_pass() {
             ),
         ],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["good".into()],
         }],
@@ -1897,7 +1959,10 @@ fn failing_early_evidence_command_blocks_overall_but_leaf_stays_deferred() {
     );
     let evidence = root.join("evidence");
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1907,7 +1972,9 @@ fn failing_early_evidence_command_blocks_overall_but_leaf_stays_deferred() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["bad".into()],
         }],
@@ -2263,7 +2330,10 @@ fn r03_share_and_deferred_coverage_makes_overall_pass() {
     deferred.stage_share = "no RX gating share".into();
     deferred.later_share = "the RY remainder".into();
     let map = StageMap {
-        stage: "RX".into(),
+        extension_boundaries: vec![],
+        handover_items: vec![],
+        prior_stage_deferred: vec![],
+stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -2279,7 +2349,9 @@ fn r03_share_and_deferred_coverage_makes_overall_pass() {
             60,
         )],
         scenarios: vec![crate::stage_map::Scenario {
-            id: "RX-A01".into(),
+            spec_mirror: None,
+            assertion_contract: None,
+id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["good".into()],
         }],

@@ -1,0 +1,297 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R07_T08_H_ADAPTER_IGNORED_SCOPE_ADDENDUM_01",
+  "createdAt": "2026-10-18T13:06:57.169072+00:00",
+  "candidate": "t08h",
+  "status": "SCOPE_CLARIFICATION_NOT_NEW_EXECUTION",
+  "purpose": "补充已有h实际表与摘要，不覆盖已经SHA记录的文件；明确13 ignored本h未执行，零跳过仅service/UI。",
+  "unchangedOriginalArtifacts": [
+    {
+      "path": "artifacts/rust-tauri/R07/T08/t08h-per-leaf-results-actual1.json",
+      "sha256Verified": "cbd9c99bbafbfb17302f97756e084d40e43ddae3968911dba335ca1f291a3884"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/t08h-per-leaf-settlement-summary1.md",
+      "sha256Verified": "16e2e43e43de2ef20252dca6e24a4b096c4b20bd39c87d5d483f7e3c76f4f059"
+    }
+  ],
+  "sourceEvidence": {
+    "receipt": "artifacts/rust-tauri/R07/T08/t08h-adapter.json",
+    "receiptSha256": "fc62d678a91e99028c36f827bdab32115521e668153bfd4abc7a44ea03394a60",
+    "actualExitCode": 0,
+    "log": "artifacts/rust-tauri/R07/T08/t08h-adapter.log",
+    "logSha256Verified": "7734969515236f18b06deb21eee797eecebe03adfa84494f1519c49e1a53eca3",
+    "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+    "sourceAndToolsUnchanged": true,
+    "gatePlanSha256": "8d8cc95b5a16fd9c26c60e76ccf5391ac32e0c4ec3de10590cc249d9ad6ac7b8"
+  },
+  "adapterActualCounts": {
+    "passed": 223,
+    "failed": 0,
+    "ignoredNotRun": 13,
+    "groupCounts": {
+      "manual-native": 2,
+      "pdf-lifecycle": 4,
+      "chromium-startup": 7
+    }
+  },
+  "perTargetRawSummaries": [
+    {
+      "logLine": 160,
+      "rawLogLine": "test result: ok. 141 passed; 0 failed; 13 ignored; 0 measured; 0 filtered out; finished in 0.36s",
+      "passed": 141,
+      "failed": 0,
+      "ignored": 13
+    },
+    {
+      "logLine": 187,
+      "rawLogLine": "test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s",
+      "passed": 21,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "logLine": 196,
+      "rawLogLine": "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "logLine": 220,
+      "rawLogLine": "test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s",
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "logLine": 227,
+      "rawLogLine": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "logLine": 260,
+      "rawLogLine": "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+      "passed": 27,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "logLine": 278,
+      "rawLogLine": "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "ignoredCases": [
+    {
+      "case": "browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted",
+      "logLine": 5,
+      "rawLogLine": "test browser::host::manual_capture::externally_restored_suspended_window_is_never_reaped_or_evicted ... ignored, 需要可见Chrome窗口，单独执行原生恢复与回收检查",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要可见Chrome窗口，单独执行原生恢复与回收检查",
+      "group": "manual-native",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target",
+      "logLine": 6,
+      "rawLogLine": "test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... ignored, 需要显式提供证据目录，并在原生Chrome测试表单中手动输入",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要显式提供证据目录，并在原生Chrome测试表单中手动输入",
+      "group": "manual-native",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs",
+      "logLine": 7,
+      "rawLogLine": "test browser::host::pdf_lifecycle_tests::browser_revoke_cancels_matching_pdf_without_conflating_run_and_workspace_epochs ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "pdf-lifecycle",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T05",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease",
+      "logLine": 8,
+      "rawLogLine": "test browser::host::pdf_lifecycle_tests::invalid_pdf_or_wrong_node_never_spawns_or_reserves_a_lease ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "pdf-lifecycle",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T05",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it",
+      "logLine": 9,
+      "rawLogLine": "test browser::host::pdf_lifecycle_tests::pdf_cancel_startup_gap_unknown_keeps_late_owner_and_wrong_owner_cannot_clear_it ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "pdf-lifecycle",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T05",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry",
+      "logLine": 10,
+      "rawLogLine": "test browser::host::pdf_lifecycle_tests::pdf_initialization_unknown_retains_scope_process_and_profile_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "pdf-lifecycle",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T05",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry",
+      "logLine": 11,
+      "rawLogLine": "test browser::host::startup_tests::auxiliary_initialization_unknown_preserves_profile_and_owner_until_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn",
+      "logLine": 12,
+      "rawLogLine": "test browser::host::startup_tests::cdp_preparation_failure_happens_before_any_real_spawn ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry",
+      "logLine": 13,
+      "rawLogLine": "test browser::host::startup_tests::first_target_failure_keeps_actual_process_and_target_until_cleanup_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile",
+      "logLine": 14,
+      "rawLogLine": "test browser::host::startup_tests::forget_rechecks_late_startup_unknown_before_purging_profile ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms",
+      "logLine": 15,
+      "rawLogLine": "test browser::host::startup_tests::live_initialization_failure_keeps_real_owner_until_cleanup_retry_confirms ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry",
+      "logLine": 16,
+      "rawLogLine": "test browser::host::startup_tests::revoke_startup_timeout_preserves_late_unknown_live_until_same_epoch_retry ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    },
+    {
+      "case": "browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap",
+      "logLine": 17,
+      "rawLogLine": "test browser::host::startup_tests::revoke_waits_for_real_spawn_owner_registration_and_confirmed_reap ... ignored, 需要真实Chromium；R07门禁显式运行",
+      "hExecutionStatus": "NOT_RUN_IGNORED",
+      "ignoredReason": "需要真实Chromium；R07门禁显式运行",
+      "group": "chromium-startup",
+      "reviewResponsibilityBoundary": [
+        "R07-T04",
+        "R07-T12"
+      ],
+      "hPassClaimed": false,
+      "historicalResultTransferredToH": false
+    }
+  ],
+  "preciseScopeCorrection": {
+    "twentyGates": "20门命令原始退出均为0，不表示每个测试均执行。",
+    "service": "40目标948通过、0失败、0ignored，原零跳过说法只对此组成立。",
+    "ui": "89文件718通过、0失败、0pending/skip，原零跳过说法只对此组成立。",
+    "adapter": "223通过、13 ignored未执行；13条不能标h通过，也不能拿旧T04/T05/开发记录当h实跑。",
+    "recommendedReportSentence": "h的20门命令退出均为0；服务948项、界面718项均通过且两组无跳过。适配器组另有13项既有Chromium/PDF/人工原生检查被忽略，本版未执行，已逐名保留到最终清账范围。"
+  },
+  "t04T05T12Boundary": [
+    "manual-native两项需要真实可见Chrome/受控手工输入，属于浏览器T04及最终T12核对；本次只读没有操作窗口或接管。",
+    "pdf-lifecycle四项为共享Chromium/PDF撤权/取消/未知清理，跨T04/T05及最终T12；测试注释写R07显式运行不等于本h实际已运行。",
+    "chromium-startup七项涉及真实spawn/owner注册/初始化未知/回收重试，主要浏览器T04及最终T12；PDF共用同宿主时需一起核影响。",
+    "既有T04/T05版本或开发独立运行的证据仍可保留历史可信范围，但不搬填h本13项执行结果。",
+    "本说明不新增原叶、不改109/343/7/14/202refs计数、不调整职责台账或自行退役门禁。"
+  ],
+  "executionByThisTask": "只读核原始receipt/log，不Cargo、不浏览器、不PDF运行、不人工输入。",
+  "originalArtifactsOverwritten": false,
+  "centralLedgerEdited": false,
+  "sourceEdited": false,
+  "newPassClaimed": false,
+  "finalR07AcceptanceClaimed": false
+}

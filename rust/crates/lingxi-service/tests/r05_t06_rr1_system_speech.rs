@@ -128,21 +128,21 @@ fn unique_dir(tag: &str) -> PathBuf {
     dir
 }
 
-fn speech_plane(endpoint: &str) -> String {
-    format!(
-        r#"{{
-            "providers": {{
-                "say_host": {{
+/// 本地语音契约：endpoint 必须为空、无凭证——占位地址会被配置校验响亮拒绝。
+fn speech_plane() -> String {
+    r#"{
+            "providers": {
+                "say_host": {
                     "protocol": "system-speech",
-                    "endpoint": "{endpoint}",
-                    "auth": {{"kind": "none"}}
-                }}
-            }},
-            "models": {{
-                "speech": {{"provider": "say_host", "model": "system-say"}}
-            }}
-        }}"#
-    )
+                    "endpoint": "",
+                    "auth": {"kind": "none"}
+                }
+            },
+            "models": {
+                "speech": {"provider": "say_host", "model": "system-say"}
+            }
+        }"#
+    .to_string()
 }
 
 struct Assembly {
@@ -184,11 +184,11 @@ fn supervisor(spill: &std::path::Path) -> Arc<ProcessSupervisor> {
     )
 }
 
-fn assemble(endpoint: &str, quota_global: usize, tag: &str) -> Assembly {
+fn assemble(quota_global: usize, tag: &str) -> Assembly {
     let runtime_dir = unique_dir(&format!("{tag}-rt"));
     let products_root = unique_dir(&format!("{tag}-products"));
     let spill = unique_dir(&format!("{tag}-spill"));
-    let plane = ModelPlaneConfig::parse_and_validate(&speech_plane(endpoint)).expect("plane");
+    let plane = ModelPlaneConfig::parse_and_validate(&speech_plane()).expect("plane");
     let credentials = Arc::new(
         lingxi_service::credentials::CredentialService::bootstrap(
             &plane,
@@ -213,7 +213,8 @@ fn assemble(endpoint: &str, quota_global: usize, tag: &str) -> Assembly {
                 },
                 ..QuotaLimits::default()
             })),
-            vec![endpoint.to_string()],
+            // 本地语音没有出口地址可入白名单。
+            Vec::new(),
             products_root.clone(),
         )
         .expect("operations")
@@ -272,7 +273,7 @@ fn speech_product_is_real(product: &RegisteredProduct) {
 /// HTTP call — the pre-fix shape fabricated an HTTP attempt).
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_real_say_registers_product_with_zero_transport_attempts() {
-    let a = assemble("http://127.0.0.1:9", 2, "real");
+    let a = assemble(2, "real");
     let product = a
         .operations
         .synthesize_speech(
@@ -319,7 +320,7 @@ async fn rr1_f20_real_say_registers_product_with_zero_transport_attempts() {
 /// and the settlement still lands (attempts 0).
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_short_deadline_times_out_kills_and_cleans() {
-    let a = assemble("http://127.0.0.1:9", 2, "timeout");
+    let a = assemble(2, "timeout");
     let long_text = "hello world ".repeat(2000);
     // The deadline (1.2 s) is far under the §29.13 cap (120 s) and under
     // the real synthesis time of this text (~15 s on this machine).
@@ -377,7 +378,7 @@ async fn rr1_f20_short_deadline_times_out_kills_and_cleans() {
 /// removed — nothing of the call survives.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_dropped_future_kills_process_and_cleans_output() {
-    let a = assemble("http://127.0.0.1:9", 2, "cancel");
+    let a = assemble(2, "cancel");
     let long_text = "hello world ".repeat(2000);
     let operations = Arc::clone(&a.operations);
     let call = tokio::spawn(async move {
@@ -444,7 +445,7 @@ async fn rr1_f20_queued_speech_waits_for_the_unified_permit() {
                 }},
                 "say_host": {{
                     "protocol": "system-speech",
-                    "endpoint": "http://127.0.0.1:9",
+                    "endpoint": "",
                     "auth": {{"kind": "none"}}
                 }}
             }},
@@ -535,7 +536,7 @@ async fn rr1_f20_queued_speech_waits_for_the_unified_permit() {
 /// An already-exhausted deadline refuses BEFORE spawning anything.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_exhausted_deadline_refuses_before_spawn() {
-    let a = assemble("http://127.0.0.1:9", 2, "spent");
+    let a = assemble(2, "spent");
     let spent = lingxi_adapters::models::dispatch::unix_ms_now() - 1;
     let failure = a
         .operations
@@ -563,7 +564,7 @@ async fn rr1_f20_exhausted_deadline_refuses_before_spawn() {
 /// the host-chosen path.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_leading_dash_text_is_message_not_option() {
-    let a = assemble("http://127.0.0.1:9", 2, "dash");
+    let a = assemble(2, "dash");
     let product = a
         .operations
         .synthesize_speech(
@@ -601,7 +602,7 @@ async fn rr1_f20_leading_dash_text_is_message_not_option() {
 /// error the platform does not produce.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_unknown_voice_falls_back_and_delivers() {
-    let a = assemble("http://127.0.0.1:9", 2, "fallback");
+    let a = assemble(2, "fallback");
     let product = a
         .operations
         .synthesize_speech(
@@ -627,7 +628,7 @@ async fn rr1_f20_unknown_voice_falls_back_and_delivers() {
 /// failure is honest, nothing is registered, nothing survives.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_unwritable_output_fails_honestly() {
-    let a = assemble("http://127.0.0.1:9", 2, "ro");
+    let a = assemble(2, "ro");
     // Drop write permission on the product root: say cannot create the
     // intermediate file and exits non-zero.
     #[cfg(unix)]
@@ -672,7 +673,7 @@ async fn rr1_f20_missing_supervisor_refuses_fail_closed() {
     let runtime_dir = unique_dir("nosup-rt");
     let products_root = unique_dir("nosup-products");
     let plane =
-        ModelPlaneConfig::parse_and_validate(&speech_plane("http://127.0.0.1:9")).expect("plane");
+        ModelPlaneConfig::parse_and_validate(&speech_plane()).expect("plane");
     let credentials = Arc::new(
         lingxi_service::credentials::CredentialService::bootstrap(
             &plane,
@@ -716,7 +717,7 @@ async fn rr1_f20_missing_supervisor_refuses_fail_closed() {
 /// dialects enforce).
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn rr1_f20_empty_text_refuses_before_spawn() {
-    let a = assemble("http://127.0.0.1:9", 2, "empty");
+    let a = assemble(2, "empty");
     let failure = a
         .operations
         .synthesize_speech(

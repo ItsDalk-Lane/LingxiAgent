@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authMode": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "credentialOk": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "msg": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "username": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "title": "BridgeDiagnosticInfo",
+  "type": "object"
+}

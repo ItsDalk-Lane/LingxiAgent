@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.90s
+     Running tests/r07_t05_media.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media-a95195c541767742)
+
+running 1 test
+test r07_media::image_approval_starts_a_distinct_real_run_and_delivers_owned_session_file ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.24s
+

@@ -1,0 +1,35 @@
+{
+  "bundles": [
+    {
+      "agentId": null,
+      "createdAt": "2026-10-18T09:48:43.912Z",
+      "id": "settings-source",
+      "name": "settings-source",
+      "skillNames": [],
+      "source": "user",
+      "sourcePackage": null,
+      "updatedAt": "2026-10-18T09:49:06.240Z"
+    },
+    {
+      "agentId": null,
+      "createdAt": "2026-10-18T09:48:43.914Z",
+      "id": "settings-target",
+      "name": "settings-target",
+      "skillNames": [],
+      "source": "user",
+      "sourcePackage": null,
+      "updatedAt": "2026-10-18T09:48:43.914Z"
+    },
+    {
+      "agentId": null,
+      "createdAt": "2026-10-18T09:49:02.606Z",
+      "id": "panel-source",
+      "name": "panel-source",
+      "skillNames": [],
+      "source": "user",
+      "sourcePackage": null,
+      "updatedAt": "2026-10-18T09:49:06.241Z"
+    }
+  ],
+  "schemaVersion": 1
+}

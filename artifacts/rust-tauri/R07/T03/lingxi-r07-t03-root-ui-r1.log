@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/app-event-actions.test.ts (25 tests | 1 failed) 211ms
+     × 排队被实际受理后刷新可见源会话，忽略其他会话和过期连接 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/app-event-actions.test.ts > 协作决定仅刷新真实源会话 > 排队被实际受理后刷新可见源会话，忽略其他会话和过期连接
+ReferenceError: handleAppEvent is not defined
+ ❯ desktop/src/react/__tests__/services/app-event-actions.test.ts:501:3
+    499|  it('排队被实际受理后刷新可见源会话，忽略其他会话和过期连接',async()=>{
+    500|   mockLoadMessages.mockClear();Object.assign(mockState,{currentSession…
+    501|   await handleAppEvent('session_collab_decision',{sourceSessionId:'oth…
+       |   ^
+    502|   await handleAppEvent('session_collab_decision',{sourceSessionId:'sou…
+    503|   expect(mockLoadMessages).not.toHaveBeenCalled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 47 passed (48)
+   Start at  04:27:58
+   Duration  977ms (transform 970ms, setup 63ms, import 1.17s, tests 310ms, environment 970ms)
+

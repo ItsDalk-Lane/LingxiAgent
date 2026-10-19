@@ -145,6 +145,7 @@ export interface SettingsState {
   settingsConfig: Record<string, any> | null;
   settingsConfigKey: string | null;
   settingsAgentsOwner: SettingsConnectionOwner | null;
+  settingsIdentityOwner: SettingsConnectionOwner | null;
   settingsDataOwner: SettingsConnectionOwner | null;
   settingsDataAgentId: string | null;
   settingsConfigStatus: RemoteResourceStatus;
@@ -212,6 +213,7 @@ export const useSettingsStore = create<SettingsStore>()((set, get) => ({
   settingsConfig: null,
   settingsConfigKey: null,
   settingsAgentsOwner: null,
+  settingsIdentityOwner: null,
   settingsDataOwner: null,
   settingsDataAgentId: null,
   settingsConfigStatus: 'idle',

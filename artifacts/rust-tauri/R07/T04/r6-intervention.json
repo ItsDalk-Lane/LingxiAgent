@@ -1,0 +1,13 @@
+{
+  "recordedAt": "2026-10-15T23:06:07.584867+00:00",
+  "candidate": "r6",
+  "targetPid": 13698,
+  "verifiedParentCargoPid": 12962,
+  "command": [
+    "kill",
+    "-TERM",
+    "13698"
+  ],
+  "exitCode": 0,
+  "reason": "旧MCP full_chain_unknown测试在外部计数器等于1前无总等待期限；新目录拦截后永不到达。已知产品兼容问题导致阻塞，不重试也不伪称通过。只终止该测试二进制，cargo --no-fail-fast继续其余目标，原日志含SIGTERM事实。"
+}

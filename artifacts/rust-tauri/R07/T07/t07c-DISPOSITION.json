@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07c",
+  "status": "FAILED_ADAPTER_GATE_DIAGNOSIS_PENDING_NOT_FINAL_ACCEPTANCE",
+  "stageStatus": "IN_PROGRESS",
+  "recordedAt": "2026-10-18T03:31:04.689493+00:00",
+  "sourceFiles": 543,
+  "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "sourceManifest": "artifacts/rust-tauri/R07/T07/SOURCE_MANIFEST_t07c.json",
+  "archiveSha256": "34e1ab9afb13b51f849cb83ce0372b696a70c47da1f408f5d9567fbaa6b64e30",
+  "archiveHashMatches": true,
+  "coreGateSummary": {
+    "planned": 11,
+    "completedReceipts": 11,
+    "exitZero": 10,
+    "nonzero": 1,
+    "pending": []
+  },
+  "coreGates": [
+    {
+      "name": "fmt",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-fmt.json",
+      "receiptSha256": "b9f17e61743dfa7f8dfac8ab8d9ceb525f16a41426e03a2ce2e2ff328603c5f7",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-fmt.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "clippy",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-clippy.json",
+      "receiptSha256": "e73c1e7ad21db69c316cd8f4c4f097f3fc28b5644232f0604241bd3aaf9fcf57",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-clippy.log",
+      "logSha256": "9a30d54c8b16d7e49510b182028079bca120aeebb7d662e88f8566e6196a49f6",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "service",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-service.json",
+      "receiptSha256": "fce9fa4b8201a11b163c1078ff8fff1933035c2f1923a71e21a6016fd3e91faf",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-service.log",
+      "logSha256": "5b6bd73e3d314cc80c90a3ac410d94c6e9f6f7ce256af5779389c932555fa755",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 1080,
+        "failed": 0,
+        "ignored": 0,
+        "summaryGroups": 50
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "adapter",
+      "status": "FAILED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-adapter.json",
+      "receiptSha256": "63e6b71bf726bb8fc94d2b7be3ce93c50e43206f06fefe41e8e618d1f982f450",
+      "exitCode": 101,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-adapter.log",
+      "logSha256": "bcfa954bcca461a075d13dba3a5b8e1d2e3171d7d9f9ebeaeda7a46400cb0a3d",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 249,
+        "failed": 1,
+        "ignored": 13,
+        "summaryGroups": 16
+      },
+      "failedTests": [
+        "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock"
+      ],
+      "finalAcceptance": false
+    },
+    {
+      "name": "kernel",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-kernel.json",
+      "receiptSha256": "2dac29d1101b117a12eb7979e20ea9cb1c30081e76e19a4d860a3fb62a8e4194",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-kernel.log",
+      "logSha256": "f21afab48784c9f89c4e69be43c22b7e81f0861f7e088733e0fce49c04638967",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 193,
+        "failed": 0,
+        "ignored": 0,
+        "summaryGroups": 4
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "protocol",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-protocol.json",
+      "receiptSha256": "892203af61c311d1fae0e12a56606b7e27f90ce36394aa3120bd65b1036c8c6c",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-protocol.log",
+      "logSha256": "41aa43acf572a22b07245f608695a7f66dbb8f1312b1fa2e3bff87ffeab261f0",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "boundaries",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-boundaries.json",
+      "receiptSha256": "5af29ec9f4091f0f5c5441611557c5e88b7e7ca1f690d061fd20ba566a53e951",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-boundaries.log",
+      "logSha256": "639c14da4d4db5655ec2449ed7c401ab077a13e2a5255019489a41ea88a20dc6",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "build",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-build.json",
+      "receiptSha256": "6c5fe7af6c2401fce28c736eb69b51b6b88d2930e63522d7fae478eec564b413",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-build.log",
+      "logSha256": "c489b333b5a6ec4f1e6f6383558a840f38176bddab3da84c586c2527ef1d1cd1",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "ui",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-ui.json",
+      "receiptSha256": "c7fecc144be4baa821c3b357d80583e49e98a76365cff598425bf006d0bc9b3e",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-ui.log",
+      "logSha256": "18ecc6c48592943cdd455c1fcacdb7ecf80d74fcebee56af29bdf6b41afcad0e",
+      "logHashMatches": true,
+      "testCounts": {
+        "suitesPassed": 21,
+        "passed": 495,
+        "failed": 0
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "types",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-types.json",
+      "receiptSha256": "11744c01325ef14440aa741d7b4f0e34137a5808dd0160142046aec6c9ba2a70",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-types.log",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "logHashMatches": true,
+      "testCounts": null,
+      "failedTests": [],
+      "finalAcceptance": false
+    },
+    {
+      "name": "protocol-tests",
+      "status": "PASSED_GATE_TASK_NOT_ACCEPTED",
+      "record": "artifacts/rust-tauri/R07/T07/t07c-protocol-tests.json",
+      "receiptSha256": "90a7740255d8a7687b6e1d136d3598b8769a95a89197737a77743e3fa0ef680c",
+      "exitCode": 0,
+      "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T07/t07c-protocol-tests.log",
+      "logSha256": "02141e8dd206dc03d337d74f845b486c01a955a97ddcbae450a2fdcb62794582",
+      "logHashMatches": true,
+      "testCounts": {
+        "passed": 41,
+        "failed": 0,
+        "ignored": 0,
+        "summaryGroups": 5
+      },
+      "failedTests": [],
+      "finalAcceptance": false
+    }
+  ],
+  "service": {
+    "exitCode": 0,
+    "groups": 50,
+    "passed": 1080,
+    "failed": 0,
+    "logSha256": "5b6bd73e3d314cc80c90a3ac410d94c6e9f6f7ce256af5779389c932555fa755",
+    "note": "固定c候选实际检查，不混入开发649/656。"
+  },
+  "adapterFailure": {
+    "testId": "r07_browser_chromium::trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock",
+    "targetPassed": 9,
+    "targetFailed": 1,
+    "failureLine": "r07_browser_chromium.rs:218 helper Result::unwrap",
+    "errorCode": "browser_closed",
+    "effectUnknown": true,
+    "logSha256": "bcfa954bcca461a075d13dba3a5b8e1d2e3171d7d9f9ebeaeda7a46400cb0a3d",
+    "cause": "原日志不能识别具体失败CDP命令；暂无闭环根因，不假称必然modal死锁。",
+    "browserSourceComparison": {
+      "against": "t07b",
+      "files": 14,
+      "allManifestEntriesEqual": true,
+      "paths": [
+        "rust/crates/lingxi-adapters/src/browser/cdp.rs",
+        "rust/crates/lingxi-adapters/src/browser/host.rs",
+        "rust/crates/lingxi-adapters/src/browser/launcher.rs",
+        "rust/crates/lingxi-adapters/src/browser/managed_files.rs",
+        "rust/crates/lingxi-adapters/src/browser/manual_capture.rs",
+        "rust/crates/lingxi-adapters/src/browser/mod.rs",
+        "rust/crates/lingxi-adapters/src/browser/ops.rs",
+        "rust/crates/lingxi-adapters/src/browser/pdf.rs",
+        "rust/crates/lingxi-adapters/src/browser/pdf_lifecycle_tests.rs",
+        "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+        "rust/crates/lingxi-adapters/src/browser/snapshot.js",
+        "rust/crates/lingxi-adapters/src/browser/startup_tests.rs",
+        "rust/crates/lingxi-adapters/src/browser/unavailable.rs",
+        "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs"
+      ]
+    }
+  },
+  "diagnostics": [
+    {
+      "record": "artifacts/rust-tauri/R07/T07/t07c-popup-diagnosis.json",
+      "receiptSha256": "439938d8825d053cd1012fca068b90db31b0cbf5ffbf1da1faba105ffb6d6998",
+      "logSha256": "45effc938382c469776ab8c38c8be7ef10ae028b24ab806d359a705459ef8395",
+      "exitCode": 0,
+      "sameCandidateSource": true,
+      "originalPopupCaseIterations": 10,
+      "allIterationExitsZero": true,
+      "binarySha256Before": "f8b20807a4615578cd7e16210ee17a23d723606efb1fa23a85c6413e485f7ab5",
+      "binarySha256After": "f8b20807a4615578cd7e16210ee17a23d723606efb1fa23a85c6413e485f7ab5",
+      "status": "NOT_REPRODUCED_DIAGNOSTIC_ONLY_ORIGINAL_FAILURE_RETAINED"
+    },
+    {
+      "record": "artifacts/rust-tauri/R07/T07/browser-close-probe/result.json",
+      "recordSha256": "40ef25969b9aa4fb8be612f6924c994a5742e007e244ea01cd871f5fdd918138",
+      "status": "OBSERVED",
+      "version": "Chrome/155.0.8059.82",
+      "checks": [
+        {
+          "round": 0,
+          "normal_history_seconds": 0.0012278340000193566,
+          "normal_history_entries": 2,
+          "alert_open_event_observed": true,
+          "history_responded_within_2_2_seconds_before_accept": true,
+          "evaluate_responded_before_accept": false,
+          "history_responded_after_accept": true,
+          "evaluate_result_after_accept": {
+            "result": {
+              "type": "string",
+              "value": "done"
+            }
+          },
+          "targets_count_during_alert": 5
+        },
+        {
+          "round": 1,
+          "normal_history_seconds": 0.0005801669976790436,
+          "normal_history_entries": 2,
+          "alert_open_event_observed": true,
+          "history_responded_within_2_2_seconds_before_accept": true,
+          "evaluate_responded_before_accept": false,
+          "history_responded_after_accept": true,
+          "evaluate_result_after_accept": {
+            "result": {
+              "type": "string",
+              "value": "done"
+            }
+          },
+          "targets_count_during_alert": 5
+        }
+      ],
+      "conclusion": "两轮真实Chrome155 pipe在alert期间getNavigationHistory均在2.2秒内响应，排除必然modal死锁；normal_history_seconds约0.58–1.23ms是正常页面数值，不混成alert响应延迟。"
+    },
+    {
+      "record": "artifacts/rust-tauri/R07/T07/browser-close-probe/result.json.attempt1",
+      "recordSha256": "ba3d04bff98117a8261b6cd442477a219828af4df14f0cc0ee1b91a6a6145196",
+      "status": "FAILED",
+      "error": "TimeoutError('CDP id 2')",
+      "conclusion": "初次独立探针CDP id2超时、checks为空；原失败保留，不当候选popup复现或通过。"
+    }
+  ],
+  "manualBrowserChecks": [
+    {
+      "testId": "same_page_native_human_takeover_records_only_owned_target",
+      "status": "NOT_RUN_ON_T07C",
+      "historicalEvidenceRetained": true
+    },
+    {
+      "testId": "externally_restored_suspended_window_is_never_reaped_or_evicted",
+      "status": "NOT_RUN_ON_T07C",
+      "historicalEvidenceRetained": true
+    }
+  ],
+  "leafDisposition": {
+    "currentT07Leaves": 65,
+    "currentT07Status": "NOT_RUN",
+    "inheritedT03Leaves": 22,
+    "inheritedStatus": "PASS_LOCAL_T03",
+    "A14ImportExport": "T08正式导入联验保留。"
+  },
+  "next": "11核心门禁已全部结束，10项0、adapter101；保持当前冻结源码，待错误保真取证方案/进一步定位，不先写T07最终通过。",
+  "retain": "b和c原失败及诊断失败全保留，不改源/原回执，不提交推送。",
+  "uiBinding": {
+    "record": "artifacts/rust-tauri/R07/T07/t07c-ui-binary-binding.json",
+    "receiptSha256": "c3941856e2d8f03382acf0181980553fc80895a831b69d96e4a0162eb58c49b6",
+    "binarySha256": "915c392e1433d74a9351540e7bb0dbde0832c2ae293b6120b3d57b590e369f7b",
+    "beforeAfterMatch": true,
+    "buildReceiptHashMatches": true,
+    "uiReceiptHashMatches": true,
+    "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+    "testCounts": {
+      "suitesPassed": 21,
+      "passed": 495,
+      "failed": 0
+    }
+  },
+  "updatedAt": "2026-10-18T03:31:33.187958+00:00"
+}

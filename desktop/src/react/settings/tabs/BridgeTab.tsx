@@ -16,6 +16,7 @@ import { SettingsRow } from '../components/SettingsRow';
 import { Toggle } from '@/ui';
 import { useSettingsStore } from '../store';
 import styles from '../Settings.module.css';
+import { bridgeConnectionKey } from '../../services/bridge-response';
 
 function pendingSecret(draft: BridgeSecretDraft) {
   const value = draft.value.trim();
@@ -46,6 +47,11 @@ function storedSecretPlaceholder(draft: BridgeSecretDraft) {
 }
 
 export function BridgeTab() {
+  const connectionKey = useSettingsStore(state => bridgeConnectionKey(state));
+  return <BridgeSettings key={connectionKey} />;
+}
+
+function BridgeSettings() {
   const b = useBridgeState();
   const snapshotBridge = useSettingsStore(s => s.settingsSnapshot.data?.preferences?.bridge);
   // 注意：不能用 `|| {}` 兜底——空对象会让 Toggle 的 `!!status?.enabled` 显示成"假关"。
@@ -296,6 +302,7 @@ export function BridgeTab() {
 
   return (
     <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="bridge">
+      {b.statusError && <div role="alert">{b.statusError}</div>}
       <SettingsSection title={t('settings.bridge.globalSettings')}>
         <SettingsRow
           label={t('settings.bridge.permissionMode')}

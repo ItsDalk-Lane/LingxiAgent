@@ -121,7 +121,12 @@ impl Fixture {
                         entered.send(()).unwrap();
                         release.await.unwrap();
                     }
-                    let content = if request["model"] == "chat-model" {
+                    // dream 五阶段按 instruction 的 memory.dream.* 标记识别：
+                    // memory 槽缺失经 chat 回退时模型身份是 chat-model，仍须
+                    // 给出 dream 形状应答（γ 修复 B 前模型身份即槽位）。
+                    let content = if instruction.contains("memory.dream.") {
+                        provider_answer(&instruction, &payload).to_string()
+                    } else if request["model"] == "chat-model" {
                         "实际消费后的模型回复".to_string()
                     } else {
                         provider_answer(&instruction, &payload).to_string()
@@ -138,6 +143,11 @@ impl Fixture {
         });
         let mut plane_json = json!({"providers":{"persona-stub":{"protocol":"openai-completions","endpoint":format!("http://{stub_addr}/v1"),"auth":{"kind":"apiKey","apiKey":"synthetic-persona-key"}}},"models":{"chat":{"provider":"persona-stub","model":"chat-model","capabilities":{"tools":true},"compat":{"contextWindow":200000}},"memory":{"provider":"persona-stub","model":"memory-model","compat":{"contextWindow":200000}}}});
         if tag == "unconfigured" {
+            // chat 与 memory 双缺：现役回退链尽头（auxiliary-slots.ts 的
+            // memory fallback=chat 也无可回退）→ dream_unavailable。
+            plane_json["models"] = json!({});
+        } else if tag == "fallback" {
+            // memory 槽缺失、chat 在：现役回退臂（dream 经 chat 模型完成）。
             plane_json["models"]
                 .as_object_mut()
                 .unwrap()
@@ -615,6 +625,32 @@ async fn configured_refusals_disabled_and_unconfigured_are_real() {
     assert!(fx.requests.lock().unwrap().is_empty());
     fx.finish().await;
 }
+// γ 修复 B：现役 memory 槽 fallback=chat（auxiliary-slots.ts:92-97）——
+// 槽未配置但 chat 在时 dream 经 chat 模型完成，served-by 如实记 chat。
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn memory_slot_unconfigured_falls_back_to_chat() {
+    let fx = Fixture::start("fallback").await;
+    seed(&fx, "agentA", "- 用户喜欢音乐");
+    assert_eq!(
+        fx.request(
+            "POST",
+            "/lingxi/v1/memories/dream/runs?agentId=agentA",
+            json!({})
+        )
+        .await
+        .0,
+        202
+    );
+    let result = wait_result(&fx, "agentA").await;
+    assert_eq!(result["status"], "succeeded", "{result}");
+    assert_eq!(result["lastRun"]["model"], "chat-model");
+    {
+        let requests = fx.requests.lock().unwrap();
+        assert!(!requests.is_empty());
+        assert!(requests.iter().all(|r| r["model"] == "chat-model"));
+    }
+    fx.finish().await;
+}
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn busy_is_same_agent_and_other_agent_can_finish() {
     let fx = Fixture::start("busy").await;
@@ -973,7 +1009,11 @@ async fn real_partial_disk_failure_rolls_back_and_recovery_is_explicit() {
     fx.finish().await;
 }
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-async fn mixed_config_failure_retains_earlier_global_write_and_agent_toggle_state() {
+async fn mixed_config_failure_writes_nothing_and_retains_agent_toggle_state() {
+    // 契约更新（R07 回归23）：agent_config_readback 已改为「所有纯校验先于
+    // 第一笔写入」——损坏补丁（无效 yuan）使整个 PUT 400，且不得留下任何
+    // 半笔写入：全局 locale 不落盘，助手配置原样，运行状态不受影响。
+    // 旧语义（全局部分先落、助手部分后败）随该有意重排序作废。
     let fx = Fixture::start("mixed").await;
     let before = std::fs::read(fx.home.join("agents/agentA/config.yaml")).unwrap();
     let result=fx.request("PUT","/lingxi/v1/agents/agentA/config",json!({"locale":"ja","agent":{"yuan":"missing-invalid-yuan"},"memory":{"enabled":false}})).await;
@@ -982,16 +1022,20 @@ async fn mixed_config_failure_retains_earlier_global_write_and_agent_toggle_stat
         std::fs::read(fx.home.join("agents/agentA/config.yaml")).unwrap(),
         before
     );
-    let prefs: Value = serde_json::from_str(
-        &std::fs::read_to_string(fx.home.join("user/preferences.json")).unwrap(),
-    )
-    .unwrap();
-    assert_eq!(prefs["locale"], "ja");
+    let prefs_path = fx.home.join("user/preferences.json");
+    if prefs_path.exists() {
+        let prefs: Value =
+            serde_json::from_str(&std::fs::read_to_string(&prefs_path).unwrap()).unwrap();
+        assert_ne!(
+            prefs["locale"], "ja",
+            "损坏补丁不得留下全局半笔写入（先校验后写入）"
+        );
+    }
     let read = fx
         .request("GET", "/lingxi/v1/agents/agentA/config", Value::Null)
         .await;
     assert_eq!(read.1["memory"]["enabled"], true);
-    assert_eq!(read.1["locale"], "ja");
+    assert_ne!(read.1["locale"], "ja");
     let status = wait_result(&fx, "agentA").await;
     assert_eq!(status["tickerPaused"], false);
     fx.finish().await;

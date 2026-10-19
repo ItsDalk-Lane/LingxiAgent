@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../stores';
+import { resolveServerConnection } from '../services/server-connection';
 import { usePanel } from '../hooks/use-panel';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
@@ -138,13 +139,21 @@ export function SkillsPanel() {
 
   const [selectedTabId, setSelectedTabId] = useState<string>(ALL_SKILLS_TAB);
   const [allViewAgentId, setAllViewAgentId] = useState<string | null>(firstUsableAgentId(agents, currentAgentId));
-  const [skillsList, setSkillsList] = useState<SkillInfo[]>([]);
-  const [skillBundles, setSkillBundles] = useState<SkillBundleInfo[]>([]);
+  const [storedSkills, setSkillsList] = useState<SkillInfo[]>([]);
+  const [storedBundles, setSkillBundles] = useState<SkillBundleInfo[]>([]);
   /** 全部技能视图所用助手（= 兼容技能开关写入的助手）的外部技能条目，用作显示门槛。 */
   const [allViewExternal, setAllViewExternal] = useState<SkillInfo[]>([]);
   const [loadedAgentId, setLoadedAgentId] = useState<string | null>(null);
   const [bundleExpandedByAgent, setBundleExpandedByAgent] = useState<Record<string, Record<string, boolean>>>({});
   const [loading, setLoading] = useState(false);
+  const [skillsLoadError, setSkillsLoadError] = useState(false);
+  const connectionKey = useStore(state => JSON.stringify(resolveServerConnection(state)));
+  const connectionScopeRef = useRef({ key: connectionKey, revision: 0 });
+  if (connectionScopeRef.current.key !== connectionKey) {
+    connectionScopeRef.current = { key: connectionKey, revision: connectionScopeRef.current.revision + 1 };
+  }
+  const listOwnerRef = useRef<{ scope: typeof connectionScopeRef.current; agentId: string } | null>(null);
+  const externalOwnerRef = useRef<typeof connectionScopeRef.current | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [highlight, setHighlight] = useState<HighlightState>({ skillName: null, bundleId: null });
   const [bundleDialog, setBundleDialog] = useState<BundleDialogState | null>(null);
@@ -166,14 +175,25 @@ export function SkillsPanel() {
     ? (allViewAgentId || firstUsableAgentId(agents, currentAgentId))
     : selectedTabId;
   selectedAgentIdRef.current = selectedAgentId;
+  // 读取失败保留同一连接、同一助手的旧列表；切换身份立即隐藏旧资料。
+  const ownsList = listOwnerRef.current?.scope === connectionScopeRef.current && listOwnerRef.current.agentId === selectedAgentId;
+  const skillsList = ownsList ? storedSkills : [];
+  const skillBundles = ownsList ? storedBundles : [];
 
   const loadSkillsForAgent = useCallback(async (agentId: string | null) => {
     if (!agentId) {
       setSkillsList([]);
       setSkillBundles([]);
       setLoadedAgentId(null);
+      listOwnerRef.current = null;
+      setSkillsLoadError(false);
       return;
     }
+    const requestScope = connectionScopeRef.current;
+    const isCurrent = () => requestScope === connectionScopeRef.current
+      && requestScope.key === JSON.stringify(resolveServerConnection(useStore.getState()))
+      && selectedAgentIdRef.current === agentId;
+    setSkillsLoadError(false);
     setLoading(true);
     try {
       const [skillsRes, bundlesRes] = await Promise.all([
@@ -186,16 +206,22 @@ export function SkillsPanel() {
       const bundleError = responseError(bundleData);
       if (skillError) throw new Error(skillError);
       if (bundleError) throw new Error(bundleError);
+      if (!Array.isArray(data.skills) || !Array.isArray(bundleData.bundles)) throw new Error(t('settings.skills.loadFailed'));
+      if (!isCurrent()) return;
+      listOwnerRef.current = { scope: requestScope, agentId };
       setSkillsList(skillListField(data));
       setSkillBundles(bundleListField(bundleData));
       setLoadedAgentId(agentId);
     } catch (err) {
       console.error('[skills-panel] load failed:', err);
-      addToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
+      if (isCurrent()) {
+        setSkillsLoadError(true);
+        addToast(t('settings.skills.loadFailed'), 'error');
+      }
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
-  }, [addToast, t]);
+  }, [addToast, t, connectionKey]);
 
   const { visible, close } = usePanel('skills');
 
@@ -209,14 +235,21 @@ export function SkillsPanel() {
   const loadAllViewExternal = useCallback(async (agentId: string | null) => {
     if (!agentId) return;
     const generation = ++allViewGenerationRef.current;
+    const scope = connectionScopeRef.current;
     try {
       const data = await readJsonObject(await lingxiFetch(`/api/skills?agentId=${encodeURIComponent(agentId)}&runtime=1`));
       const error = responseError(data);
       if (error) throw new Error(error);
-      if (allViewGenerationRef.current !== generation) return;
+      if (allViewGenerationRef.current !== generation || scope !== connectionScopeRef.current
+        || scope.key !== JSON.stringify(resolveServerConnection(useStore.getState()))) return;
+      externalOwnerRef.current = scope;
       setAllViewExternal(skillListField(data).filter(skill => skill.source === 'external'));
     } catch { /* 门槛加载失败时维持上次集合 */ }
-  }, []);
+  }, [connectionKey]);
+
+  useEffect(() => {
+    setAllViewExternal([]);
+  }, [connectionKey]);
 
   useEffect(() => {
     if (!visible) return;
@@ -256,6 +289,7 @@ export function SkillsPanel() {
   // 与内置技能同列表混排、不做分组；助手视图沿用同一可见集合，仅启停状态取当前助手。
   const externalSkillRows = useMemo(() => {
     const byName = new Map(skillsList.map(skill => [skill.name, skill]));
+    if (externalOwnerRef.current !== connectionScopeRef.current) return [];
     return allViewExternal
       .filter(skill => skill.enabled)
       .map(skill => byName.get(skill.name) ?? skill);
@@ -702,12 +736,13 @@ export function SkillsPanel() {
               </>
             ) : null}
 
+            {skillsLoadError && <div role="alert">{t('settings.skills.loadFailed')}</div>}
             {shouldShowInitialLoading ? (
               <div className={styles.empty}>{t('status.loading')}</div>
             ) : (
               <>
                 {treeSkills.length === 0 && skillBundles.length === 0 ? (
-                  <div className={styles.empty}>{t('settings.skills.noUser')}</div>
+                  skillsLoadError ? null : <div className={styles.empty}>{t('settings.skills.noUser')}</div>
                 ) : (
                   <SkillBundleTree
                     mode={canManage ? 'manage' : 'agent'}

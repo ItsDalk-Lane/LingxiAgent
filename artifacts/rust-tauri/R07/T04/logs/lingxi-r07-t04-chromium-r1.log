@@ -1,0 +1,66 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+warning: unused import: `serde_json::json`
+ --> crates/lingxi-adapters/tests/r07_browser_chromium.rs:9:5
+  |
+9 | use serde_json::json;
+  |     ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-adapters` (test "r07_browser_chromium") generated 1 warning (run `cargo fix --test "r07_browser_chromium" -p lingxi-adapters` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.71s
+     Running tests/r07_browser_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69)
+
+running 6 tests
+test downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid ... FAILED
+test independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup ... FAILED
+test pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata ... FAILED
+test same_real_target_input_snapshot_generations_and_empty_workspace ... FAILED
+test scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches ... FAILED
+test trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock ... FAILED
+
+failures:
+
+---- downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid stdout ----
+
+thread 'downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid' (754665) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:177:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Target.createTarget", effect_unknown: false }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup stdout ----
+
+thread 'independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup' (755012) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:177:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Target.createTarget", effect_unknown: false }
+
+---- pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata stdout ----
+
+thread 'pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata' (755133) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:177:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Target.createTarget", effect_unknown: false }
+
+---- same_real_target_input_snapshot_generations_and_empty_workspace stdout ----
+
+thread 'same_real_target_input_snapshot_generations_and_empty_workspace' (755241) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:177:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Target.createTarget", effect_unknown: false }
+
+---- scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches stdout ----
+
+thread 'scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches' (755349) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:177:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Target.createTarget", effect_unknown: false }
+
+---- trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock stdout ----
+
+thread 'trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock' (755453) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:177:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_remote", message: "浏览器命令失败: Target.createTarget", effect_unknown: false }
+
+
+failures:
+    downloads_are_actual_owned_bytes_and_ack_removes_only_confirmed_guid
+    independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup
+    pool_lru_is_bounded_and_idle_reap_keeps_cold_metadata
+    same_real_target_input_snapshot_generations_and_empty_workspace
+    scope_revoke_interrupts_real_pending_page_and_stale_node_never_launches
+    trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock
+
+test result: FAILED. 0 passed; 6 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.77s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_browser_chromium`

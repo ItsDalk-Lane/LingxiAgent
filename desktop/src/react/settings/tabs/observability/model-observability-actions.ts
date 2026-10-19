@@ -18,6 +18,7 @@ import {
   buildConnectionUrl,
   requireServerConnection,
 } from '../../../services/server-connection';
+import { rustObservabilityRoute } from '../../../services/rust-observability';
 import { normalizeSessionRouteError } from '../../../../../../shared/error-user-messages.ts';
 import type {
   ModelObservabilityAggregateResult,
@@ -134,7 +135,7 @@ export async function observabilityRequest(
 
   let res: Response;
   try {
-    res = await fetch(buildConnectionUrl(connection, path), {
+    res = await fetch(buildConnectionUrl(connection, rustObservabilityRoute(connection, path)), {
       method: opts.method ?? 'GET',
       headers,
       body: opts.body === undefined ? undefined : JSON.stringify(opts.body),

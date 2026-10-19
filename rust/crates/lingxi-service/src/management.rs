@@ -185,6 +185,24 @@ pub(crate) struct ManagementState {
 }
 
 impl ManagementState {
+    pub(crate) fn record_model_change(
+        &self,
+        action: &str,
+        generation: u64,
+        now: u64,
+    ) -> Result<(), String> {
+        self.change(|next| {
+            audit_with_metadata(
+                next,
+                action,
+                "model-plane",
+                now,
+                serde_json::json!({"generation":generation}),
+            );
+            Ok(())
+        })
+        .map_err(|_| "模型已生效，但审计收据保存未确认".to_string())
+    }
     pub(crate) fn open(layout: &DataRootLayout, config: &ServiceConfig) -> Result<Self, String> {
         let path = layout.runtime_dir.join(MANAGER_FILE);
         let mut record = match read_management_bytes(&path) {
@@ -633,101 +651,32 @@ async fn reload_models(
     if principal.kind != PrincipalKind::LocalUser {
         return EndpointError::local_only().into_response();
     }
-    let (source, gateway) = match (state.model_plane_source(), state.model_gateway()) {
-        (Some(source), Some(gateway)) => (source.clone(), gateway.clone()),
-        _ => {
-            return EndpointError::not_found()
-                .with_reason("model_plane_unconfigured")
-                .with_cause("models.unconfigured")
+    let Some(source) = state.model_configuration().source() else {
+        return EndpointError::not_found()
+            .with_reason("model_plane_unconfigured")
+            .with_cause("models.unconfigured")
+            .into_response();
+    };
+    match state.model_configuration().reload(&principal).await {
+        Ok(report) => {
+            state
+                .app_events()
+                .publish("models-changed", serde_json::json!({"agentId":null}));
+            Json(serde_json::json!({"ok":true,"generation":report.generation,"result":report}))
                 .into_response()
         }
-    };
-    let plane = match &source {
-        crate::config::ModelPlaneSource::EmbeddedInConfigFile { path } => {
-            match crate::config::read_service_config(path) {
-                Ok(file) => match file.model_plane {
-                    Some(plane) => plane,
-                    None => {
-                        return reload_invalid(
-                            &source,
-                            "the config file no longer carries providers/models sections \
-                             (removing the model plane requires a restart)",
-                        );
-                    }
-                },
-                Err(err) => return reload_invalid(&source, &err.to_string()),
+        Err(error) if error.status == 409 && !error.report.applied => {
+            reload_invalid(&source, &error.message)
+        }
+        Err(error) => {
+            if error.report.applied {
+                state
+                    .app_events()
+                    .publish("models-changed", serde_json::json!({"agentId":null}));
             }
-        }
-        crate::config::ModelPlaneSource::ModelsFile { path } => {
-            let raw = match std::fs::read_to_string(path) {
-                Ok(raw) => raw,
-                Err(err) => {
-                    return reload_invalid(
-                        &source,
-                        &format!("cannot read {}: {err}", path.display()),
-                    );
-                }
-            };
-            match lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(&raw) {
-                Ok(plane) => plane,
-                Err(err) => return reload_invalid(&source, &err.to_string()),
-            }
-        }
-    };
-    // R05 RR1 F02: the credential service re-seeds from the SAME freshly
-    // validated plane FIRST, stamped with the configuration generation
-    // this reload is ABOUT to publish (the number `gateway.reload` below
-    // installs — `upcoming_generation` is that single source). With the
-    // credential re-seed leading the gateway swap there is no window in
-    // which a NEW-generation route can meet OLD-generation material (the
-    // gateway has not published the new routes yet), and the re-seeded
-    // cells' epoch refuses to hand NEW material to OLD-generation routes
-    // — the reload can never mix credential material across generations.
-    // Swapping the two reloads alone would NOT close either window; the
-    // generation binding is the fix.
-    let next_generation = gateway.upcoming_generation();
-    if let Some(credentials) = state.credential_service() {
-        credentials.reload(&plane, next_generation).await;
-    }
-    let generation = gateway.reload(plane.clone());
-    // R05 RR1 F14: the freshly validated plane's network policy publishes
-    // on the SHARED policy plane atomically with the route swap — every
-    // model-plane consumer's NEXT request observes the new proxy / NO_PROXY
-    // / explicit-CA generation (in-flight requests keep the client they
-    // started with; system mode re-snapshots the exported proxy
-    // environment here, once per reload).
-    if let Some(network_plane) = state.network_plane() {
-        network_plane
-            .apply(lingxi_adapters::models::network::NetworkPolicy::from_config(&plane.network));
-    }
-    // R05-T06: the operation plane's egress allowlist follows the CURRENT
-    // provider endpoints (a same-origin media-product destination that a
-    // reload moved is no longer same-origin — the swap is atomic with the
-    // gateway's).
-    if let Some(operations) = state.operations() {
-        let endpoints: Vec<String> = gateway
-            .provider_endpoints()
-            .into_iter()
-            .map(|(_, endpoint)| endpoint)
-            .collect();
-        if let Err(err) = operations.refresh_egress_origins(&endpoints) {
-            return reload_invalid(&source, &err.to_string());
+            error.into_response()
         }
     }
-    let now = state.clock.now_unix_ms();
-    if let Err(err) = state.management.change(|next| {
-        audit_with_metadata(
-            next,
-            "models.reload",
-            "model-plane",
-            now,
-            serde_json::json!({"generation": generation}),
-        );
-        Ok(())
-    }) {
-        return err.into_response();
-    }
-    Json(serde_json::json!({"ok": true, "generation": generation})).into_response()
 }
 
 /// The material-free credential status of every configured provider
@@ -768,6 +717,10 @@ async fn revoke_model_credential(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials.revoke(&provider).await {
         Ok(()) => {
             let now = state.clock.now_unix_ms();
@@ -903,6 +856,10 @@ async fn start_model_login(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     let started = credentials
         .oauth_start(&principal.principal_id, &provider)
         .await;
@@ -958,6 +915,10 @@ async fn complete_model_login(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials
         .oauth_complete_code(
             &principal.principal_id,
@@ -1005,6 +966,10 @@ async fn poll_model_login(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials
         .oauth_poll_device(&principal.principal_id, &provider)
         .await
@@ -1034,6 +999,10 @@ async fn logout_model_credential(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials.logout(&provider).await {
         Ok(listing) => {
             let now = state.clock.now_unix_ms();
@@ -1083,6 +1052,10 @@ async fn list_oauth_models(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials.oauth_models(&provider).await {
         Ok(listing) => Json(serde_json::json!({
             "ok": true,
@@ -1134,6 +1107,10 @@ async fn add_oauth_model(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials
         .oauth_add_model(&provider, &input.model_id)
         .await
@@ -1193,6 +1170,10 @@ async fn remove_oauth_model(
             .with_cause("models.unconfigured")
             .into_response();
     };
+    let provider = state
+        .model_configuration()
+        .canonical_provider_id(&provider)
+        .await;
     match credentials.oauth_remove_model(&provider, &model_id).await {
         Ok(listing) => {
             let now = state.clock.now_unix_ms();
@@ -1286,6 +1267,7 @@ async fn server_identity(
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ThinkingQuery {
+    session_id: Option<String>,
     session_path: Option<String>,
     pending_new_session: Option<String>,
 }
@@ -1293,8 +1275,24 @@ struct ThinkingQuery {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct ThinkingInput {
+    session_id: Option<String>,
     session_path: Option<String>,
     level: String,
+}
+
+// 正式会话编号与兼容入口必须指向同一对象，不能忽略编号后误写新会话默认。
+fn thinking_target<'a>(
+    id: Option<&'a str>,
+    path: Option<&'a str>,
+) -> Result<Option<&'a str>, EndpointError> {
+    let id = id.filter(|value| !value.is_empty());
+    let path = path.filter(|value| !value.is_empty());
+    if id.is_some() && path.is_some() && id != path {
+        return Err(EndpointError::invalid_message(
+            "conflicting sessionId and sessionPath",
+        ));
+    }
+    Ok(id.or(path))
 }
 
 fn canonical_level(level: &str) -> Option<&'static str> {
@@ -1346,10 +1344,14 @@ async fn read_thinking_level(
     Extension(principal): Extension<Principal>,
     Query(query): Query<ThinkingQuery>,
 ) -> Response {
+    let target = match thinking_target(query.session_id.as_deref(), query.session_path.as_deref()) {
+        Ok(value) => value,
+        Err(error) => return error.into_response(),
+    };
     let session = if query.pending_new_session.as_deref() == Some("1") {
         None
     } else {
-        query.session_path.as_deref().filter(|v| !v.is_empty())
+        target
     };
     if let Some(id) = session {
         if let Err(e) = check_session(&state, &principal, id).await {
@@ -1381,7 +1383,11 @@ async fn write_thinking_level(
     let Some(level) = canonical_level(&input.level) else {
         return EndpointError::invalid_message("invalid thinking level").into_response();
     };
-    let session = input.session_path.as_deref().filter(|v| !v.is_empty());
+    let session = match thinking_target(input.session_id.as_deref(), input.session_path.as_deref())
+    {
+        Ok(value) => value,
+        Err(error) => return error.into_response(),
+    };
     if let Some(id) = session {
         if let Err(e) = check_session(&state, &principal, id).await {
             if e.status == StatusCode::NOT_FOUND {
@@ -2075,6 +2081,7 @@ async fn issue_credential(
     } else {
         &[
             "chat",
+            "sessions.write",
             "resources.read",
             "files.read",
             "files.write",

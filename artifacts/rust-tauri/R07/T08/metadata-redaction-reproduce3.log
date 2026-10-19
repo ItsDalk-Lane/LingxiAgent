@@ -1,0 +1,18 @@
+{"shutdown":{"code":2,"signal":null},"binarySha256After":"e3c682aa7c5cbc6259fb5dfe01087394da3283a8db7021b9e94fb87abadf2cc4","binaryUnchanged":true,"stderrSha256":"d6fba9ec473a6c55084bb6a650472a725abd5abff7a8c9b4922596b1eca33867"}
+file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/evidence-tools/model_metadata_probe.mjs:39
+    child.once('exit', () => { clearTimeout(timer); reject(new Error('隔离服务提前退出：' + stderr)); });
+                                                           ^
+
+Error: 隔离服务提前退出：LINGXI_DATA_EPOCH_BLOCKED reason=unstamped-home-with-data
+[data-epoch] The data safety gate refused startup (unstamped-home-with-data): unrecognized existing data found: agents; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision
+[data-epoch] 数据安全闸拒绝启动（unstamped-home-with-data）：unrecognized existing data found: agents; this data home carries no epoch stamp, and adopting existing data is an explicit cutover action (R08), never an automatic startup decision
+[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
+
+2026-10-18T08:29:39.866882Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="unstamped-home-with-data" [token]
+
+    at ChildProcess.<anonymous> (file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/evidence-tools/model_metadata_probe.mjs:39:60)
+    at Object.onceWrapper (node:events:631:26)
+    at ChildProcess.emit (node:events:521:24)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12)
+
+Node.js v24.16.0

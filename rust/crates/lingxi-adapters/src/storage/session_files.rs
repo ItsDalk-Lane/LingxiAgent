@@ -1500,6 +1500,25 @@ pub fn reference_identities(value: &serde_json::Value) -> Vec<String> {
     ids
 }
 
+/// 模型参数只表示意图，不是附件。原始档案不改；引用索引和分叉复用这一裁剪。
+pub(crate) fn model_history_reference_value(value: &serde_json::Value) -> serde_json::Value {
+    let mut references = value.clone();
+    if let Some(items) = references
+        .pointer_mut("/payload/items")
+        .and_then(serde_json::Value::as_array_mut)
+    {
+        for item in items {
+            if item["kind"] != "assistant" {
+                continue;
+            }
+            if let Some(object) = item.as_object_mut() {
+                object.remove("calls");
+            }
+        }
+    }
+    references
+}
+
 fn native_reference_identities(value: &serde_json::Value) -> Vec<String> {
     let mut ids = Vec::new();
     let mut seen = std::collections::HashSet::new();
@@ -1517,8 +1536,71 @@ pub(crate) fn sync_message_refs(
 ) -> Result<(), StorageError> {
     // 只有真实已存模型档案、且来源Run仍属于同一用户，才能保存原生Mount来源。
     // 普通正文/附件不能靠一个resource字段绕过原有会话文件归属检查。
-    let native=conn.query_row("SELECT EXISTS(SELECT 1 FROM messages m JOIN sessions s ON s.session_id=m.session_id JOIN runs r ON r.run_id=json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.sourceRun') WHERE m.session_id=?1 AND m.message_id=?2 AND m.role='model_history' AND m.entry_type='lingxi-model-exchange-v1' AND json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.schema')='lingxi-model-exchange-v1' AND json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.owner')=s.owner_user_id AND r.owner_subject=s.owner_user_id AND r.session_id=json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.sourceSession') AND (json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.payload.projection.target') IN ('tool:first-party:file','tool:first-party:materialize') OR json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.payload.projection.target') IS NULL))",rusqlite::params![session_id,message_id],|row|row.get::<_,bool>(0)).map_err(map_err)?;
-    sync_refs_inner(conn, session_id, message_id, content, now, native)
+    let archive=conn.query_row("SELECT EXISTS(SELECT 1 FROM messages m JOIN sessions s ON s.session_id=m.session_id JOIN runs r ON r.run_id=json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.sourceRun') WHERE m.session_id=?1 AND m.message_id=?2 AND m.role='model_history' AND m.entry_type='lingxi-model-exchange-v1' AND json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.schema')='lingxi-model-exchange-v1' AND json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.owner')=s.owner_user_id AND r.owner_subject=s.owner_user_id AND r.session_id=json_extract(CASE WHEN json_valid(m.content_json) THEN m.content_json ELSE '{}' END,'$.sourceSession'))",rusqlite::params![session_id,message_id],|row|row.get::<_,bool>(0)).map_err(map_err)?;
+    if archive {
+        let value: serde_json::Value = serde_json::from_str(content)
+            .map_err(|error| invalid(format!("model history reference JSON: {error}")))?;
+        let native = value
+            .pointer("/payload/projection/target")
+            .and_then(serde_json::Value::as_str)
+            .is_none_or(|target| {
+                matches!(
+                    target,
+                    "tool:first-party:file" | "tool:first-party:materialize"
+                )
+            });
+        let references = model_history_reference_value(&value).to_string();
+        return sync_refs_inner(conn, session_id, message_id, &references, now, native, true);
+    }
+    // 正式最终答复也可能回显未知编号；只有实际Run的固定终稿行享有此分类。
+    let model_reply=conn.query_row("SELECT EXISTS(SELECT 1 FROM messages m JOIN sessions s ON s.session_id=m.session_id JOIN runs r ON r.run_id=m.run_id WHERE m.session_id=?1 AND m.message_id=?2 AND m.message_id=r.run_id||'-final' AND m.role='assistant' AND m.entry_type='message' AND r.owner_subject=s.owner_user_id)",rusqlite::params![session_id,message_id],|row|row.get::<_,bool>(0)).map_err(map_err)?;
+    sync_refs_inner(
+        conn,
+        session_id,
+        message_id,
+        content,
+        now,
+        false,
+        model_reply,
+    )
+}
+
+/// 分叉副本不持有来源Run外键；分类必须读取实际来源行，不能靠正文中的role自报。
+pub(crate) fn sync_forked_message_refs(
+    conn: &rusqlite::Connection,
+    source_session: &str,
+    target_session: &str,
+    message_id: &str,
+    content: &str,
+    now: u64,
+) -> Result<(), StorageError> {
+    let facts=conn.query_row("SELECT m.role,m.entry_type FROM messages m JOIN sessions s ON s.session_id=m.session_id JOIN sessions t ON t.session_id=?2 WHERE m.session_id=?1 AND m.message_id=?3 AND s.owner_user_id=t.owner_user_id",rusqlite::params![source_session,target_session,message_id],|row|Ok((row.get::<_,String>(0)?,row.get::<_,String>(1)?))).optional().map_err(map_err)?
+        .ok_or_else(|| invalid("fork_reference_source_not_owned".into()))?;
+    let archive = facts.0 == "model_history" && facts.1 == "lingxi-model-exchange-v1";
+    let reply = facts.0 == "assistant" && facts.1 == "message";
+    if archive {
+        let value: serde_json::Value = serde_json::from_str(content)
+            .map_err(|error| invalid(format!("fork history reference JSON: {error}")))?;
+        let native = value
+            .pointer("/payload/projection/target")
+            .and_then(serde_json::Value::as_str)
+            .is_none_or(|target| {
+                matches!(
+                    target,
+                    "tool:first-party:file" | "tool:first-party:materialize"
+                )
+            });
+        return sync_refs_inner(
+            conn,
+            target_session,
+            message_id,
+            &model_history_reference_value(&value).to_string(),
+            now,
+            native,
+            true,
+        );
+    }
+    sync_refs_inner(conn, target_session, message_id, content, now, false, reply)
 }
 
 /// 仅由真实ToolCallCompleted提交入口调用；不是正文可选标记。
@@ -1532,7 +1614,7 @@ pub(crate) fn sync_native_tool_result_refs(
     tool_call_id: &str,
 ) -> Result<(), StorageError> {
     let native=conn.query_row("SELECT EXISTS(SELECT 1 FROM key_events WHERE session_id=?1 AND run_id=?2 AND event_type='tool_call_started' AND json_extract(payload_json,'$.toolCall.toolCallId')=?3 AND json_extract(payload_json,'$.toolCall.target') IN ('tool:first-party:file','tool:first-party:materialize'))",rusqlite::params![session_id,run_id,tool_call_id],|row|row.get::<_,bool>(0)).map_err(map_err)?;
-    sync_refs_inner(conn, session_id, message_id, content, now, native)
+    sync_refs_inner(conn, session_id, message_id, content, now, native, true)
 }
 fn sync_refs_inner(
     conn: &rusqlite::Connection,
@@ -1541,6 +1623,7 @@ fn sync_refs_inner(
     content: &str,
     now: u64,
     native: bool,
+    model_candidates: bool,
 ) -> Result<(), StorageError> {
     let value: serde_json::Value = match serde_json::from_str(content) {
         Ok(value) => value,
@@ -1582,6 +1665,10 @@ fn sync_refs_inner(
                 || r.legacy_file_paths.contains(&identity)
         });
         let Some(file) = file else {
+            // 模型文字和工具回显不是附件授权；未归属的候选只留在原始正文，不登记引用。
+            if model_candidates {
+                continue;
+            }
             return Err(invalid(format!(
                 "session_file_reference_not_owned:{identity}"
             )));
@@ -1589,6 +1676,9 @@ fn sync_refs_inner(
         if file.status != SessionFileStatus::Available
             || !std::path::Path::new(&file.real_path).exists()
         {
+            if model_candidates {
+                continue;
+            }
             return Err(invalid(format!(
                 "session_file_reference_missing:{}",
                 file.file_id
@@ -1895,12 +1985,51 @@ pub async fn register_owned_blob(
     bytes: Vec<u8>,
     lease: tokio::sync::OwnedRwLockReadGuard<()>,
 ) -> Result<SessionFileRow, StorageError> {
+    register_owned_blob_inner(db, row, bytes, lease, false, None).await
+}
+
+/// Bridge 不使用导入场景的会话补行；写入字节前在同一事务确认真实活动会话仍在。
+pub async fn register_owned_bridge_blob(
+    db: &RunDatabase,
+    row: SessionFileRow,
+    bytes: Vec<u8>,
+    lease: tokio::sync::OwnedRwLockReadGuard<()>,
+) -> Result<SessionFileRow, StorageError> {
+    register_owned_blob_inner(db, row, bytes, lease, true, None).await
+}
+
+/// 媒体字节、会话文件和可见交付摘要在同一真实事务提交。
+pub async fn register_owned_media_blob(
+    db: &RunDatabase,
+    row: SessionFileRow,
+    bytes: Vec<u8>,
+    lease: tokio::sync::OwnedRwLockReadGuard<()>,
+    guard: super::media::MediaPublicationGuard,
+) -> Result<SessionFileRow, StorageError> {
+    register_owned_blob_inner(db, row, bytes, lease, true, Some(guard)).await
+}
+
+async fn register_owned_blob_inner(
+    db: &RunDatabase,
+    row: SessionFileRow,
+    bytes: Vec<u8>,
+    lease: tokio::sync::OwnedRwLockReadGuard<()>,
+    require_active_session: bool,
+    media: Option<super::media::MediaPublicationGuard>,
+) -> Result<SessionFileRow, StorageError> {
     let timeout = db.options().busy_timeout_ms;
     db.queue()
         .submit(move |conn| {
             let _lease = lease;
             let mut copies = ForkCopies::default();
             let stored = super::run_store::with_write_txn(conn, timeout, |conn| {
+                if let Some(guard)=media.as_ref(){super::media::verify_publication(conn,guard)?;}
+                if require_active_session {
+                    let active: bool = conn.query_row("SELECT EXISTS(SELECT 1 FROM sessions WHERE session_id=?1 AND lifecycle='active')",[&row.owner_session_id],|row|row.get(0)).map_err(map_err)?;
+                    if !active {
+                        return Err(invalid("bridge_blob_session_missing_or_inactive".into()));
+                    }
+                }
                 let existing = files_on_connection(conn, &row.owner_session_id)?
                     .into_iter()
                     .find(|f| f.source_key == row.source_key);
@@ -1921,6 +2050,7 @@ pub async fn register_owned_blob(
                                 file.status = SessionFileStatus::Available;
                                 file.expires_at_ms = None;
                                 file.updated_at_ms = row.updated_at_ms;
+                                if let Some(guard)=media.as_ref(){super::media::commit_publication(conn,guard,&file)?;}
                                 return Ok(file);
                             }
                         }
@@ -1928,6 +2058,7 @@ pub async fn register_owned_blob(
                             return Err(invalid("unavailable_blob_payload_still_exists".into()));
                         }
                         touch_on_connection(conn, &row.owner_session_id, row.updated_at_ms)?;
+                        if let Some(guard)=media.as_ref(){super::media::commit_publication(conn,guard,file)?;}
                         return Ok(file.clone());
                     }
                 }
@@ -1960,6 +2091,7 @@ pub async fn register_owned_blob(
                     insert_file_on_connection(conn, &row)?;
                 }
                 touch_on_connection(conn, &row.owner_session_id, row.updated_at_ms)?;
+                if let Some(guard)=media.as_ref(){super::media::commit_publication(conn,guard,&row)?;}
                 Ok(row)
             })?;
             copies.commit();

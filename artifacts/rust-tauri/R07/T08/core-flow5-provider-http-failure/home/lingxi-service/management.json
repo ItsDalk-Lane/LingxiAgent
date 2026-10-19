@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "serverId": "server_hoX5Qj5J4nAO3DowAnMe2A",
+  "studioId": "studio_Nz3I_O6ltEtg-g0eNISj0Q",
+  "account": {
+    "userId": "user_local",
+    "username": "local",
+    "displayName": "Local User",
+    "passwordSalt": null,
+    "passwordHash": null,
+    "passwordAlgorithm": null
+  },
+  "network": {
+    "mode": "loopback",
+    "listenHost": "127.0.0.1",
+    "listenPort": 0,
+    "publicBaseUrl": null
+  },
+  "webSessions": [],
+  "defaultThinkingLevel": "medium",
+  "sessionThinkingLevels": {},
+  "audit": [
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792302195815,
+      "metadata": {
+        "generation": 2
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792302195937,
+      "metadata": {
+        "generation": 3
+      }
+    }
+  ]
+}

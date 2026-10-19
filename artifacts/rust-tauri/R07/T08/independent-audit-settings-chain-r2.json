@@ -1,0 +1,12 @@
+{
+  "status": "SOURCE_GAP_CLOSED_AWAITING_REAL_REGRESSION",
+  "priorReview": "independent-audit-settings-chain-r1.json",
+  "findingId": "T08-AUDIT-CHAT-CHOICE-1",
+  "currentSource": {
+    "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+    "sha256": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001"
+  },
+  "resolution": "setting_choice Some(id)保留owned返回owner_user_id与agent_id，统一effective_choice_for_agent，None保留草稿；因此仅改thinking不会先把全局默认强写成该会话模型。",
+  "remaining": "需要真实既有助手会话thinking GET/PUT及下一Run仍用该助手默认的回归；本审阅未运行Cargo。",
+  "originalFailure": "core-flow5 wrapper Null失败仍保留，测试只按现有goal对象包装改正读取。"
+}

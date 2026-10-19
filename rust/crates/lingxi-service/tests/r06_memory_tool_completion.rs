@@ -1783,7 +1783,12 @@ async fn boot_agent_embedding_plane(
     let layout = prepare_layout(home).unwrap();
     let file = home.join("per-agent-provider-fixture.json");
     let chat = memory_chat_stub().await;
-    let providers = json!({"a":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",a.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_A"}},"b":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",b.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_B"}},"global":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",global.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_GLOBAL"}},"chat":{"protocol":"openai-completions","endpoint":format!("http://{}/v1",chat.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_CHAT"}}});
+    // 契约更新（R07 回归27）：网关显式选择现在要求模型在平面目录内
+    // （「未知目录模型即显式未配置，绝不静默回退」）；自动入册只覆盖
+    // 无 models 清单供应商的已绑定路由。助手选定模型因此必须在供应商
+    // models 清单显式声明——与现役目录的 type/operations 两种声明风格
+    // 一一对应，保持双风格覆盖。
+    let providers = json!({"a":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",a.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_A"},"models":[{"id":"model-a","operations":["embedding"]}]},"b":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",b.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_B"},"models":[{"id":"model-b","operations":["embedding"]}]},"global":{"protocol":"openai-embeddings","endpoint":format!("http://{}/v1",global.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_GLOBAL"}},"chat":{"protocol":"openai-completions","endpoint":format!("http://{}/v1",chat.addr),"auth":{"kind":"apiKey","apiKey":"SYNTHETIC_CHAT"}}});
     let mut models = if global_enabled {
         json!({"embedding":{"provider":"global","model":"global-model"}})
     } else {

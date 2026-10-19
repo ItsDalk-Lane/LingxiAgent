@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "serverId": "server_O1_23eoL6Hz8NJzzzyFEsw",
+  "studioId": "studio_wEmajGZqmgR3U_LNc2nFdA",
+  "account": {
+    "userId": "user_local",
+    "username": "local",
+    "displayName": "Local User",
+    "passwordSalt": null,
+    "passwordHash": null,
+    "passwordAlgorithm": null
+  },
+  "network": {
+    "mode": "loopback",
+    "listenHost": "127.0.0.1",
+    "listenPort": 0,
+    "publicBaseUrl": null
+  },
+  "webSessions": [],
+  "defaultThinkingLevel": "medium",
+  "sessionThinkingLevels": {},
+  "audit": [
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038438,
+      "metadata": {
+        "generation": 2
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038508,
+      "metadata": {
+        "generation": 3
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038559,
+      "metadata": {
+        "generation": 4
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038618,
+      "metadata": {
+        "generation": 5
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038671,
+      "metadata": {
+        "generation": 6
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038720,
+      "metadata": {
+        "generation": 7
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038771,
+      "metadata": {
+        "generation": 8
+      }
+    },
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792311038830,
+      "metadata": {
+        "generation": 9
+      }
+    }
+  ]
+}

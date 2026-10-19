@@ -1,0 +1,166 @@
+{
+ "schemaVersion": 1,
+ "stage": "R07",
+ "status": "IN_PROGRESS",
+ "sourceBase": "0c86675d4",
+ "startBasis": "R06由用户明确接受；保留最后实际整轮失败，不重开R06。",
+ "scope": {
+  "baseScenarios": 24,
+  "requiredSupplementalScenarios": 408,
+  "extensionBoundaries": 2
+ },
+ "tasks": [
+  {
+   "id": "R07-T01",
+   "title": "定时任务、心跳与统一调度",
+   "status": "LOCAL_VERIFIED",
+   "note": "T01本地验证已完成，T02补齐bridge_owner真实通知回执/成功后上下文及重启不重发。Windows等未验范围继续保留，不重开R06。",
+   "historicalFailuresRetained": [
+    "调度首轮600秒超时中止，已定位后台输入历史锚点并修复；后续7项通过。",
+    "原R06界面检查缺本地构建缓存，未改写为通过。"
+   ],
+   "codeFingerprint": "f33ab49b1e8b638eb19d9c3d89c2fcf3f85dee22b7326b8f2ded665e65f78479",
+   "report": "T01_REPORT.md"
+  },
+  {
+   "id": "R07-T02",
+   "title": "五平台Bridge接入",
+   "status": "LOCAL_VERIFIED",
+   "note": "五平台正式SDK与Rust真实执行/存储链、重投/重启、安全矩阵、原生效果/回执与取消、管理页面已本地验证；独立审阅问题已关闭。真实账号、非Unix能力及正式包按延期范围保留。",
+   "codeFingerprint": "de949dedc106172aab3365fb50fcc7155bd53122afb428f3cb9d32b7a9a418b9",
+   "report": "T02_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T02"
+  },
+  {
+   "id": "R07-T03",
+   "title": "频道、DM与多Agent协作",
+   "status": "LOCAL_VERIFIED",
+   "note": "频道/DM/phone与确认式跨会话协作沿真实服务链接通；最终服务627、适配器95、UI155及适用门禁通过，独立问题已关闭。22叶本地份额及A05/A06有证据；其他OS与明确未验组合继续保留。",
+   "codeFingerprint": "c450888b209b37ec02e9c19a6a1c71722551477866c3e056546b572bf3688fb4",
+   "report": "T03_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T03"
+  },
+  {
+   "id": "R07-T04",
+   "title": "生产级浏览器宿主",
+   "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+   "note": "r7同一候选19自动门禁与原生可见性通过；r7人工接管锁屏超时保留。用户解锁后A07在后续116依赖快照实际原生输入/交还补验通过，44帧及清理已归档；完整R07最终候选仍需统一回归。",
+   "codeFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+   "report": "T04_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T04",
+   "supplementalA07Fingerprint": "898c5e0ba785aa0d2b09fcffb2f0e37ad9ba972b5ce2323d13194e040af8ea8d"
+  },
+  {
+   "id": "R07-T05",
+   "title": "Office、PDF、美化和内置插件",
+   "status": "LOCAL_VERIFIED",
+   "note": "候选t05c十项门禁全通过且源码未变：office集成14、unit群16、lib492、service32组743、adapter15组244、PDF真实Chromium7、A10导入2、UI 29+177、lint(fmt+clippy+typecheck)。14叶+A09/A10本机验证；7个媒体/即梦叶运行时归T06不提前领。r07_t05_media九项失败为T06未实现面，原始证据保留；phone_runtime一项时序敏感失败已保留原始回执并三次同源码通过。真实供应商/非Unix/正式包未验。",
+   "historicalFailuresRetained": [
+    "t05a-service：actual_proactive_31_minutes 时序敏感失败一次，同源码三次通过，回执保留未改写",
+    "r07_t05_media 9/9：T06 运行时未实现的预期失败，非回归",
+    "symlink 用例首轮构造无效（unix_permissions 掩掉文件类型位）被测试如实暴露后修正为 external_attributes"
+   ],
+   "codeFingerprint": "316fb6da889c6e3605aeb778ba52958094d6f08989fae73628b20cd19a7b7676",
+   "report": "T05_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T05"
+  },
+  {
+   "id": "R07-T06",
+   "title": "媒体生成、语音与视觉桥",
+   "status": "LOCAL_VERIFIED",
+   "note": "候选t06b八项门禁全通过且清单指纹逐门禁核验不变：media-runtime 11/11、media-admin 9/9（新增视频HTTP全链+speech/video/ASR管理面扩展）、media lib unit 6/6、service 35组777/777、adapter 16组249/249、PDF真实Chromium 7/7、UI 7套件143/143、lint(fmt+clippy workspace+typecheck×3)。38叶+T05顺延7叶+A11/A12 全部 PASS_LOCAL_T06；6条语义偏差逐条冻结于 T06_MEDIA_STATUS.md。真实付费供应商/真实jimeng CLI/非macOS/正式安装包未验（未授权）。",
+   "historicalFailuresRetained": [
+    "t06a 作废候选：四门跑绿后发现视频/语音/ASR管理面缺直接HTTP覆盖，按T05 t05b先例重冻；t06a四份绿回执保留",
+    "dev-t06t13 揭露真实缺陷：静态GET路由 /lingxi/v1/media/speech/config 遮蔽参数化PUT致405；新增 put_speech_config 合并路由后 9/9（dev-t06t15）",
+    "dev-t06ui1：rust-conversation-events-http 既存fixture缺 /sessions/source/media/jobs 替身路由致1/143失败（T06较早接线暴露的预存缺口），补真实路由形状后143/143",
+    "t06b-adapter 首跑为编排错误（误列不存在目标 r07_media_store），t06b-adapter-r2 修正清单后 249/249；首跑回执保留",
+    "t06b-service 首跑 r07_phone_runtime::actual_proactive_31_minutes 复现T05已登记时序敏感失败（禁用/启用交错窗口）；phone路径30文件与t05c逐字节一致（非T06回归），孤立重跑15/15与t06b-service-r2全量777/777同源码通过；首跑回执保留",
+    "dev 轮次指纹方法学漂移（t06t11 vs t06ui1 起）已记录；候选门禁一律以 SOURCE_MANIFEST_t06b 清单重算为准"
+   ],
+   "codeFingerprint": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+   "report": "T06_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T06"
+  },
+  {
+   "id": "R07-T07",
+   "title": "工作台、文件历史与工作流能力",
+   "status": "LOCAL_FUNCTIONS_VERIFIED_GATE_FAILURES_PENDING_T12",
+   "note": "T07冻结候选C的服务50组1080项与界面21组495项通过；完整检查因真实Chromium弹窗流程失败，候选D局部复查又出现cookie设置后Resume导航失败。原始失败和现场均保留，不宣称整轮通过。独立工作台功能已验证；浏览器问题交T12继续排查，A14导入入口在T08实接实测。",
+   "report": "T07_STATUS.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T07",
+   "developmentNotes": "T07_RESUME_NOTES.md",
+   "interfaceContract": "T07_INTERFACE_CONTRACT.md"
+  },
+  {
+   "id": "R07-T08",
+   "title": "配置、管理与导入导出接口",
+   "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+   "note": "h同一755源完整20门全部0，服务948/948、UI718/718，独立核验通过，接受T08本地实现与适用门禁份额。adapter13原生/Chromium项本h未执行；17个UI具体分支/4类窄负例/minimax原矛盾仍需T12最终逐项清账，绝不领原343全部通过。g/e/f及全部开发失败保留，LAN旧超时原因未证。按序T09，无提交推送。",
+   "report": "T08_REPORT.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T08",
+   "latestFailedCandidate": {
+    "candidate": "t08g",
+    "results": "artifacts/rust-tauri/R07/T08/RESULTS_t08g.json",
+    "resultsSha256": "7f3c7ee52f356a1b3a87314b4370366e254100ae4d94c823920287c13146974e",
+    "gateCount": 20,
+    "passedGates": 18,
+    "failedGates": 2,
+    "notRun": [],
+    "serviceExitCode": 101,
+    "history": "T08_FAILURE_HISTORY.json",
+    "fullStagePassClaimed": false
+   },
+   "currentCandidate": {
+    "candidate": "t08h",
+    "manifest": "artifacts/rust-tauri/R07/T08/SOURCE_MANIFEST_t08h.json",
+    "manifestSha256": "dfed102c2fd8eff025c8c64df378fbf18ebb8b113ab10b338b171719f789c8aa",
+    "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+    "status": "LOCAL_VERIFIED_FINAL_R07_PENDING",
+    "gateCount": 20,
+    "fullStagePassClaimed": false,
+    "results": "artifacts/rust-tauri/R07/T08/RESULTS_t08h.json",
+    "resultsSha256": "ca6866e8c7f8a4fcb39ed9da093e7117b463e5f33778665872bec03a63645b33",
+    "acceptance": "artifacts/rust-tauri/R07/T08/ACCEPTANCE_t08h.json",
+    "acceptanceSha256": "256c95bdb3951dbddf919a3455ce1915e1ca025da79a2a1cc923d8fb3be9a0e8"
+   },
+   "unresolvedCurrentTaskBlockers": [],
+   "finalR07Followup": "artifacts/rust-tauri/R07/T08/t08h-t12-clause-followup-actual1.json",
+   "handoff": "T08_HANDOFF.md"
+  },
+  {
+   "id": "R07-T09",
+   "title": "CLI、移动端与LAN服务",
+   "status": "LOCAL_VERIFIED",
+   "note": "CLI/mobile 共享 context 与真实执行接线随服务侧全量候选验证收官：回归34 全绿（219 个测试二进制、2363 项、0 失败，exitCode 0，sourceUnchanged=true，回执 artifacts/rust-tauri/R07/T09/t10-service-regression34.json）。本轮回归链 62 条全部登记于 docs/rust-tauri/R07/T10_LEAF_EVIDENCE_DRAFT.json（契约更新 6、环境受阻 5、persona 专属环境 2 另证、用户裁决设计退役 1，历史失败全部原样保留）。",
+   "readiness": "T09_IMPLEMENTATION_READINESS.md",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T09"
+  },
+  {
+   "id": "R07-T10",
+   "title": "观测查询、筛选与导出",
+   "status": "LOCAL_VERIFIED",
+   "note": "可观测性套件 r07_t10_observability 随回归34 全绿通过；叶级证据草案 docs/rust-tauri/R07/T10_LEAF_EVIDENCE_DRAFT.json 登记 408 叶核算口径、退役与受阻条目。手机权限保持原四项未扩权。",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T09"
+  },
+  {
+   "id": "R07-T11",
+   "title": "开发入口与扩展生命周期收口",
+   "status": "LOCAL_VERIFIED",
+   "note": "开发入口授权矩阵（三身份全响亮拒绝）、热卸载旧句柄失效、两项扩展边界闭合；旧用户插件目录退役为启动告知（不加载不删除）。t11-dev-unload3 3/3 绿，verify-r07-2 扩展边界 PASS。夹具修正史（ToolTargetId 签名、403 分层、助手登记）全留回执。",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T09"
+  },
+  {
+   "id": "R07-T12",
+   "title": "逐功能真实闭环与残留清账",
+   "status": "LOCAL_VERIFIED",
+   "note": "A23 双向路由矩阵（静态生产者+运行时全表探针）与 A24 无旧内核纯 Rust 闭环绿（t12-closure2 2/2）；verify-stage R07 正式门禁接通：24/24 基础场景 PASS、2/2 扩展 PASS、408 叶设计态 BLOCKED、35+43 移交透镜输出、overall 诚实 FAIL（逐断言证据待立为既定缺口）。地图/输入由 scripts/rust-tauri/r07_stage_inputs.py 生成，runner 三段解析+基础集合核对+合同机制落地。",
+   "evidenceDirectory": "artifacts/rust-tauri/R07/T12"
+  }
+ ],
+ "currentTask": "R07-DELIVERABLES",
+ "remoteWriteAuthorized": false,
+ "liveExternalAuthorized": false,
+ "productionDataAuthorized": false,
+ "releaseAuthorized": false,
+ "updatedAt": "2026-10-19T11:28:14.041846+00:00"
+}

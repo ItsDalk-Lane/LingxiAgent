@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useStore } from '../../stores';
+import { grantRustMcpSessionCapability } from '../../services/mcp-session-permissions';
 import { captureSessionConnection, ownsSessionConnection, sessionConnectionRevision, sessionOwnerFetch,
   subscribeSessionConnection, sessionSelectionRevision, type SessionConnectionOwner } from '../../services/session-connection-owner';
 
-interface Approval { approvalId: string; runId: string; summary: string; target: string }
+interface Approval { approvalId: string; runId: string; summary: string; target: string; capability?: string | null }
 interface Receipt { status: string; error?: string; checkpoint: string; persistenceError?: string }
 interface View { selection: number; owner: SessionConnectionOwner; sessionId: string; approvals: Approval[]; receipt: Receipt | null }
 
@@ -54,7 +55,7 @@ export default function RustSessionReviewPanel() {
     const timer = setInterval(() => void refresh(), 600);
     return () => { disposed = true; clearInterval(timer); };
   }, [sessionId, revision, selection]);
-  const answer = async (approvalId: string, action: 'confirmed' | 'rejected') => {
+  const answer = async (approvalId: string, action: 'confirmed' | 'rejected', remember = false) => {
     if (!visible || !ownsSessionConnection(visible.owner)
       || useStore.getState().currentSessionId !== visible.sessionId
       || sessionSelectionRevision() !== visible.selection
@@ -64,14 +65,22 @@ export default function RustSessionReviewPanel() {
     const currentOperation = () => operation.current === generation && ownsSessionConnection(owner)
       && useStore.getState().currentSessionId === target && sessionSelectionRevision() === targetSelection;
     setBusy({ id: approvalId, sessionId: target, selection: targetSelection }); setError(null);
+    let grantSaved = false;
     try {
+      if (remember) {
+        const approval = visible.approvals.find(item => item.approvalId === approvalId);
+        if (!approval?.target.startsWith('tool:mcp:') || typeof approval.capability !== 'string' || !approval.capability) throw new Error('真实MCP能力尚未就绪');
+        await grantRustMcpSessionCapability(owner, { sessionId: target, targetId: approval.target, capability: approval.capability });
+        grantSaved = true;
+        if (!currentOperation()) return;
+      }
       const response = await sessionOwnerFetch(owner, `/lingxi/v1/sessions/${encodeURIComponent(target)}/approvals/${encodeURIComponent(approvalId)}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action }),
       });
       const data = await response.json();
       if (!data || data.ok !== true || !['confirmed', 'rejected'].includes(data.decision)) throw new Error('确认结果格式无效');
       if (currentOperation()) setView(previous => previous?.owner === owner ? { ...previous, approvals: previous.approvals.filter(item => item.approvalId !== approvalId) } : previous);
-    } catch (failure) { if (currentOperation()) setError({ owner, selection: targetSelection, sessionId: target, text: failure instanceof Error ? failure.message : String(failure) }); }
+    } catch (failure) { if (currentOperation()) setError({ owner, selection: targetSelection, sessionId: target, text: `${grantSaved ? '本会话授权已生效；本次操作确认失败：' : ''}${failure instanceof Error ? failure.message : String(failure)}` }); }
     finally { if (currentOperation()) setBusy(null); }
   };
   if (!rust || !sessionId) return null;
@@ -82,6 +91,7 @@ export default function RustSessionReviewPanel() {
       <p>{approval.summary}</p>
       <button disabled={busy?.sessionId === sessionId && busy.selection === selection} onClick={() => void answer(approval.approvalId, 'confirmed')}>确认执行</button>
       <button disabled={busy?.sessionId === sessionId && busy.selection === selection} onClick={() => void answer(approval.approvalId, 'rejected')}>拒绝</button>
+      {approval.target.startsWith('tool:mcp:') && typeof approval.capability === 'string' && approval.capability && <button data-testid="rust-mcp-approve-session" disabled={busy?.sessionId === sessionId && busy.selection === selection} onClick={() => void answer(approval.approvalId, 'confirmed', true)}>本会话此工具不再询问</button>}
     </div>)}
     {visible?.receipt && <p role={['failed', 'unconfirmed_after_restart'].includes(visible.receipt.status) ? 'alert' : 'status'}>
       {visible.receipt.status === 'scheduled' ? '已确认，等待本轮结束后回退。'

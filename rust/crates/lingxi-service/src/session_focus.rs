@@ -262,11 +262,16 @@ pub(crate) async fn create_locked(
             return Err(EndpointError::invalid_message(error).into_response().into());
         }
     }
-    let mut choice =
-        match chat_settings::effective_choice_with_model(state, owner, &sid, body.model) {
-            Ok(value) => value,
-            Err(error) => return Err((failure(error)).into()),
-        };
+    let mut choice = match chat_settings::effective_choice_for_agent(
+        state,
+        owner,
+        &sid,
+        Some(&agent),
+        body.model,
+    ) {
+        Ok(value) => value,
+        Err(error) => return Err((failure(error)).into()),
+    };
     if let Some(level) = body.thinking_level {
         choice.thinking_level = Some(level);
     }

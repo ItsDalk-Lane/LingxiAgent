@@ -6,7 +6,7 @@
 // the generator (schemars 1.x over the lingxi-protocol types) emits:
 //   type, properties, required, additionalProperties (bool or schema),
 //   items, anyOf/oneOf/allOf, enum, const, pattern, $ref (local #/$defs/...),
-//   $defs, description/title (ignored).
+//   $defs, description/title/default (annotations only, no mutation).
 // Anything outside that subset is a hard validator error, never a silent
 // pass — the same "no silent degradation" rule as the Rust side.
 
@@ -119,17 +119,19 @@ function validate(value, schema, root, path, errors) {
       }
     }
   } else if (Array.isArray(type)) {
-    if (!type.some((t) => typeMatches(value, /** @type {string} */ (t)))) {
+    const actualType = type.find((t) => typeMatches(value, /** @type {string} */ (t)));
+    if (actualType === undefined) {
       errors.push(`${path}: expected one of types ${type.join("/")}, got ${describe(value)}`);
-    }
+    } else validate(value, { ...s, type: actualType }, root, path, errors);
   } else if (s.properties || s.additionalProperties !== undefined || s.required) {
     validateObject(value, s, root, path, errors);
   }
 
+  // default 只是接口注释：不填补缺失字段，类型与数组内容仍按原规则检查。
   const known = new Set([
     "$ref", "$defs", "$schema", "$id", "type", "properties", "required",
     "additionalProperties", "items", "anyOf", "oneOf", "allOf", "enum",
-    "const", "pattern", "description", "title", "format", "minimum", "maximum",
+    "const", "pattern", "description", "title", "default", "format", "minimum", "maximum",
   ]);
   for (const key of Object.keys(s)) {
     if (!known.has(key)) {

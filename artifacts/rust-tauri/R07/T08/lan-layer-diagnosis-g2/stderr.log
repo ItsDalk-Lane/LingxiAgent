@@ -1,0 +1,2 @@
+LINGXI_TRANSPORT_REJECTED request_id="req-e332cf2e994890f079208dd07b69c55a" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=http://evil.example host=192.168.3.96:53631 remote=192.168.3.96:53633
+LINGXI_TRANSPORT_REJECTED request_id="req-1a56094512365ce11869f80739f06cf7" method=POST path=/lingxi/v1/web-auth/login status=403 reason=bad_origin origin=http://evil.example host=127.0.0.1:53631 remote=127.0.0.1:53634

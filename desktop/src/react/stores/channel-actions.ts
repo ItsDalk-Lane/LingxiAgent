@@ -8,32 +8,90 @@
 
 import { useStore } from './index';
 import { lingxiFetch } from '../hooks/use-hana-fetch';
-import { hasServerConnection } from '../services/server-connection';
+import { captureConversationRequestScope } from '../services/conversation-request-scope';
+import { hasServerConnection, resolveServerConnection } from '../services/server-connection';
 import type { AgentPhoneActivity, AgentPhoneSettings, AgentPhoneToolMode, Channel, ChannelAgentActivities, ChannelMessage } from '../types';
+
+let listRequest = 0;
+let historyRequest = 0;
+let settingsRequest = 0;
+
+const pendingUserActions = new Map<'message' | 'create', { signature: string; requestId: string }>();
+
+function userActionRequest(kind: 'message' | 'create', payload: unknown): string {
+  const state = useStore.getState();
+  const signature = JSON.stringify([resolveServerConnection(state), state.currentAgentId, payload]);
+  const previous = pendingUserActions.get(kind);
+  if (previous?.signature === signature) return previous.requestId;
+  const requestId = `channel-${kind}:${globalThis.crypto.randomUUID()}`;
+  pendingUserActions.set(kind, { signature, requestId });
+  return requestId;
+}
+
+function confirmUserAction(kind: 'message' | 'create', requestId: string): void {
+  if (pendingUserActions.get(kind)?.requestId === requestId) pendingUserActions.delete(kind);
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function reportFailure(key: string): void {
+  const state = useStore.getState();
+  state.addToast?.(typeof window !== 'undefined' && window.t ? window.t(key) : key, 'error');
+}
+
+async function responseData(response: Response): Promise<any> {
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const data = await response.json();
+  if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid conversation response');
+  if (data.error) throw new Error(String(data.error));
+  return data;
+}
+
+function requireArray(value: unknown, field: string): any[] {
+  if (!Array.isArray(value)) throw new Error(`Invalid conversation ${field}`);
+  return value;
+}
+
+function requireMessages(value: unknown): ChannelMessage[] {
+  const messages = requireArray(value, 'messages');
+  if (messages.some(message => !message || ['sender', 'timestamp', 'body'].some(field => typeof message[field] !== 'string'))) {
+    throw new Error('Invalid conversation message');
+  }
+  return messages;
+}
 
 // ══════════════════════════════════════════════════════
 // 加载频道列表
 // ══════════════════════════════════════════════════════
 
 export async function loadChannels(): Promise<void> {
-  const s = useStore.getState();
-  if (!hasServerConnection(s)) return;
+  if (!hasServerConnection(useStore.getState())) return;
+  const scope = captureConversationRequestScope();
+  const request = ++listRequest;
+  const isCurrent = () => scope.isCurrent() && request === listRequest;
+  useStore.setState({ channelListLoading: true, channelListError: null });
   try {
+    if (useStore.getState().channelsEnabled === undefined) {
+      const config = await responseData(await lingxiFetch('/api/config'));
+      if (!isCurrent()) return;
+      const enabled = config.channels?.enabled === true;
+      useStore.setState({ channelsEnabled: enabled });
+      if (!enabled) { useStore.setState({ channels: [], channelTotalUnread: 0 }); return; }
+    }
     const [chRes, dmRes] = await Promise.all([
       lingxiFetch('/api/channels'),
       lingxiFetch('/api/dm'),
     ]);
-
-    const chData = chRes.ok ? await chRes.json() : { channels: [] };
-    const dmData = dmRes.ok ? await dmRes.json() : { dms: [] };
-
-    const channels: Channel[] = (chData.channels || []).map((ch: any) => ({
-      ...ch,
-      isDM: false,
-    }));
-
-    const dms: Channel[] = (dmData.dms || []).map((dm: any) => {
-      const dmOwnerId = dm.ownerAgentId || dmData.ownerAgentId || undefined;
+    const [chData, dmData] = await Promise.all([responseData(chRes), responseData(dmRes)]);
+    if (!isCurrent()) return;
+    const channels: Channel[] = requireArray(chData.channels, 'channels').map((ch: any) => {
+      if (typeof ch?.id !== 'string' || !ch.id) throw new Error('Invalid channel identity');
+      return { ...ch, isDM: false };
+    });
+    const dms: Channel[] = requireArray(dmData.dms, 'dms').map((dm: any) => {
+      if (typeof dm?.peerId !== 'string' || !dm.peerId) throw new Error('Invalid DM identity');
       return {
         id: `dm:${dm.peerId}`,
         name: dm.peerName || dm.peerId,
@@ -44,17 +102,19 @@ export async function loadChannels(): Promise<void> {
         newMessageCount: 0,
         messageCount: dm.messageCount || 0,
         isDM: true,
-        dmOwnerId,
+        dmOwnerId: dm.ownerAgentId || dmData.ownerAgentId || undefined,
         peerId: dm.peerId,
         peerName: dm.peerName,
       };
     });
-
     const allChannels = [...channels, ...dms];
     const totalUnread = allChannels.reduce((sum, ch) => sum + (ch.newMessageCount || 0), 0);
     useStore.setState({ channels: allChannels, channelTotalUnread: totalUnread });
-  } catch (err) {
-    console.error('[channels] load failed:', err);
+  } catch (error) {
+    if (isCurrent()) useStore.setState({ channelListError: errorMessage(error) });
+  } finally {
+    if (isCurrent()) useStore.setState({ channelListLoading: false });
+    scope.dispose();
   }
 }
 
@@ -68,27 +128,30 @@ function keyActivities(activities: AgentPhoneActivity[]): Record<string, AgentPh
 }
 
 export async function loadConversationAgentActivities(conversationId: string): Promise<void> {
-  const s = useStore.getState();
-  if (!conversationId || !hasServerConnection(s)) return;
+  if (!conversationId || !hasServerConnection(useStore.getState())) return;
+  const scope = captureConversationRequestScope();
   try {
-    const res = await lingxiFetch(`/api/conversations/${encodeURIComponent(conversationId)}/agent-activities`);
-    if (!res.ok) return;
-    const data = await res.json();
-    const activities = keyActivities(data.activities || []);
-    const latestState = useStore.getState();
-    const current = (latestState.channelAgentActivities || {}) as ChannelAgentActivities;
+    const res = await lingxiFetch(`/api/conversations/${encodeURIComponent(conversationId)}/agent-activities${conversationOwnerQuery(conversationId)}`);
+    const data = await responseData(res);
+    if (!scope.isCurrent()) return;
+    const rows = requireArray(data.activities, 'activities');
+    if (rows.some(activity => !activity || activity.conversationId !== conversationId
+      || ['agentId', 'timestamp', 'state', 'summary'].some(key => typeof activity[key] !== 'string'))) {
+      throw new Error('Invalid conversation activity');
+    }
+    const activities = keyActivities(rows);
+    const state = useStore.getState();
     useStore.setState({
-      channelAgentActivities: {
-        ...current,
-        [conversationId]: activities,
-      },
-      channelTickerStatus: {
-        ...(latestState.channelTickerStatus || {}),
-        [conversationId]: data.ticker || null,
-      },
+      channelAgentActivities: { ...state.channelAgentActivities, [conversationId]: activities },
+      channelTickerStatus: { ...state.channelTickerStatus, [conversationId]: data.ticker || null },
     });
-  } catch (err) {
-    console.error('[channels] load agent activities failed:', err);
+  } catch (error) {
+    if (scope.isCurrent()) {
+      console.error('[channels] load agent activities failed:', error);
+      reportFailure('channel.loadFailed');
+    }
+  } finally {
+    scope.dispose();
   }
 }
 
@@ -184,37 +247,22 @@ export async function loadConversationAgentPhoneToolMode(conversationId: string)
 }
 
 export async function loadConversationAgentPhoneSettings(conversationId: string): Promise<void> {
-  const s = useStore.getState();
-  if (!conversationId || !hasServerConnection(s)) return;
+  if (!conversationId || !hasServerConnection(useStore.getState())) return;
+  const scope = captureConversationRequestScope(true);
+  const request = ++settingsRequest;
+  const isCurrent = () => scope.isCurrent() && request === settingsRequest
+    && useStore.getState().currentChannel === conversationId;
+  if (isCurrent()) useStore.setState({ channelSettingsLoading: true, channelSettingsError: null });
   try {
-    const res = await lingxiFetch(conversationPhoneSettingsUrl(conversationId));
-    if (!res.ok) {
-      applyAgentPhoneSettings({
-        mode: 'read_only',
-        replyMinChars: null,
-        replyMaxChars: null,
-        proactiveEnabled: true,
-        reminderIntervalMinutes: 31,
-        guardLimit: 36,
-        modelOverrideEnabled: false,
-        modelOverrideModel: null,
-      });
-      return;
-    }
-    const data = await res.json();
+    const data = await responseData(await lingxiFetch(conversationPhoneSettingsUrl(conversationId)));
+    if (!isCurrent()) return;
+    if (!['read_only', 'write'].includes(data.mode)) throw new Error('Invalid conversation settings');
     applyAgentPhoneSettings(normalizeAgentPhoneSettings(data));
-  } catch (err) {
-    console.error('[channels] load phone settings failed:', err);
-    applyAgentPhoneSettings({
-      mode: 'read_only',
-      replyMinChars: null,
-      replyMaxChars: null,
-      proactiveEnabled: true,
-      reminderIntervalMinutes: 31,
-      guardLimit: 36,
-      modelOverrideEnabled: false,
-      modelOverrideModel: null,
-    });
+  } catch (error) {
+    if (isCurrent()) useStore.setState({ channelSettingsError: errorMessage(error) });
+  } finally {
+    if (isCurrent()) useStore.setState({ channelSettingsLoading: false });
+    scope.dispose();
   }
 }
 
@@ -226,23 +274,29 @@ export async function saveConversationAgentPhoneSettings(patch: Partial<AgentPho
   const s = useStore.getState();
   const conversationId = s.currentChannel;
   if (!conversationId || !hasServerConnection(s)) return;
-  const res = await lingxiFetch(conversationPhoneSettingsUrl(conversationId), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: patch.mode !== undefined ? normalizeAgentPhoneToolMode(patch.mode) : s.channelAgentPhoneToolMode,
-      replyMinChars: patch.replyMinChars !== undefined ? patch.replyMinChars : s.channelAgentReplyMinChars,
-      replyMaxChars: patch.replyMaxChars !== undefined ? patch.replyMaxChars : s.channelAgentReplyMaxChars,
-      proactiveEnabled: patch.proactiveEnabled !== undefined ? patch.proactiveEnabled : s.channelAgentProactiveEnabled,
-      reminderIntervalMinutes: patch.reminderIntervalMinutes !== undefined ? patch.reminderIntervalMinutes : s.channelAgentReminderIntervalMinutes,
-      guardLimit: patch.guardLimit !== undefined ? patch.guardLimit : s.channelAgentGuardLimit,
-      modelOverrideEnabled: patch.modelOverrideEnabled !== undefined ? patch.modelOverrideEnabled : s.channelAgentModelOverrideEnabled,
-      modelOverrideModel: patch.modelOverrideModel !== undefined ? patch.modelOverrideModel : s.channelAgentModelOverrideModel,
-    }),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  applyAgentPhoneSettings(normalizeAgentPhoneSettings(data));
+  const scope = captureConversationRequestScope(true);
+  try {
+    const res = await lingxiFetch(conversationPhoneSettingsUrl(conversationId), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: patch.mode !== undefined ? normalizeAgentPhoneToolMode(patch.mode) : s.channelAgentPhoneToolMode,
+        replyMinChars: patch.replyMinChars !== undefined ? patch.replyMinChars : s.channelAgentReplyMinChars,
+        replyMaxChars: patch.replyMaxChars !== undefined ? patch.replyMaxChars : s.channelAgentReplyMaxChars,
+        proactiveEnabled: patch.proactiveEnabled !== undefined ? patch.proactiveEnabled : s.channelAgentProactiveEnabled,
+        reminderIntervalMinutes: patch.reminderIntervalMinutes !== undefined ? patch.reminderIntervalMinutes : s.channelAgentReminderIntervalMinutes,
+        guardLimit: patch.guardLimit !== undefined ? patch.guardLimit : s.channelAgentGuardLimit,
+        modelOverrideEnabled: patch.modelOverrideEnabled !== undefined ? patch.modelOverrideEnabled : s.channelAgentModelOverrideEnabled,
+        modelOverrideModel: patch.modelOverrideModel !== undefined ? patch.modelOverrideModel : s.channelAgentModelOverrideModel,
+      }),
+    });
+    const data = await responseData(res);
+    if (!scope.isCurrent()) return;
+    if (!['read_only', 'write'].includes(data.mode)) throw new Error('Invalid conversation settings');
+    applyAgentPhoneSettings(normalizeAgentPhoneSettings(data));
+  } finally {
+    scope.dispose();
+  }
 }
 
 // ══════════════════════════════════════════════════════
@@ -250,108 +304,77 @@ export async function saveConversationAgentPhoneSettings(patch: Partial<AgentPho
 // ══════════════════════════════════════════════════════
 
 export async function openChannel(channelId: string, isDM?: boolean): Promise<void> {
-  const s = useStore.getState();
-  const ch = s.channels.find((c: Channel) => c.id === channelId);
-  const isThisDM = isDM ?? ch?.isDM ?? false;
-  const t = window.t;
-  const cachedMessages = s.channelMessageCache[channelId] || [];
-
-  // 立刻切换 + 清空旧数据，防止残留上一个频道的内容
-  // DM 时从 channel 列表提取 peerId，即使 API 失败也能显示 agent 信息
-  const peerId = isThisDM ? (ch?.peerId || channelId.replace('dm:', '')) : '';
-  const peerName = isThisDM ? (ch?.name || peerId) : '';
-  const dmOwnerId = isThisDM ? ch?.dmOwnerId : undefined;
+  const state = useStore.getState();
+  const channel = state.channels.find((item: Channel) => item.id === channelId);
+  const isThisDM = channelId.startsWith('dm:') || isDM === true || channel?.isDM === true;
+  const peerId = isThisDM ? (channel?.peerId || channelId.slice(3)) : '';
+  const peerName = isThisDM ? (channel?.name || peerId) : '';
+  const dmOwnerId = channel?.dmOwnerId;
+  const request = ++historyRequest;
+  // 缓存属于所选会话；尚未读到历史时明确显示加载或错误，不能当成空记录。
   useStore.setState({
     currentChannel: channelId,
-    channelMessages: cachedMessages,
-    channelMembers: isThisDM ? [peerId] : [],
-    channelHeaderName: isThisDM ? peerName : '',
+    channelMessages: state.channelMessageCache[channelId] || [],
+    channelMembers: isThisDM ? [peerId] : (channel?.members || []),
+    channelHeaderName: isThisDM ? peerName : `# ${channel?.name || channelId}`,
     channelHeaderMembersText: '',
     channelIsDM: isThisDM,
-    channelInfoName: isThisDM ? peerName : '',
+    channelInfoName: isThisDM ? peerName : (channel?.name || channelId),
+    channelHistoryLoading: true,
+    channelHistoryError: null,
+    channelSettingsLoading: true,
+    channelSettingsError: null,
   });
-
+  const scope = captureConversationRequestScope(true);
+  const isCurrent = () => scope.isCurrent() && request === historyRequest;
   try {
-    if (isThisDM) {
-      const ownerQuery = dmOwnerId ? `?agentId=${encodeURIComponent(dmOwnerId)}` : '';
-      const res = await lingxiFetch(`/api/dm/${encodeURIComponent(peerId)}${ownerQuery}`);
-      if (res.ok) {
-        const data = await res.json();
-        const responseOwnerId = data.ownerAgentId || dmOwnerId;
-        const messages = data.messages || [];
-        const fresh = useStore.getState();
+    const ownerQuery = dmOwnerId ? `?agentId=${encodeURIComponent(dmOwnerId)}` : '';
+    const path = isThisDM ? `/api/dm/${encodeURIComponent(peerId)}${ownerQuery}`
+      : `/api/channels/${encodeURIComponent(channelId)}`;
+    const data = await responseData(await lingxiFetch(path));
+    if (!isCurrent()) return;
+    const messages = requireMessages(data.messages);
+    const members = isThisDM ? [peerId] : requireArray(data.members, 'members');
+    if (members.some(member => typeof member !== 'string')) throw new Error('Invalid channel members');
+    const fresh = useStore.getState();
+    const name = isThisDM ? (data.peerName || peerName) : (data.name || channelId);
+    const responseOwnerId = data.ownerAgentId || dmOwnerId;
+    useStore.setState({
+      channelMessages: messages,
+      channelMessageCache: { ...fresh.channelMessageCache, [channelId]: messages },
+      channelMessageCacheDirty: { ...fresh.channelMessageCacheDirty, [channelId]: false },
+      channelMembers: members,
+      channelHeaderName: isThisDM ? name : `# ${name}`,
+      channelHeaderMembersText: isThisDM ? '' : `${members.length + 1} ${window.t('channel.membersCount')}`,
+      channelInfoName: name,
+      channels: isThisDM && responseOwnerId ? fresh.channels.map((item: Channel) =>
+        item.id === channelId ? { ...item, dmOwnerId: responseOwnerId } : item) : fresh.channels,
+    });
+    const lastMessage = messages.at(-1);
+    if (!isThisDM && lastMessage) {
+      const readScope = captureConversationRequestScope(true);
+      void lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/read`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timestamp: lastMessage.timestamp }),
+      }).then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!readScope.isCurrent()) return;
+        const latest = useStore.getState();
+        const unread = latest.channels.find(item => item.id === channelId)?.newMessageCount || 0;
         useStore.setState({
-          channelMessages: messages,
-          channelMessageCache: {
-            ...fresh.channelMessageCache,
-            [channelId]: messages,
-          },
-          channelMessageCacheDirty: {
-            ...fresh.channelMessageCacheDirty,
-            [channelId]: false,
-          },
-          channelHeaderName: data.peerName || peerName,
-          channelInfoName: data.peerName || peerName,
-          channels: responseOwnerId
-            ? fresh.channels.map((channel: Channel) =>
-              channel.id === channelId ? { ...channel, dmOwnerId: responseOwnerId } : channel)
-            : fresh.channels,
+          channelTotalUnread: Math.max(0, latest.channelTotalUnread - unread),
+          channels: latest.channels.map(item => item.id === channelId ? { ...item, newMessageCount: 0 } : item),
         });
-      }
-      // 404 = 没有历史，基本信息已在上方设置，不需要额外处理
-    } else {
-      const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const members = data.members || [];
-      const displayMembers = [useStore.getState().userName || 'user', ...members];
-      const messages = data.messages || [];
-      const fresh = useStore.getState();
-      useStore.setState({
-        channelMessages: messages,
-        channelMessageCache: {
-          ...fresh.channelMessageCache,
-          [channelId]: messages,
-        },
-        channelMessageCacheDirty: {
-          ...fresh.channelMessageCacheDirty,
-          [channelId]: false,
-        },
-        channelMembers: members,
-        channelHeaderName: `# ${data.name || channelId}`,
-        channelHeaderMembersText: `${displayMembers.length} ${t('channel.membersCount')}`,
-        channelIsDM: false,
-        channelInfoName: data.name || channelId,
-      });
-
-      // Mark as read
-      const msgs = messages;
-      const lastMsg = msgs[msgs.length - 1];
-      if (lastMsg) {
-        lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/read`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ timestamp: lastMsg.timestamp }),
-        }).catch((err: unknown) => console.warn('[channel-actions] mark-as-read failed', err));
-
-        // 重新取 store 最新状态，避免覆盖 await 期间的并发更新
-        const fresh = useStore.getState();
-        const freshCh = fresh.channels.find((c: Channel) => c.id === channelId);
-        if (freshCh) {
-          const newTotal = Math.max(0, fresh.channelTotalUnread - (freshCh.newMessageCount || 0));
-          const updatedChannels = fresh.channels.map((c: Channel) =>
-            c.id === channelId ? { ...c, newMessageCount: 0 } : c,
-          );
-          useStore.setState({ channelTotalUnread: newTotal, channels: updatedChannels });
-        }
-      }
+      }).catch(error => console.warn('[channel-actions] mark-as-read failed', error)).finally(readScope.dispose);
     }
-    loadConversationAgentActivities(channelId).catch((err: unknown) =>
-      console.warn('[channel-actions] load agent activities failed', err));
-    loadConversationAgentPhoneToolMode(channelId).catch((err: unknown) =>
-      console.warn('[channel-actions] load phone tool mode failed', err));
-  } catch (err) {
-    console.error('[channels] open failed:', err);
+    void loadConversationAgentActivities(channelId);
+    void loadConversationAgentPhoneSettings(channelId);
+  } catch (error) {
+    if (isCurrent()) useStore.setState({ channelHistoryError: errorMessage(error), channelSettingsError: errorMessage(error), channelSettingsLoading: false });
+  } finally {
+    if (isCurrent()) useStore.setState({ channelHistoryLoading: false });
+    scope.dispose();
   }
 }
 
@@ -491,17 +514,25 @@ export async function sendChannelMessage(text: string): Promise<void> {
   const channelId = s.currentChannel;
   const body = text.trim();
   if (!body || !channelId) return;
+  if (channelId.startsWith('dm:') || s.channelIsDM || s.channels.some(channel => channel.id === channelId && channel.isDM)) {
+    throw new Error('Agent DM is read only');
+  }
+  const scope = captureConversationRequestScope();
   const sender = s.userName || 'user';
+  const requestId = userActionRequest('message', { channelId, body: text });
 
   try {
     const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ body: text }),
+      body: JSON.stringify({ body: text, requestId }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (data.ok && data.timestamp) {
+    if (!data.ok || typeof data.timestamp !== 'string') throw new Error('Message was not accepted');
+    confirmUserAction('message', requestId);
+    if (!scope.isCurrent()) return;
+    if (data.ok) {
       appendChannelMessage(channelId, {
         sender,
         timestamp: data.timestamp,
@@ -509,7 +540,9 @@ export async function sendChannelMessage(text: string): Promise<void> {
       }, { markRead: true, countUnread: false });
     }
   } catch (err) {
-    console.error('[channels] send failed:', err);
+    if (scope.isCurrent()) throw err;
+  } finally {
+    scope.dispose();
   }
 }
 
@@ -525,26 +558,30 @@ function exportedArchiveFilename(disposition: string | null): string {
 export async function exportCurrentConversation(): Promise<string> {
   const conversationId = useStore.getState().currentChannel;
   if (!conversationId) throw new Error('No active conversation');
-  const ownerQuery = conversationOwnerQuery(conversationId);
-  const res = await lingxiFetch(`/api/conversations/${encodeURIComponent(conversationId)}/export${ownerQuery}`);
-  if (!res.ok) {
-    const payload = await res.json().catch(() => null);
-    throw new Error(payload?.error || `HTTP ${res.status}`);
-  }
-
-  const blob = await res.blob();
-  const filename = exportedArchiveFilename(res.headers.get('content-disposition'));
-  const downloadUrl = URL.createObjectURL(blob);
+  const scope = captureConversationRequestScope(true);
   try {
-    const anchor = document.createElement('a');
-    anchor.href = downloadUrl;
-    anchor.download = filename;
-    anchor.rel = 'noopener';
-    anchor.click();
-  } finally {
-    URL.revokeObjectURL(downloadUrl);
-  }
-  return filename;
+    const ownerQuery = conversationOwnerQuery(conversationId);
+    const res = await lingxiFetch(`/api/conversations/${encodeURIComponent(conversationId)}/export${ownerQuery}`);
+    if (!res.ok) {
+      const payload = await res.json().catch(() => null);
+      throw new Error(payload?.error || `HTTP ${res.status}`);
+    }
+
+    const blob = await res.blob();
+    if (!scope.isCurrent()) throw new Error('Conversation selection changed');
+    const filename = exportedArchiveFilename(res.headers.get('content-disposition'));
+    const downloadUrl = URL.createObjectURL(blob);
+    try {
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = filename;
+      anchor.rel = 'noopener';
+      anchor.click();
+    } finally {
+      URL.revokeObjectURL(downloadUrl);
+    }
+    return filename;
+  } finally { scope.dispose(); }
 }
 
 // ══════════════════════════════════════════════════════
@@ -552,15 +589,16 @@ export async function exportCurrentConversation(): Promise<string> {
 // ══════════════════════════════════════════════════════
 
 export async function deleteChannel(channelId: string): Promise<void> {
-  const s = useStore.getState();
+  const scope = captureConversationRequestScope();
   try {
     const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}`, {
       method: 'DELETE',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
+    if (!scope.isCurrent()) return;
     if (data.ok) {
-      if (s.currentChannel === channelId) {
+      if (useStore.getState().currentChannel === channelId) {
         useStore.setState({
           currentChannel: null,
           channelMessages: [],
@@ -572,10 +610,12 @@ export async function deleteChannel(channelId: string): Promise<void> {
       // Reload channels
       await loadChannels();
     } else {
-      console.error('[channels] delete failed:', data.error);
+      throw new Error(data.error || 'Channel was not deleted');
     }
-  } catch (err) {
-    console.error('[channels] delete failed:', err);
+  } catch {
+    if (scope.isCurrent()) reportFailure('channel.deleteFailed');
+  } finally {
+    scope.dispose();
   }
 }
 
@@ -584,27 +624,39 @@ export async function deleteChannel(channelId: string): Promise<void> {
 // ══════════════════════════════════════════════════════
 
 export async function addChannelMember(channelId: string, memberId: string): Promise<void> {
-  const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/members`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ memberId }),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.error) {
-    throw new Error(data.error || `HTTP ${res.status}`);
-  }
-  applyChannelMembers(channelId, data.members || []);
+  const scope = captureConversationRequestScope();
+  try {
+    const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/members`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ memberId }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.error) {
+      throw new Error(data.error || `HTTP ${res.status}`);
+    }
+    if (!scope.isCurrent()) return;
+    const members = requireArray(data.members, 'members');
+    if (members.some(member => typeof member !== 'string')) throw new Error('Invalid channel members');
+    applyChannelMembers(channelId, members);
+  } finally { scope.dispose(); }
 }
 
 export async function removeChannelMember(channelId: string, memberId: string): Promise<void> {
-  const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/members/${encodeURIComponent(memberId)}`, {
-    method: 'DELETE',
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.error) {
-    throw new Error(data.error || `HTTP ${res.status}`);
-  }
-  applyChannelMembers(channelId, data.members || []);
+  const scope = captureConversationRequestScope();
+  try {
+    const res = await lingxiFetch(`/api/channels/${encodeURIComponent(channelId)}/members/${encodeURIComponent(memberId)}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.error) {
+      throw new Error(data.error || `HTTP ${res.status}`);
+    }
+    if (!scope.isCurrent()) return;
+    const members = requireArray(data.members, 'members');
+    if (members.some(member => typeof member !== 'string')) throw new Error('Invalid channel members');
+    applyChannelMembers(channelId, members);
+  } finally { scope.dispose(); }
 }
 
 // ══════════════════════════════════════════════════════
@@ -617,6 +669,7 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
   const previousEnabled = s.channelsEnabled;
   const newEnabled = !s.channelsEnabled;
 
+  const scope = captureConversationRequestScope();
   try {
     const res = await lingxiFetch('/api/channels/toggle', {
       method: 'POST',
@@ -625,6 +678,7 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json().catch(() => ({}));
+    if (!scope.isCurrent()) return undefined;
     const enabled = typeof data.enabled === 'boolean' ? data.enabled : newEnabled;
     useStore.setState({ channelsEnabled: enabled });
 
@@ -632,6 +686,9 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
       await loadChannels();
     } else {
       useStore.setState({
+        channelListError: null,
+        channelHistoryError: null,
+        channelSettingsError: null,
         channels: [],
         currentChannel: null,
         channelMessages: [],
@@ -647,10 +704,11 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
     }
 
     return enabled;
-  } catch (err) {
-    console.error('[channels] toggle backend failed:', err);
-    useStore.setState({ channelsEnabled: previousEnabled });
-    return previousEnabled;
+  } catch {
+    if (scope.isCurrent()) reportFailure('channel.settingsSaveFailed');
+    return scope.isCurrent() ? previousEnabled : undefined;
+  } finally {
+    scope.dispose();
   }
 }
 
@@ -659,11 +717,14 @@ export async function toggleChannelsEnabled(): Promise<boolean | undefined> {
 // ══════════════════════════════════════════════════════
 
 export async function createChannel(name: string, members: string[], intro?: string): Promise<string | null> {
+  const scope = captureConversationRequestScope(true);
+  const requestId = userActionRequest('create', { name, members, intro: intro || null });
   try {
     const res = await lingxiFetch('/api/channels', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        requestId,
         name,
         members,
         intro: intro || undefined,
@@ -673,14 +734,21 @@ export async function createChannel(name: string, members: string[], intro?: str
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
     if (data.error) throw new Error(data.error);
+    if (typeof data.id !== 'string' || !data.id) throw new Error('Channel creation was not confirmed');
+    confirmUserAction('create', requestId);
 
+    if (!scope.isCurrent()) return null;
     await loadChannels();
+    if (!scope.isCurrent()) return null;
     if (data.id) {
       await openChannel(data.id);
     }
     return data.id || null;
   } catch (err: any) {
     console.error('[channels] create failed:', err);
-    throw err;
+    if (scope.isCurrent()) throw err;
+    return null;
+  } finally {
+    scope.dispose();
   }
 }

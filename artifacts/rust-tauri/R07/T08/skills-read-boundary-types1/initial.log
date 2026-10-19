@@ -1,0 +1,2 @@
+desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx(60,64): error TS2345: Argument of type '(message: string, type: "error" | "success" | "info" | "warning" | undefined) => void' is not assignable to parameter of type '(text: string, type?: "error" | "success" | "info" | "warning" | undefined, duration?: number | undefined, opts?: { errorCode?: string | undefined; persistent?: boolean | undefined; action?: { ...; } | undefined; dedupeKey?: string | undefined; } | undefined) => number | null'.
+  Type 'void' is not assignable to type 'number | null'.

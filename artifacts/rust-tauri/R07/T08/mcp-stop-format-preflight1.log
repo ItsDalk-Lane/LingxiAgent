@@ -1,0 +1,392 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:621:
+ /// R02, local_only is the strictest available default).
+ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
+     let m = method.to_ascii_uppercase();
+-    if path == "/lingxi/v1/mcp/session-permissions" && m == "POST" { return RoutePolicy::Scope("sessions.write"); }
+-    if path == "/lingxi/v1/mcp/oauth/callback" && m == "GET" { return RoutePolicy::Public; }
++    if path == "/lingxi/v1/mcp/session-permissions" && m == "POST" {
++        return RoutePolicy::Scope("sessions.write");
++    }
++    if path == "/lingxi/v1/mcp/oauth/callback" && m == "GET" {
++        return RoutePolicy::Public;
++    }
+     // 卡片只公开短期专用票据的读取入口，票据不能替代账户凭证。
+     if m == "GET" {
+         if let Some(rest) = path.strip_prefix("/lingxi/v1/cards/") {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:6:
+     ports::StoragePort,
+ };
+ use serde::Deserialize;
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use std::{
+     collections::{HashMap, VecDeque},
+     path::Path,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:13:
+     sync::{
+-        Arc, Mutex,
+         atomic::{AtomicBool, Ordering},
++        Arc, Mutex,
+     },
+ };
+ use tokio::sync::{broadcast, mpsc};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:124:
+     #[serde(default)]
+     pub method: Option<String>,
+ }
+-use crate::chat_settings::{ChatChoice, read_session_choice, write_session_choice};
++use crate::chat_settings::{read_session_choice, write_session_choice, ChatChoice};
+ struct Replay {
+     stream_id: Option<String>,
+     next_seq: u64,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:236:
+         frame["sessionId"] = json!(id);
+         frame["sessionPath"] = json!(format!("native:{id}"));
+         frame["sessionRefVersion"] = json!(2);
+-        frame["ts"] = json!(
+-            std::time::SystemTime::now()
+-                .duration_since(std::time::UNIX_EPOCH)
+-                .map(|d| d.as_millis() as u64)
+-                .unwrap_or(0)
+-        );
++        frame["ts"] = json!(std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH)
++            .map(|d| d.as_millis() as u64)
++            .unwrap_or(0));
+         frame["streamId"] = json!(run);
+         frame["turnId"] = json!(run);
+         frame["seq"] = json!(seq);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:1746:
+ }
+ 
+ use axum::{
+-    Json,
+     extract::{Query, State},
+     http::StatusCode,
+     response::{IntoResponse, Response},
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:1753:
++    Json,
+ };
+ #[derive(Deserialize)]
+ #[serde(rename_all = "camelCase", deny_unknown_fields)]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:1875:
+     });
+     if let Some(rows) = value["models"].as_array_mut() {
+         for row in rows {
+-            row["isCurrent"] = json!(
+-                current
+-                    .as_ref()
+-                    .is_some_and(|(provider, id)| row["id"] == *id && row["provider"] == *provider)
+-            );
++            row["isCurrent"] = json!(current
++                .as_ref()
++                .is_some_and(|(provider, id)| row["id"] == *id && row["provider"] == *provider));
+             if let Some(gateway) = state.model_gateway() {
+                 if let Ok(dispatch) =
+                     gateway.resolve_dispatch(&lingxi_kernel::model_exchange::ModelRouteRequest {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/chat_wire.rs:1888:
+                         model: row["id"].as_str().map(str::to_string),
+                     })
+                 {
+-                    row["reasoning"] = json!(
+-                        dispatch
+-                            .compat
+-                            .as_ref()
+-                            .and_then(|c| c.reasoning)
+-                            .unwrap_or(false)
+-                    );
++                    row["reasoning"] = json!(dispatch
++                        .compat
++                        .as_ref()
++                        .and_then(|c| c.reasoning)
++                        .unwrap_or(false));
+                     row["contextWindow"] =
+                         json!(dispatch.compat.as_ref().and_then(|c| c.context_window));
+                 }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2812:
+                 ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+             })?;
+         state.session_admin().attach_browser(&browsers);
+-        if let Some(gateway) = state.tool_gateway() { state.session_admin().attach_mcp_gateway(gateway); }
++        if let Some(gateway) = state.tool_gateway() {
++            state.session_admin().attach_mcp_gateway(gateway);
++        }
+         state.browsers.set(browsers).map_err(|_| {
+             ServiceStartupError::Storage(StorageError::Internal {
+                 detail: "browser already initialized".into(),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:9041:
+ /// 监听失败和正常退出共用停止信号，外部仍持有服务引用也不能继续唤醒任务。
+ fn begin_background_shutdown(state: &ServiceState) {
+     state.loop_services().stop_idle_listener();
+-    if let Some(gateway) = state.tool_gateway() { gateway.close_mcp_session_permissions(); }
++    if let Some(gateway) = state.tool_gateway() {
++        gateway.close_mcp_session_permissions();
++    }
+     state.memory().dream().stop_all();
+     state.automation().stop();
+     state.bridge().stop();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/mcp_session_permissions.rs:5:
+ };
+ 
+ use axum::{
+-    Extension, Json, Router,
+     extract::State,
+     http::StatusCode,
+     response::{IntoResponse, Response},
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/mcp_session_permissions.rs:12:
+     routing::post,
++    Extension, Json, Router,
+ };
+ use lingxi_adapters::storage::{
++    session_tree::{get_session_row, SessionTreeRow},
+     RunDatabase,
+-    session_tree::{SessionTreeRow, get_session_row},
+ };
+ use lingxi_protocol::{McpSessionPermissionRequest, McpSessionPermissionResponse};
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ 
+ use crate::{
+-    ServiceState,
+     auth::{AuthService, CredentialKind, Principal},
++    ServiceState,
+ };
+ 
+ const CAPACITY: usize = 4096;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:45:
+ #[path = "media_run.rs"]
+ mod media_run;
+ pub use media_run::MediaExecutionPermit;
+-pub(crate) use media_run::{MEDIA_REQUEST_SESSION_BUSY, MediaRequestPermit};
++pub(crate) use media_run::{MediaRequestPermit, MEDIA_REQUEST_SESSION_BUSY};
+ #[path = "beautify_run.rs"]
+ mod beautify_run;
+ pub(crate) use beautify_run::CoverPromptCall;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:61:
+     TurnDeltaSinkClosed, TurnProviderPort,
+ };
+ use lingxi_kernel::subagent::{
+-    RunLineage, RunOrigin, ToolAccessTier, ToolAuthorization, authorize_child_tool,
+-    authorize_child_tool_with_registry_id,
++    authorize_child_tool, authorize_child_tool_with_registry_id, RunLineage, RunOrigin,
++    ToolAccessTier, ToolAuthorization,
+ };
+ use lingxi_kernel::{
+-    FailureCause, NoFinalCause, QuotaResource, RunFinish, RunStateMachine, attempt_id,
+-    model_call_id, tool_call_id,
++    attempt_id, model_call_id, tool_call_id, FailureCause, NoFinalCause, QuotaResource, RunFinish,
++    RunStateMachine,
+ };
+ use lingxi_protocol::{
+     AssistantSegmentDeltaPayload, AssistantSegmentEndPayload, AssistantSegmentStartPayload,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:885:
+         Result<(), String>,
+         Result<serde_json::Value, crate::EndpointError>,
+     ) {
+-        use crate::EndpointError;
+         use crate::approval::{ApprovalDecision, ApprovalRequest};
+         use crate::toolgateway::{
+-            CallerSurface, InvocationPermissionContext, PolicyVerdict, TOOL_LIFETIME,
+-            TrustedToolLifetime,
++            CallerSurface, InvocationPermissionContext, PolicyVerdict, TrustedToolLifetime,
++            TOOL_LIFETIME,
+         };
++        use crate::EndpointError;
+         use axum::http::StatusCode;
+-        use lingxi_kernel::toolcatalog::{PermissionKind, SchemaBudget, summarize_arguments};
++        use lingxi_kernel::toolcatalog::{summarize_arguments, PermissionKind, SchemaBudget};
+         let MediaGenerateCall {
+             db,
+             events,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/session_admin.rs:15:
+ 
+ use serde::Serialize;
+ 
+-use lingxi_adapters::storage::RunDatabase;
+ use lingxi_adapters::storage::session_admin as store;
+ use lingxi_adapters::storage::session_tree::SessionTreeRow;
++use lingxi_adapters::storage::RunDatabase;
+ use lingxi_kernel::ports::StorageError;
+ 
+ /// 管理面错误：每一支都映射到响亮的 HTTP 结局。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessions.rs:22:
+ use serde::{Deserialize, Serialize};
+ 
+ use lingxi_adapters::storage::{RunDatabase, RunSummaryRow, SessionRow};
+-use lingxi_kernel::Principal as KernelPrincipal;
+ use lingxi_kernel::ports::{RequestBindingLookup, StorageError, StoragePort};
++use lingxi_kernel::Principal as KernelPrincipal;
+ use lingxi_protocol::RunStatus;
+ 
+-use crate::auth::{LOCAL_OWNER_USER_ID, Principal, PrincipalKind};
++use crate::auth::{Principal, PrincipalKind, LOCAL_OWNER_USER_ID};
+ use crate::cancel::{CancelPhase, CancelScope};
+ use crate::events::EventService;
+ use crate::runs::DriveAuthorization;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessions.rs:2543:
+     use crate::auth::{ConnectionKindSerde, CredentialKind, PrincipalKind as Pk, TrustState};
+     use crate::events::EventLimits;
+     use crate::runs::RunSupervisor;
+-    use lingxi_kernel::RunContext;
+     use lingxi_kernel::ports::{CommittedOutcome, KeyEvent};
++    use lingxi_kernel::RunContext;
+     use lingxi_protocol::{RunId, SessionId, ToolCallId};
+     use std::sync::Mutex as StdMutex;
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessions.rs:3291:
+             SteerOutcome::Miss
+         );
+         // And an idle session accepts a normal submission again.
+-        assert!(
+-            store
+-                .execute_for(
+-                    &port,
+-                    &events,
+-                    &supervisor(),
+-                    &owner,
+-                    "sess_local_alpha",
+-                    "next",
+-                    2
+-                )
+-                .await
+-                .is_ok()
+-        );
++        assert!(store
++            .execute_for(
++                &port,
++                &events,
++                &supervisor(),
++                &owner,
++                "sess_local_alpha",
++                "next",
++                2
++            )
++            .await
++            .is_ok());
+         drop(events);
+         let _ = std::fs::remove_dir_all(dir);
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessions.rs:3687:
+ 
+     #[tokio::test]
+     async fn bridge_inbox_run_survives_restart_without_a_second_run_even_before_host_bind() {
+-        use lingxi_adapters::storage::{StoreOptions, bridge as store};
++        use lingxi_adapters::storage::{bridge as store, StoreOptions};
+         use lingxi_kernel::subagent::{RunLineage, RunOrigin, SessionPermissionMode};
+         let home = std::env::temp_dir().join(format!(
+             "r07-bridge-restart-{}",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessiontools.rs:4:
+     session_tree::{RewindRequest, SessionService, SessionTreeError},
+     toolgateway::{ReviewInput, ToolInvocationGateway},
+ };
+-use lingxi_adapters::storage::{RunDatabase, session_tree as store};
++use lingxi_adapters::storage::{session_tree as store, RunDatabase};
+ use lingxi_kernel::{
+-    RunContext,
+     ports::{ToolExecutionResult, ToolExecutorPort, ToolOutcome, ToolRequest, ToolSuccess},
+     toolcatalog::{
+         Availability, DeclaredPermission, PermissionContract, PermissionKind, SchemaBudget,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/sessiontools.rs:13:
+         ToolManifest, ToolOrigin, ToolRegistry,
+     },
++    RunContext,
+ };
+ use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId, ToolSchemaDocument};
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use std::{
+     path::PathBuf,
+     sync::{Arc, Mutex},
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:3056:
+             ))
+             .unwrap();
+         gw.discard_prepared_for_call(&ctx_of("foreign-run"), &call, &prepared.handle);
+-        assert!(
+-            gw.prepared
+-                .lock()
+-                .unwrap()
+-                .contains_key(prepared.handle.as_str())
+-        );
++        assert!(gw
++            .prepared
++            .lock()
++            .unwrap()
++            .contains_key(prepared.handle.as_str()));
+         gw.discard_prepared_for_call(&ctx, &ToolCallId::new("foreign-call"), &prepared.handle);
+-        assert!(
+-            gw.prepared
+-                .lock()
+-                .unwrap()
+-                .contains_key(prepared.handle.as_str())
+-        );
++        assert!(gw
++            .prepared
++            .lock()
++            .unwrap()
++            .contains_key(prepared.handle.as_str()));
+         gw.discard_prepared_for_call(&ctx, &call, &prepared.handle);
+-        assert!(
+-            !gw.prepared
+-                .lock()
+-                .unwrap()
+-                .contains_key(prepared.handle.as_str())
+-        );
++        assert!(!gw
++            .prepared
++            .lock()
++            .unwrap()
++            .contains_key(prepared.handle.as_str()));
+         let error =
+             futures_block_on(gw.execute_prepared(&ctx, &call, &prepared.handle)).unwrap_err();
+         assert_eq!(error.code(), "gateway_prepared_handle_unknown");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:1:
+ //! 原672564：真实身份、会话、Run、存储和官方SDK；仅模型平台与MCP端为自有外部响应。
+ use axum::{
+-    Json, Router,
+     extract::State,
+     response::{IntoResponse, Response},
+     routing::{get, post},
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:7:
++    Json, Router,
+ };
+ use lingxi_adapters::models::{
+     config::ModelPlaneConfig, gateway::ConfigModelGateway, network::NetworkPlane,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:11:
+ use lingxi_kernel::ports::StoragePort;
+ use lingxi_protocol::RunId;
+ use lingxi_service::{
+-    HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState, prepare_layout,
++    prepare_layout, HomeSource, NetworkMode, ServiceConfig, ServiceDeps, ServiceState,
+ };
+ use lingxi_test_guard as _;
+-use serde_json::{Value, json};
++use serde_json::{json, Value};
+ use std::{
+     path::PathBuf,
+-    sync::{Arc, Mutex, atomic::AtomicBool},
++    sync::{atomic::AtomicBool, Arc, Mutex},
+     time::Duration,
+ };
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:626:
+ }
+ 
+ #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+-async fn missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates()
+- {
++async fn missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates(
++) {
+     let h = Harness::boot(home()).await;
+     h.configure_mcp().await;
+     h.create("mcp-scope-check").await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs:819:
+ }
+ 
+ #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+-async fn actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval()
+- {
++async fn actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval(
++) {
+     let h = Harness::boot(home()).await;
+     h.configure_mcp().await;
+     h.create("mcp-ws-session").await;

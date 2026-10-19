@@ -1,0 +1,16 @@
+{
+  "candidate": "t07c",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256Before": "915c392e1433d74a9351540e7bb0dbde0832c2ae293b6120b3d57b590e369f7b",
+  "binarySha256After": "915c392e1433d74a9351540e7bb0dbde0832c2ae293b6120b3d57b590e369f7b",
+  "binaryUnchanged": true,
+  "buildReceipt": "t07c-build.json",
+  "buildReceiptSha256": "6c5fe7af6c2401fce28c736eb69b51b6b88d2930e63522d7fae478eec564b413",
+  "uiReceipt": "t07c-ui.json",
+  "uiReceiptSha256": "c7fecc144be4baa821c3b357d80583e49e98a76365cff598425bf006d0bc9b3e",
+  "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "startedAt": "2026-10-18T03:30:01.579816+00:00",
+  "endedAt": "2026-10-18T03:30:16.033032+00:00",
+  "wrapperExitCode": 0,
+  "scope": "fresh same-candidate build used by actual service UI test; build success does not imply other platforms or manual browser takeover"
+}

@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（configured）
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model）
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-agent）
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（restart）
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（rejected-restart）
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（invalid-resource-credential）
+ ↓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure）
+ × desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（all-pages） 1125ms
+   → expected null not to be null
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（all-pages）
+AssertionError: expected null not to be null
+ ❯ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx:155:94
+    153|       fireEvent.click(screen.getByRole('button', { name: `settings.tab…
+    154|       if (screen.queryAllByRole('alert').some(alert => alert.textConte…
+    155|       expect(document.querySelector(`div[data-tab="${tab}"]:not([data-…
+       |                                                                                              ^
+    156|       if (tab === 'general') expect(screen.getByRole('button', { name:…
+    157|       if (scenario === 'without-model') expect(screen.getAllByRole('al…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 skipped (8)
+   Start at  18:33:50
+   Duration  2.88s (transform 936ms, setup 41ms, import 1.28s, tests 1.13s, environment 366ms)
+

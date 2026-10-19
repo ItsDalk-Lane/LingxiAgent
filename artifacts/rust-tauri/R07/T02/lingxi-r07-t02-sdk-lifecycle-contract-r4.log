@@ -1,0 +1,21 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/migration/r01-t02/bridge-contract.test.mjs (4 tests | 1 failed) 49ms
+     × 保留五平台回发所需的实际上下文，同时限制代次与字段名 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/migration/r01-t02/bridge-contract.test.mjs > 桥接统一消息、附件与回执契约 > 保留五平台回发所需的实际上下文，同时限制代次与字段名
+AssertionError: expected [Function] to throw an error
+ ❯ tests/migration/r01-t02/bridge-contract.test.mjs:37:101
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 67 passed (68)
+   Start at  03:14:47
+   Duration  12.28s (transform 271ms, setup 59ms, import 290ms, tests 12.08s, environment 0ms)
+

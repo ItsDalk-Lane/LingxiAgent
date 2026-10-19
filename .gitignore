@@ -170,3 +170,9 @@ desktop/native/LingxiSpeechPermissions/build/
 /artifacts/rust-tauri/R06/route-a-20261014/mood-execution-r2/
 /artifacts/rust-tauri/R06/route-a-20261014/splash-avatar-execution-r1/
 /artifacts/rust-tauri/R06/route-a-20261014/w11-binding-execution/
+
+# R07 LAN 诊断的隔离运行根含 258MB 编译产物与测试运行时数据（临时令牌/数据库）；
+# verify-stage 候选快照为全仓哈希清单（每份 44MB，可由对应提交重生）。
+# 照 R02/R06 先例保留本机取证，提交只带回执与结果 JSON，复核以本机原件为准。
+/artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/isolated/
+/artifacts/rust-tauri/R07/T12/verify-r07-*/candidate-source-*.json

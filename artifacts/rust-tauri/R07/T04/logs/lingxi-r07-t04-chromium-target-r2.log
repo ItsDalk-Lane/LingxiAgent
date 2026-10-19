@@ -1,0 +1,24 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.28s
+     Running tests/r07_browser_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-c876379d58688d69)
+
+running 1 test
+test same_real_target_input_snapshot_generations_and_empty_workspace ... FAILED
+
+failures:
+
+---- same_real_target_input_snapshot_generations_and_empty_workspace stdout ----
+
+thread 'same_real_target_input_snapshot_generations_and_empty_workspace' (771127) panicked at crates/lingxi-adapters/tests/r07_browser_chromium.rs:254:5:
+assertion `left == right` failed
+  left: String("Local browser fixture")
+ right: "Delayed browser fixture"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    same_real_target_input_snapshot_generations_and_empty_workspace
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 2.07s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_browser_chromium`

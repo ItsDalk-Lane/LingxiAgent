@@ -1,0 +1,805 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/migrations.rs:1070:
+         name: V20_NAME,
+         sql: V20_SQL,
+     },
+-    Migration { version: 21, name: V21_NAME, sql: V21_SQL },
+-    Migration { version: 22, name: V22_NAME, sql: V22_SQL },
++    Migration {
++        version: 21,
++        name: V21_NAME,
++        sql: V21_SQL,
++    },
++    Migration {
++        version: 22,
++        name: V22_NAME,
++        sql: V22_SQL,
++    },
+ ];
+ 
+ /// Highest schema version this build understands.
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs:54:
+             "AutomationNotificationCommand",
+             root_schema::<AutomationNotificationCommand>(),
+         ),
+-        ("BeautifyWorkbenchTarget", root_schema::<BeautifyWorkbenchTarget>()),
+-        ("BeautifyUploadedImage", root_schema::<BeautifyUploadedImage>()),
+-        ("BeautifyApplyRequest", root_schema::<BeautifyApplyRequest>()),
+-        ("BeautifyPresetRequest", root_schema::<BeautifyPresetRequest>()),
+-        ("BeautifyGenerateRequest", root_schema::<BeautifyGenerateRequest>()),
++        (
++            "BeautifyWorkbenchTarget",
++            root_schema::<BeautifyWorkbenchTarget>(),
++        ),
++        (
++            "BeautifyUploadedImage",
++            root_schema::<BeautifyUploadedImage>(),
++        ),
++        (
++            "BeautifyApplyRequest",
++            root_schema::<BeautifyApplyRequest>(),
++        ),
++        (
++            "BeautifyPresetRequest",
++            root_schema::<BeautifyPresetRequest>(),
++        ),
++        (
++            "BeautifyGenerateRequest",
++            root_schema::<BeautifyGenerateRequest>(),
++        ),
+         ("MediaKind", root_schema::<MediaKind>()),
+         ("MediaJobPhase", root_schema::<MediaJobPhase>()),
+         ("MediaRemoteOutcome", root_schema::<MediaRemoteOutcome>()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs:65:
+         ("MediaRemoteCancel", root_schema::<MediaRemoteCancel>()),
+         ("MediaArtifact", root_schema::<MediaArtifact>()),
+         ("MediaJobReceipt", root_schema::<MediaJobReceipt>()),
+-        ("MediaJobListResponse", root_schema::<MediaJobListResponse>()),
++        (
++            "MediaJobListResponse",
++            root_schema::<MediaJobListResponse>(),
++        ),
+         ("MediaJobResponse", root_schema::<MediaJobResponse>()),
+-        ("MediaGenerationUpdate", root_schema::<MediaGenerationUpdate>()),
+-        ("MediaJobCancelRequest", root_schema::<MediaJobCancelRequest>()),
++        (
++            "MediaGenerationUpdate",
++            root_schema::<MediaGenerationUpdate>(),
++        ),
++        (
++            "MediaJobCancelRequest",
++            root_schema::<MediaJobCancelRequest>(),
++        ),
+         ("BrowserAction", root_schema::<BrowserAction>()),
+         ("BrowserCommand", root_schema::<BrowserCommand>()),
+         ("BrowserSettings", root_schema::<BrowserSettings>()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs:419:
+ 
+ fn golden_samples() -> Vec<Golden> {
+     let mut out: Vec<Golden> = Vec::new();
+-    let target=BeautifyWorkbenchTarget{kind:"workbench-file".into(),mount_id:Some("mount-owned".into()),root_id:None,subdir:"notes".into(),name:"文档.md".into()};
+-    push(&mut out,"beautify-workbench-target.json","BeautifyWorkbenchTarget",&target,vec![]);
+-    let uploaded=BeautifyUploadedImage{filename:Some("cover.png".into()),content_base64:"YWJj".into()};
+-    push(&mut out,"beautify-uploaded-image.json","BeautifyUploadedImage",&uploaded,vec![]);
+-    push(&mut out,"beautify-apply-request.json","BeautifyApplyRequest",&BeautifyApplyRequest{file_path:None,target:Some(target.clone()),image_file_path:None,image:Some(uploaded),request_id:Some("request-stable".into())},vec![]);
+-    push(&mut out,"beautify-preset-request.json","BeautifyPresetRequest",&BeautifyPresetRequest{file_path:None,target:Some(target.clone()),preset_id:"landscape".into(),request_id:Some("request-stable".into())},vec![]);
+-    push(&mut out,"beautify-generate-request.json","BeautifyGenerateRequest",&BeautifyGenerateRequest{file_path:None,target:Some(target),executor_agent_id:Some("agent-selected".into()),agent_id:None,theme_tone:Some("light".into()),user_guidance:Some("自然风景".into()),request_id:Some("request-stable".into())},vec![]);
++    let target = BeautifyWorkbenchTarget {
++        kind: "workbench-file".into(),
++        mount_id: Some("mount-owned".into()),
++        root_id: None,
++        subdir: "notes".into(),
++        name: "文档.md".into(),
++    };
++    push(
++        &mut out,
++        "beautify-workbench-target.json",
++        "BeautifyWorkbenchTarget",
++        &target,
++        vec![],
++    );
++    let uploaded = BeautifyUploadedImage {
++        filename: Some("cover.png".into()),
++        content_base64: "YWJj".into(),
++    };
++    push(
++        &mut out,
++        "beautify-uploaded-image.json",
++        "BeautifyUploadedImage",
++        &uploaded,
++        vec![],
++    );
++    push(
++        &mut out,
++        "beautify-apply-request.json",
++        "BeautifyApplyRequest",
++        &BeautifyApplyRequest {
++            file_path: None,
++            target: Some(target.clone()),
++            image_file_path: None,
++            image: Some(uploaded),
++            request_id: Some("request-stable".into()),
++        },
++        vec![],
++    );
++    push(
++        &mut out,
++        "beautify-preset-request.json",
++        "BeautifyPresetRequest",
++        &BeautifyPresetRequest {
++            file_path: None,
++            target: Some(target.clone()),
++            preset_id: "landscape".into(),
++            request_id: Some("request-stable".into()),
++        },
++        vec![],
++    );
++    push(
++        &mut out,
++        "beautify-generate-request.json",
++        "BeautifyGenerateRequest",
++        &BeautifyGenerateRequest {
++            file_path: None,
++            target: Some(target),
++            executor_agent_id: Some("agent-selected".into()),
++            agent_id: None,
++            theme_tone: Some("light".into()),
++            user_guidance: Some("自然风景".into()),
++            request_id: Some("request-stable".into()),
++        },
++        vec![],
++    );
+ 
+     let media_job = MediaJobReceipt {
+-        task_id:"media-stable-operation".into(),kind:MediaKind::Image,provider:"configured-provider".into(),
+-        status:MediaJobPhase::Completed,source_run_id:"run-source".into(),execution_run_id:Some("run-media".into()),
+-        revision:9_007_199_254_740_993,files:vec![MediaArtifact{file_id:"file-actual".into(),filename:"图片.png".into(),mime:"image/png".into(),size_bytes:9_007_199_254_740_993}],
+-        remote_outcome:MediaRemoteOutcome::Completed,remote_cancel:None,local_delivery_stopped:false,
+-        message:Some("已生成并交付实际文件".into()),error_code:None,created_at_ms:1_700_000_000_000,updated_at_ms:1_700_000_001_000,
++        task_id: "media-stable-operation".into(),
++        kind: MediaKind::Image,
++        provider: "configured-provider".into(),
++        status: MediaJobPhase::Completed,
++        source_run_id: "run-source".into(),
++        execution_run_id: Some("run-media".into()),
++        revision: 9_007_199_254_740_993,
++        files: vec![MediaArtifact {
++            file_id: "file-actual".into(),
++            filename: "图片.png".into(),
++            mime: "image/png".into(),
++            size_bytes: 9_007_199_254_740_993,
++        }],
++        remote_outcome: MediaRemoteOutcome::Completed,
++        remote_cancel: None,
++        local_delivery_stopped: false,
++        message: Some("已生成并交付实际文件".into()),
++        error_code: None,
++        created_at_ms: 1_700_000_000_000,
++        updated_at_ms: 1_700_000_001_000,
+     };
+     for (file, phase) in [
+-        ("media-submitting.json",MediaJobPhase::Submitting),("media-submitted.json",MediaJobPhase::Submitted),
+-        ("media-generating.json",MediaJobPhase::Generating),("media-downloading.json",MediaJobPhase::Downloading),
+-        ("media-completed.json",MediaJobPhase::Completed),("media-failed.json",MediaJobPhase::Failed),
+-        ("media-cancelled.json",MediaJobPhase::Cancelled),("media-unknown.json",MediaJobPhase::Unknown),
++        ("media-submitting.json", MediaJobPhase::Submitting),
++        ("media-submitted.json", MediaJobPhase::Submitted),
++        ("media-generating.json", MediaJobPhase::Generating),
++        ("media-downloading.json", MediaJobPhase::Downloading),
++        ("media-completed.json", MediaJobPhase::Completed),
++        ("media-failed.json", MediaJobPhase::Failed),
++        ("media-cancelled.json", MediaJobPhase::Cancelled),
++        ("media-unknown.json", MediaJobPhase::Unknown),
+     ] {
+-        let mut job=media_job.clone();job.status=phase;
+-        if phase!=MediaJobPhase::Completed {job.files.clear();}
+-        if phase==MediaJobPhase::Failed {job.remote_outcome=MediaRemoteOutcome::Failed;}
+-        if phase==MediaJobPhase::Cancelled {job.local_delivery_stopped=true;job.remote_cancel=Some(MediaRemoteCancel::Unsupported);job.message=Some("已停止本地交付；远端可能仍在运行".into());}
+-        push(&mut out,file,"MediaJobReceipt",&job,vec![]);
++        let mut job = media_job.clone();
++        job.status = phase;
++        if phase != MediaJobPhase::Completed {
++            job.files.clear();
++        }
++        if phase == MediaJobPhase::Failed {
++            job.remote_outcome = MediaRemoteOutcome::Failed;
++        }
++        if phase == MediaJobPhase::Cancelled {
++            job.local_delivery_stopped = true;
++            job.remote_cancel = Some(MediaRemoteCancel::Unsupported);
++            job.message = Some("已停止本地交付；远端可能仍在运行".into());
++        }
++        push(&mut out, file, "MediaJobReceipt", &job, vec![]);
+     }
+-    push(&mut out,"media-artifact.json","MediaArtifact",&media_job.files[0],vec![]);
+-    push(&mut out,"media-job-list.json","MediaJobListResponse",&MediaJobListResponse{jobs:vec![media_job.clone()]},vec![]);
+-    push(&mut out,"media-job-response.json","MediaJobResponse",&MediaJobResponse{job:media_job.clone()},vec![]);
+-    push(&mut out,"media-generation-update.json","MediaGenerationUpdate",&MediaGenerationUpdate{session_id:"session-owned".into(),media_generation:media_job},vec![]);
+-    push(&mut out,"media-cancel-request.json","MediaJobCancelRequest",&MediaJobCancelRequest{},vec![]);
++    push(
++        &mut out,
++        "media-artifact.json",
++        "MediaArtifact",
++        &media_job.files[0],
++        vec![],
++    );
++    push(
++        &mut out,
++        "media-job-list.json",
++        "MediaJobListResponse",
++        &MediaJobListResponse {
++            jobs: vec![media_job.clone()],
++        },
++        vec![],
++    );
++    push(
++        &mut out,
++        "media-job-response.json",
++        "MediaJobResponse",
++        &MediaJobResponse {
++            job: media_job.clone(),
++        },
++        vec![],
++    );
++    push(
++        &mut out,
++        "media-generation-update.json",
++        "MediaGenerationUpdate",
++        &MediaGenerationUpdate {
++            session_id: "session-owned".into(),
++            media_generation: media_job,
++        },
++        vec![],
++    );
++    push(
++        &mut out,
++        "media-cancel-request.json",
++        "MediaJobCancelRequest",
++        &MediaJobCancelRequest {},
++        vec![],
++    );
+ 
+     push(
+         &mut out,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/media.rs:106:
+     use super::*;
+     #[test]
+     fn artifact_precision_and_closed_identity_are_preserved() {
+-        let artifact=MediaArtifact{file_id:"actual-file".into(),filename:"图.png".into(),mime:"image/png".into(),size_bytes:u64::MAX};
+-        let value=serde_json::to_value(&artifact).unwrap();
+-        assert_eq!(value["sizeBytes"],u64::MAX.to_string());
+-        assert_eq!(serde_json::from_value::<MediaArtifact>(value.clone()).unwrap(),artifact);
+-        let mut forged=value.clone();forged["hostPath"]=serde_json::json!("/private/file");
++        let artifact = MediaArtifact {
++            file_id: "actual-file".into(),
++            filename: "图.png".into(),
++            mime: "image/png".into(),
++            size_bytes: u64::MAX,
++        };
++        let value = serde_json::to_value(&artifact).unwrap();
++        assert_eq!(value["sizeBytes"], u64::MAX.to_string());
++        assert_eq!(
++            serde_json::from_value::<MediaArtifact>(value.clone()).unwrap(),
++            artifact
++        );
++        let mut forged = value.clone();
++        forged["hostPath"] = serde_json::json!("/private/file");
+         assert!(serde_json::from_value::<MediaArtifact>(forged).is_err());
+-        let mut number=value;number["sizeBytes"]=serde_json::json!(42);
++        let mut number = value;
++        number["sizeBytes"] = serde_json::json!(42);
+         assert!(serde_json::from_value::<MediaArtifact>(number).is_err());
+-        assert!(serde_json::from_value::<MediaJobCancelRequest>(serde_json::json!({"owner":"forged"})).is_err());
++        assert!(serde_json::from_value::<MediaJobCancelRequest>(
++            serde_json::json!({"owner":"forged"})
++        )
++        .is_err());
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol/src/office.rs:57:
+     use super::*;
+     #[test]
+     fn compatible_fields_are_preserved_but_identity_cannot_be_supplied() {
+-        let value=serde_json::json!({"remoteContentRef":{"kind":"mobile-workbench","rootId":"mount","subdir":"notes","name":"paper.md"},"image":{"name":"cover.png","contentBase64":"YWJj"},"requestId":"request-stable"});
+-        let request:BeautifyApplyRequest=serde_json::from_value(value.clone()).unwrap();
+-        assert_eq!(request.image.unwrap().filename.as_deref(),Some("cover.png"));
+-        assert_eq!(request.target.unwrap().root_id.as_deref(),Some("mount"));
+-        let mut forged=value;forged["principal"]=serde_json::json!("local-owner");
++        let value = serde_json::json!({"remoteContentRef":{"kind":"mobile-workbench","rootId":"mount","subdir":"notes","name":"paper.md"},"image":{"name":"cover.png","contentBase64":"YWJj"},"requestId":"request-stable"});
++        let request: BeautifyApplyRequest = serde_json::from_value(value.clone()).unwrap();
++        assert_eq!(
++            request.image.unwrap().filename.as_deref(),
++            Some("cover.png")
++        );
++        assert_eq!(request.target.unwrap().root_id.as_deref(), Some("mount"));
++        let mut forged = value;
++        forged["principal"] = serde_json::json!("local-owner");
+         assert!(serde_json::from_value::<BeautifyApplyRequest>(forged).is_err());
+     }
+ }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:740:
+     if matches!(p, "/lingxi/v1/models/set" | "/lingxi/v1/models/switch") && m == "POST" {
+         return RoutePolicy::Scope("chat");
+     }
+-    if p == "/lingxi/v1/desk/beautify/status" && matches!(m.as_str(),"GET"|"HEAD") {
++    if p == "/lingxi/v1/desk/beautify/status" && matches!(m.as_str(), "GET" | "HEAD") {
+         return RoutePolicy::Scope("resources.read");
+     }
+-    if matches!(p,"/lingxi/v1/desk/beautify/cover"|"/lingxi/v1/desk/beautify/cover/apply"|"/lingxi/v1/desk/beautify/cover/preset/apply") && m=="POST" {
++    if matches!(
++        p,
++        "/lingxi/v1/desk/beautify/cover"
++            | "/lingxi/v1/desk/beautify/cover/apply"
++            | "/lingxi/v1/desk/beautify/cover/preset/apply"
++    ) && m == "POST"
++    {
+         return RoutePolicy::Scope("resources.write");
+     }
+     if let Some(rest) = p.strip_prefix("/lingxi/v1/sessions/") {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/auth.rs:803:
+             if id_clean {
+                 let media = tail.strip_prefix("media/jobs");
+                 if let Some(suffix) = media {
+-                    let parts = suffix.trim_start_matches('/').split('/').collect::<Vec<_>>();
++                    let parts = suffix
++                        .trim_start_matches('/')
++                        .split('/')
++                        .collect::<Vec<_>>();
+                     let exact_list = suffix.is_empty();
+-                    let exact_job = suffix.starts_with('/') && parts.len()==1 && !parts[0].is_empty();
+-                    let exact_cancel = suffix.starts_with('/') && parts.len()==2 && !parts[0].is_empty() && parts[1]=="cancel";
+-                    return if ((exact_list || exact_job) && matches!(m.as_str(), "GET"|"HEAD")) || (exact_cancel && m=="POST") {
++                    let exact_job =
++                        suffix.starts_with('/') && parts.len() == 1 && !parts[0].is_empty();
++                    let exact_cancel = suffix.starts_with('/')
++                        && parts.len() == 2
++                        && !parts[0].is_empty()
++                        && parts[1] == "cancel";
++                    return if ((exact_list || exact_job) && matches!(m.as_str(), "GET" | "HEAD"))
++                        || (exact_cancel && m == "POST")
++                    {
+                         RoutePolicy::Scope("chat")
+-                    } else { RoutePolicy::LocalOnly };
++                    } else {
++                        RoutePolicy::LocalOnly
++                    };
+                 }
+             }
+             match tail {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/host_auxiliary.rs:1:
+ //! 安装包或开发宿主的外围能力组合；HTTP 和模型不能选择程序、素材或登录目录。
+-use crate::{media_jimeng::JimengLaunch, office_tools::{OfficeAssets, OfficeWorkerLaunch}, ServiceDeps};
++use crate::{
++    media_jimeng::JimengLaunch,
++    office_tools::{OfficeAssets, OfficeWorkerLaunch},
++    ServiceDeps,
++};
+ use std::path::{Path, PathBuf};
+ 
+-fn setting(name: &str) -> Option<PathBuf> { std::env::var_os(name).map(PathBuf::from) }
++fn setting(name: &str) -> Option<PathBuf> {
++    std::env::var_os(name).map(PathBuf::from)
++}
+ fn checked(path: PathBuf, directory: bool) -> Result<PathBuf, String> {
+     let meta = std::fs::symlink_metadata(&path).map_err(|_| "外围能力路径不存在")?;
+-    if !path.is_absolute() || meta.file_type().is_symlink() || if directory { !meta.is_dir() } else { !meta.is_file() } {
++    if !path.is_absolute()
++        || meta.file_type().is_symlink()
++        || if directory {
++            !meta.is_dir()
++        } else {
++            !meta.is_file()
++        }
++    {
+         return Err("外围能力要求真实的绝对文件或目录".into());
+     }
+-    path.canonicalize().map_err(|_| "外围能力路径无法确认".into())
++    path.canonicalize()
++        .map_err(|_| "外围能力路径无法确认".into())
+ }
+ 
+ pub fn configure(deps: &mut ServiceDeps) -> Result<(), String> {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/host_auxiliary.rs:15:
+-    let office = ["LINGXI_OFFICE_NODE", "LINGXI_OFFICE_WORKER", "LINGXI_OFFICE_THEMES", "LINGXI_OFFICE_COVERS"].map(setting);
++    let office = [
++        "LINGXI_OFFICE_NODE",
++        "LINGXI_OFFICE_WORKER",
++        "LINGXI_OFFICE_THEMES",
++        "LINGXI_OFFICE_COVERS",
++    ]
++    .map(setting);
+     let selected = if office.iter().any(Option::is_some) {
+         let [Some(node), Some(worker), Some(themes), Some(covers)] = office else {
+             return Err("办公运行环境配置不完整".into());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/host_auxiliary.rs:24:
+             let entry = Path::new(bridge.args.last()?);
+             let source = entry.file_name()?.to_str()? == "bridge-sdk-worker.ts";
+             let root = entry.parent()?.parent()?;
+-            let worker = root.join(if source { "scripts/office-document-worker.ts" } else { "bundle/office-document-worker.mjs" });
+-            let themes = root.join(if source { "desktop/src/themes" } else { "desktop/dist-renderer/themes" });
++            let worker = root.join(if source {
++                "scripts/office-document-worker.ts"
++            } else {
++                "bundle/office-document-worker.mjs"
++            });
++            let themes = root.join(if source {
++                "desktop/src/themes"
++            } else {
++                "desktop/dist-renderer/themes"
++            });
+             let covers = root.join("desktop/src/assets/cover-gallery");
+-            (worker.is_file() && themes.is_dir() && covers.is_dir()).then(|| (bridge.program.clone(),worker,themes,covers))
++            (worker.is_file() && themes.is_dir() && covers.is_dir())
++                .then(|| (bridge.program.clone(), worker, themes, covers))
+         })
+     };
+-    if let Some((node,worker,themes,covers)) = selected {
+-        let node=checked(node,false)?; let worker=checked(worker,false)?;
+-        deps.office_document_worker=Some(OfficeWorkerLaunch {
+-            argv:vec![node.to_string_lossy().into_owned(),"--max-old-space-size=384".into(),worker.to_string_lossy().into_owned()],
+-            cwd:worker.parent().ok_or("办公解析器缺少目录")?.to_path_buf(),
++    if let Some((node, worker, themes, covers)) = selected {
++        let node = checked(node, false)?;
++        let worker = checked(worker, false)?;
++        deps.office_document_worker = Some(OfficeWorkerLaunch {
++            argv: vec![
++                node.to_string_lossy().into_owned(),
++                "--max-old-space-size=384".into(),
++                worker.to_string_lossy().into_owned(),
++            ],
++            cwd: worker.parent().ok_or("办公解析器缺少目录")?.to_path_buf(),
+         });
+-        deps.office_assets=Some(OfficeAssets { themes_dir:checked(themes,true)?, cover_gallery_dir:checked(covers,true)? });
++        deps.office_assets = Some(OfficeAssets {
++            themes_dir: checked(themes, true)?,
++            cover_gallery_dir: checked(covers, true)?,
++        });
+     }
+-    let executor=setting("LINGXI_JIMENG_EXECUTABLE");
+-    let private=setting("LINGXI_JIMENG_PRIVATE_ROOT");
+-    let login=setting("LINGXI_JIMENG_LOGIN_HOME");
+-    let generation=std::env::var("LINGXI_JIMENG_GRANT_GENERATION").ok();
++    let executor = setting("LINGXI_JIMENG_EXECUTABLE");
++    let private = setting("LINGXI_JIMENG_PRIVATE_ROOT");
++    let login = setting("LINGXI_JIMENG_LOGIN_HOME");
++    let generation = std::env::var("LINGXI_JIMENG_GRANT_GENERATION").ok();
+     if executor.is_some() || private.is_some() || login.is_some() || generation.is_some() {
+-        let (Some(executor),Some(private_root),Some(external_login_home),Some(generation))=(executor,private,login,generation) else {
++        let (Some(executor), Some(private_root), Some(external_login_home), Some(generation)) =
++            (executor, private, login, generation)
++        else {
+             return Err("即梦执行器与外部登录许可配置不完整".into());
+         };
+-        let node=setting("LINGXI_MEDIA_NODE").ok_or("即梦纯解析器Node未配置")?;
+-        let helper=setting("LINGXI_MEDIA_HELPER").ok_or("即梦纯解析器未配置")?;
+-        let credential_grant_generation=generation.parse::<u64>().ok().filter(|n|*n>0).ok_or("即梦登录许可代次无效")?;
+-        deps.jimeng_launch=Some(JimengLaunch {
+-            executable:checked(executor,false)?,helper_argv:vec![checked(node,false)?.to_string_lossy().into_owned(),checked(helper,false)?.to_string_lossy().into_owned()],
+-            private_root,external_login_home,credential_grant_generation,
++        let node = setting("LINGXI_MEDIA_NODE").ok_or("即梦纯解析器Node未配置")?;
++        let helper = setting("LINGXI_MEDIA_HELPER").ok_or("即梦纯解析器未配置")?;
++        let credential_grant_generation = generation
++            .parse::<u64>()
++            .ok()
++            .filter(|n| *n > 0)
++            .ok_or("即梦登录许可代次无效")?;
++        deps.jimeng_launch = Some(JimengLaunch {
++            executable: checked(executor, false)?,
++            helper_argv: vec![
++                checked(node, false)?.to_string_lossy().into_owned(),
++                checked(helper, false)?.to_string_lossy().into_owned(),
++            ],
++            private_root,
++            external_login_home,
++            credential_grant_generation,
+         });
+     }
+     Ok(())
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:99:
+ pub mod logging;
+ mod management;
+ pub mod mcpbridge;
++pub mod media;
++pub mod media_jimeng;
++pub mod media_routes;
++pub mod media_tools;
+ pub mod memory;
+ pub mod memory_ticker;
+ pub mod memorytools;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:105:
+ pub mod model_history;
+ mod mood_trajectory;
+ pub mod office;
+-pub mod office_tools;
+ mod office_pdf;
+ pub mod office_routes;
+-pub mod media;
+-pub mod media_tools;
+-pub mod media_routes;
+-pub mod media_jimeng;
++pub mod office_tools;
+ pub mod operations;
+ pub mod paths;
+ pub mod persona;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2221:
+             })?;
+         }
+         let task_tools = Arc::new(background_tasks::TaskTools::new(
+-            Arc::clone(&storage), Arc::downgrade(&runs), operations_entry.clone(),
++            Arc::clone(&storage),
++            Arc::downgrade(&runs),
++            operations_entry.clone(),
+         ));
+         if let Some(gateway) = deps.tool_gateway.as_ref() {
+             background_tasks::register(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2553:
+         })?;
+         let media = media::MediaService::new(&state);
+         if let Some(launch) = deps.jimeng_launch {
+-            let runtime = media_jimeng::JimengRuntime::new(launch, state.clock().clone()).map_err(|detail| {
+-                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+-            })?;
++            let runtime = media_jimeng::JimengRuntime::new(launch, state.clock().clone()).map_err(
++                |detail| ServiceStartupError::Storage(StorageError::InvalidRequest { detail }),
++            )?;
+             media.set_jimeng(runtime).map_err(|detail| {
+                 ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+             })?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2562:
+         }
+-        task_tools.set_media(Arc::downgrade(&media)).map_err(|detail| {
+-            ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+-        })?;
++        task_tools
++            .set_media(Arc::downgrade(&media))
++            .map_err(|detail| {
++                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
++            })?;
+         state.session_admin().attach_media(&media);
+         state.sessions().attach_media(&media);
+         state.media.set(media.clone()).map_err(|_| {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2569:
+-            ServiceStartupError::Storage(StorageError::Internal { detail: "媒体服务重复初始化".into() })
++            ServiceStartupError::Storage(StorageError::Internal {
++                detail: "媒体服务重复初始化".into(),
++            })
+         })?;
+         let office_api = office_tools::OfficeApi::from_state(&state);
+         if let Some(launch) = deps.office_document_worker {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:2575:
+             })?;
+         }
+         state.office_api.set(office_api.clone()).map_err(|_| {
+-            ServiceStartupError::Storage(StorageError::Internal { detail: "办公服务重复初始化".into() })
++            ServiceStartupError::Storage(StorageError::Internal {
++                detail: "办公服务重复初始化".into(),
++            })
+         })?;
+         if let Some(gateway) = state.tool_gateway() {
+             let budget = lingxi_kernel::toolcatalog::SchemaBudget::default();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:3034:
+     pub fn browsers(&self) -> &Arc<browser::BrowserService> {
+         self.browsers.get().expect("浏览器服务已组装")
+     }
+-    pub fn office_api(&self) -> Option<&Arc<office_tools::OfficeApi>> { self.office_api.get() }
+-    pub fn office_assets(&self) -> Option<&office_tools::OfficeAssets> { self.office_assets.as_ref() }
+-    pub fn beautify(&self) -> &Arc<beautify_generation::BeautifyService> { self.beautify.get().expect("封面服务已完成初始化") }
+-    pub fn media(&self) -> &Arc<media::MediaService> { self.media.get().expect("媒体服务已完成初始化") }
++    pub fn office_api(&self) -> Option<&Arc<office_tools::OfficeApi>> {
++        self.office_api.get()
++    }
++    pub fn office_assets(&self) -> Option<&office_tools::OfficeAssets> {
++        self.office_assets.as_ref()
++    }
++    pub fn beautify(&self) -> &Arc<beautify_generation::BeautifyService> {
++        self.beautify.get().expect("封面服务已完成初始化")
++    }
++    pub fn media(&self) -> &Arc<media::MediaService> {
++        self.media.get().expect("媒体服务已完成初始化")
++    }
+     pub fn web_tools(&self) -> &Arc<web_tools::WebTools> {
+         self.web_tools.get().expect("网页工具已组装")
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:8727:
+         .unwrap_or(dream_budget);
+     match tokio::time::timeout(remaining, media_service.stop(remaining)).await {
+         Ok(Ok(unfinished)) if unfinished.is_empty() => {}
+-        Ok(Ok(_)) | Err(_) => return outcome.map(|_| ServeOutcome { drain_timed_out: true }),
+-        Ok(Err(error)) => return Err(ServiceError::Serve { source: std::io::Error::other(error) }),
++        Ok(Ok(_)) | Err(_) => {
++            return outcome.map(|_| ServeOutcome {
++                drain_timed_out: true,
++            })
++        }
++        Ok(Err(error)) => {
++            return Err(ServiceError::Serve {
++                source: std::io::Error::other(error),
++            })
++        }
+     }
+     let remaining = dream_stop_at
+         .lock()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/lib.rs:8737:
+         .unwrap_or(dream_budget);
+     match tokio::time::timeout(remaining, beautify_service.shutdown(remaining)).await {
+         Ok(Ok(unfinished)) if unfinished.is_empty() => {}
+-        Ok(Ok(_)) | Err(_) => return outcome.map(|_| ServeOutcome { drain_timed_out: true }),
+-        Ok(Err(error)) => return Err(ServiceError::Serve { source: std::io::Error::other(error) }),
++        Ok(Ok(_)) | Err(_) => {
++            return outcome.map(|_| ServeOutcome {
++                drain_timed_out: true,
++            })
++        }
++        Ok(Err(error)) => {
++            return Err(ServiceError::Serve {
++                source: std::io::Error::other(error),
++            })
++        }
+     }
+-    let remaining = dream_stop_at.lock().unwrap()
+-        .map(|at| dream_budget.saturating_sub(at.elapsed())).unwrap_or(dream_budget);
++    let remaining = dream_stop_at
++        .lock()
++        .unwrap()
++        .map(|at| dream_budget.saturating_sub(at.elapsed()))
++        .unwrap_or(dream_budget);
+     match tokio::time::timeout(remaining, browser_service.wait_stopped()).await {
+         Ok(Ok(())) => {}
+         Ok(Err(error)) => {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/office_tools.rs:742:
+                 })?
+         } else {
+             self.files
+-                .register_artifact_blob(ctx.session_id.as_str(), Some(&filename), "application/pdf", &rendered.bytes)
++                .register_artifact_blob(
++                    ctx.session_id.as_str(),
++                    Some(&filename),
++                    "application/pdf",
++                    &rendered.bytes,
++                )
+                 .await
+                 .map_err(|e| e.to_string())?
+         };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/resource_artifacts.rs:177:
+     pub(crate) fn require_same_target(&self, original: &Self) -> Result<(), ResourceIoError> {
+         let mut current = self.facts.clone();
+         current.scope.session_id = original.facts.scope.session_id.clone();
+-        if current == original.facts { Ok(()) } else { Err(conflict("后台受理时原目标或版本已改变")) }
++        if current == original.facts {
++            Ok(())
++        } else {
++            Err(conflict("后台受理时原目标或版本已改变"))
++        }
+     }
+ 
+     /// 仅由正式后台任务存储保存；不保存目录句柄，也不保存“允许写入”的授权。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/runs.rs:1029:
+     }
+ 
+     /// 固定执行的资源读口只使用真实运行绑定的数据根，不接受客户端另选数据库。
+-    pub(crate) fn owned_context_storage(&self) -> Option<&Arc<lingxi_adapters::storage::RunDatabase>> {
++    pub(crate) fn owned_context_storage(
++        &self,
++    ) -> Option<&Arc<lingxi_adapters::storage::RunDatabase>> {
+         self.context_session_store.as_ref()
+     }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/session_admin.rs:177:
+     async fn cleanup_media_session(&self, session_id: &str) -> Result<(), SessionAdminError> {
+         let media = self.media.lock().expect("会话媒体锁").upgrade();
+         if let Some(media) = media {
+-            let unfinished = media.cancel_session(session_id, std::time::Duration::from_secs(3)).await
++            let unfinished = media
++                .cancel_session(session_id, std::time::Duration::from_secs(3))
++                .await
+                 .map_err(|detail| SessionAdminError::Storage(StorageError::Io { detail }))?;
+             if !unfinished.is_empty() {
+                 return Err(SessionAdminError::Storage(StorageError::Conflict {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/session_admin.rs:588:
+             return Err(SessionAdminError::Busy);
+         }
+         if !descendants.is_empty() && child_mode.is_none() {
+-            return Err(SessionAdminError::ChildrenPresent { child_count: descendants.len() });
++            return Err(SessionAdminError::ChildrenPresent {
++                child_count: descendants.len(),
++            });
+         }
+         self.cleanup_media_session(session_id).await?;
+         if child_mode == Some(store::ChildMode::ArchiveChildren) {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/task_supervisor.rs:575:
+         gate: &Arc<lingxi_kernel::session_admission::SessionAdmission>,
+     ) -> Result<Option<lingxi_kernel::subagent::SessionPermissionMode>, StorageError> {
+         let bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+-        let Some(binding) = bindings.get(run_id) else { return Ok(None); };
++        let Some(binding) = bindings.get(run_id) else {
++            return Ok(None);
++        };
+         let permit = binding.permit.upgrade().ok_or(StorageError::Conflict {
+             detail: "parent_run_permit_expired".into(),
+         })?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/task_supervisor.rs:582:
+         let Some((owner, sid, agent, authorization)) = binding.authorization.as_ref() else {
+-            return Err(StorageError::Conflict { detail: "parent_run_authorization_missing".into() });
++            return Err(StorageError::Conflict {
++                detail: "parent_run_authorization_missing".into(),
++            });
+         };
+-        if owner != principal || sid != session_id || agent != agent_id
+-            || !permit.covers(session_id) || !permit.belongs_to(gate)
+-            || binding.root_scope.as_ref().is_none_or(CancelScope::is_cancelled) {
+-            return Err(StorageError::Conflict { detail: "parent_run_permit_mismatch".into() });
++        if owner != principal
++            || sid != session_id
++            || agent != agent_id
++            || !permit.covers(session_id)
++            || !permit.belongs_to(gate)
++            || binding
++                .root_scope
++                .as_ref()
++                .is_none_or(CancelScope::is_cancelled)
++        {
++            return Err(StorageError::Conflict {
++                detail: "parent_run_permit_mismatch".into(),
++            });
+         }
+         Ok(Some(authorization.session_mode))
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/toolgateway.rs:1143:
+             self.admission_checks(&request)?;
+         let review_summary = review_scope
+             .as_ref()
+-            .filter(|_| prepared_tool_call.permission.kind == lingxi_kernel::toolcatalog::PermissionKind::Review)
++            .filter(|_| {
++                prepared_tool_call.permission.kind
++                    == lingxi_kernel::toolcatalog::PermissionKind::Review
++            })
+             .map(|scope| -> Result<String, GatewayRefusal> {
+                 if let Some(summary) = scope
+                     .get("summary")
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:267:
+                     let is_first_image = path.contains("/images/generations") && {
+                         let mut recorded = serve_hits.lock().unwrap();
+                         recorded.push(path.clone());
+-                        recorded.iter().filter(|p| p.contains("/images/generations")).count() == 1
++                        recorded
++                            .iter()
++                            .filter(|p| p.contains("/images/generations"))
++                            .count()
++                            == 1
+                     };
+                     if is_first_image {
+                         if let Some(action) = on_first_image {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:1038:
+         if again["activity"]["status"] != "running" {
+             break again;
+         }
+-        assert!(std::time::Instant::now() < deadline, "封面任务超时：{again}");
++        assert!(
++            std::time::Instant::now() < deadline,
++            "封面任务超时：{again}"
++        );
+         tokio::time::sleep(Duration::from_millis(50)).await;
+     };
+     if last["activity"]["status"] != "completed" {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:1100:
+     let h = Harness::boot_media("operate", &stub.endpoint).await;
+     let target = h.workspace.join("article.md");
+     *slot.lock().unwrap() = Some(target.clone());
+-    let request = json!({"filePath":target,"agentId":"a","themeTone":"light","requestId":"cover-drift"});
++    let request =
++        json!({"filePath":target,"agentId":"a","themeTone":"light","requestId":"cover-drift"});
+     let (status, first) = h
+         .http(
+             reqwest::Method::POST,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_office/mod.rs:1122:
+         if again["activity"]["status"] != "running" {
+             break again;
+         }
+-        assert!(std::time::Instant::now() < deadline, "封面任务超时：{again}");
++        assert!(
++            std::time::Instant::now() < deadline,
++            "封面任务超时：{again}"
++        );
+         tokio::time::sleep(Duration::from_millis(50)).await;
+     };
+     assert_eq!(stub.image_hits(), 1);

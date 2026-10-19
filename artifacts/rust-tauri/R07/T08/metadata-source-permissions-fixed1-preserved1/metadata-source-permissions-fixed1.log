@@ -1,0 +1,74 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.77s
+     Running tests/r07_t08_media_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_media_source-c86773c2b2454f44)
+
+running 2 tests
+test media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption ... ok
+test media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.86s
+
+     Running tests/r07_t08_metadata_redaction.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_metadata_redaction-8d9b77690df60f7a)
+
+running 3 tests
+test auth_header_mask_refills_only_same_header_and_plain_metadata_value_stays_literal ... ok
+test metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id ... FAILED
+test providers_manage_without_secrets_write_cannot_replace_or_clear_model_extension_credentials ... ok
+
+failures:
+
+---- metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id stdout ----
+模型扩展遮盖真实现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-b5e1d1ae42a6fe57
+LINGXI_AUTH_REJECTED request_id="req-34cdc869bab15100c838cc837bf5ad37" method=GET path=/lingxi/v1/settings/export status=403 reason=local_owner_required remote=127.0.0.1:64405
+
+thread 'metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id' (2930464) panicked at crates/lingxi-service/tests/r07_t08_metadata_redaction.rs:173:9:
+assertion `left == right` failed: {"modelConfiguration":null,"ok":true}
+  left: Null
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.76s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_metadata_redaction`
+     Running tests/r07_t08_model_authority.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_authority-39fcc141373617fa)
+
+running 5 tests
+test real_http_reload_revalidates_replaced_local_token_after_actual_mutation_queue ... ok
+test real_http_web_session_save_revalidates_logout_after_actual_mutation_queue ... ok
+test real_http_device_model_save_revalidates_again_at_filesafety_atomic_authorization ... ok
+test real_http_device_model_save_revalidates_revocation_after_actual_mutation_queue ... ok
+test real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.09s
+
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 10 tests
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+test malformed_headers_never_clear_saved_settings_or_publish_a_generation ... ok
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.76s
+
+     Running tests/r07_t08_search_clear.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_search_clear-fb4d90632c8b5377)
+
+running 3 tests
+test legacy_search_api_key_empty_and_null_clear_only_the_selected_provider_and_survive_restart ... ok
+test per_provider_search_clear_of_inactive_key_preserves_active_key_and_never_borrows_it_after_switch ... ok
+test per_provider_search_clear_empty_and_null_remove_the_selected_key_without_legacy_resurrection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.29s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_metadata_redaction`

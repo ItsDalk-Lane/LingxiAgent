@@ -1,0 +1,45 @@
+{
+  "label": "mcp-stop-request-lifetime-ready1",
+  "scope": "DEVELOPMENT_NOT_RUN",
+  "previousActual": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mcp-remote-and-permission-fixed2.json",
+    "exitCode": 101,
+    "sourceUnchanged": true,
+    "logSha256": "4056343e1c93f228c21d85ea442229bbde908038b73475f8ad22475659971ace",
+    "remotePassed": 6,
+    "remoteFailed": 1,
+    "resourceCounters": {
+      "wireCancel": 0,
+      "handlerNotify": 0,
+      "ctCancelled": false,
+      "drop": 0,
+      "remoteActive": 1,
+      "DELETE": 1
+    }
+  },
+  "implementation": [
+    "begin_stop seals only original connection admission and wakes admitted requests; it no longer cancels SDK before exact request cancellation.",
+    "Each admitted request retains its original peer/requestId and connection-local active guard through official cancellation acknowledgement or bounded unknown receipt.",
+    "Disconnect waits original connection request guards for2seconds then still reclaims child/SDK on timeout or unconfirmed cancellation, returning cleanup failure.",
+    "Tools/list uses the same existing request_raw so no unbounded separate admission path remains.",
+    "Direct future Drop transfers active ownership into existing cancellation cleanup guard; old connection lifetime cannot cancel a newly connected one."
+  ],
+  "checksPrepared": [
+    "Existing real stdio case retains original scope/deadline/drop/echo assertions and additionally tests begin_stop rejection with zero delivery, exact cancellation arrival before close, final active0 and reconnect surviving old lifecycle cancellation.",
+    "Real remote resource test retains actual remote drop+zeroactive within unchanged3seconds and records negotiated protocol versions in addition to wire/handler/ct/DELETE observations."
+  ],
+  "sourceSha256": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "5fa1eef2fcc4506e2fc4cf3c77e3b2d9e119288bbcdc62a2ee8ce0e49789e6d8",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "f2cbda5904bdced7a7940129ee4fe4ab7d9829a811097a6dd9882243b6d593c8"
+  },
+  "executedByAgent": {
+    "cargo": false,
+    "functional": false,
+    "rustfmt": true
+  },
+  "limitations": [
+    "No claim remote cleanup fixed until actual SDK server counters show release.",
+    "Official rmcp modern HTTP consumes notify_cancelled locally to cancel the exact HTTP request; wire notification count0 alone is valid and not a failure.",
+    "Official transport/SDK/network reused; no hand-written MCP messages/client or larger timeout."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "label": "settings-ui3",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/settings/api.test.ts",
+    "desktop/src/react/__tests__/settings/SettingsContent.test.tsx",
+    "desktop/src/react/__tests__/settings/ProvidersTab.test.tsx",
+    "desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx",
+    "desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx",
+    "desktop/src/react/__tests__/settings/ModelWidget.test.tsx",
+    "desktop/src/react/__tests__/settings/actions.test.ts",
+    "--maxWorkers=2"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T04:25:45.733465+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "e130dfbb27418885295bc1de7b8430e24928afb194ccb2faa9d681c56b799720",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T04:25:51.303881+00:00",
+  "sourceFingerprintAfter": "e130dfbb27418885295bc1de7b8430e24928afb194ccb2faa9d681c56b799720",
+  "log": "artifacts/rust-tauri/R07/T08/settings-ui3.log",
+  "logSha256": "906cbeb69423c6c1eed83d7e559de2ac3e0401e16c05fbe8798a42ca66ed34b7",
+  "sourceUnchanged": true
+}

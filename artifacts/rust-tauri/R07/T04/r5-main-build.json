@@ -1,0 +1,27 @@
+{
+  "candidate": "r5",
+  "name": "main-build",
+  "command": [
+    "./node_modules/.bin/vite",
+    "build",
+    "--config",
+    "vite.config.main.js",
+    "--outDir",
+    "/private/tmp/lingxi-r07-t04-r5-main"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:00:55.393528+00:00",
+  "sourceFingerprint": "40ebe6b14045c00b72ac925aa9da6cba0585a1100df1eee611f8cdc36413939e",
+  "log": "r5-main-build.log",
+  "endedAt": "2026-10-15T23:00:56.912719+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "40ebe6b14045c00b72ac925aa9da6cba0585a1100df1eee611f8cdc36413939e",
+  "logSha256": "52dfbb81d74e8a8f99e2c3817f88e7ef9e816a87ddf14ab2329b5d2d3d94ce72",
+  "sourceUnchanged": true
+}

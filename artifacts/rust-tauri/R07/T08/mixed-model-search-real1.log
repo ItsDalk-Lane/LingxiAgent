@@ -1,0 +1,43 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (test "r07_t08_search_clear") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.03s
+     Running tests/r07_t08_search_clear.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_search_clear-053e1a8b72085a0e)
+
+running 5 tests
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-8855da9e29836899
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-50172be10aab45cb
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-1a3910b103a15df5
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-9518246e8955771f
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-adafb213b92e3ae4
+
+thread 'mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart' (3688434) panicked at crates/lingxi-service/tests/r07_t08_search_clear.rs:284:47:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime' (3688435) panicked at crates/lingxi-service/tests/r07_t08_search_clear.rs:284:47:
+called `Option::unwrap()` on a `None` value
+test mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart ... FAILED
+test mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime ... FAILED
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-058e373d9f5a9417
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-e2dbad6e344671a1
+搜索凭据清除现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-search-clear-761d63808e02fa79
+test legacy_search_api_key_empty_and_null_clear_only_the_selected_provider_and_survive_restart ... ok
+test per_provider_search_clear_of_inactive_key_preserves_active_key_and_never_borrows_it_after_switch ... ok
+test per_provider_search_clear_empty_and_null_remove_the_selected_key_without_legacy_resurrection ... ok
+
+failures:
+
+failures:
+    mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart
+    mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.47s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_search_clear`
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_search_clear`

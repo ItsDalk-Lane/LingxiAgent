@@ -1,0 +1,13 @@
+{
+  "candidate": "t07a",
+  "checkedAt": "2026-10-18T02:07:45.624594+00:00",
+  "manifest": "artifacts/rust-tauri/R07/T07/SOURCE_MANIFEST_t07a.json",
+  "fingerprintMethod": "sorted-path-sha256-bytes-mode-with-deletions-and-symlink-targets-v1",
+  "manifestFingerprintRecomputed": "e0f559efca12888cb68f168c1162b480458e2aca959775475ca8bb1340081e6a",
+  "manifestFiles": 525,
+  "archiveMembers": 525,
+  "archiveSha256": "d37d9d1c01440a4cfd8a0a3bd1473e49003d4f08bf9666c6144d6095954f89a4",
+  "allArchiveAndCurrentBytesSizesModesMatch": true,
+  "issues": [],
+  "scope": "独立读取清单、tar每个成员和当前磁盘，未调用候选生成器；未运行Cargo。非最终功能验收。"
+}

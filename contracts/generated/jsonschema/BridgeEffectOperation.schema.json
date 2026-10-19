@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "receipt_start",
+    "receipt_stop",
+    "stream_update",
+    "stream_finish",
+    "stream_cancel"
+  ],
+  "title": "BridgeEffectOperation",
+  "type": "string"
+}

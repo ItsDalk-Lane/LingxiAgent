@@ -7,7 +7,7 @@
 
 import * as lark from "@larksuiteoapi/node-sdk";
 import { debugLog } from "../debug-log.ts";
-import { downloadMedia, detectMime, formatSize, streamToBuffer } from "./media-utils.ts";
+import { downloadMedia, detectMime, formatSize } from "./media-utils.ts";
 import { createMediaCapabilities } from "./media-capabilities.ts";
 import { createStreamingCapabilities } from "./streaming-capabilities.ts";
 import {
@@ -100,6 +100,8 @@ type FeishuStreamState = {
 };
 
 type FeishuCardKitStreamState = {
+  messageId?: string | null;
+  missingMessageId?: boolean;
   cardId: string;
   elementId: string;
   sequence: number;
@@ -453,7 +455,7 @@ function normalizeFeishuInboundMessage(message: any) {
   return { text: diagnosticText(detail), attachments: [] };
 }
 
-async function bufferFromFeishuDownload(resp: any, label: any) {
+async function bufferFromFeishuDownload(resp: any, label: any, signal?: AbortSignal) {
   let stream;
   try {
     stream = resp?.getReadableStream ? resp.getReadableStream() : resp;
@@ -463,10 +465,25 @@ async function bufferFromFeishuDownload(resp: any, label: any) {
   if (!stream || typeof stream[Symbol.asyncIterator] !== "function") {
     throw new Error(`飞书${label}失败：SDK 未返回可读流`);
   }
+  const cancel = () => stream.destroy?.();
+  signal?.addEventListener("abort", cancel, { once: true });
   try {
-    return await streamToBuffer(stream);
+    const chunks: Buffer[] = [];
+    let size = 0;
+    for await (const chunk of stream) {
+      signal?.throwIfAborted();
+      const bytes = Buffer.from(chunk);
+      size += bytes.length;
+      if (size > 50 * 1024 * 1024) throw new Error("飞书附件超过大小限制");
+      chunks.push(bytes);
+    }
+    signal?.throwIfAborted();
+    return Buffer.concat(chunks, size);
   } catch (err) {
+    stream.destroy?.();
     throw wrapFeishuError(label, err);
+  } finally {
+    signal?.removeEventListener("abort", cancel);
   }
 }
 
@@ -544,7 +561,7 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
 
       const chatId = message.chat_id;
       const openId = sender.sender_id?.open_id || (sender.sender_id as any)?.app_id || "unknown";
-      const userId = sender.sender_id?.user_id || sender.sender_id?.open_id || (sender.sender_id as any)?.app_id || openId;
+      const userId = sender.sender_id?.user_id || sender.sender_id?.open_id || (sender.sender_id as any)?.app_id || null;
       const chatType = message.chat_type; // "p2p" | "group"
       const isGroup = chatType === "group";
       const sessionKey = isGroup ? `fs_group_${chatId}@${agentId}` : `fs_dm_${openId}@${agentId}`;
@@ -555,6 +572,8 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
 
       onMessage({
         platform: "feishu",
+        messageId: message.message_id || null,
+        replyContext: { messageId: message.message_id, rootId: message.root_id, parentId: message.parent_id },
         agentId,
         chatId,
         userId,
@@ -781,6 +800,7 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
       return;
     }
     state.messageId = messageId;
+    return res;
   }
 
   return {
@@ -791,7 +811,7 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
     streamingCapabilities: FEISHU_STREAMING_CAPABILITIES,
 
     async sendReply(chatId, text) {
-      await createOutboundMessage(chatId, renderFeishuOutbound(text));
+      return createOutboundMessage(chatId, renderFeishuOutbound(text));
     },
 
     /** block streaming 专用：发一条气泡，两条之间加 humanDelay */
@@ -831,18 +851,18 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
         forceInteractive: currentKind === "interactive",
       });
       if (currentKind === "post" && rendered.kind === "interactive") {
-        await transitionStreamToInteractiveCard(_chatId, state, rendered);
-        return;
+        return await transitionStreamToInteractiveCard(_chatId, state, rendered);
       }
-      await updateOutboundMessage(state.messageId, rendered);
+      const response = await updateOutboundMessage(state.messageId, rendered);
       state.renderKind = rendered.kind;
+      return response;
     },
 
     async finishStreamReply(chatId, state, text) {
-      await this.updateStreamReply(chatId, state, text);
+      return await this.updateStreamReply(chatId, state, text);
     },
 
-    async startRichStreamReply(chatId, text) {
+    async startRichStreamReply(chatId, text, options: Record<string, any> = {}) {
       const createRes = await callFeishu("CardKit 卡片创建", () => client.cardkit.v1.card.create(
         feishuCardKitCreatePayload(text),
       ));
@@ -853,9 +873,13 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
         elementId: FEISHU_CARDKIT_STREAM_ELEMENT_ID,
         sequence: 1,
       };
-      await callFeishu("CardKit 卡片发送", () => client.im.message.create(
+      const sent = await callFeishu("CardKit 卡片发送", () => client.im.message.create(
         feishuCardInstanceMessagePayload(chatId, cardId),
       ));
+      state.messageId = extractFeishuMessageId(sent);
+      state.missingMessageId = !state.messageId;
+      // 先保留已实际创建的句柄，后续设置超时仍能由宿主明确授权关闭原卡片。
+      options.captureNativeState?.(state);
       await callFeishu("CardKit 流式设置", () => setCardKitStreamingMode(state, true));
       return state;
     },
@@ -863,16 +887,16 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
     async updateRichStreamReply(_chatId, state: FeishuCardKitStreamState, text) {
       if (!state?.cardId) throw new Error("Feishu CardKit stream update requires cardId");
       if (!state?.elementId) throw new Error("Feishu CardKit stream update requires elementId");
-      await callFeishu("CardKit 内容更新", () => updateCardKitMarkdownContent(state, text));
+      return await callFeishu("CardKit 内容更新", () => updateCardKitMarkdownContent(state, text));
     },
 
     async finishRichStreamReply(chatId, state: FeishuCardKitStreamState, text) {
       await this.updateRichStreamReply(chatId, state, text);
-      await callFeishu("CardKit 流式关闭", () => setCardKitStreamingMode(state, false));
+      return await callFeishu("CardKit 流式关闭", () => setCardKitStreamingMode(state, false));
     },
 
     /** 下载飞书图片（通过 image_key） */
-    async downloadImage(imageKey, messageId) {
+    async downloadImage(imageKey, messageId, options: { signal?: AbortSignal } = {}) {
       // 用户发来的图片需要通过消息资源接口下载；image.get 只适用于机器人自己上传的图片。
       const resp = messageId
         ? await callFeishu("图片下载", () => client.im.messageResource.get({
@@ -884,16 +908,16 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
           () => client.im.image.get({ path: { image_key: imageKey } }),
           { recognizableErrorsOnly: true },
         );
-      return bufferFromFeishuDownload(resp, "图片下载");
+      return bufferFromFeishuDownload(resp, "图片下载", options.signal);
     },
 
     /** 下载飞书文件/音频/视频（通过 message_id + file_key） */
-    async downloadFile(messageId, fileKey) {
+    async downloadFile(messageId, fileKey, options: { signal?: AbortSignal } = {}) {
       const resp = await callFeishu("文件下载", () => client.im.messageResource.get({
         path: { message_id: messageId, file_key: fileKey },
         params: { type: "file" },
       }), { recognizableErrorsOnly: true });
-      return bufferFromFeishuDownload(resp, "文件下载");
+      return bufferFromFeishuDownload(resp, "文件下载", options.signal);
     },
 
     /** 发送媒体（图片走 image API，其他走 file API） */
@@ -914,7 +938,7 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
           data: { image_type: "message", image: buffer },
         }));
         const imageKey = requireUploadKey(res, "image_key", "图片");
-        await callFeishu("消息发送", () => client.im.message.create({
+        return callFeishu("消息发送", () => client.im.message.create({
           params: { receive_id_type: "chat_id" },
           data: {
             receive_id: chatId, msg_type: "image",
@@ -928,7 +952,7 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
           data: { file_type: fileType as any, file_name: filename, file: buffer },
         }));
         const fileKey = requireUploadKey(res, "file_key", "文件");
-        await callFeishu("消息发送", () => client.im.message.create({
+        return callFeishu("消息发送", () => client.im.message.create({
           params: { receive_id_type: "chat_id" },
           data: {
             receive_id: chatId,
@@ -943,7 +967,7 @@ export function createFeishuAdapter({ appId, appSecret, region, agentId, onMessa
       stopped = true;
       clearConnectionPoll();
       clearHealthTimer();
-      try { wsClient.close(); } catch {}
+      return wsClient.close();
     },
   };
 }

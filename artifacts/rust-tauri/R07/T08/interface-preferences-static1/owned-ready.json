@@ -1,0 +1,20 @@
+{
+  "kind": "development ready hashes; no Cargo performed",
+  "files": {
+    "rust/crates/lingxi-protocol/src/user_preferences.rs": "47242d06b33f8236fd81e8e67245b189db3b7aa69eb4f87b676a937f41995d9e",
+    "rust/crates/lingxi-protocol/src/lib.rs": "6ebdb5350e51f293436dcf2bde99c04d8cb84de27fe55a747a78dbcc576da1b9",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs": "03b70a57f804dd54d1c27886bfe63aca0e69db0bdfdee0b736b66cadd1aeb98f",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": "1e825a4dc71292b7372131ae292100699012484dee5d3ba0852ba88bac886e59",
+    "rust/crates/lingxi-service/src/userprefs.rs": "669c87952344df2b1f7f5653d766928b2e7982a4fce7d61b6bb33e2cc0c3ce34",
+    "rust/crates/lingxi-service/src/checkpoint_store.rs": "acf2ce95c8fc38fb14ebe817276da469526c960deada96bb989b34d62746fdb8",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+    "rust/crates/lingxi-service/src/auth.rs": "610a2128abf663c4cfceffc3590a310af75383c2ac79da697e5eae5c4969614c",
+    "rust/crates/lingxi-service/src/lib.rs": "81be72c80783d1e0712ce74f2d03792b48758dbab07db7621ea47b505361005f",
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "eefe741769083b9a1b64cb5353882512fb32d5178921f503c34f33b8274ad520",
+    "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977"
+  },
+  "newIntegrationTarget": "r07_t08_interface_preferences",
+  "caseCount": 4,
+  "generatedFilesEdited": false,
+  "mcpCompositionRootChange": "mcp_settings.attach_tasks(runs.task_supervisor())"
+}

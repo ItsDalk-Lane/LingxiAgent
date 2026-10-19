@@ -25,12 +25,14 @@ function normalizeBrowserViewerOpenTarget(target) {
     return {
       url: typeof target.url === "string" ? target.url : undefined,
       sessionPath: typeof target.sessionPath === "string" ? target.sessionPath : undefined,
+      connectionKey: typeof target.connectionKey === "string" ? target.connectionKey : undefined,
     };
   }
   return {};
 }
 
 contextBridge.exposeInMainWorld("hana", {
+  cardFrameNavigationGuard: true,
   getServerPort: () => ipcRenderer.invoke("get-server-port"),
   getServerToken: () => ipcRenderer.invoke("get-server-token"),
   getServerConnectionInfo: () => ipcRenderer.invoke('get-server-connection-info'),
@@ -173,6 +175,9 @@ contextBridge.exposeInMainWorld("hana", {
   },
   // 浏览器查看器窗口
   openBrowserViewer: (target) => ipcRenderer.invoke("open-browser-viewer", resolveTheme(), normalizeBrowserViewerOpenTarget(target)),
+  setBrowserConnection: (connection) => ipcRenderer.invoke("set-browser-connection", connection),
+  getBrowserViewerContext: () => ipcRenderer.invoke("get-browser-viewer-context"),
+  rustBrowserRequest: (target, action, options) => ipcRenderer.invoke("rust-browser-request", normalizeBrowserViewerOpenTarget(target), action, options),
   onBrowserUpdate: (cb) => {
     const handler = (_, data) => cb(data);
     ipcRenderer.on("browser-update", handler);

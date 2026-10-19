@@ -1,0 +1,49 @@
+{
+  "schema": "r07-t08-independent-mcp-history-unknown-drain-review-v1",
+  "reviewedAt": "2026-10-18T12:00:43.452858+00:00",
+  "finalAcceptance": "pending",
+  "reviewerExecutions": [],
+  "sourceSha256AllMatched": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "121bef4c2f67d7b16197cd073a1811081d51883a25fb5c4f89b08677e14bfe90",
+    "rust/crates/lingxi-service/src/mcpbridge_request_tests.rs": "967bdb483bbd0c211b8f45618e6003eff91ab9de77efaf429e4cc49513c76273"
+  },
+  "verifiedExistingEvidence": [
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-resource-stop-fixed1.json",
+      "receiptSha256": "2b71fec6b2328b4cc6cd98d4913a83a324bdcb1fbbc995470b2baf375db174e7",
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-resource-stop-fixed1.log",
+      "logSha256Verified": "f9903d607721e1476797b57d579dd49e6449a56e6b364ba86c16648f4344f4bd"
+    },
+    {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-request-stop-regression1.json",
+      "receiptSha256": "89e99db1353099d7d38ffa80eca6de414270099ae273b1a8adc4ec3838e646ca",
+      "exitCode": 101,
+      "sourceUnchanged": true,
+      "log": "artifacts/rust-tauri/R07/T08/mcp-request-stop-regression1.log",
+      "logSha256Verified": "07b170bf447a7d8395a11f7beb62fdaae3079a3f42f22b8544a02204c455c984"
+    }
+  ],
+  "previousResults": {
+    "remoteExactCase": "mcp-resource-stop-fixed1: 1 passed, 0 failed, 6 filtered. Same source throughout. Original three-second assertion actual remote active0/drop1/handler cancellation true, DELETE1, protocol2025-11-25. This predates the current history-unknown refinement.",
+    "libPrevious": "mcp-request-stop-regression1: 7 passed, 1 failed. Full-queue request cancellation had honestly become unknown, but after queue recovery and actual echo, active was zero; close still failed on the sticky historical flag. PID assertion following close.unwrap was not executed; later PIDgone observation is diagnostic only."
+  },
+  "staticConclusion": "The narrow drain change separates local stop completion from a historical per-request notification outcome. No new blocking issue found.",
+  "preservedFailureSemantics": [
+    "Current active guards not drained within the original two-second limit still return CleanupFailed.",
+    "Child stop failure and SDK service.cancel failure or timeout remain actual failures and are propagated; drain failure still does not prevent attempting these cleanup paths.",
+    "Per-call DeadlineExceeded/Cancelled outcomes remain unchanged and retain unknown remote-result semantics.",
+    "cancellation_unconfirmed stays true and is warned rather than cleared; a successful later echo cannot rewrite old unknown facts."
+  ],
+  "regressionAssertionReview": [
+    "The new checks require the historical unknown bit true and active0 before recovery; original deadline result and no early external delivery are retained.",
+    "All accepted official SDK queued handles are awaited, real echo response and single connect count retained.",
+    "After recovery the unknown bit must still be true. Actual close.unwrap, SDK connection empty, wait/kill0=ESRCH and original no-replay/zero-late-delivery assertions remain in the same executable path."
+  ],
+  "limits": [
+    "Root current lib8 regression was still pending when reviewed; this reviewer did not run Cargo or any test.",
+    "A successful local connection close must never be described as proof a previously unknown remote operation was cancelled. The new warning explicitly preserves that distinction.",
+    "No source, tests, original receipts or frozen records were modified by reviewer; only this new evidence artifact was created."
+  ]
+}

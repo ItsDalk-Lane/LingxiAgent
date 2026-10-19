@@ -172,6 +172,8 @@ export const createChatSlice = (
     const registryFiles = { ...s.sessionRegistryFilesByPath };
     const scrollPositions = { ...s.scrollPositions };
     sessions[key] = {
+      // 历史回载不能丢失已经确认的媒体版本，否则迟到的旧回执会覆盖已交付文件。
+      ...(sessions[key]?.nativeMediaJobs ? { nativeMediaJobs: sessions[key].nativeMediaJobs } : {}),
       items,
       hasMore,
       loadingMore: false,

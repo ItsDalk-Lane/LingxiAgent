@@ -258,13 +258,33 @@ pub fn dream_snapshot_hash(snapshot: &Value) -> Result<String, MemoryError> {
 /// Atomic write: tmp file + rename (incumbent `shared/safe-fs.ts`
 /// atomicWriteSync semantics).
 pub fn atomic_write(path: &Path, content: &str) -> io::Result<()> {
+    atomic_write_authorized(path, content, || true)
+}
+
+/// 同一原子写入口的授权版：实际排队结束和提交前均核对调用方冻结的授权。
+pub fn atomic_write_authorized(
+    path: &Path,
+    content: &str,
+    authorize: impl Fn() -> bool,
+) -> io::Result<()> {
+    use std::io::Write as _;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
     let _publication = ContextMaterialMutation::for_path(path);
+    if !authorize() {
+        return Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            "write authority revoked",
+        ));
+    }
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
+    // 系统实时时钟可能只有微秒精度；并行写者不能共用临时文件。
     let uniq = format!(
-        "{}-{}",
+        "{}-{}-{}",
         std::process::id(),
+        NEXT_TEMP.fetch_add(1, Ordering::Relaxed),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_nanos())
@@ -277,7 +297,33 @@ pub fn atomic_write(path: &Path, content: &str) -> io::Result<()> {
             .unwrap_or_else(|| "file".to_string()),
         uniq
     ));
-    std::fs::write(&tmp, content)?;
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&tmp)?;
+    if let Err(error) = file.write_all(content.as_bytes()) {
+        drop(file);
+        return match std::fs::remove_file(&tmp) {
+            Ok(()) => Err(error),
+            Err(cleanup) => Err(io::Error::new(
+                error.kind(),
+                format!("{error}; temporary file cleanup failed: {cleanup}"),
+            )),
+        };
+    }
+    drop(file);
+    if !authorize() {
+        return match std::fs::remove_file(&tmp) {
+            Ok(()) => Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "write authority revoked",
+            )),
+            Err(cleanup) => Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                format!("write authority revoked; temporary file cleanup failed: {cleanup}"),
+            )),
+        };
+    }
     match std::fs::rename(&tmp, path) {
         Ok(()) => Ok(()),
         Err(error) => {

@@ -610,14 +610,24 @@ pub fn apply_auth(
     auth: &ApplicableAuth,
     bearer_style: BearerStyle,
 ) -> reqwest::RequestBuilder {
-    match auth {
-        ApplicableAuth::None => request,
-        ApplicableAuth::Bearer(token) => match bearer_style {
-            BearerStyle::AuthorizationBearer => request.bearer_auth(token),
-            BearerStyle::NamedHeader(name) => request.header(name, token.as_str()),
-        },
-        ApplicableAuth::Header { name, value } => request.header(name.as_str(), value.as_str()),
+    let (name, prefix) = match bearer_style {
+        BearerStyle::AuthorizationBearer => ("authorization", "Bearer "),
+        BearerStyle::NamedHeader(name) => (name, ""),
+    };
+    let mut headers = reqwest::header::HeaderMap::new();
+    for (name, value) in auth.header_values(name, prefix) {
+        // 所有材料在配置/凭证入口已验证；保持错误可观察，不发送被静默截断的头。
+        match (
+            reqwest::header::HeaderName::from_bytes(name.as_bytes()),
+            reqwest::header::HeaderValue::from_str(&value),
+        ) {
+            (Ok(name), Ok(value)) => {
+                headers.insert(name, value);
+            }
+            _ => return request.header(name, value),
+        }
     }
+    request.headers(headers)
 }
 
 /// The incumbent base-URL join rule (lib/llm/provider-client.ts

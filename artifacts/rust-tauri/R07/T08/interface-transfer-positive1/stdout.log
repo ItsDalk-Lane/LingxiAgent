@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx (8 tests | 7 skipped) 780ms
+   ✓ 真实设置容器的导航、恢复及失败处理（configured）  779ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 7 skipped (8)
+   Start at  18:47:03
+   Duration  2.46s (transform 1.06s, setup 19ms, import 1.35s, tests 780ms, environment 245ms)
+
+JSON report written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/interface-transfer-positive1/vitest-results.json

@@ -1,0 +1,13 @@
+--- a/rust/crates/lingxi-service/src/resourceio.rs
++++ b/rust/crates/lingxi-service/src/resourceio.rs
+@@ -49,6 +49,10 @@
+ //!   语料排序差异不构成协议面）。
+ //! - 版本 mtimeMs 为整数毫秒（与 resources.rs etag 同一决策；现役 JS
+ //!   float 毫秒的小数位在回环比较中不承载语义）。
++
++#[path = "resource_artifacts.rs"]
++mod artifacts;
++pub(crate) use artifacts::{ArtifactSnapshot, ArtifactWritePreflight};
+ 
+ use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
+ use std::path::{Path, PathBuf};

@@ -14,7 +14,7 @@
 use std::collections::BTreeMap;
 
 use lingxi_kernel::model_exchange::{AuxiliarySlot, ProtocolFamily};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// The model-plane half of the service config file.
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -46,6 +46,74 @@ pub struct ProviderConfig {
     /// Credential. EXPLICIT always — a missing `auth` key is a config
     /// error (C11), never a defaulted anonymous client.
     pub auth: AuthConfig,
+    #[serde(default)]
+    pub headers: BTreeMap<String, String>,
+    /// None 兼容旧槽位目录；显式空列表代表用户清空，绝不从旧槽复活。
+    #[serde(default)]
+    pub models: Option<Vec<CatalogModel>>,
+    #[serde(default)]
+    pub metadata: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CatalogModel {
+    pub id: String,
+    #[serde(default)]
+    pub protocol: Option<String>,
+    #[serde(default)]
+    pub compat: Option<RouteCompatHints>,
+    #[serde(default)]
+    pub capabilities: Option<RouteCapabilities>,
+    #[serde(default)]
+    pub group_id: Option<String>,
+    #[serde(flatten)]
+    pub metadata: serde_json::Map<String, serde_json::Value>,
+}
+
+impl CatalogModel {
+    /// 操作标签是独立目录事实；未声明的文本模型不推测获得向量/重排能力。
+    pub fn protocol_for(
+        &self,
+        provider_id: &str,
+        provider_protocol: lingxi_kernel::model_exchange::ProtocolFamily,
+        operation: lingxi_kernel::model_exchange::ModelOperation,
+    ) -> Option<lingxi_kernel::model_exchange::ProtocolFamily> {
+        use lingxi_kernel::model_exchange::{ModelOperation, ProtocolFamily};
+        if let Some(operations) = self
+            .metadata
+            .get("operations")
+            .and_then(serde_json::Value::as_array)
+        {
+            let label = match operation {
+                ModelOperation::Embedding => "embedding",
+                ModelOperation::Rerank => "rerank",
+                _ => return None,
+            };
+            if !operations.iter().any(|value| value.as_str() == Some(label)) {
+                return None;
+            }
+            let protocol = self
+                .metadata
+                .get("operationProtocol")
+                .and_then(serde_json::Value::as_str)
+                .unwrap_or_else(|| match operation {
+                    ModelOperation::Embedding => match provider_id {
+                        "ollama" => "ollama-embed",
+                        "gemini" => "gemini-embed",
+                        "minimax" => "minimax-embeddings",
+                        _ => "openai-embeddings",
+                    },
+                    ModelOperation::Rerank if provider_id == "dashscope" => "dashscope-rerank",
+                    _ => "cohere-rerank",
+                });
+            return ProtocolFamily::parse(protocol);
+        }
+        self.protocol
+            .as_deref()
+            .and_then(ProtocolFamily::parse)
+            .or(Some(provider_protocol))
+    }
 }
 
 /// The credential shape of one provider (the material half; kernel types
@@ -148,6 +216,8 @@ pub struct ModelsSection {
     #[serde(default)]
     pub memory: Option<RouteBinding>,
     #[serde(default)]
+    pub knowledge: Option<RouteBinding>,
+    #[serde(default)]
     pub vision: Option<RouteBinding>,
     #[serde(default)]
     pub approval: Option<RouteBinding>,
@@ -181,7 +251,7 @@ pub struct ModelsSection {
 /// `minimax-tts` / `minimax-images` build it into the URL; a binding onto a
 /// MiniMax family without it is a loud dispatch-time refusal, never a
 /// guessed account). It is inert for every other family.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct RouteBinding {
     pub provider: String,
@@ -212,7 +282,7 @@ pub struct RouteBinding {
 /// budgets / protocol options are the `compat` block's carriers (the TS
 /// model object's `reasoning`, `maxTokens`, `contextWindow` fields) — this
 /// block does not duplicate them.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct RouteCapabilities {
     /// Whether the bound model accepts tool declarations (`Some(true)`
@@ -247,7 +317,7 @@ pub struct RouteCapabilities {
 /// - `output_cap_required` ↔ `model.compat.outputCapRequired`
 ///   (`core/provider-compat/output-budget.ts` 的 explicit-required 族判定面；
 ///   R06-T02 摘要请求 max_tokens 族分流读它)
-#[derive(Debug, Clone, Default, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct RouteCompatHints {
     #[serde(default)]
@@ -327,6 +397,7 @@ impl ModelsSection {
             AuxiliarySlot::Title => self.title.as_ref(),
             AuxiliarySlot::Summarize => self.summarize.as_ref(),
             AuxiliarySlot::Memory => self.memory.as_ref(),
+            AuxiliarySlot::Knowledge => self.knowledge.as_ref(),
             AuxiliarySlot::Vision => self.vision.as_ref(),
             AuxiliarySlot::Approval => self.approval.as_ref(),
             AuxiliarySlot::Guard => self.guard.as_ref(),
@@ -538,7 +609,86 @@ impl ModelPlaneConfig {
                     protocol: provider.protocol.clone(),
                 });
             }
-            validate_endpoint(id, &provider.endpoint)?;
+            let family = ProtocolFamily::parse(&provider.protocol).expect("validated");
+            if matches!(
+                family,
+                ProtocolFamily::SystemSpeech | ProtocolFamily::SystemSpeechRecognition
+            ) {
+                if !provider.endpoint.is_empty() || !matches!(provider.auth, AuthConfig::None) {
+                    return Err(ModelConfigError::InvalidEndpoint {
+                        provider: id.clone(),
+                        endpoint: provider.endpoint.clone(),
+                        detail: "本地语音必须空地址且无凭证".into(),
+                    });
+                }
+            } else {
+                validate_endpoint(id, &provider.endpoint)?;
+            }
+            for (name, value) in &provider.headers {
+                validate_auth_header(id, name, value)?;
+            }
+            if let Some(models) = &provider.models {
+                let mut ids = std::collections::BTreeSet::new();
+                for model in models {
+                    if model.id.trim().is_empty() || !ids.insert(&model.id) {
+                        return Err(ModelConfigError::InvalidJson {
+                            detail: format!("provider {id} model id is empty or duplicated"),
+                        });
+                    }
+                    if let Some(protocol) = &model.protocol {
+                        if ProtocolFamily::parse(protocol).is_none() {
+                            return Err(ModelConfigError::UnknownProtocol {
+                                provider: id.clone(),
+                                protocol: protocol.clone(),
+                            });
+                        }
+                    }
+                    if let Some(operations) = model.metadata.get("operations") {
+                        if !operations.as_array().is_some_and(|items| {
+                            !items.is_empty()
+                                && items.iter().all(|item| {
+                                    matches!(item.as_str(), Some("embedding" | "rerank"))
+                                })
+                        }) {
+                            return Err(ModelConfigError::InvalidJson {
+                                detail: "模型 operations 必须是非空 embedding/rerank 列表".into(),
+                            });
+                        }
+                    }
+                    if let Some(compat) = &model.compat {
+                        validate_route_compat(&model.id, compat)?;
+                    }
+                    if model.metadata.keys().any(|key| {
+                        matches!(
+                            key.to_ascii_lowercase().as_str(),
+                            "auth"
+                                | "headers"
+                                | "api_key"
+                                | "apikey"
+                                | "endpoint"
+                                | "base_url"
+                                | "token"
+                                | "access"
+                                | "accesstoken"
+                                | "access_token"
+                                | "refresh"
+                                | "refresh_token"
+                                | "refreshtoken"
+                                | "accountid"
+                                | "account_id"
+                                | "authorization"
+                                | "cookie"
+                                | "resourceurl"
+                                | "resource_url"
+                                | "expires"
+                        )
+                    }) {
+                        return Err(ModelConfigError::InvalidJson {
+                            detail: "模型元数据不能包含凭证或地址".into(),
+                        });
+                    }
+                }
+            }
             match &provider.auth {
                 AuthConfig::ApiKey { api_key } => {
                     if api_key.is_empty() {
@@ -546,6 +696,7 @@ impl ModelPlaneConfig {
                             provider: id.clone(),
                         });
                     }
+                    validate_auth_header(id, "authorization", &format!("Bearer {api_key}"))?;
                 }
                 AuthConfig::AuthHeader { header, value } => {
                     validate_auth_header(id, header, value)?;
@@ -568,6 +719,15 @@ impl ModelPlaneConfig {
                             provider: binding.provider.clone(),
                         });
                     }
+                    if let Some(models) = &self.providers[&binding.provider].models {
+                        if !models.iter().any(|model| model.id == binding.model) {
+                            return Err(ModelConfigError::InvalidJson {
+                                detail: format!(
+                                    "operation {operation} references unknown catalog model"
+                                ),
+                            });
+                        }
+                    }
                     if let Some(compat) = &binding.compat {
                         validate_route_compat(operation, compat)?;
                     }
@@ -579,6 +739,7 @@ impl ModelPlaneConfig {
             AuxiliarySlot::Title,
             AuxiliarySlot::Summarize,
             AuxiliarySlot::Memory,
+            AuxiliarySlot::Knowledge,
             AuxiliarySlot::Vision,
             AuxiliarySlot::Approval,
             AuxiliarySlot::Guard,
@@ -627,8 +788,23 @@ impl ModelPlaneConfig {
             validate_binding(&operation.describe(), binding)?;
             if let Some(binding) = binding {
                 if let Some(provider) = self.providers.get(&binding.provider) {
-                    let family =
+                    let provider_family =
                         ProtocolFamily::parse(&provider.protocol).expect("validated above");
+                    let family = provider
+                        .models
+                        .as_ref()
+                        .and_then(|models| models.iter().find(|model| model.id == binding.model))
+                        .map(|model| {
+                            model.protocol_for(&binding.provider, provider_family, operation)
+                        })
+                        .unwrap_or(Some(provider_family));
+                    let Some(family) = family else {
+                        return Err(ModelConfigError::RouteFamilyMismatch {
+                            operation: operation.describe(),
+                            provider: binding.provider.clone(),
+                            protocol: provider.protocol.clone(),
+                        });
+                    };
                     if !family.serves(operation.operation_class()) {
                         return Err(ModelConfigError::RouteFamilyMismatch {
                             operation: operation.describe(),

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts",
+    "desktop/src/react/__tests__/components/DeskSection.test.tsx",
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+    "--maxWorkers=2"
+  ],
+  "exitCode": 0,
+  "realServiceStatus": "NOT_RUN_NO_LINGXI_R07_SERVICE_BIN",
+  "logSha256": "5b1c79534c4b0705371c2e81c7bb7805e7022bd44ed0cb4f58fc68f71b548987",
+  "time": "2026-10-18T01:36:25.389837+00:00"
+}

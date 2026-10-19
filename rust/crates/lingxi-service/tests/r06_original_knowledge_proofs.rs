@@ -3309,23 +3309,24 @@ async fn original_manage_refusals_and_no_write_authorization_preserve_facts() {
     let foreign_jobs = facts
         .list_ingestion_jobs(Some(foreign_id), None, 200)
         .unwrap();
-    // 相对文件引用在真实历史/归属检查处结束本Run，单独核明确错误与零知识副作用。
+    // 相对文件引用的拒绝自 R07 起落在工具执行本身：模型参数与工具回显
+    // 不再视为附件授权（归属检查不再因此终止本Run），导入安全闸对非法
+    // 相对路径明确拒绝，Run 正常收官；零知识副作用单独照核。
     script.lock().unwrap().calls =
         vec![json!({"action":"add","notebookId":id,"kind":"file","filePath":"relative.md"})];
     create_manage_session(&server, "original-manage-path-refused", "operate").await;
-    let (status, error) = server
+    let (status, executed) = server
         .request(
             "POST",
             "/lingxi/v1/sessions/original-manage-path-refused/execute",
             Some(json!({"input":"验证非法相对文件路径明确拒绝且不改写资料"})),
         )
         .await;
-    assert_eq!(status, 500, "{error}");
+    assert_eq!(status, 200, "{executed}");
+    let refused = manage_result(script.lock().unwrap().requests.last().unwrap(), 0);
     assert!(
-        error
-            .to_string()
-            .contains("session_file_reference_not_owned:relative.md"),
-        "{error}"
+        refused.contains("KNOWLEDGE_IMPORT_PATH_INVALID"),
+        "{refused}"
     );
     assert!(source_ids(id).is_empty());
     assert_eq!(source_ids(foreign_id), vec![source_id.to_string()]);

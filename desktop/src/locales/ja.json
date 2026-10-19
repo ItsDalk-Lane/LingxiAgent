@@ -144,6 +144,8 @@
     "settingsVectorRetentionHint": "モデル切替や再取り込みで不要になった旧ベクトルは、設定日数（1–3650）クエリ未使用で自動削除されます。使用中の最新版には影響しません"
   },
   "channel": {
+    "loadFailed": "読み込みに失敗しました。既存の内容は保持されています。",
+    "retry": "再試行",
     "tab": "チャンネル",
     "chatTab": "チャット",
     "moreTabs": "その他のタブ",
@@ -292,6 +294,7 @@
     },
     "archivedChats": "アーカイブ",
     "runningGroup": "実行中",
+    "ungroupedChats": "グループなし",
     "actionBadge": {
       "askUser": "質問中",
       "approval": "承認待ち",
@@ -512,7 +515,31 @@
       "retryFailed": "再生成に失敗しました",
       "submitting": "送信中",
       "retryLabel": "{kind}を再生成",
-      "kindSpeech": "音声"
+      "kindSpeech": "音声",
+      "phase": {
+        "submitting": "生成リクエストを送信中",
+        "submitted": "送信済み・生成待ち",
+        "generating": "生成中",
+        "downloading": "生成完了・ダウンロード中",
+        "completed": "生成・ファイルの受け渡し完了",
+        "failed": "生成に失敗",
+        "cancelled": "ローカルの待機を停止しました",
+        "unknown": "結果は未確認です"
+      },
+      "stopWaiting": "待機を停止",
+      "stopFailed": "待機を停止できませんでした",
+      "taskFailed": "メディアタスクは未完了です",
+      "localDeliveryStopped": "この会話への追加ファイルの受け渡しを停止しました。",
+      "remoteOutcome": {
+        "failed": "リモートでの生成失敗が確認されました。",
+        "completed": "リモートで生成済みです。受け取ったファイルは引き続き開けます。",
+        "unknown": "リモートの結果は未確認で、生成が続いている可能性があります。"
+      },
+      "remoteCancel": {
+        "confirmed": "リモートのキャンセルを確認しました。",
+        "unsupported": "リモートはキャンセル非対応で、生成が完了する可能性があります。",
+        "unknown": "リモートでキャンセルされたかは未確認です。"
+      }
     },
     "turnStatus": {
       "missingFinalAnswer": "最終回答は生成されませんでした",
@@ -1062,7 +1089,20 @@
       "failed": "📎 ファイルは用意できなかった"
     },
     "browser": {
+      "stateReadFailed": "ブラウザーの状態を読み込めません",
+      "controlledWindow": "制御ブラウザー",
+      "executionNode": "実行場所",
+      "sameWindowHint": "ページはこのサービスが制御する Chromium ウィンドウで開かれます。表示・引き継ぎ・返却は同じページを操作します。",
+      "userTakeover": "手動操作中",
+      "suspended": "一時停止",
       "running": "🌐 {name} はブラウザを操作している",
+      "stopped": "停止",
+      "revoked": "アシスタントの権限は取り消されました",
+      "showControlled": "ブラウザーを表示",
+      "takeover": "手動で操作",
+      "release": "アシスタントに戻す",
+      "noVisibleWindow": "このサービスはブラウザーウィンドウを表示できません。ここでは手動操作を利用できません。",
+      "workspaceUnavailable": "このチャットで利用できるブラウザーはありません",
       "done": "🌐 {name} ブラウザ操作おわり",
       "failed": "🌐 {name} ブラウザが言うことを聞かない"
     },
@@ -1119,6 +1159,7 @@
       "failed": "⚙️ 設定は変わらなかった"
     },
     "automation": {
+      "importBlocked": "旧タスク {count} 件を読み込めず、一時停止しています。元のタスク情報を確認してください。",
       "running": "🤖 {name} は自動化の段取り中",
       "done": "🤖 {name} は自動化の段取りを済ませた",
       "failed": "🤖 自動化の段取りができなかった"
@@ -1562,6 +1603,7 @@
       "cookiesTitle": "Cookies",
       "acceptCookies": "Cookies を受け入れる",
       "acceptCookiesHint": "オンにすると、内蔵ブラウザは通常のブラウザのようにサイトの Cookies を保存して送信します。",
+      "cookiePolicyChangeHint": "Cookie 方針を変更すると、現在の操作対象ページが閉じます。URL と既存のログイン情報は保持されますが、未送信のフォーム内容は失われる場合があります。ページを開き直すと新しい方針が適用されます。",
       "clearCookies": "Cookies を消去",
       "clearCookiesHint": "内蔵ブラウザに保存された Cookies とサイトデータを消去します。",
       "clearCookiesButton": "消去",
@@ -1685,6 +1727,7 @@
       "hardwareAcceleration": "ハードウェアアクセラレーション",
       "hardwareAccelerationHint": "GPU でウィンドウを描画します。オフにすると次回起動からソフトウェア描画を使い、Windows の GPU ドライバー起因の起動クラッシュ復旧に役立ちます。",
       "sidebar": "サイドバー",
+      "sidebarLoadFailed": "サイドバー設定を読み込めませんでした。もう一度お試しください。",
       "sessionListSingleLine": "セッション一覧を 1 行表示",
       "sessionListSingleLineHint": "オンにすると各セッションを 1 行で表示します。ホバー時に右側の操作が現れ、タイトルは省略記号で短くなります。",
       "rollbackFileChanges": "巻き戻し時にファイル変更も取り消す",
@@ -2059,6 +2102,7 @@
       "retention7d": "7日",
       "maxFileSize": "次のサイズ以上を無視",
       "viewBackups": "バックアップを表示",
+      "backupsLoadFailed": "バックアップ一覧を読み込めませんでした。もう一度お試しください。",
       "hideBackups": "閉じる",
       "restoreBtn": "復元",
       "noBackups": "バックアップはまだありません",
@@ -2182,6 +2226,11 @@
       "globalDefaults": "グローバルデフォルト"
     },
     "oauth": {
+      "notPersisted": "今回のログイン情報は保存されませんでした。再起動後に再ログインが必要な場合があります。",
+      "loginRefreshFailed": "ログイン済みですが、画面の更新に失敗しました。状態を再取得してください。",
+      "logoutRefreshFailed": "ログアウト済みですが、画面の更新に失敗しました。状態を再取得してください。",
+      "browserUnavailable": "このウィンドウでは認証ページを開けません。",
+      "waitCancelled": "ローカルでの待機を停止しました。プロバイダー側の認証は完了する可能性があります。",
       "title": "クイックログイン",
       "login": "ログイン",
       "logout": "ログアウト",
@@ -2572,6 +2621,7 @@
       "disabled": "無効",
       "noSkills": "利用可能なスキルはありません",
       "noUser": "カスタムスキルはありません",
+      "loadFailed": "スキルを読み込めませんでした。もう一度お試しください。",
       "workspaceBadge": "プロジェクト",
       "copyToSkills": "スキルにコピー",
       "copied": "コピーしました ✓",
@@ -2656,6 +2706,7 @@
       "goalToggleDesc": "長期タスクにトークン/時間予算を付け、超過時に一度だけ通知"
     },
     "mcp": {
+      "selectAgentForDetails": "接続の詳細とアシスタントの権限を確認するには、アシスタントを作成または選択してください。",
       "masterTitle": "Master Switch",
       "masterName": "Enable Connectors",
       "masterDesc": "When off, new sessions receive no MCP connector tools. Frozen sessions keep their snapshot, but calls return an explicit error.",
@@ -3956,6 +4007,7 @@
       "saved": "ショートカットを保存しました",
       "resetDone": "すべて既定に戻しました",
       "registrationFailed": "ショートカットの登録に失敗しました。他のアプリで使用中の可能性があります",
+      "savedReloadFailed": "キー設定は保存されましたが、有効化が完了しませんでした。再試行するかアプリを再起動してください。",
       "noResults": "一致するショートカットがありません",
       "footnote": "ローカルショートカットは対応する画面にフォーカスがあるときのみ有効です。既定のキーは macOS と Windows/Linux で異なります。",
       "footnoteMac": "ローカルショートカットは対応する画面にフォーカスがあるときのみ有効です。⌘ は Command キーを指します。",
@@ -3995,6 +4047,17 @@
       "formatError": "削除状況の応答形式が無効です",
       "connectionChanged": "接続が変更されました。削除状況を開き直してください。",
       "resultChanged": "接続が変更されました。前のサーバーの結果はまだ反映されていません。"
+    },
+    "transfer": {
+      "title": "設定のインポートとエクスポート",
+      "hint": "秘密情報は非表示で出力されます。インポートは項目ごとに結合し、他の設定を保持します。",
+      "export": "設定をエクスポート",
+      "import": "設定をインポート",
+      "tooLarge": "設定ファイルは2 MiB以下にしてください。",
+      "connectionChanged": "接続が変わりました。もう一度操作してください。",
+      "partialApplied": "設定は反映されましたが、後続の処理が未完了です。",
+      "savedNotApplied": "設定は保存されましたが、まだ反映されていません。",
+      "partialSaved": "一部の設定は保存されました。再読み込みしてから操作してください。"
     }
   },
   "onboarding": {
@@ -4116,6 +4179,11 @@
     }
   },
   "activity": {
+    "listLoadFailed": "活動を読み込めません。前回の結果を保持しています。",
+    "actionFailed": "操作を完了できませんでした。もう一度お試しください。",
+    "unconfirmed": "結果は未確認です",
+    "cancelled": "停止済み",
+    "skipped": "今回はスキップ",
     "title": "アクティビティ",
     "empty": "アクティビティはまだありません。巡回やスケジュールタスクの実行結果がここに表示されます。",
     "back": "戻る",
@@ -4955,6 +5023,8 @@
     }
   },
   "devtools": {
+    "cardWindowUnsupported": "このウィンドウは安全な対話カードにまだ対応していません",
+    "cardServiceUnsupported": "このサービスは安全な対話カードにまだ対応していません",
     "heartbeat": "ハートビート",
     "memoryExport": "メモリエクスポート",
     "onboarding": "Onboarding",
@@ -5448,6 +5518,12 @@
     "mediaNoDisplayableFiles": "生成結果に表示可能なファイルがありません"
   },
   "sessionCollab": {
+    "decisionNotPersisted": "操作は完了しましたが、確認結果を保存できませんでした。再度開いても操作を繰り返さないでください。",
+    "queued": "送信待ち",
+    "queuedHint": "確認して送信待ちに追加しました。対象の会話が空き次第送信します。",
+    "unknown": "結果未確認",
+    "deliveryUnknown": "配信を確認できません。重複送信せず、対象の会話を確認してください。",
+    "retryMessage": "最初のメッセージを再試行",
     "messagePrefix": "[エージェント「{name}」からのメッセージです。ユーザー本人ではありません]",
     "fromAgent": "{name} からのメッセージ",
     "expand": "展開",

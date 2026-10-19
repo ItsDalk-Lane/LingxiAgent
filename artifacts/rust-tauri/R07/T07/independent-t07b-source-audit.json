@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "status": "SOURCE_ARCHIVE_VERIFIED_FINAL_GATES_PENDING",
+  "checkedAt": "2026-10-18T02:56:00.132254+00:00",
+  "candidate": "t07b",
+  "manifestRows": 541,
+  "archiveMembers": 541,
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "fingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+  "archiveSha256": "ee7766ff7e21afcd1b336a877198e5311e305bfeeb40b5336f8601530fa02277",
+  "allCurrentBytesAndModesMatch": true,
+  "allArchiveBytesAndModesMatch": true,
+  "deleted": [],
+  "symlinks": [],
+  "sourceUniverseNew": [],
+  "sourceUniverseMissing": [],
+  "integrated15": {
+    "exitCode": 0,
+    "logSha256": "90534721c042cd0596a4b3308620c20890f5fd58fb6e6db441c5b78b154f1ec5",
+    "logHashMatches": true,
+    "sourceBeforeAfterSame": true,
+    "suiteResults": [
+      [
+        "619",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      [
+        "11",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      [
+        "19",
+        "0",
+        "0",
+        "0",
+        "0"
+      ]
+    ],
+    "passedLines": 649,
+    "requiredNewTests": [
+      "goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop",
+      "goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run",
+      "goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark",
+      "goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop",
+      "goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity",
+      "goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+      "workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion",
+      "workflow::actual_http_activity_snapshot_checks_owner_and_survives_same_home_restart",
+      "loopx::tests::injected_identity_never_rebinds_delayed_registration_or_old_control"
+    ],
+    "requiredNewTestsMissing": [],
+    "developmentToCandidateChanges": [
+      {
+        "path": "rust/crates/lingxi-service/src/loopx.rs",
+        "developmentSha256": "927f6d042b0a05c830c66a31d6dbb43fa117781f2707dbf02293e479f3417a70",
+        "candidateSha256": "2ae08837905f8e2fc6206e503c1a670c81a56616d75d45708ec7eb83bda9b11b"
+      }
+    ],
+    "finalCandidateAcceptance": false
+  },
+  "errors": []
+}

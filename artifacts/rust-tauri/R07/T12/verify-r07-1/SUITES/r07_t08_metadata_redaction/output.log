@@ -1,0 +1,27 @@
+
+running 3 tests
+test auth_header_mask_refills_only_same_header_and_plain_metadata_value_stays_literal ... ok
+test metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id ... ok
+test providers_manage_without_secrets_write_cannot_replace_or_clear_model_extension_credentials ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.05s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.62s
+     Running tests/r07_t08_metadata_redaction.rs (rust/target-r07/debug/deps/r07_t08_metadata_redaction-6b3f041a218433cf)

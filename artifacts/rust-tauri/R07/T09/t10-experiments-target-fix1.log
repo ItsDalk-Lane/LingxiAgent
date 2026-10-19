@@ -1,0 +1,35 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (test "r06_experiments_completion") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.86s
+     Running tests/r06_experiments_completion.rs (rust/target-r07/debug/deps/r06_experiments_completion-da2b5afbfa0cfa0f)
+
+running 5 tests
+test actual_cli_focused_creation_and_frozen_hint_reach_wire_model_after_toggle_off ... ok
+test current_experiment_persistence_events_observation_and_real_system_permissions ... ok
+test new_main_session_policy_is_frozen_durable_and_never_grants_tools ... ok
+test original_experiments_current_tauri_window_real_service ... ok
+test original_settings_container_experiments_computer_components_and_current_live_http ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 37.95s
+

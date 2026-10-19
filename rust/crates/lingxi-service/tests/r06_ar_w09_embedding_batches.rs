@@ -1225,7 +1225,10 @@ async fn c01_presend_request_construction_failure_is_not_a_physical_request() {
         stub.addr,
         "model-a",
         "openai-embeddings",
-        "W09_SYNTHETIC\nINVALID_HEADER",
+        // 构造失败的触发器：CR/LF 自配置校验收紧（启动即拒）后改用 BEL——
+        // 通过配置校验（非空、无 CR/LF），在发送期 HeaderValue::from_str 失败，
+        // 保持「发送前构造失败」这一原语义不变。
+        "W09_SYNTHETIC\u{7}INVALID_HEADER",
     )
     .await;
     let (nb, source, _) = import_n(&service.api, 1).await;

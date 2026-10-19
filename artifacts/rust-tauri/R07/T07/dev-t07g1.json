@@ -1,0 +1,60 @@
+{
+ "stage": "R07",
+ "task": "T07",
+ "slice": "γ",
+ "label": "dev-t07g1",
+ "purpose": "git 面板 22 路由端口（现役 git-environment.ts + git-command.ts 全语义：status/worktree/branches/log/log-stats/file-diff + checkout/create-branch/stash/unstash/discard/worktree-create/commit/push/pull/stage/unstage/amend/fetch + ai-commit-message 的 summarize 槽链与账本；三层目录门禁含 studioMountRoots/agentId；scope 门禁 log-stats=files.read 特例）+ β3 修复A（cwd_history 顶层）+ β4/做梦 修复B（memory 槽 chat 回退）",
+ "candidate": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "commands": [
+  "cargo test -p lingxi-service --lib --test r07_git_panel --test r07_diary --test r07_desk_files --test r06_dream_completion --test r07_workbench --test r06_workbench_write --test auth_matrix --test r07_media_admin --test r07_t05_media",
+  "cargo fmt -p lingxi-service -- --check",
+  "cargo clippy -p lingxi-service --all-targets"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp",
+  "GIT_CONFIG_GLOBAL": "/dev/null（测试进程内注入，机器 gitconfig 隔离）",
+  "platform": "darwin-arm64"
+ },
+ "fingerprintMethod": "sha256 over rust/crates/**/*.rs：sorted(relpath) 级联 relpath\\0 + content\\0",
+ "sourceFingerprintBefore": "33c3271bbacf85281667e6d0f71a05ed6e89aac3d897bfbf97799bd570af6f2f",
+ "sourceFingerprintAfter": "33c3271bbacf85281667e6d0f71a05ed6e89aac3d897bfbf97799bd570af6f2f",
+ "sourceFilesHashed": 564,
+ "exitCode": [
+  0,
+  0,
+  0
+ ],
+ "durationSec": 77.6,
+ "durationsPerCommand": [
+  74.6,
+  2.5,
+  0.4
+ ],
+ "testCounts": {
+  "lib（含 git_panel 12 单测）": 505,
+  "r07_git_panel": 22,
+  "r07_diary": 15,
+  "r07_desk_files": 8,
+  "r06_dream_completion": 18,
+  "r07_workbench": 25,
+  "r06_workbench_write": 6,
+  "auth_matrix": 1,
+  "r07_media_admin": 11,
+  "r07_t05_media": 9,
+  "total": 620
+ },
+ "notes": [
+  "clippy 残留 3 条 warning 全在 diary.rs:954/1011/1362（β4 作者代码，dev-t07d2.log 已含同款——非 γ 引入）；γ 新增/改动文件（git_panel.rs、r07_git_panel/*、r06_dream_completion.rs、r07_diary/mod.rs）零 warning。",
+  "git_panel.rs resolve_query_dir 带 #[allow(clippy::result_large_err)]（Err=完整 axum Response 直返；chat_wire.rs:1753 等先例）。",
+  "测试夹具用真实 git 二进制对 /private/tmp 临时仓（被移植面基板，本地无网络）；远程 = 本地 bare 仓；模型面 = 确定性 TCP openai-completions 替身。",
+  "行为取证：① git log --no-walk --numstat 真实字节形状（\\x1e\\n 后纯 \\n numstat 行、块间空行、尾块归属最后提交）修正单测 fixture；② restore --source HEAD --staged --worktree 对已暂存新增文件连工作区文件一并移除；③ stash pop 冲突报文含 CONFLICT → unstash_conflict；④ 本机 tag.gpgsign=true 会漏进测试 → 测试进程内 GIT_CONFIG_GLOBAL/SYSTEM=/dev/null 隔离。",
+  "status 不主动 fetch（现役同口径）：behind 相对最近抓取的 upstream 引用计算；集成测试先走 fetch 路由再断言 behind=1。"
+ ],
+ "logFile": "artifacts/rust-tauri/R07/T07/dev-t07g1.log",
+ "logSha256": "e0b3a258c37a308de6954f0f790ae1fd35679ed8c7551ebc6d3aabf65028b0a4",
+ "timestamp": "2026-10-17T23:13:08+0800"
+}

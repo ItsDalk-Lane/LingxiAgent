@@ -1,0 +1,73 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T07:50:51.264256+00:00",
+  "stage": "R07-T08",
+  "candidate": null,
+  "finalAcceptance": "pending",
+  "mode": "READ_ONLY_SOURCE_AND_TEST_REVIEW; no Cargo/GUI run by reviewer",
+  "sourceFiles": [
+    {
+      "path": "rust/crates/lingxi-service/src/model_configuration.rs",
+      "sha256": "c01bcc80771afd6c9c0d01b78b8b519f0614bf3025b1784055676adad6adf109"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "d681d98e9f73369b938e5a68d50313543bc025316f70c4c17f8f06c43a7797b3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/cards.rs",
+      "sha256": "631bdf2536ee233b4b87383f860431c7b02ef4c8f1552b90711c97e7b6158dd8"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_model_configuration.rs",
+      "sha256": "3ce34df1e565a4d6aec60d27335f269dbff9fc7542f718b35fa8686e3eb32f0f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_model_authority.rs",
+      "sha256": "b7608e54446207cd2aa24d29364f2730b222608a4c059513f53ba603b6865229"
+    }
+  ],
+  "findingFollowups": [
+    {
+      "id": "T08-REVIEW-MODEL-HEADERS-SHAPE",
+      "sourceDisposition": "FIX_PRESENT_RUNTIME_RECHECK_PENDING",
+      "evidence": "normalize_provider rejects non-object/non-null headers; null retains explicit clear compatibility. Real malformed-input regression verifies Source bytes, generation and original header remain unchanged. Root-owned headers-invalid-reproduce1 was same-source exit101; headers-invalid-fixed1 exit0 but source changed, so neither borrowed as frozen candidate full pass."
+    },
+    {
+      "id": "T08-REVIEW-MODEL-REVOKED-QUEUED-WRITE",
+      "sourceDisposition": "FIX_PRESENT_RUNTIME_RECHECK_PENDING",
+      "evidence": "Same Auth Arc from ServiceState composition; ModelAuthority captures original Principal/Auth/management/clock. save validates before/after actual mutation queue and FileSafety authorize; saved-key/reload/network/snapshot/probe repeat validations at actual queue boundary. Probe current checks original auth and configuration generation after quota wait and before cache writes. Unknown writes preserve unconfirmed fact. Existing trusted internal non-Device/non-LoopbackToken principal validation semantics are retained."
+    },
+    {
+      "id": "T08-ROOT-MODEL-ENDPOINT-SHAPE",
+      "sourceDisposition": "FIX_PRESENT_RUNTIME_RECHECK_PENDING",
+      "evidence": "Explicit endpoint/base_url now require strings, empty string retained for system-speech. Original endpoint defect was initially static only. Later model-authority-core1 recorded a real 9pass/1fail while source changed during development; root confirmed compiler/source timing mix. Preserve that log as actual mixed-source development failure, not a frozen current-fix failure or exact unified-source reproduction."
+    }
+  ],
+  "testReview": {
+    "target": "r07_t08_model_authority",
+    "cases": 5,
+    "actualBehaviorCovered": [
+      "same active device real HTTP save success then actual write-lock queue revocation",
+      "FileSafety second pre-exchange authorization point revocation",
+      "probe and plaintext saved-key queue revocation",
+      "original local token replaced during reload queue",
+      "real web session login and logout during save queue"
+    ],
+    "assertions": [
+      "HTTP403/code model_authority_revoked",
+      "saved=false/applied=false for denied writes",
+      "Source, compatibility/preference files and gateway routes/generation fingerprints unchanged",
+      "zero owned external platform requests and zero model-call usage for pre-dispatch denial",
+      "valid local owner save and catalog still succeed"
+    ],
+    "runtimeExecutedByReviewer": false,
+    "remainingRuntimeScope": "Root must execute all five cases against stopped source, then freeze and run all T08 gates. Dedicated post-quota and late-cache scenarios were reviewed in source only unless another actual receipt proves them."
+  },
+  "compatibilityReview": [
+    "character-cards/export/plan aliases existing export preview handler within existing local authorization",
+    "oversized varsCss clears theme variables while retaining valid card body, as incumbent behavior"
+  ],
+  "newBlockingFindings": [],
+  "limitation": "This evidence reviews current source only. It is not attached to t08b, not acceptance, and never rewrites t08a failure or prior independent review."
+}

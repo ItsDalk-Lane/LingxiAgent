@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "serverId": "server_nXUgUvWfKrbSNJG2MekgCw",
+  "studioId": "studio_EVch0xqu-XaUuFnLtviuyw",
+  "account": {
+    "userId": "user_local",
+    "username": "local",
+    "displayName": "Local User",
+    "passwordSalt": null,
+    "passwordHash": null,
+    "passwordAlgorithm": null
+  },
+  "network": {
+    "mode": "loopback",
+    "listenHost": "127.0.0.1",
+    "listenPort": 0,
+    "publicBaseUrl": null
+  },
+  "webSessions": [],
+  "defaultThinkingLevel": "medium",
+  "sessionThinkingLevels": {},
+  "audit": [
+    {
+      "action": "models.credentials.login.start",
+      "target": "model-plane",
+      "atUnixMs": 1792308514683,
+      "metadata": {
+        "provider": "openai-codex"
+      }
+    },
+    {
+      "action": "models.credentials.login.callback",
+      "target": "model-plane",
+      "atUnixMs": 1792308514712,
+      "metadata": {
+        "provider": "openai-codex"
+      }
+    }
+  ]
+}

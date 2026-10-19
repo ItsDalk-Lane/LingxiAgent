@@ -1,4 +1,8 @@
 import { lingxiFetch } from '../../api';
+import { useSettingsStore } from '../../store';
+import { captureSettingsConnection, ownsSettingsConnection } from '../../connection-owner';
+import { resolveServerConnection } from '../../../services/server-connection';
+import type { McpSettingsAction, McpSettingsRequest, McpSettingsResult, McpSettingsState, McpConnectorBulkResult, McpOAuthStartResponse, McpOAuthPollResponse, McpOAuthCancelResponse, McpOAuthLogoutResponse } from '../../../../../../contracts/generated/ts/lingxi-protocol';
 import type { McpBulkResult, McpConnectorInput, McpState, McpToolPermission } from './types';
 
 /** Mirrors the manager's own default, used only until the first state load lands. */
@@ -19,8 +23,64 @@ async function jsonOrError<T>(res: Response): Promise<T> {
   return data;
 }
 
-export async function loadMcpState(agentId: string): Promise<McpState> {
-  const res = await lingxiFetch(`/api/mcp/state?agentId=${encodeURIComponent(agentId)}`);
+function usesRustMcp(): boolean {
+  return resolveServerConnection(useSettingsStore.getState())?.serverNodeKind === 'lingxi-service';
+}
+
+function object(value: unknown, label: string): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`MCP ${label}格式无效`);
+  return value as Record<string, unknown>;
+}
+
+async function rustAction(action: McpSettingsAction, payload: Record<string, unknown>, agentId?: string): Promise<McpSettingsResult> {
+  const owner = captureSettingsConnection();
+  const request: McpSettingsRequest = { action, agentId: agentId || null, payload };
+  const response = await lingxiFetch('/lingxi/v1/mcp/settings-action', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(request),
+  });
+  const data = object(await response.json(), '设置回执');
+  if (!ownsSettingsConnection(owner)) throw new Error('连接已改变，旧MCP回执不能用于当前设置');
+  const update = object(data.settingsUpdate, '设置回执');
+  if (update.action !== action || !['applied', 'failed', 'cancelled'].includes(String(update.status))
+    || typeof update.saved !== 'boolean' || typeof update.runtimeApplied !== 'boolean') throw new Error('MCP设置回执不匹配');
+  if (update.status !== 'applied' && !(action === 'mcp.connector.add_bulk' && Array.isArray(data.results))) {
+    const detail = update.error && typeof update.error === 'object' ? object(update.error, '错误').message : update.summary;
+    throw Object.assign(new Error(`${update.saved ? '设置已保存；' : ''}${update.runtimeApplied ? '运行时变更已发生；' : ''}${typeof detail === 'string' ? detail : 'MCP设置未完成'}`), { settingsUpdate: update });
+  }
+  return data as unknown as McpSettingsResult;
+}
+
+async function rustOAuth(path: string, method = 'GET'): Promise<Record<string, unknown>> {
+  const owner = captureSettingsConnection();
+  const res = await lingxiFetch(`/lingxi/v1/mcp/${path}`, { method });
+  const data = object(await res.json(), '登录回执');
+  if (!ownsSettingsConnection(owner)) throw new Error('连接已改变，旧MCP登录回执已丢弃');
+  if (!res.ok || data.error) throw new Error(typeof data.message === 'string' ? data.message : String(data.error || 'MCP登录请求未完成'));
+  return data;
+}
+
+export async function loadMcpState(agentId: string | null): Promise<McpState> {
+  if (usesRustMcp()) {
+    const owner = captureSettingsConnection();
+    const response = await lingxiFetch(`/lingxi/v1/mcp/state${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ''}`);
+    const wire = object(await response.json(), '状态') as unknown as McpSettingsState;
+    if (!ownsSettingsConnection(owner)) throw new Error('连接已改变，旧MCP状态已丢弃');
+    const config = object(wire.config, '公开配置');
+    const agent = object(wire.agentConfig, '助手权限');
+    if (wire.agentId !== agentId || typeof config.enabled !== 'boolean' || typeof config.deferEnabled !== 'boolean'
+      || typeof config.builtinDeferEnabled !== 'boolean' || !Number.isSafeInteger(config.deferThreshold)
+      || Number(config.deferThreshold) <= 0 || !Array.isArray(config.connectors)) throw new Error('MCP状态与目标助手不匹配');
+    object(agent.connectors, '助手连接器权限');
+    for (const entry of config.connectors) {
+      const connector = object(entry, '连接器');
+      if (typeof connector.id !== 'string' || typeof connector.name !== 'string' || typeof connector.transport !== 'string'
+        || !['running', 'stopped', 'failed', 'connecting'].includes(String(connector.status)) || !Array.isArray(connector.tools)) throw new Error('MCP连接器真实状态缺失');
+    }
+    return { enabled: config.enabled, deferEnabled: config.deferEnabled, deferThreshold: Number(config.deferThreshold),
+      builtinDeferEnabled: config.builtinDeferEnabled, connectors: config.connectors as McpState['connectors'], agentConfig: agent as McpState['agentConfig'] };
+  }
+
+  const res = await lingxiFetch(`/api/mcp/state${agentId ? `?agentId=${encodeURIComponent(agentId)}` : ''}`);
   const data = await jsonOrError<McpState>(res);
   return {
     enabled: data.enabled === true,
@@ -38,6 +98,7 @@ export async function loadMcpState(agentId: string): Promise<McpState> {
 }
 
 export async function setMcpEnabled(enabled: boolean): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.global.enabled', { enabled }); return; }
   const res = await lingxiFetch('/api/mcp/settings/enabled', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -53,6 +114,7 @@ export async function setMcpEnabled(enabled: boolean): Promise<void> {
 }
 
 export async function addMcpConnector(input: McpConnectorInput): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.connector.add', { connector: input, startIfEnabled: true }); return; }
   const res = await lingxiFetch('/api/mcp/connectors', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -70,6 +132,12 @@ export async function addMcpConnector(input: McpConnectorInput): Promise<void> {
  * thrown away with the error.
  */
 export async function addMcpConnectorsBulk(inputs: McpConnectorInput[]): Promise<McpBulkResult[]> {
+  if (usesRustMcp()) {
+    const result = await rustAction('mcp.connector.add_bulk', { connectors: inputs }) as unknown as McpConnectorBulkResult;
+    if (!Array.isArray(result.results) || result.results.length !== inputs.length || result.results.some(row => typeof row.ok !== 'boolean' || typeof row.saved !== 'boolean' || typeof row.runtimeApplied !== 'boolean')) throw new Error('MCP批次回执缺失');
+    return result.results.map(row => ({ ok: row.ok, ...(row.id ? { id: row.id } : {}), ...(row.error ? { error: row.error } : {}),
+      saved: row.saved, runtimeApplied: row.runtimeApplied }));
+  }
   const res = await lingxiFetch('/api/mcp/connectors/bulk', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -87,6 +155,7 @@ export async function addMcpConnectorsBulk(inputs: McpConnectorInput[]): Promise
 export async function setMcpDeferSettings(
   patch: { deferEnabled?: boolean; deferThreshold?: number; builtinDeferEnabled?: boolean },
 ): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.global.defer', patch); return; }
   const res = await lingxiFetch('/api/mcp/settings/defer', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -96,6 +165,7 @@ export async function setMcpDeferSettings(
 }
 
 export async function updateMcpConnector(connectorId: string, input: McpConnectorInput): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.connector.update', { connectorId, patch: input }); return; }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -105,6 +175,7 @@ export async function updateMcpConnector(connectorId: string, input: McpConnecto
 }
 
 export async function removeMcpConnector(connectorId: string): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.connector.remove', { connectorId }); return; }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'DELETE',
   });
@@ -115,6 +186,7 @@ export async function runMcpConnectorAction(
   connectorId: string,
   action: 'start' | 'stop' | 'refresh-tools',
 ): Promise<void> {
+  if (usesRustMcp()) { await rustAction(action === 'refresh-tools' ? 'mcp.connector.refresh_tools' : action === 'start' ? 'mcp.connector.start' : 'mcp.connector.stop', { connectorId }); return; }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/${action}`, {
     method: 'POST',
   });
@@ -126,6 +198,7 @@ export async function setAgentMcpConnector(
   connectorId: string,
   enabled: boolean,
 ): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.agent.connector.enable', { connectorId, enabled }, agentId); return; }
   const res = await lingxiFetch(`/api/mcp/agents/${encodeURIComponent(agentId)}/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -154,6 +227,7 @@ export async function setAgentMcpTools(
   connectorId: string,
   tools: Record<string, boolean>,
 ): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.agent.tool.enable', { connectorId, tools }, agentId); return; }
   const res = await lingxiFetch(`/api/mcp/agents/${encodeURIComponent(agentId)}/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -178,6 +252,7 @@ export async function updateMcpConnectorPolicy(
     pinnedTools?: Record<string, boolean>;
   },
 ): Promise<void> {
+  if (usesRustMcp()) { await rustAction('mcp.connector.update', { connectorId, patch }); return; }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -187,19 +262,37 @@ export async function updateMcpConnectorPolicy(
 }
 
 export async function startMcpOAuth(connectorId: string): Promise<{ sessionId: string; url: string }> {
+  if (usesRustMcp()) {
+    const data = await rustOAuth(`connectors/${encodeURIComponent(connectorId)}/oauth/start`, 'POST');
+    if (typeof data.sessionId !== 'string' || !data.sessionId || typeof data.url !== 'string') throw new Error('MCP登录回执格式无效');
+    const url = new URL(data.url);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error('MCP登录地址无效');
+    return data as unknown as McpOAuthStartResponse;
+  }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/start`, {
     method: 'POST',
   });
   return jsonOrError<{ sessionId: string; url: string }>(res);
 }
 
-export async function pollMcpOAuth(sessionId: string): Promise<{ status: string; error?: string }> {
+export async function pollMcpOAuth(sessionId: string): Promise<McpOAuthPollResponse> {
+  if (usesRustMcp()) {
+    const data = await rustOAuth(`oauth/poll/${encodeURIComponent(sessionId)}`);
+    if (!['pending', 'exchanging', 'done', 'error', 'cancelled', 'missing'].includes(String(data.status))
+      || (data.error !== undefined && typeof data.error !== 'string')) throw new Error('MCP登录状态格式无效');
+    return data as unknown as McpOAuthPollResponse;
+  }
   const res = await lingxiFetch(`/api/mcp/oauth/poll/${encodeURIComponent(sessionId)}`);
   return jsonOrError<{ status: string; error?: string }>(res);
 }
 
 /** Abandon a browser round trip the user gave up on. Saved credentials are untouched. */
 export async function cancelMcpOAuth(connectorId: string): Promise<void> {
+  if (usesRustMcp()) {
+    const data = await rustOAuth(`connectors/${encodeURIComponent(connectorId)}/oauth/cancel`, 'POST') as unknown as McpOAuthCancelResponse;
+    if (!Number.isSafeInteger(data.cancelled) || data.cancelled < 0) throw new Error('MCP取消回执格式无效');
+    return;
+  }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/cancel`, {
     method: 'POST',
   });
@@ -207,6 +300,13 @@ export async function cancelMcpOAuth(connectorId: string): Promise<void> {
 }
 
 export async function logoutMcpOAuth(connectorId: string): Promise<void> {
+  if (usesRustMcp()) {
+    const data = await rustOAuth(`connectors/${encodeURIComponent(connectorId)}/oauth/logout`, 'POST') as unknown as McpOAuthLogoutResponse;
+    object(data.connector, '退出连接器');
+    const view = object(data.state, '退出后状态');
+    object(view.config, '退出后配置');
+    return;
+  }
   const res = await lingxiFetch(`/api/mcp/connectors/${encodeURIComponent(connectorId)}/oauth/logout`, {
     method: 'POST',
   });

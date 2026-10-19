@@ -1,0 +1,24 @@
+{
+  "candidate": "r3",
+  "name": "browser-contract",
+  "command": [
+    "node",
+    "--test",
+    "tests/migration/r01-t02/browser-contract.test.mjs"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T22:46:28.468770+00:00",
+  "sourceFingerprint": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+  "log": "r3-browser-contract.log",
+  "endedAt": "2026-10-15T22:46:28.553964+00:00",
+  "exitCode": 1,
+  "sourceFingerprintAfter": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+  "logSha256": "cd848f95b5a06445d215b8c5467ec3a97142490876b9c727569b6c1d9aeaf88d",
+  "sourceUnchanged": true
+}

@@ -9,6 +9,15 @@ describe('mobile platform capability contract', () => {
     Reflect.deleteProperty(window, 'platform');
   });
 
+  it('浏览器旧返回值保持void，不把noopener的窗口返回值冒充系统回执', () => {
+    const open = vi.spyOn(window, 'open').mockReturnValue(window);
+    try {
+      installMobilePlatform();
+      expect(window.platform?.openExternal('https://example.invalid/owned')).toBeUndefined();
+      expect(open).toHaveBeenCalledExactlyOnceWith('https://example.invalid/owned', '_blank', 'noopener,noreferrer');
+    } finally { open.mockRestore(); }
+  });
+
   it('does not expose desktop-only file system capabilities as callable no-ops', () => {
     installMobilePlatform();
 

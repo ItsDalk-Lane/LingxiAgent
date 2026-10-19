@@ -137,10 +137,18 @@ impl Fixture {
         });
         let mut plane_json = json!({"providers":{"persona-stub":{"protocol":"openai-completions","endpoint":format!("http://{stub_addr}/v1"),"auth":{"kind":"apiKey","apiKey":"synthetic-persona-key"}}},"models":{"chat":{"provider":"persona-stub","model":"chat-model","capabilities":{"tools":true},"compat":{"contextWindow":200000}},"memory":{"provider":"persona-stub","model":"memory-model","compat":{"contextWindow":200000}}}});
         if tag == "unconfigured" {
+            // 契约更新（R07 回归26）：dream_service 已对齐现役语义——memory 槽
+            // 未配置时显式回退 chat 槽（auxiliary-slots.ts:92-97 同款）。因此
+            // 「未配置」场景必须两槽皆空，否则回退到 chat 会真实发起模型调用，
+            // 不再产生 dream_model_unconfigured，也违背「无调用、无费用」前提。
             plane_json["models"]
                 .as_object_mut()
                 .unwrap()
                 .remove("memory");
+            plane_json["models"]
+                .as_object_mut()
+                .unwrap()
+                .remove("chat");
         }
         let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
             &plane_json.to_string(),

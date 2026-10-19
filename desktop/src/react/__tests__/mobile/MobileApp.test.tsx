@@ -86,7 +86,6 @@ describe('MobileApp', () => {
     'mobile.auth.plaintextWarning': '远程明文链路不接收账号密码。',
     'mobile.auth.submit': '登录',
     'mobile.auth.scopeError': '当前登录缺少工作台权限，请重新输入访问密钥。',
-    'status.rustCoreUnavailable': 'Rust 聊天尚不可用',
   };
 
   beforeEach(() => {
@@ -236,10 +235,11 @@ describe('MobileApp', () => {
     await waitForMobileChatReady();
   });
 
-  it('uses the Rust auth routes and never enters the old mobile workspace', async () => {
+  it('logs in through the Rust auth routes and boots the formal mobile chat surface', async () => {
     let rustSessions = 0;
+    let bootstrapCalls = 0;
     fetchMock.mockImplementation((input: RequestInfo | URL) => {
-      const url = String(input);
+      const url = rustRoutePath(String(input));
       if (url === '/api/web-auth/session') {
         return Promise.resolve(new Response(null, { status: 404 }));
       }
@@ -256,6 +256,13 @@ describe('MobileApp', () => {
       if (url === '/lingxi/v1/server/identity') {
         return Promise.resolve(jsonResponse({ serverNodeKind: 'lingxi-service' }));
       }
+      if (url === '/lingxi/v1/mobile/bootstrap') {
+        bootstrapCalls++;
+        return Promise.resolve(jsonResponse(rustBootstrapFixture()));
+      }
+      if (url === '/lingxi/v1/sessions') return Promise.resolve(jsonResponse({ sessions: [rustSessionRow()] }));
+      if (url.startsWith('/lingxi/v1/chat/models')) return Promise.resolve(jsonResponse(rustChatModelsFixture()));
+      if (url === '/lingxi/v1/ws-ticket') return Promise.resolve(jsonResponse({ ticket: 'mobile-test-ws-ticket' }));
       throw new Error(`unexpected mobile request: ${url}`);
     });
 
@@ -265,13 +272,47 @@ describe('MobileApp', () => {
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'secret' } });
     fireEvent.click(screen.getByRole('button', { name: '登录' }));
 
-    await waitFor(() => expect(screen.getByText('Rust 聊天尚不可用')).toBeInTheDocument());
-    const loginCall = fetchMock.mock.calls.find(([input]) => String(input) === '/lingxi/v1/web-auth/login');
+    expect(await waitForMobileChatReady()).toHaveTextContent('sidebar.newChat');
+    const loginCall = fetchMock.mock.calls.find(([input]) => rustRoutePath(String(input)) === '/lingxi/v1/web-auth/login');
     expect(JSON.parse(String(loginCall?.[1]?.body))).toEqual({
       username: 'owner', password: 'secret', clientKind: 'mobile',
     });
-    expect(fetchMock.mock.calls.some(([input]) => String(input) === '/api/mobile/bootstrap')).toBe(false);
+    expect(fetchMock.mock.calls.some(([input]) => rustRoutePath(String(input)) === '/api/mobile/bootstrap')).toBe(false);
+    expect(fetchMock.mock.calls.some(([input]) => rustRoutePath(String(input)) === '/api/models')).toBe(false);
+    expect(fetchMock.mock.calls.some(([input]) => rustRoutePath(String(input)).includes('/api/sessions'))).toBe(false);
+    expect(bootstrapCalls).toBe(1);
+    expect(useStore.getState().currentAgentId).toBe('hana');
+    expect(useStore.getState().agents[0]).toMatchObject({ id: 'hana', name: 'Hana' });
+    expect(useStore.getState().sessions.some(session => session.path === 'native:sess_mobile_one')).toBe(true);
+    expect(useStore.getState().currentModel).toEqual({ id: 'deepseek-chat', provider: 'deepseek' });
+  });
+
+  it('fails closed when the Rust bootstrap request fails after login', async () => {
+    fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = rustRoutePath(String(input));
+      if (url === '/api/web-auth/session') {
+        return Promise.resolve(new Response(null, { status: 404 }));
+      }
+      if (url === '/lingxi/v1/health') {
+        return Promise.resolve(jsonResponse({ serverKind: 'lingxi-service', status: 'ok' }));
+      }
+      if (url === '/lingxi/v1/web-auth/session') {
+        return Promise.resolve(jsonResponse({ authenticated: true, principal: principal(['chat', 'resources.read', 'files.read', 'files.write']) }));
+      }
+      if (url === '/lingxi/v1/server/identity') {
+        return Promise.resolve(jsonResponse({ serverNodeKind: 'lingxi-service' }));
+      }
+      if (url === '/lingxi/v1/mobile/bootstrap') {
+        return Promise.resolve(new Response(JSON.stringify({ ok: false, error: 'bootstrap exploded' }), { status: 500, statusText: 'Internal Server Error' }));
+      }
+      throw new Error(`unexpected mobile request: ${url}`);
+    });
+
+    render(<MobileApp />);
+
+    expect(await screen.findByText(/lingxiFetch \/lingxi\/v1\/mobile\/bootstrap: 500/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('titlebar.currentChatTitle')).not.toBeInTheDocument();
   });
 
   it('returns stale browser sessions without file scopes to login', async () => {
@@ -1028,6 +1069,73 @@ function jsonResponse(data: unknown): Response {
     text: async () => typeof data === 'string' ? data : JSON.stringify(data),
     headers: new Headers(),
   } as Response;
+}
+
+// lingxiFetch 会把路径拼上连接 baseUrl（浏览器连接的源）；匹配前剥回路径部分。
+function rustRoutePath(url: string): string {
+  return url.startsWith('http://') || url.startsWith('https://') ? new URL(url).pathname + new URL(url).search : url;
+}
+
+// 与 GET /lingxi/v1/mobile/bootstrap 的真实响应同形状（驼峰键、模型投影、
+// 四 scope 助手摘要）；不借用旧 /api/mobile/bootstrap 的字段名。
+function rustBootstrapFixture(): Record<string, unknown> {
+  return {
+    locale: 'zh-CN',
+    agentName: 'Hana',
+    userName: 'Owner',
+    currentAgentId: 'hana',
+    agentYuan: 'lingxi',
+    homeFolder: '/workspace',
+    cwdHistory: ['/workspace'],
+    memoryMasterEnabled: true,
+    memoryEnabled: true,
+    thinkingLevel: 'medium',
+    permissionMode: 'auto',
+    appearance: { theme: registry.DEFAULT_THEME, serif: true, paperTexture: false },
+    editor: {},
+    chat: {},
+    avatars: { agent: false, user: false },
+    agents: [{
+      id: 'hana',
+      name: 'Hana',
+      yuan: 'lingxi',
+      isPrimary: true,
+      isCurrent: true,
+      hasAvatar: false,
+      homeFolder: '/workspace',
+      effectiveHomeFolder: '/workspace',
+      memoryMasterEnabled: true,
+    }],
+    models: [{ id: 'deepseek-chat', name: 'DeepSeek', provider: 'deepseek', isCurrent: true }],
+    activeModel: { id: 'deepseek-chat', provider: 'deepseek' },
+    currentModel: { id: 'deepseek-chat', provider: 'deepseek' },
+    modelState: 'ready',
+    modelGeneration: '1',
+  };
+}
+
+// 与 GET /lingxi/v1/sessions 的 SessionView 行同形状（修订点不存在时投影层
+// 如实置 null，不编造磁盘身份）。
+function rustSessionRow(): Record<string, unknown> {
+  return {
+    sessionId: 'sess_mobile_one',
+    agentId: 'hana',
+    ownerUserId: 'user_1',
+    title: '日常记录',
+    runCount: 1,
+    lastRuns: [{ runId: 'run_one', principalId: 'user_1', startedAtUnixMs: 1779000000000 }],
+  };
+}
+
+function rustChatModelsFixture(): Record<string, unknown> {
+  return {
+    models: [{ id: 'deepseek-chat', name: 'DeepSeek', provider: 'deepseek', isCurrent: true }],
+    activeModel: { id: 'deepseek-chat', provider: 'deepseek' },
+    currentModel: { id: 'deepseek-chat', provider: 'deepseek' },
+    modelState: 'ready',
+    modelGeneration: '1',
+    thinkingLevel: 'medium',
+  };
 }
 
 function stubNarrowViewport(matches: boolean): void {

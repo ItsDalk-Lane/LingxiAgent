@@ -1,0 +1,13 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.80s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-0591b361ca6dec9e)
+
+running 4 tests
+test bridge::child_revoke_tests::bridge_child_observes_actual_connector_disable_while_parent_model_is_parked ... ok
+test bridge::child_revoke_tests::bridge_child_observes_actual_permission_downgrade_while_parent_model_is_parked ... ok
+test bridge::child_revoke_tests::bridge_child_operate_positive_control_reaches_both_real_executors ... ok
+test bridge::child_revoke_tests::connector_cleanup_cancels_parked_real_child_after_parent_completed_without_rewriting_parent ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 463 filtered out; finished in 0.47s
+

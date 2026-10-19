@@ -80,19 +80,14 @@ impl OperationRequestPlan {
 
     /// Applies the resolved credential material per the family's rule.
     pub fn with_auth(mut self, auth: &ApplicableAuth, style: dispatch::BearerStyle) -> Self {
-        match auth {
-            ApplicableAuth::None => {}
-            ApplicableAuth::Bearer(token) => match style {
-                dispatch::BearerStyle::AuthorizationBearer => self
-                    .headers
-                    .push(("authorization".to_string(), format!("Bearer {token}"))),
-                dispatch::BearerStyle::NamedHeader(name) => {
-                    self.headers.push((name.to_string(), token.clone()))
-                }
-            },
-            ApplicableAuth::Header { name, value } => {
-                self.headers.push((name.clone(), value.clone()))
-            }
+        let (name, prefix) = match style {
+            dispatch::BearerStyle::AuthorizationBearer => ("authorization", "Bearer "),
+            dispatch::BearerStyle::NamedHeader(name) => (name, ""),
+        };
+        for (name, value) in auth.header_values(name, prefix) {
+            self.headers
+                .retain(|(existing, _)| !existing.eq_ignore_ascii_case(&name));
+            self.headers.push((name, value));
         }
         self
     }

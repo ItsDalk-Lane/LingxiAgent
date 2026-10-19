@@ -1,0 +1,47 @@
+{
+  "$defs": {
+    "BridgeConversationKind": {
+      "enum": [
+        "dm",
+        "group"
+      ],
+      "type": "string"
+    },
+    "BridgeWaitingReceiptMode": {
+      "enum": [
+        "native_typing",
+        "text"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "cancellable": {
+      "type": "boolean"
+    },
+    "mode": {
+      "$ref": "#/$defs/BridgeWaitingReceiptMode"
+    },
+    "refreshIntervalMs": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "scopes": {
+      "items": {
+        "$ref": "#/$defs/BridgeConversationKind"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "mode",
+    "scopes",
+    "refreshIntervalMs",
+    "cancellable"
+  ],
+  "title": "BridgeWaitingReceiptCapability",
+  "type": "object"
+}

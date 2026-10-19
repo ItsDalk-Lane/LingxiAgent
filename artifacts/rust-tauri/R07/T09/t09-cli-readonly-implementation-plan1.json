@@ -1,0 +1,219 @@
+{
+  "label": "t09-cli-readonly-implementation-plan1",
+  "createdAt": "2026-10-18T12:18:54.271336+00:00",
+  "scope": "READ_ONLY_PREPARATION_DURING_T08G_FREEZE",
+  "implementationStarted": false,
+  "finalAcceptance": false,
+  "successCriteria": [
+    "真实现役CLI chat/continue发送到唯一Rust RunSupervisor并显示真实回复与工具进度。",
+    "真实审批与取消使用同session/run/stream及原principal，重连只补事件不重复prompt。",
+    "stdin EOF完成待执行输入后有界退出；释放readline/WS/信号监听，不能保持进程悬挂。",
+    "serve默认Rust沿现有runner/同home保护/退出码；旧Node仅显式兼容，错误不能回退。"
+  ],
+  "existingContract": {
+    "formalReusableDto": [
+      "contracts/generated/ts/lingxi-protocol.ts:ClientHello",
+      "contracts/generated/ts/lingxi-protocol.ts:ServerHello",
+      "shared/contract-versions.ts 与shared/contract-versions.json：现役协议/epoch常量"
+    ],
+    "serviceLocalTypesToReuseOrPromote": [
+      "chat_wire::PromptRequest",
+      "chat_wire::AbortRequest",
+      "chat_wire::ResumeRequest",
+      "session_focus::NewBody",
+      "sessiontools::AnswerBody"
+    ],
+    "dtoGap": "prompt/abort/resume/session-create与实际审批列表目前并非完整公共generated DTO；若T09新增共享定义，应把现有服务语义原样迁入protocol并同步服务/CLI/renderer，而不造另一聊天协议。不可用底层ApprovalRequest直接假称等于HTTP pending list。"
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "use": "serverKind/status/serverVersion验证Rust身份；不能由该无业务上下文字段推断Agent/model。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/me",
+      "use": "真实principal/studioId/credentialKind；本机发现token还必须local_user+loopback_token。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/agents",
+      "use": "{agents:[{id,name,yuan,isCurrent,isPrimary,...}]}，服务list_agent_summaries可供明确当前/主Agent选择，不能随意取第一项。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/models",
+      "use": "真实目录+isCurrent；当前route仅setting_choice(...,None)，不自动代表当前Agent YAML的chat默认值（见status注意）。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/sessions",
+      "use": "{sessions:[{sessionId,title,agentId,...}]}，最近20项仅显示层slice，选择以明确ID/native locator/合法正整数索引。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/sessions/{id}",
+      "use": "归属检查+agentId/lastRuns；缺失或无权限不回焦点。"
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/sessions/new",
+      "body": {
+        "agentId": "明确实际agent id"
+      },
+      "use": "其NewBody可传cwd/workspaceFolders/model/permissionMode等现役字段；响应{ok,sessionId,path:\"native:{id}\",agentId,currentModelId,currentModelProvider,...}。不要手造JSONL路径。"
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/sessions/switch",
+      "body": {
+        "path": "native:{sessionId}"
+      },
+      "use": "沿现役切换；续聊已有会话必须固定原agent，不因全局焦点变化换成其他Agent。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/sessions/{id}/history?all=1&reconciliation=1",
+      "use": "schemaVersion=lingxi.canonical-history.v1、sessionId、items、page、revision/ETag；历史分页/内容按原安全上限，不用raw JSONL或通用HistoryPage替代canonical UI合同。"
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/ws-ticket",
+      "body": {},
+      "use": "{ticket,expiresAtUnixMs}，每次重连重新发，30s/单次/连接类型/path绑定；只带票据到WS，禁止把service bearer放URL。"
+    },
+    {
+      "method": "GET upgrade",
+      "path": "/lingxi/v1/ws?ticket={one-shot-ticket}",
+      "use": "ws库现有依赖；首次帧ClientHello协议lingxi.wire,clientKind cli,clientVersion当前版本,protocolMin1,protocolMax1,caps[]。校ServerHello serverKind/protocol/selectedProtocol范围/dataEpoch后方可业务。"
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/sessions/{id}/approvals",
+      "use": "实际{approvals:[{approvalId,target,runId,summary,resources,waitingSinceUnixMs,expiresAtUnixMs,capability}]}。按同session展示原真实审批。"
+    },
+    {
+      "method": "POST",
+      "path": "/lingxi/v1/sessions/{id}/approvals/{approvalId}",
+      "body": {
+        "action": "confirmed 或 rejected"
+      },
+      "use": "并发答复原正在运行请求；审批不存在/已变更409诚实返回。"
+    }
+  ],
+  "wire": {
+    "prompt": {
+      "type": "prompt",
+      "sessionId": "id",
+      "sessionPath": "native:id",
+      "agentId": "该session实际agentId",
+      "text": "原用户输入",
+      "clientMessageId": "本逻辑输入稳定UUID",
+      "snapshotVersion": 1,
+      "clientAttemptId": "该次尝试id"
+    },
+    "promptSemantics": [
+      "每条逻辑输入生成稳定clientMessageId；重复入站去重不是客户端自动重发许可。",
+      "订阅WS完成hello后才允许读取/提交排队stdin；单条未完成先排队或按现役wait提示，不能因stdin快速多行丢消息。",
+      "session_user_message确认与input_rejected都用原clientMessageId/snapshotVersion/clientAttemptId核对；其他session广播全部忽略。"
+    ],
+    "abort": {
+      "type": "abort",
+      "sessionId": "id",
+      "sessionPath": "native:id",
+      "streamId": "真实已确认run/stream id",
+      "reason": "user_abort"
+    },
+    "abortSemantics": [
+      "Ctrl+C/Esc当前忙时只请求取消；未知stream先记abortWhenKnown，不能猜最近runId。",
+      "读取abort_result accepted/already_stopped/rejected（当前旧CLI仅识abort_rejected错误），等待同stream真实终态/历史事实，不把提交取消当远端副作用撤销。",
+      "空闲Ctrl+C退出；/quit保持脱离查看语义，不能偷偷取消独立后台工作。"
+    ],
+    "resume": {
+      "type": "resume_stream",
+      "sessionId": "id",
+      "sessionPath": "native:id",
+      "streamId": "上次真实stream",
+      "sinceSeq": "最大连续安全整数seq",
+      "resumeToken": "本次补齐相关id"
+    },
+    "resumeSemantics": [
+      "新WS票据+hello成功后只发resume_stream，绝不重发上个prompt。",
+      "stream_resume.events为{seq,event,ts}数组，按同session+stream+seq去重，恢复最大连续序号；实时帧和补齐交错也不能双显。",
+      "reset/truncated/seq缺口用真实canonical history重读/重建显示，再接受新流；不能把空events当已完成，也不能用旧run idle清当前run。",
+      "type error/ProtocolError、input_rejected、abort_result、status等都要处理；相同native路径不替代stream/id归属。"
+    ],
+    "completion": "同session+stream status isStreaming=false以及真实最终内容/历史一致；turn_end不独自代表Run与子资源已全部收尾。"
+  },
+  "interaction": {
+    "approvals": "新增窄终端确认（例如/approve <id>、/reject <id>或当前readline确认提示），默认不自动批准，非交互输入不能猜同意；定时只读pending列表/现役approval事件唤醒，不额外执行工具。",
+    "eof": "当前cli/chat.ts没有rl.close处理，pipe EOF可能留下WS进程。最小规则：EOF封新文本，已排队输入按顺序真实提交并等其终态；最后pending/stream完成后关WS并resolve返回码，不自动abort已接受Run。原CLI没有完整聊天等待总期限，不能伪称已有；实施需按真实Run/审批现役期限和请求/重连有限预算设计退出，不能在EOF默许永久等待，也不能临时随意截短用户长任务。无法恢复或无审批答复来源时明确失败/待确认，保session/run可continue。",
+    "cleanup": "把进程退出集中到entry返回code；聊天函数返回Promise并finally清WS/readline/timer/signallistener，不在深层process.exit遮断清理。",
+    "terminalSafety": "复用safeRustTerminalText屏蔽远端title/error/tool args控制字符和token；真实文本输出流也需保留换行但拒绝终端控制序列。",
+    "controlWhileBusy": "旧chat把streaming/pending检查置于handleCommand之前，连/quit等控制命令也被挡；Rust窄适配应让审批/取消/退出控制走独立支路，普通新文本仍不能跨当前流误提交。"
+  },
+  "minimalFiles": {
+    "core": [
+      "cli/rust-service.ts:扩request方法、POST JSON、agents/models/history/create/switch/approval/ws-ticket真实client",
+      "cli/rust-chat.ts（建议独立窄适配）:正式wire握手/归属/seq/resume/审批/EOF，同Node旧chat隔离",
+      "cli/entry.ts:Rust chat/continue/status实际接线、返回码",
+      "cli/args.ts:默认runtime与help明确Rust；原显式node仍保兼容"
+    ],
+    "reuseUnchangedWherePossible": [
+      "cli/server-runner.ts现有Rust启动/同home/renderer channel/数据降级闸",
+      "cli/local-server.ts私有实例/token读取，不从旧Node回退",
+      "cli/terminal-theme.ts现有终端展示",
+      "cli/data.ts、cli/bundle.ts现役本地维护链，本阶段只验其R07责任，不擅改迁移/发布"
+    ],
+    "sharedCoordination": "Rust mobile bootstrap另位负责。status应优先共用该安全投影读模型，不能为了显示目标agent配置去要求remote chat主体拥有settings.write。"
+  },
+  "statusKnownNarrowGap": "agents.isCurrent可给真实Agent；GETmodels.isCurrent当前基于principal默认/global slot，若Agent YAML models.chat覆盖则不可声称这是Agent下一次真实选择。最小复用T09待接mobile/bootstrap的同一个安全context读取函数（按明确agent执行effective_choice_for_agent，仅返回模型身份/语言/yuan/userName等无secret），避免CLI写另一配置投影；若单独公开read DTO，统一protocol并受chat/实际读取权限。不要默认取第一个model或硬填unavailable。",
+  "testAlignment": {
+    "preserveNegative": [
+      "local token与instance/home绑定、0600与不安全链接拒绝",
+      "invalid explicit URL/header注入/错误principal/401/403/撤销/未知serverKind/version拒绝",
+      "serve channel不存在/降级覆写/同home已有Node或坏record/退出码不回退",
+      "终端控制字符/token脱敏、最多20列表、空列表实际提示",
+      "未知session/跨主体/错误stream及abort不串扰"
+    ],
+    "replaceTemporaryUnavailableOnly": [
+      {
+        "test": "Rust CLI prints authenticated health but leaves status failed until Agent and model exist",
+        "change": "保留无配置/缺字段真实失败负例；新增配置完整的真实agents/context/model身份状态0，不能仅把旧mock硬返回0。"
+      },
+      {
+        "test": "refuses to fake a model reply after identifying a real selected session",
+        "change": "保留模型未配置、WS票据失败/错误hello/未知服务等真实拒绝场景；以owned真实Rust进程+CLI子进程continue完成既有session回复替代固定unavailable前提，同时核同run/history/usage。"
+      }
+    ],
+    "requiredRealIntegration": [
+      "owned候选进程+loopback model输出真实工具调用，CLI子进程chat stdin真实prompt/EOF→文件登记sf_/resourceId，手机同session/history/content同字节（A17）。",
+      "真实Review审批确认/拒绝/取消并发、EOF/超时/WS断线resume与缺口reset、重复clientMessageId无重复Run。",
+      "A18另设备缺resources.read，已知resourceId/GET/HEAD/带ticket都拒；已撤销设备WS/HTTP/download后续拒。",
+      "CLI serve信号/异常退出保真实子进程退出码，不因测试看见health就领serve完整。",
+      "本机实际renderer mobile窄视口与同SQLite，不把Node mocked history消费者机制当Rust生产/存储证明。"
+    ]
+  },
+  "notExecuted": [
+    "No Cargo/build/service/CLI/Node/UI tests started.",
+    "No source/test/protocol/generated/plan edits.",
+    "T09 not implemented or accepted; T08g full20 gates still running."
+  ],
+  "sourceSha256": {
+    "docs/rust-tauri/R07/T09_IMPLEMENTATION_READINESS.md": "b585106cbadd7e982e3d39b9fe9086f477875366232a637fbb695855513ff8df",
+    "cli/entry.ts": "c3e720e6b6d9a2c5aca82e8616849280e130186e0d7d6d7efcaf3dfe3a1bf9be",
+    "cli/args.ts": "7ea449b5b3a6d0448357d7b23116259aa4d8b71f2ce31cb2f29dca2d90fc04ef",
+    "cli/rust-service.ts": "5215855a4bac180adddc098516d460ee63c063973ac3f6450064eb1510d8184c",
+    "cli/client.ts": "b53b6ca0cf4b46d6430733dd9e005279835b0586ea45046ae618fe47077d1832",
+    "cli/chat.ts": "ea981a843a94495e63e4b2dfa3e337284329a41b5c3943b7ec80bef4fae34c1f",
+    "cli/server-runner.ts": "357b9b2542eca630c2776525f3457fe5bb7596ca2be620c2f4734c37072d87b3",
+    "rust/crates/lingxi-service/src/chat_wire.rs": "7ce06fcff97a7a21228c38cf541c936d347454bc8acfcd78e332d46826ad824c",
+    "rust/crates/lingxi-service/src/ws.rs": "7b58c5aecde71e49159c3f1e34e5769f0d808b341701edbd64a53c346a7d3b4b",
+    "rust/crates/lingxi-service/src/session_focus.rs": "8d08997954ba578dcf1e538137f9fa5eea9c4ea49ab7f0bb4ff22993015de803",
+    "rust/crates/lingxi-service/src/sessiontools.rs": "7de68f9ecd215af8333c55753c4f6764600b8ba54a6e1777c7cf829eea204671",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+    "tests/cli-rust-service.test.ts": "7e709932200cc41004bcc972cc79de8d1954af6c8fc90b3aadd23501f69875fb",
+    "shared/contract-versions.ts": "308039f62bfbcb712ab52dd400fec761ee911f5f01af5f9dbd048d32b8fcb6fe"
+  }
+}

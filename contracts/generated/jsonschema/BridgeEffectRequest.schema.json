@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "BridgeEffectOperation": {
+      "enum": [
+        "receipt_start",
+        "receipt_stop",
+        "stream_update",
+        "stream_finish",
+        "stream_cancel"
+      ],
+      "type": "string"
+    },
+    "BridgeReplyContext": {
+      "additionalProperties": false,
+      "properties": {
+        "channelId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contextToken": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "guildId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isGroup": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "messageId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "messageThreadId": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "parentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rootId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "senderId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "targetChatId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "targetType": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeTargetType"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "BridgeTargetType": {
+      "enum": [
+        "user",
+        "group",
+        "channel"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "conversationId": {
+      "type": "string"
+    },
+    "deliveryId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "effectId": {
+      "type": "string"
+    },
+    "inboxId": {
+      "type": "string"
+    },
+    "operation": {
+      "$ref": "#/$defs/BridgeEffectOperation"
+    },
+    "replyContext": {
+      "$ref": "#/$defs/BridgeReplyContext"
+    },
+    "rich": {
+      "type": "boolean"
+    },
+    "runId": {
+      "type": "string"
+    },
+    "sequence": {
+      "format": "uint32",
+      "maximum": 4294967295,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "streamId": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "effectId",
+    "streamId",
+    "inboxId",
+    "runId",
+    "sequence",
+    "operation",
+    "conversationId",
+    "replyContext",
+    "text",
+    "rich"
+  ],
+  "title": "BridgeEffectRequest",
+  "type": "object"
+}

@@ -1,0 +1,59 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:40:38.750064+00:00",
+  "scope": "三页消费者和真实容器/原删除回归只读复核；不Cargo、不改产品或旧记录。",
+  "finalAcceptance": "pending",
+  "verifiedReceipts": {
+    "settings-entry-fresh-binary3": {
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256": "c9453107efeee539ea610e9e041dbb4e6b489f5f74c459c3cf9ca299463da089"
+    },
+    "settings-entry-delete-regression2": {
+      "exitCode": 0,
+      "sourceUnchanged": true,
+      "logSha256": "d317f3d09d26c0da391d7354c824dd41b8ed939e07de6b0679ff15c9be540f1e"
+    },
+    "settings-entry-all-pages1": {
+      "exitCode": 1,
+      "sourceUnchanged": true,
+      "logSha256": "e78d9f4852212b49a5241855399c6ada6e120b6a09fdede3e9db40df3ec59122"
+    }
+  },
+  "interfaceConsumerReal2": {
+    "actualNamedCases": 1,
+    "internalSteps": 5,
+    "exitCode": 0,
+    "binarySha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+    "binaryBeforeAfterBuildBindingAllMatched": true,
+    "ownedSourceBeforeAfterMatched": true,
+    "allFourMaterialHashesMatched": true,
+    "actualChain": "SettingsContent真实初始化→Keybindings save/reset保留已写但系统reload拒绝事实；Interface sidebar部分保存/读回；Security真实改前存档只元数据、坏JSON实际500保留旧列表和重试；同home实际服务重启后持久偏好和列表。",
+    "limits": "系统快捷键重载为受控桥ok:false，不是OS真实注册；1具名case内5步骤不写成5独立case。"
+  },
+  "threePageMechanism": {
+    "actualCases": 31,
+    "status": "interface-consumer-fixed2三个组件目标31/31。",
+    "typecheck": "同目录第二命令tsc实际exit2，错误位于当时另批MCP测试；原失败保留，不称该receipt整体全0或三套类型检查通过。"
+  },
+  "entryAndLastDelete": {
+    "freshBinary3": "4文件34/34、sourceUnchangedtrue；其中8真实容器场景含1个all-pages场景。",
+    "allPages": "导航实际17页，具体页体有界等待；Experiments Fragment检查真实children及非空文本；请求不落/api、不含404/405。仅可达/读取检查，不代表17独立case或全部保存/账号/OS效果。",
+    "oldAllPages1": "原selector不足失败保留，7skip是当次只选择all-pages的实际结果，不用本次成功抹去。",
+    "lastDelete": "原场景已由另一真实请求删除survivor，Skills默认视角实际404并可见loadFailed；随后用现役选择器改victim再要求GET200，不改掉先前最后助手删除拒绝事实。delete-regression2两Rust目标2/2日志已核。"
+  },
+  "newFinding": {
+    "id": "T08-INTERFACE-CROSS-CONNECTION-LATE-WRITE",
+    "status": "确定静态调用链，待真实A/B反例；不是已运行失败。",
+    "paths": [
+      "desktop/src/react/settings/tabs/KeybindingsTab.tsx::saveCommandBindings/resetAll",
+      "desktop/src/react/settings/actions.ts::updateSettingsSnapshot",
+      "desktop/src/react/settings/tabs/InterfaceTab.tsx::saveSessionListRowMode"
+    ],
+    "cause": "两新接写链未捕获原SettingsConnectionOwner；A保存响应迟到后直接更新当前store快照/发送全局settingsChanged及OS重载或sidebar-ui-changed，可能污染已切换并完成初始化的B。即使A组件卸载，global store/event操作仍有效。",
+    "minimalCheck": "真实A已保存响应只延迟传consumer→切换并完成真实B初始化→释放A响应；独立读回A已写，B snapshot/全局事件/OS重载不采用A结果。",
+    "minimalRepair": "保存起点capture原owner；每个异步后续投影、全局通知、OS重载前owns复验；A已持久化不回滚，不给B报A成功。",
+    "doesNotNegate": "现有31/31与单服务真实case的已验证正常/失败事实仍成立，但它们不覆盖跨连接迟到。"
+  },
+  "next": "按root决定先复现两条owned写链，再最小修复与后继候选完整检查；不扩其它未验证页。"
+}

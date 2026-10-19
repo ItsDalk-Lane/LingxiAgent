@@ -1,0 +1,23 @@
+{
+  "afterRelease": {
+    "currentUrl": "http://127.0.0.1:58024/own-form",
+    "snapshot": "Page: Lingxi R07 Own Browser b8381ce44f60f705c63f06938ed4de35\nURL: http://127.0.0.1:58024/own-form\n\nh1: 灵犀同页接管本地检查\ntext: 仅录制此测试表单。请把输入内容改为 human-latest。\n[393217] input \"测试输入\" (text, value=\"human-latest\")\n",
+    "tabId": "7DA2BCA827D4D29773F6324D9EEE5DC5",
+    "text": "Page: Lingxi R07 Own Browser b8381ce44f60f705c63f06938ed4de35\nURL: http://127.0.0.1:58024/own-form\n\nh1: 灵犀同页接管本地检查\ntext: 仅录制此测试表单。请把输入内容改为 human-latest。\n[393217] input \"测试输入\" (text, value=\"human-latest\")\n",
+    "title": "Lingxi R07 Own Browser b8381ce44f60f705c63f06938ed4de35",
+    "url": "http://127.0.0.1:58024/own-form"
+  },
+  "afterTakeover": {
+    "currentUrl": "http://127.0.0.1:58024/own-form",
+    "snapshot": "Page: Lingxi R07 Own Browser b8381ce44f60f705c63f06938ed4de35\nURL: http://127.0.0.1:58024/own-form\n\nh1: 灵犀同页接管本地检查\ntext: 仅录制此测试表单。请把输入内容改为 human-latest。\n[262145] input \"测试输入\" (text, value=\"human-latest\")\n",
+    "tabId": "7DA2BCA827D4D29773F6324D9EEE5DC5",
+    "text": "Page: Lingxi R07 Own Browser b8381ce44f60f705c63f06938ed4de35\nURL: http://127.0.0.1:58024/own-form\n\nh1: 灵犀同页接管本地检查\ntext: 仅录制此测试表单。请把输入内容改为 human-latest。\n[262145] input \"测试输入\" (text, value=\"human-latest\")\n",
+    "title": "Lingxi R07 Own Browser b8381ce44f60f705c63f06938ed4de35",
+    "url": "http://127.0.0.1:58024/own-form"
+  },
+  "expectedNativeValue": "human-latest",
+  "frames": 42,
+  "initialValue": "agent-initial",
+  "sameTarget": true,
+  "targetId": "7DA2BCA827D4D29773F6324D9EEE5DC5"
+}

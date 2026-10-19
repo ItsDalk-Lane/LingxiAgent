@@ -1,0 +1,14 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.81s

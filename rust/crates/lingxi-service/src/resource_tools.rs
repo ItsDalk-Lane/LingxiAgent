@@ -57,6 +57,7 @@ impl ResourceTools {
             session_path: None,
             emit: true,
             capture_origin: None,
+            engine_plane: false,
         }
     }
     fn cwd(&self) -> PathBuf {
@@ -188,6 +189,7 @@ impl ResourceTools {
                 session_path: None,
                 emit: true,
                 capture_origin: None,
+                engine_plane: false,
             };
             let path = self
                 .io
@@ -288,6 +290,38 @@ impl ResourceTools {
                 .map_err(|e| e.to_string())?;
             Self::check_mount_result(&reference, &value)?;
             self.track_path(ctx, &value).await?;
+            if reference["kind"] == "session-file" {
+                // 归属已由 reference 核对；只授予此次真实文件版本，不开放附件目录。
+                let path = PathBuf::from(
+                    value["filePath"]
+                        .as_str()
+                        .ok_or("session file has no local path")?,
+                );
+                let retained = crate::task_supervisor::retain_blocking_run_permit(ctx)
+                    .map_err(|e| e.to_string())?;
+                let cancel = crate::task_supervisor::blocking_run_cancel_scope(ctx)
+                    .map_err(|e| e.to_string())?;
+                let lease = self.files.payload_lease().await;
+                let access = self.access.clone();
+                let caller = ctx.clone();
+                tokio::task::spawn_blocking(move || {
+                    let _retained = retained;
+                    let _lease = lease;
+                    if cancel.as_ref().is_some_and(|scope| scope.is_cancelled()) {
+                        return Err("session file materialization cancelled".to_string());
+                    }
+                    let snapshot = Snapshot::read(&path).map_err(|error| error.to_string())?;
+                    access.grant_materialized_file(
+                        caller.principal.storage_kind(),
+                        &caller.principal.storage_subject(),
+                        caller.session_id.as_str(),
+                        &path,
+                        &snapshot,
+                    )
+                })
+                .await
+                .map_err(|error| error.to_string())??;
+            }
             return Ok(value);
         }
         let action = args["action"].as_str().ok_or("action required")?;
@@ -616,7 +650,26 @@ pub fn register(
     tools: Arc<ResourceTools>,
     budget: &SchemaBudget,
 ) {
+    register_selected(registry, gateway, tools, budget, true);
+}
+/// 无工作区时只登记暂存读取入口，不向模型新增复制等写操作。
+pub fn register_materialize(
+    registry: &ToolRegistry,
+    gateway: &crate::toolgateway::ToolInvocationGateway,
+    tools: Arc<ResourceTools>,
+    budget: &SchemaBudget,
+) {
+    register_selected(registry, gateway, tools, budget, false);
+}
+fn register_selected(
+    registry: &ToolRegistry,
+    gateway: &crate::toolgateway::ToolInvocationGateway,
+    tools: Arc<ResourceTools>,
+    budget: &SchemaBudget,
+    include_file: bool,
+) {
     for (name,kind,description) in [("file",PermissionKind::ArgumentAwareFile,"Inspect metadata, copy without overwriting by default, or extract document text with its source. Office docx/xlsx and UTF-8 text are available; unsupported binary formats fail explicitly."),("materialize",PermissionKind::Read,"Resolve an owned readable resource to its actual absolute local path. Remote HTTP resources are copied with bounded public-network access, without modifying their source.")] {
+        if name=="file"&&!include_file{continue;}
         let mut properties=json!({"fileId":{"type":"string"},"sessionId":{"type":"string"},"sessionPath":{"type":"string"},"resource":{"type":"object","additionalProperties":true},"path":{"type":"string"}});
         if name=="file" {for(k,v) in json!({"action":{"type":"string","enum":["stat","copy","extract"]},"source":{"type":"object","additionalProperties":true},"ref":{"type":"object","additionalProperties":true},"target":{"type":"object","additionalProperties":true},"targetPath":{"type":"string"},"targetDir":{"type":"string"},"filename":{"type":"string"},"conflictPolicy":{"type":"string","enum":["fail","rename","overwrite"]}}).as_object().unwrap() {properties[k]=v.clone();}}
         let mut schema=json!({"type":"object","properties":properties,"additionalProperties":false});if name=="file" {schema["required"]=json!(["action"]);}

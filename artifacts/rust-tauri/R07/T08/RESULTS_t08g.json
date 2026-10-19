@@ -1,0 +1,207 @@
+{
+  "candidate": "t08g",
+  "closedAt": "2026-10-18T12:32:24.584057+00:00",
+  "status": "FAILED_NOT_ACCEPTED",
+  "scope": "T08同一源码完整20门首次执行；两门实际失败，不是最终R07",
+  "sourceFingerprint": "6d00d82b598ad23f9cbbc05f61e9514cf8e7f771a8434f9f5884672b3782cf2f",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceAndVerificationToolsMatchedAtCloseBeforeAnyRepair": true,
+  "gatePlanSha256": "abf6f8a6f1c2c1180734f0c401139d6bb94417a5e1309cc8066465b37672fd87",
+  "gateCount": 20,
+  "passedGates": 18,
+  "failedGates": 2,
+  "notRun": [],
+  "gates": {
+    "fmt": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-fmt.json",
+      "receiptSha256": "11e5a4140c6822ab78a265c9dee2408f8f5155938b5deb9f4bd38e11dbb9a158",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diff": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-diff.json",
+      "receiptSha256": "033c45ceee4e402c62b118dd8a167583c6a8eb0c552039956981f0a57050053e",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-clippy.json",
+      "receiptSha256": "ab9cd42ab27213c54ccc78d62fab5b8f76258f2af47622b12c4f46bea3249b28",
+      "logSha256": "0b53209db424367e80c52cd8cde8b75e37af110438a0efde777104a1463956de"
+    },
+    "protocol": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-protocol.json",
+      "receiptSha256": "1d5f950032e414a0373e5ee06c7439f52212edb98b3fa15e5de85d0133942574",
+      "logSha256": "d4a1872efcdb40c349cfc97ae461e8b863d3b11bebd30fe9a18d2d8dad8ddad7"
+    },
+    "protocol-roundtrip": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-protocol-roundtrip.json",
+      "receiptSha256": "8ef19140f1ccc97384632808a563fffda33b860506532b76510dfaf2fe09bbaf",
+      "logSha256": "f5290b0a675dabbfc70869c7244ffff17b56eab495e807274e07d4e3dd9b6986"
+    },
+    "protocol-tests": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-protocol-tests.json",
+      "receiptSha256": "bc06c631ddd4348b4a9d3019227bc9ef9b4b466153cf5244c32ee054c626bbc1",
+      "logSha256": "580d78865f9b4b28061ef37cc356b2683f9c6598103a3ca8fa6f8cf9114de233"
+    },
+    "kernel": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-kernel.json",
+      "receiptSha256": "d4b5640e99cfcbb5b60e9b36473299e38acb6c80a8ee1c9dc56898c91810335a",
+      "logSha256": "ec483acf99000d1f8109ff1704e20afc215fc41719f01c1f26ed6c2cbf648f56"
+    },
+    "boundaries": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-boundaries.json",
+      "receiptSha256": "685ffae28b4fed022e8bee13ebcec286f62d82c89a8700ca36249b9ffdc397a7",
+      "logSha256": "3c62b276548c4b6d2468150baab1dac505c326c6de6a041bd077185193c30b9a"
+    },
+    "adapter": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-adapter.json",
+      "receiptSha256": "c3bb9f27c929993cab9291cec8fed71fe54358450b8d7b2e4c5513ccbb443e3a",
+      "logSha256": "f21082fa9831dbd04e6b46440639b8ae218ab9e86b835fbf3d70bbba85ef29ac"
+    },
+    "service": {
+      "status": "FAIL",
+      "exitCode": 101,
+      "receipt": "t08g-service.json",
+      "receiptSha256": "530ef63eaee4261c1b7669c6c247e04363660f7ca281ba35fb7623568b0f4daa",
+      "logSha256": "723a625ae09a5b869854cafc61281843f4d58856410533bfc8ab186e2f9f28af"
+    },
+    "model-regression": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-model-regression.json",
+      "receiptSha256": "864976c6127215d7332aa9a3f6e1d8ccf12f6058a43d99c0ae1e2aaff3976f6b",
+      "logSha256": "701042a9ff51fbc907423cfc0c68fa7a74102e1291eb4eabce276f41a1cb24a2"
+    },
+    "native-skills": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-native-skills.json",
+      "receiptSha256": "3dc9e3b22023be6e14147cd41b3c5389156686149a5d61de41196e1b315d8ca8",
+      "logSha256": "64268d48afe9834f871c69f7b804fb86f946fd1e0f4231993a17b26303df2ac5"
+    },
+    "native-picker-binding": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-native-picker-binding.json",
+      "receiptSha256": "d59833e6b5c3940b82bd51300d10090a1cadaccf45f4842b6135a0f591241cd3",
+      "logSha256": "475907d8a3308bddcb3977ff3e2cf2abd09976330a655f74c7413d57e7b401b0"
+    },
+    "skills-current": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-skills-current.json",
+      "receiptSha256": "981b75d9aebfe02bd5ed5988e009ead1fd27b2ab61541beeaa1d18f775a7ba0a",
+      "logSha256": "0f9fa31b4a33bf8a5ef8f0325a6bba1a7ef2524c83f82a3ca370933643fe1f33"
+    },
+    "build": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-build.json",
+      "receiptSha256": "a30181a04cf896bfb8b2b833cbf7743ae5593596590c05f4b6107d9b5dbb18b6",
+      "logSha256": "8f591f936ce77c57eb3dfe853ca5683897b5b654f75482851efc5270442f41e2"
+    },
+    "ui": {
+      "status": "FAIL",
+      "exitCode": 1,
+      "receipt": "t08g-ui.json",
+      "receiptSha256": "f008e5cb3e3c1725669d8e0d647da7c9ec5f584b5da51036c90150092abf5176",
+      "logSha256": "05a188a6536879a49185ff7e12bd3fb3fbc082a8c034de5f1aaaf45b3d78f1af"
+    },
+    "types": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-types.json",
+      "receiptSha256": "6389fd7ec4057cde49706011a736946c073b4985a9cb6a6345ca4928cdadca3f",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    },
+    "card-navigation-desktop": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-card-navigation-desktop.json",
+      "receiptSha256": "205be0a8d6fc54fdcf360295d1706fce8014e7b146e1f674d90a9610cff48ec8",
+      "logSha256": "e2abbef47f76bb96637d63e943c18c04bf98df513d863cd6b4f81041e2c0fc11"
+    },
+    "card-navigation-mobile": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-card-navigation-mobile.json",
+      "receiptSha256": "7bfa8f8568b7d39aad27491b1c9f58d10e7ea55002d619351fbcd7db2def2dc6",
+      "logSha256": "2445e92a0d8cf4378c2f4c28ebdd2003f9350d5ed8b1595717521b24c5488cb7"
+    },
+    "metadata-redaction-binary": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08g-metadata-redaction-binary.json",
+      "receiptSha256": "fb04bfcac02535397549296c9167c64c57227e149c7ac0f35ab1853c41c806b0",
+      "logSha256": "79a38573005dad6d2c0b1ccc96bf9955803b33c41b246f6197e42f815e99888a"
+    }
+  },
+  "binaryBindings": {
+    "ui": {
+      "path": "t08g-ui-binary-binding.json",
+      "sha256": "23aff40afcfb16b4d871db6a5fc53a5ac238371afcf18f84ab66bec41b97cf5a",
+      "wrapperExitCode": 1
+    },
+    "card-navigation-desktop": {
+      "path": "t08g-card-navigation-desktop-binary-binding.json",
+      "sha256": "0271264ea57045a67970a14d153b7cdde5672d8aba26b8974150cd053936e4aa",
+      "wrapperExitCode": 0
+    },
+    "card-navigation-mobile": {
+      "path": "t08g-card-navigation-mobile-binary-binding.json",
+      "sha256": "fb3261f591eaf584d90f6f40a679aefff6605ab93a7b8b831959eb64a4f2523b",
+      "wrapperExitCode": 0
+    },
+    "metadata-redaction-binary": {
+      "path": "t08g-metadata-redaction-binary-binary-binding.json",
+      "sha256": "d257284a97869ffa9945210d6c0ea19ec02c5ab34028ba66ec618602c8a20582",
+      "wrapperExitCode": 0
+    }
+  },
+  "service": {
+    "targets": 40,
+    "passedCases": 907,
+    "failedCases": 4,
+    "ignoredCases": 0
+  },
+  "ui": {
+    "files": 89,
+    "passedCases": 717,
+    "failedCases": 1,
+    "pendingCases": 0,
+    "namedResult": "t08g-ui-test-results.json",
+    "namedResultSha256": "3f05acc8e12a98d815b7bd7f4d4828c718155f709175a49dd2e040acbd8b25f2",
+    "failedNamedCases": [
+      {
+        "file": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/AccessTab.test.tsx",
+        "name": "AccessTab generates a desktop access key from the manual computer section"
+      }
+    ]
+  },
+  "acceptanceBlockers": [
+    "service: LAN login no response (cause unproven)",
+    "service: two native pointer prerequisites not confirmed, no order PUT",
+    "service: corrupt preferences injection raced initial Bridge import; final close failed",
+    "ui: old desktop explicit scope expectation omits new sessions.write"
+  ],
+  "oldFailuresRetained": true,
+  "t08AcceptanceClaimed": false,
+  "fullR07PassClaimed": false
+}

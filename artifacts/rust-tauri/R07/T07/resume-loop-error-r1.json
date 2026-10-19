@@ -1,0 +1,16 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+    "desktop/src/react/__tests__/stores/session-actions.test.ts",
+    "--maxWorkers=2"
+  ],
+  "exitCode": 0,
+  "sourceFingerprintBefore": "6b12102f9aa5419b4f7a4cfad5f56819df74b9b1c32f149e571b904484328a0c",
+  "sourceFingerprintAfter": "6b12102f9aa5419b4f7a4cfad5f56819df74b9b1c32f149e571b904484328a0c",
+  "sourceUnchanged": true,
+  "logSha256": "d92f4d1435b34e98ef58a27c8db9c68d8f382b5a937ea90e90507bd47af89585",
+  "time": "2026-10-18T01:26:56.308049+00:00"
+}

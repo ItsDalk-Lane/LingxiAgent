@@ -1,0 +1,23 @@
+{
+ "stage": "R07-T06",
+ "purpose": "development_not_final_acceptance",
+ "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test r07_browser_chromium",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "sourceFingerprintBefore": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "sourceFingerprintAfter": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "exitCode": 0,
+ "logSha256": "b0500c6f8982017712ce886d108f88cac7590e54818905343bdcfa5935d4576b",
+ "sourceUnchanged": true,
+ "versionBinding": {
+  "workspace": "rust/Cargo.toml",
+  "locked": true
+ },
+ "note": "dev-t06gallery3 中 r07_browser_chromium 2 例失败（browser_closed/cookie）；本运行单独复跑该目标以区分并发负载抖动与真实回归。",
+ "finishedAtUnixMs": 1792131514225
+}

@@ -1,0 +1,52 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `require_same_target` is never used
+   --> crates/lingxi-service/src/resource_artifacts.rs:177:19
+    |
+170 | impl ArtifactWritePreflight {
+    | --------------------------- method in this implementation
+...
+177 |     pub(crate) fn require_same_target(&self, original: &Self) -> Result<(), ResourceIoError> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `CoverExecutionPermit` is never constructed
+ --> crates/lingxi-service/src/beautify_run.rs:7:19
+  |
+7 | pub(crate) struct CoverExecutionPermit {
+  |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `admit_cover_job`, `finish_cover_job`, and `cover_prompt` are never used
+   --> crates/lingxi-service/src/beautify_run.rs:31:25
+    |
+ 30 | impl RunSupervisor {
+    | ------------------ methods in this implementation
+ 31 |     pub(crate) async fn admit_cover_job(
+    |                         ^^^^^^^^^^^^^^^
+...
+127 |     pub(crate) async fn finish_cover_job(
+    |                         ^^^^^^^^^^^^^^^^
+...
+164 |     pub(crate) async fn cover_prompt(
+    |                         ^^^^^^^^^^^^
+
+warning: method `authorize_cover_prepared` is never used
+    --> crates/lingxi-service/src/toolgateway.rs:2852:25
+     |
+2849 | impl ToolInvocationGateway {
+     | -------------------------- method in this implementation
+...
+2852 |     pub(crate) async fn authorize_cover_prepared(
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `lingxi-service` (lib) generated 5 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 16.84s

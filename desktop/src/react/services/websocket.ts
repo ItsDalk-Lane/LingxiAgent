@@ -14,6 +14,12 @@ import {
   recordResourceEventCursor,
 } from './resource-events';
 import { useStore } from '../stores';
+import { startRustAutomationNotifications } from './rust-automation';
+import { startRustMediaPolling } from './rust-media';
+import { startRustResourceEvents } from './rust-workbench';
+import { refreshRustAgentActivities } from './rust-agent-activities';
+import { captureSessionConnection } from './session-connection-owner';
+import { handleAppEvent } from './app-event-actions';
 import { setStatus } from '../utils/ui-helpers';
 import {
   buildConnectionWsUrl,
@@ -58,6 +64,18 @@ const WS_FAST_RETRY_LIMIT = 20;
 const WS_SLOW_RETRY_DELAY = 60_000;
 let _wsRetryCount = 0;
 let _resourceForegroundCatchUpCleanup: (() => void) | null = null;
+let _stopRustAutomationNotifications: (() => void) | null = null;
+let _stopRustMediaPolling: (() => void) | null = null;
+let _stopRustResourceEvents: (() => void) | null = null;
+
+function stopRustAutomationNotifications(): void {
+  _stopRustResourceEvents?.();
+  _stopRustResourceEvents = null;
+  _stopRustMediaPolling?.();
+  _stopRustMediaPolling = null;
+  _stopRustAutomationNotifications?.();
+  _stopRustAutomationNotifications = null;
+}
 
 // 注入循环依赖的 handlers
 injectHandlers(handleServerMessage, applyStreamingStatus);
@@ -129,6 +147,7 @@ function noteWsFailure(reasonKey: string): void {
 
 /** 服务重启时先废弃旧连接；等待本轮有效端口和令牌后再重新连接。 */
 export function disconnectWebSocketForRestart(): void {
+  stopRustAutomationNotifications();
   _wsConnectAttempt++;
   _rustSlashConnection = null;
   _rustSlashReady = false;
@@ -210,10 +229,14 @@ export function connectWebSocket(port?: string, token?: string): void {
 
 function ensureResourceForegroundCatchUp(): void {
   if (_resourceForegroundCatchUpCleanup) return;
-  _resourceForegroundCatchUpCleanup = bindResourceEventForegroundCatchUp((event) => handleServerMessage(event));
+  _resourceForegroundCatchUpCleanup = bindResourceEventForegroundCatchUp((event) => handleServerMessage(event), {
+    catchUp: () => resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service'
+      ? undefined : catchUpResourceEventsAfterReconnect((event) => handleServerMessage(event)),
+  });
 }
 
 async function openConnectionWebSocket(connection: ServerConnection, attempt: number): Promise<void> {
+  stopRustAutomationNotifications();
   const isRustService = connection.serverNodeKind === 'lingxi-service';
   _rustSlashReady = false;
   _rustSlashConnection = isRustService ? connection : null;
@@ -249,6 +272,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
 
   const failRustSocket = (reasonKey: string, code: number, reason: string) => {
     if (_ws !== socket) return;
+    stopRustAutomationNotifications();
     clearRustHandshakeTimer();
     noteWsFailure(reasonKey);
     try { socket.close(code, reason); } catch { /* 浏览器会继续走重连 */ }
@@ -273,7 +297,17 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
 
     noteComposerConnectionOpened();
     if (isRustService) {
+      stopRustAutomationNotifications();
+      _stopRustMediaPolling = startRustMediaPolling(connection);
+      _stopRustResourceEvents = startRustResourceEvents(connection, {
+        applyEvent: event => handleServerMessage(event, composerOriginConnectionKey(connection)),
+      });
+      _stopRustAutomationNotifications = startRustAutomationNotifications(connection, {
+        deliverEvent: (type, payload, source, isCurrent) => handleAppEvent(type, payload, { source, isCurrent }),
+      });
       const state = useStore.getState();
+      const owner = captureSessionConnection();
+      if (owner && state.currentSessionId) void refreshRustAgentActivities(owner, state.currentSessionId);
       const paths = [...new Set([...resolveStreamingSessionResumeTargets(state), ...unresolvedComposerSessionPaths(composerOriginConnectionKey(connection))])];
       reconcilePendingComposerSessions();
       for (const path of paths) requestStreamResume(path);
@@ -357,7 +391,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
         const current = resolveServerConnection(useStore.getState());
         if (current && JSON.stringify(current) === JSON.stringify(connection)
           && typeof msg?.sessionId === 'string'
-          && ['session_created', 'subagent_stop_result', 'slash_result', 'session_user_message', 'input_rejected', 'status', 'stage',
+          && ['session_created', 'subagent_stop_result', 'slash_result', 'session_user_message', 'loop_status', 'input_rejected', 'status', 'stage',
             'assistant_run_start', 'assistant_run_end', 'assistant_segment_start', 'assistant_segment_delta', 'assistant_segment_end',
             'tool_start', 'tool_end', 'error', 'abort_result', 'stream_resume', 'steered', 'compaction_accepted', 'compaction_result', 'context_usage'].includes(msg.type)) {
           if (msg.historyCleared === true && msg.level === 'success' && msg.targetSessionId === msg.sessionId) {
@@ -386,6 +420,7 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
 
   _ws.onclose = () => {
     if (_ws !== socket) return;
+    stopRustAutomationNotifications();
     _rustSlashReady = false;
     clearRustHandshakeTimer();
     if (!useStore.getState().wsFailureReasonKey) noteWsFailure('status.wsConnectionClosed');

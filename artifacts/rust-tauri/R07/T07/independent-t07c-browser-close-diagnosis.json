@@ -1,0 +1,289 @@
+{
+  "reviewedAt": "2026-10-18T03:25:39.118722+00:00",
+  "status": "REAL_FAILURE_PRESERVED_CAUSE_NOT_YET_ESTABLISHED",
+  "candidate": "t07c",
+  "fingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "sourceUnchangedFromB": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/cdp.rs",
+      "equal": true,
+      "sha256": "272af850aa41cc27e46ed7de3d0bdcb8bacc59ae831240ed0242cecfa1451f6f"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/host.rs",
+      "equal": true,
+      "sha256": "9077fe9a98181e246f266d06e500172b06e0af613984ece662a82c33ec61ae9e"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/launcher.rs",
+      "equal": true,
+      "sha256": "214f0e5b65d8038fff5827893eb38abc12ff23898b29992c78bad6995999a1f3"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/managed_files.rs",
+      "equal": true,
+      "sha256": "4d11dc6d7b299f7ba3f411de1b2772cabbe324189314a668b323b0038c99441f"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/manual_capture.rs",
+      "equal": true,
+      "sha256": "2b99309fc5a419a2867ebdcac76da0a2c52c71e6eaea914c569626c0d66db72e"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/mod.rs",
+      "equal": true,
+      "sha256": "68fe11c4d3ef51406296b9bafaaf382a32946a81438896abf2326c1b50945513"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/ops.rs",
+      "equal": true,
+      "sha256": "7f81f8eea5831cb7e4d85f316bda33c3b1198f2b4f8393f1c123fc8b3b09bffa"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/pdf.rs",
+      "equal": true,
+      "sha256": "202c77de42bff4f4efdcd59a4afbc93781202975576a41c97a7dc8605357274f"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/pdf_lifecycle_tests.rs",
+      "equal": true,
+      "sha256": "3a4c155428f2d5b846489097f9f8b8e42183c2b1f94b068144a3b7eeffef7da1"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+      "equal": true,
+      "sha256": "e64f784c1ea9a06309c4a6dc6a4b2bb61945d3ece9417cf6bfb0bbd1cb59de01"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/snapshot.js",
+      "equal": true,
+      "sha256": "08c2da0f1803ab7c43fc457cd495ca91a3686e137cbb442083ce1b1b3f1578d6"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/startup_tests.rs",
+      "equal": true,
+      "sha256": "e49f3e91defe637445b9ba2a99f3364886390537c245b9cfa3d5488beebf55ac"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/unavailable.rs",
+      "equal": true,
+      "sha256": "0456ce7b4cef8cf4624243e55d3a468f98134b9d482a38cce785f5a6e32a69af"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs",
+      "equal": true,
+      "sha256": "2d3a2a2c8b3cadd443f5dfab2a8f26011d7fb998f18eaae3ef6530145780b315"
+    }
+  ],
+  "adapterLogSha256": "bcfa954bcca461a075d13dba3a5b8e1d2e3171d7d9f9ebeaeda7a46400cb0a3d",
+  "failure": {
+    "test": "trusted_click_discovers_a_real_popup_and_dialog_events_do_not_deadlock",
+    "helper": "crates/lingxi-adapters/tests/r07_browser_chromium.rs:218",
+    "error": {
+      "code": "browser_closed",
+      "message": "浏览器连接已关闭",
+      "effect_unknown": true
+    },
+    "targetPassed": 9,
+    "targetFailed": 1,
+    "targetSeconds": 6.86
+  },
+  "retainedOriginalFixture": {
+    "root": "/private/tmp/lingxi-r07-tests/tmp/lingxi-browser-d564ed2551a9661d62337f0b475b04c8",
+    "exists": true,
+    "expectedProfileKey": "263cc15785a02b72b128d11985b7dec2533608be8e3fd8fdacebfe4f0824f057",
+    "actualProfiles": [
+      "263cc15785a02b72b128d11985b7dec2533608be8e3fd8fdacebfe4f0824f057"
+    ],
+    "historyReadonlyQuery": {
+      "urls": [],
+      "visits_count": 0
+    },
+    "historyLimitation": "panic后强制关闭可能未刷新History，空表不能证明未导航/未到alert"
+  },
+  "specificCodeFacts": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+      "lines": [
+        174,
+        192,
+        200,
+        208,
+        379,
+        483,
+        685
+      ],
+      "fact": "唯一事件worker逐批同步handle_event，后台refresh同步Page.getNavigationHistory；刷新Err与events Err直接close且未保存原cause。dialogOpening由同worker调用handleJavaScriptDialog。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/cdp.rs",
+      "lines": [
+        229,
+        245,
+        277,
+        344
+      ],
+      "fact": "显式close与reader EOF可共用同文browser_closed；terminal已存在时直接clone，effect_unknown不能确认本次命令是否已写出。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/launcher.rs",
+      "lines": [
+        145,
+        221
+      ],
+      "fact": "Chrome stderr丢弃；仅终止本Process持有且未wait回收的自有进程组。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs",
+      "lines": [
+        38,
+        209,
+        218,
+        588
+      ],
+      "fact": "128位随机root且create_dir失败不复用；每host独立root/network；共用unwrap未记录action/阶段，页面请求trace仅保存在内存。"
+    }
+  ],
+  "realProbe": {
+    "directory": "browser-close-probe",
+    "result": {
+      "purpose": "真实Chrome中对照Page.getNavigationHistory在alert前/期间响应；无候选源码改动、无Cargo",
+      "argv": [
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "--remote-debugging-pipe",
+        "--user-data-dir=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-cdp-readonly-probe-631onmwq",
+        "--profile-directory=Default",
+        "--headless=new",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--disable-background-networking",
+        "--disable-component-update",
+        "--disable-sync",
+        "--metrics-recording-only",
+        "--no-startup-window",
+        "--window-size=1280,860",
+        "--proxy-server=http://127.0.0.1:56166",
+        "--proxy-bypass-list=<-loopback>;127.0.0.1"
+      ],
+      "pid": 88244,
+      "profile": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-cdp-readonly-probe-631onmwq",
+      "checks": [
+        {
+          "round": 0,
+          "normal_history_seconds": 0.0012278340000193566,
+          "normal_history_entries": 2,
+          "alert_open_event_observed": true,
+          "history_responded_within_2_2_seconds_before_accept": true,
+          "evaluate_responded_before_accept": false,
+          "history_responded_after_accept": true,
+          "evaluate_result_after_accept": {
+            "result": {
+              "type": "string",
+              "value": "done"
+            }
+          },
+          "targets_count_during_alert": 5
+        },
+        {
+          "round": 1,
+          "normal_history_seconds": 0.0005801669976790436,
+          "normal_history_entries": 2,
+          "alert_open_event_observed": true,
+          "history_responded_within_2_2_seconds_before_accept": true,
+          "evaluate_responded_before_accept": false,
+          "history_responded_after_accept": true,
+          "evaluate_result_after_accept": {
+            "result": {
+              "type": "string",
+              "value": "done"
+            }
+          },
+          "targets_count_during_alert": 5
+        }
+      ],
+      "status": "OBSERVED",
+      "version": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/155.0.8059.82",
+        "revision": "@c56fe5daef8be123f68808a4bb705ff378cd2019",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "jsVersion": "15.5.35.23"
+      },
+      "wait_status": 0,
+      "owned_pid_reaped": true,
+      "only_owned_profile_removed": true,
+      "trace_sha256": "3b171d303107dfdb1533b4b18a6d1bc26a333f00281a19db03e1080ffd214b53",
+      "script_sha256": "b4049a74d3a6a0497733627ba75778cc52fa1181f69e618bc43e9e956ebddd00"
+    },
+    "measuredCommands": [
+      {
+        "id": 8,
+        "method": "Page.getNavigationHistory",
+        "send_seconds": 0.393168,
+        "response_seconds": 0.394375,
+        "elapsed_seconds": 0.001207
+      },
+      {
+        "id": 10,
+        "method": "Target.getTargets",
+        "send_seconds": 0.395599,
+        "response_seconds": 0.423425,
+        "elapsed_seconds": 0.027826
+      },
+      {
+        "id": 11,
+        "method": "Page.getNavigationHistory",
+        "send_seconds": 0.423458,
+        "response_seconds": 0.424714,
+        "elapsed_seconds": 0.001256
+      },
+      {
+        "id": 12,
+        "method": "Page.handleJavaScriptDialog",
+        "send_seconds": 2.63353,
+        "response_seconds": 2.634028,
+        "elapsed_seconds": 0.000498
+      },
+      {
+        "id": 13,
+        "method": "Page.getNavigationHistory",
+        "send_seconds": 2.634136,
+        "response_seconds": 2.63469,
+        "elapsed_seconds": 0.000554
+      },
+      {
+        "id": 15,
+        "method": "Target.getTargets",
+        "send_seconds": 2.635472,
+        "response_seconds": 2.641174,
+        "elapsed_seconds": 0.005702
+      },
+      {
+        "id": 16,
+        "method": "Page.getNavigationHistory",
+        "send_seconds": 2.641203,
+        "response_seconds": 2.642403,
+        "elapsed_seconds": 0.0012
+      },
+      {
+        "id": 17,
+        "method": "Page.handleJavaScriptDialog",
+        "send_seconds": 4.846467,
+        "response_seconds": 4.847129,
+        "elapsed_seconds": 0.000662
+      }
+    ],
+    "interpretation": "两轮alert期间Target.getTargets和Page.getNavigationHistory均正常响应，原Runtime.evaluate等待accept后返回done；不支持本机modal必阻塞history的猜测。非生产worker时序重放，不证明整条产品路径无竞态。",
+    "attempt1": "探针自身stderr fd映射失误导致reader异常与目标创建超时，原script/trace/result/stderr以.attempt1原文保留，回收自身PID87897和唯一profile；不计产品失败。"
+  },
+  "nextMinimumDiagnostic": {
+    "testHelper": "失败前保存action/tabId/阶段、fixture根和Site.requests、h.workspaces；保留stack/backtrace以定位调用点，不重试冒充通过。",
+    "runtime": "保留worker refresh/events原错误及出错method/session/seq，区分主动close与readerEOF；记录真实child退出状态与自有Chrome stderr。",
+    "constraints": "候选c仍冻结；上述为后续授权候选的取证建议，不在本次改源码、不串行回避、不改断言。"
+  },
+  "verificationLimits": [
+    "未运行Cargo；原c adapter失败保持101。",
+    "未证实同profile复用/全局kill/用户Chrome干扰，现有码不支持这些归因。",
+    "尚不能确定原失败的具体command；没有原始命令/事件/进程退出现场。"
+  ]
+}

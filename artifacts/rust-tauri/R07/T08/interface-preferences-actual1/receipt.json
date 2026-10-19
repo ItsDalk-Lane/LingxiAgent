@@ -1,0 +1,146 @@
+{
+  "kind": "DEVELOPMENT_ACTUAL_RECEIPT_AND_OWNED_BINDING",
+  "formalAcceptance": false,
+  "runnerReceipt": "artifacts/rust-tauri/R07/T08/settings-backend-integration1.json",
+  "runnerReceiptSha256": "38cc943b68873617c80147023770b119d5f3adbdc319dacc39783d8a9991e824",
+  "runnerLog": "artifacts/rust-tauri/R07/T08/settings-backend-integration1.log",
+  "runnerLogSha256": "a9883cc2fd37bbb4a52edf460e149ec5e72f55fc6cec9e3ebf144f57377300d0",
+  "exitCode": 0,
+  "wholeWorkspaceSourceUnchanged": false,
+  "ownedBinding": {
+    "ready": "artifacts/rust-tauri/R07/T08/interface-preferences-static1/owned-ready.json",
+    "readySha256": "f244cb173c2fcf1ffd24987a1342163b538e8db24ea66284de4544cdf7aaec8b",
+    "independentPreRunReview": "artifacts/rust-tauri/R07/T08/independent-interface-preferences-source-review1.json",
+    "independentPreRunReviewSha256": "a292a24f4dfef9633a9765e03194b65c3016cfa7d6b24e1194adb998fcbda917",
+    "all11Match": true,
+    "rows": [
+      {
+        "path": "rust/crates/lingxi-protocol/src/user_preferences.rs",
+        "readySha256": "47242d06b33f8236fd81e8e67245b189db3b7aa69eb4f87b676a937f41995d9e",
+        "independentPreRunSha256": "47242d06b33f8236fd81e8e67245b189db3b7aa69eb4f87b676a937f41995d9e",
+        "afterSha256": "47242d06b33f8236fd81e8e67245b189db3b7aa69eb4f87b676a937f41995d9e",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-protocol/src/lib.rs",
+        "readySha256": "6ebdb5350e51f293436dcf2bde99c04d8cb84de27fe55a747a78dbcc576da1b9",
+        "independentPreRunSha256": "6ebdb5350e51f293436dcf2bde99c04d8cb84de27fe55a747a78dbcc576da1b9",
+        "afterSha256": "6ebdb5350e51f293436dcf2bde99c04d8cb84de27fe55a747a78dbcc576da1b9",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs",
+        "readySha256": "03b70a57f804dd54d1c27886bfe63aca0e69db0bdfdee0b736b66cadd1aeb98f",
+        "independentPreRunSha256": "03b70a57f804dd54d1c27886bfe63aca0e69db0bdfdee0b736b66cadd1aeb98f",
+        "afterSha256": "03b70a57f804dd54d1c27886bfe63aca0e69db0bdfdee0b736b66cadd1aeb98f",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs",
+        "readySha256": "1e825a4dc71292b7372131ae292100699012484dee5d3ba0852ba88bac886e59",
+        "independentPreRunSha256": "1e825a4dc71292b7372131ae292100699012484dee5d3ba0852ba88bac886e59",
+        "afterSha256": "1e825a4dc71292b7372131ae292100699012484dee5d3ba0852ba88bac886e59",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/userprefs.rs",
+        "readySha256": "669c87952344df2b1f7f5653d766928b2e7982a4fce7d61b6bb33e2cc0c3ce34",
+        "independentPreRunSha256": "669c87952344df2b1f7f5653d766928b2e7982a4fce7d61b6bb33e2cc0c3ce34",
+        "afterSha256": "669c87952344df2b1f7f5653d766928b2e7982a4fce7d61b6bb33e2cc0c3ce34",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/checkpoint_store.rs",
+        "readySha256": "acf2ce95c8fc38fb14ebe817276da469526c960deada96bb989b34d62746fdb8",
+        "independentPreRunSha256": "acf2ce95c8fc38fb14ebe817276da469526c960deada96bb989b34d62746fdb8",
+        "afterSha256": "acf2ce95c8fc38fb14ebe817276da469526c960deada96bb989b34d62746fdb8",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/agents_admin.rs",
+        "readySha256": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+        "independentPreRunSha256": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+        "afterSha256": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/auth.rs",
+        "readySha256": "610a2128abf663c4cfceffc3590a310af75383c2ac79da697e5eae5c4969614c",
+        "independentPreRunSha256": "610a2128abf663c4cfceffc3590a310af75383c2ac79da697e5eae5c4969614c",
+        "afterSha256": "610a2128abf663c4cfceffc3590a310af75383c2ac79da697e5eae5c4969614c",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-service/src/lib.rs",
+        "readySha256": "81be72c80783d1e0712ce74f2d03792b48758dbab07db7621ea47b505361005f",
+        "independentPreRunSha256": "81be72c80783d1e0712ce74f2d03792b48758dbab07db7621ea47b505361005f",
+        "afterSha256": "81be72c80783d1e0712ce74f2d03792b48758dbab07db7621ea47b505361005f",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-adapters/src/storage/agent_memory.rs",
+        "readySha256": "eefe741769083b9a1b64cb5353882512fb32d5178921f503c34f33b8274ad520",
+        "independentPreRunSha256": "eefe741769083b9a1b64cb5353882512fb32d5178921f503c34f33b8274ad520",
+        "afterSha256": "eefe741769083b9a1b64cb5353882512fb32d5178921f503c34f33b8274ad520",
+        "matches": true
+      },
+      {
+        "path": "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs",
+        "readySha256": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977",
+        "independentPreRunSha256": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977",
+        "afterSha256": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977",
+        "matches": true
+      }
+    ],
+    "limit": "仅这11文件前后/独立前审哈希相等；开发轮全工作区不变为false，不冒充冻结全源或连续监控。"
+  },
+  "cases": [
+    {
+      "name": "actual_http_preferences_match_shared_pure_normalizers_for_every_command_and_partial_sidebar",
+      "status": "PASS",
+      "logLine": 30
+    },
+    {
+      "name": "actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit",
+      "status": "PASS",
+      "logLine": 32
+    },
+    {
+      "name": "actual_http_global_archives_return_only_existing_metadata_and_reject_corrupt_or_unsafe_files",
+      "status": "PASS",
+      "logLine": 33
+    },
+    {
+      "name": "actual_http_keybindings_full_replace_sidebar_partial_merge_scopes_and_same_home_restart",
+      "status": "PASS",
+      "logLine": 40
+    }
+  ],
+  "limits": [
+    "4case为真实HTTP/磁盘/重启与共享纯规则，不含从导航点击的UI执行。",
+    "提交前撤权是同一原子writer内真实AuthService设备撤销；不是已经实跑的HTTP锁队列撤权。",
+    "坏文件500限JSON/root/已保存interface块非对象；未知mode/普通binding按共享归一合同。",
+    "存档nofollow结论限本次列表，未扩大既有保存/恢复的权限或事务证明。",
+    "Windows/真实OS快捷键注册/付费或外发均未验。"
+  ],
+  "consumerReadOnlyFindings": [
+    {
+      "file": "desktop/src/react/settings/tabs/KeybindingsTab.tsx",
+      "reads": "snapshot preferences.keybindings存在时复用；否则GET新接口",
+      "writes": "PUT→返回值重画+更新snapshot",
+      "gap": "PUT后重载失败会回滚本地但磁盘已保存；reset未验ok:false，已授权新反例与修复，当前尚未执行。"
+    },
+    {
+      "file": "desktop/src/react/settings/tabs/InterfaceTab.tsx",
+      "reads": "GET sidebarUi",
+      "writes": "PUT partial rowMode→saved投影+两种settings广播",
+      "gap": "初次GET失败仅console，未显示可理解错误/重试，已授权修。"
+    },
+    {
+      "file": "desktop/src/react/settings/tabs/SecurityTab.tsx",
+      "reads": "展开备份列表GET全局/checkpoints",
+      "writes": "该列表仅展示，不操作session checkpoint",
+      "gap": "GET失败catch设空，误显无备份并丢旧表，已授权修。"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import { explicitRustConnection, readRustLocalService, RustCliClient, safeRustTe
 import { runBundlePull, runBundleStatus } from "./bundle.ts";
 import { runDataDiagnose, runDataCheckpoints, runDataRestore } from "./data.ts";
 import { ansi } from "./terminal-theme.ts";
+import { printRustStatus, startRustChat } from "./rust-chat.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "..");
@@ -82,33 +83,14 @@ export async function main(argv = process.argv.slice(2)) {
       : readRustLocalService({ lingxiHome: resolveCliLingxiHome() });
     if (connection.ok === false) {
       console.error(`${ansi.red}${safeRustTerminalText(connection.message)}${ansi.reset}`);
+      // 断点 11：无实例时明确失败并给出启动路径，不静默回退 Node、不自动启动。
+      if (!args.url) console.error(`${ansi.dim}Start one with: hana serve${ansi.reset}`);
       return 1;
     }
     const client = new RustCliClient(connection);
     try {
       if (args.command === "status") {
-        const health = await client.health();
-        let identity: Awaited<ReturnType<RustCliClient["identity"]>> | undefined;
-        let identityError: unknown;
-        try {
-          identity = await client.identity();
-        } catch (err) {
-          identityError = err;
-        }
-        console.log("LingxiAgent Rust service");
-        console.log(`  URL       ${safeRustTerminalText(connection.baseUrl)}`);
-        console.log(`  Version   ${safeRustTerminalText(health.serverVersion)}`);
-        console.log(`  Studio    ${safeRustTerminalText(identity?.studioId || "unavailable")}`);
-        console.log("  Agent     unavailable (Rust R02)");
-        console.log("  Model     unavailable (Rust R02)");
-        console.log(`  Auth      ${safeRustTerminalText(identity?.credentialKind || "unavailable (identity check failed)")}`);
-        if (identityError || !identity?.studioId) {
-          const detail = identityError instanceof Error ? identityError.message : "identity response lacks Studio";
-          console.error(`${ansi.red}Rust status is incomplete: ${safeRustTerminalText(detail)}${ansi.reset}`);
-          return 1;
-        }
-        console.error(`${ansi.red}Rust status is incomplete: Agent and model are not available yet${ansi.reset}`);
-        return 1;
+        return await printRustStatus(client);
       }
       if (args.command === "sessions") {
         const sessions = await client.sessions();
@@ -122,21 +104,7 @@ export async function main(argv = process.argv.slice(2)) {
         return 0;
       }
       if (args.command === "chat" || args.command === "continue") {
-        await client.health();
-        await client.identity();
-        if (args.command === "continue" || args.session) {
-          const sessions = await client.sessions();
-          const target = String(args.target || args.session || "").trim();
-          const number = Number(target);
-          const selected = !target
-            ? sessions[0]
-            : Number.isInteger(number) && number > 0 && String(number) === target
-              ? sessions[number - 1]
-              : sessions.find((session) => session.sessionId === target);
-          if (!selected) throw new Error(`Session not found: ${target || "(empty)"}`);
-          await client.session(selected.sessionId);
-        }
-        throw new Error("Rust service cannot open CLI chat yet: session creation and model/tool reply streaming are unavailable");
+        return await startRustChat(client, { target: args.target || undefined, session: args.session || undefined, plain: args.plain });
       }
     } catch (err) {
       console.error(`${ansi.red}${safeRustTerminalText(err instanceof Error ? err.message : err)}${ansi.reset}`);

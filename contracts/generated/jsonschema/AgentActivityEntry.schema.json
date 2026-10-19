@@ -1,0 +1,169 @@
+{
+  "$defs": {
+    "AgentActivityKind": {
+      "enum": [
+        "subagent",
+        "workflow",
+        "workflow_agent",
+        "workflow_step",
+        "heartbeat",
+        "cron"
+      ],
+      "type": "string"
+    },
+    "AgentActivityStatus": {
+      "enum": [
+        "running",
+        "done",
+        "failed",
+        "aborted"
+      ],
+      "type": "string"
+    },
+    "WorkflowStepKind": {
+      "enum": [
+        "parallel",
+        "pipeline",
+        "log"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "快照与实时活动使用同一条目。扩展字段原样保留，归属及状态必须可解析。",
+  "properties": {
+    "access": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "agentId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "agentName": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "childSessionId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "childSessionPath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "finishedAt": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "id": {
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/AgentActivityKind"
+    },
+    "label": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "parentTaskId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "phaseLabel": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sessionId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sessionPath": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "startedAt": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "status": {
+      "$ref": "#/$defs/AgentActivityStatus"
+    },
+    "stepKind": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkflowStepKind"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "threadId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "threadKind": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tokens": {
+      "format": "int64",
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "status",
+    "sessionPath",
+    "agentId",
+    "agentName",
+    "summary",
+    "childSessionPath",
+    "startedAt",
+    "finishedAt"
+  ],
+  "title": "AgentActivityEntry",
+  "type": "object"
+}

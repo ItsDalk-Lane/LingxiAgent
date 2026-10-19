@@ -1,0 +1,252 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts (24 tests | 4 failed) 79ms
+       × 加载频道和 DM 列表 60ms
+       × loads DM phone settings with the stored owner agent id 1ms
+       × 发送成功后追加消息到 store 1ms
+       × 发送成功后按发送开始时的频道同步消息 cache 和频道列表投影 0ms
+ ❯ desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx (14 tests | 1 failed) 211ms
+     × shows the half-created message with sessionId on 500 first_message_failed and stays retryable 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx > SessionCollabDraftCard > shows the half-created message with sessionId on 500 first_message_failed and stays retryable
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "sessionCollab.confirmCreate"
+
+Here are the accessible roles:
+
+  button:
+
+  Name "automation.field.agent":
+  [36m<button[39m
+    [33maria-expanded[39m=[32m"false"[39m
+    [33maria-haspopup[39m=[32m"listbox"[39m
+    [33mclass[39m=[32m"_trigger_717229 _automationDraftControlButton_2b56d7"[39m
+    [33mdata-open[39m=[32m"false"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mtitle[39m=[32m"Hanako"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "sessionCollab.ignore":
+  [36m<button[39m
+    [33mclass[39m=[32m"_automationDraftTextButton_2b56d7"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  Name "sessionCollab.retryMessage":
+  [36m<button[39m
+    [33mclass[39m=[32m"_automationDraftPrimaryButton_2b56d7"[39m
+    [33mtype[39m=[32m"button"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  img:
+
+  Name "Hanako":
+  [36m<img[39m
+    [33malt[39m=[32m"Hanako"[39m
+    [33mclass[39m=[32m"_automationDraftAgentAvatar_2b56d7"[39m
+    [33mdraggable[39m=[32m"false"[39m
+    [33msrc[39m=[32m"assets/Lingxi.png"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+  textbox:
+
+  Name "":
+  [36m<input[39m
+    [33mclass[39m=[32m"_sessionCollabDraftTitleInput_2b56d7"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mplaceholder[39m=[32m"automation.field.label"[39m
+    [33mspellcheck[39m=[32m"false"[39m
+    [33mvalue[39m=[32m""[39m
+  [36m/>[39m
+
+  Name "sessionCollab.messageField":
+  [36m<textarea[39m
+    [33maria-label[39m=[32m"sessionCollab.messageField"[39m
+    [33mclass[39m=[32m"_sessionCollabDraftTextarea_2b56d7"[39m
+    [33mdisabled[39m=[32m""[39m
+    [33mspellcheck[39m=[32m"false"[39m
+  [36m/>[39m
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_card_c01612 _sessionCollabDraftCard_2b56d7"[39m
+      [33mdata-chat-resource-card[39m=[32m""[39m
+      [33mdata-variant[39m=[32m"panel"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_details_c01612"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sessionCollabDraftBody_2b56d7"[39m
+        [36m>[39m
+          [36m<label[39m
+            [33mclass[39m=[32m"_automationDraftField_2b56d7"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mautomation.field.agent[0m
+            [36m</span>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_root_717229 _automationDraftAgentSelect_2b56d7"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-expanded[39m=[32m"false"[39m
+                [33maria-haspopup[39m=[32m"listbox"[39m
+                [33mclass[39m=[32m"_trigger_717229 _automationDraftControlButton_2b56d7"[39m
+                [33mdata-open[39m=[32m"false"[39m
+                [33mdisabled[39m=[32m""[39m
+                [33mtitle[39m=[32m"Hanako"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<img[39m
+                  [33malt[39m=[32m"Hanako"[39m
+                  [33mclass[39m=[32m"_automationDraftAgentAvatar_2b56d7"[39m
+                  [33mdraggable[39m=[32m"false"[39m
+                  [33msrc[39m=[32m"assets/Lingxi.png"[39m
+                [36m/>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"_automationDraftAgentName_2b56d7"[39m
+                [36m>[39m
+                  [0mHanako[0m
+                [36m</span>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_automationDraftControlArrow_2b56d7"[39m
+                  [33mdata-open[39m=[32m"false"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 16 16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M4 6l4 4 4-4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</label>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"_sessionCollabDraftTitleInput_2b56d7"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mplaceholder[39m=[32m"automation.field.label"[39m
+            [33mspellcheck[39m=[32m"false"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<textarea[39m
+            [33maria-label[39m=[32m"sessionCollab.messageField"[39m
+            [33mclass[39m=[32m"_sessionCollabDraftTextarea_2b56d7"[39m
+            [33mdisabled[39m=[32m""[39m
+            [33mspellcheck[39m=[32m"false"[39m
+          [36m>[39m
+            [0mfirst message body[0m
+          [36m</textarea>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_sessionCollabDraftError_2b56d7"[39m
+          [36m>[39m
+            [0msessionCollab.halfCreated:id=sid-new[0m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_automationDraftActions_2b56d7"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_automationDraftTextButton_2b56d7"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0msessionCollab.ignore[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"_automationDraftPrimaryButton_2b56d7"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0msessionCollab.retryMessage[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx:197:19
+    195|       expect(screen.getByText(/sid-new/)).toBeInTheDocument();
+    196|     });
+    197|     expect(screen.getByRole('button', { name: 'sessionCollab.confirmCr…
+       |                   ^
+    198|   });
+    199|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > loadChannels > 加载频道和 DM 列表
+AssertionError: expected undefined to be defined
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts:96:34
+     94|       // 检查 setState 被调用，包含合并的 channels
+     95|       const lastPatch = setStateCalls[setStateCalls.length - 1];
+     96|       expect(lastPatch.channels).toBeDefined();
+       |                                  ^
+     97|       const channels = lastPatch.channels as Array<{ id: string; isDM:…
+     98|       expect(channels.length).toBe(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > DM phone settings owner > loads DM phone settings with the stored owner agent id
+AssertionError: expected 'read_only' to be 'write' // Object.is equality
+
+Expected: "write"
+Received: "read_only"
+
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts:209:51
+    207|
+    208|       expect(mockFetch).toHaveBeenCalledWith('/api/conversations/dm%3A…
+    209|       expect(mockState.channelAgentPhoneToolMode).toBe('write');
+       |                                                   ^
+    210|       expect(mockState.channelAgentReplyMinChars).toBe(10);
+    211|       expect(mockState.channelAgentReplyMaxChars).toBe(80);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > sendChannelMessage > 发送成功后追加消息到 store
+Error: Agent DM is read only
+ ❯ sendChannelMessage desktop/src/react/stores/channel-actions.ts:490:11
+    488|   if (!body || !channelId) return;
+    489|   if (channelId.startsWith('dm:') || s.channelIsDM || s.channels.some(…
+    490|     throw new Error('Agent DM is read only');
+       |           ^
+    491|   }
+    492|   const scope = captureConversationRequestScope();
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts:382:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  desktop/src/react/__tests__/stores/channel-actions.test.ts > channel-actions > sendChannelMessage > 发送成功后按发送开始时的频道同步消息 cache 和频道列表投影
+Error: Agent DM is read only
+ ❯ sendChannelMessage desktop/src/react/stores/channel-actions.ts:490:11
+    488|   if (!body || !channelId) return;
+    489|   if (channelId.startsWith('dm:') || s.channelIsDM || s.channels.some(…
+    490|     throw new Error('Agent DM is read only');
+       |           ^
+    491|   }
+    492|   const scope = captureConversationRequestScope();
+ ❯ desktop/src/react/__tests__/stores/channel-actions.test.ts:429:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  5 failed | 45 passed (50)
+   Start at  03:56:06
+   Duration  1.74s (transform 2.35s, setup 71ms, import 3.54s, tests 492ms, environment 885ms)
+

@@ -1,0 +1,51 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.35s
+     Running tests/r06_chat_wire.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_chat_wire-f73bf56901f8b5c8)
+
+running 17 tests
+test actual_attachment_preparation_abort_is_immediately_idle_zero_run_and_no_late_submit ... ok
+test real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty ... ok
+test file_refs_real_owner_snapshots_office_bytes_transaction_and_negative_zero_run ... ok
+test model_switch_uses_real_session_admission_and_rejections_preserve_choice ... ok
+test real_ws_delta_is_visible_before_provider_terminal_and_abort_stale_guard ... ok
+test deleted_agent_steer_is_rejected_without_cancelling_neighbour_session ... ok
+test ws_interject_interrupts_only_target_and_preserves_real_user_receipt ... ok
+test real_ws_prompt_enters_run_tools_and_live_final_with_typed_input_refusals ... ok
+test ws_compaction_refusals_then_real_local_checkpoint_zero_fee_and_next_run ... ok
+test actual_model_switch_default_thinking_and_image_survive_restart_into_provider ... ok
+test ws_compaction_real_accepted_success_noop_failure_and_streaming_negative ... ok
+test real_provider_many_deltas_resume_reports_truncation_and_retains_contiguous_tail ... ok
+test referenced_images_real_20mib_limit_owned_bytes_and_no_run_on_refusal ... ok
+test ws_real_steering_tool_continuation_idle_prompt_and_foreign_controls_do_not_mutate ... ok
+LINGXI_AUTH_REJECTED request_id="req-9e2732ab07db4e6e50cce358b41af87c" method=GET path=/lingxi/v1/experiments status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55550
+LINGXI_AUTH_REJECTED request_id="req-f5cd7ce76d22aa89e5030736819bba4f" method=GET path=/lingxi/v1/session-thinking-level status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:55554
+CHAT-NATIVE: 
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    ../../../vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+
+test native_current_chat_page_inputarea_tiptap_true_network_and_queue_interject ... ok
+test session_id_references_are_authorized_preserved_and_never_read_source_body_implicitly ... ok
+APP-PAGES-NATIVE: 
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    ../../../vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+
+test native_current_app_pages_side_preview_attachment_and_model_response_generation ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.95s
+

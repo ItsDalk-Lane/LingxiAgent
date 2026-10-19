@@ -1,0 +1,58 @@
+{
+  "authType": "api-key",
+  "defaultApi": "openai-completions",
+  "defaultBaseUrl": "http://127.0.0.1:63244/v1",
+  "displayName": "fixture",
+  "id": "fixture",
+  "models": [
+    {
+      "capabilities": {
+        "imageInput": false,
+        "tools": true
+      },
+      "id": "fixture-chat",
+      "input": [
+        "text"
+      ],
+      "inputs": [
+        "text"
+      ],
+      "toolUse": {
+        "dialect": "openai",
+        "supportsTools": true,
+        "toolResultFormat": "message"
+      }
+    },
+    {
+      "capabilities": {
+        "imageInput": false,
+        "tools": null
+      },
+      "id": "health-model",
+      "input": [
+        "text"
+      ],
+      "inputs": [
+        "text"
+      ]
+    },
+    {
+      "capabilities": {
+        "imageInput": false,
+        "tools": true
+      },
+      "id": "fixture-chat2",
+      "input": [
+        "text"
+      ],
+      "inputs": [
+        "text"
+      ],
+      "toolUse": {
+        "dialect": "openai",
+        "supportsTools": true,
+        "toolResultFormat": "message"
+      }
+    }
+  ]
+}

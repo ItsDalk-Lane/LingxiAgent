@@ -1,0 +1,381 @@
+   Compiling num-traits v0.2.19
+   Compiling serde_json v1.0.151
+   Compiling allocator-api2 v0.2.21
+   Compiling regex-automata v0.4.18
+   Compiling hashbrown v0.17.1
+   Compiling chrono v0.4.45
+   Compiling indexmap v2.14.2
+   Compiling idna v1.1.0
+   Compiling schemars v1.2.2
+   Compiling h2 v0.4.19
+   Compiling url v2.5.8
+   Compiling tower-http v0.6.11
+   Compiling regex v1.13.1
+   Compiling hashlink v0.12.2
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling serde-saphyr v1.3.0
+   Compiling rusqlite v0.40.2
+   Compiling hyper v1.11.1
+   Compiling serde_yaml_ng v0.10.0
+   Compiling hyper-util v0.1.21
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling jieba-rs v0.6.8
+   Compiling matchers v0.2.0
+   Compiling hyper-rustls v0.27.10
+   Compiling rmcp v3.4.1
+   Compiling axum v0.8.9
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling tracing-subscriber v0.3.23
+   Compiling lopdf v0.42.0
+   Compiling euclid v0.20.14
+   Compiling zip v9.0.3
+   Compiling num-integer v0.1.47
+   Compiling pdf-extract v0.12.1
+   Compiling num-bigint v0.4.8
+   Compiling getrandom v0.3.4
+   Compiling zerocopy v0.8.58
+   Compiling num-rational v0.4.2
+   Compiling num-iter v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling num v0.4.3
+   Compiling ahash v0.8.12
+   Compiling borrow-or-share v0.2.4
+   Compiling bit-vec v0.8.0
+   Compiling fraction v0.17.0
+   Compiling fluent-uri v0.4.1
+   Compiling bit-set v0.8.0
+   Compiling vsimd v0.8.0
+   Compiling outref v0.5.2
+   Compiling num-cmp v0.1.0
+   Compiling bytecount v0.6.9
+   Compiling micromap v0.3.0
+   Compiling uuid-simd v0.8.0
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling referencing v0.57.0
+   Compiling jsonschema-value v0.57.0
+   Compiling fancy-regex v0.19.2
+   Compiling unicode-general-category v1.1.0
+   Compiling strum v0.28.0
+   Compiling jsonschema-regex v0.57.0
+   Compiling email_address v0.2.9
+   Compiling data-encoding v2.11.1
+   Compiling lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+   Compiling jsonschema v0.57.0
+   Compiling lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+warning: method `apply_cover_frozen` is never used
+   --> crates/lingxi-service/src/office_tools.rs:408:25
+    |
+165 | impl OfficeApi {
+    | -------------- method in this implementation
+...
+408 |     pub(crate) async fn apply_cover_frozen(
+    |                         ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `require_same_target` is never used
+   --> crates/lingxi-service/src/resource_artifacts.rs:177:19
+    |
+170 | impl ArtifactWritePreflight {
+    | --------------------------- method in this implementation
+...
+177 |     pub(crate) fn require_same_target(&self, original: &Self) -> Result<(), ResourceIoError> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `CoverExecutionPermit` is never constructed
+ --> crates/lingxi-service/src/beautify_run.rs:7:19
+  |
+7 | pub(crate) struct CoverExecutionPermit {
+  |                   ^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `admit_cover_job`, `finish_cover_job`, and `cover_prompt` are never used
+   --> crates/lingxi-service/src/beautify_run.rs:31:25
+    |
+ 30 | impl RunSupervisor {
+    | ------------------ methods in this implementation
+ 31 |     pub(crate) async fn admit_cover_job(
+    |                         ^^^^^^^^^^^^^^^
+...
+127 |     pub(crate) async fn finish_cover_job(
+    |                         ^^^^^^^^^^^^^^^^
+...
+164 |     pub(crate) async fn cover_prompt(
+    |                         ^^^^^^^^^^^^
+
+warning: method `authorize_cover_prepared` is never used
+    --> crates/lingxi-service/src/toolgateway.rs:2852:25
+     |
+2849 | impl ToolInvocationGateway {
+     | -------------------------- method in this implementation
+...
+2852 |     pub(crate) async fn authorize_cover_prepared(
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+warning: `lingxi-service` (lib) generated 5 warnings
+warning: `lingxi-service` (lib test) generated 5 warnings (5 duplicates)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4m 31s
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_adapters-c9e8f1b18975b2c1)
+  Executable unittests src/bin/lingxi-storage-inspect.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_storage_inspect-04b93a4070c6e32e)
+  Executable tests/active_run_listing.rs (/private/tmp/lingxi-r07-build/debug/deps/active_run_listing-b0a8f1c4c47a7888)
+  Executable tests/agent_memory_r06t06.rs (/private/tmp/lingxi-r07-build/debug/deps/agent_memory_r06t06-9d0779b7f08d40b2)
+  Executable tests/backup_faults.rs (/private/tmp/lingxi-r07-build/debug/deps/backup_faults-8a7a62b2002cd3de)
+  Executable tests/backup_restore.rs (/private/tmp/lingxi-r07-build/debug/deps/backup_restore-563d564982e4e322)
+  Executable tests/canonical_message_store.rs (/private/tmp/lingxi-r07-build/debug/deps/canonical_message_store-242291b517409adb)
+  Executable tests/context_material_commit_r06ex01.rs (/private/tmp/lingxi-r07-build/debug/deps/context_material_commit_r06ex01-bfb82404ccfcd34a)
+  Executable tests/disk_full_fault.rs (/private/tmp/lingxi-r07-build/debug/deps/disk_full_fault-19dd7fef04ae20b7)
+  Executable tests/event_store_reads.rs (/private/tmp/lingxi-r07-build/debug/deps/event_store_reads-450429177fba79c4)
+  Executable tests/ex08_independent_review.rs (/private/tmp/lingxi-r07-build/debug/deps/ex08_independent_review-55a097de1fd22cd1)
+  Executable tests/invocation_journal_store.rs (/private/tmp/lingxi-r07-build/debug/deps/invocation_journal_store-f239def636db9908)
+  Executable tests/knowledge_store_r06t07.rs (/private/tmp/lingxi-r07-build/debug/deps/knowledge_store_r06t07-5ce016b1577e9a51)
+  Executable tests/late_result_fencing_property.rs (/private/tmp/lingxi-r07-build/debug/deps/late_result_fencing_property-c7c944752a13dafa)
+  Executable tests/migration_idempotency.rs (/private/tmp/lingxi-r07-build/debug/deps/migration_idempotency-c14d9e7e2082ace4)
+  Executable tests/r05_t02_oauth_flows.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t02_oauth_flows-1ee50bd739c1ec35)
+  Executable tests/r05_t03_goldens.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t03_goldens-ed60ea1b50add1bd)
+  Executable tests/r05_t03_rr1_replay.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t03_rr1_replay-c3f870f53c094638)
+  Executable tests/r05_t04_rr1_batch_terminal.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t04_rr1_batch_terminal-40956b1e876eeca6)
+  Executable tests/r05_t04_streaming.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t04_streaming-c210e45a29d7d50e)
+  Executable tests/r05_t05_compat.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t05_compat-833a0cda6872b544)
+  Executable tests/r05_t05_timeouts.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t05_timeouts-7c87d7b0bbe3868f)
+  Executable tests/r05_t06_operations.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t06_operations-42523e6065b4cd86)
+  Executable tests/r05_t07_rr1_usage_strict.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_rr1_usage_strict-a5b457e5e4daff2f)
+  Executable tests/r05_t07_usage_families.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_usage_families-194b87fa5554ada1)
+  Executable tests/r06_ar_f06_config_preservation.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f06_config_preservation-e9d84076021fe281)
+  Executable tests/r06_ar_f06_d2_replay_probe.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f06_d2_replay_probe-6f1920bb66d4c291)
+  Executable tests/r06_ar_f12_cache_preservation.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f12_cache_preservation-c99790213d8a5294)
+  Executable tests/r06_ar_f14_migration_receipts.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f14_migration_receipts-dc117fe9cdebb5a0)
+  Executable tests/r06_ar_w09_vector_integrity.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_w09_vector_integrity-07f5185811ae2380)
+  Executable tests/r06_ex05_independent_review.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex05_independent_review-e37e3a96fbd7f41b)
+  Executable tests/r06_ex05_restore_atomicity.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex05_restore_atomicity-009c95b6b2946292)
+  Executable tests/r06_ex09_search_cache.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex09_search_cache-cd09c1f14ef19175)
+  Executable tests/r06_t02_compaction_render.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t02_compaction_render-1b082938d9f7f124)
+  Executable tests/r07_activity_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_activity_store-ffa3424d744a91aa)
+  Executable tests/r07_automation_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_store-4a190ef0e024d1f4)
+  Executable tests/r07_automation_suggestions.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_suggestions-7dc98e2d80abdd21)
+  Executable tests/r07_bridge_effect_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_effect_store-cee5c8982f82ee49)
+  Executable tests/r07_bridge_message_projection.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_message_projection-6b32b23bb1f88796)
+  Executable tests/r07_bridge_notice_render.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_notice_render-fad9e76454787fbf)
+  Executable tests/r07_bridge_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_store-61dc5e44d3a0c563)
+  Executable tests/r07_browser_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_chromium-2dfa2ef0df6af601)
+  Executable tests/r07_browser_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_store-50dea2a33880524f)
+  Executable tests/r07_conversation_files.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_files-67b2570ecdad72ae)
+  Executable tests/r07_pdf_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_pdf_chromium-fddcb2e69c0dcea1)
+  Executable tests/r07_phone_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_store-6425d59a716aaa01)
+  Executable tests/r07_session_collab_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab_store-bed0f39a9c3e47d4)
+  Executable tests/r07_t05_media_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media_store-bd2a99bb64a5382e)
+  Executable tests/run_finalize_property.rs (/private/tmp/lingxi-r07-build/debug/deps/run_finalize_property-e4d8d5f430ccfd8b)
+  Executable tests/run_id_allocator.rs (/private/tmp/lingxi-r07-build/debug/deps/run_id_allocator-a8a8df729a28d1d7)
+  Executable tests/run_lineage_store.rs (/private/tmp/lingxi-r07-build/debug/deps/run_lineage_store-0c9679f2172c3ccb)
+  Executable tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-a4bb3c88184e260a)
+  Executable tests/session_tree_r06t03.rs (/private/tmp/lingxi-r07-build/debug/deps/session_tree_r06t03-be2b3e26d8bf0ada)
+  Executable tests/storage_transactions.rs (/private/tmp/lingxi-r07-build/debug/deps/storage_transactions-11a41316c2a9974a)
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_browser_spike-0ada0ca191e3e456)
+  Executable unittests src/bin/spike_browser.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_browser-a8ad2d8754d80a61)
+  Executable unittests src/bin/spike_pdf.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_pdf-11c66577fa67c5e6)
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_kernel-484c48e1ff1b4578)
+  Executable tests/r06_t01_context_compiler.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t01_context_compiler-5dc24fa2ab6feb7a)
+  Executable tests/r06_t02_compaction.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t02_compaction-2717459a344a9543)
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_protocol-90a39cc937539da3)
+  Executable unittests src/bin/lingxi-proto-server.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_proto_server-9295b4b753402652)
+  Executable unittests src/bin/lingxi-protocol-gen.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_protocol_gen-92a0eaea8199ab0a)
+  Executable unittests src/bin/lingxi-protocol-verify.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_protocol_verify-eefb196b2f2ae6c1)
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-246079f409cd3a6d)
+  Executable unittests src/main.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-150e323e2d22df1c)
+  Executable unittests src/bin/r04_t07_fixture.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t07_fixture-99cc2573c1b5101f)
+  Executable tests/admission_dedup_adversarial.rs (/private/tmp/lingxi-r07-build/debug/deps/admission_dedup_adversarial-4df60a8f59386e21)
+  Executable tests/admission_dedup_consistency.rs (/private/tmp/lingxi-r07-build/debug/deps/admission_dedup_consistency-1c38c63c4c847556)
+  Executable tests/auth_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/auth_matrix-1de54304df84de46)
+  Executable tests/background_disconnect_recovery.rs (/private/tmp/lingxi-r07-build/debug/deps/background_disconnect_recovery-5340f44b8cee422f)
+  Executable tests/background_steering.rs (/private/tmp/lingxi-r07-build/debug/deps/background_steering-41cdb3da0fb45659)
+  Executable tests/cancel_link_inheritance.rs (/private/tmp/lingxi-r07-build/debug/deps/cancel_link_inheritance-8cbccc0bc24c2450)
+  Executable tests/cancel_terminal_race.rs (/private/tmp/lingxi-r07-build/debug/deps/cancel_terminal_race-972d2a2a0212b914)
+  Executable tests/cancellation_tree.rs (/private/tmp/lingxi-r07-build/debug/deps/cancellation_tree-67c7286d74addbe6)
+  Executable tests/config_bounds.rs (/private/tmp/lingxi-r07-build/debug/deps/config_bounds-63950639397a8e31)
+  Executable tests/event_subscription.rs (/private/tmp/lingxi-r07-build/debug/deps/event_subscription-4983cb2857a2ee9c)
+  Executable tests/ex08_processing_retention_review.rs (/private/tmp/lingxi-r07-build/debug/deps/ex08_processing_retention_review-b52c3dc68ff846a0)
+  Executable tests/execute_concurrency.rs (/private/tmp/lingxi-r07-build/debug/deps/execute_concurrency-fabf0ba4cd69c69e)
+  Executable tests/exit_race_rejections.rs (/private/tmp/lingxi-r07-build/debug/deps/exit_race_rejections-a17b5b93a12f6d43)
+  Executable tests/input_budget_refusal.rs (/private/tmp/lingxi-r07-build/debug/deps/input_budget_refusal-9721919a8273879f)
+  Executable tests/input_payload_fidelity.rs (/private/tmp/lingxi-r07-build/debug/deps/input_payload_fidelity-5113874ae60a6e54)
+  Executable tests/instance_lifecycle.rs (/private/tmp/lingxi-r07-build/debug/deps/instance_lifecycle-6478ae6b3a2dbfd8)
+  Executable tests/invocation_journal.rs (/private/tmp/lingxi-r07-build/debug/deps/invocation_journal-ac3dc40baec35a80)
+  Executable tests/late_result_fence.rs (/private/tmp/lingxi-r07-build/debug/deps/late_result_fence-8e70c2f5f0ba8dbf)
+  Executable tests/r00_management_leaves.rs (/private/tmp/lingxi-r07-build/debug/deps/r00_management_leaves-d671a4f3d3541cf8)
+  Executable tests/r00_static_web_leaves.rs (/private/tmp/lingxi-r07-build/debug/deps/r00_static_web_leaves-340ec198b50a5d01)
+  Executable tests/r03_t08_acceptance_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/r03_t08_acceptance_matrix-1546ef05cd192fd9)
+  Executable tests/r04_rr1_f02_reaper_cleanup.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_rr1_f02_reaper_cleanup-8cb69ef8ab209086)
+  Executable tests/r04_rr1_f03_stop_honesty.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_rr1_f03_stop_honesty-77150b185a60096a)
+  Executable tests/r04_rr1_f04_pty_consumption.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_rr1_f04_pty_consumption-5fe975568782c243)
+  Executable tests/r04_rr1_f05_output_integrity.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_rr1_f05_output_integrity-28bd805c78a7b266)
+  Executable tests/r04_rr1_f05_spill_failure.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_rr1_f05_spill_failure-6e99d0bacfa19703)
+  Executable tests/r04_t01_tool_catalog.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t01_tool_catalog-c0b320827860e23c)
+  Executable tests/r04_t02_tool_gateway.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t02_tool_gateway-3bd287c578544a59)
+  Executable tests/r04_t03_approval_service.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t03_approval_service-85a13fa2565841c9)
+  Executable tests/r04_t04_file_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t04_file_tools-077cf18bf43c3ea2)
+  Executable tests/r04_t05_process_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t05_process_tools-0529e0468fcfa5b8)
+  Executable tests/r04_t05_registry_capacity.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t05_registry_capacity-1cbce76dd4dbd437)
+  Executable tests/r04_t06_sandbox.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t06_sandbox-f8259785827180d0)
+  Executable tests/r04_t07_mcp_and_workers.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t07_mcp_and_workers-3539379ea40c2bfa)
+  Executable tests/r04_t08_tool_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/r04_t08_tool_matrix-780dc3a212d6ebab)
+  Executable tests/r05_t01_binary_wiring.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t01_binary_wiring-bdd58b5af6f5f02e)
+  Executable tests/r05_t01_model_plane.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t01_model_plane-db1ea8d55142eb98)
+  Executable tests/r05_t02_credentials.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t02_credentials-b8841a7dc9e4afca)
+  Executable tests/r05_t03_protocol_adapters.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t03_protocol_adapters-1ecbe2c69f53ed8a)
+  Executable tests/r05_t04_streaming.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t04_streaming-edb157286f133966)
+  Executable tests/r05_t05_network.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t05_network-a77b4313af96ea33)
+  Executable tests/r05_t05_timeouts.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t05_timeouts-9a802b651238ae35)
+  Executable tests/r05_t06_operations.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t06_operations-97f55770d35d6ad0)
+  Executable tests/r05_t06_rr1_media_resource.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t06_rr1_media_resource-504dde5aab5b6d7e)
+  Executable tests/r05_t06_rr1_system_speech.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t06_rr1_system_speech-8b3a2a4c598720f6)
+  Executable tests/r05_t06_worker_model.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t06_worker_model-85c8aee674f540b8)
+  Executable tests/r05_t07_persistence.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_persistence-e2e3959113526ca0)
+  Executable tests/r05_t07_rr1_usage_ledger.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_rr1_usage_ledger-8b3fba3d627a963d)
+  Executable tests/r05_t07_usage_trace.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t07_usage_trace-0fc0ff689c1cdeba)
+  Executable tests/r05_t08_closed_loop.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t08_closed_loop-f637ec686c1d16b5)
+  Executable tests/r05_t08_production_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t08_production_tools-10042585c78f2265)
+  Executable tests/r05_t08_resources.rs (/private/tmp/lingxi-r07-build/debug/deps/r05_t08_resources-c9177c035295c171)
+  Executable tests/r06_agent_admin_lifecycle.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_admin_lifecycle-41e990770dbec651)
+  Executable tests/r06_agent_config_readback.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_config_readback-56e1f71bcf3083d3)
+  Executable tests/r06_agent_delete_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_delete_completion-00ee08943a434502)
+  Executable tests/r06_agent_delete_skills_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_delete_skills_live-62c4e7dfcdd5f85b)
+  Executable tests/r06_agent_settings_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_settings_live-3aaba7952839507f)
+  Executable tests/r06_agent_switch_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_switch_completion-45101b6614bd59a1)
+  Executable tests/r06_ar_f01_history.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f01_history-93a9acd60781cf31)
+  Executable tests/r06_ar_f02_file_restore.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f02_file_restore-ca2c0adbf1dea6b0)
+  Executable tests/r06_ar_f03_operations.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f03_operations-b7ef2432c5a23dfb)
+  Executable tests/r06_ar_f04_lifecycle.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f04_lifecycle-ca4819ff6af50e92)
+  Executable tests/r06_ar_f05_cache.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f05_cache-de10f3324ef85de3)
+  Executable tests/r06_ar_f06_binary.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f06_binary-4f432d1f961c071e)
+  Executable tests/r06_ar_f06_config.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f06_config-b7a4a30bff3842f1)
+  Executable tests/r06_ar_f07_catalog.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f07_catalog-1f8171ba5e397831)
+  Executable tests/r06_ar_f08_projection.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f08_projection-f9b57c046eceb9d3)
+  Executable tests/r06_ar_f12_cache_consumers.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f12_cache_consumers-166f2eb3681e3870)
+  Executable tests/r06_ar_f13_submission.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_f13_submission-66642e90dd63c218)
+  Executable tests/r06_ar_w09_embedding_batches.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_w09_embedding_batches-45fda4c2d9445f4d)
+  Executable tests/r06_ar_w10_embedding_identity.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_w10_embedding_identity-db79b6036dc9fa9d)
+  Executable tests/r06_ar_w11_embedding_lifecycle.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ar_w11_embedding_lifecycle-3640d25ee21ce327)
+  Executable tests/r06_archive_jsonl_restore.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_archive_jsonl_restore-d952d486b7fc5283)
+  Executable tests/r06_b7b_config_scope_prefs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_b7b_config_scope_prefs-7c0f2fd120615830)
+  Executable tests/r06_b7b_skills_events.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_b7b_skills_events-99590928b632404a)
+  Executable tests/r06_background_tasks.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_background_tasks-ce3b40caaa8b3136)
+  Executable tests/r06_chat_wire.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_chat_wire-92ac68362696e9a7)
+  Executable tests/r06_conversation_map_and_checkpoint.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_conversation_map_and_checkpoint-c9500a4373172e2a)
+  Executable tests/r06_directory_picker.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_directory_picker-b0ad16e3f8225683)
+  Executable tests/r06_dream_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_dream_completion-6000e374e7b5d5bc)
+  Executable tests/r06_edit_command_current_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_edit_command_current_source-38afc58381023369)
+  Executable tests/r06_ex01_manual_compaction.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex01_manual_compaction-584c79a464cc95d8)
+  Executable tests/r06_ex05_restore_atomicity.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_ex05_restore_atomicity-85ef1438f8c942c2)
+  Executable tests/r06_experiments_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_experiments_completion-846fa9b0398524d0)
+  Executable tests/r06_interactive_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_interactive_completion-f6e2267f67322e27)
+  Executable tests/r06_knowledge_processors.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_knowledge_processors-6c756d1fdf36c065)
+  Executable tests/r06_knowledge_rich_sources.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_knowledge_rich_sources-f3fef31f11e123b9)
+  Executable tests/r06_memory_clear_sources.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_memory_clear_sources-7e181d6e6d1d8d1c)
+  Executable tests/r06_memory_event_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_memory_event_completion-68cef64368ebd06b)
+  Executable tests/r06_memory_ticker_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_memory_ticker_completion-c21deb2af8192924)
+  Executable tests/r06_memory_tool_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_memory_tool_completion-86774b37ccc0f427)
+  Executable tests/r06_mood_trajectory.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_mood_trajectory-abab7918096eabfd)
+  Executable tests/r06_native_discovery_current_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_native_discovery_current_source-73ece5b9a2e97bb0)
+  Executable tests/r06_native_resource_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_native_resource_completion-083e4fd307fd4a4f)
+  Executable tests/r06_office_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_office_completion-27d6f48e7f7db001)
+  Executable tests/r06_original_chat_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_chat_proofs-37a7184b538a8671)
+  Executable tests/r06_original_knowledge_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_knowledge_proofs-c05fa5fe8b359743)
+  Executable tests/r06_original_memory_skill_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_memory_skill_proofs-c7159d0862011d23)
+  Executable tests/r06_original_persona_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_persona_proofs-0154c74a3385741b)
+  Executable tests/r06_original_resource_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_resource_proofs-48724a6d5692d7de)
+  Executable tests/r06_original_session_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_session_proofs-94b0c40f7dcce894)
+  Executable tests/r06_original_skills_bundle_proofs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_original_skills_bundle_proofs-203dc77b5350579d)
+  Executable tests/r06_persona_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_persona_completion-a2a195c57d843dd8)
+  Executable tests/r06_quickchat_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_quickchat_completion-387a657924831aa0)
+  Executable tests/r06_read_rich.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_read_rich-a93d67be54df2bed)
+  Executable tests/r06_resource_mount_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_resource_mount_completion-63c62bc907199056)
+  Executable tests/r06_resource_mount_tool_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_resource_mount_tool_completion-e5246a44341e6c44)
+  Executable tests/r06_resource_tools_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_resource_tools_completion-3a270529ba0acb39)
+  Executable tests/r06_session_authorized_folders.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_authorized_folders-52cb6f9dc9e082e7)
+  Executable tests/r06_session_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_completion-778c499880d96491)
+  Executable tests/r06_session_focus_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_focus_completion-b0f56f6ba7531508)
+  Executable tests/r06_session_focus_detached_project.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_focus_detached_project-73a6667cb4a01fd3)
+  Executable tests/r06_session_history_content.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_history_content-2efb337a46a4ac36)
+  Executable tests/r06_session_list_projection.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_list_projection-c22290ef7ff392bd)
+  Executable tests/r06_session_map_browser_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_map_browser_completion-8f6df3661a9335b6)
+  Executable tests/r06_session_project_catalog.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_session_project_catalog-ec832d80e4580a9a)
+  Executable tests/r06_settings_owner_current_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_settings_owner_current_source-a9c67712771cddb0)
+  Executable tests/r06_skill_dir_delete_and_export.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_skill_dir_delete_and_export-3b1644f2c395af7e)
+  Executable tests/r06_skills_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_skills_completion-a44668b98e4f25a3)
+  Executable tests/r06_slash_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_slash_completion-1107446de6b886ab)
+  Executable tests/r06_splash_avatar_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_splash_avatar_live-acd2a1f25b1b22c6)
+  Executable tests/r06_t01_closed_loop.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t01_closed_loop-5470fb985fff2268)
+  Executable tests/r06_t01_context_compiler.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t01_context_compiler-c67a135a77b56f21)
+  Executable tests/r06_t02_closed_loop.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t02_closed_loop-97550435c098cc99)
+  Executable tests/r06_t02_compaction.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t02_compaction-ceecc508fe51d5a3)
+  Executable tests/r06_t03_session_tree.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t03_session_tree-9f57500f89a5adaa)
+  Executable tests/r06_t04_history.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t04_history-ba0a98127bb56a4c)
+  Executable tests/r06_t05_bridgemedia.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_bridgemedia-91cf6db188da8159)
+  Executable tests/r06_t05_filehistory.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_filehistory-b18439887bd08c6c)
+  Executable tests/r06_t05_fsread.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_fsread-69e576e5f84c85f9)
+  Executable tests/r06_t05_preview.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_preview-26868d1c82f53b58)
+  Executable tests/r06_t05_resourceio.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_resourceio-85d2453cf14e305a)
+  Executable tests/r06_t05_resources.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_resources-63693742dbb8e28e)
+  Executable tests/r06_t05_session_files.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t05_session_files-398fab9a3de0b0b0)
+  Executable tests/r06_t06_hooks.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t06_hooks-bd1c3b394629831f)
+  Executable tests/r06_t06_memory.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t06_memory-3d166a664ee042be)
+  Executable tests/r06_t06_skill_context.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t06_skill_context-6b5a2928ad78bb2b)
+  Executable tests/r06_t06_skills.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t06_skills-eb77cd571980e520)
+  Executable tests/r06_t07_knowledge.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t07_knowledge-b09e2a63359b19ab)
+  Executable tests/r06_t07_knowledge_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t07_knowledge_tools-510c804e8f734676)
+  Executable tests/r06_t08_behavior_eval.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t08_behavior_eval-b41ba19d03950f5b)
+  Executable tests/r06_todo_panel.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_todo_panel-d76ff59a8cf347ba)
+  Executable tests/r06_user_preferences.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_user_preferences-b4eb26b1a83bc4b2)
+  Executable tests/r06_workbench_write.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_workbench_write-2e23ef3b41f4b279)
+  Executable tests/r06_workspace_disposal.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_workspace_disposal-6824ddd6b639bb46)
+  Executable tests/r07_activity_promotion.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_activity_promotion-3968c906a3744f23)
+  Executable tests/r07_automation_activity.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_activity-cfd3e16173560ee9)
+  Executable tests/r07_automation_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_flow-03697be87b0a72f8)
+  Executable tests/r07_automation_import.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_import-8f3b6bf168070c7b)
+  Executable tests/r07_automation_permission.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_permission-e48480dabb588c0b)
+  Executable tests/r07_bridge_diagnostic.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_diagnostic-25c345b9e511c97c)
+  Executable tests/r07_bridge_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_flow-33d8a67c29dabc80)
+  Executable tests/r07_bridge_guest_context.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_guest_context-ad75f3b527ec2080)
+  Executable tests/r07_bridge_native_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_native_flow-54512be0b6363769)
+  Executable tests/r07_bridge_notice.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_notice-dcb082cf2817c5b8)
+  Executable tests/r07_bridge_permission.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_permission-977d4816a4dfda08)
+  Executable tests/r07_bridge_sdk_platforms.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_sdk_platforms-66e36744df71511c)
+  Executable tests/r07_bridge_session_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_session_routes-1bdc58ce00e13d00)
+  Executable tests/r07_bridge_worker.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_worker-58672bec3fca2328)
+  Executable tests/r07_browser_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_routes-37a737ce9f84a690)
+  Executable tests/r07_browser_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_tools-d0e2f389e9d89697)
+  Executable tests/r07_conversation_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_tools-8001c20c5233292d)
+  Executable tests/r07_daily_fresh_compact.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_daily_fresh_compact-69316f979bbdb7b8)
+  Executable tests/r07_heartbeat_plan.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_heartbeat_plan-471ee9a869314aeb)
+  Executable tests/r07_heartbeat_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_heartbeat_runtime-e3c9045a5f1635c3)
+  Executable tests/r07_office_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_office_tools-515f5e382d5f50f6)
+  Executable tests/r07_phone_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_runtime-cd49995e040e900e)
+  Executable tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-a6be2fb3fb50fa32)
+  Executable tests/r07_session_collab.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab-3e625c6d2a27c317)
+  Executable tests/r07_t05_media.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media-85a9a64455f2eeb0)
+  Executable tests/r07_web_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_web_tools-c235eb34c62549f8)
+  Executable tests/recovery_crash_points.rs (/private/tmp/lingxi-r07-build/debug/deps/recovery_crash_points-f9ba582c172c0ca5)
+  Executable tests/recovery_startup_scan.rs (/private/tmp/lingxi-r07-build/debug/deps/recovery_startup_scan-feda093db4369d9c)
+  Executable tests/request_dedup.rs (/private/tmp/lingxi-r07-build/debug/deps/request_dedup-28bf47975ea4791a)
+  Executable tests/request_id_canonicalization.rs (/private/tmp/lingxi-r07-build/debug/deps/request_id_canonicalization-58927cae2df0985a)
+  Executable tests/resource_limits.rs (/private/tmp/lingxi-r07-build/debug/deps/resource_limits-9ff712d257035b30)
+  Executable tests/run_lifecycle.rs (/private/tmp/lingxi-r07-build/debug/deps/run_lifecycle-bf5398ade03b6ed9)
+  Executable tests/service_health.rs (/private/tmp/lingxi-r07-build/debug/deps/service_health-c6f35886892035bb)
+  Executable tests/service_persistence.rs (/private/tmp/lingxi-r07-build/debug/deps/service_persistence-de39b3532fd9230b)
+  Executable tests/session_serialization.rs (/private/tmp/lingxi-r07-build/debug/deps/session_serialization-38e29e2a6aa0812d)
+  Executable tests/shutdown_coordinator.rs (/private/tmp/lingxi-r07-build/debug/deps/shutdown_coordinator-a4a57726f7ecee26)
+  Executable tests/subagent_closeout.rs (/private/tmp/lingxi-r07-build/debug/deps/subagent_closeout-014b832ca59ac8fd)
+  Executable tests/subagent_lifecycle.rs (/private/tmp/lingxi-r07-build/debug/deps/subagent_lifecycle-36e1d29dff2b7f62)
+  Executable tests/subagent_permission_inheritance.rs (/private/tmp/lingxi-r07-build/debug/deps/subagent_permission_inheritance-2740ee503d4d444e)
+  Executable tests/tls_web_login.rs (/private/tmp/lingxi-r07-build/debug/deps/tls_web_login-e2bc722be74a0fe9)
+  Executable tests/tool_receipt_unknown.rs (/private/tmp/lingxi-r07-build/debug/deps/tool_receipt_unknown-fa8cf4acbd47e334)
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_spike-29cfa16cd1fe31c5)
+  Executable unittests src/bin/spike_check_deps.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_check_deps-1967dd8ff87a73e4)
+  Executable unittests src/bin/spike_health.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_health-412fb99c380138cc)
+  Executable unittests src/bin/spike_mcp_handshake.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_mcp_handshake-63d1da2b5d49e88c)
+  Executable unittests src/bin/spike_schema_validate.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_schema_validate-766787c8d2f13091)
+  Executable unittests src/bin/spike_sqlite_queue.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_sqlite_queue-70ea549e1943576b)
+  Executable unittests src/bin/spike_tls_probe.rs (/private/tmp/lingxi-r07-build/debug/deps/spike_tls_probe-86bd72a0b0c6b06c)
+  Executable unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_test_guard-ac2e9f1aeb4fe0ca)
+  Executable unittests src/main.rs (/private/tmp/lingxi-r07-build/debug/deps/xtask-c25c176228694169)

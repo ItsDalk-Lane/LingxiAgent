@@ -1,0 +1,34 @@
+{
+ "stage": "R07-T06",
+ "purpose": "candidate_gate",
+ "candidate": "t06b",
+ "label": "t06b-pdf-chromium",
+ "command": [
+  "/Users/study_superior/.cargo/bin/cargo",
+  "test",
+  "--manifest-path",
+  "rust/Cargo.toml",
+  "--locked",
+  "-p",
+  "lingxi-adapters",
+  "--test",
+  "r07_pdf_chromium",
+  "--",
+  "--include-ignored",
+  "--test-threads=1",
+  "--nocapture"
+ ],
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "manifestFingerprintBefore": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintAfter": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintMatchesCandidate": true,
+ "exitCode": 0,
+ "durationSec": 70.3,
+ "logSha256": "40fbd34c0606314f80825ddadd34b701faed22cbf7d26e2fea5005cc819e777a"
+}

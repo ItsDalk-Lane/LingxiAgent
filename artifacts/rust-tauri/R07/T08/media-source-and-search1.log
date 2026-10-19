@@ -1,0 +1,126 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: method `provider_overlay` is never used
+   --> crates/lingxi-service/src/agent_config_readback.rs:142:19
+    |
+140 | impl ProviderCatalog {
+    | -------------------- method in this implementation
+141 |     /// 管理面读取单个供应商的目录 overlay（媒体模型写回的读取半步）。
+142 |     pub(crate) fn provider_overlay(&self, provider_id: &str) -> Option<&Value> {
+    |                   ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 11s
+     Running tests/r07_media_admin.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_media_admin-03277e4bffb0903b)
+
+running 10 tests
+test r07_media_admin::read_only_session_generate_is_forbidden_without_dispatch ... ok
+test r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty ... ok
+test r07_media_admin::http_video_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown ... ok
+test r07_media_admin::ask_mode_waits_for_real_decision_and_blocks_concurrent_admission ... ok
+test r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files ... ok
+test r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity ... ok
+test r07_media_admin::direct_media_action_waiting_for_approval_honors_cancel_and_live_plugin_revocation ... ok
+test r07_media_admin::admin_models_config_and_asr_preferences_roundtrip ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.93s
+
+     Running tests/r07_t05_media.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media-6811cc17b97d0298)
+
+running 11 tests
+test r07_media::untrusted_media_arguments_cannot_choose_credentials_or_paths_or_drop_wrong_typed_overrides ... ok
+test r07_media::describe_options_uses_actual_config_and_existing_provider_modes_without_submitting ... ok
+test r07_media::confirmed_supplier_failure_remains_failed_and_finishes_the_actual_execution_run ... ok
+test r07_media::disabling_the_plugin_after_parent_completion_cancels_real_background_and_blocks_delivery ... ok
+test r07_media::speech_delivers_real_audio_bytes_and_keeps_the_media_job_causal_run ... ok
+test r07_media::duplicate_user_request_reuses_real_run_and_does_not_create_another_generation ... ok
+test r07_media::image_approval_starts_a_distinct_real_run_and_delivers_owned_session_file ... ok
+test r07_media::stopping_a_submitted_job_does_not_claim_remote_cancellation_or_deliver_late_bytes ... ok
+test r07_media::restart_reopens_real_storage_and_queries_known_remote_without_resubmitting ... ok
+test r07_media::video_uses_real_submit_query_download_and_session_delivery_stages ... ok
+test r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.68s
+
+     Running tests/r07_t08_media_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_media_source-c86773c2b2454f44)
+
+running 2 tests
+test media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption ... FAILED
+test media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model ... FAILED
+
+failures:
+
+---- media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption stdout ----
+媒体唯一Source现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-media-source-c63e82a3fec23f7a
+媒体唯一Source现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-media-source-c63e82a3fec23f7a
+
+thread 'media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption' (2763926) panicked at crates/lingxi-service/tests/r07_t08_media_source.rs:530:9:
+assertion `left == right` failed: {"code":"model_projection_unconfirmed","details":{"requestId":"req-2bb42697caf9a327229bf8829d084a05"},"error":"Unsupported provider catalog version: null","result":{"activated":true,"applied":true,"auditRecorded":false,"clearedBindings":[],"generation":"2","projectionConfirmed":false,"saved":true}}
+  left: 500
+ right: 200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model stdout ----
+媒体唯一Source现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-media-source-49e07387292d4d15
+LINGXI_AUTH_REJECTED request_id="req-ebd7915d7f0fc9813dad75ecdfd9eaad" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:55079
+
+thread 'media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model' (2763927) panicked at crates/lingxi-service/tests/r07_t08_media_source.rs:589:10:
+called `Result::unwrap()` on an `Err` value: Elapsed(())
+
+
+failures:
+    media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption
+    media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.69s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_media_source`
+     Running tests/r07_t08_model_authority.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_authority-39fcc141373617fa)
+
+running 5 tests
+test real_http_reload_revalidates_replaced_local_token_after_actual_mutation_queue ... ok
+test real_http_web_session_save_revalidates_logout_after_actual_mutation_queue ... ok
+test real_http_device_model_save_revalidates_again_at_filesafety_atomic_authorization ... ok
+test real_http_device_model_save_revalidates_revocation_after_actual_mutation_queue ... ok
+test real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.05s
+
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 10 tests
+test malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address ... ok
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... ok
+test malformed_headers_never_clear_saved_settings_or_publish_a_generation ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.73s
+
+     Running tests/r07_t08_search_clear.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_search_clear-fb4d90632c8b5377)
+
+running 3 tests
+test legacy_search_api_key_empty_and_null_clear_only_the_selected_provider_and_survive_restart ... ok
+test per_provider_search_clear_of_inactive_key_preserves_active_key_and_never_borrows_it_after_switch ... ok
+test per_provider_search_clear_empty_and_null_remove_the_selected_key_without_legacy_resurrection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.62s
+
+     Running tests/r07_t08_speech_bindings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_speech_bindings-7c18d412cc308b2a)
+
+running 2 tests
+test http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage ... ok
+test http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.45s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_media_source`

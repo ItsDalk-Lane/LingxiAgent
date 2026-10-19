@@ -1,0 +1,323 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T09:04:15.189178+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08d",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprint": "ce4642863c79eaa2d15dedff7c579b56649a9bc2c4cf133e6647faa70879664b",
+  "finalAcceptance": "FAILED",
+  "aggregateResultSha256": "d5b6ba1653d445af4edb1127082cfd35fd667b83592a144a29110b3d9ca2a0f7",
+  "gateSummary": {
+    "total": 20,
+    "passed": 18,
+    "failed": 2,
+    "notRun": 0
+  },
+  "independentlyCheckedAll20ReceiptLogHashesCommandsAndSourceBindings": true,
+  "verifiedGates": [
+    {
+      "gate": "fmt",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "diff",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "clippy",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "protocol",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "protocol-roundtrip",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "protocol-tests",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "kernel",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "boundaries",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "adapter",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "service",
+      "exitCode": 101,
+      "status": "FAIL",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "model-regression",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "native-skills",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "native-picker-binding",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "skills-current",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "build",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "ui",
+      "exitCode": 1,
+      "status": "FAIL",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "types",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "card-navigation-desktop",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "card-navigation-mobile",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    },
+    {
+      "gate": "metadata-redaction-binary",
+      "exitCode": 0,
+      "status": "PASS",
+      "receiptSha256Matches": true,
+      "logSha256Matches": true,
+      "sourceFingerprintMatches": true,
+      "sourceUnchanged": true,
+      "verificationToolsUnchanged": true,
+      "commandMatchesPlan": true
+    }
+  ],
+  "verifiedFourFreshBuildBindings": [
+    {
+      "gate": "ui",
+      "bindingReceiptSha256": "db3f19f64f1195b574fc86de6f2b9f48afaf97500fae33d5e2cf033b10f6d833",
+      "binarySha256MatchesBeforeAfterAndBuild": true,
+      "buildReceiptSha256Matches": true,
+      "gateReceiptSha256Matches": true,
+      "wrapperSha256MatchesFrozen": true,
+      "wrapperExitCode": 1
+    },
+    {
+      "gate": "card-navigation-desktop",
+      "bindingReceiptSha256": "9618136792796de347f1055c6ce49d516c2bbb072cbe665bad22cf9fa3347c98",
+      "binarySha256MatchesBeforeAfterAndBuild": true,
+      "buildReceiptSha256Matches": true,
+      "gateReceiptSha256Matches": true,
+      "wrapperSha256MatchesFrozen": true,
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "card-navigation-mobile",
+      "bindingReceiptSha256": "4d1c8f614a0c7587598f0b4aa8a4d1c9498cd369bdb61c22bdf9799676c4e2b8",
+      "binarySha256MatchesBeforeAfterAndBuild": true,
+      "buildReceiptSha256Matches": true,
+      "gateReceiptSha256Matches": true,
+      "wrapperSha256MatchesFrozen": true,
+      "wrapperExitCode": 0
+    },
+    {
+      "gate": "metadata-redaction-binary",
+      "bindingReceiptSha256": "6528d24ce1e415ca4855f307ddb3c8a9ce90b7fddfa5904125da39920d5a458f",
+      "binarySha256MatchesBeforeAfterAndBuild": true,
+      "buildReceiptSha256Matches": true,
+      "gateReceiptSha256Matches": true,
+      "wrapperSha256MatchesFrozen": true,
+      "wrapperExitCode": 0
+    }
+  ],
+  "serviceCaseSummary": {
+    "actualTargetSummariesParsed": 34,
+    "passed": 877,
+    "failed": 2,
+    "ignored": 0,
+    "failures": [
+      "real_ws_resume_recovers_exact_missing_events_and_marks_stale_or_empty: missing terminal projection precondition; last replay event isStreaming Null!=false after final text/sequence passed",
+      "native_current_app_pages_side_preview_attachment_and_model_response_generation: AppPages native UI report null; independent readiness diagnosis in progress"
+    ],
+    "all648LibAndOriginalManagementLANAnd25AuthTestsPassedThisCandidate": true,
+    "priorLANFailureRootCause": "UNRESOLVED; unchanged code/network success does not establish original cause fixed"
+  },
+  "uiCaseSummary": {
+    "files": 65,
+    "passedFiles": 63,
+    "failedFiles": 2,
+    "passedCases": 538,
+    "failedCases": 2,
+    "failures": [
+      "OAuthCredentials.test.tsx requests explicit browser login method: API mock missing current lingxiFetchJson entry",
+      "R07BridgeRustUI.test.tsx session details: new media/jobs route absent in own network mock"
+    ]
+  },
+  "otherVerifiedFacts": [
+    "Formal native-skills and exact same-artifact native picker binding both ran and passed in order; no claim of repeated manual CUA",
+    "Desktop and mobile card navigation collector count0, actual exit0 and cleanup materials saved",
+    "Fresh production metadata probe saved/applied true and actual Source name change, all3 views no known secret, ordinary extension retained, binary unchanged and shutdown0"
+  ],
+  "prematurePostbuildAttempts": {
+    "receipt": "t08d-postbuild-premature-start1.json",
+    "sha256": "255b14bfede57e9027db7886dc2aa098b021104b9eadb0a04978ec4115a2ce98",
+    "classification": "ORCHESTRATION_PRECONDITION_REJECTED_NOT_RUN",
+    "attemptCount": 4,
+    "allFourProductCommandsNotExecuted": true,
+    "rawOutputStandalone": "NOT_SAVED; receipt states limitation",
+    "compositeOuterExit0NotPass": true,
+    "laterActualProductResultsIndependent": true
+  },
+  "sourceAtClosureScope": "All20 original receipts bind identical frozen source and helpers before/after; archive was independently checked at freeze. Current source is intentionally unfrozen for successor repair, so this report does not assert current workspace still equals d.",
+  "repairSourceReadReviewAtThisTime": {
+    "status": "PARTIAL_SOURCE_DRAFT_REVIEW_NO_RUN",
+    "resumeFixture": "Current first patch establishes actual same-session/same-stream terminal WS status plus DB terminal within original5s budget, then retains original exact tail/sequence assertions. This correctly makes full-final-tail precondition explicit.",
+    "otherPatches": "NativeAppPages readiness/UI mock/one actual consumer case still being authored; no passing claim"
+  },
+  "nextRequirement": "Complete necessary fixes, freeze successor and rerun complete applicable gates; do not combine d18 passes with successor partial passes into full acceptance. Named leaf assertions remain separately evidence-mapped.",
+  "reviewerMutations": "Only this independent evidence file; no source/plan/tool changes and no Cargo/GUI"
+}

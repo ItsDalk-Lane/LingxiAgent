@@ -712,3 +712,80 @@ async fn original_skills_settings_and_panel_current_real_service_projection() {
     assert_eq!(prefs["learn_skills"]["enabled"], false);
     h.close().await;
 }
+
+/// 真实权限拒读与部分写入：浏览器只更换请求凭证输入，不伪造服务响应。
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn current_skills_pages_real_read_failures_and_partial_bundle_writes() {
+    let h = Harness::boot().await;
+    for surface in ["settings", "panel"] {
+        let source = h.package(&format!("{surface}-boundary-skill"));
+        let (status, installed) = h
+            .request(
+                "POST",
+                "/lingxi/v1/skills/install?agentId=agentA",
+                json!({"path":source}),
+                false,
+            )
+            .await;
+        assert_eq!(status, 200, "{installed}");
+    }
+    let chat_only = h
+        .state
+        .auth()
+        .issue_device_credential(lingxi_service::LOCAL_OWNER_USER_ID, &["chat"], None)
+        .unwrap();
+    let repo = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../..")
+        .canonicalize()
+        .unwrap();
+    let evidence = h.home.join("skills-boundary-evidence");
+    std::fs::create_dir(&evidence).unwrap();
+    let receipt = evidence.join("receipt.jsonl");
+    let output = tokio::process::Command::new("node")
+        .arg(repo.join("node_modules/vitest/vitest.mjs"))
+        .args([
+            "run",
+            "desktop/src/react/settings/__tests__/R07SkillsFailureBoundariesLive.test.tsx",
+        ])
+        .current_dir(&repo)
+        .env("R07_SKILLS_URL", &h.url)
+        .env("R07_SKILLS_TOKEN", &h.token)
+        .env("R07_SKILLS_CHAT_ONLY", &chat_only.secret)
+        .env("R07_SKILLS_RECEIPT", &receipt)
+        .env("R07_SKILLS_BUNDLE_FILE", h.home.join("skill-bundles.json"))
+        .output()
+        .await
+        .unwrap();
+    std::fs::write(evidence.join("stdout.log"), &output.stdout).unwrap();
+    std::fs::write(evidence.join("stderr.log"), &output.stderr).unwrap();
+    assert!(
+        output.status.success(),
+        "真实技能边界页面失败；现场={}\n{}\n{}",
+        h.home.display(),
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let receipts: Vec<Value> = std::fs::read_to_string(&receipt)
+        .unwrap()
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(receipts.len(), 6);
+    let disk: Value =
+        serde_json::from_slice(&std::fs::read(h.home.join("skill-bundles.json")).unwrap()).unwrap();
+    for surface in ["settings", "panel"] {
+        let source_name = format!("{surface}-source");
+        let target_name = format!("{surface}-target");
+        let bundles = disk["bundles"].as_array().unwrap();
+        let source = bundles
+            .iter()
+            .find(|row| row["name"] == source_name)
+            .unwrap();
+        assert_eq!(source["skillNames"], json!([]));
+        assert!(!bundles.iter().any(|row| row["name"] == target_name));
+        assert!(receipts.iter().any(|row| row["name"]
+            == format!("{surface}-old-lists-and-partial-write")
+            && row["facts"]["changedConnectionHidesOldData"] == true));
+    }
+    h.close().await;
+}

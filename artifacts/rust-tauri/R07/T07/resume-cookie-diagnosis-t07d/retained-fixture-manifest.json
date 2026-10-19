@@ -1,0 +1,4106 @@
+{
+  "root": "/private/tmp/lingxi-r07-tests/tmp/lingxi-browser-b95a38d6748d6bcf6fb43e38e07c1257",
+  "enumeratedAt": "2026-10-18T03:41:35.193191+00:00",
+  "entries": [
+    {
+      "path": "aux",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294751314746607,
+      "birthAt": "2026-10-18T03:39:07.112013+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "downloads",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294748961287367,
+      "birthAt": "2026-10-18T03:39:07.111324+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "downloads/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294747147257611,
+      "birthAt": "2026-10-18T03:39:07.147258+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "downloads/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294748961131616,
+      "birthAt": "2026-10-18T03:39:08.961132+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294748493327244,
+      "birthAt": "2026-10-18T03:39:07.111161+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc",
+      "bytes": 672,
+      "mode": 448,
+      "mtimeNs": 1792294752149987309,
+      "birthAt": "2026-10-18T03:39:07.112441+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/ChromeFeatureState",
+      "bytes": 277,
+      "mode": 420,
+      "mtimeNs": 1792294751874425092,
+      "birthAt": "2026-10-18T03:39:07.589777+00:00",
+      "type": "file",
+      "sha256": "32a57afb1616340d02c291bc788420b3ba59857c074040f9ade113afae69f876"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default",
+      "bytes": 1984,
+      "mode": 448,
+      "mtimeNs": 1792294752150581021,
+      "birthAt": "2026-10-18T03:39:07.112745+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Account Web Data",
+      "bytes": 77824,
+      "mode": 384,
+      "mtimeNs": 1792294748457465396,
+      "birthAt": "2026-10-18T03:39:08.327328+00:00",
+      "type": "file",
+      "sha256": "e57088cd4f5a11347065520691ac0ad5f86cf902c98e6c70539a3673d2b54d8d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Account Web Data-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748461906840,
+      "birthAt": "2026-10-18T03:39:08.347096+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Affiliation Database",
+      "bytes": 53248,
+      "mode": 384,
+      "mtimeNs": 1792294747984892994,
+      "birthAt": "2026-10-18T03:39:07.642553+00:00",
+      "type": "file",
+      "sha256": "52b369ae1ac4db15be400b8d45b01d9e4c4054299fd3743f811e785a6abcbe3a"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Affiliation Database-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747985110329,
+      "birthAt": "2026-10-18T03:39:07.665929+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/BookmarkMergedSurfaceOrdering",
+      "bytes": 4,
+      "mode": 384,
+      "mtimeNs": 1792294751407469060,
+      "birthAt": "2026-10-18T03:39:11.398819+00:00",
+      "type": "file",
+      "sha256": "d914176fd50bd7f565700006a31aa97b79d3ad17cee20c8e5ff2061d5cb74817"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294747653418805,
+      "birthAt": "2026-10-18T03:39:07.640945+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/Cache_Data",
+      "bytes": 192,
+      "mode": 448,
+      "mtimeNs": 1792294752109307888,
+      "birthAt": "2026-10-18T03:39:07.644822+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/Cache_Data/3f161ac7d4379a52_0",
+      "bytes": 795,
+      "mode": 384,
+      "mtimeNs": 1792294750540652828,
+      "birthAt": "2026-10-18T03:39:10.526624+00:00",
+      "type": "file",
+      "sha256": "720066f0f8326e591330e016bae4e80cdd7eb698e9a26a2cd5bf404bccc54516"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/Cache_Data/a10a61a69fce02e5_0",
+      "bytes": 789,
+      "mode": 384,
+      "mtimeNs": 1792294748361516923,
+      "birthAt": "2026-10-18T03:39:08.320340+00:00",
+      "type": "file",
+      "sha256": "b73a071068dbb067a536bfaf4caa5649bd8dd33005f543b2544d85303bdb11a1"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/Cache_Data/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294748074013383,
+      "birthAt": "2026-10-18T03:39:08.073680+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/Cache_Data/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294751379277759,
+      "birthAt": "2026-10-18T03:39:08.074977+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/Cache_Data/index-dir/the-real-index",
+      "bytes": 120,
+      "mode": 384,
+      "mtimeNs": 1792294751353522724,
+      "birthAt": "2026-10-18T03:39:11.351218+00:00",
+      "type": "file",
+      "sha256": "052219f7165f71922b5eaa943e9a802ac41f07b79950189693a23fb83bc473b6"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/No_Vary_Search",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294751936296644,
+      "birthAt": "2026-10-18T03:39:07.650229+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/No_Vary_Search/journal.baj",
+      "bytes": 4,
+      "mode": 384,
+      "mtimeNs": 1792294751936615396,
+      "birthAt": "2026-10-18T03:39:11.936286+00:00",
+      "type": "file",
+      "sha256": "9c169428d852e25bd59b27652ed533d2a1f09f96e4c329fa5e06f47e16731543"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cache/No_Vary_Search/snapshot.baf",
+      "bytes": 20,
+      "mode": 384,
+      "mtimeNs": 1792294748112049869,
+      "birthAt": "2026-10-18T03:39:08.102640+00:00",
+      "type": "file",
+      "sha256": "0c2dd377ed0cc66161e9db8f89f7d8bcb3ad8c06c4a054bdcba214ab05f58c9a"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/ClientCertificates",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751895900393,
+      "birthAt": "2026-10-18T03:39:07.643904+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/ClientCertificates/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747675374692,
+      "birthAt": "2026-10-18T03:39:07.675375+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/ClientCertificates/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751895897934,
+      "birthAt": "2026-10-18T03:39:11.895898+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/ClientCertificates/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750324894109,
+      "birthAt": "2026-10-18T03:39:10.324894+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294747644474500,
+      "birthAt": "2026-10-18T03:39:07.641531+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/js",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294748305801410,
+      "birthAt": "2026-10-18T03:39:07.642631+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/js/ba678a2fbd8c358c_0",
+      "bytes": 298,
+      "mode": 384,
+      "mtimeNs": 1792294748353377539,
+      "birthAt": "2026-10-18T03:39:08.303417+00:00",
+      "type": "file",
+      "sha256": "d482b290fd061fbab796d82e8fdf852ab13c91cc893b477cd04c82909ab57c1c"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/js/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294747653786350,
+      "birthAt": "2026-10-18T03:39:07.644801+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/js/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749802736190,
+      "birthAt": "2026-10-18T03:39:07.655101+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/js/index-dir/the-real-index",
+      "bytes": 72,
+      "mode": 384,
+      "mtimeNs": 1792294749796709319,
+      "birthAt": "2026-10-18T03:39:09.789922+00:00",
+      "type": "file",
+      "sha256": "71aad2224c43586c2f2fa2d5ff4e707f9d86d5443ad8e8fbf22711d782ce0dbd"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/wasm",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294747672799385,
+      "birthAt": "2026-10-18T03:39:07.643553+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/wasm/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294747663847120,
+      "birthAt": "2026-10-18T03:39:07.658364+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/wasm/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294748961489826,
+      "birthAt": "2026-10-18T03:39:07.669404+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Code Cache/wasm/index-dir/the-real-index",
+      "bytes": 48,
+      "mode": 384,
+      "mtimeNs": 1792294747712309839,
+      "birthAt": "2026-10-18T03:39:07.692378+00:00",
+      "type": "file",
+      "sha256": "b62d114bdb3a1573eddd98d6319126df2b9f69c8d8d1be3a463d97b99dc8fc51"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cookies",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294749810613406,
+      "birthAt": "2026-10-18T03:39:08.064047+00:00",
+      "type": "file",
+      "sha256": "30fdf110a931947a73787c7dbbab5fafc9524fe54b7a418ba71886a71a495b36"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Cookies-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749814633306,
+      "birthAt": "2026-10-18T03:39:08.065801+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnGraphiteCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294748685054564,
+      "birthAt": "2026-10-18T03:39:08.646421+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnGraphiteCache/data_0",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748683701722,
+      "birthAt": "2026-10-18T03:39:08.683526+00:00",
+      "type": "file",
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnGraphiteCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751331284668,
+      "birthAt": "2026-10-18T03:39:08.683933+00:00",
+      "type": "file",
+      "sha256": "b1e963d702392fb7224786e7d56d43973e9b9efd1b89c17814d7c558ffc0cdec"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnGraphiteCache/data_2",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748684803437,
+      "birthAt": "2026-10-18T03:39:08.684553+00:00",
+      "type": "file",
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnGraphiteCache/data_3",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748685268273,
+      "birthAt": "2026-10-18T03:39:08.684988+00:00",
+      "type": "file",
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnGraphiteCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294748683093968,
+      "birthAt": "2026-10-18T03:39:08.652344+00:00",
+      "type": "file",
+      "sha256": "6e801757b35046df69c1dbe83c3f4333a012634dd35399678a30cb8fed765bb1"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnWebGPUCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294748607649707,
+      "birthAt": "2026-10-18T03:39:08.520095+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnWebGPUCache/data_0",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748569057924,
+      "birthAt": "2026-10-18T03:39:08.556837+00:00",
+      "type": "file",
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnWebGPUCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751331158751,
+      "birthAt": "2026-10-18T03:39:08.571835+00:00",
+      "type": "file",
+      "sha256": "b1e963d702392fb7224786e7d56d43973e9b9efd1b89c17814d7c558ffc0cdec"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnWebGPUCache/data_2",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748600822456,
+      "birthAt": "2026-10-18T03:39:08.585026+00:00",
+      "type": "file",
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnWebGPUCache/data_3",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748634846918,
+      "birthAt": "2026-10-18T03:39:08.607351+00:00",
+      "type": "file",
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/DawnWebGPUCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294748549905555,
+      "birthAt": "2026-10-18T03:39:08.520844+00:00",
+      "type": "file",
+      "sha256": "770f195e17742798087fd028bf4e586ca8be9250e03e0c4eb5876be2790d83c8"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Device Bound Sessions",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294748044891743,
+      "birthAt": "2026-10-18T03:39:08.033751+00:00",
+      "type": "file",
+      "sha256": "78a06f4f93849b88f0489d00c0389205bc9d5389608c6918549df4db668d783f"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Device Bound Sessions-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748055662018,
+      "birthAt": "2026-10-18T03:39:08.037517+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Rules",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294748082001766,
+      "birthAt": "2026-10-18T03:39:07.720404+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Rules/000003.log",
+      "bytes": 57,
+      "mode": 384,
+      "mtimeNs": 1792294748748742834,
+      "birthAt": "2026-10-18T03:39:08.081932+00:00",
+      "type": "file",
+      "sha256": "99c59cbe7db56d56a286485635e4467004641c6275e708887dd35728eb05109a"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Rules/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294747896427777,
+      "birthAt": "2026-10-18T03:39:07.881444+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Rules/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747775202438,
+      "birthAt": "2026-10-18T03:39:07.775203+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Rules/LOG",
+      "bytes": 489,
+      "mode": 384,
+      "mtimeNs": 1792294748076464023,
+      "birthAt": "2026-10-18T03:39:07.758142+00:00",
+      "type": "file",
+      "sha256": "913fb2a86885cac5098cad1bc1dfe9410fec7b387799a632c04214cf806db90d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Rules/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294747859039752,
+      "birthAt": "2026-10-18T03:39:07.835258+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Scripts",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294748732589776,
+      "birthAt": "2026-10-18T03:39:08.098146+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Scripts/000003.log",
+      "bytes": 57,
+      "mode": 384,
+      "mtimeNs": 1792294748748774168,
+      "birthAt": "2026-10-18T03:39:08.732358+00:00",
+      "type": "file",
+      "sha256": "99c59cbe7db56d56a286485635e4467004641c6275e708887dd35728eb05109a"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Scripts/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294748256534270,
+      "birthAt": "2026-10-18T03:39:08.232806+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Scripts/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748162763977,
+      "birthAt": "2026-10-18T03:39:08.162764+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Scripts/LOG",
+      "bytes": 493,
+      "mode": 384,
+      "mtimeNs": 1792294748726987991,
+      "birthAt": "2026-10-18T03:39:08.138919+00:00",
+      "type": "file",
+      "sha256": "5e2073a3ec7e9e491250d60b35c2d4adfd3c609c36c888788ff4996ffec7bb38"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension Scripts/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294748206267873,
+      "birthAt": "2026-10-18T03:39:08.180603+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294751936734855,
+      "birthAt": "2026-10-18T03:39:08.750889+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State/000003.log",
+      "bytes": 171,
+      "mode": 384,
+      "mtimeNs": 1792294748897452802,
+      "birthAt": "2026-10-18T03:39:08.896872+00:00",
+      "type": "file",
+      "sha256": "14f92b911f9fe774720461eec5bb4761ae6bfc9445c67e30bf624a8694b4b1da"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294748759727861,
+      "birthAt": "2026-10-18T03:39:08.759031+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748753209862,
+      "birthAt": "2026-10-18T03:39:08.753210+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State/LOG",
+      "bytes": 532,
+      "mode": 384,
+      "mtimeNs": 1792294751941043965,
+      "birthAt": "2026-10-18T03:39:11.936709+00:00",
+      "type": "file",
+      "sha256": "17356d696050f9661de367b85d2e73f76d03f278e84f9cea41ffcbb6c32940b2"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State/LOG.old",
+      "bytes": 532,
+      "mode": 384,
+      "mtimeNs": 1792294750363144472,
+      "birthAt": "2026-10-18T03:39:10.362717+00:00",
+      "type": "file",
+      "sha256": "dc8488fc050c8fb6133fbad733c63dc19fd3ff8ba7c51a234803e388acbd22da"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Extension State/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294748756950552,
+      "birthAt": "2026-10-18T03:39:08.755373+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Favicons",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294748012042122,
+      "birthAt": "2026-10-18T03:39:07.985990+00:00",
+      "type": "file",
+      "sha256": "1fbc7ea9722b2154b0d69c9d0ed80b6c0c98c5d389cf31ac1a2b8db030724840"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Favicons-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748012291123,
+      "birthAt": "2026-10-18T03:39:07.997431+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/GPUCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294748518868362,
+      "birthAt": "2026-10-18T03:39:08.379061+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/GPUCache/data_0",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748515967927,
+      "birthAt": "2026-10-18T03:39:08.515689+00:00",
+      "type": "file",
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/GPUCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751331017125,
+      "birthAt": "2026-10-18T03:39:08.516230+00:00",
+      "type": "file",
+      "sha256": "b1e963d702392fb7224786e7d56d43973e9b9efd1b89c17814d7c558ffc0cdec"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/GPUCache/data_2",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748518476443,
+      "birthAt": "2026-10-18T03:39:08.517255+00:00",
+      "type": "file",
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/GPUCache/data_3",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294748519573325,
+      "birthAt": "2026-10-18T03:39:08.518774+00:00",
+      "type": "file",
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/GPUCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294748515159547,
+      "birthAt": "2026-10-18T03:39:08.400301+00:00",
+      "type": "file",
+      "sha256": "92d7ccbebaa9402c297b76cb4c30a200aac8adfb6e1001fa26a003e6acb69675"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/History",
+      "bytes": 204800,
+      "mode": 384,
+      "mtimeNs": 1792294751349897951,
+      "birthAt": "2026-10-18T03:39:07.638994+00:00",
+      "type": "file",
+      "sha256": "e7e3940bdf19af87e7b3bb5beb47321537d357091689ffaf8274839a5911aa9e"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/History-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751351315876,
+      "birthAt": "2026-10-18T03:39:07.653069+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747732407422,
+      "birthAt": "2026-10-18T03:39:07.732407+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751901582803,
+      "birthAt": "2026-10-18T03:39:11.901583+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750334517169,
+      "birthAt": "2026-10-18T03:39:10.334517+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294747851574247,
+      "birthAt": "2026-10-18T03:39:07.829552+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294751940847798,
+      "birthAt": "2026-10-18T03:39:07.844952+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb/000003.log",
+      "bytes": 30,
+      "mode": 384,
+      "mtimeNs": 1792294748149384019,
+      "birthAt": "2026-10-18T03:39:08.103352+00:00",
+      "type": "file",
+      "sha256": "8bd2ea70a0b70c91de138a5b87c7936c6a6fa7c4275c54b97f4ef0ccc5b79bb4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294747964511409,
+      "birthAt": "2026-10-18T03:39:07.923318+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747876147442,
+      "birthAt": "2026-10-18T03:39:07.876148+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb/LOG",
+      "bytes": 544,
+      "mode": 384,
+      "mtimeNs": 1792294751951640157,
+      "birthAt": "2026-10-18T03:39:11.940819+00:00",
+      "type": "file",
+      "sha256": "2d7c306026a7d5b429ebb0d5dfa594d9fd5609e4f82c19afa57629866d7068c4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb/LOG.old",
+      "bytes": 544,
+      "mode": 384,
+      "mtimeNs": 1792294750363468849,
+      "birthAt": "2026-10-18T03:39:10.361975+00:00",
+      "type": "file",
+      "sha256": "a9f7f15f8c210f8d043578c09b0c4e2ffadce32680eb3a74553493aaf3e96512"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Local Storage/leveldb/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294747912611961,
+      "birthAt": "2026-10-18T03:39:07.893155+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Login Data",
+      "bytes": 40960,
+      "mode": 384,
+      "mtimeNs": 1792294748074843763,
+      "birthAt": "2026-10-18T03:39:08.028680+00:00",
+      "type": "file",
+      "sha256": "869676a006de3214994dedee2318ece6fbf55a4afc42b551ce065bb35265f8d1"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Login Data For Account",
+      "bytes": 40960,
+      "mode": 384,
+      "mtimeNs": 1792294748079919670,
+      "birthAt": "2026-10-18T03:39:08.039742+00:00",
+      "type": "file",
+      "sha256": "869676a006de3214994dedee2318ece6fbf55a4afc42b551ce065bb35265f8d1"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Login Data For Account-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748083990278,
+      "birthAt": "2026-10-18T03:39:08.042477+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Login Data-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748087010839,
+      "birthAt": "2026-10-18T03:39:08.042658+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Network Persistent State",
+      "bytes": 111,
+      "mode": 384,
+      "mtimeNs": 1792294749803626404,
+      "birthAt": "2026-10-18T03:39:09.796968+00:00",
+      "type": "file",
+      "sha256": "88c9590388d22bb0bd8da3f7d50389311957024ee5c2dfe562e2649ad427fd7d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/PersistentOriginTrials",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751901948722,
+      "birthAt": "2026-10-18T03:39:07.703106+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/PersistentOriginTrials/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747733123594,
+      "birthAt": "2026-10-18T03:39:07.733124+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/PersistentOriginTrials/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751901921555,
+      "birthAt": "2026-10-18T03:39:11.901922+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/PersistentOriginTrials/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750334660462,
+      "birthAt": "2026-10-18T03:39:10.334661+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Preferences",
+      "bytes": 7943,
+      "mode": 384,
+      "mtimeNs": 1792294752145910950,
+      "birthAt": "2026-10-18T03:39:12.145794+00:00",
+      "type": "file",
+      "sha256": "d77bd78ee50289e8f75cc64c4b4eb9e04cc17417aefcb623c3d14cc2f4c0b244"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Reporting and NEL",
+      "bytes": 36864,
+      "mode": 384,
+      "mtimeNs": 1792294748475114798,
+      "birthAt": "2026-10-18T03:39:08.270220+00:00",
+      "type": "file",
+      "sha256": "2d6dada0da20730019917ab502a8189099aa5ad98a1b23cd30715d6f9689ef11"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Reporting and NEL-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748476080595,
+      "birthAt": "2026-10-18T03:39:08.287428+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Secure Preferences",
+      "bytes": 13489,
+      "mode": 384,
+      "mtimeNs": 1792294752149149928,
+      "birthAt": "2026-10-18T03:39:12.149051+00:00",
+      "type": "file",
+      "sha256": "76d4b0775fd5f24f83e4a25a86044ffc23ff9cc6cfca7e288664c817d484f227"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294747893103089,
+      "birthAt": "2026-10-18T03:39:07.692601+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SegmentInfoDB",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751901420302,
+      "birthAt": "2026-10-18T03:39:07.727644+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SegmentInfoDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747788474563,
+      "birthAt": "2026-10-18T03:39:07.788475+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SegmentInfoDB/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751901416885,
+      "birthAt": "2026-10-18T03:39:11.901417+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SegmentInfoDB/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750334217292,
+      "birthAt": "2026-10-18T03:39:10.334217+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalDB",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751901906055,
+      "birthAt": "2026-10-18T03:39:07.814093+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747872709254,
+      "birthAt": "2026-10-18T03:39:07.872709+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalDB/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751901898888,
+      "birthAt": "2026-10-18T03:39:11.901899+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalDB/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750334534711,
+      "birthAt": "2026-10-18T03:39:10.334535+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalStorageConfigDB",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751902242932,
+      "birthAt": "2026-10-18T03:39:07.891134+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalStorageConfigDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747922314271,
+      "birthAt": "2026-10-18T03:39:07.922314+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalStorageConfigDB/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751902240974,
+      "birthAt": "2026-10-18T03:39:11.902241+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Segmentation Platform/SignalStorageConfigDB/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750334817171,
+      "birthAt": "2026-10-18T03:39:10.334817+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/ServerCertificate",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294747703271699,
+      "birthAt": "2026-10-18T03:39:07.640892+00:00",
+      "type": "file",
+      "sha256": "180ffbc2a4f10b5563f5a7bfe62d23909f0aa77572a06e59a9be4c6fca7176f7"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/ServerCertificate-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747706162217,
+      "birthAt": "2026-10-18T03:39:07.643279+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294748452688241,
+      "birthAt": "2026-10-18T03:39:08.431242+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294751894487717,
+      "birthAt": "2026-10-18T03:39:08.450724+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database/000003.log",
+      "bytes": 1263,
+      "mode": 384,
+      "mtimeNs": 1792294748765877358,
+      "birthAt": "2026-10-18T03:39:08.726985+00:00",
+      "type": "file",
+      "sha256": "fc8b8eecc2f82d48e1ab3a44d12c6024c9ab9c8e45bef93ca7c65e19f1af9b8f"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294748490870021,
+      "birthAt": "2026-10-18T03:39:08.488523+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748475338841,
+      "birthAt": "2026-10-18T03:39:08.475339+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database/LOG",
+      "bytes": 548,
+      "mode": 384,
+      "mtimeNs": 1792294751895300389,
+      "birthAt": "2026-10-18T03:39:11.894484+00:00",
+      "type": "file",
+      "sha256": "e42b33ae85e15faf3a61f4c71291acdbd99416c676d1fd4b370c803b7e3a04b6"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database/LOG.old",
+      "bytes": 548,
+      "mode": 384,
+      "mtimeNs": 1792294750324434315,
+      "birthAt": "2026-10-18T03:39:10.323906+00:00",
+      "type": "file",
+      "sha256": "a633b21f9f92c4a4d88978168de84c81d4eee5c7522ab2822af99e754831466f"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/Database/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294748482570052,
+      "birthAt": "2026-10-18T03:39:08.481787+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294748765108436,
+      "birthAt": "2026-10-18T03:39:08.452269+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache/2cc80dabc69f58b6_0",
+      "bytes": 472,
+      "mode": 384,
+      "mtimeNs": 1792294748751798812,
+      "birthAt": "2026-10-18T03:39:08.742200+00:00",
+      "type": "file",
+      "sha256": "7433e2de592bac3d53e34206cd580d140d107eae0defa146b238d209d3b34c87"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache/4cb013792b196a35_0",
+      "bytes": 10387,
+      "mode": 384,
+      "mtimeNs": 1792294748761033453,
+      "birthAt": "2026-10-18T03:39:08.757564+00:00",
+      "type": "file",
+      "sha256": "9bfcd210dc08c82ce5d351f0b2e015d246be763173e1310cc3fe651d99c308aa"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache/4cb013792b196a35_1",
+      "bytes": 7177,
+      "mode": 384,
+      "mtimeNs": 1792294748765951858,
+      "birthAt": "2026-10-18T03:39:08.765046+00:00",
+      "type": "file",
+      "sha256": "84741a5024036a0ea97fd7f651b8f2e6ddcc41689e8d113589f2d5fe36710362"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294748466589203,
+      "birthAt": "2026-10-18T03:39:08.465317+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749788852562,
+      "birthAt": "2026-10-18T03:39:08.745481+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Service Worker/ScriptCache/index-dir/the-real-index",
+      "bytes": 96,
+      "mode": 384,
+      "mtimeNs": 1792294749788008515,
+      "birthAt": "2026-10-18T03:39:09.787262+00:00",
+      "type": "file",
+      "sha256": "aee08789d39b1bdf189b572b4b232321bb2e6192f936b31357e7cbc86963c3e4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Session Storage",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294750519419987,
+      "birthAt": "2026-10-18T03:39:10.514950+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Session Storage/000003.log",
+      "bytes": 68,
+      "mode": 384,
+      "mtimeNs": 1792294751325405840,
+      "birthAt": "2026-10-18T03:39:10.519414+00:00",
+      "type": "file",
+      "sha256": "bd25adf5d7bb8fa202eb194c0a1258f3f27d745f1cc562472baeb908ffc57f63"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Session Storage/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294750517538601,
+      "birthAt": "2026-10-18T03:39:10.517358+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Session Storage/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750515362920,
+      "birthAt": "2026-10-18T03:39:10.515363+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Session Storage/LOG",
+      "bytes": 489,
+      "mode": 384,
+      "mtimeNs": 1792294750519073277,
+      "birthAt": "2026-10-18T03:39:10.515156+00:00",
+      "type": "file",
+      "sha256": "e122e3d7ca0cf138bc2ef33f7f8bbca6c9b2ac734a38d0c14b7e7675278a26e0"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Session Storage/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294750515899549,
+      "birthAt": "2026-10-18T03:39:10.515785+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sessions",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751946165206,
+      "birthAt": "2026-10-18T03:39:08.066224+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sessions/Session_13436768349728925",
+      "bytes": 5606,
+      "mode": 384,
+      "mtimeNs": 1792294749763420445,
+      "birthAt": "2026-10-18T03:39:09.729075+00:00",
+      "type": "file",
+      "sha256": "e6eee7abad53186b5a69769fa4df3b5ed9bdfcebf77d12a4af1aed4a4391c228"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sessions/Session_13436768351316084",
+      "bytes": 4236,
+      "mode": 384,
+      "mtimeNs": 1792294751316366950,
+      "birthAt": "2026-10-18T03:39:11.316117+00:00",
+      "type": "file",
+      "sha256": "9f3aa86f1534e22dc2a3bce8c5aef4b45e23dee8b23078ac147aa51bd6ef06ac"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sessions/Tabs_13436768351347997",
+      "bytes": 4690,
+      "mode": 384,
+      "mtimeNs": 1792294751384180748,
+      "birthAt": "2026-10-18T03:39:11.348568+00:00",
+      "type": "file",
+      "sha256": "c93ccb9290f11845011956e9dd9d2079fe410d54031d6617e3274a01ec385161"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294748038189910,
+      "birthAt": "2026-10-18T03:39:07.664834+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary/cache",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294748038311702,
+      "birthAt": "2026-10-18T03:39:08.033548+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary/cache/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294748037399113,
+      "birthAt": "2026-10-18T03:39:08.036679+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary/cache/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294748070273484,
+      "birthAt": "2026-10-18T03:39:08.038130+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary/cache/index-dir/the-real-index",
+      "bytes": 48,
+      "mode": 384,
+      "mtimeNs": 1792294748039416167,
+      "birthAt": "2026-10-18T03:39:08.039178+00:00",
+      "type": "file",
+      "sha256": "f967a265a4b524686f0ea41788256826b702b52ccaf3b4d7f0c5718bccb6b731"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary/db",
+      "bytes": 45056,
+      "mode": 384,
+      "mtimeNs": 1792294748066525461,
+      "birthAt": "2026-10-18T03:39:08.034966+00:00",
+      "type": "file",
+      "sha256": "0d6287fecedbc44ed9f51ded9de88629ec9f385ecff5da9a34e47e96fd5a9cba"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Shared Dictionary/db-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748066663795,
+      "birthAt": "2026-10-18T03:39:08.038176+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294751896141894,
+      "birthAt": "2026-10-18T03:39:07.644517+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database/000003.log",
+      "bytes": 40,
+      "mode": 384,
+      "mtimeNs": 1792294748962188789,
+      "birthAt": "2026-10-18T03:39:08.961119+00:00",
+      "type": "file",
+      "sha256": "f096bc366a931fba656bdcd77b24af15a5f29fc53281a727c79f82c608ecfab8"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294747751075204,
+      "birthAt": "2026-10-18T03:39:07.703952+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747662730447,
+      "birthAt": "2026-10-18T03:39:07.662730+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database/LOG",
+      "bytes": 560,
+      "mode": 384,
+      "mtimeNs": 1792294751896583063,
+      "birthAt": "2026-10-18T03:39:11.896139+00:00",
+      "type": "file",
+      "sha256": "8ccac4dd11658bec911e962267807f65e8abd0ccb6ba6ea783a77c239e79aa41"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database/LOG.old",
+      "bytes": 560,
+      "mode": 384,
+      "mtimeNs": 1792294750325415571,
+      "birthAt": "2026-10-18T03:39:10.325000+00:00",
+      "type": "file",
+      "sha256": "77ac48ad79a7e5c2d140fffc445f72f7a72c2f12570db52547100176bb538cdf"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Site Characteristics Database/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294747688787234,
+      "birthAt": "2026-10-18T03:39:07.666499+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294747641543982,
+      "birthAt": "2026-10-18T03:39:07.638647+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294751893466627,
+      "birthAt": "2026-10-18T03:39:07.640965+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB/000003.log",
+      "bytes": 118,
+      "mode": 384,
+      "mtimeNs": 1792294748963305837,
+      "birthAt": "2026-10-18T03:39:08.961902+00:00",
+      "type": "file",
+      "sha256": "b201e50dd759e0c41786332abd0c141372955e9489cf632cc09100d1f46b3ac7"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294747713943807,
+      "birthAt": "2026-10-18T03:39:07.679528+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747649324072,
+      "birthAt": "2026-10-18T03:39:07.649324+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB/LOG",
+      "bytes": 536,
+      "mode": 384,
+      "mtimeNs": 1792294751894501801,
+      "birthAt": "2026-10-18T03:39:11.893464+00:00",
+      "type": "file",
+      "sha256": "cc3e7c522eda62a0ecaa103ee76d3ef7ddb9bda428f310d5273173c1f33d5c51"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB/LOG.old",
+      "bytes": 536,
+      "mode": 384,
+      "mtimeNs": 1792294750323733185,
+      "birthAt": "2026-10-18T03:39:10.323005+00:00",
+      "type": "file",
+      "sha256": "eee59c65540a6c3c82303eaab530ad5a3e2f3a5167189c46e8fc5c1076d1fcc7"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Sync Data/LevelDB/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294747663847537,
+      "birthAt": "2026-10-18T03:39:07.653260+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Top Sites",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294748306058328,
+      "birthAt": "2026-10-18T03:39:08.057831+00:00",
+      "type": "file",
+      "sha256": "6181b0653e3a55518b879cb4019c1108a21920af938d8ab562fd6e60f2aa1a43"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Top Sites-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748312525035,
+      "birthAt": "2026-10-18T03:39:08.078924+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Trust Tokens",
+      "bytes": 36864,
+      "mode": 384,
+      "mtimeNs": 1792294748066368710,
+      "birthAt": "2026-10-18T03:39:08.033431+00:00",
+      "type": "file",
+      "sha256": "88bafa2a265212152b2405502209d64438a416ff594a040e666f031ef442a812"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Trust Tokens-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748066634045,
+      "birthAt": "2026-10-18T03:39:08.037625+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Web Data",
+      "bytes": 159744,
+      "mode": 384,
+      "mtimeNs": 1792294749790049986,
+      "birthAt": "2026-10-18T03:39:08.028927+00:00",
+      "type": "file",
+      "sha256": "854119a8896990eaa02e904ccdb94be924128ffa5ba01fd2b4888a92c86f7a62"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/Web Data-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749791156910,
+      "birthAt": "2026-10-18T03:39:08.042764+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/WebStorage",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294748068037595,
+      "birthAt": "2026-10-18T03:39:08.055716+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/WebStorage/QuotaManager",
+      "bytes": 40960,
+      "mode": 384,
+      "mtimeNs": 1792294751383743828,
+      "birthAt": "2026-10-18T03:39:08.064073+00:00",
+      "type": "file",
+      "sha256": "ec33b6f263a247af4357e82de442875a37a10100c72871dcff86fbd587549eae"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/WebStorage/QuotaManager-journal",
+      "bytes": 8720,
+      "mode": 384,
+      "mtimeNs": 1792294751929521685,
+      "birthAt": "2026-10-18T03:39:08.067994+00:00",
+      "type": "file",
+      "sha256": "6d1015eb87846d4b151df6a659e828b08bf13af8fbb2c15a81211f07ec06bd82"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/chrome_cart_db",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751897823780,
+      "birthAt": "2026-10-18T03:39:07.653837+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/chrome_cart_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747660637267,
+      "birthAt": "2026-10-18T03:39:07.660637+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/chrome_cart_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751897812571,
+      "birthAt": "2026-10-18T03:39:11.897813+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/chrome_cart_db/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750326445619,
+      "birthAt": "2026-10-18T03:39:10.326446+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/commerce_subscription_db",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751897743446,
+      "birthAt": "2026-10-18T03:39:07.649044+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/commerce_subscription_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747657992792,
+      "birthAt": "2026-10-18T03:39:07.657993+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/commerce_subscription_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751897730737,
+      "birthAt": "2026-10-18T03:39:11.897731+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/commerce_subscription_db/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750326270284,
+      "birthAt": "2026-10-18T03:39:10.326270+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/declarative_performance_observer.db",
+      "bytes": 32768,
+      "mode": 384,
+      "mtimeNs": 1792294747893412049,
+      "birthAt": "2026-10-18T03:39:07.642364+00:00",
+      "type": "file",
+      "sha256": "eda4c9567974174f08a1dbcd8badf4d6199a7e9a8b78b8826548f49e20e7badf"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/declarative_performance_observer.db-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747899625088,
+      "birthAt": "2026-10-18T03:39:07.648830+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discount_infos_db",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751897875655,
+      "birthAt": "2026-10-18T03:39:07.652089+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discount_infos_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747675819528,
+      "birthAt": "2026-10-18T03:39:07.675820+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discount_infos_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751897866280,
+      "birthAt": "2026-10-18T03:39:11.897866+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discount_infos_db/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750326449327,
+      "birthAt": "2026-10-18T03:39:10.326449+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discounts_db",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751897602237,
+      "birthAt": "2026-10-18T03:39:07.652632+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discounts_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747686095092,
+      "birthAt": "2026-10-18T03:39:07.686095+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discounts_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751897593362,
+      "birthAt": "2026-10-18T03:39:11.897593+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/discounts_db/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750326409369,
+      "birthAt": "2026-10-18T03:39:10.326409+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/parcel_tracking_db",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294751897917155,
+      "birthAt": "2026-10-18T03:39:07.651637+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/parcel_tracking_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747685172753,
+      "birthAt": "2026-10-18T03:39:07.685173+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/parcel_tracking_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751897912905,
+      "birthAt": "2026-10-18T03:39:11.897913+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/parcel_tracking_db/LOG.old",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294750326340035,
+      "birthAt": "2026-10-18T03:39:10.326340+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db",
+      "bytes": 288,
+      "mode": 448,
+      "mtimeNs": 1792294751930668359,
+      "birthAt": "2026-10-18T03:39:08.031678+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/000003.log",
+      "bytes": 14853,
+      "mode": 384,
+      "mtimeNs": 1792294751940893631,
+      "birthAt": "2026-10-18T03:39:08.976855+00:00",
+      "type": "file",
+      "sha256": "d6eb8f468de9c2a04f1bf75af5d65eba1bf8aeac786a086af15106d9c40c4e55"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294748967703115,
+      "birthAt": "2026-10-18T03:39:08.967350+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748961873079,
+      "birthAt": "2026-10-18T03:39:08.961873+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/LOG",
+      "bytes": 532,
+      "mode": 384,
+      "mtimeNs": 1792294751931166779,
+      "birthAt": "2026-10-18T03:39:11.930664+00:00",
+      "type": "file",
+      "sha256": "4202f7d80ff12dca46a2a22cdbae505534842d8e5659ab77733a3e8db2f6b9ce"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/LOG.old",
+      "bytes": 532,
+      "mode": 384,
+      "mtimeNs": 1792294750359218740,
+      "birthAt": "2026-10-18T03:39:10.358710+00:00",
+      "type": "file",
+      "sha256": "75755de9dab88ef75704fdb8988f287ecb567dff69c33f0a47a93717ae009317"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294748963284087,
+      "birthAt": "2026-10-18T03:39:08.962780+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294751929339684,
+      "birthAt": "2026-10-18T03:39:08.040318+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata/000003.log",
+      "bytes": 774,
+      "mode": 384,
+      "mtimeNs": 1792294751931375697,
+      "birthAt": "2026-10-18T03:39:08.953994+00:00",
+      "type": "file",
+      "sha256": "76cf9302670c5a7355efad261d37c7d64c08a8c5edf09a0ffff4459edceb159c"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294748075644684,
+      "birthAt": "2026-10-18T03:39:08.072337+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294748043481734,
+      "birthAt": "2026-10-18T03:39:08.043482+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata/LOG",
+      "bytes": 550,
+      "mode": 384,
+      "mtimeNs": 1792294751930031355,
+      "birthAt": "2026-10-18T03:39:11.929335+00:00",
+      "type": "file",
+      "sha256": "986a49154f45eea44309c15539930cd7dd062f658770528f3a7329f9736881f1"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata/LOG.old",
+      "bytes": 550,
+      "mode": 384,
+      "mtimeNs": 1792294750358344943,
+      "birthAt": "2026-10-18T03:39:10.357572+00:00",
+      "type": "file",
+      "sha256": "24e8fb0c55f12414bdc7ed9f1cf740d399e353baaba5a15c995e3fd63a6efe71"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Default/shared_proto_db/metadata/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294748057797865,
+      "birthAt": "2026-10-18T03:39:08.044898+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GPUPersistentCache",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294747578544256,
+      "birthAt": "2026-10-18T03:39:07.574919+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GPUPersistentCache/GPUCache",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294747579156010,
+      "birthAt": "2026-10-18T03:39:07.577702+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294747593709683,
+      "birthAt": "2026-10-18T03:39:07.579082+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42/cache.db",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747585637800,
+      "birthAt": "2026-10-18T03:39:07.585638+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42/cache.db-wal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747593367265,
+      "birthAt": "2026-10-18T03:39:07.593367+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42/cache.journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294747591472420,
+      "birthAt": "2026-10-18T03:39:07.591472+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache",
+      "bytes": 320,
+      "mode": 448,
+      "mtimeNs": 1792294748794580911,
+      "birthAt": "2026-10-18T03:39:08.055699+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/data_0",
+      "bytes": 45056,
+      "mode": 384,
+      "mtimeNs": 1792294752075819388,
+      "birthAt": "2026-10-18T03:39:08.252327+00:00",
+      "type": "file",
+      "sha256": "4274be3d673f039f3a7115bc38598cbc30c820c03ad299715b1e597c9eb51f3e"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751392576550,
+      "birthAt": "2026-10-18T03:39:08.287412+00:00",
+      "type": "file",
+      "sha256": "adf5c9c0e7e0d259a4823b3c59802ca575e79d7b01a4d6e3a6f8bd35160e9584"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/data_2",
+      "bytes": 1056768,
+      "mode": 384,
+      "mtimeNs": 1792294748799241607,
+      "birthAt": "2026-10-18T03:39:08.313584+00:00",
+      "type": "file",
+      "sha256": "7240f33980f84e45aa0b99880ef6a9939206eafa437b1277faf40d2596c9d404"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/data_3",
+      "bytes": 4202496,
+      "mode": 384,
+      "mtimeNs": 1792294748798991022,
+      "birthAt": "2026-10-18T03:39:08.342620+00:00",
+      "type": "file",
+      "sha256": "2e0a8468adf576767757156ae09925f160fbc1be217163f65f00743b6e05001c"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/f_000001",
+      "bytes": 16870,
+      "mode": 384,
+      "mtimeNs": 1792294748781996250,
+      "birthAt": "2026-10-18T03:39:08.781792+00:00",
+      "type": "file",
+      "sha256": "0bce0feed7aea9dc41c92c463381a9627a948a726ff9d38aa27b94ec30f98e40"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/f_000002",
+      "bytes": 17089,
+      "mode": 384,
+      "mtimeNs": 1792294748792921110,
+      "birthAt": "2026-10-18T03:39:08.792748+00:00",
+      "type": "file",
+      "sha256": "075cb9f882ba94bb72389555605a873b7b2944e97e456fa79663880742651d98"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/f_000003",
+      "bytes": 18807,
+      "mode": 384,
+      "mtimeNs": 1792294748794860705,
+      "birthAt": "2026-10-18T03:39:08.794567+00:00",
+      "type": "file",
+      "sha256": "3854868cf4193b79797ee82a7d28550222667c9700bd5e86d3ab29b197339e48"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/GraphiteDawnCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294748234292548,
+      "birthAt": "2026-10-18T03:39:08.056603+00:00",
+      "type": "file",
+      "sha256": "695b7f1a0c57aad1f5aee56c5b89c4aef9e0c6f3605e06c8fd2bbeb4b27db0e1"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Last Version",
+      "bytes": 13,
+      "mode": 420,
+      "mtimeNs": 1792294751873426711,
+      "birthAt": "2026-10-18T03:39:07.581088+00:00",
+      "type": "file",
+      "sha256": "a955adc231dc8cc2ad7fb2800b429d8896b47a1628efa1ac36f066cfa5e33d7f"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Local State",
+      "bytes": 3363,
+      "mode": 384,
+      "mtimeNs": 1792294752147153041,
+      "birthAt": "2026-10-18T03:39:12.147028+00:00",
+      "type": "file",
+      "sha256": "ed2698a3705bc272ed9cf66329f445a5d13c84786f80e4e565e9879bed4b53c6"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/NativeMessagingHosts",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294747560099058,
+      "birthAt": "2026-10-18T03:39:07.560099+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/OptimizationGuideModelsManifest",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294747581772234,
+      "birthAt": "2026-10-18T03:39:07.581772+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/RunningChromeVersion",
+      "bytes": 15,
+      "mode": 493,
+      "mtimeNs": 1792294751874247883,
+      "birthAt": "2026-10-18T03:39:11.874248+00:00",
+      "type": "symlink",
+      "target": "155.0.8059.82:1",
+      "followed": false
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Safe Browsing",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294747703039281,
+      "birthAt": "2026-10-18T03:39:07.703039+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/SingletonCookie",
+      "bytes": 19,
+      "mode": 493,
+      "mtimeNs": 1792294751840494297,
+      "birthAt": "2026-10-18T03:39:11.840494+00:00",
+      "type": "symlink",
+      "target": "6293226155655426770",
+      "followed": false
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/SingletonLock",
+      "bytes": 36,
+      "mode": 493,
+      "mtimeNs": 1792294751839843794,
+      "birthAt": "2026-10-18T03:39:11.839844+00:00",
+      "type": "symlink",
+      "target": "charles-gordondeMac-Studio.local-805",
+      "followed": false
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/SingletonSocket",
+      "bytes": 89,
+      "mode": 493,
+      "mtimeNs": 1792294751840430422,
+      "birthAt": "2026-10-18T03:39:11.840430+00:00",
+      "type": "symlink",
+      "target": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/com.google.Chrome.sBkRwJ/SingletonSocket",
+      "followed": false
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/Variations",
+      "bytes": 85,
+      "mode": 420,
+      "mtimeNs": 1792294752146904539,
+      "birthAt": "2026-10-18T03:39:07.548247+00:00",
+      "type": "file",
+      "sha256": "b26da4f8c7e283aa74386da0229d66af14a37986b8ca828e054fc932f68dd557"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/VariationsSafeSeedV2",
+      "bytes": 19,
+      "mode": 384,
+      "mtimeNs": 1792294747549728243,
+      "birthAt": "2026-10-18T03:39:07.549549+00:00",
+      "type": "file",
+      "sha256": "1560b22b2264f7cb6b7f6910164813f76c5e8a06fb1acf85b375e687ee49c1ad"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/VariationsSeedV2",
+      "bytes": 11,
+      "mode": 384,
+      "mtimeNs": 1792294751296500952,
+      "birthAt": "2026-10-18T03:39:11.296419+00:00",
+      "type": "file",
+      "sha256": "b4cc4174735c28360b9081be3c3d0552d8a4b3cdb54431ac00ed0d622bab6296"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/component_crx_cache",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294747572621802,
+      "birthAt": "2026-10-18T03:39:07.572622+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/extensions_crx_cache",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749796697319,
+      "birthAt": "2026-10-18T03:39:08.749291+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/extensions_crx_cache/metadata.json",
+      "bytes": 13,
+      "mode": 384,
+      "mtimeNs": 1792294749790059653,
+      "birthAt": "2026-10-18T03:39:09.789838+00:00",
+      "type": "file",
+      "sha256": "2771d13c637c267132afff9db67537bef95708534b79ae8d954254c4e64e4e0f"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/segmentation_platform",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294751874311716,
+      "birthAt": "2026-10-18T03:39:07.587802+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/segmentation_platform/ukm_db",
+      "bytes": 49152,
+      "mode": 384,
+      "mtimeNs": 1792294751379175258,
+      "birthAt": "2026-10-18T03:39:07.591597+00:00",
+      "type": "file",
+      "sha256": "7701470621dd180044fa8e49f32423f877d05aecb20b907da5bf1dd7321411dd"
+    },
+    {
+      "path": "profiles/3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc/segmentation_platform/ukm_db-wal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751874294508,
+      "birthAt": "2026-10-18T03:39:11.874295+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099",
+      "bytes": 544,
+      "mode": 448,
+      "mtimeNs": 1792294751410182118,
+      "birthAt": "2026-10-18T03:39:08.492736+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/ChromeFeatureState",
+      "bytes": 277,
+      "mode": 420,
+      "mtimeNs": 1792294749251738217,
+      "birthAt": "2026-10-18T03:39:09.251590+00:00",
+      "type": "file",
+      "sha256": "32a57afb1616340d02c291bc788420b3ba59857c074040f9ade113afae69f876"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default",
+      "bytes": 1952,
+      "mode": 448,
+      "mtimeNs": 1792294751591811458,
+      "birthAt": "2026-10-18T03:39:08.493952+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Account Web Data",
+      "bytes": 77824,
+      "mode": 384,
+      "mtimeNs": 1792294749508433066,
+      "birthAt": "2026-10-18T03:39:09.497380+00:00",
+      "type": "file",
+      "sha256": "e57088cd4f5a11347065520691ac0ad5f86cf902c98e6c70539a3673d2b54d8d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Account Web Data-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749508530734,
+      "birthAt": "2026-10-18T03:39:09.504510+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Affiliation Database",
+      "bytes": 53248,
+      "mode": 384,
+      "mtimeNs": 1792294749298381008,
+      "birthAt": "2026-10-18T03:39:09.282075+00:00",
+      "type": "file",
+      "sha256": "52b369ae1ac4db15be400b8d45b01d9e4c4054299fd3743f811e785a6abcbe3a"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Affiliation Database-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749298864386,
+      "birthAt": "2026-10-18T03:39:09.283521+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/BookmarkMergedSurfaceOrdering",
+      "bytes": 4,
+      "mode": 384,
+      "mtimeNs": 1792294751410339327,
+      "birthAt": "2026-10-18T03:39:11.410211+00:00",
+      "type": "file",
+      "sha256": "d914176fd50bd7f565700006a31aa97b79d3ad17cee20c8e5ff2061d5cb74817"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749281136234,
+      "birthAt": "2026-10-18T03:39:09.280696+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/Cache_Data",
+      "bytes": 192,
+      "mode": 448,
+      "mtimeNs": 1792294750649025545,
+      "birthAt": "2026-10-18T03:39:09.280885+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/Cache_Data/3f161ac7d4379a52_0",
+      "bytes": 795,
+      "mode": 384,
+      "mtimeNs": 1792294749705883380,
+      "birthAt": "2026-10-18T03:39:09.699221+00:00",
+      "type": "file",
+      "sha256": "3e866206138ffcf9826538b707ab861e34c3cb22c6ceb37617cf92fa8e5a63f5"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/Cache_Data/a20ee8d8e0ea323e_0",
+      "bytes": 788,
+      "mode": 384,
+      "mtimeNs": 1792294749679896843,
+      "birthAt": "2026-10-18T03:39:09.645245+00:00",
+      "type": "file",
+      "sha256": "f74aa3ae6f0934a27cd3c7d034ba44057728784d5b31e301602795a3f0c08dac"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/Cache_Data/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294749488475234,
+      "birthAt": "2026-10-18T03:39:09.487362+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/Cache_Data/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294751361959235,
+      "birthAt": "2026-10-18T03:39:09.497354+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/Cache_Data/index-dir/the-real-index",
+      "bytes": 96,
+      "mode": 384,
+      "mtimeNs": 1792294751353635433,
+      "birthAt": "2026-10-18T03:39:11.351254+00:00",
+      "type": "file",
+      "sha256": "cee8d536862f49f001960830ae091f8f0aec3341073a6a22a0a579fa744a58c0"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/No_Vary_Search",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749505784966,
+      "birthAt": "2026-10-18T03:39:09.281097+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/No_Vary_Search/journal.baj",
+      "bytes": 4,
+      "mode": 384,
+      "mtimeNs": 1792294749506165469,
+      "birthAt": "2026-10-18T03:39:09.505554+00:00",
+      "type": "file",
+      "sha256": "9c169428d852e25bd59b27652ed533d2a1f09f96e4c329fa5e06f47e16731543"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cache/No_Vary_Search/snapshot.baf",
+      "bytes": 20,
+      "mode": 384,
+      "mtimeNs": 1792294749504903253,
+      "birthAt": "2026-10-18T03:39:09.503890+00:00",
+      "type": "file",
+      "sha256": "0c2dd377ed0cc66161e9db8f89f7d8bcb3ad8c06c4a054bdcba214ab05f58c9a"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/ClientCertificates",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749284355254,
+      "birthAt": "2026-10-18T03:39:09.283216+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/ClientCertificates/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749284250045,
+      "birthAt": "2026-10-18T03:39:09.284250+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/ClientCertificates/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749283583832,
+      "birthAt": "2026-10-18T03:39:09.283584+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749282383492,
+      "birthAt": "2026-10-18T03:39:09.281296+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/js",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294749635410857,
+      "birthAt": "2026-10-18T03:39:09.282089+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/js/ba678a2fbd8c358c_0",
+      "bytes": 298,
+      "mode": 384,
+      "mtimeNs": 1792294749667724808,
+      "birthAt": "2026-10-18T03:39:09.635240+00:00",
+      "type": "file",
+      "sha256": "a4b66ccd3c9b6d4e9bb4c3efdebc933a2ed5cc819efd0d096fae3397bce7fa8e"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/js/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294749282722744,
+      "birthAt": "2026-10-18T03:39:09.282577+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/js/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294751379695928,
+      "birthAt": "2026-10-18T03:39:09.283221+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/js/index-dir/the-real-index",
+      "bytes": 72,
+      "mode": 384,
+      "mtimeNs": 1792294751353812059,
+      "birthAt": "2026-10-18T03:39:11.351232+00:00",
+      "type": "file",
+      "sha256": "e45c9430341126fbc4c3645ff6d29d124e308566a36cce3c84bb997ca561283d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/wasm",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749283319581,
+      "birthAt": "2026-10-18T03:39:09.282349+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/wasm/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294749282570993,
+      "birthAt": "2026-10-18T03:39:09.282491+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/wasm/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749376492911,
+      "birthAt": "2026-10-18T03:39:09.283206+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Code Cache/wasm/index-dir/the-real-index",
+      "bytes": 48,
+      "mode": 384,
+      "mtimeNs": 1792294749285073342,
+      "birthAt": "2026-10-18T03:39:09.283870+00:00",
+      "type": "file",
+      "sha256": "44c0364093d73a653831a794b3bde905ee76b7dac3442fc64e3701734825fe06"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cookies",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294749485324797,
+      "birthAt": "2026-10-18T03:39:09.407059+00:00",
+      "type": "file",
+      "sha256": "e63e5ecba16ce902f2c62dda454042ecca66a09d7a33f38fedac458d1a11f81b"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Cookies-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749485699716,
+      "birthAt": "2026-10-18T03:39:09.410479+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnGraphiteCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749513105095,
+      "birthAt": "2026-10-18T03:39:09.511979+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnGraphiteCache/data_0",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749512806802,
+      "birthAt": "2026-10-18T03:39:09.512759+00:00",
+      "type": "file",
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnGraphiteCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751409095278,
+      "birthAt": "2026-10-18T03:39:09.512875+00:00",
+      "type": "file",
+      "sha256": "b1e963d702392fb7224786e7d56d43973e9b9efd1b89c17814d7c558ffc0cdec"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnGraphiteCache/data_2",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749513034387,
+      "birthAt": "2026-10-18T03:39:09.512984+00:00",
+      "type": "file",
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnGraphiteCache/data_3",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749513147971,
+      "birthAt": "2026-10-18T03:39:09.513099+00:00",
+      "type": "file",
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnGraphiteCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294749512630384,
+      "birthAt": "2026-10-18T03:39:09.512106+00:00",
+      "type": "file",
+      "sha256": "bead11b5ddf4ec543d3292d5bed956c9fa80d91362afa20bae5fc9a12e9676dc"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnWebGPUCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749511720003,
+      "birthAt": "2026-10-18T03:39:09.509295+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnWebGPUCache/data_0",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749510777872,
+      "birthAt": "2026-10-18T03:39:09.510703+00:00",
+      "type": "file",
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnWebGPUCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751408951027,
+      "birthAt": "2026-10-18T03:39:09.510989+00:00",
+      "type": "file",
+      "sha256": "b1e963d702392fb7224786e7d56d43973e9b9efd1b89c17814d7c558ffc0cdec"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnWebGPUCache/data_2",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749511609544,
+      "birthAt": "2026-10-18T03:39:09.511365+00:00",
+      "type": "file",
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnWebGPUCache/data_3",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749511813046,
+      "birthAt": "2026-10-18T03:39:09.511714+00:00",
+      "type": "file",
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/DawnWebGPUCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294749510546329,
+      "birthAt": "2026-10-18T03:39:09.509379+00:00",
+      "type": "file",
+      "sha256": "1f4930a1a305edb3ca253a513e5af0339b2fb963c06f17db1ca42e992f098036"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Device Bound Sessions",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294749446946808,
+      "birthAt": "2026-10-18T03:39:09.392884+00:00",
+      "type": "file",
+      "sha256": "78a06f4f93849b88f0489d00c0389205bc9d5389608c6918549df4db668d783f"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Device Bound Sessions-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749447306811,
+      "birthAt": "2026-10-18T03:39:09.398866+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Rules",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749384659379,
+      "birthAt": "2026-10-18T03:39:09.295293+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Rules/000003.log",
+      "bytes": 57,
+      "mode": 384,
+      "mtimeNs": 1792294749442701365,
+      "birthAt": "2026-10-18T03:39:09.384646+00:00",
+      "type": "file",
+      "sha256": "99c59cbe7db56d56a286485635e4467004641c6275e708887dd35728eb05109a"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Rules/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749301847904,
+      "birthAt": "2026-10-18T03:39:09.300933+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Rules/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749296276787,
+      "birthAt": "2026-10-18T03:39:09.296277+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Rules/LOG",
+      "bytes": 489,
+      "mode": 384,
+      "mtimeNs": 1792294749382094404,
+      "birthAt": "2026-10-18T03:39:09.295788+00:00",
+      "type": "file",
+      "sha256": "9ae20a2fa98a4d09b650e07193c622423d8eb53d4924135b6a41ee1155f3a964"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Rules/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749298293174,
+      "birthAt": "2026-10-18T03:39:09.297148+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Scripts",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749405902678,
+      "birthAt": "2026-10-18T03:39:09.386231+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Scripts/000003.log",
+      "bytes": 57,
+      "mode": 384,
+      "mtimeNs": 1792294749445850843,
+      "birthAt": "2026-10-18T03:39:09.405602+00:00",
+      "type": "file",
+      "sha256": "99c59cbe7db56d56a286485635e4467004641c6275e708887dd35728eb05109a"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Scripts/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749401693027,
+      "birthAt": "2026-10-18T03:39:09.400017+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Scripts/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749387942399,
+      "birthAt": "2026-10-18T03:39:09.387942+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Scripts/LOG",
+      "bytes": 493,
+      "mode": 384,
+      "mtimeNs": 1792294749404461127,
+      "birthAt": "2026-10-18T03:39:09.386457+00:00",
+      "type": "file",
+      "sha256": "3b36d8289252aa7da2f5687afd1dd02839fb9be903c5319efae5aafbd339ef56"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension Scripts/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749396800579,
+      "birthAt": "2026-10-18T03:39:09.391701+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension State",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749698330791,
+      "birthAt": "2026-10-18T03:39:09.640171+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension State/000003.log",
+      "bytes": 171,
+      "mode": 384,
+      "mtimeNs": 1792294749712890506,
+      "birthAt": "2026-10-18T03:39:09.698176+00:00",
+      "type": "file",
+      "sha256": "14f92b911f9fe774720461eec5bb4761ae6bfc9445c67e30bf624a8694b4b1da"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension State/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749689512778,
+      "birthAt": "2026-10-18T03:39:09.686784+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension State/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749674830728,
+      "birthAt": "2026-10-18T03:39:09.674831+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension State/LOG",
+      "bytes": 489,
+      "mode": 384,
+      "mtimeNs": 1792294749697098783,
+      "birthAt": "2026-10-18T03:39:09.661192+00:00",
+      "type": "file",
+      "sha256": "7baf5c20bb3b9cf337742d023f633031f9895584997085683f779f055c7bf9ea"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Extension State/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749681160476,
+      "birthAt": "2026-10-18T03:39:09.680958+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Favicons",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294749301864446,
+      "birthAt": "2026-10-18T03:39:09.298713+00:00",
+      "type": "file",
+      "sha256": "1fbc7ea9722b2154b0d69c9d0ed80b6c0c98c5d389cf31ac1a2b8db030724840"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Favicons-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749302269824,
+      "birthAt": "2026-10-18T03:39:09.300467+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/GPUCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749508718235,
+      "birthAt": "2026-10-18T03:39:09.402514+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/GPUCache/data_0",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749507484060,
+      "birthAt": "2026-10-18T03:39:09.507272+00:00",
+      "type": "file",
+      "sha256": "d6a5fe39cd672781b256e0e3102f7022635f1d4bb7cfcc90a80fffe4d0f3877e"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/GPUCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751408787359,
+      "birthAt": "2026-10-18T03:39:09.508101+00:00",
+      "type": "file",
+      "sha256": "b1e963d702392fb7224786e7d56d43973e9b9efd1b89c17814d7c558ffc0cdec"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/GPUCache/data_2",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749508515608,
+      "birthAt": "2026-10-18T03:39:09.508406+00:00",
+      "type": "file",
+      "sha256": "ec1702806f4cc7c42a82fc2b38e89835fde7c64bb32060e0823c9077ca92efb7"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/GPUCache/data_3",
+      "bytes": 8192,
+      "mode": 384,
+      "mtimeNs": 1792294749508851694,
+      "birthAt": "2026-10-18T03:39:09.508696+00:00",
+      "type": "file",
+      "sha256": "e09f42c398d688dce168570291f1f92d079987deda3099a34adb9e8c0522b30c"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/GPUCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294749506956182,
+      "birthAt": "2026-10-18T03:39:09.405765+00:00",
+      "type": "file",
+      "sha256": "e627be4c9506f35731c60f4e650e9268cbf8b342447d5f247d860ec640a40cbf"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/History",
+      "bytes": 204800,
+      "mode": 384,
+      "mtimeNs": 1792294751352451300,
+      "birthAt": "2026-10-18T03:39:09.279930+00:00",
+      "type": "file",
+      "sha256": "67507b9ff03ab44b29f4e4c5cfd01aab29a5447b1298a0440ad0db3fd87e8f88"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/History-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751353073137,
+      "birthAt": "2026-10-18T03:39:09.281032+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749293868938,
+      "birthAt": "2026-10-18T03:39:09.293869+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749293570228,
+      "birthAt": "2026-10-18T03:39:09.293570+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749331537881,
+      "birthAt": "2026-10-18T03:39:09.331379+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage/leveldb",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749384089375,
+      "birthAt": "2026-10-18T03:39:09.331524+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage/leveldb/000003.log",
+      "bytes": 30,
+      "mode": 384,
+      "mtimeNs": 1792294749385333591,
+      "birthAt": "2026-10-18T03:39:09.384074+00:00",
+      "type": "file",
+      "sha256": "8bd2ea70a0b70c91de138a5b87c7936c6a6fa7c4275c54b97f4ef0ccc5b79bb4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage/leveldb/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749337600002,
+      "birthAt": "2026-10-18T03:39:09.337284+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage/leveldb/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749332495512,
+      "birthAt": "2026-10-18T03:39:09.332495+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage/leveldb/LOG",
+      "bytes": 501,
+      "mode": 384,
+      "mtimeNs": 1792294749382062446,
+      "birthAt": "2026-10-18T03:39:09.331832+00:00",
+      "type": "file",
+      "sha256": "5d01c4a00fdda51feb632a85d31f3d2d305c523cde2e0899cf06546511c7ce49"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Local Storage/leveldb/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749333310392,
+      "birthAt": "2026-10-18T03:39:09.333068+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Login Data",
+      "bytes": 40960,
+      "mode": 384,
+      "mtimeNs": 1792294749436423743,
+      "birthAt": "2026-10-18T03:39:09.391320+00:00",
+      "type": "file",
+      "sha256": "869676a006de3214994dedee2318ece6fbf55a4afc42b551ce065bb35265f8d1"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Login Data For Account",
+      "bytes": 40960,
+      "mode": 384,
+      "mtimeNs": 1792294749441488941,
+      "birthAt": "2026-10-18T03:39:09.391932+00:00",
+      "type": "file",
+      "sha256": "869676a006de3214994dedee2318ece6fbf55a4afc42b551ce065bb35265f8d1"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Login Data For Account-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749442672907,
+      "birthAt": "2026-10-18T03:39:09.396155+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Login Data-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749438577964,
+      "birthAt": "2026-10-18T03:39:09.397436+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Network Persistent State",
+      "bytes": 111,
+      "mode": 384,
+      "mtimeNs": 1792294751361934484,
+      "birthAt": "2026-10-18T03:39:11.351264+00:00",
+      "type": "file",
+      "sha256": "88c9590388d22bb0bd8da3f7d50389311957024ee5c2dfe562e2649ad427fd7d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/PersistentOriginTrials",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749295740033,
+      "birthAt": "2026-10-18T03:39:09.294936+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/PersistentOriginTrials/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749295732033,
+      "birthAt": "2026-10-18T03:39:09.295732+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/PersistentOriginTrials/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749295427364,
+      "birthAt": "2026-10-18T03:39:09.295427+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Preferences",
+      "bytes": 7577,
+      "mode": 384,
+      "mtimeNs": 1792294751585967796,
+      "birthAt": "2026-10-18T03:39:11.585900+00:00",
+      "type": "file",
+      "sha256": "93af9fd8ed9a5f7e11faac8f2e70849e2ed52bb7de91e14854fdaa422c6fc8f1"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Reporting and NEL",
+      "bytes": 36864,
+      "mode": 384,
+      "mtimeNs": 1792294749680175844,
+      "birthAt": "2026-10-18T03:39:09.609705+00:00",
+      "type": "file",
+      "sha256": "2d6dada0da20730019917ab502a8189099aa5ad98a1b23cd30715d6f9689ef11"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Reporting and NEL-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749680350762,
+      "birthAt": "2026-10-18T03:39:09.614642+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Secure Preferences",
+      "bytes": 13489,
+      "mode": 384,
+      "mtimeNs": 1792294751372997845,
+      "birthAt": "2026-10-18T03:39:11.352975+00:00",
+      "type": "file",
+      "sha256": "99aaf83e0039de973725fefe176116f295d260fd9ec6c52b8599b4e2e7ddc5cf"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294749298199798,
+      "birthAt": "2026-10-18T03:39:09.293315+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SegmentInfoDB",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749295582574,
+      "birthAt": "2026-10-18T03:39:09.293690+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SegmentInfoDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749295557407,
+      "birthAt": "2026-10-18T03:39:09.295557+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SegmentInfoDB/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749294929820,
+      "birthAt": "2026-10-18T03:39:09.294930+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SignalDB",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749297986255,
+      "birthAt": "2026-10-18T03:39:09.295946+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SignalDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749297953672,
+      "birthAt": "2026-10-18T03:39:09.297954+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SignalDB/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749297178709,
+      "birthAt": "2026-10-18T03:39:09.297179+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SignalStorageConfigDB",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749298784219,
+      "birthAt": "2026-10-18T03:39:09.298170+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SignalStorageConfigDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749298705302,
+      "birthAt": "2026-10-18T03:39:09.298705+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Segmentation Platform/SignalStorageConfigDB/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749298276299,
+      "birthAt": "2026-10-18T03:39:09.298276+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/ServerCertificate",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294749282751661,
+      "birthAt": "2026-10-18T03:39:09.280184+00:00",
+      "type": "file",
+      "sha256": "180ffbc2a4f10b5563f5a7bfe62d23909f0aa77572a06e59a9be4c6fca7176f7"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/ServerCertificate-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749283219205,
+      "birthAt": "2026-10-18T03:39:09.280731+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749661054434,
+      "birthAt": "2026-10-18T03:39:09.645328+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/Database",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749705368668,
+      "birthAt": "2026-10-18T03:39:09.660170+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/Database/000003.log",
+      "bytes": 1263,
+      "mode": 384,
+      "mtimeNs": 1792294749752268459,
+      "birthAt": "2026-10-18T03:39:09.705206+00:00",
+      "type": "file",
+      "sha256": "4720e81d9f0126775f31c66b21e8e56e5bbfbab96469459d5889aec8a87a5e68"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/Database/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749699538007,
+      "birthAt": "2026-10-18T03:39:09.695397+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/Database/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749675413981,
+      "birthAt": "2026-10-18T03:39:09.675414+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/Database/LOG",
+      "bytes": 505,
+      "mode": 384,
+      "mtimeNs": 1792294749704287161,
+      "birthAt": "2026-10-18T03:39:09.668561+00:00",
+      "type": "file",
+      "sha256": "b135b01aa2b0cf8696cb565c708c9821e78cb9962404484cb921ff3191522434"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/Database/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749687714016,
+      "birthAt": "2026-10-18T03:39:09.679042+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749752995589,
+      "birthAt": "2026-10-18T03:39:09.660908+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache/2cc80dabc69f58b6_0",
+      "bytes": 472,
+      "mode": 384,
+      "mtimeNs": 1792294749713870804,
+      "birthAt": "2026-10-18T03:39:09.710266+00:00",
+      "type": "file",
+      "sha256": "7433e2de592bac3d53e34206cd580d140d107eae0defa146b238d209d3b34c87"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache/4cb013792b196a35_0",
+      "bytes": 10387,
+      "mode": 384,
+      "mtimeNs": 1792294749751658372,
+      "birthAt": "2026-10-18T03:39:09.727843+00:00",
+      "type": "file",
+      "sha256": "9bfcd210dc08c82ce5d351f0b2e015d246be763173e1310cc3fe651d99c308aa"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache/4cb013792b196a35_1",
+      "bytes": 7177,
+      "mode": 384,
+      "mtimeNs": 1792294749760533969,
+      "birthAt": "2026-10-18T03:39:09.752836+00:00",
+      "type": "file",
+      "sha256": "84741a5024036a0ea97fd7f651b8f2e6ddcc41689e8d113589f2d5fe36710362"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294749684570830,
+      "birthAt": "2026-10-18T03:39:09.677312+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294751353794725,
+      "birthAt": "2026-10-18T03:39:09.711077+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Service Worker/ScriptCache/index-dir/the-real-index",
+      "bytes": 96,
+      "mode": 384,
+      "mtimeNs": 1792294751349796617,
+      "birthAt": "2026-10-18T03:39:11.348626+00:00",
+      "type": "file",
+      "sha256": "7c4694000c4b0e55107b5a115ce39fc73ca97321e392e7e65d0445fee190044f"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Session Storage",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749712493254,
+      "birthAt": "2026-10-18T03:39:09.668572+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Session Storage/000003.log",
+      "bytes": 87,
+      "mode": 384,
+      "mtimeNs": 1792294751348609193,
+      "birthAt": "2026-10-18T03:39:09.712447+00:00",
+      "type": "file",
+      "sha256": "4d7a760b35105bcacd2adef01d3f8080d1cebcf017b27603c32bf4fda6321b47"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Session Storage/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749705554294,
+      "birthAt": "2026-10-18T03:39:09.701415+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Session Storage/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749687733850,
+      "birthAt": "2026-10-18T03:39:09.687734+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Session Storage/LOG",
+      "bytes": 489,
+      "mode": 384,
+      "mtimeNs": 1792294749710831494,
+      "birthAt": "2026-10-18T03:39:09.678202+00:00",
+      "type": "file",
+      "sha256": "74ad69b78b00dde7ce973a4eb1c772852807a67f2a1458923cb9f836990b280a"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Session Storage/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749697077866,
+      "birthAt": "2026-10-18T03:39:09.691347+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sessions",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294751348648193,
+      "birthAt": "2026-10-18T03:39:09.420365+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sessions/Session_13436768351316864",
+      "bytes": 4816,
+      "mode": 384,
+      "mtimeNs": 1792294751317099122,
+      "birthAt": "2026-10-18T03:39:11.316897+00:00",
+      "type": "file",
+      "sha256": "23d1061d0b398592c0892aa8a0268e75ee10b611b6327953f9be872f250c6231"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sessions/Tabs_13436768351348209",
+      "bytes": 2207,
+      "mode": 384,
+      "mtimeNs": 1792294751372212965,
+      "birthAt": "2026-10-18T03:39:11.348618+00:00",
+      "type": "file",
+      "sha256": "595d794f59b9efe3cc4f0d2a13deec6b6656d1e9dc2ba6d4d22bd5c8604ef4ed"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294749393146098,
+      "birthAt": "2026-10-18T03:39:09.281814+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary/cache",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749396506452,
+      "birthAt": "2026-10-18T03:39:09.391219+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary/cache/index",
+      "bytes": 24,
+      "mode": 384,
+      "mtimeNs": 1792294749394606357,
+      "birthAt": "2026-10-18T03:39:09.392330+00:00",
+      "type": "file",
+      "sha256": "fbcfe23a2ecb82b7100c50811691dde0a33aa3da8d176be9882a9db485dc0f2d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary/cache/index-dir",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749403317495,
+      "birthAt": "2026-10-18T03:39:09.396156+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary/cache/index-dir/the-real-index",
+      "bytes": 48,
+      "mode": 384,
+      "mtimeNs": 1792294749402171196,
+      "birthAt": "2026-10-18T03:39:09.398067+00:00",
+      "type": "file",
+      "sha256": "d32fcc095e42ec4783b819ada01e379ab51d7c16db8afac1b9c49e2c0fe406aa"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary/db",
+      "bytes": 45056,
+      "mode": 384,
+      "mtimeNs": 1792294749471633629,
+      "birthAt": "2026-10-18T03:39:09.391362+00:00",
+      "type": "file",
+      "sha256": "0d6287fecedbc44ed9f51ded9de88629ec9f385ecff5da9a34e47e96fd5a9cba"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Shared Dictionary/db-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749471934297,
+      "birthAt": "2026-10-18T03:39:09.393064+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Site Characteristics Database",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749385437592,
+      "birthAt": "2026-10-18T03:39:09.283631+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Site Characteristics Database/000003.log",
+      "bytes": 40,
+      "mode": 384,
+      "mtimeNs": 1792294749386165096,
+      "birthAt": "2026-10-18T03:39:09.385435+00:00",
+      "type": "file",
+      "sha256": "f096bc366a931fba656bdcd77b24af15a5f29fc53281a727c79f82c608ecfab8"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Site Characteristics Database/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749290963253,
+      "birthAt": "2026-10-18T03:39:09.289968+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Site Characteristics Database/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749284742173,
+      "birthAt": "2026-10-18T03:39:09.284742+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Site Characteristics Database/LOG",
+      "bytes": 517,
+      "mode": 384,
+      "mtimeNs": 1792294749384900088,
+      "birthAt": "2026-10-18T03:39:09.284099+00:00",
+      "type": "file",
+      "sha256": "3f08d9cb8cec3eac67244af08d4da52188c8b53098170e3d3a32c1bde0e87408"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Site Characteristics Database/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749286996812,
+      "birthAt": "2026-10-18T03:39:09.285901+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749279991435,
+      "birthAt": "2026-10-18T03:39:09.279681+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data/LevelDB",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749383421663,
+      "birthAt": "2026-10-18T03:39:09.279983+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data/LevelDB/000003.log",
+      "bytes": 118,
+      "mode": 384,
+      "mtimeNs": 1792294749614794729,
+      "birthAt": "2026-10-18T03:39:09.383409+00:00",
+      "type": "file",
+      "sha256": "19f0f6fe9c84367cbef999bd16917f715a3a3a39de23b13837be7e9137a97f00"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data/LevelDB/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749285330218,
+      "birthAt": "2026-10-18T03:39:09.284074+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data/LevelDB/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749280169520,
+      "birthAt": "2026-10-18T03:39:09.280169+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data/LevelDB/LOG",
+      "bytes": 493,
+      "mode": 384,
+      "mtimeNs": 1792294749379582180,
+      "birthAt": "2026-10-18T03:39:09.280082+00:00",
+      "type": "file",
+      "sha256": "ccbd0e4fc733edbf05cdd27471a1ea76608e81e8e32034e13932bdc119696885"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Sync Data/LevelDB/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749281172151,
+      "birthAt": "2026-10-18T03:39:09.281001+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Top Sites",
+      "bytes": 20480,
+      "mode": 384,
+      "mtimeNs": 1792294749601285228,
+      "birthAt": "2026-10-18T03:39:09.401418+00:00",
+      "type": "file",
+      "sha256": "6181b0653e3a55518b879cb4019c1108a21920af938d8ab562fd6e60f2aa1a43"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Top Sites-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749601342478,
+      "birthAt": "2026-10-18T03:39:09.404491+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Trust Tokens",
+      "bytes": 36864,
+      "mode": 384,
+      "mtimeNs": 1792294749439585971,
+      "birthAt": "2026-10-18T03:39:09.392022+00:00",
+      "type": "file",
+      "sha256": "88bafa2a265212152b2405502209d64438a416ff594a040e666f031ef442a812"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Trust Tokens-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749439908598,
+      "birthAt": "2026-10-18T03:39:09.397730+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Web Data",
+      "bytes": 159744,
+      "mode": 384,
+      "mtimeNs": 1792294751384201956,
+      "birthAt": "2026-10-18T03:39:09.387314+00:00",
+      "type": "file",
+      "sha256": "453980327c90e0c547786d6f57e182e1fee1d2c30dda4fefdc7807a18aa67595"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/Web Data-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751389062445,
+      "birthAt": "2026-10-18T03:39:09.396911+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/WebStorage",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749406078512,
+      "birthAt": "2026-10-18T03:39:09.399973+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/WebStorage/QuotaManager",
+      "bytes": 40960,
+      "mode": 384,
+      "mtimeNs": 1792294751371927922,
+      "birthAt": "2026-10-18T03:39:09.402464+00:00",
+      "type": "file",
+      "sha256": "3ec988430d84e8b7b3b399a84599b0bea62b436b1e556ac4e28ad9cbc95cff63"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/WebStorage/QuotaManager-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294751379191592,
+      "birthAt": "2026-10-18T03:39:09.405800+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/chrome_cart_db",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749289682245,
+      "birthAt": "2026-10-18T03:39:09.285814+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/chrome_cart_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749289488869,
+      "birthAt": "2026-10-18T03:39:09.289489+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/chrome_cart_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749287839984,
+      "birthAt": "2026-10-18T03:39:09.287840+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/commerce_subscription_db",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749286898895,
+      "birthAt": "2026-10-18T03:39:09.285775+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/commerce_subscription_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749286700769,
+      "birthAt": "2026-10-18T03:39:09.286701+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/commerce_subscription_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749286113640,
+      "birthAt": "2026-10-18T03:39:09.286114+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/declarative_performance_observer.db",
+      "bytes": 32768,
+      "mode": 384,
+      "mtimeNs": 1792294749293353351,
+      "birthAt": "2026-10-18T03:39:09.281172+00:00",
+      "type": "file",
+      "sha256": "eda4c9567974174f08a1dbcd8badf4d6199a7e9a8b78b8826548f49e20e7badf"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/declarative_performance_observer.db-journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749293717395,
+      "birthAt": "2026-10-18T03:39:09.282121+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/discount_infos_db",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749290966503,
+      "birthAt": "2026-10-18T03:39:09.286583+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/discount_infos_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749290697043,
+      "birthAt": "2026-10-18T03:39:09.290697+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/discount_infos_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749288660447,
+      "birthAt": "2026-10-18T03:39:09.288661+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/discounts_db",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749290301499,
+      "birthAt": "2026-10-18T03:39:09.286064+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/discounts_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749290174707,
+      "birthAt": "2026-10-18T03:39:09.290175+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/discounts_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749288684114,
+      "birthAt": "2026-10-18T03:39:09.288684+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/parcel_tracking_db",
+      "bytes": 128,
+      "mode": 448,
+      "mtimeNs": 1792294749290162123,
+      "birthAt": "2026-10-18T03:39:09.286206+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/parcel_tracking_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749289985747,
+      "birthAt": "2026-10-18T03:39:09.289986+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/parcel_tracking_db/LOG",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749289330243,
+      "birthAt": "2026-10-18T03:39:09.289330+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db",
+      "bytes": 256,
+      "mode": 448,
+      "mtimeNs": 1792294749505124421,
+      "birthAt": "2026-10-18T03:39:09.391231+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/000003.log",
+      "bytes": 6737,
+      "mode": 384,
+      "mtimeNs": 1792294749655207397,
+      "birthAt": "2026-10-18T03:39:09.504972+00:00",
+      "type": "file",
+      "sha256": "7e352309825253649cd40c964ee1d7ee296d07c1e7280a1fd648630879d81ff5"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749488415858,
+      "birthAt": "2026-10-18T03:39:09.487371+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749464361958,
+      "birthAt": "2026-10-18T03:39:09.464362+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/LOG",
+      "bytes": 489,
+      "mode": 384,
+      "mtimeNs": 1792294749503924455,
+      "birthAt": "2026-10-18T03:39:09.452247+00:00",
+      "type": "file",
+      "sha256": "ea2eeb8dbcc9a1045427a929a5c35dbd2000436002f334658e560c244d641842"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749484797961,
+      "birthAt": "2026-10-18T03:39:09.476113+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/metadata",
+      "bytes": 224,
+      "mode": 448,
+      "mtimeNs": 1792294749443652788,
+      "birthAt": "2026-10-18T03:39:09.395161+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/metadata/000003.log",
+      "bytes": 706,
+      "mode": 384,
+      "mtimeNs": 1792294749508447983,
+      "birthAt": "2026-10-18T03:39:09.442644+00:00",
+      "type": "file",
+      "sha256": "50612b5eb2cec520258389d80bbe5b63ea816a74842d4ecc55abc2956c1a7ca7"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/metadata/CURRENT",
+      "bytes": 16,
+      "mode": 384,
+      "mtimeNs": 1792294749424814795,
+      "birthAt": "2026-10-18T03:39:09.408905+00:00",
+      "type": "file",
+      "sha256": "0f1bad70c7bd1e0a69562853ec529355462fcd0423263a3d39d6d0d70b780443"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/metadata/LOCK",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749398040795,
+      "birthAt": "2026-10-18T03:39:09.398041+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/metadata/LOG",
+      "bytes": 507,
+      "mode": 384,
+      "mtimeNs": 1792294749438382797,
+      "birthAt": "2026-10-18T03:39:09.396796+00:00",
+      "type": "file",
+      "sha256": "3260b15594a73426e0d84413f941ae327cf2d91ab28323fdc55d93a2d1a69a40"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Default/shared_proto_db/metadata/MANIFEST-000001",
+      "bytes": 41,
+      "mode": 384,
+      "mtimeNs": 1792294749405583842,
+      "birthAt": "2026-10-18T03:39:09.402412+00:00",
+      "type": "file",
+      "sha256": "f9d31b278e215eb0d0e9cd709edfa037e828f36214ab7906f612160fead4b2b4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GPUPersistentCache",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749247436691,
+      "birthAt": "2026-10-18T03:39:09.246814+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GPUPersistentCache/GPUCache",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294749247569025,
+      "birthAt": "2026-10-18T03:39:09.247415+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42",
+      "bytes": 160,
+      "mode": 448,
+      "mtimeNs": 1792294749248055194,
+      "birthAt": "2026-10-18T03:39:09.247564+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42/cache.db",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749247687150,
+      "birthAt": "2026-10-18T03:39:09.247687+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42/cache.db-wal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749248028278,
+      "birthAt": "2026-10-18T03:39:09.248028+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GPUPersistentCache/GPUCache/IQETDSPTEJLWJDGH77X6MIQHD6JVAS42/cache.journal",
+      "bytes": 0,
+      "mode": 384,
+      "mtimeNs": 1792294749247859193,
+      "birthAt": "2026-10-18T03:39:09.247859+00:00",
+      "type": "file",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache",
+      "bytes": 320,
+      "mode": 448,
+      "mtimeNs": 1792294749789179397,
+      "birthAt": "2026-10-18T03:39:09.513247+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/data_0",
+      "bytes": 45056,
+      "mode": 384,
+      "mtimeNs": 1792294749789805901,
+      "birthAt": "2026-10-18T03:39:09.513978+00:00",
+      "type": "file",
+      "sha256": "edf9bd8647ed16f8c13305e05a52bfbf7f9b69eb9d312a5bc4fdf3b7ce47d3e4"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/data_1",
+      "bytes": 270336,
+      "mode": 384,
+      "mtimeNs": 1792294751384454875,
+      "birthAt": "2026-10-18T03:39:09.514104+00:00",
+      "type": "file",
+      "sha256": "2fcee887ae4a52f0334ff4f8333c368ef85f37988ed3a20645dd68aae59951af"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/data_2",
+      "bytes": 1056768,
+      "mode": 384,
+      "mtimeNs": 1792294749789796068,
+      "birthAt": "2026-10-18T03:39:09.514212+00:00",
+      "type": "file",
+      "sha256": "1bdc6ce6beadd32abfbb9ad5a9946a4d2f3efebd6bafb78e3a4d0be7cdc4a93b"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/data_3",
+      "bytes": 4202496,
+      "mode": 384,
+      "mtimeNs": 1792294749789756859,
+      "birthAt": "2026-10-18T03:39:09.514338+00:00",
+      "type": "file",
+      "sha256": "9738c5af2a1dc42e209f6314cbbf966457481d81ff09a0dfbda7ca2154ab2805"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/f_000001",
+      "bytes": 16870,
+      "mode": 384,
+      "mtimeNs": 1792294749786840383,
+      "birthAt": "2026-10-18T03:39:09.781936+00:00",
+      "type": "file",
+      "sha256": "0bce0feed7aea9dc41c92c463381a9627a948a726ff9d38aa27b94ec30f98e40"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/f_000002",
+      "bytes": 17089,
+      "mode": 384,
+      "mtimeNs": 1792294749788790187,
+      "birthAt": "2026-10-18T03:39:09.788068+00:00",
+      "type": "file",
+      "sha256": "075cb9f882ba94bb72389555605a873b7b2944e97e456fa79663880742651d98"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/f_000003",
+      "bytes": 18807,
+      "mode": 384,
+      "mtimeNs": 1792294749789561816,
+      "birthAt": "2026-10-18T03:39:09.789115+00:00",
+      "type": "file",
+      "sha256": "3854868cf4193b79797ee82a7d28550222667c9700bd5e86d3ab29b197339e48"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/GraphiteDawnCache/index",
+      "bytes": 262512,
+      "mode": 384,
+      "mtimeNs": 1792294749513848308,
+      "birthAt": "2026-10-18T03:39:09.513320+00:00",
+      "type": "file",
+      "sha256": "f0c76690d1abe076cee934d057b35f50ddedeb1cee82f5b3cd53156c5cf8c102"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Last Version",
+      "bytes": 13,
+      "mode": 420,
+      "mtimeNs": 1792294749250291833,
+      "birthAt": "2026-10-18T03:39:09.250115+00:00",
+      "type": "file",
+      "sha256": "a955adc231dc8cc2ad7fb2800b429d8896b47a1628efa1ac36f066cfa5e33d7f"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Local State",
+      "bytes": 3254,
+      "mode": 384,
+      "mtimeNs": 1792294751379218675,
+      "birthAt": "2026-10-18T03:39:11.372205+00:00",
+      "type": "file",
+      "sha256": "42cb3bfe179a759dd6e6f3ac391a870970581525e7dcebbbbb550c71a800d34d"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/NativeMessagingHosts",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294749237465962,
+      "birthAt": "2026-10-18T03:39:09.237466+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/OptimizationGuideModelsManifest",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294749250154332,
+      "birthAt": "2026-10-18T03:39:09.250154+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Safe Browsing",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294749296311245,
+      "birthAt": "2026-10-18T03:39:09.296311+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/Variations",
+      "bytes": 85,
+      "mode": 420,
+      "mtimeNs": 1792294751347147184,
+      "birthAt": "2026-10-18T03:39:09.229183+00:00",
+      "type": "file",
+      "sha256": "b26da4f8c7e283aa74386da0229d66af14a37986b8ca828e054fc932f68dd557"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/VariationsSafeSeedV2",
+      "bytes": 19,
+      "mode": 384,
+      "mtimeNs": 1792294749230388751,
+      "birthAt": "2026-10-18T03:39:09.230309+00:00",
+      "type": "file",
+      "sha256": "1560b22b2264f7cb6b7f6910164813f76c5e8a06fb1acf85b375e687ee49c1ad"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/VariationsSeedV2",
+      "bytes": 11,
+      "mode": 384,
+      "mtimeNs": 1792294750236591642,
+      "birthAt": "2026-10-18T03:39:10.236493+00:00",
+      "type": "file",
+      "sha256": "b4cc4174735c28360b9081be3c3d0552d8a4b3cdb54431ac00ed0d622bab6296"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/component_crx_cache",
+      "bytes": 64,
+      "mode": 448,
+      "mtimeNs": 1792294749246549060,
+      "birthAt": "2026-10-18T03:39:09.246549+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/extensions_crx_cache",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294751379542261,
+      "birthAt": "2026-10-18T03:39:09.600937+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/extensions_crx_cache/metadata.json",
+      "bytes": 13,
+      "mode": 384,
+      "mtimeNs": 1792294751353834642,
+      "birthAt": "2026-10-18T03:39:11.351225+00:00",
+      "type": "file",
+      "sha256": "2771d13c637c267132afff9db67537bef95708534b79ae8d954254c4e64e4e0f"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/segmentation_platform",
+      "bytes": 96,
+      "mode": 448,
+      "mtimeNs": 1792294751397059411,
+      "birthAt": "2026-10-18T03:39:09.251009+00:00",
+      "type": "directory"
+    },
+    {
+      "path": "profiles/d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099/segmentation_platform/ukm_db",
+      "bytes": 49152,
+      "mode": 384,
+      "mtimeNs": 1792294751389412114,
+      "birthAt": "2026-10-18T03:39:09.251284+00:00",
+      "type": "file",
+      "sha256": "bc36407d1febb7e007871903c5ac590bf042982173f381c924a92d43c52ffc0f"
+    }
+  ],
+  "symlinksFollowed": false,
+  "archive": {
+    "path": "artifacts/rust-tauri/R07/T07/resume-cookie-diagnosis-t07d/owned-failed-fixture.tar.gz",
+    "sha256": "d0cea619711194c8feccc10da0e56789d6763b0af75b01b8ad27d6a1de111158",
+    "bytes": 280347,
+    "scope": "仅本次已确认的合成fixture，自有两个profile和aux/download；不读任何外部symlink目标。"
+  },
+  "profiles": [
+    {
+      "owner": "owner-a",
+      "identityKey": "3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc",
+      "preferencesSha256": "d77bd78ee50289e8f75cc64c4b4eb9e04cc17417aefcb623c3d14cc2f4c0b244",
+      "cookiesDefaultSetting": 2,
+      "cookieExceptions": {},
+      "profileExitType": "SessionEnded",
+      "historyUrls": [
+        [
+          "http://127.0.0.1:59443/login",
+          "Local browser fixture"
+        ],
+        [
+          "http://127.0.0.1:59443/form",
+          "Local browser fixture"
+        ]
+      ],
+      "historyLimitation": "强制关闭或未提交错误导航可能不落History，不能据缺失URL判定未发HTTP。"
+    },
+    {
+      "owner": "owner-b",
+      "identityKey": "d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099",
+      "preferencesSha256": "93af9fd8ed9a5f7e11faac8f2e70849e2ed52bb7de91e14854fdaa422c6fc8f1",
+      "cookiesDefaultSetting": 2,
+      "cookieExceptions": {},
+      "profileExitType": "Normal",
+      "historyUrls": [
+        [
+          "http://127.0.0.1:59443/form",
+          "Local browser fixture"
+        ]
+      ],
+      "historyLimitation": "强制关闭或未提交错误导航可能不落History，不能据缺失URL判定未发HTTP。"
+    }
+  ],
+  "crashRelatedEntries": []
+}

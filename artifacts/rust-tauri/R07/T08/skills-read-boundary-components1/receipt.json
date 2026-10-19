@@ -1,0 +1,16 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/components/SkillsPanel.test.tsx",
+    "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx"
+  ],
+  "exitCode": 0,
+  "developmentOnly": true,
+  "formalCandidate": false,
+  "files": {
+    "stdout.log": "d650dbe43a73ab38ff2275e1379331b1deb25e2158594ff4381abf17cb43ad00",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -73,9 +73,45 @@ vi.mock('@/ui', () => ({
 }));
 
 import { ModelsTab } from '../ModelsTab';
+import { useSettingsStore } from '../../store';
 
 function jsonResponse(body: unknown): Response {
   return { json: async () => body } as Response;
+}
+
+// 组件检查仅替代请求应答，验证实际页面和数据hook；真实Rust写入/消费由独立集成检查负责。
+function installSpeechGenerationResponses(rejectWrite = false) {
+  useSettingsStore.setState({ toastMessage: '', toastType: '', toastVisible: false });
+  mocks.lingxiFetch.mockImplementation((path: string, init?: RequestInit) => {
+    if (path === '/api/media/speech/providers') {
+      return Promise.resolve(jsonResponse({
+        providers: {
+          'system-speech': {
+            providerId: 'system-speech', displayName: 'System speech', hasCredentials: true,
+            models: [
+              { id: 'system-say-settings-model', name: 'System speech', adapterAvailable: true },
+              { id: 'alternate-say-model', name: 'Alternate speech', adapterAvailable: true },
+            ],
+          },
+        },
+        config: { defaultSpeechModel: { provider: 'system-speech', id: 'system-say-settings-model' }, speed: 1.2 },
+      }));
+    }
+    if (path === '/api/speech-recognition/providers') {
+      return Promise.resolve(jsonResponse({
+        providers: {
+          'volcengine-speech': { providerId: 'volcengine-speech', displayName: 'BigASR', hasCredentials: true, models: [{ id: 'bigasr', adapterAvailable: true }] },
+        },
+        config: { enabled: true, defaultModel: { provider: 'volcengine-speech', id: 'bigasr' } },
+      }));
+    }
+    if (path === '/api/media/speech/config' && init?.method === 'PUT') {
+      if (rejectWrite) return Promise.reject(new Error('speech-generation-save-rejected'));
+      const patch = JSON.parse(String(init.body)) as { values: { defaultSpeechModel: unknown } };
+      return Promise.resolve(jsonResponse({ values: { speed: 1.2, ...patch.values } }));
+    }
+    return Promise.resolve(jsonResponse({ providers: {}, config: {} }));
+  });
 }
 
 describe('ModelsTab', () => {
@@ -283,4 +319,65 @@ describe('ModelsTab', () => {
     expect(option).toBeDisabled();
     expect(option).toHaveTextContent('settings.media.adapterMissing');
   });
+
+  it('saves the speechGeneration default through the speech config envelope and keeps ASR independent', async () => {
+    installSpeechGenerationResponses();
+    render(<ModelsTab />);
+    const speech = await screen.findByLabelText('语音合成模型（朗读/语音消息）');
+    const asr = screen.getByLabelText('语音条转录模型');
+    await waitFor(() => {
+      expect(speech).toHaveValue('system-speech/system-say-settings-model');
+      expect(asr).toHaveValue('volcengine-speech/bigasr');
+    });
+    fireEvent.change(speech, { target: { value: 'system-speech/alternate-say-model' } });
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/speech/config', expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ values: { defaultSpeechModel: { provider: 'system-speech', id: 'alternate-say-model' } } }),
+      }));
+      expect(speech).toHaveValue('system-speech/alternate-say-model');
+      expect(useSettingsStore.getState().toastType).toBe('success');
+    });
+    expect(asr).toHaveValue('volcengine-speech/bigasr');
+    expect(mocks.lingxiFetch.mock.calls.filter(([path, init]) => path === '/api/speech-recognition/config' && (init as RequestInit)?.method === 'PUT')).toHaveLength(0);
+  });
+
+  it('clears defaultSpeechModel with explicit null and keeps the speech-recognition default', async () => {
+    installSpeechGenerationResponses();
+    render(<ModelsTab />);
+    const speech = await screen.findByLabelText('语音合成模型（朗读/语音消息）');
+    await waitFor(() => expect(speech).toHaveValue('system-speech/system-say-settings-model'));
+    fireEvent.change(speech, { target: { value: '' } });
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/speech/config', expect.objectContaining({
+        method: 'PUT', body: JSON.stringify({ values: { defaultSpeechModel: null } }),
+      }));
+      expect(speech).toHaveValue('');
+      expect(useSettingsStore.getState().toastType).toBe('success');
+    });
+    expect(screen.getByLabelText('语音条转录模型')).toHaveValue('volcengine-speech/bigasr');
+    expect(mocks.lingxiFetch.mock.calls.filter(([path, init]) => path === '/api/speech-recognition/config' && (init as RequestInit)?.method === 'PUT')).toHaveLength(0);
+  });
+
+  it.each([
+    { name: 'selection', value: 'system-speech/alternate-say-model', patch: { provider: 'system-speech', id: 'alternate-say-model' } },
+    { name: 'clear', value: '', patch: null },
+  ])('keeps the saved speech default after a failed $name and exposes the error', async ({ value, patch }) => {
+    installSpeechGenerationResponses(true);
+    render(<ModelsTab />);
+    const speech = await screen.findByLabelText('语音合成模型（朗读/语音消息）');
+    await waitFor(() => expect(speech).toHaveValue('system-speech/system-say-settings-model'));
+    fireEvent.change(speech, { target: { value } });
+    await waitFor(() => {
+      expect(mocks.lingxiFetch).toHaveBeenCalledWith('/api/media/speech/config', expect.objectContaining({
+        method: 'PUT', body: JSON.stringify({ values: { defaultSpeechModel: patch } }),
+      }));
+      expect(useSettingsStore.getState().toastType).toBe('error');
+      expect(useSettingsStore.getState().toastMessage).toBe('speech-generation-save-rejected');
+      expect(speech).toHaveValue('system-speech/system-say-settings-model');
+    });
+    expect(screen.getByLabelText('语音条转录模型')).toHaveValue('volcengine-speech/bigasr');
+    expect(mocks.lingxiFetch.mock.calls.filter(([path, init]) => path === '/api/speech-recognition/config' && (init as RequestInit)?.method === 'PUT')).toHaveLength(0);
+  });
+
 });

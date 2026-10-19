@@ -1,0 +1,258 @@
+{
+  "schema": "r07-t08-settings-navigation-readonly-v1",
+  "createdAt": "2026-10-18T09:37:34.310063+00:00",
+  "candidate": "t08f-running-frozen",
+  "productModified": false,
+  "cargoExecuted": false,
+  "finding": "SettingsContent正常Rust冷启469及有效restart262均无条件true，render370阻断除agent/access外各页；SettingsApp和SettingsModalShell都复用，独立Tab挂载不能证明现役入口可用。",
+  "tabs": [
+    {
+      "id": "agent",
+      "currentStatus": "已独立RustAgentTab开放",
+      "dependencies": "助手名册/config/身份/记忆/角色卡等RustAgentTab原链",
+      "currentRustWiring": "现有agent/API前缀映射",
+      "responsibility": "T06/T08既有",
+      "minimalAction": "保留特殊页，失败/撤权不能因ready兜底当成功"
+    },
+    {
+      "id": "access",
+      "currentStatus": "现有例外可打开",
+      "dependencies": "access summary/network/account/mobile/desktop credentials/devices revoke",
+      "currentRustWiring": "rustSettingsRoute access/devices已有；Rust management注册",
+      "responsibility": "T08管理读写；LAN/手机完整链T09",
+      "minimalAction": "保留访问入口及原鉴权，不以本地回环证明LAN"
+    },
+    {
+      "id": "me",
+      "currentStatus": "被旧总闸遮挡，但API大部已接",
+      "dependencies": "global config PUT/user-profile PUT/avatar upload/snapshot",
+      "currentRustWiring": "现有config/user-profile/avatar映射及Rust注册",
+      "responsibility": "T08",
+      "minimalAction": "开放后真实导航修改名字/资料/头像；完整global merge及owner不丢"
+    },
+    {
+      "id": "work",
+      "currentStatus": "被旧总闸遮挡，现役配置API已接",
+      "dependencies": "明确目标agent config GET/PUT/global heartbeat master/automation permission/selectFolder",
+      "currentRustWiring": "agents/config现映射；现有授权/任务运行链",
+      "responsibility": "T01/T07/T08",
+      "minimalAction": "保留明确目标owner，真实开关存盘且同现役链消费；不能仅YAML读回"
+    },
+    {
+      "id": "browser",
+      "currentStatus": "被旧总闸遮挡，专有映射已接",
+      "dependencies": "preferences/browser GET/PUT/clear-cookies",
+      "currentRustWiring": "rustBrowserRoute与browser_routes.rs:243-247",
+      "responsibility": "T04/T08",
+      "minimalAction": "开放后真实偏好保存/清cookie；C/D真实Chrome剩余边界T12不抹掉"
+    },
+    {
+      "id": "bridge",
+      "currentStatus": "被旧总闸遮挡，专有映射已接",
+      "dependencies": "bridge status/config/test/owner/settings、wechat qrcode、agent public-agents-md",
+      "currentRustWiring": "rustBridgeRoute/agent映射；Rust bridge_routes",
+      "responsibility": "T02/T08",
+      "minimalAction": "本地外端测试保存/状态，不新增真实账号/外发授权；已迁能力正常显示"
+    },
+    {
+      "id": "skills",
+      "currentStatus": "被旧总闸遮挡，路径已接",
+      "dependencies": "skills/bundles/external-paths/install/translate/agent toggles/order/export",
+      "currentRustWiring": "rustSettingsRoute skills与agents映射；原T08真实目标",
+      "responsibility": "T08",
+      "minimalAction": "从同一SettingsContent导航操作真实技能/组合，不直挂组件代替；picker桌面能力按实际"
+    },
+    {
+      "id": "providers",
+      "currentStatus": "被旧总闸遮挡；聊天供应商已接，媒体路径遗漏",
+      "dependencies": "provider summary/config/key/test/fetch-models/meta/OAuth/search及media/speech providers CRUD",
+      "currentRustWiring": "provider/config/OAuth/search已有；/api/media与speech-recognition未经过任何Rust mapper",
+      "responsibility": "T08",
+      "minimalAction": "补精确媒体/ASR URL映射到已注册media_admin；再开放，Source仍唯一，不另读compat"
+    },
+    {
+      "id": "models",
+      "currentStatus": "被旧总闸遮挡；7独立槽已接，媒体默认路径遗漏",
+      "dependencies": "preferences/models PUT/GET、models/health及四媒体默认",
+      "currentRustWiring": "models/health/preferences-models现映射；useMediaSettingsData四资源/保存走未映射旧API",
+      "responsibility": "T08",
+      "minimalAction": "补已有媒体/ASR路径，实际导航选7槽与TTS等默认并证明同服务保存/调用"
+    },
+    {
+      "id": "general",
+      "currentStatus": "被旧总闸遮挡；部分全局API映射遗漏",
+      "dependencies": "preferences/quick-chat、notifications GET/PUT，global keep_awake/config；settings export/import；auto-launch OS bridge",
+      "currentRustWiring": "Rust quick-chat/notifications已注册但rustSettingsRoute只映6类preferences未含两者；export/import/config已映射",
+      "responsibility": "T08",
+      "minimalAction": "补这两个已注册偏好映射；OS桥不具备时明确不可用；实际导出/导入从导航触发"
+    },
+    {
+      "id": "interface",
+      "currentStatus": "被旧总闸遮挡；部分子能力缺实现/映射",
+      "dependencies": "global config/editor/chat/theme；preferences/sidebar-ui；sessions/workspace-rollback",
+      "currentRustWiring": "global config已接；rollback Rust已注册未映射；sidebar-ui当前Rust未找到路由",
+      "responsibility": "T08界面配置/T07工作区",
+      "minimalAction": "最小补rollback URL；sidebar-ui不能仅改前缀，应接现有共享偏好读写+消费者或在Rust下明确禁用该控件，不能伪默认/成功"
+    },
+    {
+      "id": "keybindings",
+      "currentStatus": "被旧总闸遮挡；专用Rust API缺失",
+      "dependencies": "preferences/keybindings GET/PUT、desktop keybindingsReloadGlobal/quickChatReloadShortcut",
+      "currentRustWiring": "snapshot可读keybindings；未找到专用Rust GET/PUT或settings映射",
+      "responsibility": "T08设置缺口；不能凭推测移交T09",
+      "minimalAction": "开放前接共享偏好单写及桌面实际重载；桌面桥失败诚实回执，或明确该页尚不可用"
+    },
+    {
+      "id": "mcp",
+      "currentStatus": "被旧总闸遮挡且完整页面合同未接",
+      "dependencies": "state/9窄动作、现有页额外defer/bulk/OAuth等",
+      "currentRustWiring": "旧mcp-api URLs全未映射；Rust仅state与settings-action；state顶层/agent/status/tools结构也不匹配",
+      "responsibility": "T08九动作；额外生命周期/HTTP-SSE/OAuth按原范围留T11，不自动领完成",
+      "minimalAction": "必须在现有mcp-api加Rust分支复用同manager与公共DTO，并补安全状态投影；未实现额外动作禁用说明，绝不回退旧内核"
+    },
+    {
+      "id": "experiments",
+      "currentStatus": "被旧总闸遮挡，路径已接",
+      "dependencies": "experiments GET/PATCH、memory cache snapshot observation GET/DELETE",
+      "currentRustWiring": "现有experiments前缀映射及Rust路由",
+      "responsibility": "T07/T08已接实验边界",
+      "minimalAction": "可开放现有操作，记忆整理不重复运行；具体实验不可用按实际结果"
+    },
+    {
+      "id": "security",
+      "currentStatus": "被旧总闸遮挡；proxy配置已接，checkpoint旧列表未接",
+      "dependencies": "global sandbox/file_backup/network_proxy config；GET /api/checkpoints",
+      "currentRustWiring": "global writer/NetworkPlane真实已接；Rust只有session checkpoint与restore，未见旧全局列表",
+      "responsibility": "T08网络/安全偏好；其余备份边界须独立核",
+      "minimalAction": "可最小开放已接proxy设置；未实现全局checkpoint列表不能返回假空，应禁用/显式提示或接真现役列表，不粗放开放整页"
+    },
+    {
+      "id": "sharing",
+      "currentStatus": "被旧总闸遮挡；纯本地界面偏好",
+      "dependencies": "localStorage截图颜色/宽度/字体/分段阈值",
+      "currentRustWiring": "无服务API",
+      "responsibility": "T08界面配置",
+      "minimalAction": "可随已验证会话开放；真实localStorage持久化检查，不声称跨设备同步"
+    },
+    {
+      "id": "about",
+      "currentStatus": "被旧总闸遮挡；桌面桥+global config",
+      "dependencies": "app version/update check/install/channel/openExternal、auto_check_updates/global config",
+      "currentRustWiring": "现有platform/hana桥按宿主能力；config已映射",
+      "responsibility": "T08设置；真实发布/更新不在本次授权",
+      "minimalAction": "可开放；缺平台方法禁用/显示限制，真实外部更新/发布需原独立授权"
+    },
+    {
+      "id": "usage",
+      "currentStatus": "被旧总闸遮挡且现代API尚未迁",
+      "dependencies": "ModelObservabilitySection直接fetch /api/model-observability及sessions/messages/prompt-snapshot",
+      "currentRustWiring": "独立fetch不经过settings mapper；Rust未见同现代接口注册",
+      "responsibility": "明确R07-T10",
+      "minimalAction": "暂不开放成可用页，保留明确不可用；T10做真实记录筛选/详情/导出统一链"
+    },
+    {
+      "id": "envdeps",
+      "currentStatus": "被旧总闸遮挡且Rust专用API未找到",
+      "dependencies": "GET /api/system/env-deps、POST refresh",
+      "currentRustWiring": "无Rust相应路由/mapper",
+      "responsibility": "外围执行器清账T12；需按原范围核",
+      "minimalAction": "暂不开放；不能为了显示复制旧内核执行器或伪检测结果"
+    }
+  ],
+  "minimalSharedDesign": [
+    "不造能力探测大框架。前端维护显式已实接页/子能力清单；server identity capabilities是权限范围，不是已实现功能，不能拿studio.owner当所有tab可用。",
+    "把rustSettingsUnavailable从“所有Rust页未迁”旧哨兵改为实际连接/初始化失败状态，正常成功后才清false；渲染另以明确支持清单挡住usage/envdeps及尚未接子能力。失败/断开仍保留access恢复入口与明确错误。",
+    "冷启动须真实server identity及同连接所属数据成功，不能只在ready=true时开放（15秒兜底/错误catch也ready）。可复用当前资源owner/error/key，但别将整页权限判断外包给测试helper。",
+    "restart先撤旧连接/旧资料/可用状态，再核新服务身份并重拉同一真实资源；有效事件本身不等于身份成功，旧token/缺token/身份错误保持拒绝，不复活旧缓存。",
+    "在现有rustSettingsRoute仅补已注册的精确quick-chat/notifications、media/speech-recognition、workspace-rollback映射；无Rust实现的sidebar/keybindings不伪装改前缀就算接通。",
+    "MCP在原mcp-api做Rust分支使用公共McpSettingsRequest及真实settingsUpdate；保留旧Node分支给原宿主，Rust不可回退。manager安全state投影需包含页面所需非秘密连接资料、真实运行status/tools/policy、显式agent覆盖。既有public_config只id/name/transport等不足以供编辑与工具授权UI。"
+  ],
+  "mcpConcreteMismatch": {
+    "rustState": "{config:{enabled,deferEnabled,deferThreshold,connectors},settingsResults}",
+    "uiExpects": "{enabled,deferEnabled,deferThreshold,builtinDeferEnabled,connectors,status/tools/etc,agentConfig}",
+    "currentStateRouteIgnoresAgentId": true,
+    "currentPublicProjectionMissing": [
+      "command",
+      "args",
+      "cwd",
+      "url",
+      "status",
+      "tools",
+      "policy",
+      "agentConfig"
+    ],
+    "existingNarrowActionEndpoint": "POST /lingxi/v1/mcp/settings-action {action,agentId?,payload}",
+    "notImplementedByNineActionEnum": [
+      "global defer settings",
+      "atomic bulk import",
+      "connector OAuth",
+      "HTTP-SSE remote lifecycle beyond implemented protocols"
+    ]
+  },
+  "verificationProposal": [
+    "新真实服务+同一生产SettingsApp/Modal容器，冷启期间任何数据动作不发；身份与snapshot真实成功后实际click nav（不用手动set rustSettingsUnavailable/ready，也不直挂Tab）。",
+    "从导航依次进行provider保存/模型选择→真实下一Run、skills真实改动、MCP自有stdio九动作、general导入导出、me/work/browser/bridge已接偏好至少一项真实写入与读回/实际消费者；根据复用共同机制选择代表，不能按页批量称全功能通过。",
+    "具体失败恢复：真实身份500/错server、snapshot错误、断开/无凭证、watchdog、旧token重启事件、有效新服务重启后资料owner变化；均从原容器验证拒绝旧动作/不写另一home。",
+    "暂未迁usage/envdeps及MCP额外动作真实点击必须明确不可用，不发旧/api隐式调用，不显示空列表假成功。",
+    "窗口版和modal都至少一次真实导航；宿主缺selectFolder/系统自启/快捷键能力明确禁用，不拿Electron桥替身外推Tauri。"
+  ],
+  "limits": [
+    "本报告为源码只读事实；没有新增GUI/Cargo实跑。",
+    "当前f仍跑完整门禁，未改源/冻结计划/工具；上述必修意味着现有直挂测试证据不能证明被拦入口已可用。",
+    "未完成的本地T08入口不能只为收尾改标T09/T11；明确未来范围限既有usage/T10和MCP额外边界等。"
+  ],
+  "sourceHashes": [
+    {
+      "path": "desktop/src/react/settings/SettingsContent.tsx",
+      "sha256": "8a6c39bdbf0abed26dc458c07ec70cbfd394afd70a412c3c8bd312d6e8d1df2d"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsApp.tsx",
+      "sha256": "a3819f4bea096cfdb9022e5a6ec2627bd26db1c8cfc924562d0a00dbf9f34667"
+    },
+    {
+      "path": "desktop/src/react/components/SettingsModalShell.tsx",
+      "sha256": "4b466b2ea4d467314448afbf57243356c4aef22472d654dfbdc9670ffabdc05d"
+    },
+    {
+      "path": "desktop/src/react/settings/SettingsNav.tsx",
+      "sha256": "cfee03b7897c0493edd104e218f7dbc7f13d6e7de39129191aa1fe517531d35d"
+    },
+    {
+      "path": "desktop/src/react/settings/api.ts",
+      "sha256": "cbe677469233876756f680e0b7632b60e8e25fd6a71936e3df0713cb477d0965"
+    },
+    {
+      "path": "desktop/src/react/services/rust-settings.ts",
+      "sha256": "46c85b04e52db1a92c14c8d89c80a20ff0f557028c70dea436ae25863ecae6a3"
+    },
+    {
+      "path": "desktop/src/react/services/rust-browser.ts",
+      "sha256": "a51c40d4974394aeb02aef37e3ba3b32cfb5e4ee93fa814dea75814a0b5461e8"
+    },
+    {
+      "path": "desktop/src/react/services/rust-bridge.ts",
+      "sha256": "40031e5b62d234960146d3f2031cd0dfb0f00fa9b6a00b95224ad63ae16fda3e"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/mcp/mcp-api.ts",
+      "sha256": "b426594edea440b39a71bbe8800664be5ea213a855fd497f876e78220ed9e950"
+    },
+    {
+      "path": "desktop/src/react/settings/tabs/mcp/types.ts",
+      "sha256": "fa39cec95c1cd99e62dd4f9e7c5c6673eb65d5abd4ee38bb923d84e09f7dc1d1"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/mcp_settings.rs",
+      "sha256": "639537cf04077856dec4ad6ddd70c8f2f15e1b9d43cd0873ef082cd53f47e742"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "d681d98e9f73369b938e5a68d50313543bc025316f70c4c17f8f06c43a7797b3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/media_admin.rs",
+      "sha256": "8d5f3db0742b67ee5e9ddb4303c74c5fe377451dde34b853ae0e9351ca1a2735"
+    }
+  ]
+}

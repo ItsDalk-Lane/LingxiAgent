@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "agent": {
+      "type": "boolean"
+    },
+    "user": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "agent",
+    "user"
+  ],
+  "title": "ClientAvatarAvailability",
+  "type": "object"
+}

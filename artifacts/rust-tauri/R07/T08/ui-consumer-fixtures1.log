@@ -1,0 +1,106 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx (1 test | 1 failed) 1081ms
+     × requests the explicit browser login method and keeps the callback session local 1080ms
+ ❯ tests/stream-route-consumer-isolation.test.ts (12 tests | 1 failed) 5581ms
+     × an incremental mid-stream resume with idle runtime preserves its partial body for consecutive live completion exactly once 1108ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/stream-route-consumer-isolation.test.ts > R1 admission atomicity over the real route > an incremental mid-stream resume with idle runtime preserves its partial body for consecutive live completion exactly once
+AssertionError: expected '' to be '补发前段正文实时后段正文' // Object.is equality
+
+- Expected
++ Received
+
+- 补发前段正文实时后段正文
+
+ ❯ assertCompleted tests/stream-route-consumer-isolation.test.ts:257:22
+    255|         const body = (message.data.blocks || []).filter(block => block…
+    256|           .map(block => block.type === 'text' ? block.content : '').jo…
+    257|         expect(body).toBe(first + tail);
+       |                      ^
+    258|         expect(readLiveAssistantMessage(PATH, message.data.id)).toBeNu…
+    259|         const meta = getSessionStreamMeta(PATH)!;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx > OAuthCredentials > requests the explicit browser login method and keeps the callback session local
+TestingLibraryElementError: Unable to find role="textbox"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_pv-credentials_4045f0"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_pv-cred-row_4045f0"[39m
+      [36m>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"_pv-cred-label_4045f0"[39m
+        [36m>[39m
+          [0mOAuth[0m
+        [36m</span>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"_oauth-login-btn_4045f0"[39m
+        [36m>[39m
+          [0msettings.oauth.login[0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mrole[39m=[32m"alert"[39m
+      [36m>[39m
+        [0msettings.oauth.failed: settings.oauth.browserUnavailable[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"_pv-credentials_4045f0"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_pv-cred-row_4045f0"[39m
+      [36m>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"_pv-cred-label_4045f0"[39m
+        [36m>[39m
+          [0mOAuth[0m
+        [36m</span>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"_oauth-login-btn_4045f0"[39m
+        [36m>[39m
+          [0msettings.oauth.login[0m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mrole[39m=[32m"alert"[39m
+      [36m>[39m
+        [0msettings.oauth.failed: settings.oauth.browserUnavailable[0m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx:89:35
+     87|
+     88|     mocks.lingxiFetch.mockResolvedValueOnce(jsonResponse({ ok: true })…
+     89|     fireEvent.change(await screen.findByRole('textbox'), { target: { v…
+       |                                   ^
+     90|     fireEvent.click(screen.getByRole('button', { name: 'settings.oauth…
+     91|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 21 passed (23)
+   Start at  17:04:14
+   Duration  11.53s (transform 1.42s, setup 37ms, import 2.80s, tests 7.61s, environment 906ms)
+

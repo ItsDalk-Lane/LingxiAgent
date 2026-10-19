@@ -1,0 +1,35 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r06_agent_delete_skills_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_delete_skills_live-afcf2ac8af2cef1f)
+
+running 2 tests
+LINGXI_AUTH_REJECTED request_id="req-bacb61531c300f550aeff68b10ebe093" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58617
+UI-CHILD[complete]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-0-1792319332759037000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-368280eba78493c6451e0bd1f7a584ae" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58662
+UI-CONNECTION[guard-original]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-1-1792319332759037000/ui-result.json
+UI-CHILD[changed]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-3-1792319337715406000/ui-result.json
+UI-CONNECTION[guard-node-new-id]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-4-1792319337926415000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-d95f8532b593d8e7fe016e7fc41dfa36" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58707
+UI-CONNECTION[guard-node-same-id]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-7-1792319341860612000/ui-result.json
+UI-CHILD[failed]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-6-1792319341772619000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-fd8b7ad820284ecce791d216c8261077" method=DELETE path=/lingxi/v1/agents/victim status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58765
+UI-CONNECTION[guard-rust-endpoint]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-9-1792319345922533000/ui-result.json
+UI-CHILD[last]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-11-1792319346075778000/ui-result.json
+test agent_delete_orphan_skills_current_desktop_rust_api_and_ui ... ok
+UI-CONNECTION[guard-transport]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-12-1792319350114991000/ui-result.json
+UI-CONNECTION[guard-instance]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-14-1792319353342556000/ui-result.json
+UI-CONNECTION[guard-kind]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-16-1792319356537168000/ui-result.json
+LINGXI_AUTH_REJECTED request_id="req-022811d9c157e418d226fe610712de9f" method=GET path=/lingxi/v1/server/identity status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:58889
+UI-CONNECTION[guard-token]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-18-1792319359445340000/ui-result.json
+UI-CONNECTION[guard-roundtrip]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-20-1792319362300146000/ui-result.json
+UI-CONNECTION[guard-stable]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-22-1792319365214580000/ui-result.json
+UI-CONNECTION[guard-registry-original]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-24-1792319368888699000/ui-result.json
+UI-CONNECTION[guard-registry-endpoint]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-26-1792319372311147000/ui-result.json
+UI-CONNECTION[guard-registry-roundtrip]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-28-1792319375449191000/ui-result.json
+UI-CONNECTION[guard-registry-stable]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-30-1792319378458015000/ui-result.json
+UI-CONNECTION[guard-registry-source]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-32-1792319381844391000/ui-result.json
+UI-CONNECTION[guard-registry-fallback]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-34-1792319384715483000/ui-result.json
+UI-CONNECTION[guard-registry-unrelated]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-19756-36-1792319388323080000/ui-result.json
+test agent_delete_connection_changes_preserve_both_real_service_roots ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 59.23s
+

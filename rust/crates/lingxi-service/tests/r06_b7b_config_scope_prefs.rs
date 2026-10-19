@@ -19,6 +19,7 @@ use tokio::net::TcpStream;
 struct TestServer {
     addr: SocketAddr,
     home: PathBuf,
+    source: PathBuf,
     workspace: PathBuf,
     token: String,
     stop: tokio::sync::oneshot::Sender<()>,
@@ -74,8 +75,32 @@ async fn start_server_with_ticker(tag: &str, ticker_available: bool) -> TestServ
         network_mode: NetworkMode::Loopback,
         shutdown_timeout_ms: lingxi_service::DEFAULT_SHUTDOWN_TIMEOUT_MS,
     };
+    // 偏好检查起于未配置模型；故障场景仍使用真实可激活的共享模型链。
+    let plane = lingxi_adapters::models::config::ModelPlaneConfig::from_value(
+        json!({"providers":{},"models":{}}),
+    )
+    .unwrap();
+    let clock = std::sync::Arc::new(lingxi_service::inject::SystemClock);
+    let credentials = std::sync::Arc::new(
+        lingxi_service::credentials::CredentialService::bootstrap(
+            &plane,
+            &layout.runtime_dir,
+            clock.clone(),
+        )
+        .unwrap(),
+    );
+    let source = layout.runtime_dir.join("models.json");
     let deps = ServiceDeps {
         workspace_root: Some(workspace.clone()),
+        model_gateway: Some(std::sync::Arc::new(
+            lingxi_adapters::models::gateway::ConfigModelGateway::from_validated(plane),
+        )),
+        credential_service: Some(credentials),
+        network_plane: Some(lingxi_adapters::models::network::NetworkPlane::direct_isolated()),
+        model_plane_activation: Some(std::sync::Arc::new(std::sync::atomic::AtomicBool::new(
+            false,
+        ))),
+        clock,
         ..ServiceDeps::default()
     };
     let state = ServiceState::bootstrap_with_deps(config, &layout, deps)
@@ -116,6 +141,7 @@ async fn start_server_with_ticker(tag: &str, ticker_available: bool) -> TestServ
     TestServer {
         addr,
         home,
+        source,
         workspace,
         token,
         stop: stop_tx,
@@ -298,7 +324,7 @@ async fn global_agent_leaf_split_cross_agent_readback_and_immediate_refilter() {
         .events_since(
             latest,
             "editor-typography-changed",
-            json!({"editor": editor_patch}),
+            json!({"editor": preferences(&server.home)["editor"]}),
         )
         .await;
     assert_eq!(hits, 1, "editor-typography-changed 广播");
@@ -426,8 +452,9 @@ async fn mixed_patch_partial_success_and_memory_toggle_timestamps() {
         .await;
     assert_eq!(keep_hits, 1, "mixed patch 的全局事件仍发布");
 
-    // ── 后段失败：全局 setter 已写入 → 部分成功读回，不回滚。
+    // ── 纯输入校验先于第一笔写入，缺provider不应留下半笔设置。
     let config_before_failure = agent_config(&server.home, "agentA");
+    let prefs_before_failure = std::fs::read(server.home.join("user/preferences.json")).unwrap();
     let (status, body) = server
         .request(
             "PUT",
@@ -435,7 +462,7 @@ async fn mixed_patch_partial_success_and_memory_toggle_timestamps() {
             Some(json!({"keep_awake": false, "api": {"api_key": "sk-b7b-inline"}})),
         )
         .await;
-    assert_eq!(status, 400, "助手段（内联凭证缺 provider）后段失败：{body}");
+    assert_eq!(status, 400, "内联凭证缺provider在写前拒绝：{body}");
     assert!(
         body["error"]
             .as_str()
@@ -445,9 +472,14 @@ async fn mixed_patch_partial_success_and_memory_toggle_timestamps() {
     );
     assert_eq!(
         preferences(&server.home)["keep_awake"],
-        json!(false),
-        "前段全局 setter 已写入被如实读回（部分成功，不宣称原子回滚）"
+        json!(true),
+        "整批纯校验未通过，原全局设置保持不变"
     );
+    assert_eq!(
+        std::fs::read(server.home.join("user/preferences.json")).unwrap(),
+        prefs_before_failure
+    );
+    assert!(!server.source.exists(), "不创建未被批准的模型来源文件");
     assert_eq!(
         agent_config(&server.home, "agentA"),
         config_before_failure,
@@ -457,6 +489,43 @@ async fn mixed_patch_partial_success_and_memory_toggle_timestamps() {
         .events_since(latest, "keep-awake-changed", json!({}))
         .await;
     assert_eq!(keep_hits, 0, "失败请求不发布成功事件");
+
+    // ── 已保存后出现真实投影故障：保留部分成功事实及对应事件，不能假回滚。
+    let catalog = server.home.join("provider-catalog.json");
+    let damaged = b"{damaged compatibility projection";
+    std::fs::write(&catalog, damaged).unwrap();
+    let (status, body) = server.request("PUT", "/lingxi/v1/agents/agentA/config", Some(json!({"keep_awake":false,"providers":{"partial-fixture":{"api":"openai-completions","base_url":"http://127.0.0.1:9/v1","api_key":"synthetic-partial-key","models":[{"id":"partial-model","inputs":["text"]}]}}}))).await;
+    assert_eq!(status, 500, "实际保存后的投影错误：{body}");
+    assert_eq!(body["code"], "model_projection_unconfirmed");
+    assert_eq!(body["preferencesSaved"], true);
+    assert_eq!(body["result"]["saved"], true);
+    assert_eq!(body["result"]["applied"], true);
+    assert_eq!(preferences(&server.home)["keep_awake"], false);
+    assert_eq!(agent_config(&server.home, "agentA"), config_before_failure);
+    let source: Value = serde_json::from_slice(&std::fs::read(&server.source).unwrap()).unwrap();
+    assert_eq!(
+        source["providers"]["partial-fixture"]["models"][0]["id"],
+        "partial-model"
+    );
+    let (status, current) = server
+        .request("GET", "/lingxi/v1/agents/agentA/config", None)
+        .await;
+    assert_eq!(status, 200, "{current}");
+    assert_eq!(
+        current["providers"]["partial-fixture"]["models"][0]["id"],
+        "partial-model"
+    );
+    assert!(!current.to_string().contains("synthetic-partial-key"));
+    assert_eq!(std::fs::read(&catalog).unwrap(), damaged);
+    let (_, keep_hits) = server
+        .events_since(latest, "keep-awake-changed", json!({"keep_awake":false}))
+        .await;
+    assert_eq!(keep_hits, 1, "真实已保存的全局变更必须通知桌面");
+    let (latest, model_hits) = server
+        .events_since(latest, "models-changed", json!({"agentId":"agentA"}))
+        .await;
+    assert_eq!(model_hits, 1, "已发布模型在投影故障时仍如实通知");
+    std::fs::remove_file(&catalog).unwrap();
 
     // ── memory.enabled 时间戳：关→disabledSince，开→reenableAt（agents.ts:757）。
     let (status, body) = server

@@ -1,0 +1,26 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0624]: method `queue` is private
+   --> crates/lingxi-service/tests/r07_scheduler.rs:356:10
+    |
+356 |         .queue()
+    |          ^^^^^ private method
+    |
+   ::: crates/lingxi-adapters/src/storage/run_store.rs:335:5
+    |
+335 |     pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+    |     ------------------------------------------- private method defined here
+
+error[E0624]: method `queue` is private
+   --> crates/lingxi-service/tests/r07_scheduler.rs:379:10
+    |
+379 |         .queue()
+    |          ^^^^^ private method
+    |
+   ::: crates/lingxi-adapters/src/storage/run_store.rs:335:5
+    |
+335 |     pub(crate) fn queue(&self) -> &Arc<DbQueue> {
+    |     ------------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `lingxi-service` (test "r07_scheduler") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,701 @@
+{
+  "checks": [
+    "real-wire-hello",
+    "no-session-welcome",
+    "empty-input-zero-prompt",
+    "actual-prompt-identity",
+    "tool-stage-and-final-visible",
+    "welcome-current-exclusive"
+  ],
+  "sent": [
+    {
+      "protocol": "lingxi.wire",
+      "clientKind": "desktop",
+      "clientVersion": "0.1.43",
+      "protocolMin": 1,
+      "protocolMax": 1,
+      "caps": []
+    },
+    {
+      "protocol": "lingxi.wire",
+      "clientKind": "desktop",
+      "clientVersion": "0.1.43",
+      "protocolMin": 1,
+      "protocolMax": 1,
+      "caps": []
+    },
+    {
+      "type": "subscribe_mood",
+      "sessionId": "desktop"
+    },
+    {
+      "type": "prompt",
+      "clientMessageId": "client-user-c6490eb1-e071-4cb9-8be6-aac157de681a",
+      "snapshotVersion": 1,
+      "text": "CHAT-TOOL",
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "uiContext": null,
+      "displayMessage": {
+        "text": "CHAT-TOOL"
+      },
+      "clientAttemptId": "client-attempt-889306ad-90f0-4eb1-9d8d-a9f233114063"
+    }
+  ],
+  "received": [
+    {
+      "dataEpoch": 1,
+      "protocol": "lingxi.wire",
+      "selectedProtocol": 1,
+      "serverKind": "lingxi-service",
+      "serverVersion": "0.0.0",
+      "wireProtocolMax": 1,
+      "wireProtocolMin": 1
+    },
+    {
+      "dataEpoch": 1,
+      "protocol": "lingxi.wire",
+      "selectedProtocol": 1,
+      "serverKind": "lingxi-service",
+      "serverVersion": "0.0.0",
+      "wireProtocolMax": 1,
+      "wireProtocolMin": 1
+    },
+    {
+      "frameKind": "control",
+      "fromSeq": "0",
+      "mode": "snapshot",
+      "snapshotSeq": "0",
+      "streamId": "lingxi.mood/68693d02ab4fbb2331b8cc39915322e48e61f06d4d1b31e7d19913202857bc8a",
+      "type": "subscribed"
+    },
+    {
+      "clientMessageId": "client-user-c6490eb1-e071-4cb9-8be6-aac157de681a",
+      "message": {
+        "attachments": [],
+        "clientMessageId": "client-user-c6490eb1-e071-4cb9-8be6-aac157de681a",
+        "hasImages": false,
+        "id": "user:run_000001a14e47bf93_000001",
+        "quotedText": null,
+        "sessionRefs": null,
+        "snapshotVersion": 1,
+        "sourceEntryId": "user:run_000001a14e47bf93_000001",
+        "text": "CHAT-TOOL",
+        "timestamp": 1792314687393
+      },
+      "seq": 1,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "snapshotVersion": 1,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687393,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "session_user_message"
+    },
+    {
+      "clientMessageId": "client-user-c6490eb1-e071-4cb9-8be6-aac157de681a",
+      "message": {
+        "attachments": [],
+        "clientMessageId": "client-user-c6490eb1-e071-4cb9-8be6-aac157de681a",
+        "hasImages": false,
+        "id": "user:run_000001a14e47bf93_000001",
+        "quotedText": null,
+        "sessionRefs": null,
+        "snapshotVersion": 1,
+        "sourceEntryId": "user:run_000001a14e47bf93_000001",
+        "text": "CHAT-TOOL",
+        "timestamp": 1792314687393
+      },
+      "seq": 1,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "snapshotVersion": 1,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687393,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "session_user_message"
+    },
+    {
+      "isStreaming": true,
+      "seq": 2,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687393,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "status"
+    },
+    {
+      "isStreaming": true,
+      "seq": 2,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687393,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "status"
+    },
+    {
+      "runId": "run_000001a14e47bf93_000001",
+      "seq": 3,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687393,
+      "turnId": "run_000001a14e47bf93_000001",
+      "turnInputEntryId": "user:run_000001a14e47bf93_000001",
+      "type": "assistant_run_start"
+    },
+    {
+      "runId": "run_000001a14e47bf93_000001",
+      "seq": 3,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687393,
+      "turnId": "run_000001a14e47bf93_000001",
+      "turnInputEntryId": "user:run_000001a14e47bf93_000001",
+      "type": "assistant_run_start"
+    },
+    {
+      "modelCallId": "run_000001a14e47bf93_000001-mc0001",
+      "phase": "model",
+      "seq": 4,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687436,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "stage"
+    },
+    {
+      "modelCallId": "run_000001a14e47bf93_000001-mc0001",
+      "phase": "model",
+      "seq": 4,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687436,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "run_000001a14e47bf93_000001-tc0001",
+      "name": "tool:first-party:mcp_describe_tool",
+      "seq": 5,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687436,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_start"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "run_000001a14e47bf93_000001-tc0001",
+      "name": "tool:first-party:mcp_describe_tool",
+      "seq": 5,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687436,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "{\"availability\":\"available\",\"catalogGeneration\":84,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+          "type": "text"
+        }
+      ],
+      "details": null,
+      "error": null,
+      "id": "run_000001a14e47bf93_000001-tc0001",
+      "name": "tool:first-party:mcp_describe_tool",
+      "seq": 6,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "run_000001a14e47bf93_000001",
+      "success": true,
+      "ts": 1792314687436,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_end"
+    },
+    {
+      "content": [
+        {
+          "text": "{\"availability\":\"available\",\"catalogGeneration\":84,\"description\":\"Native Rust read tool (R04-T04): the incumbent pi-coding-agent read semantics behind the unified gateway\",\"dialect\":\"json-schema/2020-12\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"limit\":{\"minimum\":1,\"type\":\"integer\"},\"offset\":{\"minimum\":1,\"type\":\"integer\"},\"path\":{\"minLength\":1,\"type\":\"string\"}},\"required\":[\"path\"],\"type\":\"object\"},\"server\":\"first-party\",\"targetGeneration\":1,\"targetId\":\"tool:first-party:read\",\"tool\":\"read\"}",
+          "type": "text"
+        }
+      ],
+      "details": null,
+      "error": null,
+      "id": "run_000001a14e47bf93_000001-tc0001",
+      "name": "tool:first-party:mcp_describe_tool",
+      "seq": 6,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "run_000001a14e47bf93_000001",
+      "success": true,
+      "ts": 1792314687436,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "run_000001a14e47bf93_000001-mc0002",
+      "phase": "model",
+      "seq": 7,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687443,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "stage"
+    },
+    {
+      "modelCallId": "run_000001a14e47bf93_000001-mc0002",
+      "phase": "model",
+      "seq": 7,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687443,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": "{path:str}"
+      },
+      "id": "run_000001a14e47bf93_000001-tc0002",
+      "name": "tool:first-party:read",
+      "seq": 8,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687451,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_start"
+    },
+    {
+      "args": {
+        "summary": "{path:str}"
+      },
+      "id": "run_000001a14e47bf93_000001-tc0002",
+      "name": "tool:first-party:read",
+      "seq": 8,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687451,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "NATIVE-REAL-FILE-CONSUMER",
+          "type": "text"
+        }
+      ],
+      "details": {
+        "format": "text-or-binary",
+        "source": {
+          "path": "chat-real.txt",
+          "sha256": "ee6aa24dc96aca880f4e66001a88b9fba23b945f7272e8c0a715be229dee3ec1",
+          "sizeBytes": 25
+        }
+      },
+      "error": null,
+      "id": "run_000001a14e47bf93_000001-tc0002",
+      "name": "tool:first-party:read",
+      "seq": 9,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "run_000001a14e47bf93_000001",
+      "success": true,
+      "ts": 1792314687451,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_end"
+    },
+    {
+      "content": [
+        {
+          "text": "NATIVE-REAL-FILE-CONSUMER",
+          "type": "text"
+        }
+      ],
+      "details": {
+        "format": "text-or-binary",
+        "source": {
+          "path": "chat-real.txt",
+          "sha256": "ee6aa24dc96aca880f4e66001a88b9fba23b945f7272e8c0a715be229dee3ec1",
+          "sizeBytes": 25
+        }
+      },
+      "error": null,
+      "id": "run_000001a14e47bf93_000001-tc0002",
+      "name": "tool:first-party:read",
+      "seq": 9,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "run_000001a14e47bf93_000001",
+      "success": true,
+      "ts": 1792314687451,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "run_000001a14e47bf93_000001-mc0003",
+      "phase": "model",
+      "seq": 10,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687458,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "stage"
+    },
+    {
+      "modelCallId": "run_000001a14e47bf93_000001-mc0003",
+      "phase": "model",
+      "seq": 10,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687458,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "stage"
+    },
+    {
+      "kind": "text",
+      "segmentId": "assistant:3:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 11,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "assistant_segment_start"
+    },
+    {
+      "kind": "text",
+      "segmentId": "assistant:3:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 11,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "assistant_segment_start"
+    },
+    {
+      "delta": "CHAT-FINAL-0",
+      "segmentId": "assistant:3:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 12,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "delta": "CHAT-FINAL-0",
+      "segmentId": "assistant:3:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 12,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "segmentId": "assistant:3:text:default",
+      "semanticPhase": "final_answer",
+      "seq": 13,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "assistant_segment_end"
+    },
+    {
+      "runId": "run_000001a14e47bf93_000001",
+      "seq": 14,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "turnInputEntryId": "user:run_000001a14e47bf93_000001",
+      "type": "assistant_run_end"
+    },
+    {
+      "isStreaming": false,
+      "seq": 15,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "status"
+    },
+    {
+      "segmentId": "assistant:3:text:default",
+      "semanticPhase": "final_answer",
+      "seq": 13,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "assistant_segment_end"
+    },
+    {
+      "runId": "run_000001a14e47bf93_000001",
+      "seq": 14,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "turnInputEntryId": "user:run_000001a14e47bf93_000001",
+      "type": "assistant_run_end"
+    },
+    {
+      "isStreaming": false,
+      "seq": 15,
+      "sessionId": "desktop",
+      "sessionPath": "native:desktop",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a14e47bf93_000001",
+      "ts": 1792314687466,
+      "turnId": "run_000001a14e47bf93_000001",
+      "type": "status"
+    }
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/studio/workspaces"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/experiments"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/skills?agentId=lingxi&runtime=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/studio/workspaces"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/experiments"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/skills?agentId=lingxi&runtime=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/desk/DeskEditor.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/right-workspace/WorkflowCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/right-workspace/AgentActivityCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/right-workspace/SessionStatusCard.tsx"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/runtime/RuntimeInfoCapsule.module.css"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/resource-io/events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/app-events?since=0"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/session-thinking-level"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/session-thinking-level"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/history?all=1"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/approvals"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/deferred-rewind"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/interactions?sessionId=desktop"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/session-thinking-level?sessionPath=desktop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/history?all=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/approvals"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/deferred-rewind"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/interactions?sessionId=desktop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/experiments"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/skills?agentId=lingxi&runtime=1"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/session-thinking-level?sessionPath=desktop"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/mood-history"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/sessions/desktop/mood-history"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/desk/activities"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/models"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/models"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/right-workspace/SessionStatusCard.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/desk/Desk.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/right-workspace/WorkflowCard.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/react/components/right-workspace/AgentActivityCard.module.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57545/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "OPTIONS",
+      "url": "http://127.0.0.1:57545/lingxi/v1/browser/workspaces"
+    },
+    {
+      "method": "GET",
+      "url": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2040%2040%22%3E%3Crect%20width%3D%2240%22%20height%3D%2240%22%20rx%3D%2220%22%20fill%3D%22%23f0eee9%22%2F%3E%3Ctext%20x%3D%2220%22%20y%3D%2224%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2215%22%20font-weight%3D%22600%22%20fill%3D%22%232f6f8f%22%3EU%3C%2Ftext%3E%3C%2Fsvg%3E"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:57598/themes/fonts/ebgaramond-9947e6f6e128.woff2"
+    }
+  ],
+  "errors": [
+    "[InputArea] load thinking level failed Error: 连接已切换，本次旧连接结果已丢弃"
+  ],
+  "visible": "暂无情绪轨迹\n\nUser\n\nCHAT-TOOL\n\n17:11\nLingxi\nprocessFold.summary · processFold.tools\n›\n\nCHAT-FINAL-0\n\n17:11\n\n\n\n\nchat.send\nchat"
+}

@@ -1,0 +1,3205 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "checkedAt": "2026-10-18T02:57:43.636972+00:00",
+  "status": "SOURCE_RESPONSIBILITY_AUDIT_NOT_FINAL_ACCEPTANCE",
+  "counts": {
+    "currentTaskLeaves": 65,
+    "inheritedT03NotReclaimed": 22,
+    "uniqueResponsibilityTests": 86,
+    "locatedTests": 86,
+    "missingTests": 0
+  },
+  "method": "逐叶对照需求责任，读取实际测试定义、正式HTTP/磁盘/Run/账本或组件断言；本文件记录责任边界和源码定位，不把定义存在或开发日志冒充候选验收。测试目录按正式integration wrapper及实际定义定位。",
+  "missing": [],
+  "testCatalog": {
+    "desktop/src/react/__tests__/components/DeskSection.test.tsx::Rust 挂载使用显式监听权限，撤回权限和切换连接都会释放旧订阅": {
+      "source": "desktop/src/react/__tests__/components/DeskSection.test.tsx",
+      "definitionLine": 204,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "2a52265c2096af4c6daf1197d56aa04fecd7c4acae58e106ef3ddadb04c03e4b"
+    },
+    "desktop/src/react/__tests__/components/DeskSection.test.tsx::watches the workspace root plus expanded folders and reloads visible dirty tree keys from workspace events": {
+      "source": "desktop/src/react/__tests__/components/DeskSection.test.tsx",
+      "definitionLine": 140,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "2a52265c2096af4c6daf1197d56aa04fecd7c4acae58e106ef3ddadb04c03e4b"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::clears the selected agent workspace without sending frontend business IPC": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 139,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::renders the current agent desk settings from settingsConfig on the first paint": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 95,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::rolls a project skill switch back when the Agent config save fails": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 297,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the selected agent AGENTS.md injection toggle": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 243,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the selected agent workspace without sending frontend business IPC": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 123,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the two project skill discovery switches independently": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 275,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/settings/WorkTab.test.tsx::uses automation.permissionMode and does not render the removed cron auto-approve row": {
+      "source": "desktop/src/react/__tests__/settings/WorkTab.test.tsx",
+      "definitionLine": 222,
+      "kind": "frontend_component_or_mapping",
+      "sourceSha256": "0b7349bee3753662b72f5cb37cb81aa7ef4f6437041683af1797528154f0188d"
+    },
+    "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）": {
+      "source": "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts",
+      "definitionLine": 23,
+      "kind": "frontend_real_service_if_env_present",
+      "sourceSha256": "1306b3d23df90da7c1397f9005b4649dd245fffcd81a5f777d7f2de8d5729a1b"
+    },
+    "r07_activity_promotion::session_admin_refuses_live_lease_then_promotes_same_identity_after_release": {
+      "source": "rust/crates/lingxi-service/tests/r07_activity_promotion.rs",
+      "definitionLine": 17,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9531d5486eeb3e26f55775ef989b0ebc47d3b93c49be209cd91337b758a048e6",
+      "assertionLines": [
+        138,
+        145,
+        152,
+        160,
+        168,
+        175
+      ],
+      "httpRoutes": [],
+      "bodySha256": "4e5585d06630ced67be49a377f744d6352bf8e763ab7807deee44034c32e9fb6"
+    },
+    "r07_automation_activity::completed_activity_promotes_the_same_real_session_without_new_messages_or_runs": {
+      "source": "rust/crates/lingxi-service/tests/r07_automation_activity.rs",
+      "definitionLine": 238,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "c37d5e631a0a2fee87064607f059c07720c2e38a8113f4f24d203be49570b0a0",
+      "assertionLines": [
+        242,
+        243,
+        244,
+        245,
+        246,
+        255,
+        256,
+        260,
+        262,
+        263,
+        272,
+        280,
+        281,
+        282,
+        283,
+        284,
+        292,
+        293,
+        295,
+        296,
+        303,
+        304
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/activities/{id}/promote",
+        "/lingxi/v1/desk/activities/{id}/session",
+        "/lingxi/v1/sessions"
+      ],
+      "bodySha256": "588b2c376b6730a2c14db4c42f7ab23013308d053286f74892238ce10507a830"
+    },
+    "r07_automation_activity::desk_logs_return_real_bounded_records_and_reject_device_or_missing_credentials": {
+      "source": "rust/crates/lingxi-service/tests/r07_automation_activity.rs",
+      "definitionLine": 647,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "c37d5e631a0a2fee87064607f059c07720c2e38a8113f4f24d203be49570b0a0",
+      "assertionLines": [
+        653,
+        654,
+        655,
+        661,
+        674
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/logs"
+      ],
+      "bodySha256": "876c16995f5682259403da857654667b3e6224b2c43a348ea484464ff5e4f1ac"
+    },
+    "r07_automation_activity::overdue_activity_list_cancels_real_run_before_publishing_timeout_and_keeps_receipt_after_restart": {
+      "source": "rust/crates/lingxi-service/tests/r07_automation_activity.rs",
+      "definitionLine": 579,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "c37d5e631a0a2fee87064607f059c07720c2e38a8113f4f24d203be49570b0a0",
+      "assertionLines": [
+        594,
+        595,
+        596,
+        597,
+        610,
+        611,
+        621,
+        628,
+        634,
+        636,
+        640,
+        642
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/logs"
+      ],
+      "bodySha256": "2a342097acde114920dd8b2b9ccd768edd18c0055506e022d03a7cbf2c4305cc"
+    },
+    "r07_automation_activity::running_activity_uses_actual_state_and_cannot_be_promoted_while_busy": {
+      "source": "rust/crates/lingxi-service/tests/r07_automation_activity.rs",
+      "definitionLine": 309,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "c37d5e631a0a2fee87064607f059c07720c2e38a8113f4f24d203be49570b0a0",
+      "assertionLines": [
+        319,
+        320,
+        321,
+        330,
+        331,
+        339
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/activities/{id}/promote"
+      ],
+      "bodySha256": "6e001771e796025c9139d9824fb96db1b2ff83554363f4ed2f15098926387e6b"
+    },
+    "r07_desk_files::create_and_actions_flow": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 702,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        714,
+        715,
+        716,
+        721,
+        732,
+        733,
+        734,
+        743,
+        744,
+        755,
+        756,
+        766,
+        767,
+        775,
+        776,
+        777,
+        787,
+        788,
+        789,
+        800,
+        801,
+        802,
+        817,
+        818,
+        819,
+        820,
+        821,
+        822,
+        826,
+        830,
+        842,
+        843,
+        851,
+        852,
+        868,
+        869,
+        870,
+        871,
+        872,
+        884,
+        885,
+        895,
+        896,
+        897,
+        898,
+        906,
+        907,
+        908,
+        918,
+        919,
+        930,
+        931
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/files"
+      ],
+      "bodySha256": "9af4dfe405bb9cdf1a827f7b5ca21cf5e9b12ec7c20ee2b44b3fe4943c83fc42"
+    },
+    "r07_desk_files::files_listing_and_subdir_guards": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 306,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        316,
+        317,
+        318,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        338,
+        339,
+        340,
+        351,
+        352,
+        366,
+        367,
+        377,
+        378,
+        382
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/files"
+      ],
+      "bodySha256": "ad9e2f15f2c1f87f8dff3915fcfcf23434e3e2816681ac0c9db23367f6cb8435"
+    },
+    "r07_desk_files::jian_cycle_and_locale": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 480,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        488,
+        489,
+        499,
+        500,
+        501,
+        502,
+        509,
+        510,
+        520,
+        521,
+        522,
+        523,
+        533,
+        534,
+        544,
+        545,
+        546,
+        556,
+        557,
+        574,
+        575
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/jian"
+      ],
+      "bodySha256": "7c30dd65365ace71f99021025811d2550557cbcbbabc03b13d0e9ca2c836cbb2"
+    },
+    "r07_desk_files::no_workspace_fallbacks": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 940,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        946,
+        947,
+        952,
+        953,
+        954,
+        955,
+        964,
+        965,
+        966,
+        967,
+        972,
+        973,
+        983,
+        984,
+        992,
+        993
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/files",
+        "/lingxi/v1/desk/jian",
+        "/lingxi/v1/desk/path",
+        "/lingxi/v1/desk/search-files"
+      ],
+      "bodySha256": "83d86b7c7707243e9e1e77caba1802e30d760a2b565d836a18e4261babade5da"
+    },
+    "r07_desk_files::path_default_override_and_approval": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 204,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        212,
+        213,
+        223,
+        224,
+        235,
+        236,
+        241,
+        249,
+        250,
+        251,
+        262,
+        263,
+        280,
+        281,
+        294,
+        295,
+        297
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/path"
+      ],
+      "bodySha256": "6658862f80784b01ed4f511332fd3cc2159543b1ed6f7d18e75d74494e5f29f8"
+    },
+    "r07_desk_files::scope_gates": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 999,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        1008,
+        1020,
+        1021,
+        1022,
+        1034,
+        1043,
+        1044
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/files",
+        "/lingxi/v1/desk/jian",
+        "/lingxi/v1/desk/path"
+      ],
+      "bodySha256": "6cc7240c2f3e2966649d71066c1cf7b833d21501c5804ef9095e83258ddcf5bd"
+    },
+    "r07_desk_files::search_files_flow": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 389,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        404,
+        405,
+        406,
+        409,
+        410,
+        411,
+        412,
+        413,
+        423,
+        424,
+        433,
+        434,
+        447,
+        448,
+        454,
+        455,
+        456,
+        473,
+        474
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/search-files"
+      ],
+      "bodySha256": "3d8824700ea49dc239ae3a167611c18b009f604366c4b7d0cc0ba2eadc532257"
+    },
+    "r07_desk_files::upload_gate_and_flow": {
+      "source": "rust/crates/lingxi-service/tests/r07_desk_files/mod.rs",
+      "definitionLine": 584,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "d7192c2ee20f7b3775405c4dadf422f4dcd6f459073adb92290e84bbeb413e9d",
+      "assertionLines": [
+        608,
+        609,
+        611,
+        612,
+        613,
+        614,
+        618,
+        624,
+        632,
+        653,
+        655,
+        656,
+        657,
+        667,
+        668,
+        691,
+        692
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/files"
+      ],
+      "bodySha256": "424f8579d011d00418be5b57c34965e40aaf12de8898d4c8350edea2189a7bd5"
+    },
+    "r07_diary::diary_includes_same_agent_real_cron_activity_but_excludes_promoted_activity": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 1016,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        1033,
+        1045,
+        1052,
+        1061,
+        1070,
+        1074,
+        1082,
+        1090,
+        1099
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/activities",
+        "/lingxi/v1/desk/activities/{id}/promote",
+        "/lingxi/v1/desk/cron",
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "6389b8d48b841ed46f5e817b8abfa5892d6501976ae6cc6b3311f122134fe11e"
+    },
+    "r07_diary::list_missing_dir_then_utf16_descending": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 455,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        460,
+        461,
+        477,
+        478
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/list"
+      ],
+      "bodySha256": "1bfda068d30e9456746045a6a191e1ca34df9fdffa356a97d945432474c3b9e1"
+    },
+    "r07_diary::list_uses_locale_diary_dir_label": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 491,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        503,
+        504
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/list"
+      ],
+      "bodySha256": "abfe8ad6480d9a144f8e1ef74fb2fe5cb9061e9d50a17e769775722e8977d42f"
+    },
+    "r07_diary::write_for_yesterday_ignores_todays_session": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 787,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        798,
+        799,
+        800
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "b57aeb68d80108947d6b35ad66388d1a110cfb6f16ef95fcb226af9ebdb104df"
+    },
+    "r07_diary::write_llm_failure_maps_400_with_localized_message": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 880,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        899,
+        901,
+        902
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "3d4b2f52104214f30ed597937bc5b0650d72cc21fcbf6e442917fb1350a9050a"
+    },
+    "r07_diary::write_session_without_summary_uses_temporary_material": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 664,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        676,
+        679,
+        681,
+        689,
+        690,
+        694,
+        698,
+        699,
+        708
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "e495ac5d45dc2d00a8e4eac5b6fddfbf2bdc3b4240f57c3405e3a71c453dcc21"
+    },
+    "r07_diary::write_strips_mood_blocks_and_fallback_title": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 807,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        827,
+        829,
+        834
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "4ce76f69c4a243bdf7bebfbbcb95ee8257d1ba015c85b79a505b105e3964655b"
+    },
+    "r07_diary::write_temporary_failure_surfaces_warning_envelope": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 910,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        923,
+        925,
+        930,
+        931,
+        932,
+        933,
+        935
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "858c176720db22443cb5e62f710b0b47edaf8b1c1f29acc3fb15e7cb71e59173"
+    },
+    "r07_diary::write_with_summary_material_produces_diary_file": {
+      "source": "rust/crates/lingxi-service/tests/r07_diary/mod.rs",
+      "definitionLine": 582,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "9729150bcdc0f72e4065538598681e90f90f448bb6a95bb792620590f77dcf7f",
+      "assertionLines": [
+        601,
+        603,
+        604,
+        609,
+        613,
+        621,
+        624,
+        625,
+        629,
+        634,
+        635,
+        639,
+        640,
+        641,
+        642,
+        657
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/diary/write"
+      ],
+      "bodySha256": "9097b3073b2089b5121573eec0e1d32d456f8059ebd1d1a170f1b02bf82bf95c"
+    },
+    "r07_git_panel::activity_summary_actual_http_uses_summarize_slot_and_records_success_and_failure": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 2044,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        2051,
+        2052,
+        2054,
+        2055,
+        2060,
+        2061,
+        2062,
+        2063,
+        2069,
+        2070,
+        2071,
+        2080,
+        2081,
+        2083,
+        2084
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/activities/summarize"
+      ],
+      "bodySha256": "20bb31eba511bd4e48af3bb530c6d6bd224bfafd067c23e809be51411b612ee0"
+    },
+    "r07_git_panel::activity_summary_empty_missing_and_device_permission_are_honest": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 2142,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        2147,
+        2148,
+        2155,
+        2156,
+        2171
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/activities/summarize"
+      ],
+      "bodySha256": "75affb6ade076718045edff5e620cbc3cc4ae629b6488072678be441280d167e"
+    },
+    "r07_git_panel::activity_summary_revocation_cancels_call_records_unknown_usage_and_releases_permit": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 2095,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        2120,
+        2125,
+        2128,
+        2129,
+        2130,
+        2131
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/sessions/summary-source/authorized-folders"
+      ],
+      "bodySha256": "f039842adc3a6e8c61ca75f343c6f0674e3c13caeb53a95a4691d6a0c398632e"
+    },
+    "r07_git_panel::ai_commit_message_happy_path_sanitizes_and_records_usage": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1750,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1763,
+        1764,
+        1771,
+        1772,
+        1774,
+        1776,
+        1777,
+        1789,
+        1799
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/ai-commit-message"
+      ],
+      "bodySha256": "13f9bd2b97e592524c5d7ba142c6b82987e5b43614cffebf956b80c0612171a1"
+    },
+    "r07_git_panel::amend_flow": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1126,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1138,
+        1139,
+        1140,
+        1141,
+        1151,
+        1152,
+        1153,
+        1155,
+        1161,
+        1162,
+        1164
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/amend",
+        "/lingxi/v1/git/log"
+      ],
+      "bodySha256": "c4e09534902920e3a12b037be34877d6637dfaf9e2124129f3f843a281379505"
+    },
+    "r07_git_panel::auth_scope_gates": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1898,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1914,
+        1931,
+        1932,
+        1933,
+        1951,
+        1960,
+        1969,
+        1970,
+        1979,
+        1980,
+        1997,
+        1998,
+        2009,
+        2010,
+        2033,
+        2039
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/desk/activities",
+        "/lingxi/v1/desk/cron",
+        "/lingxi/v1/git/commit",
+        "/lingxi/v1/git/log",
+        "/lingxi/v1/git/log-stats",
+        "/lingxi/v1/git/status"
+      ],
+      "bodySha256": "e8550f84c2571caf8a3157b9d9b4bb328f6742f6239362b00234ffc5544d501d"
+    },
+    "r07_git_panel::branches_current_detached_and_checked_out_elsewhere": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 644,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        662,
+        663,
+        664,
+        665,
+        666,
+        677,
+        678,
+        682,
+        683
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/branches"
+      ],
+      "bodySha256": "3e0c33fbb489ed1bad4c0c732ac0facc4da299bab31c74746ac957016ba52669"
+    },
+    "r07_git_panel::checkout_matrix": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 913,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        921,
+        922,
+        931,
+        932,
+        941,
+        942,
+        951,
+        952,
+        954,
+        963,
+        964
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/checkout",
+        "/lingxi/v1/git/status"
+      ],
+      "bodySha256": "0a29f05c678b58bf4a21fbd6e738ce08257302b7537c981b51e7efeda7fbffe1"
+    },
+    "r07_git_panel::commit_flow": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1055,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1067,
+        1068,
+        1069,
+        1070,
+        1079,
+        1080,
+        1081,
+        1091,
+        1092,
+        1093,
+        1102,
+        1104,
+        1106,
+        1117,
+        1118,
+        1120
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/commit",
+        "/lingxi/v1/git/log"
+      ],
+      "bodySha256": "0c8e4400c8ee8c9e0459be11c04b6045ac9c4380c3f4907aa876153f442f941f"
+    },
+    "r07_git_panel::create_branch_matrix": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 970,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        982,
+        983,
+        985,
+        994,
+        995,
+        996,
+        997,
+        998,
+        1007,
+        1008,
+        1009,
+        1010,
+        1019,
+        1021,
+        1028,
+        1029,
+        1030,
+        1031,
+        1032,
+        1038,
+        1039,
+        1046,
+        1047
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/create-branch",
+        "/lingxi/v1/git/status"
+      ],
+      "bodySha256": "6858faa9a3a62b37695d9486d4520a609944db9c97207a6a6a892d7c3ee2d262"
+    },
+    "r07_git_panel::discard_flows": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1396,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1412,
+        1413,
+        1414,
+        1419,
+        1424,
+        1425,
+        1426,
+        1427,
+        1429,
+        1433,
+        1434,
+        1435,
+        1436,
+        1437,
+        1446,
+        1447,
+        1448,
+        1449
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/discard",
+        "/lingxi/v1/git/status"
+      ],
+      "bodySha256": "520c6bdf018955b64563a1e3fdf0d42f82b1dd101596cbe9b4d2c1ae5177551a"
+    },
+    "r07_git_panel::file_diff_tracked_untracked_binary_and_invalid": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 823,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        837,
+        838,
+        850,
+        852,
+        853,
+        854,
+        855,
+        867,
+        869,
+        870,
+        871,
+        872,
+        884,
+        885,
+        900,
+        901,
+        904,
+        905
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/file-diff"
+      ],
+      "bodySha256": "f5b9b22cb433bb335d0249ae3342548b004caf0cd5c8a8ad19116cfd103c3d8a"
+    },
+    "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1651,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1660,
+        1661,
+        1668,
+        1669,
+        1675,
+        1676,
+        1700,
+        1701,
+        1715,
+        1724,
+        1741,
+        1742
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/commit",
+        "/lingxi/v1/git/status"
+      ],
+      "bodySha256": "ed6360981f09a86d4648e4f9e337119e6a5ef65390cdbf3c32e13b15e06d4e56"
+    },
+    "r07_git_panel::log_clamps_limit_and_parses_refs": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 694,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        704,
+        705,
+        707,
+        708,
+        709,
+        710,
+        711,
+        715,
+        716,
+        717,
+        719,
+        723,
+        727,
+        728,
+        742,
+        743,
+        752,
+        753
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/log"
+      ],
+      "bodySha256": "fbe293a4c069662107803711098070f401e1b98266e8733f5c890cf0dd2d1328"
+    },
+    "r07_git_panel::log_stats_batch_whitelist_and_merge_first_parent": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 759,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        790,
+        791,
+        793,
+        794,
+        798,
+        802,
+        814,
+        815
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/log-stats"
+      ],
+      "bodySha256": "7be11171d31cf918ea6eaa2d06f4e1f8ea852407ecfd127e21521f24c8215a4b"
+    },
+    "r07_git_panel::push_pull_fetch_buckets": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1457,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1467,
+        1468,
+        1469,
+        1477,
+        1478,
+        1480,
+        1481,
+        1485,
+        1486,
+        1495,
+        1496,
+        1497,
+        1499,
+        1500,
+        1509,
+        1510,
+        1519,
+        1520,
+        1525,
+        1526,
+        1528,
+        1529,
+        1542,
+        1543,
+        1544,
+        1545,
+        1547,
+        1548
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/fetch",
+        "/lingxi/v1/git/pull",
+        "/lingxi/v1/git/push",
+        "/lingxi/v1/git/{route}"
+      ],
+      "bodySha256": "46d1e69084a262777a9bcbc149b4cdaee2c130a1f4726f2fd8ef3378556eeb57"
+    },
+    "r07_git_panel::stage_unstage_flows": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1170,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1184,
+        1185,
+        1189,
+        1191,
+        1200,
+        1201,
+        1202,
+        1206,
+        1207,
+        1210,
+        1219,
+        1220,
+        1224,
+        1234,
+        1236,
+        1237,
+        1239,
+        1241,
+        1242
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/stage",
+        "/lingxi/v1/git/status",
+        "/lingxi/v1/git/unstage"
+      ],
+      "bodySha256": "641a8639ab7f5d9d6c15cb7e9ece51a30b5eeb7b81edc48e111701c8f1294267"
+    },
+    "r07_git_panel::stash_full_flow": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1250,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1264,
+        1265,
+        1267,
+        1271,
+        1272,
+        1274,
+        1275,
+        1276,
+        1277,
+        1278,
+        1287,
+        1288,
+        1292,
+        1301,
+        1302,
+        1303,
+        1304,
+        1305,
+        1315,
+        1316,
+        1328,
+        1329,
+        1330,
+        1331,
+        1332,
+        1338,
+        1339,
+        1341,
+        1345,
+        1346,
+        1347,
+        1348,
+        1354,
+        1355,
+        1356,
+        1357,
+        1371,
+        1372,
+        1375,
+        1376,
+        1383,
+        1384,
+        1385,
+        1386,
+        1388
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/stash",
+        "/lingxi/v1/git/stashes",
+        "/lingxi/v1/git/status",
+        "/lingxi/v1/git/unstash"
+      ],
+      "bodySha256": "7fc5426e198986624ba1a778674c61ffc25cabe3b8770e6f6c2901217f2995fc"
+    },
+    "r07_git_panel::status_reports_totals_states_and_placeholders": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 445,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        457,
+        458,
+        459,
+        460,
+        461,
+        462,
+        466,
+        467,
+        468,
+        469,
+        470,
+        471,
+        472,
+        474,
+        476,
+        480,
+        484,
+        491,
+        492,
+        493,
+        494,
+        495,
+        496,
+        497
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/status"
+      ],
+      "bodySha256": "ac29c9dc829669836344618efb1d2997aeed85ef74c58053902ca16e1bf33e95"
+    },
+    "r07_git_panel::worktree_create_matrix": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 1556,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        1569,
+        1570,
+        1574,
+        1576,
+        1585,
+        1586,
+        1587,
+        1588,
+        1589,
+        1590,
+        1600,
+        1601,
+        1602,
+        1603,
+        1604,
+        1605,
+        1614,
+        1615,
+        1616,
+        1617,
+        1624,
+        1625,
+        1626,
+        1627,
+        1628,
+        1635,
+        1636,
+        1642,
+        1643
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/worktree-create",
+        "/lingxi/v1/git/worktrees"
+      ],
+      "bodySha256": "2bf5eded0fdf3abb76e2ec30d42b8cd049d35c71dc78e67a9fb53f12088bd635"
+    },
+    "r07_git_panel::worktree_info_and_list_main_and_linked": {
+      "source": "rust/crates/lingxi-service/tests/r07_git_panel/mod.rs",
+      "definitionLine": 574,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0c24be9d3f05c6a6018f0f7f90c845391578143fa280b3e3a9d8155802a1f3d8",
+      "assertionLines": [
+        593,
+        594,
+        595,
+        596,
+        597,
+        598,
+        599,
+        604,
+        605,
+        607,
+        608,
+        609,
+        610,
+        611,
+        615,
+        616,
+        617,
+        618,
+        620,
+        624,
+        630,
+        631,
+        632,
+        633,
+        635,
+        636,
+        637,
+        638
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/git/worktree-info",
+        "/lingxi/v1/git/worktrees"
+      ],
+      "bodySha256": "3a6f2810adebe2f2c7b555a214efe026f8b54429aa59a6d9b75a7dad07e224a9"
+    },
+    "r07_goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1349,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1353,
+        1359,
+        1369,
+        1409,
+        1413,
+        1425,
+        1426,
+        1434,
+        1435,
+        1436
+      ],
+      "httpRoutes": [],
+      "bodySha256": "7edd5181c39be13749fd6f6a9f6ca468ba698f5d8269e8ce4270e276f6f84441"
+    },
+    "r07_goal_loop::goal_corrupt_sidecar_is_tool_failure_through_real_run_and_never_replaced": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1443,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1457,
+        1458,
+        1465,
+        1467
+      ],
+      "httpRoutes": [],
+      "bodySha256": "182b5e0c4f0d30183ef429834b45b76855a305a525b576bf22c44eac5fa89779"
+    },
+    "r07_goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1508,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1521,
+        1522,
+        1523,
+        1531,
+        1539,
+        1543,
+        1544,
+        1545,
+        1546,
+        1548,
+        1555,
+        1567,
+        1568
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/preferences/goal"
+      ],
+      "bodySha256": "7fff39ddcc18cae729308c08acebd45f5676ed50a01aae3472e7d8284d3d58d2"
+    },
+    "r07_goal_loop::goal_six_actions_close_loop_and_over_budget_fires_exactly_once": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 460,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        474,
+        475,
+        476,
+        477,
+        478,
+        482,
+        483,
+        484,
+        485,
+        486,
+        487,
+        499,
+        500,
+        501,
+        502,
+        503,
+        510,
+        520,
+        521,
+        529,
+        530,
+        540,
+        541,
+        542,
+        556,
+        557,
+        565,
+        566,
+        567,
+        575,
+        576,
+        577,
+        578
+      ],
+      "httpRoutes": [],
+      "bodySha256": "68dc84c21ac49fc08d9d0ed732ce48f726f4be2fa417ad51e346776737d40839"
+    },
+    "r07_goal_loop::goal_write_fault_is_tool_failure_and_no_budget_notification_through_real_run": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1472,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1494,
+        1495,
+        1502,
+        1503
+      ],
+      "httpRoutes": [],
+      "bodySha256": "3f51713caaa445d2837b9285d880390feda9884e4783931d54149436827cf1da"
+    },
+    "r07_goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 585,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        591,
+        592,
+        606,
+        607,
+        612,
+        613,
+        614,
+        619,
+        620,
+        625,
+        633,
+        656,
+        657,
+        684,
+        685,
+        693,
+        694,
+        698,
+        699,
+        707,
+        708,
+        711,
+        714
+      ],
+      "httpRoutes": [],
+      "bodySha256": "3940955e9b8ebcab7f664e43a50f25f02c2b3fb11d0c6caa6d74304bff74defc"
+    },
+    "r07_goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1303,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1313,
+        1328,
+        1329
+      ],
+      "httpRoutes": [],
+      "bodySha256": "93520d746f9610e932fd5e49f71c4eb187b5b568a773dabc169a4bd19bfcdbd4"
+    },
+    "r07_goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 724,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        729,
+        734,
+        747,
+        782,
+        790,
+        791,
+        804,
+        805,
+        810,
+        811,
+        822,
+        830,
+        831,
+        832,
+        840,
+        841,
+        910,
+        917,
+        918,
+        919,
+        920,
+        921,
+        942
+      ],
+      "httpRoutes": [],
+      "bodySha256": "24156df08162b5c6a59be31c4c72fd445a21261fcf8623d6c27d54cb3d500f37"
+    },
+    "r07_goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1098,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1137,
+        1156,
+        1157,
+        1181,
+        1188,
+        1189,
+        1194
+      ],
+      "httpRoutes": [],
+      "bodySha256": "072494d745167b20fc596ffee94dfe8430e6d15375b3e5ea7cab4dab25aeee61"
+    },
+    "r07_goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 958,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        996,
+        1002,
+        1027,
+        1034,
+        1048,
+        1068,
+        1069,
+        1089
+      ],
+      "httpRoutes": [],
+      "bodySha256": "3338ce240239ed4c889988a3e544045f7fa6245d32173f19a3082c7222b30aec"
+    },
+    "r07_goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff": {
+      "source": "rust/crates/lingxi-service/tests/r07_goal_loop/mod.rs",
+      "definitionLine": 1212,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "386b4d19adbdf913dcf32975ba9e29a2b6919bf9b4477e1e3748602b6dea2105",
+      "assertionLines": [
+        1216,
+        1230,
+        1231,
+        1246,
+        1247,
+        1265,
+        1270,
+        1271,
+        1279,
+        1288,
+        1289,
+        1291
+      ],
+      "httpRoutes": [],
+      "bodySha256": "2dbe3c2a5eccaf1d19a080f543886515d2f42da27b241d74987dabde10942710"
+    },
+    "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/coverage.rs",
+      "definitionLine": 27,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "3e58936830ff78e8e02409f147d64e8be8914e0e93ae7019f903b83306005e87",
+      "assertionLines": [
+        38,
+        50,
+        51,
+        56,
+        58,
+        65,
+        66,
+        67,
+        74,
+        75,
+        76,
+        84,
+        85,
+        86,
+        94,
+        95,
+        96,
+        105,
+        106,
+        107,
+        108,
+        109,
+        126,
+        127,
+        128,
+        129,
+        130,
+        134,
+        139,
+        140,
+        142,
+        143,
+        144,
+        155,
+        156,
+        167,
+        169,
+        180,
+        181,
+        190,
+        192,
+        193
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/studio/workspaces",
+        "/lingxi/v1/studio/workspaces/{mount_id}",
+        "/lingxi/v1/workbench/actions",
+        "/lingxi/v1/workbench/content?mountId={mount_id}&subdir=alpha&name=blob.bin",
+        "/lingxi/v1/workbench/search?mountId={mount_id}&q=blob",
+        "/lingxi/v1/workbench/upload"
+      ],
+      "bodySha256": "c2e737660c9314ab4a168eff086b9f6eb57255a7d9df691fcf8cbfc9aa823bee"
+    },
+    "r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/coverage.rs",
+      "definitionLine": 4,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "3e58936830ff78e8e02409f147d64e8be8914e0e93ae7019f903b83306005e87",
+      "assertionLines": [
+        20,
+        21
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/search?q=bulk-match-"
+      ],
+      "bodySha256": "b5b56247017db426c3693d2b5bf5b8b3d866189ce46e523e5951e6a1933b7c9e"
+    },
+    "r07_workbench::lease_settlement_failure_reports_landed_action_and_upload_without_fake_success": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 1591,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        1635,
+        1636,
+        1637,
+        1638,
+        1639,
+        1640,
+        1641,
+        1642,
+        1643
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/actions",
+        "/lingxi/v1/workbench/upload"
+      ],
+      "bodySha256": "3b446a6337e077190f4602184695f8644f25241dbe20f3b3307abc5f9a467a88"
+    },
+    "r07_workbench::mount_disable_retires_watch_and_subscription_before_returning": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 1304,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        1316,
+        1326,
+        1334,
+        1336,
+        1337,
+        1345,
+        1347,
+        1348,
+        1354,
+        1365
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/resource-io/subscribe",
+        "/lingxi/v1/resource-io/watch",
+        "/lingxi/v1/studio/workspaces",
+        "/lingxi/v1/studio/workspaces/{id}"
+      ],
+      "bodySha256": "6b228443b79fa468ed9d3198f9957cf635f60b6d318c312d41d63d80795bff88"
+    },
+    "r07_workbench::remote_writes_refuse_corrupt_or_unreadable_lease_registry_without_file_changes": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 1476,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        1519,
+        1520,
+        1521,
+        1522,
+        1528,
+        1533
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/actions",
+        "/lingxi/v1/workbench/upload"
+      ],
+      "bodySha256": "7690ba34a5f5781693612c5091acd6c3eb3fb93fc0456f6fb51a8d7edd8979a8"
+    },
+    "r07_workbench::remote_writes_refuse_unwritable_lease_registry_before_mutation": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 1548,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        1577,
+        1578,
+        1579,
+        1583,
+        1584
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/actions",
+        "/lingxi/v1/workbench/upload"
+      ],
+      "bodySha256": "dc993a652e2e25df54cb861ebd81bf5dd68a990bb3963d64b6a0f673e83900f7"
+    },
+    "r07_workbench::workbench_actions_full_cycle": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 527,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        538,
+        539,
+        540,
+        541,
+        542,
+        543,
+        544,
+        552,
+        553,
+        562,
+        563,
+        577,
+        578,
+        579,
+        580,
+        595,
+        596,
+        600,
+        603,
+        604,
+        605,
+        606,
+        607,
+        621,
+        622,
+        623,
+        624,
+        625,
+        640,
+        641,
+        642,
+        658,
+        659,
+        673,
+        674,
+        675,
+        676,
+        692,
+        693,
+        694,
+        695,
+        708,
+        709,
+        722,
+        723,
+        724,
+        725,
+        729,
+        730,
+        731,
+        753,
+        755,
+        759,
+        764,
+        768,
+        786,
+        787,
+        797,
+        798,
+        800,
+        801,
+        812,
+        813,
+        814,
+        824,
+        825,
+        837
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/actions"
+      ],
+      "bodySha256": "e65cb6a68adff55ffa37ab0add976ee047b0ecad0010b4042616bd3609d3991b"
+    },
+    "r07_workbench::workbench_files_search_projection_and_guards": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 399,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        412,
+        413,
+        414,
+        415,
+        416,
+        421,
+        427,
+        435,
+        437,
+        439,
+        452,
+        453,
+        460,
+        472,
+        473,
+        482,
+        483,
+        493,
+        494,
+        496,
+        497,
+        498,
+        499,
+        500,
+        504,
+        505,
+        520,
+        521
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/files",
+        "/lingxi/v1/workbench/files?mountId=local_fs_missing",
+        "/lingxi/v1/workbench/files?subdir=alpha",
+        "/lingxi/v1/workbench/files?subdir={bad}",
+        "/lingxi/v1/workbench/search?q=",
+        "/lingxi/v1/workbench/search?q=ALPHA",
+        "/lingxi/v1/workbench/search?q=hello"
+      ],
+      "bodySha256": "6f387deeb1fe5a115d721336c41ddd7d30784703b7c80324b52aba442b349527"
+    },
+    "r07_workbench::workbench_on_mount_root_end_to_end": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 1217,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        1230,
+        1241,
+        1242,
+        1243,
+        1244,
+        1257,
+        1258,
+        1259,
+        1273,
+        1274,
+        1284,
+        1295,
+        1296,
+        1297
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/studio/workspaces",
+        "/lingxi/v1/studio/workspaces/{mount_id}",
+        "/lingxi/v1/workbench/actions",
+        "/lingxi/v1/workbench/content?mountId={mount_id}&subdir=sub&name=new.txt",
+        "/lingxi/v1/workbench/files?mountId={mount_id}&subdir=sub"
+      ],
+      "bodySha256": "aba7253d5983970fec1e0b8275bc15e3cb4d299566a4ae9301caaedfa4968b50"
+    },
+    "r07_workbench::workbench_scope_gate_and_remote_write_lease": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 1072,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        1093,
+        1094,
+        1095,
+        1112,
+        1121,
+        1122,
+        1123,
+        1140,
+        1141,
+        1142,
+        1152,
+        1153,
+        1159,
+        1161,
+        1163,
+        1164,
+        1165,
+        1166,
+        1167,
+        1168,
+        1169,
+        1170,
+        1171,
+        1172,
+        1183,
+        1184,
+        1185,
+        1197,
+        1198,
+        1209,
+        1211
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/studio/workspaces",
+        "/lingxi/v1/studio/workspaces/local_fs_anything",
+        "/lingxi/v1/workbench/actions",
+        "/lingxi/v1/workbench/files"
+      ],
+      "bodySha256": "34d9cb5b484afa0b3600958b6ead1125e4dc084b492215729f28e04f32d14a43"
+    },
+    "r07_workbench::workbench_upload_and_content": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 847,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        864,
+        865,
+        866,
+        868,
+        872,
+        876,
+        880,
+        881,
+        898,
+        899,
+        903,
+        914,
+        915,
+        916,
+        921,
+        925,
+        926,
+        930,
+        940,
+        945,
+        955,
+        956,
+        957,
+        967,
+        968,
+        969,
+        980,
+        981,
+        994,
+        995,
+        996,
+        1009,
+        1010,
+        1018,
+        1019,
+        1028,
+        1029,
+        1039,
+        1040,
+        1052,
+        1059,
+        1063
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/workbench/content?name=%E7%AC%94%E8%AE%B0.md",
+        "/lingxi/v1/workbench/content?name=..",
+        "/lingxi/v1/workbench/content?name=a.bin",
+        "/lingxi/v1/workbench/content?name=dir-entry",
+        "/lingxi/v1/workbench/content?name=missing.txt",
+        "/lingxi/v1/workbench/content?name=note.md",
+        "/lingxi/v1/workbench/upload"
+      ],
+      "bodySha256": "6f6a228d986bec1763f85e8ce291db4271299f864d5eb8967fde2443fb2803c0"
+    },
+    "r07_workbench::workspaces_list_create_disable_cycle": {
+      "source": "rust/crates/lingxi-service/tests/r07_workbench/mod.rs",
+      "definitionLine": 178,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "0e71c7ccd9815744794c57fb10f49d3506deb4823a91ab403c5d718e53b010f5",
+      "assertionLines": [
+        189,
+        190,
+        192,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        203,
+        220,
+        221,
+        222,
+        232,
+        233,
+        234,
+        247,
+        248,
+        251,
+        252,
+        253,
+        254,
+        255,
+        259,
+        267,
+        269,
+        271,
+        272,
+        273,
+        274,
+        275,
+        279,
+        280,
+        281,
+        284,
+        285,
+        296,
+        297,
+        298,
+        303,
+        304,
+        305,
+        311,
+        313,
+        314,
+        324,
+        325,
+        326,
+        327,
+        329,
+        330,
+        340,
+        341,
+        349,
+        350,
+        358,
+        359,
+        360,
+        364,
+        369,
+        377,
+        378,
+        382,
+        388
+      ],
+      "httpRoutes": [
+        "/lingxi/v1/me",
+        "/lingxi/v1/studio/workspaces",
+        "/lingxi/v1/studio/workspaces/default",
+        "/lingxi/v1/studio/workspaces/local_fs_missing",
+        "/lingxi/v1/studio/workspaces/{mount_id}",
+        "/lingxi/v1/studio/workspaces/{mount_id}/files"
+      ],
+      "bodySha256": "35efe5a0d352a399ed648639820fe71240dc159380a47d445ef879759cb4b538"
+    },
+    "r07_workflow::actual_http_activity_snapshot_checks_owner_and_survives_same_home_restart": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1623,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1645,
+        1650,
+        1651,
+        1652,
+        1653,
+        1654,
+        1655,
+        1656,
+        1657,
+        1674,
+        1676,
+        1688,
+        1689,
+        1704,
+        1705,
+        1706,
+        1717,
+        1719,
+        1734,
+        1736,
+        1737,
+        1746,
+        1747,
+        1757
+      ],
+      "httpRoutes": [],
+      "bodySha256": "fc3c196d567c94a78d679c393380dfa87b24a7b78ee5c85fc898739b2e8fe0ea"
+    },
+    "r07_workflow::actual_task_stop_route_joins_workflow_and_running_model": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 950,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        994,
+        996,
+        997,
+        1002,
+        1003
+      ],
+      "httpRoutes": [],
+      "bodySha256": "2a26574b5ebc77c3b335f42359c65678e64054bdf661252ff003ab38161264fc"
+    },
+    "r07_workflow::completed_workflow_wakes_running_idle_loop_once_after_cleanup": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1449,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1478,
+        1494,
+        1495,
+        1496
+      ],
+      "httpRoutes": [],
+      "bodySha256": "e0865d0fdd12e3f3ee0ba30fa574f2f3c07b1059bf567e7c309758c48490aa30"
+    },
+    "r07_workflow::damaged_resume_journal_is_rejected_without_rerunning_nodes": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1067,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1088,
+        1089,
+        1093,
+        1094
+      ],
+      "httpRoutes": [],
+      "bodySha256": "04de6cb1bb8ed9d89ce48c36ff1b7732281660a9ff8cacf9fbf7c29b6268444e"
+    },
+    "r07_workflow::fanout_dispatch_events_journal_and_completion_delivery": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 571,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        577,
+        578,
+        579,
+        580,
+        581,
+        582,
+        597,
+        602,
+        603,
+        604,
+        605,
+        607,
+        612,
+        618,
+        627,
+        631
+      ],
+      "httpRoutes": [],
+      "bodySha256": "fafa2fb803b610e9bdd6adb3cb3e8fcfb6d73b540ec9e095629cfd90b90b4d78"
+    },
+    "r07_workflow::first_node_failure_cancels_parallel_blocked_sibling": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1020,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1025,
+        1026
+      ],
+      "httpRoutes": [],
+      "bodySha256": "2c06fad517f37a3c8f1cdd699f1f915c44ddac4f550034c30e6837a90d164e4e"
+    },
+    "r07_workflow::journal_write_failure_reports_unsafe_resume_and_unrelated_run_cannot_cancel": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1100,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1121,
+        1122,
+        1133,
+        1134,
+        1143,
+        1144,
+        1145,
+        1146
+      ],
+      "httpRoutes": [],
+      "bodySha256": "b507a8e9290084a17357038e4ac32394a0c367302d43a560df54f1800480fd98"
+    },
+    "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1769,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1779,
+        1781,
+        1793,
+        1812,
+        1820,
+        1827,
+        1828,
+        1829,
+        1865,
+        1870
+      ],
+      "httpRoutes": [],
+      "bodySha256": "64d8889a58c22c02346a8de17559e59e1d2a4c076b9d33da2d7fcfa2a76921f7"
+    },
+    "r07_workflow::resume_requires_same_session_and_agent_before_reading_cached_results": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 1032,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        1037,
+        1046,
+        1055,
+        1056,
+        1060,
+        1061
+      ],
+      "httpRoutes": [],
+      "bodySha256": "65d50a441d73d1eb06c2034aaf050e78b1a77432f0b2afe3aaeda3e476950539"
+    },
+    "r07_workflow::resume_reuses_unchanged_nodes_and_reruns_from_first_change": {
+      "source": "rust/crates/lingxi-service/tests/r07_workflow/mod.rs",
+      "definitionLine": 657,
+      "kind": "real_rust_service_http_or_database_integration",
+      "sourceSha256": "ec801b29104653b6ba5f46365b2aa55aec3d36eb9666c7ebf2a7784b7ea31967",
+      "assertionLines": [
+        662,
+        663,
+        665,
+        666,
+        675,
+        676,
+        677,
+        682,
+        688,
+        690,
+        691,
+        700,
+        701,
+        706,
+        707,
+        709,
+        710,
+        730,
+        736,
+        740,
+        742
+      ],
+      "httpRoutes": [],
+      "bodySha256": "e50a2b3eccc36247222767529a93cca755759ff4203d5f62289d75ae259637c3"
+    }
+  },
+  "scenarios": {
+    "R00-T02-LA-CECACC73463E": {
+      "requirement": "本地文件树刷新；无 native root 时不得宣称 watch 已生效",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "desktop/src/react/__tests__/components/DeskSection.test.tsx::watches the workspace root plus expanded folders and reloads visible dirty tree keys from workspace events",
+        "desktop/src/react/__tests__/components/DeskSection.test.tsx::Rust 挂载使用显式监听权限，撤回权限和切换连接都会释放旧订阅",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "组件操作与正式请求映射承担页面责任；真实Rust二进制整合用例承担文件、便笺、挂载、监听及两项设置保存。不能扩称所有设置动作均有真实服务页面整合。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-01631175277C": {
+      "requirement": "返回活动列表，过期运行项先标记超时",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_automation_activity::overdue_activity_list_cancels_real_run_before_publishing_timeout_and_keeps_receipt_after_restart"
+      ],
+      "responsibilityReview": [
+        "正式定时或心跳链创建真实活动Run；实际HTTP读取或提升，断言持久终态、消息、计数或重启后的回执；超时先真实取消。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-F6F578E62D72": {
+      "requirement": "返回该活动 user/assistant 文本消息",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_automation_activity::completed_activity_promotes_the_same_real_session_without_new_messages_or_runs"
+      ],
+      "responsibilityReview": [
+        "正式定时或心跳链创建真实活动Run；实际HTTP读取或提升，断言持久终态、消息、计数或重启后的回执；超时先真实取消。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-B8313FF711C7": {
+      "requirement": "返回指定目录文件列表",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::files_listing_and_subdir_guards",
+        "r07_desk_files::scope_gates",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-6A5E3FEEA80D": {
+      "requirement": "返回 jian.md 内容，不存在为 null",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::jian_cycle_and_locale",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-23824E784D71": {
+      "requirement": "返回日志列表",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_automation_activity::desk_logs_return_real_bounded_records_and_reject_device_or_missing_credentials"
+      ],
+      "responsibilityReview": [
+        "正式定时或心跳链创建真实活动Run；实际HTTP读取或提升，断言持久终态、消息、计数或重启后的回执；超时先真实取消。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-5530FFB14481": {
+      "requirement": "确保目录存在并返回 path",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::path_default_override_and_approval",
+        "r07_desk_files::no_workspace_fallbacks"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-8192BCF388CF": {
+      "requirement": "返回限量文件名匹配结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::search_files_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-F6CEE2A4A3CE": {
+      "requirement": "把活动 session 移到正常 sessions 并移除活动条目",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_automation_activity::completed_activity_promotes_the_same_real_session_without_new_messages_or_runs",
+        "r07_automation_activity::running_activity_uses_actual_state_and_cannot_be_promoted_while_busy",
+        "r07_activity_promotion::session_admin_refuses_live_lease_then_promotes_same_identity_after_release"
+      ],
+      "responsibilityReview": [
+        "以真实存储和会话许可核验Busy拒绝及释放后同一会话提升、不新增Run；并非把复制出来的测试对象当成功。",
+        "正式定时或心跳链创建真实活动Run；实际HTTP读取或提升，断言持久终态、消息、计数或重启后的回执；超时先真实取消。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-4AC692C4C7C8": {
+      "requirement": "调用小工具模型并返回 summary",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::activity_summary_actual_http_uses_summarize_slot_and_records_success_and_failure",
+        "r07_git_panel::activity_summary_revocation_cancels_call_records_unknown_usage_and_releases_permit",
+        "r07_git_panel::activity_summary_empty_missing_and_device_permission_are_honest"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-770B9A0E7420": {
+      "requirement": "复制源文件；逐项结果，远端 403",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::upload_gate_and_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-2AB1A11D81C8": {
+      "requirement": "新文件出现在目录",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::create_and_actions_flow",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-DAE825843EAE": {
+      "requirement": "目录出现在列表",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-E4CC01D8499E": {
+      "requirement": "旧名消失、新名出现",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-3F0215CE6CAC": {
+      "requirement": "成功项进入目标文件夹，逐项失败保留",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-3EDEDFD7E60D": {
+      "requirement": "返回 filesByPath 与逐项结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-8C68B3F74F1F": {
+      "requirement": "文件进入回收站，返回 trashId",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::create_and_actions_flow"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-034CA4E35DBF": {
+      "requirement": "jian.md 内容更新",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::jian_cycle_and_locale",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-2396CADB0FE6": {
+      "requirement": "jian.md 被安全删除，后续读取 null",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_desk_files::jian_cycle_and_locale"
+      ],
+      "responsibilityReview": [
+        "真实HTTP与隔离目录共同核对；创建/改名/移动/回收和便笺均有实际文件或返回内容断言，另有未授权目录和scope拒绝。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-67D6791650C6": {
+      "requirement": "按日期倒序返回工作目录的 markdown 日记文件名，目录不存在时为空列表",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_diary::list_missing_dir_then_utf16_descending",
+        "r07_diary::list_uses_locale_diary_dir_label"
+      ],
+      "responsibilityReview": [
+        "真实HTTP调用确定性模型服务、实际日记文件及用量账本；日期/摘要材料/警告/失败由各责任用例核对。外部模型为替身。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-6DBCFD556C3B": {
+      "requirement": "调用 writeDiary 写入当日或指定日期文件并返回路径、内容、逻辑日期与警告；错误返回 400",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_diary::write_with_summary_material_produces_diary_file",
+        "r07_diary::write_session_without_summary_uses_temporary_material",
+        "r07_diary::write_for_yesterday_ignores_todays_session",
+        "r07_diary::write_strips_mood_blocks_and_fallback_title",
+        "r07_diary::write_llm_failure_maps_400_with_localized_message",
+        "r07_diary::write_temporary_failure_surfaces_warning_envelope",
+        "r07_diary::diary_includes_same_agent_real_cron_activity_but_excludes_promoted_activity"
+      ],
+      "responsibilityReview": [
+        "真实HTTP调用确定性模型服务、实际日记文件及用量账本；日期/摘要材料/警告/失败由各责任用例核对。外部模型为替身。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-0B65FD6CD7E5": {
+      "requirement": "返回当前分支与 detached 状态；非仓库返回 isRepo false",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::branches_current_detached_and_checked_out_elsewhere",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-0834433949CC": {
+      "requirement": "返回选定文件的 diff；无效路径拒绝",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::file_diff_tracked_untracked_binary_and_invalid",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-E0BF25B2ED9B": {
+      "requirement": "按 limit 返回提交记录；非仓库返回空列表",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::log_clamps_limit_and_parses_refs",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-6D46753E0639": {
+      "requirement": "只读返回仓库暂存记录",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-AAADF271CD6B": {
+      "requirement": "仅批准目录返回当前工作树和暂存区状态",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::status_reports_totals_states_and_placeholders",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-FD2E061B3671": {
+      "requirement": "仅批准目录返回工作树位置和所属仓库信息",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::worktree_info_and_list_main_and_linked",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-F015FF4D21DA": {
+      "requirement": "仅批准目录返回仓库工作树清单",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::worktree_info_and_list_main_and_linked",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-5BC7E9B6E685": {
+      "requirement": "只读取所选改动摘要并调用模型返回文字，不执行 git commit",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::ai_commit_message_happy_path_sanitizes_and_records_usage",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-2FBA38276D6F": {
+      "requirement": "把暂存内容并入上次提交；空 message 保留旧提交说明",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::amend_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-B1AD1F46E5D9": {
+      "requirement": "在批准仓库执行 checkout，成功后当前分支改变；缺分支或非仓库拒绝",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::checkout_matrix",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-D5A24E89CAD8": {
+      "requirement": "按 includeUnstaged 决定是否并入未暂存改动，创建本地提交并返回结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::commit_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-1F90C9FBB34A": {
+      "requirement": "从选定 base 创建新分支并返回结果，名称冲突拒绝",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::create_branch_matrix",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-894C4F341048": {
+      "requirement": "按所选路径还原工作树，未给路径时还原全部已跟踪改动；返回结果或错误",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::discard_flows",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-2C7CEEE7EFAF": {
+      "requirement": "实际执行 git fetch，只更新远端跟踪信息而不合并或改工作树；面板显示结果或失败",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::push_pull_fetch_buckets",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-64688EE37795": {
+      "requirement": "POST 只承载 hashes 列表，不写仓库；返回各提交统计",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::log_stats_batch_whitelist_and_merge_first_parent",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-51554C8D7A34": {
+      "requirement": "实际获取远端并在允许时更新本地分支/工作树；界面显示拉取结果、冲突或失败",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::push_pull_fetch_buckets",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-0FE1C5FDF210": {
+      "requirement": "实际执行 git push；无上游时尝试 push -u，界面显示成功、无远端、无待推送内容或失败",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::push_pull_fetch_buckets",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-2CCA30D19E3A": {
+      "requirement": "按 paths 暂存所选文件，缺省暂存全部改动，返回结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::stage_unstage_flows",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-EB7503027079": {
+      "requirement": "将选定路径或缺省整仓改动放入 stash，并返回结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-B2FEED2A7016": {
+      "requirement": "按 paths 从 index 撤回所选文件，缺省全部，工作树保留",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::stage_unstage_flows",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-4D50C9CC2745": {
+      "requirement": "只恢复指定 path 的文件，原整条 stash 保留",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-4AB50464D6F6": {
+      "requirement": "恢复最新整条 stash 并从 stash 列表移除",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::stash_full_flow",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-ECCCAB205D99": {
+      "requirement": "从选定 base 新建工作树并返回路径，名称或仓库错误拒绝",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_git_panel::worktree_create_matrix",
+        "r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+        "r07_git_panel::auth_scope_gates"
+      ],
+      "responsibilityReview": [
+        "真实临时git仓与本地bare远端；HTTP响应结合分支、日志、工作树、index或真实文件核对。目录与scope拒绝由独立门禁用例共同承担。没有真实远端或完整Git页面到服务操作证明。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-CC0271AAE0BD": {
+      "requirement": "经 files.read 授权后发送文件或 HEAD 元数据，文件不存在 404",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_upload_and_content",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-BD5448131631": {
+      "requirement": "经 files.read 授权后按挂载和子目录返回文件树；拒绝时 403",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_files_search_projection_and_guards",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-5F675621186C": {
+      "requirement": "经 files.read 授权后按挂载与关键词返回匹配文件",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_files_search_projection_and_guards",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-46F9CB129DD1": {
+      "requirement": "在选定挂载创建目录并返回文件树",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-9F44400169B1": {
+      "requirement": "创建或覆盖文本文件并返回文件树",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-361D16F25214": {
+      "requirement": "改变文件名并返回新文件树",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-D85EC29D698A": {
+      "requirement": "移动一个文件或目录并返回文件树",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-1BDB6B867DBA": {
+      "requirement": "批量移动所选路径并返回结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-EE30E2A3381C": {
+      "requirement": "把所选项移入可恢复位置并返回结果",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_actions_full_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-BEAB7F136A6F": {
+      "requirement": "经 files.write 和写入租约逐文件保存，返回每项成功或失败及新文件树",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workbench_upload_and_content",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease",
+        "r07_workbench::remote_writes_refuse_corrupt_or_unreadable_lease_registry_without_file_changes",
+        "r07_workbench::remote_writes_refuse_unwritable_lease_registry_before_mutation",
+        "r07_workbench::lease_settlement_failure_reports_landed_action_and_upload_without_fake_success",
+        "r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-1F41AFB4207D": {
+      "requirement": "返回目标开关与默认预算，不改动设置",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings"
+      ],
+      "responsibilityReview": [
+        "真实HTTP/真实Run和隔离DB/磁盘检查；循环含同home恢复、正式取消、首次投递两个等待窗口、弱引用释放；预算和偏好同时检查实际保存与不改无关值。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-2CB7D4AE4478": {
+      "requirement": "保存目标开关与默认预算并返回新状态",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings"
+      ],
+      "responsibilityReview": [
+        "真实HTTP/真实Run和隔离DB/磁盘检查；循环含同home恢复、正式取消、首次投递两个等待窗口、弱引用释放；预算和偏好同时检查实际保存与不改无关值。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-52A0034B50CF": {
+      "requirement": "将 active local_fs mount 标 disabled，不删除底层目录",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::mount_disable_retires_watch_and_subscription_before_returning",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-ED2647610C7B": {
+      "requirement": "返回默认工作区与活动挂载；本地主人可看原生路径，远端不可看",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::workbench_scope_gate_and_remote_write_lease"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-A08713994B5B": {
+      "requirement": "返回 mountId/subdir 范围文件列表",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-932719987220": {
+      "requirement": "验证绝对且存在的目录并创建/更新 local_fs 挂载，返回 workspace",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workbench::workspaces_list_create_disable_cycle",
+        "r07_workbench::workbench_on_mount_root_end_to_end",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "真实HTTP操作默认根和非default挂载；断言文件字节、目录、逐项结果、垃圾箱或GET/HEAD内容。租约故障要求零写入或明确已产生结果且不可重试，不能只看HTTP成功。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-125BFE1EE56C": {
+      "requirement": "start/status/pause/resume/stop 各返回状态并作用于当前会话循环",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control",
+        "r07_goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run",
+        "r07_goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+        "r07_goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop",
+        "r07_goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark",
+        "r07_goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity",
+        "r07_goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop",
+        "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion"
+      ],
+      "responsibilityReview": [
+        "真实HTTP/真实Run和隔离DB/磁盘检查；循环含同home恢复、正式取消、首次投递两个等待窗口、弱引用释放；预算和偏好同时检查实际保存与不改无关值。",
+        "真实workflow脚本、子Run和持久journal/activity；断言派单/最终回灌/重放调用次数/取消回收/权限收窄与真实父子记账；HTTP冷快照含归属和撤销及重启零重放。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-E09C077F0100": {
+      "requirement": "单个会话目标状态与token/时间预算随动作变化，完成返回最终用量。",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_goal_loop::goal_six_actions_close_loop_and_over_budget_fires_exactly_once",
+        "r07_goal_loop::goal_corrupt_sidecar_is_tool_failure_through_real_run_and_never_replaced",
+        "r07_goal_loop::goal_write_fault_is_tool_failure_and_no_budget_notification_through_real_run"
+      ],
+      "responsibilityReview": [
+        "真实HTTP/真实Run和隔离DB/磁盘检查；循环含同home恢复、正式取消、首次投递两个等待窗口、弱引用释放；预算和偏好同时检查实际保存与不改无关值。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-1DFC5E1E130A": {
+      "requirement": "schedule记录后续触发；complete结束循环，状态可见。",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control",
+        "r07_goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run",
+        "r07_goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+        "r07_goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop",
+        "r07_goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark",
+        "r07_goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity",
+        "r07_goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop",
+        "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion"
+      ],
+      "responsibilityReview": [
+        "真实HTTP/真实Run和隔离DB/磁盘检查；循环含同home恢复、正式取消、首次投递两个等待窗口、弱引用释放；预算和偏好同时检查实际保存与不改无关值。",
+        "真实workflow脚本、子Run和持久journal/activity；断言派单/最终回灌/重放调用次数/取消回收/权限收窄与真实父子记账；HTTP冷快照含归属和撤销及重启零重放。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-C1BA7A7C2737": {
+      "requirement": "返回runId、进度事件与最终JSON结果；后台执行可复用未变节点。",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "r07_workflow::fanout_dispatch_events_journal_and_completion_delivery",
+        "r07_workflow::resume_reuses_unchanged_nodes_and_reruns_from_first_change",
+        "r07_workflow::actual_task_stop_route_joins_workflow_and_running_model",
+        "r07_workflow::first_node_failure_cancels_parallel_blocked_sibling",
+        "r07_workflow::resume_requires_same_session_and_agent_before_reading_cached_results",
+        "r07_workflow::damaged_resume_journal_is_rejected_without_rerunning_nodes",
+        "r07_workflow::journal_write_failure_reports_unsafe_resume_and_unrelated_run_cannot_cancel",
+        "r07_workflow::completed_workflow_wakes_running_idle_loop_once_after_cleanup",
+        "r07_workflow::actual_http_activity_snapshot_checks_owner_and_survives_same_home_restart",
+        "r07_workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion"
+      ],
+      "responsibilityReview": [
+        "真实workflow脚本、子Run和持久journal/activity；断言派单/最终回灌/重放调用次数/取消回收/权限收窄与真实父子记账；HTTP冷快照含归属和撤销及重启零重放。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    },
+    "R00-T02-LA-E3A8057D7156": {
+      "requirement": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "status": "SOURCE_RESPONSIBILITY_REVIEWED_FINAL_EXECUTION_PENDING",
+      "responsibilityTests": [
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::renders the current agent desk settings from settingsConfig on the first paint",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the selected agent workspace without sending frontend business IPC",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::clears the selected agent workspace without sending frontend business IPC",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::uses automation.permissionMode and does not render the removed cron auto-approve row",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the selected agent AGENTS.md injection toggle",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::saves the two project skill discovery switches independently",
+        "desktop/src/react/__tests__/settings/WorkTab.test.tsx::rolls a project skill switch back when the Agent config save fails",
+        "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts::隔离目录中新建文件、便笺、挂载与监听实际生效，撤权和退出回收资源（无 LINGXI_R07_SERVICE_BIN 明确跳过）"
+      ],
+      "responsibilityReview": [
+        "组件操作与正式请求映射承担页面责任；真实Rust二进制整合用例承担文件、便笺、挂载、监听及两项设置保存。不能扩称所有设置动作均有真实服务页面整合。"
+      ],
+      "limits": [
+        "仅本机隔离环境和确定性外部替身；跨系统/正式包/真实账号不由这些检查证明。"
+      ]
+    }
+  }
+}

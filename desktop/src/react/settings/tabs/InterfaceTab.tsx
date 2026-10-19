@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSettingsStore } from '../store';
 import { lingxiFetch } from '../api';
+import { captureSettingsConnection, ownsSettingsConnection, settingsConnectionRevision } from '../connection-owner';
 import { t, VALID_THEMES, autoSaveConfig } from '../helpers';
 import { SelectWidget, Toggle } from '@/ui';
 import { SettingsGrid } from '../components/SettingsPrimitives';
@@ -111,10 +112,13 @@ function formatBodyFontSizeOffset(offset: number): string {
 }
 
 export function InterfaceTab() {
+  const connectionRevision = useSettingsStore(() => settingsConnectionRevision());
   const settingsConfig = useSettingsStore(s => s.settingsConfig);
   const showToast = useSettingsStore(s => s.showToast);
   const [appearancePrefs, setAppearancePrefs] = useState<AppearancePrefs>(() => readAppearancePrefs());
   const [sidebarUiPrefs, setSidebarUiPrefs] = useState<SidebarUiPrefs | null>(null);
+  const [sidebarLoadFailed, setSidebarLoadFailed] = useState(false);
+  const [sidebarReadAttempt, setSidebarReadAttempt] = useState(0);
   // 「回退时撤销文件改动」开关：全局偏好，默认关闭；null = 尚未加载完。
   const [rollbackFileChanges, setRollbackFileChanges] = useState<boolean | null>(null);
   const refreshAppearancePrefs = useCallback(() => {
@@ -171,19 +175,26 @@ export function InterfaceTab() {
 
   useEffect(() => {
     let cancelled = false;
+    const owner = captureSettingsConnection();
+    setSidebarUiPrefs(null);
+    setSidebarLoadFailed(false);
     lingxiFetch('/api/preferences/sidebar-ui')
       .then(res => res.json())
       .then(data => {
-        if (cancelled) return;
-        setSidebarUiPrefs(normalizeSidebarUiPrefs(data?.sidebarUi));
+        if (cancelled || !ownsSettingsConnection(owner)) return;
+        if (data?.error || !data?.sidebarUi || typeof data.sidebarUi !== 'object' || Array.isArray(data.sidebarUi)) throw new Error('invalid sidebar preferences');
+        setSidebarUiPrefs(normalizeSidebarUiPrefs(data.sidebarUi));
       })
       .catch(err => {
-        if (!cancelled) console.warn('[settings] sidebar UI preferences load failed:', err);
+        if (!cancelled && ownsSettingsConnection(owner)) {
+          setSidebarLoadFailed(true);
+          console.warn('[settings] sidebar UI preferences load failed:', err);
+        }
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [sidebarReadAttempt, connectionRevision]);
 
   useEffect(() => {
     let cancelled = false;
@@ -277,6 +288,7 @@ export function InterfaceTab() {
   };
 
   const saveSessionListRowMode = useCallback(async (singleLine: boolean) => {
+    const owner = captureSettingsConnection();
     const previousPrefs = sidebarUiPrefs;
     const basePrefs = previousPrefs ?? normalizeSidebarUiPrefs({});
     const rowMode: SidebarSessionListRowMode = singleLine ? 'single-line' : 'two-line';
@@ -291,14 +303,18 @@ export function InterfaceTab() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionList: { rowMode } }),
       });
+      if (!ownsSettingsConnection(owner)) return;
       const data = await res.json();
+      if (!ownsSettingsConnection(owner)) return;
       const saved = normalizeSidebarUiPrefs(data?.sidebarUi);
       setSidebarUiPrefs(saved);
       window.dispatchEvent(new CustomEvent('hana-settings', {
         detail: { type: 'sidebar-ui-changed', sidebarUi: saved },
       }));
+      if (!ownsSettingsConnection(owner)) return;
       window.platform?.settingsChanged?.('sidebar-ui-changed', { sidebarUi: saved });
     } catch (err: unknown) {
+      if (!ownsSettingsConnection(owner)) return;
       setSidebarUiPrefs(previousPrefs);
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
     }
@@ -480,12 +496,17 @@ export function InterfaceTab() {
       </SettingsSection>
 
       <SettingsSection title={t('settings.interface.sidebar')}>
+        {sidebarLoadFailed && <div role="alert">
+          <span>{t('settings.interface.sidebarLoadFailed')}</span>
+          <button type="button" onClick={() => setSidebarReadAttempt(attempt => attempt + 1)}>{t('action.retry')}</button>
+        </div>}
         <SettingsRow
           label={t('settings.interface.sessionListSingleLine')}
           hint={t('settings.interface.sessionListSingleLineHint')}
           control={
             <Toggle
               on={sidebarUiPrefs ? sidebarUiPrefs.sessionList.rowMode === 'single-line' : undefined}
+              disabled={sidebarUiPrefs === null}
               onChange={saveSessionListRowMode}
             />
           }

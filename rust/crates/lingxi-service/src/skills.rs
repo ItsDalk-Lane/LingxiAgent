@@ -1251,6 +1251,8 @@ impl SkillService {
     }
 
     pub fn set_external_paths(&self, paths: &[String]) -> Result<(), MemoryError> {
+        // 偏好读改写与其他设置共用同一锁，直到内存发布完成才交给下一写者。
+        let _preferences = crate::agents_admin::preferences_locked();
         let _publication = am::ContextMaterialMutation::for_home(&self.home);
         for path in paths {
             if !Path::new(path).is_absolute() {
@@ -1295,7 +1297,8 @@ impl SkillService {
 
     fn persist_external_paths(&self, paths: &[String]) -> Result<(), MemoryError> {
         let prefs_path = self.home.join("user").join("preferences.json");
-        let mut prefs = am::read_json_file(&prefs_path).unwrap_or_else(|| json!({}));
+        let mut prefs = crate::memory::MemoryService::read_preferences_root_at_home(&self.home)
+            .map_err(MemoryError::Store)?;
         prefs["external_skill_paths"] = json!(paths);
         if let Some(obj) = prefs.as_object_mut() {
             obj.insert("updatedAt".into(), json!(am::now_iso()));
@@ -1881,11 +1884,17 @@ pub async fn skills_external_paths_put_route(
         )
             .into_response();
     };
-    let paths: Vec<String> = paths
+    let Some(paths) = paths
         .iter()
-        .filter_map(Value::as_str)
-        .map(str::to_string)
-        .collect();
+        .map(|path| path.as_str().map(str::to_string))
+        .collect::<Option<Vec<String>>>()
+    else {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(json!({"error":"paths must contain only strings"})),
+        )
+            .into_response();
+    };
     match state.skills().set_external_paths(&paths) {
         Ok(()) => {
             // skills.ts:490 — 外部路径保存并重载来源后广播 skills-changed。

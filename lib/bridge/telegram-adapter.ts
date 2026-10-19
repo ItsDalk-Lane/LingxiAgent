@@ -201,6 +201,7 @@ export function createTelegramAdapter({ token, agentId, onMessage, onStatus }) {
 
       onMessage({
         platform: "telegram",
+        messageId: msg.message_id == null ? null : String(msg.message_id),
         agentId,
         chatId,
         userId,
@@ -268,15 +269,17 @@ export function createTelegramAdapter({ token, agentId, onMessage, onStatus }) {
     receiptCapabilities: TELEGRAM_RECEIPT_CAPABILITIES,
 
     async sendTypingIndicator(chatId, options = {}) {
-      try { await bot.sendChatAction(chatId, "typing"); } catch {}
+      return await bot.sendChatAction(chatId, "typing", telegramMessageOptions(options));
     },
 
     async sendReply(chatId, text, options = {}) {
       // Telegram 单条消息限制 4096 字符，超长时分段发送
       const messageOptions = telegramMessageOptions(options, "html");
+      const results = [];
       for (const chunk of formatTelegramMessageChunks(text)) {
-        await bot.sendMessage(chatId, chunk, messageOptions);
+        results.push(await bot.sendMessage(chatId, chunk, messageOptions));
       }
+      return results;
     },
 
     /** block streaming 专用：发一条气泡，两条之间加 humanDelay */
@@ -375,10 +378,10 @@ export function createTelegramAdapter({ token, agentId, onMessage, onStatus }) {
       try {
         const opts = { filename, contentType: mime };
         const messageOptions = telegramMessageOptions(metadata);
-        if (mime.startsWith("image/")) await bot.sendPhoto(chatId, buffer, messageOptions || {}, opts);
-        else if (mime.startsWith("video/")) await bot.sendVideo(chatId, buffer, messageOptions || {}, opts);
-        else if (mime.startsWith("audio/")) await bot.sendAudio(chatId, buffer, messageOptions || {}, opts);
-        else await bot.sendDocument(chatId, buffer, messageOptions || {}, opts);
+        if (mime.startsWith("image/")) return await bot.sendPhoto(chatId, buffer, messageOptions || {}, opts);
+        if (mime.startsWith("video/")) return await bot.sendVideo(chatId, buffer, messageOptions || {}, opts);
+        if (mime.startsWith("audio/")) return await bot.sendAudio(chatId, buffer, messageOptions || {}, opts);
+        return await bot.sendDocument(chatId, buffer, messageOptions || {}, opts);
       } catch (err) {
         debugLog()?.warn("bridge", `[telegram] sendMediaBuffer 失败 (${mime}): ${err.message}`);
         throw err;
@@ -389,7 +392,7 @@ export function createTelegramAdapter({ token, agentId, onMessage, onStatus }) {
       stopped = true;
       if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
       bot.removeAllListeners();
-      bot.stopPolling();
+      return bot.stopPolling();
     },
 
     /** 验证 token 有效性 */

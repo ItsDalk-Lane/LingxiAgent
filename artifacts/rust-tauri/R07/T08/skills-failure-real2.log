@@ -1,0 +1,28 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 42.64s
+     Running tests/r06_skills_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_skills_completion-258d5b18d0e11d1f)
+
+running 1 test
+LINGXI_AUTH_REJECTED request_id="req-353bc974c0182c39094737df1a6c0a2a" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53641
+LINGXI_AUTH_REJECTED request_id="req-9710ee811ca531185cce6e5d81a02352" method=GET path=/lingxi/v1/skills/bundles status=403 reason=insufficient_scope remote=127.0.0.1:53642
+LINGXI_AUTH_REJECTED request_id="req-32ad23230480ee83f06fb81b4fbd1c09" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53639
+LINGXI_AUTH_REJECTED request_id="req-c2e34128ebc2651f12e0ab127dc1adf4" method=GET path=/lingxi/v1/skills/bundles status=403 reason=insufficient_scope remote=127.0.0.1:53640
+LINGXI_AUTH_REJECTED request_id="req-80d19d333aba479c0409d55ba74f3107" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53639
+LINGXI_AUTH_REJECTED request_id="req-daeb11206c78b0f0885e3774594e7e20" method=GET path=/lingxi/v1/skills/bundles status=403 reason=insufficient_scope remote=127.0.0.1:53641
+LINGXI_AUTH_REJECTED request_id="req-4be331c72e343ec1bfc59d6066330e3a" method=GET path=/lingxi/v1/skills/external-paths status=403 reason=insufficient_scope remote=127.0.0.1:53642
+LINGXI_AUTH_REJECTED request_id="req-4442fb6a0b73d98936e54d4e598358ca" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53639
+LINGXI_AUTH_REJECTED request_id="req-b6355d70b960e95fb77422bd64c52ce2" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53646
+LINGXI_AUTH_REJECTED request_id="req-8691bc17cc27f5d0b4ca44ffaeedbf6a" method=GET path=/lingxi/v1/skills/bundles status=403 reason=insufficient_scope remote=127.0.0.1:53641
+LINGXI_AUTH_REJECTED request_id="req-45eebf96a592fb07dc691eddaf4eade9" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53639
+LINGXI_AUTH_REJECTED request_id="req-9b6ae3497742c12bf2c3b0f1c2898c6d" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53641
+LINGXI_AUTH_REJECTED request_id="req-faa8050009443b7924b761a8bd6bb0e6" method=GET path=/lingxi/v1/skills/bundles status=403 reason=insufficient_scope remote=127.0.0.1:53665
+LINGXI_AUTH_REJECTED request_id="req-9a4c01bfb6de52de29627524d90c0276" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53639
+LINGXI_AUTH_REJECTED request_id="req-44e94cffa4f192e9d4a648574ef41390" method=GET path=/lingxi/v1/skills status=403 reason=insufficient_scope remote=127.0.0.1:53642
+LINGXI_AUTH_REJECTED request_id="req-d7462ad59c1b659b4988dea81d75f565" method=GET path=/lingxi/v1/skills/bundles status=403 reason=insufficient_scope remote=127.0.0.1:53641
+test current_skills_pages_real_read_failures_and_partial_bundle_writes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 25.37s
+

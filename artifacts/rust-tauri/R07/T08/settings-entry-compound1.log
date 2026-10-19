@@ -1,0 +1,390 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（configured）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（configured） 3525ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model）
+[settings] models load failed: Error: model plane unavailable
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:95:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:472:7
+
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":500},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-model） 355ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-agent）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（without-agent） 297ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（restart）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（restart） 590ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（rejected-restart）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（rejected-restart） 423ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（invalid-resource-credential）
+[settings] models load failed: Error: authentication required
+    at errorWithCode (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/errors/error-presenter.ts:38:17)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:78:27)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at lingxiFetchJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:95:15)
+    at loadSettingsModels (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/actions.ts:113:18)
+    at async Promise.all (index 3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:472:7 {
+  code: 'unauthorized'
+}
+
+ ✓ desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（invalid-resource-credential） 236ms
+stderr | desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure）
+R07_SETTINGS_ENTRY_RESULT {"blocked":[],"requests":[{"path":"/lingxi/v1/access/summary","method":"GET","status":200},{"path":"/lingxi/v1/server/identity","method":"GET","status":200},{"path":"/lingxi/v1/settings/config","method":"GET","status":200},{"path":"/lingxi/v1/agents","method":"GET","status":200},{"path":"/lingxi/v1/models","method":"GET","status":200},{"path":"/lingxi/v1/settings/snapshot","method":"GET","status":200},{"path":"/lingxi/v1/settings/avatar-health","method":"GET","status":200},{"path":"/lingxi/v1/providers/summary","method":"GET","status":200},{"path":"/lingxi/v1/preferences/quick-chat","method":"GET","status":200},{"path":"/lingxi/v1/preferences/notifications","method":"GET","status":200},{"path":"/lingxi/v1/preferences/goal","method":"GET","status":200},{"path":"/lingxi/v1/preferences/autolearn","method":"GET","status":200},{"path":"/lingxi/v1/skills/bundles","method":"GET","status":200},{"path":"/lingxi/v1/skills","method":"GET","status":200},{"path":"/lingxi/v1/skills/external-paths","method":"GET","status":200}]}
+
+ × desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure） 10425ms
+   → ENOENT: no such file or directory, open '/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-settings-entry-Lgo15Q/home/lingxi-service/models.json'
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+        [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-panel _settings-panel-modal_4045f0"[39m
+          [33mid[39m=[32m"settingsPanel"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"settings-header _settings-header-modal_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-title-group_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"settings.back"[39m
+                [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+                [33mdata-settings-return[39m=[32m"true"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.7"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</button>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"_settings-title_4045f0"[39m
+              [36m>[39m
+                [0msettings.title[0m
+              [36m</h1>[39m
+            [36m</div>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-header-tab-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.tabs.providers[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-body_4045f0"[39m
+          [36m>[39m
+            [36m<nav[39m
+              [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"15"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.8"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"15"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"11"[39m
+                    [33mcy[39m=[32m"11"[39m
+                    [33mr[39m=[32m"7"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                  [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                  [33mtype[39m=[32m"search"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"agent"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.agent[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"me"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"7"[39m
+                    [33mr[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.me[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"interface"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx...
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx > 真实设置容器的导航、恢复及失败处理（provider-refresh-failure）
+Error: ENOENT: no such file or directory, open '/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-settings-entry-Lgo15Q/home/lingxi-service/models.json'
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"_settings-content-root_4045f0"[39m
+        [33mdata-input-ctx-zone[39m=[32m"settings"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"settings-panel _settings-panel-modal_4045f0"[39m
+          [33mid[39m=[32m"settingsPanel"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"settings-header _settings-header-modal_4045f0"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_settings-title-group_4045f0"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-label[39m=[32m"settings.back"[39m
+                [33mclass[39m=[32m"_settings-return-btn_4045f0"[39m
+                [33mdata-settings-return[39m=[32m"true"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"22"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.7"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"22"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M15 18l-6-6 6-6"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+              [36m</button>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"_settings-title_4045f0"[39m
+              [36m>[39m
+                [0msettings.title[0m
+              [36m</h1>[39m
+            [36m</div>[39m
+            [36m<h1[39m
+              [33mclass[39m=[32m"_settings-header-tab-title_4045f0"[39m
+            [36m>[39m
+              [0msettings.tabs.providers[0m
+            [36m</h1>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_settings-body_4045f0"[39m
+          [36m>[39m
+            [36m<nav[39m
+              [33mclass[39m=[32m"_settings-nav_4045f0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_settings-search-shell_4045f0"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"_settings-search-icon_4045f0"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"15"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.8"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"15"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"11"[39m
+                    [33mcy[39m=[32m"11"[39m
+                    [33mr[39m=[32m"7"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m20 20-3.5-3.5"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<input[39m
+                  [33mclass[39m=[32m"_settings-search-input_4045f0"[39m
+                  [33mplaceholder[39m=[32m"settings.settingsSearch.placeholder"[39m
+                  [33mtype[39m=[32m"search"[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m/>[39m
+              [36m</div>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"agent"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M12 2a5 5 0 0 1 5 5c0 2.76-2.24 5-5 5s-5-2.24-5-5a5 5 0 0 1 5-5z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.agent[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"me"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"[39m
+                  [36m/>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"7"[39m
+                    [33mr[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [36m<span>[39m
+                  [0msettings.tabs.me[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"_settings-nav-item_4045f0"[39m
+                [33mdata-tab[39m=[32m"interface"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"1.5"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"16"[39m
+                [36m>[39m
+                  [36m<circle[39m
+                    [33mcx...
+ ❯ timeout desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx:160:27
+    158|       const source = join(home, 'lingxi-service/models.json');
+    159|       await waitFor(async () => {
+    160|         expect(JSON.parse(await readFile(source, 'utf8')).providers['e…
+       |                           ^
+    161|         expect(useSettingsStore.getState().toastMessage).toBe('setting…
+    162|         expect(useSettingsStore.getState().settingsConfigStatus).toBe(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { errno: -2, code: 'ENOENT', syscall: 'open', path: '/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-settings-entry-Lgo15Q/home/lingxi-service/models.json' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  18:18:08
+   Duration  17.44s (transform 964ms, setup 22ms, import 1.24s, tests 15.85s, environment 266ms)
+

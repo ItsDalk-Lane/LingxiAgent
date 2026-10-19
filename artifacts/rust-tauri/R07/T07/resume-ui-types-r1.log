@@ -1,0 +1,6 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/__tests__/services/rust-workbench.test.ts(68,12): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/__tests__/services/rust-workbench.test.ts(68,36): error TS2493: Tuple type '[]' of length '0' has no element at index '1'.

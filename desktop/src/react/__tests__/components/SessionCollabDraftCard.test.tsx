@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import '@testing-library/jest-dom/vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SessionCollabDraftCard } from '../../components/chat/SessionCollabDraftCard';
 import { AssistantMessage } from '../../components/chat/AssistantMessage';
@@ -194,7 +194,7 @@ describe('SessionCollabDraftCard', () => {
       expect(screen.getByText(/sessionCollab\.halfCreated/)).toBeInTheDocument();
       expect(screen.getByText(/sid-new/)).toBeInTheDocument();
     });
-    expect(screen.getByRole('button', { name: 'sessionCollab.confirmCreate' })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'sessionCollab.retryMessage' })).not.toBeDisabled();
   });
 
   it('posts /api/session-collab/reject on ignore and converges to the rejected state on success', async () => {
@@ -302,4 +302,111 @@ describe('SessionCollabDraftCard', () => {
     // 不应该走 CronConfirmBlock 的 automation 通用兜底（那条路径没有 view/open 相关 aria-label）。
     expect(screen.queryByRole('button', { name: 'automation.openDraft' })).not.toBeInTheDocument();
   });
+  it('部分创建成功只用同一草稿与同一编辑内容重试首条消息', async () => {
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: false, partialSuccess: true,
+      code: 'first_message_failed', sessionId: 'sid-once', decisionPersisted: true,
+      result: { sessionId: 'sid-once', sessionCreated: true, firstMessageAccepted: false, deliveryStatus: 'failed', retryable: true },
+    }), { status: 500 })).mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, decisionPersisted: true,
+      result: { sessionId: 'sid-once', firstMessageAccepted: true, deliveryStatus: 'accepted' },
+    })));
+    renderCard(createBlock());
+    fireEvent.change(screen.getByDisplayValue('first message body'), { target: { value: 'edited first message' } });
+    fireEvent.click(screen.getByRole('button', { name: 'sessionCollab.confirmCreate' }));
+    const retry = await screen.findByRole('button', { name: 'sessionCollab.retryMessage' });
+    expect(screen.getByDisplayValue('edited first message')).toBeDisabled();
+    fireEvent.click(retry);
+    await screen.findByText('sessionCollab.createdSession:id=sid-once');
+    const calls = vi.mocked(lingxiFetch).mock.calls;
+    expect(calls).toHaveLength(2);
+    expect(calls[0][0]).toBe('/api/session-collab/apply');
+    expect(calls[1][0]).toBe('/api/session-collab/apply');
+    expect(calls[1][1]?.body).toBe(calls[0][1]?.body);
+    expect(JSON.parse(String(calls[1][1]?.body))).toMatchObject({ suggestionId: 'suggestion_create_1' });
+  });
+
+  it('排队确认不显示为已送达，也不再提供第二次创建按钮', async () => {
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, decisionPersisted: true,
+      result: { sessionId: 'sid-queued', targetSessionId: 'sid-queued', sessionCreated: true,
+        deliveryStatus: 'queued', firstMessageAccepted: false, acceptedRunId: null },
+    })));
+    renderCard(createBlock());
+    fireEvent.click(screen.getByRole('button', { name: 'sessionCollab.confirmCreate' }));
+    await screen.findByText('sessionCollab.queued');
+    expect(screen.getByText('sessionCollab.queuedHint')).toBeInTheDocument();
+    expect(screen.queryByText('common.approved')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'sessionCollab.confirmCreate' })).not.toBeInTheDocument();
+    expect(lingxiFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('历史排队状态随后可由真实accepted结果更新', () => {
+    const block = sendBlock({ status: 'approved', result: { deliveryStatus: 'queued' } });
+    const { rerender } = renderCard(block);
+    expect(screen.getByText('sessionCollab.queued')).toBeInTheDocument();
+    rerender(<SessionCollabDraftCard block={{ ...block, result: { deliveryStatus: 'accepted', firstMessageAccepted: true, acceptedRunId: 'run-real' } }} sessionPath={SOURCE_SESSION_PATH} />);
+    expect(screen.getByText('common.approved')).toBeInTheDocument();
+    expect(screen.queryByText('sessionCollab.queued')).not.toBeInTheDocument();
+  });
+
+  it.each(['apply', 'reject'])('实际%s成功但决定未保存时保留结果并显示警示', async operation => {
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, decisionPersisted: false,
+      result: { sessionId: 'sid-real' },
+    })));
+    renderCard(sendBlock());
+    fireEvent.click(screen.getByRole('button', { name: operation === 'apply' ? 'sessionCollab.confirmSend' : 'sessionCollab.ignore' }));
+    await screen.findByText(operation === 'apply' ? 'common.approved' : 'common.rejected');
+    expect(screen.getByRole('alert')).toHaveTextContent('sessionCollab.decisionNotPersisted');
+    expect(screen.queryByRole('button', { name: 'sessionCollab.confirmSend' })).not.toBeInTheDocument();
+  });
+
+  it('未知投递结果明确显示，禁止再次点击或自动重发', async () => {
+    vi.mocked(lingxiFetch).mockResolvedValueOnce(new Response(JSON.stringify({ ok: false, code: 'delivery_unknown',
+      result: { sessionId: 'sid-unknown', deliveryStatus: 'unknown', retryable: false },
+    }), { status: 409 }));
+    renderCard(createBlock());
+    fireEvent.click(screen.getByRole('button', { name: 'sessionCollab.confirmCreate' }));
+    await screen.findByText('sessionCollab.unknown');
+    expect(screen.getByText('sessionCollab.deliveryUnknown')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'sessionCollab.retryMessage' })).not.toBeInTheDocument();
+    expect(lingxiFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('切换草稿后旧确认响应不能覆盖新草稿', async () => {
+    let resolve!: (response: Response) => void;
+    vi.mocked(lingxiFetch).mockReturnValueOnce(new Promise(done => { resolve = done; }));
+    const { rerender } = renderCard(sendBlock());
+    fireEvent.click(screen.getByRole('button', { name: 'sessionCollab.confirmSend' }));
+    rerender(<SessionCollabDraftCard block={createBlock({ suggestionId: 'new-card' })} sessionPath={SOURCE_SESSION_PATH} />);
+    await act(async () => { resolve(new Response(JSON.stringify({ ok: true, decisionPersisted: false }))); });
+    expect(screen.getByRole('button', { name: 'sessionCollab.confirmCreate' })).not.toBeDisabled();
+    expect(screen.getByDisplayValue('first message body')).toBeInTheDocument();
+    expect(screen.queryByText('common.approved')).not.toBeInTheDocument();
+    expect(screen.queryByText('sessionCollab.decisionNotPersisted')).not.toBeInTheDocument();
+  });
+
+  it('助手切换后旧请求不把当前卡变成已确认', async () => {
+    let resolve!: (response: Response) => void;
+    vi.mocked(lingxiFetch).mockReturnValueOnce(new Promise(done => { resolve = done; }));
+    renderCard(sendBlock());
+    fireEvent.click(screen.getByRole('button', { name: 'sessionCollab.confirmSend' }));
+    act(() => { useStore.setState({ currentAgentId: 'maomao' }); });
+    await act(async () => { resolve(new Response(JSON.stringify({ ok: true }))); });
+    expect(screen.getByRole('button', { name: 'sessionCollab.confirmSend' })).not.toBeDisabled();
+    expect(screen.queryByText('common.approved')).not.toBeInTheDocument();
+  });
+
+  it('重开部分成功的历史草稿后仍只重试同一冻结payload', async () => {
+    const block = createBlock({ status: 'approved', resultSessionId: 'sid-existing',
+      result: { sessionId: 'sid-existing', deliveryStatus: 'failed', retryable: true },
+      frozenApply: { agentId: 'maomao', title: 'frozen title', firstMessage: 'frozen first message' },
+    });
+    renderCard(block);
+    expect(screen.getByDisplayValue('frozen title')).toBeDisabled();
+    expect(screen.getByDisplayValue('frozen first message')).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'sessionCollab.retryMessage' }));
+    await waitFor(() => { expect(lingxiFetch).toHaveBeenCalledTimes(1); });
+    expect(JSON.parse(String(vi.mocked(lingxiFetch).mock.calls[0][1]?.body))).toEqual({
+      suggestionId: 'suggestion_create_1', draft: { agentId: 'maomao', title: 'frozen title', firstMessage: 'frozen first message' },
+    });
+  });
+
 });

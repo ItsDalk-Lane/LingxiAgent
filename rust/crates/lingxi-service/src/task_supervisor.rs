@@ -565,6 +565,44 @@ impl TaskSupervisor {
         Ok(Some(permit))
     }
 
+    /// 读取真实受理时冻结的权限档位；会话文件里的当前设置不能替代来源授权。
+    pub(crate) fn parent_session_mode(
+        &self,
+        run_id: &str,
+        session_id: &str,
+        agent_id: &str,
+        principal: &lingxi_kernel::Principal,
+        gate: &Arc<lingxi_kernel::session_admission::SessionAdmission>,
+    ) -> Result<Option<lingxi_kernel::subagent::SessionPermissionMode>, StorageError> {
+        let bindings = self.run_permits.lock().unwrap_or_else(|p| p.into_inner());
+        let Some(binding) = bindings.get(run_id) else {
+            return Ok(None);
+        };
+        let permit = binding.permit.upgrade().ok_or(StorageError::Conflict {
+            detail: "parent_run_permit_expired".into(),
+        })?;
+        let Some((owner, sid, agent, authorization)) = binding.authorization.as_ref() else {
+            return Err(StorageError::Conflict {
+                detail: "parent_run_authorization_missing".into(),
+            });
+        };
+        if owner != principal
+            || sid != session_id
+            || agent != agent_id
+            || !permit.covers(session_id)
+            || !permit.belongs_to(gate)
+            || binding
+                .root_scope
+                .as_ref()
+                .is_none_or(CancelScope::is_cancelled)
+        {
+            return Err(StorageError::Conflict {
+                detail: "parent_run_permit_mismatch".into(),
+            });
+        }
+        Ok(Some(authorization.session_mode))
+    }
+
     pub(crate) fn claim_driver(
         self: &Arc<Self>,
         run_id: &str,

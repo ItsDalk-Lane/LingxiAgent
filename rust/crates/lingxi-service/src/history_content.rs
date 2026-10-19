@@ -1417,12 +1417,24 @@ fn current_tools(
     state: &ServiceState,
 ) -> Result<lingxi_kernel::model_exchange::ToolDeclarationSnapshot, StorageError> {
     match state.tool_gateway() {
-        Some(gateway) => lingxi_kernel::model_exchange::ToolDeclarationSnapshot::from_registry(
-            gateway.registry(),
-        )
-        .map_err(|e| StorageError::InvalidRequest {
-            detail: format!("compaction tools: {e}"),
-        }),
+        Some(gateway) => {
+            let mut snapshot =
+                lingxi_kernel::model_exchange::ToolDeclarationSnapshot::from_registry(
+                    gateway.registry(),
+                )
+                .map_err(|e| StorageError::InvalidRequest {
+                    detail: format!("compaction tools: {e}"),
+                })?;
+            // 回执口径与真实请求一致：runs 驱动对普通本地会话恒定剔除手机
+            // 控制类工具（runs.rs 的 phone_settings::control_tool 闸），回执
+            // 若保留它们会让"持久声明 ⊆ 下一请求声明"的对账恒假（δ 回归网
+            // 经 r06_ex01 fresh_commits 抓获）。Channel/Dm 来源请求仍按
+            // 各自驱动规则补充，回执记录的是普通本地会话可见面。
+            snapshot
+                .declarations
+                .retain(|tool| !crate::phone_settings::control_tool(&tool.target));
+            Ok(snapshot)
+        }
         None => Ok(lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty()),
     }
 }
@@ -1448,6 +1460,12 @@ fn local_compaction(
                 if !text.is_empty() =>
             {
                 sections.push(format!("### User\n{text}"))
+            }
+            ExchangeItem::HostNotice { delivery_id, text } => {
+                sections.push(format!(
+                    "### Delivered Host Notice\n{}",
+                    lingxi_kernel::model_exchange::render_host_notice(delivery_id, text)
+                ));
             }
             ExchangeItem::AssistantTurn { content, .. } => {
                 let text = content
@@ -1969,11 +1987,13 @@ pub trait SessionCollabDelivery: Send + Sync {
 /// 存储（主体过滤）；send/create 产确认草稿（TS 草稿语义：工具从不直接
 /// 投递，用户确认后经 [`SessionCollabTools::apply_draft`] 执行）。
 pub struct SessionCollabTools {
-    state: ServiceState,
-    delivery: Arc<dyn SessionCollabDelivery>,
-    /// 可用模型键（"provider/id"；TS resolveAvailableModel 的输入）。
+    storage: Arc<RunDatabase>,
+    memory: Arc<crate::memory::MemoryService>,
+    clock: Arc<dyn crate::inject::ServiceClock>,
+    home: std::path::PathBuf,
+    /// 兼容测试入口的可用模型；生产构造从正式模型目录读取。
     models: Vec<String>,
-    drafts: std::sync::Mutex<HashMap<String, SessionCollabDraft>>,
+    model_gateway: Option<Arc<lingxi_adapters::models::gateway::ConfigModelGateway>>,
 }
 
 /// 一次性草稿（draft-store.ts 的结构化端口：apply 闭包以载荷+行动表达）。
@@ -2000,6 +2020,10 @@ pub enum DraftApplyOutcome {
     /// create 半成功：会话已建、首条消息失败（保留新会话 id，草稿切换为
     /// 仅重试首条消息——retryable）。
     PartialSuccess { session_id: String, detail: String },
+    /// 用户已确认并持久排队，尚无真实Run受理。
+    Queued { target_session_id: Option<String> },
+    /// 已开始受理但尚无可证明结果，不能盲重投。
+    Unknown { detail: String },
     /// 一般失败：草稿保留供重试。
     Failed { detail: String },
 }
@@ -2010,11 +2034,21 @@ impl SessionCollabTools {
         delivery: Arc<dyn SessionCollabDelivery>,
         models: Vec<String>,
     ) -> Self {
+        // 旧构造签名保留，投递改由持久队列和宿主驱动；不持有闭包或State。
+        drop(delivery);
+        let mut tools = Self::production(&state, models);
+        tools.model_gateway = None;
+        tools
+    }
+
+    pub(crate) fn production(state: &ServiceState, models: Vec<String>) -> Self {
         Self {
-            state,
-            delivery,
+            storage: Arc::clone(state.storage()),
+            memory: Arc::clone(state.memory()),
+            clock: Arc::clone(state.clock()),
+            home: state.config().data_home.clone(),
             models,
-            drafts: std::sync::Mutex::new(HashMap::new()),
+            model_gateway: state.wired_model_gateway().cloned(),
         }
     }
 
@@ -2025,26 +2059,38 @@ impl SessionCollabTools {
         principal: &lingxi_kernel::Principal,
     ) -> Result<Vec<lingxi_adapters::storage::SessionRow>, String> {
         let rows = self
-            .state
-            .storage()
+            .storage
             .list_sessions()
             .await
             .map_err(|err| err.to_string())?;
         Ok(rows
             .into_iter()
-            .filter(|row| kernel_can_access(principal, &row.owner_user_id))
+            .filter(|row| kernel_can_access(principal, &row.owner_user_id, &row.session_id))
             .collect())
     }
 
     /// 工具 action 派发（session-tool.ts execute）。
     pub async fn run_action(&self, ctx: &RunContext, params: &Value) -> ToolOutcome {
+        let call = match crate::auth::hex_random_public(16) {
+            Ok(id) => ToolCallId::new(format!("collab-direct:{id}")),
+            Err(error) => return failed(ErrorCode::Internal, error.to_string()),
+        };
+        self.run_action_with_call(ctx, &call, params).await
+    }
+
+    pub async fn run_action_with_call(
+        &self,
+        ctx: &RunContext,
+        call: &ToolCallId,
+        params: &Value,
+    ) -> ToolOutcome {
         let action = params["action"].as_str().unwrap_or_default();
         match action {
             "?" => text_success(session_tool_handbook()),
             "list" => self.action_list(ctx, params).await,
             "read" => self.action_read(ctx, params).await,
-            "send" => self.action_send(ctx, params).await,
-            "create" => self.action_create(ctx, params).await,
+            "send" => self.action_send(ctx, call, params).await,
+            "create" => self.action_create(ctx, call, params).await,
             other => usage_error(other, format!("Unknown action: {other}")),
         }
     }
@@ -2097,7 +2143,7 @@ impl SessionCollabTools {
         if session_id.is_empty() {
             return usage_error("read", "sessionId is required for read.");
         }
-        let Ok(row) = tree_store::get_session_row(self.state.storage(), &session_id)
+        let Ok(row) = tree_store::get_session_row(&self.storage, &session_id)
             .await
             .map_err(|err| err.to_string())
         else {
@@ -2109,7 +2155,7 @@ impl SessionCollabTools {
         let Some(row) = row else {
             return usage_error("read", format!("Session not found: {session_id}"));
         };
-        if !kernel_can_access(&ctx.principal, &row.owner_user_id) {
+        if !kernel_can_access(&ctx.principal, &row.owner_user_id, &row.session_id) {
             // 范围受控：他人会话一律不可读（不呈现任何目标事实——与
             // 不存在同一措辞，不泄露存在性）。
             return usage_error("read", format!("Session not found: {session_id}"));
@@ -2117,11 +2163,8 @@ impl SessionCollabTools {
         if params["mode"].as_str() != Some("transcript") {
             // summary 模式（session-tool.ts:147-161）：摘要从不按需生成；
             // 无记录即如实说明。
-            let record = read_session_summary_record(
-                self.state.config().data_home.as_path(),
-                &row.agent_id,
-                &session_id,
-            );
+            let record =
+                read_session_summary_record(self.home.as_path(), &row.agent_id, &session_id);
             let summary = record
                 .as_ref()
                 .and_then(|value| value.get("summary"))
@@ -2145,7 +2188,7 @@ impl SessionCollabTools {
                 row.agent_id
             ));
         }
-        let db = Arc::clone(self.state.storage());
+        let db = Arc::clone(&self.storage);
         let Ok(projected) = project_full_branch(&db, &session_id).await else {
             return failed(
                 ErrorCode::Internal,
@@ -2177,7 +2220,12 @@ impl SessionCollabTools {
         ))
     }
 
-    async fn action_send(&self, ctx: &RunContext, params: &Value) -> ToolOutcome {
+    async fn action_send(
+        &self,
+        ctx: &RunContext,
+        call: &ToolCallId,
+        params: &Value,
+    ) -> ToolOutcome {
         let session_id = params["sessionId"]
             .as_str()
             .unwrap_or_default()
@@ -2198,7 +2246,7 @@ impl SessionCollabTools {
         if source_session_id == session_id {
             return usage_error("send", "Refusing to send to the current session itself.");
         }
-        let row = match tree_store::get_session_row(self.state.storage(), &session_id).await {
+        let row = match tree_store::get_session_row(&self.storage, &session_id).await {
             Ok(Some(row)) => row,
             Ok(None) => {
                 return usage_error("send", format!("Session not found: {session_id}"));
@@ -2210,21 +2258,26 @@ impl SessionCollabTools {
                 );
             }
         };
-        if !kernel_can_access(&ctx.principal, &row.owner_user_id) {
+        if !kernel_can_access(&ctx.principal, &row.owner_user_id, &row.session_id) {
             return usage_error("send", format!("Session not found: {session_id}"));
         }
-        let draft = self.create_draft(
-            "send",
-            &source_session_id,
-            json!({"targetSessionId": session_id, "message": message}),
-        );
-        text_success(format!(
+        let payload = json!({"targetSessionId": session_id, "message": message});
+        let draft = match self.create_draft(ctx, call, "send", payload.clone()).await {
+            Ok(draft) => draft,
+            Err(error) => return usage_error("send", error.to_string()),
+        };
+        card_success(format!(
             "Draft created ({}); waiting for the user to confirm the card. The user may edit or reject it. Check the target session later with action:\"read\".",
             draft.suggestion_id
-        ))
+        ), json!({"suggestionId":draft.suggestion_id,"kind":"session_send_draft","target":{"type":"session","sessionId":session_id,"sessionTitle":row.title,"agentId":row.agent_id},"draft":payload}))
     }
 
-    async fn action_create(&self, ctx: &RunContext, params: &Value) -> ToolOutcome {
+    async fn action_create(
+        &self,
+        ctx: &RunContext,
+        call: &ToolCallId,
+        params: &Value,
+    ) -> ToolOutcome {
         let message = params["message"]
             .as_str()
             .unwrap_or_default()
@@ -2243,7 +2296,7 @@ impl SessionCollabTools {
             return text_success("create requires an active desktop session context".to_string());
         }
         // roster（TS resolveAgentFromRoster：id 精确命中或唯一 name 命中）。
-        let summaries = match self.state.memory().list_agent_summaries() {
+        let summaries = match self.memory.list_agent_summaries() {
             Ok(summaries) => summaries,
             Err(err) => {
                 return failed(
@@ -2292,7 +2345,16 @@ impl SessionCollabTools {
         {
             // 模型无效分开报告（TS resolveAvailableModel 抛
             // session_create_invalid_model）。
-            if !self.models.iter().any(|key| key == model) {
+            let current = self
+                .model_gateway
+                .as_ref()
+                .map(|gateway| gateway.chat_model_keys());
+            if !current
+                .as_ref()
+                .unwrap_or(&self.models)
+                .iter()
+                .any(|key| key == model)
+            {
                 return usage_error(
                     "create",
                     format!(
@@ -2302,212 +2364,132 @@ impl SessionCollabTools {
             }
             model_key = Some(model.to_string());
         }
-        let draft = self.create_draft(
-            "create",
-            &source_session_id,
-            json!({
-                "agentId": target_agent,
-                "model": model_key,
-                "title": params["title"].as_str(),
-                "firstMessage": message,
-            }),
-        );
-        text_success(format!(
+        let payload = json!({"agentId":target_agent,"model":model_key,"title":params["title"].as_str(),"firstMessage":message});
+        let draft = match self
+            .create_draft(ctx, call, "create", payload.clone())
+            .await
+        {
+            Ok(draft) => draft,
+            Err(error) => return usage_error("create", error.to_string()),
+        };
+        card_success(
+            format!(
             "Draft created ({}); waiting for the user to confirm session creation for agent {}.",
             draft.suggestion_id, target_agent
-        ))
+        ),
+            json!({"suggestionId":draft.suggestion_id,"kind":"session_create_draft","target":{"type":"agent","agentId":target_agent},"draft":payload}),
+        )
     }
 
-    fn create_draft(
+    async fn create_draft(
         &self,
+        ctx: &RunContext,
+        call: &ToolCallId,
         kind: &str,
-        source_session_id: &str,
         payload: Value,
-    ) -> SessionCollabDraft {
-        static SEQ: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-        let suggestion_id = format!(
-            "session_{}_{}",
-            self.state.clock().now_unix_ms(),
-            SEQ.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-        );
-        let draft = SessionCollabDraft {
-            suggestion_id: suggestion_id.clone(),
-            kind: kind.to_string(),
-            source_session_id: source_session_id.to_string(),
-            payload,
-            created_at_unix_ms: self.state.clock().now_unix_ms(),
+    ) -> Result<SessionCollabDraft, StorageError> {
+        use lingxi_adapters::storage::conversations_collab as store;
+        let kind = if kind == "send" {
+            store::CollabDraftKind::Send
+        } else {
+            store::CollabDraftKind::Create
         };
-        self.drafts
-            .lock()
-            .expect("session collab draft store")
-            .insert(suggestion_id, draft.clone());
-        draft
+        let key =
+            serde_json::to_vec(&json!([ctx.run_id.as_str(), call.as_str()])).map_err(|e| {
+                StorageError::Internal {
+                    detail: e.to_string(),
+                }
+            })?;
+        let id = format!("session_{}", lingxi_protocol::canon::sha256_hex(&key));
+        let now = self.clock.now_unix_ms();
+        let expires = i64::try_from(now.saturating_add(7 * 24 * 60 * 60 * 1000)).map_err(|_| {
+            StorageError::InvalidRequest {
+                detail: "draft clock overflow".into(),
+            }
+        })?;
+        let draft = store::create_collab_draft(
+            &self.storage,
+            &store::CollabDraftInput {
+                id,
+                studio_id: "local".into(),
+                owner_subject: ctx.principal.storage_subject(),
+                source_session_id: ctx.session_id.as_str().into(),
+                source_run_id: ctx.run_id.as_str().into(),
+                source_tool_call_id: call.as_str().into(),
+                kind,
+                draft_json: payload.to_string(),
+                expires_at: expires,
+            },
+            now,
+        )
+        .await?;
+        Ok(SessionCollabDraft {
+            suggestion_id: draft.input.id,
+            kind: match draft.input.kind {
+                store::CollabDraftKind::Send => "send",
+                store::CollabDraftKind::Create => "create",
+            }
+            .into(),
+            source_session_id: draft.input.source_session_id,
+            payload,
+            created_at_unix_ms: now,
+        })
     }
 
-    /// 草稿确认执行（draft-store.ts apply）。create 半成功：会话已建而
-    /// 首条消息失败 → 保留新会话 id，草稿切换为仅重试首条消息。
+    /// 兼容直接调用面：确认只写持久队列，真实受理由统一宿主tick处理。
     pub async fn apply_draft(&self, suggestion_id: &str) -> DraftApplyOutcome {
-        let draft = {
-            let store = self.drafts.lock().expect("session collab draft store");
-            match store.get(suggestion_id) {
-                Some(draft) => draft.clone(),
-                None => {
-                    return DraftApplyOutcome::Rejected {
-                        reason: "not-found".to_string(),
-                    }
+        use lingxi_adapters::storage::conversations_collab as store;
+        let draft = match store::get_collab_draft(&self.storage, suggestion_id).await {
+            Ok(Some(d)) => d,
+            Ok(None) => {
+                return DraftApplyOutcome::Rejected {
+                    reason: "not-found".into(),
+                }
+            }
+            Err(e) => {
+                return DraftApplyOutcome::Failed {
+                    detail: e.to_string(),
                 }
             }
         };
-        match draft.kind.as_str() {
-            "send" => {
-                let target = draft.payload["targetSessionId"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string();
-                let message = draft.payload["message"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string();
-                if target.is_empty() || message.is_empty() {
-                    return DraftApplyOutcome::Failed {
-                        detail: "send draft payload is incomplete".to_string(),
-                    };
-                }
-                match self.delivery.deliver(&target, &message).await {
-                    Ok(()) => {
-                        self.drafts
-                            .lock()
-                            .expect("session collab draft store")
-                            .remove(suggestion_id);
-                        DraftApplyOutcome::Sent {
-                            target_session_id: target,
-                        }
-                    }
-                    Err(detail) => DraftApplyOutcome::Failed { detail },
-                }
-            }
-            "create" => {
-                let agent = draft.payload["agentId"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string();
-                let first_message = draft.payload["firstMessage"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string();
-                if agent.is_empty() || first_message.is_empty() {
-                    return DraftApplyOutcome::Failed {
-                        detail: "create draft payload is incomplete".to_string(),
-                    };
-                }
-                let model = draft.payload["model"].as_str().map(str::to_string);
-                let title = draft.payload["title"].as_str().map(str::to_string);
-                // 确认前 agent/model 配置可能变化：以当前事实重验。
-                let summaries = match self.state.memory().list_agent_summaries() {
-                    Ok(summaries) => summaries,
-                    Err(err) => {
-                        return DraftApplyOutcome::Failed {
-                            detail: format!("session_create_invalid_agent: {}", err.message),
-                        }
-                    }
-                };
-                if !summaries
-                    .iter()
-                    .any(|summary| summary["id"].as_str() == Some(agent.as_str()))
-                {
-                    return DraftApplyOutcome::Failed {
-                        detail: format!(
-                            "session_create_invalid_agent: agent is not currently available: {agent}"
-                        ),
-                    };
-                }
-                if let Some(model) = model.as_deref() {
-                    if !self.models.iter().any(|key| key == model) {
-                        return DraftApplyOutcome::Failed {
-                            detail: format!(
-                                "session_create_invalid_model: model is not currently available: {model}"
-                            ),
-                        };
-                    }
-                }
-                let created = match self
-                    .delivery
-                    .create_session(&agent, model.as_deref(), title.as_deref())
-                    .await
-                {
-                    Ok(session_id) => session_id,
-                    Err(detail) => return DraftApplyOutcome::Failed { detail },
-                };
-                match self.delivery.deliver(&created, &first_message).await {
-                    Ok(()) => {
-                        self.drafts
-                            .lock()
-                            .expect("session collab draft store")
-                            .remove(suggestion_id);
+        let edited = draft
+            .frozen_apply_json
+            .as_deref()
+            .unwrap_or(&draft.input.draft_json);
+        match store::claim_collab_apply(
+            &self.storage,
+            suggestion_id,
+            &draft.input.studio_id,
+            &draft.input.owner_subject,
+            edited,
+            self.clock.now_unix_ms(),
+        )
+        .await
+        {
+            Ok(claim) => match claim.draft.delivery_status {
+                store::CollabDeliveryStatus::Accepted => {
+                    if claim.draft.target_created {
                         DraftApplyOutcome::Created {
-                            session_id: created,
+                            session_id: claim.draft.target_session_id.unwrap_or_default(),
                         }
-                    }
-                    // 半成功：保留新会话，草稿切换为仅重试首条消息
-                    //（draft-store.ts SessionCollabPartialSuccessError）。
-                    Err(detail) => {
-                        let mut payload = draft.payload.clone();
-                        payload["model"] = Value::Null;
-                        payload["title"] = Value::Null;
-                        payload["retryFirstMessageOnly"] = json!(true);
-                        payload["createdSessionId"] = json!(created);
-                        self.drafts
-                            .lock()
-                            .expect("session collab draft store")
-                            .insert(
-                                suggestion_id.to_string(),
-                                SessionCollabDraft {
-                                    suggestion_id: suggestion_id.to_string(),
-                                    kind: "create_retry_first_message".to_string(),
-                                    source_session_id: draft.source_session_id,
-                                    payload,
-                                    created_at_unix_ms: self.state.clock().now_unix_ms(),
-                                },
-                            );
-                        DraftApplyOutcome::PartialSuccess {
-                            session_id: created,
-                            detail,
+                    } else {
+                        DraftApplyOutcome::Sent {
+                            target_session_id: claim.draft.target_session_id.unwrap_or_default(),
                         }
                     }
                 }
-            }
-            "create_retry_first_message" => {
-                let session_id = draft.payload["createdSessionId"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .to_string();
-                let first_message = draft.payload["firstMessage"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .trim()
-                    .to_string();
-                if session_id.is_empty() || first_message.is_empty() {
-                    return DraftApplyOutcome::Failed {
-                        detail: "retry draft payload is incomplete".to_string(),
-                    };
-                }
-                match self.delivery.deliver(&session_id, &first_message).await {
-                    Ok(()) => {
-                        self.drafts
-                            .lock()
-                            .expect("session collab draft store")
-                            .remove(suggestion_id);
-                        DraftApplyOutcome::Created { session_id }
-                    }
-                    Err(detail) => DraftApplyOutcome::Failed { detail },
-                }
-            }
-            other => DraftApplyOutcome::Rejected {
-                reason: format!("unknown draft kind: {other}"),
+                store::CollabDeliveryStatus::Unknown => DraftApplyOutcome::Unknown {
+                    detail: claim
+                        .draft
+                        .error
+                        .unwrap_or_else(|| "delivery acceptance unknown".into()),
+                },
+                _ => DraftApplyOutcome::Queued {
+                    target_session_id: claim.draft.target_session_id,
+                },
+            },
+            Err(e) => DraftApplyOutcome::Failed {
+                detail: e.to_string(),
             },
         }
     }
@@ -2517,12 +2499,12 @@ impl ToolExecutorPort for SessionCollabTools {
     fn execute<'a>(
         &'a self,
         ctx: &'a RunContext,
-        _call: &'a ToolCallId,
+        call: &'a ToolCallId,
         request: &'a lingxi_kernel::ports::ToolRequest,
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = ToolExecutionResult> + Send + 'a>> {
         let params = request.arguments.as_value().clone();
         Box::pin(async move {
-            let outcome = self.run_action(ctx, &params).await;
+            let outcome = self.run_action_with_call(ctx, call, &params).await;
             ToolExecutionResult::of_ctx(ctx, outcome)
         })
     }
@@ -2530,19 +2512,24 @@ impl ToolExecutorPort for SessionCollabTools {
 
 /// 主体归属（sessions.rs can_access 的 kernel 侧镜像：LocalUser 全量，
 /// 其余按 owner_user_id 相等；Automation 一律拒绝）。
-fn kernel_can_access(principal: &lingxi_kernel::Principal, owner_user_id: &str) -> bool {
-    match principal {
-        lingxi_kernel::Principal::LocalUser => true,
-        lingxi_kernel::Principal::Device { user_id, .. } => user_id == owner_user_id,
-        lingxi_kernel::Principal::WebSession { account_id } => account_id == owner_user_id,
-        lingxi_kernel::Principal::Automation { .. } => false,
-    }
+fn kernel_can_access(
+    principal: &lingxi_kernel::Principal,
+    owner_user_id: &str,
+    session_id: &str,
+) -> bool {
+    principal.can_access_session(owner_user_id, session_id)
 }
 
 fn text_success(text: String) -> ToolOutcome {
     ToolOutcome::Success {
         result: lingxi_kernel::ports::ToolSuccess::from_content(vec![ContentBlock::Text { text }]),
     }
+}
+
+fn card_success(text: String, details: Value) -> ToolOutcome {
+    let mut result = lingxi_kernel::ports::ToolSuccess::text(text);
+    result.details = details.as_object().cloned();
+    ToolOutcome::Success { result }
 }
 
 fn failed(code: ErrorCode, message: String) -> ToolOutcome {

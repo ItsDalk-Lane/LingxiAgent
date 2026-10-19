@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "BridgeEffectOperation": {
+      "enum": [
+        "receipt_start",
+        "receipt_stop",
+        "stream_update",
+        "stream_finish",
+        "stream_cancel"
+      ],
+      "type": "string"
+    },
+    "BridgeEffectStatus": {
+      "enum": [
+        "confirmed",
+        "failed",
+        "unknown",
+        "skipped"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "deliveryId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "effectId": {
+      "type": "string"
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "operation": {
+      "$ref": "#/$defs/BridgeEffectOperation"
+    },
+    "platformAck": {
+      "type": "boolean"
+    },
+    "platformMessageIds": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "sequence": {
+      "format": "uint32",
+      "maximum": 4294967295,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/BridgeEffectStatus"
+    },
+    "streamId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "effectId",
+    "streamId",
+    "sequence",
+    "operation",
+    "status",
+    "platformAck",
+    "platformMessageIds"
+  ],
+  "title": "BridgeEffectReceipt",
+  "type": "object"
+}

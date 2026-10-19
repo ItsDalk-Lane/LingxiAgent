@@ -1,0 +1,35 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/r07_pdf_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_pdf_chromium-11a66dbe33c665f1)
+
+running 7 tests
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/first-print-c41c7b63fd059250539af0eea68b7269
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/regular-isolation-62bacb9f266d65003e374a8a85ef1806
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/bad-assets-f15e0870245932a0dc1a31f4dae55564
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/r01-quality-99da1852be4babe69960aa184dcee4ff
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/scope-and-quota-e2d41d70ba34b11747c655111a2c5d45
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/deadlines-c1c3b221b33e1f13031255b3507abcf5
+PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/network-gate-de1c3f3d6e14840b79b99fa631895ff3
+test two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled ... ok
+
+thread 'actual_r01_documents_preserve_fonts_images_pagination_and_js_contract' (1386208) panicked at crates/lingxi-adapters/tests/r07_pdf_chromium.rs:182:14:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "PDF_CAPACITY", message: "文档打印执行器已达上限", effect_unknown: false }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test actual_r01_documents_preserve_fonts_images_pagination_and_js_contract ... FAILED
+test static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup ... ok
+test total_deadline_and_explicit_cancel_reap_before_returning_failure ... ok
+test broken_background_font_and_unfrozen_stylesheet_are_explicit_failures ... ok
+test html_network_frames_and_workers_never_reach_loopback_canary ... ok
+
+thread 'printing_never_switches_or_clears_the_regular_logged_in_workspace' (1386211) panicked at crates/lingxi-adapters/tests/r07_pdf_chromium.rs:647:10:
+called `Result::unwrap()` on an `Err` value: BrowserError { code: "browser_timeout", message: "浏览器操作超时", effect_unknown: true }
+test printing_never_switches_or_clears_the_regular_logged_in_workspace ... FAILED
+
+failures:
+
+failures:
+    actual_r01_documents_preserve_fonts_images_pagination_and_js_contract
+    printing_never_switches_or_clears_the_regular_logged_in_workspace
+
+test result: FAILED. 5 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.93s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_pdf_chromium`

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx",
+    "desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx",
+    "desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx"
+  ],
+  "exitCode": 1,
+  "developmentOnly": true,
+  "beforeProductFix": true,
+  "stdoutSha256": "bf4404949fe34003655ace23bf7ea6fede600910f60cd7b8ed3f7cf9ade07458",
+  "stderrSha256": "5f894cbf7fb9da71f07bb5859b9dbfbddc913b1b32facecc94d6bd825bd88b3c"
+}

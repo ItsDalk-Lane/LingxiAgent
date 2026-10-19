@@ -1,0 +1,22 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.78s
+     Running tests/r07_media_admin.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_media_admin-1a9afb5adae975fd)
+
+running 1 test
+LINGXI_TRANSPORT_REJECTED request_id="req-9d65728a24dadb73b27f09fa2713eccf" method=POST path=/lingxi/v1/media/image/generate status=408 reason=request_timeout origin=absent host=127.0.0.1:62759 remote=127.0.0.1:62760
+
+thread 'r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served' (2028989) panicked at crates/lingxi-service/tests/r07_media_admin/mod.rs:376:5:
+assertion `left == right` failed: {"code":"budget_exceeded","details":{"causeId":"transport.request_timeout","reason":"request_timeout","requestId":"req-9d65728a24dadb73b27f09fa2713eccf"},"message":"request exceeded its time budget","retryable":false}
+  left: 408
+ right: 200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served ... FAILED
+
+failures:
+
+failures:
+    r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 32.15s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_media_admin`

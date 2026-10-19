@@ -40,6 +40,26 @@ use std::time::{Duration, Instant};
 use base64::Engine as _;
 use tokio::io::{AsyncBufReadExt as _, AsyncReadExt as _, AsyncWriteExt as _, BufReader};
 
+/// 按需目录的两族工具（知识+记忆）：不得默认常驻，只能由已授权范围按轮
+/// 激活。R07 受信内置工具扩为常驻后，原「线上声明==RESIDENT_NAMES」等式
+/// 不再表达本意图，be02/be07 改用本清单做排除/计数。
+const ON_DEMAND_TOOL_NAMES: [&str; 14] = [
+    "knowledge_search",
+    "knowledge_read",
+    "knowledge_grep",
+    "knowledge_outline",
+    "knowledge_manage",
+    "search_memory",
+    "pin_memory",
+    "unpin_memory",
+    "tenet_propose",
+    "context_notes",
+    "install_skill",
+    "learn_lesson",
+    "record_experience",
+    "recall_experience",
+];
+
 /// 仅保存合成运行的原始事实；凭证和完整资料根不进入可交付日志。
 fn emit_raw(kind: &str, value: serde_json::Value) {
     let Ok(root) = std::env::var("R06_T08_RAW_OUT") else {
@@ -1273,11 +1293,15 @@ async fn be02_on_demand_catalog_declared_per_turn_not_in_prompt() {
         .map(|tool| tool["function"]["name"].as_str().expect("工具名"))
         .collect();
     wire_names.sort();
-    let mut resident_names = lingxi_service::toolcatalog_bridge::RESIDENT_NAMES.to_vec();
-    resident_names.sort();
-    assert_eq!(
-        wire_names, resident_names,
-        "知识和记忆工具必须通过按需目录取得，不能默认常驻"
+    // 常驻面自 R07 起含受信内置工具（原 7 项 + automation/browser/channel/dm/
+    // jian_update_status/notify/patrol_update_log/update_settings/web_fetch/
+    // web_search/write_stdin）。断言收窄回本意图：知识与记忆两族不得常驻，
+    // 必须经按需目录取得。
+    assert!(
+        wire_names
+            .iter()
+            .all(|name| !ON_DEMAND_TOOL_NAMES.contains(name)),
+        "知识和记忆工具必须通过按需目录取得，不能默认常驻: {wire_names:?}"
     );
     let write_decl = tools0
         .iter()
@@ -2409,10 +2433,20 @@ async fn be07_material_citation_scope_isolated_and_locatable() {
         serde_json::json!({"type":"object","properties":{"scopeId":{"type":"string"},"query":{"type":"string"},"channel":{"type":"string","enum":["fts","hybrid"]},"notebookIds":{"type":"array","items":{"type":"string"}},"sourceIds":{"type":"array","items":{"type":"string"}},"sectionKeys":{"type":"array","items":{"type":"string"}},"limit":{"type":"number"}},"required":["scopeId","query"],"additionalProperties":false})
     );
     assert!(
-        requests
-            .iter()
-            .all(|request| request["tools"] == requests[0]["tools"]
-                && request["tools"].as_array().unwrap().len() == 8),
+        requests.iter().all(|request| {
+            let tools = request["tools"].as_array().unwrap();
+            // 常驻面扩大后计数断言失效；收窄回本意图：每轮声明一致，且
+            // 两族按需工具中只有当前已授权激活的 knowledge_search 在场。
+            tools == requests[0]["tools"].as_array().unwrap()
+                && tools
+                    .iter()
+                    .filter(|tool| {
+                        ON_DEMAND_TOOL_NAMES
+                            .contains(&tool["function"]["name"].as_str().unwrap_or(""))
+                    })
+                    .count()
+                    == 1
+        }),
         "仅当前已授权选择激活检索，其余知识和记忆工具不追加"
     );
     let knowledge_db = rusqlite::Connection::open_with_flags(

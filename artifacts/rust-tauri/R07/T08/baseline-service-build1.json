@@ -1,0 +1,32 @@
+{
+  "label": "baseline-service-build1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "build",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--bin",
+    "lingxi-service"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T04:09:46.159827+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "92f87ec19484fedb92a5da2695a92c7143facb8464a5e7f662a017e0422bbfe0",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T04:11:05.543712+00:00",
+  "sourceFingerprintAfter": "ac2ea748cc7b5de424f465728f944f46b88393745390045ca3c8b2b2b7a31836",
+  "log": "artifacts/rust-tauri/R07/T08/baseline-service-build1.log",
+  "logSha256": "145f13376bfbad74fd6a75ec85be13a177bbc1794bb55b1cd3319dcb9be37196",
+  "sourceUnchanged": false
+}

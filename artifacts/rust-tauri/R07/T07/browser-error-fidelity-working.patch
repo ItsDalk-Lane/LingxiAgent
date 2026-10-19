@@ -1,0 +1,570 @@
+--- t07c/rust/crates/lingxi-adapters/src/browser/cdp.rs
++++ working/rust/crates/lingxi-adapters/src/browser/cdp.rs
+@@ -65,16 +65,37 @@
+     reader: Mutex<Option<JoinHandle<()>>>,
+ }
+ 
+-fn fail(inner: &Inner, cause: BrowserError) {
++fn fail(inner: &Inner, cause: BrowserError) -> BrowserError {
++    let mut state = inner.state.lock().unwrap_or_else(|p| p.into_inner());
++    let cause = state.terminal.get_or_insert(cause).clone();
++    // 先固定首因，再发布关闭；所有等待者和后续调用必须看见同一原因。
+     inner.stop.store(true, Ordering::Release);
+-    let mut state = inner.state.lock().unwrap_or_else(|p| p.into_inner());
+-    if state.terminal.is_none() {
+-        state.terminal = Some(cause.clone());
+-    }
+     for (_, sender) in state.pending.drain() {
+         let _ = sender.send(Err(cause.clone()));
+     }
+     inner.wake.notify_all();
++    cause
++}
++pub(super) fn safe_identifier(value: &str) -> String {
++    value
++        .chars()
++        .filter(|c| c.is_ascii_alphanumeric() || matches!(*c, '.' | '_' | '-'))
++        .take(128)
++        .collect()
++}
++pub(super) fn command_context(
++    mut cause: BrowserError,
++    method: &str,
++    session: Option<&str>,
++) -> BrowserError {
++    // 只记录协议标识，绝不把参数、页面正文或输入内容拼入诊断。
++    cause.message = format!(
++        "{} [method={}, session={}]",
++        cause.message,
++        safe_identifier(method),
++        safe_identifier(session.unwrap_or("browser"))
++    );
++    cause
+ }
+ fn nonblocking(fd: &OwnedFd) -> Result<(), BrowserError> {
+     // 句柄已由当前对象持有，fcntl不转移所有权。
+@@ -139,7 +160,7 @@
+                             libc::read(read.as_raw_fd(), chunk.as_mut_ptr().cast(), chunk.len())
+                         };
+                         if n == 0 {
+-                            return Err(error("browser_closed", "浏览器连接已关闭", true));
++                            return Err(error("browser_closed", "浏览器读取管道已到EOF", true));
+                         }
+                         if n < 0 {
+                             let e = std::io::Error::last_os_error();
+@@ -227,10 +248,25 @@
+     }
+ 
+     pub fn close(&self) {
+-        fail(
+-            &self.inner,
+-            error("browser_closed", "浏览器连接已关闭", true),
+-        );
++        self.close_with(error("browser_closed", "宿主主动关闭浏览器连接", true));
++    }
++    pub fn close_with(&self, cause: BrowserError) -> BrowserError {
++        fail(&self.inner, cause)
++    }
++    pub fn terminal_cause(&self) -> Option<BrowserError> {
++        self.inner
++            .state
++            .lock()
++            .unwrap_or_else(|p| p.into_inner())
++            .terminal
++            .clone()
++    }
++    fn closed_for_call(&self, unknown: bool) -> BrowserError {
++        let mut cause = self
++            .terminal_cause()
++            .unwrap_or_else(|| error("browser_closed", "浏览器已退出", false));
++        cause.effect_unknown = unknown;
++        cause
+     }
+     pub fn is_closed(&self) -> bool {
+         self.inner.stop.load(Ordering::Acquire)
+@@ -267,7 +303,9 @@
+         {
+             let mut state = self.inner.state.lock().unwrap_or_else(|p| p.into_inner());
+             if let Some(e) = &state.terminal {
+-                return Err(e.clone());
++                let mut cause = e.clone();
++                cause.effect_unknown = false;
++                return Err(cause);
+             }
+             if state.pending.len() >= PENDING_LIMIT {
+                 return Err(error("browser_busy", "浏览器请求已达上限", false));
+@@ -279,7 +317,7 @@
+             let writer = loop {
+                 interrupted(cancel, deadline, false)?;
+                 if self.is_closed() {
+-                    return Err(error("browser_closed", "浏览器已退出", false));
++                    return Err(self.closed_for_call(false));
+                 }
+                 match self.writer.try_lock() {
+                     Ok(g) => break g,
+@@ -293,7 +331,7 @@
+             while offset < encoded.len() {
+                 interrupted(cancel, deadline, written && effect)?;
+                 if self.is_closed() {
+-                    return Err(error("browser_closed", "浏览器已退出", written && effect));
++                    return Err(self.closed_for_call(written && effect));
+                 }
+                 if !ready(
+                     &writer,
+@@ -347,12 +385,13 @@
+                         return Err(e);
+                     }
+                     Err(mpsc::RecvTimeoutError::Disconnected) => {
+-                        return Err(error("browser_closed", "浏览器已退出", written && effect))
++                        return Err(self.closed_for_call(written && effect))
+                     }
+                     Err(mpsc::RecvTimeoutError::Timeout) => {}
+                 }
+             }
+         })();
++        let result = result.map_err(|cause| command_context(cause, method, session));
+         self.inner
+             .state
+             .lock()
+@@ -360,16 +399,14 @@
+             .pending
+             .remove(&id);
+         // 半帧不能与下一条命令拼接；关闭整个连接使真实效果保持未知。
+-        if result.is_err()
+-            && written
+-            && result.as_ref().err().is_some_and(|e| {
+-                matches!(
+-                    e.code.as_str(),
++        if let Some(cause) = result.as_ref().err().filter(|cause| {
++            written
++                && matches!(
++                    cause.code.as_str(),
+                     "browser_pipe" | "cancelled" | "browser_timeout"
+                 )
+-            })
+-        {
+-            self.close();
++        }) {
++            self.close_with(cause.clone());
+         }
+         result
+     }
+@@ -442,6 +479,127 @@
+         let mut fds = [-1; 2];
+         assert_eq!(unsafe { libc::pipe(fds.as_mut_ptr()) }, 0);
+         unsafe { (OwnedFd::from_raw_fd(fds[0]), OwnedFd::from_raw_fd(fds[1])) }
++    }
++    fn read_command(file: &mut File) -> Value {
++        let mut frame = Vec::new();
++        loop {
++            let mut byte = [0_u8; 1];
++            file.read_exact(&mut byte).unwrap();
++            if byte[0] == 0 {
++                return serde_json::from_slice(&frame).unwrap();
++            }
++            frame.push(byte[0]);
++            assert!(frame.len() < FRAME_LIMIT);
++        }
++    }
++    #[test]
++    fn first_close_cause_reaches_written_and_unwritten_calls_with_their_own_effects() {
++        let (read, write) = pair();
++        let (response, _answer) = pair();
++        let cdp = Cdp::new(response, write).unwrap();
++        let (ready, reached) = mpsc::channel();
++        let peer = std::thread::spawn(move || {
++            let mut file = File::from(read);
++            for _ in 0..2 {
++                let request = read_command(&mut file);
++                assert_eq!(request["params"]["password"], "fixture-private-marker");
++            }
++            ready.send(()).unwrap();
++        });
++        let calls: Vec<_> = [true, false]
++            .into_iter()
++            .map(|effect| {
++                let cdp = cdp.clone();
++                std::thread::spawn(move || {
++                    cdp.call(
++                        Some("fixture-session"),
++                        "Runtime.evaluate",
++                        json!({"password":"fixture-private-marker"}),
++                        Instant::now() + Duration::from_secs(10),
++                        &AtomicBool::new(false),
++                        effect,
++                    )
++                    .unwrap_err()
++                })
++            })
++            .collect();
++        // peer实际读到两个完整帧后才终止，不能靠sleep猜测是否写出。
++        reached.recv_timeout(Duration::from_secs(5)).unwrap();
++        let first = error("browser_events_lost", "原事件窗口已失效", true);
++        assert_eq!(cdp.close_with(first.clone()).message, first.message);
++        assert_eq!(
++            cdp.close_with(error("browser_timeout", "后来的错误", true))
++                .message,
++            first.message
++        );
++        cdp.close();
++        for (call, effect) in calls.into_iter().zip([true, false]) {
++            let cause = call.join().unwrap();
++            assert_eq!(cause.code, first.code);
++            assert!(cause.message.starts_with(&first.message));
++            assert!(cause.message.contains("method=Runtime.evaluate"));
++            assert!(cause.message.contains("session=fixture-session"));
++            assert!(!cause.message.contains("fixture-private-marker"));
++            assert_eq!(cause.effect_unknown, effect);
++        }
++        let unwritten = cdp
++            .call(
++                None,
++                "Target.createTarget",
++                json!({}),
++                Instant::now() + Duration::from_secs(10),
++                &AtomicBool::new(false),
++                true,
++            )
++            .unwrap_err();
++        assert_eq!(unwritten.code, first.code);
++        assert_eq!(unwritten.message, first.message);
++        assert!(!unwritten.effect_unknown);
++        assert!(cdp.inner.state.lock().unwrap().pending.is_empty());
++        peer.join().unwrap();
++    }
++    #[test]
++    fn written_cooperative_cancellation_keeps_its_cause_for_later_unwritten_calls() {
++        let (read, write) = pair();
++        let (response, _answer) = pair();
++        let cdp = Cdp::new(response, write).unwrap();
++        let cancel = Arc::new(AtomicBool::new(false));
++        let peer_cancel = cancel.clone();
++        let peer = std::thread::spawn(move || {
++            let request = read_command(&mut File::from(read));
++            assert_eq!(request["method"], "Runtime.evaluate");
++            // 完整请求确已写出，随后取消；peer故意不发送响应。
++            peer_cancel.store(true, Ordering::Release);
++        });
++        let cancelled = cdp
++            .call(
++                Some("cancel-session"),
++                "Runtime.evaluate",
++                json!({}),
++                Instant::now() + Duration::from_secs(10),
++                &cancel,
++                true,
++            )
++            .unwrap_err();
++        assert_eq!(cancelled.code, "cancelled");
++        assert!(cancelled.effect_unknown);
++        assert!(cancelled.message.contains("method=Runtime.evaluate"));
++        assert!(cdp.is_closed());
++        let later = cdp
++            .call(
++                None,
++                "Target.createTarget",
++                json!({}),
++                Instant::now() + Duration::from_secs(10),
++                &AtomicBool::new(false),
++                true,
++            )
++            .unwrap_err();
++        assert_eq!(later.code, cancelled.code);
++        assert_eq!(later.message, cancelled.message);
++        assert!(!later.effect_unknown);
++        assert!(cdp.inner.state.lock().unwrap().pending.is_empty());
++        peer.join().unwrap();
+     }
+     #[test]
+     fn eof_wakes_pending_commands_without_waiting_for_their_full_deadline() {
+@@ -469,6 +627,20 @@
+         assert!(e.effect_unknown);
+         assert!(started.elapsed() < Duration::from_secs(2));
+         assert!(cdp.inner.state.lock().unwrap().pending.is_empty());
++        assert!(e.message.contains("EOF"));
++        let later = cdp
++            .call(
++                None,
++                "Target.createTarget",
++                json!({}),
++                Instant::now() + Duration::from_secs(10),
++                &AtomicBool::new(false),
++                true,
++            )
++            .unwrap_err();
++        assert_eq!(later.code, "browser_closed");
++        assert!(later.message.contains("EOF"));
++        assert!(!later.effect_unknown);
+         worker.join().unwrap();
+     }
+     #[test]
+@@ -492,6 +664,18 @@
+         assert!(started.elapsed() < Duration::from_secs(2));
+         assert!(cdp.inner.state.lock().unwrap().pending.is_empty());
+         assert!(cdp.is_closed());
++        let later = cdp
++            .call(
++                None,
++                "Target.createTarget",
++                json!({}),
++                Instant::now() + Duration::from_secs(10),
++                &AtomicBool::new(false),
++                true,
++            )
++            .unwrap_err();
++        assert_eq!(later.code, "browser_timeout");
++        assert!(!later.effect_unknown);
+     }
+     #[test]
+     fn buffered_events_have_monotonic_cursors_and_old_windows_fail_explicitly() {
+--- t07c/rust/crates/lingxi-adapters/src/browser/runtime.rs
++++ working/rust/crates/lingxi-adapters/src/browser/runtime.rs
+@@ -1,5 +1,10 @@
+ //! 单个受控进程的页面、事件和下载；不保存业务数据库事实。
+-use super::{cdp::Cdp, error, launcher::Process, BrowserError};
++use super::{
++    cdp::{command_context, safe_identifier, Cdp},
++    error,
++    launcher::Process,
++    BrowserError,
++};
+ use lingxi_kernel::browser::BrowserDownload;
+ use lingxi_protocol::BrowserTab;
+ use serde_json::{json, Value};
+@@ -175,38 +180,41 @@
+             .spawn(move || {
+                 let mut cursor = 0;
+                 let mut next_refresh = Instant::now();
+-                loop {
++                'worker: loop {
+                     let Some(live) = weak.upgrade() else {
+                         break;
+                     };
+-                    if live.stop.load(Ordering::Acquire) || live.process.cdp.is_closed() {
++                    if live.stop.load(Ordering::Acquire) {
++                        break;
++                    }
++                    if live.process.cdp.is_closed() {
++                        if let Some(cause) = live.process.cdp.terminal_cause() {
++                            live.fail_worker(cause, "closed", cursor, None);
++                        }
+                         break;
+                     }
+                     let events = match live.process.cdp.events(cursor) {
+                         Ok(e) => e,
+-                        Err(_) => {
+-                            live.process.cdp.close();
++                        Err(cause) => {
++                            live.fail_worker(cause, "events", cursor, None);
+                             break;
+                         }
+                     };
+                     for event in events {
+                         cursor = event.sequence;
+-                        if let Err(e) = live.handle_event(&event.value) {
+-                            *live.failure.lock().unwrap_or_else(|p| p.into_inner()) = Some(e);
+-                            live.process.cdp.close();
+-                            break;
++                        if let Err(cause) = live.handle_event(&event.value) {
++                            live.fail_worker(cause, "handle_event", cursor, Some(&event.value));
++                            // 退出整个事件任务，不能在失败后继续当轮刷新制造次生错误。
++                            break 'worker;
+                         }
+                     }
+                     if Instant::now() >= next_refresh {
+-                        if live
+-                            .refresh_inner(
+-                                Instant::now() + Duration::from_secs(2),
+-                                &live.stop,
+-                                false,
+-                            )
+-                            .is_err()
+-                        {
+-                            live.process.cdp.close();
++                        if let Err(cause) = live.refresh_inner(
++                            Instant::now() + Duration::from_secs(2),
++                            &live.stop,
++                            false,
++                        ) {
++                            live.fail_worker(cause, "refresh", cursor, None);
+                             break;
+                         }
+                         next_refresh = Instant::now() + Duration::from_millis(500);
+@@ -221,6 +229,31 @@
+     }
+     pub fn cdp(&self) -> &Arc<Cdp> {
+         &self.process.cdp
++    }
++    fn fail_worker(
++        &self,
++        mut cause: BrowserError,
++        phase: &'static str,
++        sequence: u64,
++        event: Option<&Value>,
++    ) {
++        cause.message = format!(
++            "{} [worker_phase={phase}, event_sequence={sequence}]",
++            cause.message
++        );
++        let cause = self.process.cdp.close_with(cause);
++        tracing::warn!(
++            phase,
++            sequence,
++            method = %safe_identifier(event.and_then(|v| v["method"].as_str()).unwrap_or("")),
++            session = %safe_identifier(event.and_then(|v| v["sessionId"].as_str()).unwrap_or("browser")),
++            code = %safe_identifier(&cause.code),
++            "浏览器事件任务因原错误退出"
++        );
++        self.failure
++            .lock()
++            .unwrap_or_else(|p| p.into_inner())
++            .get_or_insert(cause);
+     }
+     pub fn set_authority(&self, authority: Authority) {
+         *self.authority.lock().unwrap_or_else(|p| p.into_inner()) = Some(authority);
+@@ -246,7 +279,16 @@
+             .unwrap_or_else(|p| p.into_inner())
+             .clone();
+         if let Some(authority) = authority {
+-            authority()?;
++            if let Err(cause) = authority() {
++                tracing::warn!(
++                    method = %safe_identifier(method),
++                    session = %safe_identifier(session.unwrap_or("browser")),
++                    code = %safe_identifier(&cause.code),
++                    phase = "authority",
++                    "浏览器命令授权检查失败"
++                );
++                return Err(command_context(cause, method, session));
++            }
+         }
+         let deadline = self
+             .operation_deadline
+@@ -257,6 +299,15 @@
+             .process
+             .cdp
+             .call(session, method, params, deadline, cancel, effect);
++        if let Err(cause) = &outcome {
++            tracing::warn!(
++                method = %safe_identifier(method),
++                session = %safe_identifier(session.unwrap_or("browser")),
++                code = %safe_identifier(&cause.code),
++                phase = "call",
++                "浏览器命令失败"
++            );
++        }
+         #[cfg(test)]
+         if method == "Target.createTarget" && outcome.is_ok() {
+             if let Some(control) = self
+--- t07c/rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs
++++ working/rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs
+@@ -213,9 +213,33 @@
+     (host, guard)
+ }
+ async fn execute(h: &ChromiumHost, s: BrowserScope, c: BrowserCommand) -> BrowserOutput {
+-    h.execute(s, c, Arc::new(AtomicBool::new(false)))
+-        .await
+-        .unwrap()
++    execute_checked(h, s, c, None).await
++}
++async fn execute_checked(
++    h: &ChromiumHost,
++    s: BrowserScope,
++    c: BrowserCommand,
++    context: Option<(&std::path::Path, &Site, &str)>,
++) -> BrowserOutput {
++    let action = c.action;
++    let tab = c.tab_id.clone();
++    match h.execute(s, c, Arc::new(AtomicBool::new(false))).await {
++        Ok(output) => output,
++        Err(cause) => {
++            // 只在失败时保存自有fixture现场，不输出命令参数、输入值或页面正文。
++            let workspaces = h.workspaces();
++            if let Some((root, site, phase)) = context {
++                let requests = site.requests.lock().unwrap().clone();
++                panic!(
++                    "真实浏览器命令失败: action={action:?}, tab={tab:?}, phase={phase}, owned_root={}, controlled_requests={requests:?}, workspaces={workspaces:?}, cause={cause:?}",
++                    root.display()
++                );
++            }
++            panic!(
++                "真实浏览器命令失败: action={action:?}, tab={tab:?}, workspaces={workspaces:?}, cause={cause:?}"
++            );
++        }
++    }
+ }
+ async fn navigate(h: &ChromiumHost, s: &BrowserScope, url: String) -> BrowserOutput {
+     let mut c = BrowserCommand::new(A::Navigate);
+@@ -590,19 +614,39 @@
+     let site = Site::start();
+     let (h, _network_guard) = host(&root);
+     let s = scope("popup-dialog");
+-    let opened = navigate(&h, &s, format!("{}/form", site.url)).await;
++    let mut navigation = BrowserCommand::new(A::Navigate);
++    navigation.url = Some(format!("{}/form", site.url));
++    let opened = execute_checked(
++        &h,
++        s.clone(),
++        navigation,
++        Some((&root, &site, "navigate_form")),
++    )
++    .await;
+     let tab = opened.reply.state.active_tab_id.clone().unwrap();
+-    assert_eq!(
+-        eval(
++    let mut dialog = BrowserCommand::new(A::Evaluate);
++    dialog.tab_id = Some(tab.clone());
++    dialog.expression =
++        Some("document.querySelector('#dialog').click();document.body.dataset.dialog".into());
++    assert_eq!(
++        execute_checked(
+             &h,
+-            &s,
+-            &tab,
+-            "document.querySelector('#dialog').click();document.body.dataset.dialog"
++            s.clone(),
++            dialog,
++            Some((&root, &site, "evaluate_dialog")),
+         )
+-        .await,
++        .await
++        .reply
++        .result["value"],
+         "done"
+     );
+-    let fresh = execute(&h, s.clone(), BrowserCommand::new(A::Snapshot)).await;
++    let fresh = execute_checked(
++        &h,
++        s.clone(),
++        BrowserCommand::new(A::Snapshot),
++        Some((&root, &site, "snapshot_before_click")),
++    )
++    .await;
+     let reference = regex::Regex::new(r"\[(\d+)\][^\[\]\n]*Popup")
+         .unwrap()
+         .captures(fresh.reply.result["text"].as_str().unwrap())
+@@ -612,10 +656,22 @@
+     let mut click = BrowserCommand::new(A::Click);
+     click.tab_id = Some(tab.clone());
+     click.element_ref = Some(reference);
+-    execute(&h, s.clone(), click).await;
++    execute_checked(
++        &h,
++        s.clone(),
++        click,
++        Some((&root, &site, "trusted_popup_click")),
++    )
++    .await;
+     let deadline = Instant::now() + Duration::from_secs(3);
+     loop {
+-        let out = execute(&h, s.clone(), BrowserCommand::new(A::Snapshot)).await;
++        let out = execute_checked(
++            &h,
++            s.clone(),
++            BrowserCommand::new(A::Snapshot),
++            Some((&root, &site, "poll_popup_snapshot")),
++        )
++        .await;
+         if out.reply.state.tabs.len() == 2 {
+             assert!(out
+                 .reply

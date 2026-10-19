@@ -33,7 +33,41 @@
         "session_files": "adapters.storage.session_files（R06-T05 文件身份）",
         "session_file_aliases": "adapters.storage.session_files（R06-T05 旧身份别名）",
         "session_file_refs": "adapters.storage.session_files（R06-T05 文件引用）",
-        "file_history_snapshots": "adapters.storage.file_history（R06-T05 文件历史）"
+        "file_history_snapshots": "adapters.storage.file_history（R06-T05 文件历史）",
+        "automation_jobs_v1": "service.automation（R07-T01 持久计划与配置代次）",
+        "automation_triggers_v1": "service.automation（R07-T01 触发去重与真实运行绑定）",
+        "automation_notifications_v1": "service.automation（R07-T01 排队、投递领取与真实回执）",
+        "automation_daily_receipts_v1": "service.automation（R07-T01 每日维护独立尝试收据）",
+        "automation_suggestions_v1": "service.automation（R07-T01 待用户应用的冻结建议）",
+        "automation_activity_promotions_v1": "service.session-admin（R07-T01 同会话活动升格事实）",
+        "automation_internal_sessions_v1": "service.automation（R07-T01 经真实入口登记的内部会话身份）",
+        "bridge_connectors_v1": "service.bridge（R07-T02 宿主平台身份与配置代次）",
+        "bridge_inbox_v1": "service.bridge（R07-T02 消息去重、附件就绪与真实运行关联）",
+        "bridge_outbox_v1": "service.bridge（R07-T02 目标冻结、发送领取与真实平台回执）",
+        "bridge_conversations_v1": "service.bridge（R07-T02 会话上下文代次与显示资料）",
+        "bridge_command_receipts_v1": "service.bridge（R07-T02 无模型命令一次执行及回发来源事实）",
+        "bridge_manual_actions_v1": "service.bridge（R07-T02 本机用户主动发文件的真实操作来源）",
+        "bridge_notice_receipts_v1": "service.bridge_notice（R07-T02 确认投递后追加独立上下文的幂等回执）",
+        "bridge_effect_streams_v1": "service.bridge_effects（R07-T02 等待与草稿冻结来源、未知窗口及原生模式）",
+        "bridge_effects_v1": "service.bridge_effects（R07-T02 外部效果序列、一次执行与真实平台回执）",
+        "conversation_file_operations_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "conversation_file_targets_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "conversation_file_sources_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "conversation_message_dispatch_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_chains_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_deliveries_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_dm_directions_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_discovery_cursors_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_binding_epochs_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "phone_bindings_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "session_collab_drafts_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "session_collab_decisions_v1": "service.conversations/session-collab（R07-T03 因果与收据，Rust单写队列）",
+        "browser_workspaces_v1": "service.browser（R07-T04 授权代次、恢复与真实操作收据，Rust单写队列）",
+        "browser_downloads_v1": "service.browser（R07-T04 授权代次、恢复与真实操作收据，Rust单写队列）",
+        "browser_commands_v1": "service.browser（R07-T04 授权代次、恢复与真实操作收据，Rust单写队列）",
+        "media_jobs_v1": "service.media（R07-T05/T06 真实提交、执行、下载、取消及重启核对；Rust单写队列）",
+        "beautify_jobs_v1": "service.beautify_generation（R07-T05 用户封面动作、原版本冻结与付费阶段真实回执）",
+        "beautify_authorizations_v1": "service.toolgateway（R07-T05 真实用户动作绑定的窄工具批准收据）"
       },
       "pragmas": {
         "journal_mode": "WAL (verified at open; refusal if not negotiated)",
@@ -125,6 +159,60 @@
           "name": "session_proactive_delegation_at_creation",
           "registered_by": "R06 主动委派：仅追加 sessions.proactive_delegation 默认false列。按现有解析器读取当前实际SQL字节计算SHA256，旧版本指纹不变；迁移与真实数据库回执按原契约核对。",
           "fingerprint_sha256": "4c3c36afd3f7f84e0168bdd12fcd3ebea38de6b12b1c566dac1407a1374712c6"
+        },
+        {
+          "version": 15,
+          "name": "r07_automation_receipts",
+          "registered_by": "R07-T01：从实际迁移SQL字节计算，旧V1–V14保持不变；真实新库/旧库升级验证结果另行记录。",
+          "fingerprint_sha256": "0d18730f33d5aafb4fb302ed969025d2e71cba0cd5fd3ed63c5d7d597d89ec37"
+        },
+        {
+          "version": 16,
+          "name": "r07_bridge_inbox_outbox",
+          "registered_by": "R07-T02：从实际迁移SQL字节计算；V1–V15保持不变，V15仍等于T01冻结指纹。",
+          "fingerprint_sha256": "e4b910009a7a1c21599b43c918fb53900ba7ee58bda3ae6093ae1a6bccf27869"
+        },
+        {
+          "version": 17,
+          "name": "r07_bridge_effect_receipts",
+          "registered_by": "R07-T02：独立追加等待与原生草稿回执；V1–V16指纹保持不变。",
+          "fingerprint_sha256": "3acf38748a3921ff99ef809ad95aecd56e57a39dd83b5484af1f91ef6edc0773"
+        },
+        {
+          "version": 18,
+          "name": "r07_bridge_independent_receipt",
+          "registered_by": "R07-T02：独立输入状态能力由宿主冻结；追加列默认false，V1–V17已应用SQL与指纹均保留。",
+          "fingerprint_sha256": "ff916d2332e1e35b9fcfad0a8bed46973639b645ed15e58c7e9b3dffeb2e31f4"
+        },
+        {
+          "version": 19,
+          "name": "r07_conversation_phone_collab_receipts",
+          "registered_by": "R07-T03：仅追加真实频道/私信文件两阶段收据、手机因果预算与协作草稿；V1–V18已应用SQL及指纹均保留。",
+          "fingerprint_sha256": "ad7496e374aeae2f6faeebaf46ee35e29013af39e95dfcc1c8303de5d477f20e"
+        },
+        {
+          "version": 20,
+          "name": "r07_browser_authority",
+          "registered_by": "R07-T04：追加受控浏览器授权、冷恢复、命令与下载收据；V1–V19 SQL不变。",
+          "fingerprint_sha256": "6379466e6c3d1d60c13cca6d314e172f95316f0d56da85fdb8433adc3a4d88fa"
+        },
+        {
+          "version": 21,
+          "name": "r07_media_jobs",
+          "registered_by": "R07-T05/T06：追加媒体作业真实回执；V1–V20 SQL与指纹保持不变。",
+          "fingerprint_sha256": "9eee2a9b7ba1ec2ee5a02065919b856637464357c9d03ed7b8cb6cb95fde3e70"
+        },
+        {
+          "version": 22,
+          "name": "r07_beautify_jobs",
+          "registered_by": "R07-T05：仅追加封面后台作业和明确用户动作批准收据；V1–V21 SQL与指纹保持不变，验证另记。",
+          "fingerprint_sha256": "66623eb4489e9f8ce343af5ba2c6bd046ef7a582d0424be42a91e09ceb50820c"
+        },
+        {
+          "version": 23,
+          "name": "r07_media_gallery",
+          "registered_by": "R07-T06：追加工作台媒体任务投影表（与媒体作业一一对应，运行时作业仍是唯一事实来源）；V1–V22 SQL与指纹保持不变，验证另记。",
+          "fingerprint_sha256": "e2f684b93d2e3b373709345f74a088ce331464fd73dc8169778e3ad780d8de0d"
         }
       ],
       "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",

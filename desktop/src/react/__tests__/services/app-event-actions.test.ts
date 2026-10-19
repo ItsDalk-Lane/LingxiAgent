@@ -7,6 +7,7 @@ const mockState: MockState = {};
 const mockLingxiFetch = vi.fn();
 const mockApplyAgentIdentity = vi.fn(async () => {});
 const mockLoadAgents = vi.fn(async () => {});
+const mockLoadMessages = vi.fn(async () => {});
 const mockLoadSessions = vi.fn(async () => {});
 const mockSwitchSession = vi.fn(async () => {});
 const mockLoadModels = vi.fn(async () => {});
@@ -35,6 +36,7 @@ vi.mock('../../stores/agent-actions', () => ({
 }));
 
 vi.mock('../../stores/session-actions', () => ({
+  loadMessages: mockLoadMessages,
   loadSessions: mockLoadSessions,
   switchSession: mockSwitchSession,
 }));
@@ -69,6 +71,23 @@ async function flushPromises(): Promise<void> {
 }
 
 describe('handleAppEvent', () => {
+  it('预算提醒与工作流进度只更新有归属的数据，过期连接不生效', async () => {
+    const addToast = vi.fn(); const upsertAgentActivity = vi.fn();
+    const entry = { id: 'workflow-1', kind: 'workflow', sessionId: 's1', sessionPath: 'native:s1', status: 'running' };
+    Object.assign(mockState, { addToast, upsertAgentActivity, agentActivitiesBySession: { s1: [entry] } });
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    handleAppEvent('goal_over_budget', { sessionId: 's1', name: '整理', kind: 'tokens' }, { isCurrent: () => false });
+    expect(addToast).not.toHaveBeenCalled();
+    handleAppEvent('goal_over_budget', { sessionId: 's1', name: '整理', kind: 'tokens' });
+    expect(addToast).toHaveBeenCalledWith(expect.stringContaining('整理'), 'warning', 8_000, expect.any(Object));
+    handleAppEvent('workflow_progress', { taskId: 'workflow-1', title: '无归属不得更新' });
+    handleAppEvent('workflow_progress', { sessionId: 's1', sessionPath: 'native:other', taskId: 'workflow-1', title: '错配不得更新' });
+    expect(upsertAgentActivity).not.toHaveBeenCalled();
+    handleAppEvent('workflow_progress', { sessionId: 's1', taskId: 'workflow-1', title: '读取资料' });
+    expect(upsertAgentActivity).toHaveBeenCalledWith({ ...entry, phaseLabel: '读取资料' });
+    handleAppEvent('agent_activity', { entry: { ...entry, status: 'done' } });
+    expect(upsertAgentActivity).toHaveBeenLastCalledWith({ ...entry, status: 'done' });
+  });
   beforeEach(() => {
     Object.keys(mockState).forEach(k => delete mockState[k]);
     mockLingxiFetch.mockReset();
@@ -97,6 +116,95 @@ describe('handleAppEvent', () => {
       }),
     };
     (globalThis as Record<string, unknown>).WebSocket = { OPEN: 1 };
+  });
+
+  it('Bridge 状态和真实消息按当前连接消费，过期身份不触发页面或设置窗口', async () => {
+    const reload = vi.fn(); const incoming = vi.fn(); const relay = vi.fn();
+    Object.assign(mockState, { triggerBridgeReload: reload, addBridgeMessage: incoming, serverPort: 3210, serverToken: 'owner', serverNodeKind: 'lingxi-service' });
+    (window as any).platform = { settingsChanged: relay };
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    handleAppEvent('bridge_status', { agentId: 'hana' }, { source: 'server', isCurrent: () => false });
+    expect(reload).not.toHaveBeenCalled();
+    handleAppEvent('bridge_status', { agentId: 'hana' }, { source: 'server', isCurrent: () => true });
+    expect(reload).toHaveBeenCalledOnce(); expect(relay).toHaveBeenCalledWith('bridge-status-changed', expect.objectContaining({ agentId: 'hana', connectionKey: expect.any(String) }));
+    expect(JSON.stringify(relay.mock.calls)).not.toContain('owner"');
+    const message = { agentId: 'hana', platform: 'qq', sessionKey: 'native-key', text: '真实入站' };
+    handleAppEvent('bridge_message', { message }, { isCurrent: () => true });
+    expect(incoming).toHaveBeenCalledWith(message);
+    handleAppEvent('bridge_message', { message: { text: '没有真实身份' } });
+    expect(incoming).toHaveBeenCalledOnce();
+  });
+
+  it('RC 解绑必须匹配同一真实会话映射，迟到的旧解绑不能清掉新连接', async () => {
+    Object.assign(mockState, { sessions: [{ path: 'native:session', rcAttachment: null }] });
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    handleAppEvent('bridge_rc_attached', { sessionPath: 'native:session', sessionKey: 'new-key', platform: 'wechat', title: '真实联系人' });
+    handleAppEvent('bridge_rc_detached', { sessionPath: 'native:session', sessionKey: 'old-key' });
+    expect((mockState.sessions as any[])[0].rcAttachment).toMatchObject({ sessionKey: 'new-key', platform: 'wechat' });
+    handleAppEvent('bridge_rc_detached', { sessionPath: 'native:session', sessionKey: 'new-key' });
+    expect((mockState.sessions as any[])[0].rcAttachment).toBeNull();
+  });
+
+  it('activity_update 按真实活动ID合并，并保留原有会话定位字段', async () => {
+    Object.assign(mockState, { activities: [{ id: 'trigger-1', type: 'cron', sessionId: 'activity-1', runId: 'run-1', status: 'running' }, { id: 'other' }] });
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    handleAppEvent('activity_update', { activity: { id: 'trigger-1', status: 'done', summary: '真实结果' } });
+    expect(mockState.activities).toEqual([{ id: 'trigger-1', type: 'cron', sessionId: 'activity-1', runId: 'run-1', status: 'done', summary: '真实结果' }, { id: 'other' }]);
+    expect(mockLingxiFetch).not.toHaveBeenCalled();
+  });
+
+  it('voice_transcription_update 按真实会话与文件就地挂转写，未知附件不虚构更新', async () => {
+    Object.assign(mockState, {
+      chatSessions: {
+        'native:sess-1': {
+          items: [
+            { type: 'message', data: { id: 'm1', role: 'user', attachments: [{ fileId: 'sf_abc', filename: 'voice.mp3' }, { fileId: 'sf_other', filename: 'note.txt' }] } },
+            { type: 'message', data: { id: 'm2', role: 'assistant', text: '无附件' } },
+          ],
+        },
+      },
+    });
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    const { readMessageLiveVersion } = await import('../../stores/message-live-version');
+    expect(readMessageLiveVersion('native:sess-1')).toBe(0);
+    const transcription = { status: 'ready', text: '装配线实录', providerId: 'asr' };
+    handleAppEvent('voice_transcription_update', { sessionId: 'sess-1', fileId: 'sf_abc', transcription });
+    const session = (mockState.chatSessions as any)['native:sess-1'];
+    expect(session.items[0].data.attachments[0].transcription).toEqual(transcription);
+    expect(session.items[0].data.attachments[1].transcription).toBeUndefined();
+    expect(session.items[1].data.attachments).toBeUndefined();
+    expect(readMessageLiveVersion('native:sess-1')).toBe(1);
+    // 未知 fileId、未知会话、缺字段：一律不产生状态变化，也不推进 live version。
+    const before = JSON.stringify(mockState.chatSessions);
+    handleAppEvent('voice_transcription_update', { sessionId: 'sess-1', fileId: 'sf_missing', transcription });
+    handleAppEvent('voice_transcription_update', { sessionId: 'sess-absent', fileId: 'sf_abc', transcription });
+    handleAppEvent('voice_transcription_update', { sessionId: 'sess-1', fileId: 'sf_abc' });
+    handleAppEvent('voice_transcription_update', { fileId: 'sf_abc', transcription });
+    handleAppEvent('voice_transcription_update', { sessionId: 'sess-1', fileId: 'sf_abc', transcription: 'not-an-object' });
+    expect(JSON.stringify(mockState.chatSessions)).toBe(before);
+    expect(readMessageLiveVersion('native:sess-1')).toBe(1);
+  });
+
+  it('cron_job_done 刷新真实任务计数，旧连接结果和坏格式不能覆盖现值', async () => {
+    Object.assign(mockState, { automationCount: 7 });
+    const { handleAppEvent } = await import('../../services/app-event-actions');
+    let resolve!: (response: Response) => void;
+    mockLingxiFetch.mockReturnValueOnce(new Promise<Response>(done => { resolve = done; }));
+    let current = true;
+    const pending = handleAppEvent('cron_job_done', { jobId: 'job-1' }, { isCurrent: () => current });
+    current = false;
+    resolve(jsonResponse({ jobs: [] }));
+    await pending;
+    expect(mockState.automationCount).toBe(7);
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ jobs: [{ id: 'job-1' }, { id: 'job-2' }] }));
+    await handleAppEvent('cron_job_done', { jobId: 'job-1' });
+    expect(mockState.automationCount).toBe(2);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mockLingxiFetch.mockResolvedValueOnce(jsonResponse({ jobs: null }));
+    await handleAppEvent('cron_job_done', { jobId: 'job-1' });
+    expect(mockState.automationCount).toBe(2);
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
   });
 
   it('agent-switched applies agent identity, reloads dependent data, and resets agent-scoped UI state', async () => {
@@ -433,4 +541,17 @@ describe('handleAppEvent', () => {
     expect(mockState.channelHeaderMembersText).toBe('');
     expect(mockState.channelIsDM).toBe(false);
   });
+});
+
+
+describe('协作决定仅刷新真实源会话',()=>{
+ it('排队被实际受理后刷新可见源会话，忽略其他会话和过期连接',async()=>{
+  const {handleAppEvent}=await import('../../services/app-event-actions');
+  mockLoadMessages.mockClear();Object.assign(mockState,{currentSessionPath:'native:source',sessions:[]});
+  await handleAppEvent('session_collab_decision',{sourceSessionId:'other',sessionId:'other'});
+  await handleAppEvent('session_collab_decision',{sourceSessionId:'source',sessionId:'source'},{isCurrent:()=>false});
+  expect(mockLoadMessages).not.toHaveBeenCalled();
+  await handleAppEvent('session_collab_decision',{sourceSessionId:'source',sessionId:'source',result:{deliveryStatus:'accepted'}});
+  expect(mockLoadMessages).toHaveBeenCalledWith('native:source');
+ });
 });

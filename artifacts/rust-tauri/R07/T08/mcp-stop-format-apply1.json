@@ -1,0 +1,77 @@
+{
+  "recordedAt": "2026-10-18T11:58:07.922544+00:00",
+  "command": [
+    "/Users/study_superior/.rustup/toolchains/1.98.1-aarch64-apple-darwin/bin/rustfmt",
+    "--edition",
+    "2021",
+    "--config",
+    "skip_children=true",
+    "rust/crates/lingxi-service/src/auth.rs",
+    "rust/crates/lingxi-service/src/chat_wire.rs",
+    "rust/crates/lingxi-service/src/lib.rs",
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs",
+    "rust/crates/lingxi-service/src/runs.rs",
+    "rust/crates/lingxi-service/src/session_admin.rs",
+    "rust/crates/lingxi-service/src/sessions.rs",
+    "rust/crates/lingxi-service/src/sessiontools.rs",
+    "rust/crates/lingxi-service/src/toolgateway.rs",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs"
+  ],
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "sourceBeforeBackup": "artifacts/rust-tauri/R07/T08/mcp-stop-format-input1/before.json",
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/auth.rs",
+      "sha256": "1c748aa64b6f43d1d6ad79692154489a8593d1f9e3fb6445f7cb91176f3294bd",
+      "sha256After": "75c155dab6067b47e88cd3d9afcfdb3f1bcbf08b63c15a176f609b15f65ab9e4"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "0a027b4a21e9fb8f941da0a4eed95cc65a434443ecb1f0263668b71df9d52f33",
+      "sha256After": "7ce06fcff97a7a21228c38cf541c936d347454bc8acfcd78e332d46826ad824c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/lib.rs",
+      "sha256": "82fd37409cbeaaf66bde0fee84c7db867e756dd09c1fc55df5d3839d041c43d6",
+      "sha256After": "5cfb5da1c3c717908ef7784bf9095e7002d71b090c19366177038929ecb320b5"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/mcp_session_permissions.rs",
+      "sha256": "0abd1ca27cdd7260b13da19f087edc1eeb99fe66769b8124a6e35f66f2085215",
+      "sha256After": "43ea644a1b740859aec0d95dc152ecd24576ac69068de4d651b2ea8e2acfb44f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "bb0ddfe8329b01ba2a45c7850f3c7bb28170c146a04fb0e8b34980d9eead998b",
+      "sha256After": "3a73cdbf2af17ad557fa42f6e199f4cd67b9953b9e1138493304b92acf0ea2ff"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/session_admin.rs",
+      "sha256": "d2e7cb8b33f4c794f5b1a9a6751678af03737353ca9588c3f84270a1f8292868",
+      "sha256After": "b23142c65dc62f1c3edb87441083f7d411b1e8003e6f3c535f2604f3f0db7a8f"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessions.rs",
+      "sha256": "6d4b34690362f5b9edcfec4acf4b127740a32e48f8b6a08e43fef47bf5f0e7b2",
+      "sha256After": "70626adf48a6fddf4f1bcbffaa12e2c19a0ae0ebf48dc54653d503988a9e1cc5"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/sessiontools.rs",
+      "sha256": "6ac49c6f272b1d40d1117b941c33274f3a1ebddaa52663eb69a60eddb8456500",
+      "sha256After": "7de68f9ecd215af8333c55753c4f6764600b8ba54a6e1777c7cf829eea204671"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/toolgateway.rs",
+      "sha256": "e16bb3bcae3959aca9a92a10f2ee75174f1e5bb200941a06a157fb7b90b27d20",
+      "sha256After": "7dc823667755bf2d28446f681a557989181670fe8a31eea3afed19609dc0bcbf"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs",
+      "sha256": "1fffa3b18244bf56748fcba3c2b2032b55dd0901f1c7ac97f2211cea329cfe60",
+      "sha256After": "feeb899343fd28420b72b449b14be083c10cac0cd308752e53915748afa82fc0"
+    }
+  ],
+  "scope": "格式修正，不代表功能重新验证"
+}

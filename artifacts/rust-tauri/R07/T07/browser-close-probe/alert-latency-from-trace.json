@@ -1,0 +1,29 @@
+{
+  "source": "trace.json",
+  "traceSha256": "3b171d303107dfdb1533b4b18a6d1bc26a333f00281a19db03e1080ffd214b53",
+  "resultFieldLimitation": "normal_history_seconds为无弹窗对照；原result只断言弹窗期间accept前2.2秒内已应答，不以该字段计算alert延迟。",
+  "checks": [
+    {
+      "requestId": 11,
+      "method": "Page.getNavigationHistory",
+      "dialogOpeningSeconds": 0.395572,
+      "sendSeconds": 0.423458,
+      "receiveSeconds": 0.424714,
+      "acceptSendSeconds": 2.63353,
+      "observedElapsedSeconds": 0.001256,
+      "orderingVerified": true
+    },
+    {
+      "requestId": 16,
+      "method": "Page.getNavigationHistory",
+      "dialogOpeningSeconds": 2.635456,
+      "sendSeconds": 2.641203,
+      "receiveSeconds": 2.642403,
+      "acceptSendSeconds": 4.846467,
+      "observedElapsedSeconds": 0.0012,
+      "orderingVerified": true
+    }
+  ],
+  "limitation": "Python收到与发出事件的单调时钟观测间隔，不是Chrome内部耗时；不证明生产worker原失败已定位。",
+  "originalArtifactsPreserved": true
+}

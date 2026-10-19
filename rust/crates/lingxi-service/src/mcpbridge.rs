@@ -5,10 +5,9 @@
 //!
 //! - **Transport**: the SDK's async duplex transport over any
 //!   `AsyncRead + AsyncWrite`, including REAL child-process stdio servers
-//!   spawned by this bridge with a whitelisted environment. HTTP/SSE
-//!   transports need rmcp features that are NOT in the lock (D-06:
-//!   R04/R07 按需开启并重测) — an `McpEndpoint::Unsupported` endpoint is
-//!   an honest loud refusal, never a fallback.
+//!   spawned by this bridge with a whitelisted environment. R07另接官方
+//!   Streamable HTTP，复用产品网络与独立OAuth；旧独立SSE仍明确拒绝，
+//!   不将HTTP中的SSE事件解析冒充旧SSE传输。
 //! - **Identity**: one server id namespaces every tool
 //!   (`ToolOrigin::Mcp { server_id }` → target id
 //!   `tool:mcp:{server}:{tool}`, byte-compatible with the incumbent TS
@@ -35,10 +34,8 @@
 //!   whitelist environment only ([`SAFE_MCP_ENV_PASSTHROUGH`]), never
 //!   the service process environment.
 //!
-//! Composition note (production default unchanged): like T04/T05/T06 the
-//! production bootstrap does NOT call any `register_*` in this module;
-//! the registration functions are composition entries for the R04 tool
-//! surface and tests.
+//! R07 由唯一的连接器设置管理器在生产启动和设置变更时接入本模块。
+//! 首次注册就绑定按助手检查权限的执行器；直接注册入口仍供既有调用方使用。
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::future::Future;
@@ -59,9 +56,13 @@ use lingxi_kernel::toolcatalog::{
 };
 use lingxi_kernel::RunContext;
 use lingxi_protocol::{ContentBlock, ErrorCode, ProtocolError, ToolCallId, ToolSchemaDocument};
+#[path = "mcp_http.rs"]
+pub mod http;
+
 use rmcp::model::{
-    CallToolRequestParams, CallToolResponse, ClientCapabilities, ClientConfig, Implementation,
-    ListToolsResult, PaginatedRequestParams, ProtocolVersion, Tool as McpTool,
+    CallToolRequest, CallToolRequestParams, CancelledNotificationParam, ClientCapabilities,
+    ClientConfig, ClientRequest, Implementation, PaginatedRequestParams, ProtocolVersion,
+    RequestId, ServerResult, Tool as McpTool,
 };
 use rmcp::service::{NotificationContext, RoleClient, RunningService};
 use rmcp::{ClientHandler, ServiceExt};
@@ -231,7 +232,16 @@ pub enum McpEndpoint {
     Duplex {
         factory: Arc<dyn Fn() -> BridgeIo + Send + Sync>,
     },
-    /// A transport this build does not carry (HTTP/SSE need rmcp features
+    /// 官方 Streamable HTTP，网络与授权均由真实组合根提供。
+    StreamableHttp {
+        url: String,
+        client: http::NetworkMcpClient,
+        headers:
+            std::collections::HashMap<reqwest::header::HeaderName, reqwest::header::HeaderValue>,
+        bearer: Option<String>,
+        oauth: Option<rmcp::transport::auth::AuthClient<http::NetworkMcpClient>>,
+    },
+    /// A transport this build does not carry (legacy SSE needs separate official transport
     /// outside the lock — D-06). Connecting is a LOUD refusal, never a
     /// fallback to anything.
     Unsupported { transport: String },
@@ -287,10 +297,234 @@ type BridgeClient = RunningService<RoleClient, BridgeClientHandler>;
 
 struct McpConnection {
     service: BridgeClient,
+    requests: Arc<McpRequestLifetime>,
+    child: Option<McpChild>,
     #[allow(dead_code)]
     negotiated_protocol: String,
     #[allow(dead_code)]
     server_identity: String,
+}
+
+/// 每次连接独立封口；先让已投请求用官方SDK取消，再关闭同一连接。
+#[derive(Default)]
+struct McpRequestLifetime {
+    stopping: AtomicBool,
+    active: AtomicUsize,
+    // 仅记录单次调用的远端结果未知；不把历史未知混成本地进程未回收。
+    cancellation_unconfirmed: AtomicBool,
+    stopped: tokio::sync::Notify,
+    drained: tokio::sync::Notify,
+}
+impl McpRequestLifetime {
+    // 调用方持有实际连接锁，因此领取和该连接被取走不会交错。
+    fn enter(self: &Arc<Self>) -> Option<McpActiveRequest> {
+        if self.stopping.load(Ordering::Acquire) {
+            return None;
+        }
+        self.active.fetch_add(1, Ordering::AcqRel);
+        let guard = McpActiveRequest(self.clone());
+        if self.stopping.load(Ordering::Acquire) {
+            drop(guard);
+            None
+        } else {
+            Some(guard)
+        }
+    }
+    fn begin_stop(&self) {
+        self.stopping.store(true, Ordering::Release);
+        self.stopped.notify_waiters();
+    }
+    async fn cancelled(&self) {
+        loop {
+            let notified = self.stopped.notified();
+            tokio::pin!(notified);
+            notified.as_mut().enable();
+            if self.stopping.load(Ordering::Acquire) {
+                return;
+            }
+            notified.await;
+        }
+    }
+    async fn drain(&self) -> Result<(), McpBridgeError> {
+        let result = tokio::time::timeout(std::time::Duration::from_secs(2), async {
+            loop {
+                let notified = self.drained.notified();
+                tokio::pin!(notified);
+                notified.as_mut().enable();
+                if self.active.load(Ordering::Acquire) == 0 {
+                    return;
+                }
+                notified.await;
+            }
+        })
+        .await;
+        if result.is_err() {
+            Err(McpBridgeError::CleanupFailed {
+                detail: "已投MCP请求的本地取消收尾未结束；仍继续关闭连接".into(),
+            })
+        } else {
+            if self.cancellation_unconfirmed.load(Ordering::Acquire) {
+                tracing::warn!("历史MCP调用的取消通知未确认，远端结果仍未知；本次仅继续核对本地连接及子进程退出");
+            }
+            Ok(())
+        }
+    }
+}
+struct McpActiveRequest(Arc<McpRequestLifetime>);
+impl Drop for McpActiveRequest {
+    fn drop(&mut self) {
+        self.0.active.fetch_sub(1, Ordering::AcqRel);
+        self.0.drained.notify_waiters();
+    }
+}
+
+/// 子进程归连接所有；初始化取消、断连和所有者退出均回收同一进程。
+struct McpChild {
+    process: tokio::process::Child,
+    killed: bool,
+}
+
+#[cfg(target_os = "macos")]
+fn macos_process_group_absent(pgid: u32) -> std::io::Result<bool> {
+    let mut query = [
+        libc::CTL_KERN,
+        libc::KERN_PROC,
+        libc::KERN_PROC_PGRP,
+        pgid as i32,
+    ];
+    // 只核对是否为空；缓冲不足或权限错误都不能当成资源已经回收。
+    let mut buffer = [0u8; 4096];
+    let mut bytes = buffer.len();
+    let result = unsafe {
+        libc::sysctl(
+            query.as_mut_ptr(),
+            query.len() as u32,
+            buffer.as_mut_ptr().cast(),
+            &mut bytes,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if result == 0 {
+        Ok(bytes == 0)
+    } else {
+        Err(std::io::Error::last_os_error())
+    }
+}
+
+impl McpChild {
+    fn kill(&mut self) -> std::io::Result<()> {
+        if self.killed {
+            return Ok(());
+        }
+        if let Some(_pid) = self.process.id() {
+            #[cfg(unix)]
+            {
+                // 自有且尚未回收的子进程编号不会被复用；组内后代一起结束。
+                if unsafe { libc::killpg(_pid as i32, libc::SIGKILL) } != 0 {
+                    let error = std::io::Error::last_os_error();
+                    if error.raw_os_error() != Some(libc::ESRCH) {
+                        #[cfg(target_os = "macos")]
+                        if error.raw_os_error() == Some(libc::EPERM)
+                            && self.process.try_wait()?.is_some()
+                            && macos_process_group_absent(_pid)?
+                        {
+                            // macOS对仅剩未回收退出记录的组返回EPERM；先实收子进程，再核对组空。
+                            self.killed = true;
+                            return Ok(());
+                        }
+                        return Err(error);
+                    }
+                }
+            }
+            #[cfg(not(unix))]
+            self.process.start_kill()?;
+            self.killed = true;
+        }
+        Ok(())
+    }
+    async fn stop(&mut self) -> Result<(), McpBridgeError> {
+        let owned_pid = self.process.id();
+        let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(2);
+        let kill = self.kill();
+        #[cfg(target_os = "macos")]
+        if kill
+            .as_ref()
+            .is_err_and(|error| error.raw_os_error() == Some(libc::EPERM))
+        {
+            if let Some(pgid) = owned_pid {
+                // 真实Mac退出空窗可能同时getpgid=ESRCH、try_wait=None；
+                // 仍须在原预算内实收自有child，并核对整组为空，不把EPERM吞成成功。
+                tokio::time::timeout_at(deadline, self.process.wait())
+                    .await
+                    .map_err(|_| McpBridgeError::CleanupFailed {
+                        detail: format!("等待自有退出记录超时；owned_pid={pgid}"),
+                    })?
+                    .map_err(|error| McpBridgeError::CleanupFailed {
+                        detail: format!("等待自有退出记录失败；owned_pid={pgid}：{error}"),
+                    })?;
+                if !macos_process_group_absent(pgid).map_err(|error| {
+                    McpBridgeError::CleanupFailed {
+                        detail: format!("自有进程组核对失败；owned_pid={pgid}：{error}"),
+                    }
+                })? {
+                    return Err(McpBridgeError::CleanupFailed {
+                        detail: format!("自有child已回收但组仍非空；owned_pid={pgid}"),
+                    });
+                }
+                self.killed = true;
+                return Ok(());
+            }
+        }
+        kill.map_err(|error| McpBridgeError::CleanupFailed {
+            detail: format!("停止自有进程组失败：{error}; owned_pid={owned_pid:?}"),
+        })?;
+        tokio::time::timeout_at(deadline, self.process.wait())
+            .await
+            .map_err(|_| McpBridgeError::CleanupFailed {
+                detail: "等待自有子进程退出超时".into(),
+            })?
+            .map_err(|error| McpBridgeError::CleanupFailed {
+                detail: format!("等待自有子进程失败：{error}"),
+            })?;
+        Ok(())
+    }
+}
+impl Drop for McpChild {
+    fn drop(&mut self) {
+        if self.kill().is_err() {
+            tracing::error!("MCP 子进程组回收未确认");
+        }
+    }
+}
+impl McpConnection {
+    async fn stop(self) -> Result<(), McpBridgeError> {
+        let Self {
+            service,
+            requests,
+            mut child,
+            ..
+        } = self;
+        requests.begin_stop();
+        let request_result = requests.drain().await;
+        let child_result = if let Some(process) = child.as_mut() {
+            process.stop().await
+        } else {
+            Ok(())
+        };
+        let service_result =
+            tokio::time::timeout(std::time::Duration::from_secs(2), service.cancel())
+                .await
+                .map_err(|_| McpBridgeError::CleanupFailed {
+                    detail: "等待SDK连接退出超时".into(),
+                })?
+                .map_err(|error| McpBridgeError::CleanupFailed {
+                    detail: format!("SDK连接退出任务失败：{error}"),
+                });
+        request_result
+            .and(child_result)
+            .and(service_result.map(|_| ()))
+    }
 }
 
 /// One configured MCP server: endpoint + live connection + the tool
@@ -299,12 +533,15 @@ pub struct McpServer {
     id: String,
     endpoint: McpEndpoint,
     connection: AsyncMutex<Option<McpConnection>>,
+    cancellation: std::sync::Mutex<Option<Arc<McpRequestLifetime>>>,
     /// target id -> server tool name for everything registered from the
     /// current listing (the authoritative target↔tool binding).
     registered: std::sync::Mutex<BTreeMap<String, String>>,
     /// target id -> the EXACT manifest the last sync registered/updated
     /// (change detection + the executor's output-schema snapshot).
     manifests: std::sync::Mutex<BTreeMap<String, ToolManifest>>,
+    wire_tools: std::sync::Mutex<BTreeMap<String, McpTool>>,
+    metadata_epoch: AtomicU64,
     /// Monotonic count of `tools/list_changed` notifications observed.
     pub tool_list_changed_notifications: Arc<AtomicU64>,
     connect_count: Arc<AtomicU64>,
@@ -317,6 +554,7 @@ pub enum McpBridgeError {
     ConnectFailed { detail: String },
     NegotiationMissing,
     ServerGone,
+    CleanupFailed { detail: String },
 }
 
 impl McpBridgeError {
@@ -326,6 +564,7 @@ impl McpBridgeError {
             McpBridgeError::ConnectFailed { .. } => "mcp_connect_failed",
             McpBridgeError::NegotiationMissing => "mcp_negotiation_missing",
             McpBridgeError::ServerGone => "mcp_server_gone",
+            McpBridgeError::CleanupFailed { .. } => "mcp_cleanup_failed",
         }
     }
 
@@ -344,6 +583,9 @@ impl McpBridgeError {
             McpBridgeError::ServerGone => {
                 "MCP server connection is not available for this call".to_string()
             }
+            McpBridgeError::CleanupFailed { detail } => {
+                format!("MCP 连接或子进程回收未确认：{detail}")
+            }
         }
     }
 }
@@ -354,8 +596,11 @@ impl McpServer {
             id: id.into(),
             endpoint,
             connection: AsyncMutex::new(None),
+            cancellation: std::sync::Mutex::new(None),
             registered: std::sync::Mutex::new(BTreeMap::new()),
             manifests: std::sync::Mutex::new(BTreeMap::new()),
+            wire_tools: std::sync::Mutex::new(BTreeMap::new()),
+            metadata_epoch: AtomicU64::new(0),
             tool_list_changed_notifications: Arc::new(AtomicU64::new(0)),
             connect_count: Arc::new(AtomicU64::new(0)),
         })
@@ -374,7 +619,10 @@ impl McpServer {
     pub fn is_connected(&self) -> bool {
         self.connection
             .try_lock()
-            .map(|c| c.is_some())
+            .map(|c| {
+                c.as_ref()
+                    .is_some_and(|connection| !connection.service.is_closed())
+            })
             .unwrap_or(false)
     }
 
@@ -393,6 +641,17 @@ impl McpServer {
             .unwrap_or_else(|p| p.into_inner())
             .get(target)
             .cloned()
+    }
+
+    pub fn wire_tools(&self) -> BTreeMap<String, McpTool> {
+        self.wire_tools
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
+    }
+
+    pub fn metadata_epoch(&self) -> u64 {
+        self.metadata_epoch.load(Ordering::SeqCst)
     }
 
     fn spawn_stdio(
@@ -418,7 +677,10 @@ impl McpServer {
         cmd.args(args)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::null());
+            .stderr(Stdio::null())
+            .kill_on_drop(true);
+        #[cfg(unix)]
+        cmd.process_group(0);
         if let Some(dir) = cwd {
             cmd.current_dir(dir);
         }
@@ -442,9 +704,10 @@ impl McpServer {
     /// NEVER replays any previous call — it re-initializes and re-lists;
     /// re-issuing anything is an explicit new decision.
     pub async fn connect(&self) -> Result<(String, String), McpBridgeError> {
+        self.begin_stop();
         let mut guard = self.connection.lock().await;
         if let Some(old) = guard.take() {
-            let _ = old.service.cancel().await;
+            old.stop().await?;
         }
         let handler = BridgeClientHandler {
             tool_list_changed: Arc::clone(&self.tool_list_changed_notifications),
@@ -456,31 +719,38 @@ impl McpServer {
                 env,
                 cwd,
             } => {
-                let mut child = self.spawn_stdio(command, args, env, cwd)?;
-                let stdin = child
-                    .stdin
-                    .take()
-                    .ok_or_else(|| McpBridgeError::ConnectFailed {
-                        detail: "stdio child had no stdin".to_string(),
-                    })?;
-                let stdout = child
-                    .stdout
-                    .take()
-                    .ok_or_else(|| McpBridgeError::ConnectFailed {
-                        detail: "stdio child had no stdout".to_string(),
-                    })?;
+                let mut child = McpChild {
+                    process: self.spawn_stdio(command, args, env, cwd)?,
+                    killed: false,
+                };
+                let stdin =
+                    child
+                        .process
+                        .stdin
+                        .take()
+                        .ok_or_else(|| McpBridgeError::ConnectFailed {
+                            detail: "stdio child had no stdin".to_string(),
+                        })?;
+                let stdout =
+                    child
+                        .process
+                        .stdout
+                        .take()
+                        .ok_or_else(|| McpBridgeError::ConnectFailed {
+                            detail: "stdio child had no stdout".to_string(),
+                        })?;
                 let service = handler.serve((stdout, stdin)).await.map_err(|e| {
                     McpBridgeError::ConnectFailed {
                         detail: format!("{e}"),
                     }
                 })?;
-                // Reap the child detached: when the service cancels, the
-                // ChildStdin half drops and stdin closes, terminating a
-                // well-behaved stdio server; the wait() prevents zombies.
-                tokio::spawn(async move {
-                    let _ = child.wait().await;
-                });
-                Self::finalize(service, guard, self.connect_count.as_ref())
+                Self::finalize(
+                    service,
+                    Some(child),
+                    guard,
+                    self.connect_count.as_ref(),
+                    &self.cancellation,
+                )
             }
             McpEndpoint::Duplex { factory } => {
                 let io = factory();
@@ -489,7 +759,58 @@ impl McpServer {
                         detail: format!("{e}"),
                     }
                 })?;
-                Self::finalize(service, guard, self.connect_count.as_ref())
+                Self::finalize(
+                    service,
+                    None,
+                    guard,
+                    self.connect_count.as_ref(),
+                    &self.cancellation,
+                )
+            }
+            McpEndpoint::StreamableHttp {
+                url,
+                client,
+                headers,
+                bearer,
+                oauth,
+            } => {
+                use rmcp::transport::streamable_http_client::{
+                    StreamableHttpClientTransport, StreamableHttpClientTransportConfig,
+                };
+                let mut config = StreamableHttpClientTransportConfig::with_uri(url.clone());
+                config.custom_headers = headers.clone();
+                config.auth_header = bearer.clone();
+                config.max_sse_event_size = 1024 * 1024;
+                // 不重放旧POST；过期会话必须由新的明确启动重新初始化。
+                config.reinit_on_expired_session = false;
+                let service = if let Some(oauth) = oauth {
+                    handler
+                        .serve(StreamableHttpClientTransport::with_client(
+                            oauth.clone(),
+                            config,
+                        ))
+                        .await
+                        .map_err(|_| McpBridgeError::ConnectFailed {
+                            detail: "MCP HTTP 初始化或授权失败".into(),
+                        })?
+                } else {
+                    handler
+                        .serve(StreamableHttpClientTransport::with_client(
+                            client.clone(),
+                            config,
+                        ))
+                        .await
+                        .map_err(|_| McpBridgeError::ConnectFailed {
+                            detail: "MCP HTTP 初始化失败".into(),
+                        })?
+                };
+                Self::finalize(
+                    service,
+                    None,
+                    guard,
+                    self.connect_count.as_ref(),
+                    &self.cancellation,
+                )
             }
             McpEndpoint::Unsupported { transport } => Err(McpBridgeError::EndpointUnsupported {
                 transport: transport.clone(),
@@ -499,8 +820,10 @@ impl McpServer {
 
     fn finalize(
         service: BridgeClient,
+        child: Option<McpChild>,
         mut guard: AsyncMutexGuard<'_, Option<McpConnection>>,
         connect_count: &AtomicU64,
+        cancellation: &std::sync::Mutex<Option<Arc<McpRequestLifetime>>>,
     ) -> Result<(String, String), McpBridgeError> {
         let peer = service
             .peer_info()
@@ -515,8 +838,12 @@ impl McpServer {
             .map(|i| i.name.to_string())
             .unwrap_or_default();
         connect_count.fetch_add(1, Ordering::SeqCst);
+        let requests = Arc::new(McpRequestLifetime::default());
+        *cancellation.lock().unwrap_or_else(|p| p.into_inner()) = Some(requests.clone());
         *guard = Some(McpConnection {
             service,
+            requests,
+            child,
             negotiated_protocol: negotiated.clone(),
             server_identity: identity.clone(),
         });
@@ -524,21 +851,38 @@ impl McpServer {
     }
 
     pub async fn disconnect(&self) {
-        let mut guard = self.connection.lock().await;
-        if let Some(old) = guard.take() {
-            let _ = old.service.cancel().await;
+        if let Err(error) = self.disconnect_checked().await {
+            tracing::error!(code = error.code(), "MCP 断连清理未确认");
         }
     }
 
+    /// 同步封住旧连接并唤醒其请求；异步收尾先发送精确取消，再关闭SDK。
+    pub fn begin_stop(&self) {
+        if let Some(token) = self
+            .cancellation
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .take()
+        {
+            token.begin_stop();
+        }
+    }
+
+    pub async fn disconnect_checked(&self) -> Result<(), McpBridgeError> {
+        self.begin_stop();
+        let mut guard = self.connection.lock().await;
+        if let Some(old) = guard.take() {
+            old.stop().await?;
+        }
+        Ok(())
+    }
+
     async fn list_tools(&self) -> Result<Vec<McpTool>, McpBridgeError> {
-        let guard = self.connection.lock().await;
-        let Some(conn) = guard.as_ref() else {
-            return Err(McpBridgeError::ServerGone);
-        };
         // Full paginated listing (tools/list until no cursor remains) —
         // BOUNDED: an untrusted server that always returns another cursor
         // or floods tools is refused loudly, never indulged.
         let mut tools = Vec::new();
+        let mut listing_bytes = 0usize;
         let mut cursor = None;
         let mut pages = 0usize;
         loop {
@@ -551,14 +895,37 @@ impl McpServer {
                 });
             }
             pages += 1;
-            let page: ListToolsResult = conn
-                .service
-                .peer()
-                .list_tools(Some(PaginatedRequestParams::default().with_cursor(cursor)))
+            let page = match self
+                .request_raw(
+                    ClientRequest::ListToolsRequest(rmcp::model::ListToolsRequest::with_param(
+                        PaginatedRequestParams::default().with_cursor(cursor),
+                    )),
+                    MCP_DEFAULT_CALL_DEADLINE_MS,
+                    None,
+                )
                 .await
-                .map_err(|e| McpBridgeError::ConnectFailed {
-                    detail: format!("list_tools: {e}"),
-                })?;
+                .map_err(|error| McpBridgeError::ConnectFailed {
+                    detail: format!("list_tools: {error:?}"),
+                })? {
+                ServerResult::ListToolsResult(page) => page,
+                _ => {
+                    return Err(McpBridgeError::ConnectFailed {
+                        detail: "list_tools返回了其它结果".into(),
+                    })
+                }
+            };
+            // 工具的扩展元数据同属不可信目录，避免缓存大量 UI 描述耗尽资源。
+            let page_bytes = serde_json::to_vec(&page.tools)
+                .map_err(|_| McpBridgeError::ConnectFailed {
+                    detail: "工具目录编码失败".into(),
+                })?
+                .len();
+            listing_bytes = listing_bytes.saturating_add(page_bytes);
+            if listing_bytes > 4 * 1024 * 1024 {
+                return Err(McpBridgeError::ConnectFailed {
+                    detail: "工具目录超过4MiB".into(),
+                });
+            }
             tools.extend(page.tools);
             if tools.len() > MCP_MAX_LISTED_TOOLS {
                 return Err(McpBridgeError::ConnectFailed {
@@ -579,34 +946,204 @@ impl McpServer {
     /// One `tools/call` with the deadline applied. Only the transport
     /// and deadline failures are UNKNOWN candidates — a server-returned
     /// `is_error` result is a RECEIPT (a completed call that failed).
+    async fn request_raw(
+        &self,
+        request: ClientRequest,
+        deadline_ms: u64,
+        cancel_scope: Option<crate::cancel::CancelScope>,
+    ) -> Result<ServerResult, McpCallFailure> {
+        if cancel_scope
+            .as_ref()
+            .is_some_and(|scope| scope.is_cancelled())
+        {
+            return Err(McpCallFailure::Cancelled);
+        }
+        let deadline = tokio::time::Instant::now() + std::time::Duration::from_millis(deadline_ms);
+        let mut cancellation: Option<McpRequestCancellation> = None;
+        let mut admission: Option<McpActiveRequest> = None;
+        let response = {
+            // 预算覆盖取得连接和SDK出站排队；mpsc发送被取消时尚未投递的消息会被丢弃。
+            let call = async {
+                let (peer, lifetime) = {
+                    let guard = self.connection.lock().await;
+                    let Some(conn) = guard.as_ref() else {
+                        return Err(McpCallFailure::NotConnected);
+                    };
+                    admission = Some(conn.requests.enter().ok_or(McpCallFailure::Cancelled)?);
+                    (conn.service.peer().clone(), conn.requests.clone())
+                };
+                let exchange = async {
+                    let handle = peer
+                        .send_cancellable_request(
+                            request,
+                            rmcp::service::PeerRequestOptions::no_options(),
+                        )
+                        .await
+                        .map_err(|error| McpCallFailure::Transport(error.to_string()))?;
+                    // 发送一旦完成就在下个等待点之前安装guard，直接丢future也会通知同一个请求。
+                    cancellation = Some(McpRequestCancellation {
+                        peer,
+                        request_id: Some(handle.id.clone()),
+                        admission: admission.take(),
+                    });
+                    handle
+                        .await_response()
+                        .await
+                        .map_err(|error| McpCallFailure::Transport(error.to_string()))
+                };
+                tokio::select! {
+                    biased;
+                    () = lifetime.cancelled() => Err(McpCallFailure::Cancelled),
+                    result = exchange => result,
+                }
+            };
+            tokio::select! {
+                response = tokio::time::timeout_at(deadline, call) => Some(response),
+                () = async {
+                    match &cancel_scope {
+                        Some(scope) => scope.cancelled().await,
+                        None => std::future::pending().await,
+                    }
+                } => None,
+            }
+        };
+        match response {
+            None => {
+                if let Some(cancellation) = cancellation.as_mut() {
+                    cancellation.cancel().await;
+                }
+                Err(McpCallFailure::Cancelled)
+            }
+            Some(Err(_)) => {
+                if let Some(cancellation) = cancellation.as_mut() {
+                    cancellation.cancel().await;
+                }
+                Err(McpCallFailure::DeadlineExceeded)
+            }
+            Some(Ok(result)) => {
+                if let Some(cancellation) = cancellation.as_mut() {
+                    if matches!(result, Err(McpCallFailure::Cancelled)) {
+                        cancellation.cancel().await;
+                    } else {
+                        cancellation.disarm();
+                    }
+                }
+                result
+            }
+        }
+    }
     async fn call_raw(
         &self,
         tool: &str,
         arguments: serde_json::Map<String, serde_json::Value>,
         deadline_ms: u64,
     ) -> Result<rmcp::model::CallToolResult, McpCallFailure> {
-        let guard = self.connection.lock().await;
-        let Some(conn) = guard.as_ref() else {
-            return Err(McpCallFailure::NotConnected);
+        let cancel = crate::toolgateway::TOOL_LIFETIME
+            .try_with(|lifetime| lifetime.cancel.clone())
+            .ok();
+        let params = CallToolRequestParams::new(tool.to_owned()).with_arguments(arguments);
+        match self
+            .request_raw(
+                ClientRequest::CallToolRequest(CallToolRequest::new(params)),
+                deadline_ms,
+                cancel,
+            )
+            .await?
+        {
+            ServerResult::CallToolResult(result) => Ok(result),
+            ServerResult::InputRequiredResult(_) => Err(McpCallFailure::InputRequiredRoundRefused),
+            ServerResult::CreateTaskResult(_) => Err(McpCallFailure::TaskRoundRefused),
+            _ => Err(McpCallFailure::Transport("unexpected MCP response".into())),
+        }
+    }
+    pub async fn read_resource(
+        &self,
+        uri: &str,
+        deadline_ms: u64,
+        cancel: Option<crate::cancel::CancelScope>,
+    ) -> Result<rmcp::model::ReadResourceResult, McpCallFailure> {
+        let params = rmcp::model::ReadResourceRequestParams::new(uri.to_owned());
+        match self
+            .request_raw(
+                ClientRequest::ReadResourceRequest(rmcp::model::ReadResourceRequest::new(params)),
+                deadline_ms,
+                cancel,
+            )
+            .await?
+        {
+            ServerResult::ReadResourceResult(result) => Ok(result),
+            _ => Err(McpCallFailure::Transport(
+                "unexpected MCP resource response".into(),
+            )),
+        }
+    }
+}
+
+/// 单次调用取消只通知该请求；远端是否停止仍由实际回执决定。
+struct McpRequestCancellation {
+    peer: rmcp::Peer<RoleClient>,
+    request_id: Option<RequestId>,
+    admission: Option<McpActiveRequest>,
+}
+
+impl McpRequestCancellation {
+    fn disarm(&mut self) {
+        self.request_id = None;
+        self.admission.take();
+    }
+
+    async fn cancel(&mut self) {
+        let Some(request_id) = self.request_id.clone() else {
+            return;
         };
-        let params = CallToolRequestParams::new(tool.to_string()).with_arguments(arguments);
-        let call = conn.service.peer().call_tool_once(params);
-        match tokio::time::timeout(std::time::Duration::from_millis(deadline_ms), call).await {
-            // Deadline expired: the request may have reached the server
-            // and executed — the honest UNKNOWN classification (never a
-            // blind retry, never a fabricated clean failure).
-            Err(_elapsed) => Err(McpCallFailure::DeadlineExceeded),
-            Ok(Err(transport_error)) => {
-                Err(McpCallFailure::Transport(format!("{transport_error}")))
+        let result = tokio::time::timeout(
+            std::time::Duration::from_secs(2),
+            self.peer.notify_cancelled(CancelledNotificationParam::new(
+                Some(request_id),
+                Some("调用已取消或超时；远端结果尚未确认".into()),
+            )),
+        )
+        .await;
+        if !matches!(result, Ok(Ok(()))) {
+            if let Some(admission) = &self.admission {
+                admission
+                    .0
+                    .cancellation_unconfirmed
+                    .store(true, Ordering::Release);
             }
-            Ok(Ok(response)) => match response {
-                CallToolResponse::Complete(result) => Ok(result),
-                CallToolResponse::InputRequired(_) => {
-                    Err(McpCallFailure::InputRequiredRoundRefused)
+            tracing::warn!("MCP 请求取消通知未确认，远端结果保持未知");
+        }
+        self.request_id = None;
+        self.admission.take();
+    }
+}
+
+impl Drop for McpRequestCancellation {
+    fn drop(&mut self) {
+        let Some(request_id) = self.request_id.take() else {
+            return;
+        };
+        let mut cleanup = Self {
+            peer: self.peer.clone(),
+            request_id: Some(request_id),
+            admission: self.admission.take(),
+        };
+        match tokio::runtime::Handle::try_current() {
+            Ok(runtime) => {
+                runtime.spawn(async move {
+                    cleanup.cancel().await;
+                });
+            }
+            Err(_) => {
+                if let Some(admission) = &cleanup.admission {
+                    admission
+                        .0
+                        .cancellation_unconfirmed
+                        .store(true, Ordering::Release);
                 }
-                CallToolResponse::Task(_) => Err(McpCallFailure::TaskRoundRefused),
-                _ => Err(McpCallFailure::TaskRoundRefused),
-            },
+                cleanup.disarm();
+                tracing::warn!("MCP 运行时已退出，无法确认单次请求取消通知");
+            }
         }
     }
 }
@@ -619,12 +1156,13 @@ pub enum McpCallFailure {
     NotConnected,
     Transport(String),
     DeadlineExceeded,
+    Cancelled,
     InputRequiredRoundRefused,
     TaskRoundRefused,
 }
 
 impl McpCallFailure {
-    fn reason(&self) -> String {
+    pub fn reason(&self) -> String {
         match self {
             McpCallFailure::NotConnected => {
                 "MCP server connection is not available; the call was not dispatched".to_string()
@@ -637,6 +1175,9 @@ impl McpCallFailure {
                 "MCP call deadline expired before a receipt arrived; the request MAY have \
                  reached the server — outcome is unknown, never blindly retried"
                     .to_string()
+            }
+            McpCallFailure::Cancelled => {
+                "MCP 调用已取消；已请求远端停止，结果仍未知，不会自动重放".to_string()
             }
             McpCallFailure::InputRequiredRoundRefused => {
                 "MCP server asked for interactive input (input_required); the bridge does \
@@ -807,6 +1348,16 @@ pub async fn sync_server_tools(
             removed += 1;
         }
     }
+    server.metadata_epoch.fetch_add(1, Ordering::SeqCst);
+    // 与实际注册相同，同名目录只保留首项，不能让后项元数据替换当前工具身份。
+    let accepted_names = seen_targets.values().cloned().collect::<BTreeSet<_>>();
+    let mut wire_tools = BTreeMap::new();
+    for tool in tools {
+        if accepted_names.contains(tool.name.as_ref()) {
+            wire_tools.entry(tool.name.to_string()).or_insert(tool);
+        }
+    }
+    *server.wire_tools.lock().unwrap_or_else(|p| p.into_inner()) = wire_tools;
     *server.registered.lock().unwrap_or_else(|p| p.into_inner()) = seen_targets;
     *server.manifests.lock().unwrap_or_else(|p| p.into_inner()) = next_manifests;
 
@@ -996,6 +1547,7 @@ impl ToolExecutorPort for McpToolExecutor {
                     // retry, never a fabricated clean failure.
                     McpCallFailure::Transport(_)
                     | McpCallFailure::DeadlineExceeded
+                    | McpCallFailure::Cancelled
                     | McpCallFailure::TaskRoundRefused => ToolExecutionResult::of_ctx(
                         ctx,
                         ToolOutcome::Unknown {
@@ -1153,6 +1705,31 @@ fn bind_all(
     registry: &ToolRegistry,
     gateway: &ToolInvocationGateway,
 ) -> Vec<ToolTargetId> {
+    bind_all_with(
+        server,
+        executor,
+        registry,
+        gateway,
+        |gateway, target, executor| {
+            gateway.bind_executor(
+                target.clone(),
+                Arc::clone(executor) as Arc<dyn ToolExecutorPort>,
+                "R04-T07 MCP bridge executor",
+            );
+        },
+    )
+}
+
+fn bind_all_with<F>(
+    server: &Arc<McpServer>,
+    executor: &Arc<McpToolExecutor>,
+    registry: &ToolRegistry,
+    gateway: &ToolInvocationGateway,
+    bind: F,
+) -> Vec<ToolTargetId>
+where
+    F: Fn(&ToolInvocationGateway, &ToolTargetId, &Arc<McpToolExecutor>),
+{
     let bindings = executor_bindings(server, registry);
     let targets: Vec<ToolTargetId> = bindings
         .keys()
@@ -1160,11 +1737,7 @@ fn bind_all(
         .collect();
     executor.bind_targets(bindings);
     for target in &targets {
-        gateway.bind_executor(
-            target.clone(),
-            Arc::clone(executor) as Arc<dyn ToolExecutorPort>,
-            "R04-T07 MCP bridge executor",
-        );
+        bind(gateway, target, executor);
     }
     targets
 }
@@ -1178,12 +1751,39 @@ pub async fn register_mcp_server(
     gateway: &ToolInvocationGateway,
     budget: &SchemaBudget,
 ) -> Result<RegisteredMcpServer, McpBridgeError> {
+    register_mcp_server_with_binding(
+        server,
+        registry,
+        gateway,
+        budget,
+        |gateway, target, executor| {
+            gateway.bind_executor(
+                target.clone(),
+                Arc::clone(executor) as Arc<dyn ToolExecutorPort>,
+                "R04-T07 MCP bridge executor",
+            );
+        },
+    )
+    .await
+}
+
+/// 生产管理入口在首次公开执行器时就绑定助手权限，避免事后覆盖留下裸执行窗口。
+pub async fn register_mcp_server_with_binding<F>(
+    server: Arc<McpServer>,
+    registry: &Arc<ToolRegistry>,
+    gateway: &ToolInvocationGateway,
+    budget: &SchemaBudget,
+    bind: F,
+) -> Result<RegisteredMcpServer, McpBridgeError>
+where
+    F: Fn(&ToolInvocationGateway, &ToolTargetId, &Arc<McpToolExecutor>) + Send + Sync,
+{
     let (negotiated, identity) = server.connect().await?;
     let mut sync = sync_server_tools(&server, registry, budget).await?;
     sync.negotiated_protocol = negotiated;
     sync.server_identity = identity;
     let executor = McpToolExecutor::new(Arc::clone(&server), *budget);
-    let targets = bind_all(&server, &executor, registry, gateway);
+    let targets = bind_all_with(&server, &executor, registry, gateway, bind);
     Ok(RegisteredMcpServer {
         server,
         executor,
@@ -1229,10 +1829,261 @@ pub async fn refresh_mcp_server(
 
 // ── unit tests ───────────────────────────────────────────────────────────────
 
+#[cfg(all(test, unix))]
+#[path = "mcpbridge_request_tests.rs"]
+mod request_tests;
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn macos_natural_exit_stop_reaps_real_children_within_original_cleanup_budget() {
+        let mut observed_exit = 0;
+        for _ in 0..64 {
+            let mut command = tokio::process::Command::new("/usr/bin/true");
+            command.process_group(0).kill_on_drop(true);
+            let mut child = McpChild {
+                process: command.spawn().unwrap(),
+                killed: false,
+            };
+            let pid = child.process.id().unwrap();
+            // 等真实内核退出可见，不先try_wait收取状态，保留原失败的退出/回收窗口。
+            tokio::time::timeout(std::time::Duration::from_secs(2), async {
+                loop {
+                    if unsafe { libc::getpgid(pid as i32) } == -1
+                        && std::io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+                    {
+                        break;
+                    }
+                    tokio::task::yield_now().await;
+                }
+            })
+            .await
+            .unwrap();
+            observed_exit += 1;
+            child.stop().await.unwrap_or_else(|error| {
+                panic!(
+                    "自有自然退出未收尾：owned_pid={pid},error={}",
+                    error.message()
+                )
+            });
+            assert!(macos_process_group_absent(pid).unwrap());
+            assert!(child.process.try_wait().unwrap().is_some());
+        }
+        assert_eq!(observed_exit, 64);
+    }
+
+    #[cfg(target_os = "macos")]
+    #[tokio::test]
+    async fn macos_exited_unreaped_child_is_confirmed_empty_without_hiding_live_groups() {
+        let mut live = tokio::process::Command::new("/bin/sleep");
+        live.arg("30").process_group(0).kill_on_drop(true);
+        let mut live = McpChild {
+            process: live.spawn().unwrap(),
+            killed: false,
+        };
+        assert!(!macos_process_group_absent(live.process.id().unwrap()).unwrap());
+        live.stop().await.unwrap();
+
+        let mut exited = tokio::process::Command::new("/usr/bin/true");
+        exited.process_group(0).kill_on_drop(true);
+        let mut exited = McpChild {
+            process: exited.spawn().unwrap(),
+            killed: false,
+        };
+        let pid = exited.process.id().unwrap();
+        tokio::time::timeout(std::time::Duration::from_secs(2), async {
+            loop {
+                if unsafe { libc::getpgid(pid as i32) } == -1
+                    && std::io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+                {
+                    break;
+                }
+                tokio::time::sleep(std::time::Duration::from_millis(5)).await;
+            }
+        })
+        .await
+        .unwrap();
+        // 保留真实Mac边界：此时组内只有尚未reap的退出记录，并非活进程的权限失败。
+        assert_eq!(unsafe { libc::killpg(pid as i32, libc::SIGKILL) }, -1);
+        assert_eq!(
+            std::io::Error::last_os_error().raw_os_error(),
+            Some(libc::EPERM)
+        );
+        assert!(!macos_process_group_absent(pid).unwrap());
+        exited.stop().await.unwrap();
+        assert!(macos_process_group_absent(pid).unwrap());
+    }
+
+    #[cfg(unix)]
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn real_stdio_request_cancel_deadline_and_future_drop_keep_shared_connection_usable() {
+        let root = std::env::temp_dir().join(format!(
+            "lingxi-r07-mcp-request-cancel-{}",
+            lingxi_adapters::storage::agent_memory::random_token_suffix()
+        ));
+        std::fs::create_dir_all(&root).unwrap();
+        let script = root.join("external.mjs");
+        let arrivals = root.join("arrivals.ndjson");
+        std::fs::write(&script, r#"
+import fs from 'node:fs';
+import readline from 'node:readline';
+const reply=(id,result)=>process.stdout.write(JSON.stringify({jsonrpc:'2.0',id,result})+'\n');
+readline.createInterface({input:process.stdin}).on('line',line=>{
+ const m=JSON.parse(line);fs.appendFileSync(process.argv[2],JSON.stringify(m)+'\n');
+ if(m.method==='initialize')reply(m.id,{protocolVersion:m.params.protocolVersion,capabilities:{tools:{}},serverInfo:{name:'owned-request-cancel',version:'1'}});
+ if(m.method==='tools/call'&&m.params.name==='echo')reply(m.id,{content:[{type:'text',text:'连接仍可使用'}]});
+});
+"#).unwrap();
+        let server = McpServer::new(
+            "request-cancel",
+            McpEndpoint::Stdio {
+                command: "node".into(),
+                args: vec![
+                    script.to_string_lossy().into(),
+                    arrivals.to_string_lossy().into(),
+                ],
+                env: BTreeMap::new(),
+                cwd: Some(root.clone()),
+            },
+        );
+        server.connect().await.unwrap();
+        async fn observed(path: &std::path::Path, method: &str, count: usize) {
+            tokio::time::timeout(std::time::Duration::from_secs(3), async {
+                loop {
+                    let rows = std::fs::read_to_string(path).unwrap_or_default();
+                    let actual = rows
+                        .lines()
+                        .filter_map(|line| serde_json::from_str::<serde_json::Value>(line).ok())
+                        .filter(|row| row["method"] == method)
+                        .count();
+                    if actual >= count {
+                        break;
+                    }
+                    tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+                }
+            })
+            .await
+            .expect("外部真实SDK请求或取消通知必须到达");
+        }
+        assert_eq!(
+            server
+                .call_raw("hold", serde_json::Map::new(), 80)
+                .await
+                .unwrap_err(),
+            McpCallFailure::DeadlineExceeded
+        );
+        observed(&arrivals, "notifications/cancelled", 1).await;
+
+        let cancel = crate::cancel::CancelScope::run_root("mcp-request");
+        let lifetime = crate::toolgateway::TrustedToolLifetime {
+            workspace: None,
+            cancel: cancel.clone(),
+            deadline_unix_ms: u64::MAX,
+            budget_ms: 3000,
+        };
+        let caller = server.clone();
+        let active = tokio::spawn(
+            crate::toolgateway::TOOL_LIFETIME.scope(lifetime, async move {
+                caller.call_raw("hold", serde_json::Map::new(), 3000).await
+            }),
+        );
+        observed(&arrivals, "tools/call", 2).await;
+        cancel.cancel("取消真实单次MCP请求");
+        assert_eq!(
+            active.await.unwrap().unwrap_err(),
+            McpCallFailure::Cancelled
+        );
+        observed(&arrivals, "notifications/cancelled", 2).await;
+
+        let caller = server.clone();
+        let dropped =
+            tokio::spawn(
+                async move { caller.call_raw("hold", serde_json::Map::new(), 3000).await },
+            );
+        observed(&arrivals, "tools/call", 3).await;
+        dropped.abort();
+        assert!(dropped.await.unwrap_err().is_cancelled());
+        observed(&arrivals, "notifications/cancelled", 3).await;
+        assert!(server.is_connected(), "取消单个请求不能关闭共享连接");
+        let echo = server
+            .call_raw("echo", serde_json::Map::new(), 1000)
+            .await
+            .unwrap();
+        assert!(!echo.content.is_empty());
+        let records = std::fs::read_to_string(&arrivals)
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str::<serde_json::Value>(line).unwrap())
+            .collect::<Vec<_>>();
+        let calls = records
+            .iter()
+            .filter(|row| row["method"] == "tools/call")
+            .collect::<Vec<_>>();
+        let notices = records
+            .iter()
+            .filter(|row| row["method"] == "notifications/cancelled")
+            .collect::<Vec<_>>();
+        assert_eq!(calls.len(), 4, "取消后不得重放任何旧调用");
+        assert_eq!(notices.len(), 3);
+        for (call, notice) in calls.iter().zip(notices.iter()) {
+            assert_eq!(
+                call["id"], notice["params"]["requestId"],
+                "只能取消原请求编号"
+            );
+        }
+        // 真实连接停止也必须先走该请求的官方取消，不能先使SDK失效。
+        let caller = server.clone();
+        let stopped_request =
+            tokio::spawn(
+                async move { caller.call_raw("hold", serde_json::Map::new(), 3000).await },
+            );
+        observed(&arrivals, "tools/call", 5).await;
+        let old_lifetime = {
+            let connection = server.connection.lock().await;
+            connection.as_ref().unwrap().requests.clone()
+        };
+        server.begin_stop();
+        {
+            let connection = server.connection.lock().await;
+            assert!(
+                !connection.as_ref().unwrap().service.is_closed(),
+                "封口不能抢先关闭仍需发取消的SDK"
+            );
+        }
+        assert_eq!(
+            server
+                .call_raw("must-not-enter", serde_json::Map::new(), 1000)
+                .await
+                .unwrap_err(),
+            McpCallFailure::Cancelled
+        );
+        assert_eq!(
+            stopped_request.await.unwrap().unwrap_err(),
+            McpCallFailure::Cancelled
+        );
+        observed(&arrivals, "notifications/cancelled", 4).await;
+        server.disconnect_checked().await.unwrap();
+        assert_eq!(old_lifetime.active.load(Ordering::Acquire), 0);
+        let rows = std::fs::read_to_string(&arrivals).unwrap();
+        assert!(!rows.contains("must-not-enter"), "封口后请求不得投递到外端");
+        server.connect().await.unwrap();
+        old_lifetime.begin_stop();
+        assert!(
+            !server
+                .call_raw("echo", serde_json::Map::new(), 1000)
+                .await
+                .unwrap()
+                .content
+                .is_empty(),
+            "旧连接收尾不得取消新连接请求"
+        );
+        server.disconnect_checked().await.unwrap();
+        std::fs::remove_dir_all(root).unwrap();
+    }
 
     #[test]
     fn mcp_target_ids_are_origin_namespaced() {

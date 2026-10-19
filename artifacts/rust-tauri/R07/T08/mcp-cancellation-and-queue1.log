@@ -1,0 +1,46 @@
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0308]: mismatched types
+    --> crates/lingxi-service/src/mcp_settings.rs:1914:13
+     |
+1912 |         .request(
+     |          ------- arguments to this method are incorrect
+1913 |             SETTINGS_TOPIC,
+1914 |             state.auth(),
+     |             ^^^^^^^^^^^^ expected `&Arc<AuthService>`, found `&AuthService`
+     |
+     = note: expected reference `&std::sync::Arc<auth::AuthService>`
+                found reference `&auth::AuthService`
+note: method defined here
+    --> crates/lingxi-service/src/mcp_settings.rs:1122:18
+     |
+1122 |     pub async fn request(
+     |                  ^^^^^^^
+...
+1125 |         auth: &Arc<AuthService>,
+     |         -----------------------
+
+error[E0505]: cannot move out of `manager` because it is borrowed
+    --> crates/lingxi-service/src/mcp_settings.rs:2008:14
+     |
+1959 |         let manager = McpSettingsManager::new(
+     |             ------- binding `manager` declared here
+...
+1970 |         let queued = manager.handle(
+     |                      ------- borrow of `manager` occurs here
+...
+2008 |         drop(manager);
+     |              ^^^^^^^ move out of `manager` occurs here
+2009 |         std::fs::remove_dir_all(home).unwrap();
+2010 |     }
+     |     - borrow might be used here, when `queued` is dropped and runs the destructor for type `impl futures::Future<Output = std::result::Result<serde_json::Value, McpSettingsError>>`
+     |
+help: clone the value to increment its reference count
+     |
+1970 |         let queued = manager.clone().handle(
+     |                             ++++++++
+
+Some errors have detailed explanations: E0308, E0505.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `lingxi-service` (lib test) due to 2 previous errors

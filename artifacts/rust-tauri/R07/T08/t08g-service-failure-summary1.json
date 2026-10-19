@@ -1,0 +1,23 @@
+{
+  "candidate": "t08g",
+  "status": "FAILED_NOT_ACCEPTED",
+  "createdAt": "2026-10-18T12:27:18.743542+00:00",
+  "targets": 40,
+  "passed": 907,
+  "failed": 4,
+  "ignored": 0,
+  "receipt": "t08g-service.json",
+  "receiptSha256": "530ef63eaee4261c1b7669c6c247e04363660f7ca281ba35fb7623568b0f4daa",
+  "logSha256": "723a625ae09a5b869854cafc61281843f4d58856410533bfc8ab186e2f9f28af",
+  "sourceFingerprint": "6d00d82b598ad23f9cbbc05f61e9514cf8e7f771a8434f9f5884672b3782cf2f",
+  "sourceUnchanged": true,
+  "oldFailuresRetained": true,
+  "failureScopes": [
+    "LAN self-address login: actual 20sec zero response bytes, cause unproven",
+    "two native drag checks: no order request; actual input prerequisites were not confirmed, failure preserved",
+    "corrupt preferences check: original close failed from Bridge startup import racing injected damage, original HTTP and atomic checks retained"
+  ],
+  "remainingChecks": "Independent first executions continue; original batch notRun is a historical scheduling snapshot, never rewritten",
+  "t08AcceptanceClaimed": false,
+  "fullR07PassClaimed": false
+}

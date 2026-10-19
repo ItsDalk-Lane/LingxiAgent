@@ -94,6 +94,16 @@ pub trait ContextMaterialSource: Send + Sync {
         Ok(false)
     }
     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError>;
+    /// 缺少公开材料采集能力时明确拒绝，不能先加载私有材料再裁掉。
+    fn gather_bridge_guest(
+        &self,
+        _query: &MaterialQuery,
+    ) -> Result<ContextCompileInput, ContextMaterialError> {
+        Err(ContextMaterialError::SkillMaterial {
+            detail: "public Bridge context source is unavailable".into(),
+        })
+    }
+
     fn publication_epoch(
         &self,
     ) -> Option<Arc<lingxi_adapters::storage::agent_memory::ContextMaterialEpoch>> {
@@ -359,7 +369,7 @@ pub(crate) fn proactive_delegation_from_user_dir(
 }
 
 /// 缺失 → 空串（现役 safeReadFile 语义）；其余错误响亮。
-fn read_material(path: &Path) -> Result<String, ContextMaterialError> {
+pub(crate) fn read_material(path: &Path) -> Result<String, ContextMaterialError> {
     match std::fs::read_to_string(path) {
         Ok(text) => Ok(text),
         Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
@@ -392,7 +402,7 @@ pub fn scan_agent_config(
     lingxi_adapters::storage::agent_memory::config::AgentConfigDocument::parse(text)?.scan()
 }
 
-fn parse_agent_material(path: &Path) -> Result<AgentConfigScan, ContextMaterialError> {
+pub(crate) fn parse_agent_material(path: &Path) -> Result<AgentConfigScan, ContextMaterialError> {
     lingxi_adapters::storage::agent_memory::config::read_agent_config(path)
         .and_then(|doc| doc.scan())
         .map_err(|err| ContextMaterialError::Parse {
@@ -451,7 +461,7 @@ pub fn scan_preferences(value: Option<&Value>) -> PreferencesScan {
 
 /// 现役 resolvePersonaSource 回落链（无 migration-degraded 分支——那是
 /// Electron 启动改名失败记录，本服务没有该状态来源；差异报告登记）。
-fn resolve_persona_source(
+pub(crate) fn resolve_persona_source(
     agent_dir: &Path,
     product_dir: &Path,
     yuan_type: &str,
@@ -488,7 +498,7 @@ fn resolve_persona_source(
 }
 
 /// 现役 _readYuan：语言专属优先，空串落通用版。
-fn read_yuan(
+pub(crate) fn read_yuan(
     product_dir: &Path,
     yuan_type: &str,
     zh: bool,
@@ -650,6 +660,61 @@ impl ContextMaterialSource for FileContextMaterialSource {
         &self,
     ) -> Option<Arc<lingxi_adapters::storage::agent_memory::ContextMaterialEpoch>> {
         Some(Arc::clone(&self.material_epoch))
+    }
+    fn gather_bridge_guest(
+        &self,
+        query: &MaterialQuery,
+    ) -> Result<ContextCompileInput, ContextMaterialError> {
+        if query.agent_id.is_empty()
+            || query.agent_id.contains(['/', '\\', '\0'])
+            || matches!(query.agent_id.as_str(), "." | "..")
+        {
+            return Err(ContextMaterialError::SkillMaterial {
+                detail: "invalid public Bridge agent identity".into(),
+            });
+        }
+        let agent_dir = self.agents_root.join(&query.agent_id);
+        let config = parse_agent_material(&agent_dir.join("config.yaml"))?;
+        let locale = config.locale.unwrap_or_else(|| "en".into());
+        let zh = locale.to_lowercase().starts_with("zh");
+        let yuan = config.yuan.unwrap_or_else(|| "lingxi".into());
+        if yuan.is_empty()
+            || yuan.len() > 128
+            || !yuan
+                .chars()
+                .all(|c| c.is_alphanumeric() || matches!(c, '_' | '-'))
+        {
+            return Err(ContextMaterialError::SkillMaterial {
+                detail: "invalid public Bridge persona material".into(),
+            });
+        }
+        Ok(ContextCompileInput {
+            locale,
+            for_subagent: true,
+            memory_enabled: false,
+            user_name: if zh { "访客" } else { "Guest" }.into(),
+            resolved_user_name: if zh { "访客" } else { "Guest" }.into(),
+            agent_name: config.agent_name.unwrap_or_else(|| "Lingxi".into()),
+            agent_id: query.agent_id.clone(),
+            environment_note: String::new(),
+            user_profile_md: None,
+            identity_md: String::new(),
+            yuan_md: read_yuan(&self.product_dir, &yuan, zh)?,
+            agents_md: read_material(&agent_dir.join("AGENTS.public.md"))?,
+            inject_appearance: false,
+            appearance_summary: None,
+            computer_use_available: false,
+            learn_skills_enabled: false,
+            proactive_delegation: false,
+            roster: Vec::new(),
+            memory_md: String::new(),
+            tenets: Vec::new(),
+            session_started_label: String::new(),
+            append_system_lines: Vec::new(),
+            project_context_files: Vec::new(),
+            skills: Vec::new(),
+            cwd: String::new(),
+        })
     }
     fn gather(&self, query: &MaterialQuery) -> Result<ContextCompileInput, ContextMaterialError> {
         let agent_dir = self.agents_root.join(&query.agent_id);
@@ -918,6 +983,60 @@ impl ContextCompilerService {
             None,
             None,
         )
+    }
+
+    /// 访客采集不触碰用户资料、私人记忆、工作区、技能或私有人格文件。
+    pub fn compile_guest_snapshot(
+        &self,
+        agent_id: &str,
+        started: u64,
+    ) -> Result<Arc<CompiledContext>, ContextCompileFailure> {
+        let query = MaterialQuery {
+            agent_id: agent_id.into(),
+            for_subagent: true,
+            session_started_unix_ms: started,
+        };
+        for _ in 0..8 {
+            let epoch = self.materials.publication_epoch();
+            let Some(before) = epoch
+                .as_ref()
+                .map_or(Some(0), |epoch| epoch.stable_revision())
+            else {
+                std::thread::yield_now();
+                continue;
+            };
+            let input = self
+                .materials
+                .gather_bridge_guest(&query)
+                .map_err(ContextCompileFailure::Material)?;
+            let confirm = self
+                .materials
+                .gather_bridge_guest(&query)
+                .map_err(ContextCompileFailure::Material)?;
+            if input != confirm
+                || epoch
+                    .as_ref()
+                    .map_or(Some(0), |epoch| epoch.stable_revision())
+                    != Some(before)
+            {
+                std::thread::yield_now();
+                continue;
+            }
+            let artifact = ContextCompiler::compile_bridge_guest(&input)
+                .map_err(ContextCompileFailure::Compile)?;
+            let mut compiled = CompiledContext::new(artifact);
+            compiled.observation["materialSha256"] =
+                Value::String(sha256_hex(&format!("{input:?}")));
+            compiled.observation["materialRevision"] = Value::from(before);
+            compiled.observation["sessionMemoryEnabled"] = Value::Bool(false);
+            compiled.observation["bridgeRole"] = Value::String("guest".into());
+            return Ok(Arc::new(compiled));
+        }
+        Err(ContextCompileFailure::Material(
+            ContextMaterialError::SkillMaterial {
+                detail: "public Bridge materials changed during acquisition".into(),
+            },
+        ))
     }
 
     /// 实际会话运行使用持久工作区；读取失败响亮退出，不偷偷使用另一目录。

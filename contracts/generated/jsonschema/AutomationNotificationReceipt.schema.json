@@ -1,0 +1,71 @@
+{
+  "$defs": {
+    "AutomationNotificationStatus": {
+      "enum": [
+        "queued",
+        "started",
+        "confirmed",
+        "unknown",
+        "failed"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "channel": {
+      "type": "string"
+    },
+    "createdAt": {
+      "format": "int64",
+      "type": "integer"
+    },
+    "deliveryId": {
+      "type": "string"
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "payloadJson": {
+      "type": "string"
+    },
+    "platformReceipt": true,
+    "recipient": {
+      "type": "string"
+    },
+    "runId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "$ref": "#/$defs/AutomationNotificationStatus"
+    },
+    "triggerId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "updatedAt": {
+      "format": "int64",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "deliveryId",
+    "channel",
+    "recipient",
+    "payloadJson",
+    "status",
+    "createdAt",
+    "updatedAt"
+  ],
+  "title": "AutomationNotificationReceipt",
+  "type": "object"
+}

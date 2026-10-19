@@ -1,0 +1,33 @@
+{
+  "checks": [
+    "actual-component-put-and-get",
+    "actual-self-navigation-loopback-observed"
+  ],
+  "requests": [
+    {
+      "method": "OPTIONS",
+      "path": "/lingxi/v1/cards/navigation-probe",
+      "status": 204
+    },
+    {
+      "method": "PUT",
+      "path": "/lingxi/v1/cards/navigation-probe",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/lingxi/v1/cards/navigation-probe",
+      "status": 200
+    }
+  ],
+  "outcome": {
+    "count": 1,
+    "observed": [
+      {
+        "tokenReadableAndSent": true,
+        "hrefSha256": "1bce5b88df8ae676c93d1c94f56a90ae25b5214d8569cfd9b4998f52c706b894",
+        "path": "/lingxi/v1/cards/navigation-probe"
+      }
+    ]
+  }
+}

@@ -603,13 +603,60 @@ async fn native_settings_reads_keep_real_failures_and_paid_dream_consumption() {
         "/lingxi/v1/settings/snapshot?agentId=agentA",
     ] {
         let (status, response) = fx.request("GET", route, Value::Null).await;
-        assert_eq!(status, 500, "{route}: {response}");
-        assert!(response["error"].is_string());
-        assert!(response.get("providers").is_none());
-        assert!(response.get("models").is_none());
-        assert!(response.get("config").is_none());
+        // R07 现役配置由已发布 Source 提供，损坏旧目录不能伪造读取失败。
+        assert_eq!(status, 200, "{route}: {response}");
+        assert!(response.get("error").is_none(), "{route}: {response}");
+        match route {
+            "/lingxi/v1/providers/summary" => {
+                assert!(
+                    response["providers"]["persona-stub"].is_object(),
+                    "{response}"
+                );
+            }
+            "/lingxi/v1/models" => {
+                assert!(response["models"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|row| row["id"] == "chat-model"));
+            }
+            _ => assert_eq!(
+                response["globalModels"]["models"]["memory"]["id"],
+                "memory-model"
+            ),
+        }
     }
     std::fs::remove_file(fx.home.join("provider-catalog.json")).unwrap();
+    // 对真实消费入口制造磁盘损坏；错误必须保留，不能返回空列表或空配置。
+    let chat_preferences = fx.home.join("chat-input-settings.json");
+    let previous_chat = std::fs::read(&chat_preferences).ok();
+    std::fs::write(&chat_preferences, "{broken actual chat settings").unwrap();
+    let (status, response) = fx.request("GET", "/lingxi/v1/models", Value::Null).await;
+    assert_eq!(status, 500, "{response}");
+    assert!(response["error"].is_string());
+    assert!(response.get("models").is_none());
+    match previous_chat {
+        Some(bytes) => std::fs::write(&chat_preferences, bytes).unwrap(),
+        None => std::fs::remove_file(&chat_preferences).unwrap(),
+    }
+    let preferences = fx.home.join("user/preferences.json");
+    std::fs::create_dir_all(preferences.parent().unwrap()).unwrap();
+    let previous_preferences = std::fs::read(&preferences).ok();
+    std::fs::write(&preferences, "{broken actual preferences").unwrap();
+    for route in [
+        "/lingxi/v1/settings/snapshot?agentId=agentA",
+        "/lingxi/v1/preferences/models",
+    ] {
+        let (status, response) = fx.request("GET", route, Value::Null).await;
+        assert_eq!(status, 500, "{route}: {response}");
+        assert!(response["error"].is_string());
+        assert!(response.get("config").is_none());
+        assert!(response.get("models").is_none());
+    }
+    match previous_preferences {
+        Some(bytes) => std::fs::write(&preferences, bytes).unwrap(),
+        None => std::fs::remove_file(&preferences).unwrap(),
+    }
     let compiled = fx.home.join("agents/agentA/memory/facts.md");
     std::fs::create_dir(&compiled).unwrap();
     let (status, body) = fx
@@ -1534,7 +1581,7 @@ async fn native_initialization_cache_summary_and_real_fifteen_second_timeout() {
     let fx = Fixture::start("initialization").await;
     seed(&fx, "agentA", "- 初始化真实资料");
     let result = electron_ui(&fx, "initialization").await;
-    assert_eq!(result["checks"].as_array().unwrap().len(), 12);
+    assert_eq!(result["checks"].as_array().unwrap().len(), 13);
     std::fs::write(
         evidence_dir().join("initialization-electron.json"),
         serde_json::to_vec_pretty(&result).unwrap(),

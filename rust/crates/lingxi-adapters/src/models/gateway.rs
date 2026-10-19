@@ -12,7 +12,7 @@ use std::collections::BTreeMap;
 use std::sync::{Arc, RwLock};
 
 use lingxi_kernel::model_exchange::{
-    CredentialAuthKind, CredentialReference, ModelGatewayError, ModelGatewayPort,
+    CredentialAuthKind, CredentialReference, ModelGatewayError, ModelGatewayPort, ModelOperation,
     ModelRouteRequest, ProtocolFamily, ResolvedModelRoute,
 };
 
@@ -33,10 +33,55 @@ struct GatewaySnapshot {
     generation: u64,
     providers: BTreeMap<String, ProviderEntry>,
     models: super::config::ModelsSection,
+    catalog: BTreeMap<(String, String), super::config::CatalogModel>,
 }
 
 impl GatewaySnapshot {
     fn from_config(generation: u64, config: ModelPlaneConfig) -> Self {
+        let mut catalog = BTreeMap::new();
+        for (id, provider) in &config.providers {
+            if let Some(models) = &provider.models {
+                for model in models {
+                    catalog.insert((id.clone(), model.id.clone()), model.clone());
+                }
+            }
+        }
+        for binding in [
+            config.models.chat.as_ref(),
+            config.models.title.as_ref(),
+            config.models.summarize.as_ref(),
+            config.models.memory.as_ref(),
+            config.models.knowledge.as_ref(),
+            config.models.vision.as_ref(),
+            config.models.approval.as_ref(),
+            config.models.guard.as_ref(),
+            config.models.embedding.as_ref(),
+            config.models.rerank.as_ref(),
+            config.models.image.as_ref(),
+            config.models.video.as_ref(),
+            config.models.speech.as_ref(),
+            config.models.speech_recognition.as_ref(),
+        ]
+        .into_iter()
+        .flatten()
+        {
+            if config
+                .providers
+                .get(&binding.provider)
+                .is_some_and(|provider| provider.models.is_none())
+            {
+                catalog
+                    .entry((binding.provider.clone(), binding.model.clone()))
+                    .or_insert_with(|| super::config::CatalogModel {
+                        id: binding.model.clone(),
+                        protocol: None,
+                        compat: binding.compat.clone(),
+                        capabilities: binding.capabilities.clone(),
+                        group_id: binding.group_id.clone(),
+                        metadata: Default::default(),
+                    });
+            }
+        }
         let providers = config
             .providers
             .iter()
@@ -57,6 +102,7 @@ impl GatewaySnapshot {
             generation,
             providers,
             models: config.models,
+            catalog,
         }
     }
 }
@@ -82,6 +128,15 @@ impl ConfigModelGateway {
         }
     }
 
+    /// 受信宿主的临时探测快照沿用已授权代次，不发布到全局路由。
+    pub fn from_validated_generation(config: ModelPlaneConfig, generation: u64) -> Self {
+        Self {
+            current: Arc::new(RwLock::new(Arc::new(GatewaySnapshot::from_config(
+                generation, config,
+            )))),
+        }
+    }
+
     /// Atomically swaps in a new validated config and returns the new
     /// generation (C05). Validation happened in
     /// [`ModelPlaneConfig::validate`] before this call — a reload never
@@ -102,6 +157,7 @@ impl ConfigModelGateway {
             ("title", &models.title),
             ("summarize", &models.summarize),
             ("memory", &models.memory),
+            ("knowledge", &models.knowledge),
             ("vision", &models.vision),
             ("approval", &models.approval),
             ("guard", &models.guard),
@@ -157,6 +213,7 @@ impl ConfigModelGateway {
             .expect("gateway snapshot lock")
             .providers
             .iter()
+            .filter(|(_, entry)| !entry.endpoint.is_empty())
             .map(|(id, entry)| (id.clone(), entry.endpoint.clone()))
             .collect()
     }
@@ -174,6 +231,35 @@ impl ConfigModelGateway {
                     entry.protocol.config_name().into(),
                     entry.endpoint.clone(),
                 )
+            })
+            .collect()
+    }
+
+    /// 同一快照内的有效目录，只含模型声明；不存在凭证出口。
+    pub fn catalog_models(&self) -> BTreeMap<String, Vec<super::config::CatalogModel>> {
+        let snapshot = self.current.read().expect("gateway snapshot lock");
+        let mut result: BTreeMap<String, Vec<super::config::CatalogModel>> = BTreeMap::new();
+        for ((provider, _), model) in &snapshot.catalog {
+            result
+                .entry(provider.clone())
+                .or_default()
+                .push(model.clone());
+        }
+        result
+    }
+
+    /// 协作会话只列出当前快照可作文本对话的目录项。
+    pub fn chat_model_keys(&self) -> Vec<String> {
+        let snapshot = self.current.read().expect("gateway snapshot lock");
+        snapshot
+            .catalog
+            .iter()
+            .filter_map(|((provider, model), entry)| {
+                let provider_entry = snapshot.providers.get(provider)?;
+                entry
+                    .protocol_for(provider, provider_entry.protocol, ModelOperation::Chat)
+                    .filter(|protocol| protocol.serves(ModelOperation::Chat.operation_class()))
+                    .map(|_| format!("{provider}/{model}"))
             })
             .collect()
     }
@@ -198,27 +284,10 @@ impl ConfigModelGateway {
         model: &str,
     ) -> Option<super::config::RouteCompatHints> {
         let snapshot = self.current.read().expect("gateway snapshot lock");
-        let models = &snapshot.models;
-        let found = [
-            models.chat.as_ref(),
-            models.title.as_ref(),
-            models.summarize.as_ref(),
-            models.memory.as_ref(),
-            models.vision.as_ref(),
-            models.approval.as_ref(),
-            models.guard.as_ref(),
-            models.embedding.as_ref(),
-            models.rerank.as_ref(),
-            models.image.as_ref(),
-            models.video.as_ref(),
-            models.speech.as_ref(),
-            models.speech_recognition.as_ref(),
-        ]
-        .into_iter()
-        .flatten()
-        .find(|binding| binding.provider == provider && binding.model == model)
-        .and_then(|binding| binding.compat.clone());
-        found
+        snapshot
+            .catalog
+            .get(&(provider.to_string(), model.to_string()))
+            .and_then(|model| model.compat.clone())
     }
 }
 
@@ -288,6 +357,20 @@ fn resolve_in_snapshot(
     ),
     ModelGatewayError,
 > {
+    let mut canonical_request = request.clone();
+    if let Some(provider) = canonical_request.provider.as_deref() {
+        if !snapshot.providers.contains_key(provider) {
+            let alias = match provider {
+                "openai-codex-oauth" => Some("openai-codex"),
+                "openai-codex" => Some("openai-codex-oauth"),
+                _ => None,
+            };
+            if let Some(alias) = alias.filter(|alias| snapshot.providers.contains_key(*alias)) {
+                canonical_request.provider = Some(alias.into());
+            }
+        }
+    }
+    let request = &canonical_request;
     // Every operation resolves its OWN binding (chat, the six auxiliary
     // slots, and the six T06 operation bindings share one
     // independent-resolution surface); an operation without a binding
@@ -296,42 +379,26 @@ fn resolve_in_snapshot(
     let configured: Option<&super::config::RouteBinding> =
         snapshot.models.binding_for_operation(request.operation);
     // The pin pair rule (C04): provider+model are ONE identity unit.
-    let binding = match (&request.provider, &request.model) {
+    let mut binding = match (&request.provider, &request.model) {
         (Some(provider), Some(model)) => {
             if !snapshot.providers.contains_key(provider) {
                 return Err(ModelGatewayError::UnknownProvider {
                     provider: provider.clone(),
                 });
             }
-            // 会话选择只继承同一快照中已明确配置的同一对元数据；
-            // 未配置模型仍没有能力声明，真实派发继续在发送前拒绝。
-            let models = &snapshot.models;
-            [
-                models.chat.as_ref(),
-                models.title.as_ref(),
-                models.summarize.as_ref(),
-                models.memory.as_ref(),
-                models.vision.as_ref(),
-                models.approval.as_ref(),
-                models.guard.as_ref(),
-                models.embedding.as_ref(),
-                models.rerank.as_ref(),
-                models.image.as_ref(),
-                models.video.as_ref(),
-                models.speech.as_ref(),
-                models.speech_recognition.as_ref(),
-            ]
-            .into_iter()
-            .flatten()
-            .find(|binding| &binding.provider == provider && &binding.model == model)
-            .cloned()
-            .unwrap_or_else(|| super::config::RouteBinding {
+            let model_entry = snapshot
+                .catalog
+                .get(&(provider.clone(), model.clone()))
+                .ok_or_else(|| ModelGatewayError::RouteNotConfigured {
+                    operation: format!("unknown catalog model {provider}/{model}"),
+                })?;
+            super::config::RouteBinding {
                 provider: provider.clone(),
                 model: model.clone(),
-                compat: None,
-                group_id: None,
-                capabilities: None,
-            })
+                compat: model_entry.compat.clone(),
+                group_id: model_entry.group_id.clone(),
+                capabilities: model_entry.capabilities.clone(),
+            }
         }
         (Some(provider), None) => match configured {
             Some(binding) if &binding.provider == provider => binding.clone(),
@@ -363,17 +430,36 @@ fn resolve_in_snapshot(
             provider: binding.provider.clone(),
         });
     };
+    let model_entry = snapshot
+        .catalog
+        .get(&(binding.provider.clone(), binding.model.clone()))
+        .ok_or_else(|| ModelGatewayError::RouteNotConfigured {
+            operation: format!(
+                "unknown catalog model {}/{}",
+                binding.provider, binding.model
+            ),
+        })?;
+    binding.compat = model_entry.compat.clone().or(binding.compat);
+    binding.capabilities = model_entry.capabilities.clone().or(binding.capabilities);
+    binding.group_id = model_entry.group_id.clone().or(binding.group_id);
+    let protocol = model_entry
+        .protocol_for(&binding.provider, entry.protocol, request.operation)
+        .ok_or_else(|| ModelGatewayError::OperationUnsupportedByProvider {
+            operation: request.operation.describe(),
+            provider: binding.provider.clone(),
+            protocol: entry.protocol.config_name(),
+        })?;
     // The family↔operation servable matrix (a contract fact): the
     // resolved provider's family must serve the requested operation
     // class. Load-time validation already refuses such a binding; a
     // pinned pair (provider+model) bypasses the binding table, so the
     // matrix is re-enforced HERE at resolution — never a silent
     // re-route onto another family's wire shape.
-    if !entry.protocol.serves(request.operation.operation_class()) {
+    if !protocol.serves(request.operation.operation_class()) {
         return Err(ModelGatewayError::OperationUnsupportedByProvider {
             operation: request.operation.describe(),
             provider: binding.provider.clone(),
-            protocol: entry.protocol.config_name(),
+            protocol: protocol.config_name(),
         });
     }
     let auth_kind = match &entry.auth {
@@ -402,7 +488,7 @@ fn resolve_in_snapshot(
         provider: binding.provider.clone(),
         model: binding.model,
         operation: request.operation,
-        protocol: entry.protocol,
+        protocol,
         endpoint: entry.endpoint.clone(),
         credential: CredentialReference {
             // The reference's provider id is the RESOLVED route's
@@ -521,16 +607,24 @@ mod tests {
             err,
             ModelGatewayError::ModelPinRequiresProvider { .. }
         ));
-        // A full pair pin resolves the pair explicitly — even onto a model
-        // id the configured route does not name (the pin IS the identity).
+        // 完整身份仍须命中当前目录，不能仅凭模型名称借用供应商凭证。
+        let unknown = gateway.resolve_route(&ModelRouteRequest {
+            operation: ModelOperation::Chat,
+            provider: Some("main".to_string()),
+            model: Some("other-model".to_string()),
+        });
+        assert!(matches!(
+            unknown,
+            Err(ModelGatewayError::RouteNotConfigured { .. })
+        ));
         let pinned = gateway
             .resolve_route(&ModelRouteRequest {
                 operation: ModelOperation::Chat,
                 provider: Some("main".to_string()),
-                model: Some("other-model".to_string()),
+                model: Some("gpt-test".to_string()),
             })
             .expect("explicit pair resolves");
-        assert_eq!(pinned.model, "other-model");
+        assert_eq!(pinned.model, "gpt-test");
         // Provider-only pin must equal the configured route's provider.
         let err = gateway
             .resolve_route(&ModelRouteRequest {
@@ -626,16 +720,18 @@ mod tests {
         assert_eq!(known.capabilities.tools, Some(true));
         assert_eq!(known.compat.as_ref().unwrap().context_window, Some(12345));
         assert_eq!(known.route.config_generation, 1);
-        let unknown = gateway.resolve_dispatch(&pin("unconfigured")).unwrap();
-        assert_eq!(unknown.capabilities.tools, None);
-        assert!(unknown.compat.is_none());
+        assert!(matches!(
+            gateway.resolve_dispatch(&pin("unconfigured")),
+            Err(ModelGatewayError::RouteNotConfigured { .. })
+        ));
         config["models"]["chat"]["model"] = serde_json::json!("new");
         config["models"]["chat"]["compat"]["contextWindow"] = serde_json::json!(54321);
         gateway.reload(ModelPlaneConfig::from_value(config).unwrap());
-        let retired = gateway.resolve_dispatch(&pin("old")).unwrap();
-        assert_eq!(retired.capabilities.tools, None);
-        assert!(retired.compat.is_none());
-        assert_eq!(retired.route.config_generation, 2);
+        // 上代目录已经没有的模型必须拒绝，不能以“能力未知”继续调用。
+        assert!(matches!(
+            gateway.resolve_dispatch(&pin("old")),
+            Err(ModelGatewayError::RouteNotConfigured { .. })
+        ));
         let current = gateway.resolve_dispatch(&pin("new")).unwrap();
         assert_eq!(current.capabilities.tools, Some(true));
         assert_eq!(current.compat.unwrap().context_window, Some(54321));

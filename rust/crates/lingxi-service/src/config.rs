@@ -1030,6 +1030,14 @@ pub fn read_service_config(path: &Path) -> Result<ServiceConfigFile, ConfigError
             path: path.to_path_buf(),
             detail: format!("not valid JSON: {source}"),
         })?;
+    service_config_from_value(path, &value)
+}
+
+/// 来源已取得有界文件快照时复用同一严格校验，避免再次无界读取可被替换的路径。
+pub(crate) fn service_config_from_value(
+    path: &Path,
+    value: &serde_json::Value,
+) -> Result<ServiceConfigFile, ConfigError> {
     let detail_of = |detail: String| ConfigError::ConfigFileInvalid {
         path: path.to_path_buf(),
         detail,

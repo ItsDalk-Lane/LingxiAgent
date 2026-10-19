@@ -1,0 +1,12 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts (8 tests) 44ms
+ ✓ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx (12 tests) 866ms
+     ✓ refreshes only while the real manager says a background connector is still connecting  507ms
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  19:10:33
+   Duration  1.78s (transform 545ms, setup 79ms, import 774ms, tests 909ms, environment 798ms)
+

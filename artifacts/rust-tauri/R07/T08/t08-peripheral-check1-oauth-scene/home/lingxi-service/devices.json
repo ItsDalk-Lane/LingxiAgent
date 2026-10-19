@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "devices": [
+    {
+      "schemaVersion": 1,
+      "deviceId": "device_e4fc18a37994e36e5b614dd5381ef4e3",
+      "userId": "user_local",
+      "displayName": "CLI",
+      "deviceKind": "cli",
+      "status": "active",
+      "trustState": "lan",
+      "createdAtUnixMs": 1792308512090,
+      "lastSeenAtUnixMs": 1792308513384
+    }
+  ],
+  "createdAtUnixMs": 1792308510478,
+  "updatedAtUnixMs": 1792308513384
+}

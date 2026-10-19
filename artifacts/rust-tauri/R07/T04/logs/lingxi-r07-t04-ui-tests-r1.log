@@ -1,0 +1,30 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/components/BrowserCard.test.tsx (8 tests | 1 failed) 55ms
+     × collapses the card locally without stopping or closing the session browser 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/BrowserCard.test.tsx > BrowserCard collapse semantics > collapses the card locally without stopping or closing the session browser
+Error: expect(received).toBeInTheDocument()
+
+received value must be an HTMLElement or an SVGElement.
+Received has type:  Null
+Received has value: null
+ ❯ desktop/src/react/__tests__/components/BrowserCard.test.tsx:70:20
+     68|
+     69|     render(<BrowserCard />);
+     70|     expect(card()).toBeInTheDocument();
+       |                    ^
+     71|
+     72|     fireEvent.click(screen.getByTitle('browser.collapse'));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 72 passed (73)
+   Start at  05:19:06
+   Duration  1.42s (transform 1.23s, setup 122ms, import 1.69s, tests 723ms, environment 1.96s)
+

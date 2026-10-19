@@ -54,7 +54,9 @@ fn refuse(detail: String) -> ProtocolError {
 /// The origin allowlist of a provider-endpoint set (invalid endpoints
 /// refuse loudly — they were validated at config load, so a failure here
 /// is a wiring bug).
-fn parse_origins(endpoints: &[String]) -> Result<Vec<String>, ProtocolError> {
+pub fn prepare_provider_origins(
+    endpoints: &[String],
+) -> Result<PreparedProviderOrigins, ProtocolError> {
     let mut origins = Vec::new();
     for endpoint in endpoints {
         let parts = parse_url(endpoint).map_err(|_| {
@@ -65,8 +67,11 @@ fn parse_origins(endpoints: &[String]) -> Result<Vec<String>, ProtocolError> {
         })?;
         origins.push(parts.origin);
     }
-    Ok(origins)
+    Ok(PreparedProviderOrigins(origins))
 }
+
+/// 已完成地址验证的出口来源，只能由统一校验入口产生。
+pub struct PreparedProviderOrigins(Vec<String>);
 
 /// The parse of one candidate URL's security-relevant parts.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -379,7 +384,7 @@ impl EgressGuard {
         network: std::sync::Arc<super::network::NetworkPlane>,
     ) -> Result<Self, ProtocolError> {
         Ok(Self {
-            allowed_origins: std::sync::RwLock::new(parse_origins(endpoints)?),
+            allowed_origins: std::sync::RwLock::new(prepare_provider_origins(endpoints)?.0),
             client: network.client_handle(HttpTimeouts::default())?,
             timeouts: HttpTimeouts::default(),
             resolver: system_resolver(),
@@ -397,9 +402,16 @@ impl EgressGuard {
     /// this after a config swap so same-origin egress follows the CURRENT
     /// endpoints; an in-flight download keeps the origins it started with).
     pub fn set_provider_endpoints(&self, endpoints: &[String]) -> Result<(), ProtocolError> {
-        let origins = parse_origins(endpoints)?;
-        *self.allowed_origins.write().expect("egress origins lock") = origins;
+        self.publish_provider_origins(prepare_provider_origins(endpoints)?);
         Ok(())
+    }
+
+    /// 发布已验证来源，不在已切换配置之后重新执行可失败的解析。
+    pub fn publish_provider_origins(&self, origins: PreparedProviderOrigins) {
+        *self
+            .allowed_origins
+            .write()
+            .unwrap_or_else(|p| p.into_inner()) = origins.0;
     }
 
     /// Policy check of ONE URL (no fetch, no DNS). Public for the service

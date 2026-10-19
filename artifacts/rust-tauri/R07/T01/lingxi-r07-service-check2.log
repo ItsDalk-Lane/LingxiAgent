@@ -1,0 +1,53 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>>: LowerHex` is not satisfied
+  --> crates/lingxi-service/src/automation.rs:20:29
+   |
+20 |     format!("trigger-{:x}", Sha256::digest(input))
+   |                      ----   ^^^^^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `Array<u8, UInt<UInt<UInt<UInt<UInt<..., ...>, ...>, ...>, ...>, ...>>`
+   |                      |
+   |                      required by this formatting parameter
+   |
+   = help: the following other types implement trait `LowerHex`:
+             &T
+             &mut T
+             Saturating<T>
+             Wrapping<T>
+             axum::body::Bytes
+             bytes::bytes_mut::BytesMut
+             compiler_builtins::math::libm_math::support::big::i256
+             compiler_builtins::math::libm_math::support::big::u256
+           and 63 others
+   = note: the full name for the type has been written to '/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-d62f86e79b77588b.long-type-6349846612465362974.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+
+warning: unused variable: `cancellation`
+   --> crates/lingxi-service/src/automation_daily.rs:254:29
+    |
+254 |             Ok((http, body, cancellation)) if (200..300).contains(&http) && body["ok"] == true => {
+    |                             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_cancellation`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+error[E0507]: cannot move out of `*target` which is behind a shared reference
+   --> crates/lingxi-service/src/automation_heartbeat.rs:689:19
+    |
+689 |     u64::try_from(target.signed_duration_since(now).num_milliseconds())
+    |                   ^^^^^^ -------------------------- `*target` moved due to this method call
+    |                   |
+    |                   move occurs because `*target` has type `chrono::DateTime<Tz>`, which does not implement the `Copy` trait
+    |
+note: `chrono::DateTime::<Tz>::signed_duration_since` takes ownership of the receiver `self`, which moves `*target`
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/chrono-0.4.45/src/datetime/mod.rs:554:9
+    |
+554 |         self,
+    |         ^^^^
+help: consider cloning the value if the performance cost is acceptable
+    |
+689 |     u64::try_from(target.clone().signed_duration_since(now).num_milliseconds())
+    |                         ++++++++
+
+Some errors have detailed explanations: E0277, E0507.
+For more information about an error, try `rustc --explain E0277`.
+warning: `lingxi-service` (lib) generated 1 warning
+error: could not compile `lingxi-service` (lib) due to 2 previous errors; 1 warning emitted

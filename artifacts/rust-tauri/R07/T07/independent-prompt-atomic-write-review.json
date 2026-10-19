@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "status": "CODE_REVIEW_NO_NEW_FINDINGS_FINAL_CANDIDATE_PENDING",
+  "checkedAt": "2026-10-18T03:17:13.929727+00:00",
+  "reviewedSources": {
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "c4f90817e53c740ee5d0383030a38786f21508f6cafb50fd2c48369e60e8a20c",
+    "rust/crates/lingxi-service/tests/r07_workflow/mod.rs": "cb0804cf472cc880e1836c0399a2632e18f1f265970ef042ffb8a502666e0f1b"
+  },
+  "conclusions": [
+    "同进程AtomicU64独占序号配合进程号与时间，避免原低分辨率时间并发重名；Relaxed仅负责唯一分配，未用于发布同步。",
+    "create_new保证已有同名临时文件不被截断；open失败不清他人文件。只有成功create_new的写入调用才走自身临时名清理。",
+    "write_all完成并关闭句柄后才rename；并发目标仍为最后一次完整rename结果，不承诺调用先后序；不改变原有成功/失败返回契约。",
+    "写入失败清理自身临时文件，清理失败明确保留原错误kind并说明清理错误。rename失败仍保留原返回及既有清理方式。",
+    "回归实际16个OS线程、每轮屏障同步、128轮共2048次真实IO；正文约36—40KiB，最终JSON、runId、writer/round、完整正文和toolNames一致，成功后无临时残留。",
+    "该回归不证明断电持久化、Windows目标替换或恶意外部目录替换；当前修改也未宣称新增这些保证。"
+  ],
+  "receipts": [
+    {
+      "receipt": "dev-prompt-race1.json",
+      "exitCode": 101,
+      "logSha256": "61bf7f9df486d6c261a21b8a4f5035335125e842a38f4dcccfaa32c55adbe841",
+      "logHashMatches": true,
+      "sourceUnchanged": true,
+      "summaries": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.93s"
+      ],
+      "regressionResult": [
+        "test workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier ... FAILED"
+      ]
+    },
+    {
+      "receipt": "dev-prompt-race2.json",
+      "exitCode": 0,
+      "logSha256": "691b076a21cc652dec7d8c93f7c7a7f019d3ea28ed2022526d649e8aa692213f",
+      "logHashMatches": true,
+      "sourceUnchanged": true,
+      "summaries": [
+        "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.23s"
+      ],
+      "regressionResult": [
+        "test workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier ... ok"
+      ]
+    }
+  ],
+  "cargoExecutedByReviewer": false,
+  "sourceMutatedByReviewer": false
+}

@@ -1,0 +1,20 @@
+{
+  "stage": "R07-T06",
+  "purpose": "development_not_final_acceptance",
+  "label": "t06gen1",
+  "command": "cargo check --manifest-path rust/Cargo.toml --locked -p lingxi-service",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "5047791787d6855f32a2e6e4652ecc0153f6e0479a0fc85fdf1bf9f1e5f61ec4",
+  "sourceFingerprintAfter": "5047791787d6855f32a2e6e4652ecc0153f6e0479a0fc85fdf1bf9f1e5f61ec4",
+  "sourceUnchanged": true,
+  "exitCode": 101,
+  "durationSec": 17.5,
+  "logSha256": "667c47e3cd5171161b95a991177219174ee827063ddc7e26fdacc001d4b7961f",
+  "logTail": "570 |         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),\n     |                                                                     +\n\nerror[E0282]: type annotations needed\n   --> crates/lingxi-service/src/media_generate.rs:933:25\n    |\n933 |         Ok(metadata) if metadata.is_file() => metadata,\n    |                         ^^^^^^^^ cannot infer type\n\nerror[E0282]: type annotations needed\n    --> crates/lingxi-service/src/media_generate.rs:1025:9\n     |\n1025 |     let mut file = tokio::fs::File::open(path).await?;\n     |         ^^^^^^^^\n1026 |     file.seek(std::io::SeekFrom::Start(start)).await?;\n     |     ---- type must be known at this point\n     |\nhelp: consider giving `file` an explicit type\n     |\n1025 |     let mut file: /* Type */ = tokio::fs::File::open(path).await?;\n     |                 ++++++++++++\n\nerror[E0597]: `state` does not live long enough\n    --> crates/lingxi-service/src/media_generate.rs:1051:24\n     |\n1033 |     State(state): State<ServiceState>,\n     |           ----- binding `state` declared here\n...\n1051 |     let Some(opener) = state.media_file_opener() else {\n     |                        ^^^^^ borrowed value does not live long enough\n...\n1060 |     match tokio::task::spawn_blocking(move || opener(&path)).await {\n     |           -------------------------------------------------- argument requires that `state` is borrowed for `'static`\n...\n1075 | }\n     | - `state` dropped here while still borrowed\n     |\nnote: requirement that the value outlives `'static` introduced here\n    --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/blocking.rs:222:35\n     |\n 222 |         F: FnOnce() -> R + Send + 'static,\n     |                                   ^^^^^^^\n\nerror[E0308]: mismatched types\n    --> crates/lingxi-service/src/media_generate.rs:1090:69\n     |\n1090 |         Err(rejection) => return EndpointError::from_json_rejection(rejection).into_response(),\n     |                                  ---------------------------------- ^^^^^^^^^ expected `&JsonRejection`, found `JsonRejection`\n     |                                  |\n     |                                  arguments to this function are incorrect\n     |\nnote: associated function defined here\n    --> crates/lingxi-service/src/lib.rs:3376:12\n     |\n3376 |     pub fn from_json_rejection(rejection: &axum::extract::rejection::JsonRejection) -> Self {\n     |            ^^^^^^^^^^^^^^^^^^^ ---------------------------------------------------\nhelp: consider borrowing here\n     |\n1090 |         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),\n     |                                                                     +\n\nSome errors have detailed explanations: E0282, E0308, E0408, E0433, E0597, E0599.\nFor more information about an error, try `rustc --explain E0282`.\nerror: could not compile `lingxi-service` (lib) due to 21 previous errors\n"
+}

@@ -1,5 +1,5 @@
 //! 后台任务查询及停止复用真实子 Run、原取消树和媒体交付栅栏。
-use std::sync::{Arc, Weak};
+use std::sync::{Arc, OnceLock, Weak};
 
 use axum::{
     extract::{Path, State},
@@ -25,6 +25,8 @@ pub struct TaskTools {
     storage: Arc<RunDatabase>,
     runs: Weak<RunSupervisor>,
     operations: Option<Arc<crate::operations::OperationService>>,
+    media: OnceLock<Weak<crate::media::MediaService>>,
+    workflows: OnceLock<Weak<crate::workflow::WorkflowService>>,
 }
 impl TaskTools {
     pub fn new(
@@ -36,14 +38,71 @@ impl TaskTools {
             storage,
             runs,
             operations,
+            media: OnceLock::new(),
+            workflows: OnceLock::new(),
         }
+    }
+    pub fn set_media(&self, media: Weak<crate::media::MediaService>) -> Result<(), String> {
+        self.media
+            .set(media)
+            .map_err(|_| "后台媒体入口已绑定".into())
+    }
+    pub fn set_workflows(
+        &self,
+        workflows: Weak<crate::workflow::WorkflowService>,
+    ) -> Result<(), String> {
+        self.workflows
+            .set(workflows)
+            .map_err(|_| "后台工作流入口已绑定".into())
     }
     async fn list(&self, session: &str, status: Option<&str>) -> Result<Value, String> {
         let mut tasks = subagent_threads::background_tasks(&self.storage, Some(session), None)
             .await
             .map_err(|e| e.to_string())?;
+        let owner = lingxi_adapters::storage::session_tree::get_session_row(&self.storage, session)
+            .await
+            .map_err(|e| e.to_string())?
+            .ok_or("后台任务会话不存在")?
+            .owner_user_id;
+        let jobs = lingxi_adapters::storage::media::list_session(&self.storage, session, &owner)
+            .await
+            .map_err(|e| e.to_string())?;
+        let linked_trackers = jobs
+            .iter()
+            .filter_map(|job| job.state["tracker"].as_str().map(String::from))
+            .collect::<std::collections::BTreeSet<_>>();
+        let linked_runs = jobs
+            .iter()
+            .filter_map(|job| job.execution_run_id.clone())
+            .collect::<std::collections::BTreeSet<_>>();
         if let Some(operations) = &self.operations {
-            tasks.extend(operations.owned_background_tasks(session));
+            tasks.extend(
+                operations
+                    .owned_background_tasks(session)
+                    .into_iter()
+                    .filter(|task| {
+                        !task["taskId"]
+                            .as_str()
+                            .is_some_and(|id| linked_trackers.contains(id))
+                            && !task["meta"]["runId"]
+                                .as_str()
+                                .is_some_and(|run| linked_runs.contains(run))
+                    }),
+            );
+        }
+        for job in jobs {
+            let receipt = crate::media::public_job(&job)?;
+            let status = match job.phase {
+                lingxi_adapters::storage::media::MediaPhase::Completed => "resolved",
+                lingxi_adapters::storage::media::MediaPhase::Failed
+                | lingxi_adapters::storage::media::MediaPhase::Cancelled
+                | lingxi_adapters::storage::media::MediaPhase::Unknown => "failed",
+                _ => "pending",
+            };
+            tasks.push(json!({"taskId":job.operation_id,"status":status,"type":job.kind,"deferredAtUnixMs":job.created_at,"result":if status=="resolved"{receipt["files"].clone()}else{Value::Null},"reason":receipt["message"],"parentSessionId":job.session_id,"meta":{"type":"media","runId":job.execution_run_id,"mediaGeneration":receipt}}));
+        }
+        if let Some(workflows) = self.workflows.get().and_then(Weak::upgrade) {
+            tasks.extend(workflows.list_for_session(session)?);
         }
         for task in &mut tasks {
             let date = task["deferredAtUnixMs"]
@@ -58,6 +117,44 @@ impl TaskTools {
         Ok(json!({"tasks":tasks,"available":true}))
     }
     async fn stop(&self, session: &str, task: &str, subagent_only: bool) -> Result<Value, String> {
+        if let Some(workflows) = self.workflows.get().and_then(Weak::upgrade) {
+            if let Some(result) = workflows
+                .cancel_task(session, task, std::time::Duration::from_secs(3))
+                .await?
+            {
+                return Ok(result);
+            }
+        }
+
+        if !subagent_only {
+            if let Some(job) = lingxi_adapters::storage::media::get(&self.storage, task)
+                .await
+                .map_err(|e| e.to_string())?
+            {
+                if job.session_id != session {
+                    return Ok(json!({"status":"rejected","reason":"session_mismatch"}));
+                }
+                let owner =
+                    lingxi_adapters::storage::session_tree::get_session_row(&self.storage, session)
+                        .await
+                        .map_err(|e| e.to_string())?
+                        .ok_or("后台媒体会话不存在")?
+                        .owner_user_id;
+                if job.owner_subject != owner {
+                    return Ok(json!({"status":"rejected","reason":"session_mismatch"}));
+                }
+                let media = self
+                    .media
+                    .get()
+                    .and_then(Weak::upgrade)
+                    .ok_or("后台媒体停止入口不可用")?;
+                let was_terminal = job.phase.terminal();
+                let receipt = media.cancel_owned(task, session, &owner).await?;
+                return Ok(
+                    json!({"status":if was_terminal{"already_stopped"}else{"aborted"},"remoteCancel":receipt["remoteCancel"],"remoteOutcome":receipt["remoteOutcome"],"localDeliveryStopped":receipt["localDeliveryStopped"],"mediaGeneration":receipt}),
+                );
+            }
+        }
         let Some(record) = subagent_threads::background_tasks(&self.storage, None, Some(task))
             .await
             .map_err(|e| e.to_string())?
@@ -84,6 +181,9 @@ impl TaskTools {
         let Some(runs) = self.runs.upgrade() else {
             return Ok(json!({"status":"rejected","reason":"no_handler"}));
         };
+        if let Some(media) = self.media.get().and_then(Weak::upgrade) {
+            media.cancel_from_run(task).await?;
+        }
         // taskId就是实际child Run的不可复用id，不按线程当前Run重新定位。
         Ok(
             match runs.cancel_run(task, "user stopped background task") {
@@ -96,13 +196,29 @@ impl TaskTools {
     }
     async fn invoke(&self, ctx: &RunContext, request: &ToolRequest) -> ToolOutcome {
         let owned=self.storage.query_one_text(
-            "SELECT r.run_id FROM runs r JOIN sessions s ON s.session_id=r.session_id JOIN run_attempts a ON a.run_id=r.run_id WHERE r.run_id=?1 AND r.session_id=?2 AND r.owner_kind=?3 AND r.owner_subject=?4 AND s.owner_user_id=?4 AND r.generation=?5 AND a.attempt=?6 AND a.generation=r.generation AND r.status IN ('running','waiting_approval') AND a.attempt=(SELECT attempt FROM run_attempts WHERE run_id=r.run_id ORDER BY started_at_unix_ms DESC,rowid DESC LIMIT 1)",
+            "SELECT r.run_id FROM runs r JOIN sessions s ON s.session_id=r.session_id JOIN run_attempts a ON a.run_id=r.run_id WHERE r.run_id=?1 AND r.session_id=?2 AND r.owner_kind=?3 AND r.owner_subject=?4 AND s.lifecycle='active' AND r.generation=?5 AND a.attempt=?6 AND a.generation=r.generation AND r.status IN ('running','waiting_approval') AND a.attempt=(SELECT attempt FROM run_attempts WHERE run_id=r.run_id ORDER BY started_at_unix_ms DESC,rowid DESC LIMIT 1)",
             vec![ctx.run_id.to_string(),ctx.session_id.to_string(),ctx.principal.storage_kind().into(),ctx.principal.storage_subject(),ctx.generation.to_string(),ctx.attempt.to_string()]
         ).await;
         match owned {
             Ok(Some(_)) => {}
             Ok(None) => return failed("no active session with a stable caller identity"),
             Err(error) => return failed(error.to_string()),
+        }
+        let session = match lingxi_adapters::storage::session_tree::get_session_row(
+            &self.storage,
+            ctx.session_id.as_str(),
+        )
+        .await
+        {
+            Ok(Some(session)) => session,
+            Ok(None) => return failed("后台任务会话不存在"),
+            Err(error) => return failed(error.to_string()),
+        };
+        if !ctx
+            .principal
+            .can_access_session(&session.owner_user_id, ctx.session_id.as_str())
+        {
+            return failed("后台任务会话访问已撤销");
         }
         let args = request.arguments.as_value();
         let value = match request.target.as_str() {
@@ -203,6 +319,9 @@ pub async fn stop_owned(
         Arc::downgrade(state.runs()),
         state.operations().cloned(),
     );
+    tools
+        .set_workflows(Arc::downgrade(state.workflows()))
+        .map_err(|error| Box::new(crate::EndpointError::invalid_message(error).into_response()))?;
     let result = tools.stop(&session, task, true).await.map_err(|error| {
         Box::new(
             crate::EndpointError::new(

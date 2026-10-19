@@ -5,6 +5,7 @@ import { autoSaveConfig, t } from '../helpers';
 import { loadSettingsConfig, updateSettingsSnapshot } from '../actions';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
+import { SettingsTransferSection } from '../components/SettingsTransferSection';
 import { SelectWidget, Toggle } from '@/ui';
 import { readConfigBoolean } from '../resource-state';
 import type { AutoLaunchStatus } from '../../types';
@@ -366,6 +367,7 @@ export function GeneralTab() {
           }
         />
       </SettingsSection>
+      <SettingsTransferSection />
     </div>
   );
 }

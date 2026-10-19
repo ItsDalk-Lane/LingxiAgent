@@ -1,0 +1,84 @@
+{
+  "recordedAt": "2026-10-18T06:28:08.309475+00:00",
+  "status": "PASSED_LOCAL_NATIVE_PICKER_DEVELOPMENT_PROOF_NOT_FINAL_CANDIDATE",
+  "platform": "macOS; actual CUA native UI",
+  "launch": {
+    "root": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000",
+    "app": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/Lingxi Directory Proof.app",
+    "pid": 29629,
+    "port": 63109,
+    "folder": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/selected-skill",
+    "home": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/home",
+    "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+    "binarySha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+    "sourceHashes": {
+      "desktop/src-tauri/src/lib.rs": "62700408c1f581934546ff0e7e89db202903232c48bc5b57d9127f80c0e5aa9e",
+      "desktop/src/tauri-resources/App.tsx": "2a793c3518e31e67d01053ac1726451fef69634dc28db842b55b1d5c8c9d209f",
+      "desktop/src/tauri-resources/bridge.ts": "a2658aedbf6b5c1acb5a4daca9812b9b08b42d8198e6808433b4dcc147e525ab",
+      "desktop/src-tauri/tests/directory_picker_host.rs": "6f1a6a4b2d7717b803ce0eee3eae1509d6dca60fb480d0dc20fec3c4dde2fd79"
+    },
+    "beforeHashes": {
+      "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/selected-skill/SKILL.md": "5b2e9ee82e407560bc38f94de2dc96a4ae94902a2c62b2d4853e0f0bb84d37f6",
+      "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/home/user/preferences.json": "479e31c146e5516efe135321591b15368ce975982ffb0d2fcb8eed3ccac9ff35"
+    },
+    "beforeHomeFiles": [
+      "user/preferences.json"
+    ]
+  },
+  "steps": [
+    "CUA真实点击生产资源页面的技能查看器→选择技能目录",
+    "真实NSOpenPanel中使用前往文件夹输入本轮合成目录，点击Open",
+    "实际页面读到完整所选路径与尚未安装提示，保存原始AX和截图",
+    "再次真实点击选择技能目录，在系统对话框点击Cancel",
+    "实际页面显示已取消，原选择仍在；保存原始AX和截图",
+    "CUA Cmd+Q退出本轮独立应用；检查原PID消失和隔离驱动端口关闭"
+  ],
+  "checks": {
+    "native_selected_path_visible": true,
+    "selected_notice_not_installed": true,
+    "native_cancel_notice_visible": true,
+    "cancel_retains_selected_path": true,
+    "source_and_preferences_unchanged": true,
+    "no_skill_install": true,
+    "native_process_exited": true,
+    "webdriver_port_closed": true
+  },
+  "afterHashes": {
+    "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/selected-skill/SKILL.md": "5b2e9ee82e407560bc38f94de2dc96a4ae94902a2c62b2d4853e0f0bb84d37f6",
+    "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/home/user/preferences.json": "479e31c146e5516efe135321591b15368ce975982ffb0d2fcb8eed3ccac9ff35"
+  },
+  "afterHomeFiles": [
+    "user/preferences.json"
+  ],
+  "afterSkillFiles": [
+    "SKILL.md"
+  ],
+  "cleanup": {
+    "pid": 29629,
+    "psExitCode": 1,
+    "psStdout": "",
+    "psStderr": "",
+    "portClosed": true,
+    "applicationRawExitCode": "NOT_CAPTURED; launcher spawned child and exited, so do not infer exit0 from PID absent",
+    "fixtureRootRetainedForEvidence": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000"
+  },
+  "notes": [
+    "没有DOM点击替代原生选择器，没有替换系统选择结果，没有Cargo或修改产品。",
+    "原始IPC Option值没有额外打桩捕获；以真实系统取消、页面取消提示及原路径保留作直接观察，不伪造原始null回执。",
+    "只有隔离home中的合成用户偏好做前后字节核对；不将其说成遍历验证真实个人配置。",
+    "截图/AX只保存返回生产页面后的状态；未归档系统对话框展示的其他目录列表。",
+    "该二进制来源native-skills1正式构建；其后工作区已有其他变更，不是T08最终固定候选或全叶通过。"
+  ],
+  "preflightFailuresPreserved": [
+    {
+      "action": "CUA getApp before creating dedicated bundle",
+      "error": "Invalid app: /private/tmp/lingxi-r07-t08-picker/Lingxi Directory Proof.app",
+      "disposition": "准备顺序问题；随后在唯一临时目录创建本轮产物硬链接应用包再连接，未归因为产品失败。"
+    },
+    {
+      "action": "CUA assign app after prior failed let initialization",
+      "error": "app is not defined",
+      "disposition": "工具会话变量尚未定义；随后var绑定成功，真实选择/取消均在之后执行。"
+    }
+  ]
+}

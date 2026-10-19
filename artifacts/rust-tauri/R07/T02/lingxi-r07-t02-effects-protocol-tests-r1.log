@@ -1,0 +1,69 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.43s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_protocol-9ff924745fc50829)
+
+running 36 tests
+test tests::legacy_status_names_map_without_renaming_the_wire_vocabulary ... ok
+test handshake::tests::intersection_selects_highest_common ... ok
+test tests::r00_baseline_versions_are_one ... ok
+test automation::tests::confirmation_requires_matching_positive_desktop_display_receipt ... ok
+test bridge_effect::tests::skipped_effect_cannot_claim_an_external_ack_or_message ... ok
+test handshake::tests::unknown_caps_are_reported_not_dropped ... ok
+test bridge_effect::tests::preview_ack_does_not_confirm_a_final_delivery ... ok
+test handshake::tests::wrong_family_and_malformed_range_are_invalid_message ... ok
+test history::tests::seq_fields_are_decimal_strings_on_the_wire ... ok
+test canon::tests::canonical_form_sorts_keys_and_keeps_utf8 ... ok
+test canon::tests::canonical_form_has_no_whitespace_or_trailing_newline ... ok
+test canon::tests::non_bmp_keys_sort_in_utf16_unit_order_ts_parity ... ok
+test handshake::tests::disjoint_ranges_fail_explicitly ... ok
+test bridge::tests::bridge_subject_is_stable_and_separate_for_each_actual_actor ... ok
+test tests::error_codes_have_stable_wire_names ... ok
+test tests::terminal_states_are_terminal_and_named_stably ... ok
+test tests::seq_wire_string_rejects_garbage ... ok
+test canon::tests::scalar_encodings_match_serde_json_compact_form ... ok
+test tests::protocol_error_rejects_unknown_fields ... ok
+test handshake::tests::client_hello_rejects_unknown_fields ... ok
+test tests::seq_wire_string_roundtrips_beyond_js_safe_integer ... ok
+test wire::tests::dialect_check_is_explicit ... ok
+test history::tests::cursor_roundtrip_and_strict_decode ... ok
+test tests::ids_are_opaque_and_preserved ... ok
+test automation::tests::all_durable_states_round_trip_without_claiming_delivery ... ok
+test devgate::tests::binds_to_this_checkout_when_cwd_is_inside_it ... ok
+test wire::tests::unknown_event_payload_is_preserved_verbatim ... ok
+test bridge::scope_tests::takeover_scope_has_one_canonical_closed_recoverable_target ... ok
+test bridge_effect::tests::effect_and_capability_fields_are_closed_and_keep_old_ready_compatible ... ok
+test wire::tests::u64_fields_are_decimal_strings ... ok
+test bridge::scope_tests::diagnostic_contract_does_not_accept_authority_or_unknown_result_fields ... ok
+test wire::tests::closed_payload_variants_reject_unknown_fields ... ok
+test automation::tests::commands_use_one_closed_camel_case_shape ... ok
+test wire::tests::envelope_roundtrips_and_validates_event_type ... ok
+test bridge::tests::all_five_reply_contexts_and_real_receipts_round_trip ... ok
+test bridge::tests::message_and_nested_context_cannot_self_report_authority ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-proto-server.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_proto_server-694df617dcbad98e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-gen.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_protocol_gen-d430bc0fa2b4f06d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/lingxi-protocol-verify.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_protocol_verify-f0cfe80e74942743)
+
+running 1 test
+test automation_tests::notification_commands_have_a_typed_round_trip_and_refuse_false_receipts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests lingxi_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

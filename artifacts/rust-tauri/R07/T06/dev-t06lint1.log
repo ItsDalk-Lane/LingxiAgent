@@ -1,0 +1,848 @@
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/media_gallery.rs:114:
+ /// 作业每次状态迁移后同步工作台投影。在媒体作业的同一写事务内调用
+ /// （claim/transition 均经此），投影与作业行要么一起提交要么一起回滚，
+ /// 不允许跨表漂移。UPDATE 未命中时补 INSERT，兼作旧行缺失的自愈。
+-pub(crate) fn sync_from_job_txn(conn: &rusqlite::Connection, job: &MediaJob) -> Result<(), StorageError> {
++pub(crate) fn sync_from_job_txn(
++    conn: &rusqlite::Connection,
++    job: &MediaJob,
++) -> Result<(), StorageError> {
+     let spec = &job.spec;
+     let prompt = spec["prompt"].as_str().unwrap_or("").to_owned();
+     if prompt.is_empty() || prompt.encode_utf16().count() > 32_000 {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/media_gallery.rs:122:
+     }
+     let status = gallery_status(&job.phase);
+     let files = &job.state["files"];
+-    let files = if files.is_array() { files.clone() } else { json!([]) };
++    let files = if files.is_array() {
++        files.clone()
++    } else {
++        json!([])
++    };
+     let fail_reason = match job.phase {
+         MediaPhase::Failed | MediaPhase::Unknown => Some(
+             job.state["message"]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/media_gallery.rs:318:
+ /// 由外键约束响亮失败，绝不留下悬空任务。
+ pub async fn rekey_retry(db: &RunDatabase, from: &str, to: &str) -> Result<(), StorageError> {
+     if from == to {
+-        return Err(invalid("media gallery retry rekey requires a new operation"));
++        return Err(invalid(
++            "media gallery retry rekey requires a new operation",
++        ));
+     }
+     let from = from.to_owned();
+     let to = to.to_owned();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/media_gallery.rs:325:
+     db.queue()
+         .submit(move |conn| {
+-            let txn = conn
+-                .unchecked_transaction()
+-                .map_err(map_rusqlite)?;
++            let txn = conn.unchecked_transaction().map_err(map_rusqlite)?;
+             let removed = txn
+                 .execute("DELETE FROM media_gallery_v1 WHERE task_id=?1", params![to])
+                 .map_err(map_rusqlite)?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters/src/storage/media_gallery.rs:388:
+                  WHERE t.owner_subject=?1 AND json_extract(f.value,'$.filename')=?2 \
+                  ORDER BY t.created_at DESC, t.task_id DESC LIMIT 1",
+                 params![owner, filename],
+-                |row| {
+-                    Ok((
+-                        row.get::<_, Option<String>>(0)?,
+-                        row.get::<_, String>(1)?,
+-                    ))
+-                },
++                |row| Ok((row.get::<_, Option<String>>(0)?, row.get::<_, String>(1)?)),
+             )
+             .optional()
+             .map_err(map_rusqlite)?
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/agent_config_readback.rs:761:
+ /// saveProvider（provider-registry.ts:2160-2192）：合并既有 → 内置不写插件
+ /// 文件，本地自定义/未注册插件把定义字段写进 provider-plugins 并只在目录
+ /// 留 overlay；从 deletedProviders 摘除后整目录落盘。
+-pub(crate) fn registry_save_provider(home: &Path, provider_id: &str, data: &Value) -> Result<(), String> {
++pub(crate) fn registry_save_provider(
++    home: &Path,
++    provider_id: &str,
++    data: &Value,
++) -> Result<(), String> {
+     let mut catalog = load_catalog(home)?;
+     let existing = catalog
+         .providers
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/agent_config_readback.rs:1447:
+ 
+ /// syncModels：单向投影 catalog providers → models.json。内容不变且权限
+ /// 正确时不重写（返回 false）；有变化或权限错误时重写（0600）。
+-pub(crate) fn sync_models_json(home: &Path, providers: &Map<String, Value>) -> Result<bool, String> {
++pub(crate) fn sync_models_json(
++    home: &Path,
++    providers: &Map<String, Value>,
++) -> Result<bool, String> {
+     let mut new_providers = Map::new();
+     for (name, provider) in providers {
+         let base_url = provider
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:160:
+         .and_then(Value::as_str)
+         .unwrap_or_default()
+         .to_owned();
+-    let name = pick_str(model, &["displayName", "name"]).unwrap_or(&id).to_owned();
+-    let (available, reason, message) = adapter_verdict(
+-        out.get("protocolId").and_then(Value::as_str),
+-        class,
+-    );
++    let name = pick_str(model, &["displayName", "name"])
++        .unwrap_or(&id)
++        .to_owned();
++    let (available, reason, message) =
++        adapter_verdict(out.get("protocolId").and_then(Value::as_str), class);
+     out.insert("id".into(), json!(id));
+     out.insert("name".into(), json!(name));
+     out.insert("displayName".into(), json!(name));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:297:
+         };
+         entry.insert("availableModels".into(), available_models);
+         if cap == Capability::Asr {
+-            let catalog_models: Vec<Value> = catalog.iter().map(|m| project_model(m, class)).collect();
++            let catalog_models: Vec<Value> =
++                catalog.iter().map(|m| project_model(m, class)).collect();
+             entry.insert("catalogModels".into(), json!(catalog_models));
+         }
+         providers.insert(pid, Value::Object(entry));
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:322:
+         let provider = model["provider"].as_str().unwrap_or("").trim();
+         let id = model["id"].as_str().unwrap_or("").trim();
+         if !provider.is_empty() && !id.is_empty() {
+-            out.insert(
+-                field.into(),
+-                json!({"provider": provider, "id": id}),
+-            );
++            out.insert(field.into(), json!({"provider": provider, "id": id}));
+         }
+     }
+     if cap != Capability::Asr {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:358:
+         body
+     };
+     let Some(patch) = values.as_object() else {
+-        return Err(EndpointError::invalid_message("config values must be an object").into_response());
++        return Err(
++            EndpointError::invalid_message("config values must be an object").into_response(),
++        );
+     };
+     let memory = state.memory();
+     let home = memory.home().to_path_buf();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:422:
+                                 continue;
+                             }
+                             let detail = if cap == Capability::Asr {
+-                                "speechRecognition.defaultModel requires provider and id"
+-                                    .to_owned()
++                                "speechRecognition.defaultModel requires provider and id".to_owned()
+                             } else {
+                                 format!("{field} requires provider and id")
+                             };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:430:
+-                            return Err(
+-                                EndpointError::invalid_message(detail).into_response()
+-                            );
++                            return Err(EndpointError::invalid_message(detail).into_response());
+                         }
+-                        next.insert(
+-                            key.clone(),
+-                            json!({"provider": provider, "id": id}),
+-                        );
++                        next.insert(key.clone(), json!({"provider": provider, "id": id}));
+                     }
+                 }
+             }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:592:
+         Ok(())
+     };
+     match cap {
+-        Capability::Image => requires("outputs", "image", "image generation models must include \"image\" in outputs")?,
+-        Capability::Video => requires("outputs", "video", "video generation models must include \"video\" in outputs")?,
+-        Capability::Speech => requires("outputs", "audio", "speech generation models must include \"audio\" in outputs")?,
++        Capability::Image => requires(
++            "outputs",
++            "image",
++            "image generation models must include \"image\" in outputs",
++        )?,
++        Capability::Video => requires(
++            "outputs",
++            "video",
++            "video generation models must include \"video\" in outputs",
++        )?,
++        Capability::Speech => requires(
++            "outputs",
++            "audio",
++            "speech generation models must include \"audio\" in outputs",
++        )?,
+         Capability::Asr => {
+-            requires("inputs", "audio", "speech recognition models must include \"audio\" in inputs")?;
+-            requires("outputs", "text", "speech recognition models must include \"text\" in outputs")?;
++            requires(
++                "inputs",
++                "audio",
++                "speech recognition models must include \"audio\" in inputs",
++            )?;
++            requires(
++                "outputs",
++                "text",
++                "speech recognition models must include \"text\" in outputs",
++            )?;
+         }
+     }
+     Ok(patch)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:611:
+     models: Vec<Value>,
+ ) -> Result<(), String> {
+     let catalog = readback::load_catalog(home)?;
+-    let existing = catalog.provider_overlay(provider).cloned().unwrap_or_else(|| json!({}));
++    let existing = catalog
++        .provider_overlay(provider)
++        .cloned()
++        .unwrap_or_else(|| json!({}));
+     let mut media = existing["media"].as_object().cloned().unwrap_or_default();
+     let mut block = media
+         .get(cap.overlay_key())
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:728:
+     let merged = readback::merged_catalog_providers_with(&home, false)
+         .map_err(|message| EndpointError::invalid_message(message).into_response())?;
+     let mut models = overlay_models(&merged, provider, cap);
+-    let Some(position) = models.iter().position(|m| m["id"].as_str() == Some(model_id)) else {
++    let Some(position) = models
++        .iter()
++        .position(|m| m["id"].as_str() == Some(model_id))
++    else {
+         return Err((
+             axum::http::StatusCode::NOT_FOUND,
+             Json(json!({
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:742:
+         base.insert(key, value);
+     }
+     base.insert("id".into(), json!(model_id));
+-    let normalized = normalize_media_model(&Value::Object(base), None)
+-        .ok_or_else(|| EndpointError::invalid_message("media model id is required").into_response())?;
++    let normalized = normalize_media_model(&Value::Object(base), None).ok_or_else(|| {
++        EndpointError::invalid_message("media model id is required").into_response()
++    })?;
+     models[position] = normalized;
+     write_overlay_models(&home, provider, cap, models)
+         .map_err(|message| EndpointError::invalid_message(message).into_response())?;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:763:
+     let merged = readback::merged_catalog_providers_with(&home, false)
+         .map_err(|message| EndpointError::invalid_message(message).into_response())?;
+     let mut models = overlay_models(&merged, provider, cap);
+-    let Some(position) = models.iter().position(|m| m["id"].as_str() == Some(model_id)) else {
++    let Some(position) = models
++        .iter()
++        .position(|m| m["id"].as_str() == Some(model_id))
++    else {
+         return Err(EndpointError::invalid_message(format!(
+             "media model \"{provider}/{model_id}\" not found in {}",
+             cap.overlay_key()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:888:
+     let Some(cap) = Capability::parse_kind(&kind) else {
+         return EndpointError::not_found().into_response();
+     };
+-    match edit_model(&state, &principal, cap, &provider, &model, lenient_body(&body)).await {
++    match edit_model(
++        &state,
++        &principal,
++        cap,
++        &provider,
++        &model,
++        lenient_body(&body),
++    )
++    .await
++    {
+         Ok(payload) => Json(payload).into_response(),
+         Err(response) => response,
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:929:
+     Path(provider): Path<String>,
+     body: Bytes,
+ ) -> Response {
+-    match add_model(&state, &principal, Capability::Asr, &provider, lenient_body(&body)).await {
++    match add_model(
++        &state,
++        &principal,
++        Capability::Asr,
++        &provider,
++        lenient_body(&body),
++    )
++    .await
++    {
+         Ok(payload) => Json(payload).into_response(),
+         Err(response) => response,
+     }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:941:
+     Path((provider, model)): Path<(String, String)>,
+     body: Bytes,
+ ) -> Response {
+-    match edit_model(&state, &principal, Capability::Asr, &provider, &model, lenient_body(&body))
+-        .await
++    match edit_model(
++        &state,
++        &principal,
++        Capability::Asr,
++        &provider,
++        &model,
++        lenient_body(&body),
++    )
++    .await
+     {
+         Ok(payload) => Json(payload).into_response(),
+         Err(response) => response,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_admin.rs:981:
+ pub fn router() -> Router<ServiceState> {
+     Router::new()
+         .route("/lingxi/v1/media/providers", get(providers_query))
+-        .route("/lingxi/v1/media/{kind}/providers", get(list_providers_route))
++        .route(
++            "/lingxi/v1/media/{kind}/providers",
++            get(list_providers_route),
++        )
+         .route("/lingxi/v1/media/{kind}/config", put(put_config_route))
+         .route("/lingxi/v1/media/speech/config", get(get_speech_config))
+         .route(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:28:
+     runs::MEDIA_REQUEST_SESSION_BUSY,
+     sessions::SessionAccess,
+     toolgateway::{
+-        CallerSurface, GatewayRefusal, InvocationPermissionContext, PolicyVerdict, TOOL_LIFETIME,
+-        TrustedToolLifetime,
++        CallerSurface, GatewayRefusal, InvocationPermissionContext, PolicyVerdict,
++        TrustedToolLifetime, TOOL_LIFETIME,
+     },
+     EndpointError, Principal, ServiceState,
+ };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:236:
+     let events = state.events().clone();
+     let runs = state.runs().clone();
+     let (finish_code, result) = drive_prepared(
+-        state, session, &gateway, &permit, &request_id, mode, kind, args, now,
++        state,
++        session,
++        &gateway,
++        &permit,
++        &request_id,
++        mode,
++        kind,
++        args,
++        now,
+     )
+     .await;
+     runs.finish_media_request(&db, &events, permit, finish_code, now)
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:263:
+     let db = state.storage();
+     let target = format!("tool:plugin:media:generate-{kind}");
+     let call = ToolCallId::new(format!("{}-media-generate", ctx.run_id));
+-    let request = match ToolRequest::from_effective_arguments(
+-        target.clone(),
+-        args,
+-        &SchemaBudget::default(),
+-    ) {
+-        Some(request) => request,
+-        None => {
+-            return (
+-                Err("media_arguments_invalid".into()),
+-                Err(EndpointError::invalid_message("媒体参数未通过正式规范")),
+-            )
+-        }
+-    };
++    let request =
++        match ToolRequest::from_effective_arguments(target.clone(), args, &SchemaBudget::default())
++        {
++            Some(request) => request,
++            None => {
++                return (
++                    Err("media_arguments_invalid".into()),
++                    Err(EndpointError::invalid_message("媒体参数未通过正式规范")),
++                )
++            }
++        };
+     // 拒绝分支的统一账：意向先持久，再落零派发回执（与回合驱动同序）。
+     let record_refusal = |detail: String| {
+         let call = call.clone();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:409:
+                         ApprovalDecision::Rejected { reason } => reason,
+                         _ => "approval aborted".to_string(),
+                     };
+-                    let journal =
+-                        record_refusal(format!("not dispatched: {reason}")).await;
++                    let journal = record_refusal(format!("not dispatched: {reason}")).await;
+                     return match journal {
+                         Ok(()) => (
+                             Err("media_generation_not_approved".into()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:425:
+             }
+         }
+         PolicyVerdict::Denied { message, .. } => {
+-            let journal =
+-                record_refusal(format!("not dispatched: policy denied: {message}")).await;
++            let journal = record_refusal(format!("not dispatched: policy denied: {message}")).await;
+             return match journal {
+                 Ok(()) => (
+                     Err("gateway_policy_denied".into()),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:454:
+         budget_ms: 300_000,
+     };
+     let executed = TOOL_LIFETIME
+-        .scope(lifetime, gateway.execute_prepared(ctx, &call, &prepared.handle))
++        .scope(
++            lifetime,
++            gateway.execute_prepared(ctx, &call, &prepared.handle),
++        )
+         .await;
+     let (outcome, dispatched) = match executed {
+         Ok(value) => (value.outcome, true),
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:572:
+         Ok(body) => body,
+         Err(rejection) => return EndpointError::from_json_rejection(&rejection).into_response(),
+     };
+-    let kind_value = body["kind"].as_str().or(body["type"].as_str()).unwrap_or("");
++    let kind_value = body["kind"]
++        .as_str()
++        .or(body["type"].as_str())
++        .unwrap_or("");
+     let kind = match kind_value {
+         "image" | "image_generation" | "imageGeneration" => "image",
+         "video" | "video_generation" | "videoGeneration" => "video",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:581:
+             return transcribe_inner(state, principal, &body).await
+         }
+         _ => {
+-            return EndpointError::invalid_message(format!(
+-                "unsupported media kind: {kind_value}"
+-            ))
+-            .into_response()
++            return EndpointError::invalid_message(format!("unsupported media kind: {kind_value}"))
++                .into_response()
+         }
+     };
+     generate_inner(state, principal, kind, &body).await
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:663:
+                 let mut files = Vec::new();
+                 if let Some(list) = job.state["files"].as_array() {
+                     for file in list {
+-                        let filename = file["filename"]
+-                            .as_str()
+-                            .ok_or("媒体交付文件缺少名称")?;
++                        let filename = file["filename"].as_str().ok_or("媒体交付文件缺少名称")?;
+                         files.push(filename.to_string());
+                     }
+                 }
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:706:
+ ) -> Response {
+     if let Some(filter) = query.filter.as_deref() {
+         if !matches!(filter, "favorited" | "images" | "videos") {
+-            return EndpointError::invalid_message("unsupported media task filter")
+-                .into_response();
++            return EndpointError::invalid_message("unsupported media task filter").into_response();
+         }
+     }
+     let owner = owner_subject(&principal);
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:787:
+         Err(error) => return *error,
+     };
+     let now = state.clock().now_unix_ms();
+-    let retried =
+-        match media_gallery::begin_retry(state.storage(), &task_id, &owner, now).await {
+-            Ok(Some(task)) => task,
+-            Ok(None) => return EndpointError::not_found().into_response(),
+-            Err(lingxi_kernel::ports::StorageError::Conflict { detail }) => {
+-                return EndpointError::resource_failure(
+-                    StatusCode::CONFLICT,
+-                    "media_task_not_retryable",
+-                    detail,
+-                )
+-                .into_response()
+-            }
+-            Err(error) => return EndpointError::storage(&error).into_response(),
+-        };
++    let retried = match media_gallery::begin_retry(state.storage(), &task_id, &owner, now).await {
++        Ok(Some(task)) => task,
++        Ok(None) => return EndpointError::not_found().into_response(),
++        Err(lingxi_kernel::ports::StorageError::Conflict { detail }) => {
++            return EndpointError::resource_failure(
++                StatusCode::CONFLICT,
++                "media_task_not_retryable",
++                detail,
++            )
++            .into_response()
++        }
++        Err(error) => return EndpointError::storage(&error).into_response(),
++    };
+     match drive_generate(&state, &principal, &session, "image", job.spec.clone()).await {
+         Ok(accepted) => {
+             let new_task_id = accepted["batchId"].as_str().unwrap_or_default().to_string();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:987:
+     );
+     headers.insert(
+         header::CONTENT_LENGTH,
+-        HeaderValue::from_str(&length.to_string())
+-            .unwrap_or(HeaderValue::from_static("0")),
++        HeaderValue::from_str(&length.to_string()).unwrap_or(HeaderValue::from_static("0")),
+     );
+     headers.insert(header::ACCEPT_RANGES, HeaderValue::from_static("bytes"));
+     headers.insert(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:1036:
+     let path = path.to_path_buf();
+     match tokio::task::spawn_blocking(move || read_window_blocking(&path, start, length)).await {
+         Ok(result) => result,
+-        Err(join) => Err(std::io::Error::other(format!("media read task failed: {join}"))),
++        Err(join) => Err(std::io::Error::other(format!(
++            "media read task failed: {join}"
++        ))),
+     }
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:1151:
+     let file = match state.session_files().get_file(sid, file_id).await {
+         Ok(Some(file)) => file,
+         Ok(None) => {
+-            return EndpointError::invalid_message(format!(
+-                "session file not found: {file_id}"
+-            ))
+-            .into_response()
++            return EndpointError::invalid_message(format!("session file not found: {file_id}"))
++                .into_response()
+         }
+         Err(error) => return EndpointError::invalid_message(error.to_string()).into_response(),
+     };
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:1161:
+     if file.is_directory {
+-        return EndpointError::invalid_message(format!(
+-            "session file not found: {file_id}"
+-        ))
+-        .into_response();
++        return EndpointError::invalid_message(format!("session file not found: {file_id}"))
++            .into_response();
+     }
+     // 读取上限先在登记大小上响亮拒绝（不整读超限文件）；落盘内容与登记不一致时
+     // 由 OperationService::transcribe 按实际字节数再次核验，绝不截断冒充。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:1177:
+     let bytes = match tokio::task::spawn_blocking(move || std::fs::read(&audio_path)).await {
+         Ok(Ok(bytes)) => bytes,
+         _ => {
+-            return EndpointError::invalid_message(format!(
+-                "session file not found: {file_id}"
+-            ))
+-            .into_response()
++            return EndpointError::invalid_message(format!("session file not found: {file_id}"))
++                .into_response()
+         }
+     };
+-    let now_iso = || {
+-        chrono::Utc::now()
+-            .to_rfc3339_opts(chrono::SecondsFormat::Millis, true)
+-    };
++    let now_iso = || chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true);
+     let created = now_iso();
+     let mut pending = json!({
+         "status": "pending",
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_generate.rs:1260:
+         .route("/lingxi/v1/media/tasks/batch/{batchId}", get(tasks_batch))
+         .route("/lingxi/v1/media/tasks/{taskId}", get(tasks_get))
+         .route("/lingxi/v1/media/tasks/{taskId}/retry", post(tasks_retry))
+-        .route("/lingxi/v1/media/generated/open/{filename}", post(generated_open))
+-        .route("/lingxi/v1/media/generated/{filename}", get(generated_serve))
++        .route(
++            "/lingxi/v1/media/generated/open/{filename}",
++            post(generated_open),
++        )
++        .route(
++            "/lingxi/v1/media/generated/{filename}",
++            get(generated_serve),
++        )
+         .route("/lingxi/v1/media/asr/transcribe", post(transcribe_route))
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_jimeng.rs:138:
+         if !metadata.is_file() || metadata.file_type().is_symlink() {
+             return Err("即梦程序已被替换".into());
+         }
+-        let mtime_ms = metadata.modified().map_err(|_|"即梦程序身份不可读取")?.duration_since(std::time::UNIX_EPOCH).map_err(|_|"即梦程序时间无效")?.as_millis();
++        let mtime_ms = metadata
++            .modified()
++            .map_err(|_| "即梦程序身份不可读取")?
++            .duration_since(std::time::UNIX_EPOCH)
++            .map_err(|_| "即梦程序时间无效")?
++            .as_millis();
+         // 指纹要作为工具参数经过正式预算校验：浮点会被安全整数边界拒绝，毫秒必须用整数。
+         let mtime_ms = u64::try_from(mtime_ms).map_err(|_| "即梦程序时间无效")?;
+-        let mut value = json!({"path":self.launch.executable,"size":metadata.len(),"mtimeMs":mtime_ms});
++        let mut value =
++            json!({"path":self.launch.executable,"size":metadata.len(),"mtimeMs":mtime_ms});
+         #[cfg(unix)]
+         {
+             use std::os::unix::fs::MetadataExt;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_run.rs:323:
+             attempt: attempt_id(&run, 1),
+             generation: 1,
+         };
+-        let authorization =
+-            DriveAuthorization::user_submission(Some(request_id), mode);
++        let authorization = DriveAuthorization::user_submission(Some(request_id), mode);
+         let lineage = authorization.lineage.clone();
+         let registration = self
+             .tasks
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_run.rs:448:
+ 
+ /// HTTP 来源媒体 Run 的执行凭据；与封面凭据同形：许可/注册/取消域随凭据
+ /// 持有，未统一收尾的丢弃是取消 + Abandoned，不是静默成功。
+-pub struct MediaRequestPermit {    pub context: lingxi_kernel::RunContext,
++pub struct MediaRequestPermit {
++    pub context: lingxi_kernel::RunContext,
+     pub cancel_scope: CancelScope,
+     entry: Arc<RunCancelEntry>,
+     supervisor: Arc<RunSupervisor>,
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/media_run.rs:460:
+ impl Drop for MediaRequestPermit {
+     fn drop(&mut self) {
+         if !self.finalized {
+-            self.cancel_scope
+-                .cancel("媒体来源驱动未完成统一收尾");
++            self.cancel_scope.cancel("媒体来源驱动未完成统一收尾");
+             self.entry.advance_phase(CancelPhase::Abandoned {
+                 reason: "媒体来源驱动退出，外部结果尚未统一确认".into(),
+             });
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/operations.rs:43:
+ 
+ #[path = "media_operations.rs"]
+ mod media_operations;
+-pub use media_operations::MediaRouteSnapshot;
+ pub(crate) use media_operations::media_declaration_catalog;
++pub use media_operations::MediaRouteSnapshot;
+ 
+ use std::collections::BTreeMap;
+ use std::path::{Path, PathBuf};
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:71:
+         )
+             .into_response();
+     }
+-    data.wire
+-        .lock()
+-        .unwrap()
+-        .push(("image".into(), headers));
++    data.wire.lock().unwrap().push(("image".into(), headers));
+     Json(json!({"data":[{"b64_json":PNG}]})).into_response()
+ }
+ async fn speech(State(data): State<Arc<Fixture>>, headers: HeaderMap) -> Response {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:81:
+-    data.wire
+-        .lock()
+-        .unwrap()
+-        .push(("speech".into(), headers));
++    data.wire.lock().unwrap().push(("speech".into(), headers));
+     ([("content-type", "audio/mpeg")], Bytes::from_static(MP3)).into_response()
+ }
+-async fn transcribe(
+-    State(data): State<Arc<Fixture>>,
+-    headers: HeaderMap,
+-    body: Bytes,
+-) -> Response {
++async fn transcribe(State(data): State<Arc<Fixture>>, headers: HeaderMap, body: Bytes) -> Response {
+     data.wire
+         .lock()
+         .unwrap()
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:286:
+         if let Some(body) = body {
+             request = request.json(&body);
+         }
+-        let response = request.timeout(Duration::from_secs(45)).send().await.unwrap();
++        let response = request
++            .timeout(Duration::from_secs(45))
++            .send()
++            .await
++            .unwrap();
+         let status = response.status().as_u16();
+         let text = response.text().await.unwrap();
+         (
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:335:
+ }
+ 
+ /// POST 生成（可能阻塞在批准门），在后台任务里驱动。
+-fn spawn_post(base: &str, token: &str, path: &str, body: Value) -> tokio::task::JoinHandle<(u16, Value)> {
++fn spawn_post(
++    base: &str,
++    token: &str,
++    path: &str,
++    body: Value,
++) -> tokio::task::JoinHandle<(u16, Value)> {
+     let url = format!("{base}{path}");
+     let token = token.to_string();
+     tokio::spawn(async move {
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:449:
+         .unwrap();
+     assert_eq!(response.status(), 200);
+     assert!(
+-        response.headers()["content-type"].to_str().unwrap().starts_with("image/"),
++        response.headers()["content-type"]
++            .to_str()
++            .unwrap()
++            .starts_with("image/"),
+         "{:?}",
+         response.headers()
+     );
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:456:
+     assert_eq!(response.headers()["accept-ranges"], "bytes");
+     let bytes = response.bytes().await.unwrap();
+-    let expected = base64::engine::general_purpose::STANDARD.decode(PNG).unwrap();
++    let expected = base64::engine::general_purpose::STANDARD
++        .decode(PNG)
++        .unwrap();
+     assert_eq!(bytes.as_ref(), expected.as_slice());
+     let total = expected.len();
+     // Range 窗口精确读取（206/416 与现役平价）。
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:530:
+     assert_eq!(recorded[0].to_string_lossy(), view.real_path);
+     // 生成列表读面：filter 词表与批次读。
+     let (status, body) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/tasks?filter=images", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/tasks?filter=images",
++            None,
++        )
+         .await;
+     assert_eq!(status, 200);
+     assert!(body["tasks"]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:539:
+         .iter()
+         .any(|task| task["taskId"] == task_id));
+     let (status, body) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/tasks?filter=videos", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/tasks?filter=videos",
++            None,
++        )
+         .await;
+     assert_eq!(status, 200);
+     assert!(body["tasks"].as_array().unwrap().is_empty());
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:546:
+     let (status, _) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/tasks?filter=bogus", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/tasks?filter=bogus",
++            None,
++        )
+         .await;
+     assert_eq!(status, 400);
+     let (status, body) = h
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:603:
+     // 批准后完成受理。
+     assert!(h
+         .approvals
+-        .answer_for_principal(&KernelPrincipal::LocalUser, "media-ask", &approval_id, Answer::Approve)
++        .answer_for_principal(
++            &KernelPrincipal::LocalUser,
++            "media-ask",
++            &approval_id,
++            Answer::Approve
++        )
+         .settled());
+     let (status, body) = pending.await.unwrap();
+     assert_eq!(status, 200, "{body}");
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:639:
+             &KernelPrincipal::LocalUser,
+             "media-ask",
+             &approval_id,
+-            Answer::Reject { reason: "本地测试拒绝".into() }
++            Answer::Reject {
++                reason: "本地测试拒绝".into()
++            }
+         )
+         .settled());
+     let (status, body) = rejected.await.unwrap();
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:738:
+     assert_eq!(status, 200, "{body}");
+     assert_eq!(body["delivery"]["mode"], "session");
+     assert!(body["tasks"][0]["files"].is_null(), "{body}");
+-    h.gallery_until(body["batchId"].as_str().unwrap(), "done").await;
++    h.gallery_until(body["batchId"].as_str().unwrap(), "done")
++        .await;
+     h.close().await;
+ }
+ 
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:845:
+     assert_eq!(status, 200, "{body}");
+     assert_eq!(body["ok"], true);
+     let (status, body) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/image/providers", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/image/providers",
++            None,
++        )
+         .await;
+     assert_eq!(status, 200, "{body}");
+     let provider = &body["providers"]["image"];
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:913:
+     assert_eq!(status, 200, "{body}");
+     assert_eq!(body["ok"], true);
+     let (status, body) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/image/providers", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/image/providers",
++            None,
++        )
+         .await;
+     assert_eq!(status, 200);
+     assert_eq!(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:938:
+         .await;
+     assert_eq!(status, 200, "{body}");
+     let (status, body) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/image/providers", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/image/providers",
++            None,
++        )
+         .await;
+     assert_eq!(status, 200);
+     let still = body["providers"]["image"]["models"]
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:953:
+             None,
+         )
+         .await;
+-    assert_eq!(status, 400, "删除不存在条目如实报错（现役 invalid_message 语义）");
++    assert_eq!(
++        status, 400,
++        "删除不存在条目如实报错（现役 invalid_message 语义）"
++    );
+     // ASR 面：模型 + enabled/defaultModel 偏好（默认模型须在列表内且适配可用）。
+     let (status, body) = h
+         .http(
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:1009:
+     assert!(body["config"].is_object());
+     // 能力词表之外：404（不是静默落到图片面）。
+     let (status, _) = h
+-        .http(reqwest::Method::GET, "/lingxi/v1/media/hologram/providers", None)
++        .http(
++            reqwest::Method::GET,
++            "/lingxi/v1/media/hologram/providers",
++            None,
++        )
+         .await;
+     assert_eq!(status, 404);
+     h.close().await;
+Diff in /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/tests/r07_media_admin/mod.rs:1151:
+         .await;
+     assert_eq!(status, 200, "{body}");
+     assert_eq!(body["kind"], "image");
+-    h.gallery_until(body["batchId"].as_str().unwrap(), "done").await;
++    h.gallery_until(body["batchId"].as_str().unwrap(), "done")
++        .await;
+     let (status, _) = h
+         .http(
+             reqwest::Method::POST,
+
+--- STDERR ---

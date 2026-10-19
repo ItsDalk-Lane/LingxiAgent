@@ -1,0 +1,40 @@
+{
+  "candidate": "t07d",
+  "name": "affected-service",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--no-fail-fast",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r07_browser_routes",
+    "--test",
+    "r07_browser_tools",
+    "--test",
+    "r07_office_tools",
+    "--test",
+    "r07_t05_media",
+    "--test",
+    "r07_media_admin"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T03:39:24.797376+00:00",
+  "sourceFingerprint": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+  "log": "t07d-affected-service.log",
+  "endedAt": "2026-10-18T03:40:31.044288+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "634e0efbe15e772f31be34b61d79bfbefa2957b1b3572af1b63e28a10f95c804",
+  "logSha256": "7dface6df82bd7ec257f548ca50fe0c76bcec8dc5b21b67d4ea2c7b6df690e34",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true
+}

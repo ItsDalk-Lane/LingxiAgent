@@ -1,0 +1,22 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: this `MutexGuard` is held across an await point
+   --> crates/lingxi-service/tests/r07_bridge_native_flow.rs:437:9
+    |
+437 |     let inputs = h.provider.inputs.lock().unwrap();
+    |         ^^^^^^
+    |
+    = help: consider using an async-aware `Mutex` type or ensuring the `MutexGuard` is dropped before calling `await`
+note: these are all the await points this lock is held through
+   --> crates/lingxi-service/tests/r07_bridge_native_flow.rs:447:14
+    |
+447 |             .await,
+    |              ^^^^^
+...
+450 |     h.close().await;
+    |               ^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#await_holding_lock
+    = note: `-D clippy::await-holding-lock` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::await_holding_lock)]`
+
+error: could not compile `lingxi-service` (test "r07_bridge_native_flow") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

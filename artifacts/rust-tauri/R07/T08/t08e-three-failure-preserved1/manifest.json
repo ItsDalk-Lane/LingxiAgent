@@ -1,0 +1,145 @@
+{
+  "schema": "r07-safe-failure-preservation-v1",
+  "candidate": "t08e",
+  "createdAt": "2026-10-18T09:17:15.571364+00:00",
+  "readOnlySourceInvestigation": true,
+  "originalFilesModified": false,
+  "noCargoExecuted": true,
+  "excluded": [
+    "local-token.json",
+    "device-credentials.json",
+    "devices.json",
+    "management.json",
+    "数据库及WAL/SHM",
+    "Electron浏览器资料及缓存",
+    "完整配置内容"
+  ],
+  "redaction": "精确秘密字段及实际本地令牌值；本批所留原件是否变化逐项登记",
+  "files": [
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-2997-1-1792314629415593000/ui-result.json",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/agent-guard-original/ui-result.json",
+      "originalSha256": "7b53ee18ed7142186b63ae402e53ae5a9123ffbf4cb04502fea3a48480a1a0ac",
+      "preservedSha256": "7b53ee18ed7142186b63ae402e53ae5a9123ffbf4cb04502fea3a48480a1a0ac",
+      "bytes": 11476,
+      "exactCopy": true,
+      "originalUnchangedAfterCopy": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-2997-1-1792314629415593000/logs/security-audit.jsonl",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/agent-guard-original/security-audit-empty.jsonl",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "preservedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "exactCopy": true,
+      "originalUnchangedAfterCopy": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-2997-0-1792314629415589000/ui-result.json",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/agent-complete/ui-result.json",
+      "originalSha256": "9b9453f6d05b03d1c4bcc4b1b6518f7d7ee383f09aad9e8d40c576e3315bab9b",
+      "preservedSha256": "9b9453f6d05b03d1c4bcc4b1b6518f7d7ee383f09aad9e8d40c576e3315bab9b",
+      "bytes": 11453,
+      "exactCopy": true,
+      "originalUnchangedAfterCopy": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r06-agent-admin-2997-0-1792314629415589000/logs/security-audit.jsonl",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/agent-complete/security-audit-empty.jsonl",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "preservedSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "exactCopy": true,
+      "originalUnchangedAfterCopy": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-native-3594-1792314684179202000/chat-ui-failure.json",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/chat-live/chat-ui-failure.json",
+      "originalSha256": "0d6a7536317441e8f31d149b048b7a56fda8a44d494a3be32e64c8e74de9b0bb",
+      "preservedSha256": "0d6a7536317441e8f31d149b048b7a56fda8a44d494a3be32e64c8e74de9b0bb",
+      "bytes": 21864,
+      "exactCopy": true,
+      "originalUnchangedAfterCopy": true
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/home/lingxi-r06-ex01-chat-native-3594-1792314684179202000/chat-ui-failure.txt",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/chat-live/chat-ui-failure.txt",
+      "originalSha256": "9f1678a0ee52dea265b1c901a4ec0f0ed796934270e453e27ee7e787a2d15d08",
+      "preservedSha256": "9f1678a0ee52dea265b1c901a4ec0f0ed796934270e453e27ee7e787a2d15d08",
+      "bytes": 277,
+      "exactCopy": true,
+      "originalUnchangedAfterCopy": true
+    },
+    {
+      "source": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/t08e-service.log",
+      "preserved": "artifacts/rust-tauri/R07/T08/t08e-three-failure-preserved1/service-failed-targets.log",
+      "sourceSnapshotSha256": "570d0e21d19aa06dcc8cbc61732e2313f0b5e4d8243460de02c4244f82e072c0",
+      "lineRangeInclusive": [
+        745,
+        878
+      ],
+      "preservedSha256": "b54f433665407702e7d6746de548d40b54e1a3dacd1dfb11108c364e54aff8ad",
+      "exactCopy": false,
+      "transformation": "完整失败target节选；不作为最终全批回执",
+      "snapshotOnly": true
+    }
+  ],
+  "currentMaterialHashOnly": [
+    {
+      "scene": "agent-guard-original",
+      "relativePath": "agents/victim/config.yaml",
+      "existsNow": true,
+      "bytes": 74,
+      "sha256": "75df7a4803542d55bb68b805e2cbce043a992e7e73b89bda5b8d757676b6b43a"
+    },
+    {
+      "scene": "agent-guard-original",
+      "relativePath": "agents/survivor/config.yaml",
+      "existsNow": true,
+      "bytes": 30,
+      "sha256": "0dfdaa6639aa1f01774e53368dc67c6f6fd67e2dad9343210a414b39989e07d8"
+    },
+    {
+      "scene": "agent-guard-original",
+      "relativePath": "skills/demo-owned/SKILL.md",
+      "existsNow": true,
+      "bytes": 74,
+      "sha256": "dd6cf13d1d4eda49a3debb6b8ea4461bac8d7644916d8a863d369b7824283f96"
+    },
+    {
+      "scene": "agent-guard-original",
+      "relativePath": "skills/demo-keep/SKILL.md",
+      "existsNow": true,
+      "bytes": 72,
+      "sha256": "119db54aefb91fe485653120783d729ac5d90a4f9f067e4c0ad1fb9fcfb7cce2"
+    },
+    {
+      "scene": "agent-complete",
+      "relativePath": "agents/victim/config.yaml",
+      "existsNow": true,
+      "bytes": 74,
+      "sha256": "75df7a4803542d55bb68b805e2cbce043a992e7e73b89bda5b8d757676b6b43a"
+    },
+    {
+      "scene": "agent-complete",
+      "relativePath": "agents/survivor/config.yaml",
+      "existsNow": true,
+      "bytes": 30,
+      "sha256": "0dfdaa6639aa1f01774e53368dc67c6f6fd67e2dad9343210a414b39989e07d8"
+    },
+    {
+      "scene": "agent-complete",
+      "relativePath": "skills/demo-owned/SKILL.md",
+      "existsNow": true,
+      "bytes": 86,
+      "sha256": "ed4a2a859b0d846eafad1cd9d92ade83095a8928c15d635d1c77f5a8a242396a"
+    },
+    {
+      "scene": "agent-complete",
+      "relativePath": "skills/demo-keep/SKILL.md",
+      "existsNow": true,
+      "bytes": 84,
+      "sha256": "6d8844bcf2897c9a7a3af0526743623044404fc558be7bc10a72f9dc3fb0365e"
+    }
+  ]
+}

@@ -25,7 +25,7 @@
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::sync::{Mutex, RwLock};
 
 use axum::extract::{Path as AxumPath, State};
 use axum::http::{HeaderValue, StatusCode};
@@ -82,7 +82,7 @@ struct TokenRecord {
 }
 
 pub struct BridgeMediaService {
-    base_url: String,
+    base_url: RwLock<String>,
     allowed_roots: Vec<PathBuf>,
     ttl_ms: u64,
     max_downloads: u32,
@@ -113,7 +113,7 @@ impl BridgeMediaService {
         now: impl Fn() -> u64 + Send + Sync + 'static,
     ) -> Result<Self, BridgeMediaError> {
         Ok(BridgeMediaService {
-            base_url: normalize_base_url(base_url)?,
+            base_url: RwLock::new(normalize_base_url(base_url)?),
             allowed_roots: normalize_allowed_roots(allowed_roots)?,
             ttl_ms,
             max_downloads: max_downloads.max(1),
@@ -122,13 +122,32 @@ impl BridgeMediaService {
         })
     }
 
+    /// 配置入口先完成验证和持久化，再切换同一共享发布对象。
+    pub(crate) fn set_base_url(&self, value: &str) -> Result<(), BridgeMediaError> {
+        let next = normalize_base_url(value)?;
+        *self
+            .base_url
+            .write()
+            .map_err(|_| BridgeMediaError::new("bridge media configuration lock poisoned"))? = next;
+        Ok(())
+    }
+
+    pub(crate) fn validate_base_url(value: &str) -> Result<String, BridgeMediaError> {
+        normalize_base_url(value)
+    }
+
     /// 服务内 publish（media-publisher.ts :45-82）。桥外发调用方属后续
     /// 阶段；T05 只交付该原语与 token 读路由。
     pub fn publish(
         &self,
         session_file: &SessionFileView,
     ) -> Result<PublishedMedia, BridgeMediaError> {
-        if self.base_url.is_empty() {
+        let base_url = self
+            .base_url
+            .read()
+            .map_err(|_| BridgeMediaError::new("bridge media configuration lock poisoned"))?
+            .clone();
+        if base_url.is_empty() {
             return Err(BridgeMediaError::new(
                 "public media base URL is not configured",
             ));
@@ -197,7 +216,7 @@ impl BridgeMediaService {
         Ok(PublishedMedia {
             public_url: format!(
                 "{}/lingxi/v1/bridge/media/{}",
-                self.base_url,
+                base_url,
                 crate::preview::encode_uri_component(&token)
             ),
             token,
@@ -292,13 +311,17 @@ fn normalize_base_url(base_url: &str) -> Result<String, BridgeMediaError> {
     if value.is_empty() {
         return Ok(String::new());
     }
-    let rest = value
-        .strip_prefix("https://")
-        .or_else(|| value.strip_prefix("http://"))
-        .ok_or_else(|| BridgeMediaError::new("public media base URL must be http or https"))?;
-    if rest.is_empty() {
+    let url = reqwest::Url::parse(value)
+        .map_err(|_| BridgeMediaError::new("媒体公开地址必须是有效的HTTP或HTTPS地址"))?;
+    if !matches!(url.scheme(), "http" | "https")
+        || url.host_str().is_none()
+        || !url.username().is_empty()
+        || url.password().is_some()
+        || url.query().is_some()
+        || url.fragment().is_some()
+    {
         return Err(BridgeMediaError::new(
-            "public media base URL must be http or https",
+            "媒体公开地址不能包含用户凭证、查询参数或片段",
         ));
     }
     Ok(value.trim_end_matches('/').to_string())
@@ -449,4 +472,29 @@ pub async fn bridge_media_route(
         HeaderValue::from_static("nosniff"),
     );
     response
+}
+
+#[cfg(test)]
+mod settings_url_tests {
+    use super::*;
+    #[test]
+    fn public_url_settings_reject_ambiguous_or_credential_bearing_addresses() {
+        for value in [
+            "https://",
+            "https://x.test/a?token=secret",
+            "https://x.test/#part",
+            "https://user:secret@x.test",
+            "file:///tmp/share",
+        ] {
+            assert!(
+                BridgeMediaService::validate_base_url(value).is_err(),
+                "{value}"
+            );
+        }
+        assert_eq!(
+            BridgeMediaService::validate_base_url(" https://x.test/share/ ").unwrap(),
+            "https://x.test/share"
+        );
+        assert_eq!(BridgeMediaService::validate_base_url("").unwrap(), "");
+    }
 }

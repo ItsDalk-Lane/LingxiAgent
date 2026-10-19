@@ -1,0 +1,95 @@
+{
+  "schema": "lingxi.r07.independent-short-source-review.v1",
+  "recordedAt": "2026-10-18T05:59:02.168021+00:00",
+  "mode": "READ_ONLY_NO_CARGO_NO_PRODUCT_EDITS",
+  "status": "ONE_CONFIRMED_MISSING_PATH_BOUNDARY",
+  "sourceHashes": [
+    {
+      "path": "rust/crates/lingxi-service/src/management.rs",
+      "sha256": "f252906041d1c03a705357535550b454c88565bc252969e816298d5c9577c19d"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/chat_settings.rs",
+      "sha256": "28965e0fbe5e8e29904209f64cd6d560b5e51da26f12504795e926537086070b"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/runs.rs",
+      "sha256": "07b98a7d051d9dd7e5a80b3d8b29d786a7e92317f0d6f8b87df05aeac0ba7486"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/file_safety.rs",
+      "sha256": "0b361b544067ad5d90d4abaf2beb6627322f31ed67d59c0ef238c062ca994114"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/filetools.rs",
+      "sha256": "65de7ec880afd431d0ea69d02f19f91ba1a0563ec115d27e4962e21dd820cc3e"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/storage/agent_config.rs",
+      "sha256": "968bfbafedcb694dba66ab28005c23e076a84559736f3c8bc80df75009854d0c"
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/workbench.rs",
+      "sha256": "b58818471b086bc26d473be9e307916e19dd954716263c8650b2bfb729f5ba11"
+    },
+    {
+      "path": "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs",
+      "sha256": "f0edd614c6786d640890cdf49fa4c7a7a6640cee623d2815580a79bfcfee765c"
+    }
+  ],
+  "findings": [
+    {
+      "id": "T08-AUDIT-MISSING-AGENT-PARENT-LINK",
+      "priority": "P2",
+      "source": "rust/crates/lingxi-service/src/chat_settings.rs choice_for_agent Err(NotFound) shortcut",
+      "condition": "会话无显式模型；home/agents/b为存在的悬空目录链接，或指向没有config.yaml的目录链接。",
+      "actualControlFlow": "symlink_metadata(agents/b/config.yaml)会返回NotFound；目前直接Ok(choice)回退全局模型，未到后面的Snapshot::read_bounded/DirFd父链无跟随验证。最终文件的“缺失”未区分合法旧助手缺失与不安全现有父链接。",
+      "impact": "损坏/不安全助手路径被静默当作旧会话无配置，不符合明确损坏输入失败与合法缺失兼容的区分；不是焦点助手泄漏或已验证外部读取。",
+      "minimumFix": "兼容缺失前对已存在父组件用无跟随目录链校验；普通不存在可兼容，任何存在链接/异常类型拒绝。",
+      "observedFilesystemProbe": {
+        "existingDanglingParentIsSymlink": true,
+        "finalPathSymlinkMetadataEquivalent": "NotFound",
+        "scriptExitCode": 0,
+        "fixture": "隔离TemporaryDirectory，退出已删除",
+        "productExecuted": false
+      },
+      "validationRequired": "root真实Rust检查普通缺失兼容、悬空父链接和指向无config目录链接拒绝，主目录与焦点不被读取。",
+      "reportedToRoot": true
+    }
+  ],
+  "checked": [
+    {
+      "chain": "management::ThinkingInput/ThinkingQuery",
+      "result": "sessionId与sessionPath均可用，同值接受，非空冲突先400；读取pendingNewSession前也已比较冲突；写入先检查目标权限，不把已有id当全局默认。"
+    },
+    {
+      "chain": "chat_wire::setting_choice",
+      "result": "Some会话沿owned返回事实保留agent_id，进入统一effective_choice_for_agent；None才草稿，不读焦点。"
+    },
+    {
+      "chain": "chat_settings::choice_for_agent",
+      "result": "已有显式会话/owner选择优先；配置限制1MiB、UTF8/YAML与model_reference解析、提交使用前path_is_current；只剩上述缺失捷径问题。"
+    },
+    {
+      "chain": "runs::frozen_model_options",
+      "result": "普通RunOrigin::User且无已捕获chat_input时使用choice_for_agent，冻结ModelTurnOptions；循环中实际next_turn_with_options传该值，未只修改展示或descriptor。"
+    },
+    {
+      "chain": "agent_config::model_reference",
+      "result": "存在的非mapping且非null分组明确错误；模型引用本身必须mapping并提供provider及id/model。合法null保留未配置含义。"
+    },
+    {
+      "chain": "ActivitySummaryResponse/verify",
+      "result": "untagged+deny_unknown_fields使旧error响应不先匹配Summary{None}；混合summary/error拒绝，空summary:null仍合法。verify已登记AgentActivitySnapshot、LoopStatusSnapshot、ActivitySummaryRequest、ActivitySummaryResponse四种真实解析类型，Entry经Snapshot嵌套消费。"
+    }
+  ],
+  "limits": [
+    "只作源码和文件系统分支复核；没有声称产品或门禁运行通过。",
+    "独立测试、协议roundtrip、实际Run、平台边界由root统一执行。",
+    "不改旧FAIL、原账、阶段状态，不提交不推送。"
+  ]
+}

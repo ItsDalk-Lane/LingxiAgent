@@ -1,0 +1,16 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0425]: cannot find value `jimeng` in this scope
+   --> crates/lingxi-service/tests/r07_media/mod.rs:116:27
+    |
+116 |             json!({"kind":jimeng.unwrap(),"provider":"jimeng-cli"})
+    |                           ^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `jimeng` in this scope
+   --> crates/lingxi-service/tests/r07_media/mod.rs:119:16
+    |
+119 |             if jimeng.is_some() {
+    |                ^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `lingxi-service` (test "r07_t05_media") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

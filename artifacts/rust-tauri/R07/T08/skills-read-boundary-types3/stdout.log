@@ -1,0 +1,6 @@
+desktop/src/react/settings/tabs/mcp/mcp-api.ts(5,73): error TS2724: '"../../../../../../contracts/generated/ts/lingxi-protocol"' has no exported member named 'McpSettingsState'. Did you mean 'McpSettingsStatus'?
+desktop/src/react/settings/tabs/mcp/mcp-api.ts(5,91): error TS2305: Module '"../../../../../../contracts/generated/ts/lingxi-protocol"' has no exported member 'McpConnectorBulkResult'.
+desktop/src/react/settings/tabs/mcp/mcp-api.ts(46,40): error TS2367: This comparison appears to be unintentional because the types 'McpSettingsAction' and '"mcp.connector.add_bulk"' have no overlap.
+desktop/src/react/settings/tabs/mcp/mcp-api.ts(131,37): error TS2345: Argument of type '"mcp.connector.add_bulk"' is not assignable to parameter of type 'McpSettingsAction'.
+desktop/src/react/settings/tabs/mcp/mcp-api.ts(132,106): error TS7006: Parameter 'row' implicitly has an 'any' type.
+desktop/src/react/settings/tabs/mcp/mcp-api.ts(152,41): error TS2345: Argument of type '"mcp.global.defer"' is not assignable to parameter of type 'McpSettingsAction'.

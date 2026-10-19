@@ -1,0 +1,96 @@
+{
+  "status": "REAL_RESUME_NAVIGATION_FAILURE_PRESERVED_ERROR_TEXT_LOST_ROOT_CAUSE_UNDETERMINED",
+  "candidate": "t07d",
+  "failureTest": "independent_persistent_profiles_auxiliary_locale_and_site_data_cleanup",
+  "failure": {
+    "action": "Resume",
+    "code": "browser_navigation",
+    "effect_unknown": false,
+    "owner": "owner-a",
+    "savedUrl": "http://127.0.0.1:59443/form",
+    "actualColdTab": "about:blank",
+    "ownerBReason": "cookie_policy_changed"
+  },
+  "exactPhaseEvidence": {
+    "phase": "首次配置accept_cookies=false后的Resume",
+    "evidence": "双方Preferences cookies=2；owner-b保留cookie_policy_changed，owner-a新tab about:blank；后续允许Cookie会写1，尚未到该阶段。",
+    "profiles": [
+      {
+        "owner": "owner-a",
+        "identityKey": "3c056a7967a9fbc7bec10575cdd00a82bb4d037d625fd80b746ee183e98e86bc",
+        "preferencesSha256": "d77bd78ee50289e8f75cc64c4b4eb9e04cc17417aefcb623c3d14cc2f4c0b244",
+        "cookiesDefaultSetting": 2,
+        "cookieExceptions": {},
+        "profileExitType": "SessionEnded",
+        "historyUrls": [
+          [
+            "http://127.0.0.1:59443/login",
+            "Local browser fixture"
+          ],
+          [
+            "http://127.0.0.1:59443/form",
+            "Local browser fixture"
+          ]
+        ],
+        "historyLimitation": "强制关闭或未提交错误导航可能不落History，不能据缺失URL判定未发HTTP。"
+      },
+      {
+        "owner": "owner-b",
+        "identityKey": "d1466297f2b4a442c57f3dc6cf62258d99a7d434760b97d918b23e7ba3101099",
+        "preferencesSha256": "93af9fd8ed9a5f7e11faac8f2e70849e2ed52bb7de91e14854fdaa422c6fc8f1",
+        "cookiesDefaultSetting": 2,
+        "cookieExceptions": {},
+        "profileExitType": "Normal",
+        "historyUrls": [
+          [
+            "http://127.0.0.1:59443/form",
+            "Local browser fixture"
+          ]
+        ],
+        "historyLimitation": "强制关闭或未提交错误导航可能不落History，不能据缺失URL判定未发HTTP。"
+      }
+    ]
+  },
+  "retained": {
+    "directory": "artifacts/rust-tauri/R07/T07/resume-cookie-diagnosis-t07d",
+    "adapterLogSha256": "3e7bcba0459ca48c19267a3386f0114edaeecea8af636c2474d9aaf5b9bd25d3",
+    "profileArchiveSha256": "d0cea619711194c8feccc10da0e56789d6763b0af75b01b8ad27d6a1de111158",
+    "manifestSha256": "8791ea9c37c21acd2948caa4b489612ac83f8dd0f7488a70694dd0c526af407c"
+  },
+  "requestEvidence": {
+    "actualSiteRequestsAvailable": false,
+    "reason": "ops::navigate仅检查nav.errorText为string后生成固定browser_navigation消息，未保留值。",
+    "errorTextAvailable": false,
+    "doNotInfer": "History仅保留既有login/form，不能推断失败导航是否发出HTTP或其错误类别。"
+  },
+  "observedChain": [
+    "configure(false)等待启动收口→close_all(false)→真实profile Preferences cookies=2（不清空原Cookie库）→settings提交false",
+    "Resume冷启动自有profile→Live.accept_cookies=false→autoAttach暂停每个page",
+    "attachedToTarget同步Page/Runtime/DOM.enable→生命周期事件→Emulation.setDocumentCookieDisabled(true)→Fetch.enable Request+Response→runIfWaitingForDebugger→登记attached",
+    "恢复saved /form新target约about:blank→Page.navigate true→CDP响应含字符串errorText→ops固定browser_navigation(false)；不是CDP terminal变成browser_closed",
+    "Fetch.requestPaused按responseStatusCode决定Response分支去Set-Cookie并continueResponse，否则Request分支去Cookie并显式空Cookie覆盖后continueRequest"
+  ],
+  "specificGaps": [
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/ops.rs",
+      "line": 199,
+      "fact": "错误文本被丢弃；成功CDP响应中的导航错误不经过上轮Cdp错误上下文。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/browser/runtime.rs",
+      "line": 746,
+      "fact": "Fetch阶段/responseErrorReason未作为失败现场保留；response无statusCode时落Request分支，不能只凭此确定原请求属于哪阶段。"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/tests/r07_browser_chromium.rs",
+      "line": 365,
+      "fact": "本测试尚未传owned root/phase/Site上下文，通用helper只能定位Resume，磁盘证据才缩小具体Resume。"
+    }
+  ],
+  "nextMinimumReadOnlyRecommendation": "待当前冻结组全部结束后如另授权诊断，保留安全net::ERR_*错误枚举、method/session及受控Fetch阶段/responseErrorReason，不记录URL正文/headers/cookies；本测试各Resume采用现有owned helper固定phase。当前未修改任何源，不扩大测试，不调预算/串行。",
+  "unproven": [
+    "无证据证明网络代理绕行、Cookie权限拒绝直接导致导航失败或拦截命令本身出错。",
+    "与t07c popup失败的错误类别/操作不同，不能认定同源。",
+    "没有安全依据关闭本次真实失败。"
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "recordedAt": "2026-10-18T11:27:19.596729+00:00",
+  "status": "TEST_FIXTURE_STOPPED_FOR_ROOT_RETEST_NOT_EXECUTED",
+  "priorActualRun": {
+    "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-fixed1.log",
+    "logSha256": "9c7ceac564220f9234ec1a04b34f86329526a3feda9a22657d453ba72a9e6dad",
+    "exitCode": 101,
+    "passed": 3,
+    "failed": 2,
+    "passedCases": [
+      "in_flight_grant_cannot_land_after_real_archive_restore_completed",
+      "paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting",
+      "missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates"
+    ],
+    "failures": [
+      {
+        "case": "actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval",
+        "actual": "外层6秒timeout；原日志不含第二次pending；真实持久化证明两轮完成、第二轮无再审批且实际第二次SDK调用成功",
+        "classification": "观测fixture在select每次重建同步设备密钥认证，阻塞帧读取；本轮仅测试预认证复用，待实测"
+      },
+      {
+        "case": "credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants",
+        "actual": "已到同home重启后的真实新审批，最终close真实回收EPERM pid28172 pgid=-1",
+        "classification": "实际回收未确认，交SDK作者；本轮不改产品，也不提前称整项通过"
+      }
+    ]
+  },
+  "wsScene": {
+    "syntheticHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-131ebdc6b4ac2c91",
+    "runs": [
+      [
+        "run_000001a14ec21f54_000001",
+        "completed",
+        "completed.with_final",
+        1792322707284,
+        1792322711232
+      ],
+      [
+        "run_000001a14ec23406_000002",
+        "completed",
+        "completed.with_final",
+        1792322712582,
+        1792322715294
+      ]
+    ],
+    "events": [
+      [
+        "run_000001a14ec21f54_000001",
+        "run_state_changed",
+        "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}"
+      ],
+      [
+        "run_000001a14ec21f54_000001",
+        "tool_call_started",
+        "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"3f39ec9d8aa7c48412f853938efb9baf2ecaf0d8e3d99bd78044572348a46bae\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14ec21f54_000001-tc0001\"},\"type\":\"tool_call_started\"}"
+      ],
+      [
+        "run_000001a14ec21f54_000001",
+        "run_state_changed",
+        "{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}"
+      ],
+      [
+        "run_000001a14ec21f54_000001",
+        "run_state_changed",
+        "{\"from\":\"waiting_approval\",\"reason\":\"approval_resolved\",\"to\":\"running\",\"type\":\"run_state_changed\"}"
+      ],
+      [
+        "run_000001a14ec21f54_000001",
+        "tool_call_completed",
+        "{\"result\":{\"content\":[{\"text\":\"{\\\"_meta\\\":{\\\"progressToken\\\":1},\\\"arguments\\\":{\\\"n\\\":11},\\\"name\\\":\\\"alpha\\\"}\",\"type\":\"text\"}],\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14ec21f54_000001-tc0001\",\"type\":\"tool_call_completed\"}"
+      ],
+      [
+        "run_000001a14ec21f54_000001",
+        "run_state_changed",
+        "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}"
+      ],
+      [
+        "run_000001a14ec23406_000002",
+        "run_state_changed",
+        "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}"
+      ],
+      [
+        "run_000001a14ec23406_000002",
+        "tool_call_started",
+        "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"78e629c92dd3d2d83954a8ea8d607938a69a1c5e828a7e406abcd6ccb1fd0de0\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14ec23406_000002-tc0001\"},\"type\":\"tool_call_started\"}"
+      ],
+      [
+        "run_000001a14ec23406_000002",
+        "tool_call_completed",
+        "{\"result\":{\"content\":[{\"text\":\"{\\\"_meta\\\":{\\\"progressToken\\\":2},\\\"arguments\\\":{\\\"n\\\":12},\\\"name\\\":\\\"alpha\\\"}\",\"type\":\"text\"}],\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14ec23406_000002-tc0001\",\"type\":\"tool_call_completed\"}"
+      ],
+      [
+        "run_000001a14ec23406_000002",
+        "run_state_changed",
+        "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}"
+      ]
+    ],
+    "invocationJournal": [
+      [
+        "run_000001a14ec21f54_000001",
+        "tool:mcp:fixture:alpha",
+        "succeeded",
+        "succeeded",
+        1,
+        1792322707284,
+        1792322707284
+      ],
+      [
+        "run_000001a14ec23406_000002",
+        "tool:mcp:fixture:alpha",
+        "succeeded",
+        "succeeded",
+        1,
+        1792322712582,
+        1792322712582
+      ]
+    ],
+    "calls": [
+      {
+        "_meta": {
+          "progressToken": 1
+        },
+        "arguments": {
+          "n": 11
+        },
+        "name": "alpha"
+      },
+      {
+        "_meta": {
+          "progressToken": 2
+        },
+        "arguments": {
+          "n": 12
+        },
+        "name": "alpha"
+      }
+    ],
+    "evidenceDirectory": "artifacts/rust-tauri/R07/T08/mcp-session-fixed1-ws-scene",
+    "conclusion": "第二轮实际2712ms完成，journal dispatched=1，且没有waiting_approval；未声称已抓到原WS帧，因为原timeout没有记录帧"
+  },
+  "change": {
+    "files": [
+      {
+        "path": "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs",
+        "sha256": "1fffa3b18244bf56748fcba3c2b2032b55dd0901f1c7ac97f2211cea329cfe60"
+      }
+    ],
+    "behavior": "第二次WS prompt之前一次真实authenticate；select内用同一真实principal只读准备；真pending出现才正式HTTP验证。保原5秒审批登记和6秒WS观测窗口、拒绝后原false反例断言、真实Run/journal/calls检查；增加真实帧类型日志。",
+    "product": "未改epoch/gateway/WSflag/SDK/auth/权限",
+    "checks": "rustfmt exit0；Cargo NOT_RUN_BY_AGENT；新fixture未执行"
+  },
+  "historicalCounterexample": "reproduce2实际前台flag遗漏导致第二次WS再审批红保留，reproduce3同场景实际通过；本轮fixed1超时不能改写旧原始结果",
+  "acceptance": "672564/T08不提前验收PASS"
+}

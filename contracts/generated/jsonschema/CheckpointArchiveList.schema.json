@@ -1,0 +1,65 @@
+{
+  "$defs": {
+    "CheckpointArchiveMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "sessionPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "size": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "source": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "ts": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "ts",
+        "tool",
+        "source",
+        "reason",
+        "path",
+        "size"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "checkpoints": {
+      "items": {
+        "$ref": "#/$defs/CheckpointArchiveMetadata"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "checkpoints"
+  ],
+  "title": "CheckpointArchiveList",
+  "type": "object"
+}

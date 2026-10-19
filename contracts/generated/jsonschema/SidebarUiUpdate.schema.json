@@ -1,0 +1,84 @@
+{
+  "$defs": {
+    "SidebarProjectViewPreferences": {
+      "additionalProperties": false,
+      "properties": {
+        "collapsedFolderIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "collapsedProjectIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "showAllProjectIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "collapsedProjectIds",
+        "collapsedFolderIds",
+        "showAllProjectIds"
+      ],
+      "type": "object"
+    },
+    "SidebarSessionListPreferences": {
+      "additionalProperties": false,
+      "properties": {
+        "rowMode": {
+          "$ref": "#/$defs/SidebarSessionListRowMode"
+        }
+      },
+      "required": [
+        "rowMode"
+      ],
+      "type": "object"
+    },
+    "SidebarSessionListRowMode": {
+      "enum": [
+        "two-line",
+        "single-line"
+      ],
+      "type": "string"
+    },
+    "SidebarUiPreferences": {
+      "additionalProperties": false,
+      "properties": {
+        "projectView": {
+          "$ref": "#/$defs/SidebarProjectViewPreferences"
+        },
+        "sessionList": {
+          "$ref": "#/$defs/SidebarSessionListPreferences"
+        }
+      },
+      "required": [
+        "projectView",
+        "sessionList"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "sidebarUi": {
+      "$ref": "#/$defs/SidebarUiPreferences"
+    }
+  },
+  "required": [
+    "ok",
+    "sidebarUi"
+  ],
+  "title": "SidebarUiUpdate",
+  "type": "object"
+}

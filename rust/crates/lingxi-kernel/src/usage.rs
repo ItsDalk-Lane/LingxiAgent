@@ -451,6 +451,45 @@ pub struct ModelUsageQuery {
     /// Date-window filter (inclusive bounds on `recorded_at_unix_ms`).
     pub recorded_from_unix_ms: Option<u64>,
     pub recorded_to_unix_ms: Option<u64>,
+    /// R07-T10: provider / origin / outcome filters for the observability
+    /// query surface (exact match; `None` = no filter).
+    pub provider: Option<String>,
+    pub origin: Option<String>,
+    pub outcome: Option<CallOutcome>,
+}
+
+/// R07-T10 observability filter: the multi-value (OR within a field, AND
+/// across fields) form of the ledger query. Empty vec = no filter on that
+/// field. `owner_user_id` stays singular (authorization is not a filter).
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct UsageFilter {
+    pub owner_user_id: Option<String>,
+    pub session_ids: Vec<String>,
+    pub run_ids: Vec<String>,
+    pub purposes: Vec<String>,
+    pub models: Vec<String>,
+    pub providers: Vec<String>,
+    pub origins: Vec<String>,
+    pub outcomes: Vec<CallOutcome>,
+    pub recorded_from_unix_ms: Option<u64>,
+    pub recorded_to_unix_ms: Option<u64>,
+}
+
+impl From<ModelUsageQuery> for UsageFilter {
+    fn from(q: ModelUsageQuery) -> Self {
+        Self {
+            owner_user_id: q.owner_user_id,
+            session_ids: q.session_id.into_iter().collect(),
+            run_ids: q.run_id.into_iter().collect(),
+            purposes: q.purpose.into_iter().collect(),
+            models: q.model.into_iter().collect(),
+            providers: q.provider.into_iter().collect(),
+            origins: q.origin.into_iter().collect(),
+            outcomes: q.outcome.into_iter().collect(),
+            recorded_from_unix_ms: q.recorded_from_unix_ms,
+            recorded_to_unix_ms: q.recorded_to_unix_ms,
+        }
+    }
 }
 
 #[cfg(test)]

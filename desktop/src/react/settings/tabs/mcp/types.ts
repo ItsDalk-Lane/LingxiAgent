@@ -161,4 +161,7 @@ export interface McpBulkResult {
   ok: boolean;
   id?: string;
   error?: string;
+  /** 保存与运行时处理分开显示，启动失败不能抹去已保存事实。 */
+  saved?: boolean;
+  runtimeApplied?: boolean;
 }

@@ -25,9 +25,90 @@ pub enum ApplicableAuth {
     Bearer(String),
     /// One custom auth header sent verbatim.
     Header { name: String, value: String },
+    /// 材料由同一凭证出口组合；OAuth 的新令牌优先于旧自定义认证头。
+    WithHeaders {
+        base: Box<ApplicableAuth>,
+        headers: std::collections::BTreeMap<String, String>,
+        base_wins: bool,
+    },
 }
 
 impl ApplicableAuth {
+    pub fn with_headers(
+        self,
+        headers: &std::collections::BTreeMap<String, String>,
+        base_wins: bool,
+    ) -> Self {
+        if headers.is_empty() {
+            self
+        } else {
+            Self::WithHeaders {
+                base: Box::new(self),
+                headers: headers.clone(),
+                base_wins,
+            }
+        }
+    }
+    pub fn bearer_token(&self) -> Option<&str> {
+        match self {
+            Self::Bearer(token) => Some(token),
+            Self::WithHeaders { base, .. } => base.bearer_token(),
+            _ => None,
+        }
+    }
+    /// 少数非 Bearer 协议要把主材料写入固定请求字段，仍从同一凭证收据取值。
+    pub fn primary_material(&self) -> Option<&str> {
+        match self {
+            Self::Bearer(value) | Self::Header { value, .. } => Some(value),
+            Self::WithHeaders { base, .. } => base.primary_material(),
+            Self::None => None,
+        }
+    }
+    /// 归一化名称后覆盖同名项；调用方不会 append 重复 Authorization。
+    pub fn header_values(
+        &self,
+        bearer_name: &str,
+        bearer_prefix: &str,
+    ) -> std::collections::BTreeMap<String, String> {
+        let mut result = std::collections::BTreeMap::new();
+        match self {
+            Self::None => {}
+            Self::Bearer(token) => {
+                result.insert(
+                    bearer_name.to_ascii_lowercase(),
+                    format!("{bearer_prefix}{token}"),
+                );
+            }
+            Self::Header { name, value } => {
+                result.insert(name.to_ascii_lowercase(), value.clone());
+            }
+            Self::WithHeaders {
+                base,
+                headers,
+                base_wins,
+            } => {
+                for (name, value) in headers {
+                    if !*base_wins
+                        || !matches!(
+                            name.to_ascii_lowercase().as_str(),
+                            "authorization" | "cookie" | "x-api-key"
+                        )
+                    {
+                        result.insert(name.to_ascii_lowercase(), value.clone());
+                    }
+                }
+                let base = base.header_values(bearer_name, bearer_prefix);
+                if *base_wins {
+                    result.extend(base);
+                } else {
+                    let custom = result;
+                    result = base;
+                    result.extend(custom);
+                }
+            }
+        }
+        result
+    }
     /// The material strings this auth carries (for exact-match scrubbing of
     /// any text that crosses a trust boundary — C09).
     pub fn materials(&self) -> Vec<&str> {
@@ -35,6 +116,11 @@ impl ApplicableAuth {
             ApplicableAuth::None => Vec::new(),
             ApplicableAuth::Bearer(token) => vec![token.as_str()],
             ApplicableAuth::Header { value, .. } => vec![value.as_str()],
+            ApplicableAuth::WithHeaders { base, headers, .. } => {
+                let mut values = base.materials();
+                values.extend(headers.values().map(String::as_str));
+                values
+            }
         }
     }
 }

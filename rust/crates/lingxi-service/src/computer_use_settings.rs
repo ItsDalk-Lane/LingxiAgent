@@ -89,6 +89,50 @@ pub async fn get_route(State(s): State<ServiceState>) -> Response {
         Err(e) => failure(StatusCode::INTERNAL_SERVER_ERROR, e),
     }
 }
+
+fn save_enabled(
+    memory: &crate::memory::MemoryService,
+    events: &crate::appevents::AppEventLog,
+    enabled: bool,
+) -> Result<Value, String> {
+    if default_provider().is_none() {
+        return Err("Computer Use is not supported on Linux Preview.".into());
+    }
+    let next = {
+        let _guard = crate::agents_admin::preferences_locked();
+        let mut root = memory.read_preferences_root()?;
+        let mut next = settings(&root)?;
+        next["enabled"] = json!(enabled);
+        root["computer_use"] = next.clone();
+        memory.write_preferences_root(&root)?;
+        next
+    };
+    events.publish(
+        "computer-use-settings-changed",
+        json!({"selectedProviderId":selected(&next)}),
+    );
+    Ok(next)
+}
+
+pub(crate) fn tool_enabled(memory: &crate::memory::MemoryService) -> Result<bool, String> {
+    Ok(settings(&memory.read_preferences_root()?)?["enabled"] == true)
+}
+
+/// 只能消费真实网关调用身份；不批准应用，不请求或提升操作系统授权。
+pub(crate) fn tool_set_enabled(
+    memory: &crate::memory::MemoryService,
+    events: &crate::appevents::AppEventLog,
+    auth: &crate::auth::AuthService,
+    ctx: &lingxi_kernel::RunContext,
+    call: &lingxi_protocol::ToolCallId,
+    enabled: bool,
+) -> Result<Value, String> {
+    let principal = auth.mint_local_settings_tool_principal(ctx, call)?;
+    if !principal.has_scope("settings.write") {
+        return Err("settings.write is required".into());
+    }
+    save_enabled(memory, events, enabled)
+}
 pub async fn put_route(
     State(s): State<ServiceState>,
     body: Result<Json<Value>, axum::extract::rejection::JsonRejection>,
@@ -114,27 +158,10 @@ pub async fn put_route(
             "only boolean enabled may be changed here",
         );
     }
-    let next = {
-        let _guard = crate::agents_admin::preferences_locked();
-        let mut root = match s.memory().read_preferences_root() {
-            Ok(v) => v,
-            Err(e) => return failure(StatusCode::INTERNAL_SERVER_ERROR, e),
-        };
-        let mut next = match settings(&root) {
-            Ok(v) => v,
-            Err(e) => return failure(StatusCode::INTERNAL_SERVER_ERROR, e),
-        };
-        next["enabled"] = patch["enabled"].clone();
-        root["computer_use"] = next.clone();
-        if let Err(e) = s.memory().write_preferences_root(&root) {
-            return failure(StatusCode::INTERNAL_SERVER_ERROR, e);
-        }
-        next
+    let next = match save_enabled(s.memory(), s.app_events(), patch["enabled"] == true) {
+        Ok(value) => value,
+        Err(error) => return failure(StatusCode::INTERNAL_SERVER_ERROR, error),
     };
-    s.app_events().publish(
-        "computer-use-settings-changed",
-        json!({"selectedProviderId":selected(&next)}),
-    );
     Json(json!({"ok":true,"settings":next})).into_response()
 }
 pub async fn request_route(

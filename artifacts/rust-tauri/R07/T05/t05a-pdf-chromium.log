@@ -1,0 +1,21 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s
+     Running tests/r07_pdf_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_pdf_chromium-11a66dbe33c665f1)
+
+running 7 tests
+test actual_r01_documents_preserve_fonts_images_pagination_and_js_contract ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/r01-quality-75c0c2b4fc970852b8d11b4895e09c20
+ok
+test broken_background_font_and_unfrozen_stylesheet_are_explicit_failures ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/bad-assets-03805a47f48284cf20660bf625607e75
+ok
+test html_network_frames_and_workers_never_reach_loopback_canary ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/network-gate-c38f9beaa31db3abbb467f29e98eea51
+ok
+test printing_never_switches_or_clears_the_regular_logged_in_workspace ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/regular-isolation-7020c927265691ab2ededa82713859dc
+ok
+test static_utf8_pdf_is_returned_only_after_confirmed_private_cleanup ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/first-print-ba421325c9d6f45bfed2e5cf40c8a8c8
+ok
+test total_deadline_and_explicit_cancel_reap_before_returning_failure ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/deadlines-88772cd2dc1db70c7ec2b8bd1fb9f7b6
+ok
+test two_auxiliary_leases_are_scoped_and_dropped_future_is_cancelled ... PDF_EVIDENCE /private/tmp/lingxi-r07-tests/tmp/lingxi-r07-pdf-evidence/scope-and-quota-f7206fcabffb14c84464f88cc6440c1d
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.38s
+

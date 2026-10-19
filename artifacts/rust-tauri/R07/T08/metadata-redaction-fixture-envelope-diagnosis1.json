@@ -1,0 +1,37 @@
+{
+  "scope": "REAL_FAILED_TEST_DIAGNOSIS_NOT_PRODUCT_NOOP_CONTRACT",
+  "recordedAt": "2026-10-18T08:41:46.939347+00:00",
+  "failedRunLog": "metadata-source-permissions-fixed1.log",
+  "originalLogAtDiagnosisSha256": "02bbe8879133e138be786acac9dcbc607c3c142f49df90cfda9a7df0bd953036",
+  "logMayStillBeRunning": true,
+  "case": "metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id",
+  "originalTestResult": "FAILED at first original masked roundtrip report.saved assertion; HTTP200/modelConfiguration:null",
+  "scene": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-metadata-redaction-b5e1d1ae42a6fe57",
+  "sourceSha256": "de69ad5aa0e38ba84566cf5986af2de07e07a6062ed565c9a197e9c6f19f04b1",
+  "agentConfigSha256": "f51629e6a0b45cf5892f1dfad5076cd3ec0fe2ca0953eb00a7326c14a155c6aa",
+  "actualObservations": {
+    "sourceModelIds": [
+      "alpha",
+      "beta"
+    ],
+    "agentUnknownValuesEnvelopePresent": true,
+    "priorReadMaskingAssertionsCompleted": true,
+    "authHeaderAndNoSecretsPublisherCasesPassed": true
+  },
+  "rootCause": "Fixture wrongly sent values.providers to agents config. Actual agent_config_put parses object directly and provider extraction only recognizes top-level providers; unknown values persisted to agent config and no model change was submitted. HTTP200/null is not proof of Source save nor a legitimate unchanged-model optimization.",
+  "correctRequest": {
+    "method": "PUT",
+    "route": "/lingxi/v1/agents/a/config",
+    "bodyShape": {
+      "providers": {
+        "fixture": {
+          "models": "actual masked model array"
+        }
+      }
+    }
+  },
+  "plannedMinimalFix": "Remove values wrapper from own test positive save and negative HTTP patch only; retain strict saved/applied and actual Source order/clear/id-specific secret assertions. No product changes or permission widening.",
+  "sourceEditedAtDiagnosis": false,
+  "cargoExecutedByThisAgent": false,
+  "executionState": "WAITING_ROOT_CARGO_BATCH_END_BEFORE_FIX"
+}

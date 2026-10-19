@@ -1,0 +1,34 @@
+{
+  "developmentOnly": true,
+  "formalCandidate": false,
+  "results": [
+    {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--pretty",
+        "false"
+      ],
+      "exitCode": 0,
+      "logs": {
+        "0.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "0.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "desktop/src/react/__tests__/components/SkillsPanel.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx"
+      ],
+      "exitCode": 0,
+      "logs": {
+        "1.stdout.log": "79262aac50a0ed81ada3620921ff03487fd6ef3abba82f24aafd6562b3fd143e",
+        "1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}

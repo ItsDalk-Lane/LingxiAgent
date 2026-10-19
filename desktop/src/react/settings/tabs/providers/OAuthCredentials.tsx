@@ -1,123 +1,122 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
-import { lingxiFetch } from '../../api';
+import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from '../../connection-owner';
+import { resolveServerConnection } from '../../../services/server-connection';
+import { startOAuth, completeOAuth, pollOAuth, logoutOAuth, type OAuthAttempt } from './oauth-service';
 import { t } from '../../helpers';
-import { DEFAULT_OAUTH_LOGIN_METHOD } from '../../../../../../shared/oauth-login.ts';
 import styles from '../../Settings.module.css';
-
-const platform = window.platform;
 
 export function OAuthCredentials({ providerId, summary, onRefresh }: {
   providerId: string;
   summary: ProviderSummary;
   onRefresh: () => Promise<void>;
 }) {
+  const platform = window.platform;
   const showToast = useSettingsStore(s => s.showToast);
   const [codeInput, setCodeInput] = useState('');
   const [showCodeInput, setShowCodeInput] = useState(false);
   const [deviceCode, setDeviceCode] = useState<string | null>(null);
   const [polling, setPolling] = useState(false);
-  const pollingRef = useRef(false);
-  const oauthSessionIdRef = useRef<string | null>(null);
-
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  type Operation = { owner: SettingsConnectionOwner; controller: AbortController };
+  const operation = useRef<Operation | null>(null);
+  const attemptRef = useRef<OAuthAttempt | null>(null);
+  const live = (op: Operation) => operation.current === op && !op.controller.signal.aborted && ownsSettingsConnection(op.owner);
+  const reset = () => {
+    operation.current?.controller.abort(); operation.current = null; attemptRef.current = null;
+    setShowCodeInput(false); setDeviceCode(null); setPolling(false); setBusy(false); setCodeInput('');
+  };
+  useEffect(() => {
+    const unsubscribe = useSettingsStore.subscribe(() => {
+      const op = operation.current;
+      if (op && !ownsSettingsConnection(op.owner)) { reset(); setNotice(null); }
+    });
+    return () => { unsubscribe(); operation.current?.controller.abort(); operation.current = null; attemptRef.current = null; };
+  }, [providerId]);
+  useEffect(() => { reset(); setNotice(null); }, [providerId]);
+  const begin = (): Operation => {
+    reset(); setNotice(null); setBusy(true);
+    const op = { owner: captureSettingsConnection(), controller: new AbortController() };
+    operation.current = op;
+    return op;
+  };
+  const rust = () => resolveServerConnection(useSettingsStore.getState())?.serverNodeKind === 'lingxi-service';
+  const fail = (op: Operation, error: unknown) => {
+    if (!live(op)) return;
+    const message = t('settings.oauth.failed') + ': ' + (error instanceof Error ? error.message : String(error));
+    reset(); setNotice(message); showToast(message, 'error');
+  };
+  const completed = async (op: Operation, persisted: boolean, loggedOut = false) => {
+    if (!live(op)) return;
+    attemptRef.current = null; setShowCodeInput(false); setDeviceCode(null); setPolling(false);
+    try {
+      await onRefresh();
+      if (!live(op)) return;
+      const message = !persisted && !loggedOut ? t('settings.oauth.notPersisted') : t(loggedOut ? 'settings.oauth.loggedOut' : 'settings.oauth.success');
+      reset(); setNotice(!persisted && !loggedOut ? message : null); showToast(message, !persisted && !loggedOut ? 'error' : 'success');
+    } catch (error) {
+      if (!live(op)) return;
+      const message = (!persisted && !loggedOut ? t('settings.oauth.notPersisted') + ' ' : '') + t(loggedOut ? 'settings.oauth.logoutRefreshFailed' : 'settings.oauth.loginRefreshFailed') + ': ' + (error instanceof Error ? error.message : String(error));
+      reset(); setNotice(message); showToast(message, 'error');
+    }
+  };
+  const wait = (op: Operation, ms: number) => new Promise<void>(resolve => {
+    const done = () => { clearTimeout(timer); op.controller.signal.removeEventListener('abort', done); resolve(); };
+    const timer = setTimeout(done, ms);
+    op.controller.signal.addEventListener('abort', done, { once: true });
+    if (op.controller.signal.aborted) done();
+  });
+  const pollLogin = async (op: Operation, attempt: OAuthAttempt) => {
+    let interval = attempt.intervalMs;
+    try {
+      while (live(op)) {
+        const left = attempt.expiresAt - Date.now();
+        if (left <= 0) throw new Error(t('settings.mcp.oauthTimeout'));
+        await wait(op, Math.min(interval, left));
+        if (!live(op)) return;
+        if (Date.now() >= attempt.expiresAt) throw new Error(t('settings.mcp.oauthTimeout'));
+        const outcome = await pollOAuth(attempt, op.controller.signal);
+        if (!live(op)) return;
+        if (outcome.done) { await completed(op, outcome.persisted); return; }
+        interval = outcome.intervalMs ?? interval;
+      }
+    } catch (error) { fail(op, error); }
+  };
   const login = async () => {
+    const op = begin(); const isRust = rust();
     try {
-      const res = await lingxiFetch('/api/auth/oauth/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          provider: providerId,
-          loginMethod: DEFAULT_OAUTH_LOGIN_METHOD,
-        }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      platform?.openExternal?.(data.url);
-      if (data.instructions) {
-        setDeviceCode(data.instructions);
-        setPolling(true);
-        pollingRef.current = true;
-        pollLogin(data.sessionId);
-      } else if (data.polling) {
-        setPolling(true);
-        pollingRef.current = true;
-        pollLogin(data.sessionId);
-      } else {
-        setShowCodeInput(true);
-        oauthSessionIdRef.current = data.sessionId;
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      showToast(t('settings.oauth.failed') + ': ' + msg, 'error');
-    }
+      const attempt = await startOAuth(providerId, isRust, op.controller.signal);
+      if (!live(op)) return;
+      attemptRef.current = attempt;
+      if (!platform?.openExternal) throw new Error(t('settings.oauth.browserUnavailable'));
+      const opened = await platform.openExternal(attempt.url);
+      if (opened && opened.ok === false) throw new Error(opened.error || t('settings.oauth.browserUnavailable'));
+      if (!live(op)) return;
+      setBusy(false); setDeviceCode(attempt.deviceCode); setPolling(attempt.polling); setShowCodeInput(!attempt.polling);
+      if (attempt.polling) void pollLogin(op, attempt);
+    } catch (error) { fail(op, error); }
   };
-
   const submitCode = async () => {
-    const code = codeInput.trim();
-    if (!code) return;
+    const code = codeInput.trim(); const op = operation.current; const attempt = attemptRef.current;
+    if (!code || !op || !attempt || !live(op) || busy) return;
+    setBusy(true);
     try {
-      const res = await lingxiFetch('/api/auth/oauth/callback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: oauthSessionIdRef.current, code }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      showToast(t('settings.oauth.success'), 'success');
-      setShowCodeInput(false);
-      await onRefresh();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      showToast(t('settings.oauth.failed') + ': ' + msg, 'error');
-    }
+      if (Date.now() >= attempt.expiresAt) throw new Error(t('settings.mcp.oauthTimeout'));
+      const outcome = await completeOAuth(attempt, code, op.controller.signal);
+      if (!live(op)) return;
+      if (!outcome.done) throw new Error(t('settings.oauth.waiting'));
+      await completed(op, outcome.persisted);
+    } catch (error) { fail(op, error); }
   };
-
-  const pollLogin = async (sessionId: string) => {
-    for (let i = 0; i < 100; i++) {
-      await new Promise(r => setTimeout(r, 3000));
-      if (!pollingRef.current) return;
-      try {
-        const res = await lingxiFetch(`/api/auth/oauth/poll/${sessionId}`);
-        const data = await res.json();
-        if (data.status === 'done') {
-          showToast(t('settings.oauth.success'), 'success');
-          setDeviceCode(null);
-          setPolling(false);
-          pollingRef.current = false;
-          await onRefresh();
-          return;
-        }
-        if (data.status === 'error') throw new Error(data.error || 'Login failed');
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        showToast(t('settings.oauth.failed') + ': ' + msg, 'error');
-        setDeviceCode(null);
-        setPolling(false);
-        pollingRef.current = false;
-        return;
-      }
-    }
-    setDeviceCode(null);
-    setPolling(false);
-    pollingRef.current = false;
-  };
-
   const logout = async () => {
+    const op = begin(); const isRust = rust();
     try {
-      await lingxiFetch('/api/auth/oauth/logout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider: providerId }),
-      });
-      showToast(t('settings.oauth.loggedOut'), 'success');
-      await onRefresh();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      showToast(t('settings.oauth.failed') + ': ' + msg, 'error');
-    }
+      await logoutOAuth(providerId, isRust, op.controller.signal);
+      if (live(op)) await completed(op, true, true);
+    } catch (error) { fail(op, error); }
   };
+  const cancel = () => { reset(); setNotice(t('settings.oauth.waitCancelled')); };
 
   return (
     <div className={styles['pv-credentials']}>
@@ -126,13 +125,15 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
         {summary.logged_in ? (
           <div className={styles['pv-oauth-status']}>
             <span className={styles['oauth-status-badge']}>{t('settings.oauth.loggedIn')}</span>
-            <button className={styles['oauth-logout-btn']} onClick={logout}>{t('settings.oauth.logout')}</button>
+            <button className={styles['oauth-logout-btn']} onClick={logout} disabled={busy}>{t('settings.oauth.logout')}</button>
           </div>
         ) : (
-          <button className={styles['oauth-login-btn']} onClick={login}>{t('settings.oauth.login')}</button>
+          <button className={styles['oauth-login-btn']} onClick={login} disabled={busy || showCodeInput || polling}>{t('settings.oauth.login')}</button>
         )}
       </div>
 
+      {(busy || showCodeInput || polling) && <button onClick={cancel}>{t('common.cancel')}</button>}
+      {notice && <div role="alert">{notice}</div>}
       {showCodeInput && (
         <div className={styles['oauth-code-section']}>
           <input
@@ -140,11 +141,12 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
             type="text"
             placeholder={t('settings.oauth.codePlaceholder')}
             value={codeInput}
+            disabled={busy}
             onChange={(e) => setCodeInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') submitCode(); }}
             autoFocus
           />
-          <button className={styles['oauth-code-submit']} onClick={submitCode}>{t('settings.oauth.submit')}</button>
+          <button className={styles['oauth-code-submit']} onClick={submitCode} disabled={busy}>{t('settings.oauth.submit')}</button>
         </div>
       )}
       {deviceCode && (
@@ -152,7 +154,7 @@ export function OAuthCredentials({ providerId, summary, onRefresh }: {
           <div
             className={styles['oauth-user-code']}
             title={t('settings.oauth.clickToCopy')}
-            onClick={() => navigator.clipboard.writeText(deviceCode).then(() => useSettingsStore.getState().showToast(t('settings.oauth.codeCopied'), 'success'))}
+            onClick={() => { const op=operation.current; if(op) void navigator.clipboard.writeText(deviceCode).then(() => { if(live(op)) showToast(t('settings.oauth.codeCopied'), 'success'); }).catch(error => fail(op,error)); }}
           >
             {deviceCode}
           </div>

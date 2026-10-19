@@ -1,0 +1,46 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0277]: `AgentLifecycleError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/automation_activity.rs:189:21
+    |
+189 |       let summaries = state
+    |  _____________________^
+190 | |         .memory()
+191 | |         .list_agent_summaries()
+192 | |         .map_err(ActivityError::storage)?;
+    | |________________________________________^ the trait `std::fmt::Debug` is not implemented for `AgentLifecycleError`
+    |
+note: required by a bound in `ActivityError::storage`
+   --> crates/lingxi-service/src/automation_activity.rs:27:28
+    |
+ 27 |     fn storage(error: impl std::fmt::Debug) -> Self {
+    |                            ^^^^^^^^^^^^^^^ required by this bound in `ActivityError::storage`
+help: consider annotating `AgentLifecycleError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/agents_admin.rs:40:1
+    |
+ 40 + #[derive(Debug)]
+ 41 | pub struct AgentLifecycleError {
+    |
+
+error[E0277]: `AgentLifecycleError` doesn't implement `std::fmt::Debug`
+   --> crates/lingxi-service/src/automation_activity.rs:192:18
+    |
+192 |         .map_err(ActivityError::storage)?;
+    |                  ^^^^^^^^^^^^^^^^^^^^^^ the trait `std::fmt::Debug` is not implemented for `AgentLifecycleError`
+    |
+note: required by a bound in `ActivityError::storage`
+   --> crates/lingxi-service/src/automation_activity.rs:27:28
+    |
+ 27 |     fn storage(error: impl std::fmt::Debug) -> Self {
+    |                            ^^^^^^^^^^^^^^^ required by this bound in `ActivityError::storage`
+help: consider annotating `AgentLifecycleError` with `#[derive(Debug)]`
+   --> crates/lingxi-service/src/agents_admin.rs:40:1
+    |
+ 40 + #[derive(Debug)]
+ 41 | pub struct AgentLifecycleError {
+    |
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `lingxi-service` (lib) due to 2 previous errors

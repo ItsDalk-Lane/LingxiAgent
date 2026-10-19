@@ -1,0 +1,278 @@
+{
+  "recordedAt": "2026-10-18T11:10:14.964232+00:00",
+  "status": "STOPPED_FOR_ROOT_RETEST_WS_FIXED_EPOCH_STILL_OPEN",
+  "priorRun": {
+    "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce2.log",
+    "logSha256Verified": "a7ad028d399d604039e7eac8c567b44ab0bb8b81b187277bda5605a3527bf3c6",
+    "exitCode": 101,
+    "counts": "1 passed / 3 failed",
+    "passed": "missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates",
+    "confirmedProductFailure": "WS第二同capability不同参数实际仍pending，已先拒绝并清理后断言失败",
+    "twoOtherFailures": "分别停paired beta第4Run / fresh credential第1Run，均真实waiting_approval；并未到后台或重启，不用推测替代事实"
+  },
+  "actualSyntheticScenes": [
+    {
+      "sourceSyntheticHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-d50fc7df57a0c51d",
+      "actualStage": "paired-other-capability-beta-before-background",
+      "runs": [
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "completed",
+          "completed.with_final",
+          1792321408892,
+          1792321412793
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae6894_000002",
+          "completed",
+          "completed.with_final",
+          1792321415316,
+          1792321415335
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "completed",
+          "completed.with_final",
+          1792321416590,
+          1792321420778
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae875d_000004",
+          "waiting_approval",
+          null,
+          1792321423197,
+          1792321423197
+        ]
+      ],
+      "events": [
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "run_state_changed",
+          "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321408892
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "tool_call_started",
+          "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14eae4f7c_000001-tc0001\"},\"type\":\"tool_call_started\"}",
+          1792321408892
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}",
+          1792321408892
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "run_state_changed",
+          "{\"from\":\"waiting_approval\",\"reason\":\"approval_resolved\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321408892
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "tool_call_completed",
+          "{\"result\":{\"content\":[{\"text\":\"{\\\"_meta\\\":{\\\"progressToken\\\":1},\\\"arguments\\\":{\\\"n\\\":1},\\\"name\\\":\\\"alpha\\\"}\",\"type\":\"text\"}],\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14eae4f7c_000001-tc0001\",\"type\":\"tool_call_completed\"}",
+          1792321408892
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae4f7c_000001",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",
+          1792321412793
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae6894_000002",
+          "run_state_changed",
+          "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321415316
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae6894_000002",
+          "tool_call_started",
+          "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"363379742f80b51bdb9206579af7754911543079b9399cb3fc315fb199f476e8\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14eae6894_000002-tc0001\"},\"type\":\"tool_call_started\"}",
+          1792321415316
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae6894_000002",
+          "tool_call_completed",
+          "{\"result\":{\"content\":[{\"text\":\"{\\\"_meta\\\":{\\\"progressToken\\\":2},\\\"arguments\\\":{\\\"n\\\":2},\\\"name\\\":\\\"alpha\\\"}\",\"type\":\"text\"}],\"status\":\"success\",\"truncated\":false},\"toolCallId\":\"run_000001a14eae6894_000002-tc0001\",\"type\":\"tool_call_completed\"}",
+          1792321415316
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae6894_000002",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",
+          1792321415335
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "run_state_changed",
+          "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321416590
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "tool_call_started",
+          "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"215ddd5567ca2590efd4ea109b4e56cbe591e2676fbf54a9262692c539166da6\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14eae6d8e_000003-tc0001\"},\"type\":\"tool_call_started\"}",
+          1792321416590
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}",
+          1792321416590
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "run_state_changed",
+          "{\"from\":\"waiting_approval\",\"reason\":\"approval_resolved\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321416590
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "tool_call_completed",
+          "{\"result\":{\"error\":{\"code\":\"forbidden\",\"message\":\"tool request not approved: user rejected the action\",\"retryable\":false},\"status\":\"failed\",\"truncated\":false},\"toolCallId\":\"run_000001a14eae6d8e_000003-tc0001\",\"type\":\"tool_call_completed\"}",
+          1792321416590
+        ],
+        [
+          "mcp-session-b",
+          "run_000001a14eae6d8e_000003",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"completed.with_final\",\"to\":\"completed\",\"type\":\"run_state_changed\"}",
+          1792321420778
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae875d_000004",
+          "run_state_changed",
+          "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321423197
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae875d_000004",
+          "tool_call_started",
+          "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"f3e0792e105e2bfe88e7b3bab5097b93a59a8c5b239fe3c6f87a8d0f72ab9032\"},\"target\":\"tool:mcp:fixture:beta\",\"toolCallId\":\"run_000001a14eae875d_000004-tc0001\"},\"type\":\"tool_call_started\"}",
+          1792321423197
+        ],
+        [
+          "mcp-session-a",
+          "run_000001a14eae875d_000004",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}",
+          1792321423197
+        ]
+      ],
+      "externalCalls": [
+        {
+          "_meta": {
+            "progressToken": 1
+          },
+          "arguments": {
+            "n": 1
+          },
+          "name": "alpha"
+        },
+        {
+          "_meta": {
+            "progressToken": 2
+          },
+          "arguments": {
+            "n": 2
+          },
+          "name": "alpha"
+        }
+      ],
+      "snapshot": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce2-diagnosis-scenes/lingxi-r07-mcp-session-permission-d50fc7df57a0c51d/runs.snapshot.db"
+    },
+    {
+      "sourceSyntheticHome": "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-mcp-session-permission-09c9fead172df5c0",
+      "actualStage": "fresh-credential-first-run-before-restart",
+      "runs": [
+        [
+          "mcp-restart-check",
+          "run_000001a14eae62c9_000001",
+          "waiting_approval",
+          null,
+          1792321413833,
+          1792321413833
+        ]
+      ],
+      "events": [
+        [
+          "mcp-restart-check",
+          "run_000001a14eae62c9_000001",
+          "run_state_changed",
+          "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+          1792321413833
+        ],
+        [
+          "mcp-restart-check",
+          "run_000001a14eae62c9_000001",
+          "tool_call_started",
+          "{\"toolCall\":{\"argsDigest\":{\"algorithm\":\"sha256\",\"canonicalization\":\"lingxi-canonical-json-v1\",\"hex\":\"ade0bebbcdd770e830221a9ea5ea03aa975a54ba2b90f7077c3b5e0754faf3c8\"},\"target\":\"tool:mcp:fixture:alpha\",\"toolCallId\":\"run_000001a14eae62c9_000001-tc0001\"},\"type\":\"tool_call_started\"}",
+          1792321413833
+        ],
+        [
+          "mcp-restart-check",
+          "run_000001a14eae62c9_000001",
+          "run_state_changed",
+          "{\"from\":\"running\",\"reason\":\"approval_required\",\"to\":\"waiting_approval\",\"type\":\"run_state_changed\"}",
+          1792321413833
+        ]
+      ],
+      "externalCalls": [],
+      "snapshot": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce2-diagnosis-scenes/lingxi-r07-mcp-session-permission-09c9fead172df5c0/runs.snapshot.db"
+    }
+  ],
+  "newSourceDisposition": [
+    {
+      "id": "MCP-SESSION-WS-FOREGROUND-FLAG",
+      "status": "STATIC_FIXED_WAITING_REAL_RETEST",
+      "implementation": "独立可信前台chat wrapper；仅chat_wire真实User+Full为true，所有普通后台来源仍false。"
+    },
+    {
+      "id": "MCP-SESSION-INFLIGHT-GRANT-AFTER-LIFECYCLE",
+      "status": "OPEN_WAITING_REAL_RED_COUNTEREXAMPLE",
+      "implementation": "仅新增默认None实例read observer+第5实际HTTP归档恢复反例，未修epoch；期望409，当前预计200需根实证。"
+    }
+  ],
+  "pendingDiagnostics": "每个调用具名stage、真实HTTP请求耗时/次数/pending数，原5秒不变；超时输出actualRun状态/事件，不扩大预算。",
+  "newTestName": "in_flight_grant_cannot_land_after_real_archive_restore_completed",
+  "currentTestCount": 5,
+  "readySourceHashes": {
+    "rust/crates/lingxi-service/src/sessions.rs": "6d4b34690362f5b9edcfec4acf4b127740a32e48f8b6a08e43fef47bf5f0e7b2",
+    "rust/crates/lingxi-service/src/chat_wire.rs": "0a027b4a21e9fb8f941da0a4eed95cc65a434443ecb1f0263668b71df9d52f33",
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "b6b98a598e921d367f5074e3dd9cbe1df848dd1707a18d60f4733f6deb37b899",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "b867393e961f92b68b4ed5a0ef43307d48dd40e37b46a03116ef579f19bbef26",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs": "a6d4e038e96581f3baed2381d9a731107c78e8fd26de954dc391f9e13670ddee"
+  },
+  "checks": [
+    {
+      "command": "rustfmt --edition 2024 --config skip_children=true five owned Rust sources",
+      "exitCode": 0
+    }
+  ],
+  "cargoByReviewer": "NOT_RUN",
+  "unchanged": "原失败日志/回执不改写，叶状态不标通过；无账号或对外请求。"
+}

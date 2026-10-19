@@ -1,0 +1,30 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.95s
+     Running tests/r07_browser_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_store-f8989580fe99ef3c)
+
+running 3 tests
+test downloads_can_confirm_unknown_once_without_overwriting_actual_receipt ... ok
+test emergency_stop_requires_new_actual_user_run_and_old_request_replay_cannot_revoke_again ... ok
+test actual_receipts_deduplicate_reject_changed_input_and_recover_unknown_without_reexecution ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-bff2eccd9b14bcc7)
+
+running 13 tests
+test supported_tip_matches_the_current_migration_registry ... ok
+test v14_delegation_accepts_only_boolean_values_and_rejects_null ... ok
+test v7_to_tip_chain_preserves_prior_data_and_creates_new_tables ... ok
+test delete_session_file_removes_row_and_aliases ... ok
+test list_for_owner_orders_by_registration_then_id ... ok
+test insert_and_get_roundtrip_preserves_all_fields ... ok
+test file_history_prune_enforces_age_and_total_bytes ... ok
+test upsert_session_activity_marks_coldness_for_cleanup_probe ... ok
+test refs_roundtrip_and_session_scoped_delete ... ok
+test alias_resolution_maps_legacy_ids_to_canonical ... ok
+test status_transitions_record_expiry_timestamp ... ok
+test source_key_dedup_is_scoped_to_owner ... ok
+test file_history_store_lists_files_versions_and_reads_content ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+

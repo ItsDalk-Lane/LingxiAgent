@@ -233,17 +233,31 @@ fn first_text(values: &[&Value]) -> String {
         .unwrap_or_default()
 }
 fn image_mime(path: &Path) -> Result<&'static str, String> {
-    match path
+    let extension = path
         .extension()
         .and_then(|part| part.to_str())
-        .map(str::to_ascii_lowercase)
-        .as_deref()
-    {
-        Some("png") => Ok("image/png"),
-        Some("jpg" | "jpeg") => Ok("image/jpeg"),
-        Some("webp") => Ok("image/webp"),
-        Some("gif") => Ok("image/gif"),
-        _ => Err("character card asset has unsupported image type".into()),
+        .map(str::to_ascii_lowercase);
+    // 沿已有句柄检查与受限读取拒绝链接，文件头检查不冒充完整图像解码。
+    let bytes = bounded_file(path)?;
+    let count = bytes.len();
+    match extension.as_deref() {
+        Some("png")
+            if bytes.starts_with(b"\x89PNG\r\n\x1a\n")
+                && count >= 16
+                && &bytes[12..16] == b"IHDR" =>
+        {
+            Ok("image/png")
+        }
+        Some("jpg" | "jpeg") if bytes.starts_with(b"\xff\xd8\xff") => Ok("image/jpeg"),
+        Some("webp") if bytes.starts_with(b"RIFF") && count >= 12 && &bytes[8..12] == b"WEBP" => {
+            Ok("image/webp")
+        }
+        Some("gif")
+            if count >= 13 && (bytes.starts_with(b"GIF87a") || bytes.starts_with(b"GIF89a")) =>
+        {
+            Ok("image/gif")
+        }
+        _ => Err("character card asset image content does not match a supported format".into()),
     }
 }
 fn normalize(card: &Value, root: &Path, token: &str, name: &str) -> Result<Value, String> {
@@ -626,11 +640,16 @@ async fn asset_sources(
     }
     Ok(assets)
 }
-async fn export_source(state: &ServiceState, id: &str) -> Result<Value, String> {
+async fn export_source(
+    state: &ServiceState,
+    id: &str,
+    principal: &crate::auth::Principal,
+) -> Result<Value, String> {
     let config = response_json(
         crate::agents_admin::agent_config_readback::agent_config_get_route(
             State(state.clone()),
             RoutePath(id.into()),
+            axum::Extension(principal.clone()),
         )
         .await,
     )
@@ -679,12 +698,13 @@ async fn export_source(state: &ServiceState, id: &str) -> Result<Value, String> 
 
 pub async fn export_preview_route(
     State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
     Json(body): Json<Value>,
 ) -> Response {
     let Some(id) = body["agentId"].as_str() else {
         return bad("agentId is required");
     };
-    match export_source(&state, id).await {
+    match export_source(&state, id, &principal).await {
         Ok(plan) => Json(json!({"plan": preview(&plan, Some(id))})).into_response(),
         Err(message) => error(message),
     }
@@ -737,11 +757,15 @@ fn copy_tree(source: &Path, destination: &Path, total: &mut u64) -> Result<(), S
     }
     Ok(())
 }
-pub async fn export_route(State(state): State<ServiceState>, Json(body): Json<Value>) -> Response {
+pub async fn export_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+    Json(body): Json<Value>,
+) -> Response {
     let Some(id) = body["agentId"].as_str() else {
         return bad("agentId is required");
     };
-    let plan = match export_source(&state, id).await {
+    let plan = match export_source(&state, id, &principal).await {
         Ok(plan) => plan,
         Err(message) => return error(message),
     };
@@ -949,13 +973,12 @@ fn validate_import_materials(plan: &Value, package: &Path) -> Result<(), String>
         )
     };
     let mut assets = HashSet::new();
-    for relative in plan["assets"]
-        .as_object()
-        .cloned()
-        .unwrap_or_default()
-        .values()
-    {
+    for (kind, relative) in plan["assets"].as_object().cloned().unwrap_or_default() {
         let file = inside(package, relative.as_str().ok_or("asset path missing")?)?;
+        let mime = image_mime(&file)?;
+        if kind == "avatar" && mime == "image/gif" {
+            return Err("avatar must be png, jpeg or webp".into());
+        }
         let canonical = file.canonicalize().map_err(|error| error.to_string())?;
         if assets.insert(canonical) {
             consume(&file)?;
@@ -1100,7 +1123,7 @@ pub async fn import_route(State(state): State<ServiceState>, Json(body): Json<Va
         )),
     }
 }
-fn asset_response(path: &Path) -> Response {
+fn asset_response(path: &Path, cache_control: &'static str) -> Response {
     if let Err(message) = checked_file(path) {
         return fail(StatusCode::NOT_FOUND, message);
     }
@@ -1109,7 +1132,14 @@ fn asset_response(path: &Path) -> Response {
         Err(message) => return bad(message),
     };
     match std::fs::read(path) {
-        Ok(bytes) => ([(header::CONTENT_TYPE, mime)], bytes).into_response(),
+        Ok(bytes) => (
+            [
+                (header::CONTENT_TYPE, mime),
+                (header::CACHE_CONTROL, cache_control),
+            ],
+            bytes,
+        )
+            .into_response(),
         Err(message) => error(message.to_string()),
     }
 }
@@ -1125,18 +1155,20 @@ pub async fn plan_asset_route(
         return fail(StatusCode::NOT_FOUND, "asset not found");
     };
     match inside(&root.join("package"), relative) {
-        Ok(path) => asset_response(&path),
+        Ok(path) => asset_response(&path, "private, max-age=3600"),
         Err(message) => bad(message),
     }
 }
 pub async fn export_asset_route(
     State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
     RoutePath((id, key)): RoutePath<(String, String)>,
 ) -> Response {
     let config = match response_json(
         crate::agents_admin::agent_config_readback::agent_config_get_route(
             State(state.clone()),
             RoutePath(id.clone()),
+            axum::Extension(principal),
         )
         .await,
     )
@@ -1155,8 +1187,8 @@ pub async fn export_asset_route(
         Ok(value) => value,
         Err(message) => return error(message),
     };
-    match assets[&key].as_str() {
-        Some(path) => asset_response(Path::new(path)),
+    match assets.get(&key).and_then(Value::as_str) {
+        Some(path) => asset_response(Path::new(path), "no-store"),
         None => fail(StatusCode::NOT_FOUND, "asset not found"),
     }
 }

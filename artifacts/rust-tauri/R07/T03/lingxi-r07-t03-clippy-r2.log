@@ -1,0 +1,61 @@
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: this looks like an `else if` but the `else` is missing
+  --> crates/lingxi-service/src/conversation_runtime.rs:68:29
+   |
+68 |    if *stop.borrow(){break;}if let Err(e)=host.tick(&state).await{tracing::error!(error=%e,"手机后台检查失败");*host.error.lock().ex...
+   |                             ^
+   |
+   = note: to remove this lint, add the missing `else` or add a new line before the second `if`
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#possible_missing_else
+   = note: `-D clippy::possible-missing-else` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::possible_missing_else)]`
+
+error: the `Err`-variant returned from this function is very large
+  --> crates/lingxi-service/src/conversation_routes.rs:98:57
+   |
+98 | fn checked_payload<T: DeserializeOwned>(body: &[u8]) -> Result<Value, Response> {
+   |                                                         ^^^^^^^^^^^^^^^^^^^^^^^ the `Err`-variant is at least 128 bytes
+   |
+   = help: try reducing the size of `hyper::Response<axum::body::Body>`, for example by boxing large elements or replacing it with `Box<hyper::Response<axum::body::Body>>`
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#result_large_err
+   = note: `-D clippy::result-large-err` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::result_large_err)]`
+
+error: struct pattern is not needed for a unit variant
+   --> crates/lingxi-service/src/conversation_runtime.rs:287:63
+    |
+287 |                 Err(crate::sessions::SessionExecuteError::Busy { .. }) => {}
+    |                                                               ^^^^^^^ help: remove the struct pattern
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unneeded_struct_pattern
+    = note: `-D clippy::unneeded-struct-pattern` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unneeded_struct_pattern)]`
+
+error: this `if` statement can be collapsed
+   --> crates/lingxi-service/src/conversation_runtime.rs:843:9
+    |
+843 | /         if incoming && cursor.as_ref().is_none_or(|c| c.fingerprint != fp) {
+844 | |             if discovery::message_operation(
+845 | |                 &self.storage,
+846 | |                 id,
+...   |
+871 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+843 ~         if incoming && cursor.as_ref().is_none_or(|c| c.fingerprint != fp)
+844 ~             && discovery::message_operation(
+845 |                 &self.storage,
+...
+869 |                 }
+870 ~             }
+    |
+
+error: could not compile `lingxi-service` (lib) due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 4 previous errors

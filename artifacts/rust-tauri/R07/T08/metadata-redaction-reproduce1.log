@@ -1,0 +1,12 @@
+{"shutdown":{"code":2,"signal":null},"binarySha256After":"e3c682aa7c5cbc6259fb5dfe01087394da3283a8db7021b9e94fb87abadf2cc4","binaryUnchanged":true,"stderrSha256":"a9c017af30ec759d4504b328acf7ca4340c8b3b347e1e4eaa3b90b5cb3f315ff"}
+file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/evidence-tools/model_metadata_probe.mjs:33
+    child.once('exit', () => { clearTimeout(timer); reject(new Error('隔离服务提前退出')); });
+                                                           ^
+
+Error: 隔离服务提前退出
+    at ChildProcess.<anonymous> (file:///Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/evidence-tools/model_metadata_probe.mjs:33:60)
+    at Object.onceWrapper (node:events:631:26)
+    at ChildProcess.emit (node:events:521:24)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12)
+
+Node.js v24.16.0

@@ -1,0 +1,41 @@
+{
+  "candidate": "t08a",
+  "scope": "T08_RELATED_CHECKS_NOT_FINAL_R07",
+  "runnerSha256": "aa35d24e8964d156d273f1ea09becd1cc325f0e682572d887d1f2dde7864bf46",
+  "planSha256": "a0f10cc54f49b23a5aba0cc070c85be9cce981219388fdd509f2ca0608c99d70",
+  "results": {
+    "fmt": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08a-fmt.json"
+    },
+    "diff": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08a-diff.json"
+    },
+    "clippy": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08a-clippy.json"
+    },
+    "protocol": {
+      "wrapperExitCode": 1,
+      "productCommandExecuted": true,
+      "receipt": "t08a-protocol.json"
+    }
+  },
+  "notRun": [
+    "protocol-roundtrip",
+    "protocol-tests",
+    "kernel",
+    "boundaries",
+    "adapter",
+    "service",
+    "model-regression",
+    "native-skills",
+    "skills-current",
+    "build"
+  ],
+  "fullStagePassClaimed": false
+}

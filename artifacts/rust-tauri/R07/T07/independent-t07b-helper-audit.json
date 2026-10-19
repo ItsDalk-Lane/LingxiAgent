@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "checkedAt": "2026-10-18T02:56:18.661084+00:00",
+  "status": "PASS_HELPER_ONLY_FINAL_GATES_PENDING",
+  "helperSha256": "fec1ca190293b123fcb9223ce8453c3706a5805e203d095286ba6c8dc5496edf",
+  "priorR2Receipt": "evidence-helper-selfcheck-r2.json",
+  "checks": {
+    "r2HelperHashMatches": true,
+    "r2ProbeRemoved": true,
+    "untrackedNewSourceChangesFingerprint": true,
+    "probeRemovalRestoresFingerprint": true,
+    "rowsPreserveBytesMode": true,
+    "modeChangeChangesFingerprint": true,
+    "deletionRecorded": true,
+    "symlinkTargetRecorded": true,
+    "freezeProtectsPriorEvidence": true,
+    "nonzeroProductExitPreserved": true,
+    "logHashAndExitRecorded": true,
+    "precheckRejectsBeforeProduct": true
+  },
+  "allChecksPass": true,
+  "workspaceSourcesMutated": false,
+  "cargoExecuted": false
+}

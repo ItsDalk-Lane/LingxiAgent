@@ -1,0 +1,10 @@
+{
+  "candidate": "t07a",
+  "status": "SUPERSEDED_NOT_FINAL_ACCEPTANCE",
+  "reasons": [
+    "protocol gate failed: generated API_COMPAT_MATRIX drift from actual preload surface; regeneration is required, no gate removed",
+    "independent review found start awaiting record_user_prompt can dispatch after stop/pause; lifecycle-generation fix required"
+  ],
+  "retain": "All actual exits and logs remain unchanged; completed pass gates apply only to their recorded source. No commit or push.",
+  "next": "Freeze t07b after fix and regenerated inventory; include API_COMPAT_MATRIX and PROTOCOL_SPEC in its source manifest."
+}

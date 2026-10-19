@@ -513,9 +513,11 @@ function projectTitleForDir(normalizedPath: string, sessionLabel: string | null 
  *
  * 身份形态与 sessionBelongsToWorkspaceScope 一致：mount 工作台按 mountId，
  * 本地目录会话按规范化 cwd；无可靠身份（两者皆缺）的会话不显示、不删除，
- * 维持既有纪律。mount 与本地目录的双形态合流：mount 的 nativeRootPath 已知
- * 且与某目录组路径一致时（default mount 之外的 local_fs 挂载常见这种同一
- * 项目两个入口的形态），会话合入同一项目组。
+ * 维持既有纪律——除非调用方传入 ungroupedTitle（Rust 原生会话没有目录
+ * 身份，手机端据此归入兜底组而不是整组消失）。mount 与本地目录的双形态
+ * 合流：mount 的 nativeRootPath 已知且与某目录组路径一致时（default
+ * mount 之外的 local_fs 挂载常见这种同一项目两个入口的形态），会话合入
+ * 同一项目组。
  *
  * 用户配置的挂载工作台即使名下还没有对话也会生成空组（可从行内
  * 「新建对话」直接在该项目起步）；纯历史目录若从未产生会话则不显示。
@@ -524,7 +526,7 @@ function projectTitleForDir(normalizedPath: string, sessionLabel: string | null 
  */
 export function groupSessionsByProject(
   sessions: Session[],
-  options: { studios?: ProjectGroupStudioHint[] | null; now?: Date } & SessionChildFoldOptions = {},
+  options: { studios?: ProjectGroupStudioHint[] | null; now?: Date; ungroupedTitle?: string } & SessionChildFoldOptions = {},
 ): ProjectGroup[] {
   type Draft = {
     id: string;
@@ -565,8 +567,13 @@ export function groupSessionsByProject(
     if (cwd) {
       const normalized = normalizeWorkspacePath(cwd) || cwd;
       ensure(`dir:${normalized}`, projectTitleForDir(normalized, session.workspaceLabel), null, cwd).sessions.push(session);
+      continue;
     }
-    // cwd 也缺失：无身份，维持不显示的纪律。
+    // cwd 也缺失：无目录身份。Rust 原生会话（手机端）天然如此——调用方
+    // 给了兜底组标题就归入兜底组，否则维持不显示的纪律。
+    if (options.ungroupedTitle) {
+      ensure('ungrouped', options.ungroupedTitle, null, null).sessions.push(session);
+    }
   }
 
   // 双形态合流：mount 组的 nativeRoot 与某目录组一致 → 会话并入 mount 组。

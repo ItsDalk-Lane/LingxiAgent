@@ -1,0 +1,66 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.47s
+     Running tests/r07_conversation_files.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_conversation_files-e95a00e082c56d57)
+
+running 10 tests
+test legacy_channel_identity_comes_from_safe_filename_without_rewriting_frontmatter ... ok
+test dm_partial_success_preserves_first_copy_and_never_overwrites_changed_second ... ok
+test malformed_authority_and_symlink_paths_fail_closed ... ok
+test forged_sender_headers_and_separators_round_trip_as_one_body ... ok
+test same_request_is_frozen_and_concurrent_retries_never_append_twice ... ok
+test legacy_metadata_history_and_bookmarks_survive_real_patch ... ok
+test phone_reset_keeps_history_unknown_metadata_and_dm_bytes ... ok
+test user_bookmarks_use_the_legacy_user_directory_without_aliasing_an_agent ... ok
+test restart_recognizes_written_postimage_without_blind_reappend ... ok
+test revoked_member_cannot_resume_old_prepared_append ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s
+
+     Running tests/r07_phone_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_store-7a62e66228c1729c)
+
+running 9 tests
+test binding_uses_actual_owned_session_cas_expiry_and_persistent_epoch_after_reset ... ok
+test only_actual_causal_run_can_bind_or_decide_and_each_run_decides_once ... ok
+test message_source_precedes_file_receipt_and_is_an_immutable_real_started_call ... ok
+test concurrent_claims_spend_one_frozen_budget_across_restart ... ok
+test dm_three_rounds_directional_cooldown_and_five_minute_lock_are_persistent ... ok
+test descendants_share_root_budget_and_cancellation_scope_includes_child_runs ... ok
+test delivery_binding_is_atomic_across_first_claim_reset_and_actual_unbound_run ... ok
+test accepted_unbound_run_recovers_from_lineage_and_never_creates_another ... ok
+test completed_real_reply_remains_publishable_until_same_file_operation_is_applied ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/r07_session_collab_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab_store-665c6a884346e623)
+
+running 8 tests
+test suggestions_are_inert_and_real_source_identity_and_payload_are_required ... ok
+test concurrent_apply_and_delivery_have_one_durable_lease ... ok
+test rejection_never_uses_a_caller_supplied_source_or_reopens_a_started_draft ... ok
+test apply_auth_expiry_read_only_and_frozen_edits_cannot_be_bypassed ... ok
+test create_reservation_and_partial_failure_retry_only_the_same_real_target ... ok
+test started_unknown_survives_restart_and_only_real_lineage_can_confirm_it ... ok
+test accepted_receipt_rolls_back_on_storage_error_and_cannot_be_requeued ... ok
+test decisions_are_atomic_immutable_host_facts_and_repeated_polling_does_not_append ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/session_file_store.rs (/private/tmp/lingxi-r07-build/debug/deps/session_file_store-bff2eccd9b14bcc7)
+
+running 13 tests
+test supported_tip_matches_the_current_migration_registry ... ok
+test v7_to_tip_chain_preserves_prior_data_and_creates_new_tables ... ok
+test v14_delegation_accepts_only_boolean_values_and_rejects_null ... ok
+test file_history_prune_enforces_age_and_total_bytes ... ok
+test delete_session_file_removes_row_and_aliases ... ok
+test upsert_session_activity_marks_coldness_for_cleanup_probe ... ok
+test list_for_owner_orders_by_registration_then_id ... ok
+test insert_and_get_roundtrip_preserves_all_fields ... ok
+test file_history_store_lists_files_versions_and_reads_content ... ok
+test status_transitions_record_expiry_timestamp ... ok
+test source_key_dedup_is_scoped_to_owner ... ok
+test refs_roundtrip_and_session_scoped_delete ... ok
+test alias_resolution_maps_legacy_ids_to_canonical ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

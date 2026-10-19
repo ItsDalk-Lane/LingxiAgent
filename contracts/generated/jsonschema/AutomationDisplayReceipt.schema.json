@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "channel": {
+      "type": "string"
+    },
+    "deliveryId": {
+      "type": "string"
+    },
+    "displayed": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "deliveryId",
+    "channel",
+    "displayed"
+  ],
+  "title": "AutomationDisplayReceipt",
+  "type": "object"
+}

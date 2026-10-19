@@ -1,0 +1,59 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:02:44.602449+00:00",
+  "scope": "后继入口修复开发态只读源审；不运行Cargo/GUI、不改产品/测试/冻结证据。",
+  "sourceHashes": {
+    "desktop/src/react/settings/SettingsContent.tsx": "affc5cac7f82a7abc0ed144e8231247e1436279f37cd8d66a6842847a3f71302",
+    "desktop/src/react/settings/store.ts": "dae037d69d0bd4be4300546b3aaaeec90edaa63e09f168a437fc4a010b695e0d",
+    "desktop/src/react/settings/connection-owner.ts": "496ebb69a866af4c133a05afcb719332d5af45c7ecfb5b8bfbe83c56d5ce4010",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "00ebe71aa982810002ff00c55974bb01a2b11a9d100d3958e7ade674bbe3e270"
+  },
+  "finalAcceptance": "pending",
+  "sourceConclusion": [
+    "冷启动、连接切换和重启共用initializeRustSettings；有效identity owner与连接revision绑定，连接改变同步清除。",
+    "每个异步边界后检查原owner；旧连接的identity/locale/初始化完成不能给新连接设置identity owner或解除不可用。",
+    "15秒只ready并维持不可用，不赋予identity owner，render不以ready单独放行；合法空agent/未配置模型不必伪造全部资源成功。",
+    "资源loadAgents/models/snapshot内部保存各自真实error，整体身份成功可进入配置修复，不把测试helper严格fixture就绪条件复制为产品准入。",
+    "17页签已列开放意向，但keybindings/sidebar/checkpoint/MCP配套真实端点及完整容器动作尚在开发，不能因allowlist存在领这些页已验收。"
+  ],
+  "twoStaticFindingsAndCurrentClosure": [
+    {
+      "finding": "新identity校验原漏serverNodeTransport，现役app-init已有同传输一致性约束。",
+      "now": "当前源码已加identity.serverNodeTransport === connection.serverNodeTransport || http的精确检查。",
+      "evidence": "静态补法已核，未独立运行transport反例，不虚列运行失败或通过。"
+    },
+    {
+      "finding": "entry测试finally中pending等待超时可跳过全局恢复/进程回收。",
+      "now": "当前源码用嵌套finally确保等待失败仍恢复fetch/window/store、SIGTERM/SIGKILL回收并删除隔离目录，保留原等待失败。",
+      "evidence": "静态控制流已核，未独立制造挂起运行。"
+    }
+  ],
+  "runtimeEvidenceIndependentlyRead": [
+    {
+      "receipt": "settings-entry-reproduce5.json",
+      "sourceUnchanged": true,
+      "exitCode": 1,
+      "logSha256": "509d843fdea74ada3c81ca30ee048df06607bdec30fbedad1d93366ca8423cb4",
+      "fact": "真实合法Source初始化后general/providers/skills均被阻挡，才是实际入口缺陷复现；reproduce1-4只到夹具前提失败。"
+    },
+    {
+      "receipt": "settings-entry-fixed2.json",
+      "sourceUnchanged": true,
+      "exitCode": 0,
+      "logSha256": "836b487174444c8535833b61666ff377ee96be8ca8b5ef7df56411320326e522",
+      "fact": "实际Rust子进程/真实请求三种configured、without-model、without-agent容器导航均通过；等待页面请求收尾。不是所有17页真实保存/重启/权限用例。"
+    },
+    {
+      "receipt": "settings-entry-container-regression1.json",
+      "sourceUnchanged": true,
+      "exitCode": 0,
+      "logSha256": "7c176d9b917e0c7d0476cfed2c3c3d5c5f009a94c2c14efe6679407ac772695a",
+      "fact": "两目标20例组件回归实际通过；不是新增完整生产链证明。"
+    }
+  ],
+  "remaining": [
+    "后继候选完整检查及各17页原作用域的真实端点/保存回读、服务重启、旧连接迟到及权限失效边界待具名结果。",
+    "原R06技能不可用断言需按T08接通改验实际页体/真实skills GET；两个guard early return后的dead段不能算实际执行。",
+    "当前Tauri资源入口仍非完整SettingsApp；本次容器证明为实际共享React设置+Rust服务，不能冒称完整Tauri设置窗。"
+  ]
+}

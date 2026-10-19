@@ -143,7 +143,9 @@ impl SessionTools {
         if v["status"] == "scheduled" && v["process"] != self.process {
             v["status"] = json!("unconfirmed_after_restart");
             v["rewind"] = json!("unknown");
-            v["error"]=json!("service restarted before the final deferred receipt was confirmed; inspect session operation/history before requesting a new rewind");
+            v["error"] = json!(
+                "service restarted before the final deferred receipt was confirmed; inspect session operation/history before requesting a new rewind"
+            );
         }
         Ok(Some(v))
     }
@@ -304,7 +306,7 @@ impl SessionTools {
             let _guard = self.pending.lock().unwrap_or_else(|p| p.into_inner());
             match self.receipt(&sid) {
                 Ok(Some(v)) if v["status"] == "scheduled" => {
-                    return failed("another confirmed rewind is already pending")
+                    return failed("another confirmed rewind is already pending");
                 }
                 Err(e) => return failed(e),
                 _ => {}
@@ -364,7 +366,7 @@ impl SessionTools {
                             }
                             Err(error) => break Err(format!("{error:?}")),
                             Ok(value) => {
-                                break serde_json::to_value(value).map_err(|e| e.to_string())
+                                break serde_json::to_value(value).map_err(|e| e.to_string());
                             }
                         }
                     };
@@ -395,7 +397,19 @@ impl SessionTools {
                         }
                     }
                 });
-        match spawn {Ok(_handle)=>success("User confirmed. Rewind is scheduled for when this turn ends; read the deferred receipt for the actual outcome.",receipt),Err(e)=>{let mut receipt=receipt;receipt["status"]=json!("failed");receipt["error"]=json!(format!("supervisor refused deferred rewind: {e:?}"));let _=self.save(&sid,&receipt);failed(format!("cannot schedule rewind: {e:?}"))}}
+        match spawn {
+            Ok(_handle) => success(
+                "User confirmed. Rewind is scheduled for when this turn ends; read the deferred receipt for the actual outcome.",
+                receipt,
+            ),
+            Err(e) => {
+                let mut receipt = receipt;
+                receipt["status"] = json!("failed");
+                receipt["error"] = json!(format!("supervisor refused deferred rewind: {e:?}"));
+                let _ = self.save(&sid, &receipt);
+                failed(format!("cannot schedule rewind: {e:?}"))
+            }
+        }
     }
 }
 
@@ -495,14 +509,57 @@ pub fn register(
     tools: Arc<SessionTools>,
     budget: &SchemaBudget,
 ) {
-    for(name,kind,description,schema)in[
-        ("checkpoint",PermissionKind::ArgumentAwareCheckpoint,"Create/list/drop a named checkpoint in the current session. create anchors the latest real user turn, optionally captures authorized workspace files; list reads; drop removes only the named checkpoint.",json!({"type":"object","properties":{"action":{"type":"string","enum":["create","list","drop"],"default":"create"},"name":{"type":"string","minLength":1,"maxLength":200},"snapshot":{"type":"boolean","default":true}},"additionalProperties":false})),
-        ("rewind",PermissionKind::Review,"Rewind to a named checkpoint only after fresh human confirmation. While this turn is busy it schedules a supervised deferred rewind and reports the actual result after the turn ends. External file changes are preserved.",json!({"type":"object","properties":{"checkpoint":{"type":"string","minLength":1,"maxLength":200},"restoreFiles":{"type":"boolean","default":false},"risk_accepted":{"type":"boolean"}},"additionalProperties":false})),
-    ]{
-        let manifest=ToolManifest{origin:ToolOrigin::FirstParty,local_name:name.into(),display_name:name.into(),aliases:vec![],version:"1.0.0".into(),description:description.into(),input_schema:ToolSchemaDocument{dialect:"json-schema/2020-12".into(),schema},output_schema:None,permission:PermissionContract{kind,capability_base:format!("{name}.apply")},availability:Availability::Available,timeout_ms:Some(60_000),max_concurrency:None,declared_permission:DeclaredPermission::Execute,recovery:lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE};
-        let registered=registry.register(manifest,budget).expect("会话工具必须登记成功");let executor:Arc<dyn ToolExecutorPort>=Arc::new(Executor(Arc::clone(&tools)));
-        if name=="rewind"{let db=Arc::clone(&tools.deps.storage);gateway.bind_executor_with_review(registered.target_id,executor,Arc::new(move|input,args|review(&db,input,args.as_value())),"具体会话检查点确认后延迟回退");}
-        else{gateway.bind_executor(registered.target_id,executor,"当前Run的会话检查点");}
+    for (name, kind, description, schema) in [
+        (
+            "checkpoint",
+            PermissionKind::ArgumentAwareCheckpoint,
+            "Create/list/drop a named checkpoint in the current session. create anchors the latest real user turn, optionally captures authorized workspace files; list reads; drop removes only the named checkpoint.",
+            json!({"type":"object","properties":{"action":{"type":"string","enum":["create","list","drop"],"default":"create"},"name":{"type":"string","minLength":1,"maxLength":200},"snapshot":{"type":"boolean","default":true}},"additionalProperties":false}),
+        ),
+        (
+            "rewind",
+            PermissionKind::Review,
+            "Rewind to a named checkpoint only after fresh human confirmation. While this turn is busy it schedules a supervised deferred rewind and reports the actual result after the turn ends. External file changes are preserved.",
+            json!({"type":"object","properties":{"checkpoint":{"type":"string","minLength":1,"maxLength":200},"restoreFiles":{"type":"boolean","default":false},"risk_accepted":{"type":"boolean"}},"additionalProperties":false}),
+        ),
+    ] {
+        let manifest = ToolManifest {
+            origin: ToolOrigin::FirstParty,
+            local_name: name.into(),
+            display_name: name.into(),
+            aliases: vec![],
+            version: "1.0.0".into(),
+            description: description.into(),
+            input_schema: ToolSchemaDocument {
+                dialect: "json-schema/2020-12".into(),
+                schema,
+            },
+            output_schema: None,
+            permission: PermissionContract {
+                kind,
+                capability_base: format!("{name}.apply"),
+            },
+            availability: Availability::Available,
+            timeout_ms: Some(60_000),
+            max_concurrency: None,
+            declared_permission: DeclaredPermission::Execute,
+            recovery: lingxi_kernel::invocation::ToolRecoveryCapability::CONSERVATIVE,
+        };
+        let registered = registry
+            .register(manifest, budget)
+            .expect("会话工具必须登记成功");
+        let executor: Arc<dyn ToolExecutorPort> = Arc::new(Executor(Arc::clone(&tools)));
+        if name == "rewind" {
+            let db = Arc::clone(&tools.deps.storage);
+            gateway.bind_executor_with_review(
+                registered.target_id,
+                executor,
+                Arc::new(move |input, args| review(&db, input, args.as_value())),
+                "具体会话检查点确认后延迟回退",
+            );
+        } else {
+            gateway.bind_executor(registered.target_id, executor, "当前Run的会话检查点");
+        }
     }
 }
 
@@ -543,7 +600,7 @@ pub async fn approvals_route(
     };
     let kernel = crate::sessions::kernel_principal_of(&principal);
     let records = service.pending_for_principal(&kernel, &sid);
-    axum::Json(json!({"approvals":records.into_iter().map(|r|json!({"approvalId":r.approval_id,"target":r.target,"runId":r.run_id,"summary":r.args_summary,"resources":r.resources.iter().map(|s|json!({"path":s.path,"operation":s.op.wire_name()})).collect::<Vec<_>>(),"waitingSinceUnixMs":r.waiting_since_unix_ms,"expiresAtUnixMs":r.expires_at_unix_ms})).collect::<Vec<_>>()})).into_response()
+    axum::Json(json!({"approvals":records.into_iter().map(|r|json!({"approvalId":r.approval_id,"capability":state.tool_gateway().and_then(|gateway|gateway.mcp_session_capability(&r.target)),"target":r.target,"runId":r.run_id,"summary":r.args_summary,"resources":r.resources.iter().map(|s|json!({"path":s.path,"operation":s.op.wire_name()})).collect::<Vec<_>>(),"waitingSinceUnixMs":r.waiting_since_unix_ms,"expiresAtUnixMs":r.expires_at_unix_ms})).collect::<Vec<_>>()})).into_response()
 }
 #[derive(serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -573,7 +630,7 @@ pub async fn answer_route(
             return crate::EndpointError::invalid_message(
                 "approval action must be confirmed or rejected",
             )
-            .into_response()
+            .into_response();
         }
     };
     let Some(service) = state.approvals.as_ref() else {

@@ -1,0 +1,68 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 50.42s
+     Running tests/r07_t08_mcp_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_mcp_settings-5528f6df6edb0028)
+
+running 13 tests
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-8b3511c7287b0398
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-d37be4618cfaea52test an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service ... 
+ok
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e06e17db40ddae5d
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-8811eb79935cd394
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e5e86780af5d69e5
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-0d1c4ea2c1d67561
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-3bcc7532812ba015
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-fc56295024929b47
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-5666c2c4c62c2b55
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-8ea2b078dbd0a525
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-45a43593555c1eba
+MCP设置现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-dcc944feea5972d8
+test occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained ... ok
+test an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential ... ok
+test invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore ... ok
+test restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes ... ok
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... ok
+test a_real_pending_settings_approval_does_not_survive_local_credential_replacement ... ok
+test cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent ... ok
+test stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group ... ok
+test actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources ... ok
+LINGXI_AUTH_REJECTED request_id="req-27666f1f3af4bb2428093491a1094ae6" method=GET path=/lingxi/v1/mcp/state status=403 reason=local_owner_required remote=127.0.0.1:58479
+test real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers ... ok
+LINGXI_AUTH_REJECTED request_id="req-0050c7fa75f4b93e3ff6032ebc2d9cc5" method=POST path=/lingxi/v1/mcp/settings-action status=403 reason=local_owner_required remote=127.0.0.1:58537
+test management_rejects_other_identities_corrupt_files_links_and_replaced_parent ... ok
+test a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.93s
+
+     Running tests/r07_t08_oauth_alias.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_oauth_alias-d5d7d52e4580cbf1)
+
+running 1 test
+LINGXI_AUTH_REJECTED request_id="req-9c647b6283d41911460519d89a76dc4a" method=POST [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:58547
+LINGXI_AUTH_REJECTED request_id="req-a0ee3123b1570112e2355d34e834d424" method=POST [token] status=403 reason=local_owner_required remote=127.0.0.1:58548
+
+thread 'oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source' (2427760) panicked at crates/lingxi-service/tests/r07_t08_oauth_alias.rs:404:9:
+assertion `left == right` failed: {"runCount":1,"runId":"run_000001a14de98fad_000001"}
+  left: Some("failed")
+ right: Some("completed")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source ... FAILED
+
+failures:
+
+failures:
+    oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.29s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_oauth_alias`
+     Running tests/r07_t08_speech_bindings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_speech_bindings-7c18d412cc308b2a)
+
+running 2 tests
+T08 专用语音真实现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-speech-bindings-5ddf4082540cdd7b
+T08 专用语音真实现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-speech-bindings-b9d1e0c1a2fbae64
+test http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage ... ok
+test http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_oauth_alias`

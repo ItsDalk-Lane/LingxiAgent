@@ -1,0 +1,77 @@
+{
+  "recordedAt": "2026-10-18T08:01:35.945431+00:00",
+  "status": "LOCAL_NATIVE_IPC_CHECK_PASSED_NOT_FROZEN_CANDIDATE",
+  "actualTestExitCode": 0,
+  "actualTestReceipt": "../native-picker-ipc2.json",
+  "actualTestReceiptSha256": "13fb303babb8d7bf67fdbb9c10b82bf1b52b1cdc30024e31ad806451904237c3",
+  "nativeResults": {
+    "cancelled": {
+      "input": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/selected-skill",
+      "notice": "已取消选择目录",
+      "result": null
+    },
+    "checks": [
+      "actual-native-dialog-selected-path",
+      "current-ui-retains-selected-path-not-installed",
+      "actual-cancel-null-keeps-existing-selection",
+      "source-bytes-unchanged-no-install",
+      "readonly-window-rejected"
+    ],
+    "readonly": {
+      "invokeError": "select_folder not allowed on window \"skill-viewer-0\", webview \"skill-viewer-0\", URL: local\n\nallowed on: [windows: \"main\", URL: local]\n\nreferenced by: capability: resource-main, permission: allow-select-folder",
+      "ok": false
+    },
+    "selected": {
+      "input": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/selected-skill",
+      "notice": "已选择目录，可用于查看或后续配置；尚未安装技能。",
+      "result": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/selected-skill"
+    }
+  },
+  "nativeSourcesUnchanged": true,
+  "changedNativeSources": [],
+  "binary": {
+    "path": "/private/tmp/lingxi-r07-t08-native-picker-ipc-hptt_1oc/Lingxi Directory Proof.app/Contents/MacOS/lingxi-resource-desktop",
+    "sha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+    "sameInodeAsCurrentBuild": true,
+    "hashCaptureTime": "实际运行后立即记录，未伪造运行前SHA"
+  },
+  "cleanup": {
+    "driverPortClosed": true,
+    "ownedAppProcesses": [],
+    "applicationRawExitCode": "NOT_CAPTURED;测试NativeApp Drop已kill/wait，不推断应用exit0"
+  },
+  "evidence": [
+    {
+      "path": "native-receipt.json",
+      "bytes": 967,
+      "sha256": "f7a760f38702fa5819434be5da6242c0050cc7a7c4ac890cffe9aa981f35d351"
+    },
+    {
+      "path": "selection-and-cancel.json",
+      "bytes": 451,
+      "sha256": "eb0b582dba1e54e7aef42b2330f53012c2da511404a8a67b16a973c2c0509dcc"
+    },
+    {
+      "path": "selected.png",
+      "bytes": 57585,
+      "sha256": "59a86b87a13605fa31e532bbbb5a9921194c0085866ff815c220c6c87daeaa69"
+    },
+    {
+      "path": "native-app.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "choose-ready.json",
+      "bytes": 99,
+      "sha256": "7f063a205d99ffbf64148f9b0d5d0e031c755b8309d103040c4eb9474920e28a"
+    },
+    {
+      "path": "cancel-ready.json",
+      "bytes": 18,
+      "sha256": "743c0f0c416606932f4fb52f23f2ec8689e252568494bc586d5952448f0aebba"
+    }
+  ],
+  "scope": "真实CUA选目录/取消+实际IPC值捕获和只读窗口拒绝；全工作区并行编辑导致开发sourceUnchanged=false，但所有此原生入口源逐项未变；不借此领取未跑的最终候选整阶段验收。",
+  "toolObservation": "点击Cancel后的getAXState报告App quit，因原生测试已完成全部断言后退出；以真实Cargo退出0、native receipt、端口关闭证明，不伪报CUA最后AX成功。"
+}

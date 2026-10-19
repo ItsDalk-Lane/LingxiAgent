@@ -21,6 +21,7 @@ export const LEGACY_DESKTOP_OWNER_SCOPES = Object.freeze([
 
 export const DESKTOP_REMOTE_ACCESS_SCOPES = Object.freeze([
   "chat",
+  "sessions.write",
   "resources.read",
   "files.read",
   "files.write",

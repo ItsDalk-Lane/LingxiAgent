@@ -1,0 +1,16 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0433]: cannot find module or crate `tokio_util` in this scope
+  --> crates/lingxi-service/tests/r07_t08_mcp_remote.rs:43:5
+   |
+43 | use tokio_util::sync::CancellationToken;
+   |     ^^^^^^^^^^ use of unresolved module or unlinked crate `tokio_util`
+   |
+   = help: if you wanted to use a crate named `tokio_util`, use `cargo add tokio_util` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `lingxi-service` (test "r07_t08_mcp_remote") due to 1 previous error

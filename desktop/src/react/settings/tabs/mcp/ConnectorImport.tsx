@@ -90,7 +90,7 @@ export function ConnectorImport({ busy, onImport, onDone, onCancel }: ConnectorI
                 {result.id || selected[index]?.connector.name || ''}
               </span>
               <span className={result.ok ? styles['settings-form-hint'] : styles['settings-inline-error']}>
-                {result.ok ? t('settings.mcp.importItemOk') : result.error}
+                {result.ok ? <>{t('settings.mcp.importItemOk')}{result.saved && result.runtimeApplied === false ? ` · ${t('settings.mcp.statusConnecting')}` : ''}</> : <>{result.saved ? `${t('settings.transfer.savedNotApplied')} ` : ''}{result.error}</>}
               </span>
             </div>
           ))}

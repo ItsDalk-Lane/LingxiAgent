@@ -6,6 +6,7 @@
 
 import { useStore } from '../stores';
 import { chatFetch as lingxiFetch } from '../services/chat-client';
+import { captureSessionConnection, ownsSessionConnection } from '../services/session-connection-owner';
 import { resolveServerConnection } from '../services/server-connection';
 import { errorBus } from '../../../../shared/error-bus.ts';
 import { AppError } from '../../../../shared/errors.ts';
@@ -24,17 +25,24 @@ export function showError(message: string): void {
 
 // ── 模型加载 ──
 
-export async function loadModels(): Promise<void> {
+export async function loadModels(options: { throwOnError?: boolean } = {}): Promise<void> {
+  const owner = captureSessionConnection();
   try {
     const res = await lingxiFetch('/api/models');
     const data = await res.json();
     const { pendingNewSession } = useStore.getState();
     const activeModel = data.activeModel;
-    let models = data.models || [];
+    if (!Array.isArray(data.models) || data.models.some((model: unknown) => !model || typeof model !== 'object'
+      || typeof (model as {id?: unknown}).id !== 'string' || typeof (model as {provider?: unknown}).provider !== 'string')) {
+      throw new Error('模型列表格式无效，已保留原列表');
+    }
+    let models = data.models.map((model: Record<string, unknown>) => ({ ...model,
+      ...(model.defaultThinkingLevel == null ? { defaultThinkingLevel: undefined } : {}),
+    }));
 
     // 非 pending 状态：用 session 实际绑定的 model 重写 isCurrent 标记
     // pending 状态：保持 API 返回的 isCurrent（跟 agent Chat model 走）
-    if (!pendingNewSession && activeModel) {
+    if (activeModel && (!pendingNewSession || resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service')) {
       models = models.map((m: any) => ({
         ...m,
         isCurrent: m.id === activeModel.id && m.provider === activeModel.provider,
@@ -47,7 +55,8 @@ export async function loadModels(): Promise<void> {
       currentModel: currentModelObj ? { id: currentModelObj.id, provider: currentModelObj.provider } : null,
     });
   } catch (error) {
-    if (resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service') {
+    if (options.throwOnError) throw error;
+    if (ownsSessionConnection(owner) && resolveServerConnection(useStore.getState())?.serverNodeKind === 'lingxi-service') {
       showError(error instanceof Error ? error.message : '模型列表读取失败');
     }
   }

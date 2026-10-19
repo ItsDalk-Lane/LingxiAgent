@@ -87,6 +87,40 @@ use lingxi_protocol::{ErrorCode, ProtocolError, ToolCallId};
 use crate::inject::ServiceClock;
 use crate::resourceaccess::ResourceScope;
 
+thread_local! {
+    static PREPARE_MCP_FOREGROUND: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+    static PREPARE_SETTINGS_PRINCIPAL: std::cell::RefCell<Option<crate::auth::Principal>> = const { std::cell::RefCell::new(None) };
+}
+
+/// 只在同步prepare期间携带真实入队身份；执行时使用准备记录的冻结副本。
+pub(crate) fn with_settings_principal<T>(
+    principal: Option<crate::auth::Principal>,
+    action: impl FnOnce() -> T,
+) -> T {
+    struct Restore(Option<crate::auth::Principal>);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            PREPARE_SETTINGS_PRINCIPAL.with(|slot| {
+                slot.replace(self.0.take());
+            });
+        }
+    }
+    let _restore = Restore(PREPARE_SETTINGS_PRINCIPAL.with(|slot| slot.replace(principal)));
+    action()
+}
+
+/// 仅由前台会话受理链冻结；后台与子代理不能继承临时会话能力。
+pub(crate) fn with_mcp_foreground<T>(foreground: bool, action: impl FnOnce() -> T) -> T {
+    struct Restore(bool);
+    impl Drop for Restore {
+        fn drop(&mut self) {
+            PREPARE_MCP_FOREGROUND.with(|slot| slot.set(self.0));
+        }
+    }
+    let _restore = Restore(PREPARE_MCP_FOREGROUND.with(|slot| slot.replace(foreground)));
+    action()
+}
+
 /// 监督器在真实工具子任务内注入生命周期；不从 arguments 读取。
 #[derive(Clone)]
 pub(crate) struct TrustedToolLifetime {
@@ -95,12 +129,57 @@ pub(crate) struct TrustedToolLifetime {
     pub deadline_unix_ms: u64,
     pub budget_ms: u64,
 }
+/// 仅由实际调度点构造，绑定网关冻结的调用身份与设置归属。
+#[derive(Clone)]
+pub(crate) struct TrustedSettingsContext {
+    principal: Principal,
+    settings_principal: Option<crate::auth::Principal>,
+    session_id: String,
+    run_id: String,
+    attempt: String,
+    call_id: String,
+    agent_id: String,
+    permission: InvocationPermissionContext,
+}
+impl TrustedSettingsContext {
+    pub(crate) fn settings_principal(&self) -> Option<&crate::auth::Principal> {
+        self.settings_principal.as_ref()
+    }
+    pub(crate) fn agent_id(&self) -> &str {
+        &self.agent_id
+    }
+    pub(crate) fn permission(&self) -> InvocationPermissionContext {
+        self.permission
+    }
+}
 tokio::task_local! {
     pub(crate) static TOOL_LIFETIME: TrustedToolLifetime;
     static KNOWLEDGE_RUNTIME: crate::operations::EmbeddingCallRuntime;
     static REVIEW_SCOPE: Option<serde_json::Value>;
     static EXECUTION_RESOURCES: Vec<ResourceScope>;
     static PREPARE_WORKSPACE: Option<std::path::PathBuf>;
+    pub(crate) static WORKFLOW_SCOPE: Option<crate::runs::WorkflowNodeScope>;
+    static SETTINGS_CONTEXT: TrustedSettingsContext;
+}
+
+pub(crate) fn trusted_settings_context(
+    ctx: &RunContext,
+    call: &ToolCallId,
+) -> Result<TrustedSettingsContext, String> {
+    SETTINGS_CONTEXT
+        .try_with(Clone::clone)
+        .map_err(|_| "设置工具缺少网关冻结的调用范围".to_string())
+        .and_then(|bound| {
+            if bound.principal != ctx.principal
+                || bound.session_id != ctx.session_id.as_str()
+                || bound.run_id != ctx.run_id.as_str()
+                || bound.attempt != ctx.attempt.to_string()
+                || bound.call_id != call.as_str()
+            {
+                return Err("设置工具的实际调用身份不一致".into());
+            }
+            Ok(bound)
+        })
 }
 
 /// 准备和执行都使用实际运行冻结的工作区，模型不能通过参数替换默认目录。
@@ -121,6 +200,18 @@ pub(crate) fn with_workspace<T>(
     action: impl FnOnce() -> T,
 ) -> T {
     PREPARE_WORKSPACE.sync_scope(workspace, action)
+}
+
+/// 工作流范围来自服务批准的节点，模型无法通过工具参数扩大。
+pub(crate) fn workflow_scope() -> Option<crate::runs::WorkflowNodeScope> {
+    WORKFLOW_SCOPE.try_with(Clone::clone).ok().flatten()
+}
+
+pub(crate) fn with_workflow_scope<T>(
+    scope: Option<crate::runs::WorkflowNodeScope>,
+    action: impl FnOnce() -> T,
+) -> T {
+    WORKFLOW_SCOPE.sync_scope(scope, action)
 }
 
 /// 删除执行端只能消费网关已冻结并复核的范围，模型参数不能铸造该范围。
@@ -290,6 +381,14 @@ pub enum InvocationPermissionContext {
     UserSession {
         mode: lingxi_kernel::subagent::SessionPermissionMode,
     },
+    /// 后台自动化：Ask 对应自动审核，任何档位都不能等待人工确认。
+    Automation {
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    },
+    Bridge {
+        role: lingxi_protocol::BridgeRole,
+        mode: lingxi_kernel::subagent::SessionPermissionMode,
+    },
     Subagent {
         tier: lingxi_kernel::subagent::ToolAccessTier,
         parent_mode: lingxi_kernel::subagent::SessionPermissionMode,
@@ -300,8 +399,56 @@ impl InvocationPermissionContext {
     pub fn wire_kind(&self) -> &'static str {
         match self {
             InvocationPermissionContext::UserSession { .. } => "user_session",
+            InvocationPermissionContext::Automation { .. } => "automation",
+            InvocationPermissionContext::Bridge { .. } => "bridge",
             InvocationPermissionContext::Subagent { .. } => "subagent",
         }
+    }
+}
+
+/// 外部发送者不能操作本机屏幕；同一检查覆盖声明、直接调用和被解析后的真实目标。
+pub fn bridge_forbidden_tool(name: &str, capability: &str) -> bool {
+    let name = name.rsplit(':').next().unwrap_or(name).to_ascii_lowercase();
+    name.contains("computer")
+        || name.contains("browser")
+        || capability.starts_with("computer.")
+        || capability.starts_with("browser.")
+}
+
+pub(crate) fn bridge_policy(input: &PolicyAdjudicationInput) -> PolicyVerdict {
+    use lingxi_kernel::{subagent::SessionPermissionMode, toolcatalog::PermissionKind};
+    let InvocationPermissionContext::Bridge { role, mode } = input.permission_context else {
+        unreachable!("Bridge policy only accepts host Bridge facts")
+    };
+    let deny = |code: &str, message: &str| PolicyVerdict::Denied {
+        code: code.into(),
+        layer: "bridge".into(),
+        message: message.into(),
+    };
+    if role == lingxi_protocol::BridgeRole::Guest {
+        return deny("BRIDGE_GUEST_NO_TOOLS", "普通桥接发送者只能文本问答");
+    }
+    if bridge_forbidden_tool(&input.local_name, &input.capability_base) {
+        return deny("BRIDGE_TOOL_FORBIDDEN", "桥接不能操作本机浏览器或屏幕");
+    }
+    if input.permission_kind == PermissionKind::Review {
+        return deny(
+            crate::approval_service::TOOL_APPROVAL_UNAVAILABLE,
+            "桥接不能等待人工确认此操作",
+        );
+    }
+    match (mode, input.permission_kind) {
+        (SessionPermissionMode::ReadOnly, PermissionKind::Read)
+        | (SessionPermissionMode::Ask, PermissionKind::Read)
+        | (SessionPermissionMode::Operate, _) => PolicyVerdict::Allowed,
+        (SessionPermissionMode::ReadOnly, _) => deny(
+            crate::approval_service::ACTION_BLOCKED_BY_READ_ONLY,
+            "桥接继承只读权限",
+        ),
+        _ => deny(
+            crate::approval_service::TOOL_APPROVAL_UNAVAILABLE,
+            "桥接当前权限不能确认此操作",
+        ),
     }
 }
 
@@ -406,6 +553,16 @@ pub struct PolicyAdjudicationInput {
     pub permission_context: InvocationPermissionContext,
 }
 
+/// 网关完成当前目录与参数校验后传给策略的事实，不从模型声明中采信权限。
+/// 独立于旧策略输入，保持现有策略端口与测试调用的兼容性。
+#[derive(Debug, Clone, PartialEq)]
+pub struct InvocationPolicyMaterial {
+    pub origin: lingxi_kernel::toolcatalog::ToolOrigin,
+    pub declared_permission: lingxi_kernel::toolcatalog::DeclaredPermission,
+    pub effective_arguments: serde_json::Value,
+    pub resources: Vec<ResourceScope>,
+}
+
 /// The tool-policy service port (R04-T02 怎么做 3). R04-T03's ApprovalService
 /// is the real production implementation; until it is wired the
 /// fail-closed default ([`FailClosedPolicy`]) applies. The port is
@@ -413,6 +570,15 @@ pub struct PolicyAdjudicationInput {
 /// mint new ones.
 pub trait ToolPolicyPort: Send + Sync {
     fn adjudicate(&self, input: &PolicyAdjudicationInput) -> PolicyVerdict;
+
+    /// 旧实现继续使用原裁决；自动化策略可以检查已冻结的真实动作和参数。
+    fn adjudicate_invocation(
+        &self,
+        input: &PolicyAdjudicationInput,
+        _material: &InvocationPolicyMaterial,
+    ) -> PolicyVerdict {
+        self.adjudicate(input)
+    }
 }
 
 /// The production-default policy source when NO policy service is wired:
@@ -435,7 +601,11 @@ impl ToolPolicyPort for FailClosedPolicy {
             | PermissionKind::Review
             | PermissionKind::ArgumentAwareFile
             | PermissionKind::ArgumentAwareSessionFolders
-            | PermissionKind::ArgumentAwareCheckpoint => PolicyVerdict::NeedsApproval {
+            | PermissionKind::ArgumentAwareCheckpoint
+            | PermissionKind::ArgumentAwareChannel
+            | PermissionKind::ArgumentAwareBrowser
+            | PermissionKind::ArgumentAwareGoal
+            | PermissionKind::ArgumentAwareSettings => PolicyVerdict::NeedsApproval {
                 reason: format!(
                     "no tool policy service is configured; the gateway cannot safely \
                      adjudicate an execution-class invocation of {} ({}) and never \
@@ -736,6 +906,8 @@ pub struct PreparedInvocation {
 /// re-verification and dispatch consume.
 #[derive(Debug, Clone)]
 struct PreparedRecord {
+    mcp_session_grant: Option<u64>,
+    settings_principal: Option<crate::auth::Principal>,
     principal_kind: &'static str,
     principal_subject: String,
     session_id: String,
@@ -794,10 +966,13 @@ const CONSUMED_RING_CAP: usize = 4096;
 /// supervisor ([`crate::runs::RunSupervisor`]).
 pub struct ToolInvocationGateway {
     registry: Arc<ToolRegistry>,
+    session_capabilities: crate::mcp_session_permissions::SessionCapabilities,
     catalog_definitions:
         std::sync::Mutex<Option<Arc<crate::toolcatalog_bridge::CatalogDefinitions>>>,
     budget: SchemaBudget,
     policy: Arc<dyn ToolPolicyPort>,
+    automatic_reviewer: std::sync::Mutex<Option<Arc<dyn crate::automation_review::AutoReviewPort>>>,
+    automatic_reviews: std::sync::Mutex<AutomaticReviewState>,
     executors: std::sync::Mutex<std::collections::BTreeMap<ToolTargetId, ExecutorBinding>>,
     prepared: std::sync::Mutex<HashMap<String, PreparedState>>,
     /// Bounded ring of CONSUMED handles (single-use bookkeeping without
@@ -826,7 +1001,69 @@ type AdmissionChecks = (
     Vec<ResourceScope>,
     PolicyVerdict,
     Option<serde_json::Value>,
+    Option<AutomaticReviewBinding>,
+    Option<u64>,
 );
+
+#[derive(Clone, PartialEq, Eq)]
+struct AutomaticReviewBinding {
+    key: String,
+    resources: Vec<ResourceScope>,
+}
+struct AutomaticReviewGrant {
+    binding: AutomaticReviewBinding,
+    expires_at_unix_ms: u64,
+    consumed: bool,
+}
+#[derive(Default)]
+struct AutomaticReviewState {
+    grants: Vec<AutomaticReviewGrant>,
+    in_flight: std::collections::HashSet<String>,
+}
+struct InFlightAutomaticReview<'a> {
+    state: &'a std::sync::Mutex<AutomaticReviewState>,
+    key: String,
+}
+impl Drop for InFlightAutomaticReview<'_> {
+    fn drop(&mut self) {
+        self.state
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .in_flight
+            .remove(&self.key);
+    }
+}
+
+fn automatic_review_refusal(message: &str) -> GatewayRefusal {
+    GatewayRefusal::PolicyDenied {
+        code: crate::approval_service::TOOL_APPROVAL_UNAVAILABLE.into(),
+        layer: "automation_approval".into(),
+        message: message.into(),
+    }
+}
+
+fn automatic_review_binding(
+    request: &InvocationRequest,
+    prepared: &lingxi_kernel::toolcatalog::PreparedToolCall,
+    entry: InvocationEntry,
+    resources: &[ResourceScope],
+) -> AutomaticReviewBinding {
+    let key = lingxi_protocol::digest_arguments(&serde_json::json!({
+        "principalKind":request.principal.storage_kind(),
+        "principalSubject":request.principal.storage_subject(),
+        "sessionId":request.session_id,"runId":request.run_id,"attempt":request.attempt,
+        "generation":request.generation,"agentId":request.agent_id,
+        "surface":format!("{:?}",request.surface),"permission":format!("{:?}",request.permission),
+        "entry":entry.wire_name(),"callId":request.tool_call_id.as_str(),
+        "targetId":prepared.target_id.as_str(),"digest":prepared.args_digest.hex,
+        "capability":prepared.permission.capability_base,
+        "catalogGeneration":prepared.catalog_generation,"targetGeneration":prepared.target_generation,
+    })).hex;
+    AutomaticReviewBinding {
+        key,
+        resources: resources.to_vec(),
+    }
+}
 
 impl ToolInvocationGateway {
     /// Full construction. The policy port is REQUIRED — wiring without a
@@ -843,9 +1080,12 @@ impl ToolInvocationGateway {
     ) -> Self {
         Self {
             registry,
+            session_capabilities: Default::default(),
             catalog_definitions: std::sync::Mutex::new(None),
             budget,
             policy,
+            automatic_reviewer: std::sync::Mutex::new(None),
+            automatic_reviews: std::sync::Mutex::new(AutomaticReviewState::default()),
             executors: std::sync::Mutex::new(std::collections::BTreeMap::new()),
             prepared: std::sync::Mutex::new(HashMap::new()),
             consumed_ring: std::sync::Mutex::new(std::collections::VecDeque::new()),
@@ -853,6 +1093,134 @@ impl ToolInvocationGateway {
             prepared_ttl_ms,
             live_prepared_cap,
         }
+    }
+
+    /// 只读观测真实授权处理器阶段；默认不装配，不返回授权决定。
+    pub fn set_mcp_session_grant_read_observer(
+        &self,
+        observer: Option<crate::mcp_session_permissions::GrantReadObserver>,
+    ) {
+        self.session_capabilities.set_read_observer(observer);
+    }
+    pub(crate) fn begin_mcp_session_grant(
+        &self,
+        session: &str,
+    ) -> Result<
+        crate::mcp_session_permissions::GrantEpoch,
+        crate::mcp_session_permissions::GrantError,
+    > {
+        self.session_capabilities
+            .begin(session, self.clock.now_unix_ms())
+    }
+    pub(crate) fn observe_mcp_session_grant_read(&self, session: &str) {
+        self.session_capabilities.observe_read(session);
+    }
+
+    /// 审批页面只展示真实目录给出的能力，不根据工具显示名拼接权限。
+    pub(crate) fn mcp_session_capability(&self, target: &str) -> Option<String> {
+        let listing = self.registry.describe(&ToolTargetId::parse(target)).ok()?;
+        (matches!(
+            listing.origin,
+            lingxi_kernel::toolcatalog::ToolOrigin::Mcp { .. }
+        ) && listing.availability.callable()
+            && listing.permission.kind == PermissionKind::Execute)
+            .then_some(listing.permission.capability_base)
+    }
+
+    /// 只接受实际会话与目录事实；会话能力不改变目录、工具权限或永久配置。
+    pub(crate) fn grant_mcp_session_permission(
+        &self,
+        state: &crate::ServiceState,
+        principal: &crate::auth::Principal,
+        row: &lingxi_adapters::storage::session_tree::SessionTreeRow,
+        epoch: &crate::mcp_session_permissions::GrantEpoch,
+        request: &lingxi_protocol::McpSessionPermissionRequest,
+        secure_transport: bool,
+    ) -> Result<(), crate::mcp_session_permissions::GrantError> {
+        if !crate::sessions::SessionStore::can_access_session(
+            principal,
+            &row.owner_user_id,
+            &row.session_id,
+        ) || !principal.has_scope("sessions.write")
+        {
+            return Err("会话授权身份或范围不匹配".into());
+        }
+        let target = ToolTargetId::parse(&request.target_id);
+        let listing = self
+            .registry
+            .describe(&target)
+            .map_err(|_| "MCP工具不存在")?;
+        if !matches!(
+            listing.origin,
+            lingxi_kernel::toolcatalog::ToolOrigin::Mcp { .. }
+        ) || !listing.availability.callable()
+            || listing.permission.kind != PermissionKind::Execute
+            || listing.permission.capability_base != request.capability
+        {
+            return Err("目标并非当前可调用的精确MCP能力".into());
+        }
+        let derive = self
+            .executors
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .get(&target)
+            .and_then(|binding| binding.review.clone())
+            .ok_or("MCP工具缺少受限管理绑定")?;
+        let empty = EffectiveArguments::from_value(serde_json::json!({}), &self.budget)
+            .map_err(|e| e.to_string())?;
+        let review_scope = derive(
+            &ReviewInput {
+                agent_id: &row.agent_id,
+                session_id: &row.session_id,
+                principal_kind: crate::sessions::kernel_principal_of(principal).storage_kind(),
+                principal_subject: &crate::sessions::kernel_principal_of(principal)
+                    .storage_subject(),
+            },
+            &empty,
+        )?;
+        let current = self
+            .registry
+            .describe(&target)
+            .map_err(|_| "MCP目录已改变")?;
+        if current.target_generation != listing.target_generation
+            || !current.availability.callable()
+        {
+            return Err("MCP目录已改变，请重新确认".into());
+        }
+        self.session_capabilities.grant(
+            crate::mcp_session_permissions::CapabilityBinding {
+                principal: principal.clone(),
+                session_id: row.session_id.clone(),
+                agent_id: row.agent_id.clone(),
+                target_id: request.target_id.clone(),
+                target_generation: listing.target_generation,
+                capability: request.capability.clone(),
+                review_scope,
+            },
+            epoch,
+            state,
+            row,
+            secure_transport,
+        )
+    }
+
+    /// 服务关闭时清空且封闭内存授权表；已有执行凭据也要重新核对此闸。
+    pub(crate) fn close_mcp_session_permissions(&self) {
+        self.session_capabilities.close();
+    }
+    pub(crate) fn revoke_mcp_session_permissions(&self, session: &str) {
+        self.session_capabilities.revoke_session(session);
+    }
+
+    /// 仅可信装配入口提供真实审核器，HTTP 或模型参数不能替换它。
+    pub fn set_automatic_reviewer(
+        &self,
+        reviewer: Arc<dyn crate::automation_review::AutoReviewPort>,
+    ) {
+        *self
+            .automatic_reviewer
+            .lock()
+            .unwrap_or_else(|p| p.into_inner()) = Some(reviewer);
     }
 
     pub fn attach_catalog_definitions(
@@ -986,28 +1354,52 @@ impl ToolInvocationGateway {
         request: InvocationRequest,
     ) -> Result<PreparedInvocation, GatewayRefusal> {
         let now = self.clock.now_unix_ms();
-        let (prepared_tool_call, entry, resources, policy, review_scope) =
-            self.admission_checks(&request)?;
-        let review_summary = review_scope.as_ref().map(|scope| {
-            if let Some(summary) = scope.get("summary").and_then(serde_json::Value::as_str) {
-                return summary.to_string();
-            }
-            let items = scope["items"].as_array().expect("注册端给出条目列表");
-            format!(
-                "删除 {} 条置顶原则（助手 {}）：\n{}",
-                items.len(),
-                scope["agentId"].as_str().unwrap_or(""),
-                items
-                    .iter()
-                    .map(|item| format!(
-                        "- {}：{}",
-                        item["id"].as_str().unwrap_or(""),
-                        item["content"].as_str().unwrap_or("")
-                    ))
-                    .collect::<Vec<_>>()
-                    .join("\n")
-            )
-        });
+        let (
+            prepared_tool_call,
+            entry,
+            resources,
+            policy,
+            review_scope,
+            automatic_grant,
+            mcp_session_grant,
+        ) = self.admission_checks(&request)?;
+        let review_summary = review_scope
+            .as_ref()
+            .filter(|_| {
+                prepared_tool_call.permission.kind
+                    == lingxi_kernel::toolcatalog::PermissionKind::Review
+            })
+            .map(|scope| -> Result<String, GatewayRefusal> {
+                if let Some(summary) = scope
+                    .get("summary")
+                    .and_then(serde_json::Value::as_str)
+                    .filter(|s| !s.trim().is_empty())
+                {
+                    return Ok(summary.to_string());
+                }
+                // 保留既有置顶原则的逐项确认；其他工具不能被猜作删除原则，也不能使服务panic。
+                let items = scope["items"].as_array().ok_or_else(|| {
+                    GatewayRefusal::ResourceScopeDenied {
+                        code: "review_summary_unavailable".into(),
+                        message: "工具没有提供可核对的操作摘要，无法请求确认".into(),
+                    }
+                })?;
+                Ok(format!(
+                    "删除 {} 条置顶原则（助手 {}）：\n{}",
+                    items.len(),
+                    scope["agentId"].as_str().unwrap_or(""),
+                    items
+                        .iter()
+                        .map(|item| format!(
+                            "- {}：{}",
+                            item["id"].as_str().unwrap_or(""),
+                            item["content"].as_str().unwrap_or("")
+                        ))
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                ))
+            })
+            .transpose()?;
         let args_digest_hex = prepared_tool_call.args_digest.hex.clone();
         let expires_at = now.saturating_add(self.prepared_ttl_ms);
         let handle_nonce = match crate::auth::hex_random_public(16) {
@@ -1027,7 +1419,12 @@ impl ToolInvocationGateway {
                 });
             }
         };
+        let settings_principal = PREPARE_SETTINGS_PRINCIPAL
+            .with(|slot| slot.borrow().clone())
+            .filter(|original| crate::sessions::kernel_principal_of(original) == request.principal);
         let record = PreparedRecord {
+            mcp_session_grant,
+            settings_principal,
             principal_kind: request.principal.storage_kind(),
             principal_subject: request.principal.storage_subject(),
             session_id: request.session_id,
@@ -1068,6 +1465,22 @@ impl ToolInvocationGateway {
             return Err(GatewayRefusal::PreparedRegistryFull {
                 cap: self.live_prepared_cap,
             });
+        }
+        // 预验可重复读取授权；只有铸造这一张执行凭据时消费，不能重复准备两张凭据。
+        if let Some(binding) = automatic_grant {
+            let now = self.clock.now_unix_ms();
+            let mut reviews = self
+                .automatic_reviews
+                .lock()
+                .unwrap_or_else(|p| p.into_inner());
+            let grant = reviews
+                .grants
+                .iter_mut()
+                .find(|grant| {
+                    grant.binding == binding && !grant.consumed && now <= grant.expires_at_unix_ms
+                })
+                .ok_or_else(|| automatic_review_refusal("本次自动审核授权已失效或已消费"))?;
+            grant.consumed = true;
         }
         prepared.insert(handle_nonce.clone(), PreparedState { record });
         Ok(PreparedInvocation {
@@ -1144,6 +1557,14 @@ impl ToolInvocationGateway {
         &self,
         request: &InvocationRequest,
     ) -> Result<AdmissionChecks, GatewayRefusal> {
+        self.admission_checks_with_review(request, false)
+    }
+
+    fn admission_checks_with_review(
+        &self,
+        request: &InvocationRequest,
+        review_probe: bool,
+    ) -> Result<AdmissionChecks, GatewayRefusal> {
         let prepared_tool_call = self
             .registry
             .prepare_invocation(
@@ -1153,6 +1574,72 @@ impl ToolInvocationGateway {
                 &self.budget,
             )
             .map_err(|err| self.refuse_with_current_callability(err, &request.reference))?;
+        // 确认卡只代表提议，仍不能借 Read 声明绕过当前实际只读授权。
+        let read_only_proposal = match request.permission {
+            InvocationPermissionContext::UserSession { mode }
+            | InvocationPermissionContext::Automation { mode }
+            | InvocationPermissionContext::Bridge { mode, .. } => {
+                mode == lingxi_kernel::subagent::SessionPermissionMode::ReadOnly
+            }
+            InvocationPermissionContext::Subagent { tier, parent_mode } => {
+                tier == lingxi_kernel::subagent::ToolAccessTier::ReadOnly
+                    || parent_mode == lingxi_kernel::subagent::SessionPermissionMode::ReadOnly
+            }
+        };
+        if prepared_tool_call.origin == lingxi_kernel::toolcatalog::ToolOrigin::FirstParty
+            && prepared_tool_call.local_name == "session"
+            && matches!(
+                prepared_tool_call.effective.as_value()["action"].as_str(),
+                Some("send" | "create")
+            )
+            && read_only_proposal
+        {
+            return Err(GatewayRefusal::PolicyDenied {
+                code: crate::approval_service::ACTION_BLOCKED_BY_READ_ONLY.into(),
+                layer: "session".into(),
+                message: "只读运行不能提出发送或创建会话的确认草稿".into(),
+            });
+        }
+        let bridge_principal = matches!(
+            request.principal,
+            Principal::Bridge { .. } | Principal::BridgeTakeover { .. }
+        );
+        let bridge_context = matches!(
+            request.permission,
+            InvocationPermissionContext::Bridge { .. }
+        );
+        if bridge_context && !bridge_principal
+            || bridge_principal
+                && !matches!(
+                    request.permission,
+                    InvocationPermissionContext::Bridge { .. }
+                        | InvocationPermissionContext::Subagent { .. }
+                )
+        {
+            return Err(GatewayRefusal::PolicyDenied {
+                code: "BRIDGE_IDENTITY_MISMATCH".into(),
+                layer: "bridge".into(),
+                message: "桥接身份与宿主授权不一致".into(),
+            });
+        }
+        if bridge_principal
+            && (matches!(
+                request.permission,
+                InvocationPermissionContext::Bridge {
+                    role: lingxi_protocol::BridgeRole::Guest,
+                    ..
+                }
+            ) || bridge_forbidden_tool(
+                &prepared_tool_call.local_name,
+                &prepared_tool_call.permission.capability_base,
+            ))
+        {
+            return Err(GatewayRefusal::PolicyDenied {
+                code: "BRIDGE_TOOL_FORBIDDEN".into(),
+                layer: "bridge".into(),
+                message: "桥接来源不能执行该工具".into(),
+            });
+        }
         let entry = match request.surface {
             CallerSurface::DelegationDispatch => InvocationEntry::Delegation,
             CallerSurface::SubagentRun => InvocationEntry::Subagent,
@@ -1251,7 +1738,135 @@ impl ToolInvocationGateway {
             agent_id: request.agent_id.clone(),
             permission_context: request.permission,
         };
-        let policy = match self.policy.adjudicate(&policy_input) {
+        let listing = self
+            .registry
+            .describe(&prepared_tool_call.target_id)
+            .map_err(map_catalog_error)?;
+        let material = InvocationPolicyMaterial {
+            origin: prepared_tool_call.origin.clone(),
+            declared_permission: listing.declared_permission,
+            effective_arguments: prepared_tool_call.effective.as_value().clone(),
+            resources: resources.clone(),
+        };
+        let mut verdict = self.policy.adjudicate_invocation(&policy_input, &material);
+        let session_binding = if PREPARE_MCP_FOREGROUND.with(|slot| slot.get())
+            && matches!(
+                request.permission,
+                InvocationPermissionContext::UserSession {
+                    mode: lingxi_kernel::subagent::SessionPermissionMode::Ask
+                }
+            )
+            && request.surface == CallerSurface::UserRun
+            && matches!(
+                prepared_tool_call.origin,
+                lingxi_kernel::toolcatalog::ToolOrigin::Mcp { .. }
+            )
+            && prepared_tool_call.permission.kind == PermissionKind::Execute
+            && matches!(verdict, PolicyVerdict::NeedsApproval { .. })
+        {
+            PREPARE_SETTINGS_PRINCIPAL
+                .with(|slot| slot.borrow().clone())
+                .filter(|original| {
+                    crate::sessions::kernel_principal_of(original) == request.principal
+                })
+                .and_then(|principal| {
+                    review_scope.clone().map(|review_scope| {
+                        crate::mcp_session_permissions::CapabilityBinding {
+                            principal,
+                            session_id: request.session_id.clone(),
+                            agent_id: request.agent_id.clone(),
+                            target_id: prepared_tool_call.target_id.to_string(),
+                            target_generation: prepared_tool_call.target_generation,
+                            capability: prepared_tool_call.permission.capability_base.clone(),
+                            review_scope,
+                        }
+                    })
+                })
+        } else {
+            None
+        };
+        let mcp_session_grant = session_binding.as_ref().and_then(|binding| {
+            self.session_capabilities
+                .find(binding, self.clock.now_unix_ms())
+        });
+        if mcp_session_grant.is_some() {
+            verdict = PolicyVerdict::Allowed;
+        }
+
+        if matches!(
+            request.permission,
+            InvocationPermissionContext::Bridge { .. }
+        ) {
+            let hard = if matches!(
+                request.permission,
+                InvocationPermissionContext::Bridge {
+                    role: lingxi_protocol::BridgeRole::Guest,
+                    ..
+                }
+            ) || prepared_tool_call.permission.kind
+                == lingxi_kernel::toolcatalog::PermissionKind::Review
+            {
+                bridge_policy(&policy_input)
+            } else {
+                crate::automation_permission::adjudicate(&policy_input, Some(&material))
+            };
+            if matches!(hard, PolicyVerdict::Denied { .. }) {
+                verdict = hard;
+            }
+            if matches!(verdict, PolicyVerdict::NeedsApproval { .. }) {
+                verdict = PolicyVerdict::Denied {
+                    code: crate::approval_service::TOOL_APPROVAL_UNAVAILABLE.into(),
+                    layer: "bridge".into(),
+                    message: "桥接不能等待人工批准".into(),
+                };
+            }
+        }
+        let reviewable =
+            crate::automation_permission::requires_automatic_review(&policy_input, &material);
+        let mut automatic_grant = None;
+        if reviewable
+            && (matches!(&verdict,PolicyVerdict::Denied{code,..} if code==crate::approval_service::TOOL_APPROVAL_UNAVAILABLE)
+                || matches!(&verdict, PolicyVerdict::NeedsApproval { .. }))
+        {
+            let binding = automatic_review_binding(request, &prepared_tool_call, entry, &resources);
+            let now = self.clock.now_unix_ms();
+            let mut reviews = self
+                .automatic_reviews
+                .lock()
+                .unwrap_or_else(|p| p.into_inner());
+            reviews
+                .grants
+                .retain(|grant| now <= grant.expires_at_unix_ms);
+            if reviews
+                .grants
+                .iter()
+                .any(|grant| grant.binding == binding && !grant.consumed)
+            {
+                verdict = PolicyVerdict::Allowed;
+                automatic_grant = Some(binding);
+            } else if review_probe {
+                verdict = PolicyVerdict::NeedsApproval {
+                    reason: "本次动作需要真实自动审核".into(),
+                };
+            }
+        }
+        // 即使接入旧策略或未配置策略，后台也不能进入永远无人回答的等待。
+        let verdict = match (request.permission, verdict) {
+            (
+                InvocationPermissionContext::Automation { .. },
+                verdict @ PolicyVerdict::NeedsApproval { .. },
+            ) if review_probe && reviewable => verdict,
+            (
+                InvocationPermissionContext::Automation { .. },
+                PolicyVerdict::NeedsApproval { reason },
+            ) => PolicyVerdict::Denied {
+                code: crate::approval_service::TOOL_APPROVAL_UNAVAILABLE.into(),
+                layer: "automation_approval".into(),
+                message: format!("后台任务无法等待人工确认，操作未执行：{reason}"),
+            },
+            (_, verdict) => verdict,
+        };
+        let policy = match verdict {
             PolicyVerdict::Denied {
                 code,
                 layer,
@@ -1265,7 +1880,168 @@ impl ToolInvocationGateway {
             }
             verdict => verdict,
         };
-        Ok((prepared_tool_call, entry, resources, policy, review_scope))
+        Ok((
+            prepared_tool_call,
+            entry,
+            resources,
+            policy,
+            review_scope,
+            automatic_grant,
+            mcp_session_grant,
+        ))
+    }
+
+    /// 整批预验中的异步审核入口；审核后重验原参数、权限、资源及目录代次。
+    /// 只有同一调用的后续同步预验和 prepare 可以读取该次短时授权。
+    #[allow(clippy::too_many_arguments)]
+    pub async fn review_and_validate_from_request_pinned(
+        &self,
+        ctx: &RunContext,
+        surface: CallerSurface,
+        agent_id: &str,
+        permission: InvocationPermissionContext,
+        call_id: &ToolCallId,
+        request: &ToolRequest,
+        pin: Option<CatalogPin>,
+        evidence: &[crate::automation_review::AuthorizationEvidence],
+        explicit_user_authorization: Option<&str>,
+    ) -> Result<(), GatewayRefusal> {
+        if !request.digest_matches_arguments() {
+            return Err(GatewayRefusal::DigestMismatch {
+                declared: request.args_digest.hex.clone(),
+                computed: request.arguments.digest().hex,
+            });
+        }
+        let unified = InvocationRequest::from_trusted_entry(
+            ctx,
+            surface,
+            agent_id,
+            permission,
+            ToolTargetRef::ByTargetId {
+                target_id: ToolTargetId::parse(&request.target),
+            },
+            pin,
+            request.arguments.as_value().clone(),
+            call_id.clone(),
+        );
+        let (prepared, entry, resources, verdict, _, _, _) =
+            self.admission_checks_with_review(&unified, true)?;
+        if verdict == PolicyVerdict::Allowed {
+            return Ok(());
+        }
+        if !matches!(
+            permission,
+            InvocationPermissionContext::Automation {
+                mode: lingxi_kernel::subagent::SessionPermissionMode::Ask
+            } | InvocationPermissionContext::Bridge {
+                role: lingxi_protocol::BridgeRole::Owner,
+                mode: lingxi_kernel::subagent::SessionPermissionMode::Ask
+            }
+        ) {
+            return self.admission_checks(&unified).map(|_| ());
+        }
+        let binding = automatic_review_binding(&unified, &prepared, entry, &resources);
+        let reviewer = self
+            .automatic_reviewer
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clone()
+            .ok_or_else(|| automatic_review_refusal("自动审核服务尚未配置，操作未执行"))?;
+        {
+            let now = self.clock.now_unix_ms();
+            let mut reviews = self
+                .automatic_reviews
+                .lock()
+                .unwrap_or_else(|p| p.into_inner());
+            reviews
+                .grants
+                .retain(|grant| now <= grant.expires_at_unix_ms);
+            if reviews
+                .grants
+                .iter()
+                .any(|grant| grant.binding == binding && grant.consumed)
+            {
+                return Err(automatic_review_refusal(
+                    "同一工具调用的自动审核授权已经消费",
+                ));
+            }
+            if reviews.grants.len() + reviews.in_flight.len() >= self.live_prepared_cap
+                || !reviews.in_flight.insert(binding.key.clone())
+            {
+                return Err(automatic_review_refusal(
+                    "本次自动审核正在进行或审核容量已满",
+                ));
+            }
+        }
+        let _in_flight = InFlightAutomaticReview {
+            state: &self.automatic_reviews,
+            key: binding.key.clone(),
+        };
+        let listing = self
+            .registry
+            .describe(&prepared.target_id)
+            .map_err(map_catalog_error)?;
+        let input = PolicyAdjudicationInput {
+            entry,
+            target_id: prepared.target_id.to_string(),
+            local_name: prepared.local_name.clone(),
+            permission_kind: prepared.permission.kind,
+            capability_base: prepared.permission.capability_base.clone(),
+            args_digest_hex: prepared.args_digest.hex.clone(),
+            principal_kind: ctx.principal.storage_kind(),
+            principal_subject: ctx.principal.storage_subject(),
+            session_id: ctx.session_id.to_string(),
+            run_id: ctx.run_id.to_string(),
+            agent_id: agent_id.into(),
+            permission_context: permission,
+        };
+        let material = InvocationPolicyMaterial {
+            origin: prepared.origin.clone(),
+            declared_permission: listing.declared_permission,
+            effective_arguments: prepared.effective.as_value().clone(),
+            resources,
+        };
+        if !crate::automation_permission::requires_automatic_review(&input, &material) {
+            return Err(automatic_review_refusal("该动作不能通过自动审核扩大权限"));
+        }
+        let review = crate::automation_review::AutoReviewRequest {
+            ctx: ctx.clone(),
+            tool_call_id: call_id.clone(),
+            input,
+            material,
+            evidence: evidence.to_vec(),
+            explicit_user_authorization: explicit_user_authorization.map(str::to_string),
+        };
+        match reviewer.review(&review).await {
+            crate::automation_review::AutoReviewDecision::Allowed { .. } => {}
+            crate::automation_review::AutoReviewDecision::Denied { code, reason } => {
+                return Err(GatewayRefusal::PolicyDenied {
+                    code,
+                    layer: "automation_approval".into(),
+                    message: reason,
+                });
+            }
+        }
+        let (current, entry, resources, _, _, _, _) =
+            self.admission_checks_with_review(&unified, true)?;
+        if automatic_review_binding(&unified, &current, entry, &resources) != binding {
+            return Err(automatic_review_refusal(
+                "自动审核期间工具、参数或资源范围已改变，原授权不可使用",
+            ));
+        }
+        let now = self.clock.now_unix_ms();
+        self.automatic_reviews
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .grants
+            .push(AutomaticReviewGrant {
+                binding,
+                expires_at_unix_ms: now
+                    .saturating_add(self.prepared_ttl_ms.min(DEFAULT_PREPARED_TTL_MS)),
+                consumed: false,
+            });
+        // 通过同一同步入口再验一次，不以审核结论替换原有准备链。
+        self.admission_checks(&unified).map(|_| ())
     }
 
     /// R05 RR1 F11: the whole-batch ADMISSION probe — the pure validation
@@ -1383,6 +2159,29 @@ impl ToolInvocationGateway {
             call_id.clone(),
         );
         self.prepare(unified)
+    }
+
+    /// 统一驱动退出时释放它自己的准备状态；外来ctx/call不能烧毁他人的句柄。
+    pub(crate) fn discard_prepared_for_call(
+        &self,
+        ctx: &RunContext,
+        call: &ToolCallId,
+        handle: &PreparedInvocationHandle,
+    ) {
+        let mut prepared = self.prepared.lock().unwrap_or_else(|p| p.into_inner());
+        let owns = prepared.get(handle.as_str()).is_some_and(|state| {
+            let record = &state.record;
+            record.principal_kind == ctx.principal.storage_kind()
+                && record.principal_subject == ctx.principal.storage_subject()
+                && record.session_id == ctx.session_id.as_str()
+                && record.run_id == ctx.run_id.as_str()
+                && record.attempt == ctx.attempt.as_str()
+                && record.generation == ctx.generation
+                && record.tool_call_id == *call
+        });
+        if owns {
+            prepared.remove(handle.as_str());
+        }
     }
 
     /// The single EXECUTION stage. Re-verifies EVERY bound fact against
@@ -1618,6 +2417,67 @@ impl ToolInvocationGateway {
                 });
             }
         }
+        if let Some(grant) = record.mcp_session_grant {
+            let principal = record
+                .settings_principal
+                .clone()
+                .ok_or_else(|| automatic_review_refusal("会话授权缺少原始前台身份"))?;
+            let session_binding = crate::mcp_session_permissions::CapabilityBinding {
+                principal,
+                session_id: record.session_id.clone(),
+                agent_id: record.agent_id.clone(),
+                target_id: record.target_id.to_string(),
+                target_generation: record.target_generation,
+                capability: record.capability_base.clone(),
+                review_scope: record
+                    .review_scope
+                    .clone()
+                    .unwrap_or(serde_json::Value::Null),
+            };
+            if !self
+                .session_capabilities
+                .validate(grant, &session_binding, self.clock.as_ref())
+                .await
+            {
+                return Err(GatewayRefusal::PolicyDenied {
+                    code: "mcp_session_permission_revoked".into(),
+                    layer: "mcp_session".into(),
+                    message: "会话临时授权已失效，工具未派发".into(),
+                });
+            }
+            // 实际会话读取发生await；返回后不能沿用等待前的目录与权限快照。
+            let current_listing = self
+                .registry
+                .describe(&record.target_id)
+                .map_err(map_catalog_error)?;
+            if !current_listing.availability.callable()
+                || current_listing.target_generation != record.target_generation
+            {
+                return Err(GatewayRefusal::TargetChanged {
+                    target_id: record.target_id.to_string(),
+                    detail: "会话授权复核期间MCP目录已改变".into(),
+                });
+            }
+            let current_review = binding
+                .review
+                .as_ref()
+                .ok_or_else(|| automatic_review_refusal("MCP管理绑定已失效"))?(
+                &ReviewInput {
+                    agent_id: &record.agent_id,
+                    session_id: &record.session_id,
+                    principal_kind: record.principal_kind,
+                    principal_subject: &record.principal_subject,
+                },
+                &record.effective,
+            )
+            .map_err(|message| GatewayRefusal::ResourceScopeDenied {
+                code: "review_scope_refused".into(),
+                message,
+            })?;
+            if record.review_scope.as_ref() != Some(&current_review) {
+                return Err(automatic_review_refusal("会话授权的MCP权限范围已改变"));
+            }
+        }
         // 5) Dispatch with the SERVER-BOUND arguments.
         let request = ToolRequest {
             target: record.target_id.as_str().to_string(),
@@ -1686,7 +2546,19 @@ impl ToolInvocationGateway {
                     record.review_scope.clone(),
                     EXECUTION_RESOURCES.scope(
                         record.resources.clone(),
-                        self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+                        SETTINGS_CONTEXT.scope(
+                            TrustedSettingsContext {
+                                principal: ctx.principal.clone(),
+                                settings_principal: record.settings_principal.clone(),
+                                session_id: record.session_id.clone(),
+                                run_id: record.run_id.clone(),
+                                attempt: record.attempt.clone(),
+                                call_id: call_id.to_string(),
+                                agent_id: record.agent_id.clone(),
+                                permission: record.permission,
+                            },
+                            self.dispatch_executor(ctx, call_id, &request, &binding.executor),
+                        ),
                     ),
                 ),
             )
@@ -1835,6 +2707,127 @@ impl AvailabilityReasonDisplay for lingxi_kernel::toolcatalog::Availability {
             }
             _ => None,
         }
+    }
+}
+
+/// 封面批准调用的完整输入面：固定 CoverRun 的持久层、作业与真实调用身份、
+/// 准备句柄及凭证复核入口一次成组，调用方按名绑定，不靠参数位序。
+pub(crate) struct CoverAuthorizationCall<'a> {
+    pub db: &'a lingxi_adapters::storage::RunDatabase,
+    pub job_id: &'a str,
+    pub ctx: &'a RunContext,
+    pub call: &'a ToolCallId,
+    pub prepared: &'a PreparedInvocation,
+    pub auth: &'a crate::auth::AuthService,
+    pub management: &'a crate::management::ManagementState,
+}
+
+impl ToolInvocationGateway {
+    /// 仅固定 CoverRun 消费用户已经明确发起的动作；不向普通模型或HTTP公开批准入口。
+    /// 批准绑定当前nonce、真实调用、供应商/资源范围和付费前版本，不修改通用策略。
+    pub(crate) async fn authorize_cover_prepared(
+        &self,
+        approval: CoverAuthorizationCall<'_>,
+    ) -> Result<(), String> {
+        let CoverAuthorizationCall {
+            db,
+            job_id,
+            ctx,
+            call,
+            prepared,
+            auth,
+            management,
+        } = approval;
+        use lingxi_adapters::storage::beautify::{self, CoverPhase};
+        let job = beautify::get(db, job_id)
+            .await
+            .map_err(|e| e.to_string())?
+            .ok_or("封面作业不存在")?;
+        let mut principal: crate::Principal =
+            serde_json::from_value(job.principal.clone()).map_err(|_| "封面原始认证事实损坏")?;
+        principal.web_session_id = job.web_session_id.clone();
+        auth.validate_principal(&principal)
+            .map_err(|_| "封面发起凭证已撤销")?;
+        if principal.credential_kind == crate::auth::CredentialKind::WebSession
+            && !management
+                .web_session_current(&principal, self.clock.now_unix_ms(), true)
+                .map_err(|_| "封面网页会话无法复核")?
+        {
+            return Err("封面网页会话已撤销".into());
+        }
+        let actor = crate::sessions::kernel_principal_of(&principal);
+        if (!principal.is_local_owner()
+            && principal.kind != crate::auth::PrincipalKind::Device
+            && principal.credential_kind != crate::auth::CredentialKind::WebSession)
+            || !principal.has_scope("chat")
+            || !principal.has_scope("resources.write")
+            || principal.principal_id != job.principal_id
+            || actor != ctx.principal
+            || job.run_id.as_deref() != Some(ctx.run_id.as_str())
+            || job.session_id != ctx.session_id.as_str()
+            || job.admitted_write.is_none()
+        {
+            return Err("封面批准缺少真实用户动作与当前作用范围".into());
+        }
+        let record = {
+            let records = self.prepared.lock().map_err(|_| "工具准备状态不可读")?;
+            records
+                .get(prepared.handle.as_str())
+                .ok_or("封面准备句柄已失效")?
+                .record
+                .clone()
+        };
+        let (args, route) = match (job.phase, record.target_id.as_str()) {
+            (CoverPhase::MediaPreparing, "tool:plugin:media:generate-image") => {
+                (&job.state["mediaArgs"], Some(&job.state["mediaRoute"]))
+            }
+            (CoverPhase::Applying, "tool:plugin:beautify:create-cover") => {
+                (&job.state["applyArgs"], None)
+            }
+            _ => return Err("封面阶段与工具动作不匹配".into()),
+        };
+        if record.principal_kind != ctx.principal.storage_kind()
+            || record.principal_subject != ctx.principal.storage_subject()
+            || record.session_id != ctx.session_id.as_str()
+            || record.run_id != ctx.run_id.as_str()
+            || record.attempt != ctx.attempt.as_str()
+            || record.generation != ctx.generation
+            || record.agent_id != job.agent_id
+            || record.tool_call_id != *call
+            || record.target_id != prepared.target_id
+            || record.args_digest_hex != prepared.args_digest_hex
+            || record.catalog_generation != prepared.catalog_generation
+            || record.target_generation != prepared.target_generation
+            || record.expires_at_unix_ms <= self.clock.now_unix_ms()
+            || record.effective.as_value() != args
+            || route.is_some_and(|route| {
+                record.review_scope.as_ref().map(|s| &s["mediaRoute"]) != Some(route)
+            })
+        {
+            return Err("封面批准的准备、参数、供应商或真实调用绑定已改变".into());
+        }
+        let resources = record
+            .resources
+            .iter()
+            .map(|scope| {
+                serde_json::json!({"op": scope.op.wire_name(), "path": scope.path.display().to_string()})
+            })
+            .collect::<Vec<_>>();
+        let binding = serde_json::json!({"handle":prepared.handle.as_str(),"ctx":{"runId":ctx.run_id,"sessionId":ctx.session_id,"attempt":ctx.attempt,"generation":ctx.generation},"principalId":job.principal_id,"target":record.target_id.as_str(),"argsDigest":record.args_digest_hex,"catalogGeneration":record.catalog_generation,"targetGeneration":record.target_generation,"resources":resources,"reviewScope":record.review_scope,"frozenWrite":job.admitted_write});
+        beautify::record_authorization(
+            db,
+            beautify::CoverAuthorization {
+                job_id: &job.id,
+                run: ctx.run_id.as_str(),
+                call: call.as_str(),
+                target: record.target_id.as_str(),
+                digest: &record.args_digest_hex,
+                binding,
+                now: self.clock.now_unix_ms(),
+            },
+        )
+        .await
+        .map_err(|e| e.to_string())
     }
 }
 
@@ -2034,6 +3027,55 @@ mod tests {
         let err2 = futures_block_on(gw.execute_prepared(&ctx, &call, &p1.handle))
             .expect_err("handle already consumed");
         assert_eq!(err2.code(), "gateway_prepared_handle_consumed");
+    }
+
+    #[test]
+    fn prepared_cleanup_is_bound_to_real_call_and_releases_abandoned_state() {
+        let registry = Arc::new(ToolRegistry::new());
+        registry
+            .register(
+                manifest("probe", PermissionKind::Read, Availability::Available),
+                &SchemaBudget::default(),
+            )
+            .unwrap();
+        let gw = gateway(&registry, Arc::new(FailClosedPolicy));
+        let ctx = ctx_of("cleanup-run");
+        let call = ToolCallId::new("cleanup-call");
+        let prepared = gw
+            .prepare(InvocationRequest::from_trusted_entry(
+                &ctx,
+                CallerSurface::UserRun,
+                "agent",
+                test_permission(),
+                ToolTargetRef::ByName {
+                    name: "probe".into(),
+                },
+                None,
+                json!({"path":"/x"}),
+                call.clone(),
+            ))
+            .unwrap();
+        gw.discard_prepared_for_call(&ctx_of("foreign-run"), &call, &prepared.handle);
+        assert!(gw
+            .prepared
+            .lock()
+            .unwrap()
+            .contains_key(prepared.handle.as_str()));
+        gw.discard_prepared_for_call(&ctx, &ToolCallId::new("foreign-call"), &prepared.handle);
+        assert!(gw
+            .prepared
+            .lock()
+            .unwrap()
+            .contains_key(prepared.handle.as_str()));
+        gw.discard_prepared_for_call(&ctx, &call, &prepared.handle);
+        assert!(!gw
+            .prepared
+            .lock()
+            .unwrap()
+            .contains_key(prepared.handle.as_str()));
+        let error =
+            futures_block_on(gw.execute_prepared(&ctx, &call, &prepared.handle)).unwrap_err();
+        assert_eq!(error.code(), "gateway_prepared_handle_unknown");
     }
 
     #[test]

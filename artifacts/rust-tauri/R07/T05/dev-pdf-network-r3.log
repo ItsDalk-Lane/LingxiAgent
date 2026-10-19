@@ -1,0 +1,22 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.78s
+     Running tests/r07_pdf_chromium.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_pdf_chromium-11a66dbe33c665f1)
+
+running 1 test
+test html_network_frames_and_workers_never_reach_loopback_canary ... PDF_EVIDENCE /private/tmp/lingxi-r07-t05-network-offline-r3/network-gate-36342295e841a9acbc716181932d741f
+
+thread 'html_network_frames_and_workers_never_reach_loopback_canary' (1162808) panicked at crates/lingxi-adapters/tests/r07_pdf_chromium.rs:528:5:
+assertion `left == right` failed: [{"case":0,"outcome":"PDF_ASSET_LOAD_FAILED: 文档所需资源未成功加载","requestLines":["<empty TCP connection>"],"tcpConnections":1},{"case":1,"outcome":"PDF_ASSET_LOAD_FAILED: 文档所需资源未成功加载","requestLines":["<empty TCP connection>"],"tcpConnections":1},{"case":2,"outcome":"printed","requestLines":["<empty TCP connection>"],"tcpConnections":1},{"case":3,"outcome":"printed","requestLines":["<empty TCP connection>"],"tcpConnections":1},{"case":4,"outcome":"printed","requestLines":["<empty TCP connection>"],"tcpConnections":1},{"case":5,"outcome":"PDF_RESOURCE_FORBIDDEN: 文档请求了未冻结的资源或额外页面","requestLines":["<empty TCP connection>","<empty TCP connection>","<empty TCP connection>"],"tcpConnections":3}]
+  left: 3
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    html_network_frames_and_workers_never_reach_loopback_canary
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 5.54s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_pdf_chromium`

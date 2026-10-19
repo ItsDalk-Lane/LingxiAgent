@@ -177,6 +177,39 @@ function runCheck(check, decoded, label) {
       console.log(`  [check] ${label}: third-party schema verbatim, vendor extension intact`);
       break;
     }
+    case "nullable_default_thinking_level": {
+      // R07-T09: null defaultThinkingLevel must survive the wire as an
+      // explicit null — a consumer that drops or invents a level breaks the
+      // model-context contract.
+      const parts = check.field.split(".");
+      if (!(parts[parts.length - 1] in decoded)) {
+        throw new Error(`${check.field} was dropped instead of kept as null`);
+      }
+      if (getPath(decoded, parts) !== null) {
+        throw new Error(`${check.field} must be null in this sample`);
+      }
+      console.log(`  [check] ${label}: ${check.field} kept as explicit null`);
+      break;
+    }
+    case "decimal_string_generation": {
+      // R07-T09: modelGeneration rides the wire as a decimal string; this
+      // sample exceeds 2^53-1 so a Number conversion is provably lossy.
+      const value = getPath(decoded, check.field.split("."));
+      if (typeof value !== "string") {
+        throw new Error(`${check.field} is ${typeof value}, expected decimal string`);
+      }
+      const asBig = BigInt(value);
+      if (asBig <= BigInt(Number.MAX_SAFE_INTEGER)) {
+        throw new Error(`sample ${check.field} ${value} does not exceed 2^53-1`);
+      }
+      if (BigInt(Number(value)) === asBig) {
+        throw new Error(`expected Number(${value}) to be lossy, but it was exact`);
+      }
+      console.log(
+        `  [check] ${label}: ${check.field}=${value} kept as string; Number() would lose precision`,
+      );
+      break;
+    }
     default:
       throw new Error(`unknown check kind ${check.kind}`);
   }

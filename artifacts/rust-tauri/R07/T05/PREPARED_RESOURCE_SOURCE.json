@@ -1,0 +1,41 @@
+{
+  "status": "PREPARED_UNREGISTERED_NOT_COMPILED",
+  "fileSafetyOriginalUnchanged": true,
+  "sharedPatchesApplied": false,
+  "files": [
+    {
+      "path": "rust/crates/lingxi-service/src/resource_artifacts.rs",
+      "sha256": "9e963a07e4eb78f9f2bb45a767bd681186d1b36e021dee62b74767f2cf3dcf70",
+      "bytes": 33390
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/office_tools.rs",
+      "sha256": "8ba477ac8b1a478ca3fee7e624cd3a7422bdd9306f33eb50bee4fb50db47d84a",
+      "bytes": 53065
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T05/file_safety-artifact-budget.patch",
+      "sha256": "46eb1dc4703a1b0e423a2e603078507c3688229fb68412ca266f0bde51e6495b",
+      "bytes": 13445
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T05/file_safety-artifact-budget.candidate.rs",
+      "sha256": "d24105cb3c947de9d92b60e24b91661809daddbce07689f0a48c7a38dc541a85",
+      "bytes": 27906
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T05/resourceio-artifacts-module.patch",
+      "sha256": "2abb5ab52af69753eeb0fe505ceed882a9238410008abcf97c67f04a474027be",
+      "bytes": 551
+    }
+  ],
+  "preparedTests": {
+    "resource_artifact_facts": 3,
+    "file_safety_budget": 4
+  },
+  "checks": {
+    "rustfmt": "exit0_syntax_and_format_only",
+    "git_apply_check": "exit0_not_applied",
+    "cargo": "NOT_EXECUTED"
+  }
+}

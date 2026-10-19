@@ -89,6 +89,7 @@ pub const SECRET_HASH_ITERATIONS: usize = 4096;
 /// desktop owner profile in `shared/access-scope-profiles.ts`).
 pub const LOCAL_OWNER_SCOPES: &[&str] = &[
     "chat",
+    "sessions.write",
     "resources.read",
     "resources.write",
     "files.read",
@@ -118,6 +119,8 @@ pub fn now_unix_ms() -> u64 {
 pub enum PrincipalKind {
     LocalUser,
     Device,
+    Bridge,
+    BridgeTakeover,
     Unknown,
 }
 
@@ -127,6 +130,7 @@ pub enum CredentialKind {
     LoopbackToken,
     DeviceCredential,
     WebSession,
+    Bridge,
     None,
 }
 
@@ -183,12 +187,73 @@ impl From<ConnectionKind> for ConnectionKindSerde {
 }
 
 impl Principal {
+    /// 仅可信 BridgeHost 在核准连接、平台与发送者后调用；HTTP 认证没有此入口。
+    pub(crate) fn bridge_actor(
+        platform: &str,
+        connector_id: &str,
+        sender_id: &str,
+    ) -> Result<Self, String> {
+        let subject = lingxi_protocol::bridge_subject(platform, connector_id, sender_id)
+            .map_err(str::to_owned)?;
+        Ok(Self {
+            schema_version: AUTH_SCHEMA_VERSION,
+            principal_id: format!("principal_{subject}"),
+            kind: PrincipalKind::Bridge,
+            user_id: Some(subject),
+            studio_id: None,
+            server_node_id: None,
+            device_id: None,
+            credential_id: None,
+            web_session_id: None,
+            connection_kind: ConnectionKindSerde::Local,
+            credential_kind: CredentialKind::Bridge,
+            trust_state: TrustState::Unknown,
+            scopes: vec!["chat".into()],
+        })
+    }
+    /// 已冻结真实 inbox 后才能派生；不从 HTTP 或消息参数构造此权限范围。
+    pub(crate) fn bridge_takeover(&self, session_id: &str) -> Result<Self, String> {
+        if self.kind != PrincipalKind::Bridge || self.credential_kind != CredentialKind::Bridge {
+            return Err("Bridge takeover actor required".into());
+        }
+        let subject = lingxi_protocol::bridge_takeover_subject(
+            self.user_id.as_deref().ok_or("Bridge actor missing")?,
+            session_id,
+        )
+        .map_err(str::to_owned)?;
+        let mut principal = self.clone();
+        principal.kind = PrincipalKind::BridgeTakeover;
+        principal.user_id = Some(subject);
+        Ok(principal)
+    }
+    pub(crate) fn scheduler_owner() -> Self {
+        Self::local_owner(0)
+    }
     /// Mirrors the incumbent `isLocalOwnerPrincipal`: loopback token over a
     /// local connection — the on-machine owner, allowed on every route.
     pub fn is_local_owner(&self) -> bool {
         self.kind == PrincipalKind::LocalUser
             && self.connection_kind == ConnectionKindSerde::Local
             && self.credential_kind == CredentialKind::LoopbackToken
+    }
+
+    /// 沿现役工作室拥有者规则，兼容早期桌面端完整权限组合。
+    pub fn is_studio_owner(&self) -> bool {
+        self.is_local_owner()
+            || scope_allows(&self.scopes, "studio.owner")
+            || [
+                "chat",
+                "resources.read",
+                "files.read",
+                "files.write",
+                "settings.read",
+                "settings.write",
+                "providers.manage",
+                "secrets.write",
+                "bridge.manage",
+            ]
+            .iter()
+            .all(|scope| scope_allows(&self.scopes, scope))
     }
 
     /// Mirrors `principalHasScope`: exact / namespace / `namespace.*`, with
@@ -219,6 +284,33 @@ impl Principal {
             trust_state: TrustState::Local,
             scopes: LOCAL_OWNER_SCOPES.iter().map(|s| s.to_string()).collect(),
         }
+    }
+}
+
+/// 只消费存储读取的冻结收据；撤权后也可用同一精确身份取消原任务。
+pub(crate) fn principal_for_bridge_inbox(
+    inbox: &lingxi_adapters::storage::bridge::BridgeInbox,
+) -> Result<Principal, String> {
+    let principal = Principal::bridge_actor(
+        &inbox.input.platform,
+        &inbox.input.connector_id,
+        &inbox.input.sender_id,
+    )?;
+    if inbox.prepared_takeover {
+        if !inbox.prepared
+            || inbox.role != lingxi_protocol::BridgeRole::Owner
+            || inbox.input.conversation_kind != lingxi_protocol::BridgeConversationKind::Dm
+        {
+            return Err("invalid frozen Bridge takeover".into());
+        }
+        principal.bridge_takeover(
+            inbox
+                .session_id
+                .as_deref()
+                .ok_or("Bridge takeover target missing")?,
+        )
+    } else {
+        Ok(principal)
     }
 }
 
@@ -518,6 +610,7 @@ pub enum RoutePolicy {
     Public,
     Authenticated,
     LocalOnly,
+    StudioOwner,
     Scope(&'static str),
 }
 
@@ -528,6 +621,64 @@ pub enum RoutePolicy {
 /// R02, local_only is the strictest available default).
 pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     let m = method.to_ascii_uppercase();
+    if path == "/lingxi/v1/mcp/session-permissions" && m == "POST" {
+        return RoutePolicy::Scope("sessions.write");
+    }
+    if path == "/lingxi/v1/mcp/oauth/callback" && m == "GET" {
+        return RoutePolicy::Public;
+    }
+    // 卡片只公开短期专用票据的读取入口，票据不能替代账户凭证。
+    if m == "GET" {
+        if let Some(rest) = path.strip_prefix("/lingxi/v1/cards/") {
+            let parts: Vec<_> = rest.split('/').collect();
+            if parts.len() == 3
+                && !parts[0].is_empty()
+                && parts[0].len() <= 128
+                && parts[0]
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
+                && parts[1] == "frame"
+                && parts[2].len() == 64
+                && parts[2].bytes().all(|b| b.is_ascii_hexdigit())
+            {
+                return RoutePolicy::Public;
+            }
+        }
+    }
+    if path == "/lingxi/v1/models/health" && m == "POST" {
+        return RoutePolicy::StudioOwner;
+    }
+    if matches!(
+        path,
+        "/lingxi/v1/providers/test" | "/lingxi/v1/providers/fetch-models"
+    ) && m == "POST"
+    {
+        return RoutePolicy::Scope("providers.manage");
+    }
+    if let Some(rest) = path.strip_prefix("/lingxi/v1/providers/") {
+        let parts = rest.split('/').collect::<Vec<_>>();
+        if !parts[0].is_empty()
+            && ((parts.len() == 2
+                && ["api-key", "discovered-models"].contains(&parts[1])
+                && matches!(m.as_str(), "GET" | "HEAD"))
+                || (parts.len() == 3
+                    && parts[1] == "models"
+                    && !parts[2].is_empty()
+                    && matches!(m.as_str(), "PUT" | "DELETE")))
+        {
+            return RoutePolicy::Scope("providers.manage");
+        }
+    }
+    if matches!(
+        path,
+        "/lingxi/v1/settings/config" | "/lingxi/v1/preferences/models" | "/lingxi/v1/user-profile"
+    ) && m == "PUT"
+    {
+        return RoutePolicy::Scope("settings.write");
+    }
+    if path == "/lingxi/v1/models/auxiliary-vision" && matches!(m.as_str(), "GET" | "HEAD") {
+        return RoutePolicy::Scope("chat");
+    }
     if m == "POST"
         && path
             .strip_prefix("/lingxi/v1/task/")
@@ -536,8 +687,62 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     {
         return RoutePolicy::Scope("chat");
     }
+    if path == "/lingxi/v1/desk/activities"
+        || path
+            .strip_prefix("/lingxi/v1/desk/activities/")
+            .is_some_and(|tail| {
+                tail.split_once('/').is_some_and(|(id, operation)| {
+                    !id.is_empty() && matches!(operation, "session" | "promote")
+                })
+            })
+    {
+        return RoutePolicy::LocalOnly;
+    }
+    // 手机对话仍沿现役chat范围；仅精确注册的路径和方法进入此面。
+    let read = matches!(m.as_str(), "GET" | "HEAD");
+    if let Some(rest) = path.strip_prefix("/lingxi/v1/") {
+        let parts = rest.split('/').collect::<Vec<_>>();
+        let valid = match parts.as_slice() {
+            ["browser", "workspaces" | "sessions" | "session-states"] => read,
+
+            ["channels"] => read || m == "POST",
+            ["channels", "toggle"] => m == "POST",
+            ["channels", id] if !id.is_empty() => read || m == "DELETE",
+            ["channels", id, "members" | "messages" | "read"] if !id.is_empty() => m == "POST",
+            ["channels", id, "members", member] if !id.is_empty() && !member.is_empty() => {
+                m == "DELETE"
+            }
+            ["dm"] => read,
+            ["dm", peer] if !peer.is_empty() => read,
+            ["dm", peer, "reset"] if !peer.is_empty() => m == "POST",
+            ["conversations", id, "agent-phone-settings" | "agent-phone-tool-mode"]
+                if !id.is_empty() =>
+            {
+                read || m == "POST"
+            }
+            ["conversations", id, "agent-activities" | "export"] if !id.is_empty() => read,
+            _ => false,
+        };
+        if valid {
+            return RoutePolicy::Scope("chat");
+        }
+        if parts.first() == Some(&"session-collab") {
+            return RoutePolicy::LocalOnly;
+        }
+    }
     // 与 Axum 的实际路由保持精确匹配；不能把未注册的 `/health/` 当作公开路由。
     let p = path;
+    if matches!(
+        p,
+        "/lingxi/v1/desk/cron"
+            | "/lingxi/v1/desk/cron/history"
+            | "/lingxi/v1/desk/heartbeat"
+            | "/lingxi/v1/automation/status"
+            | "/lingxi/v1/preferences/notifications"
+            | "/lingxi/v1/automation/notifications"
+    ) {
+        return RoutePolicy::LocalOnly;
+    }
     if (p == "/lingxi/v1/sessions/interactions" && matches!(m.as_str(), "GET" | "HEAD"))
         || (p == "/lingxi/v1/sessions/interactions/answer" && m == "POST")
     {
@@ -557,8 +762,31 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if (p == "/lingxi/v1/me" || p == "/lingxi/v1/server/identity") && m == "GET" {
         return RoutePolicy::Authenticated;
     }
-    // 当前桌面浏览器宿主只能由本机所有者接线，chat 凭证不能注册宿主。
+    // 用户控制必须另有管理权限，普通聊天凭证不能模拟接管；执行仍在服务节点。
+    if matches!(
+        p,
+        "/lingxi/v1/browser/open-session"
+            | "/lingxi/v1/browser/close-session"
+            | "/lingxi/v1/browser/command"
+    ) {
+        return RoutePolicy::Scope("admin");
+    }
+    // 全局凭证与站点设置仍只接受本机所有者。
+    if matches!(
+        p,
+        "/lingxi/v1/search/config"
+            | "/lingxi/v1/search/verify"
+            | "/lingxi/v1/preferences/browser"
+            | "/lingxi/v1/preferences/browser/clear-cookies"
+    ) {
+        return RoutePolicy::LocalOnly;
+    }
     if p == "/lingxi/v1/browser-host" {
+        return RoutePolicy::LocalOnly;
+    }
+    // R07-T10 观测面：查询/导出/导入全部仅本机拥有者（对齐旧面
+    // STUDIO_OWNER/LOCAL_ONLY 分类——metadata 查询也不给设备凭证）。
+    if p.starts_with("/lingxi/v1/observability/") {
         return RoutePolicy::LocalOnly;
     }
     if p == "/lingxi/v1/input-drafts" {
@@ -593,10 +821,149 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     if p == "/lingxi/v1/sessions" && (m == "GET" || m == "HEAD" || m == "POST") {
         return RoutePolicy::Scope("chat");
     }
+    // R07-T09：CLI/mobile 共享的只读聊天上下文（目录/首屏握手）沿现役
+    // 手机对话的 chat 范围；不放宽到 settings.read，也不公开供应商秘密。
+    if matches!(p, "/lingxi/v1/chat/models" | "/lingxi/v1/mobile/bootstrap")
+        && (m == "GET" || m == "HEAD")
+    {
+        return RoutePolicy::Scope("chat");
+    }
     if matches!(p, "/lingxi/v1/models/set" | "/lingxi/v1/models/switch") && m == "POST" {
         return RoutePolicy::Scope("chat");
     }
+    if p == "/lingxi/v1/desk/beautify/status" && matches!(m.as_str(), "GET" | "HEAD") {
+        return RoutePolicy::Scope("resources.read");
+    }
+    if matches!(
+        p,
+        "/lingxi/v1/desk/beautify/cover"
+            | "/lingxi/v1/desk/beautify/cover/apply"
+            | "/lingxi/v1/desk/beautify/cover/preset/apply"
+    ) && m == "POST"
+    {
+        return RoutePolicy::Scope("resources.write");
+    }
+    // R07-T07 β：工作台/Studio 挂载面（route-security.ts :389-419 + :70-73：
+    // workbench/studio 读 = files.read，写 = files.write）。DELETE
+    // workspaces/{id} 在现役未匹配写面谓词而落 /api/* STUDIO_OWNER 兜底；
+    // 候选取 files.write + 处理器内 local-owner 闸（决定性控制同现役），
+    // 登记偏差。R06 R2 原 `p == "/lingxi/v1/workbench/actions"` 检查位于
+    // sessions 前缀块内不可达（死代码），此处为真实生效分类。
+    if p == "/lingxi/v1/workbench/files"
+        || p == "/lingxi/v1/workbench/search"
+        || p == "/lingxi/v1/workbench/content"
+    {
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("files.read")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if p == "/lingxi/v1/workbench/actions" || p == "/lingxi/v1/workbench/upload" {
+        return if m == "POST" {
+            RoutePolicy::Scope("files.write")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if p == "/lingxi/v1/studio/workspaces" {
+        return if m == "GET" || m == "HEAD" {
+            RoutePolicy::Scope("files.read")
+        } else if m == "POST" {
+            RoutePolicy::Scope("files.write")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if let Some(rest) = p.strip_prefix("/lingxi/v1/studio/workspaces/") {
+        if let Some(id) = rest.strip_suffix("/files") {
+            if !id.is_empty() && !id.contains('/') && (m == "GET" || m == "HEAD") {
+                return RoutePolicy::Scope("files.read");
+            }
+            return RoutePolicy::LocalOnly;
+        }
+        if !rest.is_empty() && !rest.contains('/') && m == "DELETE" {
+            return RoutePolicy::Scope("files.write");
+        }
+        return RoutePolicy::LocalOnly;
+    }
+    // R07-T07 β3：desk 文件面（route-security.ts isDeskFileReadRoute
+    // :421-428 / isDeskFileWriteRoute :430-438）。现役读面仅 GET（HEAD 落
+    // 兜底），与 workbench 块的 GET||HEAD 不同——按现役口径分类。
+    if p == "/lingxi/v1/desk/activities/summarize" {
+        return RoutePolicy::LocalOnly;
+    }
+    if p == "/lingxi/v1/desk/logs" {
+        return RoutePolicy::LocalOnly;
+    }
+    if p == "/lingxi/v1/desk/path"
+        || p == "/lingxi/v1/desk/search-files"
+        || (p == "/lingxi/v1/desk/files" && m == "GET")
+        || (p == "/lingxi/v1/desk/jian" && m == "GET")
+    {
+        return if m == "GET" {
+            RoutePolicy::Scope("files.read")
+        } else {
+            RoutePolicy::LocalOnly
+        };
+    }
+    if (p == "/lingxi/v1/desk/files" || p == "/lingxi/v1/desk/jian") && m == "POST" {
+        return RoutePolicy::Scope("files.write");
+    }
+    // R07-T07 β4：日记面。现役 route-security.ts 无 diary 显式分类——
+    // /api/diary/* 落文件末尾 /api/* 兜底 STUDIO_OWNER；候选无 studio 面，
+    // 按 R06 口径取最严格档 LocalOnly（双路由全动词，注释登记）。
+    if p == "/lingxi/v1/diary/write" || p == "/lingxi/v1/diary/list" {
+        return RoutePolicy::LocalOnly;
+    }
+    // R07-T07 γ：git 环境信息卡面（route-security.ts:84-89 +
+    // isGitEnvironmentRoute:438-462）。log-stats 恒 files.read（只读批量
+    // 统计，POST 仅为容纳哈希列表）；其余 21 路径 GET→files.read /
+    // POST→files.write；GET|POST 以外动词现役落 /api/* 兜底
+    // STUDIO_OWNER → LocalOnly（R06 口径）。
+    if let Some(rest) = p.strip_prefix("/lingxi/v1/git/") {
+        if matches!(
+            rest,
+            "status"
+                | "worktree-info"
+                | "worktrees"
+                | "branches"
+                | "log"
+                | "log-stats"
+                | "file-diff"
+                | "checkout"
+                | "create-branch"
+                | "commit"
+                | "amend"
+                | "stage"
+                | "unstage"
+                | "fetch"
+                | "stash"
+                | "stashes"
+                | "unstash"
+                | "discard"
+                | "push"
+                | "pull"
+                | "worktree-create"
+                | "ai-commit-message"
+        ) {
+            if rest == "log-stats" {
+                return RoutePolicy::Scope("files.read");
+            }
+            return match m.as_str() {
+                "GET" => RoutePolicy::Scope("files.read"),
+                "POST" => RoutePolicy::Scope("files.write"),
+                _ => RoutePolicy::LocalOnly,
+            };
+        }
+    }
     if let Some(rest) = p.strip_prefix("/lingxi/v1/sessions/") {
+        if let Some(id) = rest.strip_suffix("/agent-activities") {
+            if !id.is_empty() && !id.contains('/') && matches!(m.as_str(), "GET" | "HEAD") {
+                return RoutePolicy::Scope("chat");
+            }
+        }
+
         if rest == "workspace-rollback" {
             return if m == "GET" || m == "HEAD" || m == "PUT" {
                 RoutePolicy::Scope("chat")
@@ -641,15 +1008,34 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         if rest == "studio-list" && (m == "GET" || m == "HEAD") {
             return RoutePolicy::Scope("chat");
         }
-        // R06 R2：工作台同版本写入（chat 写面，归属/授权在处理器内复检）。
-        if p == "/lingxi/v1/workbench/actions" && m == "POST" {
-            return RoutePolicy::Scope("chat");
-        }
         // R06 C1/C2：会话级子面的会话读/写 scope（与既有 suffix 规则同口径；
         // workspace 是处置/清扫的身份写面，find/replay/overview/content/
         // summary/turns/fresh-compact 是历史内容读写面）。
         if let Some((id, tail)) = rest.split_once('/') {
             let id_clean = !id.is_empty() && !id.contains('/');
+            if id_clean {
+                let media = tail.strip_prefix("media/jobs");
+                if let Some(suffix) = media {
+                    let parts = suffix
+                        .trim_start_matches('/')
+                        .split('/')
+                        .collect::<Vec<_>>();
+                    let exact_list = suffix.is_empty();
+                    let exact_job =
+                        suffix.starts_with('/') && parts.len() == 1 && !parts[0].is_empty();
+                    let exact_cancel = suffix.starts_with('/')
+                        && parts.len() == 2
+                        && !parts[0].is_empty()
+                        && parts[1] == "cancel";
+                    return if ((exact_list || exact_job) && matches!(m.as_str(), "GET" | "HEAD"))
+                        || (exact_cancel && m == "POST")
+                    {
+                        RoutePolicy::Scope("chat")
+                    } else {
+                        RoutePolicy::LocalOnly
+                    };
+                }
+            }
             match tail {
                 "slash" | "bridge" if id_clean && m == "POST" => return RoutePolicy::Scope("chat"),
                 "bridge/attachment" if id_clean && matches!(m.as_str(), "POST" | "DELETE") => {
@@ -941,7 +1327,7 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
     // 把存档字节写回存档记录的绝对路径；route-security 里该族落 /api/
     // 兜底 STUDIO_OWNER——Rust 无 studio 面，按既有口径取最严格档
     // LocalOnly；族内未列形状同样 fail closed）。
-    if p.starts_with("/lingxi/v1/checkpoints/") {
+    if p == "/lingxi/v1/checkpoints" || p.starts_with("/lingxi/v1/checkpoints/") {
         return RoutePolicy::LocalOnly;
     }
     if p == "/lingxi/v1/devices/credentials" {
@@ -1080,9 +1466,17 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
         if p == "/lingxi/v1/app-events" && (m == "GET" || m == "HEAD") {
             return RoutePolicy::LocalOnly;
         }
+        // 侧栏界面沿原route-security的chat权限，不借此开放其它设置。
+        if p == "/lingxi/v1/preferences/sidebar-ui" {
+            return if matches!(m.as_str(), "GET" | "HEAD" | "PUT") {
+                RoutePolicy::Scope("chat")
+            } else {
+                RoutePolicy::LocalOnly
+            };
+        }
         // R06 用户偏好对：读 settings.read / 写 settings.write。
         if let Some(rest) = p.strip_prefix("/lingxi/v1/preferences/") {
-            if matches!(rest, "autolearn" | "quick-chat" | "goal") {
+            if matches!(rest, "autolearn" | "quick-chat" | "goal" | "keybindings") {
                 return if m == "GET" || m == "HEAD" {
                     RoutePolicy::Scope("settings.read")
                 } else {
@@ -1112,6 +1506,7 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
                 | "/lingxi/v1/character-cards/import"
                 | "/lingxi/v1/character-cards/export"
                 | "/lingxi/v1/character-cards/export/preview"
+                | "/lingxi/v1/character-cards/export/plan"
         ) && m == "POST"
         {
             return RoutePolicy::LocalOnly;
@@ -1124,7 +1519,17 @@ pub fn classify_route(method: &str, path: &str) -> RoutePolicy {
             // 现役角色卡路径属于 LOCAL_ONLY 兜底，素材也不能扩大到远程设置读权限。
             return RoutePolicy::LocalOnly;
         }
-        // 仅注册助手页共享读入口；不存在的设置写法仍按未知路由拒绝。
+        // 设置文件包含本机供应商目录，互动卡片沿现役本机访问边界。
+        if matches!(
+            p,
+            "/lingxi/v1/settings/export" | "/lingxi/v1/settings/import"
+        ) || p
+            .strip_prefix("/lingxi/v1/cards/")
+            .is_some_and(|id| !id.is_empty() && !id.contains('/'))
+        {
+            return RoutePolicy::LocalOnly;
+        }
+        // 现役共享读入口；写面仍受各自路由及原有本机权限限制。
         if matches!(
             p,
             "/lingxi/v1/settings/snapshot"
@@ -1337,6 +1742,17 @@ pub fn authorize(
     let policy = classify_route(method, path);
     match policy {
         RoutePolicy::Public => Ok(()),
+        RoutePolicy::StudioOwner => {
+            if principal.is_some_and(Principal::is_studio_owner) {
+                Ok(())
+            } else {
+                Err(AuthzDenial {
+                    status: 403,
+                    reason: "studio_owner_required",
+                    required_scope: Some("studio.owner"),
+                })
+            }
+        }
         RoutePolicy::LocalOnly => {
             if principal.is_some_and(Principal::is_local_owner) {
                 Ok(())
@@ -1603,6 +2019,50 @@ fn prepare_device_credential(
 }
 
 impl AuthService {
+    /// 交互工具仅继承本机用户的窄设置能力，绝不签发拥有者或秘密写权限。
+    pub(crate) fn mint_local_settings_tool_principal(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+        call: &lingxi_protocol::ToolCallId,
+    ) -> Result<Principal, String> {
+        let bound = crate::toolgateway::trusted_settings_context(ctx, call)?;
+        let original = bound
+            .settings_principal()
+            .ok_or("设置工具缺少真实入口冻结的原始设置授权")?;
+        // kernel的LocalUser也可能来自网页登录，不能据此重新铸造本机权限。
+        if !original.is_local_owner()
+            || !original.has_scope("settings.write")
+            || crate::sessions::kernel_principal_of(original) != ctx.principal
+        {
+            return Err("设置工具只继承本机交互入口的原始设置权限".into());
+        }
+        self.validate_principal(original)
+            .map_err(|_| "原始设置凭证已失效")?;
+        if ctx.principal != lingxi_kernel::Principal::LocalUser
+            || !matches!(bound.permission(), crate::toolgateway::InvocationPermissionContext::UserSession { mode } if mode != lingxi_kernel::subagent::SessionPermissionMode::ReadOnly)
+        {
+            return Err("当前设置工具只接受本机交互会话；其他来源缺少原始设置授权".into());
+        }
+        Ok(Principal {
+            schema_version: AUTH_SCHEMA_VERSION,
+            principal_id: format!("settings_tool:{}:{}", ctx.run_id, call),
+            kind: PrincipalKind::LocalUser,
+            user_id: Some(LOCAL_OWNER_USER_ID.into()),
+            studio_id: None,
+            server_node_id: None,
+            device_id: None,
+            credential_id: None,
+            web_session_id: None,
+            connection_kind: ConnectionKindSerde::Local,
+            credential_kind: CredentialKind::None,
+            trust_state: TrustState::Local,
+            scopes: vec!["settings.write".into()],
+        })
+    }
+    /// 调度器代表已经由本机所有者保存的计划执行；身份不来自任务正文。
+    pub(crate) fn scheduler_principal(&self) -> Principal {
+        Principal::local_owner(0)
+    }
     /// Prepares the auth stores inside the isolated data root: rotates the
     /// per-start loopback token (owner-only file, bound to this instance),
     /// ensures the device registries exist, loads them.
@@ -2182,6 +2642,25 @@ impl AuthService {
 
     /// 在使用 WS 票据或已建立连接时重新核对设备身份；撤销、过期及权限变化都让旧身份失效。
     pub fn validate_principal(&self, principal: &Principal) -> Result<(), AuthDenial> {
+        if principal.credential_kind == CredentialKind::LoopbackToken {
+            let inner = self.lock();
+            let current = read_json(&inner.token_file)
+                .ok()
+                .flatten()
+                .and_then(|value| serde_json::from_value::<LocalTokenFile>(value).ok());
+            if !principal.is_local_owner()
+                || !current.is_some_and(|record| {
+                    record.schema_version == AUTH_SCHEMA_VERSION
+                        && record.kind == "local_token"
+                        && constant_time_eq(
+                            &Sha256::digest(record.token.as_bytes()),
+                            &Sha256::digest(inner.local_token.as_bytes()),
+                        )
+                })
+            {
+                return Err(AuthDenial::new("invalid_credential", ConnectionKind::Local));
+            }
+        }
         if principal.kind != PrincipalKind::Device {
             return Ok(());
         }
@@ -3235,6 +3714,23 @@ mod tests {
         );
         assert_eq!(classify_route("GET", "/lingxi/v1/ws-ticket"), LocalOnly);
         assert_eq!(classify_route("GET", "/lingxi/v1/sessions"), Scope("chat"));
+        // R07-T09：CLI/mobile 只读上下文面沿 chat 范围，写动词 fail-closed。
+        assert_eq!(
+            classify_route("GET", "/lingxi/v1/chat/models"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("HEAD", "/lingxi/v1/mobile/bootstrap"),
+            Scope("chat")
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/chat/models"),
+            LocalOnly
+        );
+        assert_eq!(
+            classify_route("POST", "/lingxi/v1/mobile/bootstrap"),
+            LocalOnly
+        );
         assert_eq!(
             classify_route("GET", "/lingxi/v1/sessions/s1"),
             Scope("chat")
@@ -3749,6 +4245,25 @@ mod tests {
     }
 
     #[test]
+    fn card_frame_public_policy_is_exact_and_never_accepts_head_or_account_paths() {
+        let path = format!("/lingxi/v1/cards/a_1-b/frame/{}", "a".repeat(64));
+        assert_eq!(classify_route("GET", &path), RoutePolicy::Public);
+        for method in ["HEAD", "PUT", "DELETE", "POST"] {
+            assert_eq!(classify_route(method, &path), RoutePolicy::LocalOnly);
+        }
+        for path in [
+            format!("{path}/"),
+            format!("{path}/extra"),
+            format!("/lingxi/v1/cards/../frame/{}", "a".repeat(64)),
+            format!("/lingxi/v1/cards/a/frame/{}", "g".repeat(64)),
+            format!("/lingxi/v1/cards/a/frame/{}", "a".repeat(63)),
+            "/lingxi/v1/cards/a".into(),
+        ] {
+            assert_eq!(classify_route("GET", &path), RoutePolicy::LocalOnly);
+        }
+    }
+
+    #[test]
     fn authorize_order_and_denials() {
         let (home, svc) = setup("authorize");
         let owner = svc
@@ -3824,6 +4339,7 @@ mod tests {
 
     #[test]
     fn registries_reload_across_bootstrap() {
+        let _ = tracing_subscriber::fmt().with_test_writer().try_init();
         let (home, svc) = setup("reload");
         let issued = svc
             .issue_device_credential("user_r", &["chat"], None)
@@ -3877,5 +4393,43 @@ mod tests {
             "invalid_credential"
         );
         teardown(&home);
+    }
+}
+
+#[cfg(test)]
+mod bridge_identity_tests {
+    use super::*;
+    #[test]
+    fn bridge_actors_and_takeover_are_host_only_restricted_identities() {
+        let principal = Principal::bridge_actor("telegram", "connector", "sender").unwrap();
+        assert_eq!(principal.kind, PrincipalKind::Bridge);
+        assert!(!principal.is_local_owner());
+        assert!(principal.has_scope("chat"));
+        assert!(!principal.has_scope("admin"));
+        assert!(!principal.has_scope("automation.manage"));
+        let kernel = crate::sessions::kernel_principal_of(&principal);
+        let subject = principal.user_id.as_deref().unwrap();
+        assert!(kernel.can_access_session(subject, "bridge-session"));
+        assert!(!kernel.can_access_session(LOCAL_OWNER_USER_ID, "desktop"));
+        let scope = principal.bridge_takeover("selected-desktop").unwrap();
+        assert!(!scope.is_local_owner());
+        assert_eq!(scope.credential_kind, CredentialKind::Bridge);
+        let kernel = crate::sessions::kernel_principal_of(&scope);
+        assert_eq!(kernel.storage_kind(), "bridge_takeover");
+        assert!(crate::sessions::SessionStore::can_access_session(
+            &scope,
+            LOCAL_OWNER_USER_ID,
+            "selected-desktop"
+        ));
+        assert!(!crate::sessions::SessionStore::can_access_session(
+            &scope,
+            LOCAL_OWNER_USER_ID,
+            "other-desktop"
+        ));
+        assert!(!crate::sessions::SessionStore::can_access(
+            &scope,
+            LOCAL_OWNER_USER_ID
+        ));
+        assert_eq!(kernel.bridge_actor_subject(), Some(subject));
     }
 }

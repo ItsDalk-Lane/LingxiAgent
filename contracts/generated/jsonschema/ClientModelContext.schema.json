@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "ClientModelSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "ClientModelState": {
+      "enum": [
+        "ready",
+        "unconfigured",
+        "unavailable"
+      ],
+      "type": "string"
+    },
+    "ClientModelSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "audio": {
+          "type": "boolean"
+        },
+        "audioTransport": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "audioTransportSupported": {
+          "type": "boolean"
+        },
+        "defaultThinkingLevel": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "input": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "isCurrent": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "reasoning": {
+          "type": "boolean"
+        },
+        "thinkingLevels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "xhigh": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "provider",
+        "isCurrent",
+        "reasoning",
+        "xhigh",
+        "thinkingLevels",
+        "audio",
+        "audioTransportSupported",
+        "input"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activeModel": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ClientModelSelection"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "modelGeneration": {
+      "description": "代次以十进制字符串传输，不能因客户端数值精度丢失归属。",
+      "type": "string"
+    },
+    "modelState": {
+      "$ref": "#/$defs/ClientModelState"
+    },
+    "models": {
+      "items": {
+        "$ref": "#/$defs/ClientModelSummary"
+      },
+      "type": "array"
+    },
+    "thinkingLevel": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "models",
+    "modelState",
+    "modelGeneration",
+    "thinkingLevel"
+  ],
+  "title": "ClientModelContext",
+  "type": "object"
+}

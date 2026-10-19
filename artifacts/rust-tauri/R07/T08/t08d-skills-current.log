@@ -1,0 +1,11 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r06_skills_completion.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_skills_completion-258d5b18d0e11d1f)
+
+running 4 tests
+test original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval ... ok
+test original_translation_uses_real_title_model_protocol_accounts_and_refuses_cross_catalog ... ok
+test original_skill_packages_workspace_source_global_and_agent_install_rejections ... ok
+test original_skills_settings_and_panel_current_real_service_projection ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 5.94s
+

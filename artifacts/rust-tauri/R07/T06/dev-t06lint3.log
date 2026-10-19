@@ -1,0 +1,24 @@
+
+--- STDERR ---
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
+    Checking lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+    Checking lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+error: taken reference of right operand
+   --> crates/lingxi-service/src/media_admin.rs:715:28
+    |
+715 |         .find(|(id, _, _)| id == &provider)
+    |                            ^^^^^^---------
+    |                                  |
+    |                                  help: use the right value directly: `provider`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#op_ref
+    = note: `-D clippy::op-ref` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::op_ref)]`
+
+error: could not compile `lingxi-service` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 1 previous error

@@ -1,0 +1,24 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.47s
+     Running tests/r07_browser_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_store-f8989580fe99ef3c)
+
+running 3 tests
+test emergency_stop_requires_new_actual_user_run_and_old_request_replay_cannot_revoke_again ... FAILED
+test downloads_can_confirm_unknown_once_without_overwriting_actual_receipt ... ok
+test actual_receipts_deduplicate_reject_changed_input_and_recover_unknown_without_reexecution ... ok
+
+failures:
+
+---- emergency_stop_requires_new_actual_user_run_and_old_request_replay_cannot_revoke_again stdout ----
+
+thread 'emergency_stop_requires_new_actual_user_run_and_old_request_replay_cannot_revoke_again' (764823) panicked at crates/lingxi-adapters/tests/r07_browser_store.rs:24:10:
+called `Result::unwrap()` on an `Err` value: Busy { timeout_ms: 0 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    emergency_stop_requires_new_actual_user_run_and_old_request_replay_cannot_revoke_again
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test r07_browser_store`

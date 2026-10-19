@@ -664,6 +664,14 @@ impl RunDatabase {
                         "SELECT session_id, agent_id, owner_user_id, title, \
                          created_at_unix_ms FROM sessions \
                          WHERE lifecycle = 'active' \
+                         AND (EXISTS(SELECT 1 FROM automation_activity_promotions_v1 p WHERE p.session_id=sessions.session_id) \
+                         OR (NOT EXISTS(SELECT 1 FROM automation_internal_sessions_v1 i WHERE i.session_id=sessions.session_id) \
+                         AND NOT EXISTS(SELECT 1 FROM runs r JOIN run_lineage l ON l.run_id=r.run_id JOIN automation_triggers_v1 t ON t.trigger_id=l.cause_id \
+                         WHERE r.session_id=sessions.session_id AND l.origin IN ('cron','heartbeat') \
+                         AND (t.run_id IS NULL OR t.run_id=r.run_id) AND (t.session_id IS NULL OR t.session_id=r.session_id)))) \
+                         AND NOT EXISTS(SELECT 1 FROM phone_bindings_v1 phone WHERE phone.session_id=sessions.session_id AND phone.actor_id=sessions.agent_id AND phone.owner_subject=sessions.owner_user_id) \
+                         AND NOT EXISTS(SELECT 1 FROM phone_deliveries_v1 phone WHERE json_extract(phone.input_json,'$.sessionId')=sessions.session_id AND phone.actor_id=sessions.agent_id AND phone.owner_subject=sessions.owner_user_id) \
+                         AND NOT EXISTS(SELECT 1 FROM runs r JOIN run_lineage l ON l.run_id=r.run_id JOIN phone_deliveries_v1 phone ON phone.delivery_id=l.cause_id WHERE r.session_id=sessions.session_id AND l.origin=phone.conversation_type AND phone.actor_id=sessions.agent_id AND phone.owner_subject=sessions.owner_user_id AND r.owner_subject=phone.owner_subject) \
                          ORDER BY created_at_unix_ms DESC, session_id DESC",
                     )
                     .map_err(migrations::map_rusqlite)?;
@@ -1223,6 +1231,8 @@ fn principal_audit_id(principal: &Principal) -> String {
         Principal::Device { device_id, .. } => format!("principal_device_{device_id}"),
         Principal::WebSession { account_id } => format!("principal_web_{account_id}"),
         Principal::Automation { surface } => format!("principal_automation_{surface}"),
+        Principal::Bridge { subject } => format!("principal_{subject}"),
+        Principal::BridgeTakeover { subject, .. } => format!("principal_{subject}"),
     }
 }
 
@@ -3124,100 +3134,21 @@ impl StoragePort for RunDatabase {
                 //
                 // R05 RR1 F21: purpose/model/date-window filters append to
                 // every scope shape (the taskbook's 按日期/类别/模型/会话
-                // 筛选).
-                let sql_base = "SELECT m.model_call_id, m.session_id, m.run_id, m.attempt, \
+                // 筛选); R07-T10 adds provider/origin/outcome the same way.
+                let (from, conditions, params) = usage_query_plan(&query.into());
+                let mut sql = format!(
+                    "SELECT m.model_call_id, m.session_id, m.run_id, m.attempt, \
                      m.purpose, m.origin, m.parent_run_id, m.cause_ref, m.parent_tool_call_id, \
                      m.provider, m.model, m.protocol, m.usage_state, m.input_tokens, \
                      m.output_tokens, m.cache_read_tokens, m.cache_write_tokens, \
                      m.reasoning_tokens, m.missing_fields, m.estimate_basis, m.invalid_detail, \
                      m.transport_attempts, m.cost_basis, m.recorded_at_unix_ms, m.outcome, \
                      m.started_at_unix_ms, m.settled_at_unix_ms, m.emitted_tool_calls \
-                     FROM model_call_usage m";
-                let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
-                let mut sql = match (&query.owner_user_id, &query.session_id, &query.run_id) {
-                    (Some(owner), session, run) => {
-                        let mut sql = format!(
-                            "{sql_base} JOIN sessions s ON s.session_id = m.session_id \
-                             WHERE s.owner_user_id = ?{}",
-                            params.len() + 1
-                        );
-                        params.push(Box::new(owner.clone()));
-                        if let Some(session) = session {
-                            sql.push_str(&format!(" AND m.session_id = ?{}", params.len() + 1));
-                            params.push(Box::new(session.clone()));
-                        }
-                        if let Some(run) = run {
-                            sql.push_str(&format!(" AND m.run_id = ?{}", params.len() + 1));
-                            params.push(Box::new(run.clone()));
-                        }
-                        sql
-                    }
-                    (None, Some(session), run) => {
-                        let mut sql =
-                            format!("{sql_base} WHERE m.session_id = ?{}", params.len() + 1);
-                        params.push(Box::new(session.clone()));
-                        if let Some(run) = run {
-                            sql.push_str(&format!(" AND m.run_id = ?{}", params.len() + 1));
-                            params.push(Box::new(run.clone()));
-                        }
-                        sql
-                    }
-                    (None, None, Some(run)) => {
-                        let sql = format!("{sql_base} WHERE m.run_id = ?{}", params.len() + 1);
-                        params.push(Box::new(run.clone()));
-                        sql
-                    }
-                    (None, None, None) => sql_base.to_string(),
-                };
-                // The F21 filters append to whichever shape above; the
-                // first one opens its own WHERE when the scope was empty.
-                let append = |sql: &mut String,
-                              params: &mut Vec<Box<dyn rusqlite::ToSql>>,
-                              condition: String,
-                              value: Box<dyn rusqlite::ToSql>| {
-                    if sql.contains(" WHERE ") {
-                        sql.push_str(" AND ");
-                    } else {
-                        sql.push_str(" WHERE ");
-                    }
-                    sql.push_str(&condition);
-                    params.push(value);
-                };
-                if let Some(purpose) = &query.purpose {
-                    let index = params.len() + 1;
-                    append(
-                        &mut sql,
-                        &mut params,
-                        format!("m.purpose = ?{index}"),
-                        Box::new(purpose.clone()),
-                    );
-                }
-                if let Some(model) = &query.model {
-                    let index = params.len() + 1;
-                    append(
-                        &mut sql,
-                        &mut params,
-                        format!("m.model = ?{index}"),
-                        Box::new(model.clone()),
-                    );
-                }
-                if let Some(from) = query.recorded_from_unix_ms {
-                    let index = params.len() + 1;
-                    append(
-                        &mut sql,
-                        &mut params,
-                        format!("m.recorded_at_unix_ms >= ?{index}"),
-                        Box::new(from as i64),
-                    );
-                }
-                if let Some(to) = query.recorded_to_unix_ms {
-                    let index = params.len() + 1;
-                    append(
-                        &mut sql,
-                        &mut params,
-                        format!("m.recorded_at_unix_ms <= ?{index}"),
-                        Box::new(to as i64),
-                    );
+                     {from}"
+                );
+                if !conditions.is_empty() {
+                    sql.push_str(" WHERE ");
+                    sql.push_str(&conditions.join(" AND "));
                 }
                 sql.push_str(" ORDER BY m.rowid");
                 let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
@@ -3229,6 +3160,505 @@ impl StoragePort for RunDatabase {
                 let mut out = Vec::new();
                 while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
                     out.push(usage_row_to_record(row)?);
+                }
+                Ok(out)
+            })
+            .await
+    }
+}
+
+/// Builds FROM/WHERE/params of a usage-ledger query (scope + R05 F21
+/// filters + R07-T10 provider/origin/outcome). Shared by the trait list
+/// query and the observability paged/aggregate reads so both always apply
+/// identical semantics. Multi-value fields become `IN (...)` (OR within a
+/// field, AND across fields).
+fn usage_query_plan(
+    filter: &lingxi_kernel::usage::UsageFilter,
+) -> (String, Vec<String>, Vec<Box<dyn rusqlite::ToSql>>) {
+    let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+    let mut conditions: Vec<String> = Vec::new();
+    fn push_one(
+        params: &mut Vec<Box<dyn rusqlite::ToSql>>,
+        conditions: &mut Vec<String>,
+        condition: &str,
+        value: Box<dyn rusqlite::ToSql>,
+    ) {
+        params.push(value);
+        conditions.push(condition.replace("?{}", &format!("?{index}", index = params.len())));
+    }
+    fn push_in(
+        params: &mut Vec<Box<dyn rusqlite::ToSql>>,
+        conditions: &mut Vec<String>,
+        column: &str,
+        values: &[String],
+    ) {
+        if values.is_empty() {
+            return;
+        }
+        let mut placeholders = String::new();
+        for value in values {
+            params.push(Box::new(value.clone()));
+            if !placeholders.is_empty() {
+                placeholders.push_str(", ");
+            }
+            placeholders.push_str(&format!("?{index}", index = params.len()));
+        }
+        conditions.push(format!("{column} IN ({placeholders})"));
+    }
+    let from = if let Some(owner) = &filter.owner_user_id {
+        push_one(
+            &mut params,
+            &mut conditions,
+            "s.owner_user_id = ?{}",
+            Box::new(owner.clone()),
+        );
+        "FROM model_call_usage m JOIN sessions s ON s.session_id = m.session_id".to_string()
+    } else {
+        "FROM model_call_usage m".to_string()
+    };
+    push_in(&mut params, &mut conditions, "m.session_id", &filter.session_ids);
+    push_in(&mut params, &mut conditions, "m.run_id", &filter.run_ids);
+    push_in(&mut params, &mut conditions, "m.purpose", &filter.purposes);
+    push_in(&mut params, &mut conditions, "m.model", &filter.models);
+    push_in(&mut params, &mut conditions, "m.provider", &filter.providers);
+    push_in(&mut params, &mut conditions, "m.origin", &filter.origins);
+    if !filter.outcomes.is_empty() {
+        let outcomes: Vec<String> = filter
+            .outcomes
+            .iter()
+            .map(|o| o.wire_name().to_string())
+            .collect();
+        push_in(&mut params, &mut conditions, "m.outcome", &outcomes);
+    }
+    if let Some(from_ms) = filter.recorded_from_unix_ms {
+        push_one(
+            &mut params,
+            &mut conditions,
+            "m.recorded_at_unix_ms >= ?{}",
+            Box::new(from_ms as i64),
+        );
+    }
+    if let Some(to_ms) = filter.recorded_to_unix_ms {
+        push_one(
+            &mut params,
+            &mut conditions,
+            "m.recorded_at_unix_ms <= ?{}",
+            Box::new(to_ms as i64),
+        );
+    }
+    (from, conditions, params)
+}
+
+/// One page of the usage ledger: the records plus each row's `rowid`
+/// (the keyset cursor material — rowid order is insertion order, which is
+/// the ledger's canonical order).
+pub struct UsagePage {
+    pub rows: Vec<(i64, lingxi_kernel::usage::ModelCallUsageRecord)>,
+}
+
+/// Aggregate metrics over one filter scope (A19: the numbers must equal
+/// the de-duplicated detail rows under the same filter).
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct UsageAggregate {
+    pub call_count: u64,
+    pub ok_count: u64,
+    pub error_count: u64,
+    pub cancelled_count: u64,
+    pub unknown_count: u64,
+    /// Rows whose usage fact is absent (`None` — never counted as zero).
+    pub usage_missing_count: u64,
+    pub input_tokens: Option<u64>,
+    pub output_tokens: Option<u64>,
+    pub cache_read_tokens: Option<u64>,
+    pub cache_write_tokens: Option<u64>,
+    pub reasoning_tokens: Option<u64>,
+    pub transport_attempts: Option<u64>,
+}
+
+/// R07-T10 group dimensions (date buckets are UTC days).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UsageGroupBy {
+    Date,
+    Provider,
+    Model,
+    Purpose,
+    Session,
+}
+
+impl UsageGroupBy {
+    fn sql_expr(self) -> &'static str {
+        match self {
+            UsageGroupBy::Date => {
+                "strftime('%Y-%m-%d', m.recorded_at_unix_ms / 1000, 'unixepoch')"
+            }
+            UsageGroupBy::Provider => "m.provider",
+            UsageGroupBy::Model => "m.model",
+            UsageGroupBy::Purpose => "m.purpose",
+            UsageGroupBy::Session => "m.session_id",
+        }
+    }
+}
+
+/// One imported legacy row: the ledger record plus its legacy trace
+/// linkage (`None` when the legacy row had no trace).
+pub struct LegacyUsageImportRow {
+    pub record: lingxi_kernel::usage::ModelCallUsageRecord,
+    /// Value stored into `recorded_at_unix_ms` (the legacy row's own
+    /// timestamp — imported history keeps its original dates so date
+    /// filters stay meaningful).
+    pub recorded_at_unix_ms: u64,
+    pub legacy_trace_id: Option<String>,
+    pub legacy_parent_call_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct LegacyImportStats {
+    pub inserted: u64,
+    /// Already-present call ids (re-import is idempotent, never a
+    /// renumber or an overwrite).
+    pub skipped_existing: u64,
+}
+
+impl RunDatabase {
+    /// R07-T10 paged read: same filters as the trait list query plus a
+    /// keyset cursor (`after_rowid`) and a hard limit.
+    pub async fn query_model_call_usage_page(
+        &self,
+        query: lingxi_kernel::usage::UsageFilter,
+        after_rowid: Option<i64>,
+        limit: u32,
+    ) -> Result<UsagePage, StorageError> {
+        self.queue
+            .submit(move |conn| {
+                let (from, mut conditions, mut params) = usage_query_plan(&query);
+                if let Some(after) = after_rowid {
+                    params.push(Box::new(after));
+                    conditions.push(format!("m.rowid > ?{index}", index = params.len()));
+                }
+                params.push(Box::new(i64::from(limit)));
+                let mut sql = format!(
+                    "SELECT m.model_call_id, m.session_id, m.run_id, m.attempt, \
+                     m.purpose, m.origin, m.parent_run_id, m.cause_ref, m.parent_tool_call_id, \
+                     m.provider, m.model, m.protocol, m.usage_state, m.input_tokens, \
+                     m.output_tokens, m.cache_read_tokens, m.cache_write_tokens, \
+                     m.reasoning_tokens, m.missing_fields, m.estimate_basis, m.invalid_detail, \
+                     m.transport_attempts, m.cost_basis, m.recorded_at_unix_ms, m.outcome, \
+                     m.started_at_unix_ms, m.settled_at_unix_ms, m.emitted_tool_calls, m.rowid \
+                     {from}"
+                );
+                if !conditions.is_empty() {
+                    sql.push_str(" WHERE ");
+                    sql.push_str(&conditions.join(" AND "));
+                }
+                sql.push_str(&format!(" ORDER BY m.rowid LIMIT ?{index}", index = params.len()));
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let param_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                let mut rows = stmt
+                    .query(param_refs.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    let record = usage_row_to_record(row)?;
+                    let rowid: i64 = row.get(28).map_err(migrations::map_rusqlite)?;
+                    out.push((rowid, record));
+                }
+                Ok(UsagePage { rows: out })
+            })
+            .await
+    }
+
+    /// R07-T10 aggregate read: identical filter semantics, grouped sums.
+    /// Token sums are NULL when no contributing row holds a value (never
+    /// zero — A19 reconciles them against the detail rows).
+    pub async fn aggregate_model_call_usage(
+        &self,
+        query: lingxi_kernel::usage::UsageFilter,
+        group_by: &[UsageGroupBy],
+    ) -> Result<Vec<(Vec<Option<String>>, UsageAggregate)>, StorageError> {
+        let group_by = group_by.to_vec();
+        self.queue
+            .submit(move |conn| {
+                let (from, conditions, params) = usage_query_plan(&query);
+                let group_exprs: Vec<&str> =
+                    group_by.iter().map(|g| g.sql_expr()).collect();
+                let select_groups = if group_exprs.is_empty() {
+                    String::new()
+                } else {
+                    format!("{}, ", group_exprs.join(", "))
+                };
+                let mut sql = format!(
+                    "SELECT {select_groups}COUNT(*), \
+                     SUM(CASE WHEN m.outcome = 'succeeded' THEN 1 ELSE 0 END), \
+                     SUM(CASE WHEN m.outcome = 'failed' THEN 1 ELSE 0 END), \
+                     SUM(CASE WHEN m.outcome = 'cancelled' THEN 1 ELSE 0 END), \
+                     SUM(CASE WHEN m.outcome = 'unknown' THEN 1 ELSE 0 END), \
+                     SUM(CASE WHEN m.usage_state = 'unknown' OR m.usage_state = 'invalid' THEN 1 ELSE 0 END), \
+                     SUM(m.input_tokens), SUM(m.output_tokens), SUM(m.cache_read_tokens), \
+                     SUM(m.cache_write_tokens), SUM(m.reasoning_tokens), SUM(m.transport_attempts) \
+                     {from}"
+                );
+                if !conditions.is_empty() {
+                    sql.push_str(" WHERE ");
+                    sql.push_str(&conditions.join(" AND "));
+                }
+                if !group_exprs.is_empty() {
+                    sql.push_str(&format!(" GROUP BY {}", group_exprs.join(", ")));
+                    sql.push_str(&format!(" ORDER BY {}", group_exprs.join(", ")));
+                }
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let param_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                let mut rows = stmt
+                    .query(param_refs.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let dim = group_exprs.len();
+                let to_u64 = |v: Option<i64>| v.map(|x| x as u64);
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    let mut key = Vec::with_capacity(dim);
+                    for i in 0..dim {
+                        key.push(row.get::<_, Option<String>>(i).map_err(migrations::map_rusqlite)?);
+                    }
+                    let base = dim;
+                    let count = |i: usize| -> Result<u64, StorageError> {
+                        Ok(row.get::<_, Option<i64>>(base + i).map_err(migrations::map_rusqlite)?.unwrap_or(0) as u64)
+                    };
+                    out.push((key, UsageAggregate {
+                        call_count: count(0)?,
+                        ok_count: count(1)?,
+                        error_count: count(2)?,
+                        cancelled_count: count(3)?,
+                        unknown_count: count(4)?,
+                        usage_missing_count: count(5)?,
+                        input_tokens: to_u64(row.get(base + 6).map_err(migrations::map_rusqlite)?),
+                        output_tokens: to_u64(row.get(base + 7).map_err(migrations::map_rusqlite)?),
+                        cache_read_tokens: to_u64(row.get(base + 8).map_err(migrations::map_rusqlite)?),
+                        cache_write_tokens: to_u64(row.get(base + 9).map_err(migrations::map_rusqlite)?),
+                        reasoning_tokens: to_u64(row.get(base + 10).map_err(migrations::map_rusqlite)?),
+                        transport_attempts: to_u64(row.get(base + 11).map_err(migrations::map_rusqlite)?),
+                    }));
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07-T10 legacy import: inserts rows the current kernel never wrote
+    /// (idempotent by call id — a re-import never renumbers, never
+    /// overwrites) and records the legacy trace linkage in the side map.
+    /// Runs in ONE transaction so a failed import never leaves a half
+    /// batch.
+    pub async fn import_legacy_model_calls(
+        &self,
+        rows: Vec<LegacyUsageImportRow>,
+        imported_at_unix_ms: u64,
+    ) -> Result<LegacyImportStats, StorageError> {
+        self.queue
+            .submit(move |conn| {
+                let tx = conn.unchecked_transaction().map_err(migrations::map_rusqlite)?;
+                let mut stats = LegacyImportStats::default();
+                for row in rows {
+                    let record = row.record;
+                    let (usage_state, input_tokens, output_tokens, cache_read, cache_write, reasoning) =
+                        match (&record.usage, &record.invalid_detail) {
+                            // A rejected-but-recorded usage object stays
+                            // `invalid` (the vocabulary is never mixed).
+                            (None, Some(_)) => ("invalid", None, None, None, None, None),
+                            (Some(usage), _) => (
+                                usage.provenance.state_name(),
+                                usage.input_tokens.map(|v| v as i64),
+                                usage.output_tokens.map(|v| v as i64),
+                                usage.cache_read_tokens.map(|v| v as i64),
+                                usage.cache_write_tokens.map(|v| v as i64),
+                                usage.reasoning_tokens.map(|v| v as i64),
+                            ),
+                            (None, None) => ("unknown", None, None, None, None, None),
+                        };
+                    let (missing_fields, estimate_basis) = match &record.usage {
+                        Some(usage) => match &usage.provenance {
+                            lingxi_kernel::usage::UsageProvenance::Partial { missing } => {
+                                (Some(missing.join(",")), None)
+                            }
+                            lingxi_kernel::usage::UsageProvenance::Estimated { basis } => {
+                                (None, Some(basis.clone()))
+                            }
+                            lingxi_kernel::usage::UsageProvenance::Reported => (None, None),
+                        },
+                        None => (None, None),
+                    };
+                    let changed = tx
+                        .execute(
+                            "INSERT OR IGNORE INTO model_call_usage \
+                             (model_call_id, session_id, run_id, attempt, purpose, origin, \
+                              parent_run_id, cause_ref, parent_tool_call_id, provider, model, \
+                              protocol, usage_state, input_tokens, output_tokens, \
+                              cache_read_tokens, cache_write_tokens, reasoning_tokens, \
+                              missing_fields, estimate_basis, invalid_detail, \
+                              transport_attempts, outcome, started_at_unix_ms, \
+                              settled_at_unix_ms, emitted_tool_calls, cost_basis, \
+                              recorded_at_unix_ms) \
+                             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, \
+                                     ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25, ?26, \
+                                     ?27, ?28)",
+                            rusqlite::params![
+                                record.model_call_id,
+                                record.session_id,
+                                record.run_id,
+                                record.attempt,
+                                record.purpose,
+                                record.origin,
+                                record.parent_run_id,
+                                record.cause_ref,
+                                record.parent_tool_call_id,
+                                record.provider,
+                                record.model,
+                                record.protocol,
+                                usage_state,
+                                input_tokens,
+                                output_tokens,
+                                cache_read,
+                                cache_write,
+                                reasoning,
+                                missing_fields,
+                                estimate_basis,
+                                record.invalid_detail,
+                                record.transport_attempts.map(|v| v as i64),
+                                record.outcome.wire_name(),
+                                record.started_at_unix_ms.map(|v| v as i64),
+                                record.settled_at_unix_ms.map(|v| v as i64),
+                                Option::<String>::None,
+                                record.cost_basis,
+                                row.recorded_at_unix_ms as i64,
+                            ],
+                        )
+                        .map_err(migrations::map_rusqlite)?;
+                    if changed == 0 {
+                        // 幂等重放可；同 id 不同内容响亮拒绝（账目不可改写）。
+                        let existing = load_usage_row(&tx, &record.model_call_id)?
+                            .expect("INSERT OR IGNORE no-op implies the row exists");
+                        let same = existing.provider == record.provider
+                            && existing.model == record.model
+                            && existing.outcome == record.outcome
+                            && existing.started_at_unix_ms == record.started_at_unix_ms
+                            && existing.usage == record.usage;
+                        if !same {
+                            return Err(StorageError::Conflict {
+                                detail: format!(
+                                    "legacy import hit existing call {} with different facts; \
+                                     a call's accounting is immutable",
+                                    record.model_call_id
+                                ),
+                            });
+                        }
+                        stats.skipped_existing += 1;
+                        continue;
+                    }
+                    stats.inserted += 1;
+                    if let Some(trace_id) = row.legacy_trace_id {
+                        tx.execute(
+                            "INSERT INTO observability_legacy_trace \
+                             (model_call_id, trace_id, parent_call_id, imported_at_unix_ms) \
+                             VALUES (?1, ?2, ?3, ?4)",
+                            rusqlite::params![
+                                record.model_call_id,
+                                trace_id,
+                                row.legacy_parent_call_id,
+                                imported_at_unix_ms as i64,
+                            ],
+                        )
+                        .map_err(migrations::map_rusqlite)?;
+                    }
+                }
+                tx.commit().map_err(migrations::map_rusqlite)?;
+                Ok(stats)
+            })
+            .await
+    }
+
+    /// R07-T10: legacy trace linkage of one imported call (None for
+    /// current-kernel rows — their causality lives in the ledger itself).
+    pub async fn legacy_trace_of(
+        &self,
+        model_call_id: &str,
+    ) -> Result<Option<(String, Option<String>)>, StorageError> {
+        let id = model_call_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT trace_id, parent_call_id FROM observability_legacy_trace \
+                         WHERE model_call_id = ?1",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt.query([id]).map_err(migrations::map_rusqlite)?;
+                match rows.next().map_err(migrations::map_rusqlite)? {
+                    Some(row) => Ok(Some((
+                        row.get(0).map_err(migrations::map_rusqlite)?,
+                        row.get(1).map_err(migrations::map_rusqlite)?,
+                    ))),
+                    None => Ok(None),
+                }
+            })
+            .await
+    }
+
+    /// R07-T10: all ledger rows of one legacy trace (import view, call-id
+    /// order — the legacy trace keeps its rows, nothing renumbered).
+    pub async fn legacy_trace_calls(
+        &self,
+        trace_id: &str,
+    ) -> Result<Vec<(String, Option<String>)>, StorageError> {
+        let id = trace_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT model_call_id, parent_call_id FROM observability_legacy_trace \
+                         WHERE trace_id = ?1 ORDER BY model_call_id",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt.query([id]).map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push((
+                        row.get(0).map_err(migrations::map_rusqlite)?,
+                        row.get(1).map_err(migrations::map_rusqlite)?,
+                    ));
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07-T10: one ledger row by call id (detail reads; None when absent).
+    pub async fn model_call_usage_by_id(
+        &self,
+        model_call_id: &str,
+    ) -> Result<Option<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        let id = model_call_id.to_string();
+        self.queue
+            .submit(move |conn| load_usage_row(conn, &id))
+            .await
+    }
+
+    /// R07-T10: legacy trace list (trace id + row count), import order.
+    pub async fn legacy_trace_list(&self) -> Result<Vec<(String, u64)>, StorageError> {
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT trace_id, COUNT(*) FROM observability_legacy_trace \
+                         GROUP BY trace_id ORDER BY MIN(rowid)",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt.query([]).map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push((
+                        row.get::<_, String>(0).map_err(migrations::map_rusqlite)?,
+                        row.get::<_, i64>(1).map_err(migrations::map_rusqlite)? as u64,
+                    ));
                 }
                 Ok(out)
             })

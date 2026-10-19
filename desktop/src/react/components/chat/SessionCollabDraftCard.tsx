@@ -1,7 +1,9 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { ChatResourceCard } from './ChatResourceCard';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
 import { useStore } from '../../stores';
+import { captureConversationRequestScope } from '../../services/conversation-request-scope';
+import { resolveServerConnection } from '../../services/server-connection';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
 import { SelectWidget, type SelectOption } from '@/ui';
@@ -24,6 +26,18 @@ type ApplyErrorState =
   | { code: 'first_message_failed'; text: string; sessionId?: string }
   | { code: 'apply_failed'; text: string };
 
+interface CollabResult {
+  sessionId?: string;
+  deliveryStatus?: 'queued' | 'accepted' | 'failed' | 'unknown';
+  retryable?: boolean;
+}
+
+function persistedCardStatus(block: { status: string; result?: CollabResult | null }): string {
+  if (block.result?.deliveryStatus === 'unknown') return 'unknown';
+  if (block.result?.deliveryStatus === 'failed' && block.result?.retryable === true) return 'pending';
+  return block.status;
+}
+
 function shortIdTail(id: string | null): string {
   return id ? `…${id.slice(-4)}` : '';
 }
@@ -35,6 +49,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
 
   const agents = useStore(s => s.agents);
   const currentAgentId = useStore(s => s.currentAgentId);
+  const connectionKey = useStore(s => JSON.stringify(resolveServerConnection(s)));
   const fallbackAgentName = useStore(s => s.agentName) || 'Lingxi';
   const fallbackAgentYuan = useStore(s => s.agentYuan) || 'lingxi';
   // reject 的 sourceSessionId 必须是真正的 sessionId，不能拿 sessionPath 充数——
@@ -46,7 +61,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
     targetSessionId ? (s.sessions.find(se => se.sessionId === targetSessionId)?.title ?? null) : null
   ));
 
-  const [status, setStatus] = useState(block.status);
+  const [status, setStatus] = useState(persistedCardStatus(block));
   const [draftMessage, setDraftMessage] = useState<string>(
     ((isCreate ? draft.firstMessage : draft.message) as string) || '',
   );
@@ -58,10 +73,59 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
   const [submitting, setSubmitting] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [createdSessionId, setCreatedSessionId] = useState<string | null>(null);
+  const [result, setResult] = useState<CollabResult | null>(block.result || null);
+  const [decisionNotPersisted, setDecisionNotPersisted] = useState(block.decisionPersisted === false);
+  const [partialRetryable, setPartialRetryable] = useState(true);
+  const partialDraft = useRef<Record<string, unknown> | null>(null);
+  const identity = JSON.stringify([connectionKey, currentAgentId, sessionPath, sourceSessionId, block.suggestionId]);
+  const identityRef = useRef(identity);
+  identityRef.current = identity;
+  const mounted = useRef(true);
 
   useEffect(() => {
-    setStatus(block.status);
-  }, [block.status]);
+    mounted.current = true;
+    setStatus(persistedCardStatus(block));
+    setDraftMessage(((isCreate ? draft.firstMessage : draft.message) as string) || '');
+    setDraftTitle((draft.title as string) || '');
+    setSelectedAgentId((draft.agentId as string) || currentAgentId || agents[0]?.id || null);
+    setErrorState(null);
+    setSubmitting(false);
+    setRejecting(false);
+    setCreatedSessionId(null);
+    setResult(block.result || null);
+    setDecisionNotPersisted(block.decisionPersisted === false);
+    setPartialRetryable(true);
+    partialDraft.current = null;
+    return () => { mounted.current = false; };
+    // 只在卡片身份改变时重置编辑内容，后台状态更新不覆盖用户输入。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [identity]);
+
+  useEffect(() => {
+    if (block.result) setResult(block.result);
+    if (typeof block.decisionPersisted === 'boolean') setDecisionNotPersisted(!block.decisionPersisted);
+  }, [block.result, block.decisionPersisted]);
+
+  useEffect(() => {
+    setStatus(persistedCardStatus(block));
+    if (block.result?.deliveryStatus === 'failed' && block.result?.retryable === true) {
+      // 宿主历史投影提供已冻结的编辑内容，重开后也只能重试原操作。
+      const frozen = block.frozenApply && typeof block.frozenApply === 'object' && !Array.isArray(block.frozenApply)
+        ? block.frozenApply : draft;
+      partialDraft.current = { ...frozen };
+      const sid = block.result.sessionId || block.resultSessionId || '';
+      setCreatedSessionId(sid || null);
+      setDraftMessage((isCreate ? frozen.firstMessage : frozen.message) || '');
+      setDraftTitle(frozen.title || '');
+      setSelectedAgentId(frozen.agentId || currentAgentId || agents[0]?.id || null);
+      setPartialRetryable(true);
+      setErrorState(isCreate
+        ? { code: 'first_message_failed', sessionId: sid, text: window.t('sessionCollab.halfCreated', { id: sid }) }
+        : { code: 'apply_failed', text: window.t('channel.sendFailed') });
+    }
+    // 草稿的变动只随宿主结果快照读取，不覆盖正常编辑。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [block.status, block.result, block.frozenApply, identity]);
 
   const effectiveAgentId = selectedAgentId || currentAgentId || agents[0]?.id || null;
   const selectedAgentInfo = resolveAgentDisplayInfo({
@@ -92,28 +156,51 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
 
   const pending = status === 'pending';
   const expired = errorState?.code === 'draft_expired';
+  const persistenceWarning = decisionNotPersisted
+    ? <div role="alert" className={styles.sessionCollabDraftError}>{window.t('sessionCollab.decisionNotPersisted')}</div>
+    : null;
 
   const handleApprove = async () => {
-    if (submitting) return;
+    if (submitting || rejecting || !partialRetryable) return;
+    const scope = captureConversationRequestScope();
+    const isCurrent = () => mounted.current && identityRef.current === identity && scope.isCurrent();
     setSubmitting(true);
     setErrorState(null);
     try {
-      const editedDraft = isCreate
+      // 部分成功后只重试原草稿与原编辑内容，不能重新创建会话或换目标。
+      const editedDraft = partialDraft.current || (isCreate
         ? { ...draft, agentId: effectiveAgentId, title: draftTitle, firstMessage: draftMessage }
-        : { ...draft, message: draftMessage };
+        : { ...draft, message: draftMessage });
       const res = await lingxiFetch('/api/session-collab/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ suggestionId: block.suggestionId, draft: editedDraft }),
         throwOnHttpError: false,
       });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
+      const data = await res.json();
+      if (!isCurrent()) return;
+      setDecisionNotPersisted(data?.decisionPersisted === false);
+      if (data?.result) setResult(data.result);
+      const code = data?.code;
+      if (code === 'delivery_unknown' || data?.result?.deliveryStatus === 'unknown') {
+        setCreatedSessionId(data?.result?.sessionId || data?.sessionId || null);
+        setStatus('unknown');
+        return;
+      }
+      if (data?.partialSuccess === true || code === 'first_message_failed') {
+        const sid = data?.sessionId || data?.result?.sessionId || '';
+        partialDraft.current = editedDraft;
+        setCreatedSessionId(sid || null);
+        setPartialRetryable(data?.result?.retryable !== false);
+        setErrorState({ code: 'first_message_failed', sessionId: sid,
+          text: window.t('sessionCollab.halfCreated', { id: sid }) });
+        return;
+      }
+      if (res.ok && data?.ok === true) {
         setCreatedSessionId((data?.result?.sessionId as string) || null);
         setStatus('approved');
         return;
       }
-      const code = data?.code;
       if (code === 'draft_expired') {
         setErrorState({ code: 'draft_expired', text: window.t('sessionCollab.expired') });
         return;
@@ -122,31 +209,21 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
         setErrorState({ code: 'draft_in_flight', text: window.t('sessionCollab.inFlight') });
         return;
       }
-      if (code === 'first_message_failed') {
-        const sid = (data?.sessionId as string) || '';
-        setErrorState({
-          code: 'first_message_failed',
-          sessionId: sid,
-          text: window.t('sessionCollab.halfCreated', { id: sid }),
-        });
-        return;
-      }
-      setErrorState({
-        code: 'apply_failed',
-        text: window.t('sessionCollab.sendFailed', { error: (data?.error as string) || res.statusText }),
-      });
-    } catch (err: any) {
-      setErrorState({
-        code: 'apply_failed',
-        text: window.t('sessionCollab.sendFailed', { error: err?.message || String(err) }),
-      });
+      setErrorState({ code: 'apply_failed',
+        text: window.t('sessionCollab.sendFailed', { error: data?.error || res.statusText }) });
+    } catch (error: any) {
+      if (isCurrent()) setErrorState({ code: 'apply_failed',
+        text: window.t('sessionCollab.sendFailed', { error: error?.message || String(error) }) });
     } finally {
-      setSubmitting(false);
+      if (isCurrent()) setSubmitting(false);
+      scope.dispose();
     }
   };
 
   const handleIgnore = async () => {
     if (submitting || rejecting) return;
+    const scope = captureConversationRequestScope();
+    const isCurrent = () => mounted.current && identityRef.current === identity && scope.isCurrent();
     setRejecting(true);
     setErrorState(null);
     try {
@@ -158,6 +235,9 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
         body: JSON.stringify(body),
         throwOnHttpError: false,
       });
+      const data = await res.json().catch(() => ({}));
+      if (!isCurrent()) return;
+      setDecisionNotPersisted(data?.decisionPersisted === false);
       // 后端契约：活条目命中直接废弃，200；条目已过期（比如重复点击）404 一样按
       // 已忽略收敛——不是错误，用户的意图（不想要这条草稿）已经达成。
       if (res.ok || res.status === 404) {
@@ -168,25 +248,28 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
         setErrorState({ code: 'draft_in_flight', text: window.t('sessionCollab.inFlight') });
         return;
       }
-      const data = await res.json().catch(() => ({}));
       setErrorState({
         code: 'apply_failed',
         text: window.t('sessionCollab.rejectFailed', { error: (data?.error as string) || res.statusText }),
       });
     } catch (err: any) {
-      setErrorState({
+      if (isCurrent()) setErrorState({
         code: 'apply_failed',
         text: window.t('sessionCollab.rejectFailed', { error: err?.message || String(err) }),
       });
     } finally {
-      setRejecting(false);
+      if (isCurrent()) setRejecting(false);
+      scope.dispose();
     }
   };
 
   if (!pending) {
     const isApproved = status === 'approved';
     const effectiveCreatedId = createdSessionId || (block.resultSessionId as string | undefined) || null;
-    const subtitle = isApproved && isCreate && effectiveCreatedId
+    const queued = result?.deliveryStatus === 'queued';
+    const unknown = status === 'unknown' || result?.deliveryStatus === 'unknown';
+    const subtitle = unknown ? window.t('sessionCollab.deliveryUnknown') : queued ? window.t('sessionCollab.queuedHint')
+      : isApproved && isCreate && effectiveCreatedId
       ? window.t('sessionCollab.createdSession', { id: effectiveCreatedId })
       : block.description;
     return (
@@ -194,10 +277,13 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
         icon={<AgentAvatar info={headerAgentInfo} className={styles.sessionCollabDraftAvatar} alt={headerAgentInfo.displayName} />}
         title={displayTitle}
         subtitle={subtitle}
-        statusLabel={isApproved ? window.t('common.approved') : window.t('common.rejected')}
-        statusTone={isApproved ? 'success' : 'muted'}
+        statusLabel={window.t(unknown ? 'sessionCollab.unknown' : queued ? 'sessionCollab.queued' : isApproved ? 'common.approved' : 'common.rejected')}
+        statusTone={unknown ? 'danger' : queued ? 'neutral' : isApproved ? 'success' : 'muted'}
         className={styles.sessionCollabDraftCard}
-      />
+        expanded={decisionNotPersisted}
+      >
+        {persistenceWarning}
+      </ChatResourceCard>
     );
   }
 
@@ -228,6 +314,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
                 triggerClassName={styles.automationDraftControlButton}
                 popupClassName={styles.automationDraftAgentPopup}
                 value={effectiveAgentId || ''}
+                disabled={submitting || rejecting || !!partialDraft.current}
                 options={agents.map((agent: any): SelectOption => ({
                   value: agent.id,
                   label: agent.name || agent.id,
@@ -262,6 +349,7 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
             <input
               className={styles.sessionCollabDraftTitleInput}
               value={draftTitle}
+              disabled={submitting || rejecting || !!partialDraft.current}
               onChange={e => setDraftTitle(e.target.value)}
               placeholder={window.t('automation.field.label')}
               spellCheck={false}
@@ -271,10 +359,12 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
         <textarea
           className={styles.sessionCollabDraftTextarea}
           value={draftMessage}
+          disabled={submitting || rejecting || !!partialDraft.current}
           onChange={e => setDraftMessage(e.target.value)}
           aria-label={window.t('sessionCollab.messageField')}
           spellCheck={false}
         />
+        {persistenceWarning}
         {errorState && (
           <div className={styles.sessionCollabDraftError}>{errorState.text}</div>
         )}
@@ -291,9 +381,9 @@ export const SessionCollabDraftCard = memo(function SessionCollabDraftCard({ blo
             className={styles.automationDraftPrimaryButton}
             type="button"
             onClick={handleApprove}
-            disabled={submitting || rejecting || expired}
+            disabled={submitting || rejecting || expired || !partialRetryable}
           >
-            {window.t(isCreate ? 'sessionCollab.confirmCreate' : 'sessionCollab.confirmSend')}
+            {window.t(partialDraft.current && isCreate ? 'sessionCollab.retryMessage' : isCreate ? 'sessionCollab.confirmCreate' : 'sessionCollab.confirmSend')}
           </button>
         </div>
       </div>

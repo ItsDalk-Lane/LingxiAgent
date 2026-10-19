@@ -144,6 +144,8 @@
     "settingsVectorRetentionHint": "換模型或重新嵌入產生的舊版向量，超過設定天數未被查詢使用即自動清理（1–3650）；正在使用的最新版本不受影響"
   },
   "channel": {
+    "loadFailed": "載入失敗，已保留原有內容",
+    "retry": "重試",
     "tab": "頻道",
     "chatTab": "聊天",
     "moreTabs": "更多標籤",
@@ -292,6 +294,7 @@
     },
     "archivedChats": "歸檔記錄",
     "runningGroup": "執行中",
+    "ungroupedChats": "未歸組",
     "actionBadge": {
       "askUser": "正在提問",
       "approval": "待批准",
@@ -512,7 +515,31 @@
       "retryFailed": "重新生成失败",
       "submitting": "提交中",
       "retryLabel": "重新生成{kind}",
-      "kindSpeech": "語音"
+      "kindSpeech": "語音",
+      "phase": {
+        "submitting": "正在提交生成請求",
+        "submitted": "已提交，等待生成",
+        "generating": "正在生成",
+        "downloading": "生成完成，正在下載",
+        "completed": "已生成並交付檔案",
+        "failed": "生成失敗",
+        "cancelled": "已停止本機等待",
+        "unknown": "結果尚未確認"
+      },
+      "stopWaiting": "停止等待",
+      "stopFailed": "停止等待失敗",
+      "taskFailed": "媒體任務未完成",
+      "localDeliveryStopped": "已停止向此對話繼續交付檔案。",
+      "remoteOutcome": {
+        "failed": "遠端已確認生成失敗。",
+        "completed": "遠端已生成，已交付的檔案仍可開啟。",
+        "unknown": "遠端結果尚未確認，可能仍在生成。"
+      },
+      "remoteCancel": {
+        "confirmed": "已確認遠端取消。",
+        "unsupported": "遠端不支援取消，可能仍會完成。",
+        "unknown": "遠端是否取消尚未確認。"
+      }
     },
     "turnStatus": {
       "missingFinalAnswer": "未產生最終回覆",
@@ -1062,7 +1089,20 @@
       "failed": "📎 檔案沒準備好"
     },
     "browser": {
+      "stateReadFailed": "無法讀取瀏覽器狀態",
+      "controlledWindow": "受控瀏覽器",
+      "executionNode": "執行位置",
+      "sameWindowHint": "網頁在該服務的受控 Chromium 視窗中。顯示、接管和恢復會操作同一頁面。",
+      "userTakeover": "你正在接管",
+      "suspended": "已暫停",
       "running": "🌐 {name} 正在操作瀏覽器",
+      "stopped": "已停止",
+      "revoked": "助手權限已撤銷",
+      "showControlled": "顯示瀏覽器",
+      "takeover": "接管",
+      "release": "交還助手",
+      "noVisibleWindow": "該服務不支援顯示網頁視窗，無法在這裡手動接管。",
+      "workspaceUnavailable": "此聊天沒有可用的瀏覽器狀態",
       "done": "🌐 {name} 操作完了",
       "failed": "🌐 {name} 瀏覽器不聽使喚"
     },
@@ -1119,6 +1159,7 @@
       "failed": "⚙️ 設定沒改成"
     },
     "automation": {
+      "importBlocked": "有 {count} 項舊任務未能匯入，已暫停這些任務。請檢查原始任務資料。",
       "running": "🤖 {name} 正在安排自動化任務",
       "done": "🤖 {name} 安排好自動化任務了",
       "failed": "🤖 自動化任務沒安排上"
@@ -1562,6 +1603,7 @@
       "cookiesTitle": "Cookies",
       "acceptCookies": "接受 Cookies",
       "acceptCookiesHint": "開啟後，內置瀏覽器會像普通瀏覽器一樣儲存和傳送網站 Cookies。",
+      "cookiePolicyChangeHint": "更改 Cookie 策略會關閉目前受控的頁面。網址和既有登入資料會保留，未送出的表單內容可能遺失；重新開啟後生效。",
       "clearCookies": "清除 Cookies",
       "clearCookiesHint": "清除內置瀏覽器已經儲存的 Cookies 和站點資料。",
       "clearCookiesButton": "清除",
@@ -1685,6 +1727,7 @@
       "hardwareAcceleration": "硬體加速",
       "hardwareAccelerationHint": "使用顯示卡繪製視窗內容。關閉後會在下次啟動使用軟體渲染，可用於恢復 Windows 顯示卡驅動導致的啟動閃退。",
       "sidebar": "側邊欄",
+      "sidebarLoadFailed": "側欄設定讀取失敗，請重試。",
       "sessionListSingleLine": "會話列表單行顯示",
       "sessionListSingleLineHint": "開啟後，每條會話只佔一行；滑鼠懸停時右側按鈕出現，標題自動縮短並顯示省略號。",
       "rollbackFileChanges": "回退時撤銷檔案改動",
@@ -2059,6 +2102,7 @@
       "retention7d": "7 天",
       "maxFileSize": "忽略大於",
       "viewBackups": "查看備份",
+      "backupsLoadFailed": "備份清單讀取失敗，請重試。",
       "hideBackups": "收起",
       "restoreBtn": "還原",
       "noBackups": "暫無備份紀錄",
@@ -2182,6 +2226,11 @@
       "globalDefaults": "全域預設"
     },
     "oauth": {
+      "notPersisted": "本次已登入，但登入資訊未儲存，重新啟動後可能需要重新登入。",
+      "loginRefreshFailed": "已登入，但頁面狀態更新失敗，請重新讀取。",
+      "logoutRefreshFailed": "已登出，但頁面狀態更新失敗，請重新讀取。",
+      "browserUnavailable": "目前視窗無法開啟授權網頁。",
+      "waitCancelled": "已停止本機等待；供應商端授權可能仍會完成。",
       "title": "快速登入",
       "login": "登入",
       "logout": "登出",
@@ -2572,6 +2621,7 @@
       "disabled": "未啟用",
       "noSkills": "暫無可用技能",
       "noUser": "暫無自訂技能",
+      "loadFailed": "技能讀取失敗，請重試。",
       "workspaceBadge": "專案",
       "copyToSkills": "複製到我的技能",
       "copied": "已複製 ✓",
@@ -2656,6 +2706,7 @@
       "goalToggleDesc": "給長任務掛 token/時間預算，超支時提醒一次並交還決定"
     },
     "mcp": {
+      "selectAgentForDetails": "請先建立或選擇助手，再查看連線詳情和助手權限。",
       "masterTitle": "總開關",
       "masterName": "啟用連接器",
       "masterDesc": "關閉後，新會話不會暴露任何 MCP 連接器工具；已凍結的舊會話呼叫時會收到明確錯誤。",
@@ -3956,6 +4007,7 @@
       "saved": "快捷鍵已儲存",
       "resetDone": "已全部恢復預設",
       "registrationFailed": "快捷鍵註冊失敗，可能已被其他應用程式佔用",
+      "savedReloadFailed": "按鍵設定已儲存，但快捷鍵更新尚未完成。請重試或重新啟動應用程式。",
       "noResults": "沒有符合的快捷鍵",
       "footnote": "局部快捷鍵僅在對應介面聚焦時生效；鍵位預設區分 macOS 與 Windows/Linux。",
       "footnoteMac": "局部快捷鍵僅在對應介面聚焦時生效；⌘ 指 Command 鍵。",
@@ -3995,6 +4047,17 @@
       "formatError": "刪除進度回應格式不正確",
       "connectionChanged": "連線已改變，請重新開啟刪除進度",
       "resultChanged": "連線已改變，原服務的清理結果尚未在此頁更新"
+    },
+    "transfer": {
+      "title": "匯入與匯出設定",
+      "hint": "匯出會隱藏金鑰。匯入依項目合併，未包含的設定維持原樣。",
+      "export": "匯出設定",
+      "import": "匯入設定",
+      "tooLarge": "設定檔不能超過 2 MiB。",
+      "connectionChanged": "連線已切換，請重新操作。",
+      "partialApplied": "設定已生效，但後續步驟尚未完成。",
+      "savedNotApplied": "設定已儲存，但尚未生效。",
+      "partialSaved": "部分設定已儲存，請重新讀取後再操作。"
     }
   },
   "onboarding": {
@@ -4116,6 +4179,11 @@
     }
   },
   "activity": {
+    "listLoadFailed": "活動讀取失敗，已保留上次結果。",
+    "actionFailed": "操作未完成，請重試。",
+    "unconfirmed": "結果尚未確認",
+    "cancelled": "已停止",
+    "skipped": "本次已略過",
     "title": "助手活動",
     "empty": "暫時沒有活動記錄，日常巡檢或定時任務執行後會出現在這裡",
     "back": "返回",
@@ -4955,6 +5023,8 @@
     }
   },
   "devtools": {
+    "cardWindowUnsupported": "目前視窗暫不支援安全互動卡片",
+    "cardServiceUnsupported": "目前服務暫不支援安全互動卡片",
     "heartbeat": "心跳巡檢",
     "memoryExport": "記憶匯出",
     "onboarding": "Onboarding",
@@ -5448,6 +5518,12 @@
     "mediaNoDisplayableFiles": "生成结果没有可显示文件"
   },
   "sessionCollab": {
+    "decisionNotPersisted": "操作已完成，但確認結果未儲存。重新開啟後請勿重複操作。",
+    "queued": "已排入佇列",
+    "queuedHint": "已確認排入佇列，目標對話空閒後再傳送。",
+    "unknown": "結果待確認",
+    "deliveryUnknown": "無法確認是否已送達，請先檢查目標對話，勿重複傳送。",
+    "retryMessage": "重試首則訊息",
     "messagePrefix": "[來自 Agent「{name}」的訊息，非使用者本人]",
     "fromAgent": "來自 {name} 的訊息",
     "expand": "展開",

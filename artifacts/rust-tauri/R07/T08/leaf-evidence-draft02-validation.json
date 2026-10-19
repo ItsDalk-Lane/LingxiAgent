@@ -1,0 +1,24 @@
+{
+  "artifact": "docs/rust-tauri/R07/T08_LEAF_EVIDENCE_DRAFT_02.json",
+  "sha256": "810e84aefa7fd172826244307274931eb8bbbf733e912a4bc3014f5111458814",
+  "checks": [
+    "原109叶编号集合完全相同",
+    "343条原断言编号及文本逐项完全相同",
+    "所有草稿状态严格为指定四种",
+    "所有逐断言证据引用可解",
+    "所有引用日志SHA256与逐行原始结果匹配"
+  ],
+  "leafDraftStatuses": {
+    "DEVELOPMENT_EVIDENCE_PRESENT": 94,
+    "NOT_RUN": 14,
+    "FAILED": 1
+  },
+  "assertionDraftStatuses": {
+    "DEVELOPMENT_EVIDENCE_PRESENT": 242,
+    "NOT_RUN": 99,
+    "FAILED": 2
+  },
+  "productModified": false,
+  "cargoExecuted": false,
+  "finalAcceptance": false
+}

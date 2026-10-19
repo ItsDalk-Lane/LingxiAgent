@@ -1,0 +1,147 @@
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0432]: unresolved import `crate::agent_config_readback`
+ --> crates/lingxi-service/src/settings_tools.rs:4:5
+  |
+4 |     agent_config_readback as config,
+  |     ---------------------^^^^^^^^^^
+  |     |
+  |     no `agent_config_readback` in the root
+  |
+  = help: consider importing this module instead:
+          crate::agents_admin::agent_config_readback
+
+error[E0433]: cannot find `agent_config_readback` in `crate`
+   --> crates/lingxi-service/src/model_configuration.rs:466:31
+    |
+466 |                 view = crate::agent_config_readback::mask_object_secrets(&Value::Object(view))
+    |                               ^^^^^^^^^^^^^^^^^^^^^ unresolved import
+    |
+help: a similar path exists
+    |
+466 |                 view = crate::agents_admin::agent_config_readback::mask_object_secrets(&Value::Object(view))
+    |                               ++++++++++++++
+help: consider importing this module
+    |
+  2 + use crate::agents_admin::agent_config_readback;
+    |
+help: if you import `agent_config_readback`, refer to it directly
+    |
+466 -                 view = crate::agent_config_readback::mask_object_secrets(&Value::Object(view))
+466 +                 view = agent_config_readback::mask_object_secrets(&Value::Object(view))
+    |
+
+error[E0433]: cannot find `agent_config_readback` in `crate`
+   --> crates/lingxi-service/src/provider_routes.rs:214:15
+    |
+214 |     if crate::agent_config_readback::scope_denied(Some(principal), scope) {
+    |               ^^^^^^^^^^^^^^^^^^^^^ unresolved import
+    |
+help: a similar path exists
+    |
+214 |     if crate::agents_admin::agent_config_readback::scope_denied(Some(principal), scope) {
+    |               ++++++++++++++
+help: consider importing this module
+    |
+  3 + use crate::agents_admin::agent_config_readback;
+    |
+help: if you import `agent_config_readback`, refer to it directly
+    |
+214 -     if crate::agent_config_readback::scope_denied(Some(principal), scope) {
+214 +     if agent_config_readback::scope_denied(Some(principal), scope) {
+    |
+
+error: implementation of `FnOnce` is not general enough
+   --> crates/lingxi-service/src/model_configuration.rs:626:20
+    |
+626 |           let task = self
+    |  ____________________^
+627 | |             .tasks
+628 | |             .spawn_detached("model-provider-probe".into(), async move {
+629 | |                 prepared.execute().await
+630 | |             })
+    | |______________^ implementation of `FnOnce` is not general enough
+    |
+    = note: closure with signature `fn((usize, &'0 serde_json::Value)) -> std::option::Option<(usize, std::string::String)>` must implement `FnOnce<((usize, &'1 serde_json::Value),)>`, for any two lifetimes `'0` and `'1`...
+    = note: ...but it actually implements `FnOnce<((usize, &serde_json::Value),)>`
+
+error[E0308]: mismatched types
+  --> crates/lingxi-service/src/cards.rs:57:23
+   |
+57 |     state.cards().put(&principal.user_id, &id, Entry { code: body.code, vars_css: body.vars_css });
+   |                   --- ^^^^^^^^^^^^^^^^^^ expected `&str`, found `&Option<String>`
+   |                   |
+   |                   arguments to this method are incorrect
+   |
+   = note: expected reference `&str`
+              found reference `&std::option::Option<std::string::String>`
+note: method defined here
+  --> crates/lingxi-service/src/cards.rs:23:8
+   |
+23 |     fn put(&self, owner: &str, id: &str, entry: Entry) {
+   |        ^^^        -----------
+
+error[E0308]: mismatched types
+  --> crates/lingxi-service/src/cards.rs:62:41
+   |
+62 |     let Some(entry) = state.cards().get(&principal.user_id, &id) else { return error(StatusCode::NOT_FOUND, "card not found"); };
+   |                                     --- ^^^^^^^^^^^^^^^^^^ expected `&str`, found `&Option<String>`
+   |                                     |
+   |                                     arguments to this method are incorrect
+   |
+   = note: expected reference `&str`
+              found reference `&std::option::Option<std::string::String>`
+note: method defined here
+  --> crates/lingxi-service/src/cards.rs:36:8
+   |
+36 |     fn get(&self, owner: &str, id: &str) -> Option<Entry> {
+   |        ^^^        -----------
+
+error[E0599]: no associated function or constant named `default` found for struct `FileSafety` in the current scope
+    --> crates/lingxi-service/src/model_configuration.rs:1392:54
+     |
+1392 |         let safety = crate::file_safety::FileSafety::default();
+     |                                                      ^^^^^^^ associated function or constant not found in `FileSafety`
+     |
+    ::: crates/lingxi-service/src/file_safety.rs:158:1
+     |
+ 158 | pub struct FileSafety {
+     | --------------------- associated function or constant `default` not found for this struct
+     |
+note: if you're trying to build a new `FileSafety`, consider using `FileSafety::new` which returns `FileSafety`
+    --> crates/lingxi-service/src/file_safety.rs:165:5
+     |
+ 165 |     pub fn new(home: &Path) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: items from traits can only be used if the trait is implemented and in scope
+     = note: the following traits define an item `default`, perhaps you need to implement one of them:
+             candidate #1: `std::default::Default`
+             candidate #2: `tinyvec::array::Array`
+
+error[E0599]: no associated function or constant named `default` found for struct `file_safety::FileSafety` in the current scope
+    --> crates/lingxi-service/src/model_configuration.rs:1392:54
+     |
+1392 |         let safety = crate::file_safety::FileSafety::default();
+     |                                                      ^^^^^^^ associated function or constant not found in `file_safety::FileSafety`
+     |
+    ::: crates/lingxi-service/src/file_safety.rs:158:1
+     |
+ 158 | pub struct FileSafety {
+     | --------------------- associated function or constant `default` not found for this struct
+     |
+note: if you're trying to build a new `file_safety::FileSafety`, consider using `file_safety::FileSafety::new` which returns `file_safety::FileSafety`
+    --> crates/lingxi-service/src/file_safety.rs:165:5
+     |
+ 165 |     pub fn new(home: &Path) -> Self {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     = help: items from traits can only be used if the trait is implemented and in scope
+     = note: the following traits define an item `default`, perhaps you need to implement one of them:
+             candidate #1: `std::default::Default`
+             candidate #2: `tinyvec::array::Array`
+
+Some errors have detailed explanations: E0308, E0432, E0433, E0599.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `lingxi-service` (lib) due to 7 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-service` (lib test) due to 7 previous errors

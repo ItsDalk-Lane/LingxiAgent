@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "BridgeTargetType": {
+      "enum": [
+        "user",
+        "group",
+        "channel"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "channelId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "contextToken": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "guildId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "isGroup": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "messageId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "messageThreadId": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "parentId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rootId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "senderId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "targetChatId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "targetType": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BridgeTargetType"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "title": "BridgeReplyContext",
+  "type": "object"
+}

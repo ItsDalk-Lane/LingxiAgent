@@ -1,0 +1,23 @@
+{
+ "stage": "R07-T06",
+ "purpose": "development_not_final_acceptance",
+ "command": "cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-adapters --test session_file_store",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "sourceFingerprintBefore": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "sourceFingerprintAfter": "a105285987831147fa2bf34f2d4c60848ce945fce015a72a583ac3d7c8eb1ffa",
+ "exitCode": 0,
+ "logSha256": "a914b9f0d206a1a9538e655bc38ffbf1228e1f2afaa5946823980b76a91a4f77",
+ "sourceUnchanged": true,
+ "versionBinding": {
+  "workspace": "rust/Cargo.toml",
+  "locked": true
+ },
+ "note": "gallery3 无 --no-fail-fast，browser 目标失败后 session_file_store 未排上；本运行单独验证 v23 断言更新。",
+ "finishedAtUnixMs": 1792131574099
+}

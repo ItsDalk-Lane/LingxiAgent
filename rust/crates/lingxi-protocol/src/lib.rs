@@ -30,11 +30,37 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 #[allow(unused_imports)]
 use lingxi_test_guard as _;
 
+pub mod automation;
+pub use automation::*;
+pub mod bridge;
+pub mod bridge_effect;
+pub mod browser;
+pub use bridge::*;
+pub use bridge_effect::*;
+pub use browser::*;
 pub mod canon;
 pub mod devgate;
 pub mod handshake;
 pub mod history;
+pub mod office;
+pub use office::*;
+pub mod media;
+pub use media::*;
 pub mod wire;
+pub mod workbench;
+pub use workbench::*;
+pub mod settings;
+pub use settings::*;
+pub mod mcp_session_permissions;
+pub use mcp_session_permissions::*;
+pub mod mcp_apps;
+pub use mcp_apps::*;
+pub mod mcp_settings;
+pub use mcp_settings::*;
+pub mod user_preferences;
+pub use user_preferences::*;
+pub mod client_context;
+pub use client_context::*;
 
 pub use handshake::{
     negotiate_protocol, ClientHello, ServerHello, WIRE_PROTOCOL_MAX_SUPPORTED,

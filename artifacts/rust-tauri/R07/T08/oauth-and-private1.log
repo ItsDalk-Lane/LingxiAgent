@@ -1,0 +1,35 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.83s
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 8 tests
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s
+
+     Running tests/r07_t08_oauth_alias.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_oauth_alias-d5d7d52e4580cbf1)
+
+running 1 test
+
+thread 'oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source' (2052913) panicked at crates/lingxi-service/tests/r07_t08_oauth_alias.rs:97:68:
+called `Result::unwrap()` on an `Err` value: InvalidJson { detail: "unknown field `future`, expected one of `providers`, `models`, `network`" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source ... FAILED
+
+failures:
+
+failures:
+    oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_oauth_alias`
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_oauth_alias`

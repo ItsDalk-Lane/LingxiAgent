@@ -184,7 +184,7 @@ await pruneServerNodeModulesViaNft({
   // every plugin/host runtime source an nft root preserves the dependency
   // closure of packages such as markdown-it without protecting all of
   // node_modules from pruning.
-  nftRoots: ["bundle/index.js", ...pluginNftRoots],
+  nftRoots: ["bundle/index.js", "bundle/bridge-sdk-worker.mjs", "bundle/bridge-sdk-diagnostic.mjs", "bundle/office-document-worker.mjs", "bundle/media-jimeng-worker.mjs", ...pluginNftRoots],
   externalPackageNames: Object.keys(externalPkg.dependencies),
   runWithTargetNode,
 });

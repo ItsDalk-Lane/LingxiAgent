@@ -1,0 +1,19 @@
+{
+  "candidate": "t07a",
+  "status": "NOT_RUN_SOURCE_BINDING_CHANGED",
+  "recordedAt": "2026-10-18T02:10:26.822248+00:00",
+  "wrapperCommand": [
+    "python3",
+    "artifacts/rust-tauri/R07/T07/evidence-tools/run_candidate.py",
+    "run",
+    "t07a",
+    "service",
+    "--",
+    "<GATE_PLAN service argv>"
+  ],
+  "wrapperExitCode": 1,
+  "productCommandExecuted": false,
+  "productExitCode": null,
+  "stdout": "候选源码已变化；先建立新的候选，不借用旧版本结果",
+  "detail": "修改验证输入范围以纳入实际接口清单/协议文档后，候选前置核对拒绝；不存在 t07a-service.json，不将批次包装器退出1冒充服务测试失败。"
+}

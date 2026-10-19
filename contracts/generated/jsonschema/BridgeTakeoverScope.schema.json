@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "接管授权只包含稳定桥接主体和一个目标会话；不可扩成整个本机所有者。",
+  "properties": {
+    "actorSubject": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "actorSubject",
+    "sessionId"
+  ],
+  "title": "BridgeTakeoverScope",
+  "type": "object"
+}

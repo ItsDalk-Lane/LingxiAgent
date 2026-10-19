@@ -1,0 +1,575 @@
+{
+  "scope": "OWNED_SAME_G_BUILD_LAYER_DIAGNOSIS_NOT_ACCEPTANCE",
+  "startedAt": "2026-10-18T12:30:19.375574+00:00",
+  "binarySha256Before": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "buildReceiptSha256": "a30181a04cf896bfb8b2b833cbf7743ae5593596590c05f4b6107d9b5dbb18b6",
+  "sourceFingerprint": "6d00d82b598ad23f9cbbc05f61e9514cf8e7f771a8434f9f5884672b3782cf2f",
+  "isolatedHome": "/private/tmp/lingxi-r07-lan-layer-g1-d6n8vwz1/home",
+  "binary": "/private/tmp/lingxi-r07-lan-layer-g1-d6n8vwz1/owned-service",
+  "interface": "en0",
+  "lanIp": "192.168.3.96",
+  "networkSettingsChanged": false,
+  "credentialsUsed": false,
+  "manualClockInjected": false,
+  "requests": [
+    {
+      "label": "loopback-before",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "destination": [
+        "127.0.0.1",
+        51621
+      ],
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 251,
+      "localSocket": [
+        "127.0.0.1",
+        51622
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        51621
+      ],
+      "status": 200,
+      "responseSha256": "d994a81f2558c81ceb68d9d8d19aeaf1cfde319755cb336421de41e71fdbcbea",
+      "elapsedSeconds": 0.026
+    },
+    {
+      "label": "lan-only-health",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "destination": [
+        "192.168.3.96",
+        51621
+      ],
+      "budgetSeconds": 20,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 251,
+      "localSocket": [
+        "192.168.3.96",
+        51623
+      ],
+      "peerSocket": [
+        "192.168.3.96",
+        51621
+      ],
+      "status": 200,
+      "responseSha256": "566c1e46afcaf672404a2224362c550d0331544d7e7e1d1f31a47ad7e2c6897a",
+      "elapsedSeconds": 4.107
+    },
+    {
+      "label": "same-process-loopback-after",
+      "method": "GET",
+      "path": "/lingxi/v1/health",
+      "destination": [
+        "127.0.0.1",
+        51621
+      ],
+      "budgetSeconds": 5,
+      "connected": true,
+      "requestWritten": true,
+      "responseBytes": 251,
+      "localSocket": [
+        "127.0.0.1",
+        51640
+      ],
+      "peerSocket": [
+        "127.0.0.1",
+        51621
+      ],
+      "status": 200,
+      "responseSha256": "566c1e46afcaf672404a2224362c550d0331544d7e7e1d1f31a47ad7e2c6897a",
+      "elapsedSeconds": 0.001
+    }
+  ],
+  "samples": [
+    {
+      "elapsed": 0.0,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 0.283,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 0.567,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 0.839,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 1.104,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 1.372,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 1.639,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 1.904,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 2.171,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 2.44,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 2.708,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 2.976,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 3.244,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 3.508,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 3.773,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    },
+    {
+      "elapsed": 4.038,
+      "ownedTcpFds": {
+        "exitCode": 0,
+        "stdout": [
+          "COMMAND     PID           USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME",
+          "Python    62212 study_superior    6u  IPv4 0xa570a635d4b383db      0t0  TCP 192.168.3.96:51623->192.168.3.96:51621 (ESTABLISHED)",
+          "owned-ser 62219 study_superior   32u  IPv4 0x6df2d5e0b1ca0e30      0t0  TCP *:51621 (LISTEN)"
+        ],
+        "stderr": []
+      },
+      "tcpStates": {
+        "exitCode": 0,
+        "stdout": [
+          "tcp4       0      0  192.168.3.96.51621     192.168.3.96.51623     ESTABLISHED          131            0  408300  146988    owned-service:62219  00901 00000004 000000000029dc71 20000081 01000800      3      0 000004",
+          "tcp4       0      0  192.168.3.96.51623     192.168.3.96.51621     ESTABLISHED            0           79  408300  146988           Python:62212  00102 00000000 000000000029dc70 00000080 04000900      2      0 000000",
+          "tcp4       0      0  *.51621                *.*                    LISTEN                 0            0  131072  131072    owned-service:62219  00100 00000006 000000000029dc63 00000001 00000800      1      0 000000",
+          "tcp4       0      0  127.0.0.1.51621        127.0.0.1.51622        TIME_WAIT            256          251  408256  146988    owned-service:62219  02131 00000004 000000000029dc6f 00000081 01000800      0      0 000000"
+        ],
+        "stderr": []
+      },
+      "listenQueues": {
+        "exitCode": 0,
+        "stdout": [
+          "1/1/128        *.51621                "
+        ],
+        "stderr": []
+      }
+    }
+  ],
+  "port": 51621,
+  "route": {
+    "exitCode": 0,
+    "stdout": [
+      "   route to: 192.168.3.96",
+      "destination: 192.168.3.96",
+      "  interface: lo0",
+      "      flags: <UP,HOST,DONE,LLINFO,WASCLONED,LOCAL,IFSCOPE,IFREF>",
+      " recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire",
+      "       0         0         0         0         0         0     16384         0 "
+    ],
+    "stderr": []
+  },
+  "serviceExitCode": 0,
+  "stdoutSha256": "1edba5a688389af7050ddf30f0f62f7b89e4d6cc2d19a78936e4c3a5afd573f7",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "binarySha256After": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "probeSha256": "740373689522f3ee3c8731df0ce81d1970e1a2433922892287ddc38f83011009",
+  "endedAt": "2026-10-18T12:30:25.889016+00:00",
+  "serviceGone": true,
+  "conclusion": "按双端FD/内核连接/队列实际观测分层；本记录不自动归因任何过滤器，也不声称真实第二设备通过"
+}

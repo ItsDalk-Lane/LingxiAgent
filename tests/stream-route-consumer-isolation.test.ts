@@ -210,6 +210,69 @@ it('keeps a resolved confirmation resolved after the next real streamed projecti
 // ── R1：接纳不得先于序号校验产生退休副作用（recheck F03）──
 
 describe('R1 admission atomicity over the real route', () => {
+  it('an incremental mid-stream resume with idle runtime preserves its partial body for consecutive live completion exactly once', async () => {
+    const h = await harness();
+    try {
+      h.emit({ type: 'agent_start' }); await h.drain();
+      const runStart = h.received.find(e => e.type === 'assistant_run_start')!;
+      const base = Number(runStart.seq);
+      const streamId = runStart.streamId as string;
+      const segmentId = 'seg-r1-runtime-idle';
+      const first = '补发前段正文';
+      const tail = '实时后段正文';
+      h.inject({ ...runStart, type: 'assistant_segment_start', seq: base + 1, segmentId, kind: 'text', semanticPhase: 'final_answer' });
+      await h.drain();
+      // 恢复窗口仍含正文，运行态已空闲；真实消费链不得因此退休尚未收尾的buffer。
+      h.inject({
+        type: 'stream_resume', sessionPath: PATH, sessionId: ID, streamId,
+        sinceSeq: base + 1, nextSeq: base + 3, isStreaming: true, runtimeIsStreaming: false,
+        reset: false, truncated: false,
+        events: [{ seq: base + 2, event: { type: 'assistant_segment_delta', segmentId, delta: first } }],
+      });
+      await h.drain();
+      await vi.waitFor(() => expect(projection()).toContain(first));
+      expect(projection()).not.toContain(tail);
+      expect(streamBufferManager.isRunActive(PATH)).toBe(true);
+      expect(getSessionStreamMeta(PATH)?.lastSeq).toBe(base + 2);
+      expect(getSessionStreamMeta(PATH)?.consumedSeqs.has(base + 2)).toBe(true);
+      expect(useStore.getState().streamingSessions).not.toContain(ID);
+
+      // 所有后半帧都经真实WebSocket到同一个handleServerMessage，不直接调用接纳或buffer。
+      const liveTail = [
+        { ...runStart, type: 'assistant_segment_delta', seq: base + 3, segmentId, delta: tail },
+        { ...runStart, type: 'assistant_segment_end', seq: base + 4, segmentId, semanticPhase: 'final_answer' },
+        { ...runStart, type: 'assistant_run_end', seq: base + 5, status: 'completed' },
+        { ...runStart, type: 'status', seq: base + 6, isStreaming: false },
+      ];
+      for (const event of liveTail) h.inject(event);
+      await h.drain();
+      const assertCompleted = () => {
+        const messages = useStore.getState().chatSessions[ID].items
+          .filter(item => item.type === 'message' && item.data.role === 'assistant');
+        expect(messages).toHaveLength(1);
+        const message = messages[0];
+        if (message.type !== 'message') throw new Error('实际助手消息缺失');
+        // 正文块沿现役投影保存在source，不能误读思考块使用的content字段。
+        const body = (message.data.blocks || []).filter(block => block.type === 'text')
+          .map(block => block.type === 'text' ? block.source : '').join('');
+        expect(body).toBe(first + tail);
+        expect(readLiveAssistantMessage(PATH, message.data.id)).toBeNull();
+        const meta = getSessionStreamMeta(PATH)!;
+        expect(meta.streamId).toBe(streamId);
+        expect(meta.lastSeq).toBe(base + 6);
+        expect([...meta.consumedSeqs].sort((a, b) => a - b))
+          .toEqual(Array.from({ length: 7 }, (_, offset) => base + offset));
+        expect(streamBufferManager.isRunActive(PATH)).toBe(false);
+        expect(useStore.getState().streamingSessions).not.toContain(ID);
+      };
+      await vi.waitFor(assertCompleted);
+      // 同一连续尾帧重送不能重复正文、提交或推进水位。
+      for (const event of liveTail) h.inject(event);
+      await h.drain();
+      assertCompleted();
+    } finally { await h.close(); }
+  });
+
   it('a gap-rejected assistant_run_end retires nothing; the re-delivered seq3/seq4 complete the body, finalize exactly once, and only evidenced seqs enter the watermark', async () => {
     const h = await harness();
     try {

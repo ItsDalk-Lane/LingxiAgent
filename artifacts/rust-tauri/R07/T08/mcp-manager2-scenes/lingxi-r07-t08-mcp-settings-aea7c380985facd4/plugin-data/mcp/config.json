@@ -1,0 +1,49 @@
+{
+  "agents": {
+    "legacy": {
+      "keep": true
+    }
+  },
+  "global": {
+    "keep": "global",
+    "mcp": {
+      "connectors": [
+        {
+          "args": [
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-aea7c380985facd4/external-fixture/platform.mjs",
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-aea7c380985facd4/external-fixture",
+            "hold-call"
+          ],
+          "autoStart": true,
+          "command": "node",
+          "enabled": true,
+          "id": "fixture",
+          "name": "fixture",
+          "transport": "stdio"
+        }
+      ],
+      "deferEnabled": false,
+      "deferThreshold": 17,
+      "enabled": true,
+      "servers": [
+        {
+          "args": [
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-aea7c380985facd4/external-fixture/platform.mjs",
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-aea7c380985facd4/external-fixture",
+            "hold-call"
+          ],
+          "autoStart": true,
+          "command": "node",
+          "enabled": true,
+          "id": "fixture",
+          "name": "fixture",
+          "transport": "stdio"
+        }
+      ],
+      "unknownMcp": 79
+    }
+  },
+  "schemaVersion": 1,
+  "sessions": {},
+  "unknownRoot": 73
+}

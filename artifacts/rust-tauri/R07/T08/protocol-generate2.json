@@ -1,0 +1,32 @@
+{
+  "label": "protocol-generate2",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "run",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-protocol",
+    "--bin",
+    "lingxi-protocol-gen"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T04:22:34.053948+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "0c4db61ed1d0ebca24561687201ca7b595a491267d125e3c21dd4b0461dbcf3a",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T04:22:37.613132+00:00",
+  "sourceFingerprintAfter": "8d3083022b545d60f7e0a10f576ad31d549e9b666987ef5bc2726a4455fc963a",
+  "log": "artifacts/rust-tauri/R07/T08/protocol-generate2.log",
+  "logSha256": "05a41258dfd7bdee2d715d6f07349aa8457626e2a386e01b38662ffefb016a2d",
+  "sourceUnchanged": false
+}

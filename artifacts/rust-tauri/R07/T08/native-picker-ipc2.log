@@ -1,0 +1,9 @@
+   Compiling lingxi-resource-desktop v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.21s
+     Running tests/directory_picker_host.rs (desktop/src-tauri/target/debug/deps/directory_picker_host-db90b1abd3e818bc)
+
+running 1 test
+test native_directory_picker_returns_real_path_cancel_null_and_never_installs ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 25.75s
+

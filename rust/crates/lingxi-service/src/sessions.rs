@@ -636,6 +636,12 @@ impl SessionBackend for RunDatabase {
 }
 
 pub struct SessionStore {
+    workflows: std::sync::Mutex<std::sync::Weak<crate::workflow::WorkflowService>>,
+    media: std::sync::Mutex<std::sync::Weak<crate::media::MediaService>>,
+    /// R07-T07-δ2: 会话预算目标引擎（现役 goal-handler 的 turn_end aborted
+    /// → pauseOnAbort 缝）。组合根在引擎建成后 attach；未 attach（测试
+    /// 直接建 store）保持钩子前形状。
+    goal_engine: std::sync::Mutex<std::sync::Weak<crate::goal::GoalEngine>>,
     backend: Box<dyn SessionBackendErased>,
     storage_admission: Option<std::sync::Arc<lingxi_kernel::session_admission::SessionAdmission>>,
     /// R03-T02: the session serialization owner — one explicit owner per
@@ -704,6 +710,9 @@ impl SessionStore {
             .unwrap_or_else(|| SessionSupervisor::new(limits));
         Self {
             backend: Box::new(backend),
+            workflows: std::sync::Mutex::new(std::sync::Weak::new()),
+            media: std::sync::Mutex::new(std::sync::Weak::new()),
+            goal_engine: std::sync::Mutex::new(std::sync::Weak::new()),
             storage_admission,
             gate,
             dedup: std::sync::Arc::new(crate::dedup::SubmissionDedup::default()),
@@ -715,6 +724,26 @@ impl SessionStore {
     /// submit steering for a running turn).
     pub fn session_supervisor(&self) -> &std::sync::Arc<SessionSupervisor> {
         &self.gate
+    }
+
+    pub(crate) fn attach_workflows(
+        &self,
+        workflows: &std::sync::Arc<crate::workflow::WorkflowService>,
+    ) {
+        *self.workflows.lock().expect("工作流关联锁") = std::sync::Arc::downgrade(workflows);
+    }
+
+    pub(crate) fn attach_media(&self, media: &std::sync::Arc<crate::media::MediaService>) {
+        *self.media.lock().expect("会话媒体关联锁") = std::sync::Arc::downgrade(media);
+    }
+
+    /// R07-T07-δ2: 组合根注入预算目标引擎（弱引用，与 media 同先例）。
+    pub(crate) fn attach_goal_engine(&self, engine: &std::sync::Arc<crate::goal::GoalEngine>) {
+        *self.goal_engine.lock().expect("goal 引擎关联锁") = std::sync::Arc::downgrade(engine);
+    }
+
+    fn goal_engine(&self) -> Option<std::sync::Arc<crate::goal::GoalEngine>> {
+        self.goal_engine.lock().expect("goal 引擎关联锁").upgrade()
     }
 
     /// The synthetic sessions seeded into a fresh database (owned by the
@@ -748,13 +777,22 @@ impl SessionStore {
         principal.user_id.as_deref() == Some(owner_user_id)
     }
 
+    /// 普通 Bridge 仍只读自己的会话；受限接管只允许服务端冻结的单个目标。
+    pub fn can_access_session(
+        principal: &Principal,
+        owner_user_id: &str,
+        session_id: &str,
+    ) -> bool {
+        kernel_principal_of(principal).can_access_session(owner_user_id, session_id)
+    }
+
     /// Lists the sessions visible to `principal` (identity projection of
     /// the run database; read-only).
     pub async fn list_for(&self, principal: &Principal) -> Result<Vec<SessionView>, StorageError> {
         let rows = self.backend.list_sessions_erased().await?;
         let mut views = Vec::with_capacity(rows.len());
         for row in rows {
-            if !Self::can_access(principal, &row.owner_user_id) {
+            if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
                 continue;
             }
             views.push(self.facts_of(row).await?.into());
@@ -770,7 +808,9 @@ impl SessionStore {
     ) -> Result<SessionAccess, StorageError> {
         match self.backend.get_session_erased(session_id).await? {
             None => Ok(SessionAccess::NotFound),
-            Some(row) if Self::can_access(principal, &row.owner_user_id) => {
+            Some(row)
+                if Self::can_access_session(principal, &row.owner_user_id, &row.session_id) =>
+            {
                 Ok(SessionAccess::Ok(self.facts_of(row).await?))
             }
             Some(_) => Ok(SessionAccess::Forbidden),
@@ -788,7 +828,7 @@ impl SessionStore {
             .await
             .map_err(SessionExecuteError::Storage)?
             .ok_or(SessionExecuteError::NotFound)?;
-        if !Self::can_access(principal, &row.owner_user_id) {
+        if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
             return Err(SessionExecuteError::Forbidden);
         }
         self.backend
@@ -952,6 +992,8 @@ impl SessionStore {
             submission.request_id,
             self.gate.permission_mode(session_id),
         );
+        authorization.foreground_mcp_session_permissions = true;
+        authorization.settings_principal = Some(principal.clone());
         authorization.knowledge_selection = submission.knowledge.cloned();
         let kernel_principal = kernel_principal_of(principal);
         let _run_permit = supervisor
@@ -1142,6 +1184,322 @@ impl SessionStore {
         now_ms: u64,
         chat_input: Option<crate::runs::ChatRunInput>,
     ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_background_authorized_for(
+            storage, events, supervisor, background, principal, session_id, submission, now_ms,
+            chat_input, None, None, None, None,
+        )
+        .await
+    }
+
+    /// 已鉴权的交互WS使用后台运输生命周期，但仍是用户前台发起的操作。
+    /// 此入口不接受客户端提供的来源标志，显式后台、桥接和自动化不能调用它借权。
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) async fn execute_foreground_chat_for(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+        chat_input: Option<crate::runs::ChatRunInput>,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_background_authorized_inner(
+            storage, events, supervisor, background, principal, session_id, submission, now_ms,
+            chat_input, None, None, None, None, true,
+        )
+        .await
+    }
+
+    /// 仅服务内部调度器可指定后台来源；HTTP 参数不能伪造此入口。
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) async fn execute_scheduled_for(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        input: &str,
+        trigger_id: &str,
+        origin: lingxi_kernel::subagent::RunOrigin,
+        chat_input: Option<crate::runs::ChatRunInput>,
+        loop_identity: Option<crate::loopx::LoopRunIdentity>,
+        now_ms: u64,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        // R07-T07-δ6：Loop 唤醒轮也走此入口（trigger_id = 循环键
+        // sessionId）；循环轮 grant Full，权限上下文仍是 UserSession。
+        if !matches!(
+            origin,
+            lingxi_kernel::subagent::RunOrigin::Cron
+                | lingxi_kernel::subagent::RunOrigin::Heartbeat
+                | lingxi_kernel::subagent::RunOrigin::Loop
+        ) || trigger_id.is_empty()
+        {
+            return Err(SessionExecuteError::InvalidRequestId {
+                detail: "invalid scheduled submission identity".into(),
+            });
+        }
+        let submission = ExecuteSubmission {
+            input,
+            request_id: None,
+            knowledge: None,
+        };
+        let lineage = lingxi_kernel::subagent::RunLineage {
+            parent_run_id: None,
+            origin,
+            source_message_id: None,
+            cause_id: Some(trigger_id.to_string()),
+        };
+        self.execute_background_authorized_for(
+            storage,
+            events,
+            supervisor,
+            background,
+            principal,
+            session_id,
+            &submission,
+            now_ms,
+            chat_input,
+            Some(lineage),
+            None,
+            None,
+            loop_identity,
+        )
+        .await
+    }
+
+    /// 平台已认证消息的专用入口；角色只能由宿主配置派生，不能来自消息正文。
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) async fn execute_bridge_for(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        input: &str,
+        attachment_context: Option<&str>,
+        inbox_id: &str,
+        message_id: &str,
+        role: lingxi_protocol::BridgeRole,
+        bridge_mode: lingxi_kernel::subagent::SessionPermissionMode,
+        chat_input: Option<crate::runs::ChatRunInput>,
+        now_ms: u64,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        if principal.kind != PrincipalKind::Bridge
+            || principal.credential_kind != crate::auth::CredentialKind::Bridge
+            || principal
+                .user_id
+                .as_deref()
+                .is_none_or(|subject| !lingxi_protocol::valid_bridge_subject(subject))
+            || inbox_id.trim().is_empty()
+            || message_id.trim().is_empty()
+        {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        let inbox = lingxi_adapters::storage::bridge::get_inbox(storage, inbox_id)
+            .await
+            .map_err(SessionExecuteError::Storage)?
+            .ok_or(SessionExecuteError::Forbidden)?;
+        let connector =
+            lingxi_adapters::storage::bridge::get_connector(storage, &inbox.input.connector_id)
+                .await
+                .map_err(SessionExecuteError::Storage)?
+                .ok_or(SessionExecuteError::Forbidden)?;
+        let actor = lingxi_protocol::bridge_subject(
+            &inbox.input.platform,
+            &inbox.input.connector_id,
+            &inbox.input.sender_id,
+        )
+        .map_err(|_| SessionExecuteError::Forbidden)?;
+        let expected_role = if inbox.input.conversation_kind
+            == lingxi_protocol::BridgeConversationKind::Dm
+            && connector.input.owner_sender_id.as_deref() == Some(inbox.input.sender_id.as_str())
+        {
+            lingxi_protocol::BridgeRole::Owner
+        } else {
+            lingxi_protocol::BridgeRole::Guest
+        };
+        if !inbox.prepared
+            || inbox.session_id.as_deref() != Some(session_id)
+            || inbox.input.message_id != message_id
+            || inbox.role != role
+            || expected_role != role
+            || !connector.input.enabled
+            || connector.generation != inbox.connector_generation
+            || connector.input.platform != inbox.input.platform
+            || connector.input.actor_id != inbox.actor_id
+            || connector.input.owner_subject != inbox.owner_subject
+            || actor != principal.user_id.as_deref().unwrap_or_default()
+        {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        let scoped_principal = if inbox.prepared_takeover {
+            if role != lingxi_protocol::BridgeRole::Owner {
+                return Err(SessionExecuteError::Forbidden);
+            }
+            Some(
+                principal
+                    .bridge_takeover(session_id)
+                    .map_err(|_| SessionExecuteError::Forbidden)?,
+            )
+        } else {
+            None
+        };
+        let principal = scoped_principal.as_ref().unwrap_or(principal);
+        let frozen_input: serde_json::Value = serde_json::from_str(&inbox.input.payload_json)
+            .map_err(|_| SessionExecuteError::Forbidden)?;
+        if frozen_input["text"].as_str() != Some(input) {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        // 原始消息仍与持久来源逐字比对；附件正文只由宿主复用正式文件准备链传入。
+        let prepared_input = match attachment_context.filter(|text| !text.is_empty()) {
+            Some(context) => format!("{input}\n\n{context}"),
+            None => input.to_owned(),
+        };
+        if prepared_input.len() > crate::limits::MAX_SUBMISSION_INPUT_BYTES {
+            return Err(SessionExecuteError::InputTooLarge {
+                bytes: prepared_input.len(),
+                limit_bytes: crate::limits::MAX_SUBMISSION_INPUT_BYTES,
+            });
+        }
+        let request_id = format!("bridge:{inbox_id}");
+        // 常规定时任务之外的真实桥接来源有独立因果锚点；重启不能仅凭空的内存dedup重建它。
+        if let Some((earlier, _, _)) =
+            lingxi_adapters::storage::bridge::get_inbox_run(storage, inbox_id)
+                .await
+                .map_err(SessionExecuteError::Storage)?
+        {
+            let kernel = kernel_principal_of(principal);
+            let key = crate::dedup::DedupKey {
+                owner_kind: kernel.storage_kind().into(),
+                owner_subject: kernel.storage_subject(),
+                session_id: session_id.into(),
+                request_id: request_id.clone(),
+            };
+            if self.dedup.lookup(&key).is_none() {
+                return Err(SessionExecuteError::RequestIdBoundToEarlierRun {
+                    request_id,
+                    run_id: earlier,
+                });
+            }
+        }
+        let submission = ExecuteSubmission {
+            input: &prepared_input,
+            request_id: Some(&request_id),
+            knowledge: None,
+        };
+        let lineage = lingxi_kernel::subagent::RunLineage {
+            parent_run_id: None,
+            origin: lingxi_kernel::subagent::RunOrigin::Bridge,
+            source_message_id: Some(message_id.to_string()),
+            cause_id: Some(inbox_id.to_string()),
+        };
+        self.execute_background_authorized_for(
+            storage,
+            events,
+            supervisor,
+            background,
+            principal,
+            session_id,
+            &submission,
+            now_ms,
+            chat_input,
+            Some(lineage),
+            Some(role),
+            Some(bridge_mode),
+            None,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) async fn execute_background_authorized_for(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+        chat_input: Option<crate::runs::ChatRunInput>,
+        lineage: Option<lingxi_kernel::subagent::RunLineage>,
+        bridge_role: Option<lingxi_protocol::BridgeRole>,
+        mode_override: Option<lingxi_kernel::subagent::SessionPermissionMode>,
+        loop_identity: Option<crate::loopx::LoopRunIdentity>,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        self.execute_background_authorized_inner(
+            storage,
+            events,
+            supervisor,
+            background,
+            principal,
+            session_id,
+            submission,
+            now_ms,
+            chat_input,
+            lineage,
+            bridge_role,
+            mode_override,
+            loop_identity,
+            false,
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    async fn execute_background_authorized_inner(
+        &self,
+        storage: &std::sync::Arc<lingxi_adapters::storage::RunDatabase>,
+        events: &std::sync::Arc<EventService>,
+        supervisor: &std::sync::Arc<crate::runs::RunSupervisor>,
+        background: &std::sync::Arc<crate::background::BackgroundDriveRegistry>,
+        principal: &Principal,
+        session_id: &str,
+        submission: &ExecuteSubmission<'_>,
+        now_ms: u64,
+        chat_input: Option<crate::runs::ChatRunInput>,
+        lineage: Option<lingxi_kernel::subagent::RunLineage>,
+        bridge_role: Option<lingxi_protocol::BridgeRole>,
+        mode_override: Option<lingxi_kernel::subagent::SessionPermissionMode>,
+        loop_identity: Option<crate::loopx::LoopRunIdentity>,
+        foreground_mcp_session_permissions: bool,
+    ) -> Result<ExecuteAccepted, SessionExecuteError> {
+        // 仅循环控制器签发的原代次证明可进入循环来源；普通后台入口不能借用。
+        let loop_source = lineage
+            .as_ref()
+            .is_some_and(|lineage| lineage.origin == lingxi_kernel::subagent::RunOrigin::Loop);
+        if loop_source != loop_identity.is_some()
+            || loop_identity
+                .as_ref()
+                .is_some_and(|identity| !identity.is_for_session(session_id))
+        {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        if matches!(
+            principal.kind,
+            PrincipalKind::Bridge | PrincipalKind::BridgeTakeover
+        ) != bridge_role.is_some()
+        {
+            return Err(SessionExecuteError::Forbidden);
+        }
+        let phone_source = lineage.as_ref().is_some_and(|lineage| {
+            matches!(
+                lineage.origin,
+                lingxi_kernel::subagent::RunOrigin::Channel
+                    | lingxi_kernel::subagent::RunOrigin::Dm
+            )
+        });
+        if phone_source && (!principal.is_local_owner() || mode_override.is_none()) {
+            return Err(SessionExecuteError::Forbidden);
+        }
         // R03 RR2/F05-01 — the background surface canonicalizes through the
         // SAME single boundary as the foreground one: the dedup key, the
         // cross-restart anchor lookup and the DriveAuthorization lineage
@@ -1184,6 +1542,47 @@ impl SessionStore {
         // capacity) retracts the reservation here because nothing was
         // spawned and nothing was written (a loud refusal, never a fake
         // acceptance).
+        let mut authorization = DriveAuthorization::user_submission(
+            submission.request_id,
+            self.gate.permission_mode(session_id),
+        )
+        .with_knowledge(submission.knowledge.cloned())
+        .with_chat(chat_input);
+        authorization.loop_identity = loop_identity;
+        if let Some(lineage) = lineage {
+            authorization.lineage = lineage;
+        }
+        if let Some(role) = bridge_role {
+            authorization.grant = crate::runs::RunGrant::Bridge { role };
+            if let Some(mode) = mode_override {
+                use lingxi_kernel::subagent::SessionPermissionMode as M;
+                authorization.session_mode = match (authorization.session_mode, mode) {
+                    (M::ReadOnly, _) | (_, M::ReadOnly) => M::ReadOnly,
+                    (M::Ask, _) | (_, M::Ask) => M::Ask,
+                    _ => M::Operate,
+                };
+            }
+        }
+        if authorization.lineage.origin == lingxi_kernel::subagent::RunOrigin::SessionCollab {
+            if let Some(mode) = mode_override {
+                use lingxi_kernel::subagent::SessionPermissionMode as M;
+                authorization.session_mode = match (authorization.session_mode, mode) {
+                    (M::ReadOnly, _) | (_, M::ReadOnly) => M::ReadOnly,
+                    (M::Ask, _) | (_, M::Ask) => M::Ask,
+                    _ => M::Operate,
+                };
+            }
+        }
+        if phone_source {
+            authorization.grant = crate::runs::RunGrant::Phone;
+            authorization.session_mode = mode_override.expect("手机来源的权限已在受理前验证");
+        }
+        if authorization.lineage.origin == lingxi_kernel::subagent::RunOrigin::User
+            && authorization.grant == crate::runs::RunGrant::Full
+        {
+            authorization.settings_principal = Some(principal.clone());
+            authorization.foreground_mcp_session_permissions = foreground_mcp_session_permissions;
+        }
         let started = crate::background::spawn_background_drive_with_started(
             supervisor,
             storage,
@@ -1194,12 +1593,7 @@ impl SessionStore {
             _agent_id,
             run_id.clone(),
             submission.input.to_string(),
-            DriveAuthorization::user_submission(
-                submission.request_id,
-                self.gate.permission_mode(session_id),
-            )
-            .with_knowledge(submission.knowledge.cloned())
-            .with_chat(chat_input),
+            authorization,
             binding,
             now_ms,
             lease,
@@ -1309,7 +1703,7 @@ impl SessionStore {
             Ok(None) => return Err(SessionExecuteError::NotFound),
             Err(err) => return Err(SessionExecuteError::Storage(err)),
         };
-        if !Self::can_access(principal, &row.owner_user_id) {
+        if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
             return Err(SessionExecuteError::Forbidden);
         }
         match (self.storage_admission.clone(), port.session_admission()) {
@@ -1318,7 +1712,7 @@ impl SessionStore {
             _ => {
                 return Err(SessionExecuteError::Storage(StorageError::Conflict {
                     detail: "session_storage_binding_mismatch".into(),
-                }))
+                }));
             }
         }
         let agent_id = row.agent_id;
@@ -1486,7 +1880,7 @@ impl SessionStore {
         for round in 0..4 {
             match self.dedup.admit(key.clone(), digest.clone(), admission) {
                 Err(full) => {
-                    return Err(SessionExecuteError::IdempotencyRegistryFull { cap: full.cap })
+                    return Err(SessionExecuteError::IdempotencyRegistryFull { cap: full.cap });
                 }
                 Ok(Err(rejection)) => return Err(rejection),
                 Ok(Ok(crate::dedup::DedupDecision::Replay { run_id })) => {
@@ -1682,7 +2076,7 @@ impl SessionStore {
             Ok(None) => return Err(SessionExecuteError::NotFound),
             Err(err) => return Err(SessionExecuteError::Storage(err)),
         };
-        if !Self::can_access(principal, &row.owner_user_id) {
+        if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
             return Err(SessionExecuteError::Forbidden);
         }
         match self.gate.steering_submit(session_id, text) {
@@ -1727,7 +2121,7 @@ impl SessionStore {
             Ok(None) => return Err(SessionExecuteError::NotFound),
             Err(err) => return Err(SessionExecuteError::Storage(err)),
         };
-        if !Self::can_access(principal, &row.owner_user_id) {
+        if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
             return Err(SessionExecuteError::Forbidden);
         }
         if record.status.is_terminal() {
@@ -1736,8 +2130,29 @@ impl SessionStore {
                 status: record.status,
             });
         }
+        let workflows = self.workflows.lock().expect("工作流关联锁").upgrade();
+        if let Some(workflows) = workflows {
+            workflows.cancel_for_run(run_id);
+        }
+        let media = self.media.lock().expect("会话媒体关联锁").upgrade();
+        if let Some(media) = media {
+            // 悬空运行（无活跃取消作用域）证明没有在跑的媒体任务可撤，
+            // 跳过媒体取消让下方 NotLive 分支诚实报告 DanglingActive；
+            // 活跃运行的媒体取消失败仍然响亮拒绝。
+            if supervisor.run_scope(run_id).is_some() {
+                media.cancel_from_run(run_id).await.map_err(|detail| {
+                    SessionExecuteError::Storage(StorageError::Conflict { detail })
+                })?;
+            }
+        }
         match supervisor.cancel_run(run_id, "user") {
             crate::cancel::FireOutcome::Fired | crate::cancel::FireOutcome::AlreadyCancelling => {
+                // R07-T07-δ2: 现役 turn_end aborted → pauseOnAbort
+                // （goal-handler.ts:25-26）：中止被接受即暂停活跃 goal
+                // （时间预算停计），引擎异常不外抛打断取消链。
+                if let Some(engine) = self.goal_engine() {
+                    engine.pause_on_abort(&session_id);
+                }
                 Ok(CancelRunOutcome::Accepted {
                     run_id: run_id.to_string(),
                     phase: supervisor
@@ -1800,7 +2215,7 @@ impl SessionStore {
             Ok(None) => return Err(SessionExecuteError::NotFound),
             Err(err) => return Err(SessionExecuteError::Storage(err)),
         };
-        if !Self::can_access(principal, &row.owner_user_id) {
+        if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
             return Err(SessionExecuteError::Forbidden);
         }
         let _permit = self.gate.mutation_permit(session_id).map_err(|e| match e {
@@ -1847,7 +2262,7 @@ impl SessionStore {
             Ok(None) => return Err(SessionExecuteError::NotFound),
             Err(err) => return Err(SessionExecuteError::Storage(err)),
         };
-        if !Self::can_access(principal, &row.owner_user_id) {
+        if !Self::can_access_session(principal, &row.owner_user_id, &row.session_id) {
             return Err(SessionExecuteError::Forbidden);
         }
         port.load_run_lineage(&lingxi_protocol::RunId::new(run_id.to_string()))
@@ -1906,6 +2321,22 @@ pub(crate) fn kernel_principal_of(principal: &Principal) -> KernelPrincipal {
                 .user_id
                 .clone()
                 .unwrap_or_else(|| "unknown-user".to_string()),
+        },
+        PrincipalKind::BridgeTakeover => match principal
+            .user_id
+            .as_deref()
+            .and_then(|subject| lingxi_protocol::parse_bridge_takeover_subject(subject).ok())
+        {
+            Some(scope) => KernelPrincipal::BridgeTakeover {
+                subject: scope.actor_subject,
+                session_id: scope.session_id,
+            },
+            None => KernelPrincipal::Automation {
+                surface: "invalid_bridge_scope".into(),
+            },
+        },
+        PrincipalKind::Bridge => KernelPrincipal::Bridge {
+            subject: principal.user_id.clone().unwrap_or_default(),
         },
         // Authenticated-but-unclassified principals never reach the write
         // path with a fabricated identity; they execute as a narrowed
@@ -2095,6 +2526,13 @@ pub async fn sessions_studio_list_route(
             // cancelling 同口径），附活动 run id 清单。
             "running": running,
             "activeRuns": active_run_ids,
+            // R07-T07-δ6：冷启动循环状态注入（现役 sessions.ts:839）——仅
+            // running/paused 注入，stopped/completed 如实为 null；运行时
+            // 变更靠 loop_status WS 增量。
+            "loopStatus": crate::loopsvc::loop_status_inject(
+                &state.loop_services().controller,
+                &view.session_id,
+            ),
         }));
     }
     (
@@ -2114,6 +2552,71 @@ mod tests {
     use lingxi_kernel::RunContext;
     use lingxi_protocol::{RunId, SessionId, ToolCallId};
     use std::sync::Mutex as StdMutex;
+
+    #[tokio::test]
+    async fn scheduled_loop_without_controller_identity_is_rejected_before_admission() {
+        let home = std::env::temp_dir().join(format!(
+            "r07-loop-origin-proof-{}",
+            lingxi_adapters::storage::agent_memory::random_token_suffix()
+        ));
+        std::fs::create_dir_all(&home).expect("home");
+        let db = std::sync::Arc::new(
+            RunDatabase::open(&home.join("runs.db"), Default::default())
+                .await
+                .expect("db"),
+        );
+        let sessions = std::sync::Arc::new(SessionStore::new((*db).clone()));
+        let events = std::sync::Arc::new(
+            EventService::new(db.clone(), sessions.clone(), EventLimits::default())
+                .expect("events"),
+        );
+        let runs = std::sync::Arc::new(supervisor());
+        let background = crate::background::BackgroundDriveRegistry::new();
+        let owner = owner_principal();
+        let result = sessions
+            .execute_scheduled_for(
+                &db,
+                &events,
+                &runs,
+                &background,
+                &owner,
+                "not-created",
+                "不能伪造循环投递",
+                "not-created",
+                lingxi_kernel::subagent::RunOrigin::Loop,
+                None,
+                None,
+                1,
+            )
+            .await;
+        assert!(matches!(result, Err(SessionExecuteError::Forbidden)));
+        assert!(!db.session_admission().is_busy("not-created"));
+        assert_eq!(db.total_runs().await.expect("runs"), 0);
+        assert!(runs.task_supervisor().tasks().is_empty());
+        // 普通定时来源无需循环证明，应进入原有会话查找，不能一并被新闸误拒绝。
+        let cron = sessions
+            .execute_scheduled_for(
+                &db,
+                &events,
+                &runs,
+                &background,
+                &owner,
+                "not-created",
+                "普通定时任务",
+                "cron-trigger",
+                lingxi_kernel::subagent::RunOrigin::Cron,
+                None,
+                None,
+                2,
+            )
+            .await;
+        assert!(matches!(cron, Err(SessionExecuteError::NotFound)));
+        assert_eq!(db.total_runs().await.expect("runs"), 0);
+        drop(events);
+        drop(sessions);
+        db.close().await.expect("close");
+        std::fs::remove_dir_all(home).expect("cleanup");
+    }
 
     /// R03-T01: the no-provider supervisor is the production default wiring
     /// until R05 registers real providers; these ownership-logic unit tests
@@ -3183,6 +3686,128 @@ mod tests {
         assert_eq!(store_a.run_count("sess_local_alpha").await.unwrap(), 1);
         drop(events_a);
         let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[tokio::test]
+    async fn bridge_inbox_run_survives_restart_without_a_second_run_even_before_host_bind() {
+        use lingxi_adapters::storage::{bridge as store, StoreOptions};
+        use lingxi_kernel::subagent::{RunLineage, RunOrigin, SessionPermissionMode};
+        let home = std::env::temp_dir().join(format!(
+            "r07-bridge-restart-{}",
+            lingxi_adapters::storage::agent_memory::random_token_suffix()
+        ));
+        std::fs::create_dir_all(&home).unwrap();
+        let path = home.join("runs.db");
+        let db = RunDatabase::open(&path, StoreOptions::default())
+            .await
+            .unwrap();
+        store::put_connector(
+            &db,
+            &store::BridgeConnectorInput {
+                id: "c".into(),
+                platform: "qq".into(),
+                studio_id: "studio".into(),
+                actor_id: "agent".into(),
+                owner_subject: "user_local".into(),
+                owner_sender_id: Some("sender".into()),
+                enabled: true,
+                config_json: "{}".into(),
+            },
+            None,
+            1,
+        )
+        .await
+        .unwrap();
+        let inbox = store::claim_inbox(
+            &db,
+            &store::BridgeInboxInput {
+                platform: "qq".into(),
+                connector_id: "c".into(),
+                conversation_id: "dm".into(),
+                conversation_kind: store::ConversationKind::Dm,
+                message_id: "platform-message".into(),
+                sender_id: "sender".into(),
+                payload_json:
+                    serde_json::json!({"text":"真实消息","replyContext":{"isGroup":false}})
+                        .to_string(),
+                attachments: vec![],
+            },
+            1,
+            2,
+        )
+        .await
+        .unwrap()
+        .inbox;
+        let principal = Principal::bridge_actor("qq", "c", "sender").unwrap();
+        let sid = inbox.session_id.as_deref().unwrap();
+        db.ensure_session_seed(vec![SessionRow {
+            session_id: sid.into(),
+            agent_id: "agent".into(),
+            owner_user_id: principal.user_id.clone().unwrap(),
+            title: "Bridge".into(),
+            created_at_unix_ms: 2,
+        }])
+        .await
+        .unwrap();
+        store::prepare_inbox_session(&db, &inbox.id, 1, sid, &[], 3)
+            .await
+            .unwrap();
+        let ctx = RunContext {
+            principal: kernel_principal_of(&principal),
+            session_id: SessionId::new(sid),
+            run_id: RunId::new("actual-prior-run"),
+            attempt: lingxi_protocol::AttemptId::new("actual-prior-run#a1"),
+            generation: 1,
+        };
+        db.record_run_started(&ctx, 4).await.unwrap();
+        db.record_run_lineage(
+            &ctx,
+            RunLineage {
+                parent_run_id: None,
+                origin: RunOrigin::Bridge,
+                cause_id: Some(inbox.id.clone()),
+                source_message_id: Some(inbox.input.message_id.clone()),
+            },
+            4,
+        )
+        .await
+        .unwrap();
+        db.close().await.unwrap();
+        let db = std::sync::Arc::new(
+            RunDatabase::open(&path, StoreOptions::default())
+                .await
+                .unwrap(),
+        );
+        let sessions = std::sync::Arc::new(SessionStore::new((*db).clone()));
+        let events = std::sync::Arc::new(
+            EventService::new(db.clone(), sessions.clone(), EventLimits::default()).unwrap(),
+        );
+        let result = sessions
+            .execute_bridge_for(
+                &db,
+                &events,
+                &std::sync::Arc::new(supervisor()),
+                &crate::background::BackgroundDriveRegistry::new(),
+                &principal,
+                sid,
+                "真实消息",
+                None,
+                &inbox.id,
+                &inbox.input.message_id,
+                lingxi_protocol::BridgeRole::Owner,
+                SessionPermissionMode::Ask,
+                None,
+                5,
+            )
+            .await;
+        assert!(
+            matches!(result,Err(SessionExecuteError::RequestIdBoundToEarlierRun{run_id,..}) if run_id=="actual-prior-run")
+        );
+        assert_eq!(db.count_runs(sid).await.unwrap(), 1);
+        drop(events);
+        drop(sessions);
+        db.close().await.unwrap();
+        std::fs::remove_dir_all(home).unwrap();
     }
 
     #[allow(unused)]

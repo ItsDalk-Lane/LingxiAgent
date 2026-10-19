@@ -1,0 +1,24 @@
+{
+  "files": [
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce2-diagnosis-scenes/lingxi-r07-mcp-session-permission-d50fc7df57a0c51d/mcp-calls.jsonl",
+      "sha256": "6ee309e7fba5c65d9eb8de4321d96c3ddf02b27ae3358d5ad8a798c773c25e33",
+      "bytes": 130,
+      "copyMethod": "only synthetic external MCP calls fixture bytes"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce2-diagnosis-scenes/lingxi-r07-mcp-session-permission-d50fc7df57a0c51d/runs.snapshot.db",
+      "sha256": "20af5b2256fff2d20875b2b950f5f74879cfefadd091901a929326487aa3d8d0",
+      "bytes": 839680,
+      "copyMethod": "SQLite read-only backup API"
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-reproduce2-diagnosis-scenes/lingxi-r07-mcp-session-permission-09c9fead172df5c0/runs.snapshot.db",
+      "sha256": "ccc7bc46cf0087f6a103e35927512dba6aa49f06b3b0e15f356d887ae9fc1aba",
+      "bytes": 802816,
+      "copyMethod": "SQLite read-only backup API"
+    }
+  ],
+  "secretFilesCopied": false,
+  "notes": "仅两自有合成fixture的数据库一致快照与MCP调用文件；未复制凭证/令牌/账号配置。"
+}

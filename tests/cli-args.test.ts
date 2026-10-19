@@ -46,9 +46,10 @@ describe("CLI args", () => {
     });
   });
 
-  it("selects Rust only when explicitly requested", () => {
-    expect(parseCliArgs(["status"])).toMatchObject({ runtime: "node" });
+  it("defaults to Rust and keeps an explicit node fallback", () => {
+    expect(parseCliArgs(["status"])).toMatchObject({ runtime: "rust" });
     expect(parseCliArgs(["status", "--runtime", "rust"])).toMatchObject({ runtime: "rust" });
+    expect(parseCliArgs(["status", "--runtime", "node"])).toMatchObject({ runtime: "node" });
     expect(() => parseCliArgs(["status", "--runtime", "invalid"])).toThrow("--runtime must be one of");
   });
 

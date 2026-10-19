@@ -1,0 +1,18 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx (12 tests | 1 failed) 1272ms
+     × shows the first sidebar read failure and retries before enabling the control 1061ms
+ ❯ desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx (14 tests | 3 failed) 1572ms
+     × keeps saved shortcut after rejected-result from the system reload 26ms
+     × keeps saved shortcut after thrown-error from the system reload 12ms
+     × keeps persisted defaults and reports reset reload ok:false as an error 1017ms
+ ❯ desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx (5 tests | 2 failed) 2175ms
+     × shows the first archive read failure with retry instead of no backups 1022ms
+     × keeps the last actual archive list when a later read fails 1046ms
+
+ Test Files  3 failed (3)
+      Tests  6 failed | 25 passed (31)
+   Start at  18:17:55
+   Duration  3.02s (transform 618ms, setup 130ms, import 1.17s, tests 5.02s, environment 797ms)
+

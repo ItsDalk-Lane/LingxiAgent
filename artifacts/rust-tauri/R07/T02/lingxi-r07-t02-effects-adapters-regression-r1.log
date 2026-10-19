@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/feishu-adapter.test.ts (36 tests | 1 failed) 52ms
+     × declares Feishu CardKit rich streaming and updates markdown content by sequence 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/feishu-adapter.test.ts > createFeishuAdapter > declares Feishu CardKit rich streaming and updates markdown content by sequence
+AssertionError: expected { cardId: 'card_stream_001', …(4) } to deeply equal { cardId: 'card_stream_001', …(2) }
+
+- Expected
++ Received
+
+  {
+    "cardId": "card_stream_001",
+    "elementId": "hana_stream_markdown",
++   "messageId": null,
++   "missingMessageId": true,
+    "sequence": 5,
+  }
+
+ ❯ tests/feishu-adapter.test.ts:1034:19
+    1032|     await adapter.finishRichStreamReply("oc_chat", state, "final");
+    1033|
+    1034|     expect(state).toEqual({
+       |                   ^
+    1035|       cardId: "card_stream_001",
+    1036|       elementId: "hana_stream_markdown",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 56 passed (57)
+   Start at  02:52:56
+   Duration  533ms (transform 245ms, setup 61ms, import 299ms, tests 447ms, environment 0ms)
+

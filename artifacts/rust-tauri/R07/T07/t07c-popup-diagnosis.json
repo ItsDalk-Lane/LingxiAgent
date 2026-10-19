@@ -1,0 +1,24 @@
+{
+  "candidate": "t07c",
+  "name": "popup-diagnosis",
+  "command": [
+    "python3",
+    "artifacts/rust-tauri/R07/T07/evidence-tools/diagnose_browser_popup.py"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T03:25:47.772370+00:00",
+  "sourceFingerprint": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "log": "t07c-popup-diagnosis.log",
+  "endedAt": "2026-10-18T03:25:56.919273+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "f634f22f7b072c7d258b6dfaf48014c5d0a863ee8aa0fab3f123203a94bbcabe",
+  "logSha256": "45effc938382c469776ab8c38c8be7ef10ae028b24ab806d359a705459ef8395",
+  "baseCommitAfter": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceUnchanged": true
+}

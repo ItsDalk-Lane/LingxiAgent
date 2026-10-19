@@ -5,7 +5,7 @@ use crate::{
     resourceio::{ResourceIoError, ResourceRef},
 };
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{json, Map, Value};
 use std::{
     path::{Path, PathBuf},
     sync::Arc,
@@ -209,6 +209,9 @@ impl MountProvider {
     }
 }
 impl MountLease {
+    pub(crate) fn id(&self) -> &str {
+        &self.id
+    }
     pub(crate) fn root(&self) -> &Path {
         &self.root
     }
@@ -308,4 +311,350 @@ impl MountLease {
         }
         Ok(value)
     }
+}
+
+// ── 注册表写路径（现役 core/studio-mounts.ts 平价）──
+//
+// 校验/规范化/原子写逐条对齐 ensureStudioMountRegistry / loadStudioMountRegistry /
+// upsertStudioMount / disableStudioMount / listStudioMountsForStudio /
+// validateStudioMount(Registry) / normalizeMountCapabilities：
+// - 文件缺失时创建空登记（读路径 MountProvider 的 unsupported_provider 语义只服务
+//   于挂载解析，不服务于工作台列表面）；
+// - upsert 规范化只保留已知键并丢掉未知键；disable 保留该挂载的全部既有键；
+// - 写盘为 JSON 两空格缩进 + 尾换行 + 原子替换（tmp+rename）。
+
+const SOURCE_KINDS: [&str; 2] = ["storage", "studio"];
+const STORAGE_PROVIDERS: [&str; 5] = ["local_fs", "webdav", "s3", "google_drive", "hana_cloud"];
+const PRESENTATIONS: [&str; 3] = ["folder", "external_panel", "linked_studio"];
+const STATUSES: [&str; 2] = ["active", "disabled"];
+const CAPABILITIES: [&str; 6] = ["list", "read", "write", "watch", "materialize", "execute"];
+/// 与 MountProvider::mount 的读取上限一致：写出不得超过读取可承载。
+const REGISTRY_MOUNT_CAP: usize = 4096;
+
+fn registry_error(message: impl Into<String>) -> ResourceIoError {
+    // 现役校验失败抛裸 Error，路由层落 400 studio_workspace_failed。
+    error(400, "studio_workspace_failed", message)
+}
+
+fn iso_now(now_ms: u64) -> String {
+    chrono::DateTime::from_timestamp_millis(now_ms as i64)
+        .unwrap_or_default()
+        .to_rfc3339_opts(chrono::SecondsFormat::Millis, true)
+}
+
+fn non_empty(value: &Value) -> Option<&str> {
+    value.as_str().filter(|s| !s.trim().is_empty())
+}
+
+/// validateStudioMount 的校验段（不写回规范化结果）。
+fn validate_mount(value: &Value) -> Result<(), ResourceIoError> {
+    let obj = value
+        .as_object()
+        .ok_or_else(|| registry_error("invalid studio mount: expected object"))?;
+    if value.get("schemaVersion") != Some(&json!(1)) {
+        return Err(registry_error(
+            "invalid studio mount: schemaVersion must be 1",
+        ));
+    }
+    for field in ["mountId", "hostStudioId", "label"] {
+        if non_empty(&value[field]).is_none() {
+            return Err(registry_error(format!("{field} required")));
+        }
+    }
+    let source_kind = value["sourceKind"].as_str().unwrap_or("");
+    if !SOURCE_KINDS.contains(&source_kind) {
+        return Err(registry_error(format!(
+            "sourceKind must be one of {}",
+            SOURCE_KINDS.join(", ")
+        )));
+    }
+    if !PRESENTATIONS.contains(&value["presentation"].as_str().unwrap_or("")) {
+        return Err(registry_error(format!(
+            "presentation must be one of {}",
+            PRESENTATIONS.join(", ")
+        )));
+    }
+    if !STATUSES.contains(&value["status"].as_str().unwrap_or("")) {
+        return Err(registry_error(format!(
+            "status must be one of {}",
+            STATUSES.join(", ")
+        )));
+    }
+    let capabilities = value["capabilities"]
+        .as_array()
+        .filter(|list| !list.is_empty())
+        .ok_or_else(|| registry_error("capabilities must be a non-empty array"))?;
+    for capability in capabilities {
+        if !CAPABILITIES.contains(&capability.as_str().unwrap_or("")) {
+            return Err(registry_error(format!(
+                "unknown mount capability: {}",
+                capability.as_str().unwrap_or("<non-string>")
+            )));
+        }
+    }
+    if source_kind == "storage" {
+        if !STORAGE_PROVIDERS.contains(&value["provider"].as_str().unwrap_or("")) {
+            return Err(registry_error(format!(
+                "provider must be one of {}",
+                STORAGE_PROVIDERS.join(", ")
+            )));
+        }
+    } else {
+        for field in ["sourceStudioId", "sourceResourceId", "grantId"] {
+            if non_empty(&value[field]).is_none() {
+                return Err(registry_error(format!("{field} required")));
+            }
+        }
+        if value["sourceStudioId"] == value["hostStudioId"] {
+            return Err(registry_error(
+                "Studio mount cannot point at its own hostStudioId",
+            ));
+        }
+    }
+    let _ = obj;
+    Ok(())
+}
+
+fn validate_registry(value: &Value) -> Result<(), ResourceIoError> {
+    if !value.is_object() {
+        return Err(registry_error(
+            "invalid studio-mounts.json: expected object",
+        ));
+    }
+    if value.get("schemaVersion") != Some(&json!(1)) {
+        return Err(registry_error(
+            "invalid studio-mounts.json: schemaVersion must be 1",
+        ));
+    }
+    let mounts = value["mounts"]
+        .as_array()
+        .ok_or_else(|| registry_error("invalid studio-mounts.json: mounts must be an array"))?;
+    if mounts.len() > REGISTRY_MOUNT_CAP {
+        return Err(registry_error(
+            "invalid studio-mounts.json: mounts too many",
+        ));
+    }
+    let mut seen = std::collections::HashSet::new();
+    for mount in mounts {
+        validate_mount(mount)?;
+        if !seen.insert(mount["mountId"].as_str().unwrap_or("").to_owned()) {
+            return Err(registry_error(format!(
+                "invalid studio-mounts.json: duplicate mountId {}",
+                mount["mountId"].as_str().unwrap_or("")
+            )));
+        }
+    }
+    Ok(())
+}
+
+/// validateStudioMount 的规范化段：只保留已知键，capabilities 按目录序去重。
+fn normalize_mount_for_write(value: &Value, now: &str) -> Result<Value, ResourceIoError> {
+    let capabilities = value["capabilities"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    let mut seen = std::collections::HashSet::new();
+    for capability in &capabilities {
+        if let Some(c) = capability.as_str() {
+            seen.insert(c.to_owned());
+        }
+    }
+    let normalized_caps: Vec<Value> = CAPABILITIES
+        .iter()
+        .filter(|c| seen.contains(**c))
+        .map(|c| json!(c))
+        .collect();
+    let mut out = Map::new();
+    out.insert("schemaVersion".into(), json!(1));
+    for field in [
+        "mountId",
+        "hostStudioId",
+        "sourceKind",
+        "label",
+        "presentation",
+    ] {
+        out.insert(field.into(), value[field].clone());
+    }
+    out.insert("capabilities".into(), json!(normalized_caps));
+    out.insert(
+        "grantId".into(),
+        value.get("grantId").cloned().unwrap_or(Value::Null),
+    );
+    out.insert(
+        "status".into(),
+        value
+            .get("status")
+            .filter(|s| !s.is_null())
+            .cloned()
+            .unwrap_or_else(|| json!("active")),
+    );
+    out.insert(
+        "createdAt".into(),
+        value
+            .get("createdAt")
+            .and_then(|v| v.as_str().map(String::from))
+            .map(Value::String)
+            .unwrap_or_else(|| json!(now)),
+    );
+    out.insert(
+        "updatedAt".into(),
+        value
+            .get("updatedAt")
+            .and_then(|v| v.as_str().map(String::from))
+            .map(Value::String)
+            .unwrap_or_else(|| json!(now)),
+    );
+    if value["sourceKind"].as_str() == Some("storage") {
+        out.insert("provider".into(), value["provider"].clone());
+        if let Some(locator) = value.get("rootLocator") {
+            out.insert("rootLocator".into(), locator.clone());
+        }
+    } else {
+        for field in ["sourceStudioId", "sourceResourceId"] {
+            out.insert(field.into(), value[field].clone());
+        }
+    }
+    let out = Value::Object(out);
+    validate_mount(&out)?;
+    Ok(out)
+}
+
+/// studio-mounts.json 的读写台（现役 studio-mounts.ts 的加载/ upsert / disable / 列举）。
+pub(crate) struct MountRegistry<'a> {
+    home: &'a Path,
+}
+
+impl<'a> MountRegistry<'a> {
+    pub(crate) fn new(home: &'a Path) -> Self {
+        Self { home }
+    }
+    fn path(&self) -> PathBuf {
+        self.home.join("studio-mounts.json")
+    }
+    fn read_present(&self) -> Result<Option<Value>, ResourceIoError> {
+        let path = self.path();
+        let bytes = match std::fs::read(&path) {
+            Ok(bytes) => bytes,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(e) => {
+                return Err(registry_error(format!(
+                    "failed to read studio-mounts.json: {e}"
+                )))
+            }
+        };
+        let value: Value = serde_json::from_slice(&bytes)
+            .map_err(|e| registry_error(format!("invalid studio-mounts.json: {e}")))?;
+        Ok(Some(value))
+    }
+    fn write(&self, registry: &Value) -> Result<(), ResourceIoError> {
+        validate_registry(registry)?;
+        let mut text = serde_json::to_string_pretty(registry)
+            .map_err(|e| registry_error(format!("登记序列化失败：{e}")))?;
+        text.push('\n');
+        crate::paths::atomic_write(&self.path(), text.as_bytes())
+            .map_err(|e| registry_error(format!("failed to write studio-mounts.json: {e}")))
+    }
+    /// ensureStudioMountRegistry + loadStudioMountRegistry：缺失则创建空登记。
+    pub(crate) fn load_or_create(&self, now_ms: u64) -> Result<Value, ResourceIoError> {
+        if let Some(current) = self.read_present()? {
+            validate_registry(&current)?;
+            return Ok(current);
+        }
+        let now = iso_now(now_ms);
+        let created = json!({"schemaVersion":1,"mounts":[],"createdAt":now,"updatedAt":now});
+        self.write(&created)?;
+        Ok(created)
+    }
+    pub(crate) fn list_for_studio(
+        &self,
+        studio: &str,
+        now_ms: u64,
+    ) -> Result<Vec<Value>, ResourceIoError> {
+        if studio.trim().is_empty() {
+            return Err(registry_error("hostStudioId required"));
+        }
+        let registry = self.load_or_create(now_ms)?;
+        Ok(registry["mounts"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|mount| mount["hostStudioId"].as_str() == Some(studio))
+            .collect())
+    }
+    /// upsertStudioMount：同 mountId 覆盖（createdAt 沿用旧值），否则追加。
+    pub(crate) fn upsert(&self, mount: Value, now_ms: u64) -> Result<Value, ResourceIoError> {
+        let now = iso_now(now_ms);
+        let mut mount = mount;
+        mount["schemaVersion"] = json!(1);
+        if mount.get("status").is_none_or(Value::is_null) {
+            mount["status"] = json!("active");
+        }
+        let normalized = normalize_mount_for_write(&mount, &now)?;
+        let mut registry = self.load_or_create(now_ms)?;
+        let mounts = registry["mounts"]
+            .as_array_mut()
+            .ok_or_else(|| registry_error("invalid studio-mounts.json: mounts must be an array"))?;
+        let existing = mounts
+            .iter()
+            .position(|item| item["mountId"] == normalized["mountId"]);
+        let stored = if let Some(index) = existing {
+            let created_at = mounts[index]
+                .get("createdAt")
+                .and_then(|v| v.as_str().map(String::from))
+                .unwrap_or_else(|| normalized["createdAt"].as_str().unwrap_or(&now).into());
+            let mut next = normalized.clone();
+            next["createdAt"] = json!(created_at);
+            next["updatedAt"] = json!(now);
+            mounts[index] = next.clone();
+            next
+        } else {
+            mounts.push(normalized.clone());
+            normalized
+        };
+        registry["updatedAt"] = json!(now);
+        self.write(&registry)?;
+        Ok(stored)
+    }
+    /// disableStudioMount：仅翻 status=disabled，保留该挂载全部既有键。
+    pub(crate) fn disable(
+        &self,
+        mount_id: &str,
+        host_studio: Option<&str>,
+        now_ms: u64,
+    ) -> Result<Value, ResourceIoError> {
+        if mount_id.trim().is_empty() {
+            return Err(registry_error("mountId required"));
+        }
+        let now = iso_now(now_ms);
+        let mut registry = self.load_or_create(now_ms)?;
+        let mounts = registry["mounts"]
+            .as_array_mut()
+            .ok_or_else(|| registry_error("invalid studio-mounts.json: mounts must be an array"))?;
+        let Some(index) = mounts.iter().position(|item| {
+            item["mountId"].as_str() == Some(mount_id)
+                && host_studio.is_none_or(|studio| item["hostStudioId"].as_str() == Some(studio))
+        }) else {
+            return Err(registry_error(format!(
+                "studio mount not found: {mount_id}"
+            )));
+        };
+        mounts[index]["status"] = json!("disabled");
+        mounts[index]["updatedAt"] = json!(now);
+        let stored = mounts[index].clone();
+        registry["updatedAt"] = json!(now);
+        self.write(&registry)?;
+        Ok(stored)
+    }
+}
+
+/// localFsMountId：sha256(`${studioId}\0${rootPath}`) 前 16 个 hex。
+pub(crate) fn local_fs_mount_id(studio: &str, root_path: &str) -> String {
+    use sha2::Digest as _;
+    let digest = sha2::Sha256::digest(format!("{studio}\0{root_path}").as_bytes());
+    let mut hex = String::with_capacity(16);
+    for byte in &digest[..8] {
+        hex.push_str(&format!("{byte:02x}"));
+    }
+    format!("local_fs_{hex}")
 }

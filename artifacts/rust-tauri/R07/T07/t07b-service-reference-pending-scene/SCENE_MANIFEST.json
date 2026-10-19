@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "candidate": "t07b",
+  "status": "RAW_SYNTHETIC_FAILURE_SCENE_PRESERVED",
+  "sourceFixtureHome": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-71416-1792292362805725000/home",
+  "preservedAt": "2026-10-18T03:05:52.152153+00:00",
+  "testId": "r06_agent_settings_live::native_pending_reference_deletion_current_electron_shows_and_retries_truthfully",
+  "sourceFingerprint": "7192fa54c9f314384b04f7b76453d3ae7917983801471fcb47db1dabe2d52a2b",
+  "scope": "仅本地合成fixture的原UI JSON、真实删除receipt、preferences原字节；不复制真实账号或本机其他数据。",
+  "files": [
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-71416-1792292362805725000/home/ui-result.json",
+      "copy": "artifacts/rust-tauri/R07/T07/t07b-service-reference-pending-scene/ui-result.json",
+      "bytes": 7175,
+      "mode": "0o644",
+      "sha256": "b912f76c37247af49b7564dc0af31b213a491fec51a67954dae5d7702677fc09",
+      "copySha256": "b912f76c37247af49b7564dc0af31b213a491fec51a67954dae5d7702677fc09"
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-71416-1792292362805725000/home/user/preferences.json",
+      "copy": "artifacts/rust-tauri/R07/T07/t07b-service-reference-pending-scene/user/preferences.json",
+      "bytes": 171,
+      "mode": "0o644",
+      "sha256": "c4fa39e389bd7df7987beda1e651df0f114822d9037665049f67cc6a3aa43aa0",
+      "copySha256": "c4fa39e389bd7df7987beda1e651df0f114822d9037665049f67cc6a3aa43aa0"
+    },
+    {
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-71416-1792292362805725000/home/lingxi-service/agent-deletions/delete-71416-1792292393351354000-2/receipt.json",
+      "copy": "artifacts/rust-tauri/R07/T07/t07b-service-reference-pending-scene/lingxi-service/agent-deletions/delete-71416-1792292393351354000-2/receipt.json",
+      "bytes": 441,
+      "mode": "0o644",
+      "sha256": "1f93049fe41b311b8f8d80501872e38fdeb49f529c334ed53b32926a5cd2c078",
+      "copySha256": "1f93049fe41b311b8f8d80501872e38fdeb49f529c334ed53b32926a5cd2c078"
+    }
+  ],
+  "actualObservation": "Electron页面未出现预期引用清理pending提示，出现至少保留一个助手；原UI failureMessages完整保留。服务门禁尚在跑无最终退出，原因仍由独立审阅定位，不先归咎产品或夹具。"
+}

@@ -92,9 +92,9 @@ use std::time::{Duration, Instant};
 use serde_json::{json, Value};
 
 use crate::stage_map::{
-    is_stage_neutral_kind, LeafDeferredCase, StageMap, SupplementalLeaf, BASIS_AUTH_PRIMITIVE_ONLY,
-    BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_LATER_STAGE, BASIS_DEFERRED_TO_R07,
-    BASIS_FULL_ORIGINAL_BEHAVIOR, BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED,
+    is_stage_neutral_kind, LeafAssertionContract, LeafDeferredCase, StageMap, SupplementalLeaf,
+    BASIS_AUTH_PRIMITIVE_ONLY, BASIS_CLIENT_ONLY_STAGE_CONFLICT, BASIS_DEFERRED_TO_LATER_STAGE,
+    BASIS_DEFERRED_TO_R07, BASIS_FULL_ORIGINAL_BEHAVIOR, BASIS_PROTOCOL, BASIS_R02_SHARE_SATISFIED,
     BASIS_REQUIRED_BEHAVIOR_PENDING, BASIS_ROUTE_PRESENT_STATIC, BASIS_STAGE_SHARE_SATISFIED,
 };
 use crate::RESULT_VERSION;
@@ -446,6 +446,19 @@ fn check_leaf_assertion_contract(
             "assertion contract missing (parser invariant violated — failing closed)".to_string(),
         );
     };
+    check_assertion_contract(contract, outcomes, repo_root, evidence_root)
+}
+
+/// 逐断言合同核对核心（R07-T12 提取，叶与基础场景共用）：生产者必须
+/// 本轮通过；证据文件必须存在、schema 正确、整份记录全部成立；图钉
+/// 案例逐条核对实际值。这只能证明案例数值，不能自行证明案例观察到
+/// 了 R00 原行为；语义缺口由叶项/场景汇总另行阻断。
+fn check_assertion_contract(
+    contract: &LeafAssertionContract,
+    outcomes: &[CommandOutcome],
+    repo_root: &Path,
+    evidence_root: &Path,
+) -> (Vec<Value>, String) {
     // The producer must have PASSED this run. (The refs check below already
     // covers it since the parser forces producer ∈ refs, but the contract
     // check names the producer explicitly.)
@@ -688,14 +701,137 @@ fn observe_deferred_case(
     })
 }
 
+/// 阶段序（"R07" → 7）；无法解析返回 None。
+fn stage_ordinal(stage: &str) -> Option<u32> {
+    stage.strip_prefix('R')?.parse().ok()
+}
+
 /// The stages after `stage` this leaf's acceptance also belongs to
 /// (derived from the mirrored R00 execution_stage_ids — never invented).
+/// R07-T12：语义修正为「真正后续」——按阶段序比较，早于本阶段的条目
+/// 不再列入。此函数也用于 R02—R06 的结果文本；已验收结果文件不回改，
+/// 修正只影响未来运行。无法解析阶段序时保留原「非本阶段即列入」的
+/// 呈现（响亮呈现，不猜）。
 fn later_stages_of(leaf: &SupplementalLeaf, stage: &str) -> Vec<String> {
+    let current = stage_ordinal(stage);
     leaf.r00_execution_stage_ids
         .iter()
-        .filter(|id| id.as_str() != stage)
+        .filter(|id| match (stage_ordinal(id), current) {
+            (Some(other), Some(cur)) => other > cur,
+            _ => id.as_str() != stage,
+        })
         .cloned()
         .collect()
+}
+
+/// R07-T12 基础场景集合核对（opt-in）：地图任一场景声明 specMirror 即
+/// 表示该地图声称全量基础保真——R00 ACCEPTANCE_MAP 中 kind=="base" 且
+/// stage_id==本阶段的集合必须与地图 scenarios 全等，且每个场景都须
+/// 携带镜像并逐字段等于原账（name/given/when/then/evidence/environment
+/// 取 spec 子对象，task_ids/feature_ids/ledger_status 取顶层字段）。
+/// 未声明镜像的地图（R02—R06）不走此核对，历史门禁行为不变。
+fn check_base_scenario_set(map: &StageMap, repo_root: &Path) -> Result<(), String> {
+    if !map.scenarios.iter().any(|s| s.spec_mirror.is_some()) {
+        return Ok(());
+    }
+    let path = repo_root.join(R00_ACCEPTANCE_MAP_PATH);
+    let text = std::fs::read_to_string(&path).map_err(|e| {
+        format!(
+            "cannot read the R00 acceptance ledger {}: {e} (base scenario set \
+             check fails closed)",
+            path.display()
+        )
+    })?;
+    let value: Value = serde_json::from_str(&text).map_err(|e| {
+        format!("R00 acceptance ledger {} is not valid JSON: {e}", path.display())
+    })?;
+    let scenarios = value
+        .get("scenarios")
+        .and_then(Value::as_object)
+        .ok_or_else(|| format!("R00 acceptance ledger {} has no scenarios object", path.display()))?;
+    let mut expected: Vec<(&String, &Value)> = scenarios
+        .iter()
+        .filter(|(_, entry)| {
+            entry.get("kind").and_then(Value::as_str) == Some("base")
+                && entry.get("stage_id").and_then(Value::as_str) == Some(map.stage.as_str())
+        })
+        .collect();
+    expected.sort_by(|a, b| a.0.cmp(b.0));
+    let expected_ids: Vec<&str> = expected.iter().map(|(id, _)| id.as_str()).collect();
+    let mut declared_ids: Vec<&str> = map.scenarios.iter().map(|s| s.id.as_str()).collect();
+    declared_ids.sort();
+    if declared_ids != expected_ids {
+        return Err(format!(
+            "base scenario set mismatch for stage {}: map declares {:?} but the R00 \
+             ledger binds {:?} — a map claiming base fidelity (specMirror) can neither \
+             drop nor invent base scenarios",
+            map.stage, declared_ids, expected_ids
+        ));
+    }
+    for (id, entry) in expected {
+        let scenario = map
+            .scenarios
+            .iter()
+            .find(|s| s.id == *id)
+            .expect("set equality checked above");
+        let Some(mirror) = scenario.spec_mirror.as_ref() else {
+            return Err(format!(
+                "base scenario {id:?} has no specMirror while the map claims base \
+                 fidelity — every base scenario must mirror its R00 spec"
+            ));
+        };
+        let spec = entry
+            .get("spec")
+            .and_then(Value::as_object)
+            .ok_or_else(|| format!("R00 ledger base scenario {id:?} has no spec object"))?;
+        let mut field_diffs: Vec<String> = Vec::new();
+        for (key, actual) in [
+            ("name", &mirror.name),
+            ("given", &mirror.given),
+            ("when", &mirror.when),
+            ("then", &mirror.then),
+            ("evidence", &mirror.evidence),
+            ("environment", &mirror.environment),
+        ] {
+            let wanted = spec.get(key).and_then(Value::as_str).unwrap_or("");
+            if wanted != actual {
+                field_diffs.push(format!("{key}: map={actual:?} r00={wanted:?}"));
+            }
+        }
+        let wanted_status = entry.get("ledger_status").and_then(Value::as_str).unwrap_or("");
+        if wanted_status != mirror.ledger_status {
+            field_diffs.push(format!(
+                "ledger_status: map={:?} r00={wanted_status:?}",
+                mirror.ledger_status
+            ));
+        }
+        for key in ["task_ids", "feature_ids"] {
+            let wanted: Vec<String> = entry
+                .get(key)
+                .and_then(Value::as_array)
+                .map(|list| {
+                    list.iter()
+                        .filter_map(|v| v.as_str().map(str::to_string))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let actual = if key == "task_ids" {
+                &mirror.task_ids
+            } else {
+                &mirror.feature_ids
+            };
+            if *actual != wanted {
+                field_diffs.push(format!("{key}: map={actual:?} r00={wanted:?}"));
+            }
+        }
+        if !field_diffs.is_empty() {
+            return Err(format!(
+                "base scenario {id:?} specMirror drifted from the R00 ledger: {}",
+                field_diffs.join("; ")
+            ));
+        }
+    }
+    Ok(())
 }
 
 fn roll_up_supplemental_leaf(
@@ -1746,6 +1882,8 @@ where
     // afterwards would waste a run and, worse, let a doctored map lean on
     // the runner's legitimacy for the parts it did declare.
     let r00_expected = cross_check_supplemental_coverage(map, repo_root)?;
+    // R07-T12：基础场景集合核对（地图声明 specMirror 才启用，历史地图不变）。
+    check_base_scenario_set(map, repo_root)?;
 
     // F04: one verify run writes one FRESH evidence root. A non-empty root
     // means stale evidence from an earlier run could mask this one — the
@@ -1885,18 +2023,32 @@ where
         .scenarios
         .iter()
         .map(|scenario| {
-            let passed = scenario.command_refs.iter().all(|key| {
+            let refs_passed = scenario.command_refs.iter().all(|key| {
                 outcomes
                     .iter()
                     .find(|o| &o.key == key)
                     .is_some_and(|o| o.passed())
             });
-            json!({
+            // R07-T12：声明了逐断言合同的基础场景，命令全绿之外还须合同
+            // 案例逐条成立（命令退出 0 从来不是原断言的替身）。未声明合同
+            // 的场景（R02—R06）输出形状与判定保持原样。
+            let mut entry = json!({
                 "id": scenario.id,
                 "requirement": scenario.requirement,
                 "commandRefs": scenario.command_refs,
-                "status": if passed { "PASS" } else { "FAIL" },
-            })
+            });
+            let mut passed = refs_passed;
+            if let Some(contract) = scenario.assertion_contract.as_ref() {
+                let (results, failures) =
+                    check_assertion_contract(contract, &outcomes, repo_root, evidence_root);
+                if !failures.is_empty() {
+                    passed = false;
+                    entry["reason"] = json!(failures);
+                }
+                entry["assertionResults"] = json!(results);
+            }
+            entry["status"] = json!(if passed { "PASS" } else { "FAIL" });
+            entry
         })
         .collect();
 
@@ -2048,6 +2200,106 @@ where
             supplemental_total
         ));
     }
+    // R07-T12 扩展边界：每项 PASS 当其 commandRefs 全部通过；任一不过
+    // 即 FAIL 并阻断 overall。不并入补充叶集合计数。
+    let extension_json: Vec<Value> = map
+        .extension_boundaries
+        .iter()
+        .map(|boundary| {
+            let passed = boundary.command_refs.iter().all(|key| {
+                outcomes
+                    .iter()
+                    .find(|o| &o.key == key)
+                    .is_some_and(|o| o.passed())
+            });
+            json!({
+                "featureId": boundary.feature_id,
+                "requirement": boundary.requirement,
+                "commandRefs": boundary.command_refs,
+                "note": boundary.note,
+                "status": if passed { "PASS" } else { "FAIL" },
+            })
+        })
+        .collect();
+    let extensions_pass = extension_json.iter().all(|e| e["status"] == "PASS");
+
+    // R07-T12 移交汇总：每项状态 = 对应补充叶本轮状态的透镜视图，不
+    // 新增门禁（408 叶未覆盖已由 supplemental_covered 阻断 overall，
+    // 移交不重复计数）。声明即核对数量承诺：handoverItems 恰好 35
+    // （R04 规划继承的权威清单）、priorStageDeferred 恰好 43（R02—R04
+    // 地图递延声明的合并数）；仅声明了对应段的地图受此约束。
+    if !map.handover_items.is_empty() && map.handover_items.len() != 35 {
+        return Err(format!(
+            "handoverItems declares {} items but the R07 commitment is exactly \
+             35 — failing closed",
+            map.handover_items.len()
+        ));
+    }
+    if !map.prior_stage_deferred.is_empty() && map.prior_stage_deferred.len() != 43 {
+        return Err(format!(
+            "priorStageDeferred declares {} items but the R02—R06 maps defer \
+             exactly 43 leaves to R07 — failing closed",
+            map.prior_stage_deferred.len()
+        ));
+    }
+    let leaf_status = |id: &str| -> Value {
+        supplemental_json
+            .iter()
+            .find(|entry| entry["id"] == id)
+            .map(|entry| entry["status"].clone())
+            .unwrap_or(Value::Null)
+    };
+    let handover_json: Vec<Value> = map
+        .handover_items
+        .iter()
+        .map(|item| {
+            json!({
+                "id": item.id,
+                "featureId": item.feature_id,
+                "executionStageIds": item.execution_stage_ids,
+                "note": item.note,
+                "leafStatus": leaf_status(&item.id),
+            })
+        })
+        .collect();
+    let prior_json: Vec<Value> = map
+        .prior_stage_deferred
+        .iter()
+        .map(|item| {
+            json!({
+                "id": item.id,
+                "sourceStages": item.source_stages,
+                "r00ExecutionStageIds": item.execution_stage_ids,
+                "note": item.note,
+                "leafStatus": leaf_status(&item.id),
+            })
+        })
+        .collect();
+    let handover_completeness = json!({
+        "handoverItems": {
+            "declared": map.handover_items.len(),
+            "expected": 35,
+            "verifiedPass": handover_json.iter().filter(|h| h["leafStatus"] == "PASS").count(),
+            "gaps": handover_json
+                .iter()
+                .filter(|h| h["leafStatus"] != "PASS")
+                .map(|h| h["id"].clone())
+                .collect::<Vec<_>>(),
+        },
+        "priorStageDeferred": {
+            "declared": map.prior_stage_deferred.len(),
+            "expected": 43,
+            "verifiedPass": prior_json.iter().filter(|h| h["leafStatus"] == "PASS").count(),
+            "gaps": prior_json
+                .iter()
+                .filter(|h| h["leafStatus"] != "PASS")
+                .map(|h| h["id"].clone())
+                .collect::<Vec<_>>(),
+        },
+        "note": "移交是 408 补充叶的透镜视图：状态即叶本轮状态，不重复计数；\
+                 缺口清单随 overall 一并输出，35 项承诺在 408 内闭合。",
+    });
+
     // PASS∪DEFERRED 全覆盖才允许 overall PASS；deferred 集合与声明全等已
     // 上面核对。另：所有已执行命令必须全部通过——提前实现的
     // early-evidence 生产者（client/static 矩阵）失败仍是命令 FAIL，
@@ -2062,7 +2314,8 @@ where
 
     let overall_pass = scenario_json.iter().all(|s| s["status"] == "PASS")
         && supplemental_covered
-        && commands_not_passing.is_empty();
+        && commands_not_passing.is_empty()
+        && extensions_pass;
     let finished = crate::now_ms();
 
     Ok(json!({
@@ -2081,6 +2334,10 @@ where
         "commands": command_json,
         "scenarios": scenario_json,
         "supplementalLeafScenarios": supplemental_json,
+        "extensionBoundaries": extension_json,
+        "handoverCompleteness": handover_completeness,
+        "handoverItems": handover_json,
+        "priorStageDeferred": prior_json,
         "supplementalLeafCoverage": {
             "r00LedgerPath": R00_ACCEPTANCE_MAP_PATH,
             "r00FeatureStageAcceptancePath": R00_FEATURE_STAGE_ACCEPTANCE_PATH,

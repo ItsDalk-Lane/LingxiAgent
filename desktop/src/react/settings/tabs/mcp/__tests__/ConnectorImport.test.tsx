@@ -73,6 +73,26 @@ describe('ConnectorImport', () => {
     expect(screen.getByText('url is required')).toBeTruthy();
   });
 
+  it('shows saved queued imports as connecting without pretending their runtime already completed', async () => {
+    renderImport(vi.fn(async () => [{ ok: true, id: 'alpha', saved: true, runtimeApplied: false }]));
+    pasteAndParse(TWO_SERVERS);
+    fireEvent.click(screen.getByLabelText('beta'));
+    fireEvent.click(screen.getByText('settings.mcp.importConfirm:1'));
+    await screen.findByTestId('mcp-import-result');
+    expect(screen.getByText('settings.mcp.importItemOk · settings.mcp.statusConnecting')).toBeTruthy();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('keeps a saved connector visible as saved when its real runtime step failed', async () => {
+    renderImport(vi.fn(async () => [{ ok: true, id: 'alpha', saved: true, runtimeApplied: true },
+      { ok: false, id: 'beta', saved: true, runtimeApplied: false, error: 'fixture SDK failed' }]));
+    pasteAndParse(TWO_SERVERS);
+    fireEvent.click(screen.getByText('settings.mcp.importConfirm:2'));
+    await screen.findByTestId('mcp-import-result');
+    expect(screen.getByText('settings.transfer.savedNotApplied fixture SDK failed')).toBeTruthy();
+    expect(screen.getByText('beta')).toBeTruthy();
+  });
+
   it('keeps the per-item verdicts when the batch is refused as a whole', async () => {
     const failure = Object.assign(new Error('connector 2: url is required'), {
       results: [{ ok: true }, { ok: false, error: 'url is required' }],

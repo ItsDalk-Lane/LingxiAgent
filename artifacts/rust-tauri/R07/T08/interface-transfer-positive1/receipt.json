@@ -1,0 +1,38 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx",
+    "--testNamePattern=configured",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile.json=artifacts/rust-tauri/R07/T08/interface-transfer-positive1/vitest-results.json"
+  ],
+  "exitCode": 0,
+  "developmentOnly": true,
+  "formalAcceptance": false,
+  "selectedActualPasses": 1,
+  "otherCasesIntentionallyUnselected": 7,
+  "binary": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binaryBeforeSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryAfterSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryUnchanged": true,
+  "sourceBefore": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "c87478150b59c4f35a196e664a792d63df905442b3a06e99d9520681cdcb40bd",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "0d5ea0e10b96d38972a82d0a6acee33ca067e65309e6baa38f19de703800e5c0",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "12299c0bc6b5987684002cfd0a231e1f36113b3680874fbfb6ffbb3e5189f639",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "19332d5fd9fc761aa1434e03bda456124b3a3365bb4fb37f2b9a857996bdaab1",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "4b3f42514447ea22d51fdc01c414d28cc18d73a956c89f4371ac8bb61d7c7292"
+  },
+  "sourceAfter": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "c87478150b59c4f35a196e664a792d63df905442b3a06e99d9520681cdcb40bd",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "0d5ea0e10b96d38972a82d0a6acee33ca067e65309e6baa38f19de703800e5c0",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "12299c0bc6b5987684002cfd0a231e1f36113b3680874fbfb6ffbb3e5189f639",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "19332d5fd9fc761aa1434e03bda456124b3a3365bb4fb37f2b9a857996bdaab1",
+    "desktop/src/react/__tests__/services/r07-settings-entry-real-service.test.tsx": "4b3f42514447ea22d51fdc01c414d28cc18d73a956c89f4371ac8bb61d7c7292"
+  },
+  "trackedSourceUnchanged": true,
+  "stdoutSha256": "23607dcfd381fd4edac9de1dc4495e2d6bee7be8c43eab47d123a655798d5a05",
+  "stderrSha256": "34a7e7a815db680b184c04bb07091258d7272c130aa74599d80ed68643305978"
+}

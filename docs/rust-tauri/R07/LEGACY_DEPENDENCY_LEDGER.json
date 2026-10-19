@@ -1,0 +1,103 @@
+{
+  "schema": "lingxi.r07.legacy-dependency-ledger.v1",
+  "stage": "R07",
+  "generatedAt": "2026-10-19",
+  "baseCommit": "0c86675d4",
+  "note": "外围执行器与旧依赖逐条绑定：语言/位置/保留理由/能力边界/授权/退出策略/证据。不以语言为唯一淘汰理由；每条绑定真实证据或明确的未验边界。",
+  "items": [
+    {
+      "id": "LEGACY-PI-KERNEL",
+      "what": "旧 Pi 内核（Node 侧执行链）",
+      "language": "TypeScript/Node",
+      "where": "server/、core/（历史目录）；R07 起不再参与运行链",
+      "whyRemains": "已退役。A24 闭卷证明：无旧内核的最小产品目录下纯 Rust 链会话→真实执行→用量落账→观测可查，唯一出站 HTTP 为替身供应商（无任何旧服务地址）。",
+      "capabilityBoundary": "不得代理回旧内核；旧面路由不存在。",
+      "authorization": "本地隔离验证；真实账号/付费供应商未验。",
+      "exitStrategy": "已退出运行链；目录处置权留用户（不删除用户数据）。",
+      "evidence": ["artifacts/rust-tauri/R07/T09/t12-closure2.json"]
+    },
+    {
+      "id": "LEGACY-USER-PLUGINS",
+      "what": "数据根下旧用户插件目录 plugins/（第三方插件生态）",
+      "language": "JavaScript（旧引擎加载）",
+      "where": "{lingxiHome}/plugins",
+      "whyRemains": "R07-T11 退役加载：启动探测到残留只写结构化告知日志，不加载、不删除、不阻塞；处置权留用户（对齐旧引擎兼容提示行为）。",
+      "capabilityBoundary": "插件斜杠命令无注册入口，调度面响亮未知命令；/api/plugins/dev* 开发入口三身份全响亮拒绝（401/403/404）。",
+      "authorization": "本地隔离验证。",
+      "exitStrategy": "已退出加载链；告知日志引导用户自行处置。",
+      "evidence": ["artifacts/rust-tauri/R07/T09/t11-dev-unload3.json", "rust/crates/lingxi-service/src/legacy_plugins.rs"]
+    },
+    {
+      "id": "BRIDGE-SDK-WORKER-NODE",
+      "what": "五平台 Bridge SDK worker 进程（T02）",
+      "language": "TypeScript on Node（scripts/bridge-sdk-worker.ts）",
+      "where": "开发环境经 PATH 解析 node 执行仓库内 worker；安装包由桌面提供经包验证的路径",
+      "whyRemains": "平台官方 SDK 只有 Node 形态；Rust 服务经 stdio 协议驱动 worker，协议面已 Rust 化。",
+      "capabilityBoundary": "worker 只承载平台 SDK 会话；授权/存储/事件链在 Rust 侧。",
+      "authorization": "真实平台账号一收一留 DEFERRED_R10（未授权）。",
+      "exitStrategy": "平台提供 Rust 可用 SDK 前保留；worker 启动失败响亮报错不回退旧内核。",
+      "evidence": ["rust/crates/lingxi-service/src/bridge_worker.rs", "docs/rust-tauri/R07/T02_REPORT.md"]
+    },
+    {
+      "id": "CLI-NODE-ENTRY",
+      "what": "CLI 入口运行时（cli/*.ts）",
+      "language": "TypeScript on Node",
+      "where": "cli/；npm run cli",
+      "whyRemains": "CLI 作为客户端接入 Rust 服务（默认 Rust 服务链）；入口壳仍 Node 是发布形态决定，非执行链回退。",
+      "capabilityBoundary": "Rust 失败不悄悄回退 Node 服务；CLI 只作客户端。",
+      "authorization": "本地验证。",
+      "exitStrategy": "R08+ 评估原生 CLI 壳；现阶段保留。",
+      "evidence": ["docs/rust-tauri/R07/R07_PROGRESS.json"]
+    },
+    {
+      "id": "ELECTRON-SHELL",
+      "what": "Electron 桌面壳（main.cjs/preload.cjs）与 Vite 开发链",
+      "language": "JavaScript/TypeScript on Electron 42 + Vite 7",
+      "where": "desktop/",
+      "whyRemains": "R07 阶段桌面壳仍 Electron（Tauri 壳能力验证在独立目录推进）；dev:web 仍起 Node 是既有开发行为。",
+      "capabilityBoundary": "壳只是宿主；服务链为 Rust。/desktop/ 托管 mobile.html 为既有行为。",
+      "authorization": "本地验证；其他系统与正式安装包未验。",
+      "exitStrategy": "随 Tauri 迁移后续阶段收口。",
+      "evidence": ["AGENTS.md", "docs/rust-tauri/R07/R07_NEXT_TOOL_HANDOFF_20261018.md"]
+    },
+    {
+      "id": "DESKTOP-BROWSER-HOST-RETIRED",
+      "what": "桌面内嵌浏览器宿主（main.cjs 旧 browser 命令面）",
+      "language": "JavaScript",
+      "where": "desktop/main.cjs setupBrowserCommands",
+      "whyRemains": "R07 起 rustHost 早退：原生浏览器状态窗口独立创建，绝不挂载本机 WebContentsView；旧用例经用户 2026-10-19 裁决按设计退役（RETIRED_BY_DESIGN）。",
+      "capabilityBoundary": "旧宿主行为不再存在；T04 替代证据承载新宿主面。",
+      "authorization": "锁屏下真原生对话框受阻项保留。",
+      "exitStrategy": "已退役；R08 重立对应覆盖义务（登记于 retiredByDesign）。",
+      "evidence": ["docs/rust-tauri/R07/T10_LEAF_EVIDENCE_DRAFT.json"]
+    },
+    {
+      "id": "MCP-LEGACY-SSE-UNIMPLEMENTED",
+      "what": "MCP legacy SSE 传输（旧版 SSE 连接器协议）",
+      "language": "—",
+      "where": "mcpbridge（支持 stdio 与 streamable HTTP）",
+      "whyRemains": "已知边界，按交接要求保留登记、不凭描述抹掉；现行支持 stdio + streamable HTTP（rmcp）。",
+      "capabilityBoundary": "legacy SSE 连接器不接；声明该传输的连接器响亮失败。",
+      "authorization": "—",
+      "exitStrategy": "有真实 legacy SSE 连接器需求时单独立项实现。",
+      "evidence": ["docs/rust-tauri/R07/R07_NEXT_TOOL_HANDOFF_20261018.md §四 T11"]
+    },
+    {
+      "id": "NPM-WORKSPACES-REMOVED",
+      "what": "原 packages/* npm workspaces 插件生态",
+      "language": "—",
+      "where": "仓库根（04f90d2b2 拆除）",
+      "whyRemains": "已拆除，保留内置插件（skills2set/ 随产品分发）。",
+      "capabilityBoundary": "无 workspace 构建步骤；内置插件不是第三方加载面。",
+      "authorization": "—",
+      "exitStrategy": "已收口。",
+      "evidence": ["AGENTS.md"]
+    }
+  ],
+  "knownUnverified": [
+    "真实账号/付费供应商/对外发消息：未授权未验（DEFERRED_R10）",
+    "非 macOS 平台与正式安装包：未验",
+    "SDK 解析前分配上限：未证明（交接保留边界）",
+    "锁屏下真原生对话框/废纸篓等环境受阻项：见 T10_LEAF_EVIDENCE_DRAFT blockedEnvironmentCases"
+  ]
+}

@@ -563,6 +563,8 @@
         "local_user",
         "device",
         "web_session",
+        "bridge",
+        "bridge_takeover",
         "automation"
       ],
       "type": "string"

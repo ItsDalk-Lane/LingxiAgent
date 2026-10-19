@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "BridgeDiagnosticInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "authMode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "credentialOk": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "msg": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "username": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "BridgeQrcodeStatus": {
+      "enum": [
+        "waiting",
+        "scanned",
+        "confirmed",
+        "expired",
+        "error"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "baseUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "botId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "botToken": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "info": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeDiagnosticInfo"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "const": "diagnostic_result",
+          "type": "string"
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "qrcodeId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "qrcodeUrl": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BridgeQrcodeStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "userId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "ok"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "BridgeDiagnosticResult"
+}

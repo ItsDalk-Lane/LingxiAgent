@@ -1,0 +1,11 @@
+{
+  "performedAt": "2026-10-15T23:50:12.563301+00:00",
+  "method": "cua_repl native Chrome app click(21), super+a, typeText(human-latest), getAXState",
+  "windowTitle": "Lingxi R07 Own Browser 295bb35c5af3637383845ad7fb1e1bef",
+  "url": "http://127.0.0.1:57722/own-form",
+  "observedBefore": "agent-initial",
+  "observedAfter": "human-latest",
+  "targetId": "881196EA783B3DCA9705E6F501F4EA0A",
+  "rawObservation": "21 文本栏 (settable) 测试输入, Value: human-latest；focused UI element 21",
+  "scope": "only this explicitly created local test form"
+}

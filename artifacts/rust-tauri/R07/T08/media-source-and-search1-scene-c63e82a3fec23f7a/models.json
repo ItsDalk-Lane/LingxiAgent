@@ -1,0 +1,54 @@
+{
+  "providers": {
+    "fixture": {
+      "api": "openai-completions",
+      "apiKey": "hana-runtime-api-key:fixture",
+      "baseUrl": "http://127.0.0.1:55052",
+      "models": [
+        {
+          "api": "openai-completions",
+          "baseUrl": "http://127.0.0.1:55052",
+          "contextWindow": 8192,
+          "id": "chat-only",
+          "name": "Chat Only",
+          "provider": "fixture"
+        },
+        {
+          "api": "openai-completions",
+          "baseUrl": "http://127.0.0.1:55052",
+          "id": "seed-speech",
+          "name": "Seed Speech",
+          "provider": "fixture"
+        },
+        {
+          "api": "openai-audio-speech",
+          "baseUrl": "http://127.0.0.1:55052",
+          "id": "new-speech",
+          "name": "New Speech",
+          "provider": "fixture"
+        },
+        {
+          "api": "openai-images",
+          "baseUrl": "http://127.0.0.1:55052",
+          "id": "new-image",
+          "name": "New Image",
+          "provider": "fixture"
+        },
+        {
+          "api": "agnes-videos",
+          "baseUrl": "http://127.0.0.1:55052",
+          "id": "new-video",
+          "name": "New Video",
+          "provider": "fixture"
+        },
+        {
+          "api": "openai-audio-transcriptions",
+          "baseUrl": "http://127.0.0.1:55052",
+          "id": "new-asr",
+          "name": "New Asr",
+          "provider": "fixture"
+        }
+      ]
+    }
+  }
+}

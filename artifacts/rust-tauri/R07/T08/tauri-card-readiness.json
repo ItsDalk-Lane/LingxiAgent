@@ -1,0 +1,26 @@
+{
+  "status": "READ_ONLY_DESIGN_NOT_IMPLEMENTED",
+  "actualHost": {
+    "build": "desktop/src-tauri/tauri.conf.json frontendDist=../dist-tauri-resources",
+    "entry": "desktop/src/tauri-resources/main.tsx 仅ResourceDesktop/NativeSkillViewer，未加载聊天InteractiveCard或Run历史",
+    "bridge": "ResourceConnection仅提供资源监听入口，凭证留宿主；尚无cards/Run读取桥",
+    "policy": "主窗口frame-src self/blob，禁止直接HTTP卡片；没有现役卡片frame保护入口"
+  },
+  "checkedDependencies": {
+    "tauri": "2.12.1",
+    "wry": "0.57.0",
+    "onNavigation": "WebviewWindowBuilder.on_navigation可取消导航；runtime-wry转with_navigation_handler；Windows实现add_NavigationStarting，未为该回调注册FrameNavigationStarting，不足以宣称所有iframe保护。",
+    "webResourceRequest": "当前只支持tauri URI协议，非外部开发服务器；同步响应修改，不是已有HTTP卡片代理"
+  },
+  "minimumSafeImplementation": {
+    "approach": "独立卡片WebviewWindow，卡片作为顶层文档，避免对子框架on_navigation跨平台支持作无证据假设。",
+    "required": [
+      "主窗口正式命令经main_only及现有服务实例/本机凭证核对，向真实cards PUT登记，返回只含短期票据的当前服务精确URL；不得接受任意URL或向脚本暴露通用token。",
+      "仅该URL在on_navigation白名单，禁止所有跳转/重定向/查询串变化；on_new_window拒绝；下载拒绝。",
+      "卡片窗口label不匹配任何现役main/viewer/skill-viewer能力，远端卡片无IPC权限；服务HTML自己的sandbox/connect/frame CSP继续有效。",
+      "存在真正Run卡片入口与关闭/退出回收；以当前真实Run结果在实际Tauri宿主打开并点击，向自有loopback导航零请求，并验证票据过期/替换/重启。"
+    ],
+    "notASmallFlag": "当前Tauri没有聊天卡片入口，不能仅设置平台布尔能力或放宽CSP就宣称接通。"
+  },
+  "decisionBoundary": "本轮仅只读，未改Tauri宿主，也未将此项标通过。不存在已证实环境阻塞；是尚需实现与实际宿主验证的明确工作。"
+}

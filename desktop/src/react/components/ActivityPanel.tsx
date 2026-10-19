@@ -87,7 +87,8 @@ export function ActivityPanel() {
   const agentName = useStore(s => s.agentName);
   const setActivities = useStore(s => s.setActivities);
 
-  const [hbEnabled, setHbEnabled] = useState(true);
+  const [hbEnabled, setHbEnabled] = useState<boolean | null>(null);
+  const [panelError, setPanelError] = useState<'load' | 'action' | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(currentAgentId);
   const [selectedBucket, setSelectedBucket] = useState<ActivityBucket>('automation');
   const t = window.t ?? ((p: string) => p);
@@ -129,18 +130,24 @@ export function ActivityPanel() {
 
   const loadData = useCallback(() => {
     lingxiFetch('/api/desk/activities')
-      .then(r => r.json())
-      .then(data => setActivities(data.activities || []))
-      .catch(err => console.warn('[activity] fetch activities failed:', err));
+      .then(async response => {
+        if (response.ok === false) throw new Error('activity request failed');
+        const data = await response.json();
+        if (!Array.isArray(data.activities)) throw new Error('invalid activity list');
+        setActivities(data.activities);
+        setPanelError(null);
+      })
+      .catch(err => { console.warn('[activity] fetch activities failed:', err); setPanelError('load'); });
     fetchConfig()
       .then(data => setHbEnabled(data.desk?.heartbeat_master !== false))
-      .catch(err => console.warn('[activity] fetch config failed:', err));
+      .catch(err => { console.warn('[activity] fetch config failed:', err); setPanelError('load'); });
   }, [setActivities]);
 
   const { visible, close: closePanel } = usePanel('activity', loadData, [currentAgentId]);
   const close = useCallback(() => { closePanel(); }, [closePanel]);
 
   const toggleHeartbeat = useCallback(async () => {
+    if (hbEnabled === null) return;
     const next = !hbEnabled;
     setHbEnabled(next);
     try {
@@ -150,7 +157,9 @@ export function ActivityPanel() {
         body: JSON.stringify({ desk: { heartbeat_master: next } }),
       });
       invalidateConfigCache();
+      setPanelError(null);
     } catch {
+      setPanelError('action');
       setHbEnabled(!next); // rollback
     }
   }, [hbEnabled]);
@@ -159,12 +168,14 @@ export function ActivityPanel() {
     try {
       const res = await lingxiFetch(`/api/desk/activities/${activityId}/promote`, { method: 'POST' });
       const data = await res.json();
-      if (data.error || !data.sessionPath) return;
+      if (data.error || !data.sessionPath) throw new Error('activity promotion failed');
       await loadSessions();
       await switchSession(data.sessionPath);
       const latest = useStore.getState().activities;
       setActivities(latest.filter(a => a.id !== activityId));
+      setPanelError(null);
     } catch (err) {
+      setPanelError('action');
       console.error('[activity] promote failed:', err);
     }
   }, [setActivities]);
@@ -182,6 +193,7 @@ export function ActivityPanel() {
                 <button
                   className={'hana-toggle' + (hbEnabled ? ' on' : '')}
                   onClick={toggleHeartbeat}
+                  disabled={hbEnabled === null}
                 />
               </div>
             <button className={fp.floatingPanelClose} onClick={close}>
@@ -193,9 +205,10 @@ export function ActivityPanel() {
           </div>
           <div className={fp.floatingPanelBody}>
             <div className={fp.activityCards} id="activityCards">
-              {agentTabs.length === 0 ? (
+              {panelError && <div className={fp.activityEmpty} role="alert">{t(panelError === 'load' ? 'activity.listLoadFailed' : 'activity.actionFailed')}</div>}
+              {agentTabs.length === 0 ? (!panelError && (
                 <div className={fp.activityEmpty}>{t('activity.empty')}</div>
-              ) : (
+              )) : (
                 <>
                   <AgentTabScroller
                     items={agentTabItems}
@@ -229,9 +242,9 @@ export function ActivityPanel() {
                     })}
                   </div>
                   <div className={automationStyles.groupList}>
-                    {activeActivities.length === 0 ? (
+                    {activeActivities.length === 0 ? (!panelError && (
                       <div className={fp.activityEmpty}>{t('activity.emptyForCategory')}</div>
-                    ) : activeActivities.map(a => (
+                    )) : activeActivities.map(a => (
                       <ActivityCard
                         key={a.id}
                         activity={a}
@@ -287,17 +300,19 @@ function ActivityCard({
     durationText = t('activity.duration', { text: formatElapsed(a.finishedAt - a.startedAt) });
   }
   const timeText = a.startedAt ? formatSessionDate(new Date(a.startedAt).toISOString()) : '';
-  const subtitle = a.summary || (a.type === 'heartbeat' ? t('activity.patrolDone') : t('activity.cronDone'));
-  const statusLabel = a.status === 'error'
-    ? t('activity.error')
-    : a.status === 'running'
-      ? t('common.executing')
-      : durationText || timeText;
-  const statusTone: ChatResourceCardStatusTone = a.status === 'error'
-    ? 'danger'
-    : a.status === 'running'
-      ? 'accent'
-      : 'muted';
+  const completed = a.status === 'success' || a.status === 'completed' || a.status === 'done';
+  const failed = a.status === 'error' || a.status === 'failed';
+  const running = a.status === 'running' || a.status === 'queued';
+  const resultLabel = failed ? t('activity.error')
+    : running ? t('common.executing')
+    : a.status === 'cancelled' ? t('activity.cancelled')
+    : a.status === 'skipped' ? t('activity.skipped')
+    : t('activity.unconfirmed');
+  const subtitle = a.summary || (completed
+    ? (a.type === 'heartbeat' ? t('activity.patrolDone') : t('activity.cronDone'))
+    : resultLabel);
+  const statusLabel = completed ? durationText || timeText : resultLabel;
+  const statusTone: ChatResourceCardStatusTone = failed ? 'danger' : running ? 'accent' : 'muted';
 
   useEffect(() => {
     if (!open || !canUseSession || messages !== null || loadError) return;

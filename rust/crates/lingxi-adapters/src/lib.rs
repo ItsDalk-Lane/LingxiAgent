@@ -12,5 +12,7 @@
 //!   real HTTP adapter and the gateway-backed turn provider (R05-T01).
 //!   Browser/integrations adapters arrive with their owning stages (R07).
 
+pub mod browser;
+pub mod conversation_files;
 pub mod models;
 pub mod storage;

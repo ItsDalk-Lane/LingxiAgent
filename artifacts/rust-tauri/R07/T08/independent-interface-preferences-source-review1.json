@@ -1,0 +1,38 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "reviewedAt": "2026-10-18T10:11:31.334375+00:00",
+  "scope": "T08原设置及35移交Security配套端点静态审阅；不运行Cargo/GUI，不修改产品/测试/协议。",
+  "sourceHashes": {
+    "rust/crates/lingxi-protocol/src/user_preferences.rs": "47242d06b33f8236fd81e8e67245b189db3b7aa69eb4f87b676a937f41995d9e",
+    "rust/crates/lingxi-protocol/src/lib.rs": "6ebdb5350e51f293436dcf2bde99c04d8cb84de27fe55a747a78dbcc576da1b9",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-gen.rs": "03b70a57f804dd54d1c27886bfe63aca0e69db0bdfdee0b736b66cadd1aeb98f",
+    "rust/crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs": "1e825a4dc71292b7372131ae292100699012484dee5d3ba0852ba88bac886e59",
+    "rust/crates/lingxi-service/src/userprefs.rs": "669c87952344df2b1f7f5653d766928b2e7982a4fce7d61b6bb33e2cc0c3ce34",
+    "rust/crates/lingxi-service/src/checkpoint_store.rs": "acf2ce95c8fc38fb14ebe817276da469526c960deada96bb989b34d62746fdb8",
+    "rust/crates/lingxi-service/src/agents_admin.rs": "a33980e1605c56134cf351446e270245e4e88ead02741b51fe7016755a5610ec",
+    "rust/crates/lingxi-service/src/auth.rs": "610a2128abf663c4cfceffc3590a310af75383c2ac79da697e5eae5c4969614c",
+    "rust/crates/lingxi-service/src/lib.rs": "81be72c80783d1e0712ce74f2d03792b48758dbab07db7621ea47b505361005f",
+    "rust/crates/lingxi-adapters/src/storage/agent_memory.rs": "eefe741769083b9a1b64cb5353882512fb32d5178921f503c34f33b8274ad520",
+    "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs": "90c41b4d44cc99ddf148e215037b0284df425e075594c9ec484b94e99a57c977"
+  },
+  "all11OwnedReadyHashesMatched": true,
+  "finalAcceptance": "pending",
+  "sourceConclusion": [
+    "keybindings复用6个现役命令注册规则、UTF16长度及JS trim/空格/修饰键归一，PUT全量替换显式覆盖；sidebar按现役部分合并，保留另一section及根内无关偏好。",
+    "两偏好写入同preferences全局锁和严格root读取，沿原MemoryService writer；new atomic_write_authorized在资料写等待结束与临时文件写完rename前检查原Auth主体/scope，WebSession同时核当前状态。",
+    "旧atomic_write调用默认授权true保持原路径行为；没有声称新增FileSafety事务或对所有旧写入一并补授权。",
+    "checkpoint list读取原独立改前存档目录，不混会话分支检查点；只返回8白名单元数据，流式跳过content/content_b64未知字段，缺目录不创建，损坏JSON/危险链接/读取变化返回500。",
+    "权限边界保持sidebar chat、keybindings settings.read/write、全局checkpoints LocalOnly；list读取前后复验原local owner。",
+    "统一协议10类型已加入导出、官方generator和verify分派；generated实际同步与所有消费者检查仍待root执行。"
+  ],
+  "testCoverageLimits": [
+    "新增4个目标使用真实HTTP/存储/同home重启以及共享纯规则独立oracle，未独立执行。",
+    "直接atomic_write_authorized+真实设备revoke证明拟测commit回调边界；不是已经实跑HTTP锁排队撤权。端点HTTPrevoke当前是请求前撤销。",
+    "损坏500条款针对坏JSON/root或已保存interface顶层非对象；现役普通非法binding/未知sidebar mode仍按共享归一合同处理，不能宣称任意坏子字段全部拒绝。",
+    "原user-edit保存/restore已有路径不属于本次list新权限设计；不得用新增list检查代原恢复/保存全链验收。"
+  ],
+  "remaining": [
+    "根唯一Cargo实际4case与全协议生成/适用回归待结果，不提前通过。",
+    "Preferences读取仍沿既有严格读取口，非新增nofollow文件事务；nofollow结论限本次archive list的DirFd/open_attachment_nofollow。"
+  ]
+}

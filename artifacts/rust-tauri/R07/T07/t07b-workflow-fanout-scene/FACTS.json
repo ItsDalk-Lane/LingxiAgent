@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "status": "FAILED_CANDIDATE_ORIGINAL_FACTS_NOT_RERUN",
+  "candidate": "t07b",
+  "testId": "workflow::fanout_dispatch_events_journal_and_completion_delivery",
+  "journal": [
+    {
+      "attempts": 1,
+      "key": "543674ad55456525",
+      "nodeSeq": 2,
+      "result": "R:fold alpha",
+      "status": "ok",
+      "ts": 1800000000000
+    },
+    {
+      "attempts": 2,
+      "key": "ff5c6a510a0d44f1",
+      "nodeSeq": 3,
+      "result": "R:fold beta",
+      "status": "ok",
+      "ts": 1800000000000
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "run_000001a3185c5000_000001",
+      "session_id": "wf-main",
+      "status": "completed",
+      "terminal_reason": "completed.with_final",
+      "attempt_count": 1,
+      "modelCallStartedCount": 2,
+      "usageRows": 2,
+      "durableStates": [
+        {
+          "from": "queued",
+          "to": "running",
+          "type": "run_state_changed"
+        },
+        {
+          "from": "running",
+          "reason": "completed.with_final",
+          "to": "completed",
+          "type": "run_state_changed"
+        }
+      ]
+    },
+    {
+      "run_id": "run_000001a3185c5000_000002",
+      "session_id": "wf-main",
+      "status": "completed",
+      "terminal_reason": "completed.with_final",
+      "attempt_count": 1,
+      "modelCallStartedCount": 1,
+      "usageRows": 1,
+      "durableStates": [
+        {
+          "from": "queued",
+          "to": "running",
+          "type": "run_state_changed"
+        },
+        {
+          "from": "running",
+          "reason": "completed.with_final",
+          "to": "completed",
+          "type": "run_state_changed"
+        }
+      ]
+    },
+    {
+      "run_id": "run_000001a3185c5000_000003",
+      "session_id": "wf-main",
+      "status": "failed",
+      "terminal_reason": "failed.provider_error",
+      "attempt_count": 1,
+      "modelCallStartedCount": 0,
+      "usageRows": 0,
+      "durableStates": [
+        {
+          "from": "queued",
+          "to": "running",
+          "type": "run_state_changed"
+        },
+        {
+          "from": "running",
+          "reason": "failed.provider_error",
+          "to": "failed",
+          "type": "run_state_changed"
+        }
+      ]
+    },
+    {
+      "run_id": "run_000001a3185c5000_000004",
+      "session_id": "wf-main",
+      "status": "completed",
+      "terminal_reason": "completed.with_final",
+      "attempt_count": 1,
+      "modelCallStartedCount": 1,
+      "usageRows": 1,
+      "durableStates": [
+        {
+          "from": "queued",
+          "to": "running",
+          "type": "run_state_changed"
+        },
+        {
+          "from": "running",
+          "reason": "completed.with_final",
+          "to": "completed",
+          "type": "run_state_changed"
+        }
+      ]
+    }
+  ],
+  "actualConclusion": "本次beta首次真实Run已queued→running→failed.provider_error，模型开始事件和usage均零；已排除本次由派发前session_busy造成。仍待查真实provider_error，不将未知原因归成无故偶发，也不把补充诊断当修复。",
+  "rootCause": "PROVIDER_ERROR_UNDER_DIAGNOSIS",
+  "databaseIntegrity": [
+    "ok"
+  ],
+  "foreignKeyViolations": []
+}

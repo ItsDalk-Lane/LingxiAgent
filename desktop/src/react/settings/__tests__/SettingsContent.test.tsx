@@ -221,7 +221,7 @@ describe('SettingsContent tab heading', () => {
     await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
   });
 
-  it('clears foreign cached data before Rust settings and keeps unimplemented tabs unavailable', async () => {
+  it('clears foreign cached data and blocks settings when the Rust identity is incomplete', async () => {
     window.platform.getServerConnectionInfo = vi.fn(async () => ({
       port: 63002, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
     }));
@@ -244,7 +244,7 @@ describe('SettingsContent tab heading', () => {
     expect(lingxiFetch).toHaveBeenCalledWith('/lingxi/v1/server/identity');
     expect(useSettingsStore.getState()).toMatchObject({
       activeTab: 'access', rustSettingsUnavailable: true, settingsConfig: null,
-      settingsConfigStatus: 'error', agents: [], runtimeModels: [], settingsDataOwner: null, settingsDataAgentId: null,
+      settingsConfigStatus: 'error', agents: [], runtimeModels: [], settingsIdentityOwner: null, settingsDataOwner: null, settingsDataAgentId: null,
     });
     expect(actionMocks.loadAgents).not.toHaveBeenCalled();
     expect(actionMocks.loadSettingsModels).not.toHaveBeenCalled();

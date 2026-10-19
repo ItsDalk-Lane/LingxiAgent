@@ -1,0 +1,15 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.63s
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 7 tests
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test revoked_source_is_rejected_without_a_run ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+

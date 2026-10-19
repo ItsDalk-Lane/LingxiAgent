@@ -14,6 +14,7 @@ import { useStore } from '../stores';
 import { createNewSession, reconcileCurrentSessionMessages } from '../stores/session-actions';
 import {
   initializeMobileRuntime,
+  invalidateMobileRuntime,
   loadMobileSessions,
   readMobileAuthSession,
   type MobilePrincipal,
@@ -48,6 +49,7 @@ type MobileEdgeGesture = {
 };
 
 export function MobileApp(): React.ReactElement {
+  const authRevision = useRef(0);
   const [authState, setAuthState] = useState<AuthState>('checking');
   const [authBackend, setAuthBackend] = useState<'node' | 'rust' | null>(null);
   const [principal, setPrincipal] = useState<MobilePrincipal | null>(null);
@@ -59,8 +61,12 @@ export function MobileApp(): React.ReactElement {
   const [mobileUpdateAvailable, setMobileUpdateAvailable] = useState(() => window.__hanaMobileUpdateAvailable === true);
 
   const bootstrap = useCallback(async () => {
+    const revision = ++authRevision.current;
+    const isCurrent = () => authRevision.current === revision;
     await ensureMobileAuthLocale();
+    if (!isCurrent()) return;
     const session = await readMobileAuthSession();
+    if (!isCurrent()) return;
     setAuthBackend(session.backend);
     if (!session.authenticated || !session.principal) {
       setAuthState('login');
@@ -70,12 +76,15 @@ export function MobileApp(): React.ReactElement {
       await apiJson(session.backend === 'rust'
         ? '/lingxi/v1/web-auth/logout'
         : '/api/web-auth/logout', { method: 'POST' }).catch(() => null);
+      if (!isCurrent()) return;
+      invalidateMobileRuntime();
       setPrincipal(null);
       setLoginError((window.t ?? ((p: string) => p))('mobile.auth.scopeError'));
       setAuthState('login');
       return;
     }
-    await initializeMobileRuntime(session.principal, session.backend);
+    await initializeMobileRuntime(session.principal, session.backend, { isCurrent });
+    if (!isCurrent()) return;
     setPrincipal(session.principal);
     setAuthState('ready');
   }, []);
@@ -91,6 +100,8 @@ export function MobileApp(): React.ReactElement {
     });
     return () => {
       cancelled = true;
+      authRevision.current++;
+      invalidateMobileRuntime();
     };
   }, [bootstrap]);
 
@@ -110,6 +121,9 @@ export function MobileApp(): React.ReactElement {
 
   const login = async (event: React.FormEvent) => {
     event.preventDefault();
+    const revision = ++authRevision.current;
+    let activeRevision = revision;
+    invalidateMobileRuntime();
     setLoginError(null);
     try {
       if (!authBackend) throw new Error('mobile server identity could not be verified');
@@ -122,10 +136,14 @@ export function MobileApp(): React.ReactElement {
         method: 'POST',
         body: JSON.stringify(authBackend === 'rust' ? { ...body, clientKind: 'mobile' } : body),
       });
+      if (authRevision.current !== revision) return;
       setLoginSecret('');
       setLoginPassword('');
-      await bootstrap();
+      const initializing = bootstrap();
+      activeRevision = authRevision.current;
+      await initializing;
     } catch (err) {
+      if (authRevision.current !== activeRevision) return;
       setLoginError(err instanceof Error ? err.message : (window.t ?? ((p: string) => p))('mobile.auth.loginFailed'));
     }
   };

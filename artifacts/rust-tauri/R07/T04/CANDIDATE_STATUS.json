@@ -1,0 +1,75 @@
+{
+  "updatedAt": "2026-10-15T23:32:21.830790+00:00",
+  "candidates": [
+    {
+      "candidate": "r1",
+      "status": "FAILED",
+      "sourceFingerprint": "36cba78e63aa9268dd13356127696b5f099869394139998ea6bda437938e85e9",
+      "archive": {
+        "path": "source-r1.tar.gz",
+        "sha256": "e0432a9233a3e88ae88cd2615f1c233d6644d5cd0050f15a8d366abc4c75ed6f"
+      },
+      "note": "实际UI293和三types通过；service lib471通过5失败；browser-flows routes10通过/browser10通过2失败；web8通过。失败保留，未运行组不算通过。"
+    },
+    {
+      "candidate": "r2",
+      "status": "SUPERSEDED_UNEXECUTED",
+      "sourceFingerprint": "7ef464c9ebe94d49b4404e3920d83c3cc2664117789b3f3b296b0fd5c8cef85e",
+      "archive": {
+        "path": "source-r2.tar.gz",
+        "sha256": "a712933b449b326157569c766651ab4c0e9e2b6dbe4025dcb046461e37d249d6"
+      },
+      "note": "快照已保存但未开始门禁；独立审阅发现连续人工急停与旧插话竞态，修复后建立r3；不借用r1结果冒称r2通过。"
+    },
+    {
+      "candidate": "r3",
+      "status": "FAILED",
+      "sourceFingerprint": "db2891f6e2c8fb03a513af30806ce459c35a1946abe101ac9cd85c07107f312f",
+      "archive": {
+        "path": "source-r3.tar.gz",
+        "sha256": "e1bf7563f75eff96fde7e7372a7c851abab1137fe0fe15a4a883f349e52da2aa"
+      },
+      "note": "routes10通过、browser12通过1失败（新用户提交早于真实会话许可释放）；UI293、三types、66跨语言样本通过；接口测试以错误node runner启动失败，下一轮使用项目Vitest。未执行的其余组保持未运行。"
+    },
+    {
+      "candidate": "r4",
+      "status": "FAILED",
+      "sourceFingerprint": "23e0342b92e66cf8856575dc29f87a9cd10db34ccd675f63d481c915b3d1986f",
+      "archive": {
+        "path": "source-r4.tar.gz",
+        "sha256": "8f32a22c4f7eb9f3ac0501d35da36f3076567d879e31bb8c6e0df9afeca32308"
+      },
+      "note": "浏览器31、UI293、三types、66跨语言、4接口、ownership、依赖边界、main/preload通过；service lib476通过，既有R04工具网关2通过11失败：新read目录初始化影响已有read宿主声明。其余Rust组未执行；收窄初始化范围后另建r5。"
+    },
+    {
+      "candidate": "r5",
+      "status": "FAILED",
+      "sourceFingerprint": "40ebe6b14045c00b72ac925aa9da6cba0585a1100df1eee611f8cdc36413939e",
+      "archive": {
+        "path": "source-r5.tar.gz",
+        "sha256": "69cb924546b877198dc36e3fd5b5fc4985b38496a38fd435b435d24b051cc91c"
+      },
+      "note": "Rust编译失败：phone_tools漏同步phone权限校验新增参数；未执行Rust测试。Node九组通过。修复调用方后另建r6，不复写r5。"
+    },
+    {
+      "candidate": "r6",
+      "status": "FAILED",
+      "sourceFingerprint": "ee770ff89c7262c07dab96c51388b1420385e322d2f6a98bde7e4c7165ba2efe",
+      "archive": {
+        "path": "source-r6.tar.gz",
+        "sha256": "2569ed4d1fcfa9a94de9d38053633d72fb32aef501e7f3ac36e485860fab4bf3"
+      },
+      "note": "browser31/UI293/Node9组通过；service旧13+新增2网关通过，其余4目标失败。Github/MCP/worker/协作含可信注入目录被隐式修改；资源工具为旧HTTP500契约断言未反映真实工具拒绝。MCP1项无期限等待由精确PID TERM结束，介入另记。独立审阅IR-01发现启动半成功Unknown ownership缺口；修复后建立r7。未执行组不借用其他结果。"
+    },
+    {
+      "candidate": "r7",
+      "status": "AUTOMATED_PASS_MANUAL_ENV_BLOCKED",
+      "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+      "archive": {
+        "path": "source-r7.tar.gz",
+        "sha256": "63b2aa50c18c16302386ecc62611de9c5e69e6ba0ee91524305eb409ca11dbbb"
+      },
+      "note": "19组门禁和额外native-visibility exit0；native-handoff因Mac锁屏未能原生输入，实际超时exit101、cleanupconfirmed。源码前后未变，旧失败保留；A07仍必需，最终候选待解锁补验。"
+    }
+  ]
+}

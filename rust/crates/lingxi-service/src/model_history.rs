@@ -20,6 +20,21 @@ use std::{
 };
 
 pub const ENTRY_TYPE: &str = "lingxi-model-exchange-v1";
+pub async fn record_delivered_bridge_notice(
+    db: &RunDatabase,
+    delivery_id: &str,
+    now: u64,
+) -> Result<Option<lingxi_adapters::storage::bridge_notice::BridgeNoticeFact>, StorageError> {
+    lingxi_adapters::storage::bridge_notice::record_delivered_bridge_notice(db, delivery_id, now)
+        .await
+}
+
+fn automation_input_run(message_id: &str) -> Option<&str> {
+    message_id
+        .strip_prefix("model-history:")?
+        .strip_suffix(":input")
+        .filter(|id| !id.is_empty())
+}
 fn corrupt(detail: impl Into<String>) -> StorageError {
     StorageError::Corrupted {
         detail: format!("model_history: {}", detail.into()),
@@ -35,20 +50,20 @@ fn decode<T: serde::de::DeserializeOwned>(v: &Value) -> Result<T, StorageError> 
 }
 
 // 当前读取权限和原始执行身份分别验证：本地主人可读所有会话，其余主体精确归属。
-fn can_read(principal: &Principal, owner: &str) -> bool {
-    match principal {
-        Principal::LocalUser => true,
-        Principal::Device { user_id, .. } => user_id == owner,
-        Principal::WebSession { account_id } => account_id == owner,
-        Principal::Automation { .. } => false,
-    }
+fn can_read(principal: &Principal, owner: &str, session: &str) -> bool {
+    principal.can_access_session(owner, session)
 }
+
 fn archive_actor(body: &Value) -> Result<Principal, StorageError> {
     let actor = lingxi_kernel::recovery::principal_from_storage_facts(
         str_field(body, "actorKind")?,
         str_field(body, "actorSubject")?,
     )?;
-    if !can_read(&actor, str_field(body, "owner")?) {
+    if !can_read(
+        &actor,
+        str_field(body, "owner")?,
+        str_field(body, "sourceSession")?,
+    ) {
         return Err(corrupt(
             "archive original actor is not authorized for session owner",
         ));
@@ -207,7 +222,7 @@ impl ModelHistory {
             .get_session(session)
             .await?
             .ok_or_else(|| corrupt("missing session"))?;
-        if !can_read(principal, &s.owner_user_id) || s.agent_id != agent {
+        if !can_read(principal, &s.owner_user_id, session) || s.agent_id != agent {
             return Err(StorageError::InvalidRequest {
                 detail: "model_history: principal/agent/session mismatch".into(),
             });
@@ -316,13 +331,27 @@ impl ModelHistory {
                     detail: "fork target is not on the current branch".into(),
                 })?;
             rows.truncate(index + 1);
-            if !rows.iter().any(|row| row.entry_type == ENTRY_TYPE) {
+            if !rows.iter().any(|row| {
+                row.entry_type == ENTRY_TYPE
+                    || row.entry_type == lingxi_adapters::storage::bridge_notice::ENTRY_TYPE
+                    || row.entry_type
+                        == lingxi_adapters::storage::conversations_collab::DECISION_ENTRY_TYPE
+            }) {
                 return Ok(Vec::new());
             }
         }
         let branch_run_inputs: HashSet<String> = rows
             .iter()
-            .filter_map(|r| r.message_id.strip_prefix("user:").map(str::to_string))
+            .filter_map(|r| {
+                r.message_id
+                    .strip_prefix("user:")
+                    .or_else(|| {
+                        (r.entry_type == ENTRY_TYPE)
+                            .then(|| automation_input_run(&r.message_id))
+                            .flatten()
+                    })
+                    .map(str::to_string)
+            })
             .collect();
         let mut lineage_sessions = HashSet::new();
         let mut ancestor = Some(session.to_string());
@@ -415,7 +444,13 @@ impl ModelHistory {
                 str_field(&facts, "runOwner")?,
             )?;
             if facts["owner"] != session_owner
-                || !can_read(&original_actor, &session_owner)
+                || !can_read(
+                    &original_actor,
+                    &session_owner,
+                    facts["session"]
+                        .as_str()
+                        .ok_or_else(|| corrupt("legacy source session missing"))?,
+                )
                 || facts["agent"] != agent
                 || facts["purpose"] != "chat"
                 || !lineage_sessions.contains(str_field(&facts, "session")?)
@@ -481,6 +516,50 @@ impl ModelHistory {
             if row.message_id == format!("user:{current_run}") {
                 continue;
             }
+            // 决策是可核对的界面收据，不是新的用户指令或普通聊天内容。
+            if row.entry_type == lingxi_adapters::storage::conversations_collab::DECISION_ENTRY_TYPE
+            {
+                continue;
+            }
+            if row.entry_type == lingxi_adapters::storage::bridge_notice::ENTRY_TYPE {
+                let fact: lingxi_adapters::storage::bridge_notice::BridgeNoticeFact =
+                    serde_json::from_str(&row.content_json)
+                        .map_err(|_| corrupt("通知事实快照损坏"))?;
+                let saved = lingxi_adapters::storage::bridge_notice::load_notice_fact(
+                    &self.storage,
+                    &fact.delivery_id,
+                )
+                .await?
+                .ok_or_else(|| corrupt("通知事实缺少真实送达收据"))?;
+                if saved != fact
+                    || fact.actor_subject != session_owner
+                    || fact.agent_id != agent
+                    || row.role != "host_context"
+                    || row.run_id.is_some()
+                    || row.message_id
+                        != format!(
+                            "bridge-notice:{}",
+                            canon::sha256_hex(fact.delivery_id.as_bytes())
+                        )
+                {
+                    return Err(corrupt("通知事实身份或来源不匹配"));
+                }
+                if let Some(source) =
+                    store::get_session_row(&self.storage, &fact.session_id).await?
+                {
+                    if source.owner_user_id != session_owner
+                        || source.agent_id != agent
+                        || !lineage_sessions.contains(&fact.session_id)
+                    {
+                        return Err(corrupt("通知事实不属于当前保留分支"));
+                    }
+                }
+                exchange.push(ExchangeItem::HostNotice {
+                    delivery_id: fact.delivery_id,
+                    text: fact.text,
+                });
+                continue;
+            }
             if row.entry_type == ENTRY_TYPE {
                 let v: Value =
                     serde_json::from_str(&row.content_json).map_err(|e| corrupt(e.to_string()))?;
@@ -536,11 +615,12 @@ impl ModelHistory {
                 if source_run.is_empty() || source_session.is_empty() {
                     return Err(corrupt("empty archive source identity"));
                 }
-                if let Some(source) = self
+                let source = self
                     .storage
                     .load_run(&lingxi_protocol::RunId::new(source_run))
-                    .await?
-                {
+                    .await?;
+                let source_exists = source.is_some();
+                if let Some(source) = source {
                     if source.session_id.as_str() != source_session {
                         return Err(corrupt("archive source Run/session disagreement"));
                     }
@@ -568,6 +648,47 @@ impl ModelHistory {
                             "archive source Run actor/session owner disagreement",
                         ));
                     }
+                }
+                if let Some(origin) = v.get("inputOrigin") {
+                    let origin = origin
+                        .as_str()
+                        .ok_or_else(|| corrupt("automation input origin missing"))?;
+                    let input_items = payload["items"]
+                        .as_array()
+                        .ok_or_else(|| corrupt("automation input items missing"))?;
+                    if !matches!(
+                        origin,
+                        "cron" | "heartbeat" | "channel" | "dm" | "session_collab" | "loop"
+                    ) || row.message_id != format!("model-history:{source_run}:input")
+                        || row.role != "model_history"
+                        || payload["mode"] != "append"
+                        || payload.get("projection").is_some()
+                        || input_items.len() != 1
+                        || input_items[0]["kind"] != "user"
+                        || input_items[0]["text"].as_str().is_none()
+                    {
+                        return Err(corrupt("automation input archive binding mismatch"));
+                    }
+                    let source_lineage = self
+                        .storage
+                        .load_run_lineage(&lingxi_protocol::RunId::new(source_run))
+                        .await?;
+                    if let Some(lineage) = source_lineage {
+                        if lineage.origin.wire_name() != origin
+                            || lineage.cause_id.as_deref().is_none_or(str::is_empty)
+                        {
+                            return Err(corrupt("automation input source lineage mismatch"));
+                        }
+                    } else if source_exists {
+                        return Err(corrupt("automation input source lineage missing"));
+                    }
+                    // 本轮提交另由驱动传给模型；历史读取才恢复已完成后台任务的输入。
+                    if source_run != current_run {
+                        exchange.push(decode_item(&input_items[0])?);
+                    }
+                    continue;
+                } else if automation_input_run(&row.message_id).is_some() {
+                    return Err(corrupt("automation input anchor lacks source origin"));
                 }
                 if let Some(projection) = payload.get("projection") {
                     let host_id = str_field(projection, "toolCallId")?;
@@ -762,6 +883,13 @@ impl ModelHistory {
             if row.entry_type == "hana-session-branch-reset" {
                 continue;
             }
+            // R07-T07-δ6：loop-user-prompt 是循环任务的展示型气泡
+            // （recordUserPrompt 平移），模型上下文恒定排除——展示层投影由
+            // history_projection 的 LoopUserPrompt 臂承担。本臂漏配时未知
+            // 类型闸会把它误判成未知遗留行（δ 集成测试抓获）。
+            if row.entry_type == crate::loopx::LOOP_USER_PROMPT_MESSAGE_TYPE {
+                continue;
+            }
             if matches!(
                 row.entry_type.as_str(),
                 "todo-state-v1"
@@ -926,6 +1054,22 @@ impl ModelHistory {
             // 这只是缺少完成档案的恢复诊断，绝非ToolCallCompleted或成功收据；不执行旧工具。
             exchange.push(ExchangeItem::ToolResult{tool_call_id:ToolCallId::new(tool),provider_call_id:provider,outcome:ToolOutcome::Unknown{reason:format!("历史调用所属Run {source} 已终止/中断，但没有完整模型结果档案；本条只描述模型历史未知，真实执行/副作用状态以原收据为准，不能从本诊断判断成功或失败。恢复仅提供Unknown诊断，不重放工具，不视为成功；检查既有结果后再决定新的任务。")}});
         }
+        for item in &exchange {
+            if let ExchangeItem::HostNotice { delivery_id, text } = item {
+                let fact = lingxi_adapters::storage::bridge_notice::load_notice_fact(
+                    &self.storage,
+                    delivery_id,
+                )
+                .await?
+                .ok_or_else(|| corrupt("历史通知缺少真实送达收据"))?;
+                if fact.actor_subject != session_owner
+                    || fact.agent_id != agent
+                    || fact.text != *text
+                {
+                    return Err(corrupt("历史通知正文或接收身份不等于送达事实"));
+                }
+            }
+        }
         validate_pairs(&exchange)?;
         Ok(exchange)
     }
@@ -943,7 +1087,11 @@ impl ModelHistory {
         let mut source_runs = Vec::new();
         let mut excluded = HashSet::new();
         for row in &chain {
-            if let Some(run) = row.message_id.strip_prefix("user:") {
+            if let Some(run) = row
+                .message_id
+                .strip_prefix("user:")
+                .or_else(|| automation_input_run(&row.message_id))
+            {
                 source_runs.push(run.to_string());
             }
             if row.entry_type == ENTRY_TYPE {
@@ -992,6 +1140,155 @@ impl ModelHistory {
                 now_unix_ms: action.now,
             },
             allowed,
+        )
+        .await
+    }
+
+    /// 后台输入进入专用模型档案，不能伪装成用户消息或省略真实来源。
+    pub(crate) async fn record_automation_input(
+        &self,
+        ctx: &RunContext,
+        agent: &str,
+        input: &str,
+        now: u64,
+    ) -> Result<(), StorageError> {
+        self.gate(&ctx.principal, agent, ctx.session_id.as_str())
+            .await?;
+        let run = self
+            .storage
+            .load_run(&ctx.run_id)
+            .await?
+            .ok_or_else(|| corrupt("automation input Run missing"))?;
+        let lineage = self
+            .storage
+            .load_run_lineage(&ctx.run_id)
+            .await?
+            .ok_or_else(|| corrupt("automation input lineage missing"))?;
+        let owner = store::get_session_row(&self.storage, ctx.session_id.as_str())
+            .await?
+            .ok_or_else(|| corrupt("automation input session missing"))?
+            .owner_user_id;
+        let owned = self.storage.query_one_text(
+            "SELECT r.run_id FROM runs r JOIN run_attempts a ON a.run_id=r.run_id WHERE r.run_id=?1 AND r.session_id=?2 AND r.owner_kind=?3 AND r.owner_subject=?4 AND r.generation=?5 AND a.attempt=?6 AND a.generation=r.generation AND r.status='running'",
+            vec![ctx.run_id.to_string(),ctx.session_id.to_string(),ctx.principal.storage_kind().into(),ctx.principal.storage_subject(),ctx.generation.to_string(),ctx.attempt.to_string()],
+        ).await?;
+        use lingxi_kernel::subagent::RunOrigin as Origin;
+        let causal_match = match lineage.origin {
+            Origin::Channel | Origin::Dm => {
+                let id = lineage
+                    .cause_id
+                    .as_deref()
+                    .ok_or_else(|| corrupt("phone input cause missing"))?;
+                let d = lingxi_adapters::storage::conversations::get_delivery(&self.storage, id)
+                    .await?
+                    .ok_or_else(|| corrupt("phone input delivery missing"))?;
+                let actual =
+                    lingxi_adapters::storage::conversations::get_delivery_run(&self.storage, id)
+                        .await?
+                        .ok_or_else(|| corrupt("phone input actual Run missing"))?;
+                actual.0 == ctx.run_id.as_str()
+                    && actual.1 == ctx.session_id.as_str()
+                    && d.input.actor_id == agent
+                    && d.input.input_json["prompt"] == input
+            }
+            Origin::SessionCollab => {
+                let id = lineage
+                    .cause_id
+                    .as_deref()
+                    .ok_or_else(|| corrupt("collaboration input cause missing"))?;
+                let d = lingxi_adapters::storage::conversations_collab::get_collab_draft(
+                    &self.storage,
+                    id,
+                )
+                .await?
+                .ok_or_else(|| corrupt("collaboration draft missing"))?;
+                let actual = lingxi_adapters::storage::conversations_collab::get_collab_run(
+                    &self.storage,
+                    id,
+                )
+                .await?
+                .ok_or_else(|| corrupt("collaboration actual Run missing"))?;
+                let payload: Value = serde_json::from_str(
+                    d.frozen_apply_json
+                        .as_deref()
+                        .ok_or_else(|| corrupt("collaboration frozen input missing"))?,
+                )
+                .map_err(|e| corrupt(e.to_string()))?;
+                let source = store::get_session_row(&self.storage, &d.input.source_session_id)
+                    .await?
+                    .ok_or_else(|| corrupt("collaboration source session missing"))?;
+                let body = payload["message"]
+                    .as_str()
+                    .or_else(|| payload["firstMessage"].as_str())
+                    .ok_or_else(|| corrupt("collaboration message missing"))?;
+                actual.0 == ctx.run_id.as_str()
+                    && actual.1 == ctx.session_id.as_str()
+                    && crate::session_collab::collaboration_input(&source.agent_id, body) == input
+            }
+            Origin::Cron | Origin::Heartbeat => true,
+            // R07-T07-δ6：Loop 唤醒轮的因果锚是循环控制器自身的派发闸
+            // （execute_scheduled_for 只受理 Cron/Heartbeat/Loop 且
+            // trigger_id=循环键非空），本层无可回读的第二来源，与
+            // Cron/Heartbeat 同口径。
+            Origin::Loop => true,
+            _ => false,
+        };
+        let actor_allowed = ctx.principal == Principal::LocalUser
+            || (lineage.origin == Origin::SessionCollab
+                && matches!(ctx.principal, Principal::Device { .. }));
+        if !actor_allowed
+            || !causal_match
+            || owner != ctx.principal.storage_subject()
+            || run.session_id != ctx.session_id
+            || owned.is_none()
+            || !matches!(
+                lineage.origin,
+                Origin::Cron
+                    | Origin::Heartbeat
+                    | Origin::Channel
+                    | Origin::Dm
+                    | Origin::SessionCollab
+                    | Origin::Loop
+            )
+            || lineage.cause_id.as_deref().is_none_or(str::is_empty)
+        {
+            return Err(corrupt("automation input Run/principal/lineage mismatch"));
+        }
+        let mut body = json!({"schema":ENTRY_TYPE,"owner":owner,"actorKind":ctx.principal.storage_kind(),
+            "actorSubject":ctx.principal.storage_subject(),"agent":agent,"sourceSession":ctx.session_id,
+            "boundSession":ctx.session_id,"sourceRun":ctx.run_id,"inputOrigin":lineage.origin.wire_name(),
+            "payload":{"mode":"append","items":[encode_item(&ExchangeItem::UserTurn{text:input.to_string()})?]}});
+        body["digest"] = json!(canon::sha256_hex(&canon::canonical_json_bytes(&body)));
+        let chain = store::list_branch_messages(&self.storage, ctx.session_id.as_str()).await?;
+        let message_id = format!("model-history:{}:input", ctx.run_id);
+        let encoded = body.to_string();
+        if let Some(existing) = chain.iter().find(|row| row.message_id == message_id) {
+            return if existing.role == "model_history"
+                && existing.entry_type == ENTRY_TYPE
+                && existing.content_json == encoded
+            {
+                Ok(())
+            } else {
+                Err(corrupt("automation input replay changed"))
+            };
+        }
+        if !chain.is_empty() && matches!(lineage.origin, Origin::Cron | Origin::Heartbeat) {
+            return Err(corrupt("automation input requires its new activity branch"));
+        }
+        let parent = chain.last().map(|row| row.message_id.as_str());
+        store::append_message(
+            &self.storage,
+            store::AppendMessage {
+                session_id: ctx.session_id.as_str(),
+                message_id: &message_id,
+                parent_message_id: parent,
+                run_id: None,
+                role: "model_history",
+                content_json: &encoded,
+                entry_type: ENTRY_TYPE,
+                model_call_id: None,
+                now_unix_ms: now,
+            },
         )
         .await
     }
@@ -1068,7 +1365,11 @@ impl ModelHistory {
         }
         let input_index = chain
             .iter()
-            .position(|r| r.message_id == format!("user:{}", ctx.run_id))
+            .position(|r| {
+                r.message_id == format!("user:{}", ctx.run_id)
+                    || (r.entry_type == ENTRY_TYPE
+                        && r.message_id == format!("model-history:{}:input", ctx.run_id))
+            })
             .ok_or_else(|| corrupt("current Run input left active branch"))?;
         let children: HashSet<String> =
             cms::read_lineage_children(&self.storage, &[ctx.run_id.as_str().to_string()])
@@ -1257,6 +1558,9 @@ pub(crate) fn encode_item(item: &ExchangeItem) -> Result<Value, StorageError> {
             json!({"kind":"user_media","text":text,"images":encode_images(images)})
         }
         ExchangeItem::UserTurn { text } => json!({"kind":"user","text":text}),
+        ExchangeItem::HostNotice { delivery_id, text } => {
+            json!({"kind":"host_notice","deliveryId":delivery_id,"text":text})
+        }
         ExchangeItem::AssistantTurn {
             call,
             content,
@@ -1363,6 +1667,10 @@ pub(crate) fn decode_item(v: &Value) -> Result<ExchangeItem, StorageError> {
         "user_media" => ExchangeItem::UserMediaTurn {
             text: str_field(v, "text")?.into(),
             images: decode_images(&v["images"])?,
+        },
+        "host_notice" => ExchangeItem::HostNotice {
+            delivery_id: str_field(v, "deliveryId")?.into(),
+            text: str_field(v, "text")?.into(),
         },
         "user" => ExchangeItem::UserTurn {
             text: str_field(v, "text")?.into(),

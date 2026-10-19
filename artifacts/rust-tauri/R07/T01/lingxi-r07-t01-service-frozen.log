@@ -1,0 +1,127 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.60s
+     Running tests/r07_activity_promotion.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_activity_promotion-c8847ddb31cb3e74)
+
+running 1 test
+test session_admin_refuses_live_lease_then_promotes_same_identity_after_release ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/r07_automation_activity.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_activity-4d74172c1bced4ec)
+
+running 7 tests
+test unknown_trigger_without_real_run_is_never_displayed_as_finished_chat ... ok
+test actual_cancelled_run_keeps_cancelled_activity_status ... ok
+test withdrawn_source_folders_hide_details_and_block_promotion ... ok
+test heartbeat_and_its_internal_scope_project_without_fake_user_input ... ok
+test completed_activity_promotes_the_same_real_session_without_new_messages_or_runs ... ok
+test restored_actual_inflight_snapshot_reports_interrupted_as_unknown ... ok
+test running_activity_uses_actual_state_and_cannot_be_promoted_while_busy ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+     Running tests/r07_automation_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_flow-2ab8cb00acd1866c)
+
+running 11 tests
+test notification_preference_updates_preserve_other_settings_and_reject_damage ... ok
+test existing_global_switch_and_agent_setting_roundtrip_preserve_other_fields ... ok
+test slash_apply_uses_frozen_owned_suggestion ... ok
+test management_preserves_minute_strings_and_millisecond_numbers_from_real_ui ... ok
+test started_display_with_no_receipt_becomes_unknown_without_resend ... ok
+test real_notify_tool_claim_and_receipt_survive_restart_without_resend ... ok
+test real_tool_suggestion_requires_apply_and_replays_after_expiry ... ok
+test unsupported_future_schema_is_preserved_and_does_not_block_later_jobs ... ok
+test scheduled_reminder_keeps_trigger_run_and_confirmed_delivery_after_restart ... ok
+test completion_preference_only_queues_real_terminal_results_and_keeps_focus_policy ... ok
+test restart_between_real_run_completion_and_receipt_settlement_catches_up_once ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s
+
+     Running tests/r07_automation_import.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_import-6224f258bdad75ee)
+
+running 8 tests
+test atomic_import_competition_has_one_insert_and_preserves_legacy_revision ... ok
+test symlinked_history_is_rejected_without_reading_or_modifying_the_target ... ok
+test duplicate_or_colliding_ids_cannot_choose_or_overwrite_an_existing_job ... ok
+test read_only_tmp_recovery_and_old_plugin_notifications_become_agent_prompts ... ok
+test unresolved_paths_revoked_sessions_and_unknown_history_are_explicitly_blocked ... ok
+test legacy_agent_jobs_use_verified_directory_identity_and_studio_legacy_refs_deduplicate ... ok
+test import_replay_does_not_overwrite_user_edits_or_resurrect_soft_deleted_jobs ... ok
+test imports_unknown_fields_cursor_revision_and_raw_history_without_rewriting_sources ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
+     Running tests/r07_automation_permission.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_permission-d23769d2dea63ba4)
+
+running 15 tests
+test automation_policy_resolution_keeps_interactive_ask_distinct ... ok
+test auto_allows_known_routine_operations_with_bound_arguments ... ok
+test missing_or_changed_review_material_fails_closed ... ok
+test auto_requires_real_automatic_review_for_boundaries_and_unknown_operations ... ok
+test read_only_inheritance_classifies_real_note_actions ... ok
+test external_origin_cannot_impersonate_routine_or_self_declare_permission ... ok
+test native_file_routine_requires_a_bound_writable_resource ... ok
+test unattended_review_and_user_questions_never_wait_even_in_operate ... ok
+test real_reviewer_parser_rejects_broader_missing_or_fabricated_authorization ... ok
+test real_gateway_supplies_schema_normalized_parameters_and_never_parks_background ... ok
+test automatic_review_grants_expire_and_cannot_survive_registry_changes ... ok
+test automatic_review_grant_is_bound_to_one_call_and_consumed_once ... ok
+test reviewer_payload_is_bounded_redacted_and_identity_checked ... ok
+test real_native_write_respects_inherited_read_only_and_workspace_boundary ... ok
+test real_approval_slot_uses_frozen_trigger_evidence_and_accounts_format_retry ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/r07_daily_fresh_compact.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_daily_fresh_compact-721b7d0e0468a5ec)
+
+running 6 tests
+test logical_day_changes_at_local_four_am ... ok
+test started_unknown_and_closed_intake_never_replay_or_claim_next_day ... ok
+test busy_bridge_is_remaining_work_without_claiming_or_interrupting_it ... ok
+test known_failure_waits_an_hour_and_retries_with_new_attempt ... ok
+test actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart ... ok
+test permission_change_during_real_summary_cancels_and_keeps_unknown_receipt ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+     Running tests/r07_heartbeat_plan.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_heartbeat_plan-86e03a440e093c51)
+
+running 10 tests
+test slots_are_unix_aligned_and_manual_requests_have_independent_cooldown ... ok
+test daily_boundaries_are_local_and_failures_or_remaining_work_retry_after_one_hour ... ok
+test real_resource_listing_shape_is_strict_and_no_bad_entry_becomes_an_empty_scan ... ok
+test auto_heartbeat_requires_explicit_agent_opt_in_and_master_gate ... ok
+test output_segments_preserve_current_locale_labels_and_cannot_traverse ... ok
+test jian_status_keeps_concurrent_user_body_and_program_owned_start_snapshot ... ok
+test unchanged_jian_is_still_planned_so_model_can_continue_or_skip_using_saved_state ... ok
+test patrol_plan_excludes_own_outputs_and_includes_both_root_and_first_level_jian ... ok
+test patrol_log_is_utf8_and_display_is_limited_without_modifying_original_material ... ok
+test deeper_hidden_unknown_and_duplicate_jian_roots_are_refused ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/r07_heartbeat_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_heartbeat_runtime-da6b06f5236e8dcc)
+
+running 6 tests
+test create_if_absent_never_overwrites_a_competing_resource ... ok
+test missing_agent_cannot_receive_a_workspace_scope_or_background_run ... ok
+test ordinary_chat_cannot_borrow_heartbeat_program_log_target ... ok
+test config_switch_off_cancels_real_inflight_patrol_and_does_not_write_log ... ok
+test separate_agents_run_together_but_same_agent_overlap_is_discarded ... ok
+test real_patrol_and_root_first_level_jian_use_gateway_fixed_logs ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.71s
+
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 7 tests
+test revoked_source_is_rejected_without_a_run ... ok
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+

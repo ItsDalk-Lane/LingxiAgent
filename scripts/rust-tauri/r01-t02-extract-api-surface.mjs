@@ -208,8 +208,8 @@ function extractPlatformApi() {
   const body = src.slice(open + 1, end);
   const members = [];
   for (const line of body.split("\n")) {
-    // members are method signatures: `name?(args): Ret` or `name(args): Ret`
-    const m = line.match(/^\s{2}(\w+)(\?)?\s*\(/);
+    // 接口也包含宿主能力布尔属性；它们同样属于桥接边界，不能只登记方法。
+    const m = line.match(/^\s{2}(?:readonly\s+)?(\w+)(?:\?)?\s*(?:\(|:)/);
     if (m) members.push(m[1]);
   }
   return members;

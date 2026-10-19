@@ -1,0 +1,30 @@
+{
+  "label": "settings-ui1",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/rust-settings.test.ts",
+    "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+    "desktop/src/react/settings/tabs/__tests__/GeneralTab.test.tsx",
+    "--maxWorkers=2"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T03:56:15.085346+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "dfec4ddc8b2c3e8c0b48df1970f555b08da9cc9d4db4a57f33cbb700149878aa",
+  "finalAcceptance": false,
+  "exitCode": 0,
+  "endedAt": "2026-10-18T03:56:17.912131+00:00",
+  "sourceFingerprintAfter": "88119fd1742fcca9039af6abbc19bc4dd32ff3c04615b56677c9073747f8b151",
+  "log": "artifacts/rust-tauri/R07/T08/settings-ui1.log",
+  "logSha256": "8dd826293bd2c9d66365cc26a05edb6042c7563acd56606fef945f0de656e5c3",
+  "sourceUnchanged": false
+}

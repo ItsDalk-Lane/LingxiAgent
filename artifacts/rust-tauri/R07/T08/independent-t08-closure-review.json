@@ -1,0 +1,89 @@
+{
+  "recordedAt": "2026-10-18T06:24:44.366969+00:00",
+  "status": "READONLY_REVIEW_PLUS_AUTHORIZED_OAUTH_FIX_NOT_ACCEPTANCE",
+  "counts": {
+    "leaves": 109,
+    "originalAssertions": 343,
+    "providers": 39
+  },
+  "implementationGaps": [
+    {
+      "id": "OAuth settings component",
+      "leaves": [
+        "R00-T02-LA-D50161CE274A"
+      ],
+      "finding": "原页面四项操作为旧 /api/auth/oauth 契约，Rust只提供正式 provider-path login/callback/poll/logout；既有请求/响应也不兼容。",
+      "action": "已按本轮后续授权修复组件、协议归一、取消/迟到/连接隔离及13单测；后端精确Codex双别名定位及真实HTTP回归由core代理处理，当前不是最终验收。",
+      "proof": [
+        "desktop/src/react/settings/tabs/providers/oauth-service.ts",
+        "desktop/src/react/settings/tabs/providers/OAuthCredentials.tsx",
+        "artifacts/rust-tauri/R07/T08/oauth-ui-development.json"
+      ]
+    },
+    {
+      "id": "update_settings MCP user-only path",
+      "leaves": [
+        "R00-T02-LA-B30DA03C8576"
+      ],
+      "finding": "旧工具列出9个MCP设置动作，经权限/用户确认后bus.request(mcp:settings-action)执行；Rust SETTINGS只有14普通键，所有mcp前缀一律拒绝，search也仅给user_only提示。未见该工具的用户专属MCP执行分支。",
+      "classification": "CONFIRMED_IMPLEMENTATION_CONTRACT_GAP_NOT_MISSING_TEST_ONLY",
+      "minimalAction": "复用真实MCP管理/授权通道，在已冻结用户批准身份下执行明确动作；缺授权仍拒绝，不可把现有保守拒绝当原成功分支完成。需要root决定T08原责任闭合方案，不应仅添加stub成功。",
+      "source": [
+        "lib/tools/update-settings-tool.ts:51",
+        "lib/tools/update-settings-tool.ts:462",
+        "rust/crates/lingxi-service/src/settings_tools.rs:157",
+        "rust/crates/lingxi-service/src/settings_tools.rs:401",
+        "rust/crates/lingxi-service/src/settings_tools.rs:429"
+      ]
+    }
+  ],
+  "evidenceGapsNotImplementationGaps": [
+    {
+      "id": "39 suppliers",
+      "finding": "39定义、精确协议登记与probe plan已有真实代码，不能因为逐品牌回执缺失宣称39均未实现。草稿39静态+117间接断言仍无逐身份完整真实服务证明；需精确id矩阵经保存/选模型/真实网关/外部loopback替身及拒绝路径。目录探测Unavailable/Skipped不是媒体能力成功。",
+      "status": "NOT_PROVEN_PER_ID; do not relabel all as missing implementation"
+    },
+    {
+      "id": "skill native picker selection/cancel",
+      "leaves": [
+        "R00-T02-LA-52A5D1660088",
+        "R00-T02-LA-99F8CD228733"
+      ],
+      "finding": "Electron select-skill/select-folder用真实系统对话框，取消返回null；SkillsTab选空直接return不发安装/PUT。Tauri也已有select_folder及directory_picker_host真实脚本。尚未核到本候选实际技能选择+取消原生回执，viewer通过不代替picker，但源码不是缺失。",
+      "source": [
+        "desktop/main.cjs:5975",
+        "desktop/main.cjs:6001",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:199",
+        "desktop/src/react/settings/tabs/SkillsTab.tsx:484",
+        "desktop/src-tauri/src/lib.rs:101",
+        "desktop/src-tauri/tests/directory_picker_host.rs:153"
+      ]
+    },
+    {
+      "id": "existing pass receipts",
+      "finding": "core-flow11真实22项0且sourceUnchanged；native-skills1单个真实viewer0但source变化；types4完整typecheck0。都为开发证据，不是新固定候选109叶通过。"
+    }
+  ],
+  "minimumFinalGates": [
+    "冻结实际工作区源码+测试+二进制，全部回执同源，不把开发receipt升级。",
+    "主控唯一Cargo：service lib；6个r07_t08目标，加真实OAuth管理/代表矩阵新增目标；受影响R05 credentials/model-plane、adapter gateway/config/auth/network局部；本轮R06配置/技能/原生设置失败修复对应局部；不重跑整轮R06。",
+    "protocol generate/check+Rust/TS roundtrip；API surface check；rustfmt/clippy；npm三个tsconfig typecheck。",
+    "针对性settings/provider/skills/media/card UI；新增OAuth13；最终二进制真实设置导入导出、真实Run卡片、OAuth外部替身真实HTTP到组件。",
+    "原生技能picker selection+cancel实际回执与已实现viewer分别登记；真实窗口检查不能以mock返回null代替系统取消。",
+    "T08发布影响的T06辅助/ASR/媒体最小真实调用回归；39供应商逐身份矩阵缺项逐原断言保留NOT_RUN，真实账号/其他OS仍另记。"
+  ],
+  "notes": [
+    "不改产品、叶状态或旧失败的独立核算部分保持只读；OAuth为root后续明确授权实现。",
+    "T09尚未启动；本文件不构成T08通过。"
+  ],
+  "sourceHashes": {
+    "docs/rust-tauri/R07/T08_LEAF_EVIDENCE_DRAFT.json": "1cab68cd6dece53cccac0e5195b7ef0826fcb04d96bc566cb19de3e623ea2fb7",
+    "docs/rust-tauri/R07/R07_LEAF_MAP.json": "80ebd469b63dd7fcec275fa4a575dd42068e46ec38c3241ec323f6258e46625d",
+    "rust/crates/lingxi-service/src/settings_tools.rs": "ed612f0c2d778e031bb008ece344658e5953c1dd359cc35bd36db6f62aa36de7",
+    "lib/tools/update-settings-tool.ts": "6538ace2f384aaa9e6b9e5d1a5b52d3dd21e7c4f5ba0029065720e02cdc013a1",
+    "rust/crates/lingxi-service/src/provider_probe.rs": "c73574d344d8d489451330ebd01f6a08b5118d94e021af811a008ab431c5ce83",
+    "desktop/main.cjs": "dcb386bd5119759bf2a54a83b26100fd8d2b0ca9c1f2dc55fc7cbbe9667af3cb",
+    "desktop/src/react/settings/tabs/SkillsTab.tsx": "3855368033bc7b127fcf5623f9b1e7b72ece73f4646355ebfb32aaf05161cfb4",
+    "desktop/src-tauri/tests/directory_picker_host.rs": "6f1a6a4b2d7717b803ce0eee3eae1509d6dca60fb480d0dc20fec3c4dde2fd79"
+  }
+}

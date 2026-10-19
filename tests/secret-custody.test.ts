@@ -129,4 +129,20 @@ describe("secret custody helpers", () => {
       clientSecret: "new-client-secret",
     }, secretKeys)).toEqual(["appSecret"]);
   });
+
+  it("registers snake-case OAuth tokens exactly across nested masks, patch refill and permission collection", async () => {
+    const { MASKED_SECRET, maskObjectSecrets, resolveSecretPatch, collectSecretPatchPaths, hasSecretPatch } = await import("../shared/secret-custody.ts");
+    const saved = { api_key: "saved-model-api", access_token: "saved-access", refresh_token: "saved-refresh", access_tokenLabel: "ordinary-access-label", refresh_token_count: 4 };
+    const masked = maskObjectSecrets({ models: [{ id: "a", extension: saved }] }) as { models: Array<{ id: string; extension: typeof saved }> };
+    expect(masked).toEqual({ models: [{ id: "a", extension: { ...saved, api_key: MASKED_SECRET, access_token: MASKED_SECRET, refresh_token: MASKED_SECRET } }] });
+    expect(resolveSecretPatch({ patch: masked.models[0].extension, existing: saved })).toEqual(saved);
+    expect(resolveSecretPatch({ patch: { access_token: "", refresh_token: null }, existing: saved })).toEqual({ access_token: "", refresh_token: null });
+    expect(resolveSecretPatch({ patch: { access_token: MASKED_SECRET, refresh_token: MASKED_SECRET }, existing: {} })).toEqual({ access_token: "", refresh_token: "" });
+    expect(collectSecretPatchPaths({ models: [{ id: "a", extension: { access_token: "replacement", refresh_token: "", api_key: MASKED_SECRET, access_tokenLabel: "ordinary" } }, { id: "b", extension: { access_token: null, refresh_token: MASKED_SECRET } }] })).toEqual(["models.0.extension.access_token", "models.0.extension.refresh_token", "models.1.extension.access_token"]);
+    expect(hasSecretPatch({ extension: { access_token: MASKED_SECRET, refresh_token: MASKED_SECRET } })).toBe(false);
+    expect(hasSecretPatch({ extension: { access_token: "", refresh_token: null } })).toBe(true);
+    expect(maskObjectSecrets({ access_token: "visible-when-not-registered", refresh_token: "also-visible", accessToken: "explicit" }, ["accessToken"])).toEqual({ access_token: "visible-when-not-registered", refresh_token: "also-visible", accessToken: MASKED_SECRET });
+    expect(collectSecretPatchPaths({ access_token: "visible", refresh_token: "visible", accessToken: "changed" }, ["accessToken"])).toEqual(["accessToken"]);
+  });
+
 });

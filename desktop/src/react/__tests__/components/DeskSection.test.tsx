@@ -201,6 +201,41 @@ describe('DeskSection workspace watching', () => {
     expect(mocks.retainResourceWatch).not.toHaveBeenCalledWith({ kind: 'mount', mountId: 'mount_docs', path: '' });
   });
 
+  it('Rust 挂载使用显式监听权限，撤回权限和切换连接都会释放旧订阅', async () => {
+    const { WorkspaceFileWatchBridge } = await import('../../components/right-workspace/WorkspaceFileWatchBridge');
+    const previous = useStore.getState();
+    const connection = { connectionId: 'r07-rust-watch', kind: 'local', serverId: 'rust', serverNodeKind: 'lingxi-service',
+      studioId: 'local', label: 'Rust', baseUrl: 'http://127.0.0.1:3210', wsUrl: 'ws://127.0.0.1:3210',
+      token: 'watch-token', authState: 'paired', trustState: 'local', credentialKind: 'loopback_token', capabilities: [] };
+    const workspace = { workspaceId: 'mount_docs', mountId: 'mount_docs', label: '资料', nativeRootPath: '/Users/me/Documents', capabilities: ['list', 'read', 'write', 'watch'] };
+    const warning = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    useStore.setState({ serverConnections: { [connection.connectionId]: connection }, activeServerConnectionId: connection.connectionId,
+      activeServerConnection: connection, studioWorkspaces: [workspace], deskBasePath: 'studio:mount_docs',
+      deskWorkspaceMountId: 'mount_docs', deskWorkspaceNativeRoot: '/Users/me/Documents', deskExpandedPaths: ['notes'] } as never);
+    const view = render(<WorkspaceFileWatchBridge />);
+    try {
+      expect(mocks.retainResourceWatch).toHaveBeenCalledWith({ kind: 'mount', mountId: 'mount_docs', path: '' });
+      expect(mocks.retainResourceWatch).toHaveBeenCalledWith({ kind: 'mount', mountId: 'mount_docs', path: 'notes' });
+      const releases = mocks.retainResourceWatch.mock.results.map(result => result.value);
+      await act(async () => { useStore.setState({ studioWorkspaces: [{ ...workspace, capabilities: ['list', 'read', 'write'] }] }); });
+      expect(releases.every(release => release.mock.calls.length === 1)).toBe(true);
+      expect(mocks.retainResourceWatch).toHaveBeenCalledTimes(2);
+      expect(warning).toHaveBeenCalledWith(expect.stringContaining('未授权文件监听'));
+      await act(async () => { useStore.setState({ studioWorkspaces: [workspace] }); });
+      expect(mocks.retainResourceWatch).toHaveBeenCalledTimes(4);
+      await act(async () => { useStore.setState({ activeServerConnection: { ...connection, token: 'changed-watch-token' },
+        serverConnections: { [connection.connectionId]: { ...connection, token: 'changed-watch-token' } } } as never); });
+      expect(mocks.retainResourceWatch).toHaveBeenCalledTimes(6);
+      await act(async () => { useStore.setState({ deskWorkspaceNativeRoot: null }); });
+      expect(mocks.retainResourceWatch).toHaveBeenCalledTimes(6);
+      expect(mocks.retainResourceWatch.mock.results.every(result => result.value.mock.calls.length === 1)).toBe(true);
+    } finally {
+      view.unmount(); warning.mockRestore();
+      useStore.setState({ activeServerConnection: previous.activeServerConnection, activeServerConnectionId: previous.activeServerConnectionId,
+        serverConnections: previous.serverConnections, studioWorkspaces: previous.studioWorkspaces });
+    }
+  });
+
   it('flushes dirty expanded tree paths when the workspace tree mounts', async () => {
     const { DeskSection } = await import('../../components/DeskSection');
     useStore.setState({

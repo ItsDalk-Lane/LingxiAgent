@@ -19,7 +19,30 @@ const MAX_BRIDGES: usize = 1024;
 #[derive(Default)]
 struct Attachments {
     targets: HashMap<String, String>,
+    actual: HashMap<String, ActualBridgeAttachment>,
+    pending: HashMap<String, ActualBridgeSelection>,
 }
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct ActualBridgeIdentity {
+    connector_id: String,
+    generation: u64,
+    sender_id: String,
+    actor_id: String,
+    actor_subject: String,
+    owner_inbox_id: String,
+}
+#[derive(Debug, Clone)]
+struct ActualBridgeAttachment {
+    identity: ActualBridgeIdentity,
+    target: String,
+}
+#[derive(Debug, Clone)]
+struct ActualBridgeSelection {
+    identity: ActualBridgeIdentity,
+    options: Vec<(String, String)>,
+    expires: u64,
+}
+
 /// Bridge 标识持久化；接管关系只在本次宿主生命周期内有效。
 pub struct SlashService {
     index: PathBuf,
@@ -33,6 +56,14 @@ struct BridgeRecord {
     agent_id: String,
     owner_user_id: String,
     channel_key: String,
+}
+/// 每日整理只消费真实登记且归本机所有者的 Bridge，会话身份随后仍须查库复核。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct DailyBridgeTarget {
+    pub session_id: String,
+    pub agent_id: String,
+    pub owner_user_id: String,
+    pub channel_key: String,
 }
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -49,7 +80,7 @@ pub struct SlashResult {
     session_id: String,
     target_session_id: String,
     level: &'static str,
-    text: String,
+    pub(crate) text: String,
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     history_cleared: bool,
 }
@@ -79,19 +110,94 @@ impl SlashService {
         }
         Ok(rows)
     }
+    pub(crate) fn daily_owner_targets(&self) -> Result<Vec<DailyBridgeTarget>, String> {
+        let rows = self.read_index()?;
+        let attached = self
+            .attachments
+            .lock()
+            .map_err(|_| "bridge attachment lock poisoned")?;
+        Ok(rows
+            .into_iter()
+            .filter(|(id, row)| {
+                (row.owner_user_id == crate::auth::LOCAL_OWNER_USER_ID
+                    || lingxi_protocol::valid_bridge_subject(&row.owner_user_id))
+                    && !attached.targets.contains_key(id)
+                    && !attached.actual.contains_key(id)
+            })
+            .map(|(session_id, row)| DailyBridgeTarget {
+                session_id,
+                agent_id: row.agent_id,
+                owner_user_id: row.owner_user_id,
+                channel_key: row.channel_key,
+            })
+            .collect())
+    }
+    /// 排队期间可能删除、换归属或进入接管；执行前及执行期间重新核实名册。
+    pub(crate) fn daily_target_is_current(
+        &self,
+        target: &DailyBridgeTarget,
+    ) -> Result<bool, String> {
+        let rows = self.read_index()?;
+        let attached = self
+            .attachments
+            .lock()
+            .map_err(|_| "bridge attachment lock poisoned")?;
+        Ok(rows.get(&target.session_id).is_some_and(|row| {
+            (row.owner_user_id == crate::auth::LOCAL_OWNER_USER_ID
+                || lingxi_protocol::valid_bridge_subject(&row.owner_user_id))
+                && row.owner_user_id == target.owner_user_id
+                && row.agent_id == target.agent_id
+                && row.channel_key == target.channel_key
+                && !attached.targets.contains_key(&target.session_id)
+                && !attached.actual.contains_key(&target.session_id)
+        }))
+    }
+    /// 仅真实宿主在数据库核准 owner 私聊后调用，不开放新的 HTTP 权限。
+    pub(crate) fn register_actual_bridge(
+        &self,
+        id: &str,
+        facts: &crate::sessions::SessionFacts,
+        channel_key: &str,
+    ) -> Result<(), String> {
+        if !lingxi_protocol::valid_bridge_subject(&facts.owner_user_id)
+            || facts.session_id != id
+            || channel_key.trim().is_empty()
+            || channel_key.len() > 256
+        {
+            return Err("invalid actual Bridge registration".into());
+        }
+        self.register_inner(id, facts, channel_key, true)
+    }
     fn register(
         &self,
         id: &str,
         facts: &crate::sessions::SessionFacts,
         channel_key: &str,
     ) -> Result<(), String> {
+        self.register_inner(id, facts, channel_key, false)
+    }
+    fn register_inner(
+        &self,
+        id: &str,
+        facts: &crate::sessions::SessionFacts,
+        channel_key: &str,
+        idempotent: bool,
+    ) -> Result<(), String> {
         let _guard = self
             .mutation
             .lock()
             .map_err(|_| "bridge index lock poisoned")?;
         let mut rows = self.read_index()?;
-        if rows.contains_key(id) {
-            return Err("bridge session already registered".into());
+        if let Some(row) = rows.get(id) {
+            return if idempotent
+                && row.agent_id == facts.agent_id
+                && row.owner_user_id == facts.owner_user_id
+                && row.channel_key == channel_key
+            {
+                Ok(())
+            } else {
+                Err("bridge session already registered".into())
+            };
         }
         if rows.len() >= MAX_BRIDGES {
             return Err("bridge registry full".into());
@@ -142,6 +248,37 @@ impl SlashService {
             Some(_) => Err("bridge session identity mismatch".into()),
             None => Ok(false),
         }
+    }
+    /// 宿主先凭此只读分类领取命令收据，再调用有副作用的派发。
+    pub(crate) fn bridge_command_kind(
+        &self,
+        source: &str,
+        text: &str,
+        now: u64,
+    ) -> Result<Option<&'static str>, String> {
+        let command = text
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        if command == "/rc" {
+            return Ok(Some("rc"));
+        }
+        if command == "/exitrc" {
+            return Ok(Some("exitrc"));
+        }
+        if command.starts_with('/') {
+            return Ok(None);
+        }
+        let attached = self
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?;
+        Ok(attached
+            .pending
+            .get(source)
+            .filter(|selection| now < selection.expires)
+            .map(|_| "rc"))
     }
     fn attachment(&self, bridge: &str) -> Result<Option<String>, String> {
         Ok(self
@@ -357,6 +494,51 @@ pub async fn dispatch(
     let (command, args) = raw.split_once(char::is_whitespace).unwrap_or((raw, ""));
     let command = command.to_ascii_lowercase();
     match command.as_str() {
+        "/apply" => {
+            if !principal.is_local_owner() {
+                send(
+                    &tx,
+                    id,
+                    target,
+                    "error",
+                    "应用定时任务建议需要本机所有者权限",
+                )
+                .await;
+                return;
+            }
+            let reference = args.trim();
+            if reference.is_empty() || reference.split_whitespace().count() != 1 {
+                send(&tx, id, target, "error", "用法：/apply 建议编号").await;
+                return;
+            }
+            let result = crate::automation::manage(
+                &crate::automation::JobApi::from_state(state),
+                principal,
+                &json!({"action":"apply_suggestion","suggestionId":reference,"sessionId":target}),
+            )
+            .await;
+            match result {
+                Ok(applied) => {
+                    let title = applied["job"]["label"]
+                        .as_str()
+                        .filter(|title| !title.trim().is_empty())
+                        .or_else(|| applied["job"]["id"].as_str())
+                        .unwrap_or("定时任务");
+                    send(
+                        &tx,
+                        id,
+                        target,
+                        "success",
+                        format!("定时任务「{title}」已应用"),
+                    )
+                    .await;
+                }
+                Err(error) => {
+                    send(&tx, id, target, "error", format!("应用建议失败：{error}")).await
+                }
+            }
+        }
+
         "/compact" | "/fresh-compact" | "/freshcompact" | "/fresh_compact" => {
             let fresh = command != "/compact";
             if fresh && attachment.is_some() {
@@ -530,6 +712,113 @@ pub async fn dispatch(
                 }
             }
         },
+        // 现役 core/slash-commands/bridge-commands.ts 的 /loop
+        // （permission:"owner"；bridge-commands.ts:249-284 逐字文本）。
+        "/loop" => {
+            if !principal.is_local_owner() {
+                send(&tx, id, target, "error", "管理循环任务需要本机所有者权限").await;
+                return;
+            }
+            // 桥接未挂接会话的循环投递 Rust 侧无对应物（δ4 登记偏差）；
+            // 挂接态 target 已解析为桌面会话，不在此列。现役同位错误：
+            // "loop: bridge delivery is not available"。
+            if bridge && attachment.is_none() {
+                send(
+                    &tx,
+                    id,
+                    target,
+                    "error",
+                    "loop: bridge delivery is not available",
+                )
+                .await;
+                return;
+            }
+            let controller = &state.loop_services().controller;
+            let loop_target = crate::loopx::LoopTarget::desktop(target);
+            let args_trimmed = args.trim();
+            let first_token = args_trimmed
+                .split_whitespace()
+                .next()
+                .unwrap_or("")
+                .to_ascii_lowercase();
+            if args_trimmed.is_empty() || first_token == "status" {
+                match controller.status_for_target(&loop_target) {
+                    Some(record) => {
+                        send(
+                            &tx,
+                            id,
+                            target,
+                            if controller.storage_error(target).is_some() { "error" } else { "success" },
+                            match controller.storage_error(target) {
+                                Some(error)=>format!("{}\n自动推进已停止，状态尚未保存；修复后用 /loop resume 重试。\n{error}",crate::loopsvc::render_loop_status(&record)),
+                                None=>crate::loopsvc::render_loop_status(&record),
+                            },
+                        )
+                        .await
+                    }
+                    None => {
+                        if args_trimmed.is_empty() {
+                            send(
+                                &tx,
+                                id,
+                                target,
+                                "error",
+                                "用法：/loop <任务> | /loop stop | pause | resume | status",
+                            )
+                            .await;
+                        } else {
+                            send(&tx, id, target, "success", "（该会话没有循环）").await;
+                        }
+                    }
+                }
+                return;
+            }
+            if first_token == "stop" {
+                match controller.stop(&loop_target).await {
+                    Ok(_) => send(&tx, id, target, "success", "（循环已终止）").await,
+                    Err(err) => send(&tx, id, target, "error", err.message).await,
+                }
+                return;
+            }
+            if first_token == "pause" {
+                match controller.pause(&loop_target, "user", None).await {
+                    Ok(_) => {
+                        send(
+                            &tx,
+                            id,
+                            target,
+                            "success",
+                            "（循环已暂停，/loop resume 恢复）",
+                        )
+                        .await
+                    }
+                    Err(err) => send(&tx, id, target, "error", err.message).await,
+                }
+                return;
+            }
+            if first_token == "resume" {
+                match controller.resume(&loop_target).await {
+                    Ok(_) => send(&tx, id, target, "success", "（循环已恢复）").await,
+                    Err(err) => send(&tx, id, target, "error", err.message).await,
+                }
+                return;
+            }
+            // 现役 isStart：有参数且首词非子命令 → 以全部参数为任务启动。
+            match controller.start(&loop_target, args_trimmed).await {
+                Ok(_) => {
+                    send(
+                        &tx,
+                        id,
+                        target,
+                        "success",
+                        "（循环已启动，/loop status 查看进度，/loop stop 终止）",
+                    )
+                    .await
+                }
+                Err(err) => send(&tx, id, target, "error", err.message).await,
+            }
+        }
+
         _ => send(&tx, id, target, "error", format!("未知命令：{raw}")).await,
     }
 }
@@ -582,4 +871,414 @@ pub async fn slash_route(
         results
     });
     Json(json!({"results":results})).into_response()
+}
+
+async fn current_actual_owner(
+    state: &ServiceState,
+    inbox: &lingxi_adapters::storage::bridge::BridgeInbox,
+    source: &str,
+) -> Result<ActualBridgeIdentity, String> {
+    use lingxi_adapters::storage::bridge as store;
+    let actual = store::get_inbox(state.storage(), &inbox.id)
+        .await
+        .map_err(|e| e.to_string())?
+        .ok_or("Bridge owner receipt missing")?;
+    if actual.input != inbox.input
+        || actual.role != lingxi_protocol::BridgeRole::Owner
+        || actual.input.conversation_kind != lingxi_protocol::BridgeConversationKind::Dm
+    {
+        return Err("Bridge owner DM required".into());
+    }
+    let connector = store::get_connector(state.storage(), &actual.input.connector_id)
+        .await
+        .map_err(|e| e.to_string())?
+        .ok_or("Bridge connector missing")?;
+    if !connector.input.enabled
+        || connector.generation != actual.connector_generation
+        || connector.input.owner_sender_id.as_deref() != Some(actual.input.sender_id.as_str())
+        || connector.input.actor_id != actual.actor_id
+        || connector.input.platform != actual.input.platform
+        || connector.input.owner_subject != crate::auth::LOCAL_OWNER_USER_ID
+        || actual.owner_subject != connector.input.owner_subject
+    {
+        return Err("Bridge owner authorization revoked".into());
+    }
+    let actor_subject = lingxi_protocol::bridge_subject(
+        &actual.input.platform,
+        &actual.input.connector_id,
+        &actual.input.sender_id,
+    )
+    .map_err(str::to_owned)?;
+    let row = lingxi_adapters::storage::session_tree::get_session_row(state.storage(), source)
+        .await
+        .map_err(|e| e.to_string())?
+        .ok_or("Bridge source session missing")?;
+    if row.owner_user_id != actor_subject
+        || row.agent_id != actual.actor_id
+        || row.lifecycle != "active"
+    {
+        return Err("Bridge source session authority mismatch".into());
+    }
+    if state
+        .memory()
+        .is_agent_deleted_checked(&actual.actor_id)
+        .map_err(|e| e.to_string())?
+    {
+        return Err("Bridge actor deleted".into());
+    }
+    let resolution = store::resolve_conversation(
+        state.storage(),
+        &actual.id,
+        actual.connector_generation,
+        state.clock().now_unix_ms(),
+    )
+    .await
+    .map_err(|e| e.to_string())?;
+    // 已准备的接管消息 session_id 是桌面目标，source 仍须来自持久会话映射。
+    let conversations =
+        store::list_conversations(state.storage(), &actual.input.connector_id, 1000)
+            .await
+            .map_err(|e| e.to_string())?;
+    if !conversations.iter().any(|row| {
+        row.conversation_id == actual.input.conversation_id
+            && row.sender_id == actual.input.sender_id
+            && row.actor_id == actual.actor_id
+            && row.current_session_id.as_deref() == Some(source)
+    }) || (!actual.prepared && resolution.session_id != source)
+    {
+        return Err("Bridge source conversation changed".into());
+    }
+    Ok(ActualBridgeIdentity {
+        connector_id: actual.input.connector_id,
+        generation: actual.connector_generation,
+        sender_id: actual.input.sender_id,
+        actor_id: actual.actor_id,
+        actor_subject,
+        owner_inbox_id: actual.id,
+    })
+}
+fn same_actual_actor(a: &ActualBridgeIdentity, b: &ActualBridgeIdentity) -> bool {
+    a.connector_id == b.connector_id
+        && a.generation == b.generation
+        && a.sender_id == b.sender_id
+        && a.actor_id == b.actor_id
+        && a.actor_subject == b.actor_subject
+}
+async fn actual_desktop_target(
+    state: &ServiceState,
+    id: &str,
+    agent: &str,
+) -> Result<bool, String> {
+    let valid=state.storage().query_one_text("SELECT s.session_id FROM sessions s WHERE s.session_id=?1 AND s.owner_user_id='user_local' AND s.agent_id=?2 AND s.lifecycle='active' AND NOT EXISTS(SELECT 1 FROM bridge_conversations_v1 c WHERE c.current_session_id=s.session_id) AND NOT EXISTS(SELECT 1 FROM bridge_inbox_v1 i WHERE i.session_id=s.session_id AND i.prepared_takeover=0) AND NOT EXISTS(SELECT 1 FROM automation_internal_sessions_v1 i WHERE i.session_id=s.session_id AND NOT EXISTS(SELECT 1 FROM automation_activity_promotions_v1 p WHERE p.session_id=i.session_id))",vec![id.into(),agent.into()]).await.map_err(|e|e.to_string())?;
+    Ok(valid.is_some() && !state.slash.read_index()?.contains_key(id))
+}
+fn publish_actual_detached(state: &ServiceState, source: &str, target: &str) {
+    state.app_events().publish(
+        "bridge_rc_detached",
+        json!({"sessionKey":source,"sessionPath":format!("native:{target}")}),
+    );
+}
+pub(crate) fn clear_bridge_takeover(state: &ServiceState, source: &str) -> Result<(), String> {
+    let removed = {
+        let mut attached = state
+            .slash
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?;
+        attached.pending.remove(source);
+        attached.actual.remove(source)
+    };
+    if let Some(old) = removed {
+        publish_actual_detached(state, source, &old.target);
+    }
+    Ok(())
+}
+pub(crate) fn revoke_bridge_takeovers(
+    state: &ServiceState,
+    connector_id: &str,
+) -> Result<(), String> {
+    let sources = {
+        let attached = state
+            .slash
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?;
+        attached
+            .actual
+            .iter()
+            .filter(|(_, row)| row.identity.connector_id == connector_id)
+            .map(|(source, _)| source.clone())
+            .chain(
+                attached
+                    .pending
+                    .iter()
+                    .filter(|(_, row)| row.identity.connector_id == connector_id)
+                    .map(|(source, _)| source.clone()),
+            )
+            .collect::<Vec<_>>()
+    };
+    for source in sources {
+        clear_bridge_takeover(state, &source)?;
+    }
+    Ok(())
+}
+/// 返回下一条真实消息的唯一目标，失效绑定立即撤横幅，不重新授权其它会话。
+pub(crate) async fn resolve_takeover(
+    state: &ServiceState,
+    inbox: &lingxi_adapters::storage::bridge::BridgeInbox,
+    source: &str,
+) -> Result<Option<String>, String> {
+    let binding = {
+        state
+            .slash
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?
+            .actual
+            .get(source)
+            .cloned()
+    };
+    let Some(binding) = binding else {
+        return Ok(None);
+    };
+    let identity = match current_actual_owner(state, inbox, source).await {
+        Ok(identity) => identity,
+        Err(error) => {
+            clear_bridge_takeover(state, source)?;
+            return Err(error);
+        }
+    };
+    if !same_actual_actor(&binding.identity, &identity)
+        || !actual_desktop_target(state, &binding.target, &identity.actor_id).await?
+    {
+        clear_bridge_takeover(state, source)?;
+        return Ok(None);
+    }
+    // 建立绑定时的真实 owner DM 仍须存在，不能用自报 sessionKey 转移授权。
+    let origin = lingxi_adapters::storage::bridge::get_inbox(
+        state.storage(),
+        &binding.identity.owner_inbox_id,
+    )
+    .await
+    .map_err(|e| e.to_string())?
+    .ok_or("Bridge takeover origin missing")?;
+    if origin.role != lingxi_protocol::BridgeRole::Owner
+        || origin.connector_generation != identity.generation
+        || origin.input.sender_id != identity.sender_id
+    {
+        clear_bridge_takeover(state, source)?;
+        return Ok(None);
+    }
+    Ok(Some(binding.target))
+}
+/// 只供可信宿主消费已领取的命令收据；普通消息返回 None，随后走正式 Run。
+pub(crate) async fn dispatch_bridge_message(
+    state: &ServiceState,
+    inbox: &lingxi_adapters::storage::bridge::BridgeInbox,
+    source: &str,
+    text: &str,
+) -> Result<Option<SlashResult>, String> {
+    let now = state.clock().now_unix_ms();
+    let Some(kind) = state.slash.bridge_command_kind(source, text, now)? else {
+        return Ok(None);
+    };
+    let identity = current_actual_owner(state, inbox, source).await?;
+    let result = |level, text: String, target: &str| {
+        Some(SlashResult {
+            kind: "slash_result",
+            session_id: source.into(),
+            target_session_id: target.into(),
+            level,
+            text,
+            history_cleared: false,
+        })
+    };
+    let raw = text.trim();
+    let (command, args) = raw.split_once(char::is_whitespace).unwrap_or((raw, ""));
+    if kind == "exitrc" {
+        clear_bridge_takeover(state, source)?;
+        return Ok(result("success", "已退出接管桌面会话".into(), source));
+    }
+    if command.eq_ignore_ascii_case("/rc") && args.trim().is_empty() {
+        if resolve_takeover(state, inbox, source).await?.is_some() {
+            return Ok(result(
+                "error",
+                "当前已处于接管态，请先 /exitrc 再切换".into(),
+                source,
+            ));
+        }
+        let mut sessions = state
+            .sessions()
+            .list_for(&state.auth().scheduler_principal())
+            .await
+            .map_err(|e| e.to_string())?;
+        sessions.sort_by(|a, b| {
+            b.last_runs
+                .first()
+                .map(|r| r.started_at_unix_ms)
+                .cmp(&a.last_runs.first().map(|r| r.started_at_unix_ms))
+                .then_with(|| a.session_id.cmp(&b.session_id))
+        });
+        let mut options = Vec::new();
+        for session in sessions {
+            if session.agent_id != identity.actor_id
+                || session.owner_user_id != crate::auth::LOCAL_OWNER_USER_ID
+                || !actual_desktop_target(state, &session.session_id, &identity.actor_id).await?
+            {
+                continue;
+            }
+            let occupied = {
+                let attached = state
+                    .slash
+                    .attachments
+                    .lock()
+                    .map_err(|_| "attachment lock poisoned")?;
+                attached
+                    .targets
+                    .values()
+                    .any(|id| id == &session.session_id)
+                    || attached
+                        .actual
+                        .values()
+                        .any(|row| row.target == session.session_id)
+            };
+            if !occupied {
+                options.push((
+                    session.session_id,
+                    if session.title.is_empty() {
+                        "未命名会话".into()
+                    } else {
+                        session.title
+                    },
+                ));
+                if options.len() == 10 {
+                    break;
+                }
+            }
+        }
+        if options.is_empty() {
+            return Ok(result(
+                "success",
+                "当前助手没有可接管的桌面会话".into(),
+                source,
+            ));
+        }
+        let lines = options
+            .iter()
+            .enumerate()
+            .map(|(i, (_, title))| format!("{}. {title}", i + 1))
+            .collect::<Vec<_>>()
+            .join("\n");
+        state
+            .slash
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?
+            .pending
+            .insert(
+                source.into(),
+                ActualBridgeSelection {
+                    identity,
+                    options,
+                    expires: now.saturating_add(5 * 60 * 1000),
+                },
+            );
+        return Ok(result("success",format!("选择要接管的桌面会话（回复编号）：\n{lines}\n\n5 分钟内不选则自动取消。/exitrc 退出接管。"),source));
+    }
+    let selection = {
+        state
+            .slash
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?
+            .pending
+            .get(source)
+            .cloned()
+    };
+    let Some(selection) =
+        selection.filter(|row| now < row.expires && same_actual_actor(&row.identity, &identity))
+    else {
+        clear_bridge_takeover(state, source)?;
+        return Ok(result(
+            "error",
+            "请重新发送 /rc 选择桌面会话".into(),
+            source,
+        ));
+    };
+    let value = if command.eq_ignore_ascii_case("/rc") {
+        args.trim()
+    } else {
+        raw
+    };
+    let index = value
+        .parse::<usize>()
+        .ok()
+        .filter(|index| *index >= 1 && *index <= selection.options.len());
+    let Some(index) = index else {
+        return Ok(result(
+            "error",
+            format!("请输入数字编号（1-{}）", selection.options.len()),
+            source,
+        ));
+    };
+    let (target, title) = selection.options[index - 1].clone();
+    let deadline = tokio::time::Instant::now() + std::time::Duration::from_secs(30);
+    loop {
+        let current = current_actual_owner(state, inbox, source).await?;
+        if !same_actual_actor(&current, &identity)
+            || !actual_desktop_target(state, &target, &identity.actor_id).await?
+        {
+            clear_bridge_takeover(state, source)?;
+            return Ok(result(
+                "error",
+                "目标会话或桥接授权已改变，接管取消".into(),
+                source,
+            ));
+        }
+        if !state.sessions().session_supervisor().is_busy(&target) {
+            break;
+        }
+        if tokio::time::Instant::now() >= deadline {
+            clear_bridge_takeover(state, source)?;
+            return Ok(result(
+                "error",
+                "目标会话持续在回复中（>30s），接管取消。稍后重试 /rc".into(),
+                source,
+            ));
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+    }
+    {
+        let mut attached = state
+            .slash
+            .attachments
+            .lock()
+            .map_err(|_| "attachment lock poisoned")?;
+        if attached
+            .actual
+            .iter()
+            .any(|(other, row)| other != source && row.target == target)
+            || attached.targets.values().any(|id| id == &target)
+        {
+            return Ok(result(
+                "error",
+                "目标会话已被另一个桥接会话接管".into(),
+                source,
+            ));
+        }
+        attached.pending.remove(source);
+        attached.actual.insert(
+            source.into(),
+            ActualBridgeAttachment {
+                identity,
+                target: target.clone(),
+            },
+        );
+    }
+    state.app_events().publish("bridge_rc_attached",json!({"sessionKey":source,"sessionPath":format!("native:{target}"),"title":title,"platform":inbox.input.platform}));
+    Ok(result(
+        "success",
+        format!("已接管桌面会话《{title}》"),
+        &target,
+    ))
 }

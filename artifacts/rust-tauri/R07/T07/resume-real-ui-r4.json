@@ -1,0 +1,20 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/stores/r07-workbench-real-service.test.ts",
+    "--maxWorkers=1"
+  ],
+  "environment": {
+    "LINGXI_R07_SERVICE_BIN": "/private/tmp/lingxi-r07-build/debug/lingxi-service"
+  },
+  "binarySha256": "145a494e28cc944e5fdef82a07bb2f82680935392d54273857f6bcef15207cd0",
+  "exitCode": 1,
+  "startedAt": "2026-10-18T01:49:00.766626+00:00",
+  "finishedAt": "2026-10-18T01:49:03.202118+00:00",
+  "sourceFingerprintBefore": "6a731cea1679382f771194c72d1e5cdc05a026936dc6b9eb5c6569a183299570",
+  "sourceFingerprintAfter": "6a731cea1679382f771194c72d1e5cdc05a026936dc6b9eb5c6569a183299570",
+  "logSha256": "0a8623a58ac0dbbfad5a5b1895cfc4e9fd07c376644cc1fa0b80d9e906de59b3",
+  "scope": "真实隔离Rust子进程与前端动作及WorkTab组件；开发检查，尚非最终冻结"
+}

@@ -227,6 +227,22 @@ pub fn principal_from_storage_facts(
         "web_session" => Ok(crate::Principal::WebSession {
             account_id: subject.to_string(),
         }),
+        "bridge" if lingxi_protocol::valid_bridge_subject(subject) => {
+            Ok(crate::Principal::Bridge {
+                subject: subject.to_string(),
+            })
+        }
+        "bridge" => Err(StorageError::Corrupted {
+            detail: "runs row holds an invalid Bridge owner subject".into(),
+        }),
+        "bridge_takeover" => {
+            let scope = lingxi_protocol::parse_bridge_takeover_subject(subject)
+                .map_err(|e| StorageError::Corrupted { detail: e.into() })?;
+            Ok(crate::Principal::BridgeTakeover {
+                subject: scope.actor_subject,
+                session_id: scope.session_id,
+            })
+        }
         "automation" => Ok(crate::Principal::Automation {
             surface: subject.to_string(),
         }),
@@ -411,6 +427,23 @@ mod tests {
         roundtrip(&Principal::Automation {
             surface: "cron".to_string(),
         });
+        roundtrip(&Principal::Bridge {
+            subject: lingxi_protocol::bridge_subject("qq", "connector", "sender").unwrap(),
+        });
+        assert!(principal_from_storage_facts("bridge", "user_local").is_err());
+        let scoped = Principal::BridgeTakeover {
+            subject: lingxi_protocol::bridge_subject("qq", "connector", "sender").unwrap(),
+            session_id: "selected-desktop".into(),
+        };
+        roundtrip(&scoped);
+        assert!(scoped.can_access_session(crate::LOCAL_OWNER_SUBJECT, "selected-desktop"));
+        assert!(!scoped.can_access_session(crate::LOCAL_OWNER_SUBJECT, "other-desktop"));
+        assert!(principal_from_storage_facts(
+            "bridge_takeover",
+            r#"{"actorSubject":"user_local","sessionId":"desktop"}"#
+        )
+        .is_err());
+
         match principal_from_storage_facts("local_user", "someone_else") {
             Err(StorageError::Corrupted { .. }) => {}
             other => panic!("unexpected: {other:?}"),

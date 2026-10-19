@@ -1,0 +1,83 @@
+[
+  {
+    "seconds": 0.028,
+    "kind": "launch",
+    "argv": [
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "--remote-debugging-pipe",
+      "--user-data-dir=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-cdp-readonly-probe-ozwf_dgr",
+      "--profile-directory=Default",
+      "--headless=new",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-component-update",
+      "--disable-sync",
+      "--metrics-recording-only",
+      "--no-startup-window",
+      "--window-size=1280,860",
+      "--proxy-server=http://127.0.0.1:56051",
+      "--proxy-bypass-list=<-loopback>;127.0.0.1"
+    ],
+    "profile": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-cdp-readonly-probe-ozwf_dgr"
+  },
+  {
+    "seconds": 0.028658,
+    "kind": "owned_process",
+    "pid": 87897,
+    "pgid": 87897
+  },
+  {
+    "seconds": 0.028733,
+    "kind": "send",
+    "message": {
+      "id": 1,
+      "method": "Browser.getVersion",
+      "params": {}
+    }
+  },
+  {
+    "seconds": 0.300629,
+    "kind": "http",
+    "path": "http://clients2.google.com/time/1/current?cup2key=10:SxVaQXnMHa5FAEsFLfKwGgOJ7iTAsARU5ARARIbqvR0&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "seconds": 0.308348,
+    "kind": "receive",
+    "message": {
+      "id": 1,
+      "result": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/155.0.8059.82",
+        "revision": "@c56fe5daef8be123f68808a4bb705ff378cd2019",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "jsVersion": "15.5.35.23"
+      }
+    }
+  },
+  {
+    "seconds": 0.30843,
+    "kind": "send",
+    "message": {
+      "id": 2,
+      "method": "Target.createTarget",
+      "params": {
+        "url": "about:blank"
+      }
+    }
+  },
+  {
+    "seconds": 8.31852,
+    "kind": "send",
+    "message": {
+      "id": 3,
+      "method": "Browser.close",
+      "params": {}
+    }
+  },
+  {
+    "seconds": 16.328725,
+    "kind": "browser_close_result",
+    "error": "TimeoutError('CDP id 3')"
+  }
+]

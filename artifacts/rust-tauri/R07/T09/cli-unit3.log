@@ -1,0 +1,470 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/cli-chat-runtime.test.ts (1 test | 1 failed) 183ms
+     × hides another session's stream frame and exits nonzero on an unexpected disconnect 182ms
+LingxiAgent · Hana
+Session s1 · native:s1
+
+Rust service HTTP 503: ticket unavailable
+ ❯ tests/cli-closure-census.test.ts (23 tests | 2 failed) 66642ms
+     × matches the committed deterministic closure and baseline 17091ms
+     × writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place 16537ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/cli-chat-runtime.test.ts > CLI chat real WebSocket boundary > hides another session's stream frame and exits nonzero on an unexpected disconnect
+AssertionError: expected null to match object { sessionId: 's1', …(2) }
+
+- Expected:
+{
+  "sessionId": "s1",
+  "sessionPath": "/synthetic/session-one.jsonl",
+  "text": "hello",
+}
+
++ Received:
+null
+
+ ❯ tests/cli-chat-runtime.test.ts:82:20
+     80|     ]).finally(() => clearTimeout(timeout));
+     81|     expect(exitCode).toBe(1);
+     82|     expect(prompt).toMatchObject({ sessionId: "s1", sessionPath: selec…
+       |                    ^
+     83|     expect(stdout).toContain("RIGHT_SESSION_TEXT");
+     84|     expect(stdout).not.toContain("WRONG_SESSION_TEXT");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > matches the committed deterministic closure and baseline
+AssertionError: expected { version: 1, …(5) } to deeply equal { version: 1, …(5) }
+
+- Expected
++ Received
+
+@@ -239,19 +239,36 @@
+        ],
+        "reason": "Reached via esbuild source module graph, imported by cli/server-runner.ts (import-statement); cli/bundle.ts (import-statement); cli/data.ts (import-statement); +1 more importer(s).",
+      },
+      {
+        "inputType": "source-graph",
++       "path": "cli/rust-chat.ts",
++       "provenance": [
++         {
++           "from": "cli/entry.ts",
++           "kind": "import-statement",
++           "root": "cli-entry",
++         },
++       ],
++       "reason": "Reached via esbuild source module graph, imported by cli/entry.ts (import-statement).",
++     },
++     {
++       "inputType": "source-graph",
+        "path": "cli/rust-service.ts",
+        "provenance": [
+          {
++           "from": "cli/rust-chat.ts",
++           "kind": "import-statement",
++           "root": "cli-entry",
++         },
++         {
+            "from": "cli/entry.ts",
+            "kind": "import-statement",
+            "root": "cli-entry",
+          },
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by cli/entry.ts (import-statement).",
++       "reason": "Reached via esbuild source module graph, imported by cli/rust-chat.ts (import-statement); cli/entry.ts (import-statement).",
+      },
+      {
+        "inputType": "source-graph",
+        "path": "cli/server-runner.ts",
+        "provenance": [
+@@ -6738,10 +6755,20 @@
+      },
+      {
+        "inputType": "source-graph",
+        "path": "lib/knowledge/ann-index-store.ts",
+        "provenance": [
++         {
++           "from": "lib/knowledge/knowledge-index-store.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
++         {
++           "from": "lib/knowledge/vector-index-adapter.ts",
++           "kind": "import-statement",
++           "root": "server-bootstrap",
++         },
+          {
+            "from": "lib/knowledge/usearch-vector-backend.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+@@ -6749,11 +6776,11 @@
+            "from": "lib/knowledge/vector-search-backend-factory.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/usearch-vector-backend.ts (import-statement); lib/knowledge/vector-search-backend-factory.ts (import-statement).",
++       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-index-store.ts (import-statement); lib/knowledge/vector-index-adapter.ts (import-statement); lib/knowledge/usearch-vector-backend.ts (import-statement); +1 more importer(s).",
+      },
+      {
+        "inputType": "source-graph",
+        "path": "lib/knowledge/chunker.ts",
+        "provenance": [
+@@ -6843,31 +6870,31 @@
+            "from": "lib/knowledge/knowledge-store.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+-           "from": "lib/knowledge/knowledge-index-store.ts",
++           "from": "lib/knowledge/ann-index-store.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+-           "from": "lib/knowledge/ingestion-service.ts",
++           "from": "lib/knowledge/knowledge-index-store.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+-           "from": "lib/knowledge/vector-index-adapter.ts",
++           "from": "lib/knowledge/ingestion-service.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+-           "from": "lib/knowledge/knowledge-query-service.ts",
++           "from": "lib/knowledge/vector-index-adapter.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+-           "from": "lib/knowledge/ann-index-store.ts",
++           "from": "lib/knowledge/knowledge-query-service.ts",
+            "kind": "import-statement",
+            "root": "server-bootstrap",
+          },
+          {
+            "from": "lib/knowledge/usearch-vector-backend.ts",
+@@ -30099,43 +30126,13 @@
+            "root": "nft-server-bundle",
+          },
+        ],
+        "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+      },
+-     {
+-       "inputType": "nft-runtime-trace",
+-       "path": "node_modules/@earendil-works/pi-ai/node_modules/typebox/build/value/convert/from_array.mjs",
+-       "provenance": [
+-         {
+-           "kind": "nft-trace",
+-           "root": "nft-server-bundle",
+-         },
+-       ],
+-       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+-     },
+-     {
+-       "inputType": "nft-runtime-trace",
+-       "path": "node_modules/@earendil-works/pi-ai/node_modules/typebox/build/value/convert/from_bigint.mjs",
+-       "provenance": [
+-         {
+-           "kind": "nft-trace",
+-           "root": "nft-server-bundle",
+-         },
+-       ],
+-       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+-     },
+-     {
+-       "inputType": "nft-runtime-trace",
+-       "path": "node_modules/@earendil-works/pi-ai/node_modules/typebox/build/value/convert/from_boolean.mjs",
+-       "provenance": [
+-         {
+-           "kind": "nft-trace",
+-           "root": "nft-server-bundle",
+-         },
+-       ],
+-       "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)",
+-     },
++     [Object],
++     [Object],
++     [Object],
+      [Object],
+      [Object],
+      [Object],
+      [Object],
+      [Object],
+
+ ❯ tests/cli-closure-census.test.ts:318:30
+    316|     const generatedClosure = await computeCliRuntimeClosure({ rootDir:…
+    317|     const committedClosure = JSON.parse(fs.readFileSync(CLOSURE_PATH, …
+    318|     expect(generatedClosure).toEqual(committedClosure);
+       |                              ^
+    319|     // 可移植性：生成物不得泄漏本机绝对路径。dynamicCallSites 段除外——那是
+    320|     // DYNAMIC_CALL_ALLOWLIST 的回显，argText 必须逐字匹配供应商源码里的调用点
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/cli-closure-census.test.ts > compute-cli-closure: full generation (real esbuild + nft, slow) > writeCliRuntimeClosure/writeOpenBoundaryBaseline regenerate the exact committed files in place
+AssertionError: expected '{\n  "version": 1,\n  "generatedBy": …' to be '{\n  "version": 1,\n  "generatedBy": …' // Object.is equality
+
+- Expected
++ Received
+
+@@ -31,10 +31,16 @@
+        "path": "server/index.ts",
+        "inputType": "nft-runtime-trace",
+        "reason": "@vercel/nft trace of an esbuild-compiled bundle of server/index.ts (internal repo source inlined, npm packages left external) -- bundle externals / runtime dependency files for the open server composition's npm dependency surface. Since the route-composition split this file no longer imports the closed-product route files (see the server-bootstrap root's reason above), so this trace no longer pulls in their npm dependencies either -- narrower, and more accurate, than before the split. The packaged product bundle (vite.config.server.js's build.lib.entry) is compiled from server/main-full.ts instead, which statically includes this file plus the closed-product routes; that closed bundle is out of scope for this open-closure trace by design. Same nft usage pattern as the server build's pruneServerNodeModulesViaNft() in scripts/build-server-phases.mjs (read-only precedent)."
+      },
+      {
++       "id": "create-require-root:package.json",
++       "path": "package.json",
++       "inputType": "dynamic-process-root",
++       "reason": "Reached via a createRequire()-bound local require(\"../package.json\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
++     },
++     {
+        "id": "create-require-root:shared/artifact-core/activation.cjs",
+        "path": "shared/artifact-core/activation.cjs",
+        "inputType": "dynamic-process-root",
+        "reason": "Reached via a createRequire()-bound local require(\"../shared/artifact-core/activation.cjs\") call in cli/server-runner.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
+      },
+@@ -59,10 +65,16 @@
+      {
+        "id": "create-require-root:shared/artifact-core/pointer-store.cjs",
+        "path": "shared/artifact-core/pointer-store.cjs",
+        "inputType": "dynamic-process-root",
+        "reason": "Reached via a createRequire()-bound local require(\"../shared/artifact-core/pointer-store.cjs\") call in cli/server-runner.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
++     },
++     {
++       "id": "create-require-root:shared/contract-versions.cjs",
++       "path": "shared/contract-versions.cjs",
++       "inputType": "dynamic-process-root",
++       "reason": "Reached via a createRequire()-bound local require(\"../shared/contract-versions.cjs\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
+      }
+    ],
+    "dynamicCallSites": [
+      {
+        "file": "core/speech-recognition/system-speech-adapter.ts",
+@@ -302,20 +314,37 @@
+          }
+        ],
+        "reason": "Reached via esbuild source module graph, imported by cli/server-runner.ts (import-statement); cli/bundle.ts (import-statement); cli/data.ts (import-statement); +1 more importer(s)."
+      },
+      {
++       "path": "cli/rust-chat.ts",
++       "inputType": "source-graph",
++       "provenance": [
++         {
++           "root": "cli-entry",
++           "from": "cli/entry.ts",
++           "kind": "import-statement"
++         }
++       ],
++       "reason": "Reached via esbuild source module graph, imported by cli/entry.ts (import-statement)."
++     },
++     {
+        "path": "cli/rust-service.ts",
+        "inputType": "source-graph",
+        "provenance": [
++         {
++           "root": "cli-entry",
++           "from": "cli/rust-chat.ts",
++           "kind": "import-statement"
++         },
+          {
+            "root": "cli-entry",
+            "from": "cli/entry.ts",
+            "kind": "import-statement"
+          }
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by cli/entry.ts (import-statement)."
++       "reason": "Reached via esbuild source module graph, imported by cli/rust-chat.ts (import-statement); cli/entry.ts (import-statement)."
+      },
+      {
+        "path": "cli/server-runner.ts",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -6802,10 +6831,20 @@
+      },
+      {
+        "path": "lib/knowledge/ann-index-store.ts",
+        "inputType": "source-graph",
+        "provenance": [
++         {
++           "root": "server-bootstrap",
++           "from": "lib/knowledge/knowledge-index-store.ts",
++           "kind": "import-statement"
++         },
++         {
++           "root": "server-bootstrap",
++           "from": "lib/knowledge/vector-index-adapter.ts",
++           "kind": "import-statement"
++         },
+          {
+            "root": "server-bootstrap",
+            "from": "lib/knowledge/usearch-vector-backend.ts",
+            "kind": "import-statement"
+          },
+@@ -6813,11 +6852,11 @@
+            "root": "server-bootstrap",
+            "from": "lib/knowledge/vector-search-backend-factory.ts",
+            "kind": "import-statement"
+          }
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/usearch-vector-backend.ts (import-statement); lib/knowledge/vector-search-backend-factory.ts (import-statement)."
++       "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-index-store.ts (import-statement); lib/knowledge/vector-index-adapter.ts (import-statement); lib/knowledge/usearch-vector-backend.ts (import-statement); +1 more importer(s)."
+      },
+      {
+        "path": "lib/knowledge/chunker.ts",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -6908,31 +6947,31 @@
+            "from": "lib/knowledge/knowledge-store.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+-           "from": "lib/knowledge/knowledge-index-store.ts",
++           "from": "lib/knowledge/ann-index-store.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+-           "from": "lib/knowledge/ingestion-service.ts",
++           "from": "lib/knowledge/knowledge-index-store.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+-           "from": "lib/knowledge/vector-index-adapter.ts",
++           "from": "lib/knowledge/ingestion-service.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+-           "from": "lib/knowledge/knowledge-query-service.ts",
++           "from": "lib/knowledge/vector-index-adapter.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+-           "from": "lib/knowledge/ann-index-store.ts",
++           "from": "lib/knowledge/knowledge-query-service.ts",
+            "kind": "import-statement"
+          },
+          {
+            "root": "server-bootstrap",
+            "from": "lib/knowledge/usearch-vector-backend.ts",
+@@ -102884,18 +102923,23 @@
+        ],
+        "reason": "nft-runtime-trace via nft-server-bundle (see roots[] for the full explanation)"
+      },
+      {
+        "path": "package.json",
+-       "inputType": "runtime-asset",
++       "inputType": "source-graph",
+        "provenance": [
+          {
++           "root": "create-require-root:package.json",
++           "from": null,
++           "kind": "root"
++         },
++         {
+            "root": "declared-asset",
+            "kind": "file"
+          }
+        ],
+-       "reason": "server/index.ts's startServer() reads fromRoot(\"package.json\") via fs.readFileSync for version display."
++       "reason": "Declared root: Reached via a createRequire()-bound local require(\"../package.json\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
+      },
+      {
+        "path": "server/app-events.ts",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -105058,18 +105102,23 @@
+          },
+          {
+            "root": "server-bootstrap",
+            "from": "server/index.ts",
+            "kind": "import-statement"
++         },
++         {
++           "root": "create-require-root:shared/contract-versions.cjs",
++           "from": null,
++           "kind": "root"
+          },
+          {
+            "root": "create-require-root:shared/artifact-core/ota-core.cjs",
+            "from": "shared/artifact-core/ota-core.cjs",
+            "kind": "require-call"
+          }
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by cli/bundle.ts (import-statement); cli/data.ts (import-statement); server/routes/server-identity.ts (import-statement); +2 more importer(s)."
++       "reason": "Declared root: Reached via a createRequire()-bound local require(\"../shared/contract-versions.cjs\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
+      },
+      {
+        "path": "shared/contract-versions.json",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -105082,16 +105131,21 @@
+            "root": "server-bootstrap",
+            "from": "shared/contract-versions.cjs",
+            "kind": "require-call"
+          },
+          {
++           "root": "create-require-root:shared/contract-versions.cjs",
++           "from": "shared/contract-versions.cjs",
++           "kind": "require-call"
++         },
++         {
+            "root": "create-require-root:shared/artifact-core/ota-core.cjs",
+            "from": "shared/contract-versions.cjs",
+            "kind": "require-call"
+          }
+        ],
+-       "reason": "Reached via esbuild source module graph, imported by shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call)."
++       "reason": "Reached via esbuild source module graph, imported by shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call); +1 more importer(s)."
+      },
+      {
+        "path": "shared/data-epoch.cjs",
+        "inputType": "source-graph",
+        "provenance": [
+@@ -107250,14 +107304,14 @@
+        ],
+        "reason": "Reached via esbuild source module graph, imported by cli/terminal-theme.ts (import-statement)."
+      }
+    ],
+    "stats": {
+-     "totalFiles": 8950,
++     "totalFiles": 8951,
+      "byInputType": {
+-       "source-graph": 836,
+-       "runtime-asset": 11,
++       "source-graph": 838,
++       "runtime-asset": 10,
+        "nft-runtime-trace": 8103
+      }
+    }
+  }
+
+
+ ❯ tests/cli-closure-census.test.ts:371:21
+    369|       const after = fs.readFileSync(CLOSURE_PATH, "utf-8");
+    370|       const afterBaseline = fs.readFileSync(BASELINE_PATH, "utf-8");
+    371|       expect(after).toBe(before);
+       |                     ^
+    372|       expect(afterBaseline).toBe(beforeBaseline);
+    373|     } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 9 passed (11)
+      Tests  3 failed | 122 passed (125)
+   Start at  23:22:38
+   Duration  66.99s (transform 1.24s, setup 221ms, import 1.44s, tests 67.55s, environment 1ms)
+

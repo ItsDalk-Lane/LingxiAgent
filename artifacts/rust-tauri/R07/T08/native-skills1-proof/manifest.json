@@ -1,0 +1,20 @@
+{
+  "scope": "DEVELOPMENT_NATIVE_MAC_ONLY_NOT_FINAL_CANDIDATE",
+  "originalProof": "/private/tmp/lingxi-r07-tests/tmp/lingxi-skills-native-proof-f86ed5f8515db2b2",
+  "checks": 11,
+  "files": {
+    "native-app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outside.txt": "d528fc0da6584a491efd368953514faf44bc20380b7cc03e22144fa0c99c3117",
+    "reader-boundary-stderr.log": "544046730f28a37a02c9e1d282e645e0845578c140e3859ed5ba58335598ba11",
+    "reader-boundary-stdout.log": "19528cdb8e90752014bd8b6ff21f90e6bcd2e46d47ee88effa87939731228050",
+    "receipt.json": "1d38c56c427f24631c3212f7ce0dd09905bfff6258d6832fef1cba50d7d8b88b",
+    "runner-stderr.log": "ac0e131ebd5ebf9bdae979dc7872dd0bc7b43551b38d66d5a092b6a5f3e01857",
+    "runner-stdout.log": "283773cb56c45f2c9469d4245cdd6d2b58f8f22cb90c12c54d37c7f86d1a5a8a",
+    "sample-skill/SKILL.md": "2924692b7c0b933249ddcd8a2c28e07615162056e2dd50498848722773111a43",
+    "sample-skill/examples/中文.txt": "15416fd5fda2d1b16174b1da8b9113cf7bea460ddaa58eb206524f46b8b6d806",
+    "sample-skill/oversized.txt": "e9a099c75ef837c28bc91683bee127e463fa0ee10c11fd816f8d2d428c0d610e",
+    "skill-viewer.png": "2d038c921146106e5d77521a789bc260b7a1b1379cce9b8d8adeba01a338d818"
+  },
+  "parentReceipt": "artifacts/rust-tauri/R07/T08/native-skills1.json",
+  "windowsLinux": "NOT_RUN"
+}

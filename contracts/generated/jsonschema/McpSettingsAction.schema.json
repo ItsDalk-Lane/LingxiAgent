@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "mcp.global.enabled",
+    "mcp.global.defer",
+    "mcp.connector.add",
+    "mcp.connector.add_bulk",
+    "mcp.connector.update",
+    "mcp.connector.remove",
+    "mcp.connector.start",
+    "mcp.connector.stop",
+    "mcp.connector.refresh_tools",
+    "mcp.agent.connector.enable",
+    "mcp.agent.tool.enable"
+  ],
+  "title": "McpSettingsAction",
+  "type": "string"
+}

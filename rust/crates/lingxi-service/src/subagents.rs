@@ -754,6 +754,13 @@ impl SubagentRuntime {
         Ok(())
     }
 
+    /// R07-T07-δ8：workflow agentType 解析复用同一花名册扫描。现役
+    /// resolveAgentId 在全花名册上 find（含调用方自身），故传永不匹配的
+    /// 空 current——不是 subagent 派发，无需排除自身。
+    pub(crate) fn workflow_roster(&self) -> Result<Vec<Value>, SubagentDispatchError> {
+        self.candidates("")
+    }
+
     fn candidates(&self, current: &str) -> Result<Vec<Value>, SubagentDispatchError> {
         let root = self
             .agents_root
@@ -1353,6 +1360,10 @@ impl SubagentRuntime {
         // is what the tool-policy plane needs to reproduce the
         // incumbent's ask-tier deny_on_prompt semantics (R04-SUP-01).
         let grant = DriveAuthorization {
+            foreground_mcp_session_permissions: false,
+            settings_principal: None,
+            loop_identity: None,
+            workflow_scope: None,
             chat_input: None,
             knowledge_selection: None,
             lineage,

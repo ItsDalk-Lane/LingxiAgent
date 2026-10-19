@@ -1,0 +1,10 @@
+{
+  "reviewedAt": "2026-10-18T03:28:58.543945+00:00",
+  "scope": "/private/tmp/lingxi-r07-tests/tmp/lingxi-browser-d564ed2551a9661d62337f0b475b04c8/profiles/263cc15785a02b72b128d11985b7dec2533608be8e3fd8fdacebfe4f0824f057",
+  "profileMatchesPopupDialog": true,
+  "scopeExists": true,
+  "entriesEnumerated": 175,
+  "symlinksFollowed": false,
+  "crashRelatedEntries": [],
+  "limitation": "仅枚举本次失败测试的已确认唯一profile；未遍历用户日志/其他profile。无dump不等于Chrome未异常退出；有Crashpad pending也须对应具体报告及时间。"
+}

@@ -1,0 +1,92 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused import: `time::Duration`
+ --> crates/lingxi-service/tests/r07_scheduler.rs:2:74
+  |
+2 | use std::{sync::{Arc,Mutex,atomic::{AtomicUsize,Ordering}},path::PathBuf,time::Duration};
+  |                                                                          ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r07_scheduler") generated 1 warning (run `cargo fix --test "r07_scheduler" -p lingxi-service` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 40.11s
+     Running tests/r07_automation_store.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_store-7196d981931a359b)
+
+running 12 tests
+test one_shot_old_revision_cannot_disable_edited_configuration ... ok
+test daily_known_failure_retries_after_one_hour_but_started_and_success_survive_restart ... ok
+test concurrent_claims_and_configuration_updates_have_one_winner ... ok
+test malformed_configuration_and_owner_changes_leave_original_job_untouched ... ok
+test notification_claim_is_unique_and_unacknowledged_delivery_never_requeues ... ok
+test one_shot_terminal_states_disable_same_revision_but_skip_does_not_advance ... ok
+test stale_trigger_cannot_overwrite_edited_or_deleted_job_and_history_survives ... ok
+test ordinary_user_notification_uses_real_run_without_fabricated_trigger ... ok
+test daily_concurrent_claim_has_one_attempt_and_unknown_never_retries ... ok
+test reopen_preserves_raw_configuration_trigger_and_confirmed_delivery ... ok
+test crash_before_binding_recovers_only_unique_durable_causal_run ... ok
+test cursor_write_failure_rolls_back_trigger_settlement_as_one_transaction ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running tests/r07_automation_permission.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_automation_permission-d23769d2dea63ba4)
+
+running 15 tests
+test automation_policy_resolution_keeps_interactive_ask_distinct ... ok
+test missing_or_changed_review_material_fails_closed ... ok
+test native_file_routine_requires_a_bound_writable_resource ... ok
+test auto_allows_known_routine_operations_with_bound_arguments ... ok
+test read_only_inheritance_classifies_real_note_actions ... ok
+test auto_requires_real_automatic_review_for_boundaries_and_unknown_operations ... ok
+test external_origin_cannot_impersonate_routine_or_self_declare_permission ... ok
+test unattended_review_and_user_questions_never_wait_even_in_operate ... ok
+test real_reviewer_parser_rejects_broader_missing_or_fabricated_authorization ... ok
+test real_gateway_supplies_schema_normalized_parameters_and_never_parks_background ... ok
+test automatic_review_grants_expire_and_cannot_survive_registry_changes ... ok
+test automatic_review_grant_is_bound_to_one_call_and_consumed_once ... ok
+test reviewer_payload_is_bounded_redacted_and_identity_checked ... ok
+test real_approval_slot_uses_frozen_trigger_evidence_and_accounts_format_retry ... ok
+test real_native_write_respects_inherited_read_only_and_workspace_boundary ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/r07_daily_fresh_compact.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_daily_fresh_compact-721b7d0e0468a5ec)
+
+running 5 tests
+test actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart ... FAILED
+test known_failure_waits_an_hour_and_retries_with_new_attempt ... FAILED
+test permission_change_during_real_summary_cancels_and_keeps_unknown_receipt ... FAILED
+test started_unknown_and_closed_intake_never_replay_or_claim_next_day ... FAILED
+test logical_day_changes_at_local_four_am ... ok
+
+failures:
+
+---- actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart stdout ----
+
+thread 'actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart' (145863) panicked at crates/lingxi-service/tests/r07_daily_fresh_compact.rs:16:59:
+隔离测试目录: NotPresent
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- known_failure_waits_an_hour_and_retries_with_new_attempt stdout ----
+
+thread 'known_failure_waits_an_hour_and_retries_with_new_attempt' (145864) panicked at crates/lingxi-service/tests/r07_daily_fresh_compact.rs:16:59:
+隔离测试目录: NotPresent
+
+---- permission_change_during_real_summary_cancels_and_keeps_unknown_receipt stdout ----
+
+thread 'permission_change_during_real_summary_cancels_and_keeps_unknown_receipt' (145866) panicked at crates/lingxi-service/tests/r07_daily_fresh_compact.rs:16:59:
+隔离测试目录: NotPresent
+
+---- started_unknown_and_closed_intake_never_replay_or_claim_next_day stdout ----
+
+thread 'started_unknown_and_closed_intake_never_replay_or_claim_next_day' (145867) panicked at crates/lingxi-service/tests/r07_daily_fresh_compact.rs:16:59:
+隔离测试目录: NotPresent
+
+
+failures:
+    actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart
+    known_failure_waits_an_hour_and_retries_with_new_attempt
+    permission_change_during_real_summary_cancels_and_keeps_unknown_receipt
+    started_unknown_and_closed_intake_never_replay_or_claim_next_day
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_daily_fresh_compact`

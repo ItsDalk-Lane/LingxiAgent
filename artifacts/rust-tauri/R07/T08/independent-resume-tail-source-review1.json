@@ -1,0 +1,60 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:56:47.403593+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08d",
+  "finalAcceptance": "pending",
+  "mode": "READ_ONLY_SOURCE_REVIEW_NO_CARGO_GUI_OR_PRODUCT_CHANGE",
+  "question": "Could runtimeIsStreaming=false on a pre-terminal cached stream_resume retire the stream and permanently drop subsequent live terminal frames?",
+  "sourceHashes": [
+    {
+      "path": "rust/crates/lingxi-service/src/chat_wire.rs",
+      "sha256": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001"
+    },
+    {
+      "path": "rust/crates/lingxi-service/tests/r06_chat_wire.rs",
+      "sha256": "36cf91b67aba632b8792db6568588fba43760714be02abc5644a139038adaccc"
+    },
+    {
+      "path": "desktop/src/react/services/stream-resume.ts",
+      "sha256": "6968fc5512aa6054441d1dc90257c4f7fafc9621793851c0dafcf6dcc74347eb"
+    },
+    {
+      "path": "desktop/src/react/services/stream-admission.ts",
+      "sha256": "42c12f775783bc1b4e61c391d5180a289bf47a3474be7666929ee713d0d6a5e0"
+    },
+    {
+      "path": "desktop/src/react/services/ws-message-handler.ts",
+      "sha256": "238dedef56066faeaa1e0c4f1a380e5ab3c65521aba713d4b053fd8690348e08"
+    },
+    {
+      "path": "desktop/src/react/stores/streaming-slice.ts",
+      "sha256": "bc1d5c2d0490bd9983a55286b2ea0da0cc0a6e1eaf4579ee37ddf2cf3ba599bd"
+    },
+    {
+      "path": "desktop/src/react/hooks/use-stream-buffer.ts",
+      "sha256": "7aecb7714398dfbe676e797db0e494b1aab513023068069bc9aabb17305177cd"
+    }
+  ],
+  "observedTestFact": "Parent reports original r06_chat_wire resume failure last event.isStreaming Null!=false after exact contiguous sequence and -FINAL text assertions already passed. This is not proof of missing final text. Original d failure must remain recorded.",
+  "backendAnalysis": [
+    "observe_run polls stored events every5ms independently of run active state; DB active empty does not mean all events projected to ChatWire cache",
+    "resume queries active DB then locks streams; projection final handler publishes assistant_run_end and status(false) through separate publish lock acquisitions, so resume can legally see terminal DB with intermediate cached prefix",
+    "Original test waits DB active empty and immediately requires cached events last status(false); it lacks actual projection-complete precondition"
+  ],
+  "frontendAnalysis": [
+    "runtimeIsStreaming=false controls applyStreamingStatus(false,force), which removes streamingSessions/activeSessionStreams only",
+    "That path does not retire SessionStreamMeta.admission, reset consumed sequence evidence or call streamBufferManager.finishRun",
+    "Live same-stream continuous delta/end/status still pass updateSessionStreamMeta/StreamAdmission; runtime=false is not an admission rejection input",
+    "Status handler intentionally never begins/finishes/finalizes run; actual run_end owns buffer finalization",
+    "On reset/truncated/non-incremental rebuild, live frames may be held during HTTP hydrate, but intermediate msg.isStreaming=true causes a second requestStreamResume after hydration to recover them",
+    "These observations assume normal valid identity/continuous stream and successful existing recovery transport; no claim all network failures are solved"
+  ],
+  "conclusion": "No deterministic product tail-loss path identified from runtimeIsStreaming=false alone. Establishing actual same-session/same-stream WS terminal status within original timeout before asserting complete final replay tail is a valid fixture precondition fix, not itself a product implementation fix.",
+  "necessaryMinimalConsumerRegression": [
+    "Feed actual handleServerMessage an intermediate same-stream resume with runtimeIsStreaming=false/isStreaming=true and no final status; then actual subsequent same-stream run_end/status (and valid remaining text frames if prefix before them). Assert complete displayed content, sequence progression, accepted terminal frames and cleared busy state",
+    "For reset/rebuild path delay actual message hydration while terminal live frame arrives, then verify second resume requested and terminal content/status recovered; do not only inject final status into store"
+  ],
+  "executionStatus": "Consumer regressions proposed, not run by reviewer. Parent controls fixes and applicable actual verification after frozen d finishes.",
+  "scope": "Frozen d source untouched; current failed gate does not become pass based on static review. Independent other d gates may continue and final aggregate remains based on actual results."
+}

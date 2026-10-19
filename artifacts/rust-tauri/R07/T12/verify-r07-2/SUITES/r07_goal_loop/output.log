@@ -1,0 +1,36 @@
+
+running 11 tests
+test goal_loop::goal_write_fault_is_tool_failure_and_no_budget_notification_through_real_run ... ok
+test goal_loop::goal_corrupt_sidecar_is_tool_failure_through_real_run_and_never_replaced ... ok
+test goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop ... ok
+test goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run ... ok
+test goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark ... ok
+test goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings ... ok
+test goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop ... ok
+test goal_loop::goal_six_actions_close_loop_and_over_budget_fires_exactly_once ... ok
+test goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity ... ok
+test goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff ... ok
+test goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control has been running for over 60 seconds
+test goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 61.64s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.53s
+     Running tests/r07_goal_loop.rs (rust/target-r07/debug/deps/r07_goal_loop-7459da6fe39a5657)

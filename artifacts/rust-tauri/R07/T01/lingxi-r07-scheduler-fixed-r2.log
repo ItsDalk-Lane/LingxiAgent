@@ -1,0 +1,33 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.74s
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 6 tests
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... FAILED
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test revoked_source_is_rejected_without_a_run ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+
+failures:
+
+---- background_input_and_real_tool_results_reload_after_restart_without_user_messages stdout ----
+2026-10-15T16:42:18.152742Z  INFO lingxi_service: request handled request_id="req-a0186edc1f39b2b3be15b8ecb93faf30" method=POST path=/lingxi/v1/desk/cron status=200
+2026-10-15T16:42:18.155055Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185d3a60_000001 session_id="activity-trigger-8e0ffd4ed21cb088b4da1704dde969128b64af05426bb9626b1e488f07ef5b39"
+2026-10-15T16:42:18.159306Z  WARN lingxi_service::runs: whole-batch admission refused this model tool turn (zero dispatch); the journal closes a never-dispatched failure run_id=run_000001a3185d3a60_000001 tool_call=run_000001a3185d3a60_000001-tc0001 target="tool:first-party:cron"
+2026-10-15T16:42:18.163283Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a3185d3a60_000001 outcome=completed.with_final
+
+thread 'background_input_and_real_tool_results_reload_after_restart_without_user_messages' (190348) panicked at crates/lingxi-service/tests/r07_scheduler.rs:274:5:
+assertion `left == right` failed
+  left: Bool(false)
+ right: true
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    background_input_and_real_tool_results_reload_after_restart_without_user_messages
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.82s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_scheduler`

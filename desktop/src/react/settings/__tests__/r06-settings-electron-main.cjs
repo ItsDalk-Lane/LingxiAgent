@@ -13,6 +13,7 @@ app.commandLine.appendSwitch('disable-gpu');
 const requests = [];
 const reveals = [];
 const checks = [];
+const nativePointerDiagnostics = [];
 let window;
 let chooser;
 let cardNetwork;
@@ -28,7 +29,117 @@ async function js(source) { return window.webContents.executeJavaScript(source, 
 async function until(source, message, ms = 15_000) {
   const deadline = Date.now() + ms;
   while (Date.now() < deadline) { if (await js(`(() => { try { return (${source}); } catch { return false; } })()`)) return; await new Promise(resolve => setTimeout(resolve, 25)); }
-  throw new Error(`${message}\n${await js('document.body.innerText.slice(-10000)')}`);
+  const forms = await js('window.__r06?.agentFormDiagnostic?.() || null');
+  throw new Error(`${message}\nAgent form diagnostic: ${JSON.stringify(forms)}\n${await js('document.body.innerText.slice(-10000)')}`);
+}
+// 只读取真实焦点、命中与可信指针事件；不派发DOM事件，也不改产品拖动状态。
+async function nativePointerSnapshot(stage, id, point) {
+  const renderer = await js(`(() => {
+    const node = document.querySelector('[data-agent-id=' + JSON.stringify(${JSON.stringify(id)}) + ']');
+    const point = ${JSON.stringify(point || null)};
+    return { documentFocused: document.hasFocus(), hover: !!node?.parentElement.matches(':hover'),
+      hit: point ? document.elementFromPoint(point.x, point.y)?.closest('[data-agent-id]')?.dataset.agentId || null : null,
+      order: window.__r06.store.getState().agents.map(agent => agent.id),
+      events: (window.__r06NativePointerEvents || []).slice(-40) };
+  })()`);
+  const value = { stage, atUnixMs: Date.now(), agentId: id, point, windowFocused: window.isFocused(), windowVisible: window.isVisible(), ...renderer };
+  nativePointerDiagnostics.push(value);
+  console.log('NATIVE-POINTER:' + JSON.stringify(value));
+  return value;
+}
+async function nativeUntil(source, message, deadline) {
+  const remaining = deadline - Date.now();
+  assert.ok(remaining > 0, message + ' exceeded original deadline');
+  await until(source, message, remaining);
+}
+async function nativeRequestUntil(predicate, message, deadline) {
+  while (Date.now() < deadline) {
+    if (predicate()) return;
+    await new Promise(resolve => setTimeout(resolve, 25));
+  }
+  throw new Error(message);
+}
+async function prepareNativeAgentPointer(id, stage, deadline) {
+  await js(`(() => {
+    if (!window.__r06NativePointerEvents) {
+      window.__r06NativePointerEvents = [];
+      for (const type of ['pointerdown','pointermove','pointerup','pointercancel','gotpointercapture','lostpointercapture']) {
+        document.addEventListener(type, event => {
+          const node = event.target?.closest?.('[data-agent-id]');
+          window.__r06NativePointerEvents.push({ type, atUnixMs: Date.now(), trusted: event.isTrusted, pointerId: event.pointerId,
+            pointerType: event.pointerType, target: node?.dataset.agentId || null, x: event.clientX, y: event.clientY,
+            button: event.button, buttons: event.buttons, focused: document.hasFocus(),
+            hover: !!node?.parentElement.matches(':hover'), captured: !!node?.hasPointerCapture(event.pointerId) });
+          if (window.__r06NativePointerEvents.length > 80) window.__r06NativePointerEvents.shift();
+        }, true);
+      }
+    }
+    document.querySelector('[data-agent-id=' + JSON.stringify(${JSON.stringify(id)}) + ']').scrollIntoView({ block: 'center', inline: 'center' });
+  })()`);
+  window.show(); app.focus({ steal: true }); window.focus();
+  let point = null;
+  let previous = null;
+  while (Date.now() < deadline) {
+    if (window.isFocused()) {
+      point = await js(`(() => {
+        if (!document.hasFocus()) return null;
+        const id = ${JSON.stringify(id)};
+        const node = document.querySelector('[data-agent-id=' + JSON.stringify(id) + ']');
+        if (!node) return null;
+        const box = node.getBoundingClientRect();
+        const centerX = (box.left + box.right) / 2, centerY = (box.top + box.bottom) / 2;
+        let best = null, distance = Infinity;
+        for (let y = Math.ceil(Math.max(0, box.top + 5)); y < Math.min(innerHeight, box.bottom - 5); y += 5)
+          for (let x = Math.ceil(Math.max(0, box.left + 5)); x < Math.min(innerWidth, box.right - 5); x += 5) {
+            if (document.elementFromPoint(x, y)?.closest('[data-agent-id]')?.dataset.agentId !== id) continue;
+            const next = (x-centerX)**2 + (y-centerY)**2;
+            if (next < distance) { best = { x, y }; distance = next; }
+          }
+        return best;
+      })()`);
+      if (point) {
+        // 实际发送的就是已核对命中的整数点；悬停展开后重新核对，避免布局移动。
+        window.webContents.sendInputEvent({ type: 'mouseMove', x: point.x, y: point.y });
+        const ready = await js(`(() => { const point=${JSON.stringify(point)};
+          const node=document.querySelector('[data-agent-id=' + JSON.stringify(${JSON.stringify(id)}) + ']');
+          return document.hasFocus() && !!node?.parentElement.matches(':hover')
+            && document.elementFromPoint(point.x, point.y)?.closest('[data-agent-id]')?.dataset.agentId === ${JSON.stringify(id)};
+        })()`);
+        if (ready && window.isFocused() && previous?.x === point.x && previous?.y === point.y) {
+          await nativePointerSnapshot(stage + '-ready', id, point);
+          return point;
+        }
+        previous = ready ? point : null;
+      }
+    } else previous = null;
+    await new Promise(resolve => setTimeout(resolve, 25));
+  }
+  await nativePointerSnapshot(stage + '-not-ready', id, point);
+  throw new Error(stage + ': real focus, integer target and hover did not become ready within original deadline');
+}
+async function dragNativeAgent(id, point, stage, deadline) {
+  assert.ok(window.isFocused(), stage + ': actual native focus before pointerdown');
+  await nativeUntil(`(() => { const point=${JSON.stringify(point)};
+    const node=document.querySelector('[data-agent-id=' + JSON.stringify(${JSON.stringify(id)}) + ']');
+    return document.hasFocus() && !!node?.parentElement.matches(':hover')
+      && document.elementFromPoint(point.x, point.y)?.closest('[data-agent-id]')?.dataset.agentId === ${JSON.stringify(id)};
+  })()`, stage + ': actual integer target before pointerdown', deadline);
+  await js('window.__r06NativePointerEvents.length = 0');
+  window.webContents.sendInputEvent({ type: 'mouseDown', x: point.x, y: point.y, button: 'left', clickCount: 1 });
+  try {
+    await nativeUntil(`(() => { const node=document.querySelector('[data-agent-id=' + JSON.stringify(${JSON.stringify(id)}) + ']');
+      const event=(window.__r06NativePointerEvents || []).find(event=>event.type==='pointerdown' && event.trusted && event.target===${JSON.stringify(id)});
+      return !!event && node?.hasPointerCapture(event.pointerId);
+    })()`, stage + ': actual trusted down captured by product handler', deadline);
+    window.webContents.sendInputEvent({ type: 'mouseMove', x: point.x + 160, y: point.y, modifiers: ['leftButtonDown'] });
+    await nativeUntil(`(() => { const node=document.querySelector('[data-agent-id=' + JSON.stringify(${JSON.stringify(id)}) + ']');
+      return node?.dataset.wasDragged==='1' && (window.__r06NativePointerEvents || []).some(event=>event.type==='pointermove' && event.trusted && event.target===${JSON.stringify(id)} && event.buttons===1);
+    })()`, stage + ': actual trusted move started product drag', deadline);
+  } finally {
+    // 即使前提失败也释放真实鼠标；不得留按键影响后续原生检查。
+    window.webContents.sendInputEvent({ type: 'mouseUp', x: point.x + 160, y: point.y, button: 'left', clickCount: 1 });
+    await nativePointerSnapshot(stage + '-after', id, point);
+  }
 }
 async function click(key) {
   await until(`Array.from(document.querySelectorAll('button')).some(node => node.textContent.trim() === window.t(${JSON.stringify(key)}) && !node.disabled)`, 'actual enabled button ' + key);
@@ -39,6 +150,18 @@ async function toggle(key) { await js(`window.__r06.toggle(${JSON.stringify(key)
 async function selectAgent(id) {
   await input('select[aria-label="助手"]', id);
   await until(`window.__r06.store.getState().getSettingsAgentId() === ${JSON.stringify(id)} && window.__r06.store.getState().settingsConfigStatus === 'ready'`, 'browse agent actual configuration');
+  await renderedAgentForm(id);
+}
+async function renderedAgentForm(id) {
+  // 回读状态就绪后，还须等真实控件与同一助手的完整配置一致，不依赖CSS名称或textarea顺序。
+  await until(`window.__r06.agentFormReady(${JSON.stringify(id)})`, 'actual selected agent form has rendered returned configuration');
+  await js(`(() => { const form=window.__r06.agentForm(); form.name.id='r06-agent-name'; form.identity.id='r06-agent-identity'; form.behavior.id='r06-agent-behavior'; })()`);
+}
+async function inputAgentPersona(id, identity, behavior) {
+  await renderedAgentForm(id);
+  await input('#r06-agent-identity', identity);
+  await input('#r06-agent-behavior', behavior);
+  await until(`(() => { const form=window.__r06.agentForm(); return form.identity?.value === ${JSON.stringify(identity)} && form.behavior?.value === ${JSON.stringify(behavior)}; })()`, 'actual persona inputs retain both user changes');
 }
 async function fileInput(selector, file) {
   const { root } = await window.webContents.debugger.sendCommand('DOM.getDocument');
@@ -66,6 +189,10 @@ app.whenReady().then(async () => {
   if (['card-owner','failures','initialization','boundaries'].includes(scenario)) cardNetwork = await prepareCardNetwork();
   window = new BrowserWindow({ show: false, width: 1180, height: 950,
     webPreferences: { backgroundThrottling: false, preload: path.join(__dirname, 'r06-settings-electron-preload.cjs'), contextIsolation: true, nodeIntegration: false } });
+  for (const event of ['focus', 'blur']) window.on(event, () => {
+    const value = { stage: 'native-window-' + event, scenario, atUnixMs: Date.now(), windowFocused: window.isFocused(), windowVisible: window.isVisible() };
+    nativePointerDiagnostics.push(value); console.log('NATIVE-FOCUS:' + JSON.stringify(value));
+  });
   window.webContents.session.webRequest.onCompleted(details => {
     const parsed = new URL(details.url);
     const otherFile = path.join(home, 'other-connection.json');
@@ -85,6 +212,35 @@ app.whenReady().then(async () => {
     const module = await import('/react/settings/store.ts');
     window.__r06 = {
       store: module.useSettingsStore,
+      agentForm() {
+        const tab = Array.from(document.querySelectorAll('[data-tab="agent"]')).find(node => Array.from(node.querySelectorAll('input')).some(input => input.placeholder === window.t('settings.agent.agentNameHint')));
+        return {
+          name: tab && Array.from(tab.querySelectorAll('input')).find(input => input.placeholder === window.t('settings.agent.agentNameHint')),
+          identity: tab?.querySelector('textarea[rows="3"]'),
+          behavior: tab?.querySelector('textarea[rows="10"]'),
+        };
+      },
+      agentFormReady(id) {
+        const state = this.store.getState();
+        const config = state.settingsConfig;
+        const form = this.agentForm();
+        return state.getSettingsAgentId() === id && state.settingsDataAgentId === id && state.settingsConfigStatus === 'ready' && !!config && !!form.name && !!form.identity && !!form.behavior && form.name.value === (config.agent?.name || '') && form.identity.value === (config._identity || '') && form.behavior.value === (config._agents || '');
+      },
+      agentFormDiagnostic() {
+        const state = this.store.getState();
+        const config = state.settingsConfig;
+        // 只记录本合成夹具的身份表单，不输出完整设置、连接凭证或请求头。
+        const text = value => typeof value === 'string' ? value.slice(0, 2048) : null;
+        return {
+          selected: state.getSettingsAgentId(), dataAgentId: state.settingsDataAgentId,
+          configStatus: state.settingsConfigStatus, hasConfigKey: !!state.settingsConfigKey,
+          expected: { name: text(config?.agent?.name), identity: text(config?._identity), behavior: text(config?._agents) },
+          forms: Array.from(document.querySelectorAll('[data-tab="agent"]')).map(tab => ({
+            names: Array.from(tab.querySelectorAll('input')).filter(node => node.placeholder === window.t('settings.agent.agentNameHint')).map(node => ({ value: text(node.value), className: node.className, disabled: node.disabled })),
+            textareas: Array.from(tab.querySelectorAll('textarea')).map(node => ({ rows: node.rows, value: text(node.value), disabled: node.disabled })),
+          })),
+        };
+      },
       click(key) {
         const label = window.t(key);
         const button = Array.from(document.querySelectorAll('button')).findLast(node => node.textContent.trim() === label && !node.disabled);
@@ -140,7 +296,16 @@ app.whenReady().then(async () => {
   if (['failures','initialization','boundaries'].includes(scenario)) { cardNetwork.release(); cardNetwork.server.closeAllConnections(); await new Promise(resolve => cardNetwork.server.close(resolve)); }
   console.log('R06_SETTINGS_ELECTRON_RESULT:' + JSON.stringify({ scenario, checks, requests, reveals, dreamRuns }));
   window.destroy(); app.exit(0);
-}).catch(error => { console.error(error.stack || String(error)); if (window && !window.isDestroyed()) window.destroy(); app.exit(1); });
+}).catch(async error => {
+  // 子检查失败也保全已发生的动作与网络状态；退出码仍为失败，不能生成成功报告。
+  let forms = null;
+  let tenetDiagnostic = null;
+  try { if (window && !window.isDestroyed()) forms = await js('window.__r06?.agentFormDiagnostic?.() || null'); } catch (traceError) { console.error('form diagnostic unavailable', traceError.message); }
+  // 仅记录本夹具合成原则的可见性和错误节点数量，不输出用户正文或凭证。
+  try { if (window && !window.isDestroyed()) tenetDiagnostic = await js(`({oldSyntheticTenetVisible:document.body.innerText.includes('已有真实原则'),newSyntheticTenetVisible:Array.from(document.querySelectorAll('span')).some(node=>node.textContent==='新写入但刷新失败'),errorNodes:document.querySelectorAll('[class*=tenets-error]').length})`); } catch (traceError) { console.error('tenet diagnostic unavailable', traceError.message); }
+  try { fs.writeFileSync(path.join(home, 'electron-failure-trace.json'), JSON.stringify({scenario, error:error.stack || String(error), checks, requests, reveals, forms, tenetDiagnostic, nativePointerDiagnostics, windowDestroyed:!window || window.isDestroyed()}, null, 2)); } catch (traceError) { console.error('failure trace write failed', traceError); }
+  console.error(error.stack || String(error)); if (window && !window.isDestroyed()) window.destroy(); app.exit(1);
+});
 
 async function workflow() {
   const savedB = fs.readFileSync(path.join(home, 'agents/agentB/config.yaml'));
@@ -169,9 +334,7 @@ async function workflow() {
   check('02-chat-model-real-save', (await config()).models.chat.provider === 'persona-stub');
   await js(`Array.from(document.querySelectorAll('.yuan-chip')).find(node => node.textContent.includes('ming')).click()`);
   await waitConfig("window.__r06.store.getState().settingsConfig.agent.yuan === 'ming'");
-  await js(`window.__r06.input('textarea', '页面真实身份')`);
-  const behaviorSelector = await js(`Array.from(document.querySelectorAll('textarea')).filter(node => node.value === 'agentA已保存行为').map(node => { node.id='r06-real-behavior'; return '#'+node.id; })[0]`);
-  await input(behaviorSelector, '页面真实行为');
+  await inputAgentPersona('agentA', '页面真实身份', '页面真实行为');
   await js(`Array.from(document.querySelectorAll('button')).filter(node => node.textContent.trim() === window.t('settings.save')).at(-1).click()`);
   await waitConfig("window.__r06.store.getState().settingsConfig._identity === '页面真实身份'");
   check('03-yuan-persona-independent-writes', fs.readFileSync(path.join(home, 'agents/agentA/identity.md'), 'utf8') === '页面真实身份' && fs.readFileSync(path.join(home, 'agents/agentA/AGENTS.md'), 'utf8') === '页面真实行为');
@@ -334,22 +497,12 @@ async function workflow() {
   await selectAgent('agentA');
   const beforeOrder = (await api('GET', '/lingxi/v1/agents')).agents.map(agent => agent.id);
   const cardId = beforeOrder[0];
-  // Electron 的真实鼠标输入需要原生窗口获得焦点；此短窗口只使用本轮合成资料。
-  window.show(); app.focus({ steal: true }); window.focus();
-  await new Promise(resolve => setTimeout(resolve, 300));
-  await js(`document.querySelector('[data-agent-id="${cardId}"]').scrollIntoView({ block: 'center', inline: 'center' })`);
-  let rect = await js(`(() => { const node = document.querySelector('[data-agent-id="${cardId}"]'); const box=node.getBoundingClientRect(); return {x: box.x, y:box.y,width:box.width,height:box.height}; })()`);
-  window.webContents.sendInputEvent({ type: 'mouseMove', x: Math.round(rect.x + 30), y: Math.round(rect.y + 30) });
-  await new Promise(resolve => setTimeout(resolve, 400));
-  const point = await js(`(() => { const id=${JSON.stringify(cardId)}; const box=document.querySelector('[data-agent-id="'+id+'"]').getBoundingClientRect(); for(let y=Math.max(0,box.top+5); y<Math.min(innerHeight,box.bottom-5); y+=5) for(let x=Math.max(0,box.left+5); x<Math.min(innerWidth,box.right-5); x+=5) if(document.elementFromPoint(x,y)?.closest('[data-agent-id]')?.dataset.agentId === id) return {x,y}; return null; })()`);
+  // 焦点、真实命中、手势和结果共用原15秒预算，不用固定睡眠猜测就绪。
+  const orderDeadline = Date.now() + 15_000;
+  const point = await prepareNativeAgentPointer(cardId, 'workflow-order', orderDeadline);
   check('18-order-visible-real-drag-target', !!point);
-  console.log('DRAG-FIXTURE:' + JSON.stringify(await js(`(() => { const node=document.querySelector('[data-agent-id="${cardId}"]'); return { point:${JSON.stringify(point)}, hover: node.parentElement.matches(':hover'), indices: Array.from(node.parentElement.children).map(item => ({ id:item.dataset.agentId, x:item.style.getPropertyValue('--tx-spread') })) }; })()`)));
-  window.webContents.sendInputEvent({ type: 'mouseDown', x: Math.round(point.x), y: Math.round(point.y), button: 'left', clickCount: 1 });
-  window.webContents.sendInputEvent({ type: 'mouseMove', x: Math.round(point.x + 160), y: Math.round(point.y), modifiers: ['leftButtonDown'] });
-  await new Promise(resolve => setTimeout(resolve, 100));
-  window.webContents.sendInputEvent({ type: 'mouseUp', x: Math.round(point.x + 160), y: Math.round(point.y), button: 'left', clickCount: 1 });
-  console.log('DRAG-FIXTURE-AFTER:' + JSON.stringify(await js(`(() => {const node=document.querySelector('[data-agent-id="${cardId}"]');return {dragged:node.dataset.wasDragged,hover:node.parentElement.matches(':hover'),order:window.__r06.store.getState().agents.map(item=>item.id)};})()`)));
-  await until(`window.__r06.store.getState().agents[0].id !== '${cardId}'`, 'actual pointer reorder');
+  await dragNativeAgent(cardId, point, 'workflow-order', orderDeadline);
+  await nativeUntil(`window.__r06.store.getState().agents[0].id !== ${JSON.stringify(cardId)}`, 'actual pointer reorder', orderDeadline);
   window.hide();
   check('18-order-real-pointer-persist', (await api('GET', '/lingxi/v1/agents')).agents[0].id !== cardId);
   await selectAgent('agentA');
@@ -439,11 +592,10 @@ async function failures() {
   const oldBehavior = fs.readFileSync(behavior);
   child.execFileSync('/usr/bin/chflags', ['uchg', behavior]);
   try {
-    await js(`const nodes = Array.from(document.querySelectorAll('textarea')); nodes[0].id='r06-partial-identity'; nodes[1].id='r06-partial-behavior';`);
-    await input('#r06-partial-identity', '身份确实部分写入'); await input('#r06-partial-behavior', '行为禁止写入');
+    await inputAgentPersona('agentA', '身份确实部分写入', '行为禁止写入');
     const priorToast = await js('window.__r06.store.getState().toastMessage');
     await js(`Array.from(document.querySelectorAll('button')).filter(node => node.textContent.trim() === window.t('settings.save')).at(-1).click()`);
-    for (let poll = 0; poll < 200 && !requests.some(request => request.method === 'PUT' && request.path.endsWith('/agents-md') && request.status === 500); poll++) await new Promise(resolve => setTimeout(resolve, 10));
+    for (let poll = 0; poll < 2000 && !(requests.some(request => request.method === 'PUT' && request.path.endsWith('/identity') && request.status === 200) && requests.some(request => request.method === 'PUT' && request.path.endsWith('/agents-md') && request.status === 500)); poll++) await new Promise(resolve => setTimeout(resolve, 10));
     check('persona-real-one-success-one-failure', requests.some(request => request.method === 'PUT' && request.path.endsWith('/identity') && request.status === 200) && requests.some(request => request.method === 'PUT' && request.path.endsWith('/agents-md') && request.status === 500));
     await until(`window.__r06.store.getState().toastType === 'error' && window.__r06.store.getState().toastMessage !== ${JSON.stringify(priorToast)}`, 'partial persona failure actual toast');
     check('persona-partial-write-honest', fs.readFileSync(path.join(agentRoot, 'identity.md'), 'utf8') === '身份确实部分写入' && fs.readFileSync(behavior).equals(oldBehavior));
@@ -455,16 +607,20 @@ async function failures() {
     await click('settings.memory.compiledView');
     await until(`Array.from(document.querySelectorAll('[role=alert]')).some(node => node.innerText.includes('regular'))`, 'compiled failed read shown inline');
     check('compiled-read-error-is-not-empty-success', requests.some(request => request.path === '/lingxi/v1/memories/compiled' && request.status === 400));
-    await js(`Array.from(document.querySelectorAll('button')).findLast(node => node.textContent.trim() === '✕').click()`);
+    // 只关闭当前记忆弹窗，不能命中设置窗口自己的关闭按钮。
+    await js(`(() => { const titles=[window.t('settings.memory.compiled'),window.t('settings.memory.actions.viewTitle')]; const header=Array.from(document.querySelectorAll('h3')).filter(node=>titles.includes(node.textContent.trim())&&Array.from(node.parentElement.querySelectorAll('button')).some(button=>button.textContent.trim()==='✕')).at(-1); if(!header)throw new Error('actual memory modal close missing'); Array.from(header.parentElement.querySelectorAll('button')).find(button=>button.textContent.trim()==='✕').click(); })()`);
+    await until(`!Array.from(document.querySelectorAll('h3')).some(node=>[window.t('settings.memory.compiled'),window.t('settings.memory.actions.viewTitle')].includes(node.textContent.trim())&&Array.from(node.parentElement.querySelectorAll('button')).some(button=>button.textContent.trim()==='✕'))`, 'memory modal actually closed');
   } finally { fs.rmdirSync(factsPath); fs.renameSync(factsPath + '.fixture-saved', factsPath); }
   check('compiled-failure-preserved-material', fs.readFileSync(factsPath).equals(factsBefore));
-  const catalog = path.join(home, 'provider-catalog.json');
-  fs.writeFileSync(catalog, '{broken actual catalog');
+  const chatPreferences = path.join(home, 'chat-input-settings.json');
+  const oldChat = fs.existsSync(chatPreferences) ? fs.readFileSync(chatPreferences) : null;
+  const failedReads = requests.filter(request => request.path === '/lingxi/v1/models' && request.status === 500).length;
+  fs.writeFileSync(chatPreferences, '{broken actual chat settings');
   try {
     await js(`window.dispatchEvent(new Event('hana-models-changed'))`);
     await until(`window.__r06.store.getState().runtimeModelsError !== null`, 'actual models failure state');
-    check('models-failure-keeps-existing-list', await js(`window.__r06.store.getState().runtimeModels.length > 0 && document.querySelector('[role=alert]') !== null`));
-  } finally { fs.unlinkSync(catalog); }
+    check('models-failure-keeps-existing-list', requests.filter(request => request.path === '/lingxi/v1/models' && request.status === 500).length > failedReads && await js(`window.__r06.store.getState().runtimeModels.length > 0 && document.querySelector('[role=alert]') !== null`));
+  } finally { if(oldChat)fs.writeFileSync(chatPreferences,oldChat);else fs.unlinkSync(chatPreferences); }
 }
 
 async function receiptOwner() {
@@ -572,9 +728,20 @@ async function initializationBoundaries() {
   const catalog=path.join(home,'provider-catalog.json'); const old=fs.existsSync(catalog)?fs.readFileSync(catalog):null;
   fs.writeFileSync(catalog,'{invalid actual provider catalog'); summary.release();
   try {
-    await until(`!!window.__r06.store.getState().providersSummaryError`, 'actual provider summary failure marked');
-    check('00-summary-failure-explicit-not-empty-success', await js('window.__r06.store.getState().ready && !!window.__r06.store.getState().providersSummaryError') && requests.some(request=>request.path==='/lingxi/v1/providers/summary'&&request.status===500));
+    await until(`!!window.__r06.store.getState().providersSummary['persona-stub'] && !window.__r06.store.getState().providersSummaryError`, 'actual published Source summary survives obsolete catalog corruption');
+    check('00-published-summary-survives-legacy-corruption', await js('window.__r06.store.getState().ready && !!window.__r06.store.getState().providersSummary["persona-stub"]') && requests.some(request=>request.path==='/lingxi/v1/providers/summary'&&request.status===200));
   } finally { if(old)fs.writeFileSync(catalog,old);else fs.unlinkSync(catalog); }
+  // 错误改从现役模型读取入口注入，仍验证真实失败且已有数据不被空成功覆盖。
+  const chatPreferences=path.join(home,'chat-input-settings.json');const oldChat=fs.existsSync(chatPreferences)?fs.readFileSync(chatPreferences):null;
+  const modelReadsBefore=requests.filter(request=>request.path==='/lingxi/v1/models'&&request.status===500).length;
+  fs.writeFileSync(chatPreferences,'{invalid actual chat settings');
+  try {
+    await js(`window.dispatchEvent(new Event('hana-models-changed'))`);
+    await until(`!!window.__r06.store.getState().runtimeModelsError`, 'actual initialization model read failure marked');
+    check('00-model-read-failure-explicit-not-empty-success', await js('window.__r06.store.getState().ready && !!window.__r06.store.getState().runtimeModelsError && window.__r06.store.getState().runtimeModels.length>0 && !!document.querySelector("[role=alert]")') && requests.filter(request=>request.path==='/lingxi/v1/models'&&request.status===500).length>modelReadsBefore);
+  } finally { if(oldChat)fs.writeFileSync(chatPreferences,oldChat);else fs.unlinkSync(chatPreferences); }
+  await js(`window.dispatchEvent(new Event('hana-models-changed'))`);
+  await until(`window.__r06.store.getState().runtimeModelsError===null && window.__r06.store.getState().runtimeModels.length>0`, 'restored real models before initialization cache checks');
   const previousName=await js(`document.querySelector('input[class*=agent-name-input]').value`);
   const snapshotsBefore=requests.filter(request=>request.path==='/lingxi/v1/settings/snapshot'&&request.method==='GET').length;
   const identity=cardNetwork.pause('/lingxi/v1/server/identity');
@@ -605,7 +772,8 @@ async function remainingBoundaries() {
   check('14-write-persisted-before-refresh-error', JSON.parse(written).tenets.some(item=>item.content==='新写入但刷新失败'));
   fs.writeFileSync(tenetPath,'{invalid real tenet file');cardNetwork.release();
   try {
-    await until(`document.body.innerText.includes('tenets') || document.body.innerText.includes('原则')`, 'tenet real failed refresh');
+    // 网络完成事件早于页面处理响应；等待真实错误节点，不能以原有“原则”标题代替。
+    await until(`!!document.querySelector('[class*=tenets-error]')`, 'actual failed tenet refresh rendered error');
     for(let i=0;!requests.some(request=>request.method==='GET'&&request.path==='/lingxi/v1/agents/agentA/tenets'&&request.status>=400)&&i<500;i++)await new Promise(resolve=>setTimeout(resolve,10));
     check('14-success-post-failed-get-old-list-and-error', requests.some(request=>request.method==='POST'&&request.path==='/lingxi/v1/agents/agentA/tenets'&&request.status===200) && requests.some(request=>request.method==='GET'&&request.path==='/lingxi/v1/agents/agentA/tenets'&&request.status>=400) && await js(`document.body.innerText.includes('已有真实原则') && !Array.from(document.querySelectorAll('span')).some(node=>node.textContent==='新写入但刷新失败') && !!document.querySelector('[class*=tenets-error]')`));
   } finally {fs.writeFileSync(tenetPath,written);}
@@ -624,23 +792,29 @@ async function remainingBoundaries() {
   check('17-disabled-clears-error-and-zero-get',healthCount()===beforeOff);
   await toggle('settings.memory.sectionTitle');await until(`document.querySelector('[class*=memory-health-strip]')?.innerText.includes('daily_pipeline_absent_in_candidate')`,'restored real health');
   const order=(await api('GET','/lingxi/v1/agents')).agents.map(agent=>agent.id);const id=order[0];
-  window.show();app.focus({steal:true});window.focus();await new Promise(resolve=>setTimeout(resolve,200));
-  const target=async()=>{await js(`document.querySelector('[data-agent-id="${id}"]').scrollIntoView({block:'center'})`);const rect=await js(`(()=>{const r=document.querySelector('[data-agent-id="${id}"]').getBoundingClientRect();return {x:r.x,y:r.y}})()`);window.webContents.sendInputEvent({type:'mouseMove',x:Math.round(rect.x+30),y:Math.round(rect.y+30)});await new Promise(resolve=>setTimeout(resolve,400));return js(`(()=>{const box=document.querySelector('[data-agent-id="${id}"]').getBoundingClientRect();for(let y=Math.max(0,box.top+5);y<Math.min(innerHeight,box.bottom-5);y+=5)for(let x=Math.max(0,box.left+5);x<Math.min(innerWidth,box.right-5);x+=5)if(document.elementFromPoint(x,y)?.closest('[data-agent-id]')?.dataset.agentId==='${id}')return {x,y};return null})()`)};
-  let point=await target();assert.ok(point);const orderCount=requests.filter(request=>request.path==='/lingxi/v1/agents/order'&&request.method==='PUT').length;
+  const cancelDeadline = Date.now() + 15_000;
+  let point = await prepareNativeAgentPointer(id, 'boundaries-cancel', cancelDeadline);
+  const orderCount=requests.filter(request=>request.path==='/lingxi/v1/agents/order'&&request.method==='PUT').length;
   await js(`document.querySelector('[data-agent-id="${id}"]').addEventListener('pointercancel',event=>{window.r06Cancelled={trusted:event.isTrusted,type:event.type}},{once:true})`);
   await window.webContents.debugger.sendCommand('Emulation.setTouchEmulationEnabled',{enabled:true});
   await window.webContents.debugger.sendCommand('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:point.x,y:point.y,id:1}]});
   await window.webContents.debugger.sendCommand('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:point.x+160,y:point.y,id:1}]});
   await window.webContents.debugger.sendCommand('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
-  await window.webContents.debugger.sendCommand('Emulation.setTouchEmulationEnabled',{enabled:false});await new Promise(resolve=>setTimeout(resolve,120));
+  await window.webContents.debugger.sendCommand('Emulation.setTouchEmulationEnabled',{enabled:false});
+  await nativeUntil(`window.r06Cancelled?.trusted===true`, 'actual trusted pointercancel delivered', cancelDeadline);
+  await nativePointerSnapshot('boundaries-cancel-after', id, point);
   check('18-native-trusted-pointercancel-zero-order-put',await js(`window.r06Cancelled?.trusted===true`)&&requests.filter(request=>request.path==='/lingxi/v1/agents/order'&&request.method==='PUT').length===orderCount);
   check('18-pointercancel-keeps-real-order',JSON.stringify((await api('GET','/lingxi/v1/agents')).agents.map(agent=>agent.id))===JSON.stringify(order));
   await api('PUT','/lingxi/v1/agents/primary',{id:'agentA'});const prefs=path.join(home,'user/preferences.json');const bytes=fs.readFileSync(prefs);require('node:child_process').execFileSync('/usr/bin/chflags',['uchg',prefs]);
   const reads=requests.filter(request=>request.path==='/lingxi/v1/agents'&&request.method==='GET').length;
-  try {point=await target();assert.ok(point);window.webContents.sendInputEvent({type:'mouseDown',x:Math.round(point.x),y:Math.round(point.y),button:'left',clickCount:1});window.webContents.sendInputEvent({type:'mouseMove',x:Math.round(point.x+160),y:Math.round(point.y),modifiers:['leftButtonDown']});await new Promise(resolve=>setTimeout(resolve,100));window.webContents.sendInputEvent({type:'mouseUp',x:Math.round(point.x+160),y:Math.round(point.y),button:'left',clickCount:1});
-    await until(`window.__r06.store.getState().agents.map(agent=>agent.id).join(',')===${JSON.stringify(order.join(','))}`,'real failed order recovery');
-    for(let i=0;!requests.some(request=>request.path==='/lingxi/v1/agents/order'&&request.status>=400)&&i<500;i++)await new Promise(resolve=>setTimeout(resolve,10));
-    for(let i=0;requests.filter(request=>request.path==='/lingxi/v1/agents'&&request.method==='GET').length<=reads&&i<500;i++)await new Promise(resolve=>setTimeout(resolve,10));
+  const failureDeadline = Date.now() + 15_000;
+  try {
+    point = await prepareNativeAgentPointer(id, 'boundaries-write-failure', failureDeadline);
+    await dragNativeAgent(id, point, 'boundaries-write-failure', failureDeadline);
+    await nativeRequestUntil(() => requests.some(request=>request.path==='/lingxi/v1/agents/order'&&request.method==='PUT'&&request.status===500), 'actual order PUT500 must precede recovery', Math.min(failureDeadline, Date.now()+5000));
+    const failedOrderIndex = requests.findIndex(request=>request.path==='/lingxi/v1/agents/order'&&request.method==='PUT'&&request.status===500);
+    await nativeRequestUntil(() => requests.slice(failedOrderIndex+1).some(request=>request.path==='/lingxi/v1/agents'&&request.method==='GET'), 'actual agents GET after failed order', Math.min(failureDeadline, Date.now()+5000));
+    await nativeUntil(`window.__r06.store.getState().agents.map(agent=>agent.id).join(',')===${JSON.stringify(order.join(','))}`, 'real failed order recovery', failureDeadline);
     check('18-order-real-io-failure-then-get-recovery',requests.some(request=>request.path==='/lingxi/v1/agents/order'&&request.method==='PUT'&&request.status===500)&&requests.filter(request=>request.path==='/lingxi/v1/agents'&&request.method==='GET').length>reads&&await js(`window.__r06.store.getState().agents.map(agent=>agent.id).join(',')===${JSON.stringify(order.join(','))}`));
     check('18-order-failure-preserves-real-prefs',fs.readFileSync(prefs).equals(bytes)&&JSON.stringify((await api('GET','/lingxi/v1/agents')).agents.map(agent=>agent.id))===JSON.stringify(order));
   } finally {require('node:child_process').execFileSync('/usr/bin/chflags',['nouchg',prefs]);window.hide();}

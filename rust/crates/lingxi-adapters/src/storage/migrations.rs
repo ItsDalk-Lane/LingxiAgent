@@ -624,6 +624,391 @@ pub const V14_SQL: &str = r#"
 ALTER TABLE sessions ADD COLUMN proactive_delegation INTEGER NOT NULL DEFAULT 0 CHECK(proactive_delegation IN (0,1));
 "#;
 
+/// R07：计划、触发与外发收据复用运行库的持久单写队列；历史不能因删除计划消失。
+pub const V15_NAME: &str = "r07_automation_receipts";
+pub const V15_SQL: &str = r#"
+CREATE TABLE automation_jobs_v1 (
+    id TEXT PRIMARY KEY,
+    studio_id TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    owner_kind TEXT NOT NULL,
+    owner_subject TEXT NOT NULL,
+    schema_version INTEGER NOT NULL CHECK(schema_version > 0),
+    config_revision INTEGER NOT NULL CHECK(config_revision > 0),
+    config_json TEXT NOT NULL,
+    next_run_at INTEGER,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+CREATE INDEX idx_automation_jobs_due ON automation_jobs_v1(next_run_at) WHERE deleted_at IS NULL;
+CREATE INDEX idx_automation_jobs_studio ON automation_jobs_v1(studio_id) WHERE deleted_at IS NULL;
+CREATE TABLE automation_triggers_v1 (
+    trigger_id TEXT PRIMARY KEY,
+    job_id TEXT NOT NULL REFERENCES automation_jobs_v1(id),
+    due_at INTEGER NOT NULL,
+    config_revision INTEGER NOT NULL CHECK(config_revision > 0),
+    status TEXT NOT NULL CHECK(status IN ('claimed','running','succeeded','failed','skipped','cancelled','unknown')),
+    session_id TEXT,
+    run_id TEXT,
+    result_json TEXT,
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    config_json TEXT NOT NULL,
+    UNIQUE(job_id,due_at,config_revision),
+    CHECK((session_id IS NULL) = (run_id IS NULL))
+);
+CREATE INDEX idx_automation_triggers_pending ON automation_triggers_v1(status,created_at);
+CREATE INDEX idx_automation_triggers_job ON automation_triggers_v1(job_id,due_at);
+CREATE TABLE automation_notifications_v1 (
+    delivery_id TEXT PRIMARY KEY,
+    trigger_id TEXT REFERENCES automation_triggers_v1(trigger_id),
+    run_id TEXT REFERENCES runs(run_id),
+    channel TEXT NOT NULL,
+    recipient TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('queued','started','confirmed','unknown','failed')),
+    platform_receipt_json TEXT,
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    CHECK(trigger_id IS NOT NULL OR run_id IS NOT NULL)
+);
+CREATE INDEX idx_automation_notifications_trigger ON automation_notifications_v1(trigger_id);
+CREATE INDEX idx_automation_notifications_pending ON automation_notifications_v1(status,created_at);
+CREATE TABLE automation_daily_receipts_v1 (
+    session_id TEXT NOT NULL REFERENCES sessions(session_id),
+    logical_date TEXT NOT NULL,
+    attempt INTEGER NOT NULL CHECK(attempt > 0),
+    status TEXT NOT NULL CHECK(status IN ('started','succeeded','failed','unknown')),
+    result_json TEXT,
+    error TEXT,
+    started_at INTEGER NOT NULL,
+    completed_at INTEGER,
+    retry_at INTEGER,
+    PRIMARY KEY(session_id,logical_date)
+);
+CREATE TABLE automation_suggestions_v1 (
+    id TEXT PRIMARY KEY,
+    studio_id TEXT NOT NULL,
+    session_id TEXT NOT NULL REFERENCES sessions(session_id),
+    owner_subject TEXT NOT NULL,
+    operation TEXT NOT NULL CHECK(operation IN ('create','update')),
+    job_id TEXT,
+    expected_revision INTEGER CHECK(expected_revision IS NULL OR expected_revision > 0),
+    job_json TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    applied_job_id TEXT REFERENCES automation_jobs_v1(id),
+    state TEXT NOT NULL CHECK(state IN ('pending','applied')),
+    created_at INTEGER NOT NULL
+);
+CREATE TABLE automation_activity_promotions_v1 (
+    trigger_id TEXT PRIMARY KEY REFERENCES automation_triggers_v1(trigger_id),
+    session_id TEXT NOT NULL UNIQUE REFERENCES sessions(session_id),
+    promoted_at INTEGER NOT NULL
+);
+CREATE TABLE automation_internal_sessions_v1 (
+    session_id TEXT PRIMARY KEY REFERENCES sessions(session_id),
+    kind TEXT NOT NULL CHECK(kind IN ('activity','heartbeat_scope')),
+    trigger_id TEXT REFERENCES automation_triggers_v1(trigger_id),
+    agent_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    CHECK((kind='activity' AND trigger_id IS NOT NULL) OR (kind='heartbeat_scope' AND trigger_id IS NULL))
+);
+"#;
+
+/// R07：外部消息、运行关联与外发事实持久化；旧消息身份跨配置代次保持不变。
+pub const V16_NAME: &str = "r07_bridge_inbox_outbox";
+pub const V16_SQL: &str = r#"
+CREATE TABLE bridge_connectors_v1 (
+    id TEXT PRIMARY KEY,
+    platform TEXT NOT NULL CHECK(platform IN ('telegram','feishu','dingtalk','qq','wechat')),
+    studio_id TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    owner_subject TEXT NOT NULL CHECK(owner_subject='user_local'),
+    owner_sender_id TEXT,
+    generation INTEGER NOT NULL CHECK(generation>0),
+    enabled INTEGER NOT NULL CHECK(enabled IN (0,1)),
+    config_json TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+CREATE TABLE bridge_conversations_v1 (
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    conversation_id TEXT NOT NULL,
+    sender_id TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    conversation_kind TEXT NOT NULL CHECK(conversation_kind IN ('dm','group')),
+    epoch INTEGER NOT NULL CHECK(epoch>0),
+    current_session_id TEXT,
+    metadata_json TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY(connector_id,conversation_id,sender_id,actor_id)
+);
+CREATE INDEX idx_bridge_conversations_recent ON bridge_conversations_v1(connector_id,updated_at);
+CREATE TABLE bridge_inbox_v1 (
+    id TEXT PRIMARY KEY,
+    platform TEXT NOT NULL,
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    conversation_id TEXT NOT NULL,
+    conversation_kind TEXT NOT NULL CHECK(conversation_kind IN ('dm','group')),
+    message_id TEXT NOT NULL,
+    sender_id TEXT NOT NULL,
+    role TEXT NOT NULL CHECK(role IN ('owner','guest')),
+    actor_id TEXT NOT NULL,
+    owner_subject TEXT NOT NULL CHECK(owner_subject='user_local'),
+    connector_generation INTEGER NOT NULL CHECK(connector_generation>0),
+    payload_json TEXT NOT NULL,
+    attachments_json TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('claimed','running','succeeded','failed','cancelled','unknown','command')),
+    session_id TEXT,
+    run_id TEXT,
+    request_id TEXT NOT NULL UNIQUE,
+    result_json TEXT,
+    error TEXT,
+    prepared INTEGER NOT NULL DEFAULT 0 CHECK(prepared IN (0,1)),
+    prepared_takeover INTEGER NOT NULL DEFAULT 0 CHECK(prepared_takeover IN (0,1)),
+    resolved_files_json TEXT NOT NULL DEFAULT '[]',
+    conversation_epoch INTEGER CHECK(conversation_epoch IS NULL OR conversation_epoch>0),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE(platform,connector_id,conversation_id,message_id),
+    CHECK(run_id IS NULL OR session_id IS NOT NULL)
+);
+CREATE INDEX idx_bridge_inbox_pending ON bridge_inbox_v1(status,created_at);
+CREATE INDEX idx_bridge_inbox_owner_target ON bridge_inbox_v1(connector_id,connector_generation,role,created_at);
+CREATE TABLE bridge_command_receipts_v1 (
+    inbox_id TEXT PRIMARY KEY REFERENCES bridge_inbox_v1(id),
+    command TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('started','confirmed','unknown','failed')),
+    result_json TEXT,
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+CREATE TABLE bridge_manual_actions_v1 (
+    id TEXT PRIMARY KEY,
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    connector_generation INTEGER NOT NULL CHECK(connector_generation>0),
+    target_inbox_id TEXT NOT NULL REFERENCES bridge_inbox_v1(id),
+    source_session_id TEXT NOT NULL,
+    file_id TEXT NOT NULL,
+    content_sha256 TEXT NOT NULL,
+    label TEXT,
+    filename TEXT NOT NULL,
+    mime TEXT NOT NULL,
+    size_bytes INTEGER NOT NULL CHECK(size_bytes>=0),
+    created_at INTEGER NOT NULL
+);
+CREATE TABLE bridge_outbox_v1 (
+    delivery_id TEXT PRIMARY KEY,
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    connector_generation INTEGER NOT NULL CHECK(connector_generation>0),
+    inbox_id TEXT REFERENCES bridge_inbox_v1(id),
+    manual_action_id TEXT UNIQUE REFERENCES bridge_manual_actions_v1(id),
+    run_id TEXT,
+    conversation_id TEXT NOT NULL,
+    conversation_kind TEXT NOT NULL CHECK(conversation_kind IN ('dm','group')),
+    target_inbox_id TEXT NOT NULL REFERENCES bridge_inbox_v1(id),
+    reply_context_json TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    attachments_json TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('queued','started','confirmed','unknown','failed')),
+    platform_receipt_json TEXT,
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    CHECK(inbox_id IS NOT NULL OR run_id IS NOT NULL OR manual_action_id IS NOT NULL),
+    CHECK(manual_action_id IS NULL OR (inbox_id IS NULL AND run_id IS NULL))
+);
+CREATE UNIQUE INDEX idx_bridge_outbox_command ON bridge_outbox_v1(inbox_id) WHERE run_id IS NULL AND manual_action_id IS NULL;
+CREATE INDEX idx_bridge_outbox_pending ON bridge_outbox_v1(status,created_at);
+CREATE INDEX idx_bridge_outbox_inbox ON bridge_outbox_v1(inbox_id);
+CREATE TABLE bridge_notice_receipts_v1 (
+    delivery_id TEXT PRIMARY KEY REFERENCES bridge_outbox_v1(delivery_id),
+    session_id TEXT NOT NULL,
+    message_id TEXT NOT NULL,
+    fact_json TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+"#;
+
+/// R07：等待提示、草稿更新与最终投递回执共用真实因果来源，重启不重放未知效果。
+pub const V17_NAME: &str = "r07_bridge_effect_receipts";
+pub const V17_SQL: &str = r#"
+CREATE TABLE bridge_effect_streams_v1 (
+    stream_id TEXT PRIMARY KEY,
+    inbox_id TEXT NOT NULL REFERENCES bridge_inbox_v1(id),
+    run_id TEXT NOT NULL,
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    connector_generation INTEGER NOT NULL CHECK(connector_generation>0),
+    mode TEXT NOT NULL CHECK(mode IN ('receipt_only','native_stream')),
+    rich INTEGER NOT NULL CHECK(rich IN (0,1)),
+    conversation_id TEXT NOT NULL,
+    reply_context_json TEXT NOT NULL,
+    unknown INTEGER NOT NULL DEFAULT 0 CHECK(unknown IN (0,1)),
+    closed INTEGER NOT NULL DEFAULT 0 CHECK(closed IN (0,1)),
+    last_sequence INTEGER NOT NULL DEFAULT 0 CHECK(last_sequence>=0 AND last_sequence<=4294967295),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE(inbox_id,run_id)
+);
+CREATE INDEX idx_bridge_effect_streams_active ON bridge_effect_streams_v1(connector_id,connector_generation,closed);
+CREATE TABLE bridge_effects_v1 (
+    effect_id TEXT PRIMARY KEY,
+    stream_id TEXT NOT NULL REFERENCES bridge_effect_streams_v1(stream_id),
+    request_key TEXT NOT NULL,
+    sequence INTEGER NOT NULL CHECK(sequence>0 AND sequence<=4294967295),
+    operation TEXT NOT NULL CHECK(operation IN ('receipt_start','receipt_stop','stream_update','stream_finish','stream_cancel')),
+    request_json TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('started','confirmed','failed','unknown','skipped')),
+    receipt_json TEXT,
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE(stream_id,request_key),
+    UNIQUE(stream_id,sequence)
+);
+CREATE INDEX idx_bridge_effects_started ON bridge_effects_v1(status,stream_id);
+CREATE UNIQUE INDEX idx_bridge_effects_finish ON bridge_effects_v1(stream_id) WHERE operation='stream_finish';
+"#;
+
+/// R07：独立输入状态与内容草稿分开冻结；旧候选保守地视为不独立。
+pub const V18_NAME: &str = "r07_bridge_independent_receipt";
+pub const V18_SQL: &str = r#"
+ALTER TABLE bridge_effect_streams_v1 ADD COLUMN receipt_independent INTEGER NOT NULL DEFAULT 0 CHECK(receipt_independent IN (0,1));
+"#;
+
+/// R07：频道/私信兼容文件收据、手机投递因果预算与协作草稿；既有版本保持逐字不变。
+pub const V19_NAME: &str = "r07_conversation_phone_collab_receipts";
+pub const V19_SQL: &str = r#"
+CREATE TABLE conversation_file_operations_v1(operation_id TEXT PRIMARY KEY,request_sha256 TEXT NOT NULL,mutation_json TEXT NOT NULL,status TEXT NOT NULL CHECK(status IN ('prepared','applied','partial','failed','unknown')),created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL);
+CREATE TABLE conversation_file_targets_v1(operation_id TEXT NOT NULL REFERENCES conversation_file_operations_v1(operation_id),relative_path TEXT NOT NULL,preimage_sha256 TEXT,postimage_sha256 TEXT,postimage TEXT,status TEXT NOT NULL CHECK(status IN ('prepared','applied','failed','unknown')),error TEXT,PRIMARY KEY(operation_id,relative_path));
+CREATE INDEX idx_conversation_files_recovery ON conversation_file_operations_v1(status,created_at);
+CREATE TABLE conversation_file_sources_v1(operation_id TEXT PRIMARY KEY,source_run_id TEXT NOT NULL REFERENCES runs(run_id) ON DELETE CASCADE,source_tool_call_id TEXT NOT NULL UNIQUE REFERENCES invocation_journal(journal_id));
+CREATE TABLE conversation_message_dispatch_v1(operation_id TEXT PRIMARY KEY REFERENCES conversation_file_operations_v1(operation_id),status TEXT NOT NULL CHECK(status IN ('completed','skipped')),reason TEXT,updated_at INTEGER NOT NULL);
+CREATE TABLE phone_chains_v1(root_chain_id TEXT PRIMARY KEY,owner_subject TEXT NOT NULL,conversation_type TEXT NOT NULL CHECK(conversation_type IN ('channel','dm')),conversation_scope TEXT NOT NULL,budget_limit INTEGER NOT NULL CHECK(budget_limit BETWEEN 1 AND 64),spent INTEGER NOT NULL CHECK(spent>=0 AND spent<=budget_limit),created_at INTEGER NOT NULL);
+CREATE TABLE phone_deliveries_v1(delivery_id TEXT PRIMARY KEY,input_json TEXT NOT NULL,owner_subject TEXT NOT NULL,actor_id TEXT NOT NULL,conversation_id TEXT NOT NULL,conversation_type TEXT NOT NULL CHECK(conversation_type IN ('channel','dm')),cause_id TEXT NOT NULL,batch_digest TEXT NOT NULL,root_chain_id TEXT NOT NULL REFERENCES phone_chains_v1(root_chain_id),status TEXT NOT NULL CHECK(status IN ('claimed','running','completed','failed','cancelled','unknown')),session_id TEXT REFERENCES sessions(session_id) ON DELETE SET NULL,run_id TEXT UNIQUE REFERENCES runs(run_id) ON DELETE SET NULL,decision TEXT CHECK(decision IN ('reply','pass')),decision_body TEXT,decision_at INTEGER CHECK(decision_at>=0),error TEXT,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL,UNIQUE(owner_subject,cause_id,actor_id,batch_digest));
+CREATE INDEX idx_phone_deliveries_pending ON phone_deliveries_v1(status,created_at);
+CREATE INDEX idx_phone_deliveries_chain ON phone_deliveries_v1(root_chain_id,actor_id,status);
+CREATE TABLE phone_dm_directions_v1(owner_subject TEXT NOT NULL,from_actor TEXT NOT NULL,to_actor TEXT NOT NULL,delivery_id TEXT NOT NULL REFERENCES phone_deliveries_v1(delivery_id),processing_until INTEGER NOT NULL,cooldown_until INTEGER NOT NULL,PRIMARY KEY(owner_subject,from_actor,to_actor));
+CREATE TABLE phone_discovery_cursors_v1(conversation_id TEXT PRIMARY KEY,message_fingerprint TEXT NOT NULL,proactive_slot INTEGER NOT NULL,updated_at INTEGER NOT NULL);
+CREATE TABLE phone_binding_epochs_v1(actor_id TEXT NOT NULL,conversation_id TEXT NOT NULL,owner_subject TEXT NOT NULL,epoch INTEGER NOT NULL CHECK(epoch>0),PRIMARY KEY(actor_id,conversation_id,owner_subject));
+CREATE TABLE phone_bindings_v1(actor_id TEXT NOT NULL,conversation_id TEXT NOT NULL,conversation_type TEXT NOT NULL CHECK(conversation_type IN ('channel','dm')),owner_subject TEXT NOT NULL,session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,mode TEXT NOT NULL CHECK(mode IN ('ask','read_only','operate')),epoch INTEGER NOT NULL CHECK(epoch>0),last_used INTEGER NOT NULL,expires_at INTEGER NOT NULL,PRIMARY KEY(actor_id,conversation_id,owner_subject));
+CREATE TABLE session_collab_drafts_v1(id TEXT PRIMARY KEY,studio_id TEXT NOT NULL,owner_subject TEXT NOT NULL CHECK(owner_subject='user_local'),source_session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,source_run_id TEXT NOT NULL REFERENCES runs(run_id) ON DELETE CASCADE,source_tool_call_id TEXT NOT NULL,kind TEXT NOT NULL CHECK(kind IN ('send','create')),draft_json TEXT NOT NULL,frozen_apply_json TEXT,request_id TEXT NOT NULL UNIQUE,state TEXT NOT NULL CHECK(state IN ('pending','applying','applied','rejected','unknown')),delivery_status TEXT NOT NULL CHECK(delivery_status IN ('none','queued','started','accepted','failed','unknown')),reserved_target_id TEXT,target_session_id TEXT REFERENCES sessions(session_id) ON DELETE SET NULL,target_created INTEGER NOT NULL DEFAULT 0 CHECK(target_created IN (0,1)),accepted_run_id TEXT REFERENCES runs(run_id) ON DELETE SET NULL,attempt INTEGER NOT NULL DEFAULT 0 CHECK(attempt>=0),error TEXT,created_at INTEGER NOT NULL,expires_at INTEGER NOT NULL,updated_at INTEGER NOT NULL,UNIQUE(source_run_id,source_tool_call_id));
+CREATE INDEX idx_session_collab_queue ON session_collab_drafts_v1(delivery_status,created_at);
+CREATE TABLE session_collab_decisions_v1(suggestion_id TEXT PRIMARY KEY REFERENCES session_collab_drafts_v1(id) ON DELETE CASCADE,session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,message_id TEXT NOT NULL UNIQUE,decision_json TEXT NOT NULL,created_at INTEGER NOT NULL);
+"#;
+
+pub const V20_NAME: &str = "r07_browser_authority";
+pub const V20_SQL: &str = r#"
+CREATE TABLE browser_workspaces_v1 (
+ session_id TEXT PRIMARY KEY REFERENCES sessions(session_id) ON DELETE CASCADE,
+ owner_subject TEXT NOT NULL, execution_node TEXT NOT NULL,
+ epoch INTEGER NOT NULL CHECK(epoch>0), revoked INTEGER NOT NULL CHECK(revoked IN(0,1)),
+ revoked_run_watermark INTEGER NOT NULL DEFAULT 0,
+ state_json TEXT CHECK(state_json IS NULL OR json_valid(state_json)), updated_at INTEGER NOT NULL
+);
+CREATE INDEX idx_browser_owner ON browser_workspaces_v1(owner_subject);
+CREATE TABLE browser_downloads_v1 (
+ session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,
+ download_id TEXT NOT NULL, owner_subject TEXT NOT NULL, source_run_id TEXT,
+ status TEXT NOT NULL CHECK(status IN('completed','unknown','failed')),
+ file_id TEXT, error TEXT, updated_at INTEGER NOT NULL,
+ PRIMARY KEY(session_id,download_id)
+);
+CREATE TABLE browser_commands_v1 (
+ operation_id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,
+ owner_subject TEXT NOT NULL, epoch INTEGER NOT NULL, input_json TEXT NOT NULL CHECK(json_valid(input_json)),
+ status TEXT NOT NULL CHECK(status IN('started','confirmed','unknown','failed')),
+ result_json TEXT CHECK(result_json IS NULL OR json_valid(result_json)), error TEXT,
+ updated_at INTEGER NOT NULL
+);
+"#;
+
+pub const V21_NAME: &str = "r07_media_jobs";
+pub const V21_SQL: &str = r#"
+CREATE TABLE media_jobs_v1 (
+ operation_id TEXT PRIMARY KEY,
+ session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,
+ owner_subject TEXT NOT NULL,
+ source_run_id TEXT NOT NULL REFERENCES runs(run_id) ON DELETE CASCADE,
+ execution_run_id TEXT REFERENCES runs(run_id) ON DELETE SET NULL,
+ tool_call_id TEXT NOT NULL, kind TEXT NOT NULL CHECK(kind IN('image','video','speech')),
+ provider TEXT NOT NULL, request_digest TEXT NOT NULL,
+ spec_json TEXT NOT NULL CHECK(json_valid(spec_json)),
+ state_json TEXT NOT NULL CHECK(json_valid(state_json)),
+ phase TEXT NOT NULL CHECK(phase IN('submitting','submitted','generating','downloading','completed','failed','cancelled','unknown')),
+ revision INTEGER NOT NULL DEFAULT 1 CHECK(revision>0),
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
+ UNIQUE(source_run_id,tool_call_id,kind)
+);
+CREATE INDEX idx_media_session_updated ON media_jobs_v1(session_id,updated_at);
+CREATE INDEX idx_media_open ON media_jobs_v1(phase,created_at);
+"#;
+
+pub const V22_NAME: &str = "r07_beautify_jobs";
+pub const V22_SQL: &str = r#"
+CREATE TABLE beautify_jobs_v1 (
+ job_id TEXT PRIMARY KEY, principal_id TEXT NOT NULL, request_id TEXT NOT NULL,
+ session_id TEXT NOT NULL, run_id TEXT UNIQUE REFERENCES runs(run_id) ON DELETE SET NULL,
+ phase TEXT NOT NULL CHECK(phase IN('queued','starting','prompting','prompt_ready','media_preparing','media_pending','applying','completed','failed','cancelled','unknown')),
+ revision INTEGER NOT NULL CHECK(revision>0), job_json TEXT NOT NULL CHECK(json_valid(job_json)),
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
+ UNIQUE(principal_id,request_id)
+);
+CREATE INDEX idx_beautify_open ON beautify_jobs_v1(phase,created_at);
+CREATE TABLE beautify_authorizations_v1 (
+ job_id TEXT NOT NULL REFERENCES beautify_jobs_v1(job_id), call_id TEXT NOT NULL,
+ run_id TEXT NOT NULL, target TEXT NOT NULL, args_digest TEXT NOT NULL,
+ binding_json TEXT NOT NULL CHECK(json_valid(binding_json)), created_at INTEGER NOT NULL,
+ PRIMARY KEY(job_id,call_id)
+);
+"#;
+
+pub const V23_NAME: &str = "r07_media_gallery";
+pub const V23_SQL: &str = r#"
+CREATE TABLE media_gallery_v1 (
+ task_id TEXT PRIMARY KEY REFERENCES media_jobs_v1(operation_id) ON DELETE CASCADE,
+ session_id TEXT NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,
+ owner_subject TEXT NOT NULL,
+ batch_id TEXT NOT NULL,
+ kind TEXT NOT NULL CHECK(kind IN('image','video','speech')),
+ type TEXT NOT NULL,
+ prompt TEXT NOT NULL,
+ provider TEXT, model TEXT,
+ status TEXT NOT NULL CHECK(status IN('pending','done','failed','cancelled')),
+ favorited INTEGER NOT NULL DEFAULT 0 CHECK(favorited IN(0,1)),
+ files_json TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(files_json)),
+ fail_reason TEXT,
+ retry_count INTEGER NOT NULL DEFAULT 0 CHECK(retry_count>=0),
+ attempt INTEGER NOT NULL DEFAULT 1 CHECK(attempt>=1),
+ created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, completed_at INTEGER
+);
+CREATE INDEX idx_media_gallery_owner_created ON media_gallery_v1(owner_subject,created_at);
+CREATE INDEX idx_media_gallery_batch ON media_gallery_v1(batch_id);
+"#;
+
+/// R07-T10 legacy observability import (version 24): side map from an
+/// imported call id to its LEGACY trace linkage. The authoritative ledger
+/// table stays untouched — imported rows keep their original call ids
+/// (never renumbered, so a legacy multi-turn trace never splits) and the
+/// legacy trace_id / parent_call_id live here. No FK (mirrors the legacy
+/// store's ordering-tolerant stance; the read side interprets orphans).
+pub const V24_NAME: &str = "r07_observability_legacy_trace";
+pub const V24_SQL: &str = r#"
+CREATE TABLE observability_legacy_trace (
+    model_call_id       TEXT PRIMARY KEY,
+    trace_id            TEXT NOT NULL,
+    parent_call_id      TEXT,
+    imported_at_unix_ms INTEGER NOT NULL
+);
+CREATE INDEX idx_observability_legacy_trace_trace ON observability_legacy_trace(trace_id);
+"#;
+
 pub const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 1,
@@ -694,6 +1079,56 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 14,
         name: V14_NAME,
         sql: V14_SQL,
+    },
+    Migration {
+        version: 15,
+        name: V15_NAME,
+        sql: V15_SQL,
+    },
+    Migration {
+        version: 16,
+        name: V16_NAME,
+        sql: V16_SQL,
+    },
+    Migration {
+        version: 17,
+        name: V17_NAME,
+        sql: V17_SQL,
+    },
+    Migration {
+        version: 18,
+        name: V18_NAME,
+        sql: V18_SQL,
+    },
+    Migration {
+        version: 19,
+        name: V19_NAME,
+        sql: V19_SQL,
+    },
+    Migration {
+        version: 20,
+        name: V20_NAME,
+        sql: V20_SQL,
+    },
+    Migration {
+        version: 21,
+        name: V21_NAME,
+        sql: V21_SQL,
+    },
+    Migration {
+        version: 22,
+        name: V22_NAME,
+        sql: V22_SQL,
+    },
+    Migration {
+        version: 23,
+        name: V23_NAME,
+        sql: V23_SQL,
+    },
+    Migration {
+        version: 24,
+        name: V24_NAME,
+        sql: V24_SQL,
     },
 ];
 

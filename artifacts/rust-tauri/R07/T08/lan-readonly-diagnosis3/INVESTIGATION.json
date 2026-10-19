@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "scope": "R00_LAN_READONLY_CAUSE_LOCALIZATION_NOT_GATE_PASS",
+  "createdAt": "2026-10-18T08:41:07.783183+00:00",
+  "conclusion": "实际故障已在不注入ManualClock的隔离真实Rust服务复现，LAN首请求甚至无Origin的health也0字节；同服务loopback正常。纯Python真实LAN TCP对照正常。固定Rust副本的LAN发送后0.2秒lsof均只见LISTEN、未见该服务拥有对应LAN连接，stderr亦无LAN处理完成或拒绝标记。证据优先指向特定程序的accept前/到达接入链，不能归咎登录、限流或冻结时钟；具体OS/按程序过滤/网络中介机制未确定，不宣称已定位某防火墙/TUN。",
+  "staticFacts": [
+    {
+      "source": "rust/crates/lingxi-service/tests/r00_management_leaves.rs",
+      "points": [
+        "LAN段使用同home但全新bootstrap、新RateLimiter、新ManualClock(clock_epoch)，不是继续沿用此前已推进14天的clock实例。",
+        "原段先loopback实际签移动凭证成功，然后首个LAN请求为Origin evil.example的POST/login；首次即0字节，尚未到正确Origin登录。"
+      ]
+    },
+    {
+      "source": "rust/crates/lingxi-service/src/lib.rs",
+      "points": [
+        "transport_guard先本机网卡枚举+origin规则+public_base_url，再bad_origin立即403，之后才有连接类别/限流/auth/login。",
+        "超量即429/注册表满503；请求总预算使用tokio wall-clock timeout，不由ManualClock推进触发。"
+      ]
+    },
+    {
+      "source": "rust/crates/lingxi-service/src/limits.rs",
+      "points": [
+        "新RateLimiter默认240请求/10000ms，check同步短锁返回，不等待窗口重新打开。"
+      ]
+    },
+    {
+      "source": "rust/crates/lingxi-service/src/management.rs",
+      "points": [
+        "credential登录分支调用真实AuthService.authenticate，不走密码spawn_blocking；expiry只用now计算数值；但原首个bad_origin在这些步骤之前已经应被拒绝。"
+      ]
+    },
+    {
+      "source": "rust/crates/lingxi-service/src/serve.rs",
+      "points": [
+        "真实TcpListener.accept后才spawn Hyper连接任务；accept、header读超时、SDK HTTP请求预算均不是ManualClock sleep。"
+      ]
+    },
+    {
+      "source": "rust/crates/lingxi-service/src/inject.rs",
+      "points": [
+        "ManualClock.now_unix_ms仅AtomicU64读取，advance仅加数值，没有等待/网络处理。"
+      ]
+    }
+  ],
+  "sourceReadSha256": {
+    "rust/crates/lingxi-service/tests/r00_management_leaves.rs": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453",
+    "rust/crates/lingxi-service/src/management.rs": "0a3c56df581d730d876a79d6c2b959fa3c5ca11a59ae889d406fe4ad18c89c83",
+    "rust/crates/lingxi-service/src/auth.rs": "f9ea065aba71ebcbafb8183ddcc33dfdcd4490146db8a5998cb0e9b2f363af55",
+    "rust/crates/lingxi-service/src/lib.rs": "d681d98e9f73369b938e5a68d50313543bc025316f70c4c17f8f06c43a7797b3",
+    "rust/crates/lingxi-service/src/limits.rs": "93d7bbd0a1bc22417cfb800d75601c61e8ee396ff8801218382738938d6767c5",
+    "rust/crates/lingxi-service/src/serve.rs": "95faa3f52bb1c1a33738501b33038bda41e0e29eca6eee541fadb84b202847b8",
+    "rust/crates/lingxi-service/src/inject.rs": "c440a0c38f5710500b3aa3c557ca33d9503db485d13fc1555416a7efb4c560e4",
+    "rust/crates/lingxi-service/src/transport.rs": "d4a5fe9ac17e2f0e2e666bc04658008002fa48d1f661875fa41121f5ff012c95"
+  },
+  "actualRuns": [
+    {
+      "directory": "lan-readonly-diagnosis1",
+      "exitCode": 1,
+      "meaning": "准备阶段在MCP原始只读目录不可用时退出2；该探针首次采用OS临时目录别名并且product-dir父级选择错误，均已在新独立探针纠正。没有执行LAN请求，不据此判新产品回归或LAN根因。"
+    },
+    {
+      "directory": "lan-readonly-diagnosis2",
+      "exitCode": 1,
+      "meaning": "实际LAN foreign login20s0bytes、health5s0bytes、正确Origin login5s0bytes；loopback签凭证200、foreign403、health200，服务exit0。路径二进制运行期间被统一build替换，binaryUnchanged=false，不能充当固定版本证明。"
+    },
+    {
+      "directory": "lan-readonly-diagnosis3",
+      "exitCode": 1,
+      "meaning": "从现成产物复制自有同SHA可执行文件21458f19bdc4f1becc1366c3e395ed63dd60a769357713cf77fca97196479383；运行前后同SHA，重复同一结果，全部真实LAN请求connect/send完成但0字节。发送后只读lsof该服务均只见监听；服务实际退出0。无ManualClock、无Cargo、无外部服务。"
+    },
+    {
+      "directory": "lan-readonly-raw-tcp1",
+      "exitCode": 0,
+      "meaning": "无Rust/HTTP/auth/clock的Python自有TCP listener真实接到192.168.3.96源连接、收到并回复21字节；LAN和loopback均正常，线程及监听已关闭。不证明Rust或手机入口通过。"
+    }
+  ],
+  "limits": [
+    "没有包级/内核网络过滤/安全产品/应用防火墙规则证据，故具体接入前阻断机制仍未确定。",
+    "lsof是发送后0.2秒瞬时观测，不伪称持续跟踪全部accept/syscall。",
+    "当前二进制副本/空home与原正式c测试可执行文件和历史home不同，只用于定位共性条件；不覆盖原失败、不领原c门禁通过。",
+    "本机真实网卡地址自连，不是第二设备或手机端到端。",
+    "未改网络/防火墙/TUN、未触真实用户home或账号，所有凭证只在自有隔离home且未复制到报告。"
+  ],
+  "originalFailureUnchanged": true,
+  "networkSettingsChanged": false,
+  "cargoRun": false
+}

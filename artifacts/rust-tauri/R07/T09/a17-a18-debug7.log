@@ -1,0 +1,64 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 482ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+Error: write 落盘缺失: /private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/workspace/a17-xentry-output.txt
+base 下全部文件:
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/agents/a17agent/.lingxi-recovery-02c0c70ba276724f24e31364748ee0ac.original
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/agents/a17agent/config.yaml
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/chat-input-settings.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/data-epoch.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/file-recovery-records/02c0c70ba276724f24e31364748ee0ac.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/file-write-witnesses/97d6e15e12b9c0a0ae65be68217099562b6ebbc95b78ee038dc6e3dd7683612a.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/file-write-witnesses/a81738216e0ddaf9e03a68485b89163940154af7d1008dcde8902ce44e8445e3.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/ingestion-worker.lock
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_index.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_index.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_index.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_index.db.guard
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_index.db.owner
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_vector.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_vector.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_vector.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_vector.db.guard
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/knowledge/knowledge_vector.db.owner
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/data/runs.db
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/data/runs.db-shm
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/data/runs.db-wal
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/data/session-prompt-snapshots/7a9747048fb63c0860319e505f7b20fd070a165f8fe901a1ce7f82d8dcf7f868.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/data/session-ui/7a9747048fb63c0860319e505f7b20fd070a165f8fe901a1ce7f82d8dcf7f868.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/device-credentials.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/devices.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/instance.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/instance.lock
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/local-token.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/logs/service-000001.log
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/lingxi-service/management.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/logs/security-audit.jsonl
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/home/user/preferences.json
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/product/yuan/lingxi.md
+/private/tmp/lingxi-r07-tests/tmp/lingxi-a17-FglOjH/service-config.json
+stubSeen: [{"model":"chat","stream":true,"messages":2,"tools":[]},{"model":"chat","stream":true,"messages":4,"tools":["tool error [invalid_message]: tool arguments violate the current schema: 必须先在本轮读取目标的正式说明；模型自报代次不能替代说明来源"]},{"model":"chat","stream":true,"messages":6,"tools":["tool error [invalid_message]: tool arguments violate the current schema: 必须先在本轮读取目标的正式说明；模型自报代次不能替代说明来源","tool error [invalid_message]: ⚠ Agent loop guard: tool \"mcp_call\" has failed 2 consecutive times. Inspect the error and change the approach before retrying.\ntool arguments violate the current schema: 必须先在本轮读取目标的正式说明；模型自报代次不能替代说明来源"]}]
+== security-audit ==
+
+== witnesses ==
+{"ctime":[1792336718,272569875],"dev":16777229,"ino":328881844,"modified":"SystemTime { tv_sec: 1792336718, tv_nsec: 263151599 }","sha256":"5664310674a1de087052a3d28e4cae194d27becc9dea29c64d4b29735075e23d","size":116}
+{"ctime":[1792336718,297704473],"dev":16777229,"ino":328881854,"modified":"SystemTime { tv_sec: 1792336718, tv_nsec: 293138315 }","sha256":"30c2b40712db7209eef21a41fb7153f3c3b401d039b2113ba045bfa0e000cb16","size":124}
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:207:13
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  23:18:37
+   Duration  590ms (transform 22ms, setup 20ms, import 19ms, tests 482ms, environment 0ms)
+

@@ -1,0 +1,46 @@
+{
+  "models": {
+    "chat": {
+      "model": "chat-only",
+      "provider": "fixture"
+    },
+    "speech": {
+      "model": "seed-speech",
+      "provider": "fixture"
+    }
+  },
+  "network": {
+    "proxy": {
+      "mode": "direct"
+    }
+  },
+  "providers": {
+    "fixture": {
+      "auth": {
+        "apiKey": "synthetic-media-key",
+        "kind": "apiKey"
+      },
+      "endpoint": "http://127.0.0.1:55052",
+      "models": [
+        {
+          "context": 8192,
+          "id": "chat-only",
+          "input": [
+            "text"
+          ]
+        },
+        {
+          "id": "seed-speech",
+          "outputs": [
+            "audio"
+          ],
+          "protocol": "openai-audio-speech",
+          "unknownKeep": {
+            "nested": true
+          }
+        }
+      ],
+      "protocol": "openai-completions"
+    }
+  }
+}

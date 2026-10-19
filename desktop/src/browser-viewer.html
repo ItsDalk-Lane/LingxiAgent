@@ -205,6 +205,29 @@
             background: var(--accent-light);
             border-color: color-mix(in srgb, var(--border) 88%, var(--text-muted));
         }
+        /* 原生浏览器状态页与旧网页容器分离，颜色沿用当前主题。 */
+        .rust-browser-panel {
+            height: 100vh; overflow: auto; padding: 52px 24px 24px;
+            color: var(--text); line-height: 1.65; font-size: 14px;
+        }
+        .rust-browser-drag-strip {
+            position: absolute; top: 0; left: 0; right: 0; height: 36px;
+            -webkit-app-region: drag;
+        }
+        .rust-browser-panel h2 { font-size: 20px; margin-bottom: 12px; }
+        .rust-browser-panel p { margin: 10px 0; overflow-wrap: anywhere; }
+        .rust-browser-panel [role="alert"] { color: var(--coral, #b05555); }
+        .rust-browser-panel button {
+            padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px;
+            color: var(--text); background: var(--bg-card); font: inherit;
+            cursor: pointer; -webkit-app-region: no-drag;
+        }
+        .rust-browser-panel button:hover:not(:disabled) { background: var(--accent-light); }
+        .rust-browser-panel button:disabled { opacity: .45; cursor: default; }
+        .rust-browser-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+        .rust-browser-tabs { list-style: none; margin: 14px 0; }
+        .rust-browser-tabs li { display: flex; gap: 8px; margin: 9px 0; }
+        .rust-browser-tabs li button:first-child { min-width: 0; overflow-wrap: anywhere; text-align: left; }
     </style>
 </head>
 <body>

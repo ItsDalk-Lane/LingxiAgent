@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use axum::body::Body;
 use axum::extract::{Path as RoutePath, State};
 use axum::http::{header, HeaderValue, StatusCode};
-use axum::response::{IntoResponse, Response};
+use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
 use axum::Router;
 
@@ -41,11 +41,13 @@ fn valid_dist(path: &Path) -> Option<PathBuf> {
 }
 
 pub(crate) fn routes() -> Router<ServiceState> {
+    // 页面用相对路径引用资源；无尾斜杠入口必须重定向到带尾斜杠形态，
+    // 否则浏览器把 ./assets/x 解析到根路径而 404/401。
     Router::new()
-        .route("/mobile", get(mobile_index))
+        .route("/mobile", get(|| async { Redirect::permanent("/mobile/") }))
         .route("/mobile/", get(mobile_index))
         .route("/mobile/{*path}", get(mobile_asset))
-        .route("/desktop", get(desktop_index))
+        .route("/desktop", get(|| async { Redirect::permanent("/desktop/") }))
         .route("/desktop/", get(desktop_index))
         .route("/desktop/{*path}", get(desktop_asset))
 }

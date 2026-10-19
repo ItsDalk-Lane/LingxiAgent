@@ -377,6 +377,19 @@ pub enum RunOrigin {
     Cron,
     Heartbeat,
     Bridge,
+    /// 频道与助手私聊的正式后台来源，由服务冻结真实消息和成员范围。
+    Channel,
+    Dm,
+    /// 用户确认的跨会话协作草稿，因果指向源运行和持久草稿。
+    SessionCollab,
+    /// 已批准工具孵化的固定媒体执行，不授予模型或通用工具能力。
+    Media,
+    /// 用户明确发起的固定封面工作流，目标和付费范围预先冻结。
+    Beautify,
+    /// R07-T07-δ6：/loop 循环的唤醒轮。循环轮就是该会话的普通交互轮
+    /// （RunGrant::Full → UserSession 权限上下文，交互审批保留），只是
+    /// 入口来源是循环闹钟/事件而非用户键入。
+    Loop,
 }
 
 impl RunOrigin {
@@ -387,6 +400,12 @@ impl RunOrigin {
             RunOrigin::Cron => "cron",
             RunOrigin::Heartbeat => "heartbeat",
             RunOrigin::Bridge => "bridge",
+            RunOrigin::Channel => "channel",
+            RunOrigin::Dm => "dm",
+            RunOrigin::SessionCollab => "session_collab",
+            RunOrigin::Media => "media",
+            RunOrigin::Beautify => "beautify",
+            RunOrigin::Loop => "loop",
         }
     }
 
@@ -400,6 +419,12 @@ impl RunOrigin {
             "cron" => Some(RunOrigin::Cron),
             "heartbeat" => Some(RunOrigin::Heartbeat),
             "bridge" => Some(RunOrigin::Bridge),
+            "channel" => Some(RunOrigin::Channel),
+            "dm" => Some(RunOrigin::Dm),
+            "session_collab" => Some(RunOrigin::SessionCollab),
+            "media" => Some(RunOrigin::Media),
+            "beautify" => Some(RunOrigin::Beautify),
+            "loop" => Some(RunOrigin::Loop),
             _ => None,
         }
     }

@@ -1,0 +1,48 @@
+{
+  "scope": "READ_ONLY_DIAGNOSIS_AND_OWNED_NATIVE_PROBE_NOT_A_PRODUCT_FIX",
+  "createdAt": "2026-10-18T11:22:48.567572+00:00",
+  "originalFailure": {
+    "log": "artifacts/rust-tauri/R07/T08/mcp-session-permission-reproduce3.log",
+    "sha256": "8f1b7cae564ec4533be2f63e8470b1e35e74863322b238ed4854db72027aa6eb",
+    "test": "credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants",
+    "panicTestLine": 414,
+    "code": "mcp_cleanup_unconfirmed",
+    "ownedPid": 24956,
+    "actualPgid": -1,
+    "killpgErrno": 1,
+    "knownFacts": [
+      "Failure arose during actual Service run shutdown, after fresh credential approval was observed.",
+      "Current process observation no longer finds pid24956; this later observation cannot prove its state at failure.",
+      "The existing EPERM exception requires synchronous try_wait(Some) before empty-group verification.",
+      "The error does not report which of try_wait(None) or nonempty group caused refusal, so original exact branch remains unknown."
+    ]
+  },
+  "source": {
+    "file": "rust/crates/lingxi-service/src/mcpbridge.rs",
+    "sha256": "8222bc77499c4e7615647f53b00d5b9ecf602e1effa56e425ad391886af0f237",
+    "lines": {
+      "kill": 339,
+      "macosEpermGuard": 354,
+      "asyncStop": 377
+    }
+  },
+  "nativeObservation": {
+    "file": "artifacts/rust-tauri/R07/T08/mcp-cleanup-native-observation1.json",
+    "sha256": "bea60b0e4982d944a803fb34c7e9a15d5b7d873b91e5d6be1242ed0e37cb4d73",
+    "actualOwnedSamples": 3,
+    "result": "All3: killpg EPERM, waitpid WNOHANG=0, getpgid=-1/ESRCH, sysctl group648bytes; subsequent exact waitpid reaped every own child.",
+    "scopeLimit": "Demonstrates a real macOS exiting/reapability window; does not assert that this exclusively explains pid24956."
+  },
+  "minimumFixProposal": [
+    "On macOS EPERM in async stop, retain the original own pid before any try_wait mutation.",
+    "Use the existing two-second cleanup budget to actually await the owned child exit, then verify the process group is empty with the existing sysctl guard.",
+    "Never treat getpgid=-1 alone as success, never suppress live-group EPERM, never signal a group after the owned child has been reaped.",
+    "Preserve synchronous Drop honesty; it cannot block on async wait or claim confirmed cleanup."
+  ],
+  "minimumRustRegressionPlan": [
+    "Bounded real self-owned child natural-exit tests call the real McpChild.stop; retain actual errno/try_wait/group observations.",
+    "A still-live self-owned group must remain nonempty until real kill/wait, so the empty-group exception cannot swallow live cleanup failure.",
+    "Do not replace kernel calls, storage, process identity, or clock."
+  ],
+  "status": "PRODUCT_UNCHANGED; WAIT_FOR_ROOT_REMOTE_RUN_AND_AUTHORIZATION_TO_EDIT"
+}

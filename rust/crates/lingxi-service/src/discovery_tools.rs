@@ -193,7 +193,7 @@ impl ToolExecutorPort for Executor {
 
 #[cfg(windows)]
 #[path = "discovery_windows.rs"]
-mod windows_readonly;
+pub(crate) mod windows_readonly;
 
 #[cfg(any(target_os = "macos", target_os = "linux", windows))]
 mod native {

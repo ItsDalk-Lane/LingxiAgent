@@ -1,0 +1,86 @@
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused imports: `BrowserReply` and `RunId`
+  --> crates/lingxi-service/src/browser.rs:11:36
+   |
+11 |     BrowserAction, BrowserCommand, BrowserReply, BrowserSettings, BrowserWorkspace, RunId,
+   |                                    ^^^^^^^^^^^^                                     ^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no method named `query` found for struct `RequestBuilder` in the current scope
+   --> crates/lingxi-service/src/web_tools.rs:465:18
+    |
+461 |               "brave" => client
+    |  ________________________-
+462 | |                 .get(endpoint)
+463 | |                 .header("X-Subscription-Token", key)
+464 | |                 .header("Accept", "application/json")
+465 | |                 .query(&[("q", query), ("count", &count.to_string())]),
+    | |                 -^^^^^ method not found in `RequestBuilder`
+    | |_________________|
+    |
+
+error[E0277]: the trait bound `std::string::String: From<BrowserError>` is not satisfied
+    --> crates/lingxi-service/src/lib.rs:5536:85
+     |
+5536 |             return EndpointError::new(StatusCode::BAD_GATEWAY, ErrorCode::Internal, error)
+     |                    ------------------ required by a bound introduced by this call   ^^^^^ the trait `From<BrowserError>` is not implemented for `std::string::String`
+     |
+     = help: `std::string::String` implements trait `From<T>`:
+               From<&mut str>
+               From<&std::string::String>
+               From<&str>
+               From<&tendril::tendril::Tendril<tendril::fmt::UTF8, A>>
+               From<Box<str>>
+               From<Cow<'_, str>>
+               From<char>
+               From<reqwest::Url>
+             and 3 others
+     = note: required for `BrowserError` to implement `Into<std::string::String>`
+note: required by a bound in `EndpointError::new`
+    --> crates/lingxi-service/src/lib.rs:2973:63
+     |
+2973 |     fn new(status: StatusCode, code: ErrorCode, message: impl Into<String>) -> Self {
+     |                                                               ^^^^^^^^^^^^ required by this bound in `EndpointError::new`
+
+error: future cannot be sent between threads safely
+   --> crates/lingxi-service/src/browser.rs:739:24
+    |
+739 |           *worker = Some(tokio::spawn(async move {
+    |  ________________________^
+740 | |             let mut stop = this.stop.subscribe();
+741 | |             let mut ticks = tokio::time::interval(std::time::Duration::from_secs(30));
+742 | |             ticks.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+...   |
+746 | |             this.shutdown().await.map_err(|e| e.to_string())
+747 | |         }));
+    | |__________^ future created by async block is not `Send`
+    |
+    = help: within `{async block@crates/lingxi-service/src/browser.rs:739:37: 739:47}`, the trait `std::marker::Send` is not implemented for `std::sync::RwLockReadGuard<'_, bool>`
+note: future is not `Send` as this value is used across an await
+   --> crates/lingxi-service/src/browser.rs:744:132
+    |
+744 | ...   tokio::select! { biased; _ = stop.wait_for(|v| *v) => break, _ = ticks.tick() => { if let Err(e) = this.maintain().await { tracing::error!(error=%e,"浏览器维护失败"); } } }
+    |       -------------------------------------------------------------------------------------------------------------------^^^^^----------------------------------------------------
+    |       |                                                                                                                  |
+    |       |                                                                                                                  await occurs here, with `mut output` maybe used later
+    |       has type `BrowserService::start::{closure#0}::__tokio_select_util::Out<std::result::Result<tokio::sync::watch::Ref<'_, bool>, tokio::sync::watch::error::RecvError>, tokio::time::Instant>` which is not `Send`
+note: required by a bound in `tokio::spawn`
+   --> /Users/study_superior/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/tokio-1.53.1/src/task/spawn.rs:176:21
+    |
+174 |     pub fn spawn<F>(future: F) -> JoinHandle<F::Output>
+    |            ----- required by a bound in this function
+175 |     where
+176 |         F: Future + Send + 'static,
+    |                     ^^^^ required by this bound in `spawn`
+
+Some errors have detailed explanations: E0277, E0599.
+For more information about an error, try `rustc --explain E0277`.
+warning: `lingxi-service` (lib) generated 1 warning
+error: could not compile `lingxi-service` (lib) due to 3 previous errors; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `lingxi-service` (lib test) generated 1 warning (1 duplicate)
+error: could not compile `lingxi-service` (lib test) due to 3 previous errors; 1 warning emitted

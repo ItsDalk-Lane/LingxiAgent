@@ -2963,6 +2963,66 @@ fn file_manifest(
     }
 }
 
+/// 无工作区时仅开放正式 read；外部文件仍须先以真实会话文件 materialize 授予精确版本。
+pub fn register_read_file_tool(
+    registry: &ToolRegistry,
+    gateway: &ToolInvocationGateway,
+    access: Arc<ResourceAccess>,
+    cwd: PathBuf,
+    clock: Arc<dyn ServiceClock>,
+    budget: &SchemaBudget,
+) -> Arc<FileTools> {
+    let tools = Arc::new(FileTools::new(
+        access.clone(),
+        cwd.clone(),
+        clock,
+        Arc::new(NoopChangeLog),
+    ));
+    bind_read_file_tool(registry, gateway, tools.clone(), access, cwd, budget);
+    tools
+}
+fn bind_read_file_tool(
+    registry: &ToolRegistry,
+    gateway: &ToolInvocationGateway,
+    tools: Arc<FileTools>,
+    access: Arc<ResourceAccess>,
+    cwd: PathBuf,
+    budget: &SchemaBudget,
+) -> ToolTargetId {
+    let read_manifest = file_manifest(
+        "read",
+        lingxi_kernel::toolcatalog::PermissionKind::Read,
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "path": {"type": "string", "minLength": 1},
+                "offset": {"type": "integer", "minimum": 1},
+                "limit": {"type": "integer", "minimum": 1},
+            },
+            "required": ["path"],
+            "additionalProperties": false,
+        }),
+    );
+    let read_target = registry
+        .register(read_manifest, budget)
+        .expect("the resident read tool registers")
+        .target_id;
+    gateway.bind_executor_with_resources(
+        read_target.clone(),
+        Arc::new(CoreFileExecutor::new(
+            Arc::clone(&tools),
+            FileToolKind::Read,
+        )),
+        Some(FileTools::resource_extractor(
+            Arc::clone(&access),
+            cwd.clone(),
+            ResourceOp::Read,
+        )),
+        "R04-T04 native read executor (real filesystem)",
+    );
+    read_target
+}
+
 /// Registers the three REAL file tools on the registry and binds their
 /// executors (with resource-scope derivation) on the gateway. This is
 /// the composition entry the Rust stack calls when the native file
@@ -2983,19 +3043,13 @@ pub fn register_core_file_tools(
         clock,
         changes,
     ));
-    let read_manifest = file_manifest(
-        "read",
-        lingxi_kernel::toolcatalog::PermissionKind::Read,
-        serde_json::json!({
-            "type": "object",
-            "properties": {
-                "path": {"type": "string", "minLength": 1},
-                "offset": {"type": "integer", "minimum": 1},
-                "limit": {"type": "integer", "minimum": 1},
-            },
-            "required": ["path"],
-            "additionalProperties": false,
-        }),
+    let read_target = bind_read_file_tool(
+        registry,
+        gateway,
+        tools.clone(),
+        access.clone(),
+        cwd.clone(),
+        budget,
     );
     let write_manifest = file_manifest(
         "write",
@@ -3035,10 +3089,6 @@ pub fn register_core_file_tools(
             "additionalProperties": false,
         }),
     );
-    let read_target = registry
-        .register(read_manifest, budget)
-        .expect("the resident read tool registers")
-        .target_id;
     let write_target = registry
         .register(write_manifest, budget)
         .expect("the resident write tool registers")
@@ -3047,19 +3097,6 @@ pub fn register_core_file_tools(
         .register(edit_manifest, budget)
         .expect("the resident edit tool registers")
         .target_id;
-    gateway.bind_executor_with_resources(
-        read_target.clone(),
-        Arc::new(CoreFileExecutor::new(
-            Arc::clone(&tools),
-            FileToolKind::Read,
-        )),
-        Some(FileTools::resource_extractor(
-            Arc::clone(&access),
-            cwd.clone(),
-            ResourceOp::Read,
-        )),
-        "R04-T04 native read executor (real filesystem)",
-    );
     gateway.bind_executor_with_resources(
         write_target.clone(),
         Arc::new(CoreFileExecutor::new(
@@ -3131,6 +3168,7 @@ impl ToolExecutorPort for CoreFileExecutor {
         let args = request.arguments.as_value().clone();
         // Tokio 阻塞池不继承任务局部值；必须显式带上本轮已经冻结的工作区。
         let workspace = crate::toolgateway::workspace();
+        let workflow_scope = crate::toolgateway::workflow_scope();
         let call = call.clone();
         Box::pin(async move {
             let retained = match crate::task_supervisor::retain_blocking_run_permit(&ctx) {
@@ -3146,14 +3184,16 @@ impl ToolExecutorPort for CoreFileExecutor {
             let read_tools = Arc::clone(&tools);
             let (mut outcome, image) = tokio::task::spawn_blocking(move || {
                 let _retained_permit = retained;
-                crate::toolgateway::with_workspace(workspace, || {
-                    let mut image = None;
-                    let outcome = match kind {
-                        FileToolKind::Read => tools.run_read(&work_ctx, &args, &mut image),
-                        FileToolKind::Write => tools.run_write(&work_ctx, &args),
-                        FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
-                    };
-                    (outcome, image)
+                crate::toolgateway::with_workflow_scope(workflow_scope, || {
+                    crate::toolgateway::with_workspace(workspace, || {
+                        let mut image = None;
+                        let outcome = match kind {
+                            FileToolKind::Read => tools.run_read(&work_ctx, &args, &mut image),
+                            FileToolKind::Write => tools.run_write(&work_ctx, &args),
+                            FileToolKind::Edit => tools.run_edit(&work_ctx, &args),
+                        };
+                        (outcome, image)
+                    })
                 })
             })
             .await

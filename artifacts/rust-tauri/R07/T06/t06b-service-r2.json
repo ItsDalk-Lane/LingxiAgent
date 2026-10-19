@@ -1,0 +1,21 @@
+{
+ "stage": "R07-T06",
+ "purpose": "candidate_gate",
+ "candidate": "t06b",
+ "label": "t06b-service-r2",
+ "command": "/Users/study_superior/.cargo/bin/cargo test --no-fail-fast --manifest-path rust/Cargo.toml --locked -p lingxi-service --lib --test r07_activity_promotion --test r07_automation_activity --test r07_automation_flow --test r07_automation_import --test r07_automation_permission --test r07_bridge_diagnostic --test r07_bridge_flow --test r07_bridge_guest_context --test r07_bridge_native_flow --test r07_bridge_notice --test r07_bridge_permission --test r07_bridge_sdk_platforms --test r07_bridge_session_routes --test r07_bridge_worker --test r07_conversation_tools --test r07_daily_fresh_compact --test r07_heartbeat_plan --test r07_heartbeat_runtime --test r07_phone_runtime --test r07_scheduler --test r07_session_collab --test r06_session_history_content --test r04_t02_tool_gateway --test r04_t04_file_tools --test r04_t07_mcp_and_workers --test r06_t05_session_files --test r06_t05_resources --test r06_t05_resourceio --test r06_resource_tools_completion --test r06_resource_mount_tool_completion --test r06_original_resource_proofs --test r07_t05_media --test r07_media_admin --test r07_office_tools",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "manifestFingerprintBefore": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintAfter": "190b0c25f184eaacc23c53a02bafb54845f25dc05d8b7fa5c86550a7705b49bb",
+ "manifestFingerprintMatchesCandidate": true,
+ "exitCode": 0,
+ "durationSec": 122.2,
+ "logSha256": "5debd230f22e9152b1aa4ca9fda58f114c01f4e2c9f7d53bf6e2f8d1c24b649e",
+ "note": "重跑：t06b-adapter 首跑为编排错误（误列不存在目标 r07_media_store）；t06b-service 首跑失败为已知时序敏感用例复现。首跑回执均保留。"
+}

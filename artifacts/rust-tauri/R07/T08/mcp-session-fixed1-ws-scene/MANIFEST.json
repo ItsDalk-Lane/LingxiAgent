@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-fixed1-ws-scene/mcp-calls.jsonl",
+      "sha256": "4a504c0f9066313aa151c452f6bc2a1731d245e3708f91d0f586281100de7ebb",
+      "bytes": 132
+    },
+    {
+      "path": "artifacts/rust-tauri/R07/T08/mcp-session-fixed1-ws-scene/runs.snapshot.db",
+      "sha256": "dfe1a87cab72183af2e53145b922aa2da993d3f2aa175efcd4683c56ad0ac6e0",
+      "bytes": 827392
+    }
+  ],
+  "method": "SQLite read-only backup；仅自有合成MCP外端调用，不复制凭证文件"
+}

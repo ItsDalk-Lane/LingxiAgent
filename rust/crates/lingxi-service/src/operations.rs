@@ -41,6 +41,11 @@
 //! desktop host's authorization surface; a bare service process cannot
 //! hold it — an explicit refusal, not a placeholder).
 
+#[path = "media_operations.rs"]
+mod media_operations;
+pub(crate) use media_operations::media_declaration_catalog;
+pub use media_operations::MediaRouteSnapshot;
+
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -711,9 +716,7 @@ impl OperationService {
             outcome,
             started_at_unix_ms,
             settled_at_unix_ms: Some(lingxi_adapters::models::dispatch::unix_ms_now()),
-            context: context
-                .cloned()
-                .or_else(|| MEDIA_TASK_OWNER.try_with(Clone::clone).ok()),
+            context: media_operations::context_or_current(context),
         })
         .await
         .map_err(|failure| OperationFailure {
@@ -763,25 +766,30 @@ impl OperationService {
         ),
         OperationFailure,
     > {
-        let route = self
-            .gateway
-            .resolve_route(&ModelRouteRequest::for_operation(operation))
-            .map_err(|error| {
-                let code = match &error {
-                    ModelGatewayError::UnknownProvider { .. }
-                    | ModelGatewayError::RouteNotConfigured { .. } => ErrorCode::NotFound,
-                    ModelGatewayError::MissingCredential { .. } => ErrorCode::Unauthorized,
-                    ModelGatewayError::ModelPinRequiresProvider { .. }
-                    | ModelGatewayError::OperationUnsupportedByProvider { .. }
-                    | ModelGatewayError::CapabilityUnsupported { .. }
-                    | ModelGatewayError::ProtocolNotImplemented { .. } => ErrorCode::InvalidMessage,
-                };
-                OperationFailure {
-                    code,
-                    message: format!("{error}"),
-                    retryable: false,
-                }
-            })?;
+        let route = match media_operations::frozen_route(operation)? {
+            Some(route) => route,
+            None => self
+                .gateway
+                .resolve_route(&ModelRouteRequest::for_operation(operation))
+                .map_err(|error| {
+                    let code = match &error {
+                        ModelGatewayError::UnknownProvider { .. }
+                        | ModelGatewayError::RouteNotConfigured { .. } => ErrorCode::NotFound,
+                        ModelGatewayError::MissingCredential { .. } => ErrorCode::Unauthorized,
+                        ModelGatewayError::ModelPinRequiresProvider { .. }
+                        | ModelGatewayError::OperationUnsupportedByProvider { .. }
+                        | ModelGatewayError::CapabilityUnsupported { .. }
+                        | ModelGatewayError::ProtocolNotImplemented { .. } => {
+                            ErrorCode::InvalidMessage
+                        }
+                    };
+                    OperationFailure {
+                        code,
+                        message: format!("{error}"),
+                        retryable: false,
+                    }
+                })?,
+        };
         // system-speech-recognition is the §29.13 platform-honesty refusal.
         if route.protocol == ProtocolFamily::SystemSpeechRecognition {
             return Err(OperationFailure {
@@ -803,6 +811,7 @@ impl OperationService {
                 message: format!("{error}"),
                 retryable: false,
             })?;
+        media_operations::capture_media_auth(&auth)?;
         Ok((route, auth))
     }
 
@@ -921,6 +930,7 @@ impl OperationService {
         product: MediaProductRef,
         deadline_unix_ms: Option<u64>,
     ) -> Result<RegisteredProduct, OperationFailure> {
+        media_operations::before_media_download().await?;
         match product {
             MediaProductRef::Bytes { bytes, mime } => self.register_product(kind, &bytes, &mime),
             MediaProductRef::Url { url, mime_hint } => {
@@ -957,6 +967,14 @@ impl OperationService {
     /// gateway swap — same-origin egress follows the live config).
     pub fn refresh_egress_origins(&self, endpoints: &[String]) -> Result<(), ProtocolError> {
         self.egress.set_provider_endpoints(endpoints)
+    }
+
+    /// 与模型目录同批发布预验证的出口来源。
+    pub fn publish_egress_origins(
+        &self,
+        origins: lingxi_adapters::models::egress::PreparedProviderOrigins,
+    ) {
+        self.egress.publish_provider_origins(origins);
     }
 
     /// R05 RR1 F18: registers one tracked media task and returns the HOST
@@ -1312,6 +1330,7 @@ impl OperationService {
         let plan =
             dialects::image::build_image_submit(&route, &auth, &request, &serde_json::Value::Null)
                 .map_err(OperationFailure::from_protocol)?;
+        media_operations::before_media_dispatch().await?;
         let body = match self
             .dispatcher
             .execute_json(&plan, deadline_unix_ms, &auth)
@@ -1398,6 +1417,7 @@ impl OperationService {
         let plan =
             dialects::image::build_image_submit(route, auth, request, &serde_json::Value::Null)
                 .map_err(OperationFailure::from_protocol)?;
+        media_operations::before_media_dispatch().await?;
         let (bytes, _content_type) = match self
             .dispatcher
             .execute_bytes(&plan, deadline_unix_ms, auth)
@@ -1475,6 +1495,7 @@ impl OperationService {
                 ),
                 retryable: false,
             })?;
+        media_operations::capture_media_auth(&auth)?;
         let plan = dialects::image::build_dashscope_image_query(
             &record.route,
             &auth,
@@ -1487,8 +1508,13 @@ impl OperationService {
             .map_err(OperationFailure::from_pair)?;
         let outcome = dialects::image::parse_dashscope_image_query(&body)
             .map_err(OperationFailure::from_protocol)?;
-        self.settle_poll("image", &record, outcome, deadline_unix_ms)
-            .await
+        self.settle_poll(
+            "image",
+            &record,
+            media_operations::scrub_media_poll(outcome, &auth),
+            deadline_unix_ms,
+        )
+        .await
     }
 
     /// Maps ONE parsed poll outcome onto the honest state machine behind
@@ -1516,6 +1542,7 @@ impl OperationService {
                 Ok(current_status(&state, &record.route.protocol))
             }
             TaskPollOutcome::Done { products } => {
+                media_operations::before_media_download().await?;
                 // One poll settles at a time; the second concurrent poll
                 // finds the committed receipt and replays it.
                 let _settle = record.settle.lock().await;
@@ -1605,6 +1632,7 @@ impl OperationService {
         let plan =
             dialects::video::build_video_submit(&route, &auth, &request, &serde_json::Value::Null)
                 .map_err(OperationFailure::from_protocol)?;
+        media_operations::before_media_dispatch().await?;
         let body = match self
             .dispatcher
             .execute_json(&plan, deadline_unix_ms, &auth)
@@ -1709,6 +1737,7 @@ impl OperationService {
             legacy_task_id: record.legacy_job_id.clone(),
             model_name: Some(record.model_name.clone()),
         };
+        media_operations::capture_media_auth(&auth)?;
         let outcome = dialects::video::execute_agnes_video_query(
             &self.dispatcher,
             &record.route,
@@ -1718,8 +1747,13 @@ impl OperationService {
         )
         .await
         .map_err(OperationFailure::from_pair)?;
-        self.settle_poll("video", &record, outcome, deadline_unix_ms)
-            .await
+        self.settle_poll(
+            "video",
+            &record,
+            media_operations::scrub_media_poll(outcome, &auth),
+            deadline_unix_ms,
+        )
+        .await
     }
 
     /// Cancels the LOCAL tracking of one async media task. The provider
@@ -1824,6 +1858,7 @@ impl OperationService {
         }
         let plan = dialects::speech::build_speech(&route, &auth, &request)
             .map_err(OperationFailure::from_protocol)?;
+        media_operations::before_media_dispatch().await?;
         match route.protocol {
             ProtocolFamily::OpenAiAudioSpeech => {
                 let (bytes, _content_type) = match self
@@ -1858,7 +1893,10 @@ impl OperationService {
                     &dialects::speech::effective_openai_speech_format(request.format.as_deref()),
                 )
                 .to_string();
-                self.register_product("speech", &bytes, &mime)
+                {
+                    media_operations::before_media_download().await?;
+                    self.register_product("speech", &bytes, &mime)
+                }
             }
             ProtocolFamily::MinimaxTts => {
                 let body = match self
@@ -1894,6 +1932,7 @@ impl OperationService {
                         .map_err(OperationFailure::from_protocol)?;
                 match product {
                     MediaProductRef::Bytes { bytes, mime } => {
+                        media_operations::before_media_download().await?;
                         self.register_product("speech", &bytes, &mime)
                     }
                     MediaProductRef::Url { .. } => Err(OperationFailure {
@@ -2075,6 +2114,7 @@ impl OperationService {
                 lingxi_adapters::models::dispatch::unix_ms_now()
             )),
         };
+        let owner = media_operations::media_process_owner(owner)?;
         let spec = crate::procsupervisor::SpawnSpec {
             argv,
             cwd: self.products_root.clone(),
@@ -2084,6 +2124,7 @@ impl OperationService {
             cols: 80,
             rows: 24,
         };
+        media_operations::before_media_dispatch().await?;
         let spawned = match supervisor.spawn(spec).await {
             Ok(spawned) => spawned,
             Err(failure @ crate::procsupervisor::SpawnFailure::RegistryFull) => {
@@ -2229,6 +2270,7 @@ impl OperationService {
             message: format!("system speech produced no output: {err}"),
             retryable: false,
         })?;
+        media_operations::before_media_download().await?;
         let product = self.register_product("speech", &bytes, "audio/mp4")?;
         // The intermediate say output was the SOURCE of the registered
         // (digest-named) product; the guard removes the duplicate on drop.
@@ -2248,6 +2290,19 @@ impl OperationService {
 
     // ── transcription (ASR) ──────────────────────────────────────────────
 
+    /// 识别结果连同实际承运的路由事实——响应只标注真实跑过的路由，绝不标注
+    /// 受理时假定的路由（两次解析之间的配置翻转不会污染标注）。
+    pub async fn speech_recognition_route(
+        &self,
+    ) -> Result<(String, String, String), OperationFailure> {
+        let (route, _auth) = self.resolve(ModelOperation::SpeechRecognition).await?;
+        Ok((
+            route.provider,
+            route.model,
+            route.protocol.config_name().to_owned(),
+        ))
+    }
+
     /// One transcription call over host-read audio. The volcengine-bigasr
     /// status header check fires on the RESPONSE headers; the text ladder
     /// is the dialect's.
@@ -2256,7 +2311,7 @@ impl OperationService {
         audio: HostAudio,
         language: Option<String>,
         deadline_unix_ms: Option<u64>,
-    ) -> Result<dialects::transcribe::TranscriptionOutcome, OperationFailure> {
+    ) -> Result<TranscriptionReceipt, OperationFailure> {
         if audio.bytes.is_empty() {
             return Err(OperationFailure {
                 code: ErrorCode::InvalidMessage,
@@ -2317,9 +2372,23 @@ impl OperationService {
         .await?;
         dialects::transcribe::bigasr_status_ok(&headers)
             .map_err(OperationFailure::from_protocol)?;
-        dialects::transcribe::parse_transcription(route.protocol, &body)
-            .map_err(OperationFailure::from_protocol)
+        let outcome = dialects::transcribe::parse_transcription(route.protocol, &body)
+            .map_err(OperationFailure::from_protocol)?;
+        Ok(TranscriptionReceipt {
+            provider: route.provider,
+            model: route.model,
+            protocol: route.protocol.config_name(),
+            outcome,
+        })
     }
+}
+
+/// 转写回执：识别结果 + 实际承运路由（provider/model/protocol 线名）。
+pub struct TranscriptionReceipt {
+    pub provider: String,
+    pub model: String,
+    pub protocol: &'static str,
+    pub outcome: dialects::transcribe::TranscriptionOutcome,
 }
 
 fn entropy_to_hex(digest: &[u8]) -> String {

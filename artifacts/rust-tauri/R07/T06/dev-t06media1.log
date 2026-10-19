@@ -1,0 +1,28 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running tests/r07_t05_media.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media-a95195c541767742)
+
+running 11 tests
+test r07_media::untrusted_media_arguments_cannot_choose_credentials_or_paths_or_drop_wrong_typed_overrides ... ok
+test r07_media::describe_options_uses_actual_config_and_existing_provider_modes_without_submitting ... ok
+test r07_media::confirmed_supplier_failure_remains_failed_and_finishes_the_actual_execution_run ... ok
+test r07_media::stopping_a_submitted_job_does_not_claim_remote_cancellation_or_deliver_late_bytes ... ok
+test r07_media::disabling_the_plugin_after_parent_completion_cancels_real_background_and_blocks_delivery ... ok
+test r07_media::speech_delivers_real_audio_bytes_and_keeps_the_media_job_causal_run ... ok
+test r07_media::duplicate_user_request_reuses_real_run_and_does_not_create_another_generation ... ok
+test r07_media::image_approval_starts_a_distinct_real_run_and_delivers_owned_session_file ... ok
+test r07_media::restart_reopens_real_storage_and_queries_known_remote_without_resubmitting ... ok
+test r07_media::video_uses_real_submit_query_download_and_session_delivery_stages ... ok
+
+thread 'r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery' (1718301) panicked at crates/lingxi-service/tests/r07_media/mod.rs:419:10:
+外部生成须先进入正式批准: Elapsed(())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery ... FAILED
+
+failures:
+
+failures:
+    r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.77s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t05_media`

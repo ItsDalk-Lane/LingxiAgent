@@ -1,0 +1,104 @@
+{
+  "candidate": "t08d",
+  "recordedAt": "2026-10-18T09:00:03.955254+00:00",
+  "classification": "ORCHESTRATION_PRECONDITION_REJECTED_NOT_RUN",
+  "reason": "根端提前启动构建后检查，正式build回执尚不存在；wrapper FileNotFoundError拒绝，四个产品命令均未执行",
+  "rawToolOutputSavedInStandaloneFile": false,
+  "wrapperSha256": "77a507461d37c22e82fcc9941e4860b462e28d67288421c1ee276fddf3490134",
+  "attempts": [
+    {
+      "wrapperCommand": [
+        "python3",
+        "artifacts/rust-tauri/R07/T08/evidence-tools/run_ui_bound.py",
+        "t08d",
+        "ui"
+      ],
+      "wrapperExitCode": 1,
+      "productCommandExecuted": false,
+      "plannedProductCommand": [
+        "env",
+        "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service",
+        "npx",
+        "vitest",
+        "run",
+        "desktop/src/react/__tests__/settings",
+        "desktop/src/react/__tests__/services/rust-settings.test.ts",
+        "desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx",
+        "desktop/src/react/__tests__/components/InteractiveCard.test.tsx",
+        "desktop/src/react/__tests__/components/thinking-level-button.test.tsx",
+        "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+        "desktop/src/react/settings/tabs/__tests__/GeneralTab.test.tsx",
+        "desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx",
+        "desktop/src/react/settings/tabs/providers/__tests__",
+        "desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx",
+        "desktop/src/react/__tests__/services/r07-oauth-real-service.test.tsx",
+        "desktop/src/react/__tests__/components/SettingsUpdateCard.test.tsx",
+        "tests/secret-custody.test.ts",
+        "--maxWorkers=2"
+      ]
+    },
+    {
+      "wrapperCommand": [
+        "python3",
+        "artifacts/rust-tauri/R07/T08/evidence-tools/run_ui_bound.py",
+        "t08d",
+        "metadata-redaction-binary"
+      ],
+      "wrapperExitCode": 1,
+      "productCommandExecuted": false,
+      "plannedProductCommand": [
+        "env",
+        "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service",
+        "node",
+        "artifacts/rust-tauri/R07/T08/evidence-tools/model_metadata_probe.mjs"
+      ]
+    },
+    {
+      "wrapperCommand": [
+        "python3",
+        "artifacts/rust-tauri/R07/T08/evidence-tools/run_ui_bound.py",
+        "t08d",
+        "card-navigation-desktop"
+      ],
+      "wrapperExitCode": 1,
+      "productCommandExecuted": false,
+      "plannedProductCommand": [
+        "env",
+        "-u",
+        "LINGXI_R07_CARD_BASELINE_SOURCE",
+        "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service",
+        "LINGXI_R07_CARD_EVIDENCE=artifacts/rust-tauri/R07/T08/t08d-card-navigation-desktop",
+        "LINGXI_R07_CARD_EXPECT_BLOCK=1",
+        "LINGXI_R07_CARD_GUARD=1",
+        "LINGXI_R07_CARD_MOBILE_CSP=0",
+        "node",
+        "desktop/src/react/__tests__/components/r07-t08-card-navigation-probe.mjs"
+      ]
+    },
+    {
+      "wrapperCommand": [
+        "python3",
+        "artifacts/rust-tauri/R07/T08/evidence-tools/run_ui_bound.py",
+        "t08d",
+        "card-navigation-mobile"
+      ],
+      "wrapperExitCode": 1,
+      "productCommandExecuted": false,
+      "plannedProductCommand": [
+        "env",
+        "-u",
+        "LINGXI_R07_CARD_BASELINE_SOURCE",
+        "LINGXI_R07_SERVICE_BIN=/private/tmp/lingxi-r07-build/debug/lingxi-service",
+        "LINGXI_R07_CARD_EVIDENCE=artifacts/rust-tauri/R07/T08/t08d-card-navigation-mobile",
+        "LINGXI_R07_CARD_EXPECT_BLOCK=1",
+        "LINGXI_R07_CARD_GUARD=0",
+        "LINGXI_R07_CARD_MOBILE_CSP=1",
+        "node",
+        "desktop/src/react/__tests__/components/r07-t08-card-navigation-probe.mjs"
+      ]
+    }
+  ],
+  "compositeNavigationOuterExitCode": 0,
+  "compositeOuterZeroDoesNotMeanPass": true,
+  "laterActualRunsMustUseFreshReceipts": true
+}

@@ -1,0 +1,98 @@
+{
+  "label": "mcp-request-stop-runtime-summary1",
+  "createdAt": "2026-10-18T11:55:57.066348+00:00",
+  "scope": "DEVELOPMENT_SINGLE_RESOURCE_CASE_NOT_T08_ACCEPTANCE",
+  "finalAcceptance": false,
+  "actualReceipt": {
+    "path": "artifacts/rust-tauri/R07/T08/mcp-resource-stop-fixed1.json",
+    "command": [
+      "/Users/study_superior/.cargo/bin/cargo",
+      "test",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--locked",
+      "-p",
+      "lingxi-service",
+      "--test",
+      "r07_t08_mcp_remote",
+      "actual_http_apps_visibility_launch_input_resources_and_generation_cancellation",
+      "--",
+      "--exact",
+      "--nocapture"
+    ],
+    "exitCode": 0,
+    "sourceUnchanged": true,
+    "sourceFingerprint": "bfca54331585734c3fe9150639cb05167ef42b82eb1b1847d9dbebb7d339fcf8",
+    "log": "artifacts/rust-tauri/R07/T08/mcp-resource-stop-fixed1.log",
+    "logSha256": "f9903d607721e1476797b57d579dd49e6449a56e6b364ba86c16648f4344f4bd"
+  },
+  "selectedCase": "actual_http_apps_visibility_launch_input_resources_and_generation_cancellation",
+  "actualResults": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "filteredOut": 6,
+    "wholeCaseDurationSeconds": 2.04,
+    "remoteObservationWithinOriginalBudgetSeconds": 3,
+    "remoteFacts": {
+      "deleteRequests": 1,
+      "handlerCancelNotifications": 1,
+      "handlerCtBranch": 1,
+      "handlerCtCancelled": true,
+      "handlerDropCtCancelled": 1,
+      "protocolVersions": [
+        "2025-11-25"
+      ],
+      "remoteActive": 0,
+      "remoteHandlerDropped": 1,
+      "wireCancelNotifications": 1
+    }
+  },
+  "conclusion": "修后实际SDK资源请求收到同连接取消，远端ct分支执行且真实handler结束/drop，活跃数归零；DELETE不再被单独当作已回收证明。",
+  "causalEvidence": {
+    "before": {
+      "receipt": "artifacts/rust-tauri/R07/T08/mcp-remote-and-permission-fixed2.json",
+      "exitCode": 101,
+      "logSha256": "4056343e1c93f228c21d85ea442229bbde908038b73475f8ad22475659971ace",
+      "resourceFacts": {
+        "wireCancel": 0,
+        "handlerNotify": 0,
+        "ctCancelled": false,
+        "drop": 0,
+        "remoteActive": 1,
+        "DELETE": 1
+      }
+    },
+    "minimalFix": "begin_stop先封本连接新请求、唤醒已准入请求以原peer+requestId发送官方取消并有界收尾，随后关闭SDK；不再先关SDK令取消guard失去投递机会。",
+    "keptOriginalFailure": true
+  },
+  "correctionToEarlierStaticHypothesis": [
+    "实际运行观测协议为2025-11-25，不是对LATEST/2026现代HTTP分支的功能验证。",
+    "此前静态指出现代SDK可能本地消费cancel通知的事实不能用来解释本次旧版本wire0；本次wire0确有未发送，而修后实际wire1/handler1。",
+    "此前仅ct观察可能漏看Drop的猜测已被fixed2实际drop0/active1证伪，不作为结案理由。"
+  ],
+  "newCommentReview": {
+    "sourceUnchanged": true,
+    "checked": [
+      "McpRequestLifetime文档及enter注释",
+      "begin_stop注释",
+      "新增真实stdio停止/重连注释",
+      "测试远端RAII及正常UI前提注释"
+    ],
+    "result": "新增说明均中文，SDK/peer/requestId/Drop等原标识保留；旧英文模块说明/旧分页注释未改。"
+  },
+  "ownedSourceSha256": {
+    "rust/crates/lingxi-service/src/mcpbridge.rs": "5fa1eef2fcc4506e2fc4cf3c77e3b2d9e119288bbcdc62a2ee8ce0e49789e6d8",
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_remote.rs": "f2cbda5904bdced7a7940129ee4fe4ab7d9829a811097a6dd9882243b6d593c8"
+  },
+  "pendingBeforeBroadConclusion": [
+    "lib mcpbridge::原取消/背压/重连/Mac相关回归根端正在执行，未据单例提前领通过。",
+    "全remote7、MCP22、权限5后续同候选回执尚待逐项确认。",
+    "未冻结g，T08尚未最终验收。"
+  ],
+  "limitations": [
+    "owned loopback official SDK外端，不代表真实第三方帐号或其它操作系统。",
+    "现代HTTP分支未由本单例覆盖。",
+    "未执行额外Cargo或改动Rust/TS/source plan/old evidence。"
+  ]
+}

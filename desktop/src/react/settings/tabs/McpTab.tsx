@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '../store';
 import { t } from '../helpers';
+import { captureSettingsConnection, ownsSettingsConnection } from '../connection-owner';
+import { resolveServerConnection } from '../../services/server-connection';
 import { SettingsSection } from '../components/SettingsSection';
 import { ConfirmDialog, Toggle } from '@/ui';
 import { ConnectorDetail } from './mcp/ConnectorDetail';
@@ -41,6 +43,8 @@ const OAUTH_POLL_ATTEMPTS = 100;
 
 export function McpTab() {
   const currentAgentId = useSettingsStore(s => s.currentAgentId);
+  const connection = useSettingsStore(s => resolveServerConnection(s));
+  const previousConnectionRef = useRef(connection);
   const showToast = useSettingsStore(s => s.showToast);
   const [viewAgentId, setViewAgentId] = useState<string | null>(currentAgentId);
   const viewAgentIdRef = useRef(viewAgentId);
@@ -48,6 +52,7 @@ export function McpTab() {
 
   const [state, setState] = useState(EMPTY_MCP_STATE);
   const [loadingState, setLoadingState] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   // One key per in-flight mutation. Two connectors can be busy at once without
   // one disabling the other's controls, and edit no longer shares remove's key.
   const [busyKeys, setBusyKeys] = useState<ReadonlySet<string>>(() => new Set());
@@ -57,6 +62,18 @@ export function McpTab() {
   const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
   const [oauthWaitingId, setOAuthWaitingId] = useState<string | null>(null);
   const oauthCancelledRef = useRef<Set<string>>(new Set());
+  const operationSequenceRef = useRef(0);
+  const operationOwnersRef = useRef(new Map<string, number>());
+  const viewRevisionRef = useRef(0);
+  const beginOperation = (key: string) => {
+    const token = ++operationSequenceRef.current;
+    operationOwnersRef.current.set(key, token);
+    const owner = captureSettingsConnection();
+    const agent = viewAgentIdRef.current;
+    const revision = viewRevisionRef.current;
+    return () => ownsSettingsConnection(owner) && viewAgentIdRef.current === agent
+      && viewRevisionRef.current === revision && operationOwnersRef.current.get(key) === token;
+  };
   // Only the newest load may write state; a slower earlier response must not
   // overwrite a fresher one after concurrent mutations.
   const loadSequenceRef = useRef(0);
@@ -67,42 +84,83 @@ export function McpTab() {
 
   const loadState = useCallback(async () => {
     const agentId = viewAgentIdRef.current;
-    if (!agentId) {
-      setLoadingState(false);
-      return;
-    }
     const sequence = loadSequenceRef.current + 1;
     loadSequenceRef.current = sequence;
     setLoadingState(true);
+    const owner = captureSettingsConnection();
     try {
       const data = await loadMcpState(agentId);
-      if (loadSequenceRef.current !== sequence || viewAgentIdRef.current !== agentId) return;
+      if (loadSequenceRef.current !== sequence || viewAgentIdRef.current !== agentId || !ownsSettingsConnection(owner)) return false;
       setState(data);
+      setLoadError(null);
+      return true;
     } catch (err) {
       console.error('[mcp] load failed:', err);
+      if (loadSequenceRef.current === sequence && viewAgentIdRef.current === agentId && ownsSettingsConnection(owner)) {
+        setLoadError(err instanceof Error ? err.message : String(err));
+      }
+      return false;
     } finally {
       if (loadSequenceRef.current === sequence) setLoadingState(false);
     }
   }, []);
 
   useEffect(() => {
-    loadState();
-  }, [loadState, viewAgentId]);
+    viewRevisionRef.current += 1;
+    operationOwnersRef.current.clear();
+    oauthCancelledRef.current.clear();
+    setBusyKeys(new Set());
+    setOAuthWaitingId(null);
+    setAddOpen(false);
+    setImportOpen(false);
+    setPendingRemoveId(null);
+    // 换连接/助手先撤回旧权限投影；读取失败保留错误，不能伪装没有连接器。
+    if (previousConnectionRef.current !== connection) {
+      previousConnectionRef.current = connection;
+      setState(EMPTY_MCP_STATE);
+      setOpenConnectorId(null);
+    } else {
+      setState(previous => ({ ...previous, agentConfig: { connectors: {} } }));
+    }
+    setLoadError(null);
+    void loadState();
+  }, [loadState, viewAgentId, connection]);
 
-  const run = async (key: string, action: () => Promise<void>) => {
+  useEffect(() => {
+    // 只在真实后台启动尚未结束时更新状态；离开页面或换连接即回收定时器。
+    if (loadingState || loadError || !state.connectors.some(connector => connector.status === 'connecting')) return;
+    const timer = window.setTimeout(() => { void loadState(); }, 500);
+    return () => window.clearTimeout(timer);
+  }, [state, loadingState, loadError, loadState, connection, viewAgentId]);
+
+  useEffect(() => () => {
+    viewRevisionRef.current += 1;
+    operationOwnersRef.current.clear();
+    loadSequenceRef.current += 1;
+  }, []);
+
+  const run = async (key: string, action: (current: () => boolean) => Promise<void>) => {
+    const current = beginOperation(key);
     setBusyKeys(current => new Set(current).add(key));
     try {
-      await action();
-      await loadState();
+      await action(current);
+      if (!current()) return;
+      const loaded = await loadState();
+      if (!current()) return;
+      if (!loaded) throw new Error('MCP 设置可能已保存，但状态刷新未确认');
       showToast(t('settings.autoSaved'), 'success');
     } catch (err: unknown) {
-      showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
+      if (current()) {
+        // 启动失败等动作可能已保存用户意图，仍须读取真实结果。
+        await loadState();
+        if (!current()) return;
+        showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
+      }
     } finally {
-      setBusyKeys(current => {
-        const next = new Set(current);
-        next.delete(key);
-        return next;
-      });
+      if (current()) {
+        operationOwnersRef.current.delete(key);
+        setBusyKeys(keys => { const next = new Set(keys); next.delete(key); return next; });
+      }
     }
   };
 
@@ -114,29 +172,42 @@ export function McpTab() {
 
   const toggleGlobal = (enabled: boolean) => run('global', () => setMcpEnabled(enabled));
   const toggleGlobalFromRow = () => {
-    if (loadingState || busyKeys.has('global')) return;
+    if (loadingState || loadError || busyKeys.has('global')) return;
     toggleGlobal(!state.enabled);
   };
 
-  const addConnector = (input: McpConnectorInput) => run('add', async () => {
+  const addConnector = (input: McpConnectorInput) => run('add', async current => {
     await addMcpConnector(input);
-    setAddOpen(false);
+    if (current()) setAddOpen(false);
   });
 
   const updateConnector = (connectorId: string, input: McpConnectorInput) =>
     run(`update-${connectorId}`, () => updateMcpConnector(connectorId, input));
 
   const importConnectors = async (connectors: McpConnectorInput[]) => {
-    const results = await addMcpConnectorsBulk(connectors);
-    await loadState();
-    return results;
+    const current = beginOperation('import-json');
+    setBusyKeys(keys => new Set(keys).add('import-json'));
+    try {
+      const results = await addMcpConnectorsBulk(connectors);
+      if (!current()) throw new Error('连接已改变，旧导入回执不能用于当前页面');
+      const loaded = await loadState();
+      if (!current()) throw new Error('连接已改变，旧导入状态不能用于当前页面');
+      if (!loaded) throw Object.assign(new Error('导入结果已返回，但状态刷新未确认'), { results });
+      return results;
+    } finally {
+      if (current()) {
+        operationOwnersRef.current.delete('import-json');
+        setBusyKeys(keys => { const next = new Set(keys); next.delete('import-json'); return next; });
+      }
+    }
   };
 
   const connectorAction = (connectorId: string, action: 'start' | 'stop' | 'refresh-tools') =>
     run(`${action}-${connectorId}`, () => runMcpConnectorAction(connectorId, action));
 
-  const removeConnector = (connectorId: string) => run(`remove-${connectorId}`, async () => {
+  const removeConnector = (connectorId: string) => run(`remove-${connectorId}`, async current => {
     await removeMcpConnector(connectorId);
+    if (!current()) return;
     setPendingRemoveId(null);
     // The page it was opened on no longer describes anything.
     setOpenConnectorId(current => (current === connectorId ? null : current));
@@ -175,32 +246,59 @@ export function McpTab() {
     run('defer', () => setMcpDeferSettings(patch));
 
   const connectOAuth = async (connectorId: string) => {
+    const key = `oauth-${connectorId}`;
+    const current = beginOperation(key);
     oauthCancelledRef.current.delete(connectorId);
     setOAuthWaitingId(connectorId);
+    const owner = captureSettingsConnection();
     try {
       const { sessionId, url } = await startMcpOAuth(connectorId);
-      platform?.openExternal?.(url);
-      await waitForOAuth(sessionId);
-      await loadState();
+      if (!current() || oauthCancelledRef.current.has(connectorId)) return;
+      try {
+        if (!platform?.openExternal) throw new Error(t('settings.oauth.browserUnavailable'));
+        const opened = await platform.openExternal(url);
+        if (opened && opened.ok === false) throw new Error(opened.error || t('settings.oauth.browserUnavailable'));
+      } catch (error) {
+        if (current() && !oauthCancelledRef.current.has(connectorId)) {
+          try { await cancelMcpOAuth(connectorId); }
+          catch (cleanupError) {
+            throw new Error(`${error instanceof Error ? error.message : String(error)}；登录等待取消未确认：${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`);
+          }
+        }
+        throw error;
+      }
+      if (!current() || oauthCancelledRef.current.has(connectorId)) return;
+      if (!await waitForOAuth(sessionId, owner, () => current() && !oauthCancelledRef.current.has(connectorId))) return;
+      if (!current() || oauthCancelledRef.current.has(connectorId)) return;
+      const loaded = await loadState();
+      if (!current() || oauthCancelledRef.current.has(connectorId)) return;
+      if (!loaded) throw new Error('MCP登录可能已保存，但状态刷新未确认');
       showToast(t('settings.autoSaved'), 'success');
     } catch (err: unknown) {
-      // A wait the user called off is not a failure to report at them.
-      if (!oauthCancelledRef.current.has(connectorId)) {
+      if (current() && !oauthCancelledRef.current.has(connectorId)) {
         showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
       }
     } finally {
-      oauthCancelledRef.current.delete(connectorId);
-      setOAuthWaitingId(current => (current === connectorId ? null : current));
+      if (current()) {
+        operationOwnersRef.current.delete(key);
+        oauthCancelledRef.current.delete(connectorId);
+        setOAuthWaitingId(previous => (previous === connectorId ? null : previous));
+      }
     }
   };
 
   const cancelOAuth = async (connectorId: string) => {
+    const owner = captureSettingsConnection();
+    const revision = viewRevisionRef.current;
+    const original = operationOwnersRef.current.get(`oauth-${connectorId}`);
+    const current = () => ownsSettingsConnection(owner) && viewRevisionRef.current === revision
+      && operationOwnersRef.current.get(`oauth-${connectorId}`) === original;
     oauthCancelledRef.current.add(connectorId);
-    setOAuthWaitingId(current => (current === connectorId ? null : current));
+    setOAuthWaitingId(null);
     try {
       await cancelMcpOAuth(connectorId);
     } catch (err: unknown) {
-      showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
+      if (current()) showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
     }
   };
 
@@ -208,13 +306,15 @@ export function McpTab() {
     run(`oauth-logout-${connectorId}`, () => logoutMcpOAuth(connectorId));
 
   const openConnector = state.connectors.find(connector => connector.id === openConnectorId) || null;
+  const errorNotice = loadError && <div role="alert">{t('settings.refreshFailed')}: {loadError} <button type="button" onClick={() => { void loadState(); }}>{t('action.retry')}</button></div>;
 
   if (openConnector) {
     return (
       <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="mcp">
+        {errorNotice}
         <ConnectorDetail
           connector={openConnector}
-          globalEnabled={state.enabled}
+          globalEnabled={state.enabled && !loadingState && !loadError}
           busyKeys={busyKeys}
           viewAgentId={viewAgentId}
           agentConfig={state.agentConfig}
@@ -239,6 +339,7 @@ export function McpTab() {
 
   return (
     <div className={`${styles['settings-tab-content']} ${styles['active']}`} data-tab="mcp">
+      {errorNotice}
       <SettingsSection title={t('settings.mcp.masterTitle')}>
         <div
           className={styles['skills-list-item']}
@@ -258,7 +359,7 @@ export function McpTab() {
             <Toggle
               on={loadingState ? undefined : state.enabled}
               onChange={toggleGlobal}
-              disabled={busyKeys.has('global')}
+              disabled={busyKeys.has('global') || loadingState || !!loadError}
               label={loadingState ? t('status.loading') : state.enabled ? t('common.on') : t('common.off')}
             />
           </div>
@@ -267,7 +368,7 @@ export function McpTab() {
           deferEnabled={state.deferEnabled}
           deferThreshold={state.deferThreshold}
           builtinDeferEnabled={state.builtinDeferEnabled}
-          busy={busyKeys.has('defer') || !state.enabled}
+          busy={busyKeys.has('defer') || loadingState || !!loadError || !state.enabled}
           onChange={changeDefer}
         />
       </SettingsSection>
@@ -277,6 +378,7 @@ export function McpTab() {
           <button
             className={styles['pv-add-form-btn']}
             type="button"
+            disabled={loadingState || !!loadError}
             onClick={() => { setAddOpen(open => !open); setImportOpen(false); }}
           >
             {t('settings.mcp.addConnector')}
@@ -284,6 +386,7 @@ export function McpTab() {
           <button
             className={styles['pv-add-form-btn']}
             type="button"
+            disabled={loadingState || !!loadError}
             onClick={() => { setImportOpen(open => !open); setAddOpen(false); }}
           >
             {t('settings.mcp.importJson')}
@@ -308,16 +411,19 @@ export function McpTab() {
           />
         )}
 
-        <ConnectorList
+        {(!loadError || state.connectors.length > 0) && <ConnectorList
           connectors={state.connectors}
           globalEnabled={state.enabled}
           loading={loadingState}
           busyKeys={busyKeys}
           agentConfig={state.agentConfig}
-          onOpen={setOpenConnectorId}
+          onOpen={id => {
+            if (!viewAgentId) { showToast(t('settings.mcp.selectAgentForDetails'), 'error'); return; }
+            setOpenConnectorId(id);
+          }}
           onAction={connectorAction}
           onRemove={setPendingRemoveId}
-        />
+        />}
       </SettingsSection>
 
       <ConfirmDialog
@@ -337,12 +443,17 @@ export function McpTab() {
   );
 }
 
-async function waitForOAuth(sessionId: string): Promise<void> {
+async function waitForOAuth(sessionId: string, owner: ReturnType<typeof captureSettingsConnection>, current: () => boolean): Promise<boolean> {
   for (let i = 0; i < OAUTH_POLL_ATTEMPTS; i += 1) {
     await new Promise(resolve => setTimeout(resolve, OAUTH_POLL_INTERVAL_MS));
+    if (!current()) return false;
+    if (!ownsSettingsConnection(owner)) throw new Error('连接已改变，原MCP登录等待已结束');
     const status = await pollMcpOAuth(sessionId);
-    if (status.status === 'done') return;
-    if (status.status === 'cancelled') return;
+    if (!current()) return false;
+    if (!ownsSettingsConnection(owner)) throw new Error('连接已改变，原MCP登录回执已丢弃');
+    if (status.status === 'done') return true;
+    if (status.status === 'cancelled') return false;
+    if (status.status === 'missing') throw new Error(t('settings.mcp.oauthFailed'));
     if (status.status === 'error') throw new Error(status.error || t('settings.mcp.oauthFailed'));
   }
   throw new Error(t('settings.mcp.oauthTimeout'));

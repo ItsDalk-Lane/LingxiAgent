@@ -1,0 +1,140 @@
+    Checking hyper-rustls v0.27.10
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking axum v0.8.9
+    Checking lopdf v0.42.0
+    Checking reqwest v0.13.5
+    Checking euclid v0.20.14
+    Checking zip v9.0.3
+    Checking time-core v0.1.9
+    Checking pdf-extract v0.12.1
+    Checking num-conv v0.2.2
+    Checking powerfmt v0.2.0
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking deranged v0.5.8
+    Checking ring v0.17.14
+    Checking pem v4.0.0
+    Checking num-integer v0.1.47
+    Checking time v0.3.55
+   Compiling getrandom v0.3.4
+   Compiling zerocopy v0.8.58
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking yasna v0.6.0
+    Checking rcgen v0.14.10
+    Checking num-bigint v0.4.8
+   Compiling ahash v0.8.12
+    Checking num-rational v0.4.2
+    Checking num-iter v0.1.46
+    Checking num-complex v0.4.6
+   Compiling unicode-general-category v1.1.0
+    Checking num v0.4.3
+    Checking borrow-or-share v0.2.4
+    Checking bit-vec v0.8.0
+   Compiling heck v0.5.0
+    Checking bit-set v0.8.0
+   Compiling strum_macros v0.28.0
+    Checking fluent-uri v0.4.1
+    Checking fraction v0.17.0
+    Checking micromap v0.3.0
+    Checking bytecount v0.6.9
+    Checking vsimd v0.8.0
+    Checking num-cmp v0.1.0
+    Checking outref v0.5.2
+    Checking jsonschema-value v0.57.0
+    Checking uuid-simd v0.8.0
+    Checking strum v0.28.0
+    Checking referencing v0.57.0
+    Checking fancy-regex v0.19.2
+    Checking jsonschema-regex v0.57.0
+    Checking email_address v0.2.9
+    Checking data-encoding v2.11.1
+    Checking lingxi-browser-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-browser-spike)
+    Checking jsonschema v0.57.0
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Checking lingxi-spike v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-spike)
+error: this looks like an `else if` but the `else` is missing
+   --> crates/lingxi-service/src/bridge.rs:372:139
+    |
+372 | ...   BridgeWorkerEvent::Message{..}=>{if !ready{return Err("Bridge message arrived before initialization".into());}if let Some(job...
+    |                                                                                                                     ^
+    |
+    = note: to remove this lint, add the missing `else` or add a new line before the second `if`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#possible_missing_else
+    = note: `-D clippy::possible-missing-else` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::possible_missing_else)]`
+
+error: items after a test module
+   --> crates/lingxi-protocol/src/bin/lingxi-protocol-verify.rs:104:1
+    |
+104 | mod automation_tests {
+    | ^^^^^^^^^^^^^^^^^^^^
+...
+137 | use lingxi_test_guard as _;
+    |     ^^^^^^^^^^^^^^^^^
+138 |
+139 | fn main() -> ExitCode {
+    | ^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: could not compile `lingxi-protocol` (bin "lingxi-protocol-verify" test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: this function has too many arguments (9/7)
+   --> crates/lingxi-service/src/bridge_effects.rs:118:5
+    |
+118 | /     async fn send(
+119 | |         &mut self,
+120 | |         state: &ServiceState,
+121 | |         cfg: &store::BridgeConnector,
+...   |
+127 | |         delivery_id: Option<String>,
+128 | |     ) -> Result<bool, String> {
+    | |_____________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: found call to `str::trim` before `str::split_whitespace`
+   --> crates/lingxi-service/src/slash.rs:260:14
+    |
+260 |               .trim()
+    |  ______________^
+261 | |             .split_whitespace()
+    | |_____________^ help: remove `trim()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#trim_split_whitespace
+    = note: `-D clippy::trim-split-whitespace` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::trim_split_whitespace)]`
+
+error: could not compile `lingxi-service` (lib) due to 3 previous errors
+error: items after a test module
+    --> crates/lingxi-service/src/automation.rs:1412:1
+     |
+1412 |   mod shutdown_tests {
+     |   ^^^^^^^^^^^^^^^^^^
+...
+1473 |   fn notification_mode(value: Option<&Value>) -> Result<&str, String> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+1481 |   fn notification_preferences(prefs: &Value) -> Result<Value, String> {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+1501 |   pub async fn notification_preferences_get_route(State(state): State<ServiceState>) -> Response {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+1511 | / pub async fn notification_preferences_put_route(
+1512 | |     State(state): State<ServiceState>,
+1513 | |     Extension(principal): Extension<Principal>,
+1514 | |     Json(body): Json<Value>,
+1515 | | ) -> Response {
+     | |_____________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#items_after_test_module
+     = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+     = help: move the items to before the test module was defined
+
+error: could not compile `lingxi-service` (lib test) due to 4 previous errors

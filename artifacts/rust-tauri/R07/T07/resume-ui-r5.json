@@ -1,0 +1,30 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "desktop/src/react/__tests__/services/rust-workbench.test.ts",
+    "desktop/src/react/__tests__/services/rust-agent-activities.test.ts",
+    "desktop/src/react/__tests__/services/resource-events.test.ts",
+    "desktop/src/react/__tests__/services/app-event-actions.test.ts",
+    "desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts",
+    "desktop/src/react/__tests__/services/rust-automation.test.ts",
+    "desktop/src/react/__tests__/services/websocket.test.ts",
+    "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+    "desktop/src/react/__tests__/components/DeskSection.test.tsx",
+    "desktop/src/react/__tests__/utils/preview-document-refresh.test.ts",
+    "desktop/src/react/__tests__/stores/r07-workbench-actions.test.ts",
+    "desktop/src/react/__tests__/stores/desk-actions.test.ts",
+    "desktop/src/react/__tests__/stores/desk-new-session-capture.test.ts",
+    "desktop/src/react/__tests__/components/WelcomeScreen.test.tsx",
+    "desktop/src/react/__tests__/components/WorkspaceSwitcher.test.tsx",
+    "desktop/src/react/__tests__/components/slash-commands-diary.test.ts",
+    "--maxWorkers=2"
+  ],
+  "exitCode": 0,
+  "sourceFingerprintBefore": "3b391fbb8a687da1c124c17f366d7d6d5ee7baa1bd44c592fd0863240a6cef11",
+  "sourceFingerprintAfter": "3b391fbb8a687da1c124c17f366d7d6d5ee7baa1bd44c592fd0863240a6cef11",
+  "sourceUnchanged": true,
+  "logSha256": "400ec9abff42ad7eedd0d67cc9ac1393c1e802b4e1bde6ac80d17eb7120d558a",
+  "time": "2026-10-18T01:20:44.465127+00:00"
+}

@@ -199,6 +199,8 @@ describe('dm_new_message websocket routing', () => {
     useStore.setState({
       currentTab: 'channels',
       currentAgentId: 'alice',
+      agents: [{ id: 'alice', name: 'Alice', yuan: 'lingxi', isPrimary: true }],
+      channels: [],
       currentChannel: 'dm:bob',
       channelMessages: [],
     } as never);
@@ -208,7 +210,7 @@ describe('dm_new_message websocket routing', () => {
     });
   });
 
-  it('routes a DM event to the peer of the current agent when the current agent is the sender', () => {
+  it('routes a DM event to the peer of the primary agent when the primary is the sender', () => {
     handleServerMessage({
       type: 'dm_new_message',
       from: 'alice',
@@ -217,6 +219,13 @@ describe('dm_new_message websocket routing', () => {
 
     expect(openChannelMock).toHaveBeenCalledWith('dm:bob', true);
     expect(loadChannelsMock).not.toHaveBeenCalled();
+  });
+
+  it('reloads the directory when no primary or owned pair proves the DM owner', () => {
+    useStore.setState({ agents: [], channels: [], currentAgentId: 'alice' } as never);
+    handleServerMessage({ type: 'dm_new_message', from: 'alice', to: 'bob' });
+    expect(loadChannelsMock).toHaveBeenCalledOnce();
+    expect(openChannelMock).not.toHaveBeenCalled();
   });
 
   it('routes a primary-owned visible DM even when chat focus is another agent', () => {

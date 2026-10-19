@@ -1451,6 +1451,7 @@ impl TurnProviderPort for ScriptedUsageProvider {
                     ExchangeItem::ToolResult { .. } => "tool_result",
                     ExchangeItem::CompactionSummary { .. } => "compaction_summary",
                     ExchangeItem::CompactionInstruction { .. } => "compaction_instruction",
+                    ExchangeItem::HostNotice { .. } => "host_notice",
                 })
                 .collect(),
         );

@@ -1,0 +1,109 @@
+{
+  "createdAt": "2026-10-18T06:16:25.735932+00:00",
+  "status": "FAILED_ORIGINAL_PRESERVED",
+  "sourceLog": "artifacts/rust-tauri/R07/T08/legacy-settings1.log",
+  "rows": [
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/ui-result.json",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/ui-result.json",
+      "bytes": 3672,
+      "sha256": "a5a75010b8430046e0ed2acfdca7a70e9c8fbb39dcb48f0877c21dbb200e8704"
+    },
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/user/preferences.json",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/user/preferences.json",
+      "bytes": 20,
+      "sha256": "4fcce506592e55074156cab2f5fea35cce0d48ea5f8c919b69cd71ffc735f2c8"
+    },
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/agents/agentA/config.yaml",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/agents/agentA/config.yaml",
+      "bytes": 135,
+      "sha256": "f328dfa7360c1a69ce02be0a499ae160bb1a2737cd55ae79b7775c7fc56fad9b"
+    },
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/agents/agentA/identity.md",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/agents/agentA/identity.md",
+      "bytes": 24,
+      "sha256": "47a747475fadfd000fae534f4532cfdb337e15815be7aaa04b9b60e17a6c7acd"
+    },
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/agents/agentA/AGENTS.md",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/agents/agentA/AGENTS.md",
+      "bytes": 21,
+      "sha256": "2743e1040c5e3110e714ec86779e337d1138f08561c1f21ffe98ffb80e009bca"
+    },
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/agents/agentA/memory/facts.md",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/agents/agentA/memory/facts.md",
+      "bytes": 36,
+      "sha256": "4785a92ca005a113e71bcb22c71bc95871e41d08a1492ece459c4f35fd65486c"
+    },
+    {
+      "scenario": "failures",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/agents/agentB/config.yaml",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/failures/agents/agentB/config.yaml",
+      "bytes": 90,
+      "sha256": "3f02ec4b4009cecee9fbee239e23d8ec6d2fcd72851bcbbf5c487edb4cfdfe12"
+    },
+    {
+      "scenario": "initialization",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/ui-result.json",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/initialization/ui-result.json",
+      "bytes": 7214,
+      "sha256": "2c4726159a1baf2febc19baaffdd7410aa4dab3e4566ae6a9f9df0b25b2a8156"
+    },
+    {
+      "scenario": "initialization",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/agents/agentA/config.yaml",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/initialization/agents/agentA/config.yaml",
+      "bytes": 90,
+      "sha256": "a900a81efcfaa490d806d80df338b1bfc9c8ab8004f0df7dacb8916be61fb3b6"
+    },
+    {
+      "scenario": "initialization",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/agents/agentA/identity.md",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/initialization/agents/agentA/identity.md",
+      "bytes": 21,
+      "sha256": "6e20b3b08cc672a451bb68d5e7297d8dadcd775b9c6f8c394610ce7aecd29c5d"
+    },
+    {
+      "scenario": "initialization",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/agents/agentA/AGENTS.md",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/initialization/agents/agentA/AGENTS.md",
+      "bytes": 21,
+      "sha256": "2743e1040c5e3110e714ec86779e337d1138f08561c1f21ffe98ffb80e009bca"
+    },
+    {
+      "scenario": "initialization",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/agents/agentA/memory/facts.md",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/initialization/agents/agentA/memory/facts.md",
+      "bytes": 24,
+      "sha256": "fe8e4dc9800f311e85924dc9ae1dafd5bc2cb290a067a2ea0cd44e5d73b6cc88"
+    },
+    {
+      "scenario": "initialization",
+      "original": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/agents/agentB/config.yaml",
+      "copy": "artifacts/rust-tauri/R07/T08/legacy-settings1-scenes/initialization/agents/agentB/config.yaml",
+      "bytes": 90,
+      "sha256": "3f02ec4b4009cecee9fbee239e23d8ec6d2fcd72851bcbbf5c487edb4cfdfe12"
+    }
+  ],
+  "excluded": [
+    "credentials",
+    "local-token",
+    "browser profile",
+    "cache"
+  ],
+  "notes": [
+    "仅复制已知两份合成测试现场；原始文件未修改。",
+    "两个子检查未生成 electron-result.json；原失败 catch 没有持久化 requests/checks，因此不补造旧跟踪。",
+    "原日志与 ui-result.json 仍为失败；修复后须新运行。"
+  ]
+}

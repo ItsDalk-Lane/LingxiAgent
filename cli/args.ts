@@ -15,7 +15,7 @@ export function parseCliArgs(argv = []) {
     command,
     subcommand: null,
     channel: "stable",
-    runtime: "node",
+    runtime: "rust",
     plain: false,
     url: null,
     token: null,
@@ -155,7 +155,7 @@ Usage:
   hana data restore <transitionId>  Restore data from a checkpoint (asks for confirmation)
 
 Connection options:
-  --runtime <node|rust>            Select the existing Node server or the Rust service (default: node)
+  --runtime <node|rust>            Select the existing Node server or the Rust service (default: rust)
   --url <baseUrl>                   Connect to a specific LingxiAgent Server
   --token <token>                   Bearer token for that server
   --session <path>                  Chat in a specific session

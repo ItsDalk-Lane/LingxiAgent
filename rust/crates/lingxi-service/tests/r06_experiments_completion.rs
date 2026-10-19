@@ -676,6 +676,14 @@ async fn original_experiments_current_tauri_window_real_service() {
         200
     );
     let proof = h.home.join("native-ui-evidence");
+    // 原生构建缓存位置与 directory_picker/skills_completion 同一环境合同
+    // （LINGXI_SKILLS_NATIVE_TARGET 优先），硬编码默认值仅作历史回退。
+    let native_target = std::env::var_os("LINGXI_SKILLS_NATIVE_TARGET")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from("/Users/study_superior/.cache/lingxi-r06-builds/tauri-resources")
+        });
+    assert!(native_target.is_dir(), "需要已保留的原生构建缓存；此证明不创建新target");
     let output = tokio::process::Command::new("node")
         .arg(repo.join("desktop/src/react/settings/__tests__/run-experiments-live-ui.mjs"))
         .current_dir(&repo)
@@ -683,10 +691,7 @@ async fn original_experiments_current_tauri_window_real_service() {
         .env("R06_EXPERIMENT_TOKEN", &h.token)
         .env("R06_EXPERIMENT_READONLY", &h.readonly)
         .env("R06_EXPERIMENT_PROOF", &proof)
-        .env(
-            "R06_EXPERIMENT_NATIVE_TARGET",
-            "/Users/study_superior/.cache/lingxi-r06-builds/tauri-resources",
-        )
+        .env("R06_EXPERIMENT_NATIVE_TARGET", &native_target)
         .output()
         .await
         .unwrap();

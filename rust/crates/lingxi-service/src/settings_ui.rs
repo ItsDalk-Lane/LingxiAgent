@@ -21,21 +21,60 @@ fn failure(message: impl Into<String>) -> Response {
 pub(crate) fn model_preferences(state: &ServiceState) -> Result<Value, String> {
     let preferences = state.memory().read_preferences_root()?;
     let mut models = Map::new();
+    for key in [
+        "title",
+        "summarize",
+        "memory",
+        "knowledge",
+        "vision",
+        "approval",
+        "guard",
+    ] {
+        models.insert(key.into(), Value::Null);
+    }
+    models.insert(
+        "vision_enabled".into(),
+        preferences
+            .get("vision_auxiliary_enabled")
+            .cloned()
+            .unwrap_or(json!(false)),
+    );
     let mut operation_models: Vec<Value> = Vec::new();
     if let Some(gateway) = state.model_gateway() {
+        for (provider, entries) in gateway.catalog_models() {
+            for model in entries {
+                let operations = model
+                    .metadata
+                    .get("operations")
+                    .cloned()
+                    .unwrap_or(json!([]));
+                if !operations
+                    .as_array()
+                    .is_some_and(|values| values.iter().all(Value::is_string))
+                {
+                    return Err("catalog model operations must be string array".into());
+                }
+                operation_models.push(json!({"id":model.id,"provider":provider,
+                    "label":model.metadata.get("name").or_else(||model.metadata.get("displayName")).and_then(Value::as_str).unwrap_or(&model.id),
+                    "dimensions":model.metadata.get("dimensions"),"operations":operations}));
+            }
+        }
         for (operation, binding) in gateway.configured_routes() {
-            models.insert(
-                operation.clone(),
-                json!({"provider": binding.provider, "id": binding.model}),
-            );
+            let slot = operation.strip_prefix("auxiliary.").unwrap_or(&operation);
+            if models.contains_key(slot) {
+                models.insert(
+                    slot.into(),
+                    json!({"provider": binding.provider, "id": binding.model}),
+                );
+            }
             if let Some(existing) = operation_models
                 .iter_mut()
                 .find(|m| m["provider"] == binding.provider && m["id"] == binding.model)
             {
-                existing["operations"]
-                    .as_array_mut()
-                    .expect("操作列表")
-                    .push(json!(operation));
+                let operations = existing["operations"].as_array_mut().expect("操作列表");
+                if !operations.contains(&json!(operation)) {
+                    operations.push(json!(operation));
+                }
             } else {
                 operation_models.push(json!({"id": binding.model, "provider": binding.provider, "label": binding.model, "operations": [operation]}));
             }
@@ -43,7 +82,8 @@ pub(crate) fn model_preferences(state: &ServiceState) -> Result<Value, String> {
     }
     Ok(
         json!({"models": models, "operation_models": operation_models,
-        "thinking_level": preferences.get("thinking_level").cloned().unwrap_or(Value::Null)}),
+        "thinking_level": preferences.get("thinking_level").cloned().unwrap_or(json!("medium")),
+        "search": crate::credentials::search::SearchCredentials::from_preferences(&preferences)?.masked()}),
     )
 }
 
@@ -55,60 +95,27 @@ pub async fn preferences_models_route(State(state): State<ServiceState>) -> Resp
 }
 
 pub async fn models_route(State(state): State<ServiceState>) -> Response {
-    let providers = match crate::agents_admin::agent_config_readback::merged_catalog_providers_with(
-        state.memory().home(),
-        false,
-    ) {
-        Ok(value) => value,
-        Err(error) => return failure(error),
-    };
-    let mut models: Vec<Value> = Vec::new();
-    let runtime_providers = state
-        .model_gateway()
-        .map(|gateway| gateway.provider_ids())
-        .unwrap_or_default();
-    for (provider, raw) in providers {
-        if !runtime_providers.contains(&provider) {
-            continue;
-        }
-        if let Some(entries) = raw.get("models").and_then(Value::as_array) {
-            for entry in entries {
-                let id = entry
-                    .as_str()
-                    .or_else(|| entry.get("id").and_then(Value::as_str));
-                let Some(id) = id.filter(|id| !id.is_empty()) else {
-                    return failure(format!("provider {provider} has malformed model entry"));
-                };
-                // 只公开目录显示字段；元数据中的密钥字段永不穿过此读取出口。
-                models.push(json!({"id": id, "provider": provider,
-                    "name": entry.get("name").and_then(Value::as_str).unwrap_or(id),
-                    "contextWindow": entry.get("contextWindow"), "input": entry.get("input")}));
-            }
-        }
-    }
+    let mut models = Vec::new();
     if let Some(gateway) = state.model_gateway() {
-        for (purpose, binding) in gateway.configured_routes() {
-            if [
-                "embedding",
-                "rerank",
-                "image",
-                "video",
-                "speech",
-                "speech_recognition",
-            ]
-            .contains(&purpose.as_str())
-            {
-                continue;
-            }
-            if !models
-                .iter()
-                .any(|m| m["provider"] == binding.provider && m["id"] == binding.model)
-            {
-                models.push(json!({"id": binding.model, "provider": binding.provider, "name": binding.model}));
+        for (provider, entries) in gateway.catalog_models() {
+            for model in entries {
+                let selection = lingxi_kernel::model_exchange::ModelRouteRequest {
+                    operation: lingxi_kernel::model_exchange::ModelOperation::Chat,
+                    provider: Some(provider.clone()),
+                    model: Some(model.id.clone()),
+                };
+                // 设置选择范围以当前目录和真实可派发协议为准；旧槽不能复活已删除模型。
+                if gateway.resolve_dispatch(&selection).is_err() {
+                    continue;
+                }
+                models.push(json!({"id":model.id,"provider":provider,
+                    "name":model.metadata.get("name").or_else(||model.metadata.get("displayName")).and_then(Value::as_str).unwrap_or(&model.id),
+                    "contextWindow":model.metadata.get("contextWindow").or_else(||model.metadata.get("context")),
+                    "input":model.metadata.get("inputs").or_else(||model.metadata.get("input"))}));
             }
         }
     }
-    Json(json!({"models": models})).into_response()
+    Json(json!({"models":models})).into_response()
 }
 
 pub async fn providers_summary_route(State(state): State<ServiceState>) -> Response {
@@ -169,31 +176,17 @@ pub async fn providers_summary_route(State(state): State<ServiceState>) -> Respo
 }
 
 pub async fn user_profile_route(State(state): State<ServiceState>) -> Response {
-    let path = state.memory().user_dir().join("user.md");
-    match std::fs::symlink_metadata(&path) {
-        Ok(metadata) if !metadata.file_type().is_file() => {
-            return failure("user profile must be a regular file")
-        }
-        Ok(_) => {}
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
-            return Json(json!({"content": ""})).into_response()
-        }
-        Err(error) => return failure(format!("cannot inspect user profile: {error}")),
-    }
-    match std::fs::read_to_string(path) {
-        Ok(content) => Json(json!({"content": content})).into_response(),
-        Err(error) => failure(format!("cannot read user profile: {error}")),
+    match crate::settings_configuration::read_user_profile(&state) {
+        Ok(content) => Json(json!({"content":content})).into_response(),
+        Err(e) => failure(e),
     }
 }
 
-pub async fn config_route(State(state): State<ServiceState>) -> Response {
-    match state.memory().read_preferences_root() {
-        Ok(preferences) => Json(
-            json!({"locale": preferences.get("locale").and_then(Value::as_str).unwrap_or("zh-CN")}),
-        )
-        .into_response(),
-        Err(error) => failure(error),
-    }
+pub async fn config_route(
+    State(state): State<ServiceState>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
+) -> Response {
+    crate::settings_configuration::config_get(&state, &principal).await
 }
 
 pub async fn avatars_health_route(State(state): State<ServiceState>) -> Response {
@@ -241,19 +234,15 @@ pub struct SnapshotQuery {
 pub async fn snapshot_route(
     State(state): State<ServiceState>,
     Query(query): Query<SnapshotQuery>,
+    axum::Extension(principal): axum::Extension<crate::auth::Principal>,
 ) -> Response {
     let id = query.agent_id;
-    if let Err(error) = crate::agents_admin::agent_config_readback::merged_catalog_providers_with(
-        state.memory().home(),
-        false,
-    ) {
-        return failure(error);
-    }
     // 聚合现役处理器，不另造人格回退链或经验读取规则；任一路失败，快照显式失败。
     let config = match response_value(
         crate::agents_admin::agent_config_readback::agent_config_get_route(
             State(state.clone()),
             RoutePath(id.clone()),
+            axum::Extension(principal.clone()),
         )
         .await,
     )
@@ -311,7 +300,27 @@ pub async fn snapshot_route(
         Ok(value) => value,
         Err(error) => return failure(error),
     };
-    let mut preferences = preferences;
+    // 快照只投影现役界面需要的偏好；兼容未知字段保留在磁盘，不默认公开。
+    let mut preferences = Value::Object(
+        [
+            "quickChat",
+            "notifications",
+            "keybindings",
+            "browser",
+            "bridge",
+            "speechRecognition",
+            "appearance",
+            "network_proxy",
+            "modelObservability",
+        ]
+        .into_iter()
+        .filter_map(|key| {
+            preferences
+                .get(key)
+                .map(|value| (key.into(), value.clone()))
+        })
+        .collect(),
+    );
     let computer = match crate::computer_use_settings::projection(&state) {
         Ok(value) => value,
         Err(error) => return failure(error),
@@ -325,5 +334,6 @@ pub async fn snapshot_route(
         Err(response) => return *response,
     };
     preferences["experiments"] = experiments["experiments"].clone();
+    let preferences = crate::agents_admin::agent_config_readback::mask_object_secrets(&preferences);
     Json(json!({"agentId": id, "config": config, "identity": identity["content"], "agents": agents["content"], "publicAgents": public_agents["content"], "userProfile": user["content"], "experience": experience, "globalModels": global_models, "preferences": preferences})).into_response()
 }

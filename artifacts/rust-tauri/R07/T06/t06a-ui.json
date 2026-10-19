@@ -1,0 +1,20 @@
+{
+ "stage": "R07-T06",
+ "purpose": "candidate_gate",
+ "candidate": "t06a",
+ "label": "t06a-ui",
+ "command": "npx vitest run desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts desktop/src/react/__tests__/services/app-event-actions.test.ts desktop/src/react/__tests__/services/rust-automation.test.ts desktop/src/react/__tests__/services/rust-media-http.test.tsx desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts desktop/src/react/__tests__/services/rust-browser-events-http.test.ts tests/r07-media-sdk-worker.test.ts",
+ "environment": {
+  "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+  "CARGO_BUILD_JOBS": "4",
+  "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+  "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+ },
+ "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+ "manifestFingerprintBefore": "7be9fb89cbaa58a25ede7e6d0e541049ea46de468e4b8a902c5c94097ab0a9a4",
+ "manifestFingerprintAfter": "7be9fb89cbaa58a25ede7e6d0e541049ea46de468e4b8a902c5c94097ab0a9a4",
+ "manifestFingerprintMatchesCandidate": true,
+ "exitCode": 0,
+ "durationSec": 7.0,
+ "logSha256": "551204c524a0100b05f7bb93866709d0b923f0a75cf03500359e2ec3d757d173"
+}

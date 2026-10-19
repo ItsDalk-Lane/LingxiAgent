@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 1 failed) 13603ms
+     × A17：手机四 scope 凭证见同一身份并同字节下载 1241ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收 > A17：手机四 scope 凭证见同一身份并同字节下载
+TypeError: Body is unusable: Body has already been read
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:262:35
+    260|     const bootstrap = await phone('GET', '/lingxi/v1/mobile/bootstrap'…
+    261|     assert.equal(bootstrap.status, 200, await bootstrap.text());
+    262|     assert.equal((await bootstrap.json()).currentAgentId, 'a17agent');
+       |                                   ^
+    263|
+    264|     const sessions = await (await phone('GET', '/lingxi/v1/sessions'))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  23:19:50
+   Duration  13.70s (transform 25ms, setup 16ms, import 18ms, tests 13.60s, environment 0ms)
+

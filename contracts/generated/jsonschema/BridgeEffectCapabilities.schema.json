@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "BridgeConversationKind": {
+      "enum": [
+        "dm",
+        "group"
+      ],
+      "type": "string"
+    },
+    "BridgeStreamCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "maxChars": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "minIntervalMs": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "mode": {
+          "$ref": "#/$defs/BridgeStreamMode"
+        },
+        "receiptFolded": {
+          "type": "boolean"
+        },
+        "rich": {
+          "type": "boolean"
+        },
+        "scopes": {
+          "items": {
+            "$ref": "#/$defs/BridgeConversationKind"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "mode",
+        "scopes",
+        "minIntervalMs",
+        "maxChars",
+        "rich",
+        "receiptFolded"
+      ],
+      "type": "object"
+    },
+    "BridgeStreamMode": {
+      "enum": [
+        "batch",
+        "draft",
+        "rich_draft",
+        "edit_message",
+        "cardkit_stream",
+        "block"
+      ],
+      "type": "string"
+    },
+    "BridgeWaitingReceiptCapability": {
+      "additionalProperties": false,
+      "properties": {
+        "cancellable": {
+          "type": "boolean"
+        },
+        "mode": {
+          "$ref": "#/$defs/BridgeWaitingReceiptMode"
+        },
+        "refreshIntervalMs": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scopes": {
+          "items": {
+            "$ref": "#/$defs/BridgeConversationKind"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "mode",
+        "scopes",
+        "refreshIntervalMs",
+        "cancellable"
+      ],
+      "type": "object"
+    },
+    "BridgeWaitingReceiptMode": {
+      "enum": [
+        "native_typing",
+        "text"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "receipt": {
+      "$ref": "#/$defs/BridgeWaitingReceiptCapability"
+    },
+    "streams": {
+      "items": {
+        "$ref": "#/$defs/BridgeStreamCapability"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "receipt",
+    "streams"
+  ],
+  "title": "BridgeEffectCapabilities",
+  "type": "object"
+}

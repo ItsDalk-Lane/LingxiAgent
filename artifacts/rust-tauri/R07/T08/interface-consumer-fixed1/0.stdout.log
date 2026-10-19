@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx (12 tests | 1 failed) 310ms
+     × shows the first sidebar read failure and retries before enabling the control 122ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 30 passed (31)
+   Start at  18:19:40
+   Duration  1.16s (transform 510ms, setup 61ms, import 959ms, tests 956ms, environment 1.12s)
+

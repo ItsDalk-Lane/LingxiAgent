@@ -1981,6 +1981,29 @@ describe('ws-message-handler loop_status', () => {
     });
   });
 
+  it('循环保存故障保留真实running状态并只提醒一次，不伪造暂停', () => {
+    const previous = useStore.getState();
+    const addToast = vi.fn();
+    const connection = { connectionId: 'loop-runtime-a', kind: 'local', serverId: 'rust-loop', serverNodeKind: 'lingxi-service', studioId: 'local',
+      label: '循环服务', baseUrl: 'http://127.0.0.1:3210', wsUrl: 'ws://127.0.0.1:3210', token: 'loop-test-token',
+      authState: 'paired', trustState: 'local', credentialKind: 'loopback_token', capabilities: [] };
+    useStore.setState({ activeServerConnectionId: connection.connectionId, activeServerConnection: connection,
+      serverConnections: { [connection.connectionId]: connection }, currentSessionId: 'loop-session', currentSessionPath: 'native:loop-session', addToast } as never);
+    const message = { type: 'loop_status', sessionId: 'loop-session', sessionPath: 'native:loop-session', status: 'running',
+      runtimeError: 'loop persistence failed: simulated disk error' };
+    try {
+      handleServerMessage(message); handleServerMessage(message);
+      expect(useStore.getState().loopStatusBySession['loop-session']).toMatchObject({ status: 'running', runtimeError: message.runtimeError });
+      expect(addToast).toHaveBeenCalledOnce();
+      expect(addToast).toHaveBeenCalledWith(expect.stringContaining('无法自动推进'), 'warning', 10_000, expect.any(Object));
+      handleServerMessage({ ...message, sessionId: 'unknown', sessionPath: 'native:unknown' });
+      expect(addToast).toHaveBeenCalledOnce();
+    } finally {
+      useStore.setState({ addToast: previous.addToast, activeServerConnectionId: previous.activeServerConnectionId,
+        activeServerConnection: previous.activeServerConnection, serverConnections: previous.serverConnections });
+    }
+  });
+
   it('loop_status 缺省字段归一化为 0 / null', () => {
     handleServerMessage({
       type: 'loop_status',

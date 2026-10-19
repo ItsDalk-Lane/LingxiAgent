@@ -29,19 +29,26 @@ zip = { workspace = true }
 # Office 只解析受限内存中的 XML，不展开外部实体或写出归档成员。
 quick-xml = { workspace = true }
 lingxi-protocol = { path = "../lingxi-protocol" }
-# R04-T07: the OFFICIAL MCP Rust SDK (R01 D-06), at the SAME locked
-# version and feature set lingxi-spike already validated
-# (default-features=false + client,server — in-process duplex initialize
-# handshake, negotiated protocol, tools/list, plus real stdio child
-# transports built on tokio's already-locked "process" feature). No new
-# package version enters rust/Cargo.lock: rmcp 3.4.1 and every dependency
-# of these features is already a locked member via lingxi-spike
-# (workspace feature unification). HTTP/SSE transports are deliberately
-# NOT enabled here (D-06: they would add unlocked packages; an
-# unsupported endpoint refuses loudly instead of falling back).
-rmcp = { version = "3.4.1", default-features = false, features = ["client", "server"] }
+# R07-T08：仅官方 MCP 3.4.1 协议/授权与 Streamable HTTP；HTTP 客户端由共享 NetworkPlane 提供。
+# OAuth、SSE事件解析及受监督 worker 随官方 feature 进入锁，不实现旧独立 SSE 协议。
+rmcp = { version = "=3.4.1", default-features = false, features = ["client", "server", "auth", "transport-streamable-http-client-reqwest"] }
+async-trait = "=0.1.89"
+sse-stream = "=0.2.4"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
+# 办公 frontmatter 复用 adapters 已锁定的 YAML 实现，不新增包版本。
+serde_yaml_ng = "=0.10.0"
+# R07-T07-δ8（设计登记 docs/rust-tauri/R07/T07_STATUS.md δ8）：工作流 JS 沙箱
+# 引擎。boa_engine 0.20 是纯 Rust ECMAScript 实现，符合依赖选型先例
+# （quick-xml/zip-zlib-rs/jieba 同档）；v8/deno_core 过重、rquickjs 引 C 均不取。
+# 本任务是 R02-T01 以来首次向 Cargo.lock 引入新第三方包族（boa_engine 及其
+# 传递依赖），选型与探针验证（/private/tmp/boa-probe 4/4）已在 δ8 设计节登记。
+# default-features=false：不启用 boa 的 deser/flowgraph/temporal 等非必需特性，
+# 沙箱只用核心 Context/Value/NativeFunction 与 job queue 钩子。
+boa_engine = { version = "=0.20.0", default-features = false }
+# boa 定制 job queue 的 FuturesUnordered（FutureJob !Send，current_thread 驱动）。
+# futures 0.3.34 已在工作区锁内（rmcp 传递依赖），只加边不增版本。
+futures = "0.3.34"
 # R04-T05: the "process" feature is added for tokio::process::Command
 # (async spawn/wait of the supervised children). Feature flags only —
 # tokio 1.53.1 and all its deps (bytes/libc/mio/...) are already locked;
@@ -71,6 +78,9 @@ tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
 hyper = { version = "1.11.1", default-features = false, features = ["http1", "server"] }
 sha1 = "0.11.0"
 sha2 = "0.11.0"
+# R07-T10: legacy observability import opens the old store read-only
+# (same already-locked rusqlite/libsqlite3 pair as lingxi-adapters).
+rusqlite = { version = "0.40.2", features = ["bundled"] }
 base64 = "0.23.1"
 #   - hyper-util 0.1.21 (axum's own runtime glue, same locked version):
 #     TokioIo adapts hyper's upgraded connection IO to tokio's
@@ -141,6 +151,8 @@ windows-sys = { version = "=0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_
 # coordinator tests to hold a REAL external WAL write lock while proving the
 # deadline bounds a blocked DB close.
 [dev-dependencies]
+# 自有 HTTP 外端同样使用官方服务传输，不手写 MCP 协议。
+rmcp = { version = "=3.4.1", default-features = false, features = ["transport-streamable-http-server"] }
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 # 测试时临时生成证书/密钥，仓库和证据中均不保存私钥。
 rcgen = "=0.14.10"

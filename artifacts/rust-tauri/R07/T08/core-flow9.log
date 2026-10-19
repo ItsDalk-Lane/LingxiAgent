@@ -1,0 +1,66 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.66s
+     Running tests/r07_t08_provider_http.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_http-9597e57d2d7c2a07)
+
+running 6 tests
+test health_pins_catalog_model_and_anthropic_connection_have_real_usage ... ok
+test catalog_draft_mask_and_cache_never_publish_remote_models_or_count_usage ... ok
+test model_patch_and_removal_preserve_other_settings_and_stop_new_dispatch ... ok
+test actual_local_run_settings_search_apply_target_agent_and_security_refusals ... ok
+test auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation ... FAILED
+test api_key_reveal_requires_both_scopes_and_discovery_secret_drafts_cannot_bypass ... ok
+
+failures:
+
+---- auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation stdout ----
+
+thread 'auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation' (1957504) panicked at crates/lingxi-service/tests/r07_t08_provider_http.rs:992:10:
+called `Option::unwrap()` on a `None` value
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.08s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_provider_http`
+     Running tests/r07_t08_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_settings-5a3bca7a61891857)
+
+running 15 tests
+test user_profile_parent_directory_link_cannot_redirect_reads_or_writes ... ok
+test invalid_import_and_unknown_global_fields_never_write_any_preferences ... ok
+test existing_machine_default_workspace_get_and_ensure_do_not_depend_on_service_home_or_modify_user_files ... ok
+test corrupt_preferences_are_preserved_and_profile_writes_reject_symlinks ... ok
+test rejected_agent_provider_and_yuan_patches_do_not_save_global_values_first ... ok
+test snapshots_and_default_exports_hide_all_saved_secret_shapes ... ok
+test partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers ... FAILED
+test partial_global_save_still_emits_only_the_changes_that_really_happened ... ok
+test saved_proxy_credentials_never_leave_read_or_export_and_new_unsupported_credentials_are_refused ... ok
+test export_import_roundtrip_preserves_masked_secrets_and_unmentioned_preferences ... ok
+test applied_model_projection_error_still_notifies_current_model_consumers ... ok
+test deleting_one_recent_workspace_keeps_the_other_workspace_and_other_agent ... ok
+test one_global_edit_and_masked_search_edit_preserve_other_values_and_restart ... ok
+test workspace_history_uses_explicit_agent_and_profile_survives_restart ... ok
+test remote_settings_scope_cannot_use_local_only_settings_archive ... ok
+
+failures:
+
+---- partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers stdout ----
+
+thread 'partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers' (1957727) panicked at crates/lingxi-service/tests/r07_t08_settings.rs:610:9:
+assertion `left == right` failed: /lingxi/v1/settings/import: {"raw":"Failed to deserialize the JSON body into the target type: missing field `modelPreferences` at line 1 column 148"}
+  left: 422
+ right: 200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers
+
+test result: FAILED. 14 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.73s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_settings`
+error: 2 targets failed:
+    `-p lingxi-service --test r07_t08_provider_http`
+    `-p lingxi-service --test r07_t08_settings`

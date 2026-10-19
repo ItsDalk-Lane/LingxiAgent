@@ -1,0 +1,34 @@
+{
+  "candidate": "r5",
+  "name": "browser-flows",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r07_browser_routes",
+    "--test",
+    "r07_browser_tools",
+    "--test",
+    "r07_web_tools"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:00:21.400991+00:00",
+  "sourceFingerprint": "40ebe6b14045c00b72ac925aa9da6cba0585a1100df1eee611f8cdc36413939e",
+  "log": "r5-browser-flows.log",
+  "endedAt": "2026-10-15T23:00:27.988605+00:00",
+  "exitCode": 101,
+  "sourceFingerprintAfter": "40ebe6b14045c00b72ac925aa9da6cba0585a1100df1eee611f8cdc36413939e",
+  "logSha256": "82f2c441a40586a04d35516f5576b93dbd67bdb8c3c37196c8ec1d3ea9c5b70c",
+  "sourceUnchanged": true
+}

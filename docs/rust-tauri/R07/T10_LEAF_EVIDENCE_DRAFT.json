@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "R07_T10_LEAF_EVIDENCE_DRAFT_NOT_ACCEPTANCE",
+  "stage": "R07",
+  "task": "R07-T10",
+  "status": "DRAFT_DEVELOPMENT_EVIDENCE_NOT_FINAL_ACCEPTANCE",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "generatedAtNote": "2026-10-19 本轮 T10 开发证据绑定；证据 label 对应 artifacts/rust-tauri/R07/T09/ 下 run_development 回执与日志；失败 label（t10-observability-rust1/2/3/6、t10-service-regression1-6 等）原样保留。",
+  "counts": {
+    "leaves": 19,
+    "PASS_CURRENT_EXECUTION": 6,
+    "PARTIAL_CURRENT_EXECUTION": 4,
+    "NOT_RUN": 9
+  },
+  "fixedBugsThisRound": [
+    "lib.rs：observability::routes() 此前未真正并入主路由（全部 404）——补 merge",
+    "observability.rs：合计分组 values 一律写 date 键（provider/model/purpose/session 分组错标）改为按维度名落位；overall/groups 补 usageAggregateAvailability（complete/partial/unknown，旧契约词汇），否则会话缓存率胶囊永远不显示",
+    "sessions.rs：cancel_run_for 媒体段对悬空运行误报 Conflict 吞掉 DanglingActive——无活跃作用域证明无活媒体可撤，跳过让 NotLive 分支诚实报告（修 adv_c04 回归）",
+    "bridge.rs+lib.rs：桥宿主启动恢复写在就绪后与外部写锁竞争，busy 即杀宿主——恢复成败改为就绪门（恢复完成才 on_ready，失败响亮拒服务）",
+    "conversation_runtime.rs+lib.rs：对话宿主同款启动恢复竞争，同款就绪门",
+    "auth_matrix.rs：T09 的 /mobile 308 重定向更新旧断言为 308→/mobile/ 200 正向检查",
+    "run_development.py：证据工具环境原本写死 CARGO_TARGET_DIR，调用方透传无效——改为尊重调用方环境"
+  ],
+  "environmentFindings": [
+    "r04_t06_sandbox：CARGO_TARGET_DIR 若指到 /private/tmp 下，沙箱测试的「禁区哨兵」会落在沙箱契约允许写的 /private/tmp 内（测试设计假设 target 不在 OS tmp）——target 迁回仓库内 rust/target-r07；旧构建缓存 /private/tmp/lingxi-r07-build（368G）已按磁盘纪律删除",
+    "r00_management_leaves 的 LAN 用例被 macOS 应用防火墙按测试二进制哈希拦截：新构建哈希未在允许列表（旧哈希 4c2478101d26e1c4/fd07a3259fe27571 在列），socketfilterfw 需 root，登记环境受阻不改写为通过",
+    "r06_agent_settings_live 的 Electron 子进程链会继承宿主 ELECTRON_RUN_AS_NODE=1（编辑器扩展宿主环境变量污染）：Electron 退化为 Node，app 未定义全灭；后续运行一律 env -u ELECTRON_RUN_AS_NODE（证据 t10-electron-env-fix1/2/3）",
+    "r06_agent_settings_live 两个真实指针/焦点用例要求 macOS 窗口获得真实键盘焦点：屏幕锁定（IOConsoleLocked=true）时焦点不可得，两例登记环境受阻并列入回归跳过清单，待解锁环境复跑，不改写为通过",
+    {
+      "id": "ENV-R06-EVIDENCE-DIRS",
+      "kind": "harness-requirement",
+      "detail": "六个 r06_ar_* 等套件要求 LINGXI_W03/F05/F08/F13_EVIDENCE 与 LINGXI_PRODUCT_DIR 等环境变量（写证据快照/产品目录定位）。裸 cargo test 不提供即 panic NotPresent；R06 生产者脚本负责供给。全量回归必须镜像该环境块。",
+      "evidence": "artifacts/rust-tauri/R07/T09/t10-service-regression11.log:1716"
+    },
+    "LINGXI_SKILLS_NATIVE_TARGET 是 R06 生产者环境合同成员（r06_stage_inputs.py:642-644 同供）；本轮回归环境块此前漏供，回归21 起补：desktop/src-tauri/target。",
+    "LINGXI_TAURI_PROOF_TARGET 须指向仓库外目录（native_resource 套件硬性断言）；与 LINGXI_SKILLS_NATIVE_TARGET 分工：前者禁仓库内，后者即仓库内保留缓存。孤儿缓存来历：回归24 experiments 硬编码路径下内层 cargo 编译产物，已核实非软链误建。",
+    {
+      "id": "ENV-PERSONA-PRODUCT-DIR",
+      "kind": "harness-requirement",
+      "detail": "r06_original_persona_proofs 硬要求 LINGXI_PRODUCT_DIR=$TMPDIR父级/persona-product （合成模板根）；ex05/t08 等套件在 lib 下绿。单块环境无法同时满足——按 R06 生产者惯例分两次供给：全量回归跳过 persona 两例 + 专属环境单独跑 persona 套件。",
+      "evidence": "artifacts/rust-tauri/R07/T09/t10-service-regression30.log:3008"
+    }
+  ],
+  "leaves": {
+    "R00-T02-LA-0F28429F329E": {
+      "featureId": "F-D22-DESKTOP_BEHAVIOR-DESKTOP-BEHAVIOR-OBSERVABILITY-EXPORT-0F2842",
+      "originalThen": "得到可下载或保存的观测数据文件",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PARTIAL_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "导出字节流真实可得（NDJSON）；「可下载/保存」的 UI 保存动作本轮未跑页面验收。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-D656CA656A89": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-OBSERVABILITY-BLOB-GET-D656CA",
+      "originalThen": "GET 返回正文流",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "blob GET 正文流未迁移：Rust 面不捕获/存储正文，该端点不存在，请求响亮 404（不静默降级）。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-3645002066F0": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-OBSERVABILITY-BLOB-HEAD-364500",
+      "originalThen": "HEAD 仅返回头",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "blob HEAD 同上，未迁移。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-C7D757226915": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-C7D757",
+      "originalThen": "返回调用详情与来源",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PASS_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "calls/{id} 详情：旧行带 legacyTrace 关联（traceId/parentCallId/同 trace 兄弟），新内核行因果字段在账本自身。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-F9EA8D71EE92": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-F9EA8D",
+      "originalThen": "返回 payloadRecords，不内联正文",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PARTIAL_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "详情不内联正文（payloadAvailability=not_captured 如实标注）；payloadRecords 列表字段未投影（Rust 面不捕获正文，空数组与否未逐字段对账）。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-2045462C0D98": {
+      "featureId": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-204546",
+      "originalThen": "可用状态与录制状态如实显示；无权限和网络失败显示 alert，不冒充空数据",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PARTIAL_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8",
+        "t10-observability-route1"
+      ],
+      "note": "health 返回真实 recordingStatus/query.queryStatus 与 callCount；渲染层路由映射已接（单测覆盖映射表）；「无权限/网络失败显示 alert」分支复用旧 UI 实现未在新面重验。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-FA8EA4339EFF": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-FA8EA4",
+      "originalThen": "返回精确记录正文",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "payload 精确正文：Rust 面不捕获正文（设计：账本+元数据，不存请求/响应体），无正文可返回。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-5BEFE4A3A61C": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-5BEFE4",
+      "originalThen": "返回持久化与保留期设置",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "观测 settings GET（持久化/保留期）未迁移；请求响亮 404。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-08EB520C2ECC": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-08EB52",
+      "originalThen": "返回大小与数量，未初始化 404",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "storage overview（大小与数量、未初始化 404）未迁移。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-ECC851003BBF": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-ECC851",
+      "originalThen": "返回 trace 详情与来源",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PASS_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "traces/{id}：导入旧三调用父子链 3 calls + 2 edges 不断裂；不存在 trace 404。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-96CA6DBF8317": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-96CA6D",
+      "originalThen": "返回 NDJSON 字节流",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PASS_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "export NDJSON：manifest(exportSchemaVersion=1,totalCalls)+逐调用行；带交叉筛选导出与同筛选查询集合一致；超限 413 带 matchedCalls/maxCalls。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-CC8E90E00CB6": {
+      "featureId": "F-D22-ROUTE_BEHAVIOR-BEHAVIOR-MODEL-OBSERVABILITY-MODEL-OBSERVABILITY-CC8E90",
+      "originalThen": "调用观测存储删除并返回实际结果；无存储、筛选无效或查询失败均明确报错",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "maintenance/delete（观测存储删除）未迁移。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-85BCDAD6E3AE": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-85BCDA",
+      "originalThen": "返回统计聚合",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PASS_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "query/aggregate overall 与 groupBy date 分组对账：合计==同筛选去重明细求和；无 usage 行 token 保持 null 缺失标记。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-AB2CF6B28D08": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-AB2CF6",
+      "originalThen": "返回过滤后的调用列表",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PASS_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "query/calls 多值/交叉筛选（日期∩provider∩purpose∩outcome∩sessionId）真实 SQLite 明细断言；native: 前缀兼容。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-AFDC77ECAE8B": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-AFDC77",
+      "originalThen": "返回过滤后的 trace 列表",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "query/traces 路由已实现（limit/cursor 收下暂全量返回），本轮未写覆盖测试。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-0E9326840E66": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-MODEL-OBSERVABILITY-MODEL-OBSERV-0E9326",
+      "originalThen": "只保存 retention，永开字段不可关闭",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "settings PUT（只保存 retention、永开字段不可关闭）未迁移。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-CFACFCAD88EC": {
+      "featureId": "F-D22-SEMANTIC_EFFECT-SEMANTIC-EFFECT-USAGE-USAGE-LLM-READ-CFACFC",
+      "originalThen": "返回账本中按时间、归属、助手、模型、提供者、状态等过滤的记录",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PASS_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-rust8"
+      ],
+      "note": "账本读取面筛选覆盖时间/提供者/模型/purpose/会话/状态；LocalOnly 单归属，owner 维度等价本机全部。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-1850FE23DD5D": {
+      "featureId": "F-D22-UI-UI-SETTINGS-USAGE-1850FE",
+      "originalThen": "逐动作核对实际状态与页面投影；失败不伪装成空数据",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "PARTIAL_CURRENT_EXECUTION",
+      "directCurrentProof": [
+        "t10-observability-route1",
+        "t10-typecheck1"
+      ],
+      "note": "设置页观测面请求经 rustObservabilityRoute 接入原生服务（映射单测+typecheck）；页面逐动作真实服务验收未跑。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    },
+    "R00-T02-LA-4D1720CCD10D": {
+      "featureId": "F-D22-WS_IN-WS-IN-CONTEXT-USAGE-4D1720",
+      "originalThen": "返回 tokens、contextWindow、percent 及可选 breakdown 供界面展示",
+      "originalExecutionStages": [
+        "R05",
+        "R07"
+      ],
+      "draftResult": "NOT_RUN",
+      "directCurrentProof": [],
+      "note": "WS_IN context-usage（tokens/contextWindow/percent）属 WS 协议入口，不在本轮观测查询面实现范围。",
+      "scopeWarning": "本判定只覆盖 R07 本轮份额；R08/R10/R11 共享叶不在此代领。"
+    }
+  },
+  "regressionChainThisRound": [
+    {
+      "label": "t10-service-regression8-newtarget",
+      "exitCode": 101,
+      "note": "新 target 冷建全量；10 例 rr1_f20 全灭——承前未提交的 config.rs 校验收紧（system-speech 必须空地址无凭证）撞旧夹具占位地址；frontier 停在 r05_t06_rr1_system_speech"
+    },
+    {
+      "label": "t10-rr1-speech-fixture1",
+      "exitCode": 0,
+      "note": "夹具改空地址（对齐生产 system-speech 空 base_url 事实），10/10 通过"
+    },
+    {
+      "label": "t10-service-regression9-newtarget",
+      "exitCode": 101,
+      "note": "frontier 推进到 r06_agent_settings_live；9 例 Electron 全灭——ELECTRON_RUN_AS_NODE 环境污染"
+    },
+    {
+      "label": "t10-electron-env-fix1",
+      "exitCode": 101,
+      "note": "剔除污染后 12/14 过；剩 2 例为真实焦点依赖，锁屏受阻"
+    },
+    {
+      "label": "t10-service-regression10-focus-gated",
+      "exitCode": 101,
+      "note": "frontier 推进到 r06_agent_switch_completion；existing_b 模型钉入断言为旧焦点语义残留"
+    },
+    {
+      "label": "t10-agent-switch-fix1",
+      "exitCode": 0,
+      "note": "断言更新为 T08 agent 感知链（钉所属助手模型），4/4 通过；同脚本其余断言与 EX12_TARGET_ONLY 变体本就更支持新语义"
+    },
+    {
+      "label": "t10-service-regression11",
+      "exitCode": 101,
+      "note": "63 套件 1202 测试全绿后 frontier 推进到 r06_ar_f03_operations：21 例全灭于 LINGXI_W03_EVIDENCE 未设置（r06_ar_f03_operations.rs:569 env::var unwrap NotPresent）。定性为 harness 环境供给缺失，非产品回归——R06 自己的生产者 r06_stage_inputs.py:563 即为这些套件准备同名证据目录。本轮两个修复（speech 夹具、agent-switch 断言）在全量中得到复证。"
+    },
+    {
+      "label": "t10-service-regression12",
+      "exitCode": null,
+      "note": "镜像 R06 harness 环境（LINGXI_W03/F05/F08/F13_EVIDENCE 等指向全新空目录、LINGXI_PRODUCT_DIR=lib）重跑全量；跳过项不变（r00 LAN、2 例锁屏焦点）。运行中。"
+    },
+    {
+      "label": "t10-service-regression12",
+      "exitCode": 101,
+      "note": "环境补齐后 frontier 推进到 r06_ar_f12_cache_consumers（70 套件 1281 测试绿）。1 例 ingestion_normal_positive 失败：测试断言的变体绑定停留在原始 profile（10-14 形态），10-15 的 4cdbd0f99 已把 worker 变体切到 current_cache_profile_hash——提交态既有断点，R06 绿灯证据（10-13）早于破坏性提交。定性：契约更新类修复。"
+    },
+    {
+      "label": "t10-f12-variant-fix1",
+      "exitCode": 0,
+      "note": "断言改绑 worker 实际变体（raw→hashed profile），保留旧式变体不被接管的反向断言；整二进制 6/6 通过。probe1/probe2 记录 --exact 前缀不匹配导致 0 测试空跑的教训。"
+    },
+    {
+      "label": "t10-service-regression13",
+      "exitCode": 101,
+      "note": "操作失误：bash -c 单引号内 $R 未导出到子 shell，证据目录环境变量全部缺失，等价于回归11 的条件空跑（同前沿 r06_ar_f03，63 套件 1202 绿）。回执 environment 段证实变量缺席。f12 修复未经全量验证，原样保留此记录。"
+    },
+    {
+      "label": "t10-service-regression14",
+      "exitCode": null,
+      "note": "字面路径重写环境块重跑；运行中。"
+    },
+    {
+      "label": "t10-service-regression14",
+      "exitCode": 101,
+      "note": "环境块生效，f12 修复在全量中复证通过；前沿推进到 r06_ar_f13_submission（71 套件 1283 绿）。1 例失败：默认工具面计数断言停留在 7，1be910755 恢复可信工具曝光后为 18（实测名单无 knowledge_search，R07 各能力面在内）。定性：契约更新类。"
+    },
+    {
+      "label": "t10-f13-tools-fix1",
+      "exitCode": 0,
+      "note": "裸计数 7 改为按名钉住 18 个默认工具（后续增减必须显式更新清单），knowledge_search 缺席与范围文本缺席断言保留；2/2 通过。"
+    },
+    {
+      "label": "t10-service-regression15",
+      "exitCode": null,
+      "note": "运行中。"
+    },
+    {
+      "label": "t10-service-regression15",
+      "exitCode": 101,
+      "note": "f13 修复在全量中复证通过；前沿推进到 r06_ar_w09_embedding_batches（72 套件 1284 绿）。11 例全灭于 W09_EVIDENCE 未设置——我的环境清点 grep 只匹配 LINGXI_* 前缀漏掉 W01/W09/W10/W11。定性：harness 环境供给缺失（第二类）。"
+    },
+    {
+      "label": "t10-service-regression16",
+      "exitCode": null,
+      "note": "按 R06 生产者 env_for 块对齐补齐 W01/W09/W10/W11_EVIDENCE 全新目录重跑；运行中。"
+    },
+    {
+      "label": "t10-service-regression16",
+      "exitCode": 101,
+      "note": "前沿倒退到 r06_agent_settings_live（59 套件 1173 绿）：native_settings_current_electron_real_io_failures_and_partial_writes 失败于 persona 一成功一失败断言（身份 PUT 200 + 锁定行为文件 PUT 500）。同代码在回归15 全绿。"
+    },
+    {
+      "label": "t10-settings-flake-probe1",
+      "exitCode": 0,
+      "note": "同套件低负载定点复跑 12/12 通过（2 焦点用例照旧跳过）。定性：负载敏感的真实 Electron UI 抖动，非代码缺陷；两份回执都保留。"
+    },
+    {
+      "label": "t10-service-regression17",
+      "exitCode": null,
+      "note": "环境不变重跑全量；若同点复现失败则升级为真问题排查。运行中。"
+    },
+    {
+      "label": "t10-service-regression17",
+      "exitCode": null,
+      "note": "启动命令尾部多余的 `&` 使回归进程脱离 harness 跟踪（孤儿但存活，PID 76821，日志持续写入）；回执将在进程自然结束后读取，监视任务 b5e081fqo 兜底通知。登记为操作注记，不作结果证据。"
+    },
+    {
+      "label": "t10-service-regression17",
+      "exitCode": 101,
+      "note": "前沿退到 r04_t05_process_tools（33 套件 867 绿）：r04_a10 PTY 用例等待终端退出超时。该用例在回归11-16 连续六次通过，本轮为孤发失败。定性：负载敏感抖动（与 settings_live 同类形态）。"
+    },
+    {
+      "label": "t10-service-regression18",
+      "exitCode": null,
+      "note": "切换 RUST_TEST_THREADS=1（R06 生产者当年证明的串行条件）压掉二进制内资源争抢，换取全量一次走完；代价是墙钟变长。运行中。"
+    },
+    {
+      "label": "t10-service-regression18",
+      "exitCode": 101,
+      "note": "串行条件下前沿重回 r06_ar_w09（72 套件 1288 绿），c01_presend 失败：夹具用 CR/LF 凭证触发发送前构造失败，未提交的配置校验收紧（启动即拒 CR/LF 认证头）使二进制 READY 前退出。定性：夹具触发器修复（产品收紧是有意的）。"
+    },
+    {
+      "label": "t10-w09-presend-fix1",
+      "exitCode": 0,
+      "note": "触发器 CR/LF→BEL 控制符（过配置校验、发送期构造失败原语义不变）；w09 串行 16/16 通过。"
+    },
+    {
+      "label": "t10-service-regression19",
+      "exitCode": 101,
+      "note": "串行全量：76 套件通过后前沿到 r06_chat_wire（1344+ 绿），native_current_app_pages 图片用例失败：渲染端发出的 prompt images=0。根因：T09 新路由 /lingxi/v1/chat/models（client_context）在模型元数据未声明 input 数组时兜底合成 [\"text\"]，渲染端据显式数组判定纯文本模型、图片降级为文件发送。夹具/发送链未变，属产品回归（目录投影与发送闸事实源不一致）。"
+    },
+    {
+      "label": "t10-chatwire-capsule-probe1",
+      "exitCode": 101,
+      "note": "定点复跑同败（低负载），排除负载抖动；debug1/2（临时夹具快照，已还原）确认发送帧 images=0、服务端回显 hasImages=false。"
+    },
+    {
+      "label": "t10-chatwire-input-fix1",
+      "exitCode": 0,
+      "note": "真修（产品回归）：client_context::model_summary 的 input 兜底由恒定 [\"text\"] 改为与发送闸同一事实源——capabilities.image_input==Some(true) 时如实追加 \"image\"；元数据显式 input 仍优先。定点复跑 1/1 通过；T09 断言（input 含 text）不受影响；协议结构未动。"
+    },
+    {
+      "label": "t10-service-regression20",
+      "exitCode": 101,
+      "note": "chat_wire 修复生效并越过；新前沿 r06_directory_picker：测试要求已保留的原生构建缓存（LINGXI_SKILLS_NATIVE_TARGET，R06 生产者环境合同的一部分），我的回归环境块漏供。机器上默认路径 ~/.cache/lingxi-r06-builds 已不存在，但 desktop/src-tauri/target（2.2G，含 directory_picker_host 预建产物）即为保留缓存。定性：环境供给缺口（同 f03/w09 类），补供变量。"
+    },
+    {
+      "label": "t10-service-regression21",
+      "exitCode": 101,
+      "note": "缓存供给生效，内层 Tauri 测试真实编译并运行；失败于原生目录对话框等待：choose-ready/cancel-ready 阶段文件只供真实系统操作协调（R06 评审原话），选目录/取消需解锁屏幕的真实操作者。定性：环境受阻（GUI 操作者类，锁屏），与既有 2 焦点用例同类，回归22 起跳过并登记 BLOCKED，不代领通过。"
+    },
+    {
+      "label": "t10-service-regression22",
+      "exitCode": 101,
+      "note": "新前沿 r06_agent_settings_live：persona 一成功一失败断言复现失败（回归16 同款，该轮决策为「同点复现升级」）。根因是夹具 2 秒定窗口轮询网络台账，全量运行节奏下两个 PUT 可能尚未同时入账；同文件其余等待均为 20 秒 until。"
+    },
+    {
+      "label": "t10-settings-persona-probe1",
+      "exitCode": 0,
+      "note": "低负载定点 1/1 通过（回归16 同型复证），坐实节奏敏感而非语义断裂。"
+    },
+    {
+      "label": "t10-settings-persona-fix1",
+      "exitCode": 0,
+      "note": "夹具修复（真修-夹具缺陷）：2 秒单条件轮询放宽为 20 秒双条件轮询，断言语句逐字不变（仍要求 identity PUT 200 且 agents-md PUT 500）。全套件复验运行中。结果：persona 用例转绿；套件内仅 2 个失败恰为已登记受阻焦点用例（本定点验证未带跳过参数，属预期呈现，与全量回归跳过清单一致）。"
+    },
+    {
+      "label": "t10-service-regression23",
+      "exitCode": 101,
+      "note": "82 套件绿后前沿 r06_dream_completion：mixed_config_failure 用例断言旧语义（400 后全局 locale 仍落盘）。未提交工作已把 PUT 改为「所有纯校验先于第一笔写入」（代码注释明示意图：损坏补丁不得留半笔写入；git show HEAD 对照确认次序倒置）。定性：契约更新——有意的先校验后写入加固，断言随之翻转。"
+    },
+    {
+      "label": "t10-dream-mixed-fix1",
+      "exitCode": 0,
+      "note": "断言翻转为先校验后写入语义并改名 mixed_config_failure_writes_nothing_and_retains_agent_toggle_state（仅自身定义处引用该名）：400 照断；config.yaml 原样照断；preferences.json 不得含 locale=ja（或不存在）；GET locale!=ja、memory.enabled=true、tickerPaused=false 照断。全套件复验运行中。注意：这是用户可见语义变化（混合表单含非法字段时合法字段不再保存），将写入最终报告醒目位置。 结果：全套件 18/18 通过。"
+    },
+    {
+      "label": "t10-service-regression24",
+      "exitCode": 101,
+      "note": "86 套件绿后前沿 r06_experiments_completion：原生实验页「原生驱动未就绪」——测试把已删除的默认缓存路径硬编码给内层 Tauri 构建（R06_EXPERIMENT_NATIVE_TARGET），冷目录全量编译超出就绪窗口。同文件族另有 interactive 一处同款硬编码。定性：环境合同对齐（同 directory_picker 类）。"
+    },
+    {
+      "label": "t10-experiments-target-fix1",
+      "exitCode": 0,
+      "note": "experiments 与 interactive 两处改为 LINGXI_SKILLS_NATIVE_TARGET 环境合同优先、原硬编码默认仅作回退，并补「不创建新 target」断言（与 directory_picker 同款）。定点复验运行中。 结果：全套件 5/5 通过（锁屏下 Tauri 窗口 WebDriver 用例正常，佐证仅真原生对话框类受阻）。"
+    },
+    {
+      "label": "t10-service-regression25",
+      "exitCode": null,
+      "note": "运行中被手动终止（任务 killed），非代码失败；部分日志保留，不产生通过/失败结论。"
+    },
+    {
+      "label": "t10-service-regression26",
+      "exitCode": 101,
+      "note": "92 套件绿后前沿 r06_memory_ticker_completion：unconfigured 用例 lastError 不再含 dream_model_unconfigured。dream_service 未提交 diff 引入 memory 槽→chat 回退（注释援引现役 auxiliary-slots.ts:92-97 / agent.ts:472-476，属有意对齐现役）；该夹具「unconfigured」只删 memory 槽、chat 仍在——回退后不再未配置。插桩取实际 lastError 中（标签 t10-dream-fallback-debug1，随后还原）。"
+    },
+    {
+      "label": "t10-dream-fallback-fix1",
+      "exitCode": 0,
+      "note": "契约更新坐实并修复：插桩显示实际错误为「expected value at line 1 column 1」（回退 chat 后对替身发起真实调用撞上非 JSON 响应），证明回退真实生效。夹具 unconfigured 场景改为 memory+chat 两槽皆空，全部断言（响亮错误码、503、无调用、无费用、model=null）原样保留。全套件 13/13 通过。插桩已还原。"
+    },
+    {
+      "label": "t10-service-regression27",
+      "exitCode": 101,
+      "note": "93 套件绿后前沿 r06_memory_tool_completion：ex06 用例 semantic 期望 skipped_no_coverage 实得 unavailable_unresolvable（嵌入梯级某环失败）。memory/memorytools/knowledge 服务侧对 HEAD 零 diff，最近绿灯 10-15；先定点复跑区分抖动与真断（标签 t10-ex06-semantic-probe1）。"
+    },
+    {
+      "label": "t10-ex06-catalog-fix1",
+      "exitCode": 0,
+      "note": "插桩坐实断点：网关显式选择拒 a/model-a、b/model-b（「未知目录模型即显式未配置，绝不静默回退」——R07 网关重写的有意收紧；自动入册只覆盖无 models 清单供应商的已绑定路由）。修复：夹具在供应商 models 清单显式声明两个助手选定嵌入模型（operations 风格；memory 层 known 校验仍走独立 provider-catalog.json，双风格保留）。全套件复验运行中。插桩已还原。 结果：全套件 12/12 通过。"
+    },
+    {
+      "label": "t10-service-regression28",
+      "exitCode": 101,
+      "note": "96 套件绿后前沿 r06_native_resource_completion：断言「禁止在仓库中堆积构建副本」——该套件的目标目录推导（CARGO_TARGET_DIR 父级+tauri-resources）落在仓库内。同时查明 ~/.cache/lingxi-r06-builds/tauri-resources 实为回归24 experiments 失败时内层构建的孤儿产物（2.1G 依赖缓存，仓库外）。定性：环境供给——补供 LINGXI_TAURI_PROOF_TARGET 指向该仓库外缓存。"
+    },
+    {
+      "label": "t10-native-resource-probe1",
+      "exitCode": 101,
+      "note": "缓存复用成功（内层 6.5 秒完成编译），WebDriver 两子项通过；失败于系统废纸篓环节：测试写出阶段文件后等外部真实 Finder 操作者回执（240 秒窗口），锁屏无操作者超时。定性：环境受阻（GUI 操作者类）。"
+    },
+    {
+      "label": "t10-service-regression29",
+      "exitCode": 101,
+      "note": "带 5 项受阻跳过全量复证；运行中。",
+      "result": "99 套件绿后前沿 r06_original_knowledge_proofs：original_manage_refusals 首段断言 execute 500+session_file_reference_not_owned:relative.md，实际 200（run completed.with_final）。定案：契约更新——工作区 session_files.rs 有意收窄引用认领面（模型参数与工具回显不再视为附件授权，未归属身份只不登记引用；普通附件入口的严格归属校验由 r07_browser_tools.rs 保留面继续锁定）。拒绝改由导入安全闸在工具执行内完成（KNOWLEDGE_IMPORT_PATH_INVALID），零知识副作用不变。"
+    },
+    {
+      "label": "t10-manage-refusal-probe1",
+      "exitCode": 101,
+      "result": "定点复跑 original_manage_refusals：复现 200≠500（与回归29 同点，非抖动）。"
+    },
+    {
+      "label": "t10-manage-refusal-debug1",
+      "exitCode": 101,
+      "result": "插桩取证：execute 200、run=completed|completed.with_final、脚本未被完全消费——归属拒绝从未触发。沿 sync 链路定位：HEAD 在 tool_call_completed/模型档案提交处对未归属 filePath 硬拒（session_file_reference_not_owned），工作区 R07 收窄为 model_candidates 跳过。取证后插桩已还原（文件回到 HEAD）。"
+    },
+    {
+      "label": "t10-manage-refusal-fix1",
+      "exitCode": 0,
+      "result": "契约更新落位：首段断言改为 execute 200 + 工具结果含 KNOWLEDGE_IMPORT_PATH_INVALID，零知识副作用断言逐字保留。单用例 1/1 绿。"
+    },
+    {
+      "label": "t10-original-knowledge-suite1",
+      "exitCode": 0,
+      "result": "契约更新后整套件复跑：26/26 绿（兄弟用例含授权管理、交互审批、只读拒绝全数保留）。"
+    },
+    {
+      "label": "t10-service-regression30",
+      "exitCode": 101,
+      "result": "101 套件绿（含修复后 original_knowledge_proofs 26/26、memory_skill 25/25）后前沿 r06_original_persona_proofs：套件硬断言 LINGXI_PRODUCT_DIR==$TMPDIR父级/persona-product，与全量回归供给的 lib 冲突。非代码缺陷——该套件本会话从未跑到（reg1-29 未抵达），环境合同互不兼容。处置：全量回归按名跳过该套件两例（名字经全仓库核实唯一），persona 以专属环境单独取证（t10-persona-suite1），不计入受阻清单。"
+    },
+    {
+      "label": "t10-persona-suite1",
+      "exitCode": 101,
+      "result": "首次直跑失败：证据工具 run_development.py 第22行把 LINGXI_PRODUCT_DIR 硬钉为 ROOT/lib 覆盖外层供给，套件仍读到 lib。非产品缺陷。"
+    },
+    {
+      "label": "t10-persona-suite2",
+      "exitCode": 0,
+      "result": "命令内 env 覆盖 LINGXI_PRODUCT_DIR=$TMPDIR父级/persona-product 后 2/2 绿；sourceUnchanged=true。"
+    },
+    {
+      "label": "t10-service-regression31",
+      "exitCode": 101,
+      "result": "117 套件绿后前沿 r06_session_map_browser_completion 两例：①map 例因渲染端模型目录已迁 /lingxi/v1/chat/models（R07-T09 客户端上下文面），夹具仍断 /lingxi/v1/models——契约更新，夹具断言已修；②browser 例的测试对象（桌面 Electron 浏览器宿主 WS 恢复）被工作区有意退役（main.cjs 禁止原生后端注册旧执行宿主，T04 原生 Chromium 设计），对应叶 R00-T02-LA-FBDEEDAC0B11 早已 defer 至 R08 桌面域——退役属治理决策，待用户定夺。"
+    },
+    {
+      "label": "t10-session-map-fix1",
+      "exitCode": 101,
+      "result": "地图夹具第一处契约更新（/lingxi/v1/models→/lingxi/v1/chat/models）生效但暴露第二处：会话文件面已迁 /lingxi/v1/desk/files（desk-actions.ts），夹具仍断 workspace-files。"
+    },
+    {
+      "label": "t10-session-map-fix2",
+      "exitCode": 0,
+      "result": "两处端点断言更新后 1/1 绿（真实服务+真实 Electron 地图窗口，32.8s）；sourceUnchanged=true。"
+    },
+    {
+      "label": "t10-service-regression32",
+      "exitCode": 101,
+      "result": "143 套件绿后前沿 r06_t08_behavior_eval 两例（be02/be07）：常驻工具面已由 7 扩为 18（工作区在 automation_patrol/conversation_tools/web_tools/settings_tools/automation_tools/browser_tools/phone_tools 各注册点经 add_model_resident 提升受信内置工具，HEAD 全部为 0 处调用，R07 有意扩面；知识与记忆两族仍未常驻）。断言「线上声明==RESIDENT_NAMES(7)」「轮轮计数==8」随之失效——契约更新：断言收窄回原意图（两族具名清单排除/恰一激活），保护语义不变。"
+    },
+    {
+      "label": "t10-t08-resident-fix1",
+      "exitCode": 1,
+      "result": "证据工具侧误用：cargo test 只收一个位置过滤词，多过滤词须放 -- 之后；未进入测试，不产生结论。"
+    },
+    {
+      "label": "t10-t08-resident-fix2",
+      "exitCode": 0,
+      "result": "be02/be07 契约更新后 2/2 绿；sourceUnchanged=true。"
+    },
+    {
+      "label": "t10-t08-suite1",
+      "exitCode": 0,
+      "result": "T08 整套件 13/13 绿（契约更新未影响兄弟 11 例）；sourceUnchanged=true。"
+    },
+    {
+      "label": "t10-service-regression33",
+      "exitCode": 101,
+      "result": "回归33：208 套件推进后首个失败即停，断点 run_lifecycle::r03_a01_three_model_calls_produce_exactly_one_task_terminal（持久事件链实际 12 条 vs 期望 11，多出 tool_result_model_projection）。定性契约更新：runs.rs 重构使直注执行器路径也统一归档模型投影（注释明示『历史恢复必须消费此记录』为有意设计），发射代码与 HEAD 无异；R06 验收证据（T04/06_workspace_regression/full_workspace.txt、T06-REVIEW-02/r2b_targeted.txt）证实该用例曾绿。208 套件全绿。logSha256=c8f5741ead73d448…，sourceUnchanged=true。"
+    },
+    {
+      "label": "t10-runlifecycle-fix1",
+      "exitCode": 0,
+      "result": "run_lifecycle 契约更新后整套件 12/12 绿：期望事件链插入 tool_result_model_projection、live frames 断言 11→12；sourceUnchanged=true。"
+    },
+    {
+      "label": "t10-service-regression34",
+      "exitCode": 0,
+      "result": "回归34 全绿：219 个测试二进制、2363 项测试全过、0 失败（8 项跳过：5 环境受阻+2 persona 专属环境另证+1 用户裁决退役）。前沿修复全部复证：管理拒绝契约更新、persona 环境合同、会话地图双端点、T08 常驻面 7→18、run_lifecycle 模型投影事件链。47 分钟，logSha256=f345b265fea1aff6…，sourceUnchanged=true。服务侧全量候选验证通过。"
+    },
+    {
+      "label": "t11-dev-unload1",
+      "exitCode": 101,
+      "result": "T11 套件首轮：编译失败——暂存测试把 ToolTargetId::parse 当可错调用（.expect），实际签名是不失败构造（r04 现役用法证实）。定性暂存测试缺陷，修 true 根因后复跑（unload2）。原始回执与日志原样保留。"
+    },
+    {
+      "label": "t11-dev-unload2",
+      "exitCode": 101,
+      "result": "T11 套件二轮：编译过、运行 0/3。三处暂存测试语义假设与现行服务不符——①远端凭证打未注册 /api/* 由鉴权层 403（local_owner_required，鉴权先于路由）而非 404；②③显式助手必须真实存在（R07 网关目录收紧），agent/lingxi 未登记。均为测试夹具缺陷（产品行为反而是更严的正确分层），按 r06_chat_wire/r07_t08_mcp_settings 已证夹具形状修正后复跑 unload3。原始回执保留。"
+    },
+    {
+      "label": "t11-dev-unload3",
+      "exitCode": 0,
+      "result": "T11 套件 3/3 绿（开发入口矩阵三身份响亮拒绝、热卸载旧句柄失效、扩展边界保留）：夹具修正后复证，sourceUnchanged=true，logSha256=ec37ac3cb949d8e6…。"
+    },
+    {
+      "label": "t12-xtask-units1",
+      "exitCode": 0,
+      "result": "T12 runner 改造（specMirror/扩展边界/移交三段解析+基础集合核对+合同核心提取+later_stages_of 语义修正+overall 扩展）后 xtask 自身 124/124 绿——R02—R06 地图解析与 runner_tests 行为不变；sourceUnchanged=true。"
+    },
+    {
+      "label": "t12-xtask-units2",
+      "exitCode": 0,
+      "result": "R07.json/R07_INPUTS.json 生成并内嵌后复跑 124/124 绿：embedded 全地图解析测试覆盖 R07（24 基础场景+408 叶+2 扩展+35/43 移交全部形状合法、commandRefs 全可解析）；sourceUnchanged=true。"
+    },
+    {
+      "label": "t12-closure1",
+      "exitCode": 101,
+      "result": "T12 闭卷首轮：A24 无旧内核闭环绿；A23 路由矩阵探针（320+ 次连发）触发对等限流 429（默认 240/窗）——夹具缺陷非产品缺陷，预算抬高后复跑 closure2。原始回执保留。"
+    },
+    {
+      "label": "t12-closure2",
+      "exitCode": 0,
+      "result": "T12 闭卷 2/2 绿：A23 全表路由矩阵（每条注册路由真实可达且受鉴权把守、限流预算抬升后不再误触）、A24 无旧内核纯 Rust 闭环（会话→真实执行→用量落账→观测可查，唯一出站为替身供应商）；sourceUnchanged=true，logSha256=1ef19061d5760899…。"
+    },
+    {
+      "label": "t10-service-regression35",
+      "exitCode": 101,
+      "result": "回归35（含 T11/T12 增量）：175 个二进制推进后断点 r07_phone_runtime::actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt——等待投递沉降超时，宿主 lastError='Agent phone is disabled'。该用例有 T05 记录在案的时序敏感史（t05a 一次失败同源码三次通过），且回归34 刚绿。原始回执保留。"
+    },
+    {
+      "label": "t10-phone-flake-check1",
+      "exitCode": 0,
+      "result": "时序复跑 1/3 绿（同源码单测 --exact）。"
+    },
+    {
+      "label": "t10-phone-flake-check2",
+      "exitCode": 0,
+      "result": "时序复跑 2/3 绿。"
+    },
+    {
+      "label": "t10-phone-flake-check3",
+      "exitCode": 0,
+      "result": "时序复跑 3/3 绿。三连胜与 T05 历史形态一致，定性时序敏感 flake（投递沉降等待窗），非 T11/T12 增量引入——T11 仅在启动链加只读目录探测+日志，与手机调度无交互。"
+    },
+    {
+      "label": "t10-service-regression36",
+      "exitCode": 0,
+      "result": "回归36 全绿：220 个测试二进制（含新增 r07_t11/r07_t12）、2368 项全过、0 失败、约 49 分钟，sourceUnchanged=true，logSha256=1f5e2e35615b7fb1…。T11/T12 增量后的全量候选复证通过；回归35 断点为时序 flake 的结论坐实。"
+    },
+    {
+      "label": "verify-r07-1",
+      "exitCode": 1,
+      "result": "verify-stage R07 首轮：22/24 基础场景、2 扩展 PASS，408 叶 BLOCKED；r07_git_panel 7 例失败——生产者把套件运行时放仓库内，git 发现爬升把宿主仓库误判为夹具工作区（非产品缺陷）。修生产者（运行时移 /private/tmp）后单套件复证绿。结果 JSON 与套件日志原样保留（RUNTIME 划痕因符号链接阻碍候选指纹已清除）。"
+    },
+    {
+      "label": "verify-r07-2",
+      "exitCode": 1,
+      "result": "verify-stage R07 正式形状达成（设计态诚实 FAIL）：24/24 基础场景 PASS、2/2 扩展边界 PASS、408/408 补充叶 BLOCKED（required_behavior_pending，逐断言证据待立）、移交透镜 35/35+43/43 随叶 BLOCKED、53 命令全绿 commandsNotPassing=[]、候选逐命令快照无漂移、runner 身份绑定通过。overall FAIL 即「门禁已接通并真实消费义务、缺口即逐断言证据」的设计状态。结果：artifacts/rust-tauri/R07/T12/verify-r07-2/verify-stage-result.json。"
+    }
+  ],
+  "blockedEnvironmentCases": [
+    {
+      "case": "r06_directory_picker::original_system_directory_dialog_real_path_cancel_and_no_install",
+      "reason": "真实原生目录对话框需解锁屏幕与操作者（System Events 类协调）；锁屏持续。",
+      "resolution": "用户解锁屏幕并允许操作后单独复验。"
+    },
+    {
+      "case": "r06_native_resource_completion::current_native_resource_three_leaves_real_windows_and_os_trash",
+      "reason": "须真实 Finder 确认合成文件入系统废纸篓（外部操作者回执制）；锁屏持续。",
+      "resolution": "用户解锁屏幕并允许操作后单独复验。"
+    }
+  ],
+  "retiredByDesign": [
+    {
+      "test": "current_browser_host_restores_target_preserves_old_view_and_reports_disconnect",
+      "suite": "r06_session_map_browser_completion",
+      "decision": "RETIRED_BY_DESIGN（用户 2026-10-19 裁决）",
+      "rationale": "测试对象「桌面 Electron 浏览器宿主 WS 恢复」已被 R07 工作区有意移除：desktop/main.cjs 禁止原生后端注册旧执行宿主（原生服务直控 Chromium，T04 设计）；对应叶 R00-T02-LA-FBDEEDAC0B11 的焦点切换+浏览器恢复早已 defer 至 R08 桌面域。",
+      "replacementEvidence": "docs/rust-tauri/R07/T04_REPORT.md 原生浏览器冷恢复/显式恢复（r7-native-* 回执）",
+      "regressionHandling": "全量回归按名跳过；R08 桌面域重建时重立该叶的验收。"
+    }
+  ]
+}

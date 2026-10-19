@@ -1,0 +1,39 @@
+{
+  "candidate": "t07d",
+  "scope": "TARGETED_REGRESSION_NOT_FINAL_R07",
+  "plan": "TARGETED_GATE_PLAN_t07d.json",
+  "planSha256": "58b5156b1b3b4036fab3449b3689413bd7cb0f3c6ca6360848f4f15cd2f8a04c",
+  "results": {
+    "fmt": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t07d-fmt.json"
+    },
+    "clippy": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t07d-clippy.json"
+    },
+    "adapter": {
+      "wrapperExitCode": 101,
+      "productCommandExecuted": true,
+      "receipt": "t07d-adapter.json"
+    },
+    "affected-service": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t07d-affected-service.json"
+    },
+    "browser-headless": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t07d-browser-headless.json"
+    },
+    "build": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t07d-build.json"
+    }
+  },
+  "fullStagePassClaimed": false
+}

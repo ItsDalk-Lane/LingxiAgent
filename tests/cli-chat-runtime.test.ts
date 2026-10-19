@@ -50,7 +50,7 @@ describe("CLI chat real WebSocket boundary", () => {
     if (!address || typeof address === "string") throw new Error("unexpected test listener address");
 
     const child = spawn(process.execPath, [
-      path.join(process.cwd(), "cli", "entry.ts"), "chat", "--plain",
+      path.join(process.cwd(), "cli", "entry.ts"), "chat", "--plain", "--runtime", "node",
       "--url", `http://127.0.0.1:${address.port}`, "--token", "synthetic-token", "--session", selectedPath,
     ], { cwd: process.cwd(), stdio: ["pipe", "pipe", "pipe"] });
     children.push(child);

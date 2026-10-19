@@ -1,0 +1,64 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (test "r07_t11_dev_entry_and_unload") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.64s
+     Running tests/r07_t11_dev_entry_and_unload.rs (rust/target-r07/debug/deps/r07_t11_dev_entry_and_unload-056b40ced83f6228)
+
+running 3 tests
+test r07_t11_dev_entry_matrix_rejects_every_caller ... FAILED
+test r07_t11_extension_boundaries_hold ... FAILED
+test r07_t11_unload_invalidates_pinned_handles ... FAILED
+
+failures:
+
+---- r07_t11_dev_entry_matrix_rejects_every_caller stdout ----
+LINGXI_AUTH_REJECTED request_id="req-5c1c22426b60b95f00dad23548ebf8e1" method=POST path=/api/plugins/dev status=401 Unauthorized reason=missing_credential remote=127.0.0.1:62104
+LINGXI_AUTH_REJECTED request_id="req-d87da9985c862f407725c195f52f944f" method=POST path=/api/plugins/dev status=403 reason=local_owner_required remote=127.0.0.1:62105
+
+thread 'r07_t11_dev_entry_matrix_rejects_every_caller' (6853019) panicked at crates/lingxi-service/tests/r07_t11_dev_entry_and_unload.rs:193:9:
+assertion `left == right` failed: remote client hits no dev entry: /api/plugins/dev
+  left: 403
+ right: 404
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- r07_t11_extension_boundaries_hold stdout ----
+
+thread 'r07_t11_extension_boundaries_hold' (6853164) panicked at crates/lingxi-service/tests/r07_t11_dev_entry_and_unload.rs:385:5:
+assertion `left == right` failed: slash dispatcher exists: {"error":"agent not found or unsafe configuration path: lingxi"}
+  left: 404
+ right: 200
+
+---- r07_t11_unload_invalidates_pinned_handles stdout ----
+
+thread 'r07_t11_unload_invalidates_pinned_handles' (6853170) panicked at crates/lingxi-service/tests/r07_t11_dev_entry_and_unload.rs:279:14:
+prepare before unload: ResourceScopeDenied { code: "review_scope_refused", message: "目标助手不存在" }
+
+
+failures:
+    r07_t11_dev_entry_matrix_rejects_every_caller
+    r07_t11_extension_boundaries_hold
+    r07_t11_unload_invalidates_pinned_handles
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.17s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t11_dev_entry_and_unload`

@@ -1,0 +1,555 @@
+{
+  "stage": "R07-T04",
+  "status": "DEVELOPMENT_NOT_FINAL_VERIFICATION",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceState": "开发中候选；各次运行前未统一冻结源码，不将这些局部结果当作最终候选门禁。保留实际失败；null退出码须后续从调用回执核对，不推测通过。",
+  "capturedAtUtc": "2026-10-15T22:06:42.434843+00:00",
+  "logs": [
+    {
+      "log": "logs/lingxi-r07-t04-browser-consume-r1.log",
+      "bytes": 1761,
+      "sha256": "ce255849bf62582700d696e43b83f5a16adad4acc3d0e18387bf0808c6ea9af8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:34:20.675300+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-browser-contract-r1.log",
+      "bytes": 229,
+      "sha256": "01fdc31b116c554e2ad5725991b2e841fa93ce659eaec9a188187611fc6f5498",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:48:31.325855+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-browser-contract-r2.log",
+      "bytes": 228,
+      "sha256": "22af7f473f959dc03f68b03f7d6568fcc19991e723e6085d1f086b6f3a0dc795",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:52:06.186683+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-browser-tools-r1.log",
+      "bytes": 743,
+      "sha256": "4d60cdd866fc365e3a3faed7dc4b35e9c68ca473e9e3e4ef03984aef46134fe7",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:40:27.408340+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-browser-web-tools-r2.log",
+      "bytes": 1838,
+      "sha256": "482a36797574a64aff169225510660d4d5e650b474dd6a8c1be50e4c121e5d0c",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:42:49.539356+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-chromium-r1.log",
+      "bytes": 4382,
+      "sha256": "9aba0e51083f6924809a91023f110a3016f77eed473d92f241e7fc6342b48369",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:37:51.497407+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-chromium-r4.log",
+      "bytes": 2091,
+      "sha256": "4173ad883bee98b1aef75073b8a63d3ab0c8ee882358b93a23fd9670053cd7d5",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:47:48.279688+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-chromium-r5.log",
+      "bytes": 2663,
+      "sha256": "eb33d594651d7d68d78dd4a9988cb2b782e4a2ab704ba9e5e2795c07f2914f27",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:52:52.431958+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-chromium-r6.log",
+      "bytes": 1708,
+      "sha256": "334331df45e9f4559767ab019024e00fb4909d0a71610ed9ba0591657f3efbc9",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:59:08.119574+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-chromium-target-r2.log",
+      "bytes": 1102,
+      "sha256": "12637202e9b71d645df009ee046753f4b9e435879f8c233c07f84e463e7ce2fe",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:44:09.510103+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-chromium-target-r3.log",
+      "bytes": 1847,
+      "sha256": "517f0d96c4863db920b1bf830989ad985f2b5eeb7a00eba1938d8a78d38afc14",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:46:11.725715+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-contract-generate-r1.log",
+      "bytes": 355,
+      "sha256": "80b842b2038f7101221bce68b13d66074730680f0803d9bd0a00330916797229",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:22:11.353233+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-contract-generate-r2.log",
+      "bytes": 375,
+      "sha256": "a24f24580e7b6049b1e3afa52bf1e94f6b586951a9e9482d1c72ce612b6b3ec6",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:51:02.091859+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-contract-r1.log",
+      "bytes": 564,
+      "sha256": "58e552068bf1236366f342123ab601fcc38c481e9f1b542bba9da85090464f8a",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:19:02.687935+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-conversation-consume-r1.log",
+      "bytes": 1434,
+      "sha256": "7a0f3d3854669846d517e3eacb17a920b5ca9d3c6e3bae1f4a6e56a8b85972d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:26:00.464764+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-conversation-consume-r2.log",
+      "bytes": 234,
+      "sha256": "73e2d8f8ab65c9a2e4e33f8993c5e659b1ba5180ee83f5b554864b6cce1ea477",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:26:27.176052+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-cookie-notice-local-r2.log",
+      "bytes": 236,
+      "sha256": "0894ed756b2b551637dc173bd24bd5090346f500d3d73396f71e2d47cc5be44e",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:04:40.819925+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-cookie-notice-r1.log",
+      "bytes": 36270,
+      "sha256": "2712483a013e48e8a1e851e2648b6b0de5209302b4aa3eabc066978467199ae5",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:02:32.742638+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-cookie-notice-r2.log",
+      "bytes": 236,
+      "sha256": "81bf387a7ea31be6a2507219c720a2b63b0a7d2a569c5024b6045f8c581968ef",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:02:46.816753+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-link-open-r1.log",
+      "bytes": 236,
+      "sha256": "8095cb36e1fb005bdbc600aac43ffcec5bf3174e7a218103ebf8d9d3f3623d88",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:53:44.917723+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-main-build-final.log",
+      "bytes": 377,
+      "sha256": "b235c39c34805c79c7461c31de3668a614a8dace7b43995b387561439e883813",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:32:22.498638+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-main-build.log",
+      "bytes": 371,
+      "sha256": "8af78a453e0b3b93f95c25fbeb91d041e4b774f66e0eaaf2c8df1083a5f20955",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:26:46.890174+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-preload-build.log",
+      "bytes": 266,
+      "sha256": "8d93146d161eb9f218c6f1be52eedf99515eee849ab1c623bc39418f5b08d00a",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:28:49.489534+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-protocol-r1.log",
+      "bytes": 4009,
+      "sha256": "64bf14208ce8de8c05f755689df778872c0796536d881892987e49ab2abfd97b",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:49:00.535548+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-roundtrip-r1.log",
+      "bytes": 767,
+      "sha256": "fe683013808faa9568b168469ded1c21cbecc2ba1b4f1f75a9ce42652d4e01be",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:45:19.434202+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-roundtrip-r2.log",
+      "bytes": 911,
+      "sha256": "ee2cb8b6d13c663f59eef2070f2cebd1f7c4b624b02e6b365f65cb5da34ca3b0",
+      "exitCode": 1,
+      "completedAtFileMtimeUtc": "2026-10-15T21:51:31.101106+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-roundtrip-r3.log",
+      "bytes": 767,
+      "sha256": "02a387fbf4388c405f81d95a73ae7fd7899cecf1e526df6d2c9fdc5c36f892bc",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:52:04.541516+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-roundtrip-verify-r1.log",
+      "bytes": 408,
+      "sha256": "6f8b93a9fe6530b03b184e627207d03bbc41f4d93ee1df54296b9e54e152ab66",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:57:49.613163+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-service-check-r1.log",
+      "bytes": 5337,
+      "sha256": "5967830ba9268aa8b0b22e17cf980fcf99471a3fcf2697603a64e0684cf1c24f",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:36:23.880693+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-service-check-r2.log",
+      "bytes": 184,
+      "sha256": "3bbae6c5f1ec321aad901d8e3d85fb0bc6cfba6e9daed41b66031bb768f7a8e2",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:38:47.131914+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-service-flows-r3.log",
+      "bytes": 1052,
+      "sha256": "18330422f252c3c144e2e55e34cf434914767798c060fe4722b5636aee8aed8b",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:49:45.928391+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-service-flows-r4.log",
+      "bytes": 1435,
+      "sha256": "0c518a9b7ed348c1be1579edec9c4a299700e0a83db47d33a8839c02c9da08a0",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:54:48.488278+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-service-flows-r5.log",
+      "bytes": 2023,
+      "sha256": "96e0be4abb6c182b750c140809ec4d646714e916ced6029d906cee6ac7625dcd",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:56:01.428581+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-snapshot-compat-r1.log",
+      "bytes": 236,
+      "sha256": "023dd0801ae0c8eed3929bf70d2bd751322a736b1ddcd0aad1ca2a6544c78b7e",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:39:35.661366+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-snapshot-http-r1.log",
+      "bytes": 236,
+      "sha256": "67e427d0400d5039c9e1410c9ef995a980eca4012c213d1f17122b0bfc617bd5",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:40:32.166113+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-storage-r1.log",
+      "bytes": 2579,
+      "sha256": "f61234b002be1a259d200e88fbd9b16a7a88c185fa7343906345dda14fa2bcc3",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:36:49.246527+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-storage-r2.log",
+      "bytes": 2264,
+      "sha256": "cf3bd664bded9dd041693180bc548d71fabf4f8db1105e83b072f3ef0e61efcb",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:37:27.588073+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-storage-r3.log",
+      "bytes": 1327,
+      "sha256": "8ed911df1e767264d0cb7ea8bd4dc50afeab50c50eddc496e7fe7ea35b3248ef",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:41:07.215595+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-storage-r4.log",
+      "bytes": 1728,
+      "sha256": "a4507e94b55013e84c1e9204b9ef340735e9a9fd51505b49608da31c69e5f082",
+      "exitCode": 0,
+      "completedAtFileMtimeUtc": "2026-10-15T21:45:23.019866+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-types-cookie-notice-final.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:02:53.986951+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-types-cookie-notice-local-final.log",
+      "bytes": 255,
+      "sha256": "79dcf09f421e882bb7d8ea1918db992c1c32a6ddf4035894e532f6de9a06517c",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:04:29.275399+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-types-cookie-notice-local-r2.log",
+      "bytes": 410,
+      "sha256": "528d50321b01ff6e63be9f8c72927f668c755bf7194b702d8b1d24efa9067859",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:04:46.967874+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-types-cookie-notice-local-r3.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:05:20.300190+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-types-link-relay-r1.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:54:25.961097+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-types-link-relay-r2.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:57:41.791903+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-combined-r1.log",
+      "bytes": 241,
+      "sha256": "6a4258d6fe65a85cd8918b49bd5c34a4b86099e4f99da2c195c03fec3ddf866c",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:23:28.943676+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-combined-r2.log",
+      "bytes": 241,
+      "sha256": "22c126e398d23d9b1c198fb18161990c8f324bc6a9377d28373d798d7b5cdf2e",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:24:14.094553+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-consumers-final.log",
+      "bytes": 241,
+      "sha256": "6cfd89e4c7c887f20278fa33037998adc13935f5af252b27a6b66d06e534e9c9",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:35:18.480357+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-consumers-types.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:35:18.574500+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-cookie-notice-final.log",
+      "bytes": 241,
+      "sha256": "a739cd13a5b1a2774313bdcfea1e4f64cb50680f9329645700cc3329f5f2db51",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:02:57.246660+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-cookie-notice-local-final.log",
+      "bytes": 241,
+      "sha256": "e5744a140ede1c295fba17e410a5f3787c903c005cddbed9fa76295568e9fc6f",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:04:23.912518+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-cookie-notice-r2.log",
+      "bytes": 241,
+      "sha256": "f25c29c635d4bacd65c462148cd60ae5a3a06910041851b2facd7f37dbfca68e",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:05:00.090134+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-cookie-notice-r3.log",
+      "bytes": 241,
+      "sha256": "b61a6454839fd3856ec8feddd4a9d440342cf6849f149a84fba141b3679c63ba",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T22:05:23.772440+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-entry.log",
+      "bytes": 233,
+      "sha256": "7bac77e64f11da566865b975a757387af8951c97b751f2ea19eaba5600eb772f",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:32:18.596673+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-final-r1.log",
+      "bytes": 241,
+      "sha256": "5c3f01c4062056eb991fbc44a733f45fc9bc6cf9e2f45f88189f212b58f9ae47",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:27:23.969725+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-final-r2.log",
+      "bytes": 241,
+      "sha256": "e5d21046fafe7d2f52c4bea4e23e7b7d944c566918b77a783d31cbbb02ce1d78",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:28:51.883011+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-final-r3.log",
+      "bytes": 241,
+      "sha256": "106edbcb70e7df8554b689e5009d9fd63e9dd8b43976b0ca6c952ec704841da4",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:30:39.636742+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-final-r4.log",
+      "bytes": 241,
+      "sha256": "a791662bd5ba16e7ed48a19cc98e5e84e8d4f8d93b3e74f7e0823c7504dbc96e",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:31:56.743203+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-fulltypes-final-r2.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:30:39.729421+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-fulltypes-final-r3.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:31:56.837253+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-fulltypes-final.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:28:24.801559+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-fulltypes-r1.log",
+      "bytes": 645,
+      "sha256": "667715298b3d118b61a52724789db6fb9ad9ace6775f621797dbe1ca3b63a5be",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:22:22.403054+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-fulltypes-r2.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:23:02.872924+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-fulltypes-r3.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:26:27.268073+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-link-relay-r1.log",
+      "bytes": 241,
+      "sha256": "f227ae2151f7debf3081ae7ae17af124cbe6429e032809980b96427b7eda5be4",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:54:27.965601+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-link-relay-r2.log",
+      "bytes": 241,
+      "sha256": "58ecb89e731dff736412415d123a9a93a95455d5792766e69ae43397d125d8c2",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:57:45.208184+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-new-r1.log",
+      "bytes": 234,
+      "sha256": "d8571d160a9a1b7d11062c3c50da64bbdc7aac07355aa89f4ab731e5d1073bd3",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:21:10.729388+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-new-tests-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:33:44.858672+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-owner-final.log",
+      "bytes": 236,
+      "sha256": "33a13cca0f4ca4a5ece9d8ea05ba673e5bac53cf37f199c8794f03d67456b15d",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:29:38.800427+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-scope-r1.log",
+      "bytes": 233,
+      "sha256": "c0b89328ffc481823c760fa376c5eea515057ea614f4cbba44114760c0294ca4",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:22:42.608103+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-snapshot-final.log",
+      "bytes": 241,
+      "sha256": "e8e31140ab2a9cad569975b895d8022ab79dc1f8963554cb748d74be9561a0c0",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:40:55.975003+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-snapshot-types.log",
+      "bytes": 119,
+      "sha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:40:56.068172+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-tests-r1.log",
+      "bytes": 1185,
+      "sha256": "6b85fe254a4e8ca9bd041b5ff64ebc5c4472d966a448f355847987724d859d74",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:19:08.265037+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-tests-r2.log",
+      "bytes": 237,
+      "sha256": "0a9b1b3de5969e182a3dfb954a44b5a73fba191c0cb027f87493a12c8352ee2a",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:20:01.401882+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-types-r1.log",
+      "bytes": 448,
+      "sha256": "7355ea32151e591ec1ccb86e82718c2fcf964049f3add43d3bb7704fa20c60fa",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:18:04.239020+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-types-r2.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:20:01.420419+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-ui-types-r3.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": null,
+      "completedAtFileMtimeUtc": "2026-10-15T21:21:10.747373+00:00"
+    },
+    {
+      "log": "logs/lingxi-r07-t04-web-tools-r1.log",
+      "bytes": 2052,
+      "sha256": "be8658944a300213b2fd8d90ef7621da975b8130022bb1e5c52d23ff92f7aafd",
+      "exitCode": 101,
+      "completedAtFileMtimeUtc": "2026-10-15T21:40:03.426365+00:00"
+    }
+  ]
+}

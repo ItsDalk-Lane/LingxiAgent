@@ -1,0 +1,18 @@
+{
+  "candidate": "t08h",
+  "gate": "metadata-redaction-binary",
+  "wrapperSha256": "77a507461d37c22e82fcc9941e4860b462e28d67288421c1ee276fddf3490134",
+  "binary": "/private/tmp/lingxi-r07-build/debug/lingxi-service",
+  "binarySha256Before": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "binarySha256After": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+  "binaryUnchanged": true,
+  "buildReceipt": "t08h-build.json",
+  "buildReceiptSha256": "94fe5dc5b50f9c4a08e619633c7a5924bfff16fbf2352b1acb1a3fb8bda5c651",
+  "uiReceipt": "t08h-metadata-redaction-binary.json",
+  "uiReceiptSha256": "93c94504539427e2b05dcc242503b847f8a4044e2f26e4ac3a131da5fae0a080",
+  "sourceFingerprint": "f0dd4aa5092b31eb121c3977da8e65cbe2035ab3f4581b6c5898cf73f8da354e",
+  "startedAt": "2026-10-18T13:00:23.161505+00:00",
+  "endedAt": "2026-10-18T13:00:27.127128+00:00",
+  "wrapperExitCode": 0,
+  "scope": "fresh same-candidate build used by actual service UI test; build success does not imply other platforms or manual browser takeover"
+}

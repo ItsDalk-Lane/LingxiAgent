@@ -1,0 +1,32 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r06_agent_switch_completion.rs (rust/target-r07/debug/deps/r06_agent_switch_completion-8733323e5b538106)
+
+running 4 tests
+test no_model_switch_refuses_without_session_focus_or_config_side_effects ... ok
+test target_agent_model_runs_when_global_chat_route_is_absent ... ok
+test deleting_current_agent_commits_replacement_focus_before_original_deletion_and_recovers_cleanup ... ok
+test current_agent_switch_creates_owned_focus_session_and_next_run_uses_its_workspace ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.78s
+

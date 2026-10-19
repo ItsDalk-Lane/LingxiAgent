@@ -1,0 +1,79 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:24:46.519211+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08c",
+  "finalAcceptance": "pending",
+  "findingId": "T08-MODEL-NESTED-KNOWN-SECRET-READ-PROJECTION",
+  "status": "STATIC_CONFIRMED_RUNTIME_NOT_RUN",
+  "runtimeFailureReceipt": null,
+  "sourceHashes": [
+    {
+      "path": "rust/crates/lingxi-service/src/model_configuration.rs",
+      "sha256": "67c48e0e63e589c488854856159a001f68758e715cbdcd7913d8d41e20420de3"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/provider_routes.rs",
+      "sha256": "341518a260203e4b6101261b9c98986f1d70f6c0aabc92138af860fbe8d77962"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/agent_config_readback.rs",
+      "sha256": "646814e917535b074df08200047d95c309f4cdc60e81325a05499cfb65764b4c"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/settings_configuration.rs",
+      "sha256": "e34085e8f8c016d099a8b6d8432d68fc81d0bfda4be609d512a54850084512f7"
+    },
+    {
+      "path": "rust/crates/lingxi-adapters/src/models/config.rs",
+      "sha256": "75d0b15f5d0041b5b0083631578c562308628c62cbf3c8d0c10b366b61d534a9"
+    },
+    {
+      "path": "rust/crates/lingxi-service/src/provider_probe.rs",
+      "sha256": "c73574d344d8d489451330ebd01f6a08b5118d94e021af811a008ab431c5ce83"
+    }
+  ],
+  "allowedMetadataShape": {
+    "id": "m1",
+    "extension": {
+      "api_key": "synthetic-fixture-api-key",
+      "access_token": "synthetic-fixture-access-token"
+    },
+    "customField": {
+      "ordinaryCompatibility": "keep"
+    }
+  },
+  "acceptancePath": "Real settings/config ProviderPatch.models array or media add can preserve this shape through normalize_model, ModelPlane CatalogModel flatten metadata and top-level-only credential-field validation. Ordinary update_model HTTP drops top-level extension in normalize_model_patch whitelist, so do not use that route to claim Source rejection. Existing Source can also carry nested known keys.",
+  "readPaths": [
+    {
+      "surface": "ModelConfiguration.snapshot",
+      "finding": "provider_views(masked=true) inserts models unchanged; gateway catalog then overwrites models with raw serialized CatalogModel; final providers not recursively masked",
+      "api_key": "EXPOSED_STATIC_PATH",
+      "access_token": "EXPOSED_STATIC_PATH"
+    },
+    {
+      "surface": "providers/summary",
+      "finding": "summary_payload directly clones snapshot models with no final mask",
+      "api_key": "EXPOSED_STATIC_PATH",
+      "access_token": "EXPOSED_STATIC_PATH"
+    },
+    {
+      "surface": "settings/config and settings/export",
+      "finding": "Both final responses recursively call mask_object_secrets; exact SECRET_KEYS contains api_key but omits snake-case access_token (only accessToken)",
+      "api_key": "MASKED_BY_EXISTING_RECURSIVE_FINAL_MASK",
+      "access_token": "EXPOSED_STATIC_PATH"
+    }
+  ],
+  "necessaryMinimalFix": [
+    "Mask complete snapshot provider projection after gateway catalog overlay, retaining non-secret unknown fields",
+    "Extend exact existing known-secret vocabulary for snake-case access_token/refresh_token consistent with model credential prohibition; do not guess arbitrary text secrets",
+    "Optionally make existing model credential-field validation recursive to enforce write rule without removing ordinary extension/customField metadata; include already-existing Source read coverage"
+  ],
+  "requiredRealChecks": [
+    "Owner HTTP provider-model array save accepted or explicitly rejected according to intended rule",
+    "Read snapshot/summary/config/default export and assert exact known sentinel absent while ordinary unknown metadata remains",
+    "Read-only device settings scope cannot obtain nested sentinels",
+    "Bind any actual failure to source/command/exit evidence; none was run by this reviewer"
+  ],
+  "mutations": "Only this new evidence file; no source/test/gate changes and no Cargo/GUI/network execution"
+}

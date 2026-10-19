@@ -441,8 +441,17 @@ impl Provider {
             lingxi_kernel::ports::ProviderTurn::ToolRequests {
                 content: Vec::new(),
                 requests: vec![lingxi_kernel::ports::ToolRequest::from_effective_arguments(
-                    "tool:first-party:install_skill",
-                    Fixture::arg(),
+                    "tool:first-party:mcp_describe_tool",
+                    serde_json::json!({"name":"install_skill"}),
+                    &SchemaBudget::default(),
+                )
+                .unwrap()],
+            },
+            lingxi_kernel::ports::ProviderTurn::ToolRequests {
+                content: Vec::new(),
+                requests: vec![lingxi_kernel::ports::ToolRequest::from_effective_arguments(
+                    "tool:first-party:mcp_call",
+                    serde_json::json!({"tool":"install_skill","arguments":Fixture::arg()}),
                     &SchemaBudget::default(),
                 )
                 .unwrap()],
@@ -515,6 +524,8 @@ async fn github_registered_real_driver_requires_review_rejects_readonly_and_neve
         clock,
         &SchemaBudget::default(),
     );
+    // 此验证使用完整目录流程，宿主注入工具面时也必须显式登记目录。
+    crate::toolcatalog_bridge::register(&registry, &gateway, &SchemaBudget::default());
     let provider = Arc::new(Provider::default());
     let layout = crate::prepare_layout(&f.home).unwrap();
     let state = crate::ServiceState::bootstrap_with_deps(

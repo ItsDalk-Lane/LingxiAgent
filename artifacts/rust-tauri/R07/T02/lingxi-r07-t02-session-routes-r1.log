@@ -1,0 +1,39 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.44s
+     Running tests/r07_bridge_session_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_session_routes-d3e88fe48174c241)
+
+running 3 tests
+test manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact ... FAILED
+test history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context ... FAILED
+test manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents ... FAILED
+
+failures:
+
+---- manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact stdout ----
+
+thread 'manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact' (413830) panicked at crates/lingxi-service/tests/r07_bridge_session_routes.rs:162:14:
+called `Result::unwrap()` on an `Err` value: UnsupportedMedia("text/plain")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context stdout ----
+
+thread 'history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context' (413828) panicked at crates/lingxi-service/tests/r07_bridge_session_routes.rs:323:10:
+called `Result::unwrap()` on an `Err` value: UnsupportedMedia("text/plain")
+
+---- manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents stdout ----
+
+thread 'manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents' (413829) panicked at crates/lingxi-service/tests/r07_bridge_session_routes.rs:162:14:
+called `Result::unwrap()` on an `Err` value: UnsupportedMedia("text/plain")
+
+
+failures:
+    history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context
+    manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents
+    manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_bridge_session_routes`

@@ -1,0 +1,70 @@
+{
+  "createdAt": "2026-10-18T12:41:19.480796+00:00",
+  "scope": "g失败后局部修正开发复验；不是后继固定候选或最终R07接受",
+  "gResultsUnchangedSha256": "7f3c7ee52f356a1b3a87314b4370366e254100ae4d94c823920287c13146974e",
+  "changedFromGArchiveOrUnchangedBase": [
+    "desktop/src/react/__tests__/settings/AccessTab.test.tsx",
+    "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+    "rust/crates/lingxi-service/tests/r07_t08_interface_preferences.rs"
+  ],
+  "records": [
+    {
+      "name": "interface-corrupt-startup-fixed1",
+      "receipt": "artifacts/rust-tauri/R07/T08/interface-corrupt-startup-fixed1.json",
+      "receiptSha256": "6b053e11a4ab89e0c0ce73457883c5353c14e8344c5154128f6b1c6d796bbdd8",
+      "exitCode": 0,
+      "sourceFingerprint": "7afc1a6eec6f995970470ac30daa03007fa3c9c3bc516e82e6f31a34af4847b0",
+      "logSha256": "e71e4417c38d61c21a112fdbe003901d5086aac84c7bee7122f60320d1b2d053"
+    },
+    {
+      "name": "desktop-scope-expectation-fixed1",
+      "receipt": "artifacts/rust-tauri/R07/T08/desktop-scope-expectation-fixed1.json",
+      "receiptSha256": "d20dd0016c834f3f67c354989c36fdddfd99ea1d37dbea31213624af0558bfd9",
+      "exitCode": 0,
+      "sourceFingerprint": "7afc1a6eec6f995970470ac30daa03007fa3c9c3bc516e82e6f31a34af4847b0",
+      "logSha256": "c955dd2f6ae232a343386a1712d60aea3028358cb98f0b6cf2d824df0611f516"
+    },
+    {
+      "name": "native-drag-prerequisites-fixed1",
+      "receipt": "artifacts/rust-tauri/R07/T08/native-drag-prerequisites-fixed1.json",
+      "receiptSha256": "3ee80a05b51ae7c9d3cdf8346b9d643aa031c7b1f2f07ef412ebed7a59f70ab7",
+      "exitCode": 0,
+      "sourceFingerprint": "4e8f501786568fe32287315c72d24c5320ea72f9f878d9a4c2670e3f89846352",
+      "logSha256": "86a34246f197aad0165d7db46690ff94290993d721a7291331e585a77923ae68"
+    },
+    {
+      "name": "post-g-test-fix-clippy1",
+      "receipt": "artifacts/rust-tauri/R07/T08/post-g-test-fix-clippy1.json",
+      "receiptSha256": "f91a86f757ea8741cb0efa65479ce360073e136f79cd6ec5d0a3be692f7be11b",
+      "exitCode": 0,
+      "sourceFingerprint": "4e8f501786568fe32287315c72d24c5320ea72f9f878d9a4c2670e3f89846352",
+      "logSha256": "7a34514846b3b2607f5dbc95f48d9d5a2dea6e25a51b6f6d82f39ccf95a59fea"
+    },
+    {
+      "name": "post-g-test-fix-format1",
+      "receipt": "artifacts/rust-tauri/R07/T08/post-g-test-fix-format1.json",
+      "receiptSha256": "af9999284e436fc0de5dfbfba3524713942a611c6f73dc041260b5e6ef8cdefb",
+      "exitCode": 0,
+      "sourceFingerprint": "4e8f501786568fe32287315c72d24c5320ea72f9f878d9a4c2670e3f89846352",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "lan-management-after-layer-positive1",
+      "receipt": "artifacts/rust-tauri/R07/T08/lan-management-after-layer-positive1.json",
+      "receiptSha256": "772a20e31c6606d5096cbfc688c7a8d0df5861f7bb38e4dfba4d828f9f2bba17",
+      "exitCode": 0,
+      "sourceFingerprint": "4e8f501786568fe32287315c72d24c5320ea72f9f878d9a4c2670e3f89846352",
+      "logSha256": "3b0b95c130b89f39bf96538e6145efd80526b7fbb9e64458791c288ef2318a9f"
+    }
+  ],
+  "verifiedCaseCounts": {
+    "nativeSettings": 14,
+    "interfacePreferences": 4,
+    "accessTab": 10,
+    "originalManagementIncludingLan": 1
+  },
+  "lanInterpretation": "g2新层诊断正例后，原r00整个未改测试后续完整通过；旧20秒0bytes失败保留，未证明原因或根治，不改系统设置",
+  "evidencePreparationFailureRetained": "第一版摘要内存检查仅遍历g归档清单，未计Access原与base相同而此次新修改的路径，exact changed set断言失败，未写任何成果文件；本次按现runner全部source_paths及g archive/base校验，原g与旧记录无修改。此为证据准备错误，不是产品检查失败。",
+  "t08AcceptanceClaimed": false,
+  "historicalFailuresRewritten": false
+}

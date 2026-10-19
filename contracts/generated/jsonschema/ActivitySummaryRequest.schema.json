@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "id 缺失保留现役业务错误响应；不将旧的 HTTP 200 错误改成解析错误。",
+  "properties": {
+    "id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "title": "ActivitySummaryRequest",
+  "type": "object"
+}

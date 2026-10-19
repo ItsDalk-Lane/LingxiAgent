@@ -93,7 +93,8 @@ use lingxi_protocol::ToolCallId;
 use crate::approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
 use crate::inject::ServiceClock;
 use crate::toolgateway::{
-    InvocationPermissionContext, PolicyAdjudicationInput, PolicyVerdict, ToolPolicyPort,
+    InvocationPermissionContext, InvocationPolicyMaterial, PolicyAdjudicationInput, PolicyVerdict,
+    ToolPolicyPort,
 };
 
 /// The incumbent's structured refusal code for "approval is required but
@@ -166,6 +167,13 @@ pub fn resolve_approval_policy(context: &InvocationPermissionContext) -> Approva
             // deny_on_prompt — the SUP-01 semantics.
             ApprovalPolicy::DenyOnPrompt
         }
+        InvocationPermissionContext::Automation { mode } => match mode {
+            SessionPermissionMode::Operate => ApprovalPolicy::Never,
+            SessionPermissionMode::Ask | SessionPermissionMode::ReadOnly => {
+                ApprovalPolicy::DenyOnPrompt
+            }
+        },
+        InvocationPermissionContext::Bridge { .. } => ApprovalPolicy::DenyOnPrompt,
     }
 }
 
@@ -394,6 +402,18 @@ impl ApprovalService {
     // lands on the kernel's refusal before anything is dispatched.
     pub fn adjudicate(&self, input: &PolicyAdjudicationInput) -> PolicyVerdict {
         use lingxi_kernel::toolcatalog::PermissionKind;
+        if matches!(
+            input.permission_context,
+            InvocationPermissionContext::Bridge { .. }
+        ) {
+            return crate::toolgateway::bridge_policy(input);
+        }
+        if matches!(
+            input.permission_context,
+            InvocationPermissionContext::Automation { .. }
+        ) {
+            return crate::automation_permission::adjudicate(input, None);
+        }
         if input.permission_kind == PermissionKind::Review {
             return match input.permission_context {
                 InvocationPermissionContext::UserSession {
@@ -411,6 +431,10 @@ impl ApprovalService {
                     layer: "approval_policy".into(),
                     message: "unattended subagents cannot confirm this destructive scope".into(),
                 },
+                InvocationPermissionContext::Automation { .. }
+                | InvocationPermissionContext::Bridge { .. } => unreachable!(
+                    "automation verdict is resolved before the interactive approval branch"
+                ),
             };
         }
         match input.permission_context {
@@ -491,6 +515,30 @@ impl ApprovalService {
                     }
                 }
             }
+            InvocationPermissionContext::Automation { .. }
+            | InvocationPermissionContext::Bridge { .. } => unreachable!(
+                "automation verdict is resolved before the interactive approval branch"
+            ),
+        }
+    }
+
+    /// 后台分类消费网关提供的真实动作；异步审核及其单次授权仍由统一网关接续。
+    pub fn adjudicate_invocation(
+        &self,
+        input: &PolicyAdjudicationInput,
+        material: &InvocationPolicyMaterial,
+    ) -> PolicyVerdict {
+        if matches!(
+            input.permission_context,
+            InvocationPermissionContext::Automation { .. }
+                | InvocationPermissionContext::Bridge {
+                    role: lingxi_protocol::BridgeRole::Owner,
+                    ..
+                }
+        ) {
+            crate::automation_permission::adjudicate(input, Some(material))
+        } else {
+            self.adjudicate(input)
         }
     }
 
@@ -722,6 +770,14 @@ impl ApprovalService {
 impl ToolPolicyPort for ApprovalService {
     fn adjudicate(&self, input: &PolicyAdjudicationInput) -> PolicyVerdict {
         ApprovalService::adjudicate(self, input)
+    }
+
+    fn adjudicate_invocation(
+        &self,
+        input: &PolicyAdjudicationInput,
+        material: &InvocationPolicyMaterial,
+    ) -> PolicyVerdict {
+        ApprovalService::adjudicate_invocation(self, input, material)
     }
 }
 

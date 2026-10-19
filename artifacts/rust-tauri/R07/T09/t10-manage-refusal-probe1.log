@@ -1,0 +1,42 @@
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r06_original_knowledge_proofs") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.48s
+     Running tests/r06_original_knowledge_proofs.rs (rust/target-r07/debug/deps/r06_original_knowledge_proofs-577a4a02367fb162)
+
+running 1 test
+test original_manage_refusals_and_no_write_authorization_preserve_facts ... 
+thread 'original_manage_refusals_and_no_write_authorization_preserve_facts' (6070827) panicked at crates/lingxi-service/tests/r06_original_knowledge_proofs.rs:3323:5:
+assertion `left == right` failed: {"runCount":1,"runId":"run_000001a151f9aeeb_000001"}
+  left: 200
+ right: 500
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    original_manage_refusals_and_no_write_authorization_preserve_facts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.85s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_original_knowledge_proofs`

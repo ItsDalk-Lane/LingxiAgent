@@ -180,7 +180,7 @@ impl OpenAiCodexResponsesAdapter {
         // incumbent refuses the same way): only an OAuth bearer JWT carries
         // it. Anything else is a loud non-retryable auth failure — never a
         // fabricated id, never a request without one.
-        let ApplicableAuth::Bearer(token) = auth else {
+        let Some(token) = auth.bearer_token() else {
             return fail(
                 ProtocolError::new(
                     ErrorCode::Unauthorized,
@@ -221,11 +221,12 @@ impl OpenAiCodexResponsesAdapter {
         };
         let request = client
             .post(&url)
-            .bearer_auth(token)
             .header("OpenAI-Beta", "responses=experimental")
             .header("originator", "pi")
             .header("chatgpt-account-id", account_id)
             .json(&body);
+        let request =
+            dispatch::apply_auth(request, auth, dispatch::BearerStyle::AuthorizationBearer);
         let response = match dispatch::send_with_timeouts(
             request,
             &self.timeouts,

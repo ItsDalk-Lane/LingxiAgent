@@ -35,6 +35,9 @@ import {
 import { buildKnowledgeVectorRuntime, assertKnowledgeVectorRuntime, knowledgeUseArchNativePath } from "./build-server-runtime-assets.mjs";
 import { repairUseArchNative } from "./prepare-usearch-native.mjs";
 import { pruneRuntimeDeadFiles } from "./build-server-prune.mjs";
+import { buildBridgeSdkWorkers } from "./build-bridge-sdk-workers.mjs";
+import { buildOfficeWorker } from "./build-office-worker.mjs";
+import { buildMediaWorker } from "./build-media-worker.mjs";
 
 // ── Node.js runtime ──────────────────────────────────────────────────────
 
@@ -181,6 +184,9 @@ export function buildViteServerBundle({ rootDir, viteBundleDir, bundleOutDir, en
 
   fs.cpSync(viteBundleDir, bundleOutDir, { recursive: true });
   buildKnowledgeVectorRuntime({ rootDir, bundleOutDir });
+  buildBridgeSdkWorkers({ rootDir, bundleOutDir });
+  buildOfficeWorker({ rootDir, bundleOutDir });
+  buildMediaWorker({ rootDir, bundleOutDir });
   log("[build-server] Vite bundle copied to bundle/");
 }
 

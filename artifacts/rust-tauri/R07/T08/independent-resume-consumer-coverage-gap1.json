@@ -1,0 +1,64 @@
+{
+  "reviewer": "independent-subagent-r07_t08_final_review",
+  "reviewedAt": "2026-10-18T08:58:08.339631+00:00",
+  "stage": "R07-T08",
+  "candidate": "t08d",
+  "finalAcceptance": "pending",
+  "scope": "Read-only existing named-test coverage inspection; no test/product/gate changes or execution",
+  "specificUncoveredCombination": "Intermediate stream_resume with runtimeIsStreaming=false but isStreaming=true and only a prefix of same stream, followed by later live terminal frames",
+  "existingNamedTests": [
+    {
+      "file": "desktop/src/react/__tests__/services/stream-resume.test.ts",
+      "case": "force-clears a stale active stream when runtime resume says the session is no longer running",
+      "covers": "Empty resume updates busy list",
+      "doesNotCover": "Mocks handler/buffer; no same-stream later real live terminal consumption"
+    },
+    {
+      "file": "desktop/src/react/__tests__/services/ws-message-handler.test.ts",
+      "case": "stream_resume 场景：服务端返回 isStreaming=false，前端把焦点 session 从 streamingSessions 移除",
+      "covers": "Streaming status helper busy collection",
+      "doesNotCover": "Resume and buffer mocked; not real replay/admission/content"
+    },
+    {
+      "file": "tests/stream-route-consumer-isolation.test.ts",
+      "case": "a gap-rejected assistant_run_end retires nothing; the re-delivered seq3/seq4 complete the body, finalize exactly once, and only evidenced seqs enter the watermark",
+      "covers": "Actual WebSocket→actual handler/resume→real buffer/store with runtime=false and run_end inside replay",
+      "doesNotCover": "Intermediate isStreaming=true resume then separately arriving live tail"
+    },
+    {
+      "file": "tests/stream-route-consumer-isolation.test.ts",
+      "case": "a background rebuild with a delayed history read cannot overwrite a newly admitted live stream",
+      "covers": "Delayed hydrate/generation guard with newly admitted different stream",
+      "doesNotCover": "Same-stream mid-snapshot terminal tail recovery"
+    }
+  ],
+  "smallestNecessaryTest": {
+    "location": "tests/stream-route-consumer-isolation.test.ts, end of existing R1 admission atomicity group",
+    "reuse": [
+      "existing real local WebSocket harness",
+      "h.inject actual wire frames",
+      "injectHandlers(handleServerMessage,applyStreamingStatus)",
+      "actual streamBufferManager/useStore and live projection helpers"
+    ],
+    "sequence": [
+      "consume same-stream status/start/segment-start and text prefix with continuous seq",
+      "inject incremental resume from actual consumed seq, prefix-only events, runtimeIsStreaming=false/isStreaming=true",
+      "send subsequent same-stream continuous remaining delta/segment-end/run_end/status(false) as real WS frames"
+    ],
+    "observableAssertions": [
+      "full text exactly once in actual store/live projection",
+      "buffer run finalized after actual end",
+      "actual meta lastSeq/consumed sequences reach true terminal tail",
+      "busy list cleared"
+    ],
+    "doNotMock": [
+      "stream admission",
+      "resume replay",
+      "handleServerMessage",
+      "buffer/store outcome"
+    ],
+    "notRun": true
+  },
+  "resetBranchBoundary": "If only this single incremental case is added, same-stream reset/hydrate tail branch remains source reasoning only, not newly executed PASS. Existing R2 different-stream tests do not prove it.",
+  "planBoundary": "Current d UI gate does not select tests/stream-route-consumer-isolation.test.ts or isolated stream-resume.test.ts. Do not mutate frozen d; if successor adds test, explicitly select its target in successor frozen plan and run it."
+}

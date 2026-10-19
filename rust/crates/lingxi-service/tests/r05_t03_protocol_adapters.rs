@@ -1371,7 +1371,8 @@ async fn codex_family_runs_end_to_end_over_sse() {
             "codex_svc": {{
                 "protocol": "openai-codex-responses",
                 "endpoint": "{}/backend-api",
-                "auth": {{"kind": "apiKey", "apiKey": "{}"}}
+                "auth": {{"kind": "apiKey", "apiKey": "{}"}},
+                "headers": {{"X-T08-Codex": "composed-header"}}
             }}
         }},
         "models": {{"chat": {{"provider": "codex_svc", "model": "gpt-codex-svc", "capabilities": {{"tools": true}}}}}}"#,
@@ -1402,6 +1403,7 @@ async fn codex_family_runs_end_to_end_over_sse() {
         request.header("chatgpt-account-id"),
         Some("acct-t03-service")
     );
+    assert_eq!(request.header("x-t08-codex"), Some("composed-header"));
     assert_eq!(request.header("x-api-key"), None);
     // The family's fixed wire facts.
     assert_eq!(request.body["store"], false);

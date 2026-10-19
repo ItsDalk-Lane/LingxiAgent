@@ -152,19 +152,98 @@ pub const SESSION_SEARCH_QUERY_MAX_CHARS: usize = 512;
 #[derive(Clone)]
 pub struct SessionAdminService {
     storage: Arc<RunDatabase>,
+    mcp_gateway: Arc<std::sync::Mutex<std::sync::Weak<crate::toolgateway::ToolInvocationGateway>>>,
     context_compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
     session_files: Option<Arc<crate::sessionfiles::SessionFileService>>,
     input_drafts: Option<Arc<crate::input_drafts::InputDraftsService>>,
+    browser: Arc<std::sync::Mutex<std::sync::Weak<crate::browser::BrowserService>>>,
+    media: Arc<std::sync::Mutex<std::sync::Weak<crate::media::MediaService>>>,
+    workflows: Arc<std::sync::Mutex<std::sync::Weak<crate::workflow::WorkflowService>>>,
+    loops: Arc<std::sync::Mutex<std::sync::Weak<crate::loopx::LoopController>>>,
 }
 
 impl SessionAdminService {
     pub fn new(storage: Arc<RunDatabase>) -> Self {
         Self {
             storage,
+            mcp_gateway: Default::default(),
             session_files: None,
             context_compiler: None,
             input_drafts: None,
+            browser: Arc::new(std::sync::Mutex::new(std::sync::Weak::new())),
+            media: Arc::new(std::sync::Mutex::new(std::sync::Weak::new())),
+            workflows: Arc::new(std::sync::Mutex::new(std::sync::Weak::new())),
+            loops: Arc::new(std::sync::Mutex::new(std::sync::Weak::new())),
         }
+    }
+
+    /// 会话关闭、删除或恢复时清除本次运行内记住的MCP能力。
+    pub fn attach_mcp_gateway(&self, gateway: &Arc<crate::toolgateway::ToolInvocationGateway>) {
+        *self.mcp_gateway.lock().unwrap_or_else(|p| p.into_inner()) = Arc::downgrade(gateway);
+    }
+    pub fn attach_workflows(&self, workflows: &Arc<crate::workflow::WorkflowService>) {
+        *self.workflows.lock().expect("工作流关联锁") = Arc::downgrade(workflows);
+    }
+    pub fn attach_loop_controller(&self, controller: &Arc<crate::loopx::LoopController>) {
+        *self.loops.lock().expect("循环关联锁") = Arc::downgrade(controller);
+    }
+    pub fn attach_media(&self, media: &Arc<crate::media::MediaService>) {
+        *self.media.lock().expect("会话媒体锁") = Arc::downgrade(media);
+    }
+    async fn cleanup_media_session(&self, session_id: &str) -> Result<(), SessionAdminError> {
+        let controller = self.loops.lock().expect("循环关联锁").upgrade();
+        if let Some(controller) = controller {
+            if let Some(record) = controller
+                .tool_status(session_id)
+                .filter(|r| r.status.is_active())
+            {
+                controller.stop(&record.target).await.map_err(|e| {
+                    SessionAdminError::Storage(StorageError::Io {
+                        detail: e.to_string(),
+                    })
+                })?;
+            }
+        }
+        let workflows = self.workflows.lock().expect("工作流关联锁").upgrade();
+        if let Some(workflows) = workflows {
+            let pending = workflows
+                .cancel_session(session_id, std::time::Duration::from_secs(3))
+                .await
+                .map_err(|detail| SessionAdminError::Storage(StorageError::Io { detail }))?;
+            if !pending.is_empty() {
+                return Err(SessionAdminError::Storage(StorageError::Conflict {
+                    detail: "工作流尚未完成清理；会话保留供重试".into(),
+                }));
+            }
+        }
+
+        let media = self.media.lock().expect("会话媒体锁").upgrade();
+        if let Some(media) = media {
+            let unfinished = media
+                .cancel_session(session_id, std::time::Duration::from_secs(3))
+                .await
+                .map_err(|detail| SessionAdminError::Storage(StorageError::Io { detail }))?;
+            if !unfinished.is_empty() {
+                return Err(SessionAdminError::Storage(StorageError::Conflict {
+                    detail: "媒体进程清理未确认；会话保留供重试".into(),
+                }));
+            }
+        }
+        Ok(())
+    }
+    pub fn attach_browser(&self, browser: &Arc<crate::browser::BrowserService>) {
+        *self.browser.lock().expect("会话浏览器锁") = Arc::downgrade(browser);
+    }
+    async fn cleanup_browser_sessions(&self) -> Result<(), SessionAdminError> {
+        let browser = self.browser.lock().expect("会话浏览器锁").upgrade();
+        if let Some(browser) = browser {
+            browser.maintain().await.map_err(|e| {
+                SessionAdminError::Storage(StorageError::Io {
+                    detail: format!("session lifecycle changed; browser cleanup unconfirmed: {e}"),
+                })
+            })?;
+        }
+        Ok(())
     }
 
     /// 正式管理面接通同一托管清扫器；物理失败的行仍在库中，重启可恢复。
@@ -188,6 +267,17 @@ impl SessionAdminService {
 
     /// 永久删除后的草稿清理：失败不回滚行删除，显式报"清理待完成"。
     async fn cleanup_deleted_drafts(&self, session_id: &str) -> Result<(), SessionAdminError> {
+        let workflows = self.workflows.lock().expect("工作流关联锁").upgrade();
+        if let Some(workflows) = workflows {
+            workflows
+                .remove_session_activities(session_id)
+                .map_err(|detail| {
+                    SessionAdminError::Storage(StorageError::Io {
+                        detail: format!("session deleted; workflow cleanup pending: {detail}"),
+                    })
+                })?;
+        }
+
         if let Some(drafts) = &self.input_drafts {
             drafts
                 .remove_session_entries(&[session_id])
@@ -202,6 +292,7 @@ impl SessionAdminService {
     }
 
     async fn cleanup_deleted_payloads(&self) -> Result<(), SessionAdminError> {
+        self.cleanup_browser_sessions().await?;
         if let Some(files) = &self.session_files {
             files.cleanup_cold_sessions().await.map_err(|err| {
                 SessionAdminError::Storage(StorageError::Io {
@@ -220,6 +311,14 @@ impl SessionAdminService {
         self
     }
     fn reclaim_context(&self, sid: &str) {
+        if let Some(gateway) = self
+            .mcp_gateway
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .upgrade()
+        {
+            gateway.revoke_mcp_session_permissions(sid);
+        }
         if let Some(compiler) = &self.context_compiler {
             compiler.invalidate_session(sid);
         }
@@ -286,6 +385,44 @@ impl SessionAdminService {
         let (svc, sid, title) = (self.clone(), sid.to_string(), title.to_string());
         Self::join(tokio::spawn(async move {
             svc.rename_session_inner(&sid, &title).await
+        }))
+        .await
+    }
+    /// 活动升格沿同一会话运行许可串行；保留原会话及全部真实消息和运行身份。
+    pub async fn promote_automation_activity(
+        &self,
+        principal: &crate::Principal,
+        trigger_id: &str,
+        now: u64,
+    ) -> Result<String, SessionAdminError> {
+        if !principal.is_local_owner() {
+            return Err(SessionAdminError::InvalidRequest {
+                detail: "local_owner_required".into(),
+            });
+        }
+        let (svc, trigger) = (self.clone(), trigger_id.to_string());
+        Self::join(tokio::spawn(async move {
+            let sid = lingxi_adapters::storage::automation_activity::activity_session(
+                &svc.storage,
+                &trigger,
+            )
+            .await?
+            .ok_or(SessionAdminError::NotFound)?;
+            let _permit = svc.acquire(&[&sid])?;
+            let promotion = lingxi_adapters::storage::automation_activity::promote(
+                &svc.storage,
+                &trigger,
+                &sid,
+                now,
+            )
+            .await
+            .map_err(|error| match error {
+                StorageError::Conflict { ref detail } if detail == "session_busy" => {
+                    SessionAdminError::Busy
+                }
+                other => SessionAdminError::from(other),
+            })?;
+            Ok(promotion.session_id)
         }))
         .await
     }
@@ -513,6 +650,17 @@ impl SessionAdminService {
         if descendants != current_descendants {
             return Err(SessionAdminError::Busy);
         }
+        if !descendants.is_empty() && child_mode.is_none() {
+            return Err(SessionAdminError::ChildrenPresent {
+                child_count: descendants.len(),
+            });
+        }
+        self.cleanup_media_session(session_id).await?;
+        if child_mode == Some(store::ChildMode::ArchiveChildren) {
+            for child in descendants.iter().filter(|id| !skip.contains(id)) {
+                self.cleanup_media_session(child).await?;
+            }
+        }
         let outcome = match store::archive_session_counted(
             &self.storage,
             session_id,
@@ -541,12 +689,36 @@ impl SessionAdminService {
                 });
             }
         };
+        let workflows = self.workflows.lock().expect("工作流关联锁").upgrade();
+        if let Some(workflows) = workflows {
+            workflows
+                .remove_session_activities(session_id)
+                .map_err(|detail| {
+                    SessionAdminError::Storage(StorageError::Io {
+                        detail: format!("session archived; workflow cleanup pending: {detail}"),
+                    })
+                })?;
+            if child_mode == Some(store::ChildMode::ArchiveChildren) {
+                for child in descendants.iter().filter(|id| !skip.contains(id)) {
+                    workflows
+                        .remove_session_activities(child)
+                        .map_err(|detail| {
+                            SessionAdminError::Storage(StorageError::Io {
+                                detail: format!(
+                                    "child archived; workflow cleanup pending: {detail}"
+                                ),
+                            })
+                        })?;
+                }
+            }
+        }
         self.reclaim_context(session_id);
         for id in descendants {
             if !skip.contains(&id) {
                 self.reclaim_context(&id);
             }
         }
+        self.cleanup_browser_sessions().await?;
         Ok(ArchiveView {
             session_id: session_id.to_string(),
             archived_children: outcome.archived_children,
@@ -613,6 +785,7 @@ impl SessionAdminService {
         session_id: &str,
     ) -> Result<(), SessionAdminError> {
         let _permit = self.acquire(&[session_id])?;
+        self.cleanup_media_session(session_id).await?;
         match store::delete_archived_session(&self.storage, session_id).await? {
             store::LifecycleOutcome::Done => {
                 self.reclaim_context(session_id);
@@ -666,6 +839,7 @@ impl SessionAdminService {
             {
                 continue;
             }
+            self.cleanup_media_session(&row.session_id).await?;
             match store::delete_archived_session(&self.storage, &row.session_id).await? {
                 store::LifecycleOutcome::Done => {
                     self.cleanup_deleted_payloads().await?;
@@ -969,6 +1143,7 @@ impl SessionAdminService {
                     continue;
                 }
             };
+            self.cleanup_media_session(&sid).await?;
             let outcome = store::archive_session(&self.storage, &sid, None, &[], now_unix_ms).await;
             match outcome {
                 Ok(_) => {
@@ -1011,6 +1186,7 @@ impl SessionAdminService {
                 }
             }
         }
+        self.cleanup_browser_sessions().await?;
         Ok(WorkspaceDisposalView {
             ok: true,
             action: match action {
@@ -1087,6 +1263,7 @@ impl SessionAdminService {
                     continue;
                 }
             };
+            self.cleanup_media_session(&sid).await?;
             match store::archive_session(&self.storage, &sid, None, &[], now_unix_ms).await {
                 Ok(_) => {
                     self.reclaim_context(&sid);
@@ -1100,6 +1277,7 @@ impl SessionAdminService {
                 }
             }
         }
+        self.cleanup_browser_sessions().await?;
         Ok(SweepOrphanedView {
             ok: true,
             scanned,

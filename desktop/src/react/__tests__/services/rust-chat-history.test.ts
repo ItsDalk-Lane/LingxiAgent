@@ -43,3 +43,19 @@ describe('Rust user presentation retains the real scoped source', () => {
   expect(result[0].data.quotedText).toBe('真实引文');expect(result[0].data.sessionRefs).toEqual([{sessionId:'source',label:'Session'}]);
  });
 });
+
+
+describe('协作确认卡从真实工具回执重建', () => {
+ it('保留已确认编辑与真实排队结果，重开不回到待确认', () => {
+  const details={suggestionId:'draft-1',kind:'session_send_draft',target:{type:'session',sessionId:'other'},draft:{message:'原草稿'},frozenApply:{message:'实际确认的文字'},status:'approved',decisionPersisted:true,result:{deliveryStatus:'queued',firstMessageAccepted:false}};
+  const result=projectRustHistoryItems([user,{kind:'tool_call',run,toolCallId:'call',target:'tool:first-party:session',status:'success',firstSeq:'2',result:{status:'success',details,content:[],resourceRefs:[],truncated:false}}],'session');
+  const message=result.find(item=>item.type==='message'&&item.data.role==='assistant');
+  if(message?.type!=='message')throw Error('未创建助手回合');
+  const card=message.data.blocks?.find(block=>block.type==='suggestion_card');
+  expect(card).toMatchObject({kind:'session_send_draft',status:'approved',decisionPersisted:true,detail:{draft:{message:'实际确认的文字'}},result:{deliveryStatus:'queued',firstMessageAccepted:false}});
+ });
+ it('失败工具及普通文本不伪造确认卡',()=>{
+  const result=projectRustHistoryItems([user,{kind:'tool_call',run,toolCallId:'call',target:'tool:first-party:session',status:'failed',firstSeq:'2',result:{status:'failed',details:{kind:'session_send_draft',suggestionId:'draft',draft:{message:'unconfirmed'}},content:[],resourceRefs:[],truncated:false}}],'session');
+  expect(result.flatMap(item=>item.type==='message'?item.data.blocks||[]:[]).some(block=>block.type==='suggestion_card')).toBe(false);
+ });
+});

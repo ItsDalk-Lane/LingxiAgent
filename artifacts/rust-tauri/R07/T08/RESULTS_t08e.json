@@ -1,0 +1,166 @@
+{
+  "candidate": "t08e",
+  "closedAt": "2026-10-18T09:24:32.782174+00:00",
+  "status": "FAILED",
+  "scope": "T08候选完整检查，不是最终R07",
+  "sourceFingerprint": "f8b3924db2d194834f38efcdbbf231762a9f057d0b8c2f70361b37dd6ddb5a1e",
+  "sourceAndVerificationToolsMatchedAtCloseBeforeAnyRepair": true,
+  "gateCount": 20,
+  "passedGates": 19,
+  "failedGates": 1,
+  "notRun": [],
+  "gates": {
+    "fmt": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-fmt.json",
+      "receiptSha256": "9df3ee3136e5a7f478b0097c58ba5829ad037628b6b818bdc0a0104c860772d5",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diff": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-diff.json",
+      "receiptSha256": "96a1ecee85c1ddc11803fd5a99fc42d9ee2ac7909ee478e58e2f526cef37a734",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-clippy.json",
+      "receiptSha256": "38dcd0bd1fffacc5cab4c879f264a8b0b1afbcf728a2f8e4927abf8c37866e87",
+      "logSha256": "53688d446266fc0fd4b28fc0ff61fe5af9f2d4493c4ac039b44cf193ed44d156"
+    },
+    "protocol": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-protocol.json",
+      "receiptSha256": "4adc546d585e4857840525b6a5e2a891477daeed905e060ed69ae99b8055c37e",
+      "logSha256": "a20f879957fb4531dccc8a305b365fb624adb6da408ff9108d7df39cbf74889c"
+    },
+    "protocol-roundtrip": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-protocol-roundtrip.json",
+      "receiptSha256": "6219ae7d797baed0981845a06a1f324ad97952c7f80208887d0f40567cc76c9c",
+      "logSha256": "a19f539dd569608ed6e00ab7b9bff183898e4a112d40819c597c58b10cbc6b12"
+    },
+    "protocol-tests": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-protocol-tests.json",
+      "receiptSha256": "a5a561a48d4e86526aad59ccc5da1a889861e78a566b44c68a71a4739b237b41",
+      "logSha256": "c582b18e2b34c54d3d45e3c6c6e889e67873a0552ef02a510ff3afbf0ebf7e7a"
+    },
+    "kernel": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-kernel.json",
+      "receiptSha256": "c4552d1dab2801ba89f3a6ca8b6ee7fb12003445a15536cd6a8f72ea9ed72634",
+      "logSha256": "77183f0b61b103693d4e3932d76b6b506577962ecf72894ea53e07aa1d570dfd"
+    },
+    "boundaries": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-boundaries.json",
+      "receiptSha256": "5260b2dbf3cf80541c4f12c19fe1928a0f3abfc40d47b15dd0295497ab5ad67e",
+      "logSha256": "fd56a5e6e1873a3fffe732174b02421a2502daec8f2f7f0c93be095e4837826b"
+    },
+    "adapter": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-adapter.json",
+      "receiptSha256": "783444077a5f56a816105c70fa30c75ab9ad9bb1085a8b4a918d4110c7092571",
+      "logSha256": "75a31ce3ae0e7379d3fabcc0260f6e933fdd7d0a5100bee28f04603310250845"
+    },
+    "service": {
+      "status": "FAIL",
+      "exitCode": 101,
+      "receipt": "t08e-service.json",
+      "receiptSha256": "44feb2b6a4bb14c91ab4150d2db271e9b6ad94fcfa521460700dbbaf2f2ee5dd",
+      "logSha256": "570d0e21d19aa06dcc8cbc61732e2313f0b5e4d8243460de02c4244f82e072c0"
+    },
+    "model-regression": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-model-regression.json",
+      "receiptSha256": "e0bd06a348e2d8ef190d3826c806ff474bec189c2bb0cc97f0cd5c70c1806729",
+      "logSha256": "a288e31622f84366baaea72b8fff8d23b181342c2cf1186e9466f8dbacf2fb81"
+    },
+    "native-skills": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-native-skills.json",
+      "receiptSha256": "36222f3de6fb125bd5992fff9573b427eeaf0993576c79bc740d65beae309c92",
+      "logSha256": "42c0bde3e454b7ab4526ac324e8ed468b560534e0e14ba89937a56ae3fc0f688"
+    },
+    "native-picker-binding": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-native-picker-binding.json",
+      "receiptSha256": "36d7ca73384dda610a005a79c9804c8931dfc0ba073b74e7a7ac8b3930ec4ef7",
+      "logSha256": "475907d8a3308bddcb3977ff3e2cf2abd09976330a655f74c7413d57e7b401b0"
+    },
+    "skills-current": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-skills-current.json",
+      "receiptSha256": "ec8cd581d817e21eed692fc12e0d3f1e676617e6720090905506d22e72e645f1",
+      "logSha256": "9f50eeb58bf9fe8b00aaec973fa811d452d913fcd0795aa031fe2394c7f8f0d9"
+    },
+    "build": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-build.json",
+      "receiptSha256": "67ee23a70d89e3e50b2b4e7d1aabebf009fa16a4de25ad8c707ec3c82e766a2e",
+      "logSha256": "2bc683fb4e4f4f21ee9ee39e2b8ecce2efe20d3b1be57bda5316aa519ab3d30a"
+    },
+    "ui": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-ui.json",
+      "receiptSha256": "6adcd156be97de91ce4a1371808c7281ac681b40cb3ec963a8722c22a25a7acb",
+      "logSha256": "139d0fba2655a1eba528a4496a743484d286476b55a3868b35ff9ea57af114ad"
+    },
+    "types": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-types.json",
+      "receiptSha256": "fc73094da072afb146225450363175cfc4dae5a586d2abf72bc46d99e5dc4c6b",
+      "logSha256": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8"
+    },
+    "card-navigation-desktop": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-card-navigation-desktop.json",
+      "receiptSha256": "2427d27f7df1e3107995942942335afd9387fbf0b46558b0915250678719bd10",
+      "logSha256": "db618b195776625c0e8daff32aa22dd364a0314604e8db28aaeceb6e77002e1c"
+    },
+    "card-navigation-mobile": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-card-navigation-mobile.json",
+      "receiptSha256": "80f1a8dbf94070c9cce23a3cddcbc76f67672b182ddc4a1c949c59c1b20bdc43",
+      "logSha256": "58f793c97b480f68f37dd50d8ed97b32db005f6e89281eaba422775598180903"
+    },
+    "metadata-redaction-binary": {
+      "status": "PASS",
+      "exitCode": 0,
+      "receipt": "t08e-metadata-redaction-binary.json",
+      "receiptSha256": "75d3a38e15d1e1c2ad36eb96869d61a355fa040df2c2b159fd3269cb0e0f126e",
+      "logSha256": "9f5204e877ed1754d8bc89484d6f069eb261f33ecb573e35bf6cc0456c975c09"
+    }
+  },
+  "service": {
+    "targets": 34,
+    "passedCases": 876,
+    "failedCases": 3
+  },
+  "ui": {
+    "files": 66,
+    "passedCases": 552,
+    "failedCases": 0
+  },
+  "oldFailuresRetained": true,
+  "fullR07PassClaimed": false
+}

@@ -1,0 +1,37 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "candidate": "t08f",
+  "reviewedAt": "2026-10-18T09:31:24.445529+00:00",
+  "finalAcceptance": "pending",
+  "scope": "冻结源码与计划预审；正式20门尚未结束。",
+  "verified": {
+    "sourceRows": 657,
+    "sourceFingerprint": "71924b54ab9c82a70b2327010d4287c3c04e73221b65b7699e744b20adbce836",
+    "allCurrentSourceHashesMatch": true,
+    "archiveSha256AndEveryMemberContentModeMatch": true,
+    "manifestFingerprintRecomputed": true,
+    "frozenPlanHashMatch": true,
+    "runnerAndFourVerificationHelpersHashMatch": true,
+    "gateCount": 20,
+    "deltaFromE": "6个检查相关文件新增进冻结覆盖：4个原有但此前未改检查文件+2个新测试屏障文件，不是6个产品功能新增。",
+    "uiPlan": "保留e全部原选择/worker界限，增加屏障负例文件；双reporter及候选唯一路径JSON只增加具名原始输出，实际总数以正式回执为准。"
+  },
+  "relatedSourceReview": "independent-f-initialization-source-review1.json",
+  "developmentReceipt": {
+    "file": "initialization-capsule-fixed1.json",
+    "exitCode": 0,
+    "sourceUnchanged": true,
+    "logSha256IndependentlyMatched": true,
+    "actualTargetResults": [
+      "r06_agent_delete_skills_live 2/2",
+      "r06_chat_wire 17/17"
+    ],
+    "scope": "原两Rust目标完整开发验证，不是本冻结候选20门整体验收。"
+  },
+  "nativePickerReuse": "计划仍在正式native-skills后单独检查原proof-v2固定hash、原始receipt/log/边界证据、35路径原生闭包和fresh原生binary同字节。认可精确同产物复用人工证据，不声称f重做了人工接管或其他平台。",
+  "remaining": [
+    "等待正式20门与全部原始日志/回执、4份fresh-build绑定完成后才能结算。",
+    "原e和更早失败记录保持FAILED/NOT_RUN等原事实；本轮未通过前不得说T08/R07完成。",
+    "e管理LAN本次通过不证明此前根因已找到或修复。"
+  ]
+}

@@ -1,0 +1,46 @@
+[
+  {
+    "event_id": "run_000001a14dd7fc64_000001-start",
+    "stream_id": "mcp-inflight-stop",
+    "seq": 1,
+    "session_id": "mcp-inflight-stop",
+    "run_id": "run_000001a14dd7fc64_000001",
+    "attempt": "run_000001a14dd7fc64_000001#a1",
+    "event_type": "run_state_changed",
+    "payload_json": "{\"from\":\"queued\",\"to\":\"running\",\"type\":\"run_state_changed\"}",
+    "committed_at_unix_ms": 1792307362916
+  },
+  {
+    "event_id": "run_000001a14dd7fc64_000001-run_000001a14dd7fc64_000001-mc0001-start",
+    "stream_id": "mcp-inflight-stop",
+    "seq": 2,
+    "session_id": "mcp-inflight-stop",
+    "run_id": "run_000001a14dd7fc64_000001",
+    "attempt": "run_000001a14dd7fc64_000001#a1",
+    "event_type": "model_call_started",
+    "payload_json": "{\"model\":\"fixture-chat\",\"modelCallId\":\"run_000001a14dd7fc64_000001-mc0001\",\"operation\":\"chat\",\"provider\":\"fixture\",\"type\":\"model_call_started\"}",
+    "committed_at_unix_ms": 1792307362916
+  },
+  {
+    "event_id": "run_000001a14dd7fc64_000001-run_000001a14dd7fc64_000001-mc0001-done",
+    "stream_id": "mcp-inflight-stop",
+    "seq": 3,
+    "session_id": "mcp-inflight-stop",
+    "run_id": "run_000001a14dd7fc64_000001",
+    "attempt": "run_000001a14dd7fc64_000001#a1",
+    "event_type": "model_call_completed",
+    "payload_json": "{\"modelCallId\":\"run_000001a14dd7fc64_000001-mc0001\",\"type\":\"model_call_completed\",\"usage\":{\"inputTokens\":\"3\",\"outputTokens\":\"1\"}}",
+    "committed_at_unix_ms": 1792307362916
+  },
+  {
+    "event_id": "run_000001a14dd7fc64_000001-done",
+    "stream_id": "mcp-inflight-stop",
+    "seq": 4,
+    "session_id": "mcp-inflight-stop",
+    "run_id": "run_000001a14dd7fc64_000001",
+    "attempt": "run_000001a14dd7fc64_000001#a1",
+    "event_type": "run_state_changed",
+    "payload_json": "{\"from\":\"running\",\"reason\":\"failed.provider_error\",\"to\":\"failed\",\"type\":\"run_state_changed\"}",
+    "committed_at_unix_ms": 1792307362950
+  }
+]

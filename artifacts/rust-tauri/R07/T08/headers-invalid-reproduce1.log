@@ -1,0 +1,20 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.82s
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 1 test
+
+thread 'malformed_headers_never_clear_saved_settings_or_publish_a_generation' (2609868) panicked at crates/lingxi-service/tests/r07_t08_model_configuration.rs:540:18:
+损坏的请求头必须拒绝，不能清空原值: ModelConfigurationApplyReport { saved: true, applied: true, generation: 3, activated: true, cleared_bindings: [], audit_recorded: true, projection_confirmed: true }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test malformed_headers_never_clear_saved_settings_or_publish_a_generation ... FAILED
+
+failures:
+
+failures:
+    malformed_headers_never_clear_saved_settings_or_publish_a_generation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.20s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_model_configuration`

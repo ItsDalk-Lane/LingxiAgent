@@ -1,0 +1,19 @@
+    Checking lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error: called `unwrap` on `jimeng` after checking its variant with `is_some`
+  --> crates/lingxi-service/tests/r07_media/mod.rs:93:36
+   |
+89 |     let names = if jimeng.is_some() {
+   |                 ------------------- help: try: `if let Some(<item>) = jimeng`
+...
+93 |             format!("generate-{}", jimeng.unwrap()),
+   |                                    ^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#unnecessary_unwrap
+   = note: `-D clippy::unnecessary-unwrap` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::unnecessary_unwrap)]`
+
+error: could not compile `lingxi-service` (test "r07_t05_media") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

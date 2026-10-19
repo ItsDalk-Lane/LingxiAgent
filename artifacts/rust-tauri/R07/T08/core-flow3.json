@@ -1,0 +1,39 @@
+{
+  "label": "core-flow3",
+  "scope": "DEVELOPMENT_PARALLEL_EDITING_NOT_CANDIDATE_ACCEPTANCE",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--no-fail-fast",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-service",
+    "--test",
+    "r07_t08_settings",
+    "--test",
+    "r07_t08_model_configuration",
+    "--test",
+    "r07_t08_network_preferences",
+    "--test",
+    "r07_t08_provider_http"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-18T04:17:12.034896+00:00",
+  "baseCommit": "0c86675d49442fe0e38259bd3097423fb340eecc",
+  "sourceFingerprintBefore": "c1ad49d2661aeefaeb131aee5888674d73bf9a6343e34b0b0cc9225c96bf347c",
+  "finalAcceptance": false,
+  "exitCode": 101,
+  "endedAt": "2026-10-18T04:17:42.497585+00:00",
+  "sourceFingerprintAfter": "68657984012374334eeb4ad02c772eb063e5d6225ab6526338fa76dee6a489f9",
+  "log": "artifacts/rust-tauri/R07/T08/core-flow3.log",
+  "logSha256": "139c08879518f27e84f5376c1dbda2c54df4a8a22ea2f9c4eae8cd6f6166a582",
+  "sourceUnchanged": false
+}

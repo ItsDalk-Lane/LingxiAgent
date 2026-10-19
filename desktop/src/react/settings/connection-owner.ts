@@ -19,7 +19,7 @@ useSettingsStore.subscribe(() => {
   if (next !== currentKey) {
     currentKey = next; revision++;
     // 连接改变时同步撤销旧资料，不等页面 effect；同一实际连接重开不触发清理。
-    useSettingsStore.setState({ settingsAgentsOwner: null, settingsDataOwner: null, settingsDataAgentId: null,
+    useSettingsStore.setState({ settingsIdentityOwner: null, settingsAgentsOwner: null, settingsDataOwner: null, settingsDataAgentId: null,
       settingsConfig: null, settingsConfigKey: null, settingsConfigStatus: 'idle', settingsConfigError: null,
       settingsSnapshot: createRemoteResource(), globalModelsConfig: null, runtimeModels: [],
       providersSummary: {}, agents: [], currentAgentId: null, settingsAgentId: null,

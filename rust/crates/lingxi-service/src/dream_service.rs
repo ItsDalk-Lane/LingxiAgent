@@ -6,7 +6,7 @@ use lingxi_adapters::{
     storage::agent_memory as am,
 };
 use lingxi_kernel::{
-    model_exchange::{AuxiliarySlot, ModelOperation, ModelRouteRequest},
+    model_exchange::{AuxiliarySlot, ModelGatewayError, ModelOperation, ModelRouteRequest},
     ports::StoragePort,
     usage::{CallOutcome, ModelCallUsageRecord, ReportedUsage},
 };
@@ -76,15 +76,32 @@ fn availability(state: &ServiceState) -> Result<(AuxiliaryExecutor, ModelOperati
             "dream_credentials_unavailable: 模型凭证不可用",
         )
     })?;
-    let operation = ModelOperation::Auxiliary(AuxiliarySlot::Memory);
-    gateway
-        .resolve_dispatch(&ModelRouteRequest::for_operation(operation))
-        .map_err(|error| {
-            fail(
+    // 现役 memory 槽 fallback=chat（auxiliary-slots.ts:92-97；agent.ts
+    // :472-476 经 engine.resolveAuxiliaryExecution("memory") 解析）：槽未
+    // 配置（RouteNotConfigured）时显式回退 chat；槽已配置但解析失败不回
+    // 退——与 persona.rs:401-410 同一现役口径。槽与 chat 双缺才报未配置。
+    let operation = match gateway.resolve_dispatch(&ModelRouteRequest::for_operation(
+        ModelOperation::Auxiliary(AuxiliarySlot::Memory),
+    )) {
+        Ok(_) => ModelOperation::Auxiliary(AuxiliarySlot::Memory),
+        Err(ModelGatewayError::RouteNotConfigured { .. }) => {
+            gateway
+                .resolve_dispatch(&ModelRouteRequest::for_operation(ModelOperation::Chat))
+                .map_err(|error| {
+                    fail(
+                        "dream_unavailable",
+                        format!("dream_model_unconfigured: 记忆模型未配置: {error}"),
+                    )
+                })?;
+            ModelOperation::Chat
+        }
+        Err(error) => {
+            return Err(fail(
                 "dream_unavailable",
                 format!("dream_model_unconfigured: 记忆模型未配置: {error}"),
-            )
-        })?;
+            ))
+        }
+    };
     let network = state.network_plane().cloned().ok_or_else(|| {
         fail(
             "dream_unavailable",

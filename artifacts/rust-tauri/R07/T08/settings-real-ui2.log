@@ -1,0 +1,91 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx (1 test | 1 failed) 3868ms
+     × 实际导出隐藏密钥，修改导出文件后从按钮导入并保留其他设置（无服务二进制时明确跳过） 3867ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx > 设置页按钮连接真实 Rust 子进程 > 实际导出隐藏密钥，修改导出文件后从按钮导入并保留其他设置（无服务二进制时明确跳过）
+Error: Invalid Chai property: toBeDisabled
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<section[39m
+        [33maria-labelledby[39m=[32m"_r_0_-title"[39m
+        [33mclass[39m=[32m"_section_c3cd25"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_sectionHeader_c3cd25"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"_sectionTitle_c3cd25"[39m
+            [33mid[39m=[32m"_r_0_-title"[39m
+          [36m>[39m
+            [0msettings.transfer.title[0m
+          [36m</h2>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"_surface_c3cd25 _surfaceCard_c3cd25 _sectionBody_c3cd25"[39m
+          [33mdata-settings-surface[39m=[32m"card"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"_row_c3cd25 _rowInline_c3cd25"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowText_c3cd25"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowLabel_c3cd25"[39m
+              [36m>[39m
+                [0msettings.transfer.title[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"_rowHint_c3cd25"[39m
+              [36m>[39m
+                [0msettings.transfer.hint[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"_rowControl_c3cd25"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.transfer.export[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [0msettings.transfer.import[0m
+              [36m</button>[39m
+              [36m<input[39m
+                [33maccept[39m=[32m"application/json,.json"[39m
+                [33maria-label[39m=[32m"settings.transfer.import"[39m
+                [33mhidden[39m=[32m""[39m
+                [33mtype[39m=[32m"file"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+ ❯ desktop/src/react/__tests__/services/r07-settings-real-service.test.tsx:63:100
+
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  13:43:15
+   Duration  4.79s (transform 349ms, setup 22ms, import 468ms, tests 3.87s, environment 289ms)
+

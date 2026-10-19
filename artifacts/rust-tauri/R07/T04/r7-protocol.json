@@ -1,0 +1,28 @@
+{
+  "candidate": "r7",
+  "name": "protocol",
+  "command": [
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--locked",
+    "-p",
+    "lingxi-protocol",
+    "--manifest-path",
+    "rust/Cargo.toml"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:25:55.555105+00:00",
+  "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "log": "r7-protocol.log",
+  "endedAt": "2026-10-15T23:26:01.486133+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "logSha256": "93ca11d4645f84d166c94250ac993fe69aa52734a0859f72728afed945855c89",
+  "sourceUnchanged": true
+}

@@ -3,11 +3,11 @@
   "task": "R01-T02",
   "generatedBy": "scripts/rust-tauri/r01-t02-extract-api-surface.mjs (机械提取,禁止手改条目)",
   "generatedFrom": {
-    "contentSha": "ff0008c0cdf4437bc87b269dcefa8ba21efb3bd40e413436c085345e918edf78",
+    "contentSha": "e682235ea6ba680d842de29a3bcd1eed03d43801e27d0612c7eae1f861ed955f",
     "note": "contentSha=sha256(JSON.stringify({fullInventory,surfaces,summary,sourceDigests})),内容派生戳,不嵌入 git HEAD 等移动坐标;--check 在当前工作区重跑并全文逐字节 diff(无字段豁免)。",
     "sourceDigests": {
-      "desktop/preload.cjs": "6e178ddc1a58e341a499c423e38d4d4ebad8743745d87b7599cdc77366f7549b",
-      "desktop/src/react/types.ts": "1fd8f5e4bcea4b65f5145381f264009e5f14c5d76138f6bf403a14933cdb43eb",
+      "desktop/preload.cjs": "db10e3dd3a32db63d435b2058c14acaee0ac0fd50fcbbb3c0c52f53e732d4be2",
+      "desktop/src/react/types.ts": "e54a11d32eff39b6acf581fcb2237872b46556586fe4db5543da98be290eeeda",
       "server/composition/full-root.ts": "e5f8322020f8f7f014b449f8a9625871630c251483b59a13013b89719d2d77b8",
       "server/composition/open-root.ts": "c9a9a249fdc3dfa7a3e69d499709f335445ef8e00b1b2568b9e233fc9b5a869b",
       "server/index.ts": "0f16d567d1800417318608a1944bb42b0121082ce05593f7facb078ffc09cc17",
@@ -104,6 +104,7 @@
       "invoke:get-app-version",
       "invoke:get-auto-launch-status",
       "invoke:get-avatar-path",
+      "invoke:get-browser-viewer-context",
       "invoke:get-keep-awake-status",
       "invoke:get-pending-announcement",
       "invoke:get-platform",
@@ -139,11 +140,13 @@
       "invoke:release-check-latest",
       "invoke:reload-main-window",
       "invoke:run-edit-command",
+      "invoke:rust-browser-request",
       "invoke:screenshot-render",
       "invoke:select-files",
       "invoke:select-folder",
       "invoke:select-skill",
       "invoke:set-auto-launch-enabled",
+      "invoke:set-browser-connection",
       "invoke:set-keep-awake-enabled",
       "invoke:show-in-finder",
       "invoke:show-notification",
@@ -5297,6 +5300,15 @@
     ],
     "preloadBridge": [
       {
+        "id": "preload:cardFrameNavigationGuard",
+        "kind": "preload_bridge",
+        "member": "cardFrameNavigationGuard",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": ""
+      },
+      {
         "id": "preload:getServerPort",
         "kind": "preload_bridge",
         "member": "getServerPort",
@@ -5963,6 +5975,33 @@
         "notes": ""
       },
       {
+        "id": "preload:setBrowserConnection",
+        "kind": "preload_bridge",
+        "member": "setBrowserConnection",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": ""
+      },
+      {
+        "id": "preload:getBrowserViewerContext",
+        "kind": "preload_bridge",
+        "member": "getBrowserViewerContext",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": ""
+      },
+      {
+        "id": "preload:rustBrowserRequest",
+        "kind": "preload_bridge",
+        "member": "rustBrowserRequest",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": ""
+      },
+      {
         "id": "preload:browserGoBack",
         "kind": "preload_bridge",
         "member": "browserGoBack",
@@ -6163,6 +6202,16 @@
     ],
     "platformApi": [
       {
+        "id": "platform_api:cardFrameNavigationGuard",
+        "kind": "platform_api_type",
+        "member": "cardFrameNavigationGuard",
+        "source": "desktop/src/react/types.ts (PlatformApi)",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": "window.hana 的 TS 类型镜像；与 preload_bridge 逐项对应关系由 R09 核对。"
+      },
+      {
         "id": "platform_api:getServerPort",
         "kind": "platform_api_type",
         "member": "getServerPort",
@@ -6216,6 +6265,36 @@
         "id": "platform_api:openBrowserViewer",
         "kind": "platform_api_type",
         "member": "openBrowserViewer",
+        "source": "desktop/src/react/types.ts (PlatformApi)",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": "window.hana 的 TS 类型镜像；与 preload_bridge 逐项对应关系由 R09 核对。"
+      },
+      {
+        "id": "platform_api:setBrowserConnection",
+        "kind": "platform_api_type",
+        "member": "setBrowserConnection",
+        "source": "desktop/src/react/types.ts (PlatformApi)",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": "window.hana 的 TS 类型镜像；与 preload_bridge 逐项对应关系由 R09 核对。"
+      },
+      {
+        "id": "platform_api:getBrowserViewerContext",
+        "kind": "platform_api_type",
+        "member": "getBrowserViewerContext",
+        "source": "desktop/src/react/types.ts (PlatformApi)",
+        "category": "native_host",
+        "disposition": "native_host_mapping",
+        "newProtocolCounterpart": "tauri-host command/event (R09 宿主映射)",
+        "notes": "window.hana 的 TS 类型镜像；与 preload_bridge 逐项对应关系由 R09 核对。"
+      },
+      {
+        "id": "platform_api:rustBrowserRequest",
+        "kind": "platform_api_type",
+        "member": "rustBrowserRequest",
         "source": "desktop/src/react/types.ts (PlatformApi)",
         "category": "native_host",
         "disposition": "native_host_mapping",
@@ -7215,21 +7294,21 @@
     ]
   },
   "summary": {
-    "total": 626,
+    "total": 634,
     "byKind": {
       "http_route": 423,
       "ws_endpoint": 2,
-      "preload_bridge": 96,
-      "platform_api_type": 105
+      "preload_bridge": 100,
+      "platform_api_type": 109
     },
     "byCategory": {
       "business_compat": 427,
-      "native_host": 199
+      "native_host": 207
     },
     "byDisposition": {
       "retain": 426,
       "controlled_deprecation": 1,
-      "native_host_mapping": 199
+      "native_host_mapping": 207
     }
   }
 }

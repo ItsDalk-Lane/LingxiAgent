@@ -1,0 +1,181 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.24s
+     Running tests/r06_agent_config_readback.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_config_readback-60d976346afd1df2)
+
+running 14 tests
+test put_config_inline_credential_transfer_readback ... FAILED
+test experiments_read_and_write ... ok
+test get_config_reads_real_yaml_injects_globals_and_masks_every_secret ... FAILED
+test get_config_experience_enabled_is_boolean_and_invalid_config_fails_loudly ... ok
+test current_status_list_get_and_readonly ... ok
+test put_config_validation_and_auth ... ok
+test get_config_provider_registry_failure_gives_empty_providers_not_an_error ... FAILED
+test get_config_identity_is_keyed_by_path_not_focus_and_never_discloses_another_agent ... ok
+test get_config_gcs_gone_workspace_history_before_answering_only_for_that_agent ... ok
+test put_config_provider_save_readback ... FAILED
+test get_config_unknown_or_invalid_agent_is_404_with_no_side_effects ... ok
+test cache_snapshot_observation_read ... ok
+test cache_snapshot_observation_delete ... ok
+test get_config_without_catalog_reads_without_creating_it ... FAILED
+
+failures:
+
+---- put_config_inline_credential_transfer_readback stdout ----
+
+thread 'put_config_inline_credential_transfer_readback' (1976332) panicked at crates/lingxi-service/tests/r06_agent_config_readback.rs:587:5:
+assertion `left == right` failed: 转存：{"code":"invalid_model_settings","error":"供应商必须声明协议","preferencesSaved":false,"result":{"activated":true,"applied":false,"auditRecorded":false,"clearedBindings":[],"generation":"1","projectionConfirmed":false,"saved":false}}
+  left: 400
+ right: 200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- get_config_reads_real_yaml_injects_globals_and_masks_every_secret stdout ----
+
+thread 'get_config_reads_real_yaml_injects_globals_and_masks_every_secret' (1976329) panicked at crates/lingxi-service/tests/r06_agent_config_readback.rs:1493:5:
+assertion `left == right` failed: 准备供应商：{"code":"invalid_model_settings","error":"供应商必须声明协议","preferencesSaved":false,"result":{"activated":true,"applied":false,"auditRecorded":false,"clearedBindings":[],"generation":"1","projectionConfirmed":false,"saved":false}}
+  left: 400
+ right: 200
+
+---- get_config_provider_registry_failure_gives_empty_providers_not_an_error stdout ----
+
+thread 'get_config_provider_registry_failure_gives_empty_providers_not_an_error' (1976328) panicked at crates/lingxi-service/tests/r06_agent_config_readback.rs:1727:5:
+assertion `left == right` failed: 失败 → 空对象（非 null/数组）
+  left: Object {"readback-fixture": Object {"api": String("openai-completions"), "api_key": String(""), "base_url": String("http://127.0.0.1:1/v1"), "credential_generation": String("1"), "credential_state": String("keyless"), "headers": Object {}, "logged_in": Bool(false), "model_count": Number(1), "models": Array [Object {"capabilities": Object {"imageInput": Null, "tools": Bool(true)}, "compat": Null, "groupId": Null, "id": String("synthetic"), "protocol": Null}]}}
+ right: Object {}
+
+---- put_config_provider_save_readback stdout ----
+
+thread 'put_config_provider_save_readback' (1976333) panicked at crates/lingxi-service/tests/r06_agent_config_readback.rs:303:5:
+assertion `left == right` failed: 供应商保存：{"code":"invalid_model_settings","error":"供应商必须声明协议","preferencesSaved":false,"result":{"activated":true,"applied":false,"auditRecorded":false,"clearedBindings":[],"generation":"1","projectionConfirmed":false,"saved":false}}
+  left: 400
+ right: 200
+
+---- get_config_without_catalog_reads_without_creating_it stdout ----
+
+thread 'get_config_without_catalog_reads_without_creating_it' (1976331) panicked at crates/lingxi-service/tests/r06_agent_config_readback.rs:1753:5:
+assertion `left == right` failed
+  left: Object {"readback-fixture": Object {"api": String("openai-completions"), "api_key": String(""), "base_url": String("http://127.0.0.1:1/v1"), "credential_generation": String("1"), "credential_state": String("keyless"), "headers": Object {}, "logged_in": Bool(false), "model_count": Number(1), "models": Array [Object {"capabilities": Object {"imageInput": Null, "tools": Bool(true)}, "compat": Null, "groupId": Null, "id": String("synthetic"), "protocol": Null}]}}
+ right: Object {}
+
+
+failures:
+    get_config_provider_registry_failure_gives_empty_providers_not_an_error
+    get_config_reads_real_yaml_injects_globals_and_masks_every_secret
+    get_config_without_catalog_reads_without_creating_it
+    put_config_inline_credential_transfer_readback
+    put_config_provider_save_readback
+
+test result: FAILED. 9 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_agent_config_readback`
+     Running tests/r06_agent_settings_live.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_agent_settings_live-49278c6a1fd55505)
+
+running 14 tests
+test native_character_card_duplicate_skill_source_and_sparse_path_refuse_without_public_mutation ... ok
+test native_character_card_application_and_http_delete_never_recreate_deleted_directory ... ok
+test native_character_card_zip_roundtrip_real_materials_and_memory_choice ... ok
+test native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents ... ok
+test native_settings_reads_keep_real_failures_and_paid_dream_consumption ... FAILED
+test native_agent_settings_current_electron_entry_smoke ... ok
+test native_pending_reference_deletion_current_electron_shows_and_retries_truthfully ... ok
+test native_pending_receipt_owner_switch_two_real_services_never_posts_to_other_service ... ok
+test native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel ... ok
+test native_character_card_owner_two_real_services_and_delayed_import_response ... ok
+test native_settings_current_electron_actual_read_permission_denied_is_error ... ok
+test native_settings_current_electron_real_io_failures_and_partial_writes ... FAILED
+test native_initialization_cache_summary_and_real_fifteen_second_timeout ... FAILED
+test native_settings_nineteen_actions_actual_electron_and_service ... ok
+
+failures:
+
+---- native_settings_reads_keep_real_failures_and_paid_dream_consumption stdout ----
+LINGXI_AUTH_REJECTED request_id="req-8ad9df39c79a413ceecb788324f26e14" method=GET path=/lingxi/v1/settings/snapshot status=403 reason=insufficient_scope remote=127.0.0.1:58861
+LINGXI_AUTH_REJECTED request_id="req-3d9ef9661f57de7dde1d3944d53b4b93" method=GET path=/lingxi/v1/models status=403 reason=insufficient_scope remote=127.0.0.1:58871
+
+thread 'native_settings_reads_keep_real_failures_and_paid_dream_consumption' (1976613) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:606:9:
+assertion `left == right` failed: /lingxi/v1/providers/summary: {"providers":{"agnes":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://apihub.agnes-ai.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Agnes AI","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","runtime_provider_id":"agnes"},{"capability":"videoGeneration","runtime_provider_id":"agnes"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"anthropic":{"api":"anthropic-messages","api_key":"","auth_type":"api-key","base_url":"https://api.anthropic.com","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Anthropic","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"baichuan":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.baichuan-ai.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"百川智能","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"baidu-cloud":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://qianfan.baidubce.com/v2","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"百度智能云 (文心)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"dashscope":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://dashscope.aliyuncs.com/compatible-mode/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"阿里云百炼 (DashScope)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","runtime_provider_id":"dashscope"},{"capability":"speechRecognition","runtime_provider_id":"dashscope"},{"capability":"speechGeneration","runtime_provider_id":"dashscope"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"dashscope-coding":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://coding.dashscope.aliyuncs.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"百炼 Coding Plan","has_credentials":false,"headers":{},"is_coding_plan":true,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"deepseek":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.deepseek.com","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"DeepSeek","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"deepseek-responses":{"api":"openai-responses","api_key":"","auth_type":"api-key","base_url":"https://api.deepseek.com","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"DeepSeek (Responses)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"embedding-stub":{"api":"openai-embeddings","api_key":"","auth_type":"api-key","base_url":"http://127.0.0.1:58795/v1","can_delete":true,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"embedding-stub","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":true,"media_capability_bindings":[],"missing_fields":["api_key"],"models":[{"capabilities":null,"compat":null,"groupId":null,"id":"embedding-model","protocol":null}],"supports_oauth":false,"type":"api-key"},"fireworks":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.fireworks.ai/inference/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Fireworks AI","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"gemini":{"api":"google-generative-ai","api_key":"","auth_type":"api-key","base_url":"https://generativelanguage.googleapis.com/v1beta","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Google Gemini","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","runtime_provider_id":"gemini"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"groq":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.groq.com/openai/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Groq","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"hunyuan":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.hunyuan.cloud.tencent.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"腾讯混元","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"infini":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://cloud.infini-ai.com/maas/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"无问芯穹 (Infini)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"kimi-coding":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.kimi.com/coding/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Kimi Coding Plan","has_credentials":false,"headers":{},"is_coding_plan":true,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"mimo":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.xiaomimimo.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Xiaomi (MiMo)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"mimo-token-plan":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://token-plan-cn.xiaomimimo.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Xiaomi MiMo Token Plan","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"minimax":{"api":"anthropic-messages","api_key":"","auth_type":"api-key","base_url":"https://api.minimaxi.com/anthropic","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"MiniMax","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","runtime_provider_id":"minimax"},{"capability":"speechGeneration","runtime_provider_id":"minimax"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"minimax-token-plan":{"api":"anthropic-messages","api_key":"","auth_type":"api-key","base_url":"https://api.minimaxi.com/anthropic","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"MiniMax Token Plan","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","credential_lane_id":"minimax-token-plan","runtime_provider_id":"minimax"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"mistral":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.mistral.ai/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Mistral AI","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"modelscope":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api-inference.modelscope.cn/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"魔搭 (ModelScope)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"moonshot":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.moonshot.cn/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Moonshot (Kimi)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"ollama":{"api":"openai-completions","api_key":"","auth_type":"none","base_url":"http://localhost:11434/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Ollama (本地)","has_credentials":true,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["models"],"models":[],"supports_oauth":false,"type":"api-key"},"openai":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.openai.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"OpenAI","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","runtime_provider_id":"openai"},{"capability":"speechRecognition","runtime_provider_id":"openai"},{"capability":"speechGeneration","runtime_provider_id":"openai"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"openai-codex-oauth":{"api":"openai-codex-responses","api_key":"","auth_type":"oauth","base_url":"https://chatgpt.com/backend-api","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"OpenAI Codex (OAuth)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":true,"logged_in":false,"media_capability_bindings":[{"capability":"imageGeneration","credential_lane_id":"codex-oauth","runtime_provider_id":"openai-codex-oauth"}],"missing_fields":[],"models":["gpt-5.6-sol","gpt-5.6-terra","gpt-5.6-luna","gpt-5.5","gpt-5.4","gpt-5.4-mini","gpt-5.2"],"supports_oauth":true,"type":"oauth"},"opencode":{"api":"anthropic-messages","api_key":"","auth_type":"api-key","base_url":"https://opencode.ai/zen","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"OpenCode Zen","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"opencode-go":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://opencode.ai/zen/go/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"OpenCode Go","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"openrouter":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://openrouter.ai/api/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"OpenRouter","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"perplexity":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.perplexity.ai","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Perplexity","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"persona-stub":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"http://127.0.0.1:58795/v1","can_delete":true,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"persona-stub","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":true,"media_capability_bindings":[],"missing_fields":["api_key"],"models":[{"capabilities":{"imageInput":null,"tools":true},"compat":{"cacheControlFormat":null,"contextWindow":200000,"maxTokens":null,"outputCapRequired":null,"outputIncludesThinking":null,"quirks":[],"reasoning":null,"reasoningProfile":null,"thinkingFormat":null,"thinkingLevelMap":null,"video":null},"groupId":null,"id":"chat-model","protocol":null},{"capabilities":null,"compat":{"cacheControlFormat":null,"contextWindow":200000,"maxTokens":null,"outputCapRequired":null,"outputIncludesThinking":null,"quirks":[],"reasoning":null,"reasoningProfile":null,"thinkingFormat":null,"thinkingLevelMap":null,"video":null},"groupId":null,"id":"memory-model","protocol":null}],"supports_oauth":false,"type":"api-key"},"siliconflow":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.siliconflow.cn/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"SiliconFlow (硅基流动)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"stepfun":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.stepfun.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"阶跃星辰 (StepFun)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"system-speech":{"api":"system-speech","api_key":"","auth_type":"none","base_url":"","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"系统语音识别","has_credentials":true,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"speechGeneration","runtime_provider_id":"system-speech"},{"capability":"speechRecognition","runtime_provider_id":"system-speech"}],"missing_fields":["models"],"models":[],"supports_oauth":false,"type":"api-key"},"together":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.together.xyz/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"Together AI","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"volcengine":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://ark.cn-beijing.volces.com/api/v3","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"火山引擎 (豆包)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","runtime_provider_id":"volcengine"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"volcengine-coding":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://ark.cn-beijing.volces.com/api/coding/v3","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"火山引擎 Coding Plan","has_credentials":false,"headers":{},"is_coding_plan":true,"is_configured":false,"media_capability_bindings":[{"capability":"imageGeneration","credential_lane_id":"volcengine-coding","runtime_provider_id":"volcengine"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"volcengine-speech":{"api":"volcengine-bigasr","api_key":"","auth_type":"api-key","base_url":"https://openspeech.bytedance.com","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"火山引擎语音 (BigASR)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[{"capability":"speechRecognition","runtime_provider_id":"volcengine-speech"}],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"xai":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.x.ai/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"xAI (Grok)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"xai-oauth":{"api":"openai-responses","api_key":"","auth_type":"oauth","base_url":"https://cli-chat-proxy.grok.com/v1","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"xAI Grok (OAuth)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":true,"logged_in":false,"media_capability_bindings":[],"missing_fields":[],"models":[{"api":"openai-responses","context":500000,"id":"grok-4.5","image":true,"maxOutput":128000,"name":"Grok 4.5","reasoning":true},{"api":"openai-responses","context":500000,"id":"grok-4.5-latest","image":true,"maxOutput":128000,"name":"Grok 4.5 Latest","reasoning":true},{"api":"openai-responses","context":500000,"id":"grok-build-latest","image":true,"maxOutput":128000,"name":"Grok Build Latest","reasoning":true},{"api":"openai-responses","context":1000000,"id":"grok-4.3","image":true,"maxOutput":128000,"name":"Grok 4.3","reasoning":true}],"supports_oauth":true,"type":"oauth"},"zhipu":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://open.bigmodel.cn/api/paas/v4","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"智谱 AI (GLM)","has_credentials":false,"headers":{},"is_coding_plan":false,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"},"zhipu-coding":{"api":"openai-completions","api_key":"","auth_type":"api-key","base_url":"https://api.z.ai/api/coding/paas/v4","can_delete":false,"config_error":null,"config_status":"needs_setup","custom_models":[],"display_name":"智谱 GLM Coding Plan","has_credentials":false,"headers":{},"is_coding_plan":true,"is_configured":false,"media_capability_bindings":[],"missing_fields":["api_key","models"],"models":[],"supports_oauth":false,"type":"api-key"}}}
+  left: 200
+ right: 500
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- native_settings_current_electron_real_io_failures_and_partial_writes stdout ----
+SETTINGS-UI-CHILD[failures]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-20865-1792303787950771000/home/ui-result.json
+
+thread 'native_settings_current_electron_real_io_failures_and_partial_writes' (1976611) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+
+---- native_initialization_cache_summary_and_real_fifteen_second_timeout stdout ----
+SETTINGS-UI-CHILD[initialization]: JSON report written to /private/tmp/lingxi-r07-tests/tmp/settings-completion-initialization-20865-1792303787950812000/home/ui-result.json
+
+thread 'native_initialization_cache_summary_and_real_fifteen_second_timeout' (1976606) panicked at crates/lingxi-service/tests/r06_agent_settings_live.rs:542:5:
+actual Electron UI failed
+
+
+failures:
+    native_initialization_cache_summary_and_real_fifteen_second_timeout
+    native_settings_current_electron_real_io_failures_and_partial_writes
+    native_settings_reads_keep_real_failures_and_paid_dream_consumption
+
+test result: FAILED. 11 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 43.60s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_agent_settings_live`
+     Running tests/r06_b7b_config_scope_prefs.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_b7b_config_scope_prefs-eed788cc5ea0e39f)
+
+running 2 tests
+test global_agent_leaf_split_cross_agent_readback_and_immediate_refilter ... FAILED
+test mixed_patch_partial_success_and_memory_toggle_timestamps ... FAILED
+
+failures:
+
+---- global_agent_leaf_split_cross_agent_readback_and_immediate_refilter stdout ----
+
+thread 'global_agent_leaf_split_cross_agent_readback_and_immediate_refilter' (1982106) panicked at crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs:304:5:
+assertion `left == right` failed: editor-typography-changed 广播
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- mixed_patch_partial_success_and_memory_toggle_timestamps stdout ----
+
+thread 'mixed_patch_partial_success_and_memory_toggle_timestamps' (1982107) panicked at crates/lingxi-service/tests/r06_b7b_config_scope_prefs.rs:446:5:
+assertion `left == right` failed: 前段全局 setter 已写入被如实读回（部分成功，不宣称原子回滚）
+  left: Bool(true)
+ right: Bool(false)
+
+
+failures:
+    global_agent_leaf_split_cross_agent_readback_and_immediate_refilter
+    mixed_patch_partial_success_and_memory_toggle_timestamps
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `-p lingxi-service --test r06_b7b_config_scope_prefs`
+     Running tests/r06_b7b_skills_events.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_b7b_skills_events-d000919b254f9e47)
+
+running 1 test
+test skills_faces_broadcast_and_bundle_boundaries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/r06_settings_owner_current_source.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_settings_owner_current_source-4104e8cdb10af0ed)
+
+running 1 test
+test current_settings_owner_switch_cannot_edit_other_real_service_before_identity_ready ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.92s
+
+     Running tests/r06_t06_skills.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_t06_skills-4ea5ce32f7d8ffcf)
+
+running 6 tests
+test a12_layer1_guard_slot_absent_fails_closed_to_risk_confirmation ... ok
+test a12_layer1_install_review_token_protocol_end_to_end ... ok
+test a12_layer1_safe_review_installs_directly_marked_not_default_enabled ... ok
+test a12_layer2_gateway_refuses_out_of_workspace_skill_action ... ok
+test a11_memory_tools_are_bound_to_one_agent_at_construction ... ok
+test skills_http_faces_whitelist_shadow_readonly_and_bundles ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+error: 3 targets failed:
+    `-p lingxi-service --test r06_agent_config_readback`
+    `-p lingxi-service --test r06_agent_settings_live`
+    `-p lingxi-service --test r06_b7b_config_scope_prefs`

@@ -1,0 +1,101 @@
+{
+  "models": {
+    "chat": {
+      "model": "fixture-chat",
+      "provider": "fixture"
+    }
+  },
+  "providers": {
+    "fixture": {
+      "auth": {
+        "apiKey": "saved-fixture-key",
+        "kind": "apiKey"
+      },
+      "endpoint": "http://127.0.0.1:60923/v1",
+      "headers": {
+        "x-fixture": "saved-header"
+      },
+      "metadata": {
+        "custom": {
+          "preserve": 17
+        }
+      },
+      "models": [
+        {
+          "capabilities": {
+            "imageInput": false,
+            "tools": true
+          },
+          "id": "fixture-chat",
+          "input": [
+            "text"
+          ],
+          "inputs": [
+            "text"
+          ],
+          "toolUse": {
+            "dialect": "openai",
+            "supportsTools": true,
+            "toolResultFormat": "message"
+          }
+        },
+        {
+          "capabilities": {
+            "imageInput": false,
+            "tools": null
+          },
+          "id": "health-model",
+          "input": [
+            "text"
+          ],
+          "inputs": [
+            "text"
+          ]
+        },
+        {
+          "capabilities": {
+            "imageInput": false,
+            "tools": true
+          },
+          "id": "fixture-chat2",
+          "input": [
+            "text"
+          ],
+          "inputs": [
+            "text"
+          ],
+          "toolUse": {
+            "dialect": "openai",
+            "supportsTools": true,
+            "toolResultFormat": "message"
+          }
+        }
+      ],
+      "protocol": "openai-completions"
+    },
+    "fixture-anthropic": {
+      "auth": {
+        "apiKey": "saved-anthropic-key",
+        "kind": "apiKey"
+      },
+      "endpoint": "http://127.0.0.1:60923/v1",
+      "metadata": {},
+      "models": [
+        {
+          "capabilities": {
+            "imageInput": false,
+            "tools": null
+          },
+          "id": "claude-fixture",
+          "input": [
+            "text"
+          ],
+          "inputs": [
+            "text"
+          ]
+        }
+      ],
+      "protocol": "anthropic-messages"
+    }
+  }
+}

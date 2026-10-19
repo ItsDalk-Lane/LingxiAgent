@@ -1,0 +1,38 @@
+{
+  "candidate": "r7",
+  "name": "native-handoff",
+  "command": [
+    "/usr/bin/env",
+    "LINGXI_BROWSER_MANUAL_EVIDENCE_DIR=/private/tmp/lingxi-r07-t04-manual-r7",
+    "LINGXI_BROWSER_MANUAL_WAIT_SECONDS=180",
+    "/Users/study_superior/.cargo/bin/cargo",
+    "test",
+    "--manifest-path",
+    "rust/Cargo.toml",
+    "--locked",
+    "-p",
+    "lingxi-adapters",
+    "--lib",
+    "browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target",
+    "--",
+    "--ignored",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-15T23:28:53.551778+00:00",
+  "sourceFingerprint": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "log": "r7-native-handoff.log",
+  "endedAt": "2026-10-15T23:30:54.691051+00:00",
+  "exitCode": 101,
+  "sourceFingerprintAfter": "612f1bdd45a4af24ec84e9956c3cd233fdec21d3883ac41bc7d26db1d5a6fc55",
+  "logSha256": "4df6c45dcdbf5760e33acf8b8b333b0bfa64fac799b411fb4b132ae6fa5b9bc4",
+  "sourceUnchanged": true
+}

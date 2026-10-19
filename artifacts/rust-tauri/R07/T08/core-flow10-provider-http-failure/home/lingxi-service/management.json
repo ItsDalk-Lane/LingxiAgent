@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "serverId": "server_lesyaTqek6X8pgLdQ4egng",
+  "studioId": "studio_lTH028dfaAyztN9X-pLApw",
+  "account": {
+    "userId": "user_local",
+    "username": "local",
+    "displayName": "Local User",
+    "passwordSalt": null,
+    "passwordHash": null,
+    "passwordAlgorithm": null
+  },
+  "network": {
+    "mode": "loopback",
+    "listenHost": "127.0.0.1",
+    "listenPort": 0,
+    "publicBaseUrl": null
+  },
+  "webSessions": [],
+  "defaultThinkingLevel": "medium",
+  "sessionThinkingLevels": {},
+  "audit": [
+    {
+      "action": "models.save",
+      "target": "model-plane",
+      "atUnixMs": 1792303507254,
+      "metadata": {
+        "generation": 2
+      }
+    }
+  ]
+}

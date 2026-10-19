@@ -1,0 +1,35 @@
+{
+  "scope": "original synthetic UI failure preserved, never converted to pass",
+  "files": [
+    {
+      "path": "failures/ui-result.json",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-27618-1792304565487508000/home/ui-result.json",
+      "sha256": "b542b7ac1c2dd475c9ad7e368d09c058a665e10f41007be4b8af4ee5c4a378ae"
+    },
+    {
+      "path": "failures/electron-failure-trace.json",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-failures-27618-1792304565487508000/home/electron-failure-trace.json",
+      "sha256": "9161c4150d45d79336124ed3cf3b8bffb3b5e4609f08757119a63c51fb029213"
+    },
+    {
+      "path": "workflow/ui-result.json",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-27618-1792304565487494000/home/ui-result.json",
+      "sha256": "80f4145d9560677e14a55d1c180b40be38c50803e65a61b496445943cc7e7e21"
+    },
+    {
+      "path": "workflow/electron-failure-trace.json",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-workflow-27618-1792304565487494000/home/electron-failure-trace.json",
+      "sha256": "c19750e51b9b0428ac49aec901903802eb7e06d7fabdc22928c8601ccc79577d"
+    },
+    {
+      "path": "references-pending/ui-result.json",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-27618-1792304565487516000/home/ui-result.json",
+      "sha256": "acad5c40e442b1acb0ffaf911e8ce147f8a94826cd4c95b736b85ac20b81ed81"
+    },
+    {
+      "path": "references-pending/electron-failure-trace.json",
+      "source": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-references-pending-27618-1792304565487516000/home/electron-failure-trace.json",
+      "sha256": "e89961e262e7d706b62c623b58ec17a651017d57a421d0f2497c7623a1bd99e5"
+    }
+  ]
+}

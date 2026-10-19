@@ -27,23 +27,56 @@ pub mod approval;
 pub mod approval_service;
 pub mod artifactverify;
 pub mod auth;
+pub mod automation;
+pub mod automation_activity;
+pub mod automation_daily;
+pub mod automation_heartbeat;
+pub mod automation_import;
+pub mod automation_patrol;
+pub mod automation_permission;
+pub mod automation_review;
+pub mod automation_schedule;
+pub mod automation_tools;
 pub mod background;
 pub mod background_tasks;
+mod beautify_generation;
+pub mod bridge;
+mod bridge_effect_text;
+mod bridge_effects;
+pub mod bridge_media_pipe;
+mod bridge_permission;
+pub mod bridge_routes;
+pub(crate) mod bridge_run_authority;
+pub mod bridge_session_routes;
+pub mod bridge_worker;
 pub mod bridgemedia;
+pub mod browser;
 pub mod browser_host;
+pub mod browser_routes;
+pub mod browser_tools;
 pub mod cancel;
 pub mod cardguide;
+pub mod cards;
 pub mod character_cards;
 pub mod chat_settings;
 pub mod chat_wire;
 pub mod checkpoint_store;
+pub mod client_context;
 pub mod compaction;
 pub mod computer_use_settings;
 pub mod config;
 pub mod context_compiler;
 pub mod conversation_map;
+pub mod conversation_routes;
+pub mod conversation_runtime;
+pub mod conversation_status;
+pub mod conversation_tools;
+pub mod conversations;
 pub mod credentials;
 pub mod dedup;
+pub mod desk_files;
+pub mod desk_logs;
+pub mod diary;
 pub mod discovery_tools;
 pub mod dream_service;
 pub mod epoch;
@@ -54,9 +87,13 @@ pub mod filehistory;
 pub mod filemeta;
 pub mod filetools;
 pub mod fsread;
+pub mod git_panel;
+pub mod goal;
+pub mod goaltools;
 pub mod history;
 pub mod history_projection;
 pub mod hooks;
+pub mod host_auxiliary;
 pub mod inject;
 pub mod input_drafts;
 pub mod instance;
@@ -66,22 +103,43 @@ pub mod invocations;
 pub mod knowledge;
 pub mod knowledge_processors;
 pub mod knowledgetools;
+pub mod legacy_plugins;
 pub mod limits;
 pub mod logging;
+pub mod loopsvc;
+pub mod looptools;
+pub mod loopx;
 mod management;
+pub mod mcp_session_permissions;
+pub mod mcp_settings;
 pub mod mcpbridge;
+pub mod media;
+pub mod media_admin;
+pub mod media_generate;
+pub mod media_jimeng;
+pub mod media_routes;
+pub mod media_tools;
 pub mod memory;
 pub mod memory_ticker;
 pub mod memorytools;
+pub mod model_configuration;
 pub mod model_history;
 mod mood_trajectory;
 pub mod office;
+mod office_pdf;
+pub mod office_routes;
+pub mod office_tools;
 pub mod operations;
 pub mod paths;
 pub mod persona;
+mod phone_run_authority;
+pub mod phone_settings;
+pub mod phone_tools;
 pub mod preview;
 pub mod procsupervisor;
 pub mod projects;
+pub mod provider_probe;
+pub mod provider_routes;
 pub mod quotas;
 pub mod read_vision;
 pub mod recovery;
@@ -94,9 +152,11 @@ pub mod resourceio;
 pub mod resources;
 pub mod runs;
 pub mod sandbox;
+pub mod search_routes;
 mod security_audit;
 pub mod serve;
 pub mod session_admin;
+pub mod session_collab;
 pub mod session_focus;
 pub mod session_locator;
 pub mod session_prompt;
@@ -106,11 +166,14 @@ pub mod session_ui;
 pub mod sessionfiles;
 pub mod sessions;
 pub mod sessiontools;
+pub mod settings_configuration;
+pub mod settings_tools;
 pub mod settings_ui;
 pub mod shutdown;
 pub mod skills;
 pub mod slash;
 pub mod stagefiles;
+mod observability;
 mod static_web;
 pub mod streaming_norm;
 pub mod subagents;
@@ -120,8 +183,13 @@ pub mod toolcatalog_bridge;
 pub mod toolgateway;
 pub mod transport;
 pub mod userprefs;
+pub mod web_tools;
+pub mod workbench;
 pub mod workermodel;
 pub mod workerrpc;
+pub mod workflow;
+pub mod workflow_routes;
+pub mod workflowjs;
 pub mod ws;
 
 pub use approval::{ApprovalDecision, ApprovalGate, ApprovalRequest};
@@ -489,8 +557,27 @@ pub struct ServiceState {
     slash: Arc<slash::SlashService>,
     chat_wire: Arc<chat_wire::ChatWire>,
     browser_host: Arc<browser_host::BrowserHost>,
+    browsers: Arc<std::sync::OnceLock<Arc<browser::BrowserService>>>,
+    web_tools: Arc<std::sync::OnceLock<Arc<web_tools::WebTools>>>,
+    office_api: Arc<std::sync::OnceLock<Arc<office_tools::OfficeApi>>>,
+    office_assets: Option<office_tools::OfficeAssets>,
+    beautify: Arc<std::sync::OnceLock<Arc<beautify_generation::BeautifyService>>>,
+    media: Arc<std::sync::OnceLock<Arc<media::MediaService>>>,
+    automation: Arc<automation::AutomationHost>,
+    bridge: Arc<bridge::BridgeHost>,
+    conversations: Arc<conversation_runtime::ConversationHost>,
+    conversation_files: lingxi_adapters::conversation_files::ConversationFiles,
+    session_collab: Arc<std::sync::OnceLock<Arc<history::history_content::SessionCollabTools>>>,
     events: Arc<events::EventService>,
     app_events: Arc<appevents::AppEventLog>,
+    /// R07-T07-δ2: 会话预算目标引擎单例（run 进账钩 / 取消钩 / goal 工具
+    /// 共用；组合根处注释说明现役对应件）。
+    goal_engine: Arc<goal::GoalEngine>,
+    /// R07-T07-δ6: 循环面三件套（控制器/闹钟/存储；slash /loop 臂、
+    /// loop_control 工具与会话列表注入共用）。
+    loop_services: loopsvc::LoopServices,
+    workflows: Arc<workflow::WorkflowService>,
+    desk_logs: Arc<desk_logs::DeskLog>,
     session_projects: Arc<projects::SessionProjectsService>,
     rate: Arc<limits::RateLimiter>,
     ws_conns: Arc<limits::WsConnectionCounter>,
@@ -564,6 +651,8 @@ pub struct ServiceState {
     interactions: Arc<interaction_store::InteractionStore>,
     focus_mutation: Arc<tokio::sync::Mutex<()>>,
     approvals: Option<Arc<approval_service::ApprovalService>>,
+    /// R07-T06: 产物"系统打开"的注入点（None = open 路由响亮 503）。
+    media_file_opener: Option<media_generate::MediaFileOpener>,
     /// Subagent runtime (R03-T06): child-run dispatch/reply/close through
     /// the same run supervisor.
     subagents: Arc<subagents::SubagentRuntime>,
@@ -585,7 +674,9 @@ pub struct ServiceState {
     model_gateway: Option<Arc<lingxi_adapters::models::gateway::ConfigModelGateway>>,
     /// Where the model plane was loaded from (R05-T01) — the reload
     /// surface re-reads the SAME source, never a guessed location.
-    model_plane_source: Option<config::ModelPlaneSource>,
+    model_configuration: Arc<model_configuration::ModelConfiguration>,
+    mcp_settings: Arc<mcp_settings::McpSettingsManager>,
+    cards: Arc<cards::CardCache>,
     /// The credential service (R05-T02), present exactly when the model
     /// gateway is: the SINGLE credential-material exit of the model plane
     /// (C01) — seeded from the same provider config, owning the OAuth
@@ -655,6 +746,18 @@ impl std::error::Error for ServiceStartupError {}
 /// sleeps.
 #[derive(Clone)]
 pub struct ServiceDeps {
+    /// 办公素材与解析器由可信宿主组装，客户端不能传入可执行程序或素材根。
+    pub office_assets: Option<office_tools::OfficeAssets>,
+    pub office_document_worker: Option<office_tools::OfficeWorkerLaunch>,
+    /// 即梦外部登录仅由可信宿主显式授权，不继承个人HOME。
+    pub jimeng_launch: Option<media_jimeng::JimengLaunch>,
+    /// 可信注入宿主显式装配封闭根的会话文件工具；无 HTTP 或用户配置入口。
+    /// 生产模型链自动装配；其余注入默认保留调用方完整工具面。
+    pub assemble_session_file_tools: bool,
+    /// 仅可信测试或宿主组装可注入外部浏览器端口，客户端不得选择。
+    pub browser_port: Option<Arc<dyn lingxi_kernel::browser::BrowserPort>>,
+    /// 仅可信宿主可替换 SDK 进程；消息与 HTTP 均不能选择程序。
+    pub bridge_worker_launch: Option<bridge_worker::BridgeWorkerLaunch>,
     /// 可信宿主指定的产品素材根；测试用自身临时目录，默认仍沿现行环境/安装目录解析。
     pub product_material_dir: Option<std::path::PathBuf>,
     /// 可信宿主的确定性文件写入时序探针，生产默认关闭，无 HTTP 或配置入口。
@@ -767,6 +870,8 @@ pub struct ServiceDeps {
     /// management reload surface re-reads the SAME source (never a guessed
     /// location).
     pub model_plane_source: Option<config::ModelPlaneSource>,
+    /// 生产空配置预装共享链但尚未激活；None 保留既有注入测试语义。
+    pub model_plane_activation: Option<Arc<std::sync::atomic::AtomicBool>>,
     /// The credential service (R05-T02). REQUIRED whenever the production
     /// chain is wired (`model_gateway` set and no injected `turn_provider`)
     /// — a configured model plane without its credential service is a loud
@@ -811,6 +916,9 @@ pub struct ServiceDeps {
     /// exchange and the run continues). `None` keeps the pre-R06-T02
     /// shape exactly (no compaction check at all).
     pub compaction_service: Option<std::sync::Arc<compaction::CompactionService>>,
+    /// R07-T06: 产物"系统打开"的注入点（现役 openWithSystem）。生产默认是
+    /// 平台 opener；测试注入录制替身。`None` 时 open 路由响亮 503，绝不冒充成功。
+    pub media_file_opener: Option<media_generate::MediaFileOpener>,
 }
 
 /// The formal tool plane's shared handles (R05 RR1 F24): what the real
@@ -827,6 +935,12 @@ type ToolPlaneHandles = (
 impl Default for ServiceDeps {
     fn default() -> Self {
         Self {
+            office_assets: None,
+            office_document_worker: None,
+            jimeng_launch: None,
+            assemble_session_file_tools: false,
+            browser_port: None,
+            bridge_worker_launch: bridge_worker::BridgeWorkerLaunch::discover(),
             product_material_dir: None,
             native_file_mutation_test_hook: None,
             ws_ticket_ttl_ms: ws::DEFAULT_WS_TICKET_TTL_MS,
@@ -855,6 +969,7 @@ impl Default for ServiceDeps {
             tool_gateway: None,
             model_gateway: None,
             model_plane_source: None,
+            model_plane_activation: None,
             credential_service: None,
             network_plane: None,
             resource_url_provider: None,
@@ -863,6 +978,7 @@ impl Default for ServiceDeps {
             worker_tool_registration: None,
             context_compiler: None,
             compaction_service: None,
+            media_file_opener: Some(media_generate::platform_media_file_opener()),
         }
     }
 }
@@ -870,6 +986,10 @@ impl Default for ServiceDeps {
 impl std::fmt::Debug for ServiceDeps {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ServiceDeps")
+            .field(
+                "assemble_session_file_tools",
+                &self.assemble_session_file_tools,
+            )
             .field("ws_ticket_ttl_ms", &self.ws_ticket_ttl_ms)
             .field("rate_window_ms", &self.rate_window_ms)
             .field("rate_max", &self.rate_max)
@@ -1160,6 +1280,9 @@ impl ServiceState {
             .validate()
             .map_err(ServiceStartupError::Storage)?;
         validate_resource_deps(&deps)?;
+        // R07-T11：旧用户插件生态已退役——数据根下残留 plugins/ 只告知
+        // （不加载、不删除、不阻塞启动），处置权留给用户。
+        legacy_plugins::warn_if_legacy_plugins(&layout.home);
         let auth = AuthService::bootstrap(layout, &identity.instance_id)
             .map_err(ServiceStartupError::Auth)?;
         let management = management::ManagementState::open(layout, &config)
@@ -1214,6 +1337,77 @@ impl ServiceState {
         )
         .map_err(ServiceStartupError::Storage)?;
         let events = Arc::new(events);
+        // R07-T07-δ2: 会话预算目标引擎（现役 server/index.ts:972-991 的组合
+        // 件）。单一实例——run 驱动的进账/时间检查钩、会话取消钩与 goal
+        // 工具共用同一引擎（现役注释：侧车全量原子写，双实例会丢增量）。
+        // 超支提醒恰好一次（引擎内 overBudgetNotified 守卫）：模型可见面走
+        // steering 保留投递（deliver_retained，现役 deliverCustomMessage
+        // display:false 的 Rust 对应），用户面走 app_events 轮询
+        // （"goal_over_budget" 结构化载荷；Rust 无现役 _emitEvent
+        // notification 通道，偏差登记见 T07_STATUS δ 设计定稿）。回调失败
+        // 只记 tracing，不吞账本（现役 try/catch 语义）。
+        let app_events = Arc::new(appevents::AppEventLog::new());
+        let goal_engine = {
+            let supervisor = Arc::downgrade(session_arc.session_supervisor());
+            let notify_events = Arc::clone(&app_events);
+            let notify_clock = Arc::clone(&deps.clock);
+            Arc::new(goal::GoalEngine::new(
+                config.data_home.clone(),
+                Arc::new(
+                    move |session_id: &str, goal: &goal::GoalState, kind: goal::OverBudgetKind| {
+                        let label = match kind {
+                            goal::OverBudgetKind::Tokens => format!(
+                                "token budget {} exceeded (used {})",
+                                goal.token_budget
+                                    .map(|budget| budget.to_string())
+                                    .unwrap_or_else(|| "null".to_string()),
+                                goal.tokens_used
+                            ),
+                            goal::OverBudgetKind::Time => "time budget exceeded".to_string(),
+                        };
+                        let content = format!(
+                            "<hana-goal-over-budget goal=\"{}\">{}. Wrap up current work and hand the decision back to the user: finish now, or ask whether to continue despite the overage. Check the goal tool status for exact numbers.</hana-goal-over-budget>",
+                            goal.name, label
+                        );
+                        match supervisor.upgrade() {
+                            Some(gate) => {
+                                if let Err(error) = gate.deliver_retained(session_id, &content) {
+                                    tracing::warn!(
+                                        ?error,
+                                        session_id,
+                                        "goal over-budget steering delivery failed"
+                                    );
+                                }
+                            }
+                            None => {
+                                tracing::warn!(
+                                    session_id,
+                                    "goal over-budget: session supervisor gone"
+                                );
+                            }
+                        }
+                        let active_ms = goal::goal_active_ms(goal, notify_clock.now_unix_ms());
+                        notify_events.publish(
+                            "goal_over_budget",
+                            serde_json::json!({
+                                "sessionId": session_id,
+                                "name": goal.name.as_str(),
+                                "kind": kind.wire_name(),
+                                "tokensUsed": goal.tokens_used,
+                                "tokenBudget": goal.token_budget,
+                                "activeMs": active_ms,
+                                "timeBudgetMs": goal.time_budget_ms,
+                            }),
+                        );
+                    },
+                ),
+                Box::new({
+                    let clock = Arc::clone(&deps.clock);
+                    move || clock.now_unix_ms()
+                }),
+            ))
+        };
+        session_arc.attach_goal_engine(&goal_engine);
         // R3-F02: the 2x connection-cap derivation is a CHECKED
         // multiplication. The CLI parse bound (1..=usize::MAX/2) and
         // validate_resource_deps above make the overflow branch unreachable
@@ -1294,6 +1488,21 @@ impl ServiceState {
                 })?;
         }
         let file_safety = Arc::new(file_safety::FileSafety::new(&config.data_home));
+        // 没有工作区也能读取自己刚生成的会话文件；零根策略不授予任何目录。
+        let session_read_access = if workspace_access.is_none()
+            && (wired_real_model_chain || deps.assemble_session_file_tools)
+        {
+            Some(Arc::new(resourceaccess::ResourceAccess::new(&[]).map_err(
+                |error| {
+                    ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: error.to_string(),
+                    })
+                },
+            )?))
+        } else {
+            None
+        };
+
         // R06-T06：记忆/技能/人格服务（工具面注册模型侧工具需要它们）。
         // product_dir 复用 T01 的解析链。
         let t06_data_home = config.data_home.clone();
@@ -1399,22 +1608,49 @@ impl ServiceState {
                         .to_string(),
                 })
             })?;
-            let registry = Arc::new(lingxi_kernel::toolcatalog::ToolRegistry::new());
-            let approvals = Arc::new(approval_service::ApprovalService::new(Arc::clone(
-                &deps.clock,
-            )));
-            approval_service_handle = Some(Arc::clone(&approvals));
+            // 宿主显式注入工具网关与批准门时（带真实模型面的验收宿主），组合根必须
+            // 采用同一套装配：注入网关的注册表承接全部正式工具登记，批准请求落到宿主
+            // 持有的批准服务。静默另建网关会让注入的批准服务永远看不到批准条目
+            // （R07-T06 媒体批准链的"外部生成须先进入正式批准"超时根因）。只注入其一
+            // 会把工具执行与批准等待拆到两个服务上，是响亮启动错误而非静默降级。
             let budget = lingxi_kernel::toolcatalog::SchemaBudget::default();
-            let gateway = Arc::new(toolgateway::ToolInvocationGateway::new(
-                Arc::clone(&registry),
-                Arc::clone(&approvals) as Arc<dyn toolgateway::ToolPolicyPort>,
-                Arc::clone(&deps.clock),
-                budget,
-                toolgateway::DEFAULT_PREPARED_TTL_MS,
-                toolgateway::DEFAULT_LIVE_PREPARED_CAP,
-            ));
+            let (registry, gateway) = match (deps.tool_gateway.clone(), deps.approval_gate.clone())
+            {
+                (Some(injected_gateway), Some(_)) => {
+                    let registry = Arc::clone(injected_gateway.registry());
+                    (registry, injected_gateway)
+                }
+                (None, None) => {
+                    let registry = Arc::new(lingxi_kernel::toolcatalog::ToolRegistry::new());
+                    let approvals = Arc::new(approval_service::ApprovalService::new(Arc::clone(
+                        &deps.clock,
+                    )));
+                    approval_service_handle = Some(Arc::clone(&approvals));
+                    let gateway = Arc::new(toolgateway::ToolInvocationGateway::new(
+                        Arc::clone(&registry),
+                        Arc::clone(&approvals) as Arc<dyn toolgateway::ToolPolicyPort>,
+                        Arc::clone(&deps.clock),
+                        budget,
+                        toolgateway::DEFAULT_PREPARED_TTL_MS,
+                        toolgateway::DEFAULT_LIVE_PREPARED_CAP,
+                    ));
+                    deps.approval_gate =
+                        Some(Arc::clone(&approvals) as Arc<dyn approval::ApprovalGate>);
+                    (registry, gateway)
+                }
+                _ => {
+                    return Err(ServiceStartupError::Storage(StorageError::InvalidRequest {
+                        detail: "an injected tool gateway and an injected approval gate must \
+                                 come from the same host assembly; adopting only one would split \
+                                 the approval chain across two services"
+                            .into(),
+                    }));
+                }
+            };
             // 子任务与其他正式工具共用当轮声明、参数校验和权限判断。
             subagents::register_tools(&registry, gateway.as_ref(), &budget);
+            // R07-T07-δ3 goal 工具登记已移至 deps.tool_gateway 恒可达点
+            // （loop_control 同位），此处不再重复注册。
             // R06 收口：hana_card_guide（Hana Interactive Card 设计手册，
             // 现役 lib/tools/card-guide-tool.ts + core/agent.ts:973 工具面；
             // 只读静态指南，无需 workspace，返回全册文本且不产卡片）。
@@ -1551,9 +1787,38 @@ impl ServiceState {
             // registry (the file tools' verified capability rows), never
             // the conservative default, once real tools exist.
             deps.recovery_capabilities = Arc::new(invocations::RegistryCapabilities::new(registry));
-            deps.approval_gate = Some(Arc::clone(&approvals) as Arc<dyn approval::ApprovalGate>);
+            // 批准门：注入装配沿用宿主批准门（上面 match 已校验成对）；自建装配已在分支内写入。
             deps.tool_gateway = Some(gateway);
             deps.turn_provider = Some(Arc::new(provider));
+        }
+        if let (Some(access), Some(gateway)) =
+            (session_read_access.as_ref(), deps.tool_gateway.as_ref())
+        {
+            let target = lingxi_kernel::toolcatalog::tool_target_id(
+                &lingxi_kernel::toolcatalog::ToolOrigin::FirstParty,
+                "read",
+            )
+            .expect("正式read目标");
+            if gateway.registry().describe(&target).is_err() {
+                let tools = filetools::register_read_file_tool(
+                    gateway.registry(),
+                    gateway,
+                    access.clone(),
+                    config.data_home.clone(),
+                    deps.clock.clone(),
+                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                );
+                tools.set_file_safety(file_safety.clone());
+                read_file_tools = Some(tools);
+                // 仅生产链或明确装配的注入宿主进入这里；已有目录策略保持原样。
+                if !gateway.has_catalog_definitions() {
+                    toolcatalog_bridge::register(
+                        gateway.registry(),
+                        gateway,
+                        &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                    );
+                }
+            }
         }
         // R03-T01: the run lifecycle supervisor. Degenerate bounds are a
         // loud startup error (never clamped silently); a missing provider is
@@ -1595,7 +1860,10 @@ impl ServiceState {
         // handle-verified dispatch after `started`); `None` keeps the R03
         // shape exactly (raw executor port / loud no-tools failure).
         .with_tool_gateway(deps.tool_gateway.clone())
-        .with_session_admission(Arc::clone(storage.session_admission()));
+        .with_settlement_clock(Arc::clone(&deps.clock))
+        .with_session_admission(Arc::clone(storage.session_admission()))
+        // R07-T07-δ2: 预算目标进账/时间检查钩的引擎句柄。
+        .with_goal_engine(Arc::clone(&goal_engine));
         // R05-T05: the per-call wall-clock tuning (validated in
         // `validate_resource_deps`; revalidated at the builder boundary).
         let runs = runs
@@ -1747,6 +2015,7 @@ impl ServiceState {
         // observation endpoint serves the SAME artifact (R06-A01); `None`
         // keeps the pre-R06 shape exactly.
         let runs = runs
+            .with_model_activation(deps.model_plane_activation.clone())
             .with_context_compiler(deps.context_compiler.clone())
             .with_context_session_store(Arc::clone(&storage))
             .with_session_resource_access(
@@ -2100,15 +2369,16 @@ impl ServiceState {
                 })
             })?;
         }
+        let task_tools = Arc::new(background_tasks::TaskTools::new(
+            Arc::clone(&storage),
+            Arc::downgrade(&runs),
+            operations_entry.clone(),
+        ));
         if let Some(gateway) = deps.tool_gateway.as_ref() {
             background_tasks::register(
                 gateway.registry(),
                 gateway,
-                Arc::new(background_tasks::TaskTools::new(
-                    Arc::clone(&storage),
-                    Arc::downgrade(&runs),
-                    operations_entry.clone(),
-                )),
+                task_tools.clone(),
                 &lingxi_kernel::toolcatalog::SchemaBudget::default(),
             );
         }
@@ -2191,9 +2461,19 @@ impl ServiceState {
         // （engine.getBridgeMediaPublicBaseUrl?.() 无候选配置面对应物，
         // 台账申报）；白名单 = media-roots.ts 收集器的候选映射
         // （data_home + workspace + 用户主目录 + 临时根）。
+        let bridge_preferences = memory_service.read_preferences_root().map_err(|detail| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+        })?;
+        let bridge_public_base_url = bridge_preferences
+            .pointer("/bridge/mediaPublicBaseUrl")
+            .and_then(serde_json::Value::as_str)
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+            .map(str::to_string)
+            .unwrap_or_else(|| std::env::var("LINGXI_BRIDGE_PUBLIC_BASE_URL").unwrap_or_default());
         let bridge_media = Arc::new(
             bridgemedia::BridgeMediaService::new(
-                &std::env::var("LINGXI_BRIDGE_PUBLIC_BASE_URL").unwrap_or_default(),
+                &bridge_public_base_url,
                 &bridgemedia::collect_bridge_media_allowed_roots(
                     &data_home,
                     workspace_access.as_ref().map(|(_, root)| root.as_path()),
@@ -2272,6 +2552,31 @@ impl ServiceState {
             );
         }
 
+        if let (Some(gateway), Some(access)) =
+            (deps.tool_gateway.as_ref(), session_read_access.as_ref())
+        {
+            let target = lingxi_kernel::toolcatalog::tool_target_id(
+                &lingxi_kernel::toolcatalog::ToolOrigin::FirstParty,
+                "materialize",
+            )
+            .expect("正式materialize目标");
+            if gateway.registry().describe(&target).is_err() {
+                resource_tools::register_materialize(
+                    gateway.registry(),
+                    gateway,
+                    Arc::new(resource_tools::ResourceTools::new(
+                        storage.clone(),
+                        session_files.clone(),
+                        resource_io.clone(),
+                        access.clone(),
+                        data_home.clone(),
+                        file_safety.clone(),
+                    )),
+                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                );
+            }
+        }
+
         // R06-T05 Round 5：fs 直读面授权根（fs.ts :77-86 的候选映射：
         // data_home + workspace）。
         let fs_read = Arc::new(fsread::FsReadService::new(
@@ -2281,11 +2586,124 @@ impl ServiceState {
         // R06：输入草稿服务先建，供 session_admin 永久删除时同步清理草稿。
         let input_drafts_handle = Arc::new(input_drafts::InputDraftsService::new(&data_home));
         let session_projects_handle = Arc::new(projects::SessionProjectsService::new(&data_home));
+        let injected_browser_port = deps.browser_port.take();
+        // R07-T07-δ6: 循环面组合（现役 server/index.ts:488-491 LoopStore +
+        // engine.setLoopServices 挂钩）。chat_wire 提前落地：状态广播与
+        // 展示气泡闭包与结构字面量共享同一实例。LoopStore::load 对损坏文件
+        // 按现役语义移备份空态继续；IO 错误响亮拒绝启动。
+        let chat_wire = Arc::new(chat_wire::ChatWire::new(&data_home));
+        let loop_services = loopsvc::build_loop_services(
+            &data_home,
+            &session_arc,
+            &storage,
+            &events,
+            &runs,
+            &background,
+            operations_entry.clone(),
+            &chat_wire,
+            &auth.scheduler_principal(),
+            &deps.clock,
+        )
+        .map_err(|err| {
+            ServiceStartupError::Storage(StorageError::Io {
+                detail: format!("loop state load failed: {err}"),
+            })
+        })?;
+        // R07-T07-δ3: goal 预算工具（现役 lib/tools/goal-tool.ts）——同一引擎
+        // 单例；默认预算读 user/preferences.json 的 goal 段。原登记在模型面
+        // 装配分支内，turn_provider 替身宿主（全部双组合测试）永远拿不到
+        // goal 工具——与 δ6/δ7/δ8 同位移到注入/自建网关的恒可达注册点
+        // （deps.tool_gateway 在 1778 行自建臂回填后两处均非空）。
+        if let Some(gateway) = deps.tool_gateway.clone() {
+            goaltools::register_goal_tool(
+                gateway.registry(),
+                gateway.as_ref(),
+                Arc::clone(&goal_engine),
+                config.data_home.clone(),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
+        }
+        // R07-T07-δ7: loop_control 工具（现役 lib/tools/loop-control-tool.ts）
+        // ——与其它正式工具同一注册表/网关；注册表只可能在模型面装配后存在。
+        if let Some(gateway) = deps.tool_gateway.clone() {
+            looptools::register_loop_control_tool(
+                gateway.registry(),
+                gateway.as_ref(),
+                Arc::clone(&loop_services.controller),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
+        }
+        // R07-T07-δ8: workflow 引擎（现役 lib/tools/workflow-tool.ts）。
+        // 节点复用 subagent 的 child-run 通道，故服务持有同一
+        // SubagentRuntime 花名册；工具与正式工具同一注册表/网关。派单即回，
+        // 服务持有工作流监督器，统一处理取消、会话清理与退出。
+        let workflow_service = Arc::new(workflow::WorkflowService::new(
+            Arc::clone(&storage),
+            Arc::clone(&events),
+            Arc::clone(&runs),
+            Arc::clone(session_arc.session_supervisor()),
+            Arc::clone(&subagent_runtime),
+            Arc::clone(&app_events),
+            memory_service.agents_root(),
+            Arc::clone(&deps.clock),
+        ));
+        if let Some(gateway) = deps.tool_gateway.clone() {
+            workflow::register_workflow_tool(
+                gateway.registry(),
+                gateway.as_ref(),
+                Arc::clone(&workflow_service),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
+        }
+        loop_services
+            .attach_workflows(&workflow_service)
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        workflow_service.attach_loop_controller(&loop_services.controller);
+        task_tools
+            .set_workflows(Arc::downgrade(&workflow_service))
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        session_arc.attach_workflows(&workflow_service);
+        let model_activation = deps
+            .model_plane_activation
+            .clone()
+            .unwrap_or_else(|| Arc::new(std::sync::atomic::AtomicBool::new(true)));
+        let management = Arc::new(management);
+        let auth = Arc::new(auth);
+        let model_configuration = Arc::new(
+            model_configuration::ModelConfiguration::new(
+                data_home.clone(),
+                layout.runtime_dir.clone(),
+                deps.model_plane_source.clone(),
+                model_activation,
+                deps.model_gateway.clone(),
+                deps.credential_service.clone(),
+                deps.network_plane.clone(),
+                operations_entry.clone(),
+                Arc::clone(&management),
+                Arc::clone(&auth),
+                Arc::clone(&deps.clock),
+                Arc::clone(&storage),
+                Arc::clone(runs.task_supervisor()),
+                runs.quotas_shared(),
+            )
+            .map_err(|detail| ServiceStartupError::Storage(StorageError::Io { detail }))?,
+        );
+        let mcp_settings = mcp_settings::McpSettingsManager::new(
+            Arc::clone(&memory_service),
+            Arc::clone(&app_events),
+            deps.tool_gateway.as_ref().map(Arc::downgrade),
+        );
+        mcp_settings.attach_tasks(runs.task_supervisor());
+        mcp_settings.attach_network(deps.network_plane.as_ref());
         let state = Self {
             _knowledge_worker_owner: Arc::new(KnowledgeWorkerOwner(knowledge_service.clone())),
             config: Arc::new(config),
-            auth: Arc::new(auth),
-            management: Arc::new(management),
+            auth,
+            management,
             static_web: Arc::new(static_web::StaticWebConfig::resolve()),
             bound_addr: Arc::new(std::sync::RwLock::new(None)),
             tickets: Arc::new(WsTicketService::new(
@@ -2295,13 +2713,28 @@ impl ServiceState {
             storage: Arc::clone(&storage),
             sessions: session_arc,
             slash: Arc::new(slash::SlashService::new(&data_home)),
-            chat_wire: Arc::new(chat_wire::ChatWire::new(&data_home)),
+            chat_wire: Arc::clone(&chat_wire),
             browser_host: Arc::new(browser_host::BrowserHost::default()),
+            browsers: Arc::new(std::sync::OnceLock::new()),
+            web_tools: Arc::new(std::sync::OnceLock::new()),
+            office_api: Arc::new(std::sync::OnceLock::new()),
+            office_assets: deps.office_assets.clone(),
+            beautify: Arc::new(std::sync::OnceLock::new()),
+            media: Arc::new(std::sync::OnceLock::new()),
+            automation: Arc::new(automation::AutomationHost::default()),
+            conversations: Arc::new(conversation_runtime::ConversationHost::default()),
+            conversation_files: lingxi_adapters::conversation_files::ConversationFiles::new(
+                data_home.clone(),
+            )
+            .map_err(ServiceStartupError::Storage)?,
+            session_collab: Arc::new(std::sync::OnceLock::new()),
+            bridge: Arc::new(bridge::BridgeHost::new(deps.bridge_worker_launch.clone())),
             session_tree: session_tree_handle,
             session_tools,
             interactions,
             focus_mutation: Arc::new(tokio::sync::Mutex::new(())),
             approvals: approval_service_handle,
+            media_file_opener: deps.media_file_opener.clone(),
             session_admin: Arc::new(
                 session_admin::SessionAdminService::new(Arc::clone(&storage))
                     .with_context_compiler(deps.context_compiler.clone())
@@ -2334,7 +2767,11 @@ impl ServiceState {
             rollback_preferences_lock: Arc::new(tokio::sync::Mutex::new(())),
             input_drafts: input_drafts_handle,
             events: Arc::clone(&events),
-            app_events: Arc::new(appevents::AppEventLog::new()),
+            app_events: Arc::clone(&app_events),
+            goal_engine: Arc::clone(&goal_engine),
+            loop_services,
+            workflows: workflow_service,
+            desk_logs: Arc::new(desk_logs::DeskLog::default()),
             session_projects: session_projects_handle,
             rate: Arc::new(limits::RateLimiter::new(deps.rate_window_ms, deps.rate_max)),
             ws_conns: Arc::new(limits::WsConnectionCounter::new(deps.ws_max_connections)),
@@ -2362,7 +2799,9 @@ impl ServiceState {
             intake,
             recovery_report,
             model_gateway: deps.model_gateway.clone(),
-            model_plane_source: deps.model_plane_source.clone(),
+            model_configuration,
+            mcp_settings,
+            cards: Arc::new(cards::CardCache::default()),
             credential_service: deps.credential_service.clone(),
             worker_model,
             operations: operations_entry,
@@ -2371,11 +2810,281 @@ impl ServiceState {
             compaction: compaction_service,
         };
         let knowledge_owner = Arc::downgrade(state.knowledge());
+        let (browser_port, browser_unavailable) =
+            browser::production_port(&state, injected_browser_port)?;
+        let browsers = browser::BrowserService::new(&state, browser_port, browser_unavailable)
+            .await
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        state.session_admin().attach_browser(&browsers);
+        if let Some(gateway) = state.tool_gateway() {
+            state.session_admin().attach_mcp_gateway(gateway);
+        }
+        state.browsers.set(browsers).map_err(|_| {
+            ServiceStartupError::Storage(StorageError::Internal {
+                detail: "browser already initialized".into(),
+            })
+        })?;
+        let web = web_tools::WebTools::production(&state).map_err(|detail| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+        })?;
+        state.web_tools.set(web.clone()).map_err(|_| {
+            ServiceStartupError::Storage(StorageError::Internal {
+                detail: "web tools already initialized".into(),
+            })
+        })?;
+        let media = media::MediaService::new(&state);
+        if let Some(launch) = deps.jimeng_launch {
+            let runtime = media_jimeng::JimengRuntime::new(launch, state.clock().clone()).map_err(
+                |detail| ServiceStartupError::Storage(StorageError::InvalidRequest { detail }),
+            )?;
+            media.set_jimeng(runtime).map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        }
+        task_tools
+            .set_media(Arc::downgrade(&media))
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        state.session_admin().attach_workflows(state.workflows());
+        state
+            .session_admin()
+            .attach_loop_controller(&state.loop_services().controller);
+        state.session_admin().attach_media(&media);
+        state.sessions().attach_media(&media);
+        state.media.set(media.clone()).map_err(|_| {
+            ServiceStartupError::Storage(StorageError::Internal {
+                detail: "媒体服务重复初始化".into(),
+            })
+        })?;
+        let office_api = office_tools::OfficeApi::from_state(&state);
+        if let Some(launch) = deps.office_document_worker {
+            office_api.set_document_worker(launch).map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        }
+        state.office_api.set(office_api.clone()).map_err(|_| {
+            ServiceStartupError::Storage(StorageError::Internal {
+                detail: "办公服务重复初始化".into(),
+            })
+        })?;
+        if let Some(gateway) = state.tool_gateway() {
+            let budget = lingxi_kernel::toolcatalog::SchemaBudget::default();
+            office_tools::register(gateway, office_api.clone(), &budget).map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+            settings_tools::register(
+                gateway,
+                &budget,
+                settings_tools::SettingsToolDeps {
+                    memory: state.memory().clone(),
+                    auth: state.auth.clone(),
+                    events: state.app_events().clone(),
+                    media: media.clone(),
+                    bridge_media: state.bridge_media().clone(),
+                    models: state.wired_model_gateway().cloned(),
+                    mcp: state.mcp_settings().clone(),
+                },
+            )
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+            media_tools::register(gateway, media, &budget).map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        }
+        if let Some(gateway) = state.tool_gateway() {
+            browser_tools::register(
+                gateway,
+                state.browsers().clone(),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            )
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+            web_tools::register(
+                gateway,
+                web,
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            )
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        }
+        state.media().recover().await.map_err(|detail| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+        })?;
+        let beautify = beautify_generation::BeautifyService::from_state(&state, &office_api);
+        office_api
+            .set_beautify_generation(beautify.clone())
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+        state.beautify.set(beautify.clone()).map_err(|_| {
+            ServiceStartupError::Storage(StorageError::Internal {
+                detail: "封面服务重复初始化".into(),
+            })
+        })?;
+        beautify.recover().await.map_err(|detail| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+        })?;
+        let collab = Arc::new(session_collab::production(&state).map_err(|detail| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+        })?);
+        state.session_collab.set(collab.clone()).map_err(|_| {
+            ServiceStartupError::Storage(StorageError::Internal {
+                detail: "session collaboration already initialized".into(),
+            })
+        })?;
+        if let Some(gateway) = state.tool_gateway() {
+            session_collab::register(
+                gateway.registry(),
+                gateway,
+                collab,
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            );
+        }
+        let import_report =
+            automation_import::import_current_studio(&automation::JobApi::from_state(&state)).await;
+        if import_report.blocked > 0 {
+            tracing::error!(
+                blocked = import_report.blocked,
+                "部分旧自动任务未迁移，需检查原始资料；这些任务不会执行"
+            );
+        }
+        state
+            .automation()
+            .set_import_report(serde_json::to_value(import_report).expect("导入报告可序列化"));
+        if let Some(gateway) = state.tool_gateway() {
+            automation_patrol::register(gateway, state.automation().patrol(), &state).map_err(
+                |detail| ServiceStartupError::Storage(StorageError::Internal { detail }),
+            )?;
+            conversation_tools::register(
+                gateway,
+                conversations::ConversationApi::from_state(&state),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            )
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+            phone_tools::register(
+                gateway,
+                conversations::ConversationApi::from_state(&state),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            )
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+            automation_tools::register(
+                gateway,
+                automation::JobApi::from_state(&state),
+                &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+            )
+            .map_err(|detail| {
+                ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
+            })?;
+            if let (Some(models), Some(credentials)) = (
+                state.wired_model_gateway(),
+                state.wired_credential_service(),
+            ) {
+                let executor = Arc::new(
+                    lingxi_adapters::models::auxiliary::AuxiliaryExecutor::new_with_network(
+                        models.clone(),
+                        credentials.clone(),
+                        lingxi_kernel::toolcatalog::SchemaBudget::default(),
+                        state.wired_network_plane().cloned().unwrap_or_else(
+                            lingxi_adapters::models::network::NetworkPlane::direct_isolated,
+                        ),
+                    )
+                    .map_err(|error| {
+                        ServiceStartupError::Storage(StorageError::InvalidRequest {
+                            detail: format!("cannot construct automation approval model: {error}"),
+                        })
+                    })?,
+                );
+                gateway.set_automatic_reviewer(Arc::new(
+                    automation_review::ModelAutoReviewer::new(
+                        executor,
+                        state.storage().clone(),
+                        state.runs().quotas_shared(),
+                        state.clock().clone(),
+                    ),
+                ));
+            }
+        }
+        let conversation_owner = Arc::downgrade(state.conversations());
+        let bridge_owner = Arc::downgrade(state.bridge());
+        let automation_owner = Arc::downgrade(state.automation());
+        let mcp_owner = Arc::downgrade(state.mcp_settings());
+        let automation_close_budget =
+            std::time::Duration::from_millis(state.config().shutdown_timeout_ms);
+        // 仅持有可撤销监听的弱停止句柄；关库先停止新空闲任务，不保活服务组合根。
+        let loop_idle_stop = Arc::new(state.loop_services().idle_listener_stopper());
         state
             .storage()
             .register_before_close(Arc::new(move || {
                 let knowledge_owner = knowledge_owner.clone();
+                let automation_owner = automation_owner.clone();
+                let mcp_owner = mcp_owner.clone();
+                let bridge_owner = bridge_owner.clone();
+                let conversation_owner = conversation_owner.clone();
+                let loop_idle_stop = Arc::clone(&loop_idle_stop);
                 Box::pin(async move {
+                    loop_idle_stop();
+                    let deadline = tokio::time::Instant::now() + automation_close_budget;
+                    // 关库同样回收MCP；即使失败，也继续尝试原有后台清理。
+                    let mcp_cleanup = if let Some(manager) = mcp_owner.upgrade() {
+                        manager.begin_stop();
+                        tokio::time::timeout_at(deadline, manager.shutdown())
+                            .await
+                            .map_err(|_| StorageError::Internal {
+                                detail: "MCP cleanup unconfirmed before storage close".into(),
+                            })
+                            .and_then(|result| {
+                                result.map_err(|error| StorageError::Internal {
+                                    detail: error.to_string(),
+                                })
+                            })
+                    } else {
+                        Ok(())
+                    };
+                    if let Err(error) = &mcp_cleanup {
+                        tracing::error!(error = %error, "MCP 关库清理未确认");
+                    }
+                    if let Some(host) = conversation_owner.upgrade() {
+                        host.stop();
+                        tokio::time::timeout_at(deadline, host.wait_stopped())
+                            .await
+                            .map_err(|_| StorageError::Internal {
+                                detail: "conversation cleanup unconfirmed before storage close"
+                                    .into(),
+                            })?
+                            .map_err(|detail| StorageError::Internal { detail })?;
+                    }
+                    if let Some(host) = automation_owner.upgrade() {
+                        host.stop();
+                    }
+                    if let Some(host) = bridge_owner.upgrade() {
+                        host.stop();
+                        tokio::time::timeout_at(deadline, host.wait_stopped())
+                            .await
+                            .map_err(|_| StorageError::Internal {
+                                detail: "Bridge cleanup unconfirmed before storage close".into(),
+                            })?
+                            .map_err(|detail| StorageError::Internal { detail })?;
+                    }
+                    if let Some(host) = automation_owner.upgrade() {
+                        host.stop();
+                        tokio::time::timeout_at(deadline, host.wait_stopped())
+                            .await
+                            .map_err(|_| StorageError::Internal {
+                                detail: "automation cleanup unconfirmed before storage close"
+                                    .into(),
+                            })?
+                            .map_err(|detail| StorageError::Internal { detail })?;
+                    }
                     if let Some(knowledge) = knowledge_owner.upgrade() {
                         knowledge.wait_worker_stopped().await.map_err(|error| {
                             StorageError::Internal {
@@ -2383,7 +3092,7 @@ impl ServiceState {
                             }
                         })?;
                     }
-                    Ok(())
+                    mcp_cleanup
                 })
             }))
             .map_err(ServiceStartupError::Storage)?;
@@ -2406,6 +3115,14 @@ impl ServiceState {
                 }
             }
         }
+        // R07-T07-δ6：启动恢复（现役 server/index.ts:997 的
+        // recoverAtBoot）——启动期 run 恢复扫描之后、开始服务之前：不可
+        // 投递的循环标记停止，缺闹钟的活跃循环补兜底闹钟。闹钟定时器
+        // 在 tokio 运行时内武装。
+        state
+            .runs()
+            .attach_loop_controller(&state.loop_services().controller);
+        state.loop_services().controller.recover_at_boot().await;
         // R06-T05 D14：启动清扫一次（现役 server/index.ts:563-570
         // fire-and-forget + warn 日志；失败不阻断启动）。现役 24h
         // setInterval 不引入——常驻定时器违背 R02-T06 关停纪律，周期调度
@@ -2418,6 +3135,11 @@ impl ServiceState {
                 }
             });
         }
+        state.mcp_settings().restore().await.map_err(|error| {
+            ServiceStartupError::Storage(StorageError::InvalidRequest {
+                detail: error.to_string(),
+            })
+        })?;
         Ok(state)
     }
 
@@ -2447,6 +3169,14 @@ impl ServiceState {
 
     pub fn sessions(&self) -> &sessions::SessionStore {
         &self.sessions
+    }
+
+    pub fn bridge(&self) -> &Arc<bridge::BridgeHost> {
+        &self.bridge
+    }
+
+    pub fn automation(&self) -> &Arc<automation::AutomationHost> {
+        &self.automation
     }
 
     /// R06-T03: the session tree service (fork / retry / rewind / checkpoints).
@@ -2514,6 +3244,11 @@ impl ServiceState {
         self.tool_gateway.as_ref()
     }
 
+    /// R07-T06: 产物"系统打开"的注入点（生产=平台 opener，测试=录制替身）。
+    pub(crate) fn media_file_opener(&self) -> Option<&media_generate::MediaFileOpener> {
+        self.media_file_opener.as_ref()
+    }
+
     /// R06-T06: the skill service (discovery / whitelist / install audit /
     /// bundles / removal).
     pub fn skills(&self) -> &Arc<skills::SkillService> {
@@ -2560,6 +3295,23 @@ impl ServiceState {
         &self.app_events
     }
 
+    /// R07-T07-δ2: 会话预算目标引擎（goal 工具与 δ6 loop/slash 面共用）。
+    pub fn goal_engine(&self) -> &Arc<goal::GoalEngine> {
+        &self.goal_engine
+    }
+
+    pub fn workflows(&self) -> &Arc<workflow::WorkflowService> {
+        &self.workflows
+    }
+    pub fn desk_logs(&self) -> &Arc<desk_logs::DeskLog> {
+        &self.desk_logs
+    }
+
+    /// R07-T07-δ6: 循环面（/loop 命令、loop_control 工具、会话列表注入）。
+    pub fn loop_services(&self) -> &loopsvc::LoopServices {
+        &self.loop_services
+    }
+
     /// R06 会话项目/文件夹目录服务。
     pub fn session_projects(&self) -> &Arc<projects::SessionProjectsService> {
         &self.session_projects
@@ -2576,20 +3328,55 @@ impl ServiceState {
     pub fn model_gateway(
         &self,
     ) -> Option<&Arc<lingxi_adapters::models::gateway::ConfigModelGateway>> {
-        self.model_gateway.as_ref()
+        self.model_gateway.as_ref().filter(|_| {
+            self.model_configuration
+                .activation
+                .load(std::sync::atomic::Ordering::Acquire)
+        })
     }
 
     /// Where the model plane was loaded from (R05-T01): the reload surface
     /// re-reads the SAME source.
-    pub fn model_plane_source(&self) -> Option<&config::ModelPlaneSource> {
-        self.model_plane_source.as_ref()
+    pub fn cards(&self) -> &Arc<cards::CardCache> {
+        &self.cards
+    }
+    pub(crate) fn wired_model_gateway(
+        &self,
+    ) -> Option<&Arc<lingxi_adapters::models::gateway::ConfigModelGateway>> {
+        self.model_gateway.as_ref()
+    }
+    pub(crate) fn wired_credential_service(&self) -> Option<&Arc<credentials::CredentialService>> {
+        self.credential_service.as_ref()
+    }
+    pub(crate) fn wired_operations(&self) -> Option<&Arc<operations::OperationService>> {
+        self.operations.as_ref()
+    }
+    pub(crate) fn wired_network_plane(
+        &self,
+    ) -> Option<&Arc<lingxi_adapters::models::network::NetworkPlane>> {
+        self.network_plane.as_ref()
+    }
+    pub fn model_configuration(&self) -> &Arc<model_configuration::ModelConfiguration> {
+        &self.model_configuration
+    }
+
+    pub fn mcp_settings(&self) -> &Arc<mcp_settings::McpSettingsManager> {
+        &self.mcp_settings
+    }
+
+    pub fn model_plane_source(&self) -> Option<config::ModelPlaneSource> {
+        self.model_configuration.source()
     }
 
     /// The credential service (R05-T02) — the single material exit of the
     /// model plane; the management surface reports its status and revokes
     /// through it.
     pub fn credential_service(&self) -> Option<&Arc<credentials::CredentialService>> {
-        self.credential_service.as_ref()
+        self.credential_service.as_ref().filter(|_| {
+            self.model_configuration
+                .activation
+                .load(std::sync::atomic::Ordering::Acquire)
+        })
     }
 
     /// The worker model-callback port (R05-T06) — worker tools bind THIS
@@ -2603,13 +3390,21 @@ impl ServiceState {
     /// entry of the non-chat model plane; present when the real model
     /// chain was wired at bootstrap.
     pub fn operations(&self) -> Option<&Arc<operations::OperationService>> {
-        self.operations.as_ref()
+        self.operations.as_ref().filter(|_| {
+            self.model_configuration
+                .activation
+                .load(std::sync::atomic::Ordering::Acquire)
+        })
     }
 
     /// The model plane's shared network policy plane (R05 RR1 F14) — the
     /// reload surface publishes new policy generations on it.
     pub fn network_plane(&self) -> Option<&Arc<lingxi_adapters::models::network::NetworkPlane>> {
-        self.network_plane.as_ref()
+        self.network_plane.as_ref().filter(|_| {
+            self.model_configuration
+                .activation
+                .load(std::sync::atomic::Ordering::Acquire)
+        })
     }
 
     /// The session-scoped context compiler (R06-T01) — the observation
@@ -2634,11 +3429,39 @@ impl ServiceState {
 
     /// The injected clock (R02-T07): every served-path timestamp reads
     /// through this surface, so tests drive time instead of sleeping.
+    pub fn conversation_files(&self) -> &lingxi_adapters::conversation_files::ConversationFiles {
+        &self.conversation_files
+    }
+    pub fn conversations(&self) -> &Arc<conversation_runtime::ConversationHost> {
+        &self.conversations
+    }
+    pub fn session_collab(&self) -> Option<&Arc<history::history_content::SessionCollabTools>> {
+        self.session_collab.get()
+    }
+
     pub fn clock(&self) -> &Arc<dyn ServiceClock> {
         &self.clock
     }
 
     /// The injected request-id source (R02-T07).
+    pub fn browsers(&self) -> &Arc<browser::BrowserService> {
+        self.browsers.get().expect("浏览器服务已组装")
+    }
+    pub fn office_api(&self) -> Option<&Arc<office_tools::OfficeApi>> {
+        self.office_api.get()
+    }
+    pub fn office_assets(&self) -> Option<&office_tools::OfficeAssets> {
+        self.office_assets.as_ref()
+    }
+    pub fn beautify(&self) -> &Arc<beautify_generation::BeautifyService> {
+        self.beautify.get().expect("封面服务已完成初始化")
+    }
+    pub fn media(&self) -> &Arc<media::MediaService> {
+        self.media.get().expect("媒体服务已完成初始化")
+    }
+    pub fn web_tools(&self) -> &Arc<web_tools::WebTools> {
+        self.web_tools.get().expect("网页工具已组装")
+    }
     pub fn request_ids(&self) -> &Arc<dyn RequestIdGen> {
         &self.request_ids
     }
@@ -5294,12 +6117,24 @@ async fn switch_session_route(
         .into_response();
     }
     // 焦点提交后等待当前桌面实际恢复；下游失败须如实呈现，不能假称恢复成功。
-    let browser_resume = match state.browser_host.resume(&session_id).await {
+    let browser_resume = match state
+        .browsers()
+        .resume_for(
+            &principal,
+            &session_id,
+            format!("restore-browser-{}", state.request_ids().next_request_id()),
+        )
+        .await
+    {
         Ok(value) => value,
         Err(error) => {
-            return EndpointError::new(StatusCode::BAD_GATEWAY, ErrorCode::Internal, error)
-                .with_reason("browser_resume_failed")
-                .into_response()
+            return EndpointError::new(
+                StatusCode::BAD_GATEWAY,
+                ErrorCode::Internal,
+                error.to_string(),
+            )
+            .with_reason("browser_resume_failed")
+            .into_response()
         }
     };
     let history_revision = match (
@@ -7163,6 +7998,70 @@ fn error_details(reason: &str, cause_id: &str) -> serde_json::Map<String, serde_
 pub fn build_router(state: ServiceState) -> Router {
     Router::new()
         .route("/lingxi/v1/health", get(health))
+        .merge(conversation_routes::router())
+        .merge(browser_routes::router())
+        .merge(office_routes::router())
+        .merge(media_routes::router())
+        .merge(media_admin::router())
+        .merge(media_generate::router())
+        .route("/lingxi/v1/search/config", get(search_routes::settings))
+        .route("/lingxi/v1/search/verify", post(search_routes::verify))
+        .route(
+            "/lingxi/v1/session-collab/apply",
+            post(session_collab::apply_route),
+        )
+        .route(
+            "/lingxi/v1/session-collab/reject",
+            post(session_collab::reject_route),
+        )
+        .route(
+            "/lingxi/v1/session-collab/drafts",
+            get(session_collab::drafts_route),
+        )
+        .route("/lingxi/v1/bridge/status", get(bridge_routes::status_route))
+        .route(
+            "/lingxi/v1/bridge/sessions/{sessionKey}/messages",
+            get(bridge_session_routes::messages_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/sessions/{sessionKey}/reset",
+            post(bridge_session_routes::reset_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/send-media",
+            post(bridge_session_routes::send_media_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/deliveries/{deliveryId}",
+            get(bridge_session_routes::delivery_route),
+        )
+        .route("/lingxi/v1/bridge/test", post(bridge_routes::test_route))
+        .route(
+            "/lingxi/v1/bridge/wechat/qrcode",
+            post(bridge_routes::qrcode_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/wechat/qrcode-status",
+            post(bridge_routes::qrcode_status_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/config",
+            post(bridge_routes::config_route),
+        )
+        .route("/lingxi/v1/bridge/owner", post(bridge_routes::owner_route))
+        .route("/lingxi/v1/bridge/stop", post(bridge_routes::stop_route))
+        .route(
+            "/lingxi/v1/bridge/settings",
+            post(bridge_routes::settings_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/messages",
+            get(bridge_routes::messages_route),
+        )
+        .route(
+            "/lingxi/v1/bridge/sessions",
+            get(bridge_routes::sessions_route),
+        )
         .route("/lingxi/v1/me", get(me))
         .route(
             "/lingxi/v1/input-drafts",
@@ -7206,6 +8105,43 @@ pub fn build_router(state: ServiceState) -> Router {
         .route("/lingxi/v1/sessions/pin", post(pin_session_route))
         .route("/lingxi/v1/sessions/pin-order", post(pin_order_route))
         .route(
+            "/lingxi/v1/desk/activities",
+            get(automation_activity::list_route),
+        )
+        .route(
+            "/lingxi/v1/desk/activities/{id}/session",
+            get(automation_activity::session_route),
+        )
+        .route(
+            "/lingxi/v1/desk/activities/{id}/promote",
+            post(automation_activity::promote_route),
+        )
+        .route(
+            "/lingxi/v1/desk/cron",
+            get(automation::cron_get_route).post(automation::cron_post_route),
+        )
+        .route(
+            "/lingxi/v1/desk/heartbeat",
+            axum::routing::post(automation::heartbeat_route),
+        )
+        .route(
+            "/lingxi/v1/desk/cron/history",
+            get(automation::history_route),
+        )
+        .route(
+            "/lingxi/v1/preferences/notifications",
+            get(automation::notification_preferences_get_route)
+                .put(automation::notification_preferences_put_route),
+        )
+        .route(
+            "/lingxi/v1/automation/status",
+            get(automation::status_route),
+        )
+        .route(
+            "/lingxi/v1/automation/notifications",
+            get(automation::notifications_get_route).post(automation::notifications_post_route),
+        )
+        .route(
             "/lingxi/v1/sessions/workspace-rollback",
             get(workspace_rollback_get_route).put(workspace_rollback_put_route),
         )
@@ -7236,11 +8172,30 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/sessions/studio-list",
             get(sessions::sessions_studio_list_route),
         )
-        // R06 R2：工作台同版本写入/版本冲突（现役 mount-aware writeText 端口）。
+        // R07-T07 β：工作台/Studio 挂载面（现役 studio-workspaces.ts +
+        // mobile-workbench.ts 全动作端口；R06 R2 的 writeText 单面并入
+        // workbench::router() 的 actions 处理器，响应形状保持兼容）。
+        .route("/lingxi/v1/desk/logs", get(desk_logs::list_route))
         .route(
-            "/lingxi/v1/workbench/actions",
-            post(resourceio::workbench_write_text_route),
+            "/lingxi/v1/desk/activities/summarize",
+            post(automation_activity::summarize_route),
         )
+        .route(
+            "/lingxi/v1/sessions/{session_id}/agent-activities",
+            get(workflow_routes::activities_route),
+        )
+        .merge(workbench::router())
+        // R07-T07 β3：desk 工作台文件面（现役 desk.ts 的 path/files/
+        // search-files/jian 六路由，批准目录门禁 + local-owner upload 闸）。
+        .merge(desk_files::router())
+        // R07-T07 β4：日记面（现役 diary.ts 两路由 + diary-writer.ts
+        // 材料/模型链全语义；memory 槽 AuxiliaryExecutor，登记偏差见
+        // T07_STATUS.md β4）。
+        .merge(diary::router())
+        // R07-T07 γ：git 环境信息卡面（现役 git-environment.ts 22 路由 +
+        // git-command.ts 执行/解析全语义；批准目录门禁 + studio 挂载根 +
+        // summarize 槽 AI 提交信息）。
+        .merge(git_panel::router())
         // R06 C1 收尾：工作台处置与孤儿清扫（现役 workspace-disposal /
         // sweep-orphaned-workspaces，sessions.write 口径）。
         .route(
@@ -7558,6 +8513,7 @@ pub fn build_router(state: ServiceState) -> Router {
         // 分支头，只把存档字节写回存档记录的绝对路径并返回写回位置）。
         // LocalOnly（auth.rs 分类：现役 /api/checkpoints/* 落 STUDIO_OWNER
         // 兜底，Rust 侧按既有口径映射最严格档）。
+        .route("/lingxi/v1/checkpoints", get(checkpoint_store::list_route))
         .route(
             "/lingxi/v1/checkpoints/user-edit",
             post(checkpoint_store::user_edit_route),
@@ -7674,6 +8630,14 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/preferences/goal",
             get(userprefs::goal_get_route).put(userprefs::goal_put_route),
         )
+        .route(
+            "/lingxi/v1/preferences/keybindings",
+            get(userprefs::keybindings_get_route).put(userprefs::keybindings_put_route),
+        )
+        .route(
+            "/lingxi/v1/preferences/sidebar-ui",
+            get(userprefs::sidebar_ui_get_route).put(userprefs::sidebar_ui_put_route),
+        )
         // R06 用户偏好对（现役 /preferences/autolearn、/preferences/quick-chat）
         .route(
             "/lingxi/v1/preferences/autolearn",
@@ -7730,6 +8694,10 @@ pub fn build_router(state: ServiceState) -> Router {
             post(character_cards::export_preview_route),
         )
         .route(
+            "/lingxi/v1/character-cards/export/plan",
+            post(character_cards::export_preview_route),
+        )
+        .route(
             "/lingxi/v1/character-cards/export",
             post(character_cards::export_route),
         )
@@ -7746,7 +8714,10 @@ pub fn build_router(state: ServiceState) -> Router {
             "/lingxi/v1/settings/snapshot",
             get(settings_ui::snapshot_route),
         )
-        .route("/lingxi/v1/settings/config", get(settings_ui::config_route))
+        .route(
+            "/lingxi/v1/settings/config",
+            get(settings_ui::config_route).put(settings_configuration::config_put_route),
+        )
         .route(
             "/lingxi/v1/preferences/computer-use",
             get(computer_use_settings::get_route).put(computer_use_settings::put_route),
@@ -7765,21 +8736,32 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         .route("/lingxi/v1/models", get(chat_wire::models_route))
         .route("/lingxi/v1/models/set", post(chat_wire::model_set_route))
+        // R07-T09：CLI/mobile 共享的只读聊天上下文面（chat scope）。
+        .route(
+            "/lingxi/v1/chat/models",
+            get(client_context::chat_models_route),
+        )
+        .route(
+            "/lingxi/v1/mobile/bootstrap",
+            get(client_context::mobile_bootstrap_route),
+        )
         .route(
             "/lingxi/v1/models/switch",
             post(chat_wire::model_switch_route),
         )
         .route(
             "/lingxi/v1/preferences/models",
-            get(settings_ui::preferences_models_route),
+            get(settings_ui::preferences_models_route)
+                .put(settings_configuration::models_put_route),
         )
         .route(
             "/lingxi/v1/providers/summary",
-            get(settings_ui::providers_summary_route),
+            get(provider_routes::summary_route),
         )
         .route(
             "/lingxi/v1/user-profile",
-            get(settings_ui::user_profile_route),
+            get(settings_ui::user_profile_route)
+                .put(settings_configuration::user_profile_put_route),
         )
         // ── R06-T06 tenets/pinned/experience/config 人格面 ──
         .route(
@@ -7954,8 +8936,43 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         .route("/lingxi/v1/ws", get(ws_handler))
         .route("/lingxi/v1/browser-host", get(browser_host::route))
+        .route(
+            "/lingxi/v1/settings/config/workspaces/recent",
+            post(settings_configuration::recent_add_route)
+                .delete(settings_configuration::recent_remove_route),
+        )
+        .route(
+            "/lingxi/v1/settings/config/workspaces/recent/all",
+            axum::routing::delete(settings_configuration::recent_clear_route),
+        )
+        .route(
+            "/lingxi/v1/settings/config/default-workspace",
+            get(settings_configuration::default_workspace_route)
+                .post(settings_configuration::ensure_default_workspace_route),
+        )
+        .route(
+            "/lingxi/v1/settings/export",
+            get(settings_configuration::export_route),
+        )
+        .route(
+            "/lingxi/v1/settings/import",
+            post(settings_configuration::import_route),
+        )
+        .route(
+            "/lingxi/v1/cards/{card_id}/frame/{ticket}",
+            get(cards::frame_route),
+        )
+        .route(
+            "/lingxi/v1/cards/{card_id}",
+            get(cards::get_route).put(cards::put_route),
+        )
+        .merge(provider_routes::router())
+        .merge(mcp_session_permissions::router())
+        .merge(mcp_settings::router())
         .merge(management::routes())
         .merge(static_web::routes())
+        // R07-T10：观测查询/导出/旧库导入（LocalOnly，auth_guard 统一把关）。
+        .merge(observability::routes())
         .layer(axum::extract::DefaultBodyLimit::max(
             limits::DEFAULT_BODY_LIMIT_BYTES,
         ))
@@ -8040,6 +9057,61 @@ where
     run_with_tls(state, shutdown, on_ready, drain_budget, None).await
 }
 
+/// 监听失败和正常退出共用停止信号，外部仍持有服务引用也不能继续唤醒任务。
+fn begin_background_shutdown(state: &ServiceState) {
+    state.loop_services().stop_idle_listener();
+    if let Some(gateway) = state.tool_gateway() {
+        gateway.close_mcp_session_permissions();
+    }
+    state.memory().dream().stop_all();
+    state.automation().stop();
+    state.bridge().stop();
+    state.conversations().stop();
+    state.browsers().stop();
+    state.mcp_settings().begin_stop();
+    state.resource_io().shutdown();
+    state.loop_services().alarm.dispose();
+    state.loop_services().controller.dispose();
+    state.workflows().begin_stop();
+    state.media().begin_stop();
+    state.beautify().begin_stop();
+    state.knowledge().shutdown();
+}
+
+/// 尚未开始监听就失败时，也先通知全部已恢复的后台组件，再核对实际退出。
+async fn cleanup_before_listen_failure(
+    state: &ServiceState,
+    original: &std::io::Error,
+) -> Result<(), ServiceError> {
+    begin_background_shutdown(state);
+    let deadline = tokio::time::Instant::now()
+        + std::time::Duration::from_millis(state.config().shutdown_timeout_ms);
+    let mcp = tokio::time::timeout_at(deadline, state.mcp_settings().shutdown()).await;
+    let knowledge =
+        tokio::time::timeout_at(deadline, state.knowledge().wait_worker_stopped()).await;
+    let mut failures = Vec::new();
+    match mcp {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => failures.push(format!("MCP: {error}")),
+        Err(_) => failures.push("MCP: cleanup timed out".into()),
+    }
+    match knowledge {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => failures.push(format!("knowledge: {error}")),
+        Err(_) => failures.push("knowledge: cleanup timed out".into()),
+    }
+    if failures.is_empty() {
+        Ok(())
+    } else {
+        Err(ServiceError::Serve {
+            source: std::io::Error::other(format!(
+                "listen failed: {original}; cleanup unconfirmed: {}",
+                failures.join("; ")
+            )),
+        })
+    }
+}
+
 /// 通过真实 TLS 握手服务请求；未配置时保持原有 HTTP 行为。
 pub async fn run_with_tls<F>(
     state: ServiceState,
@@ -8056,14 +9128,7 @@ where
     let listener = match tokio::net::TcpListener::bind(bind_addr).await {
         Ok(listener) => listener,
         Err(source) => {
-            knowledge_worker
-                .wait_worker_stopped()
-                .await
-                .map_err(|error| ServiceError::Serve {
-                    source: std::io::Error::other(format!(
-                        "bind failed: {source}; knowledge worker stop failed: {error}"
-                    )),
-                })?;
+            cleanup_before_listen_failure(&state, &source).await?;
             return Err(ServiceError::Bind {
                 addr: bind_addr,
                 source,
@@ -8073,14 +9138,7 @@ where
     let local = match listener.local_addr() {
         Ok(addr) => addr,
         Err(source) => {
-            knowledge_worker
-                .wait_worker_stopped()
-                .await
-                .map_err(|error| ServiceError::Serve {
-                    source: std::io::Error::other(format!(
-                        "listener address failed: {source}; knowledge worker stop failed: {error}"
-                    )),
-                })?;
+            cleanup_before_listen_failure(&state, &source).await?;
             return Err(ServiceError::Bind {
                 addr: bind_addr,
                 source,
@@ -8092,6 +9150,28 @@ where
         .write()
         .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(local);
     state.memory().dream().ticker().start(state.clone());
+    state.automation().start(state.clone());
+    state.bridge().start(state.clone());
+    // 桥启动恢复（inbox/outbox/指令重投）必须抢在就绪前完成；恢复失败
+    // 响亮拒绝服务，不在半恢复状态接流量（就绪前的外部位锁故障不再
+    // 在半途中杀死桥宿主）。
+    state
+        .bridge()
+        .wait_recovery()
+        .await
+        .map_err(|error| ServiceError::Serve {
+            source: std::io::Error::other(format!("bridge recovery: {error}")),
+        })?;
+    state.conversations().start(state.clone());
+    // 对话宿主的启动恢复同理：就绪前拿到确定结果，失败响亮拒绝。
+    state
+        .conversations()
+        .wait_recovery()
+        .await
+        .map_err(|error| ServiceError::Serve {
+            source: std::io::Error::other(format!("conversation recovery: {error}")),
+        })?;
+    state.browsers().start();
     on_ready(local);
 
     // R2-F04: the serving loop enforces CONNECTION-level admission at the
@@ -8102,14 +9182,21 @@ where
     // (`--http-max-in-flight` / `--http-request-budget-ms`).
     let conn_admission = Arc::clone(state.connection_admission());
     let header_budget = state.admission().request_budget();
-    let knowledge_on_signal = knowledge_worker.clone();
     let dream_service = Arc::clone(state.memory());
-    let dream_on_signal = Arc::clone(&dream_service);
+    let media_service = Arc::clone(state.media());
+    let beautify_service = Arc::clone(state.beautify());
+    let browser_service = Arc::clone(state.browsers());
+    let mcp_service = Arc::clone(state.mcp_settings());
+    let conversation_host = Arc::clone(state.conversations());
+    let bridge_host = Arc::clone(state.bridge());
+    let automation_host = Arc::clone(state.automation());
     let dream_budget = drain_budget.unwrap_or(std::time::Duration::from_millis(
         state.config().shutdown_timeout_ms,
     ));
     let dream_stop_at = Arc::new(std::sync::Mutex::new(None::<std::time::Instant>));
     let dream_signal_at = Arc::clone(&dream_stop_at);
+    let workflows = Arc::clone(state.workflows());
+    let state_on_signal = state.clone();
     let router = build_router(state);
     // The graceful-shutdown future consumes the stop signal and records the
     // signal instant; the drain budget watchdog is armed at THAT instant (the
@@ -8120,8 +9207,7 @@ where
     let graceful = async move {
         shutdown.await;
         *dream_signal_at.lock().unwrap() = Some(std::time::Instant::now());
-        dream_on_signal.dream().stop_all();
-        knowledge_on_signal.shutdown();
+        begin_background_shutdown(&state_on_signal);
         let _ = signal_tx.send(std::time::Instant::now());
     };
     let server = serve::serve_with_connection_admission(
@@ -8175,9 +9261,159 @@ where
         .wait_worker_stopped()
         .await
         .map_err(|error| ServiceError::Serve {
-            source: std::io::Error::other(error.to_string()),
+            source: std::io::Error::other(format!("knowledge-worker stop: {error}")),
         })?;
     dream_service.dream().stop_all();
+    automation_host.stop();
+    bridge_host.stop();
+    conversation_host.stop();
+    browser_service.stop();
+    mcp_service.begin_stop();
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, mcp_service.shutdown()).await {
+        Ok(Ok(())) => {}
+        Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("mcp shutdown: {error}")),
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, workflows.stop(remaining)).await {
+        Ok(Ok(unfinished)) if unfinished.is_empty() => {}
+        Ok(Ok(_)) | Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("workflows stop: {error}")),
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, media_service.stop(remaining)).await {
+        Ok(Ok(unfinished)) if unfinished.is_empty() => {}
+        Ok(Ok(_)) | Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("media stop: {error}")),
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, beautify_service.shutdown(remaining)).await {
+        Ok(Ok(unfinished)) if unfinished.is_empty() => {}
+        Ok(Ok(_)) | Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("beautify shutdown: {error}")),
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, browser_service.wait_stopped()).await {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("browser stop: {error}")),
+            })
+        }
+        Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, conversation_host.wait_stopped()).await {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("conversation stop: {error}")),
+            })
+        }
+        Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, bridge_host.wait_stopped()).await {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("bridge stop: {error}")),
+            })
+        }
+        Err(_) => {
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            })
+        }
+    }
+    let remaining = dream_stop_at
+        .lock()
+        .unwrap()
+        .map(|at| dream_budget.saturating_sub(at.elapsed()))
+        .unwrap_or(dream_budget);
+    match tokio::time::timeout(remaining, automation_host.wait_stopped()).await {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => {
+            return Err(ServiceError::Serve {
+                source: std::io::Error::other(format!("automation stop: {error}")),
+            })
+        }
+        Err(_) => {
+            tracing::error!("自动化任务清理超时，未确认的任务保留恢复记录");
+            return outcome.map(|_| ServeOutcome {
+                drain_timed_out: true,
+            });
+        }
+    }
     let remaining = dream_stop_at
         .lock()
         .unwrap()
@@ -8187,7 +9423,7 @@ where
         Ok(Ok(())) => {}
         Ok(Err(error)) => {
             return Err(ServiceError::Serve {
-                source: std::io::Error::other(error.to_string()),
+                source: std::io::Error::other(format!("dream stop: {error}")),
             })
         }
         Err(_) => {

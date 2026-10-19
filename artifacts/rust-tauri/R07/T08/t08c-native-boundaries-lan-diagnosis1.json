@@ -1,0 +1,103 @@
+{
+  "artifactKind": "R07_T08_T08C_REAL_FAILURE_DIAGNOSIS",
+  "createdAt": "2026-10-18T08:31:22.533055+00:00",
+  "candidate": "t08c",
+  "candidateInvalidatedByLaterNecessaryFixes": true,
+  "originalResultPreserved": {
+    "receipt": "t08c-service.json",
+    "receiptSha256": "2e454e97422e5272c22b5d16f94c0d5c261fa25222bdaab8131a2f92983ff044",
+    "log": "t08c-service.log",
+    "logSha256": "4349821452ab7ad896a39b3697c9c70d7231136a9a39227876fe67213f8b9203",
+    "exitCode": 101,
+    "serviceSourceUnchanged": true,
+    "nativeTargetPassed": 13,
+    "nativeTargetFailed": 1,
+    "managementTargetPassed": 0,
+    "managementTargetFailed": 1
+  },
+  "nativeFailure": {
+    "case": "native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel",
+    "scene": "/private/tmp/lingxi-r07-tests/tmp/settings-completion-boundaries-79319-1792311821753937000/home",
+    "originalUiResultSha256": "e0ab4015d2750e12ff2cf9e9221eb3934f38b99c15fccc7b82053bedaea5f74c",
+    "originalTraceSha256": "c681922aaccceadf31525baaebab507aefa77a1dbe6d978d1c00cf173e236523",
+    "failedCheck": "14-success-post-failed-get-old-list-and-error",
+    "actualCompletedChecks": [
+      "production-settings-entry",
+      "actual-agents-list",
+      "actual-settings-snapshot",
+      "actual-model-catalog",
+      "actual-current-model-binding",
+      "explicit-maintenance-state",
+      "14-write-persisted-before-refresh-error"
+    ],
+    "actualTenetRequests": [
+      {
+        "method": "OPTIONS",
+        "path": "/lingxi/v1/agents/agentA/tenets",
+        "status": 204,
+        "origin": "http://127.0.0.1:59923"
+      },
+      {
+        "method": "GET",
+        "path": "/lingxi/v1/agents/agentA/tenets",
+        "status": 200,
+        "origin": "http://127.0.0.1:59923"
+      },
+      {
+        "method": "POST",
+        "path": "/lingxi/v1/agents/agentA/tenets",
+        "status": 200,
+        "origin": "http://127.0.0.1:59923"
+      },
+      {
+        "method": "GET",
+        "path": "/lingxi/v1/agents/agentA/tenets",
+        "status": 409,
+        "origin": "http://127.0.0.1:59923"
+      }
+    ],
+    "diagnosis": "实际POST200、磁盘已新增成功；真实GET409发生。原until等待含“原则”的页面文字，旧标题初始即满足；随后只依据webRequest.onCompleted读取错误后立即检查React DOM，没有等待setError提交。该等待本身存在明确竞态，未据原资料证明产品丢了旧列表。",
+    "productEvidence": {
+      "path": "desktop/src/react/settings/tabs/agent/AgentTenets.tsx",
+      "sha256": "7c96c6c7d71006158dadfda005cfbf609b735426513a24ca400a52ce0c1259bb",
+      "points": [
+        "add成功后await refresh；无乐观添加到tenets",
+        "refresh错误只setError，保留原tenets",
+        "错误节点由React state渲染，网络onCompleted不是DOM就绪屏障"
+      ]
+    },
+    "minimalFix": {
+      "path": "desktop/src/react/settings/__tests__/r06-settings-electron-main.cjs",
+      "frozenSourceSha256": "8ccd4ff8d280cbfbc11e75be246207e54ce3605b67738af05cf21214903a030b",
+      "afterSourceSha256": "887117ef8c4862adf33b807a16d4a8689cbec8713d27f7e477aa801c97f3a298",
+      "change": "仅将等待条件改成真实tenets-error节点已出现，保留15秒和全部旧列表/新内容未假显示/POST200/GET409/实际落盘断言；失败另存只含合成原则布尔与错误节点数的安全诊断",
+      "validation": "node --check exit0；实际Electron重验未运行",
+      "productChanged": false,
+      "cargoRunByThisAgent": false
+    }
+  },
+  "lanFailure": {
+    "case": "r00_management_positive_and_negative_branches_on_real_service",
+    "observedEndpoint": "192.168.3.96:58479",
+    "observedOperation": "POST /lingxi/v1/web-auth/login",
+    "observed": "TcpStream连接后写读总预算20秒到期，0响应字节；整个case失败约54.83秒",
+    "source": "rust/crates/lingxi-service/tests/r00_management_leaves.rs",
+    "sourceSha256": "3e72c2a2d16287549a2727a355642ec279c09595d42d6ec42d9c5585c8d2f453",
+    "facts": [
+      "真实0.0.0.0端口监听，使用实际非loopback网卡IPv4，不由请求头伪造LAN",
+      "client为直接tokio TcpStream，不经过reqwest/http_proxy，设置no_proxy不是有效补法",
+      "当前只读ifconfig证实en0 active持192.168.3.96，route get该本机IP经lo0本地路由；这不等于以127.0.0.1替换LAN地址",
+      "未采集包级/防火墙规则证据，不能把防火墙或TUN具体根因当已确认事实；也不能排除运行环境/服务处理阻塞，原测试失败如实保留"
+    ],
+    "readOnlyRouteObservation": "   route to: 192.168.3.96\ndestination: 192.168.3.96\n  interface: lo0\n      flags: <UP,HOST,DONE,LLINFO,WASCLONED,LOCAL,IFSCOPE,IFREF>\n recvpipe  sendpipe  ssthresh  rtt,msec    rttvar  hopcount      mtu     expire\n       0         0         0         0         0         0     16384         0 \n",
+    "networkSettingsChanged": false,
+    "notPerformed": [
+      "没有切换防火墙/TUN/代理/权限",
+      "没有跳过原断言",
+      "没有用loopback正例覆盖LAN失败",
+      "没有把原case此前局部成功升级整个管理case通过"
+    ],
+    "responsibility": "T09实际LAN/手机接入继续定位；T08本机配置独立工作继续。T08候选报告明确管理整项失败/环境边界，不能领全门禁通过。",
+    "possibleLaterValidation": "在已授权且实际可达的当前LAN环境，用同一真实服务和原地址/Origin/连接类别重新执行；若采用正式已签名服务仍须绑定该真实产物，不能借不同二进制成功覆盖本失败。"
+  }
+}

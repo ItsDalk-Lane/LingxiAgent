@@ -1,0 +1,34 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 25.86s
+     Running tests/r07_phone_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_runtime-6b33c93be36bde1a)
+
+running 12 tests
+test actual_member_removal_cancels_waiting_models_before_any_publication ... ok
+test actual_read_only_phone_rejects_native_write_and_hides_recursive_tools ... ok
+test actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat ... ok
+test actual_channel_pass_records_decision_without_publishing_ordinary_final ... ok
+test actual_dm_stop_marker_stops_chain_and_new_user_action_waits_for_direction_cooldown ... ok
+test actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action ... ok
+test actual_legacy_markdown_first_discovery_external_append_and_restart_keep_one_cause ... ok
+test actual_dm_chain_shares_three_run_budget_across_both_directions_and_cooldown ... ok
+test actual_dm_stop_marker_variants_strip_public_text_and_never_start_reverse_run ... ok
+test actual_archived_phone_session_rotates_and_does_not_block_independent_channel ... ok
+test actual_phone_sessions_reuse_within_30_minutes_and_rotate_at_idle_expiry ... ok
+test actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.41s
+
+     Running tests/r07_session_collab.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_session_collab-e9ed2f26742c668c)
+
+running 7 tests
+test unconfirmed_started_create_recovers_existing_target_but_never_resends ... ok
+test reject_expiry_readonly_and_spoofed_source_are_checked_by_real_records ... ok
+test registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits ... ok
+test create_apply_is_single_target_and_survives_restart_without_replay ... ok
+test disabling_channels_blocks_a_previously_confirmed_busy_collaboration_queue ... ok
+test current_phone_authority_still_allows_queued_collaboration_after_root_completed ... ok
+test removing_phone_member_blocks_a_previously_confirmed_busy_collaboration_queue ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.49s
+

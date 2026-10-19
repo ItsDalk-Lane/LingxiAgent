@@ -12,6 +12,7 @@ import {
   refreshPreviewItemsFromRemoteWorkbenchTarget,
 } from './remote-file-preview';
 import { resolvedLocalPathAlias, type ResourceRef } from '../services/resource-events';
+import { resolveServerConnection } from '../services/server-connection';
 
 export type PreviewDocumentTarget =
   | { kind: 'local-file'; filePath: string }
@@ -187,6 +188,10 @@ function resourceRefForPreviewDocumentTarget(
   const normalized = normalizeWorkbenchContentRef(target.target);
   const mountId = normalized.mountId || normalized.rootId || 'default';
   if (mountId && mountId !== 'default') {
+    if (resolveServerConnection(state)?.serverNodeKind === 'lingxi-service') {
+      const workspace = state.studioWorkspaces.find(item => item.mountId === mountId);
+      if (!workspace?.nativeRootPath || !workspace.capabilities?.includes('watch')) return null;
+    }
     return {
       kind: 'mount',
       mountId,

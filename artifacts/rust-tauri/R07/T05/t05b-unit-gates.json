@@ -1,0 +1,26 @@
+{
+  "stage": "R07-T05",
+  "candidate": "t05b",
+  "name": "unit-gates",
+  "purpose": "final_acceptance",
+  "command": [
+    "/bin/zsh",
+    "-c",
+    "/Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --lib file_safety -- --nocapture && /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --lib resourceio::artifacts -- --nocapture && /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --lib office_pdf -- --nocapture && /Users/study_superior/.cargo/bin/cargo test --manifest-path rust/Cargo.toml --locked -p lingxi-service --lib office_tools -- --nocapture"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "environment": {
+    "CARGO_TARGET_DIR": "/private/tmp/lingxi-r07-build",
+    "CARGO_BUILD_JOBS": "4",
+    "LINGXI_HOME": "/private/tmp/lingxi-r07-tests/home",
+    "TMPDIR": "/private/tmp/lingxi-r07-tests/tmp"
+  },
+  "startedAt": "2026-10-16T04:48:53.213034+00:00",
+  "sourceFingerprint": "618ca688717a3092835963be74e421e951176b5d625d5f714200f771489121fe",
+  "log": "t05b-unit-gates.log",
+  "endedAt": "2026-10-16T04:48:56.504777+00:00",
+  "exitCode": 0,
+  "sourceFingerprintAfter": "618ca688717a3092835963be74e421e951176b5d625d5f714200f771489121fe",
+  "logSha256": "3369ad911c20a3e0550d6dd988577e4bb6c355f8a01c6bfd47c6f36b8a90ff09",
+  "sourceUnchanged": true
+}

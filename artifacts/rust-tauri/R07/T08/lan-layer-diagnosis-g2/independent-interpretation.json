@@ -1,0 +1,165 @@
+{
+  "kind": "INDEPENDENT_SINGLE_EXECUTION_DIFFERENCE_DIAGNOSIS_NOT_R07_ACCEPTANCE",
+  "createdAt": "2026-10-18T12:39:20.102268+00:00",
+  "execution": {
+    "argv": [
+      "python3",
+      "artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/probe.py"
+    ],
+    "exitCode": 0,
+    "executions": 1,
+    "servicePid": 64639,
+    "port": 53631,
+    "networkAndSystemSettingsChanged": false,
+    "cargoRun": false,
+    "productTestsPlansGatesModified": false,
+    "realCredentialsUsed": false,
+    "manualClockInjected": false
+  },
+  "binding": {
+    "receipt": "artifacts/rust-tauri/R07/T08/lan-layer-diagnosis-g2/receipt.json",
+    "receiptSha256": "dd962c4847806d55325a8a9fc147475d4aa038ae4e74e90ce2b76a6405e16c6a",
+    "g1ReceiptSha256BeforeAndAfter": "828fb70cdfee2926a33827c751ba8f7dd86e4b3bd4a7c798988a283a310799f2",
+    "gBuildReceiptSha256": "a30181a04cf896bfb8b2b833cbf7743ae5593596590c05f4b6107d9b5dbb18b6",
+    "gSourceFingerprint": "6d00d82b598ad23f9cbbc05f61e9514cf8e7f771a8434f9f5884672b3782cf2f",
+    "binarySha256BeforeAfterBothOwnedCopies": "0aa124e8db5e2c791d2c568145e3b75a897df9ac988dbccb9ae01c7af0cdfb2b",
+    "sharedTargetRead": false,
+    "probeSha256": "66b42450b4c7ad18621a03a926a7502805e8fc7a9d6af29ddb8e2390772636c0",
+    "stdoutSha256": "1e401555269e84b3b519113ff5f653d4bcf2f21f58f298581e7c03134d8d8831",
+    "stderrSha256": "f90cb0eb88515ac31cb30d258b8ea09b89f5ac32f4fdae8a2d372940b66ff42e"
+  },
+  "actualResults": [
+    {
+      "operation": "lan-health",
+      "status": 200,
+      "elapsedSeconds": 0.014597,
+      "responseBytes": 251,
+      "firstResponseByteElapsedSeconds": 0.014549,
+      "postResponseSamples": 2,
+      "responseSha256": "a4a0aa9bcb2b63c3fb29928d436b885c2944545954300707a4f6b90317c21d9d"
+    },
+    {
+      "operation": "lan-foreign-origin-login",
+      "status": 403,
+      "elapsedSeconds": 0.009806,
+      "responseBytes": 341,
+      "firstResponseByteElapsedSeconds": 0.00976,
+      "postResponseSamples": 2,
+      "responseSha256": "a351cc035ae94a8f0d8bf0e12995c6a88c1d5d9ef5ffbdde0aa3c37d568139cd"
+    },
+    {
+      "operation": "same-process-loopback-foreign-origin-login",
+      "status": 403,
+      "elapsedSeconds": 0.001555,
+      "responseBytes": 341,
+      "firstResponseByteElapsedSeconds": 0.001527,
+      "postResponseSamples": 2,
+      "responseSha256": "2b7d2f7692b70520562abe7118f278052fc55ae2ae7a6a971daac91422a2d7b9"
+    }
+  ],
+  "newInformation": [
+    "同一固定g程序、同一进程内，LAN health和foreign-Origin拒绝登录、本机回环拒绝登录均快速完成；两个拒绝响应和服务日志都明确transport.bad_origin。",
+    "本次没有复现20秒0字节，也没有复现g1健康读取4.107秒延迟。未改产品、系统设置或权限；因此不能说已修复原间歇失败。",
+    "当前本机LAN地址的实际路由为lo0/LOCAL；本次不是手机或另一台设备的连通验证。"
+  ],
+  "sampling": {
+    "count": 7,
+    "headersPreserved": true,
+    "statesFlagsFourTuplesPreserved": true,
+    "everyRequestHasTwoStartedAfterResponse": true,
+    "schedule": "每轮三个只读命令依次执行，再等待0.2秒；命令的实际起止时间逐项保留，非同时快照。",
+    "allListenQueueSamples": "0/0/128",
+    "limitation": "请求均在0.015秒内结束；第一轮lsof结束时首个连接已关闭，采样只见LISTEN和TIME_WAIT，不能据无已接收FD断言没有accept。",
+    "rows": [
+      {
+        "stage": "startup",
+        "startedElapsed": 2.053806,
+        "endedElapsed": 2.115968
+      },
+      {
+        "stage": "lan-health",
+        "startedElapsed": 2.318425,
+        "endedElapsed": 2.379789
+      },
+      {
+        "stage": "lan-health",
+        "startedElapsed": 2.583013,
+        "endedElapsed": 2.644653
+      },
+      {
+        "stage": "lan-foreign-origin-login",
+        "startedElapsed": 2.848344,
+        "endedElapsed": 2.9102
+      },
+      {
+        "stage": "lan-foreign-origin-login",
+        "startedElapsed": 3.115173,
+        "endedElapsed": 3.200428
+      },
+      {
+        "stage": "same-process-loopback-foreign-origin-login",
+        "startedElapsed": 3.405524,
+        "endedElapsed": 3.47942
+      },
+      {
+        "stage": "same-process-loopback-foreign-origin-login",
+        "startedElapsed": 3.681792,
+        "endedElapsed": 3.742331
+      }
+    ]
+  },
+  "macQueueInterpretation": {
+    "localMan": {
+      "path": "/usr/share/man/man1/netstat.1",
+      "sha256": "d583b6298d39444bf2a5f628a5f0e4c961a6ce81210aa91d6def7ffc72922a47",
+      "meaning": "-L三列为未accept总数/未完成未accept数/队列上限。"
+    },
+    "actualSoqlencomp": {
+      "value": [
+        "0"
+      ],
+      "exitCode": 0
+    },
+    "g1QueueCorrection": "在本机kern.ipc.soqlencomp=0语义下，g1的1/1/128表示1个未完成、0个完成待accept；不能据此指责用户态漏处理已经就绪的accept。",
+    "g1ColumnCorrection": "g1服务端行的131是rxbytes；Recv-Q为0，不能把131说成用户态未读队列长度。TCP ESTABLISHED和socket是否已进入可accept队列是不同层次。",
+    "g1StateDecode": "g1 socket state00901可拆为SS_INCOMP(0x800)、SS_NBIO(0x100)、SS_NOFDREF(0x1)，未设置SS_ISCONNECTED(0x2)；这与未进入完成accept队列一致。",
+    "g1FlagsDecode": "g1 LAN未完成socket的flags20000081包含SOF_CONTENT_FILTER(0x20000000)。该位只证明当时附着过滤处理，不能证明正在等待裁决、哪一个过滤程序负责或它就是原失败原因。",
+    "explicitCorrectionToPriorMessage": "我此前将g1 loopback TIME_WAIT也描述为20000081是不正确的；重新逐行核验16帧后，loopback实际均00000081。本摘要纠正该口头比较。",
+    "crossPhaseLimit": "g2快速完成后的TIME_WAIT行均00000081，g1是连接未完成期间20000081。不同生命周期阶段的flags差异不能用来证明因果。",
+    "possibleMechanismNotDiagnosis": "Apple公开XNU在soisconnected中存在pending内容过滤裁决时提前返回、暂不交给accept的路径。这说明TCP已ESTABLISHED而用户态未获得连接可以共存，但本次没有该分支的运行轨迹或裁决日志，不能宣布命中它。",
+    "sourceVersionLimit": "下列Apple main源码用于解释字段与可能机制，不等于逐字匹配本机运行内核；本机表头、man与只读sysctl结果另有实际证据。",
+    "primarySources": [
+      {
+        "url": "https://raw.githubusercontent.com/apple-oss-distributions/network_cmds/main/netstat.tproj/inet.c",
+        "lines": "339-408",
+        "supports": "netstat表头与so_qlen/so_incqlen/so_qlimit、Recv-Q字段。"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/sys/socketvar.h",
+        "lines": "136-153,255,371-384",
+        "supports": "完成/未完成队列、SS状态和SOF_CONTENT_FILTER位。"
+      },
+      {
+        "url": "https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/kern/uipc_socket2.c",
+        "lines": "159-216,318-333",
+        "supports": "accept队列迁移、裁决等待可能路径与soqlencomp计数规则。"
+      }
+    ]
+  },
+  "cleanup": {
+    "serviceExitCode": 0,
+    "forcedKill": false,
+    "serviceGone": true,
+    "samplerStopped": true,
+    "listenerCheckExitCode": 1,
+    "listenerCheckRows": [],
+    "bothBinaryCopiesUnchanged": true
+  },
+  "acceptanceBoundary": [
+    "g原LAN门禁失败、旧LAN失败和g1慢响应记录全部保留，不重写通过。",
+    "此单次检查没有真实登录、没有真实账号、没有完整原r00管理场景，不代替它们。",
+    "此检查不能证明根因是防火墙、TUN、ManualClock、Tokio、特定内容过滤器或程序身份策略。",
+    "未在缺少新变量时再次盲目重跑；若要解释间歇性，需在下一次实际卡顿时保留同样分层证据及进一步可用的只读系统裁决信息。"
+  ],
+  "finalAcceptance": "NOT_EVALUATED_BY_THIS_DIAGNOSTIC"
+}

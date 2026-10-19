@@ -1,0 +1,31 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.03s
+     Running tests/r07_bridge_flow.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_flow-94971086ecc22585)
+
+running 3 tests
+test stopping_immediately_after_start_does_not_lose_shutdown ... ok
+test sent_without_receipt_becomes_unknown_on_restart_and_is_not_sent_again ... ok
+test all_five_platforms_use_real_runs_and_stable_reply_receipts ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.51s
+
+     Running tests/r07_bridge_guest_context.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_guest_context-3657c8860753b4bb)
+
+running 2 tests
+test damaged_public_material_is_a_visible_error_and_cannot_fall_back_to_private_files ... ok
+test guest_reads_only_public_persona_and_never_private_preferences_or_memory ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/r07_bridge_worker.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_bridge_worker-04fabb3eee7040dd)
+
+running 5 tests
+test worker_uses_real_pipe_and_does_not_inherit_service_secrets ... ok
+test command_limit_refuses_dispatch_and_existing_worker_remains_stoppable ... ok
+test oversized_output_is_bounded_and_worker_is_reaped ... ok
+test incomplete_frame_and_malformed_output_never_become_messages ... ok
+test cancelled_read_preserves_partial_frame ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+

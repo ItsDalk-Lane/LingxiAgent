@@ -88,6 +88,8 @@ function resetState() {
   Object.assign(mockState, {
     activeTab: 'agent',
     ready: true,
+    // 标题布局试件也遵守真实store的数组默认值；不代填任何服务读取结果。
+    agents: [],
     set: vi.fn((patch: Record<string, unknown>) => Object.assign(mockState, patch)),
     showToast: vi.fn(),
   });

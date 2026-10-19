@@ -1,0 +1,71 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.61s
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 8 tests
+
+thread 'existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key' (2047878) panicked at crates/lingxi-service/tests/r07_t08_model_configuration.rs:127:14:
+called `Result::unwrap()` on an `Err` value: ModelApplyError { status: 409, code: "model_source_invalid", message: "invalid --config \"/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-model-core-df7183c02bcc1f9a/service.json\": unknown key \"future\" (the closed key set is \"home\", \"workspace\", \"providers\", \"models\", \"workers\")", report: ModelConfigurationApplyReport { saved: false, applied: false, generation: 1, activated: false, cleared_bindings: [], audit_recorded: false, projection_confirmed: false } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key ... FAILED
+test legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back ... ok
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+
+failures:
+
+failures:
+    existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.27s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_model_configuration`
+     Running tests/r07_t08_provider_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_matrix-7431f11362a71f88)
+
+running 1 test
+provider_matrix 现场：/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-provider-matrix-00472ab062534ac3
+provider_matrix 已核实 provider=agnes protocol=openai-completions model=matrix-model-agnes call_id=probe-30361a6d30a779ac54747dac5d74bf36 usage=100/10
+provider_matrix 已核实 provider=dashscope protocol=openai-completions model=matrix-model-dashscope call_id=probe-7d9e0e9fcb43257c350f664641ee04d6 usage=101/11
+provider_matrix 已核实 provider=openai protocol=openai-completions model=matrix-model-openai call_id=probe-8ab5bff5d98b16acd7f1679ab710989c usage=102/12
+provider_matrix 已核实 provider=anthropic protocol=anthropic-messages model=matrix-model-anthropic call_id=probe-385864c01a530ea28a6deef76d883e28 usage=103/13
+provider_matrix 已核实 provider=deepseek protocol=openai-completions model=matrix-model-deepseek call_id=probe-1d1ff630095946e9b8e95b1d12c2820a usage=104/14
+provider_matrix 已核实 provider=deepseek-responses protocol=openai-responses model=matrix-model-deepseek-responses call_id=probe-3cf5bae07b475c8012f54cc5a5f2276d usage=105/15
+provider_matrix 已核实 provider=gemini protocol=google-generative-ai model=matrix-model-gemini call_id=probe-13982ad2bbeaa5eea94629e711dcab8d usage=106/16
+provider_matrix 已核实 provider=openrouter protocol=openai-completions model=matrix-model-openrouter call_id=probe-1d9e810e0a3d75943062886b7c56a4de usage=107/17
+provider_matrix 已核实 provider=opencode protocol=anthropic-messages model=matrix-model-opencode call_id=probe-62d37ff1a302dc027af99524a1e69df6 usage=108/18
+provider_matrix 已核实 provider=opencode-go protocol=openai-completions model=matrix-model-opencode-go call_id=probe-269a6585ca87795de96f1484e05daf63 usage=109/19
+provider_matrix 已核实 provider=ollama protocol=openai-completions model=matrix-model-ollama call_id=probe-bbd9d38836d4cb0d05fe5170a9ff6f17 usage=110/20
+provider_matrix 已核实 provider=minimax protocol=anthropic-messages model=matrix-model-minimax call_id=probe-0feb83629288adcf996be9750e410772 usage=111/21
+provider_matrix 已核实 provider=minimax-token-plan protocol=anthropic-messages model=matrix-model-minimax-token-plan call_id=probe-b9d1138a9f6c40cf7e89c7267745efb1 usage=112/22
+provider_matrix 已核实 provider=siliconflow protocol=openai-completions model=matrix-model-siliconflow call_id=probe-17dcc63822507f91b609228b4137c613 usage=113/23
+provider_matrix 已核实 provider=zhipu protocol=openai-completions model=matrix-model-zhipu call_id=probe-1ed97b71c022ab972ff6a3e1c1b5176b usage=114/24
+provider_matrix 已核实 provider=moonshot protocol=openai-completions model=matrix-model-moonshot call_id=probe-8285e8da3220e496230f1d7d0f8aaa8b usage=115/25
+provider_matrix 已核实 provider=baichuan protocol=openai-completions model=matrix-model-baichuan call_id=probe-9a514181081644ce9923d1cc043d1856 usage=116/26
+provider_matrix 已核实 provider=stepfun protocol=openai-completions model=matrix-model-stepfun call_id=probe-f41fd0c0da81627149fcd70c336ebd7d usage=117/27
+provider_matrix 已核实 provider=volcengine protocol=openai-completions model=matrix-model-volcengine call_id=probe-249ad0076e3192058314ac63204d3417 usage=118/28
+provider_matrix 已核实 provider=hunyuan protocol=openai-completions model=matrix-model-hunyuan call_id=probe-74c7193405d05baba72790285723e1b4 usage=119/29
+provider_matrix 已核实 provider=baidu-cloud protocol=openai-completions model=matrix-model-baidu-cloud call_id=probe-bcb315bad24fb5aa060f9679929dd57f usage=120/30
+provider_matrix 已核实 provider=modelscope protocol=openai-completions model=matrix-model-modelscope call_id=probe-a62c88d3825054da20dda545f46118bc usage=121/31
+provider_matrix 已核实 provider=infini protocol=openai-completions model=matrix-model-infini call_id=probe-df78f53c3078c0a99235d139e1240f3f usage=122/32
+provider_matrix 已核实 provider=mimo protocol=openai-completions model=matrix-model-mimo call_id=probe-7bf4c5f5b8b774ab3ad5b5935ab32ada usage=123/33
+provider_matrix 已核实 provider=mimo-token-plan protocol=openai-completions model=matrix-model-mimo-token-plan call_id=probe-298f1f9174b8405699a5f4cc62a9ceed usage=124/34
+provider_matrix 已核实 provider=groq protocol=openai-completions model=matrix-model-groq call_id=probe-7aa78af993a2cad8f5e99507cd240028 usage=125/35
+provider_matrix 已核实 provider=together protocol=openai-completions model=matrix-model-together call_id=probe-918daf0b57c834fc4ca132bac98e8bf0 usage=126/36
+provider_matrix 已核实 provider=fireworks protocol=openai-completions model=matrix-model-fireworks call_id=probe-4c80fd53d071c5f3903a561710e85e8d usage=127/37
+provider_matrix 已核实 provider=mistral protocol=openai-completions model=matrix-model-mistral call_id=probe-8b6a1efbe60a1753baded9bcb3f43811 usage=128/38
+provider_matrix 已核实 provider=perplexity protocol=openai-completions model=matrix-model-perplexity call_id=probe-ce3f15b0466f202e395aa26e4d26d915 usage=129/39
+provider_matrix 已核实 provider=xai protocol=openai-completions model=matrix-model-xai call_id=probe-302b6f9dc305af8d196e233be9eedd7f usage=130/40
+provider_matrix 已核实 provider=dashscope-coding protocol=openai-completions model=matrix-model-dashscope-coding call_id=probe-7aac6da5cf39e50547b02457087dc8e4 usage=131/41
+provider_matrix 已核实 provider=kimi-coding protocol=openai-completions model=matrix-model-kimi-coding call_id=probe-a1f26c294449fba754aa5f1af0cc832e usage=132/42
+provider_matrix 已核实 provider=volcengine-coding protocol=openai-completions model=matrix-model-volcengine-coding call_id=probe-0d1998faf29ee6eb04755383796b2cc3 usage=133/43
+provider_matrix 已核实 provider=zhipu-coding protocol=openai-completions model=matrix-model-zhipu-coding call_id=probe-c511aa1d65bb22b820a5a98e78672f14 usage=134/44
+test every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.97s
+
+error: 1 target failed:
+    `-p lingxi-service --test r07_t08_model_configuration`

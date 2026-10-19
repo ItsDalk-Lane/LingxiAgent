@@ -50,6 +50,10 @@
 //! - 版本 mtimeMs 为整数毫秒（与 resources.rs etag 同一决策；现役 JS
 //!   float 毫秒的小数位在回环比较中不承载语义）。
 
+#[path = "resource_artifacts.rs"]
+mod artifacts;
+pub(crate) use artifacts::{ArtifactSnapshot, ArtifactWritePreflight};
+
 use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
@@ -452,6 +456,13 @@ pub struct OpContext {
     /// D8 文件历史接线：写路径捕获的 origin 覆盖（None → "event"）。
     /// restore 路由传 "restore"（file-history.ts :88 的 captureNow）。
     pub capture_origin: Option<String>,
+    /// 引擎面授权（现役 resourceIOForEngine = engine.resourceIO，其
+    /// ResourceAccessPolicy 以 getSandboxEnabled:()=>false 构造——不按工
+    /// 作区根/授予收窄，仅受保护根拒绝）：desk 文件面的 desk 根可以位
+    /// 于服务 workspace_root 之外（home_folder/cwd_history/会话 cwd），
+    /// 决定性控制在路由层（批准目录门禁/local-owner/upload 敏感路径筛
+    /// 查）。工具面恒 false。
+    pub engine_plane: bool,
 }
 
 impl OpContext {
@@ -466,6 +477,7 @@ impl OpContext {
             session_path: None,
             emit: true,
             capture_origin: None,
+            engine_plane: false,
         }
     }
 }
@@ -789,6 +801,7 @@ struct IoInner {
     file_safety: std::sync::RwLock<Arc<crate::file_safety::FileSafety>>,
     bus: ResourceEventBus,
     watch_gate: Mutex<()>,
+    watch_stopped: std::sync::atomic::AtomicBool,
     watches: Mutex<HashMap<String, WatchEntry>>,
     watch_ids: Mutex<HashMap<String, String>>,
     subscriptions: Mutex<HashMap<String, Subscription>>,
@@ -852,6 +865,7 @@ impl ResourceIoService {
             mounts: std::sync::OnceLock::new(),
             bus: ResourceEventBus::new(now.clone()),
             watch_gate: Mutex::new(()),
+            watch_stopped: std::sync::atomic::AtomicBool::new(false),
             watches: Mutex::new(HashMap::new()),
             watch_ids: Mutex::new(HashMap::new()),
             subscriptions: Mutex::new(HashMap::new()),
@@ -1231,6 +1245,32 @@ impl ResourceIoService {
         }
     }
 
+    /// 现役 local-fs-provider mkdir（:159-163）：递归创建；changeType 按
+    /// 事先存在性（existed → modified，否则 created）。写级授权。
+    pub async fn mkdir(&self, input: &Value, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        let reference = normalize_resource_ref(input)?;
+        Self::refuse_unconfigured_url(&reference)?;
+        match &reference {
+            ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. } => {
+                let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
+                let inner = self.inner.clone();
+                let ctx2 = ctx.clone();
+                let result = spawn_blocking_io(retained, move || {
+                    inner.filesystem(&reference, "write", cancel)?.mkdir(&ctx2)
+                })
+                .await?;
+                self.emit_changed(&result, ctx);
+                self.capture_history(&result, ctx).await?;
+                Ok(result)
+            }
+            other => Err(ResourceIoError::capability_denied(
+                "mkdir",
+                provider_id_for_ref(other),
+            )),
+        }
+    }
+
     /// rename 与 move 共用现役 moveLike（:180-193）：跨 provider →
     /// 501 cross_provider_move_unsupported；同 provider 走能力闸。
     pub async fn rename(
@@ -1289,6 +1329,57 @@ impl ResourceIoService {
             }
             other => Err(ResourceIoError::capability_denied(
                 capability,
+                provider_id_for_ref(other),
+            )),
+        }
+    }
+
+    /// 现役 copy（resource-io.ts :152-162）：fromRef.kind === toRef.kind，
+    /// 否则 501 cross_provider_copy_unsupported；同 kind 走能力闸。与
+    /// move/rename 不同，挂载源允许跨挂载复制（mount-provider.ts :153）。
+    /// 现役不 capture_history；候选按本服务 mkdir/write 的既定约定补记，
+    /// 属于收紧而非放宽。
+    pub async fn copy(
+        &self,
+        from: &Value,
+        to: &Value,
+        ctx: &OpContext,
+    ) -> Result<Value, ResourceIoError> {
+        let from_ref = normalize_resource_ref(from)?;
+        let to_ref = normalize_resource_ref(to)?;
+        if from_ref.kind() != to_ref.kind() {
+            return Err(ResourceIoError::new(
+                501,
+                "cross_provider_copy_unsupported",
+                format!(
+                    "ResourceIO cross-provider copy is not implemented: {} -> {}",
+                    from_ref.kind(),
+                    to_ref.kind()
+                ),
+            ));
+        }
+        Self::refuse_unconfigured_url(&from_ref)?;
+        match (&from_ref, &to_ref) {
+            (
+                ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. },
+                ResourceRef::LocalFile { .. } | ResourceRef::Mount { .. },
+            ) => {
+                let retained = self.blocking_permit(ctx)?;
+                let cancel = self.operation_cancel(ctx)?;
+                let inner = self.inner.clone();
+                let ctx2 = ctx.clone();
+                let result = spawn_blocking_io(retained, move || {
+                    inner
+                        .filesystem(&to_ref, "write", cancel)?
+                        .copy_from(&from_ref, &ctx2)
+                })
+                .await?;
+                self.emit_changed(&result, ctx);
+                self.capture_history(&result, ctx).await?;
+                Ok(result)
+            }
+            (other, _) => Err(ResourceIoError::capability_denied(
+                "copy",
                 provider_id_for_ref(other),
             )),
         }
@@ -1916,6 +2007,17 @@ impl ResourceIoService {
     /// registry.retain：已存在 → refCount+1；新建 → 初始快照 + 启动轮询。
     /// 目标必须存在（现役 fs.watch 对缺失路径同步 ENOENT → 路由 400）。
     fn retain_watch(&self, input: &Value) -> Result<String, ResourceIoError> {
+        if self
+            .inner
+            .watch_stopped
+            .load(std::sync::atomic::Ordering::Acquire)
+        {
+            return Err(ResourceIoError::new(
+                409,
+                "resource_watch_stopped",
+                "服务已停止接收监听",
+            ));
+        }
         let (file_path, is_directory, resource_key, _resource, mount) =
             match self.resolve_watch_target(input) {
                 Ok(target) => target,
@@ -2111,6 +2213,75 @@ impl ResourceIoService {
         true
     }
 
+    /// 与停用持久化共用监听闸：返回后不会再发布该挂载的旧监听事件。
+    pub(crate) fn disable_mount<T>(
+        &self,
+        mount_id: &str,
+        mount_root: Option<&Path>,
+        disable: impl FnOnce() -> Result<T, ResourceIoError>,
+    ) -> Result<T, ResourceIoError> {
+        let _gate = self
+            .inner
+            .watch_gate
+            .lock()
+            .unwrap_or_else(|p| p.into_inner());
+        let result = disable()?;
+        let targets: Vec<_> = self
+            .inner
+            .watches
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .iter()
+            .filter(|(_, entry)| {
+                entry.mount.as_ref().is_some_and(|m| m.id() == mount_id)
+                    || (entry.mount.is_none()
+                        && mount_root.is_some_and(|root| entry.file_path.starts_with(root)))
+            })
+            .map(|(key, entry)| (key.clone(), entry.generation.clone()))
+            .collect();
+        let error = ResourceIoError::new(403, "mount_revoked", "挂载已停用，监听授权已撤销");
+        for (key, generation) in targets {
+            self.inner.retire_watch_locked(&key, &generation, &error);
+        }
+        Ok(result)
+    }
+
+    /// 退出时立即释放订阅和轮询，不依赖服务状态最后一个引用析构。
+    pub fn shutdown(&self) {
+        let _gate = self
+            .inner
+            .watch_gate
+            .lock()
+            .unwrap_or_else(|p| p.into_inner());
+        self.inner
+            .watch_stopped
+            .store(true, std::sync::atomic::Ordering::Release);
+        if let Some(task) = self
+            .inner
+            .poller
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .take()
+        {
+            task.abort();
+        }
+        self.inner
+            .watches
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clear();
+        self.inner
+            .watch_ids
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clear();
+        self.inner
+            .subscriptions
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .clear();
+    }
+
     /// 诊断面（registry :137-149）。
     pub fn diagnostics(&self) -> Value {
         let watches = self.inner.watches.lock().unwrap_or_else(|p| p.into_inner());
@@ -2167,6 +2338,20 @@ impl ResourceIoService {
                     break;
                 };
                 inner.poll_watches_once();
+                let _gate = inner.watch_gate.lock().unwrap_or_else(|p| p.into_inner());
+                if inner
+                    .watches
+                    .lock()
+                    .unwrap_or_else(|p| p.into_inner())
+                    .is_empty()
+                {
+                    inner
+                        .poller
+                        .lock()
+                        .unwrap_or_else(|p| p.into_inner())
+                        .take();
+                    break;
+                }
             }
         }));
     }
@@ -2176,10 +2361,6 @@ impl IoInner {
     /// 一拍轮询：重取快照 → diff → 发事件。同窗口多次变化合并为一条
     /// （现役 80ms 去抖窗口的轮询等价语义，D7）。
     /// 撤销挂载授权时同步释放关联监听与订阅，不继续发旧授权的事件。
-    fn revoke_watch(&self, key: &str, generation: &str, error: &ResourceIoError) {
-        let _gate = self.watch_gate.lock().unwrap_or_else(|p| p.into_inner());
-        self.retire_watch_locked(key, generation, error);
-    }
     fn retire_watch_locked(&self, key: &str, generation: &str, error: &ResourceIoError) {
         {
             let mut watches = self.watches.lock().unwrap_or_else(|p| p.into_inner());
@@ -2253,11 +2434,12 @@ impl IoInner {
                 .collect()
         };
         for (resource_key, generation, file_path, is_directory, mount) in targets {
+            let _gate = self.watch_gate.lock().unwrap_or_else(|p| p.into_inner());
             let new_snapshot = match &mount {
                 Some(lease) => match checked_mount_snapshot(&file_path, is_directory, lease) {
                     Ok(value) => value,
                     Err(error) => {
-                        self.revoke_watch(&resource_key, &generation, &error);
+                        self.retire_watch_locked(&resource_key, &generation, &error);
                         continue;
                     }
                 },
@@ -2812,6 +2994,23 @@ impl WorkspacePlane {
         if let Some(mount) = &self.mount {
             mount.check(op)?;
         }
+        if ctx.engine_plane {
+            // 引擎面（resource-access-policy.ts sandbox-off）：真实路径解
+            // 析 + 受保护根拒绝，不按工作区根/授予收窄。
+            return self
+                .access
+                .authorize_engine_plane(Path::new(raw_path), &self.cwd, op)
+                .map(|scope| scope.path)
+                .map_err(|refusal| {
+                    let safe = match refusal.cause {
+                        crate::resourceaccess::AccessRefusalCause::Unresolvable => {
+                            "Resource path is invalid".to_string()
+                        }
+                        _ => "Resource is outside authorized roots".to_string(),
+                    };
+                    ResourceIoError::access_denied(op.wire_name(), refusal.message, safe)
+                });
+        }
         self.access
             .authorize(
                 ctx.principal_kind,
@@ -2952,6 +3151,9 @@ impl FileOperations<'_> {
     ) -> Result<Value, ResourceIoError> {
         self.map(self.local_write_expected_version(&self.reference, content, version, ctx)?)
     }
+    fn mkdir(&self, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        self.map(self.local_mkdir(&self.reference, ctx)?)
+    }
     fn move_to(&self, to: &ResourceRef, ctx: &OpContext) -> Result<Value, ResourceIoError> {
         let target = match &self.mount {
             Some(m) => m.sibling(to)?,
@@ -2963,6 +3165,50 @@ impl FileOperations<'_> {
             None => Ok(value),
         }
     }
+    /// 现役 copy 的源解析（local-fs-provider.ts :173 的
+    /// assertAllowed(source,"read") 对应物）：挂载源经挂载 provider
+    /// 的读租约（跨挂载允许）；本地源走引擎面授权——与现役引擎平面
+    /// （resource-access-policy.ts sandbox 关闭）一致，路由层
+    /// local-owner / desk 批准目录 / isSensitivePath 才是决定性控制。
+    fn copy_from(&self, from: &ResourceRef, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        let (source_path, _source_lease) = match from {
+            ResourceRef::Mount { .. } => {
+                let provider = self
+                    .mounts
+                    .get()
+                    .ok_or_else(|| ResourceIoError::unsupported_provider("mount"))?;
+                let lease = provider.resolve(from, "read", None)?;
+                (lease.target().to_path_buf(), Some(lease))
+            }
+            ResourceRef::LocalFile { path } => {
+                let plane = self
+                    .workspace
+                    .as_ref()
+                    .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
+                let scope = plane
+                    .access
+                    .authorize_engine_plane(Path::new(path), &plane.cwd, ResourceOp::Read)
+                    .map_err(|refusal| {
+                        let safe = match refusal.cause {
+                            crate::resourceaccess::AccessRefusalCause::Unresolvable => {
+                                "Resource path is invalid".to_string()
+                            }
+                            _ => "Resource is outside authorized roots".to_string(),
+                        };
+                        ResourceIoError::access_denied("read", refusal.message, safe)
+                    })?;
+                (scope.path, None)
+            }
+            other => {
+                return Err(ResourceIoError::capability_denied(
+                    "copy",
+                    provider_id_for_ref(other),
+                ))
+            }
+        };
+        let result = self.local_copy(&source_path, ctx)?;
+        self.map(result)
+    }
     fn trash(
         &self,
         namespace: Option<&str>,
@@ -2973,6 +3219,85 @@ impl FileOperations<'_> {
     }
     fn materialize(&self, ctx: &OpContext) -> Result<Value, ResourceIoError> {
         self.map(self.local_materialize(&self.reference, ctx)?)
+    }
+}
+
+/// 现役 cpSync 的递归复制（local-fs-provider.ts :173-205，
+/// dereference:false）：顶层/内部符号链接一律重建为符号链接；真实目
+/// 录递归；真实文件内容复制；其余特殊文件响亮报错（不静默跳过）。
+fn copy_tree(source: &Path, target: &Path) -> Result<(), ResourceIoError> {
+    let meta = std::fs::symlink_metadata(source).map_err(|err| {
+        ResourceIoError::io_bad_request(format!(
+            "cannot stat copy source {}: {err}",
+            source.display()
+        ))
+    })?;
+    if meta.file_type().is_symlink() {
+        let original = std::fs::read_link(source).map_err(|err| {
+            ResourceIoError::io_bad_request(format!(
+                "cannot read copy source link {}: {err}",
+                source.display()
+            ))
+        })?;
+        recreate_symlink(&original, source, target).map_err(|err| {
+            ResourceIoError::io_bad_request(format!(
+                "cannot recreate link {}: {err}",
+                target.display()
+            ))
+        })
+    } else if meta.is_dir() {
+        std::fs::create_dir_all(target).map_err(|err| {
+            ResourceIoError::io_bad_request(format!(
+                "cannot create directory {}: {err}",
+                target.display()
+            ))
+        })?;
+        for entry in std::fs::read_dir(source).map_err(|err| {
+            ResourceIoError::io_bad_request(format!(
+                "cannot read copy source directory {}: {err}",
+                source.display()
+            ))
+        })? {
+            let entry = entry.map_err(|err| {
+                ResourceIoError::io_bad_request(format!(
+                    "cannot read copy source directory {}: {err}",
+                    source.display()
+                ))
+            })?;
+            copy_tree(&entry.path(), &target.join(entry.file_name()))?;
+        }
+        Ok(())
+    } else if meta.is_file() {
+        std::fs::copy(source, target).map_err(|err| {
+            ResourceIoError::io_bad_request(format!(
+                "cannot copy {} to {}: {err}",
+                source.display(),
+                target.display()
+            ))
+        })?;
+        Ok(())
+    } else {
+        Err(ResourceIoError::io_bad_request(format!(
+            "cannot copy special file {}",
+            source.display()
+        )))
+    }
+}
+
+#[cfg(unix)]
+fn recreate_symlink(original: &Path, _source: &Path, target: &Path) -> std::io::Result<()> {
+    std::os::unix::fs::symlink(original, target)
+}
+
+#[cfg(windows)]
+fn recreate_symlink(original: &Path, source: &Path, target: &Path) -> std::io::Result<()> {
+    if std::fs::metadata(source)
+        .map(|m| m.is_dir())
+        .unwrap_or(false)
+    {
+        std::os::windows::fs::symlink_dir(original, target)
+    } else {
+        std::os::windows::fs::symlink_file(original, target)
     }
 }
 
@@ -3155,6 +3480,50 @@ impl FileOperations<'_> {
             .as_ref()
             .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
         let file_path = plane.authorize(self.local_path(reference)?, ResourceOp::Write, ctx)?;
+        if expected.get("exists") == Some(&Value::Bool(false)) {
+            if expected.as_object().is_none_or(|value| value.len() != 1) {
+                return Err(ResourceIoError::io_bad_request(
+                    "create-if-absent expectedVersion must contain only exists:false",
+                ));
+            }
+            // 首次程序日志也是版本写：竞争者先创建时返回冲突，绝不改走覆盖。
+            let held_parent = open_resource_parent(&file_path, true)?;
+            let safety = self.file_safety.read().unwrap().clone();
+            let result = safety.create(
+                &crate::file_safety::witness_scope(
+                    ctx.principal_kind,
+                    &ctx.principal_subject,
+                    &ctx.session_id,
+                ),
+                &file_path,
+                content,
+                || {
+                    plane
+                        .authorize(
+                            self.local_path(reference).unwrap_or(""),
+                            ResourceOp::Write,
+                            ctx,
+                        )
+                        .ok()
+                        .as_deref()
+                        == Some(file_path.as_path())
+                        && file_path.parent().is_some_and(|parent| {
+                            held_parent.same_directory(parent).unwrap_or(false)
+                        })
+                },
+            );
+            return match result {
+                Ok(()) => Ok(WorkspacePlane::mutation_result(&file_path, "created")),
+                Err(crate::file_safety::WriteError::Conflict) => Ok(serde_json::json!({
+                    "ok": false,
+                    "conflict": true,
+                    "filePath": file_path.to_string_lossy(),
+                    "resourceKey": local_key(&file_path),
+                    "resource": WorkspacePlane::descriptor(&file_path),
+                })),
+                Err(error) => Err(ResourceIoError::io_bad_request(error.to_string())),
+            };
+        }
         let snapshot = crate::file_safety::Snapshot::read(&file_path).ok();
         let current = std::fs::metadata(&file_path)
             .ok()
@@ -3209,6 +3578,57 @@ impl FileOperations<'_> {
             ),
             Err(error) => Err(ResourceIoError::io_bad_request(error.to_string())),
         }
+    }
+
+    /// 现役 mkdir（local-fs-provider.ts :159-163）：mkdirSync recursive，
+    /// changeType = existed ? "modified" : "created"。写级授权一次完成。
+    fn local_mkdir(
+        &self,
+        reference: &ResourceRef,
+        ctx: &OpContext,
+    ) -> Result<Value, ResourceIoError> {
+        let plane = self
+            .workspace
+            .as_ref()
+            .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
+        let file_path = plane.authorize(self.local_path(reference)?, ResourceOp::Write, ctx)?;
+        let existed = file_path.exists();
+        std::fs::create_dir_all(&file_path).map_err(|err| {
+            ResourceIoError::io_bad_request(format!(
+                "cannot create directory {}: {err}",
+                file_path.display()
+            ))
+        })?;
+        Ok(WorkspacePlane::mutation_result(
+            &file_path,
+            if existed { "modified" } else { "created" },
+        ))
+    }
+
+    /// 现役 copy 的目标侧（local-fs-provider.ts :173-205）：
+    /// assertAllowed(target,"write") → existed 判定 → mkdir 父级 →
+    /// 递归复制（符号链接重建、文件内容复制）；changeType = existed ?
+    /// "modified" : "created"。源授权已在 copy_from 完成。
+    fn local_copy(&self, source: &Path, ctx: &OpContext) -> Result<Value, ResourceIoError> {
+        let plane = self
+            .workspace
+            .as_ref()
+            .ok_or_else(|| ResourceIoError::provider_not_available("local_fs"))?;
+        let target = plane.authorize(self.local_path(&self.reference)?, ResourceOp::Write, ctx)?;
+        let existed = target.exists();
+        if let Some(parent) = target.parent() {
+            std::fs::create_dir_all(parent).map_err(|err| {
+                ResourceIoError::io_bad_request(format!(
+                    "cannot create directory {}: {err}",
+                    parent.display()
+                ))
+            })?;
+        }
+        copy_tree(source, &target)?;
+        Ok(WorkspacePlane::mutation_result(
+            &target,
+            if existed { "modified" } else { "created" },
+        ))
     }
 
     fn local_list(

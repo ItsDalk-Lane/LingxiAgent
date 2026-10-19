@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "AutomationDisplayReceipt": {
+      "additionalProperties": false,
+      "properties": {
+        "channel": {
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": "string"
+        },
+        "displayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "deliveryId",
+        "channel",
+        "displayed"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "claim",
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "deliveryId"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "ack",
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": "string"
+        },
+        "platformReceipt": {
+          "$ref": "#/$defs/AutomationDisplayReceipt"
+        }
+      },
+      "required": [
+        "action",
+        "deliveryId",
+        "platformReceipt"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "failed",
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "deliveryId",
+        "error"
+      ],
+      "type": "object"
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "const": "unknown",
+          "type": "string"
+        },
+        "deliveryId": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "deliveryId",
+        "error"
+      ],
+      "type": "object"
+    }
+  ],
+  "title": "AutomationNotificationCommand"
+}

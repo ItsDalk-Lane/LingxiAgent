@@ -1,0 +1,25 @@
+CARD_CLICK_STATE:{"hasHandler":true,"text":"实际点击","tokenReadable":false}
+T08_CARD_NATIVE_RESULT:{"checks":["actual-frame-no-owner-token","actual-component-put-and-get","actual-script-executed","actual-self-navigation-blocked"],"requests":[{"method":"OPTIONS","path":"/lingxi/v1/cards/navigation-probe","status":204},{"method":"PUT","path":"/lingxi/v1/cards/navigation-probe","status":200},{"method":"GET","path":"/lingxi/v1/cards/navigation-probe/frame/3f1d95857fbf4a7163e7c8fa8333f1722f206dee69b99b77d601e12ccf7560ec","status":200}],"outcome":{"count":0,"observed":[]},"blockedNavigations":[{"reason":"interactive_card_navigation_blocked"}],"cspMessages":[],"navigationFailures":[]}
+
+▲ [WARNING] The "assert" keyword is not supported in the configured target environment ("node24.16.0") [assert-to-with]
+
+    vite.config.ts:7:33:
+      7 │ import pkg from './package.json' assert { type: 'json' };
+        │                                  ~~~~~~
+        ╵                                  with
+
+  Did you mean to use "with" instead of "assert"?
+
+(electron) 'console-message' arguments are deprecated and will be removed. Please use Event<WebContentsConsoleMessageEventParams> object instead.
+[8394:1018/122750.444869:INFO:CONSOLE:733] "[vite] connecting...", source: http://127.0.0.1:5173/@vite/client (733)
+[8394:1018/122750.453105:INFO:CONSOLE:827] "[vite] connected.", source: http://127.0.0.1:5173/@vite/client (827)
+[8394:1018/122750.898820:INFO:CONSOLE:20103] "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold", source: http://127.0.0.1:5173/@fs/private/tmp/lingxi-card-nav-5NC07J/home/.card-vite-cache/deps/react-dom_client.js?v=77792d3d (20103)
+[8394:1018/122750.917176:INFO:CONSOLE:2] "%cElectron Security Warning (Insecure Content-Security-Policy) font-weight: bold; This renderer process has either no Content Security
+  Policy set or a policy with "unsafe-eval" enabled. This exposes users of
+  this app to unnecessary security risks.
+
+For more information and help, consult
+https://electronjs.org/docs/tutorial/security.
+This warning will not show up
+once the app is packaged.", source: node:electron/js2c/sandbox_bundle (2)
+[8394:1018/122750.974105:INFO:CONSOLE:0] "Unrecognized Content-Security-Policy directive 'navigate-to'.", source: http://127.0.0.1:64420/lingxi/v1/cards/navigation-probe/frame/3f1d95857fbf4a7163e7c8fa8333f1722f206dee69b99b77d601e12ccf7560ec#v=1 (0)

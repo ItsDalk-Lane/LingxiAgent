@@ -1,0 +1,55 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running tests/r07_browser_routes.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_routes-c933ce6238713ee4)
+
+running 10 tests
+test concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results ... ok
+test partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown ... ok
+test partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success ... ok
+test unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content ... ok
+test actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions ... ok
+test screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes ... ok
+test archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success ... ok
+test repeated_download_after_unknown_ack_reuses_actual_delivered_file_and_receipt ... ok
+test restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page ... ok
+test chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.96s
+
+     Running tests/r07_browser_tools.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_browser_tools-dfd1908d7da3d362)
+
+running 12 tests
+test external_unknown_effect_is_persisted_and_never_reported_as_success ... ok
+test actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url ... ok
+test undeclared_materialize_is_refused_without_dispatch_and_actual_run_finishes ... ok
+test actual_run_cancellation_reaches_external_cleanup_and_settles_both_records ... ok
+test page_change_and_foreign_tab_invalidate_approval_before_external_dispatch ... ok
+test actual_readonly_snapshot_persists_receipt_but_write_never_dispatches ... ok
+test actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork ... FAILED
+test new_actual_user_submission_releases_emergency_stop_with_a_new_epoch ... ok
+test screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions ... ok
+test accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop ... FAILED
+test unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown ... ok
+test confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start ... ok
+
+failures:
+
+---- actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork stdout ----
+
+thread 'actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork' (906565) panicked at crates/lingxi-service/tests/r07_browser_tools.rs:1254:10:
+called `Result::unwrap()` on an `Err` value: Storage(InvalidRequest { detail: "session_file_reference_not_owned:sf_5a088cd6cf0a512b" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop stdout ----
+
+thread 'accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop' (906564) panicked at crates/lingxi-service/tests/r07_browser_tools.rs:937:5:
+assertion failed: !granted.revoked
+2026-10-15T22:35:12.860315Z  WARN lingxi_service::runs: run driver exited without a finalize; cancellation tree fired, registry entry removed, durable row left honest (R03-T07 owns recovery) run_id=run_000001a3185c5000_000001
+
+
+failures:
+    accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop
+    actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork
+
+test result: FAILED. 10 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_browser_tools`

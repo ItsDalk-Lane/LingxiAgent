@@ -10,6 +10,9 @@
 import { useStore } from './index';
 import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch } from '../services/session-connection-owner';
 import { readRustChatHistory, projectRustHistoryItems } from '../services/rust-chat-history';
+import { refreshRustMediaJobs } from '../services/rust-media';
+import { refreshRustAgentActivities } from '../services/rust-agent-activities';
+import { readLoopRuntimeError, warnLoopRuntimeError } from '../services/loop-runtime-error';
 import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
@@ -452,6 +455,7 @@ export async function loadMessages(
         return { chatSessions: { ...state.chatSessions, [key]: { ...state.chatSessions[key], nativeRawItems: data.rawItems } } };
       });
       if (data.items.length && useStore.getState().currentSessionPath === targetPath) useStore.setState({ welcomeVisible: false });
+      await refreshRustMediaJobs(nativeOwner, sessionId);
     } catch (error) { if (ownsSessionConnection(nativeOwner)) { console.warn('[session] 历史读取失败，保留当前内容', error); throw error; } }
     return;
   }
@@ -824,6 +828,7 @@ export async function loadMoreMessages(forPath?: string): Promise<void> {
         const key = sessionScopedKey(state as Record<string, any>, targetPath) || targetPath;
         return { chatSessions: { ...state.chatSessions, [key]: { ...state.chatSessions[key], nativeRawItems: rawItems } } };
       });
+      await refreshRustMediaJobs(owner, sessionId);
     } catch (error) {
       if (ownsSessionConnection(owner)) {
         console.warn('[session] 历史翻页失败，保留已加载内容', error);
@@ -1028,9 +1033,13 @@ export async function loadSessions(): Promise<void> {
         maxTurns: s.loopStatus.maxTurns ?? null,
         pausedReason: s.loopStatus.pausedReason ?? null,
         prompt: s.loopStatus.prompt ?? null,
+        ...(readLoopRuntimeError(s.loopStatus.runtimeError) ? { runtimeError: readLoopRuntimeError(s.loopStatus.runtimeError) } : {}),
       };
     }
     useStore.setState({ loopStatusBySession: nextLoopStatusBySession });
+    for (const [sessionId, loopStatus] of Object.entries(nextLoopStatusBySession)) {
+      warnLoopRuntimeError(sessionId, loopStatus.runtimeError);
+    }
 
     const latest = useStore.getState();
     if (
@@ -1295,6 +1304,7 @@ export async function switchSession(path: string): Promise<void> {
     }
 
     // 在设置 currentSessionPath 之前预加载消息历史。
+    if (native && owner && typeof data.sessionId === 'string') void refreshRustAgentActivities(owner, data.sessionId);
     // 一旦 currentSessionPath 指向新 session，主窗口 WebSocket 会将该 session 的流式事件
     // 路由到 streamBufferManager，触发 bumpMessageLiveVersion，导致 loadMessages 的
     // 竞态守卫跳过 hydrate，store 丢失完整历史。提前加载可避免此竞态。

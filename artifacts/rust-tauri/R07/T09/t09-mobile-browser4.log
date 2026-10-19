@@ -1,0 +1,43 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-t09-mobile-browser.test.mjs (1 test | 1 failed) 37906ms
+     × 手机端登录→列表→历史→刷新恢复且不重发 33185ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-t09-mobile-browser.test.mjs > R07-T09 窄视口手机端真实浏览器验收 > 手机端登录→列表→历史→刷新恢复且不重发
+Error: 等待超时: 会话列表出现目标会话并点击
+页面侧: {
+  "sidebarOpen": true,
+  "sessionItems": [],
+  "sidebarText": "未归组\n3"
+}
+API 侧: [
+  {
+    "id": "session-aa1ba212b4f52585c2d1c71950c936eb",
+    "title": "新会话",
+    "firstMessage": ""
+  },
+  {
+    "id": "sess_local_beta",
+    "title": "Synthetic session beta",
+    "firstMessage": ""
+  },
+  {
+    "id": "sess_local_alpha",
+    "title": "Synthetic session alpha",
+    "firstMessage": ""
+  }
+]
+ ❯ tests/r07-t09-mobile-browser.test.mjs:307:13
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  00:04:01
+   Duration  38.00s (transform 35ms, setup 17ms, import 20ms, tests 37.91s, environment 0ms)
+

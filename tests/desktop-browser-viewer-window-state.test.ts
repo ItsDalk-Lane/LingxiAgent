@@ -33,8 +33,10 @@ function caseBody(source, name) {
 }
 
 function ipcHandlerBody(source, channel) {
-  const marker = `wrapIpcBestEffortHandler("${channel}"`;
-  const start = source.indexOf(marker);
+  // R07 起 open-browser-viewer 改为 wrapIpcHandler（发送方校验需要抛错），
+  // 其余浏览器通道仍是 best-effort；两种注册壳都接受。
+  const candidates = [`wrapIpcBestEffortHandler("${channel}"`, `wrapIpcHandler("${channel}"`];
+  const start = candidates.map((m) => source.indexOf(m)).filter((i) => i >= 0).sort((a, b) => a - b)[0] ?? -1;
   expect(start).toBeGreaterThan(-1);
   const bodyStart = source.indexOf("=> {", start) + 3;
   expect(bodyStart).toBeGreaterThan(start);

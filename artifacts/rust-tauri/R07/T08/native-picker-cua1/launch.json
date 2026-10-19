@@ -1,0 +1,23 @@
+{
+  "root": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000",
+  "app": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/Lingxi Directory Proof.app",
+  "pid": 29629,
+  "port": 63109,
+  "folder": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/selected-skill",
+  "home": "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/home",
+  "binary": "/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src-tauri/target/debug/lingxi-resource-desktop",
+  "binarySha256": "dd7582b9b59de8f4b3739a97309f10b4790e5e3167932e5b6fd4d15d3a125281",
+  "sourceHashes": {
+    "desktop/src-tauri/src/lib.rs": "62700408c1f581934546ff0e7e89db202903232c48bc5b57d9127f80c0e5aa9e",
+    "desktop/src/tauri-resources/App.tsx": "2a793c3518e31e67d01053ac1726451fef69634dc28db842b55b1d5c8c9d209f",
+    "desktop/src/tauri-resources/bridge.ts": "a2658aedbf6b5c1acb5a4daca9812b9b08b42d8198e6808433b4dcc147e525ab",
+    "desktop/src-tauri/tests/directory_picker_host.rs": "6f1a6a4b2d7717b803ce0eee3eae1509d6dca60fb480d0dc20fec3c4dde2fd79"
+  },
+  "beforeHashes": {
+    "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/selected-skill/SKILL.md": "5b2e9ee82e407560bc38f94de2dc96a4ae94902a2c62b2d4853e0f0bb84d37f6",
+    "/private/tmp/lingxi-r07-t08-picker-1792304801789381000/home/user/preferences.json": "479e31c146e5516efe135321591b15368ce975982ffb0d2fcb8eed3ccac9ff35"
+  },
+  "beforeHomeFiles": [
+    "user/preferences.json"
+  ]
+}

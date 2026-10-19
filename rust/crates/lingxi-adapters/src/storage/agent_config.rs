@@ -801,6 +801,17 @@ impl AgentConfigDocument {
         section: &str,
         key: &str,
     ) -> Result<Option<(String, String)>, MemoryError> {
+        // 损坏的模型分组不能伪装成“未设置”，继而偷偷采用另一模型。
+        if !section.is_empty() {
+            if let Some(group) = self.value.get(section) {
+                if !matches!(
+                    group.value,
+                    NodeValue::Mapping(_) | NodeValue::Scalar(Value::Null)
+                ) {
+                    return Err(invalid(format!("{section} must be a mapping")));
+                }
+            }
+        }
         let Some(value) = self.field(section, key) else {
             return Ok(None);
         };

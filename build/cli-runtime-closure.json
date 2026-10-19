@@ -33,6 +33,12 @@
       "reason": "@vercel/nft trace of an esbuild-compiled bundle of server/index.ts (internal repo source inlined, npm packages left external) -- bundle externals / runtime dependency files for the open server composition's npm dependency surface. Since the route-composition split this file no longer imports the closed-product route files (see the server-bootstrap root's reason above), so this trace no longer pulls in their npm dependencies either -- narrower, and more accurate, than before the split. The packaged product bundle (vite.config.server.js's build.lib.entry) is compiled from server/main-full.ts instead, which statically includes this file plus the closed-product routes; that closed bundle is out of scope for this open-closure trace by design. Same nft usage pattern as the server build's pruneServerNodeModulesViaNft() in scripts/build-server-phases.mjs (read-only precedent)."
     },
     {
+      "id": "create-require-root:package.json",
+      "path": "package.json",
+      "inputType": "dynamic-process-root",
+      "reason": "Reached via a createRequire()-bound local require(\"../package.json\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
+    },
+    {
       "id": "create-require-root:shared/artifact-core/activation.cjs",
       "path": "shared/artifact-core/activation.cjs",
       "inputType": "dynamic-process-root",
@@ -61,6 +67,12 @@
       "path": "shared/artifact-core/pointer-store.cjs",
       "inputType": "dynamic-process-root",
       "reason": "Reached via a createRequire()-bound local require(\"../shared/artifact-core/pointer-store.cjs\") call in cli/server-runner.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
+    },
+    {
+      "id": "create-require-root:shared/contract-versions.cjs",
+      "path": "shared/contract-versions.cjs",
+      "inputType": "dynamic-process-root",
+      "reason": "Reached via a createRequire()-bound local require(\"../shared/contract-versions.cjs\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
     }
   ],
   "dynamicCallSites": [
@@ -304,7 +316,7 @@
       "reason": "Reached via esbuild source module graph, imported by cli/server-runner.ts (import-statement); cli/bundle.ts (import-statement); cli/data.ts (import-statement); +1 more importer(s)."
     },
     {
-      "path": "cli/rust-service.ts",
+      "path": "cli/rust-chat.ts",
       "inputType": "source-graph",
       "provenance": [
         {
@@ -314,6 +326,23 @@
         }
       ],
       "reason": "Reached via esbuild source module graph, imported by cli/entry.ts (import-statement)."
+    },
+    {
+      "path": "cli/rust-service.ts",
+      "inputType": "source-graph",
+      "provenance": [
+        {
+          "root": "cli-entry",
+          "from": "cli/rust-chat.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "cli-entry",
+          "from": "cli/entry.ts",
+          "kind": "import-statement"
+        }
+      ],
+      "reason": "Reached via esbuild source module graph, imported by cli/rust-chat.ts (import-statement); cli/entry.ts (import-statement)."
     },
     {
       "path": "cli/server-runner.ts",
@@ -6806,6 +6835,16 @@
       "provenance": [
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/knowledge-index-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
+          "from": "lib/knowledge/vector-index-adapter.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/usearch-vector-backend.ts",
           "kind": "import-statement"
         },
@@ -6815,7 +6854,7 @@
           "kind": "import-statement"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/usearch-vector-backend.ts (import-statement); lib/knowledge/vector-search-backend-factory.ts (import-statement)."
+      "reason": "Reached via esbuild source module graph, imported by lib/knowledge/knowledge-index-store.ts (import-statement); lib/knowledge/vector-index-adapter.ts (import-statement); lib/knowledge/usearch-vector-backend.ts (import-statement); +1 more importer(s)."
     },
     {
       "path": "lib/knowledge/chunker.ts",
@@ -6910,6 +6949,11 @@
         },
         {
           "root": "server-bootstrap",
+          "from": "lib/knowledge/ann-index-store.ts",
+          "kind": "import-statement"
+        },
+        {
+          "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-index-store.ts",
           "kind": "import-statement"
         },
@@ -6926,11 +6970,6 @@
         {
           "root": "server-bootstrap",
           "from": "lib/knowledge/knowledge-query-service.ts",
-          "kind": "import-statement"
-        },
-        {
-          "root": "server-bootstrap",
-          "from": "lib/knowledge/ann-index-store.ts",
           "kind": "import-statement"
         },
         {
@@ -102886,14 +102925,19 @@
     },
     {
       "path": "package.json",
-      "inputType": "runtime-asset",
+      "inputType": "source-graph",
       "provenance": [
+        {
+          "root": "create-require-root:package.json",
+          "from": null,
+          "kind": "root"
+        },
         {
           "root": "declared-asset",
           "kind": "file"
         }
       ],
-      "reason": "server/index.ts's startServer() reads fromRoot(\"package.json\") via fs.readFileSync for version display."
+      "reason": "Declared root: Reached via a createRequire()-bound local require(\"../package.json\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
     },
     {
       "path": "server/app-events.ts",
@@ -105062,12 +105106,17 @@
           "kind": "import-statement"
         },
         {
+          "root": "create-require-root:shared/contract-versions.cjs",
+          "from": null,
+          "kind": "root"
+        },
+        {
           "root": "create-require-root:shared/artifact-core/ota-core.cjs",
           "from": "shared/artifact-core/ota-core.cjs",
           "kind": "require-call"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by cli/bundle.ts (import-statement); cli/data.ts (import-statement); server/routes/server-identity.ts (import-statement); +2 more importer(s)."
+      "reason": "Declared root: Reached via a createRequire()-bound local require(\"../shared/contract-versions.cjs\") call in cli/rust-service.ts, which esbuild's own module-graph tracer cannot follow (see the createRequire discovery pass above this function). Declared as its own root so its module graph is traced the same as any other declared root."
     },
     {
       "path": "shared/contract-versions.json",
@@ -105084,12 +105133,17 @@
           "kind": "require-call"
         },
         {
+          "root": "create-require-root:shared/contract-versions.cjs",
+          "from": "shared/contract-versions.cjs",
+          "kind": "require-call"
+        },
+        {
           "root": "create-require-root:shared/artifact-core/ota-core.cjs",
           "from": "shared/contract-versions.cjs",
           "kind": "require-call"
         }
       ],
-      "reason": "Reached via esbuild source module graph, imported by shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call)."
+      "reason": "Reached via esbuild source module graph, imported by shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call); shared/contract-versions.cjs (require-call); +1 more importer(s)."
     },
     {
       "path": "shared/data-epoch.cjs",
@@ -107252,10 +107306,10 @@
     }
   ],
   "stats": {
-    "totalFiles": 8950,
+    "totalFiles": 8951,
     "byInputType": {
-      "source-graph": 836,
-      "runtime-asset": 11,
+      "source-graph": 838,
+      "runtime-asset": 10,
       "nft-runtime-trace": 8103
     }
   }

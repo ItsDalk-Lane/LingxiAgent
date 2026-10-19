@@ -1,0 +1,58 @@
+{
+  "label": "mcp-supported-http-stale-expectation1",
+  "createdAt": "2026-10-18T12:05:17.396306+00:00",
+  "scope": "DEVELOPMENT_NOT_RUN_TEST_CONTRACT_ALIGNMENT",
+  "finalAcceptance": false,
+  "original": {
+    "receipt": "artifacts/rust-tauri/R07/T08/mcp-t08-complete-regression1.json",
+    "exitCode": 101,
+    "sourceUnchanged": true,
+    "log": "artifacts/rust-tauri/R07/T08/mcp-t08-complete-regression1.log",
+    "logSha256": "15f2a491492d1020cb70ffda8cce392b13a4b30fe398627628cae2ae04ecfbab",
+    "remotePassed": 7,
+    "permissionPassed": 5,
+    "managementPassed": 21,
+    "managementFailed": 1,
+    "actualError": "mcp_connect_failed",
+    "oldExpectedError": "mcp_endpoint_unsupported"
+  },
+  "actualFixtureEvidence": [
+    {
+      "file": "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs",
+      "lines": "217-222",
+      "fact": "endpoint为owned localhost/v1，Axum仅注册/v1/models GET、/v1/chat/completions POST、/v1/messages POST，没有MCP/v1握手handler。"
+    },
+    {
+      "file": "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs",
+      "fact": "相同endpoint作为remote connector URL由真实九动作Run保存后启动；HTTP已支持，实际初始化请求进入官方SDK后该地址不能完成MCP握手。"
+    }
+  ],
+  "minimalEdit": {
+    "comments": "明确HTTP已支持、该地址故意为模型端点而不是MCP端点。",
+    "assertion": "仅将精确error code改为mcp_connect_failed；不是接受任意error。",
+    "unchanged": [
+      "status Failed",
+      "saved true",
+      "runtimeApplied false",
+      "原九动作及真实SDK消费者检查",
+      "后续仅用户可写的command/env拒绝",
+      "未知字段/同ID旧句柄失效/助手隔离等全部原断言"
+    ]
+  },
+  "sourceSha256": {
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_settings.rs": "9d9f3b4e818a487ee7f5722f064a1a6ad36ea72148d90ec28098d0d4f087dd69"
+  },
+  "executedByAgent": {
+    "cargo": false,
+    "functional": false
+  },
+  "pending": [
+    "root原case定向回归",
+    "strict clippy",
+    "新g固定候选门禁与独立审阅"
+  ],
+  "limitations": [
+    "原Unsupported阶段失败/记录不覆写。",
+    "整套T08尚未最终验收。"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "enum": [
+    "failed",
+    "not_yet_confirmed",
+    "not_submitted",
+    "accepted",
+    "completed",
+    "unknown"
+  ],
+  "title": "MediaRemoteOutcome",
+  "type": "string"
+}

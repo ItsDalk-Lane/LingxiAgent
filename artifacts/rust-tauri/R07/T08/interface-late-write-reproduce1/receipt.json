@@ -1,0 +1,30 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile.json=artifacts/rust-tauri/R07/T08/interface-late-write-reproduce1/vitest-results.json"
+  ],
+  "exitCode": 1,
+  "developmentOnly": true,
+  "binary": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binaryBeforeSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryAfterSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "sourceBefore": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "2cf0e498c0aec5c8506e96c58a327115da9558b764a3d71475c6cb9e6a0a909a",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "9ed4bee73a688c95394b36be8e93c17c7e96408cf1199345f9c17d2394816061",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "cd05f32a09383663e1b351821d5229b2fd7f8c74c6e9e35840ddc3359ad86b54",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "3a272d8dfdf007a691240a25f5b0734cf00ef8aba177e39632e64dadea68c38c"
+  },
+  "sourceAfter": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "2cf0e498c0aec5c8506e96c58a327115da9558b764a3d71475c6cb9e6a0a909a",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "9ed4bee73a688c95394b36be8e93c17c7e96408cf1199345f9c17d2394816061",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "cd05f32a09383663e1b351821d5229b2fd7f8c74c6e9e35840ddc3359ad86b54",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "3a272d8dfdf007a691240a25f5b0734cf00ef8aba177e39632e64dadea68c38c"
+  },
+  "stdoutSha256": "d9536e4790cbd328b265b418959bd7406c5e051f56377963754ecd9e40fd1347",
+  "stderrSha256": "942651c3fe14b0dfd48627ef8a5360f70c7a9175758bb328ed1af7a11b5fd186"
+}

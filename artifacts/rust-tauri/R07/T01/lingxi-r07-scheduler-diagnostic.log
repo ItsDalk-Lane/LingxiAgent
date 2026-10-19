@@ -1,0 +1,23 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 32.87s
+     Running tests/r07_scheduler.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_scheduler-cfa258b8f5871d0d)
+
+running 1 test
+test one_shot_is_disabled_after_real_execution ... 2026-10-15T16:36:15.616984Z  INFO lingxi_service: request handled request_id="req-b4e38eddf1ef64b71334aa1be68c569d" method=POST path=/lingxi/v1/desk/cron status=200
+2026-10-15T16:36:15.619295Z  INFO lingxi_service::sessions: background submission accepted: the drive is decoupled from this caller's connection (disconnect ≠ cancel) run_id=run_000001a3185d3a60_000001 session_id="activity-trigger-c46ef28a415688482302854bb33d50a486f4586fa3904f7a2cfe8629412383ab"
+2026-10-15T16:36:15.621603Z  WARN lingxi_service::runs: run driver exited without a finalize; cancellation tree fired, registry entry removed, durable row left honest (R03-T07 owns recovery) run_id=run_000001a3185d3a60_000001
+2026-10-15T16:36:15.621629Z ERROR lingxi_service::background: background drive FAILED before its finalize (loud; the durable row stays honest) run_id=run_000001a3185d3a60_000001 error=Storage(Corrupted { detail: "model_history: current Run input left active branch" })
+
+thread 'one_shot_is_disabled_after_real_execution' (165663) panicked at crates/lingxi-service/tests/r07_scheduler.rs:58:137:
+定时任务未在测试期限内结束：providerCalls=1，tasks=[TaskRef { id: 1, label: "background_drive:run_000001a3185d3a60_000001", kind: Background, run_id: None, exit: Some(Completed) }]，backgroundExits=[]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    one_shot_is_disabled_after_real_execution
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 10.14s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_scheduler`

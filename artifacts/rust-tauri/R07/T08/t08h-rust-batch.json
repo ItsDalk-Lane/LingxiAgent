@@ -1,0 +1,85 @@
+{
+  "candidate": "t08h",
+  "scope": "T08_RELATED_CHECKS_NOT_FINAL_R07",
+  "runnerSha256": "3c56ff235f5b28edef5609888eb976f7c82e0e6d9e777b0c5f597bf70cfe049b",
+  "planSha256": "8d8cc95b5a16fd9c26c60e76ccf5391ac32e0c4ec3de10590cc249d9ad6ac7b8",
+  "results": {
+    "fmt": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-fmt.json"
+    },
+    "diff": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-diff.json"
+    },
+    "clippy": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-clippy.json"
+    },
+    "protocol": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-protocol.json"
+    },
+    "protocol-roundtrip": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-protocol-roundtrip.json"
+    },
+    "protocol-tests": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-protocol-tests.json"
+    },
+    "kernel": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-kernel.json"
+    },
+    "boundaries": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-boundaries.json"
+    },
+    "adapter": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-adapter.json"
+    },
+    "service": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-service.json"
+    },
+    "model-regression": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-model-regression.json"
+    },
+    "native-skills": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-native-skills.json"
+    },
+    "native-picker-binding": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-native-picker-binding.json"
+    },
+    "skills-current": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-skills-current.json"
+    },
+    "build": {
+      "wrapperExitCode": 0,
+      "productCommandExecuted": true,
+      "receipt": "t08h-build.json"
+    }
+  },
+  "notRun": [],
+  "fullStagePassClaimed": false
+}

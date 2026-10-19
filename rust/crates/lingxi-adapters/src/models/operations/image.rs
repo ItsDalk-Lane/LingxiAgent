@@ -504,7 +504,7 @@ fn build_openai_codex_image(
 ) -> Result<OperationRequestPlan, ProtocolError> {
     // The account id is a hard requirement of this family (same posture as
     // the codex chat family): only an OAuth bearer JWT carries it.
-    let ApplicableAuth::Bearer(token) = auth else {
+    let Some(token) = auth.bearer_token() else {
         return Err(ProtocolError::new(
             ErrorCode::Unauthorized,
             "openai-codex-responses-image requires an OAuth bearer credential (the codex \

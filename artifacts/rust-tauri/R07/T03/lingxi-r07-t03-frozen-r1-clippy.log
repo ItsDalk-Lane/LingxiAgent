@@ -1,0 +1,25 @@
+    Checking lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+    Checking lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error: this looks like an `else if` but the `else` is missing
+   --> crates/lingxi-adapters/src/storage/conversations.rs:663:156
+    |
+663 | ...ctor,&conversation,&owner)?;if old.is_none(){return Ok(false);}if old.as_ref().is_some_and(|row|row.epoch!=epoch as u64){return ...
+    |                                                                   ^
+    |
+    = note: to remove this lint, add the missing `else` or add a new line before the second `if`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#possible_missing_else
+    = note: `-D clippy::possible-missing-else` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::possible_missing_else)]`
+
+error: this looks like an `else if` but the `else` is missing
+   --> crates/lingxi-adapters/src/storage/conversations_collab.rs:522:202
+    |
+522 | ...t,false)?;if d.state==CollabDraftState::Rejected{return Ok(d);}if d.state!=CollabDraftState::Pending{return Err(conflict("draft ...
+    |                                                                   ^
+    |
+    = note: to remove this lint, add the missing `else` or add a new line before the second `if`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#possible_missing_else
+
+error: could not compile `lingxi-adapters` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `lingxi-adapters` (lib test) due to 2 previous errors

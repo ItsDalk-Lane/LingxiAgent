@@ -42,6 +42,14 @@
 //! (R03-T05) reads exactly that as UNKNOWN and never lets a non-idempotent
 //! side effect be blindly retried.
 
+#[path = "media_run.rs"]
+mod media_run;
+pub use media_run::MediaExecutionPermit;
+pub(crate) use media_run::{MediaRequestPermit, MEDIA_REQUEST_SESSION_BUSY};
+#[path = "beautify_run.rs"]
+mod beautify_run;
+pub(crate) use beautify_run::CoverPromptCall;
+
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -64,7 +72,7 @@ use lingxi_protocol::{
     AssistantSegmentDeltaPayload, AssistantSegmentEndPayload, AssistantSegmentStartPayload,
     ContentBlock, ErrorCode, EventId, EventPayload, KnownEventPayload, ModelCallCompletedPayload,
     ModelCallDeltaPayload, ModelCallId, ModelCallStartedPayload, ProtocolError, RunId,
-    RunStateChangedPayload, RunStatus, ToolCallCompletedPayload, ToolCallDescriptor,
+    RunStateChangedPayload, RunStatus, ToolCallCompletedPayload, ToolCallDescriptor, ToolCallId,
     ToolCallStartedPayload, ToolResultStatus, ToolResultWire,
 };
 
@@ -78,6 +86,70 @@ use crate::quotas::QuotaManager;
 use crate::session_supervisor::SteeringInbox;
 use crate::streaming_norm::{DeltaNormalizer, NormEvent};
 use crate::task_supervisor::{TaskExit, TaskSupervisor};
+
+/// 明确用户封面动作仅允许这两个固定步骤，不接受任意目标或准备句柄。
+#[derive(Clone, Copy)]
+pub(crate) enum CoverAction {
+    GenerateImage,
+    Apply,
+}
+
+pub(crate) trait CoverActionGuard: Send + Sync {
+    fn current_cover<'a>(
+        &'a self,
+        job: &'a lingxi_adapters::storage::beautify::CoverJob,
+        ctx: &'a lingxi_kernel::RunContext,
+        cancel: &'a CancelScope,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), String>> + Send + 'a>>;
+}
+
+pub(crate) struct CoverActionCall<'a> {
+    pub db: &'a lingxi_adapters::storage::RunDatabase,
+    pub job_id: &'a str,
+    pub action: CoverAction,
+    pub ctx: &'a lingxi_kernel::RunContext,
+    pub cancel: &'a CancelScope,
+    pub guard: &'a dyn CoverActionGuard,
+    pub auth: &'a crate::auth::AuthService,
+    pub management: &'a crate::management::ManagementState,
+    pub clock: &'a dyn crate::ServiceClock,
+}
+
+/// HTTP明确用户媒体动作的固定词表；不能借此请求任意工具。
+#[derive(Clone, Copy)]
+pub(crate) enum MediaGenerateAction {
+    Image,
+    Video,
+    Speech,
+}
+impl MediaGenerateAction {
+    pub(crate) fn parse(kind: &str) -> Option<Self> {
+        match kind {
+            "image" => Some(Self::Image),
+            "video" => Some(Self::Video),
+            "speech" => Some(Self::Speech),
+            _ => None,
+        }
+    }
+    fn kind(self) -> &'static str {
+        match self {
+            Self::Image => "image",
+            Self::Video => "video",
+            Self::Speech => "speech",
+        }
+    }
+}
+
+pub(crate) struct MediaGenerateCall<'a> {
+    pub db: &'a Arc<lingxi_adapters::storage::RunDatabase>,
+    pub events: &'a Arc<EventService>,
+    pub session: &'a lingxi_adapters::storage::session_tree::SessionTreeRow,
+    pub permit: &'a MediaRequestPermit,
+    pub request_id: &'a str,
+    pub action: MediaGenerateAction,
+    pub args: serde_json::Value,
+    pub now: u64,
+}
 
 /// Hard bounds of one driven run (R03-T01; injected through `ServiceDeps`).
 /// Both bounds are loud: hitting `max_model_turns` FAILS the run with
@@ -382,7 +454,21 @@ impl TurnDeltaSink for ChannelDeltaSink {
 /// subagent runtime for child runs) and bound to the run for its whole
 /// lifetime — neither a model swap nor an executor swap can widen it.
 #[derive(Debug, Clone, PartialEq)]
+pub struct WorkflowNodeScope {
+    /// 空列表表示节点只读，执行面按此范围与原有权限求交。
+    pub write_roots: Vec<std::path::PathBuf>,
+    pub tool_filter: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct DriveAuthorization {
+    /// 仅真实前台会话受理可设置；后台和子运行均保持false。
+    pub foreground_mcp_session_permissions: bool,
+    /// 真实交互入口冻结的原始身份；设置工具仍须复核其权限和凭证现效。
+    pub settings_principal: Option<crate::auth::Principal>,
+    /// 仅循环控制器能签发的原始代次身份；不来自模型或 HTTP 参数。
+    pub loop_identity: Option<crate::loopx::LoopRunIdentity>,
+    pub workflow_scope: Option<WorkflowNodeScope>,
     pub chat_input: Option<ChatRunInput>,
     pub knowledge_selection: Option<crate::sessions::KnowledgeSelection>,
     /// parentRunId / origin / sourceMessageId / causeId — durably recorded
@@ -415,6 +501,10 @@ pub enum RunGrant {
     /// authorizes every target (quota-admitted, authenticated — the T05
     /// semantics; R04's policy gateway replaces this decision point).
     Full,
+    /// 角色由可信 BridgeHost 配置核准；群聊和未知发送者只能为 Guest。
+    Bridge { role: lingxi_protocol::BridgeRole },
+    /// 只由频道/私聊投递宿主受理，权限仍由本轮手机设置收窄。
+    Phone,
     /// A subagent child run: EVERY tool target is authorized against the
     /// ATTENUATED tier (parent grant ∩ subagent tool scope — the real
     /// authorization boundary of R03-A11). The tier is fixed at dispatch;
@@ -478,6 +568,10 @@ impl DriveAuthorization {
             );
         }
         Self {
+            foreground_mcp_session_permissions: false,
+            settings_principal: None,
+            loop_identity: None,
+            workflow_scope: None,
             chat_input: None,
             knowledge_selection: None,
             lineage: RunLineage::user_submission(request_id),
@@ -497,8 +591,41 @@ impl DriveAuthorization {
     /// The gateway permission context of this run's invocations
     /// (R04-T03): derived from the grant + the session-mode snapshot the
     /// run was admitted with — a trusted driver fact, never model data.
+    fn scoped_invocation_permission_context(
+        &self,
+        phone_scoped: bool,
+    ) -> crate::toolgateway::InvocationPermissionContext {
+        if phone_scoped {
+            let mode = if matches!(
+                self.grant,
+                RunGrant::Subagent {
+                    tier: ToolAccessTier::ReadOnly
+                }
+            ) {
+                lingxi_kernel::subagent::SessionPermissionMode::ReadOnly
+            } else {
+                self.session_mode
+            };
+            crate::toolgateway::InvocationPermissionContext::Automation { mode }
+        } else {
+            self.invocation_permission_context()
+        }
+    }
+
     pub fn invocation_permission_context(&self) -> crate::toolgateway::InvocationPermissionContext {
+        if matches!(self.lineage.origin, RunOrigin::Cron | RunOrigin::Heartbeat) {
+            return crate::toolgateway::InvocationPermissionContext::Automation {
+                mode: self.session_mode,
+            };
+        }
         match self.grant {
+            RunGrant::Phone => crate::toolgateway::InvocationPermissionContext::Automation {
+                mode: self.session_mode,
+            },
+            RunGrant::Bridge { role } => crate::toolgateway::InvocationPermissionContext::Bridge {
+                role,
+                mode: self.session_mode,
+            },
             RunGrant::Full => crate::toolgateway::InvocationPermissionContext::UserSession {
                 mode: self.session_mode,
             },
@@ -526,6 +653,15 @@ pub enum DriveError {
 impl From<StorageError> for DriveError {
     fn from(err: StorageError) -> Self {
         DriveError::Storage(err)
+    }
+}
+
+impl std::fmt::Display for DriveError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DriveError::Storage(err) => write!(f, "{err}"),
+            DriveError::Internal(message) => f.write_str(message),
+        }
     }
 }
 
@@ -593,6 +729,7 @@ impl Drop for RegistrationGuard<'_> {
 /// one supervisor safely.
 pub struct RunSupervisor {
     provider: Option<Arc<dyn TurnProviderPort>>,
+    model_activation: Option<Arc<std::sync::atomic::AtomicBool>>,
     tools: Option<Arc<dyn ToolExecutorPort>>,
     limits: RunDriveLimits,
     quotas: Arc<QuotaManager>,
@@ -663,6 +800,20 @@ pub struct RunSupervisor {
     session_resource_access: Option<Arc<crate::resourceaccess::ResourceAccess>>,
     knowledge: Option<Arc<crate::knowledge::KnowledgeService>>,
     model_history: Option<Arc<crate::model_history::ModelHistory>>,
+    settlement_clock: Option<Arc<dyn crate::ServiceClock>>,
+    /// R07-T07-δ2: 会话预算目标引擎（现役 server/goal-handler.ts 的总线观察
+    /// 缝）。`Some` 时：每次模型调用账本行落盘成功后按分量合计进账
+    /// （落盘才记账 = 现役「中止且未落盘不记账」口径）、每轮迭代顶做时间
+    /// 预算懒检查。`None`（测试装配）保持钩子前形状。
+    goal_engine: Option<Arc<crate::goal::GoalEngine>>,
+    /// R07-T07-δ6: 循环控制器观察缝（现役 server/loop-bus-handlers.ts 的
+    /// 总线订阅）。晚绑定弱引用（同 `browser` 字段先例）：循环面在组合根
+    /// 晚于 RunSupervisor 装配（投递钩反向持有 RunSupervisor），启动期
+    /// attach_loop_controller 一次性绑定。`None`（未绑定/测试装配）保持
+    /// 钩子前形状。真实主任务按 run_id 登记；模型轮只更新自己的标记，
+    /// 普通结束和取消均在统一终态提交后结算，空闲守恒由实际许可释放触发。
+    loop_controller: std::sync::Mutex<std::sync::Weak<crate::loopx::LoopController>>,
+    browser: std::sync::Mutex<std::sync::Weak<crate::browser::BrowserService>>,
 }
 
 /// R06-T03: persists a user-origin run's input into the session message tree.
@@ -726,6 +877,532 @@ impl std::fmt::Debug for RunSupervisor {
 }
 
 impl RunSupervisor {
+    /// 固定媒体用户动作由运行驱动拥有完整准备/批准/执行/回执次序，HTTP面只映射输入输出。
+    pub(crate) async fn execute_media_generate(
+        &self,
+        input: MediaGenerateCall<'_>,
+    ) -> (
+        Result<(), String>,
+        Result<serde_json::Value, crate::EndpointError>,
+    ) {
+        use crate::approval::{ApprovalDecision, ApprovalRequest};
+        use crate::toolgateway::{
+            CallerSurface, InvocationPermissionContext, PolicyVerdict, TrustedToolLifetime,
+            TOOL_LIFETIME,
+        };
+        use crate::EndpointError;
+        use axum::http::StatusCode;
+        use lingxi_kernel::toolcatalog::{summarize_arguments, PermissionKind, SchemaBudget};
+        let MediaGenerateCall {
+            db,
+            events,
+            session,
+            permit,
+            request_id,
+            action,
+            args,
+            now,
+        } = input;
+        if self
+            .storage_admission
+            .as_ref()
+            .is_none_or(|gate| !Arc::ptr_eq(gate, db.session_admission()))
+            || !self
+                .run_scope(permit.context.run_id.as_str())
+                .is_some_and(|scope| scope.same_scope(&permit.cancel_scope))
+            || permit.context.session_id.as_str() != session.session_id
+        {
+            return (
+                Err("media_source_not_admitted".into()),
+                Err(EndpointError::forbidden("media_source_not_admitted")),
+            );
+        }
+        let mode = match self.tasks.parent_session_mode(
+            permit.context.run_id.as_str(),
+            &session.session_id,
+            &session.agent_id,
+            &permit.context.principal,
+            db.session_admission(),
+        ) {
+            Ok(Some(mode)) => mode,
+            _ => {
+                return (
+                    Err("media_source_not_admitted".into()),
+                    Err(EndpointError::forbidden("media_source_not_admitted")),
+                );
+            }
+        };
+        let gateway = match self.tool_gateway.as_deref() {
+            Some(gateway) => gateway,
+            None => {
+                return (
+                    Err("media_gateway_unavailable".into()),
+                    Err(EndpointError::resource_failure(
+                        StatusCode::SERVICE_UNAVAILABLE,
+                        "media_gateway_unavailable",
+                        "媒体工具网关尚未配置",
+                    )),
+                );
+            }
+        };
+        let ctx = &permit.context;
+        let kind = action.kind();
+        let target = format!("tool:plugin:media:generate-{kind}");
+        let call = ToolCallId::new(format!("{}-media-generate", ctx.run_id));
+        let request = match ToolRequest::from_effective_arguments(
+            target.clone(),
+            args,
+            &SchemaBudget::default(),
+        ) {
+            Some(request) => request,
+            None => {
+                return (
+                    Err("media_arguments_invalid".into()),
+                    Err(EndpointError::invalid_message("媒体参数未通过正式规范")),
+                );
+            }
+        };
+        // 拒绝分支的统一账：意向先持久，再落零派发回执（与回合驱动同序）。
+        let record_refusal = |detail: String| {
+            let call = call.clone();
+            let target = target.clone();
+            let digest = request.args_digest.hex.clone();
+            async move {
+                db.record_invocation_intent(
+                    ctx,
+                    InvocationIntent {
+                        journal_id: call.clone(),
+                        target,
+                        args_digest: digest,
+                        args_summary: Some("明确用户媒体生成动作".into()),
+                        idempotency_key: Some(call.to_string()),
+                    },
+                    now,
+                )
+                .await
+                .map_err(|e| e.to_string())?;
+                db.record_invocation_receipt(
+                    ctx,
+                    &call,
+                    InvocationReceipt {
+                        outcome: ReceiptOutcome::Failed,
+                        detail,
+                        dedup_id: None,
+                        dispatched: false,
+                    },
+                    now,
+                )
+                .await
+                .map_err(|e| e.to_string())?;
+                Ok::<(), String>(())
+            }
+        };
+        let prepared = match gateway.prepare_from_request(
+            ctx,
+            CallerSurface::UserRun,
+            &session.agent_id,
+            InvocationPermissionContext::UserSession { mode },
+            &call,
+            &request,
+        ) {
+            Ok(prepared) => prepared,
+            Err(refusal) => {
+                let journal = record_refusal(format!("not dispatched: {refusal}")).await;
+                let mapped = map_media_prepare_refusal(&refusal);
+                let code = refusal.code().to_string();
+                return match journal {
+                    Ok(()) => (Err(code), Err(mapped)),
+                    Err(error) => (
+                        Err("media_journal_failed".into()),
+                        Err(EndpointError::invalid_message(error)),
+                    ),
+                };
+            }
+        };
+        let _cleanup = PreparedCallCleanup {
+            gateway,
+            ctx,
+            call: &call,
+            handle: &prepared.handle,
+        };
+        let intent = InvocationIntent {
+            journal_id: call.clone(),
+            target: target.clone(),
+            args_digest: prepared.args_digest_hex.clone(),
+            args_summary: Some("明确用户媒体生成动作".into()),
+            idempotency_key: Some(call.to_string()),
+        };
+        if let Err(error) = db.record_invocation_intent(ctx, intent, now).await {
+            return (
+                Err("media_journal_failed".into()),
+                Err(EndpointError::invalid_message(error.to_string())),
+            );
+        }
+        match &prepared.policy {
+            PolicyVerdict::Allowed => {}
+            PolicyVerdict::NeedsApproval { reason } => {
+                let Some(gate) = self.approval.clone() else {
+                    let journal = record_refusal(format!(
+                        "not dispatched: approval required but unavailable: {reason}"
+                    ))
+                    .await;
+                    return match journal {
+                        Ok(()) => (
+                            Err("media_approval_unavailable".into()),
+                            Err(EndpointError::forbidden("media_approval_unavailable")),
+                        ),
+                        Err(error) => (
+                            Err("media_journal_failed".into()),
+                            Err(EndpointError::invalid_message(error)),
+                        ),
+                    };
+                };
+                if let Err(error) = self.media_request_wait_approval(db, events, ctx, now).await {
+                    return (
+                        Err("media_state_failed".into()),
+                        Err(EndpointError::invalid_message(error)),
+                    );
+                }
+                let gate_req = ApprovalRequest {
+                    requires_scope_review: prepared.permission_kind == PermissionKind::Review,
+                    tool_call_id: call.clone(),
+                    target: target.clone(),
+                    args_digest: prepared.args_digest_hex.clone(),
+                    args_summary: prepared
+                        .review_summary
+                        .clone()
+                        .or_else(|| request.args_summary.clone())
+                        .or_else(|| Some(summarize_arguments(&request.arguments))),
+                    resources: prepared.resources.clone(),
+                };
+                let decision = tokio::select! {
+                    biased;
+                    _ = permit.cancel_scope.cancelled() => ApprovalDecision::Aborted,
+                    decided = gate.request(ctx, &gate_req) => decided,
+                };
+                if let Err(error) = self
+                    .media_request_resume_running(db, events, ctx, now)
+                    .await
+                {
+                    return (
+                        Err("media_state_failed".into()),
+                        Err(EndpointError::invalid_message(error)),
+                    );
+                }
+                match decision {
+                    ApprovalDecision::Approved => {}
+                    ApprovalDecision::Rejected { .. } | ApprovalDecision::Aborted => {
+                        let reason = match decision {
+                            ApprovalDecision::Rejected { reason } => reason,
+                            _ => "approval aborted".to_string(),
+                        };
+                        let journal = record_refusal(format!("not dispatched: {reason}")).await;
+                        return match journal {
+                            Ok(()) => (
+                                Err("media_generation_not_approved".into()),
+                                Err(EndpointError::forbidden("media_generation_not_approved")),
+                            ),
+                            Err(error) => (
+                                Err("media_journal_failed".into()),
+                                Err(EndpointError::invalid_message(error)),
+                            ),
+                        };
+                    }
+                }
+            }
+            PolicyVerdict::Denied { message, .. } => {
+                let journal =
+                    record_refusal(format!("not dispatched: policy denied: {message}")).await;
+                return match journal {
+                    Ok(()) => (
+                        Err("gateway_policy_denied".into()),
+                        Err(EndpointError::forbidden("media_generation_policy_denied")),
+                    ),
+                    Err(error) => (
+                        Err("media_journal_failed".into()),
+                        Err(EndpointError::invalid_message(error)),
+                    ),
+                };
+            }
+        }
+        for phase in [InvocationPhase::Authorized, InvocationPhase::Started] {
+            if let Err(error) = db.advance_invocation(ctx, &call, phase, now).await {
+                return (
+                    Err("media_journal_failed".into()),
+                    Err(EndpointError::invalid_message(error.to_string())),
+                );
+            }
+        }
+        let lifetime = TrustedToolLifetime {
+            workspace: None,
+            cancel: permit.cancel_scope.clone(),
+            deadline_unix_ms: now.saturating_add(300_000),
+            budget_ms: 300_000,
+        };
+        let executed = TOOL_LIFETIME
+            .scope(
+                lifetime,
+                gateway.execute_prepared(ctx, &call, &prepared.handle),
+            )
+            .await;
+        let (outcome, dispatched) = match executed {
+            Ok(value) => (value.outcome, true),
+            Err(refusal) => (
+                ToolOutcome::Failed {
+                    error: refusal.to_tool_error(),
+                },
+                false,
+            ),
+        };
+        let receipt = InvocationReceipt {
+            outcome: match &outcome {
+                ToolOutcome::Success { .. } => ReceiptOutcome::Succeeded,
+                ToolOutcome::Failed { .. } | ToolOutcome::Cancelled => ReceiptOutcome::Failed,
+                ToolOutcome::Unknown { .. } => ReceiptOutcome::Unknown,
+            },
+            detail: format!("{outcome:?}"),
+            dedup_id: Some(request_id.to_string()),
+            dispatched,
+        };
+        if let Err(error) = db.record_invocation_receipt(ctx, &call, receipt, now).await {
+            return (
+                Err("media_journal_failed".into()),
+                Err(EndpointError::invalid_message(format!(
+                    "媒体动作已派发={dispatched}，真实结果={outcome:?}，调用回执尚未确认保存：{error}"
+                ))),
+            );
+        }
+        match outcome {
+            ToolOutcome::Success { result } => {
+                let details = result
+                    .details
+                    .as_ref()
+                    .and_then(|details| details.get("mediaGeneration"))
+                    .cloned();
+                match details {
+                    Some(value) => (Ok(()), Ok(value)),
+                    None => (
+                        Err("media_receipt_missing".into()),
+                        Err(EndpointError::resource_failure(
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            "media_receipt_missing",
+                            "媒体受理回执缺失",
+                        )),
+                    ),
+                }
+            }
+            ToolOutcome::Failed { error } => (
+                Err(format!("media_submit_failed:{:?}", error.code)),
+                Err(EndpointError::invalid_message(error.message)),
+            ),
+            ToolOutcome::Cancelled => (
+                Err("media_submit_cancelled".into()),
+                Err(EndpointError::invalid_message("媒体生成已取消")),
+            ),
+            ToolOutcome::Unknown { reason } => (
+                Err("media_submit_unknown".into()),
+                Err(EndpointError::resource_failure(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "media_submit_unknown",
+                    format!("媒体受理结果未知，恢复链将如实核对：{reason}"),
+                )),
+            ),
+        }
+    }
+}
+
+fn map_media_prepare_refusal(refusal: &crate::toolgateway::GatewayRefusal) -> crate::EndpointError {
+    match refusal {
+        crate::toolgateway::GatewayRefusal::ArgumentsInvalid { .. } => {
+            crate::EndpointError::invalid_message(refusal.to_string())
+        }
+        crate::toolgateway::GatewayRefusal::PolicyDenied { .. } => {
+            crate::EndpointError::forbidden("media_generation_policy_denied")
+        }
+        crate::toolgateway::GatewayRefusal::TargetNotRegistered { .. }
+        | crate::toolgateway::GatewayRefusal::TargetNotCallable { .. } => {
+            crate::EndpointError::resource_failure(
+                axum::http::StatusCode::SERVICE_UNAVAILABLE,
+                refusal.code(),
+                refusal.to_string(),
+            )
+        }
+        _ => crate::EndpointError::invalid_message(refusal.to_string()),
+    }
+}
+
+struct PreparedCallCleanup<'a> {
+    gateway: &'a crate::toolgateway::ToolInvocationGateway,
+    ctx: &'a lingxi_kernel::RunContext,
+    call: &'a ToolCallId,
+    handle: &'a crate::toolgateway::PreparedInvocationHandle,
+}
+impl Drop for PreparedCallCleanup<'_> {
+    fn drop(&mut self) {
+        self.gateway
+            .discard_prepared_for_call(self.ctx, self.call, self.handle);
+    }
+}
+
+impl RunSupervisor {
+    /// 固定封面动作沿统一调用顺序写入回执；业务服务只能请求动作，不能自行派发准备句柄。
+    pub(crate) async fn execute_cover_action(
+        &self,
+        input: CoverActionCall<'_>,
+    ) -> Result<ToolOutcome, String> {
+        use lingxi_adapters::storage::beautify::{self, CoverPhase};
+        let CoverActionCall {
+            db,
+            job_id,
+            action,
+            ctx,
+            cancel,
+            guard,
+            auth,
+            management,
+            clock,
+        } = input;
+        if self
+            .storage_admission
+            .as_ref()
+            .is_none_or(|gate| !Arc::ptr_eq(gate, db.session_admission()))
+            || !self
+                .run_scope(ctx.run_id.as_str())
+                .is_some_and(|scope| scope.same_scope(cancel))
+        {
+            return Err("封面动作没有当前真实运行的权限与取消域".into());
+        }
+        let job = beautify::get(db, job_id)
+            .await
+            .map_err(|error| error.to_string())?
+            .ok_or("封面作业不存在")?;
+        guard.current_cover(&job, ctx, cancel).await?;
+        let (label, target, args) = match (action, job.phase) {
+            (CoverAction::GenerateImage, CoverPhase::MediaPreparing) => (
+                "cover-image",
+                "tool:plugin:media:generate-image",
+                job.state["mediaArgs"].clone(),
+            ),
+            (CoverAction::Apply, CoverPhase::Applying) => (
+                "cover-apply",
+                "tool:plugin:beautify:create-cover",
+                job.state["applyArgs"].clone(),
+            ),
+            _ => return Err("封面阶段与固定用户动作不匹配".into()),
+        };
+        let gateway = self.tool_gateway.as_ref().ok_or("统一工具网关未配置")?;
+        let call = ToolCallId::new(format!("{}-{label}", ctx.run_id));
+        let request = ToolRequest::from_effective_arguments(
+            target,
+            args,
+            &lingxi_kernel::toolcatalog::SchemaBudget::default(),
+        )
+        .ok_or("封面参数未通过正式规范")?;
+        let prepared = gateway
+            .prepare_from_request(
+                ctx,
+                crate::toolgateway::CallerSurface::UserRun,
+                &job.agent_id,
+                crate::toolgateway::InvocationPermissionContext::UserSession {
+                    mode: lingxi_kernel::subagent::SessionPermissionMode::Ask,
+                },
+                &call,
+                &request,
+            )
+            .map_err(|error| error.to_string())?;
+        let _cleanup = PreparedCallCleanup {
+            gateway,
+            ctx,
+            call: &call,
+            handle: &prepared.handle,
+        };
+        db.record_invocation_intent(
+            ctx,
+            InvocationIntent {
+                journal_id: call.clone(),
+                target: target.into(),
+                args_digest: prepared.args_digest_hex.clone(),
+                args_summary: Some("明确用户封面动作".into()),
+                idempotency_key: Some(format!("{}:{label}", job.id)),
+            },
+            clock.now_unix_ms(),
+        )
+        .await
+        .map_err(|error| error.to_string())?;
+        let dispatched_result = async {
+            gateway
+                .authorize_cover_prepared(crate::toolgateway::CoverAuthorizationCall {
+                    db,
+                    job_id: &job.id,
+                    ctx,
+                    call: &call,
+                    prepared: &prepared,
+                    auth,
+                    management,
+                })
+                .await?;
+            guard.current_cover(&job, ctx, cancel).await?;
+            db.advance_invocation(ctx, &call, InvocationPhase::Authorized, clock.now_unix_ms())
+                .await
+                .map_err(|error| error.to_string())?;
+            db.advance_invocation(ctx, &call, InvocationPhase::Started, clock.now_unix_ms())
+                .await
+                .map_err(|error| error.to_string())?;
+            let lifetime = crate::toolgateway::TrustedToolLifetime {
+                workspace: None,
+                cancel: cancel.clone(),
+                deadline_unix_ms: clock.now_unix_ms().saturating_add(300_000),
+                budget_ms: 300_000,
+            };
+            let result = crate::toolgateway::TOOL_LIFETIME
+                .scope(
+                    lifetime,
+                    gateway.execute_prepared(ctx, &call, &prepared.handle),
+                )
+                .await;
+            Ok::<_, String>(match result {
+                Ok(value) => (value.outcome, true),
+                Err(error) => (
+                    ToolOutcome::Failed {
+                        error: error.to_tool_error(),
+                    },
+                    false,
+                ),
+            })
+        }
+        .await;
+        let (outcome, dispatched) = match &dispatched_result {
+            Ok((outcome, dispatched)) => (outcome.clone(), *dispatched),
+            Err(error) => (
+                ToolOutcome::Failed {
+                    error: ProtocolError::new(ErrorCode::Forbidden, error.clone(), false),
+                },
+                false,
+            ),
+        };
+        let receipt = InvocationReceipt {
+            outcome: match &outcome {
+                ToolOutcome::Success { .. } => ReceiptOutcome::Succeeded,
+                ToolOutcome::Failed { .. } | ToolOutcome::Cancelled => ReceiptOutcome::Failed,
+                ToolOutcome::Unknown { .. } => ReceiptOutcome::Unknown,
+            },
+            detail: format!("{outcome:?}"),
+            dedup_id: Some(format!("{}:{label}", job.id)),
+            dispatched,
+        };
+        if let Err(error) = db
+            .record_invocation_receipt(ctx, &call, receipt, clock.now_unix_ms())
+            .await
+        {
+            return Err(format!(
+                "封面动作已派发={dispatched}，真实结果={outcome:?}，调用回执尚未确认保存：{error}"
+            ));
+        }
+        dispatched_result.map(|(outcome, _)| outcome)
+    }
+}
+
+impl RunSupervisor {
     /// Production wiring until R05 registers real providers: no provider,
     /// no tools, no approval gate. Runs driven by this supervisor complete
     /// WITHOUT model content (`completed.no_final.no_provider_configured`)
@@ -735,6 +1412,7 @@ impl RunSupervisor {
         let cancel_policy = CancelPolicy::default();
         Self {
             provider: None,
+            model_activation: None,
             tools: None,
             limits: RunDriveLimits::default(),
             quotas: Arc::new(QuotaManager::new(crate::quotas::QuotaLimits::default())),
@@ -758,6 +1436,10 @@ impl RunSupervisor {
             chat_settings_home: None,
             session_resource_access: None,
             model_history: None,
+            settlement_clock: None,
+            goal_engine: None,
+            loop_controller: std::sync::Mutex::new(std::sync::Weak::new()),
+            browser: std::sync::Mutex::new(std::sync::Weak::new()),
             knowledge: None,
         }
     }
@@ -779,6 +1461,7 @@ impl RunSupervisor {
         cancel_policy.validate()?;
         Ok(Self {
             provider,
+            model_activation: None,
             tools,
             limits,
             quotas: Arc::new(quotas),
@@ -805,8 +1488,43 @@ impl RunSupervisor {
             chat_settings_home: None,
             session_resource_access: None,
             model_history: None,
+            settlement_clock: None,
+            goal_engine: None,
+            loop_controller: std::sync::Mutex::new(std::sync::Weak::new()),
+            browser: std::sync::Mutex::new(std::sync::Weak::new()),
             knowledge: None,
         })
+    }
+
+    pub fn attach_browser(&self, browser: &Arc<crate::browser::BrowserService>) {
+        *self.browser.lock().expect("浏览器服务弱引用锁") = Arc::downgrade(browser);
+    }
+
+    /// 终态使用完成当时的服务时钟，避免长任务把开始时间误作完成时间。
+    pub fn with_settlement_clock(mut self, clock: Arc<dyn crate::ServiceClock>) -> Self {
+        self.settlement_clock = Some(clock);
+        self
+    }
+
+    /// R07-T07-δ2: binds the session goal-budget engine (builder-style;
+    /// the composition root calls this after [`Self::new`]). `None` keeps
+    /// the pre-R07 shape exactly (no budget accounting on the run path).
+    pub fn with_goal_engine(mut self, engine: Arc<crate::goal::GoalEngine>) -> Self {
+        self.goal_engine = Some(engine);
+        self
+    }
+
+    /// R07-T07-δ6: 晚绑定循环控制器（组合根在循环面装配后调用一次）。
+    pub fn attach_loop_controller(&self, controller: &Arc<crate::loopx::LoopController>) {
+        *self.loop_controller.lock().expect("loop 控制器关联锁") =
+            std::sync::Arc::downgrade(controller);
+    }
+
+    fn loop_controller(&self) -> Option<Arc<crate::loopx::LoopController>> {
+        self.loop_controller
+            .lock()
+            .expect("loop 控制器关联锁")
+            .upgrade()
     }
 
     /// R06-T03: binds the user-message recorder (builder-style; the
@@ -868,6 +1586,14 @@ impl RunSupervisor {
     /// the composition root calls this after [`Self::new`]). Binding it
     /// makes its compiled artifact the ONLY system-prompt source of every
     /// driven run of this supervisor (no dual prompt path).
+    pub fn with_model_activation(
+        mut self,
+        activation: Option<Arc<std::sync::atomic::AtomicBool>>,
+    ) -> Self {
+        self.model_activation = activation;
+        self
+    }
+
     pub fn with_context_compiler(
         mut self,
         compiler: Option<Arc<crate::context_compiler::ContextCompilerService>>,
@@ -958,6 +1684,13 @@ impl RunSupervisor {
 
     pub fn task_supervisor(&self) -> &Arc<TaskSupervisor> {
         &self.tasks
+    }
+
+    /// 固定执行的资源读口只使用真实运行绑定的数据根，不接受客户端另选数据库。
+    pub(crate) fn owned_context_storage(
+        &self,
+    ) -> Option<&Arc<lingxi_adapters::storage::RunDatabase>> {
+        self.context_session_store.as_ref()
     }
 
     /// The cleanup deadline policy in force.
@@ -1225,6 +1958,77 @@ impl RunSupervisor {
         quota_session_lane: &str,
         started_notice: &mut Option<tokio::sync::oneshot::Sender<Result<(), DriveError>>>,
     ) -> Result<RunFinish, DriveError> {
+        // 循环身份只能由最初投递签发；等待数据库不能把旧运行领入新循环。
+        let loop_source = authorization.lineage.origin == RunOrigin::Loop;
+        if loop_source != authorization.loop_identity.is_some()
+            || (loop_source && authorization.grant != RunGrant::Full)
+        {
+            return Err(DriveError::Storage(StorageError::Conflict {
+                detail: "loop_run_identity_missing_or_wrong_origin".into(),
+            }));
+        }
+        if let Some(identity) = authorization.loop_identity.as_ref() {
+            let loops = self.loop_controller().ok_or_else(|| {
+                DriveError::Storage(StorageError::Conflict {
+                    detail: "loop_controller_unavailable".into(),
+                })
+            })?;
+            loops
+                .validate_loop_identity(session_id, identity)
+                .map_err(|error| {
+                    DriveError::Storage(StorageError::Conflict {
+                        detail: format!("loop_run_identity_rejected: {error}"),
+                    })
+                })?;
+        }
+        if (matches!(
+            principal,
+            lingxi_kernel::Principal::Bridge { .. }
+                | lingxi_kernel::Principal::BridgeTakeover { .. }
+        ) && authorization.grant == RunGrant::Full)
+            || (matches!(authorization.grant, RunGrant::Bridge { .. })
+                && (!matches!(
+                    principal,
+                    lingxi_kernel::Principal::Bridge { .. }
+                        | lingxi_kernel::Principal::BridgeTakeover { .. }
+                ) || authorization.lineage.origin != RunOrigin::Bridge
+                    || authorization.lineage.parent_run_id.is_some()
+                    || authorization
+                        .lineage
+                        .cause_id
+                        .as_deref()
+                        .is_none_or(str::is_empty)
+                    || authorization
+                        .lineage
+                        .source_message_id
+                        .as_deref()
+                        .is_none_or(str::is_empty)))
+        {
+            return Err(DriveError::Storage(StorageError::Conflict {
+                detail: "bridge_run_authorization_mismatch".into(),
+            }));
+        }
+        if matches!(authorization.grant, RunGrant::Phone)
+            && (principal != &lingxi_kernel::Principal::LocalUser
+                || !matches!(
+                    authorization.lineage.origin,
+                    RunOrigin::Channel | RunOrigin::Dm
+                )
+                || authorization
+                    .lineage
+                    .cause_id
+                    .as_deref()
+                    .is_none_or(str::is_empty)
+                || authorization
+                    .lineage
+                    .source_message_id
+                    .as_deref()
+                    .is_none_or(str::is_empty))
+        {
+            return Err(DriveError::Storage(StorageError::Conflict {
+                detail: "phone_run_authorization_mismatch".into(),
+            }));
+        }
         // 初读只筛归属，不能借忙状态泄露别人的会话。真实业务在持权后重读。
         let mut direct_registration = None;
         let mut retained_permit = None;
@@ -1248,10 +2052,7 @@ impl RunSupervisor {
                         detail: "session_not_found".into(),
                     })
                 })?;
-            if !matches!(principal, lingxi_kernel::Principal::LocalUser)
-                && (matches!(principal, lingxi_kernel::Principal::Automation { .. })
-                    || principal.storage_subject() != before.owner_user_id)
-            {
+            if !principal.can_access_session(&before.owner_user_id, session_id) {
                 return Err(DriveError::Storage(StorageError::Conflict {
                     detail: "cross_principal_access".into(),
                 }));
@@ -1305,8 +2106,7 @@ impl RunSupervisor {
                         detail: "session_not_found".into(),
                     })
                 })?;
-            if (!matches!(principal, lingxi_kernel::Principal::LocalUser)
-                && principal.storage_subject() != current.owner_user_id)
+            if !principal.can_access_session(&current.owner_user_id, session_id)
                 || current.lifecycle != "active"
                 || current.unknown_file_effects
             {
@@ -1333,6 +2133,11 @@ impl RunSupervisor {
             .map_err(DriveError::Storage)?;
         let _direct_registration = direct_registration;
         let _retained_permit = retained_permit;
+        // 只承认本轮已经与身份、会话、授权完全匹配的真实预登记许可。
+        let admitted_parentless_subagent = _retained_permit.is_some()
+            && matches!(authorization.grant, RunGrant::Subagent { .. })
+            && authorization.lineage.origin == RunOrigin::Subagent
+            && authorization.lineage.parent_run_id.is_none();
         // 归属校验必须早于新Run、输入与注册写入，错误主体不能制造伪运行。
         let history = if matches!(authorization.grant, RunGrant::Subagent { .. }) {
             None
@@ -1394,6 +2199,35 @@ impl RunSupervisor {
             .record_run_started(&ctx, now_ms)
             .await
             .map_err(DriveError::Storage)?;
+        // 只让真实循环主运行拥有预算身份；普通用户和子任务只触发实际空闲守恒。
+        // 登记使用最初投递携带的原代次，绝不在此读取当前循环重新认领。
+        // 真实终态会消费登记；中途错误或 future 被丢弃则由护栏阻止未确认续跑。
+        let _loop_observer = if let Some(identity) = authorization.loop_identity.as_ref() {
+            match self.loop_controller() {
+                Some(loops) => {
+                    let observer = loops.register_loop_run(
+                        ctx.session_id.as_str(),
+                        ctx.run_id.as_str(),
+                        identity,
+                    );
+                    if observer.is_none()
+                        || loops
+                            .validate_loop_identity(ctx.session_id.as_str(), identity)
+                            .is_err()
+                    {
+                        // 开始已经实际落盘，不能直接丢弃为半条Running；沿统一取消链清理。
+                        self.cancel_run(ctx.run_id.as_str(), "loop_lifecycle_superseded");
+                    }
+                    observer
+                }
+                None => {
+                    self.cancel_run(ctx.run_id.as_str(), "loop_controller_unavailable");
+                    None
+                }
+            }
+        } else {
+            None
+        };
         // R03 repair G04/F05 — THE PROMISE POINT: the durable run-start
         // commit is the moment an explicit requestId (when the submission
         // carried one) starts promising THIS run's identity. From here the
@@ -1406,10 +2240,6 @@ impl RunSupervisor {
             binding.commit_durable();
         }
         events.publish_committed(&started.events);
-        // 真存储提交及受理绑定完成后才确认；等待者消失不取消后台执行。
-        if let Some(notice) = started_notice.take() {
-            let _ = notice.send(Ok(()));
-        }
         // R03-T06: the four-part lineage (parentRunId/origin/
         // sourceMessageId/causeId) is durably recorded right after the run
         // row exists — the parent-child relationship survives every later
@@ -1417,14 +2247,16 @@ impl RunSupervisor {
         port.record_run_lineage(&ctx, authorization.lineage.clone(), now_ms)
             .await
             .map_err(DriveError::Storage)?;
-        // R06-T03: a USER-origin run's input is persisted into the session
-        // message tree right after the durable run-start commit (parent =
-        // the session's current branch head) — the write path of the tree
-        // that fork copies and rewind rewinds. Only RunOrigin::User; child/
-        // cron/heartbeat/bridge runs never mint user-message rows. A failure
-        // surfaces as DriveError (the caller finalizes the run Failed; the
-        // input is never pretended to have landed).
-        if authorization.lineage.origin == RunOrigin::User {
+        // 后台受理必须同时具有真实Run及因果来源；回执丢失仍不取消执行。
+        if let Some(notice) = started_notice.take() {
+            let _ = notice.send(Ok(()));
+        }
+        // 用户和已核准的桥接来信都是真实消息，写入会话分支；后台任务使用独立输入锚点。
+        // 写入失败必须终结运行，不能假装附件与正文已经入库。
+        if matches!(
+            authorization.lineage.origin,
+            RunOrigin::User | RunOrigin::Bridge
+        ) {
             if let Some(recorder) = &self.user_message_recorder {
                 if let Err(error) = recorder
                     .record_user_message_with_chat(
@@ -1458,12 +2290,93 @@ impl RunSupervisor {
                 }
             }
         }
+        if authorization.lineage.origin == RunOrigin::User {
+            if let Some(db) = self.context_session_store.as_ref() {
+                let browser = self.browser.lock().expect("浏览器服务弱引用锁").upgrade();
+                let refresh = if let Some(browser) = browser {
+                    browser
+                        .release_for_user_run(session_id, run_id.as_str(), now_ms)
+                        .await
+                        .map_err(|error| StorageError::InvalidRequest {
+                            detail: error.to_string(),
+                        })
+                } else {
+                    lingxi_adapters::storage::browser::release_for_user_run(
+                        db,
+                        session_id,
+                        run_id.as_str(),
+                        now_ms,
+                    )
+                    .await
+                    .map(|_| ())
+                };
+                if let Err(error) = refresh {
+                    let finish = RunFinish::Failed {
+                        cause: FailureCause::StorageFailed {
+                            code: format!("browser_user_authority: {error}"),
+                            retryable: false,
+                        },
+                    };
+                    self.adjudicated_finalize(
+                        port,
+                        events,
+                        &ctx,
+                        &entry,
+                        RunStatus::Running,
+                        finish,
+                        now_ms,
+                    )
+                    .await?;
+                    guard.disarm();
+                    return Err(DriveError::Storage(error));
+                }
+            }
+        }
+        if matches!(
+            authorization.lineage.origin,
+            RunOrigin::Cron
+                | RunOrigin::Heartbeat
+                | RunOrigin::Channel
+                | RunOrigin::Dm
+                | RunOrigin::SessionCollab
+                | RunOrigin::Loop
+        ) {
+            if let Some(history) = &history {
+                if let Err(error) = history
+                    .record_automation_input(&ctx, agent_id, input, now_ms)
+                    .await
+                {
+                    let finish = RunFinish::Failed {
+                        cause: FailureCause::StorageFailed {
+                            code: format!("automation_input_record: {error}"),
+                            retryable: false,
+                        },
+                    };
+                    self.adjudicated_finalize(
+                        port,
+                        events,
+                        &ctx,
+                        &entry,
+                        RunStatus::Running,
+                        finish,
+                        now_ms,
+                    )
+                    .await?;
+                    guard.disarm();
+                    return Err(DriveError::Storage(error));
+                }
+            }
+        }
 
         // 2) Model turns. No provider configured: explicit no-content
         //    completion (never a fake reply). The early close goes through
         //    the SAME adjudicated finalize as every other terminal (R03
         //    repair G02/F03: a cancellation accepted at the boundary wins).
-        let Some(provider) = self.provider.clone() else {
+        let Some(provider) = self.provider.clone().filter(|_| {
+            self.model_activation
+                .as_ref()
+                .is_none_or(|active| active.load(std::sync::atomic::Ordering::Acquire))
+        }) else {
             let finish = RunFinish::CompletedWithoutFinal {
                 cause: NoFinalCause::NoProviderConfigured,
             };
@@ -1523,7 +2436,29 @@ impl RunSupervisor {
         let session_started_ms = session_row
             .as_ref()
             .map_or(now_ms, |row| row.created_at_unix_ms.max(0) as u64);
-        let session_memory_enabled = session_row.as_ref().is_none_or(|row| row.memory_enabled);
+        let phone_scoped = matches!(authorization.grant, RunGrant::Phone)
+            || if let Some(db) = self.context_session_store.as_deref() {
+                crate::phone_run_authority::scope(
+                    db,
+                    &authorization,
+                    &ctx,
+                    admitted_parentless_subagent,
+                )
+                .await
+                .ok()
+                .flatten()
+                .is_some()
+            } else {
+                false
+            };
+        // 手机沿普通助手加载记忆，但后台会话本身不进入记忆整理候选。
+        let session_memory_enabled = phone_scoped
+            || !matches!(
+                authorization.grant,
+                RunGrant::Bridge {
+                    role: lingxi_protocol::BridgeRole::Guest
+                }
+            ) && session_row.as_ref().is_none_or(|row| row.memory_enabled);
         let session_owner = session_row.as_ref().map_or_else(
             || principal.storage_subject(),
             |row| row.owner_user_id.clone(),
@@ -1534,7 +2469,14 @@ impl RunSupervisor {
             match self
                 .chat_settings_home
                 .as_ref()
-                .map(|home| crate::chat_settings::choice(home, &session_owner, session_id))
+                .map(|home| {
+                    crate::chat_settings::choice_for_agent(
+                        home,
+                        &session_owner,
+                        session_id,
+                        Some(agent_id),
+                    )
+                })
                 .transpose()
             {
                 Ok(Some(choice)) if choice.model.is_some() || choice.thinking_level.is_some() => {
@@ -1573,14 +2515,24 @@ impl RunSupervisor {
         let compiled_context = match self.context_compiler.as_ref() {
             Some(compiler) => {
                 let for_subagent = matches!(authorization.grant, RunGrant::Subagent { .. });
-                match compiler.compile_session_snapshot(
-                    self.context_session_store.as_deref(),
-                    session_id,
-                    agent_id,
-                    for_subagent,
-                    session_started_ms,
-                    session_memory_enabled,
+                let compilation = if matches!(
+                    authorization.grant,
+                    RunGrant::Bridge {
+                        role: lingxi_protocol::BridgeRole::Guest
+                    }
                 ) {
+                    compiler.compile_guest_snapshot(agent_id, session_started_ms)
+                } else {
+                    compiler.compile_session_snapshot(
+                        self.context_session_store.as_deref(),
+                        session_id,
+                        agent_id,
+                        for_subagent,
+                        session_started_ms,
+                        session_memory_enabled,
+                    )
+                };
+                match compilation {
                     Ok(compiled) => Some(compiled),
                     Err(failure) => {
                         let finish = RunFinish::Failed {
@@ -1777,6 +2729,34 @@ impl RunSupervisor {
                 }
             };
         }
+        // 桥接身份随连接撤权立即失效；拒绝进入同一取消树，继续由现有驱动完成清理。
+        macro_rules! gate_bridge_authority {
+            () => {{
+                if let Err(reason) = crate::bridge_run_authority::validate(
+                    self.context_session_store.as_deref(),
+                    &authorization,
+                    &ctx,
+                    agent_id,
+                    self.chat_settings_home.as_deref(),
+                )
+                .await
+                {
+                    self.cancel_run(run_id.as_str(), &reason);
+                }
+                if let Err(reason) = crate::phone_run_authority::validate(
+                    self.context_session_store.as_deref(),
+                    &authorization,
+                    &ctx,
+                    self.chat_settings_home.as_deref(),
+                    admitted_parentless_subagent,
+                )
+                .await
+                {
+                    self.cancel_run(run_id.as_str(), &reason);
+                }
+                gate_cancel!();
+            }};
+        }
         // R05-T01: every tool outcome that closes a tool-loop iteration —
         // all four [`ToolOutcome`] states, including every zero-dispatch
         // refusal — joins the run's exchange history, so the NEXT model
@@ -1916,6 +2896,16 @@ impl RunSupervisor {
                     },
                 };
             }
+            // R07-T07-δ2: 现役 goal-handler 的 turn_start 时间预算懒检查点
+            // （goal-handler.ts:23-24）——每轮迭代顶查一次活动时长预算。
+            if let Some(engine) = self.goal_engine.as_ref() {
+                engine.tick_time_budget(ctx.session_id.as_str());
+            }
+            // R07-T07-δ6: 现役总线 turn_start（loop-bus-handlers.ts:14-15）——
+            // 循环 pending → active 提升与本轮 flags 重置。
+            if let Some(loops) = self.loop_controller() {
+                loops.on_run_model_turn_start(ctx.session_id.as_str(), ctx.run_id.as_str());
+            }
             // Steering (frozen incumbent semantics): drain the session's
             // steering channel BEFORE the turn — steered text reaches this
             // model call's input; the loop itself is never interrupted.
@@ -1936,7 +2926,7 @@ impl RunSupervisor {
             // build failure (a wire-name conflict) is a LOUD run failure,
             // never a silently narrowed tool list. Without a gateway wired
             // (the R03 double wiring) the snapshot is explicitly empty.
-            let tool_snapshot = match self.tool_gateway.as_ref() {
+            let mut tool_snapshot = match self.tool_gateway.as_ref() {
                 Some(gateway) => {
                     // 只有当前认证提交已冻结非空资料范围时才激活检索声明；不改全局常驻列表。
                     let activated = if knowledge_scope
@@ -1968,6 +2958,33 @@ impl RunSupervisor {
                 }
                 None => lingxi_kernel::model_exchange::ToolDeclarationSnapshot::empty(),
             };
+            if matches!(
+                authorization.grant,
+                RunGrant::Bridge {
+                    role: lingxi_protocol::BridgeRole::Guest
+                }
+            ) {
+                tool_snapshot.declarations.clear();
+            } else if matches!(
+                principal,
+                lingxi_kernel::Principal::Bridge { .. }
+                    | lingxi_kernel::Principal::BridgeTakeover { .. }
+            ) {
+                tool_snapshot
+                    .declarations
+                    .retain(|tool| !crate::toolgateway::bridge_forbidden_tool(&tool.target, ""));
+            }
+            tool_snapshot.declarations.retain(|tool| {
+                if phone_scoped {
+                    !crate::phone_settings::forbidden_tool(&tool.target)
+                        && (matches!(
+                            authorization.lineage.origin,
+                            RunOrigin::Channel | RunOrigin::Dm
+                        ) || !crate::phone_settings::control_tool(&tool.target))
+                } else {
+                    !crate::phone_settings::control_tool(&tool.target)
+                }
+            });
             // R06-T02: the mid-run compaction check at the turn boundary
             // (the incumbent `compactIfNeeded` position: after the tool
             // snapshot exists — the compaction request carries it — and
@@ -2351,6 +3368,7 @@ impl RunSupervisor {
             } else {
                 None
             };
+            gate_bridge_authority!();
             let model_child = self
                 .tasks
                 .spawn_linked(
@@ -3127,16 +4145,27 @@ impl RunSupervisor {
                             } else {
                                 crate::toolgateway::CallerSurface::UserRun
                             };
-                            let permission = authorization.invocation_permission_context();
-                            if let Err(refusal) = gateway.validate_from_request_pinned(
-                                &ctx,
-                                surface,
-                                agent_id,
-                                permission,
-                                &call_id,
-                                request,
-                                request_pins[index],
-                            ) {
+                            let permission =
+                                authorization.scoped_invocation_permission_context(phone_scoped);
+                            // 审核是可取消的模型请求；不能让已接受的取消等待审核超时。
+                            // 审核适配器的 Drop 守卫保留尚未观测到结算的真实计费事实。
+                            let validation = tokio::select! {
+                                biased;
+                                _ = root.cancelled() => {
+                                    let reason = root.reason().unwrap_or_else(|| "cancelled".to_string());
+                                    let finish = self.settle_cancellation(
+                                        port, events, &ctx, &entry, live_status, reason, now_ms,
+                                    ).await?;
+                                    guard.disarm();
+                                    return Ok(finish);
+                                }
+                                result = gateway.review_and_validate_from_request_pinned(
+                                    &ctx, surface, agent_id, permission, &call_id, request,
+                                    request_pins[index], &[], None,
+                                ) => result,
+                            };
+                            gate_cancel!();
+                            if let Err(refusal) = validation {
                                 // The refusal keeps its OWN structured code
                                 // and diagnostic (the model must see the
                                 // real reason: policy denial, schema
@@ -3399,21 +4428,48 @@ impl RunSupervisor {
                                 // driver's trusted snapshot (grant tier +
                                 // session mode) — the model never supplies
                                 // it.
-                                let permission = authorization.invocation_permission_context();
-                                match crate::toolgateway::with_workspace(
-                                    compiled_context
-                                        .as_ref()
-                                        .and_then(|value| value.workspace())
-                                        .map(std::path::PathBuf::from),
+                                let permission = authorization
+                                    .scoped_invocation_permission_context(phone_scoped);
+                                match crate::toolgateway::with_settings_principal(
+                                    authorization.settings_principal.clone(),
                                     || {
-                                        gateway.prepare_from_request_pinned(
-                                            &ctx,
-                                            surface,
-                                            agent_id,
-                                            permission,
-                                            &call_id,
-                                            request,
-                                            request_pins[index],
+                                        crate::toolgateway::with_mcp_foreground(
+                                            authorization.foreground_mcp_session_permissions,
+                                            || {
+                                                crate::toolgateway::with_workflow_scope(
+                                                    authorization.workflow_scope.clone(),
+                                                    || {
+                                                        crate::toolgateway::with_workspace(
+                                                            authorization
+                                                                .workflow_scope
+                                                                .as_ref()
+                                                                .and_then(|scope| {
+                                                                    scope
+                                                                        .write_roots
+                                                                        .first()
+                                                                        .cloned()
+                                                                })
+                                                                .or_else(|| {
+                                                                    compiled_context
+                                                                .as_ref()
+                                                                .and_then(|value| value.workspace())
+                                                                .map(std::path::PathBuf::from)
+                                                                }),
+                                                            || {
+                                                                gateway.prepare_from_request_pinned(
+                                                                    &ctx,
+                                                                    surface,
+                                                                    agent_id,
+                                                                    permission,
+                                                                    &call_id,
+                                                                    request,
+                                                                    request_pins[index],
+                                                                )
+                                                            },
+                                                        )
+                                                    },
+                                                )
+                                            },
                                         )
                                     },
                                 ) {
@@ -3545,8 +4601,41 @@ impl RunSupervisor {
                         // family stays blocked through EITHER vocabulary.
                         // Without a gateway the R03 bare-name judgment
                         // stands unchanged.
+                        gate_bridge_authority!();
                         let authorization_decision = match authorization.grant {
+                            RunGrant::Phone => {
+                                let name = prepared
+                                    .as_ref()
+                                    .map(|p| p.local_name.as_str())
+                                    .unwrap_or(request.target.as_str());
+                                if crate::phone_settings::forbidden_tool(name) {
+                                    ToolAuthorization::Denied {
+                                        code: "PHONE_TOOL_FORBIDDEN",
+                                        layer: "phone",
+                                        message: "手机来源不能使用该工具".into(),
+                                    }
+                                } else {
+                                    ToolAuthorization::Allowed
+                                }
+                            }
                             RunGrant::Full => ToolAuthorization::Allowed,
+                            RunGrant::Bridge { role } => {
+                                let name = prepared
+                                    .as_ref()
+                                    .map(|prepared| prepared.local_name.as_str())
+                                    .unwrap_or(request.target.as_str());
+                                if role == lingxi_protocol::BridgeRole::Guest
+                                    || crate::toolgateway::bridge_forbidden_tool(name, "")
+                                {
+                                    ToolAuthorization::Denied {
+                                        code: "BRIDGE_TOOL_FORBIDDEN",
+                                        layer: "bridge",
+                                        message: "此桥接来源不能执行该工具".into(),
+                                    }
+                                } else {
+                                    ToolAuthorization::Allowed
+                                }
+                            }
                             RunGrant::Subagent { tier } => match prepared.as_ref() {
                                 Some(prepared) => authorize_child_tool_with_registry_id(
                                     tier,
@@ -3555,6 +4644,59 @@ impl RunSupervisor {
                                 ),
                                 None => authorize_child_tool(tier, request.target.as_str()),
                             },
+                        };
+                        let local_name = prepared
+                            .as_ref()
+                            .map(|p| p.local_name.as_str())
+                            .unwrap_or(request.target.as_str());
+                        let revoked_workflow =
+                            if let Some(scope) = authorization.workflow_scope.as_ref() {
+                                match self.context_session_store.as_deref() {
+                                    Some(storage) => crate::workflow::validate_node_authority(
+                                        storage,
+                                        session_id,
+                                        scope,
+                                        authorization.session_mode,
+                                    )
+                                    .await
+                                    .err(),
+                                    None => Some("workflow authority store is unavailable".into()),
+                                }
+                            } else {
+                                None
+                            };
+                        let filtered_out = authorization
+                            .workflow_scope
+                            .as_ref()
+                            .and_then(|scope| scope.tool_filter.as_ref())
+                            .is_some_and(|filter| {
+                                !filter.iter().any(|name| {
+                                    name == local_name || name == request.target.as_str()
+                                })
+                            });
+                        let authorization_decision = if let Some(message) = revoked_workflow {
+                            ToolAuthorization::Denied {
+                                code: "WORKFLOW_AUTHORITY_REVOKED",
+                                layer: "workflow",
+                                message,
+                            }
+                        } else if filtered_out {
+                            ToolAuthorization::Denied {
+                                code: "WORKFLOW_TOOL_FILTER",
+                                layer: "workflow",
+                                message: "工具不在本工作流节点允许的范围内".into(),
+                            }
+                        } else if (phone_scoped
+                            && crate::phone_settings::forbidden_tool(local_name))
+                            || (!phone_scoped && crate::phone_settings::control_tool(local_name))
+                        {
+                            ToolAuthorization::Denied {
+                                code: "PHONE_SCOPE_FORBIDDEN",
+                                layer: "phone",
+                                message: "工具不在当前手机权限范围内".into(),
+                            }
+                        } else {
+                            authorization_decision
                         };
                         if let ToolAuthorization::Denied {
                             code,
@@ -3901,7 +5043,7 @@ impl RunSupervisor {
                         // cancellation accepted at the authorization or
                         // approval boundary above must not spawn a new
                         // child run.
-                        gate_cancel!();
+                        gate_bridge_authority!();
                         if let Some(delegation) = request.delegation.clone() {
                             // The dispatch IS the side effect: `started`
                             // is durable before it (same write-order
@@ -3914,6 +5056,7 @@ impl RunSupervisor {
                             )
                             .await
                             .map_err(DriveError::Storage)?;
+                            gate_bridge_authority!();
                             let parent = crate::subagents::ParentRunFacts {
                                 principal: ctx.principal.clone(),
                                 session_id: ctx.session_id.to_string(),
@@ -4103,7 +5246,7 @@ impl RunSupervisor {
                         // must not become an external tool execution (the
                         // journal entry stays at `started`; recovery
                         // classifies it as unobserved).
-                        gate_cancel!();
+                        gate_bridge_authority!();
                         // ── supervised tool execution ──
                         // R04-T02: on the gateway wiring the dispatch is
                         // the gateway's re-verified, single-use
@@ -4119,10 +5262,16 @@ impl RunSupervisor {
                         let tool_ctx = ctx.clone();
                         let exec_call_id = call_id.clone();
                         let trusted_lifetime = crate::toolgateway::TrustedToolLifetime {
-                            workspace: compiled_context
+                            workspace: authorization
+                                .workflow_scope
                                 .as_ref()
-                                .and_then(|value| value.workspace())
-                                .map(std::path::PathBuf::from),
+                                .and_then(|scope| scope.write_roots.first().cloned())
+                                .or_else(|| {
+                                    compiled_context
+                                        .as_ref()
+                                        .and_then(|value| value.workspace())
+                                        .map(std::path::PathBuf::from)
+                                }),
                             cancel: tool_scope.clone(),
                             deadline_unix_ms: tool_deadline,
                             budget_ms: u64::try_from(
@@ -4133,6 +5282,7 @@ impl RunSupervisor {
                         let tool_child = match tool_gateway.as_ref() {
                             Some(gateway) => {
                                 let gateway = Arc::clone(gateway);
+                                let workflow_scope = authorization.workflow_scope.clone();
                                 let handle = prepared
                                     .as_ref()
                                     .expect("the gateway wiring prepared this call")
@@ -4144,11 +5294,22 @@ impl RunSupervisor {
                                         &tool_scope,
                                         format!("tool_call:{}", call_id.as_str()),
                                         prepared.as_ref().is_some_and(|plan| {
-                                            plan.local_name == "knowledge_search"
-                                                && matches!(&plan.origin, lingxi_kernel::toolcatalog::ToolOrigin::FirstParty)
+                                            matches!(
+                                                plan.local_name.as_str(),
+                                                "knowledge_search"
+                                                    | "browser"
+                                                    | "web_search"
+                                                    | "web_fetch"
+                                            ) && matches!(
+                                                &plan.origin,
+                                                lingxi_kernel::toolcatalog::ToolOrigin::FirstParty
+                                            ) || (plan.local_name == "html-to-pdf" && matches!(
+                                                &plan.origin,
+                                                lingxi_kernel::toolcatalog::ToolOrigin::Plugin { plugin_id } if plugin_id == "office"
+                                            ))
                                         }),
                                         async move {
-                                            crate::toolgateway::TOOL_LIFETIME
+                                            crate::toolgateway::WORKFLOW_SCOPE.scope(workflow_scope, crate::toolgateway::TOOL_LIFETIME
                                                 .scope(
                                                     trusted_lifetime,
                                                     gateway.execute_prepared(
@@ -4156,8 +5317,7 @@ impl RunSupervisor {
                                                         &exec_call_id,
                                                         &handle,
                                                     ),
-                                                )
-                                                .await
+                                                )).await
                                         },
                                     )
                                     .map_err(|rejected| DriveError::Storage(rejected.into()))?
@@ -4418,6 +5578,12 @@ impl RunSupervisor {
                     break finish_no_final(saw_tool_failure, saw_process_content);
                 }
                 lingxi_kernel::ports::ProviderTurn::Failed { error, retryable } => {
+                    // R07-T07-δ6: 现役 message_end stopReason=="error"
+                    // （loop-bus-handlers.ts:16-17）——失败模型轮置本轮
+                    // has_error；重试与否由下方预算/回退闸另行决定。
+                    if let Some(loops) = self.loop_controller() {
+                        loops.on_run_message_error(ctx.session_id.as_str(), ctx.run_id.as_str());
+                    }
                     if let Some(child) = &child_history {
                         child
                             .record_failure(&ctx, agent_id, &error)
@@ -4582,7 +5748,7 @@ impl RunSupervisor {
         now_ms: u64,
     ) -> Result<RunFinish, DriveError> {
         let superseded = finish.terminal_reason();
-        match entry.claim_terminal(&superseded) {
+        let outcome = match entry.claim_terminal(&superseded) {
             TerminalAdjudication::Claimed => {
                 self.finalize_settlement(port, events, ctx, live_status, finish, now_ms)
                     .await
@@ -4607,7 +5773,8 @@ impl RunSupervisor {
                 }
                 Ok(settled)
             }
-        }
+        };
+        outcome
     }
 
     /// The R03-T03 cancellation flow, phases 2–4 + the single finalize:
@@ -4755,6 +5922,11 @@ impl RunSupervisor {
         finish: RunFinish,
         now_ms: u64,
     ) -> Result<RunFinish, DriveError> {
+        let now_ms = self
+            .settlement_clock
+            .as_ref()
+            .map(|clock| clock.now_unix_ms())
+            .unwrap_or(now_ms);
         let run_id = ctx.run_id.clone();
         let to = finish.status();
         let reason = finish.terminal_reason();
@@ -4779,6 +5951,22 @@ impl RunSupervisor {
             .await
             .map_err(DriveError::Storage)?;
         events.publish_committed(&committed.events);
+        // 正常完成与合作取消共用这一真实提交出口；重放和子运行不重复消费主轮。
+        // 此处只做归属记账，兜底调度等实际会话许可释放后再检查。
+        if committed.newly_committed {
+            if let Some(loops) = self.loop_controller() {
+                if matches!(&finish, RunFinish::Failed { .. }) {
+                    loops.on_run_message_error(ctx.session_id.as_str(), ctx.run_id.as_str());
+                }
+                loops
+                    .on_run_end(
+                        ctx.session_id.as_str(),
+                        ctx.run_id.as_str(),
+                        matches!(&finish, RunFinish::Cancelled { .. }),
+                    )
+                    .await;
+            }
+        }
         if !committed.newly_committed {
             tracing::info!(
                 run_id = %run_id,
@@ -4860,6 +6048,9 @@ impl RunSupervisor {
         port.record_model_call_usage(record, now_ms)
             .await
             .map_err(DriveError::Storage)?;
+        // R07-T07-δ2: 账本行落盘成功后才给 goal 预算进账（落盘才记账 =
+        // 现役「中止且未落盘不记账」口径，goal-handler.ts:18-22）。
+        self.record_goal_token_usage(ctx, &facts.usage_report);
         let committed = port
             .record_run_events(
                 ctx,
@@ -4903,7 +6094,40 @@ impl RunSupervisor {
         port.record_model_call_usage(record, now_ms)
             .await
             .map_err(DriveError::Storage)?;
+        // R07-T07-δ2: 中止在飞的调用同样落盘后才进账（与 completed 同钩）。
+        self.record_goal_token_usage(ctx, &facts.usage_report);
         Ok(())
+    }
+
+    /// R07-T07-δ2 goal 预算 token 进账（现役 goal-handler 的 token_usage
+    /// 观察缝）：total = usage 各 Some 分量（input/output/cache_read/
+    /// cache_write/reasoning）之和；全 None（provider 未报）不记，沿用
+    /// R05「未报不虚构」口径。引擎侧任何异常都不外抛——预算账本绝不能
+    /// 吞掉运行账本（现役 try/catch 语义；引擎方法本身已内化 IO 失败
+    /// 为 tracing）。
+    fn record_goal_token_usage(
+        &self,
+        ctx: &lingxi_kernel::RunContext,
+        usage_report: &lingxi_kernel::usage::ReportedUsage,
+    ) {
+        let Some(engine) = self.goal_engine.as_ref() else {
+            return;
+        };
+        let lingxi_kernel::usage::ReportedUsage::Known(usage) = usage_report else {
+            return;
+        };
+        let components = [
+            usage.input_tokens,
+            usage.output_tokens,
+            usage.cache_read_tokens,
+            usage.cache_write_tokens,
+            usage.reasoning_tokens,
+        ];
+        if components.iter().all(Option::is_none) {
+            return;
+        }
+        let total = components.into_iter().flatten().sum::<u64>();
+        engine.record_token_usage(ctx.session_id.as_str(), total);
     }
 
     /// R05-T04 (D6): normalizes one drained delta batch through the
@@ -5274,6 +6498,81 @@ mod tests {
                 max_attempts: RunDriveLimits::DEFAULT_MAX_ATTEMPTS,
             }
         );
+    }
+
+    /// R07-T07-δ2: token 进账钩的分量合计与跳过规则（全 None/Unknown/
+    /// Invalid 不记；分量求和；超预算恰好一次通知）。
+    #[test]
+    fn goal_token_usage_hook_sums_components_and_skips_unreported() {
+        use lingxi_kernel::usage::{ModelCallUsage, ReportedUsage, UsageProvenance};
+
+        let root = std::env::temp_dir().join(format!("lingxi-r07-goalhook-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let notices = std::sync::Arc::new(std::sync::Mutex::new(Vec::new()));
+        let sink = std::sync::Arc::clone(&notices);
+        let engine = std::sync::Arc::new(crate::goal::GoalEngine::new(
+            root.clone(),
+            std::sync::Arc::new(move |session: &str, _goal, kind| {
+                sink.lock()
+                    .unwrap()
+                    .push((session.to_string(), kind.wire_name().to_string()));
+            }),
+            Box::new(|| 1_000),
+        ));
+        let supervisor =
+            RunSupervisor::without_provider().with_goal_engine(std::sync::Arc::clone(&engine));
+        let created = engine.create(
+            "sess-hook",
+            crate::goal::CreateGoalInput {
+                name: Some("hooked".into()),
+                token_budget: Some(10),
+                time_budget_ms: None,
+            },
+        );
+        assert!(matches!(created, crate::goal::CreateGoalOutcome::Ok(_)));
+        let ctx = lingxi_kernel::RunContext {
+            principal: lingxi_kernel::Principal::LocalUser,
+            session_id: lingxi_protocol::SessionId::new("sess-hook"),
+            run_id: lingxi_protocol::RunId::new("run-hook"),
+            attempt: lingxi_protocol::AttemptId::new("run-hook#a1"),
+            generation: 1,
+        };
+        let usage_of = |input: Option<u64>, output: Option<u64>| {
+            ReportedUsage::Known(ModelCallUsage {
+                input_tokens: input,
+                output_tokens: output,
+                cache_read_tokens: None,
+                cache_write_tokens: None,
+                reasoning_tokens: None,
+                provenance: UsageProvenance::Reported,
+            })
+        };
+        // 全 None → 不记（provider 未报不虚构）。
+        supervisor.record_goal_token_usage(&ctx, &usage_of(None, None));
+        assert_eq!(engine.read("sess-hook").expect("goal 在").tokens_used, 0);
+        // Unknown / Invalid → 不记。
+        supervisor.record_goal_token_usage(&ctx, &ReportedUsage::Unknown);
+        supervisor.record_goal_token_usage(
+            &ctx,
+            &ReportedUsage::Invalid {
+                detail: "negative".into(),
+            },
+        );
+        assert_eq!(engine.read("sess-hook").expect("goal 在").tokens_used, 0);
+        // 分量求和进账；超预算恰好一次通知。
+        supervisor.record_goal_token_usage(&ctx, &usage_of(Some(6), Some(1)));
+        assert_eq!(engine.read("sess-hook").expect("goal 在").tokens_used, 7);
+        assert!(notices.lock().unwrap().is_empty());
+        supervisor.record_goal_token_usage(&ctx, &usage_of(Some(4), Some(1)));
+        assert_eq!(engine.read("sess-hook").expect("goal 在").tokens_used, 12);
+        assert_eq!(
+            notices.lock().unwrap().as_slice(),
+            &[("sess-hook".to_string(), "tokens".to_string())]
+        );
+        // 未挂引擎的装配：钩子是无操作（保持钩子前形状）。
+        RunSupervisor::without_provider()
+            .record_goal_token_usage(&ctx, &usage_of(Some(1), Some(1)));
+        let _ = std::fs::remove_dir_all(&root);
     }
 
     #[test]

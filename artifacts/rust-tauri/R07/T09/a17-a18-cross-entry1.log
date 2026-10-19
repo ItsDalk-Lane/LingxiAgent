@@ -1,0 +1,40 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs (2 tests | 2 skipped) 3497ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/r07-a17-a18-cross-entry.test.mjs > R07-T09 A17/A18 跨入口真实验收
+AssertionError: CLI exit=1
+stdout:
+
+stderr:
+[31mNo Rust service instance record was found at /Users/study_superior/.lingxi-dev/lingxi-service/instance.json[0m
+
+
+1 !== 0
+
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/r07-a17-a18-cross-entry.test.mjs:173:12
+    171|     // CLI 腿：真实子进程发 prompt，驱动真实 Run 与真实工具。
+    172|     const cli = await runCli(ctx.home);
+    173|     assert.equal(cli.code, 0, `CLI exit=${cli.code}\nstdout:\n${cli.st…
+       |            ^
+    174|     assert.ok(cli.stdout.includes(FINAL), `CLI 未输出模型最终答复\nstdout:\n${c…
+    175|     assert.ok(cli.stdout.includes('◇'), `CLI 未展示工具执行\nstdout:\n${cli.s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 skipped (2)
+   Start at  22:59:53
+   Duration  3.61s (transform 21ms, setup 20ms, import 19ms, tests 3.50s, environment 0ms)
+

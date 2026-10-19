@@ -1,0 +1,41 @@
+{
+  "schema": "r07-t08-mcp-session-ws-regression-readiness-v1",
+  "recordedAt": "2026-10-18T10:51:14.239685+00:00",
+  "status": "RUST_SOURCE_STOPPED_FOR_ROOT_FIRST_CHECK_NOT_ACCEPTANCE",
+  "previousReady": "mcp-session-permission-implementation-ready1.json",
+  "actualRunsByReviewer": [],
+  "newTest": {
+    "name": "actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval",
+    "state": "NOT_RUN",
+    "proof": "真实设备WS升级/协议hello→首轮prompt真实MCP pending→HTTP grant/approve→真实终态/回执→第二轮同session同capability不同args。若出现第二待批，保存日志的真实pending、拒绝令Run结算、关闭实际socket和服务后才断言失败；不以HTTP execute替代现役WS。"
+  },
+  "target": "r07_t08_mcp_session_permissions",
+  "currentTestCount": 4,
+  "compile": "NOT_RUN_ROOT_ONLY",
+  "knownOpenStaticIssues": [
+    {
+      "id": "MCP-SESSION-WS-FOREGROUND-FLAG",
+      "state": "STATIC_CONFIRMED_NOT_YET_RUNTIME_REPRODUCED",
+      "facts": "HTTP前台execute true，但chat_wire真实prompt仍调用execute_background_chat_for，user_submission默认为false；当前产品未修，以保留原状真实反例。",
+      "nextFix": "新增仅实际鉴权WS用户prompt可调用的前台交互受理wrapper，真实服务器冻结flag；不能把所有background_chat_for改true。显式后台、automation、bridge、subagent仍false。"
+    },
+    {
+      "id": "MCP-SESSION-INFLIGHT-GRANT-AFTER-LIFECYCLE",
+      "state": "STATIC_CONFIRMED_NOT_YET_RUNTIME_REPRODUCED",
+      "facts": "active行读取await后，另线程archive+restore两次reclaim可在grant插入前完成；created_at相同且会话再active，单纯删既有grant不能阻旧在途grant迟到插入。",
+      "nextFix": "首次await前捕获会话mutation epoch，reclaim即推进，同grant插入互斥锁内复验。需真实受理与归档恢复的确定性交错，顺序归档测试不替代。"
+    }
+  ],
+  "sourceHashes": {
+    "rust/crates/lingxi-service/tests/r07_t08_mcp_session_permissions.rs": "ffb7253586114983cf39850993180657a01650ff52721577a8065d18fbae901a",
+    "rust/crates/lingxi-service/src/mcp_session_permissions.rs": "cf98acb8d62c1e6876b0b0722e77ab084e9776ae32f3c9fb79cc46805ace35cc",
+    "rust/crates/lingxi-service/src/toolgateway.rs": "80ce29045a3ce6fa321b3bd88311b3727a4ebd98009136e40de505e984d3c49d",
+    "rust/crates/lingxi-service/src/sessions.rs": "41306327eebc0a5e43e9c74aa6740e14de7e16610a290b8cf6e7673b2a9c622e",
+    "rust/crates/lingxi-service/src/runs.rs": "bb0ddfe8329b01ba2a45c7850f3c7bb28170c146a04fb0e8b34980d9eead998b",
+    "rust/crates/lingxi-service/src/chat_wire.rs": "e62b40a6d1ca126ff50f1ff7228be999f6435eda2a2e46a27008672f81a6c001"
+  },
+  "notes": [
+    "遵照根要求先停全部Rust修改，待与MCP SDK同库源码一起首次check；当前不执行修复，不Cargo。",
+    "原UI6项mock HTTP检查保持scope；不领Rust、WS或生命周期交错通过。"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "reviewer": "r07_t08_final_review",
+  "candidate": "t08f",
+  "reviewedAt": "2026-10-18T09:41:11.328613+00:00",
+  "finalAcceptance": "CHECKS_PASSED_NOT_ACCEPTED",
+  "scope": "只读独立核验原冻结候选完整检查证据；不修改Source/计划/工具，不运行Cargo/GUI。",
+  "actualResults": {
+    "executedGates": 20,
+    "exitZeroGates": 20,
+    "failedGates": 0,
+    "notRun": [],
+    "serviceTargets": 34,
+    "servicePassedCases": 879,
+    "serviceFailedCases": 0,
+    "uiFiles": 67,
+    "uiPassedNamedCases": 555,
+    "uiFailedSkippedPendingTodoCases": 0
+  },
+  "bindingVerification": {
+    "sourceFingerprint": "71924b54ab9c82a70b2327010d4287c3c04e73221b65b7699e744b20adbce836",
+    "sourceRows": 657,
+    "archiveSha256": "f7c1b79ea77a8e05e3c729375d8006faa87dd8d67dfbe3da8e11117e4443d419",
+    "manifestFingerprintArchiveAndCurrentSourceAtPreReview": "independent-final-review-t08f.json已逐行核；关闭后后继编辑不绑定为f源码。",
+    "resultsSha256": "9cd9ac39a46173f90d3387acc14e55cd2adea5bda514ff5f381e9af3251c1332",
+    "all20ReceiptAndLogHashesVerified": true,
+    "all20ExactFrozenCommandsAndZeroExitsVerified": true,
+    "all20SourceFingerprintBeforeAfterAndToolsUnchangedVerified": true,
+    "all20PlanHashVerified": true,
+    "all4FreshBuildBindingReceiptHashesAndBinaryBeforeAfterVerified": true,
+    "freshBuildBinarySha256": "d91fbf82e0dd91f80b71264a66570e08972c3c0d1f0cfadaaa41a9c417a6821c",
+    "nativePickerProofReuse": "单独正式native-skills与binding门均通过，证明同产物/闭包复用原人工证据，未声称f再次人工操作。"
+  },
+  "namedUiEvidence": {
+    "path": "t08f-ui-test-results.json",
+    "sha256": "265ad8f76f9726beb2c72a79618f869872da25a1efa7422edddc13265528443f",
+    "matchesClosedResultsHash": true,
+    "all555AssertionsActuallyPassed": true,
+    "granularity": "已解决e聚合日志无法取本轮具名结果的粒度限制；每项有testResults/assertionResults原名及passed状态，不反向补造e具名结果。",
+    "configurationArchiveCase": "实际导出隐藏密钥，修改导出文件后从按钮导入并保留其他设置（无服务二进制时明确跳过）实际passed、非skip；可结算直接组件+fresh实际服务链。",
+    "limitations": "具名通过只证明case实际断言，不能按555或选中143分摊343原复合断言。"
+  },
+  "acceptanceBlockers": [
+    "已静态确认正常Rust初始化及重启的SettingsContent仍阻挡T08已接页签，当前直挂组件通过不代表用户实际入口可达。",
+    "技能GET失败与跨bundle多写部分失败、Provider写成功后真实读取失败等原复合条款仍缺对应实际证明。",
+    "35移交中MCP设置投影及管理动作是本阶段原责任，须按原文核实，不能因未实现就自行禁用并递延。"
+  ],
+  "priorFailures": "a/b/c/d/e原失败、取消及未执行均保留。f20全绿不能覆盖这些历史事实，也不能消除新发现入口缺口。",
+  "next": "只读独审后继原范围必要修复，主端唯一Cargo；后继需完整新候选验收。"
+}

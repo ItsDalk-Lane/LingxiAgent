@@ -207,6 +207,7 @@ function normalizeDingTalkInboundMessage(payload: Record<string, any>, agentId: 
 
   return {
     platform: "dingtalk",
+    conversationId,
     agentId,
     chatId,
     userId,

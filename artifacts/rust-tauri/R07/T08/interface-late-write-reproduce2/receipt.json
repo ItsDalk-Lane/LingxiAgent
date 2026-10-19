@@ -1,0 +1,31 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile.json=artifacts/rust-tauri/R07/T08/interface-late-write-reproduce2/vitest-results.json"
+  ],
+  "exitCode": 1,
+  "developmentOnly": true,
+  "binary": "/private/tmp/lingxi-r07-tests/binaries/settings-entry-backend-build2/lingxi-service",
+  "binaryBeforeSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "binaryAfterSha256": "d7b56a69dfb584747618d8f0eb36d6ca92484b496158328c2fbc426ba4db2ece",
+  "sourceBefore": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "2cf0e498c0aec5c8506e96c58a327115da9558b764a3d71475c6cb9e6a0a909a",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "9ed4bee73a688c95394b36be8e93c17c7e96408cf1199345f9c17d2394816061",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "cd05f32a09383663e1b351821d5229b2fd7f8c74c6e9e35840ddc3359ad86b54",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "bb0c3da2b43d9d894b34f8dc80f38a885e96b5539562ec9efb28d50189d67f78"
+  },
+  "sourceAfter": {
+    "desktop/src/react/settings/tabs/KeybindingsTab.tsx": "2cf0e498c0aec5c8506e96c58a327115da9558b764a3d71475c6cb9e6a0a909a",
+    "desktop/src/react/settings/tabs/InterfaceTab.tsx": "9ed4bee73a688c95394b36be8e93c17c7e96408cf1199345f9c17d2394816061",
+    "desktop/src/react/settings/components/SettingsTransferSection.tsx": "cd05f32a09383663e1b351821d5229b2fd7f8c74c6e9e35840ddc3359ad86b54",
+    "desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx": "bb0c3da2b43d9d894b34f8dc80f38a885e96b5539562ec9efb28d50189d67f78"
+  },
+  "stdoutSha256": "3bfb66fb40aea70b79e72b2d5c52558466fb634e6c545b07bb8a8cec1e6bb5b9",
+  "stderrSha256": "112187f3f0a33e32bacb29e1d88658bff0fde99d9e49a975c6be818fb3e854d5",
+  "observationRefinement": "hold full real Response after clone confirms body arrived; release observed independently of stale consumer choosing not to parse"
+}

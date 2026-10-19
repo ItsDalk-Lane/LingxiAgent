@@ -1,0 +1,869 @@
+[
+  {
+    "seconds": 0.003715,
+    "kind": "launch",
+    "argv": [
+      "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "--remote-debugging-pipe",
+      "--user-data-dir=/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-cdp-readonly-probe-631onmwq",
+      "--profile-directory=Default",
+      "--headless=new",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-networking",
+      "--disable-component-update",
+      "--disable-sync",
+      "--metrics-recording-only",
+      "--no-startup-window",
+      "--window-size=1280,860",
+      "--proxy-server=http://127.0.0.1:56166",
+      "--proxy-bypass-list=<-loopback>;127.0.0.1"
+    ],
+    "profile": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-cdp-readonly-probe-631onmwq"
+  },
+  {
+    "seconds": 0.004135,
+    "kind": "owned_process",
+    "pid": 88244,
+    "pgid": 88244
+  },
+  {
+    "seconds": 0.004199,
+    "kind": "send",
+    "message": {
+      "id": 1,
+      "method": "Browser.getVersion",
+      "params": {}
+    }
+  },
+  {
+    "seconds": 0.253435,
+    "kind": "http",
+    "path": "http://clients2.google.com/time/1/current?cup2key=10:RfLb79m-B2rYL0BMfm2ZdUNkX_ZlOxNGOgy7RqmjC1c&cup2hreq=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "seconds": 0.261859,
+    "kind": "receive",
+    "message": {
+      "id": 1,
+      "result": {
+        "protocolVersion": "1.3",
+        "product": "Chrome/155.0.8059.82",
+        "revision": "@c56fe5daef8be123f68808a4bb705ff378cd2019",
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "jsVersion": "15.5.35.23"
+      }
+    }
+  },
+  {
+    "seconds": 0.261906,
+    "kind": "send",
+    "message": {
+      "id": 2,
+      "method": "Target.createTarget",
+      "params": {
+        "url": "about:blank"
+      }
+    }
+  },
+  {
+    "seconds": 0.337184,
+    "kind": "receive",
+    "message": {
+      "id": 2,
+      "result": {
+        "targetId": "1151810E28F5BFFB7D283944F5CAEAD6"
+      }
+    }
+  },
+  {
+    "seconds": 0.33723,
+    "kind": "send",
+    "message": {
+      "id": 3,
+      "method": "Target.attachToTarget",
+      "params": {
+        "targetId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "flatten": true
+      }
+    }
+  },
+  {
+    "seconds": 0.3443,
+    "kind": "receive",
+    "message": {
+      "method": "Target.attachedToTarget",
+      "params": {
+        "sessionId": "438FDFDE9819C31FE65C992FD383E761",
+        "targetInfo": {
+          "targetId": "1151810E28F5BFFB7D283944F5CAEAD6",
+          "type": "page",
+          "title": "",
+          "url": "about:blank",
+          "attached": true,
+          "canAccessOpener": false,
+          "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+        },
+        "waitingForDebugger": false
+      }
+    }
+  },
+  {
+    "seconds": 0.344327,
+    "kind": "receive",
+    "message": {
+      "id": 3,
+      "result": {
+        "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+      }
+    }
+  },
+  {
+    "seconds": 0.344353,
+    "kind": "send",
+    "message": {
+      "id": 4,
+      "method": "Page.enable",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.376037,
+    "kind": "receive",
+    "message": {
+      "method": "Page.frameStoppedLoading",
+      "params": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6"
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.376079,
+    "kind": "receive",
+    "message": {
+      "id": 4,
+      "result": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.376099,
+    "kind": "send",
+    "message": {
+      "id": 5,
+      "method": "Runtime.enable",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.38037,
+    "kind": "receive",
+    "message": {
+      "method": "Runtime.executionContextCreated",
+      "params": {
+        "context": {
+          "id": 1,
+          "origin": "://",
+          "name": "",
+          "uniqueId": "-9184805535418617991.5374572715259866992",
+          "auxData": {
+            "isDefault": true,
+            "type": "default",
+            "frameId": "1151810E28F5BFFB7D283944F5CAEAD6"
+          }
+        }
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.380386,
+    "kind": "receive",
+    "message": {
+      "id": 5,
+      "result": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.380405,
+    "kind": "send",
+    "message": {
+      "id": 6,
+      "method": "Page.navigate",
+      "params": {
+        "url": "http://127.0.0.1:56166/form"
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.381285,
+    "kind": "receive",
+    "message": {
+      "method": "Page.frameStartedNavigating",
+      "params": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "url": "http://127.0.0.1:56166/form",
+        "loaderId": "2C0CD79A92AE7A54E5F90998ABCA555C",
+        "navigationType": "differentDocument"
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.381427,
+    "kind": "receive",
+    "message": {
+      "method": "Page.frameStartedLoading",
+      "params": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6"
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.382275,
+    "kind": "http",
+    "path": "/form"
+  },
+  {
+    "seconds": 0.382888,
+    "kind": "receive",
+    "message": {
+      "id": 6,
+      "result": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "loaderId": "2C0CD79A92AE7A54E5F90998ABCA555C",
+        "isDownload": false
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.382904,
+    "kind": "send",
+    "message": {
+      "id": 7,
+      "method": "Runtime.evaluate",
+      "params": {
+        "expression": "!!document.querySelector('#dialog')",
+        "returnByValue": true
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.385446,
+    "kind": "receive",
+    "message": {
+      "method": "Runtime.executionContextsCleared",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.386101,
+    "kind": "receive",
+    "message": {
+      "method": "Runtime.executionContextsCleared",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.38612,
+    "kind": "receive",
+    "message": {
+      "method": "Page.frameNavigated",
+      "params": {
+        "frame": {
+          "id": "1151810E28F5BFFB7D283944F5CAEAD6",
+          "loaderId": "2C0CD79A92AE7A54E5F90998ABCA555C",
+          "url": "http://127.0.0.1:56166/form",
+          "domainAndRegistry": "",
+          "securityOrigin": "http://127.0.0.1:56166",
+          "securityOriginDetails": {
+            "isLocalhost": true
+          },
+          "mimeType": "text/html",
+          "adFrameStatus": {
+            "adFrameType": "none"
+          },
+          "secureContextType": "SecureLocalhost",
+          "crossOriginIsolatedContextType": "NotIsolated",
+          "gatedAPIFeatures": []
+        },
+        "type": "Navigation"
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.38913,
+    "kind": "receive",
+    "message": {
+      "method": "Runtime.executionContextCreated",
+      "params": {
+        "context": {
+          "id": 2,
+          "origin": "http://127.0.0.1:56166",
+          "name": "",
+          "uniqueId": "4432819029284783307.20414282526351687",
+          "auxData": {
+            "isDefault": true,
+            "type": "default",
+            "frameId": "1151810E28F5BFFB7D283944F5CAEAD6"
+          }
+        }
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.392035,
+    "kind": "receive",
+    "message": {
+      "method": "Page.domContentEventFired",
+      "params": {
+        "timestamp": 54790.150234
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.392047,
+    "kind": "receive",
+    "message": {
+      "method": "Page.loadEventFired",
+      "params": {
+        "timestamp": 54790.150349
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.392871,
+    "kind": "receive",
+    "message": {
+      "method": "Page.frameStoppedLoading",
+      "params": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6"
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.393122,
+    "kind": "receive",
+    "message": {
+      "id": 7,
+      "result": {
+        "result": {
+          "type": "boolean",
+          "value": true
+        }
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.393168,
+    "kind": "send",
+    "message": {
+      "id": 8,
+      "method": "Page.getNavigationHistory",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.394037,
+    "kind": "http",
+    "path": "/favicon.ico"
+  },
+  {
+    "seconds": 0.394375,
+    "kind": "receive",
+    "message": {
+      "id": 8,
+      "result": {
+        "currentIndex": 1,
+        "entries": [
+          {
+            "id": 8,
+            "url": "about:blank",
+            "userTypedURL": "about:blank",
+            "title": "",
+            "transitionType": "auto_toplevel"
+          },
+          {
+            "id": 13,
+            "url": "http://127.0.0.1:56166/form",
+            "userTypedURL": "http://127.0.0.1:56166/form",
+            "title": "",
+            "transitionType": "typed"
+          }
+        ]
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.394409,
+    "kind": "send",
+    "message": {
+      "id": 9,
+      "method": "Runtime.evaluate",
+      "params": {
+        "expression": "document.querySelector('#dialog').click();document.body.dataset.dialog",
+        "returnByValue": true,
+        "awaitPromise": true
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.395572,
+    "kind": "receive",
+    "message": {
+      "method": "Page.javascriptDialogOpening",
+      "params": {
+        "url": "http://127.0.0.1:56166/form",
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "message": "local dialog",
+        "type": "alert",
+        "hasBrowserHandler": true,
+        "defaultPrompt": ""
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.395599,
+    "kind": "send",
+    "message": {
+      "id": 10,
+      "method": "Target.getTargets",
+      "params": {}
+    }
+  },
+  {
+    "seconds": 0.423425,
+    "kind": "receive",
+    "message": {
+      "id": 10,
+      "result": {
+        "targetInfos": [
+          {
+            "targetId": "9D42854FF8E786992096512644C822F9",
+            "type": "service_worker",
+            "title": "Service Worker chrome-extension://fignfifoniblkonapihmkfakmlgkbkcf/service_worker.js",
+            "url": "chrome-extension://fignfifoniblkonapihmkfakmlgkbkcf/service_worker.js",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "1151810E28F5BFFB7D283944F5CAEAD6",
+            "type": "page",
+            "title": "127.0.0.1:56166/form",
+            "url": "http://127.0.0.1:56166/form",
+            "attached": true,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "A67B99DD3BF8A199ADD8EDFC34EB6205",
+            "type": "browser_ui",
+            "title": "Omnibox Popup",
+            "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "14DA771229AFBCA4A67E8121633975AD",
+            "type": "browser_ui",
+            "title": "Omnibox Popup",
+            "url": "chrome://omnibox-popup.top-chrome/",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "76D92541FAAD5BC03AC4B368CFACAEBE",
+            "type": "background_page",
+            "title": "Google Hangouts",
+            "url": "chrome-extension://nkeimhogjdpnpccoofpliimaahmaaome/background.html",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "seconds": 0.423458,
+    "kind": "send",
+    "message": {
+      "id": 11,
+      "method": "Page.getNavigationHistory",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 0.424714,
+    "kind": "receive",
+    "message": {
+      "id": 11,
+      "result": {
+        "currentIndex": 1,
+        "entries": [
+          {
+            "id": 8,
+            "url": "about:blank",
+            "userTypedURL": "about:blank",
+            "title": "",
+            "transitionType": "auto_toplevel"
+          },
+          {
+            "id": 13,
+            "url": "http://127.0.0.1:56166/form",
+            "userTypedURL": "http://127.0.0.1:56166/form",
+            "title": "",
+            "transitionType": "typed"
+          }
+        ]
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.633522,
+    "kind": "before_dialog_accept",
+    "round": 0,
+    "history_responded": true,
+    "evaluate_responded": false
+  },
+  {
+    "seconds": 2.63353,
+    "kind": "send",
+    "message": {
+      "id": 12,
+      "method": "Page.handleJavaScriptDialog",
+      "params": {
+        "accept": true
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.633653,
+    "kind": "receive",
+    "message": {
+      "method": "Page.javascriptDialogClosed",
+      "params": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "result": true,
+        "userInput": ""
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.634028,
+    "kind": "receive",
+    "message": {
+      "id": 12,
+      "result": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.634095,
+    "kind": "receive",
+    "message": {
+      "id": 9,
+      "result": {
+        "result": {
+          "type": "string",
+          "value": "done"
+        }
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.634136,
+    "kind": "send",
+    "message": {
+      "id": 13,
+      "method": "Page.getNavigationHistory",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.63469,
+    "kind": "receive",
+    "message": {
+      "id": 13,
+      "result": {
+        "currentIndex": 1,
+        "entries": [
+          {
+            "id": 8,
+            "url": "about:blank",
+            "userTypedURL": "about:blank",
+            "title": "",
+            "transitionType": "auto_toplevel"
+          },
+          {
+            "id": 13,
+            "url": "http://127.0.0.1:56166/form",
+            "userTypedURL": "http://127.0.0.1:56166/form",
+            "title": "",
+            "transitionType": "typed"
+          }
+        ]
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.634717,
+    "kind": "send",
+    "message": {
+      "id": 14,
+      "method": "Runtime.evaluate",
+      "params": {
+        "expression": "document.querySelector('#dialog').click();document.body.dataset.dialog",
+        "returnByValue": true,
+        "awaitPromise": true
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.635456,
+    "kind": "receive",
+    "message": {
+      "method": "Page.javascriptDialogOpening",
+      "params": {
+        "url": "http://127.0.0.1:56166/form",
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "message": "local dialog",
+        "type": "alert",
+        "hasBrowserHandler": true,
+        "defaultPrompt": ""
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.635472,
+    "kind": "send",
+    "message": {
+      "id": 15,
+      "method": "Target.getTargets",
+      "params": {}
+    }
+  },
+  {
+    "seconds": 2.641174,
+    "kind": "receive",
+    "message": {
+      "id": 15,
+      "result": {
+        "targetInfos": [
+          {
+            "targetId": "9D42854FF8E786992096512644C822F9",
+            "type": "service_worker",
+            "title": "Service Worker chrome-extension://fignfifoniblkonapihmkfakmlgkbkcf/service_worker.js",
+            "url": "chrome-extension://fignfifoniblkonapihmkfakmlgkbkcf/service_worker.js",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "1151810E28F5BFFB7D283944F5CAEAD6",
+            "type": "page",
+            "title": "127.0.0.1:56166/form",
+            "url": "http://127.0.0.1:56166/form",
+            "attached": true,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "A67B99DD3BF8A199ADD8EDFC34EB6205",
+            "type": "browser_ui",
+            "title": "Omnibox Popup",
+            "url": "chrome://omnibox-popup.top-chrome/omnibox_popup_aim.html",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "14DA771229AFBCA4A67E8121633975AD",
+            "type": "browser_ui",
+            "title": "Omnibox Popup",
+            "url": "chrome://omnibox-popup.top-chrome/",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          },
+          {
+            "targetId": "76D92541FAAD5BC03AC4B368CFACAEBE",
+            "type": "background_page",
+            "title": "Google Hangouts",
+            "url": "chrome-extension://nkeimhogjdpnpccoofpliimaahmaaome/background.html",
+            "attached": false,
+            "canAccessOpener": false,
+            "browserContextId": "60E9F00EE92D747A7E4174F814E09B1B"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "seconds": 2.641203,
+    "kind": "send",
+    "message": {
+      "id": 16,
+      "method": "Page.getNavigationHistory",
+      "params": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 2.642403,
+    "kind": "receive",
+    "message": {
+      "id": 16,
+      "result": {
+        "currentIndex": 1,
+        "entries": [
+          {
+            "id": 8,
+            "url": "about:blank",
+            "userTypedURL": "about:blank",
+            "title": "",
+            "transitionType": "auto_toplevel"
+          },
+          {
+            "id": 13,
+            "url": "http://127.0.0.1:56166/form",
+            "userTypedURL": "http://127.0.0.1:56166/form",
+            "title": "",
+            "transitionType": "typed"
+          }
+        ]
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 4.846455,
+    "kind": "before_dialog_accept",
+    "round": 1,
+    "history_responded": true,
+    "evaluate_responded": false
+  },
+  {
+    "seconds": 4.846467,
+    "kind": "send",
+    "message": {
+      "id": 17,
+      "method": "Page.handleJavaScriptDialog",
+      "params": {
+        "accept": true
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 4.846623,
+    "kind": "receive",
+    "message": {
+      "method": "Page.javascriptDialogClosed",
+      "params": {
+        "frameId": "1151810E28F5BFFB7D283944F5CAEAD6",
+        "result": true,
+        "userInput": ""
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 4.847129,
+    "kind": "receive",
+    "message": {
+      "id": 17,
+      "result": {},
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 4.847159,
+    "kind": "receive",
+    "message": {
+      "id": 14,
+      "result": {
+        "result": {
+          "type": "string",
+          "value": "done"
+        }
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 4.847172,
+    "kind": "send",
+    "message": {
+      "id": 18,
+      "method": "Browser.close",
+      "params": {}
+    }
+  },
+  {
+    "seconds": 4.847655,
+    "kind": "receive",
+    "message": {
+      "id": 18,
+      "result": {}
+    }
+  },
+  {
+    "seconds": 4.848195,
+    "kind": "receive",
+    "message": {
+      "method": "Inspector.detached",
+      "params": {
+        "reason": "Render process gone."
+      },
+      "sessionId": "438FDFDE9819C31FE65C992FD383E761"
+    }
+  },
+  {
+    "seconds": 4.851491,
+    "kind": "receive",
+    "message": {
+      "method": "Target.detachedFromTarget",
+      "params": {
+        "sessionId": "438FDFDE9819C31FE65C992FD383E761",
+        "targetId": "1151810E28F5BFFB7D283944F5CAEAD6"
+      }
+    }
+  },
+  {
+    "seconds": 5.017273,
+    "kind": "pipe_eof"
+  }
+]

@@ -22,6 +22,8 @@ const DEFAULT_SECRET_KEYS = new Set<string>([
   "password",
   "accessToken",
   "refreshToken",
+  "access_token",
+  "refresh_token",
 ]);
 
 export function isMaskedSecretValue(value: unknown): value is typeof MASKED_SECRET {

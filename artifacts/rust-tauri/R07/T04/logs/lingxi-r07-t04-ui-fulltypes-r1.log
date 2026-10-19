@@ -1,0 +1,9 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+tests/rust-browser-control.test.ts(28,12): error TS2532: Object is possibly 'undefined'.
+tests/rust-browser-control.test.ts(28,32): error TS2493: Tuple type '[]' of length '0' has no element at index '1'.
+tests/rust-browser-control.test.ts(39,32): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+tests/rust-browser-control.test.ts(40,23): error TS2532: Object is possibly 'undefined'.
+tests/rust-browser-control.test.ts(40,43): error TS2493: Tuple type '[]' of length '0' has no element at index '1'.

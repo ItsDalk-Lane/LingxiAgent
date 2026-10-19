@@ -19,25 +19,37 @@ function loginHeaders() {
   };
 }
 
+async function loginJson(response: Response): Promise<Record<string, any>> {
+  if (!response.body) throw new Error("登录响应为空");
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of response.body) {
+    const bytes = Buffer.from(chunk); size += bytes.length;
+    if (size > 64 * 1024) throw new Error("登录响应超过大小限制");
+    chunks.push(bytes);
+  }
+  return JSON.parse(Buffer.concat(chunks, size).toString("utf8"));
+}
+
 /**
  * 获取微信扫码登录二维码
  * @returns {Promise<{ ok: boolean, qrcodeUrl?: string, qrcodeId?: string, error?: string }>}
  */
-export async function getWechatQrcode() {
+export async function getWechatQrcode(options: { signal?: AbortSignal } = {}) {
   try {
     const url = `${BASE_URL}/ilink/bot/get_bot_qrcode?bot_type=${BOT_TYPE}`;
-    const res = await fetch(url, { headers: loginHeaders() });
+    const res = await fetch(url, { headers: loginHeaders(), signal: options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(10_000)]) : AbortSignal.timeout(10_000), redirect: "error" });
     if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      return { ok: false, error: `HTTP ${res.status}: ${body}` };
+      return { ok: false, error: `HTTP ${res.status}` };
     }
-    const data = await res.json();
+    const data = await loginJson(res);
     if (!data.qrcode) {
       return { ok: false, error: "服务器未返回二维码" };
     }
     // qrcode_img_content 是要被编码成二维码的 URL 文本，不是图片
     // 用 qrcode 库转成 data URL（base64 PNG），前端直接 <img src> 显示
     const qrText = data.qrcode_img_content || data.qrcode;
+    if (typeof qrText !== "string" || Buffer.byteLength(qrText) > 4096) throw new Error("二维码内容无效");
     const qrcodeDataUrl = await QRCode.toDataURL(qrText, { width: 280, margin: 2 });
     return {
       ok: true,
@@ -58,7 +70,7 @@ export async function getWechatQrcode() {
  * @param {string} qrcodeId - 从 getWechatQrcode 获取的 qrcode 值
  * @returns {Promise<{ status: string, botToken?: string, botId?: string, userId?: string, baseUrl?: string, error?: string }>}
  */
-export async function pollWechatQrcodeStatus(qrcodeId) {
+export async function pollWechatQrcodeStatus(qrcodeId, options: { signal?: AbortSignal } = {}) {
   if (!qrcodeId) {
     return { status: "error", error: "qrcodeId is required" };
   }
@@ -70,7 +82,7 @@ export async function pollWechatQrcodeStatus(qrcodeId) {
 
     let res;
     try {
-      res = await fetch(url, { headers: loginHeaders(), signal: controller.signal });
+      res = await fetch(url, { headers: loginHeaders(), signal: options.signal ? AbortSignal.any([options.signal, controller.signal]) : controller.signal, redirect: "error" });
       clearTimeout(timer);
     } catch (err) {
       clearTimeout(timer);
@@ -81,11 +93,10 @@ export async function pollWechatQrcodeStatus(qrcodeId) {
     }
 
     if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      return { status: "error", error: `HTTP ${res.status}: ${body}` };
+      return { status: "error", error: `HTTP ${res.status}` };
     }
 
-    const data = await res.json();
+    const data = await loginJson(res);
 
     switch (data.status) {
       case "wait":

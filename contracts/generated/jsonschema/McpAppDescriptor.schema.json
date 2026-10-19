@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "_meta": true,
+    "connectorId": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "inputSchema": true,
+    "outputSchema": true,
+    "resourceUri": {
+      "type": "string"
+    },
+    "serverId": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "toolName": {
+      "type": "string"
+    },
+    "visibility": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "connectorId",
+    "serverId",
+    "toolName",
+    "title",
+    "description",
+    "resourceUri",
+    "visibility",
+    "inputSchema"
+  ],
+  "title": "McpAppDescriptor",
+  "type": "object"
+}

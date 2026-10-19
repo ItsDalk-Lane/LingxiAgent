@@ -7,22 +7,25 @@ import fs from 'node:fs';
 import zh from '../../../locales/zh.json';
 import { SettingsContent } from '../SettingsContent';
 import { useSettingsStore } from '../store';
+import { observeAgentDeleteInitialization } from './agent-delete-initialization';
 
 const enabled = !!process.env.R06_AGENT_DELETE_UI_URL;
 afterEach(cleanup);
 
 it.skipIf(!enabled)('rust_agent_delete_current_settings_real_service', async () => {
+  const testDeadline = performance.now() + 60_000;
   const base = process.env.R06_AGENT_DELETE_UI_URL!;
   const token = process.env.R06_AGENT_DELETE_UI_TOKEN!;
   const home = process.env.R06_AGENT_DELETE_UI_HOME!;
   const scenario = process.env.R06_AGENT_DELETE_UI_CASE!;
   const actualFetch = globalThis.fetch;
+  const initialization = observeAgentDeleteInitialization({ actualFetch, base, token, home, testDeadline });
   const attempts: Array<{ path: string; method: string }> = [];
   const receipts: Array<{ path: string; method: string; status: number; data: any }> = [];
   // 只观察真实HTTP响应，不替换服务、鉴权、路由或业务结果。
   globalThis.fetch = async (input, init) => {
     attempts.push({ path: new URL(String(input)).pathname, method: init?.method || 'GET' });
-    const response = await actualFetch(input, init);
+    const response = await initialization.fetch(input, init);
     receipts.push({ path: new URL(String(input)).pathname, method: init?.method || 'GET', status: response.status, data: await response.clone().json() });
     return response;
   };
@@ -47,7 +50,7 @@ it.skipIf(!enabled)('rust_agent_delete_current_settings_real_service', async () 
   let restoreSkillMode: number | undefined;
   try {
     render(<SettingsContent variant="modal" />);
-    await waitFor(() => expect(useSettingsStore.getState().ready).toBe(true));
+    await initialization.waitForReady();
     fireEvent.click(screen.getByRole('button', { name: '助手' }));
     await waitFor(() => expect(screen.getByRole('combobox', { name: '助手' })).toBeEnabled());
     fireEvent.change(screen.getByRole('combobox', { name: '助手' }), { target: { value: 'victim' } });
@@ -141,11 +144,27 @@ it.skipIf(!enabled)('rust_agent_delete_current_settings_real_service', async () 
       expect(screen.queryByText(/not_orphan|removal_failed/)).not.toBeInTheDocument();
       await waitFor(() => expect(useSettingsStore.getState().agents.map(agent => agent.id)).not.toContain('victim'));
     }
-    // 当前桌面入口仅此助手页接通，其他Rust设置仍明确不可用。
+    // T08接通现役技能页；删除后的导航仍须读到同一真实服务，不能退回旧不可用提示。
+    const beforeSkillsNavigation = receipts.length;
     fireEvent.click(screen.getByRole('button', { name: '技能' }));
-    expect(screen.getAllByRole('alert').some(alert => alert.textContent?.includes(translate('settings.rustCoreUnavailable')))).toBe(true);
+    if (scenario === 'last') {
+      // 此场景此前从另一请求真实删掉survivor，技能默认视角仍是它，应先显示真实404。
+      await waitFor(() => {
+        expect(receipts.slice(beforeSkillsNavigation).some(receipt => receipt.path === '/lingxi/v1/skills' && receipt.method === 'GET' && receipt.status === 404)).toBe(true);
+        expect(screen.getAllByRole('alert').some(alert => alert.textContent?.includes(translate('settings.skills.loadFailed')))).toBe(true);
+      }, { timeout: 10_000 });
+      // 通过现役选择器切回实际保留的victim后，再要求真实读取成功。
+      fireEvent.click(screen.getByRole('button', { name: '保留助手' }));
+      fireEvent.click(screen.getByRole('option', { name: '待删除助手' }));
+    }
+    await waitFor(() => {
+      expect(document.querySelector('div[data-tab="skills"]:not([data-settings-page])')).not.toBeNull();
+      expect(receipts.slice(beforeSkillsNavigation).some(receipt => receipt.path === '/lingxi/v1/skills' && receipt.method === 'GET' && receipt.status === 200)).toBe(true);
+    }, { timeout: 10_000 });
+    expect(screen.queryAllByRole('alert').some(alert => alert.textContent?.includes(translate('settings.rustCoreUnavailable')))).toBe(false);
   } finally {
     if (restoreSkillMode !== undefined) fs.chmodSync(`${home}/skills/demo-owned`, restoreSkillMode);
     globalThis.fetch = actualFetch;
+    initialization.dispose();
   }
 });

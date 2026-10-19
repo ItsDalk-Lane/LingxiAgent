@@ -1,0 +1,36 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 40.72s
+     Running tests/r07_phone_runtime.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_phone_runtime-6b33c93be36bde1a)
+
+running 12 tests
+test actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action ... FAILED
+test actual_member_removal_cancels_waiting_models_before_any_publication ... ok
+test actual_read_only_phone_rejects_native_write_and_hides_recursive_tools ... ok
+test actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat ... ok
+test actual_channel_pass_records_decision_without_publishing_ordinary_final ... ok
+test actual_dm_stop_marker_stops_chain_and_new_user_action_waits_for_direction_cooldown ... ok
+test actual_legacy_markdown_first_discovery_external_append_and_restart_keep_one_cause ... ok
+test actual_dm_chain_shares_three_run_budget_across_both_directions_and_cooldown ... ok
+test actual_dm_stop_marker_variants_strip_public_text_and_never_start_reverse_run ... ok
+test actual_phone_sessions_reuse_within_30_minutes_and_rotate_at_idle_expiry ... ok
+test actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt ... ok
+test actual_archived_phone_session_rotates_and_does_not_block_independent_channel ... ok
+
+failures:
+
+---- actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action stdout ----
+
+thread 'actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action' (639180) panicked at crates/lingxi-service/tests/r07_phone_runtime.rs:331:9:
+assertion `left == right` failed: {"error":"DM reset boundary is damaged"}
+  left: 409
+ right: 200
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action
+
+test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.31s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_phone_runtime`

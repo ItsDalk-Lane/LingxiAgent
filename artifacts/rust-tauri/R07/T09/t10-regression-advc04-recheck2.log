@@ -1,0 +1,34 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.96s
+     Running tests/admission_dedup_adversarial.rs (/private/tmp/lingxi-r07-build/debug/deps/admission_dedup_adversarial-c4d13cb8327069d6)
+
+running 5 tests
+test adv_c01_spawn_window_failure_and_retraction_leave_no_sticky_state ... ok
+test adv_c04_response_lost_before_any_external_effect_replays_real_run ... ok
+test adv_c03_isolation_controls_hold_while_a_key_is_mid_admission ... ok
+test adv_c02_response_lost_inside_start_window_resolves_lazily ... ok
+test adv_c05_restart_with_unknown_side_effects_refuses_explicitly ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+

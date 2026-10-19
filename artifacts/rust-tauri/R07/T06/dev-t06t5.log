@@ -1,0 +1,25 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0624]: method `read_preferences_root` is private
+   --> crates/lingxi-service/tests/r07_media_admin/mod.rs:222:50
+    |
+222 |             let mut preferences = state.memory().read_preferences_root().unwrap();
+    |                                                  ^^^^^^^^^^^^^^^^^^^^^ private method
+    |
+   ::: /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/agents_admin.rs:107:5
+    |
+107 |     pub(crate) fn read_preferences_root(&self) -> Result<Value, String> {
+    |     ------------------------------------------------------------------- private method defined here
+
+error[E0624]: method `write_preferences_root` is private
+   --> crates/lingxi-service/tests/r07_media_admin/mod.rs:224:28
+    |
+224 |             state.memory().write_preferences_root(&preferences).unwrap();
+    |                            ^^^^^^^^^^^^^^^^^^^^^^ private method
+    |
+   ::: /Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service/src/agents_admin.rs:117:5
+    |
+117 |     pub(crate) fn write_preferences_root(&self, value: &Value) -> Result<(), String> {
+    |     -------------------------------------------------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `lingxi-service` (test "r07_media_admin") due to 2 previous errors

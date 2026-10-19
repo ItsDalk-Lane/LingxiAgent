@@ -393,7 +393,7 @@ describe('SessionList context menu', () => {
     render(<SessionList />);
 
     await waitFor(() => {
-      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/browser/session-states');
+      expect(lingxiFetchMock).toHaveBeenCalledWith('/api/browser/session-states', expect.objectContaining({ signal: expect.any(AbortSignal) }));
     });
     expect(lingxiFetchMock).not.toHaveBeenCalledWith('/api/preferences/sidebar-ui');
   });

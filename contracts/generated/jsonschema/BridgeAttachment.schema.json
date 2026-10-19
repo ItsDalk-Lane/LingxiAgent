@@ -1,0 +1,55 @@
+{
+  "$defs": {
+    "BridgeAttachmentKind": {
+      "enum": [
+        "image",
+        "audio",
+        "video",
+        "file"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "attachmentId": {
+      "type": "string"
+    },
+    "filename": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "kind": {
+      "$ref": "#/$defs/BridgeAttachmentKind"
+    },
+    "mime": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "platformRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sizeBytes": {
+      "format": "uint32",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "attachmentId",
+    "kind"
+  ],
+  "title": "BridgeAttachment",
+  "type": "object"
+}

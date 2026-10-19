@@ -182,6 +182,32 @@ pub struct ResourceAccess {
     state: std::sync::Mutex<AccessState>,
 }
 
+/// 普通授权再宽也不能超过节点声明的写目录；范围不写进共享会话状态。
+fn enforce_workflow_write_scope(
+    requested: &Path,
+    resolved: &Path,
+    op: ResourceOp,
+) -> Result<(), AccessRefusal> {
+    if op == ResourceOp::Write {
+        if let Some(scope) = crate::toolgateway::workflow_scope() {
+            let allowed = scope.write_roots.iter().any(|root| {
+                std::fs::canonicalize(root)
+                    .is_ok_and(|current| current == *root && resolved.starts_with(&current))
+            });
+            if !allowed {
+                return Err(AccessRefusal {
+                    cause: AccessRefusalCause::OutsideWriteScope,
+                    requested_path: requested.display().to_string(),
+                    resolved_path: Some(resolved.display().to_string()),
+                    op,
+                    message: "write is outside this workflow node's declared folders".into(),
+                });
+            }
+        }
+    }
+    Ok(())
+}
+
 impl ResourceAccess {
     /// Builds the access with the workspace roots (read-write). Roots are
     /// canonicalized; a root that cannot be resolved is a LOUD error — an
@@ -444,6 +470,7 @@ impl ResourceAccess {
                 ),
             });
         };
+        enforce_workflow_write_scope(&requested, &resolved, op)?;
         let cached = if op == ResourceOp::Read {
             self.lock()
                 .materialized_reads
@@ -550,6 +577,54 @@ impl ResourceAccess {
             op,
             message,
         })
+    }
+
+    /// 引擎面授权（现役 resource-access-policy.ts :71 `check`，
+    /// `getSandboxEnabled: () => false` 的引擎平面）：真实路径解析 +
+    /// 受保护服务根/`.lingxi-recovery-` 组件拒绝照常生效，但**不**按
+    /// 工作区根/授予收窄——与现役引擎面「sandbox 关闭即放行其余」一
+    /// 致。决定性控制在路由层（local-owner 门禁、desk 批准目录门禁、
+    /// isSensitivePath 筛查），此处只做内核级不变量。
+    pub fn authorize_engine_plane(
+        &self,
+        raw_path: &Path,
+        cwd: &Path,
+        op: ResourceOp,
+    ) -> Result<ResourceScope, AccessRefusal> {
+        let requested = absolutize(raw_path, cwd);
+        let Some(resolved) = resolve_real(&requested) else {
+            return Err(AccessRefusal {
+                cause: AccessRefusalCause::Unresolvable,
+                requested_path: requested.display().to_string(),
+                resolved_path: None,
+                op,
+                message: format!(
+                    "{} {} cannot be resolved to a real filesystem path (no existing \
+                     ancestor); the operation is refused",
+                    op.wire_name(),
+                    requested.display()
+                ),
+            });
+        };
+        enforce_workflow_write_scope(&requested, &resolved, op)?;
+        let protected = self.lock().protected_roots.iter().any(|root| {
+            is_inside(&resolved, root) || (op == ResourceOp::Write && is_inside(root, &resolved))
+        });
+        let recovery_object = resolved.components().any(|c| {
+            c.as_os_str()
+                .to_string_lossy()
+                .starts_with(".lingxi-recovery-")
+        });
+        if protected || recovery_object {
+            return Err(AccessRefusal {
+                cause: AccessRefusalCause::Blocked,
+                requested_path: requested.display().to_string(),
+                resolved_path: Some(resolved.display().to_string()),
+                op,
+                message: "resource is protected service recovery state".into(),
+            });
+        }
+        Ok(ResourceScope::new(resolved, op))
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, AccessState> {
@@ -662,6 +737,82 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).expect("temp root");
         dir
+    }
+
+    #[test]
+    fn workflow_write_scope_intersects_ambient_roots_and_engine_plane() {
+        let root = temp_root("workflow").canonicalize().unwrap();
+        let narrow = root.join("narrow");
+        std::fs::create_dir(&narrow).unwrap();
+        let access = ResourceAccess::new(std::slice::from_ref(&root)).unwrap();
+        let scope = crate::runs::WorkflowNodeScope {
+            write_roots: vec![narrow.clone()],
+            tool_filter: None,
+        };
+        crate::toolgateway::with_workflow_scope(Some(scope), || {
+            assert!(access
+                .authorize(
+                    "owner",
+                    "u",
+                    "s",
+                    &narrow.join("ok"),
+                    &root,
+                    ResourceOp::Write
+                )
+                .is_ok());
+            assert!(access
+                .authorize(
+                    "owner",
+                    "u",
+                    "s",
+                    &root.join("outside"),
+                    &root,
+                    ResourceOp::Write
+                )
+                .is_err());
+            assert!(access
+                .authorize_engine_plane(&root.join("outside"), &root, ResourceOp::Write)
+                .is_err());
+            assert!(access
+                .authorize(
+                    "owner",
+                    "u",
+                    "s",
+                    &root.join("outside"),
+                    &root,
+                    ResourceOp::Read
+                )
+                .is_ok());
+        });
+        crate::toolgateway::with_workflow_scope(
+            Some(crate::runs::WorkflowNodeScope {
+                write_roots: vec![],
+                tool_filter: None,
+            }),
+            || {
+                assert!(access
+                    .authorize(
+                        "owner",
+                        "u",
+                        "s",
+                        &narrow.join("readonly"),
+                        &root,
+                        ResourceOp::Write
+                    )
+                    .is_err());
+            },
+        );
+        assert!(access
+            .authorize(
+                "owner",
+                "u",
+                "s",
+                &root.join("outside"),
+                &root,
+                ResourceOp::Write
+            )
+            .is_ok());
+        std::fs::remove_dir_all(root).unwrap();
     }
 
     #[test]

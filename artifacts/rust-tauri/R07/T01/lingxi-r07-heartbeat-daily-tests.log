@@ -1,0 +1,356 @@
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.189
+   Compiling memchr v2.8.3
+   Compiling typenum v1.20.1
+   Compiling itoa v1.0.18
+   Compiling siphasher v1.0.4
+   Compiling smallvec v1.16.1
+   Compiling serde_core v1.0.229
+   Compiling log v0.4.34
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.34
+   Compiling stable_deref_trait v1.2.1
+   Compiling bytes v1.12.1
+   Compiling once_cell v1.21.4
+   Compiling core-foundation-sys v0.8.7
+   Compiling zerofrom v0.1.8
+   Compiling phf_shared v0.13.1
+   Compiling scopeguard v1.2.0
+   Compiling futures-sink v0.3.34
+   Compiling foldhash v0.2.0
+   Compiling bitflags v2.13.2
+   Compiling hashbrown v0.17.1
+   Compiling yoke v0.8.3
+   Compiling errno v0.3.14
+   Compiling phf_generator v0.13.1
+   Compiling signal-hook-registry v1.4.8
+   Compiling tracing-core v0.1.36
+   Compiling hybrid-array v0.4.15
+   Compiling mio v1.2.3
+   Compiling socket2 v0.6.5
+   Compiling slab v0.4.12
+   Compiling zerovec v0.11.8
+   Compiling generic-array v0.14.7
+   Compiling futures-channel v0.3.34
+   Compiling tokio v1.53.1
+   Compiling equivalent v1.0.2
+   Compiling indexmap v2.14.2
+   Compiling tracing v0.1.44
+   Compiling http v1.5.0
+   Compiling futures-task v0.3.34
+   Compiling futures-io v0.3.34
+   Compiling crypto-common v0.2.2
+   Compiling futures-util v0.3.34
+   Compiling block-buffer v0.12.1
+   Compiling serde v1.0.229
+   Compiling tinystr v0.8.4
+   Compiling cmov v0.5.4
+   Compiling base64 v0.23.1
+   Compiling litemap v0.8.3
+   Compiling zeroize v1.9.0
+   Compiling writeable v0.6.4
+   Compiling ctutils v0.4.2
+   Compiling icu_locale_core v2.3.0
+   Compiling num-traits v0.2.19
+   Compiling zmij v1.0.23
+   Compiling http-body v1.1.0
+   Compiling crypto-common v0.1.7
+   Compiling potential_utf v0.1.6
+   Compiling zerotrie v0.2.5
+   Compiling phf_codegen v0.13.1
+   Compiling simdutf8 v0.1.5
+   Compiling untrusted v0.9.0
+   Compiling percent-encoding v2.3.2
+   Compiling const-oid v0.10.2
+   Compiling utf8_iter v1.0.4
+   Compiling encoding_rs v0.8.42
+   Compiling icu_collections v2.3.0
+   Compiling digest v0.11.3
+   Compiling icu_provider v2.3.1
+   Compiling tokio-util v0.7.19
+   Compiling rustls-pki-types v1.15.1
+   Compiling aws-lc-sys v0.45.0
+   Compiling tower-service v0.3.3
+   Compiling icu_properties_data v2.3.0
+   Compiling serde_json v1.0.151
+   Compiling httparse v1.10.1
+   Compiling aws-lc-rs v1.18.1
+   Compiling icu_normalizer_data v2.3.0
+   Compiling block-padding v0.3.3
+   Compiling phf_macros v0.13.1
+   Compiling try-lock v0.2.5
+   Compiling atomic-waker v1.1.2
+   Compiling new_debug_unreachable v1.0.6
+   Compiling fnv v1.0.7
+   Compiling rand_core v0.10.1
+   Compiling phf v0.13.1
+   Compiling h2 v0.4.19
+   Compiling rustls-webpki v0.103.15
+   Compiling want v0.3.1
+   Compiling inout v0.1.4
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling system-configuration-sys v0.6.0
+   Compiling parking_lot_core v0.9.12
+   Compiling form_urlencoded v1.2.2
+   Compiling string_cache_codegen v0.6.1
+   Compiling lock_api v0.4.14
+   Compiling core-foundation v0.9.4
+   Compiling iana-time-zone v0.1.65
+   Compiling sync_wrapper v1.0.2
+   Compiling cpufeatures v0.3.1
+   Compiling phf_shared v0.11.3
+   Compiling aho-corasick v1.1.5
+   Compiling tower-layer v0.3.3
+   Compiling precomputed-hash v0.1.1
+   Compiling httpdate v1.0.3
+   Compiling subtle v2.6.1
+   Compiling regex-syntax v0.8.11
+   Compiling ryu v1.0.23
+   Compiling rustls v0.23.45
+   Compiling regex-automata v0.4.18
+   Compiling hyper v1.11.1
+   Compiling phf_generator v0.11.3
+   Compiling ref-cast v1.0.27
+   Compiling system-configuration v0.7.0
+   Compiling chrono v0.4.45
+   Compiling web_atoms v0.2.6
+   Compiling parking_lot v0.12.5
+   Compiling idna_adapter v1.2.2
+   Compiling cipher v0.4.4
+   Compiling getrandom v0.4.3
+   Compiling block-buffer v0.10.4
+   Compiling adler2 v2.0.1
+   Compiling mime v0.3.17
+   Compiling ipnet v2.12.2
+   Compiling simd-adler32 v0.3.10
+   Compiling tinyvec v1.13.3
+   Compiling dyn-clone v1.0.20
+   Compiling dtor-proc-macro v0.0.6
+   Compiling unicode-normalization v0.1.25
+   Compiling dtor v0.3.0
+   Compiling schemars v1.2.2
+   Compiling miniz_oxide v0.9.1
+   Compiling hyper-util v0.1.21
+   Compiling digest v0.10.7
+   Compiling idna v1.1.0
+   Compiling string_cache v0.9.0
+   Compiling crc32fast v1.5.2
+   Compiling phf_codegen v0.11.3
+   Compiling tower v0.5.3
+   Compiling sha2 v0.11.0
+   Compiling http-body-util v0.1.5
+   Compiling core-foundation v0.10.1
+   Compiling security-framework-sys v2.17.0
+   Compiling cpufeatures v0.2.17
+   Compiling ctor-proc-macro v0.0.7
+   Compiling lazy_static v1.5.0
+   Compiling dtoa v1.0.11
+   Compiling zlib-rs v0.6.8
+   Compiling security-framework v3.7.0
+   Compiling dtoa-short v0.3.5
+   Compiling ctor v0.8.0
+   Compiling thiserror v2.0.21
+   Compiling jieba-rs v0.6.8
+   Compiling url v2.5.8
+   Compiling tokio-rustls v0.26.5
+   Compiling serde_urlencoded v0.7.1
+   Compiling sha1 v0.11.0
+   Compiling chacha20 v0.10.2
+   Compiling tendril v0.5.1
+   Compiling selectors v0.38.0
+   Compiling inout v0.2.2
+   Compiling getrandom v0.2.17
+   Compiling arraydeque v0.5.1
+   Compiling pom v1.1.0
+   Compiling anstyle v1.0.14
+   Compiling byteorder v1.5.0
+   Compiling unicode-bidi v0.3.18
+   Compiling unicode-properties v0.1.4
+   Compiling unicode-width v0.2.2
+   Compiling fxhash v0.2.1
+   Compiling annotate-snippets v0.12.16
+   Compiling granit-parser v1.3.0
+   Compiling stringprep v0.1.5
+   Compiling phf v0.11.3
+   Compiling cssparser v0.37.0
+   Compiling flate2 v1.1.10
+   Compiling derive_more v2.1.1
+   Compiling markup5ever v0.39.0
+   Compiling cipher v0.5.2
+   Compiling rand v0.10.3
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling tower-http v0.6.11
+   Compiling hyper-rustls v0.27.10
+   Compiling libsqlite3-sys v0.38.2
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling aes v0.8.4
+   Compiling sha2 v0.10.9
+   Compiling md-5 v0.10.6
+   Compiling ecb v0.1.2
+   Compiling cbc v0.1.2
+   Compiling regex v1.13.1
+   Compiling encoding_rs_io v0.1.8
+   Compiling hmac v0.13.0
+   Compiling futures-executor v0.3.34
+   Compiling hashlink v0.12.2
+   Compiling servo_arc v0.4.3
+   Compiling cedarwood v0.4.6
+   Compiling nom v8.0.0
+   Compiling nohash-hasher v0.2.0
+   Compiling unsafe-libyaml v0.2.11
+   Compiling fallible-iterator v0.3.0
+   Compiling hashbrown v0.14.5
+   Compiling weezl v0.1.12
+   Compiling ttf-parser v0.25.1
+   Compiling spin v0.9.9
+   Compiling rustc-hash v2.1.3
+   Compiling rangemap v1.8.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling rusqlite v0.40.2
+   Compiling multer v3.1.0
+   Compiling lopdf v0.42.0
+   Compiling serde_yaml_ng v0.10.0
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling serde-saphyr v1.3.0
+   Compiling futures v0.3.34
+   Compiling pbkdf2 v0.13.0
+   Compiling nix v0.31.3
+   Compiling reqwest v0.13.5
+   Compiling salsa20 v0.11.0
+   Compiling html5ever v0.39.0
+   Compiling adobe-cmap-parser v0.4.1
+   Compiling type1-encoding-parser v0.1.1
+   Compiling sharded-slab v0.1.7
+   Compiling axum-core v0.5.6
+   Compiling uuid v1.26.1
+   Compiling matchers v0.2.0
+   Compiling euclid v0.20.14
+   Compiling tokio-stream v0.1.19
+   Compiling serde_path_to_error v0.1.20
+   Compiling tracing-log v0.2.0
+   Compiling csv-core v0.1.13
+   Compiling thread_local v1.1.10
+   Compiling matchit v0.8.4
+   Compiling postscript v0.14.1
+   Compiling ego-tree v0.11.0
+   Compiling nu-ansi-term v0.50.3
+   Compiling cff-parser v0.2.0
+   Compiling typed-path v0.12.3
+   Compiling tracing-subscriber v0.3.23
+   Compiling pdf-extract v0.12.1
+   Compiling scraper v0.27.0
+   Compiling zip v9.0.3
+   Compiling axum v0.8.9
+   Compiling rmcp v3.4.1
+   Compiling csv v1.4.0
+   Compiling scrypt v0.12.0
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling ring v0.17.14
+   Compiling if-addrs v0.15.0
+   Compiling quick-xml v0.42.0
+   Compiling time-core v0.1.9
+   Compiling qrcodegen v1.8.0
+   Compiling powerfmt v0.2.0
+   Compiling num-conv v0.2.2
+   Compiling deranged v0.5.8
+   Compiling time v0.3.55
+   Compiling yasna v0.6.0
+   Compiling pem v4.0.0
+   Compiling rcgen v0.14.10
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+error[E0433]: cannot find `automation_review` in `crate`
+   --> crates/lingxi-service/src/toolgateway.rs:825:64
+    |
+825 |     automatic_reviewer: std::sync::Mutex<Option<Arc<dyn crate::automation_review::AutoReviewPort>>>,
+    |                                                                ^^^^^^^^^^^^^^^^^ could not find `automation_review` in the crate root
+
+error[E0433]: cannot find `automation_review` in `crate`
+   --> crates/lingxi-service/src/toolgateway.rs:913:67
+    |
+913 |     pub fn set_automatic_reviewer(&self, reviewer: Arc<dyn crate::automation_review::AutoReviewPort>) {
+    |                                                                   ^^^^^^^^^^^^^^^^^ could not find `automation_review` in the crate root
+
+error[E0433]: cannot find `automation_review` in `crate`
+    --> crates/lingxi-service/src/toolgateway.rs:1396:28
+     |
+1396 |         evidence: &[crate::automation_review::AuthorizationEvidence],
+     |                            ^^^^^^^^^^^^^^^^^ could not find `automation_review` in the crate root
+
+error[E0433]: cannot find `automation_review` in `crate`
+    --> crates/lingxi-service/src/toolgateway.rs:1431:27
+     |
+1431 | ...   let review=crate::automation_review::AutoReviewRequest{ctx:ctx.clone(),tool_call_id:call_id.clone(),input,material,evidence:...
+     |                         ^^^^^^^^^^^^^^^^^ could not find `automation_review` in the crate root
+
+error[E0433]: cannot find `automation_review` in `crate`
+    --> crates/lingxi-service/src/toolgateway.rs:1433:20
+     |
+1433 |             crate::automation_review::AutoReviewDecision::Allowed{..}=>{},
+     |                    ^^^^^^^^^^^^^^^^^ could not find `automation_review` in the crate root
+
+error[E0433]: cannot find `automation_review` in `crate`
+    --> crates/lingxi-service/src/toolgateway.rs:1434:20
+     |
+1434 | ...   crate::automation_review::AutoReviewDecision::Denied{code,reason}=>return Err(GatewayRefusal::PolicyDenied{code,layer:"autom...
+     |              ^^^^^^^^^^^^^^^^^ could not find `automation_review` in the crate root
+
+error[E0425]: cannot find function `automatic_review_refusal` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1136:32
+     |
+1136 |                 .ok_or_else(|| automatic_review_refusal("本次自动审核授权已失效或已消费"))?;
+     |                                ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_binding` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1343:27
+     |
+1343 |             let binding = automatic_review_binding(request, &prepared_tool_call, entry, &resources);
+     |                           ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_binding` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1410:23
+     |
+1410 |         let binding = automatic_review_binding(&unified,&prepared,entry,&resources);
+     |                       ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_refusal` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1412:27
+     |
+1412 |             .ok_or_else(||automatic_review_refusal("自动审核服务尚未配置，操作未执行"))?;
+     |                           ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_refusal` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1418:28
+     |
+1418 |                 return Err(automatic_review_refusal("同一工具调用的自动审核授权已经消费"));
+     |                            ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_refusal` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1421:28
+     |
+1421 |                 return Err(automatic_review_refusal("本次自动审核正在进行或审核容量已满"));
+     |                            ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_refusal` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1429:24
+     |
+1429 |             return Err(automatic_review_refusal("该动作不能通过自动审核扩大权限"));
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_binding` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1437:12
+     |
+1437 |         if automatic_review_binding(&unified,&current,entry,&resources)!=binding {
+     |            ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `automatic_review_refusal` in this scope
+    --> crates/lingxi-service/src/toolgateway.rs:1438:24
+     |
+1438 |             return Err(automatic_review_refusal("自动审核期间工具、参数或资源范围已改变，原授权不可使用"));
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `lingxi-service` (lib) due to 15 previous errors
+warning: build failed, waiting for other jobs to finish...

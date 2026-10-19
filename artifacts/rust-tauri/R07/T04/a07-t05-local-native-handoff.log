@@ -1,0 +1,11 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.63s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_adapters-6c8c124e84396616)
+
+running 1 test
+test browser::host::manual_capture::same_page_native_human_takeover_records_only_owned_target ... MANUAL_READY=/private/tmp/lingxi-r07-a07-unlocked/capture-295bb35c5af3637383845ad7fb1e1bef/ready.json
+MANUAL_COMPLETE=/private/tmp/lingxi-r07-a07-unlocked/capture-295bb35c5af3637383845ad7fb1e1bef
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 148 filtered out; finished in 19.52s
+

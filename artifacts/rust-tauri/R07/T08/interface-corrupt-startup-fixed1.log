@@ -1,0 +1,25 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (test "r07_t08_interface_preferences") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.07s
+     Running tests/r07_t08_interface_preferences.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_interface_preferences-e5f17c15ad6678c4)
+
+running 4 tests
+test actual_http_preferences_match_shared_pure_normalizers_for_every_command_and_partial_sidebar ... ok
+LINGXI_AUTH_REJECTED request_id="req-ce0cef82ba6a686bba70f21291811197" method=GET path=/lingxi/v1/checkpoints status=403 reason=local_owner_required remote=127.0.0.1:52667
+test actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit ... ok
+test actual_http_global_archives_return_only_existing_metadata_and_reject_corrupt_or_unsafe_files ... ok
+LINGXI_AUTH_REJECTED request_id="req-0133038b895722c6d1e6cc5fc0463a19" method=GET path=/lingxi/v1/preferences/keybindings status=403 reason=insufficient_scope remote=127.0.0.1:52678
+LINGXI_AUTH_REJECTED request_id="req-b6445b002845a6ccb1d7d5f8c83d147b" method=PUT path=/lingxi/v1/preferences/keybindings status=403 reason=insufficient_scope remote=127.0.0.1:52679
+LINGXI_AUTH_REJECTED request_id="req-9de4d489d250caa5d937f0222028b584" method=PUT path=/lingxi/v1/preferences/keybindings status=403 reason=insufficient_scope remote=127.0.0.1:52681
+LINGXI_AUTH_REJECTED request_id="req-f1f7c0dfe46d0c4ccd3f206ab569798e" method=GET path=/lingxi/v1/preferences/sidebar-ui status=403 reason=insufficient_scope remote=127.0.0.1:52702
+LINGXI_AUTH_REJECTED request_id="req-5572701faa6dedee532e43eebb4cc7ee" method=PUT path=/lingxi/v1/preferences/keybindings status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:52721
+LINGXI_AUTH_REJECTED request_id="req-31aebcb62c183aa5fa009436a2651912" method=PUT path=/lingxi/v1/preferences/sidebar-ui status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:52722
+test actual_http_keybindings_full_replace_sidebar_partial_merge_scopes_and_same_home_restart ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.81s
+

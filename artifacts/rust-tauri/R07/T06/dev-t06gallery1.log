@@ -1,0 +1,349 @@
+   Compiling libc v0.2.189
+   Compiling stable_deref_trait v1.2.1
+   Compiling serde_core v1.0.229
+   Compiling memchr v2.8.3
+   Compiling yoke v0.8.3
+   Compiling jobserver v0.1.35
+   Compiling mio v1.2.3
+   Compiling zerovec v0.11.8
+   Compiling socket2 v0.6.5
+   Compiling cc v1.4.7
+   Compiling zerotrie v0.2.5
+   Compiling tinystr v0.8.4
+   Compiling tokio v1.53.1
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling cmake v0.1.58
+   Compiling icu_collections v2.3.0
+   Compiling aws-lc-sys v0.45.0
+   Compiling icu_provider v2.3.1
+   Compiling indexmap v2.14.2
+   Compiling serde v1.0.229
+   Compiling tracing-core v0.1.36
+   Compiling futures-task v0.3.34
+   Compiling tokio-util v0.7.19
+   Compiling tracing v0.1.44
+   Compiling futures-util v0.3.34
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling digest v0.11.3
+   Compiling h2 v0.4.19
+   Compiling idna_adapter v1.2.2
+   Compiling system-configuration-sys v0.6.0
+   Compiling serde_json v1.0.151
+   Compiling cpufeatures v0.3.1
+   Compiling core-foundation v0.9.4
+   Compiling futures-channel v0.3.34
+   Compiling libsqlite3-sys v0.38.2
+   Compiling system-configuration v0.7.0
+   Compiling hyper v1.11.1
+   Compiling idna v1.1.0
+   Compiling security-framework-sys v2.17.0
+   Compiling core-foundation v0.10.1
+   Compiling aho-corasick v1.1.5
+   Compiling tower v0.5.3
+   Compiling security-framework v3.7.0
+   Compiling schemars v1.2.2
+   Compiling regex-automata v0.4.18
+   Compiling hyper-util v0.1.21
+   Compiling url v2.5.8
+   Compiling sha2 v0.11.0
+   Compiling sha1 v0.11.0
+   Compiling log v0.4.34
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling regex v1.13.1
+   Compiling tower-http v0.6.11
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+   Compiling serde_urlencoded v0.7.1
+   Compiling rusqlite v0.40.2
+   Compiling serde-saphyr v1.3.0
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling jieba-rs v0.6.8
+   Compiling serde_yaml_ng v0.10.0
+   Compiling getrandom v0.2.17
+   Compiling aws-lc-rs v1.18.1
+   Compiling rustls v0.23.45
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.5
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+error: cannot find macro `json` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:354:35
+    |
+354 |         assert!(task_type("asr", &json!({"prompt":"x"})).is_err());
+    |                                   ^^^^
+    |
+help: consider importing one of these macros
+    |
+324 +     use crate::storage::media_gallery::json;
+    |
+324 +     use serde_json::json;
+    |
+
+error: cannot find macro `json` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:353:41
+    |
+353 |         assert_eq!(task_type("speech", &json!({"prompt":"x"})).unwrap(), "speech");
+    |                                         ^^^^
+    |
+help: consider importing one of these macros
+    |
+324 +     use crate::storage::media_gallery::json;
+    |
+324 +     use serde_json::json;
+    |
+
+error: cannot find macro `json` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:350:33
+    |
+350 |             task_type("video", &json!({"prompt":"x","referenceImages":[{"kind":"session_file","fileId":"f"}]})).unwrap(),
+    |                                 ^^^^
+    |
+help: consider importing one of these macros
+    |
+324 +     use crate::storage::media_gallery::json;
+    |
+324 +     use serde_json::json;
+    |
+
+error: cannot find macro `json` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:344:18
+    |
+344 |                 &json!({"prompt":"x","image":{"kind":"session_file","fileId":"f"}})
+    |                  ^^^^
+    |
+help: consider importing one of these macros
+    |
+324 +     use crate::storage::media_gallery::json;
+    |
+324 +     use serde_json::json;
+    |
+
+error: cannot find macro `json` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:338:33
+    |
+338 |             task_type("image", &json!({"prompt":"x"})).unwrap(),
+    |                                 ^^^^
+    |
+help: consider importing one of these macros
+    |
+324 +     use crate::storage::media_gallery::json;
+    |
+324 +     use serde_json::json;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:326:20
+    |
+326 |         assert_eq!(gallery_status(&MediaPhase::Submitted), "pending");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:326:36
+    |
+326 |         assert_eq!(gallery_status(&MediaPhase::Submitted), "pending");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:327:20
+    |
+327 |         assert_eq!(gallery_status(&MediaPhase::Generating), "pending");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:327:36
+    |
+327 |         assert_eq!(gallery_status(&MediaPhase::Generating), "pending");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:328:20
+    |
+328 |         assert_eq!(gallery_status(&MediaPhase::Downloading), "pending");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:328:36
+    |
+328 |         assert_eq!(gallery_status(&MediaPhase::Downloading), "pending");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:329:20
+    |
+329 |         assert_eq!(gallery_status(&MediaPhase::Completed), "done");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:329:36
+    |
+329 |         assert_eq!(gallery_status(&MediaPhase::Completed), "done");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:330:20
+    |
+330 |         assert_eq!(gallery_status(&MediaPhase::Failed), "failed");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:330:36
+    |
+330 |         assert_eq!(gallery_status(&MediaPhase::Failed), "failed");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:331:20
+    |
+331 |         assert_eq!(gallery_status(&MediaPhase::Cancelled), "cancelled");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:331:36
+    |
+331 |         assert_eq!(gallery_status(&MediaPhase::Cancelled), "cancelled");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `gallery_status` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:332:20
+    |
+332 |         assert_eq!(gallery_status(&MediaPhase::Unknown), "failed");
+    |                    ^^^^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::gallery_status;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `MediaPhase`
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:332:36
+    |
+332 |         assert_eq!(gallery_status(&MediaPhase::Unknown), "failed");
+    |                                    ^^^^^^^^^^ use of undeclared type `MediaPhase`
+    |
+help: consider importing this enum through its public re-export
+    |
+324 +     use crate::storage::media_gallery::MediaPhase;
+    |
+
+error[E0425]: cannot find function `task_type` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:338:13
+    |
+338 |             task_type("image", &json!({"prompt":"x"})).unwrap(),
+    |             ^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::task_type;
+    |
+
+error[E0425]: cannot find function `task_type` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:342:13
+    |
+342 |             task_type(
+    |             ^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::task_type;
+    |
+
+error[E0425]: cannot find function `task_type` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:350:13
+    |
+350 |             task_type("video", &json!({"prompt":"x","referenceImages":[{"kind":"session_file","fileId":"f"}]})).unwrap(),
+    |             ^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::task_type;
+    |
+
+error[E0425]: cannot find function `task_type` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:353:20
+    |
+353 |         assert_eq!(task_type("speech", &json!({"prompt":"x"})).unwrap(), "speech");
+    |                    ^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::task_type;
+    |
+
+error[E0425]: cannot find function `task_type` in this scope
+   --> crates/lingxi-adapters/src/storage/media_gallery.rs:354:17
+    |
+354 |         assert!(task_type("asr", &json!({"prompt":"x"})).is_err());
+    |                 ^^^^^^^^^ not found in this scope
+    |
+help: consider importing this function
+    |
+324 +     use crate::storage::media_gallery::task_type;
+    |
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `lingxi-adapters` (lib test) due to 24 previous errors
+warning: build failed, waiting for other jobs to finish...

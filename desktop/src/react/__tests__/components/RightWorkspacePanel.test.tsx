@@ -851,10 +851,13 @@ describe('RightWorkspacePanel', () => {
     fireEvent.click(await screen.findByText('Hana：飞书 · 小群'));
 
     await waitFor(() => {
+      // R07 起发送体携带幂等 requestId 与桥会话键（bridge-media-action 去重合同）。
       expect(sendBodies).toEqual([
         {
           platform: 'feishu',
           chatId: 'oc_chat',
+          sessionKey: 'fs_1',
+          requestId: expect.any(String),
           filePath: '/tmp/session-files/report.pdf',
           label: 'report.pdf',
           sessionPath: '/sessions/main.jsonl',

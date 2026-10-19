@@ -1,0 +1,99 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.51s
+     Running tests/auth_matrix.rs (/private/tmp/lingxi-r07-build/debug/deps/auth_matrix-3c32a9f42da78d62)
+
+running 25 tests
+test a05_loopback_mode_refuses_non_loopback_bind_at_config_layer ... ok
+test a05_forged_principal_fields_are_ignored_not_trusted ... ok
+test a06_origin_matrix_http ... ok
+test a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer ... ok
+test a06_ws_origin_and_host_matrix ... ok
+test a06_invalid_ws_upgrade_keeps_its_protocol_status ... ok
+test a06_host_header_tampering_is_rejected ... ok
+test a05_forged_and_unknown_session_ids ... ok
+test limits_body_size_and_rate_and_ws_ceiling ... ok
+test a06_trailing_slashes_do_not_inherit_registered_route_permissions ... ok
+test a06_unmasked_client_frame_closes_with_protocol_error ... ok
+test a05_no_credential_is_rejected_without_side_effects ... ok
+test a06_cli_shape_full_business_roundtrip ... ok
+test a07_closed_storage_returns_http_error_without_run_or_completion_event ... ok
+test a06_expired_and_replayed_ws_tickets_are_rejected ... ok
+test a05_ws_late_client_write_after_server_close_keeps_frames_intact ... ok
+test device_registry_failure_is_not_reported_as_bad_credentials ... ok
+test a05_unreadable_registry_fails_closed_and_recovers ... ok
+test r00_account_password_web_cookie_and_logout_have_real_state ... ok
+test a05_ws_ticket_and_live_socket_observe_external_revocation ... ok
+test a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects ... ok
+test r00_access_devices_pairing_thinking_qr_and_static_boundaries ... ok
+test a05_live_device_status_and_expiry_changes_take_effect ... ok
+test agent_config_get_requires_settings_read_scope_without_side_effects ... ok
+test a05_cross_principal_session_misuse_is_forbidden_without_side_effects ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.26s
+
+     Running tests/r06_workbench_write.rs (/private/tmp/lingxi-r07-build/debug/deps/r06_workbench_write-0575c5ac2cacc08c)
+
+running 1 test
+test workbench_write_text_same_version_conflict_and_retry_chain ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests/r07_media_admin.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_media_admin-c88ed5c706b8a1fc)
+
+running 9 tests
+test r07_media_admin::read_only_session_generate_is_forbidden_without_dispatch ... ok
+test r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty ... ok
+test r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown ... ok
+test r07_media_admin::http_video_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served ... ok
+test r07_media_admin::ask_mode_waits_for_real_decision_and_blocks_concurrent_admission ... ok
+test r07_media_admin::admin_models_config_and_asr_preferences_roundtrip ... ok
+test r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity ... ok
+test r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.72s
+
+     Running tests/r07_t05_media.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t05_media-be280e3937391d87)
+
+running 11 tests
+test r07_media::untrusted_media_arguments_cannot_choose_credentials_or_paths_or_drop_wrong_typed_overrides ... ok
+test r07_media::describe_options_uses_actual_config_and_existing_provider_modes_without_submitting ... ok
+test r07_media::confirmed_supplier_failure_remains_failed_and_finishes_the_actual_execution_run ... ok
+test r07_media::disabling_the_plugin_after_parent_completion_cancels_real_background_and_blocks_delivery ... ok
+test r07_media::speech_delivers_real_audio_bytes_and_keeps_the_media_job_causal_run ... ok
+test r07_media::duplicate_user_request_reuses_real_run_and_does_not_create_another_generation ... ok
+test r07_media::stopping_a_submitted_job_does_not_claim_remote_cancellation_or_deliver_late_bytes ... ok
+test r07_media::image_approval_starts_a_distinct_real_run_and_delivers_owned_session_file ... ok
+test r07_media::restart_reopens_real_storage_and_queries_known_remote_without_resubmitting ... ok
+test r07_media::video_uses_real_submit_query_download_and_session_delivery_stages ... ok
+test r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.69s
+
+     Running tests/r07_workbench.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_workbench-b11f054dc90061ea)
+
+running 6 tests
+test r07_workbench::workbench_files_search_projection_and_guards ... ok
+test r07_workbench::workspaces_list_create_disable_cycle ... ok
+test r07_workbench::workbench_on_mount_root_end_to_end ... ok
+test r07_workbench::workbench_actions_full_cycle ... ok
+test r07_workbench::workbench_upload_and_content ... ok
+test r07_workbench::workbench_scope_gate_and_remote_write_lease ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.00s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.43s
+     Running unittests src/lib.rs (/private/tmp/lingxi-r07-build/debug/deps/lingxi_service-4f3f510b8411a33d)
+
+running 5 tests
+test security_audit::tests::replay_is_idempotent_and_never_writes_secret ... ok
+test security_audit::tests::log_and_directory_symlinks_are_rejected_without_touching_target ... ok
+test security_audit::tests::malformed_and_oversized_logs_fail_without_appending ... ok
+test security_audit::tests::optional_result_and_lease_id_passthrough ... ok
+test auth::tests::security_audit_log_failure_rejects_before_issuing_and_replay_is_idempotent ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 488 filtered out; finished in 2.43s
+
+
+=== lib unit: security_audit ===

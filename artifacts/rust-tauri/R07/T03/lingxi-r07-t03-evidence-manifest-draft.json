@@ -1,0 +1,787 @@
+{
+  "status": "DRAFT_NOT_FINAL",
+  "createdAt": "2026-10-15T21:02:36.856686+00:00",
+  "report": "/Users/study_superior/Desktop/Code/LingxiAgent/docs/rust-tauri/R07/T03_REPORT.md",
+  "candidate": {
+    "manifest": "/private/tmp/lingxi-r07-t03-frozen-source-r1.json",
+    "fingerprint": "64bfbd4e684a9d5b86b3545895aa1c54f139e93cad862a9d5e2be2b70a35a61a",
+    "files": 292,
+    "final": false,
+    "note": "Root will add direct HTTP evidence and create a later candidate."
+  },
+  "focusLeafIds": [
+    "R00-T02-LA-DD087FDD3244",
+    "R00-T02-LA-83F82782EBE0",
+    "R00-T02-LA-85E238ED0A35",
+    "R00-T02-LA-D6260D4602D4",
+    "R00-T02-LA-2D0E80691667",
+    "R00-T02-LA-4E5926A9497C",
+    "R00-T02-LA-58E05103F577",
+    "R00-T02-LA-64A517AF731B",
+    "R00-T02-LA-65D8750AA9E8",
+    "R00-T02-LA-A3FF205AEA4E",
+    "R00-T02-LA-9C2C9DDD5C20",
+    "R00-T02-LA-21462479CB14",
+    "R00-T02-LA-AB6659451E92",
+    "R00-T02-LA-6663A77204AC",
+    "R00-T02-LA-4B76B864DF95",
+    "R00-T02-LA-0C94E56AF61D",
+    "R00-T02-LA-963D7804F78C",
+    "R00-T02-LA-021F8ADF489B",
+    "R00-T02-LA-0FB9CBC86E41",
+    "R00-T02-LA-E76F081F6E5B",
+    "R00-T02-LA-361603791D9E",
+    "R00-T02-LA-51E2C5A963ED"
+  ],
+  "handoffLeafIds": [
+    "R00-T02-LA-01631175277C",
+    "R00-T02-LA-034CA4E35DBF",
+    "R00-T02-LA-125BFE1EE56C",
+    "R00-T02-LA-1BDB6B867DBA",
+    "R00-T02-LA-1DFC5E1E130A",
+    "R00-T02-LA-1F41AFB4207D",
+    "R00-T02-LA-23824E784D71",
+    "R00-T02-LA-2396CADB0FE6",
+    "R00-T02-LA-2AB1A11D81C8",
+    "R00-T02-LA-2CB7D4AE4478",
+    "R00-T02-LA-361D16F25214",
+    "R00-T02-LA-3EDEDFD7E60D",
+    "R00-T02-LA-3F0215CE6CAC",
+    "R00-T02-LA-46F9CB129DD1",
+    "R00-T02-LA-4AC692C4C7C8",
+    "R00-T02-LA-52A0034B50CF",
+    "R00-T02-LA-5530FFB14481",
+    "R00-T02-LA-5F675621186C",
+    "R00-T02-LA-67D6791650C6",
+    "R00-T02-LA-6A5E3FEEA80D",
+    "R00-T02-LA-6DBCFD556C3B",
+    "R00-T02-LA-770B9A0E7420",
+    "R00-T02-LA-8192BCF388CF",
+    "R00-T02-LA-8C68B3F74F1F",
+    "R00-T02-LA-932719987220",
+    "R00-T02-LA-9F44400169B1",
+    "R00-T02-LA-A08713994B5B",
+    "R00-T02-LA-B8313FF711C7",
+    "R00-T02-LA-BD5448131631",
+    "R00-T02-LA-BEAB7F136A6F",
+    "R00-T02-LA-C1BA7A7C2737",
+    "R00-T02-LA-CC0271AAE0BD",
+    "R00-T02-LA-CECACC73463E",
+    "R00-T02-LA-D85EC29D698A",
+    "R00-T02-LA-DAE825843EAE",
+    "R00-T02-LA-E09C077F0100",
+    "R00-T02-LA-E3A8057D7156",
+    "R00-T02-LA-E4CC01D8499E",
+    "R00-T02-LA-ED2647610C7B",
+    "R00-T02-LA-EE30E2A3381C",
+    "R00-T02-LA-F6CEE2A4A3CE",
+    "R00-T02-LA-F6F578E62D72"
+  ],
+  "logs": [
+    {
+      "path": "/private/tmp/lingxi-r07-t03-adapters-r2.log",
+      "bytesObserved": 4073,
+      "sha256Observed": "05070d6a3791102c0ead1d7bb8dccd97a40313b44202f542fb89a86a32e35fe8",
+      "rustTestSummaries": [
+        {
+          "passed": 10,
+          "failed": 0,
+          "summary": "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s"
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "summary": "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s"
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "summary": "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-check-r1.log",
+      "bytesObserved": 111,
+      "sha256Observed": "b220266f94eebe19d9f15fc32deeb4eae43988a9d97548768ffed8a04d46b8c5",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-check-r2.log",
+      "bytesObserved": 7735,
+      "sha256Observed": "53d056ac2ec273cf3c603558152f1c52a2441e9bbc0ddef0f662d77caea5d8ca",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-check-r3.log",
+      "bytesObserved": 14997,
+      "sha256Observed": "24883d4d76c8ca1039eceb26a605519c7a5afa1352e338ebf83b11220e2d5a74",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-check-r4.log",
+      "bytesObserved": 865,
+      "sha256Observed": "92dfc12c4b209926154b2008c13ff3109735eb9db05bc87f4272300880321524",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-check-r5.log",
+      "bytesObserved": 297,
+      "sha256Observed": "c9c067340fb3cd05d0866e16f7d25efcab986fbea5de4d77b2bceed1ddcf4e83",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-clippy-r2.log",
+      "bytesObserved": 919,
+      "sha256Observed": "c502b4d98ba8d23b79ff689f6b6d2071e48c71d0590634d3a4c0cc268f99a5d9",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-r06-r1.log",
+      "bytesObserved": 504,
+      "sha256Observed": "7193966241b860cc5c4030cb0a1054ae34a3bee63f9d8b29cb0f27b9e4ed5c6c",
+      "rustTestSummaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.22s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-service-create-r3.log",
+      "bytesObserved": 633,
+      "sha256Observed": "03e5dc827ce07289a4fb83c3b77e6fa02c5b7b2e8c35ed438efe487ba3170655",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-service-r1.log",
+      "bytesObserved": 3465,
+      "sha256Observed": "95fd203b313fa02556cd87a532d07ec67f97c1c76281c2668f653a965f8113d0",
+      "rustTestSummaries": [
+        {
+          "passed": 0,
+          "failed": 4,
+          "summary": "test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.50s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-service-r2.log",
+      "bytesObserved": 1802,
+      "sha256Observed": "00aa0c037cb900fe1baeffab6eb1b6452d7826e7a5f3d67b3b028793169ac490",
+      "rustTestSummaries": [
+        {
+          "passed": 2,
+          "failed": 2,
+          "summary": "test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.51s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-service-r4.log",
+      "bytesObserved": 11236,
+      "sha256Observed": "05c2e48e541fdc0256c1f32180951a8d814d623e1745c48fe273ba2137374f76",
+      "rustTestSummaries": [
+        {
+          "passed": 2,
+          "failed": 2,
+          "summary": "test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-service-r5.log",
+      "bytesObserved": 10932,
+      "sha256Observed": "bb5fd6806a304d89a12c7f03720dcec7874f8613825361fe306907bece77f4e7",
+      "rustTestSummaries": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "summary": "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-service-r6.log",
+      "bytesObserved": 11216,
+      "sha256Observed": "960da518e8924d8ef3318be8d1be522ba178a9600957b4b2a307679c260f1d23",
+      "rustTestSummaries": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "summary": "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-store-r1.log",
+      "bytesObserved": 823,
+      "sha256Observed": "eac87255972961b06a6d5794511ab4850ef10fc8f412a18818cd675da228d117",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-store-r2.log",
+      "bytesObserved": 1077,
+      "sha256Observed": "a3573ea027fb480dff3f29e8d95a408018ac06264d2a25e3b32ef5a47de52176",
+      "rustTestSummaries": [
+        {
+          "passed": 8,
+          "failed": 0,
+          "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-collab-store-r3.log",
+      "bytesObserved": 1077,
+      "sha256Observed": "b8c6f8b8a53bcdeb511daef15dc2b2d9994f91b1f914ea74dbf76db2c0b7b762",
+      "rustTestSummaries": [
+        {
+          "passed": 8,
+          "failed": 0,
+          "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-events-r1.log",
+      "bytesObserved": 235,
+      "sha256Observed": "c9f643ddde9e31415ebb92270f83a53c39c352464be75396439a6b2c158fedcc",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-files-phone-store-r1.log",
+      "bytesObserved": 2766,
+      "sha256Observed": "605c046baa83c92728a107d202a93eb284fd5f6e46334b73915762f87cd638d1",
+      "rustTestSummaries": [
+        {
+          "passed": 9,
+          "failed": 0,
+          "summary": "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s"
+        },
+        {
+          "passed": 8,
+          "failed": 1,
+          "summary": "test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-final-ownership.log",
+      "bytesObserved": 1552,
+      "sha256Observed": "037058d859e004dbadaaef02bceb95a2776455bf0369ff009cfe22270a966779",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-final-typecheck.log",
+      "bytesObserved": 119,
+      "sha256Observed": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-final-ui.log",
+      "bytesObserved": 241,
+      "sha256Observed": "bcb7ccff80c1c267335e34293d4779fd0d4da2c37b84a01f15ca38775afce5f8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-frozen-r1-adapter.log",
+      "bytesObserved": 5331,
+      "sha256Observed": "b7076dd959ff3a29b82853c1b2eee434e92fc645eee734b469707dee292f9028",
+      "rustTestSummaries": [
+        {
+          "passed": 3,
+          "failed": 0,
+          "summary": "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s"
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "summary": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s"
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "summary": "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s"
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "summary": "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s"
+        },
+        {
+          "passed": 7,
+          "failed": 1,
+          "summary": "test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-frozen-r1-clippy.log",
+      "bytesObserved": 1759,
+      "sha256Observed": "45e5191025fe3761168e4793dd566d6bd4102986f616afa9c58813a9b4048133",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-frozen-r1-format.log",
+      "bytesObserved": 0,
+      "sha256Observed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-frozen-r1-generated.log",
+      "bytesObserved": 277,
+      "sha256Observed": "a24599394bc1e7c0146ebbaa81f1a60fecc4547278071234bfbd0be70501afc1",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-frozen-r1-protocol.log",
+      "bytesObserved": 3896,
+      "sha256Observed": "1c67b6881c5c74effbf710bbb749d47c0c2a0b85f36bd72f4e2e730db763f245",
+      "rustTestSummaries": [
+        {
+          "passed": 36,
+          "failed": 0,
+          "summary": "test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "summary": "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "summary": "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "summary": "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-frozen-r1-service.log",
+      "bytesObserved": 56554,
+      "sha256Observed": "c7d0ebb41eedbaee288fcf8468d07108e02d44e86e0efae4045357fdc2198159",
+      "rustTestSummaries": [
+        {
+          "passed": 472,
+          "failed": 0,
+          "summary": "test result: ok. 472 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.77s"
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "summary": "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.60s"
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s"
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s"
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "summary": "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s"
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s"
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "summary": "test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s"
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.04s"
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.05s"
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s"
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "summary": "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.50s"
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "summary": "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s"
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "summary": "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.65s"
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "summary": "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s"
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s"
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s"
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "summary": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s"
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "summary": "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "summary": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "summary": "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.79s"
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s"
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "summary": "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.42s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-http-surfaces-r1.log",
+      "bytesObserved": 613,
+      "sha256Observed": "1957e008a2dbcc9529dbaa875fd0f7e53eb52afb246a06ed331d2097001887af",
+      "rustTestSummaries": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 1.18s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-phone-collab-r4.log",
+      "bytesObserved": 2435,
+      "sha256Observed": "51d7cf05028a39d93b6b30a2f0d29f7d3cc5e446f400815715b5f3a13064a6fa",
+      "rustTestSummaries": [
+        {
+          "passed": 12,
+          "failed": 0,
+          "summary": "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.41s"
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.49s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-phone-collab-r5.log",
+      "bytesObserved": 1459,
+      "sha256Observed": "7a85a76b9681195753b6a70fde07c4c7dad6b3fe35f98cc339aafd94fccb0e56",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-phone-collab-r6.log",
+      "bytesObserved": 5572,
+      "sha256Observed": "aedbdf25f8a6cf85e3aaaa3e054aee44b78eb79652ddad3547575f04e999cfd9",
+      "rustTestSummaries": [
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s"
+        },
+        {
+          "passed": 11,
+          "failed": 2,
+          "summary": "test result: FAILED. 11 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.89s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-phone-collab-r7.log",
+      "bytesObserved": 3372,
+      "sha256Observed": "530b5e6d4f6fd37fe00c6bcefd1f3de0de67642dbcce1b0d4f933917226dd944",
+      "rustTestSummaries": [
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s"
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "summary": "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.83s"
+        },
+        {
+          "passed": 9,
+          "failed": 0,
+          "summary": "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.09s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-phone-runtime-r2.log",
+      "bytesObserved": 947,
+      "sha256Observed": "41ce1ff182bc178d6ca8ced1c28b2447f1b03294143ba55d561da910fe2037da",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-phone-runtime-r3.log",
+      "bytesObserved": 2249,
+      "sha256Observed": "cd8a79eaced1d96819503de8e20d8b3b2d5de77f4f4dc2415dfe9b3d6f2bb43f",
+      "rustTestSummaries": [
+        {
+          "passed": 11,
+          "failed": 1,
+          "summary": "test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.31s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-root-eslint-r1.log",
+      "bytesObserved": 225,
+      "sha256Observed": "76b4da721cfb67b0f04db5ac92f266e54d49b63a638dbe341a736b226161e02c",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-root-ui-r1.log",
+      "bytesObserved": 1335,
+      "sha256Observed": "1759ebc99a11c277f6da5dfc88c1d18c48b73dcf20e7443af67926348a82ef5b",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-root-ui-r2.log",
+      "bytesObserved": 236,
+      "sha256Observed": "cabdb20d1b178416e4c24c433d3833d5f628c2af2d62819eb9354f9eaad89ca1",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-storage-static.log",
+      "bytesObserved": 1877,
+      "sha256Observed": "c5f9713f283bf4523a36857bb3cef3ee231ac6f9ba50db9a476c97c5a599394f",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-tools-runtime-r1.log",
+      "bytesObserved": 2820,
+      "sha256Observed": "1f014259ae27d4614da63fa1cc4abf2902532083e4480dcaea9e42f5e271929e",
+      "rustTestSummaries": [
+        {
+          "passed": 7,
+          "failed": 0,
+          "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s"
+        },
+        {
+          "passed": 4,
+          "failed": 2,
+          "summary": "test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.99s"
+        }
+      ],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-typecheck-r7.log",
+      "bytesObserved": 119,
+      "sha256Observed": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-lint-r6.log",
+      "bytesObserved": 634,
+      "sha256Observed": "149e4720c3f15c3d05140657cb105b9f2cd101d14fbf4a6d19b1a3a42cd2c025",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-lint.log",
+      "bytesObserved": 1184,
+      "sha256Observed": "64e8a61b4e5a384592d8a06a7028529d5dc47fefe363813457d56af438476755",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r1.log",
+      "bytesObserved": 10944,
+      "sha256Observed": "c0d23e8785d1a629556d25213a66026c6b7a4add4953552d506bd1a7a8bd1129",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r2.log",
+      "bytesObserved": 2506,
+      "sha256Observed": "8d13b047b7a430e6b204bda72c9297cb3e64321197458110a81d195f37991500",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r3.log",
+      "bytesObserved": 239,
+      "sha256Observed": "48f87fb5e48212f3eb434aa46ad9bad51ff078b59ebba4ef102b82c8d67aceff",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r4.log",
+      "bytesObserved": 239,
+      "sha256Observed": "2428438a3bf67694baa704bb197e2298425c8230828282b22e96b325264b82f5",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r5.log",
+      "bytesObserved": 239,
+      "sha256Observed": "64a0904c6d3c5127df85a4782ff0acd03655be65ce50ba752d27f9b07059bd9f",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r6.log",
+      "bytesObserved": 239,
+      "sha256Observed": "b3f80a3629fc19fc7ce1dcafb8a7a53dc4f89ad7c35432e23bc6de6c23b17403",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-r7.log",
+      "bytesObserved": 239,
+      "sha256Observed": "e4f572362c769310e8c237a321094fc30471bad606e45fde5198a88d7452c196",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-types-final.log",
+      "bytesObserved": 119,
+      "sha256Observed": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-types-r1.log",
+      "bytesObserved": 0,
+      "sha256Observed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-types-r2.log",
+      "bytesObserved": 0,
+      "sha256Observed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-types-r4.log",
+      "bytesObserved": 119,
+      "sha256Observed": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-types-r6.log",
+      "bytesObserved": 119,
+      "sha256Observed": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    },
+    {
+      "path": "/private/tmp/lingxi-r07-t03-ui-types-r7.log",
+      "bytesObserved": 119,
+      "sha256Observed": "b32daeef2af45d85547f664e7ad68b9dd0c290942ad702592eff35b5cb4a65d8",
+      "rustTestSummaries": [],
+      "classification": "observed_log_not_final_gate_receipt"
+    }
+  ],
+  "commandReceipts": [
+    "/private/tmp/lingxi-r07-t03-ui-final-runs.json"
+  ],
+  "copyPolicy": "Only explicitly listed logs/receipts/source manifest or root-owned source archive; do not copy test homes, databases, credentials, environments, Cargo targets or entire temporary directories."
+}

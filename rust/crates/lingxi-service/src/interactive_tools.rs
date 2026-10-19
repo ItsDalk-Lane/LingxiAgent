@@ -137,8 +137,9 @@ impl Executor {
                 else {
                     return fail("title and code must be strings");
                 };
-                if title.len() > 500 || code.len() > 1024 * 1024 {
-                    return fail("card title or code exceeds size limit");
+                if code.is_empty() || title.len() > 500 || code.len() > crate::cards::MAX_CODE_BYTES
+                {
+                    return fail("card title or code is invalid or exceeds size limit");
                 }
                 let card = match crate::auth::hex_random_public(16) {
                     Ok(id) => {

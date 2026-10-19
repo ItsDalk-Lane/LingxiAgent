@@ -1,5 +1,8 @@
 import { openFilePreview } from './file-preview';
 import { extOfName } from './file-kind';
+import { currentRustBrowserConnection, openRustBrowserViewer } from '../services/rust-browser';
+import { captureConversationRequestScope } from '../services/conversation-request-scope';
+import { showError } from './ui-helpers';
 
 export type LinkTarget =
   | { kind: 'web'; url: string }
@@ -157,9 +160,20 @@ export async function openInternalLink(href: string, context: LinkOpenContext = 
 
   if (target.kind === 'web') {
     if (hasDesktopBrowserViewer() && typeof window.platform?.openBrowserViewer === 'function') {
-      window.platform.openBrowserViewer(context.sessionPath
-        ? { url: target.url, sessionPath: context.sessionPath }
-        : target.url);
+      if (currentRustBrowserConnection()) {
+        // 必须使用链接所属的明确会话，不从当前焦点猜测远端网页归属。
+        const scope = captureConversationRequestScope();
+        try {
+          await openRustBrowserViewer(context.sessionPath || '', false, target.url);
+        } catch (error) {
+          if (scope.isCurrent()) showError(error instanceof Error ? error.message : String(error));
+          return false;
+        } finally { scope.dispose(); }
+      } else {
+        await window.platform.openBrowserViewer(context.sessionPath
+          ? { url: target.url, sessionPath: context.sessionPath }
+          : target.url);
+      }
     } else {
       window.platform?.openExternal?.(target.url);
     }

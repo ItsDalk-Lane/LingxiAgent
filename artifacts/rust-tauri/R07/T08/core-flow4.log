@@ -1,0 +1,133 @@
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 05s
+     Running tests/r07_t08_model_configuration.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_model_configuration-ac1cc7bd96006499)
+
+running 6 tests
+test compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it ... FAILED
+test embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers ... ok
+test first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart ... ok
+test operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes ... ok
+test explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials ... ok
+test headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials ... ok
+
+failures:
+
+---- compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it stdout ----
+
+thread 'compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it' (1786789) panicked at crates/lingxi-service/tests/r07_t08_model_configuration.rs:440:5:
+assertion `left == right` failed
+  left: Number(3)
+ right: "3"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_model_configuration`
+     Running tests/r07_t08_network_preferences.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_network_preferences-75a0c51af6b70f8b)
+
+running 1 test
+test saved_network_proxy_reaches_actual_next_model_dispatch_without_restart_or_loopback_bypass ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.74s
+
+     Running tests/r07_t08_provider_http.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_provider_http-9597e57d2d7c2a07)
+
+running 5 tests
+test health_pins_catalog_model_and_anthropic_connection_have_real_usage ... ok
+test catalog_draft_mask_and_cache_never_publish_remote_models_or_count_usage ... ok
+test model_patch_and_removal_preserve_other_settings_and_stop_new_dispatch ... ok
+test api_key_reveal_requires_both_scopes_and_discovery_secret_drafts_cannot_bypass ... ok
+test actual_local_run_settings_search_apply_target_agent_and_security_refusals ... FAILED
+
+failures:
+
+---- actual_local_run_settings_search_apply_target_agent_and_security_refusals stdout ----
+LINGXI_TRANSPORT_REJECTED request_id="req-2d16a9d700df5667516f0b1fe24545b5" method=POST [token] status=408 reason=request_timeout origin=absent host=127.0.0.1:63787 remote=127.0.0.1:63813
+
+thread 'actual_local_run_settings_search_apply_target_agent_and_security_refusals' (1786938) panicked at crates/lingxi-service/tests/r07_t08_provider_http.rs:335:9:
+408: {"code":"budget_exceeded","details":{"causeId":"transport.request_timeout","reason":"request_timeout","requestId":"req-2d16a9d700df5667516f0b1fe24545b5"},"message":"request exceeded its time budget","retryable":false}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    actual_local_run_settings_search_apply_target_agent_and_security_refusals
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.96s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_provider_http`
+     Running tests/r07_t08_settings.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_settings-5a3bca7a61891857)
+
+running 10 tests
+test user_profile_parent_directory_link_cannot_redirect_reads_or_writes ... ok
+test invalid_import_and_unknown_global_fields_never_write_any_preferences ... ok
+test corrupt_preferences_are_preserved_and_profile_writes_reject_symlinks ... ok
+test rejected_agent_provider_and_yuan_patches_do_not_save_global_values_first ... ok
+test snapshots_and_default_exports_hide_all_saved_secret_shapes ... ok
+test saved_proxy_credentials_never_leave_read_or_export_and_new_unsupported_credentials_are_refused ... ok
+test export_import_roundtrip_preserves_masked_secrets_and_unmentioned_preferences ... ok
+test one_global_edit_and_masked_search_edit_preserve_other_values_and_restart ... ok
+test workspace_history_uses_explicit_agent_and_profile_survives_restart ... ok
+test remote_settings_scope_cannot_use_local_only_settings_archive ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.54s
+
+     Running tests/r07_t08_skills_cards.rs (/private/tmp/lingxi-r07-build/debug/deps/r07_t08_skills_cards-788c585009d5655d)
+
+running 5 tests
+test character_card_default_zip_contains_no_configuration_secrets_and_bad_zip_creates_no_agent ... FAILED
+test external_paths_and_other_preferences_share_real_read_merge_write_and_restart ... FAILED
+test external_skill_paths_reject_bad_input_and_corrupt_preferences_without_mutation ... FAILED
+test real_run_show_card_reaches_real_component_registration_and_http_document ... ok
+test card_http_is_bounded_local_only_sandboxed_and_rebuilt_after_real_restart ... FAILED
+
+failures:
+
+---- character_card_default_zip_contains_no_configuration_secrets_and_bad_zip_creates_no_agent stdout ----
+
+thread 'character_card_default_zip_contains_no_configuration_secrets_and_bad_zip_creates_no_agent' (1788442) panicked at crates/lingxi-service/tests/r07_t08_skills_cards.rs:160:147:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- external_paths_and_other_preferences_share_real_read_merge_write_and_restart stdout ----
+
+thread 'external_paths_and_other_preferences_share_real_read_merge_write_and_restart' (1788443) panicked at crates/lingxi-service/tests/r07_t08_skills_cards.rs:99:154:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- external_skill_paths_reject_bad_input_and_corrupt_preferences_without_mutation stdout ----
+
+thread 'external_skill_paths_reject_bad_input_and_corrupt_preferences_without_mutation' (1788444) panicked at crates/lingxi-service/tests/r07_t08_skills_cards.rs:78:151:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- card_http_is_bounded_local_only_sandboxed_and_rebuilt_after_real_restart stdout ----
+LINGXI_AUTH_REJECTED request_id="req-5ef5ac40ea9c18f57363ad5272d1c5ba" method=HEAD [token] status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63918
+LINGXI_AUTH_REJECTED request_id="req-8377f684e1174f9278a7d1c00d72bfb3" method=GET path=/lingxi/v1/sessions status=401 Unauthorized reason=invalid_credential remote=127.0.0.1:63919
+LINGXI_AUTH_REJECTED request_id="req-88ba250f30cd6e166d87271250d71b03" method=GET path=/lingxi/v1/cards/c_real status=403 reason=local_owner_required remote=127.0.0.1:63949
+LINGXI_AUTH_REJECTED request_id="req-116f1d6d84024fef6e5131a1de03fd0a" method=GET path=/lingxi/v1/cards/c_real status=401 Unauthorized reason=missing_credential remote=127.0.0.1:63952
+LINGXI_TRANSPORT_REJECTED request_id="req-cf7860ad3af6e06d8d85cead822c6fe3" method=PUT path=/lingxi/v1/cards/lru_217 status=429 reason=rate_limited origin=absent host=127.0.0.1:63913 remote=127.0.0.1:64175
+
+thread 'card_http_is_bounded_local_only_sandboxed_and_rebuilt_after_real_restart' (1788441) panicked at crates/lingxi-service/tests/r07_t08_skills_cards.rs:138:22:
+assertion `left == right` failed
+  left: 429
+ right: 200
+
+
+failures:
+    card_http_is_bounded_local_only_sandboxed_and_rebuilt_after_real_restart
+    character_card_default_zip_contains_no_configuration_secrets_and_bad_zip_creates_no_agent
+    external_paths_and_other_preferences_share_real_read_merge_write_and_restart
+    external_skill_paths_reject_bad_input_and_corrupt_preferences_without_mutation
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.56s
+
+error: test failed, to rerun pass `-p lingxi-service --test r07_t08_skills_cards`
+error: 3 targets failed:
+    `-p lingxi-service --test r07_t08_model_configuration`
+    `-p lingxi-service --test r07_t08_provider_http`
+    `-p lingxi-service --test r07_t08_skills_cards`

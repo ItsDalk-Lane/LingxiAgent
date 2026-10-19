@@ -4,6 +4,420 @@
   "samples": [
     {
       "checks": [],
+      "file": "user-preferences-KeybindingsPreferences.json",
+      "sha256": "bc23c38ea3308adb7779b7897d0b5d3c5df1e2e9bc97f3da31103a09dbac0bb4",
+      "type": "KeybindingsPreferences"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-KeybindingsUpdate.json",
+      "sha256": "611b2c91bb376f10020335470d1db366964510342a3219ba70b816e067e30047",
+      "type": "KeybindingsUpdate"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-SidebarProjectViewPreferences.json",
+      "sha256": "b6824442982895b2b3ff5164a8a1af3379b765e5c95f13fbeedee3f2271cdb97",
+      "type": "SidebarProjectViewPreferences"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-SidebarSessionListRowMode.json",
+      "sha256": "6c95e5881b1ef60fbbfefb31b579e8c09b8ed38e4f23eafa2340db122fe168d7",
+      "type": "SidebarSessionListRowMode"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-SidebarSessionListPreferences.json",
+      "sha256": "a5c1dcfabd1e21f4e7732382f7170e15212824624ae9bde8b9fcddfe4ecc1708",
+      "type": "SidebarSessionListPreferences"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-SidebarUiPreferences.json",
+      "sha256": "fc5f53048cc3a4af8f09492e8a66d1912084268c737a77c81f286c547e371c78",
+      "type": "SidebarUiPreferences"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-SidebarUiResponse.json",
+      "sha256": "7a413a56f729a52edd8479bae7a6f7a61945519222fe7559bd25df5b443b73d5",
+      "type": "SidebarUiResponse"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-SidebarUiUpdate.json",
+      "sha256": "cc90690ed756f9cfcd791c12ae2fce02980b1ad7b849b932648717e87c15383c",
+      "type": "SidebarUiUpdate"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-CheckpointArchiveMetadata.json",
+      "sha256": "a48cf5e9266dee3e6a39f8ea16a8ada9ec888624cefe4cc2b831655d8a632799",
+      "type": "CheckpointArchiveMetadata"
+    },
+    {
+      "checks": [],
+      "file": "user-preferences-CheckpointArchiveList.json",
+      "sha256": "d24ef7de1651fedd179be2ad504c999481b8e66d566953819749e64a3e958b34",
+      "type": "CheckpointArchiveList"
+    },
+    {
+      "checks": [],
+      "file": "mcp-session-permission-request.json",
+      "sha256": "cda4945dacff90ceb00cf12c628bb952a4b000face82c632f7a07fe4482f4995",
+      "type": "McpSessionPermissionRequest"
+    },
+    {
+      "checks": [],
+      "file": "mcp-session-permission-response.json",
+      "sha256": "7f10e6d51fd6a4210e5e410a628e7a329d42c2babe97fada3320b648ec006e1a",
+      "type": "McpSessionPermissionResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpAppsQuery.json",
+      "sha256": "5bfa66fd22b481c320b8cb9fbbb153755e7b514618d9969f30157a9c35df8a37",
+      "type": "McpAppsQuery"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpResourceQuery.json",
+      "sha256": "4e134fcd15fcd195352d282e8c3d75c65e4dd84a31011c91521d6170ea995d56",
+      "type": "McpResourceQuery"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpAppLaunchRequest.json",
+      "sha256": "c64d8da43cb68331d66bdf41b9eb1a2d5d5947ad6cc337c3b8f27ebd162f0d1b",
+      "type": "McpAppLaunchRequest"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpAppDescriptor.json",
+      "sha256": "7032c47f6f7c308a7283bfd71b22cfc2a7159145ab1fbf8a3843d21abab7a907",
+      "type": "McpAppDescriptor"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpOAuthStartResponse.json",
+      "sha256": "1715b3165eac008b01817ca89613652a0eb12709784233a10f01fefcc6ddb09e",
+      "type": "McpOAuthStartResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpOAuthPollResponse.json",
+      "sha256": "a839711b15b8e9862282ec0ed1034f134efb54b5d9969e66ea285babef923d4a",
+      "type": "McpOAuthPollResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpOAuthCancelResponse.json",
+      "sha256": "5829c99688739c953eed759a70e46b5e64ccc3ee1ee5517bb76d4808cab938c5",
+      "type": "McpOAuthCancelResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpAppsResponse.json",
+      "sha256": "f04702dd27cf2e18242096b1906a5948507a04a62a4a89b23f0226f8d161f6e9",
+      "type": "McpAppsResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpAppLaunchResponse.json",
+      "sha256": "e17451ef5ec236d66aa2e6895dacf3092b827751de4ddec3a3ded03891e20af3",
+      "type": "McpAppLaunchResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-apps-McpOAuthLogoutResponse.json",
+      "sha256": "26403b5970ffbdcc4b6410c1c3a5da15e8e05681042050368464d4b3ea36a424",
+      "type": "McpOAuthLogoutResponse"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-action.json",
+      "sha256": "8b04af4efb6095e35fe044af292288b7db5870463b4d593bc68698998c7ce32f",
+      "type": "McpSettingsAction"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-status.json",
+      "sha256": "06234c1cf33df85364aedb5de2e65dc2fcb144ff65a249457c5f140fde7ee1d4",
+      "type": "McpSettingsStatus"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-failure.json",
+      "sha256": "f5e6fba84fb5f40336afc9cc90fac3c5fae72148d72b2e057f1595c09cff90c8",
+      "type": "McpSettingsFailure"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-change.json",
+      "sha256": "ddcce48a9aad4a9d6516f5f71556f8e0c6340a73b2368c51d52ac2604cff584f",
+      "type": "McpSettingsChange"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-update.json",
+      "sha256": "fee94b3d8e740a77a5a0742adda97e0b4629480808dd687c72ec42a6c7d8fa48",
+      "type": "McpSettingsUpdate"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-request.json",
+      "sha256": "91541667946425a8a4c46ba32e9283e76cf805fa45e04a08425f3b70c99e1a25",
+      "type": "McpSettingsRequest"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-partial-failure.json",
+      "sha256": "1028303b528bf0a82a70344e22688c30f4d78889757634b3fdf73986278d5276",
+      "type": "McpSettingsResult"
+    },
+    {
+      "checks": [],
+      "file": "mcp-defer-request.json",
+      "sha256": "9ca4d1aa1e83d185c6b9643a2519312a48fc32bc2c1e909448bfc5728cc9256f",
+      "type": "McpSettingsRequest"
+    },
+    {
+      "checks": [],
+      "file": "mcp-bulk-request.json",
+      "sha256": "2f40acbc0531e1dae7d15d2168b6d8f4d7d60e086e6709984b6db01856ee8431",
+      "type": "McpSettingsRequest"
+    },
+    {
+      "checks": [],
+      "file": "mcp-settings-state.json",
+      "sha256": "b7700115ca30962cffd8945f81327ce17a1645553dd76ebc28bb60124b183fc6",
+      "type": "McpSettingsState"
+    },
+    {
+      "checks": [],
+      "file": "mcp-import-row.json",
+      "sha256": "2b7bad0523d573534083d41950f7875f242e491eff422126258da685698d8e20",
+      "type": "McpConnectorImportResult"
+    },
+    {
+      "checks": [],
+      "file": "mcp-import-result.json",
+      "sha256": "c185495d59d4be208853f4c4404ac885490e9c2cb7f121ffff196f7c9a5bc1c8",
+      "type": "McpConnectorBulkResult"
+    },
+    {
+      "checks": [],
+      "file": "interactive-card-put.json",
+      "sha256": "a56ea3dd3445a86c8e30e9f60f4f06cf933db0cd4d2c57293bd2598246f2f4b9",
+      "type": "InteractiveCardPut"
+    },
+    {
+      "checks": [],
+      "file": "interactive-card-put-response.json",
+      "sha256": "a7f9a4320bfdec9786b2da00e04a102043336124dbfd9d9bf3035b65bf380af0",
+      "type": "InteractiveCardPutResponse"
+    },
+    {
+      "checks": [],
+      "file": "settings-archive-format.json",
+      "sha256": "7da143e720a769ee47e8effef4997bff4e63ae325aa638784579797d8abe78ad",
+      "type": "SettingsArchiveFormat"
+    },
+    {
+      "checks": [],
+      "file": "settings-archive.json",
+      "sha256": "3d5540b507cb8bc33b9ba25c62dc45bd986ee69773d6df2c1b49a2a6a17bdf13",
+      "type": "SettingsArchive"
+    },
+    {
+      "checks": [],
+      "file": "model-configuration-apply-report.json",
+      "sha256": "ce57d5f6e13e26c26a2c94852ad54eb5d0a39ef57b1f828fed33b92d963c270f",
+      "type": "ModelConfigurationApplyReport"
+    },
+    {
+      "checks": [],
+      "file": "agent-activity-snapshot.json",
+      "sha256": "080e74d5bdbd4783f8dd3f4a1368e58ed2e17efdaba575a615217698262c61fa",
+      "type": "AgentActivitySnapshot"
+    },
+    {
+      "checks": [],
+      "file": "loop-status-unconfirmed.json",
+      "sha256": "e4e232decd290af8f6074332c5a5ac7f1d3f675cea5da67cff6a710e2e7a49ff",
+      "type": "LoopStatusSnapshot"
+    },
+    {
+      "checks": [],
+      "file": "activity-summary-request.json",
+      "sha256": "8ac9026ca0f14f65d03b339468554f62557b7aa5ebe9e592d1a0124237e94965",
+      "type": "ActivitySummaryRequest"
+    },
+    {
+      "checks": [],
+      "file": "activity-summary-null.json",
+      "sha256": "6005c0283e17ea6d0eec2cf1435980dabbb4619b9b3e3f57ac3d0c2fcef52608",
+      "type": "ActivitySummaryResponse"
+    },
+    {
+      "checks": [],
+      "file": "activity-summary-error.json",
+      "sha256": "6afef0a6a3bc88fbacf64d1cb4902f914d9f4f17b3cd811b8e32c594b74be9cb",
+      "type": "ActivitySummaryResponse"
+    },
+    {
+      "checks": [],
+      "file": "beautify-workbench-target.json",
+      "sha256": "8d294d44968dbfde36e887c006c827704e81b247b76a8eb11f31c384b89545c1",
+      "type": "BeautifyWorkbenchTarget"
+    },
+    {
+      "checks": [],
+      "file": "beautify-uploaded-image.json",
+      "sha256": "5c25c8f8dba366175262d9d8c3bc61cb22b04e9ec79d29f3ab8e532f7e9114b6",
+      "type": "BeautifyUploadedImage"
+    },
+    {
+      "checks": [],
+      "file": "beautify-apply-request.json",
+      "sha256": "7daf75a43be875a69f9960122dcb49c54d5052445532e758e247a6fea5c358c8",
+      "type": "BeautifyApplyRequest"
+    },
+    {
+      "checks": [],
+      "file": "beautify-preset-request.json",
+      "sha256": "8fc162a260fbd354832645488da867f3784ff3cf17c7c1512fed4e37ca5c5f39",
+      "type": "BeautifyPresetRequest"
+    },
+    {
+      "checks": [],
+      "file": "beautify-generate-request.json",
+      "sha256": "77dd82c1d054232288662432b45e24658487c2b099ab6a96a79d957fb9ff14c8",
+      "type": "BeautifyGenerateRequest"
+    },
+    {
+      "checks": [],
+      "file": "media-submitting.json",
+      "sha256": "f1fb91e2acbedfce64766a6c2e168394b60c00ff0efbe81ee6613b5cf9d72fe1",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-submitted.json",
+      "sha256": "6767cedf64e538cf3f040ee61843d429a50dc3066f96c9a699edc13279797608",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-generating.json",
+      "sha256": "0af5c0fedc7d4c1d31c7a1775d237f7d7890fa413d51fbcceea7fad6653c95d3",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-downloading.json",
+      "sha256": "f0fc372c75145f65f0154f64ac2176f212fc68e4fc6cc879f285e0b622029db2",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-completed.json",
+      "sha256": "3213347db4aa90d55dbfbd453d1651a0da681aed81f13f61bfc3da430e4ad91f",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-failed.json",
+      "sha256": "8beed1dd6adca8fd8f60ad31835ed28ba0c83f0f845b18f0909f1495acdbbcc7",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-cancelled.json",
+      "sha256": "6dac0421f4f90dcee1c6a39be5143f9fcb6521363179220dc90b634f59746487",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-unknown.json",
+      "sha256": "6c28b1ebafe5a308d3cfb8f19d435470ecc223ed85243d9ffc04458d642ec697",
+      "type": "MediaJobReceipt"
+    },
+    {
+      "checks": [],
+      "file": "media-artifact.json",
+      "sha256": "9db4dbb125331d98f8b58a79d7997876b4135e41fdf0169b92576e050cb097b4",
+      "type": "MediaArtifact"
+    },
+    {
+      "checks": [],
+      "file": "media-job-list.json",
+      "sha256": "20a5eded24a8ab189aad8caa3a3df8467e3da66e5cbbe6d0ec2cfd30c74e27c2",
+      "type": "MediaJobListResponse"
+    },
+    {
+      "checks": [],
+      "file": "media-job-response.json",
+      "sha256": "01908f7669e92fc3ede1cbb277f3595f4509b6b602b98b955a11078d11436a84",
+      "type": "MediaJobResponse"
+    },
+    {
+      "checks": [],
+      "file": "media-generation-update.json",
+      "sha256": "577ee35c4f05e71792e592046257c3075fb80e7030b113133f4cc4930c70e2ee",
+      "type": "MediaGenerationUpdate"
+    },
+    {
+      "checks": [],
+      "file": "media-cancel-request.json",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "type": "MediaJobCancelRequest"
+    },
+    {
+      "checks": [],
+      "file": "browser-action.json",
+      "sha256": "5c3374f812f8f9f8bafd73f7f850a76a16b736e52390d80e4aa7a7436b93e3e1",
+      "type": "BrowserAction"
+    },
+    {
+      "checks": [],
+      "file": "browser-settings.json",
+      "sha256": "8f7755fe318dff02747b81cff9f86fca3f81872a93be0174e5bcb01b3883ef05",
+      "type": "BrowserSettings"
+    },
+    {
+      "checks": [],
+      "file": "browser-open-behavior.json",
+      "sha256": "bf45832557d68946799a70ce9791111b3dfbd258ceb9639a1c9ce97a94451f1a",
+      "type": "BrowserOpenBehavior"
+    },
+    {
+      "checks": [],
+      "file": "browser-tab.json",
+      "sha256": "c94c35b37b4a2ebe7c25a17d8b10585df1a2799df28a1cf51dcb0f096c01325d",
+      "type": "BrowserTab"
+    },
+    {
+      "checks": [],
+      "file": "browser-workspace.json",
+      "sha256": "a0e767f3a64abb0c3b3a7a8f88269ce018110eda025d9bec60fb7d10d9be2b40",
+      "type": "BrowserWorkspace"
+    },
+    {
+      "checks": [],
+      "file": "browser-command.json",
+      "sha256": "5755293f062f5c6f0672ae47ef4c689d463e640d8a42087d2d52554b439430ab",
+      "type": "BrowserCommand"
+    },
+    {
+      "checks": [],
+      "file": "browser-reply.json",
+      "sha256": "3c22c124d21ebd4081ee40fad0ef9103c80a2f040a406627cd05ea976ee40b5e",
+      "type": "BrowserReply"
+    },
+    {
+      "checks": [],
       "file": "client-hello.json",
       "sha256": "75227352d13e49f924afbbd6afe3a0070752227679a5b50c9cd35ff63aa3e826",
       "type": "ClientHello"
@@ -105,6 +519,348 @@
       "file": "tool-schema-document.json",
       "sha256": "7dbbb59468cb3e41fd9390eb5c02506aebc84737f535e9448de0ee691cd2f392",
       "type": "ToolSchemaDocument"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-queued.json",
+      "sha256": "18302a9ada7e69a979e67dd0d7a1af60a6b7858cf90a9d723bba3a111820fd90",
+      "type": "AutomationNotificationReceipt"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-started.json",
+      "sha256": "a892b17c91b279d9186afd9982a10783bc43820b426dc2addc1df7ad22451c33",
+      "type": "AutomationNotificationReceipt"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-confirmed.json",
+      "sha256": "aae0e6fbd3023ea084ab9958a5d635115621f71a30267ba1e7d6e66cd31862cc",
+      "type": "AutomationNotificationReceipt"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-unknown.json",
+      "sha256": "3cb273ddb633b87d5481384c6b8e94c6404e3afce1228b86331d6273f4fa17a5",
+      "type": "AutomationNotificationReceipt"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-failed.json",
+      "sha256": "c2dea337d5d3ef64d1e83ae1124c3b3a3a625b14fb98037832ffe34e838e63d8",
+      "type": "AutomationNotificationReceipt"
+    },
+    {
+      "checks": [],
+      "file": "bridge-connection-status.json",
+      "sha256": "47bbb290d0c629cb5eab53b5dce4a1447f043488c56d6ca02ab3241f23b715b8",
+      "type": "BridgeConnectionStatus"
+    },
+    {
+      "checks": [],
+      "file": "bridge-worker-connecting.json",
+      "sha256": "e6117090d1dc2b1bf1c9b68df966b99a831e6a222d6f7d4ecb54c6c29f7c6d88",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-worker-connected.json",
+      "sha256": "6a7aba2bb707d93a035ab72f86cf959bfc1af6bb1a8d9ad4e8f6b48f5805b812",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-worker-disconnected.json",
+      "sha256": "52fb803f386c647ed5e280988336f6d7153c44fe3b77b7bcf0a293ac6ce04aaa",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-status.json",
+      "sha256": "66967c3c8be87735db13483ffcf1634b42ed82f19718e488c07e01322ef6d23b",
+      "type": "AutomationNotificationStatus"
+    },
+    {
+      "checks": [],
+      "file": "automation-notification-claim.json",
+      "sha256": "31bf403b24b919bbe51c0d8811c91af0c7d25f22fad331928ea1c6c571556592",
+      "type": "AutomationNotificationClaim"
+    },
+    {
+      "checks": [],
+      "file": "automation-display-receipt.json",
+      "sha256": "d1506755e6a47d349da4f41a2bf2f031c28761179b680c61f265c397f33b2a2d",
+      "type": "AutomationDisplayReceipt"
+    },
+    {
+      "checks": [],
+      "file": "automation-command-claim.json",
+      "sha256": "d7f1f3d3f7fea51e8a1d267d652c464e79e6245a4a2fd56ded7bda5c80b71cd0",
+      "type": "AutomationNotificationCommand"
+    },
+    {
+      "checks": [],
+      "file": "automation-command-ack.json",
+      "sha256": "521dac958318544f9f1771aeb863ac17a5988c681532fdde88ef3c03035c47d9",
+      "type": "AutomationNotificationCommand"
+    },
+    {
+      "checks": [],
+      "file": "automation-command-failed.json",
+      "sha256": "d5d89d63cfdfbee022ae854278e4f4f9c0d239ad91b274943732d7d1b2d51d34",
+      "type": "AutomationNotificationCommand"
+    },
+    {
+      "checks": [],
+      "file": "automation-command-unknown.json",
+      "sha256": "f9c30300a6a9f29a65aea1871b1faacdb54fc92599d5bb1aaa189a43ac4aabbb",
+      "type": "AutomationNotificationCommand"
+    },
+    {
+      "checks": [],
+      "file": "bridge-role.json",
+      "sha256": "622f06cbcd2e7e61637e17212e714e6c721d2dd5a9f7bc1aec911b65b34edcf5",
+      "type": "BridgeRole"
+    },
+    {
+      "checks": [],
+      "file": "bridge-conversation.json",
+      "sha256": "c5890db8f49cbeba598adf6b91a1f65a26e519a945095616d3f7559509e3b301",
+      "type": "BridgeConversationKind"
+    },
+    {
+      "checks": [],
+      "file": "bridge-attachment-kind.json",
+      "sha256": "bfdde6f5651ac5e4e6711f3c2836d5f8c5c4b381a50eb87c51d990b7eb36501b",
+      "type": "BridgeAttachmentKind"
+    },
+    {
+      "checks": [],
+      "file": "bridge-target-type.json",
+      "sha256": "3190d261d186aeead3a8deec202737c7775af5c8d455a9e5ba958c48b5fd3f59",
+      "type": "BridgeTargetType"
+    },
+    {
+      "checks": [],
+      "file": "bridge-attachment.json",
+      "sha256": "c34c454cb906bdb090795010c3685e0f7224f6181f387b6444c2507a751116a1",
+      "type": "BridgeAttachment"
+    },
+    {
+      "checks": [],
+      "file": "bridge-context.json",
+      "sha256": "a4ffe088061c95c3f12cbd18ad408323cb0ce8ad79688fd886e73268e027fc66",
+      "type": "BridgeReplyContext"
+    },
+    {
+      "checks": [],
+      "file": "bridge-command-send.json",
+      "sha256": "be706a318275a45c9436d0895108bff1619e77e531b5f3849f5fd9fe365ff6b4",
+      "type": "BridgeWorkerCommand"
+    },
+    {
+      "checks": [],
+      "file": "bridge-message.json",
+      "sha256": "f61a17f3b3026c12447161703ffbaf6710b2c26ae9a5ddca502159877496b0bd",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-receipt-confirmed.json",
+      "sha256": "f40e42c61c5d32a493e50e81edd834b29fb5e535ee03988feb730bf58efef621",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-receipt-failed.json",
+      "sha256": "2523651d3ded881a73dd8a70b33780182b6a69ae13167cdf64790f06d8345514",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-receipt-unknown.json",
+      "sha256": "67832d4cf6a1d2fe028ea2ac61b624d1bac894c9f3190be8330c3f9fbc64c9d9",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-receipt-status.json",
+      "sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+      "type": "BridgeReceiptStatus"
+    },
+    {
+      "checks": [],
+      "file": "bridge-takeover-scope.json",
+      "sha256": "72c3568c435beef1d012bbe4e0f96a6b1b641afb1af159ab1d19aa03802b0eab",
+      "type": "BridgeTakeoverScope"
+    },
+    {
+      "checks": [],
+      "file": "bridge-diagnostic-command.json",
+      "sha256": "177ffa1fe2345d86996db746e6368856054d8c28e1ff9cfc49eccdb1f9decfdf",
+      "type": "BridgeDiagnosticCommand"
+    },
+    {
+      "checks": [],
+      "file": "bridge-qrcode-status.json",
+      "sha256": "71ce8ff4c179188015b1c36fa4d86d9581a3e9f2b2fad8a879d8cc2538d6b475",
+      "type": "BridgeQrcodeStatus"
+    },
+    {
+      "checks": [],
+      "file": "bridge-diagnostic-info.json",
+      "sha256": "9793c2a6aa80ecef4175c811ca3481b0cbde9f9b82589cc26dbdc263e2df4b29",
+      "type": "BridgeDiagnosticInfo"
+    },
+    {
+      "checks": [],
+      "file": "bridge-diagnostic-result.json",
+      "sha256": "2b45e2073e782d346004d9b979090b75a5abeee1638661eca48d22490ad3be5b",
+      "type": "BridgeDiagnosticResult"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-operation.json",
+      "sha256": "58d64d54fc15241a56556adf73d6ae97317fec3402168e708c9a83c1d7efbe2e",
+      "type": "BridgeEffectOperation"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-status.json",
+      "sha256": "eb8bf0d80db323992f6b634aab492b1e6d9e96a8e87a511c2a0db75ab929452c",
+      "type": "BridgeEffectStatus"
+    },
+    {
+      "checks": [],
+      "file": "bridge-waiting-receipt-mode.json",
+      "sha256": "a816b7974b00ec18505bb5b4df585536de711c46ebbb12ad9f88b35d6a50e3e2",
+      "type": "BridgeWaitingReceiptMode"
+    },
+    {
+      "checks": [],
+      "file": "bridge-stream-mode.json",
+      "sha256": "f1248531666f30c1e9d239b837e8a94f488636960d5bddd5fb32e5b7fa3883f5",
+      "type": "BridgeStreamMode"
+    },
+    {
+      "checks": [],
+      "file": "bridge-waiting-receipt-capability.json",
+      "sha256": "a2132c6f739215f990ceba6172732c611fd335de33aeee6b5ecf7b403dca8095",
+      "type": "BridgeWaitingReceiptCapability"
+    },
+    {
+      "checks": [],
+      "file": "bridge-stream-capability.json",
+      "sha256": "d600c11e8c017f1d3bb19fa1b6894fd54788092470e3cc97b0001a6b72087b70",
+      "type": "BridgeStreamCapability"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-capabilities.json",
+      "sha256": "f98a512c21561b5105ec88e03f3f83b7ad294448546584927e79546729ce2a04",
+      "type": "BridgeEffectCapabilities"
+    },
+    {
+      "checks": [],
+      "file": "bridge-worker-ready-capabilities.json",
+      "sha256": "a24383f1422eadeb424ff85787cd9a29b0463d54fdd999c0d277f8ce2a55f3a4",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-request.json",
+      "sha256": "d5ed64c4ee8593e80e9893e1fec2d1ee8e3d4636488d57a5429403a0f70cf43e",
+      "type": "BridgeEffectRequest"
+    },
+    {
+      "checks": [],
+      "file": "bridge-worker-effect.json",
+      "sha256": "09e98ed3e4761aa9d48b9fd05bbdf658edcbe048c45f65f8c0caca478bb08d95",
+      "type": "BridgeWorkerCommand"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-confirmed.json",
+      "sha256": "f8cff6338b590850670dc2992df8db703249f4223fd3e6cac9dbf4d3261d0bb2",
+      "type": "BridgeEffectReceipt"
+    },
+    {
+      "checks": [],
+      "file": "bridge-worker-effect-receipt.json",
+      "sha256": "d69f82cd3a13d0e4bccfa8fb7370d1642ae74618354095f343857f24f8beef57",
+      "type": "BridgeWorkerEvent"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-unknown.json",
+      "sha256": "9d27b128fb25fbd37c0961d10e61529c9a5a3ead98ae019d4b3f343eec944296",
+      "type": "BridgeEffectReceipt"
+    },
+    {
+      "checks": [],
+      "file": "bridge-effect-skipped.json",
+      "sha256": "1df4a10acc1b49f53d3323d8c579fad4bc66237714503881bb80ac9090112b43",
+      "type": "BridgeEffectReceipt"
+    },
+    {
+      "checks": [],
+      "file": "client-context-query.json",
+      "sha256": "73e7d231e6efec816f69eb9236408ed6fdf2040a4230a20b190d08de6b209abc",
+      "type": "ClientContextQuery"
+    },
+    {
+      "checks": [],
+      "file": "client-model-selection.json",
+      "sha256": "2bcd43e2467eb45fa2971ace08e70101ba1374cf59b25091308cbf148a0c99ed",
+      "type": "ClientModelSelection"
+    },
+    {
+      "checks": [],
+      "file": "client-model-state.json",
+      "sha256": "40ec7f71ea684c8b976e79e8e425f87779e6de57f4821dcfc8066dbcad2defe0",
+      "type": "ClientModelState"
+    },
+    {
+      "checks": [
+        {
+          "field": "defaultThinkingLevel",
+          "kind": "nullable_default_thinking_level",
+          "note": "null must round-trip as null; consumers normalize it, never fabricate a level"
+        }
+      ],
+      "file": "client-model-summary.json",
+      "sha256": "f15002e54de8683b9ac88b39205da26085d92383eb5327e904efe25e5f2d1361",
+      "type": "ClientModelSummary"
+    },
+    {
+      "checks": [
+        {
+          "field": "modelGeneration",
+          "kind": "decimal_string_generation",
+          "note": "generation exceeds 2^53-1; TS must keep it a string, never a Number"
+        }
+      ],
+      "file": "client-model-context.json",
+      "sha256": "f384ea3698df2dd354afeac30c46c3864779de2cf27989349ad62349da195cc1",
+      "type": "ClientModelContext"
+    },
+    {
+      "checks": [],
+      "file": "client-agent-summary.json",
+      "sha256": "01bdb9cfddad8549c924743306f64dac925a50d0c754f289ebbb954561f91d45",
+      "type": "ClientAgentSummary"
+    },
+    {
+      "checks": [],
+      "file": "client-avatar-availability.json",
+      "sha256": "e5dfc843b490bf8aed8c2fb2cfbd68681926005075e33c6b6dcc8bb55cc7ee6e",
+      "type": "ClientAvatarAvailability"
+    },
+    {
+      "checks": [],
+      "file": "mobile-bootstrap-response.json",
+      "sha256": "773bab09a08a2ba311172240484fa99f3fba9a4ab11d2df7949a2eab9cf78d55",
+      "type": "MobileBootstrapResponse"
     }
   ]
 }

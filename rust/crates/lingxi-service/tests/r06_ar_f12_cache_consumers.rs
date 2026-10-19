@@ -223,11 +223,27 @@ async fn ingestion_case(upgrade: bool) {
         );
     } else {
         assert_eq!(job.status, "pending_embedding");
+        // 现役 worker 在派生算法版本化的缓存 profile 下建变体
+        // （current_cache_profile_hash，4cdbd0f99 起）；本用例预建的原始
+        // profile 变体扮演旧式残留——worker 不得复用它，也不得破坏它，
+        // 必须把自己算法版本的变体建到 ready。
+        let worker_variant_id = lingxi_kernel::knowledge::chunk_index_variant_id(
+            artifact_id,
+            &ks::current_cache_profile_hash(&profile),
+        );
         assert_eq!(
-            index.get_variant(&variant.id).unwrap().unwrap().status,
+            index.get_variant(&worker_variant_id).unwrap().unwrap().status,
             "ready"
         );
-        assert!(!index.list_variant_chunks(&variant.id).unwrap().is_empty());
+        assert!(!index
+            .list_variant_chunks(&worker_variant_id)
+            .unwrap()
+            .is_empty());
+        assert_eq!(
+            index.get_variant(&variant.id).unwrap().unwrap().status,
+            "building",
+            "旧式残留变体必须保持原样，worker 不得静默接管"
+        );
     }
 }
 

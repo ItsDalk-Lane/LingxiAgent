@@ -424,12 +424,25 @@ pub(crate) fn project<T: Serialize>(
             } else {
                 Vec::new()
             };
+        // 可选透传（R07 工作台审计携带失败结果与写租约关联）：intent 不带
+        // 这两个字段时保持既有形状（result=success、leaseId=null），既有
+        // 调用方（auth/management/media-admin）的投影逐字节不变。
+        let result = match value.get("result") {
+            None | Some(Value::Null) => "success",
+            Some(Value::String(text)) => text.as_str(),
+            Some(_) => return Err("security audit result must be a string".into()),
+        };
+        let lease_id = match value.get("leaseId") {
+            None => Value::Null,
+            Some(v @ (Value::Null | Value::String(_))) => v.clone(),
+            Some(_) => return Err("security audit leaseId must be a string or null".into()),
+        };
         // 普通管理写入在受信端核验本地主人；密码迁移保留实际登录连接身份。
         let event = json!({
             "schemaVersion": 1, "eventId": event_id.clone(), "timestamp": timestamp,
-            "action": action, "target": target, "result": "success",
+            "action": action, "target": target, "result": result,
             "actor": actor,
-            "decision": null, "leaseId": null, "errorCode": null,
+            "decision": null, "leaseId": lease_id, "errorCode": null,
             "secretFields": secret_fields, "metadata": metadata
         });
         let mut line =
@@ -486,6 +499,51 @@ mod tests {
         assert!(!log.contains("private-test-secret"));
         let event: Value = serde_json::from_str(log.lines().next().unwrap()).unwrap();
         assert_eq!(event["metadata"]["credentialId"], "cred_test");
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn optional_result_and_lease_id_passthrough() {
+        let root = home("passthrough");
+        // 缺省形状不变：既有调用方不带 result/leaseId。
+        project(&root, "device", &[intent()]).unwrap();
+        // 携带失败结果与租约关联的 intent（R07 工作台审计）。
+        project(
+            &root,
+            "workbench",
+            &[json!({
+                "action": "mobile_workbench.write",
+                "target": "studio:studio_test",
+                "atUnixMs": 2,
+                "result": "failed",
+                "leaseId": "lease_test",
+                "metadata": {"studioId": "studio_test"}
+            })],
+        )
+        .unwrap();
+        // 非字符串 result / leaseId 响亮拒绝，不落盘。
+        assert!(project(
+            &root,
+            "workbench",
+            &[json!({"action":"a","target":"t","atUnixMs":3,"result":1})]
+        )
+        .is_err());
+        assert!(project(
+            &root,
+            "workbench",
+            &[json!({"action":"a","target":"t","atUnixMs":3,"leaseId":1})]
+        )
+        .is_err());
+        let log = std::fs::read_to_string(root.join("logs/security-audit.jsonl")).unwrap();
+        let events: Vec<Value> = log
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0]["result"], "success");
+        assert_eq!(events[0]["leaseId"], Value::Null);
+        assert_eq!(events[1]["result"], "failed");
+        assert_eq!(events[1]["leaseId"], "lease_test");
         std::fs::remove_dir_all(root).unwrap();
     }
 

@@ -1,0 +1,20 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx (5 tests) 201ms
+ ✓ desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx (14 tests) 456ms
+ ✓ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx (12 tests) 366ms
+ ✓ desktop/src/react/__tests__/services/r07-interface-preferences-real-service.test.tsx (1 test) 1235ms
+   ✓ actual navigation saves keybindings and sidebar, keeps saved reload failures, and reads global archive metadata across restart  1235ms
+ ✓ desktop/src/react/__tests__/services/r07-interface-late-write-real-service.test.tsx (4 tests) 2291ms
+   ✓ actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-save)  674ms
+   ✓ actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (key-reset)  490ms
+   ✓ actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (sidebar-save)  486ms
+   ✓ actual A save, delayed response and actual B connection isolate snapshot, events and OS reload (archive-import-aba)  640ms
+
+ Test Files  5 passed (5)
+      Tests  36 passed (36)
+   Start at  18:46:23
+   Duration  4.12s (transform 2.46s, setup 100ms, import 3.81s, tests 4.55s, environment 2.02s)
+
+JSON report written to /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R07/T08/interface-late-write-fixed2/vitest-results.json

@@ -1,0 +1,49 @@
+{
+  "agents": {
+    "legacy": {
+      "keep": true
+    }
+  },
+  "global": {
+    "keep": "global",
+    "mcp": {
+      "connectors": [
+        {
+          "args": [
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e457c6aef3712b90/external-slow/platform.mjs",
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e457c6aef3712b90/external-slow",
+            "hold-init"
+          ],
+          "autoStart": true,
+          "command": "node",
+          "enabled": true,
+          "id": "slow",
+          "name": "slow",
+          "transport": "stdio"
+        }
+      ],
+      "deferEnabled": false,
+      "deferThreshold": 17,
+      "enabled": true,
+      "servers": [
+        {
+          "args": [
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e457c6aef3712b90/external-slow/platform.mjs",
+            "/private/tmp/lingxi-r07-tests/tmp/lingxi-r07-t08-mcp-settings-e457c6aef3712b90/external-slow",
+            "hold-init"
+          ],
+          "autoStart": true,
+          "command": "node",
+          "enabled": true,
+          "id": "slow",
+          "name": "slow",
+          "transport": "stdio"
+        }
+      ],
+      "unknownMcp": 79
+    }
+  },
+  "schemaVersion": 1,
+  "sessions": {},
+  "unknownRoot": 73
+}

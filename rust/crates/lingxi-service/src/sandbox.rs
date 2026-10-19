@@ -527,6 +527,17 @@ pub trait SandboxPort: Send + Sync {
     /// refusal; this method NEVER returns the bare request argv.
     fn wrap(&self, request: SandboxCommandRequest)
         -> Result<WrappedSandboxCommand, SandboxRefusal>;
+    /// 节点写范围必须由后端真实收窄；未知后端不能退回宽权限执行。
+    fn wrap_scoped(
+        &self,
+        _request: SandboxCommandRequest,
+        _write_roots: &[PathBuf],
+    ) -> Result<WrappedSandboxCommand, SandboxRefusal> {
+        Err(SandboxRefusal::PolicyUnsupported {
+            backend: self.backend(),
+            detail: "workflow write-scope containment is unavailable".into(),
+        })
+    }
     /// The helper trust established at construction (audit/diagnostics);
     /// `None` when the backend has no helper (the unsupported backend).
     fn helper_trust(&self) -> Option<&HelperTrust> {
@@ -577,6 +588,14 @@ impl SeatbeltSandbox {
     /// ordering preserved: SBPL is last-match-wins so the deny lines
     /// follow the allows).
     pub fn build_profile(&self, network_allowed: bool) -> Result<String, SandboxRefusal> {
+        self.build_profile_scoped(network_allowed, None)
+    }
+
+    fn build_profile_scoped(
+        &self,
+        network_allowed: bool,
+        write_roots: Option<&[PathBuf]>,
+    ) -> Result<String, SandboxRefusal> {
         let mut lines: Vec<String> = vec![
             "(version 1)".to_string(),
             "(deny default)".to_string(),
@@ -594,7 +613,8 @@ impl SeatbeltSandbox {
         ];
         let quote =
             |raw: &Path| -> Result<String, SandboxRefusal> { profile_literal("seatbelt", raw) };
-        for path in &self.policy.writable_paths {
+        let roots = write_roots.map(|roots| intersect_write_roots(&self.policy, roots));
+        for path in roots.as_deref().unwrap_or(&self.policy.writable_paths) {
             lines.push(format!(
                 "(allow file-write* (subpath \"{}\"))",
                 quote(path)?
@@ -603,20 +623,22 @@ impl SeatbeltSandbox {
         // Temp resources: the incumbent allows /private/tmp and the
         // realpath'd TMPDIR. `realpath_or_lexical("/tmp")` resolves to
         // /private/tmp on macOS and stays /tmp where that IS the real path.
-        let tmp = realpath_or_lexical(Path::new("/tmp"));
-        lines.push(format!(
-            "(allow file-write* (subpath \"{}\"))",
-            quote(&tmp)?
-        ));
-        let tmpdir = std::env::var("TMPDIR")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| PathBuf::from("/tmp"));
-        let tmpdir = realpath_or_lexical(&tmpdir);
-        if tmpdir != tmp {
+        if write_roots.is_none() {
+            let tmp = realpath_or_lexical(Path::new("/tmp"));
             lines.push(format!(
                 "(allow file-write* (subpath \"{}\"))",
-                quote(&tmpdir)?
+                quote(&tmp)?
             ));
+            let tmpdir = std::env::var("TMPDIR")
+                .map(PathBuf::from)
+                .unwrap_or_else(|_| PathBuf::from("/tmp"));
+            let tmpdir = realpath_or_lexical(&tmpdir);
+            if tmpdir != tmp {
+                lines.push(format!(
+                    "(allow file-write* (subpath \"{}\"))",
+                    quote(&tmpdir)?
+                ));
+            }
         }
         lines.push(String::new());
         if !self.policy.protected_paths.is_empty() {
@@ -650,6 +672,31 @@ impl SeatbeltSandbox {
         }
         Ok(lines.join("\n"))
     }
+}
+
+/// 只取原策略与节点授权的交集；目录身份变化时不授予写权限。
+fn intersect_write_roots(policy: &SandboxPolicy, roots: &[PathBuf]) -> Vec<PathBuf> {
+    let mut narrowed = Vec::new();
+    for root in roots {
+        if !std::fs::canonicalize(root).is_ok_and(|current| current == *root && current.is_dir()) {
+            continue;
+        }
+        for base in &policy.writable_paths {
+            let candidate = if root.starts_with(base) {
+                Some(root)
+            } else if base.starts_with(root) {
+                Some(base)
+            } else {
+                None
+            };
+            if let Some(path) = candidate {
+                if !narrowed.contains(path) {
+                    narrowed.push(path.clone());
+                }
+            }
+        }
+    }
+    narrowed
 }
 
 /// The SBPL string literal for one path — REFUSES paths containing `"` or
@@ -764,6 +811,16 @@ impl SandboxPort for SeatbeltSandbox {
             backend: "seatbelt",
             network_allowed,
         })
+    }
+
+    fn wrap_scoped(
+        &self,
+        request: SandboxCommandRequest,
+        write_roots: &[PathBuf],
+    ) -> Result<WrappedSandboxCommand, SandboxRefusal> {
+        let mut wrapped = self.wrap(request)?;
+        wrapped.argv[2] = self.build_profile_scoped(wrapped.network_allowed, Some(write_roots))?;
+        Ok(wrapped)
     }
 
     fn helper_trust(&self) -> Option<&HelperTrust> {
@@ -1017,6 +1074,32 @@ impl SandboxPort for BwrapSandbox {
         })
     }
 
+    fn wrap_scoped(
+        &self,
+        mut request: SandboxCommandRequest,
+        write_roots: &[PathBuf],
+    ) -> Result<WrappedSandboxCommand, SandboxRefusal> {
+        let mut policy = self.policy.clone();
+        policy.writable_paths = intersect_write_roots(&self.policy, write_roots);
+        let narrowed = BwrapSandbox {
+            policy,
+            helper_path: self.helper_path.clone(),
+            trust: self.trust.clone(),
+        };
+        // cwd 只负责定位；写权限只能来自上面的交集，不能再 bind 整个 cwd。
+        let cwd = request.cwd.take();
+        let command_len = request.argv.len();
+        let mut wrapped = narrowed.wrap(request)?;
+        if let Some(cwd) = cwd {
+            let index = wrapped.argv.len() - command_len - 1;
+            wrapped.argv.splice(
+                index..index,
+                ["--chdir".into(), cwd.to_string_lossy().into_owned()],
+            );
+        }
+        Ok(wrapped)
+    }
+
     fn helper_trust(&self) -> Option<&HelperTrust> {
         self.trust.as_ref()
     }
@@ -1213,6 +1296,57 @@ mod tests {
             runtime_writable_paths: vec![root.join("runtime-cache")],
             network: SandboxNetworkPolicy::Allowed,
         }
+    }
+
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn workflow_seatbelt_contains_actual_writes_even_beneath_shared_tmp() {
+        let root = std::env::temp_dir().join(format!(
+            "workflow-seatbelt-{}",
+            crate::auth::hex_random_public(8).unwrap()
+        ));
+        let narrow = root.join("narrow");
+        std::fs::create_dir_all(&narrow).unwrap();
+        let root = root.canonicalize().unwrap();
+        let narrow = narrow.canonicalize().unwrap();
+        let policy = SandboxPolicy::derive(&SandboxPolicyInput {
+            workspace_roots: vec![root.clone()],
+            ..policy_input(&root)
+        })
+        .unwrap();
+        let sandbox = SeatbeltSandbox::new(policy, None).unwrap();
+        let inside = narrow.join("inside");
+        let outside = root.join("outside");
+        let wrapped = sandbox
+            .wrap_scoped(
+                SandboxCommandRequest {
+                    argv: vec![
+                        "/bin/sh".into(),
+                        "-c".into(),
+                        "printf scoped > \"$1\"; printf escaped > \"$2\"".into(),
+                        "probe".into(),
+                        inside.to_string_lossy().into_owned(),
+                        outside.to_string_lossy().into_owned(),
+                    ],
+                    cwd: Some(narrow.clone()),
+                    network: SandboxNetworkRequest::Contained,
+                },
+                std::slice::from_ref(&narrow),
+            )
+            .unwrap();
+        let result = std::process::Command::new(&wrapped.argv[0])
+            .args(&wrapped.argv[1..])
+            .output()
+            .unwrap();
+        assert!(!result.status.success());
+        assert_eq!(std::fs::read_to_string(&inside).unwrap(), "scoped");
+        assert!(!outside.exists(), "默认临时目录授权不能扩大节点写域");
+        let profile = sandbox.build_profile_scoped(false, Some(&[])).unwrap();
+        assert!(!profile.contains(&format!(
+            "(allow file-write* (subpath \"{}\"))",
+            root.display()
+        )));
+        std::fs::remove_dir_all(root).unwrap();
     }
 
     #[test]
