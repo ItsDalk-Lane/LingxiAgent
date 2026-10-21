@@ -108,8 +108,9 @@ fn one_command_map(command: CommandSpec) -> StageMap {
         default_timeout_secs: 60,
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec![command.key.clone()],
         }],
@@ -276,7 +277,7 @@ fn stage_rollup_fails_when_one_scenario_fails_and_reports_real_codes() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![
@@ -294,14 +295,16 @@ stage: "RX".into(),
             crate::stage_map::Scenario {
                 spec_mirror: None,
                 assertion_contract: None,
-id: "RX-A01".into(),
+                suite_test_anchors: Vec::new(),
+                id: "RX-A01".into(),
                 requirement: "REQUIRED".into(),
                 command_refs: vec!["good".into()],
             },
             crate::stage_map::Scenario {
                 spec_mirror: None,
                 assertion_contract: None,
-id: "RX-A02".into(),
+                suite_test_anchors: Vec::new(),
+                id: "RX-A02".into(),
                 requirement: "REQUIRED".into(),
                 command_refs: vec!["bad".into()],
             },
@@ -378,7 +381,7 @@ fn non_empty_evidence_root_is_refused_before_any_command_runs() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -389,8 +392,9 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -759,6 +763,7 @@ stage: "RX".into(),
         ],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
 id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
@@ -1127,6 +1132,7 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
 id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
@@ -1193,6 +1199,7 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
 id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
@@ -1256,6 +1263,7 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
 id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
@@ -1324,7 +1332,7 @@ fn r00_mirror_drift_aborts_the_gate_before_any_command_runs() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1335,8 +1343,9 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["ok".into()],
         }],
@@ -1375,7 +1384,7 @@ fn stale_leaf_evidence_aborts_the_gate() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1386,8 +1395,9 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -1421,7 +1431,7 @@ fn r00_ledger_cross_check_refuses_dropped_leaves() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1432,8 +1442,9 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -1462,7 +1473,7 @@ fn missing_r00_ledger_aborts_the_gate() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1473,8 +1484,9 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["marker".into()],
         }],
@@ -1864,6 +1876,7 @@ stage: "RX".into(),
         ],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
 id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
@@ -1962,7 +1975,7 @@ fn failing_early_evidence_command_blocks_overall_but_leaf_stays_deferred() {
         extension_boundaries: vec![],
         handover_items: vec![],
         prior_stage_deferred: vec![],
-stage: "RX".into(),
+        stage: "RX".into(),
         result_version: crate::RESULT_VERSION.into(),
         default_timeout_secs: 60,
         commands: vec![spec(
@@ -1973,8 +1986,9 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
-id: "RX-A01".into(),
+            id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
             command_refs: vec!["bad".into()],
         }],
@@ -2350,6 +2364,7 @@ stage: "RX".into(),
         )],
         scenarios: vec![crate::stage_map::Scenario {
             spec_mirror: None,
+            suite_test_anchors: Vec::new(),
             assertion_contract: None,
 id: "RX-A01".into(),
             requirement: "REQUIRED".into(),
@@ -2575,4 +2590,100 @@ fn rr3_nested_process_probe() {
     )
     .unwrap();
     assert_eq!(report["overall"], "PASS", "{report}");
+}
+
+#[test]
+fn suite_test_anchor_hit_keeps_scenario_pass() {
+    let root = temp_root("anchor-hit");
+    write_minimal_r00_ledger(&root, &[]);
+    let evidence = root.join("evidence");
+    let command = spec(
+        "anchored",
+        &[
+            "sh", "-c",
+            "mkdir -p {EVIDENCE}/SUITES/anchored \
+             && printf 'running 1 test\\ntest anchor_me ... ok\\ntest result: ok. 1 passed; 0 failed\\n' > {EVIDENCE}/SUITES/anchored/output.log \
+             && printf done > {EVIDENCE}/proof.txt",
+        ],
+        &["{EVIDENCE}/SUITES/anchored/output.log", "{EVIDENCE}/proof.txt"],
+        60,
+    );
+    let mut map = one_command_map(command);
+    map.scenarios[0].suite_test_anchors = vec![crate::stage_map::SuiteTestAnchor {
+        command: "anchored".into(),
+        test: "anchor_me".into(),
+    }];
+    let report =
+        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+    assert_eq!(report["overall"], "PASS", "{report}");
+    assert_eq!(report["scenarios"][0]["status"], "PASS");
+    assert_eq!(
+        report["scenarios"][0]["suiteTestAnchors"][0]["observed"],
+        "ok"
+    );
+}
+
+#[test]
+fn suite_test_anchor_miss_fails_even_when_command_exits_zero() {
+    // 反向验证：套件退出 0 但关键测试未在日志出现（零匹配/被过滤）——
+    // 场景必须 FAIL，不得以命令退出码冒充原断言。
+    let root = temp_root("anchor-miss");
+    write_minimal_r00_ledger(&root, &[]);
+    let evidence = root.join("evidence");
+    let command = spec(
+        "empty_green",
+        &[
+            "sh", "-c",
+            "mkdir -p {EVIDENCE}/SUITES/empty_green \
+             && printf 'running 0 tests\\ntest result: ok. 0 passed; 0 failed\\n' > {EVIDENCE}/SUITES/empty_green/output.log \
+             && printf done > {EVIDENCE}/proof.txt",
+        ],
+        &["{EVIDENCE}/SUITES/empty_green/output.log", "{EVIDENCE}/proof.txt"],
+        60,
+    );
+    let mut map = one_command_map(command);
+    map.scenarios[0].suite_test_anchors = vec![crate::stage_map::SuiteTestAnchor {
+        command: "empty_green".into(),
+        test: "the_key_assertion".into(),
+    }];
+    let report =
+        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+    assert_eq!(report["commands"][0]["status"], "PASS");
+    assert_eq!(report["scenarios"][0]["status"], "FAIL", "{report}");
+    assert_eq!(
+        report["scenarios"][0]["suiteTestAnchors"][0]["observed"],
+        "absent"
+    );
+    assert_eq!(report["overall"], "FAIL");
+}
+
+#[test]
+fn suite_test_anchor_failed_test_line_is_not_a_pass() {
+    // 日志里该测试存在但未通过（not ok / FAILED）同样 FAIL。
+    let root = temp_root("anchor-not-ok");
+    write_minimal_r00_ledger(&root, &[]);
+    let evidence = root.join("evidence");
+    let command = spec(
+        "flaky_green",
+        &[
+            "sh", "-c",
+            "mkdir -p {EVIDENCE}/SUITES/flaky_green \
+             && printf 'test the_key_assertion ... FAILED\\ntest result: FAILED. 0 passed; 1 failed\\n' > {EVIDENCE}/SUITES/flaky_green/output.log \
+             && printf done > {EVIDENCE}/proof.txt",
+        ],
+        &["{EVIDENCE}/SUITES/flaky_green/output.log", "{EVIDENCE}/proof.txt"],
+        60,
+    );
+    let mut map = one_command_map(command);
+    map.scenarios[0].suite_test_anchors = vec![crate::stage_map::SuiteTestAnchor {
+        command: "flaky_green".into(),
+        test: "the_key_assertion".into(),
+    }];
+    let report =
+        verify_stage(&map, &root, &evidence, "deadbeef", false, 0).expect("runs to completion");
+    assert_eq!(report["scenarios"][0]["status"], "FAIL", "{report}");
+    assert_eq!(
+        report["scenarios"][0]["suiteTestAnchors"][0]["observed"],
+        "not_ok"
+    );
 }

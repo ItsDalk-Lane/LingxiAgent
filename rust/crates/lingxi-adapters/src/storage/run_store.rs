@@ -3216,11 +3216,21 @@ fn usage_query_plan(
     } else {
         "FROM model_call_usage m".to_string()
     };
-    push_in(&mut params, &mut conditions, "m.session_id", &filter.session_ids);
+    push_in(
+        &mut params,
+        &mut conditions,
+        "m.session_id",
+        &filter.session_ids,
+    );
     push_in(&mut params, &mut conditions, "m.run_id", &filter.run_ids);
     push_in(&mut params, &mut conditions, "m.purpose", &filter.purposes);
     push_in(&mut params, &mut conditions, "m.model", &filter.models);
-    push_in(&mut params, &mut conditions, "m.provider", &filter.providers);
+    push_in(
+        &mut params,
+        &mut conditions,
+        "m.provider",
+        &filter.providers,
+    );
     push_in(&mut params, &mut conditions, "m.origin", &filter.origins);
     if !filter.outcomes.is_empty() {
         let outcomes: Vec<String> = filter
@@ -3286,15 +3296,17 @@ pub enum UsageGroupBy {
 }
 
 impl UsageGroupBy {
-    fn sql_expr(self) -> &'static str {
+    /// `date_offset_seconds` shifts the day boundary for the Date dimension
+    /// (dateBucket.utcOffsetMinutes；0 = UTC 日，原版默认）。
+    fn sql_expr(self, date_offset_seconds: i64) -> String {
         match self {
-            UsageGroupBy::Date => {
-                "strftime('%Y-%m-%d', m.recorded_at_unix_ms / 1000, 'unixepoch')"
-            }
-            UsageGroupBy::Provider => "m.provider",
-            UsageGroupBy::Model => "m.model",
-            UsageGroupBy::Purpose => "m.purpose",
-            UsageGroupBy::Session => "m.session_id",
+            UsageGroupBy::Date => format!(
+                "strftime('%Y-%m-%d', m.recorded_at_unix_ms / 1000 + {date_offset_seconds}, 'unixepoch')"
+            ),
+            UsageGroupBy::Provider => "m.provider".to_string(),
+            UsageGroupBy::Model => "m.model".to_string(),
+            UsageGroupBy::Purpose => "m.purpose".to_string(),
+            UsageGroupBy::Session => "m.session_id".to_string(),
         }
     }
 }
@@ -3350,7 +3362,10 @@ impl RunDatabase {
                     sql.push_str(" WHERE ");
                     sql.push_str(&conditions.join(" AND "));
                 }
-                sql.push_str(&format!(" ORDER BY m.rowid LIMIT ?{index}", index = params.len()));
+                sql.push_str(&format!(
+                    " ORDER BY m.rowid LIMIT ?{index}",
+                    index = params.len()
+                ));
                 let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
                 let param_refs: Vec<&dyn rusqlite::ToSql> =
                     params.iter().map(|p| p.as_ref()).collect();
@@ -3376,12 +3391,26 @@ impl RunDatabase {
         query: lingxi_kernel::usage::UsageFilter,
         group_by: &[UsageGroupBy],
     ) -> Result<Vec<(Vec<Option<String>>, UsageAggregate)>, StorageError> {
+        self.aggregate_model_call_usage_offset(query, group_by, 0)
+            .await
+    }
+
+    /// R07 收口 A：date 维度按 dateBucket.utcOffsetMinutes 分桶的聚合。
+    pub async fn aggregate_model_call_usage_offset(
+        &self,
+        query: lingxi_kernel::usage::UsageFilter,
+        group_by: &[UsageGroupBy],
+        date_offset_minutes: i64,
+    ) -> Result<Vec<(Vec<Option<String>>, UsageAggregate)>, StorageError> {
         let group_by = group_by.to_vec();
+        let date_offset_seconds = date_offset_minutes.saturating_mul(60);
         self.queue
             .submit(move |conn| {
                 let (from, conditions, params) = usage_query_plan(&query);
-                let group_exprs: Vec<&str> =
-                    group_by.iter().map(|g| g.sql_expr()).collect();
+                let group_exprs: Vec<String> = group_by
+                    .iter()
+                    .map(|g| g.sql_expr(date_offset_seconds))
+                    .collect();
                 let select_groups = if group_exprs.is_empty() {
                     String::new()
                 } else {
@@ -3456,25 +3485,33 @@ impl RunDatabase {
     ) -> Result<LegacyImportStats, StorageError> {
         self.queue
             .submit(move |conn| {
-                let tx = conn.unchecked_transaction().map_err(migrations::map_rusqlite)?;
+                let tx = conn
+                    .unchecked_transaction()
+                    .map_err(migrations::map_rusqlite)?;
                 let mut stats = LegacyImportStats::default();
                 for row in rows {
                     let record = row.record;
-                    let (usage_state, input_tokens, output_tokens, cache_read, cache_write, reasoning) =
-                        match (&record.usage, &record.invalid_detail) {
-                            // A rejected-but-recorded usage object stays
-                            // `invalid` (the vocabulary is never mixed).
-                            (None, Some(_)) => ("invalid", None, None, None, None, None),
-                            (Some(usage), _) => (
-                                usage.provenance.state_name(),
-                                usage.input_tokens.map(|v| v as i64),
-                                usage.output_tokens.map(|v| v as i64),
-                                usage.cache_read_tokens.map(|v| v as i64),
-                                usage.cache_write_tokens.map(|v| v as i64),
-                                usage.reasoning_tokens.map(|v| v as i64),
-                            ),
-                            (None, None) => ("unknown", None, None, None, None, None),
-                        };
+                    let (
+                        usage_state,
+                        input_tokens,
+                        output_tokens,
+                        cache_read,
+                        cache_write,
+                        reasoning,
+                    ) = match (&record.usage, &record.invalid_detail) {
+                        // A rejected-but-recorded usage object stays
+                        // `invalid` (the vocabulary is never mixed).
+                        (None, Some(_)) => ("invalid", None, None, None, None, None),
+                        (Some(usage), _) => (
+                            usage.provenance.state_name(),
+                            usage.input_tokens.map(|v| v as i64),
+                            usage.output_tokens.map(|v| v as i64),
+                            usage.cache_read_tokens.map(|v| v as i64),
+                            usage.cache_write_tokens.map(|v| v as i64),
+                            usage.reasoning_tokens.map(|v| v as i64),
+                        ),
+                        (None, None) => ("unknown", None, None, None, None, None),
+                    };
                     let (missing_fields, estimate_basis) = match &record.usage {
                         Some(usage) => match &usage.provenance {
                             lingxi_kernel::usage::UsageProvenance::Partial { missing } => {
@@ -3664,9 +3701,508 @@ impl RunDatabase {
             })
             .await
     }
+
+    /// R07 收口 A：统一轨迹面 keyset 分页。`session:` 前缀 = 会话轨迹
+    /// （新内核因果链按会话聚合）、裸 id = 导入 legacy trace、
+    /// includeSingleton 时无会话孤儿调用单列为轨迹；`after` =
+    /// (first_seen_ms, trace_id)。
+    pub async fn session_trace_page(
+        &self,
+        query: lingxi_kernel::usage::UsageFilter,
+        origin: Option<&str>,
+        min_call_count: u64,
+        include_singleton: bool,
+        after: Option<(i64, String)>,
+        limit: u32,
+    ) -> Result<Vec<SessionTraceRow>, StorageError> {
+        let origin = origin.map(str::to_string);
+        self.queue
+            .submit(move |conn| {
+                let (from, conditions, mut params) = usage_query_plan(&query);
+                let condition_sql = if conditions.is_empty() {
+                    "1 = 1".to_string()
+                } else {
+                    conditions.join(" AND ")
+                };
+                let singleton_arm = if include_singleton {
+                    " UNION ALL SELECT f.model_call_id, f.rid, \
+                     COALESCE(f.started_at_unix_ms, f.recorded_at_unix_ms), f.outcome, NULL \
+                     FROM filtered f WHERE f.session_id IS NULL OR f.session_id = ''"
+                } else {
+                    ""
+                };
+                params.push(Box::new(min_call_count.min(i64::MAX as u64) as i64));
+                let having_index = params.len();
+                let origin_sql = if let Some(wanted) = &origin {
+                    params.push(Box::new(wanted.clone()));
+                    let origin_index = params.len();
+                    format!(
+                        "AND (SELECT t3.origin FROM traces t3 WHERE t3.trace_id = g.trace_id \
+                         ORDER BY t3.seen, t3.trace_seq LIMIT 1) = ?{origin_index} "
+                    )
+                } else {
+                    String::new()
+                };
+                let cursor_sql = if let Some((seen, trace)) = after {
+                    params.push(Box::new(seen));
+                    let seen_gt = params.len();
+                    params.push(Box::new(seen));
+                    let seen_eq = params.len();
+                    params.push(Box::new(trace));
+                    let trace_index = params.len();
+                    format!(
+                        "AND (g.first_seen > ?{seen_gt} OR (g.first_seen = ?{seen_eq} AND g.trace_id > ?{trace_index}))"
+                    )
+                } else {
+                    String::new()
+                };
+                params.push(Box::new(i64::from(limit)));
+                let limit_index = params.len();
+                let sql = format!(
+                    "WITH filtered AS (SELECT m.rowid AS rid, m.* {from} WHERE {condition_sql}), \
+                     traces AS ( \
+                       SELECT 'session:' || f.session_id AS trace_id, f.rid AS trace_seq, \
+                       COALESCE(f.started_at_unix_ms, f.recorded_at_unix_ms) AS seen, f.outcome, f.origin \
+                       FROM filtered f WHERE f.session_id IS NOT NULL AND f.session_id <> '' \
+                       UNION ALL \
+                       SELECT l.trace_id, l.rowid, \
+                       COALESCE(f.started_at_unix_ms, f.recorded_at_unix_ms), f.outcome, 'imported' \
+                       FROM filtered f JOIN observability_legacy_trace l ON l.model_call_id = f.model_call_id \
+                       {singleton_arm}), \
+                     groups AS ( \
+                       SELECT trace_id, MIN(seen) AS first_seen, MAX(seen) AS last_seen, \
+                       COUNT(*) AS call_count, \
+                       SUM(CASE WHEN outcome = 'succeeded' THEN 1 ELSE 0 END) AS ok_count, \
+                       SUM(CASE WHEN outcome = 'failed' THEN 1 ELSE 0 END) AS error_count, \
+                       SUM(CASE WHEN outcome = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count, \
+                       SUM(CASE WHEN outcome = 'unknown' THEN 1 ELSE 0 END) AS unknown_count \
+                       FROM traces GROUP BY trace_id HAVING COUNT(*) >= ?{having_index}) \
+                     SELECT g.trace_id, g.first_seen, g.last_seen, g.call_count, g.ok_count, \
+                     g.error_count, g.cancelled_count, g.unknown_count, \
+                     (SELECT t2.origin FROM traces t2 WHERE t2.trace_id = g.trace_id \
+                      ORDER BY t2.seen, t2.trace_seq LIMIT 1) AS origin \
+                     FROM groups g WHERE 1 = 1 {origin_sql} {cursor_sql} \
+                     ORDER BY g.first_seen, g.trace_id LIMIT ?{limit_index}"
+                );
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let param_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                let mut rows = stmt
+                    .query(param_refs.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    let count = |i: usize| -> Result<u64, StorageError> {
+                        Ok(row
+                            .get::<_, Option<i64>>(i)
+                            .map_err(migrations::map_rusqlite)?
+                            .unwrap_or(0) as u64)
+                    };
+                    out.push(SessionTraceRow {
+                        session_id: row.get(0).map_err(migrations::map_rusqlite)?,
+                        first_seen_ms: row.get(1).map_err(migrations::map_rusqlite)?,
+                        last_seen_ms: row.get(2).map_err(migrations::map_rusqlite)?,
+                        call_count: count(3)?,
+                        ok_count: count(4)?,
+                        error_count: count(5)?,
+                        cancelled_count: count(6)?,
+                        unknown_count: count(7)?,
+                        origin: row.get(8).map_err(migrations::map_rusqlite)?,
+                    });
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07 收口 A：观测存储概况的按日统计（本地日历日由调用方给偏移）。
+    pub async fn usage_daily_overview(
+        &self,
+        date_offset_minutes: i64,
+    ) -> Result<Vec<UsageDayRow>, StorageError> {
+        let date_offset_seconds = date_offset_minutes.saturating_mul(60);
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(&format!(
+                        "SELECT strftime('%Y-%m-%d', \
+                         COALESCE(started_at_unix_ms, recorded_at_unix_ms) / 1000 + {date_offset_seconds}, 'unixepoch'), \
+                         COUNT(*), MIN(COALESCE(started_at_unix_ms, recorded_at_unix_ms)), \
+                         MAX(COALESCE(started_at_unix_ms, recorded_at_unix_ms)) \
+                         FROM model_call_usage GROUP BY 1 ORDER BY 1"
+                    ))
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt.query([]).map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push(UsageDayRow {
+                        date: row.get(0).map_err(migrations::map_rusqlite)?,
+                        calls: row.get::<_, Option<i64>>(1)
+                            .map_err(migrations::map_rusqlite)?
+                            .unwrap_or(0) as u64,
+                        oldest_ms: row.get(2).map_err(migrations::map_rusqlite)?,
+                        newest_ms: row.get(3).map_err(migrations::map_rusqlite)?,
+                    });
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07 收口 A：按 last_seen 本地日期命中的会话轨迹键（窗口空 = 全部）。
+    pub async fn session_trace_ids_in_windows(
+        &self,
+        date_offset_minutes: i64,
+        windows: &[(String, String)],
+    ) -> Result<Vec<String>, StorageError> {
+        let date_offset_seconds = date_offset_minutes.saturating_mul(60);
+        let windows = windows.to_vec();
+        self.queue
+            .submit(move |conn| {
+                let day = format!(
+                    "strftime('%Y-%m-%d', MAX(COALESCE(started_at_unix_ms, recorded_at_unix_ms)) / 1000 + {date_offset_seconds}, 'unixepoch')"
+                );
+                let (condition, params): (String, Vec<Box<dyn rusqlite::ToSql>>) =
+                    if windows.is_empty() {
+                        ("1 = 1".to_string(), Vec::new())
+                    } else {
+                        let mut parts = Vec::new();
+                        let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+                        for (from, to) in &windows {
+                            params.push(Box::new(from.clone()));
+                            let from_index = params.len();
+                            params.push(Box::new(to.clone()));
+                            parts.push(format!("{day} BETWEEN ?{from_index} AND ?{index}", index = params.len()));
+                        }
+                        (parts.join(" OR "), params)
+                    };
+                let sql = format!(
+                    "SELECT session_id FROM model_call_usage \
+                     WHERE session_id IS NOT NULL AND session_id <> '' \
+                     GROUP BY session_id HAVING {condition} ORDER BY session_id"
+                );
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let param_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                let mut rows = stmt
+                    .query(param_refs.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push(row.get(0).map_err(migrations::map_rusqlite)?);
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07 收口 A：按 last_seen 本地日期命中的导入 legacy trace 键。
+    pub async fn legacy_trace_ids_in_windows(
+        &self,
+        date_offset_minutes: i64,
+        windows: &[(String, String)],
+    ) -> Result<Vec<String>, StorageError> {
+        let date_offset_seconds = date_offset_minutes.saturating_mul(60);
+        let windows = windows.to_vec();
+        self.queue
+            .submit(move |conn| {
+                let day = format!(
+                    "strftime('%Y-%m-%d', MAX(COALESCE(m.started_at_unix_ms, m.recorded_at_unix_ms)) / 1000 + {date_offset_seconds}, 'unixepoch')"
+                );
+                let (condition, params): (String, Vec<Box<dyn rusqlite::ToSql>>) =
+                    if windows.is_empty() {
+                        ("1 = 1".to_string(), Vec::new())
+                    } else {
+                        let mut parts = Vec::new();
+                        let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
+                        for (from, to) in &windows {
+                            params.push(Box::new(from.clone()));
+                            let from_index = params.len();
+                            params.push(Box::new(to.clone()));
+                            parts.push(format!("{day} BETWEEN ?{from_index} AND ?{index}", index = params.len()));
+                        }
+                        (parts.join(" OR "), params)
+                    };
+                let sql = format!(
+                    "SELECT l.trace_id FROM observability_legacy_trace l \
+                     JOIN model_call_usage m ON m.model_call_id = l.model_call_id \
+                     GROUP BY l.trace_id HAVING {condition} ORDER BY l.trace_id"
+                );
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let param_refs: Vec<&dyn rusqlite::ToSql> =
+                    params.iter().map(|p| p.as_ref()).collect();
+                let mut rows = stmt
+                    .query(param_refs.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push(row.get(0).map_err(migrations::map_rusqlite)?);
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07 收口 A：删除会话轨迹/legacy trace 及其账本行与映射行，返回
+    /// (删除的 usage 行数, 删除的映射行数)。会话与 trace 键均由调用方
+    /// 事先按窗口解析；两类删除在同一事务内落定。
+    pub async fn delete_observability_traces(
+        &self,
+        sessions: &[String],
+        legacy_trace_ids: &[String],
+        include_orphans: bool,
+    ) -> Result<(u64, u64), StorageError> {
+        let sessions = sessions.to_vec();
+        let legacy_trace_ids = legacy_trace_ids.to_vec();
+        let busy = self.queue.options().busy_timeout_ms;
+        self.queue
+            .submit(move |conn| {
+                with_write_txn(conn, busy, |conn| {
+                    let mut usage_deleted: u64 = 0;
+                    let mut mapping_deleted: u64 = 0;
+                    if include_orphans {
+                        // 全量删除连带无会话孤儿行（它们不构成会话轨迹，
+                        // 但属于「全部数据」的既定语义）。
+                        let mapped: usize = conn
+                            .execute(
+                                "DELETE FROM observability_legacy_trace WHERE model_call_id IN \
+                                 (SELECT model_call_id FROM model_call_usage WHERE session_id IS NULL OR session_id = '')",
+                                [],
+                            )
+                            .map_err(migrations::map_rusqlite)?;
+                        mapping_deleted += mapped as u64;
+                        let rows: usize = conn
+                            .execute(
+                                "DELETE FROM model_call_usage WHERE session_id IS NULL OR session_id = ''",
+                                [],
+                            )
+                            .map_err(migrations::map_rusqlite)?;
+                        usage_deleted += rows as u64;
+                    }
+                    for session in &sessions {
+                        let mapped: usize = conn
+                            .execute(
+                                "DELETE FROM observability_legacy_trace WHERE model_call_id IN \
+                                 (SELECT model_call_id FROM model_call_usage WHERE session_id = ?1)",
+                                [session],
+                            )
+                            .map_err(migrations::map_rusqlite)?;
+                        mapping_deleted += mapped as u64;
+                        let rows: usize = conn
+                            .execute(
+                                "DELETE FROM model_call_usage WHERE session_id = ?1",
+                                [session],
+                            )
+                            .map_err(migrations::map_rusqlite)?;
+                        usage_deleted += rows as u64;
+                    }
+                    for trace in &legacy_trace_ids {
+                        let calls: Vec<String> = {
+                            let mut stmt = conn
+                                .prepare(
+                                    "SELECT model_call_id FROM observability_legacy_trace WHERE trace_id = ?1",
+                                )
+                                .map_err(migrations::map_rusqlite)?;
+                            let mut rows = stmt.query([trace]).map_err(migrations::map_rusqlite)?;
+                            let mut out = Vec::new();
+                            while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                                out.push(row.get(0).map_err(migrations::map_rusqlite)?);
+                            }
+                            out
+                        };
+                        if calls.is_empty() {
+                            continue;
+                        }
+                        let mut usage_deleted_in_trace: usize = 0;
+                        for call in &calls {
+                            let rows: usize = conn
+                                .execute(
+                                    "DELETE FROM model_call_usage WHERE model_call_id = ?1",
+                                    [call],
+                                )
+                                .map_err(migrations::map_rusqlite)?;
+                            usage_deleted_in_trace += rows;
+                        }
+                        usage_deleted += usage_deleted_in_trace as u64;
+                        let mapped: usize = conn
+                            .execute(
+                                "DELETE FROM observability_legacy_trace WHERE trace_id = ?1",
+                                [trace],
+                            )
+                            .map_err(migrations::map_rusqlite)?;
+                        mapping_deleted += mapped as u64;
+                    }
+                    Ok((usage_deleted, mapping_deleted))
+                })
+            })
+            .await
+    }
+
+    /// R07 收口 A：观测账本里该会话的全部调用 id（会话轨迹详情用）。
+    pub async fn usage_call_ids_for_session(
+        &self,
+        session_id: &str,
+    ) -> Result<Vec<String>, StorageError> {
+        let session_id = session_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT model_call_id FROM model_call_usage WHERE session_id = ?1 \
+                         ORDER BY COALESCE(started_at_unix_ms, recorded_at_unix_ms), rowid",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt
+                    .query([&session_id])
+                    .map_err(migrations::map_rusqlite)?;
+                let mut out = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    out.push(row.get(0).map_err(migrations::map_rusqlite)?);
+                }
+                Ok(out)
+            })
+            .await
+    }
+
+    /// R07 收口 A：VACUUM 压实（观测手动删除后；标准 SQLite 操作）。
+    pub async fn vacuum(&self) -> Result<(), StorageError> {
+        self.queue
+            .submit(move |conn| {
+                conn.execute_batch("VACUUM")
+                    .map_err(migrations::map_rusqlite)?;
+                Ok(())
+            })
+            .await
+    }
+
+    /// R07 收口 A：无会话孤儿行计数（全量删除的 deletedTraces 份额）。
+    pub async fn orphan_usage_count(&self) -> Result<u64, StorageError> {
+        self.queue
+            .submit(move |conn| {
+                let count: i64 = conn
+                    .query_row(
+                        "SELECT COUNT(*) FROM model_call_usage WHERE session_id IS NULL OR session_id = ''",
+                        [],
+                        |row| row.get(0),
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                Ok(count.max(0) as u64)
+            })
+            .await
+    }
+
+    /// R07 收口 A：emit 过该工具调用 id 的账本行（因果父 call 查找）。
+    pub async fn usage_call_emitting(
+        &self,
+        tool_call_id: &str,
+    ) -> Result<Option<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        let tool_call_id = tool_call_id.to_string();
+        self.queue
+            .submit(move |conn| {
+                let mut stmt = conn
+                    .prepare(
+                        // emitted 列以逗号连接存储；包围匹配避免子串误命中。
+                        "SELECT m.model_call_id FROM model_call_usage m \
+                         WHERE m.emitted_tool_calls IS NOT NULL \
+                         AND (',' || m.emitted_tool_calls || ',') LIKE '%,' || ?1 || ',%' LIMIT 2",
+                    )
+                    .map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt
+                    .query([&tool_call_id])
+                    .map_err(migrations::map_rusqlite)?;
+                let mut hits: Vec<String> = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    hits.push(row.get(0).map_err(migrations::map_rusqlite)?);
+                }
+                if hits.len() > 1 {
+                    return Err(StorageError::Corrupted {
+                        detail: format!(
+                            "tool call {tool_call_id} is claimed by multiple ledger rows"
+                        ),
+                    });
+                }
+                match hits.into_iter().next() {
+                    Some(id) => load_usage_row(conn, &id),
+                    None => Ok(None),
+                }
+            })
+            .await
+    }
+
+    /// R07 收口 A：parent_tool_call_id 命中给定工具调用 id 集合的账本行
+    /// （因果子 call 查找；集合为空返回空）。
+    pub async fn usage_calls_with_parent(
+        &self,
+        tool_call_ids: &[String],
+    ) -> Result<Vec<lingxi_kernel::usage::ModelCallUsageRecord>, StorageError> {
+        if tool_call_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let tool_call_ids = tool_call_ids.to_vec();
+        self.queue
+            .submit(move |conn| {
+                let mut placeholders = String::new();
+                for (i, _id) in tool_call_ids.iter().enumerate() {
+                    if i > 0 {
+                        placeholders.push(',');
+                    }
+                    placeholders.push_str(&format!("?{index}", index = i + 1));
+                }
+                let sql = format!(
+                    "SELECT model_call_id FROM model_call_usage \
+                     WHERE parent_tool_call_id IN ({placeholders}) \
+                     ORDER BY COALESCE(started_at_unix_ms, recorded_at_unix_ms), rowid"
+                );
+                let params: Vec<&dyn rusqlite::ToSql> = tool_call_ids
+                    .iter()
+                    .map(|id| id as &dyn rusqlite::ToSql)
+                    .collect();
+                let mut stmt = conn.prepare(&sql).map_err(migrations::map_rusqlite)?;
+                let mut rows = stmt
+                    .query(params.as_slice())
+                    .map_err(migrations::map_rusqlite)?;
+                let mut ids: Vec<String> = Vec::new();
+                while let Some(row) = rows.next().map_err(migrations::map_rusqlite)? {
+                    ids.push(row.get(0).map_err(migrations::map_rusqlite)?);
+                }
+                let mut out = Vec::new();
+                for id in ids {
+                    if let Some(record) = load_usage_row(conn, &id)? {
+                        out.push(record);
+                    }
+                }
+                Ok(out)
+            })
+            .await
+    }
 }
 
-/// Loads one ledger row by call id (None when absent).
+/// R07 收口 A：轨迹行（统一轨迹面：`session:` 前缀会话轨迹 / 导入 legacy
+/// trace / 可选 singleton；first/last 取
+/// COALESCE(started, recorded)——账本行 started 允许为空）。
+#[derive(Debug, Clone)]
+pub struct SessionTraceRow {
+    pub session_id: String,
+    pub first_seen_ms: i64,
+    pub last_seen_ms: i64,
+    pub call_count: u64,
+    pub ok_count: u64,
+    pub error_count: u64,
+    pub cancelled_count: u64,
+    pub unknown_count: u64,
+    /// 会话内最早一次调用的 origin。
+    pub origin: Option<String>,
+}
+
+/// R07 收口 A：观测存储概况的按日统计行。
+#[derive(Debug, Clone)]
+pub struct UsageDayRow {
+    pub date: String,
+    pub calls: u64,
+    pub oldest_ms: i64,
+    pub newest_ms: i64,
+}
+
 fn load_usage_row(
     conn: &rusqlite::Connection,
     model_call_id: &str,

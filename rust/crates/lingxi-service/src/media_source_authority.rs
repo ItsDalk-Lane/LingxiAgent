@@ -187,6 +187,54 @@ pub(super) async fn validate(db: &RunDatabase, job: &MediaJob, home: &Path) -> R
                 id = lineage.parent_run_id.ok_or_else(bad)?;
             }
             RunOrigin::Media => return Err(bad()),
+            RunOrigin::Loop => {
+                // Loop 来源的正式持久授权 = 落盘循环记录本体：run 必须是
+                // 循环根（无父 run）、主体是本机用户、cause_id 逐字等于目标
+                // 会话，且会话仍活跃；循环记录存在且状态活跃（Running/
+                // Paused）。stop/complete 原子写终态，持续重查的下一拍即拒
+                // ——撤权立即停止交付；记录缺失/损坏/版本不符同样拒。
+                if lineage.parent_run_id.is_some()
+                    || principal != lingxi_kernel::Principal::LocalUser
+                    || lineage.cause_id.as_deref() != Some(actual.session_id.as_str())
+                    || actual.session_id.as_str() != job.session_id
+                {
+                    return Err(bad());
+                }
+                let session = session_tree::get_session_row(db, actual.session_id.as_str())
+                    .await
+                    .map_err(|_| bad())?
+                    .ok_or_else(bad)?;
+                if session.lifecycle != "active" {
+                    return Err(bad());
+                }
+                let raw = std::fs::read_to_string(home.join(".ephemeral").join("loop-state.json"))
+                    .map_err(|_| bad())?;
+                let parsed: serde_json::Value = serde_json::from_str(&raw).map_err(|_| bad())?;
+                if parsed
+                    .get("schemaVersion")
+                    .and_then(serde_json::Value::as_u64)
+                    != Some(1)
+                {
+                    return Err(bad());
+                }
+                let loops = parsed
+                    .get("loops")
+                    .and_then(serde_json::Value::as_array)
+                    .ok_or_else(bad)?;
+                let mut active = false;
+                for entry in loops {
+                    let record: crate::loopx::LoopRecord =
+                        serde_json::from_value(entry.clone()).map_err(|_| bad())?;
+                    if record.key == actual.session_id.as_str() {
+                        active = record.status.is_active();
+                        break;
+                    }
+                }
+                if !active {
+                    return Err(bad());
+                }
+                return Ok(());
+            }
             RunOrigin::Beautify => {
                 // 封面后台任务的正式持久授权 = 持久化封面作业本体：
                 // run/会话/主体逐字一致，且受理时冻结写事实已绑定（付费前完成）。

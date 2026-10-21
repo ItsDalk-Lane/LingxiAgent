@@ -437,6 +437,7 @@ impl BridgeHost {
                         if !ready { if tokio::time::Instant::now()>=ready_deadline{return Err("Bridge SDK initialization timed out".into());}continue; }
                         queue_command_replies(state,connector).await?;
                         advance_inbox(state,connector).await?;
+                        advance_loop_deliveries(state,connector).await?;
                         if inflight.values().any(|started|started.elapsed()>Duration::from_secs(30)){return Err("Bridge delivery receipt timed out; sending outcome is unknown".into());}
                         if !connected {effects.expire_pending(state).await?;continue;}
                         effects.tick(state,connector,&mut worker).await?;
@@ -795,7 +796,7 @@ async fn receive(
             state.storage(),
             &inbox.id,
             cfg.generation,
-            kind,
+            &kind,
             state.clock().now_unix_ms(),
         )
         .await
@@ -866,6 +867,7 @@ async fn advance_inbox(state: &ServiceState, cfg: &store::BridgeConnector) -> Re
                     inbox_id: Some(inbox.id.clone()),
                     manual_action_id: None,
                     run_id: Some(run_id.clone()),
+                    loop_delivery_id: None,
                     payload_json: json!({"text":text}).to_string(),
                     attachments: vec![],
                 };
@@ -996,6 +998,111 @@ async fn advance_inbox(state: &ServiceState, cfg: &store::BridgeConnector) -> Re
                 Err(error) => return Err(format!("Bridge task admission failed: {error:?}")),
             }
         }
+    }
+    Ok(())
+}
+/// 桥循环投递推进：台账 queued 行 → 真实 outbox 行。reply 等 run 终态后
+/// 冻结文本（兜底文案与 inbox 回复链一致）；notice 文本即台账文本（消毒
+/// 后为空属损坏，登记失败不外发）。入队被拒 = 授权已变化，台账记 failed
+/// 如实呈现，不静默重试。
+async fn advance_loop_deliveries(
+    state: &ServiceState,
+    cfg: &store::BridgeConnector,
+) -> Result<(), String> {
+    for row in store::pending_loop_deliveries(state.storage(), &cfg.input.id)
+        .await
+        .map_err(|e| e.to_string())?
+    {
+        if row.input.connector_generation != cfg.generation {
+            continue;
+        }
+        let text = match row.input.kind.as_str() {
+            "reply" => {
+                let run_id = row
+                    .input
+                    .run_id
+                    .as_deref()
+                    .ok_or("loop reply ledger row has no run")?;
+                let run = state
+                    .storage()
+                    .load_run(&RunId::new(run_id))
+                    .await
+                    .map_err(|e| e.to_string())?
+                    .ok_or("loop reply run disappeared")?;
+                if !run.status.is_terminal() {
+                    continue;
+                }
+                let reply = final_reply(state, &row.input.session_id, run_id).await?;
+                reply
+                    .filter(|text| !text.is_empty())
+                    .unwrap_or_else(|| match run.status {
+                        RunStatus::Cancelled => "本次任务已取消。".into(),
+                        RunStatus::Failed => "本次任务执行失败，请在灵犀中查看详情。".into(),
+                        RunStatus::Completed => {
+                            "任务已结束，但没有可发送的回复内容，请在灵犀中查看详情。".into()
+                        }
+                        _ => "本次任务的结果暂时无法确认，请在灵犀中查看详情。".into(),
+                    })
+            }
+            "notice" => {
+                let text = crate::history::history_content::sanitize_bridge_visible_text(
+                    row.input
+                        .text
+                        .as_deref()
+                        .ok_or("loop notice ledger row has no text")?,
+                );
+                if text.is_empty() {
+                    store::settle_loop_delivery(
+                        state.storage(),
+                        &row.input.delivery_id,
+                        "failed",
+                        Some("loop notice text sanitized to empty".into()),
+                        state.clock().now_unix_ms(),
+                    )
+                    .await
+                    .map_err(|e| e.to_string())?;
+                    continue;
+                }
+                text
+            }
+            other => return Err(format!("loop delivery kind unknown: {other}")),
+        };
+        let input = store::BridgeOutboxInput {
+            delivery_id: row.input.delivery_id.clone(),
+            connector_id: cfg.input.id.clone(),
+            connector_generation: cfg.generation,
+            inbox_id: None,
+            manual_action_id: None,
+            run_id: row.input.run_id.clone(),
+            loop_delivery_id: Some(row.input.delivery_id.clone()),
+            payload_json: json!({"text":text}).to_string(),
+            attachments: vec![],
+        };
+        let settled =
+            match store::enqueue_outbox(state.storage(), &input, state.clock().now_unix_ms()).await
+            {
+                Ok(_) => {
+                    store::settle_loop_delivery(
+                        state.storage(),
+                        &row.input.delivery_id,
+                        "enqueued",
+                        None,
+                        state.clock().now_unix_ms(),
+                    )
+                    .await
+                }
+                Err(error) => {
+                    store::settle_loop_delivery(
+                        state.storage(),
+                        &row.input.delivery_id,
+                        "failed",
+                        Some(error.to_string()),
+                        state.clock().now_unix_ms(),
+                    )
+                    .await
+                }
+            };
+        settled.map_err(|e| e.to_string())?;
     }
     Ok(())
 }
@@ -1196,6 +1303,7 @@ async fn queue_command_replies(
             inbox_id: Some(inbox.id),
             manual_action_id: None,
             run_id: None,
+            loop_delivery_id: None,
             payload_json: json!({"text":text}).to_string(),
             attachments: vec![],
         };

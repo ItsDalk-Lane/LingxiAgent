@@ -387,10 +387,24 @@ async fn real_submission_freezes_selected_sources_and_rejects_old_or_foreign_sco
         assert_eq!(
             names,
             [
-                "automation", "browser", "channel", "dm", "edit", "exec_command",
-                "jian_update_status", "mcp_call", "mcp_describe_tool", "mcp_search_tools",
-                "notify", "patrol_update_log", "read", "update_settings", "web_fetch",
-                "web_search", "write", "write_stdin",
+                "automation",
+                "browser",
+                "channel",
+                "dm",
+                "edit",
+                "exec_command",
+                "jian_update_status",
+                "mcp_call",
+                "mcp_describe_tool",
+                "mcp_search_tools",
+                "notify",
+                "patrol_update_log",
+                "read",
+                "update_settings",
+                "web_fetch",
+                "web_search",
+                "write",
+                "write_stdin",
             ]
         );
         assert!(!declarations

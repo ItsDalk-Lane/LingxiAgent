@@ -258,7 +258,7 @@ impl Executor {
                     );
                     let input=lingxi_adapters::storage::bridge::BridgeOutboxInput {
                         delivery_id:id.clone(),connector_id:connector.input.id.clone(),connector_generation:connector.generation,
-                        inbox_id:None,manual_action_id:None,run_id:Some(ctx.run_id.to_string()),
+                        inbox_id:None,manual_action_id:None,run_id:Some(ctx.run_id.to_string()),loop_delivery_id:None,
                         payload_json:json!({"text":format!("{title}\n\n{body}"),"title":title,"body":body,"contextPolicy":args["contextPolicy"].as_str().unwrap_or("record_when_delivered"),"sourceSessionId":ctx.session_id,"toolCallId":call}).to_string(),attachments:vec![],
                     };
                     match lingxi_adapters::storage::bridge::enqueue_outbox(&self.api.storage,&input,self.api.clock.now_unix_ms()).await {

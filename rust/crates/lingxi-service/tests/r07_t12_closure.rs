@@ -1,6 +1,5 @@
 //! R07-T12：A23 运行时路由矩阵（每个已注册路由真实可达、受鉴权把守）与
 //! A24 禁止代理回旧内核（纯 Rust 链闭环：会话→执行→账本→观测，无旧服务）。
-use lingxi_kernel::ports::StoragePort;
 use lingxi_service::{
     prepare_layout, run, HomeSource, NetworkMode, ServeOutcome, ServiceConfig, ServiceDeps,
     ServiceError, ServiceState,
@@ -80,9 +79,14 @@ impl Server {
     }
 
     async fn json(&self, method: &str, path: &str, body: Option<Value>) -> (u16, Value) {
-        let (status, raw) = self.call(Some(&self.token.clone()), method, path, body).await;
+        let (status, raw) = self
+            .call(Some(&self.token.clone()), method, path, body)
+            .await;
         let parsed = serde_json::from_slice(&raw).unwrap_or_else(|_| {
-            panic!("{method} {path} -> {status} non-JSON: {}", String::from_utf8_lossy(&raw))
+            panic!(
+                "{method} {path} -> {status} non-JSON: {}",
+                String::from_utf8_lossy(&raw)
+            )
         });
         (status, parsed)
     }
@@ -118,7 +122,14 @@ async fn boot(home: PathBuf, deps: ServiceDeps) -> Server {
         .await
     });
     let addr = ready_rx.await.expect("readiness");
-    Server { addr, token, stop: stop_tx, handle, state, home }
+    Server {
+        addr,
+        token,
+        stop: stop_tx,
+        handle,
+        state,
+        home,
+    }
 }
 
 /// 与 A23 静态生产者同一提取法（同源不同实现）：只扫 cfg(test) 之前的
@@ -137,19 +148,28 @@ fn registered_routes() -> Vec<(String, String)> {
             Some(cut) => &text[..cut],
             None => &text,
         };
-        let needle = ".route(\"";
-        let mut rest = production;
-        while let Some(at) = rest.find(needle) {
-            let after = &rest[at + needle.len()..];
-            let end = after.find('"').expect("route literal closes");
-            let route = &after[..end];
-            if route.starts_with('/') {
-                routes.push((
-                    route.to_string(),
-                    entry.file_name().to_string_lossy().into_owned(),
-                ));
+        // 多行注册同样提取：`.route(` 与路径字面量之间允许任意空白（含换行）。
+        let mut cursor = 0;
+        while let Some(at) = production[cursor..].find(".route(") {
+            let after_paren = &production[cursor..][at + ".route(".len()..];
+            let skipped = after_paren
+                .chars()
+                .take_while(|c| c.is_whitespace())
+                .map(char::len_utf8)
+                .sum::<usize>();
+            let rest = &after_paren[skipped..];
+            if rest.starts_with('"') {
+                if let Some(end) = rest[1..].find('"') {
+                    let route = &rest[1..1 + end];
+                    if route.starts_with('/') {
+                        routes.push((
+                            route.to_string(),
+                            entry.file_name().to_string_lossy().into_owned(),
+                        ));
+                    }
+                }
             }
-            rest = &after[end + 1..];
+            cursor = cursor + at + ".route(".len();
         }
     }
     routes.sort();
@@ -205,6 +225,17 @@ async fn r07_t12_a23_runtime_route_matrix() {
         "/desktop/",
         "/desktop/{*path}",
     ];
+    // token 即凭证的读面（classify_route Public 分支逐字镜像）：HTML 预览
+    // 与桥媒体拉取——无效/过期一律 404 空体，不回 401/403 泄露存在性。
+    let public_token_get = |route: &str| -> bool {
+        if let Some(rest) = route.strip_prefix("/lingxi/v1/preview/html/") {
+            return !rest.is_empty();
+        }
+        if let Some(token) = route.strip_prefix("/lingxi/v1/bridge/media/") {
+            return !token.is_empty() && !token.contains('/');
+        }
+        false
+    };
     let mut holes = Vec::new();
     let mut unguarded = Vec::new();
     for (route, source) in &routes {
@@ -218,7 +249,7 @@ async fn r07_t12_a23_runtime_route_matrix() {
         if with == 404 {
             holes.push(format!("{route} ({source})"));
         }
-        if public_get.contains(&route.as_str()) {
+        if public_get.contains(&route.as_str()) || public_token_get(route) {
             continue;
         }
         let (without, _) = server.call(None, "GET", &probe, None).await;
@@ -227,7 +258,10 @@ async fn r07_t12_a23_runtime_route_matrix() {
         }
     }
     assert!(holes.is_empty(), "注册声明但未接线的路由空洞: {holes:?}");
-    assert!(unguarded.is_empty(), "无凭证未 401 的受守路由: {unguarded:?}");
+    assert!(
+        unguarded.is_empty(),
+        "无凭证未 401 的受守路由: {unguarded:?}"
+    );
     server.stop().await;
 }
 
@@ -318,8 +352,8 @@ async fn r07_t12_a24_closed_loop_without_legacy_kernel() {
 
     // 模型平面：唯一供应商是 loopback 替身（合成 key，非真实凭证）。
     let config = json!({"providers":{"remote":{"protocol":"openai-completions","endpoint":format!("http://{}/v1",stub.addr),"auth":{"kind":"apiKey","apiKey":"A24_SYNTHETIC_ONLY"}}},"models":{"chat":{"provider":"remote","model":"chat","capabilities":{"tools":true,"imageInput":true},"compat":{"contextWindow":200000,"reasoning":true}},"title":{"provider":"remote","model":"chat","capabilities":{"tools":true},"compat":{"contextWindow":200000,"reasoning":true}},"summarize":{"provider":"remote","model":"chat","capabilities":{"tools":true},"compat":{"contextWindow":200000}}}});
-    let plane = lingxi_adapters::models::config::ModelPlaneConfig::from_value(config)
-        .expect("model plane");
+    let plane =
+        lingxi_adapters::models::config::ModelPlaneConfig::from_value(config).expect("model plane");
     let layout = prepare_layout(&home).expect("layout");
     let credentials = Arc::new(
         lingxi_service::credentials::CredentialService::bootstrap(
@@ -402,7 +436,9 @@ async fn r07_t12_a24_closed_loop_without_legacy_kernel() {
         .await;
     assert_eq!(status, 200, "observability query: {calls}");
     assert!(
-        calls["calls"].as_array().is_some_and(|rows| !rows.is_empty()),
+        calls["calls"]
+            .as_array()
+            .is_some_and(|rows| !rows.is_empty()),
         "run 的模型调用必须真实落账可查: {calls}"
     );
 
@@ -414,6 +450,155 @@ async fn r07_t12_a24_closed_loop_without_legacy_kernel() {
         "出站请求不得离开供应商替身边界: {paths:?}"
     );
 
+    // ── 各能力域真实闭环（一次无工具聊天不足以证明 A24）──
+    // 观测域：聚合与轨迹面在同一条真实链上可查。
+    let (status, aggregate) = server
+        .json(
+            "POST",
+            "/lingxi/v1/observability/query/aggregate",
+            Some(json!({"groupBy": ["date"], "dateBucket": {"bucket": "day", "utcOffsetMinutes": 0}})),
+        )
+        .await;
+    assert_eq!(status, 200, "aggregate: {aggregate}");
+    assert!(
+        aggregate["overall"]["callCount"]
+            .as_u64()
+            .is_some_and(|n| n >= 1),
+        "聚合必须读到本轮真实调用: {aggregate}"
+    );
+    let (status, traces) = server
+        .json(
+            "POST",
+            "/lingxi/v1/observability/query/traces",
+            Some(json!({"minCallCount": 1})),
+        )
+        .await;
+    assert_eq!(status, 200, "traces: {traces}");
+    assert!(
+        traces["traces"]
+            .as_array()
+            .is_some_and(|rows| !rows.is_empty()),
+        "会话轨迹必须呈现: {traces}"
+    );
+    let (status, settings) = server
+        .json("GET", "/lingxi/v1/observability/settings", None)
+        .await;
+    assert_eq!(status, 200, "settings: {settings}");
+    // 自动化域：调度状态面在真实服务上可读。
+    let (status, automation) = server
+        .json("GET", "/lingxi/v1/automation/status", None)
+        .await;
+    assert_eq!(status, 200, "automation status: {automation}");
+    // 媒体域：供应商目录读回真实配置平面。
+    let (status, media) = server.json("GET", "/lingxi/v1/media/providers", None).await;
+    assert_eq!(status, 200, "media providers: {media}");
+    // 桥域：真实配置写读往返（禁用态配置——不启动外部连接）。
+    let (status, body) = server
+        .json(
+            "POST",
+            "/lingxi/v1/bridge/config?agentId=lingxi",
+            Some(json!({"platform":"telegram","enabled":false,"credentials":{"token":"A24_SYNTHETIC_ONLY"}})),
+        )
+        .await;
+    assert_eq!(status, 200, "bridge config: {body}");
+
+    // ── 主动旧内核检测：本测试进程树不得出现 node 运行时（旧 Pi 内核
+    // 由 node 承载；Rust 服务链自身不 spawn node）。ps 独立取证。──
+    let ps = std::process::Command::new("ps")
+        .args(["-axo", "pid=,ppid=,comm="])
+        .output()
+        .expect("ps for kernel detection");
+    let table = String::from_utf8_lossy(&ps.stdout);
+    let self_pid = std::process::id().to_string();
+    // 沿父链向上收集本进程所属树根，再向下枚举全部后代。
+    let mut parent_of: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut comm_of: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    for line in table.lines() {
+        let mut parts = line.split_whitespace();
+        let (Some(pid), Some(ppid), Some(comm)) = (parts.next(), parts.next(), parts.next()) else {
+            continue;
+        };
+        parent_of.insert(pid.to_string(), ppid.to_string());
+        comm_of.insert(pid.to_string(), comm.to_string());
+    }
+    let mut frontier = vec![self_pid.clone()];
+    let mut tree = vec![self_pid.clone()];
+    while let Some(pid) = frontier.pop() {
+        for (child, parent) in &parent_of {
+            if parent == &pid && !tree.contains(child) {
+                tree.push(child.clone());
+                frontier.push(child.clone());
+            }
+        }
+    }
+    let node_processes: Vec<String> = tree
+        .iter()
+        .filter(|pid| {
+            comm_of
+                .get(*pid)
+                .map(|comm| comm.contains("node"))
+                .unwrap_or(false)
+        })
+        .map(|pid| format!("{pid}:{}", comm_of[pid]))
+        .collect();
+    assert!(
+        node_processes.is_empty(),
+        "Rust 服务链不得调用旧 node 内核，发现: {node_processes:?}"
+    );
+
     server.stop().await;
     stub.task.abort();
+}
+
+/// A24 检测器自证（反向红）：故意 spawn 一个 node 进程，检测逻辑必须
+/// 抓到——检测变红能力本身被验证，避免「扫描永远绿」的假检测。
+#[tokio::test]
+async fn r07_t12_kernel_detector_catches_a_real_node_process() {
+    let mut child = std::process::Command::new("node")
+        .arg("-e")
+        .arg("setTimeout(()=>{}, 5000)")
+        .spawn()
+        .expect("node fixture for detector self-test");
+    let self_pid = std::process::id().to_string();
+    let ps = std::process::Command::new("ps")
+        .args(["-axo", "pid=,ppid=,comm="])
+        .output()
+        .expect("ps");
+    let table = String::from_utf8_lossy(&ps.stdout);
+    let mut parent_of: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut comm_of: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    for line in table.lines() {
+        let mut parts = line.split_whitespace();
+        let (Some(pid), Some(ppid), Some(comm)) = (parts.next(), parts.next(), parts.next()) else {
+            continue;
+        };
+        parent_of.insert(pid.to_string(), ppid.to_string());
+        comm_of.insert(pid.to_string(), comm.to_string());
+    }
+    let mut frontier = vec![self_pid.clone()];
+    let mut tree = vec![self_pid.clone()];
+    while let Some(pid) = frontier.pop() {
+        for (child, parent) in &parent_of {
+            if parent == &pid && !tree.contains(child) {
+                tree.push(child.clone());
+                frontier.push(child.clone());
+            }
+        }
+    }
+    let node_processes: Vec<String> = tree
+        .iter()
+        .filter(|pid| {
+            comm_of
+                .get(*pid)
+                .map(|comm| comm.contains("node"))
+                .unwrap_or(false)
+        })
+        .map(|pid| format!("{pid}:{}", comm_of[pid]))
+        .collect();
+    let _ = child.kill();
+    let _ = child.wait();
+    assert!(
+        !node_processes.is_empty(),
+        "检测器必须能抓到真实 node 子进程，否则 A24 的『无旧内核』断言只是空转"
+    );
 }

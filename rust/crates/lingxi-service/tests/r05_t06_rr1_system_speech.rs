@@ -672,8 +672,7 @@ async fn rr1_f20_unwritable_output_fails_honestly() {
 async fn rr1_f20_missing_supervisor_refuses_fail_closed() {
     let runtime_dir = unique_dir("nosup-rt");
     let products_root = unique_dir("nosup-products");
-    let plane =
-        ModelPlaneConfig::parse_and_validate(&speech_plane()).expect("plane");
+    let plane = ModelPlaneConfig::parse_and_validate(&speech_plane()).expect("plane");
     let credentials = Arc::new(
         lingxi_service::credentials::CredentialService::bootstrap(
             &plane,

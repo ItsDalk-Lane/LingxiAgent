@@ -162,5 +162,35 @@
  "liveExternalAuthorized": false,
  "productionDataAuthorized": false,
  "releaseAuthorized": false,
- "updatedAt": "2026-10-19T11:28:14.041846+00:00"
+ "updatedAt": "2026-10-19T11:28:14.041846+00:00",
+ "closeout": {
+  "phase": "R07-CLOSEOUT",
+  "reviewBaseline": "bfe32d107fb60852712b897a25403d7f092671b3",
+  "headVerified": "bfe32d107fb60852712b897a25403d7f092671b3（与审查基线一致；收口修改在工作区未提交）",
+  "plan": "R07_CLOSEOUT_PLAN.md",
+  "ledger": "R07_CLOSEOUT_LEDGER.json（408叶：CONVERT_REGISTRY 181 / BIND_EVIDENCE 180 / SHARE_DOC_AND_BIND 47，1050 断言）",
+  "baselineGate": "verify-r07-closeout-baseline 完成：前半程源码未变时 24 基础场景/2 扩展 PASS；后半程因收口改码触发 stale-runner 保护中止（candidateSourceBinding stale），overall FAIL 属预期证据绑定行为",
+  "fixedDefects": {
+   "A_observability": "已实现并验证：settings GET/PUT（retention 持久化 home/model-observability-settings.json，恒真面 409，重启保留）、storage 概况（真实按日统计+库文件大小）、maintenance/delete（窗口/全量删除+VACUUM+孤儿行）、payloads/blobs 显式 404/400、query/traces 重写为统一轨迹面（session: 会话聚合+legacy 导入+singleton，minCallCount/origin/includeSingleton/limit/cursor keyset 分页）、query/aggregate dateBucket（utcOffsetMinutes 分桶；timeZone 显式 400）、export 契约对齐（query.filter/includePayloads/bundle trace+usage）、call 详情补 payloadRecords/attempts/parentCall/childCalls（因果链经 emitted/parent_tool_call_id 真实查询）、trace 详情补契约字段与 session: 支持；前端 rustObservabilityRoute 全段映射。r07_t10_observability 套件 2/2（新增 closeout 综合测试）、UI 135+5 绿",
+   "B_bridge_loop": "已实现并验证：bridge_command_kind 认 /loop /stop /abort /halt；LoopTarget::bridge；循环轮经 execute_scheduled_for 真实执行；回执/通知落 V25 bridge_loop_deliveries 台账（重启不丢）；V26 重建 outbox 增加 loop_delivery_id 来源列（来源互斥 CHECK，notice 三源皆空被拒的真实缺陷已修）；连接会话 tick 推进台账→outbox→真实外发；model_history 桥会话 owner 匹配经 bridge_conversations_v1 持久锚。r07_bridge_flow 14/14（含 guest 边界、全生命周期、伪造来源拒绝、重启回执）、相邻 store/effect/notice/projection 套件绿",
+   "C_loop_media_auth": "已实现并验证：media_source_authority 增加 RunOrigin::Loop 分支——循环根 run+本机用户+cause 逐字匹配目标会话+会话活跃+落盘循环记录活跃（Running/Paused）即授权；stop/complete 后下一拍即拒（撤权立即生效）；子任务继承链（parent_run 沿袭）保持拒绝。r07_t05_media 13/13（含 loop 来源授权与撤权场景）",
+   "D_gate_proof": "已实现并验证：双扫描器（python+rust 测试内）多行 .route 修复（141→409 条路由）；behavior_matrix unmapped≠0 或清单<300 退出 1（首轮 82 unmapped 红证据留存）；lib.rs 主干 23 组前缀按 handler 模块归因补齐（0 unmapped）；24 基础场景逐场景登记 39 条 suiteTestAnchors（stage_map 强制 command∈commandRefs；锚点零匹配/未通过/producer 失败均场景 FAIL，xtask 127 单元测试含 3 项正反向锚点测试）；A24 扩为六能力域闭环（会话执行/观测聚合+轨迹+设置/自动化状态/媒体目录/桥配置）+进程树 node 检测（含故意 spawn node 的检测器自证红测试）+出站 HTTP 白名单断言；A23 运行时探针照常全表"
+  },
+  "negativeVerification": "artifacts/rust-tauri/R07/T12/negative-verification-closeout-1（matrix 82-unmapped 红→0 绿；锚点 absent/not_ok 红→hit 绿；检测器抓 node 红→无 node 绿）+ gate-01 实战红：7 场景锚点名与日志模块前缀不一致被机器真实拦下（A09–A15 FAIL），修正后 gate-02 转 PASS",
+  "gateCloseout": {
+   "gate01": "verify-r07-closeout-01：53 命令全 PASS、candidate/runner 稳定，但 7 场景因锚点名缺模块前缀 FAIL（锚点机制实战反向验证）；回执原样保留",
+   "gate02": "verify-r07-closeout-02：52/53 命令 PASS（r07_t08_mcp_settings 套件内限流 429 时序敏感失败；同源码孤立重跑 3 次 22/22 全绿，回执 verify-r07-closeout-02-mcp-settings-flaky-retry/）、22/24 场景 PASS（A15/A16 因该 flaky 挂）、2/2 扩展 PASS、408 叶 BLOCKED（既定缺口）、overall FAIL（如实：逐断言证据待立为主因）、candidateSourceBinding stable=true",
+   "gate03": "verify-r07-closeout-03（绑定后候选）：53/53 命令 PASS（含新生产者 r07_leaf_cases）、24/24 场景 PASS（锚点全部命中）、2/2 扩展 PASS、叶 181 PASS / 227 BLOCKED / 0 FAIL、candidateSourceBinding stable=true、runner PASS；overall FAIL 仅因 227 叶仍 required_behavior_pending——R07 未达放行条件",
+   "gate04": "verify-r07-closeout-04：54/54 命令 PASS、24/24 场景 PASS、2/2 扩展 PASS、叶 241 PASS / 167 BLOCKED / 0 FAIL、stable=true、runner PASS；overall FAIL 仅因 167 叶未绑定",
+   "gate11": "verify-r07-closeout-11（决定性候选）：57/57 命令 PASS、24/24 场景 PASS、408/408 叶 PASS、2/2 扩展 PASS、35/35 移交 + 43/43 递延透镜全 PASS、candidate stable=true、runner PASS、47.1 分钟 —— overall PASS"
+  },
+  "knownRemaining": "无未绑定叶；R07 门禁 overall PASS。按完成条件：24 场景/408 叶/2 扩展/35+43 视图结算准确，正式门禁有效通过；独立审查为建议放行 R08 前的最后人工步骤",
+  "updatedAt": "2026-10-21T12:00:00.000000+00:00",
+  "leafBinding": {
+   "infrastructure": "scripts/rust-tauri/r07_leaf_cases.py（套件日志→lingxi.leaf-case-results.v1 案例，套件退出非0即全部 actual=0）+ docs/rust-tauri/R07/R07_LEAF_BINDINGS.json（逐叶逐断言绑定与 rationale）+ scripts/rust-tauri/r07_apply_leaf_bindings.py（注入 R07.json：full_original_behavior 逐断言 case 不复用；stage_share_satisfied 仅限含后续阶段叶并写 stageShare/laterShare）+ xtask r07_registered_map 解析护栏测试",
+   "bound": "408/408 叶（1050/1050 断言）全部经正式合同机制绑定：供应商 39、MCP 19（stage_share R08）、技能服务面 27（r07_probe_skills 19 测试）、接入/设备/思考/桥/频道 33（r07_probe_access 21 测试）、观测面 16、设置/模型/卡片/频道导出/git 39、办公/美化/语音工具 19、面板/设置页大叶（UI 逐断言）12、浏览器 R09 份额 8、对话工具（run_tools/ptc/ast_grep/lsp/run_code/security_scan/learn_lesson，lib 共享层真实 vitest）6、CLI 11、即梦 2、跨阶段 R08/R09 份额叶 10 等；生产者 r07_ui_vitest（595 UI/CLI/工具测试）+ r07_leaf_cases（57 套件→1050 案例）",
+   "unbound": "0",
+   "notBound_rationale": "不绑定条件：叶内无法为每条断言找到语义对应的独立真实测试（如回执/富流式切换的『字段缺省不改原值』边界、桥状态只读面）；n≥3 断言且域内测试不足；客户端渲染行为（Rust 套件结构性不覆盖）"
+  }
+ }
 }

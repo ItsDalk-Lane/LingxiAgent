@@ -105,8 +105,8 @@ pub struct LoopAlarmSlot {
     pub reason: String,
 }
 
-/// 现役 target 形状：δ 只承接 desktop 面（桥接 loop 依赖现役桥挂钩，
-/// Rust 桥运行时无对应物——T07_STATUS δ4 登记偏差）。
+/// 现役 target 形状：desktop 面 + bridge 面（R07 收口补齐：桥循环轮在桥
+/// 会话上执行，回执经循环投递台账走 outbox 链）。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct LoopTarget {
     pub kind: String,
@@ -118,6 +118,12 @@ impl LoopTarget {
     pub fn desktop(session_id: &str) -> Self {
         Self {
             kind: "desktop".to_string(),
+            session_id: session_id.to_string(),
+        }
+    }
+    pub fn bridge(session_id: &str) -> Self {
+        Self {
+            kind: "bridge".to_string(),
             session_id: session_id.to_string(),
         }
     }
@@ -213,7 +219,7 @@ impl LoopStore {
                             .map_err(|error| invalid(&format!("malformed record: {error}")))?;
                         if record.key.trim().is_empty()
                             || record.target.session_id != record.key
-                            || record.target.kind != "desktop"
+                            || !matches!(record.target.kind.as_str(), "desktop" | "bridge")
                         {
                             return Err(invalid("record key or target is invalid"));
                         }

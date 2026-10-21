@@ -45,6 +45,17 @@ pub struct Scenario {
     /// R07-T12：基础场景逐断言合同（与叶项同一机制；可选）。命令全绿
     /// 只证明套件退出 0，合同案例才证明原断言被真实观察到。
     pub assertion_contract: Option<LeafAssertionContract>,
+    /// R07 收口 D：套件测试锚点——场景引用套件的日志里必须真实出现
+    /// `test <name> ... ok`。防「套件退出 0 但关键测试被过滤/跳过」的
+    /// 假绿；锚点未命中即场景 FAIL。
+    pub suite_test_anchors: Vec<SuiteTestAnchor>,
+}
+
+/// 一个套件测试锚点：producer 命令 + 必须出现并通过的具体测试名。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SuiteTestAnchor {
+    pub command: String,
+    pub test: String,
 }
 
 /// 基础场景的 R00 原规格镜像（R07-T12）：verify 时逐字段对照 R00 账本，
@@ -285,6 +296,11 @@ fn err(detail: &str) -> String {
     format!("stage map invalid: {detail}")
 }
 
+/// 阶段序（"R07" → 7）；非 R 前缀或溢出返回 None，调用侧按原语义兜底。
+fn stage_ordinal_str(stage: &str) -> Option<u32> {
+    stage.strip_prefix('R')?.parse().ok()
+}
+
 fn non_empty_string(value: &Value, what: &str) -> Result<String, String> {
     value
         .as_str()
@@ -497,14 +513,14 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
         let spec_mirror = match object.get("specMirror") {
             None => None,
             Some(value) => {
-                let mirror = value.as_object().ok_or_else(|| {
-                    err(&format!("scenario {id:?} specMirror must be an object"))
-                })?;
+                let mirror = value
+                    .as_object()
+                    .ok_or_else(|| err(&format!("scenario {id:?} specMirror must be an object")))?;
                 let field = |key: &str| -> Result<String, String> {
                     non_empty_string(
-                        mirror
-                            .get(key)
-                            .ok_or_else(|| err(&format!("scenario {id:?} specMirror missing {key}")))?,
+                        mirror.get(key).ok_or_else(|| {
+                            err(&format!("scenario {id:?} specMirror missing {key}"))
+                        })?,
                         &format!("scenario {id:?} specMirror {key}"),
                     )
                 };
@@ -538,7 +554,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
             None => None,
             Some(value) => {
                 let contract = value.as_object().ok_or_else(|| {
-                    err(&format!("scenario {id:?} assertionContract must be an object"))
+                    err(&format!(
+                        "scenario {id:?} assertionContract must be an object"
+                    ))
                 })?;
                 let producer_command = non_empty_string(
                     contract.get("producerCommand").ok_or_else(|| {
@@ -563,7 +581,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 }
                 let evidence_path = non_empty_string(
                     contract.get("evidencePath").ok_or_else(|| {
-                        err(&format!("scenario {id:?} assertionContract missing evidencePath"))
+                        err(&format!(
+                            "scenario {id:?} assertionContract missing evidencePath"
+                        ))
                     })?,
                     &format!("scenario {id:?} assertionContract evidencePath"),
                 )?;
@@ -626,12 +646,61 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 })
             }
         };
+        // R07 收口 D：可选套件测试锚点——command 必须 ∈ commandRefs，
+        // test 名非空；锚点由 verify 在套件日志中逐条核对。
+        let mut suite_test_anchors = Vec::new();
+        if let Some(value) = object.get("suiteTestAnchors") {
+            let list = value.as_array().ok_or_else(|| {
+                err(&format!(
+                    "scenario {id:?} suiteTestAnchors must be an array"
+                ))
+            })?;
+            for anchor_value in list {
+                let anchor = anchor_value.as_object().ok_or_else(|| {
+                    err(&format!(
+                        "scenario {id:?} suiteTestAnchors entry must be an object"
+                    ))
+                })?;
+                let command = non_empty_string(
+                    anchor.get("command").ok_or_else(|| {
+                        err(&format!(
+                            "scenario {id:?} suiteTestAnchors entry missing command"
+                        ))
+                    })?,
+                    &format!("scenario {id:?} suiteTestAnchors command"),
+                )?;
+                if !command_refs.contains(&command) {
+                    return Err(err(&format!(
+                        "scenario {id:?} suiteTestAnchors command {command:?} is not in \
+                         the scenario's commandRefs — anchors must probe a suite this \
+                         scenario actually runs"
+                    )));
+                }
+                let test = non_empty_string(
+                    anchor.get("test").ok_or_else(|| {
+                        err(&format!(
+                            "scenario {id:?} suiteTestAnchors entry missing test"
+                        ))
+                    })?,
+                    &format!("scenario {id:?} suiteTestAnchors test"),
+                )?;
+                if suite_test_anchors.iter().any(|existing: &SuiteTestAnchor| {
+                    existing.command == command && existing.test == test
+                }) {
+                    return Err(err(&format!(
+                        "scenario {id:?} suiteTestAnchors repeats {command:?}/{test:?}"
+                    )));
+                }
+                suite_test_anchors.push(SuiteTestAnchor { command, test });
+            }
+        }
         scenarios.push(Scenario {
             id,
             requirement,
             command_refs,
             spec_mirror,
             assertion_contract,
+            suite_test_anchors,
         });
     }
 
@@ -911,9 +980,18 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 // 递延只对真实双阶段（含后续阶段）的叶合法：一个只归属
                 // 本阶段的叶没有可递延的验收归属，标 deferred 只会是
                 // 把本阶段义务静默扫地出门。
+                // R07 收口修正：后续阶段按阶段序判定（R02/R07 叶的 R02 不是
+                // R07 的后续）；阶段序无法解析时按原「非本阶段」语义保留，
+                // 响亮呈现而不猜。
+                let has_later_stage = r00_execution_stage_ids.iter().any(|s| {
+                    match (stage_ordinal_str(s), stage_ordinal_str(&stage)) {
+                        (Some(other), Some(current)) => other > current,
+                        _ => s.as_str() != stage,
+                    }
+                });
                 if (basis_kind == BASIS_DEFERRED_TO_R07
                     || basis_kind == BASIS_DEFERRED_TO_LATER_STAGE)
-                    && !r00_execution_stage_ids.iter().any(|s| s.as_str() != stage)
+                    && !has_later_stage
                 {
                     return Err(err(&format!(
                         "supplemental leaf {id:?} is marked deferred_to_r07 but its \
@@ -1364,14 +1442,18 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                 }
                 let requirement = non_empty_string(
                     entry.get("requirement").ok_or_else(|| {
-                        err(&format!("extensionBoundaries {feature_id:?} missing requirement"))
+                        err(&format!(
+                            "extensionBoundaries {feature_id:?} missing requirement"
+                        ))
                     })?,
                     &format!("extensionBoundaries {feature_id:?} requirement"),
                 )?;
                 let refs_value = entry
                     .get("commandRefs")
                     .ok_or_else(|| {
-                        err(&format!("extensionBoundaries {feature_id:?} missing commandRefs"))
+                        err(&format!(
+                            "extensionBoundaries {feature_id:?} missing commandRefs"
+                        ))
                     })?
                     .as_array()
                     .ok_or_else(|| {
@@ -1430,9 +1512,9 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
                     .ok_or_else(|| err(&format!("{key} must be an array")))?;
                 let mut items = Vec::with_capacity(list.len());
                 for (index, value) in list.iter().enumerate() {
-                    let entry = value.as_object().ok_or_else(|| {
-                        err(&format!("{key} #{index} must be an object"))
-                    })?;
+                    let entry = value
+                        .as_object()
+                        .ok_or_else(|| err(&format!("{key} #{index} must be an object")))?;
                     let id = non_empty_string(
                         entry
                             .get("id")
@@ -1482,9 +1564,13 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
             }
         }
     };
-    let handover_items = parse_handovers("handoverItems", "executionStageIds", &supplemental_leaves)?;
-    let prior_stage_deferred =
-        parse_handovers("priorStageDeferred", "r00ExecutionStageIds", &supplemental_leaves)?;
+    let handover_items =
+        parse_handovers("handoverItems", "executionStageIds", &supplemental_leaves)?;
+    let prior_stage_deferred = parse_handovers(
+        "priorStageDeferred",
+        "r00ExecutionStageIds",
+        &supplemental_leaves,
+    )?;
 
     Ok(StageMap {
         stage,
@@ -1530,6 +1616,40 @@ mod map_tests {
         assert_eq!(map.commands[0].timeout_secs, 30);
         assert_eq!(map.scenarios.len(), 1);
         assert_eq!(map.scenarios[0].command_refs, vec!["a_ok"]);
+    }
+
+    #[test]
+    fn r07_registered_map_parses_with_anchors_and_leaf_bindings() {
+        // R07 收口：24 场景全部带套件测试锚点；叶绑定（full_original_behavior）
+        // 逐断言 case 覆盖通过解析层校验；其余叶保持 required_behavior_pending。
+        let map =
+            parse_stage_map(include_str!("stage_maps/R07.json")).expect("真实R07阶段图可解析");
+        assert_eq!(map.scenarios.len(), 24);
+        assert!(
+            map.scenarios
+                .iter()
+                .all(|s| !s.suite_test_anchors.is_empty()),
+            "每个基础场景都须带套件测试锚点"
+        );
+        assert_eq!(map.supplemental_leaves.len(), 408, "原始到期条款不能丢失");
+        let bound: Vec<_> = map
+            .supplemental_leaves
+            .iter()
+            .filter(|l| l.basis_kind == BASIS_FULL_ORIGINAL_BEHAVIOR)
+            .collect();
+        assert!(!bound.is_empty(), "至少一个叶已完成逐断言绑定");
+        for leaf in &bound {
+            let contract = leaf.assertion_contract.as_ref().expect("绑定叶必须带合同");
+            assert_eq!(contract.producer_command, "r07_leaf_cases");
+            assert_eq!(
+                leaf.original_assertion_cases.len(),
+                leaf.r00_assertions.len()
+            );
+            assert!(leaf
+                .evidence_command_refs
+                .contains(&"r07_leaf_cases".to_string()));
+        }
+        assert!(map.commands.iter().any(|c| c.key == "r07_leaf_cases"));
     }
 
     #[test]

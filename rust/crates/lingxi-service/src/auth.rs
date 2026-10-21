@@ -3723,10 +3723,7 @@ mod tests {
             classify_route("HEAD", "/lingxi/v1/mobile/bootstrap"),
             Scope("chat")
         );
-        assert_eq!(
-            classify_route("POST", "/lingxi/v1/chat/models"),
-            LocalOnly
-        );
+        assert_eq!(classify_route("POST", "/lingxi/v1/chat/models"), LocalOnly);
         assert_eq!(
             classify_route("POST", "/lingxi/v1/mobile/bootstrap"),
             LocalOnly

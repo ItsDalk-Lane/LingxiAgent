@@ -119,6 +119,7 @@ async fn messages_share_canonical_identity_and_preserve_inbound_and_all_delivery
                 inbox_id: Some(inbox.id.clone()),
                 manual_action_id: None,
                 run_id: Some("projection-run".into()),
+                loop_delivery_id: None,
                 payload_json:
                     json!({"text":format!("外发{state}"),"credentials":"PRIVATE-PAYLOAD"})
                         .to_string(),

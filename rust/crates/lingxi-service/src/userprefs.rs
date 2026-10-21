@@ -83,6 +83,36 @@ impl MemoryService {
         self.merge_write("autolearn", patch)
     }
 
+    /// 新会话默认权限写面（R07 收口）：校验闭集词汇后写
+    /// session_permission_mode_default，返回规范化后的实际值。
+    #[allow(clippy::result_large_err)]
+    pub fn set_session_permission_default(&self, patch: Value) -> Result<Value, Response> {
+        let mode = patch
+            .get("permissionMode")
+            .or_else(|| patch.get("sessionPermissionDefault"))
+            .and_then(Value::as_str)
+            .ok_or_else(|| {
+                EndpointError::invalid_message("permissionMode is required").into_response()
+            })?;
+        if !matches!(mode, "auto" | "operate" | "ask" | "read_only") {
+            return Err(EndpointError::invalid_message(
+                "permissionMode must be auto|operate|ask|read_only",
+            )
+            .into_response());
+        }
+        let _lock = crate::agents_admin::preferences_locked();
+        let mut root = self.read_root()?;
+        root["session_permission_mode_default"] = json!(mode);
+        self.write_preferences_root(&root).map_err(|message| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": message })),
+            )
+                .into_response()
+        })?;
+        Ok(json!({ "permissionMode": mode }))
+    }
+
     /// 目标预算为全局偏好；只读时返回默认值，不生成偏好文件。
     #[allow(clippy::result_large_err)]
     pub fn goal_preferences(&self) -> Result<Value, Response> {
@@ -224,9 +254,26 @@ pub async fn session_permission_default_get_route(State(state): State<ServiceSta
         }
         Err(error) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"error":error})),
+            Json(json!({ "error":error})),
         )
             .into_response(),
+    }
+}
+
+/// 新会话默认权限写面（R07 收口）：合法闭集写入并返回规范化值。
+pub async fn session_permission_default_put_route(
+    State(state): State<ServiceState>,
+    body: axum::body::Bytes,
+) -> Response {
+    let patch = match body_object(body, "permissionMode") {
+        Ok(value) => value,
+        Err(response) => return response,
+    };
+    match state.memory().set_session_permission_default(patch) {
+        Ok(value) => {
+            Json(json!({ "ok": true, "permissionMode": value["permissionMode"] })).into_response()
+        }
+        Err(response) => response,
     }
 }
 

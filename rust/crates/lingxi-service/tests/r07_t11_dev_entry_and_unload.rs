@@ -85,11 +85,15 @@ impl Server {
             .and_then(|s| s.parse::<u16>().ok())
             .unwrap_or(0);
         let text = String::from_utf8_lossy(&buf[header_end + 4..]).to_string();
-        (status, serde_json::from_str(&text).unwrap_or_else(|_| json!({"raw": text})))
+        (
+            status,
+            serde_json::from_str(&text).unwrap_or_else(|_| json!({"raw": text})),
+        )
     }
 
     async fn local(&self, method: &str, path: &str, body: Option<Value>) -> (u16, Value) {
-        self.request(Some(&self.token.clone()), method, path, body).await
+        self.request(Some(&self.token.clone()), method, path, body)
+            .await
     }
 
     async fn stop(self) {
@@ -128,7 +132,9 @@ async fn boot_at(home: PathBuf, with_gateway: bool) -> Server {
         ));
         ServiceDeps {
             tool_gateway: Some(gateway),
-            approval_gate: Some(Arc::clone(&approvals) as Arc<dyn lingxi_service::approval::ApprovalGate>),
+            approval_gate: Some(
+                Arc::clone(&approvals) as Arc<dyn lingxi_service::approval::ApprovalGate>
+            ),
             ..ServiceDeps::default()
         }
     } else {
@@ -155,7 +161,14 @@ async fn boot_at(home: PathBuf, with_gateway: bool) -> Server {
         .await
     });
     let addr = ready_rx.await.expect("readiness");
-    Server { addr, token, stop: stop_tx, handle, state, home }
+    Server {
+        addr,
+        token,
+        stop: stop_tx,
+        handle,
+        state,
+        home,
+    }
 }
 
 /// A21：开发入口矩阵——无凭证/远端设备凭证/本地所有者三种身份 × 旧面
@@ -185,11 +198,19 @@ async fn r07_t11_dev_entry_matrix_rejects_every_caller() {
         let (status, _) = server
             .request(None, "POST", path, Some(json!({"tool":"any","args":{}})))
             .await;
-        assert_eq!(status, 401, "no credential must be rejected at auth: {path}");
+        assert_eq!(
+            status, 401,
+            "no credential must be rejected at auth: {path}"
+        );
         // 远端设备凭证：鉴权层以 local_owner_required 响亮 403（/api/* 未注册
         // 路径按管理面默认仅所有者），鉴权先于路由，永远到不了 404。
         let (status, _) = server
-            .request(Some(&remote_secret), "POST", path, Some(json!({"tool":"any","args":{}})))
+            .request(
+                Some(&remote_secret),
+                "POST",
+                path,
+                Some(json!({"tool":"any","args":{}})),
+            )
             .await;
         assert_eq!(status, 403, "remote client rejected at authz layer: {path}");
         // 本地所有者同样 404：Rust 面没有开发入口，本地身份也没有旁路。
@@ -233,7 +254,11 @@ async fn r07_t11_unload_invalidates_pinned_handles() {
         .await;
     assert_eq!(status, 200, "add connector: {body}");
     let (status, body) = server
-        .local("POST", "/lingxi/v1/mcp/settings-action", Some(json!({"action":"mcp.connector.start","payload":{"connectorId":"fixture"}})))
+        .local(
+            "POST",
+            "/lingxi/v1/mcp/settings-action",
+            Some(json!({"action":"mcp.connector.start","payload":{"connectorId":"fixture"}})),
+        )
         .await;
     assert_eq!(status, 200, "start connector: {body}");
 
@@ -241,9 +266,7 @@ async fn r07_t11_unload_invalidates_pinned_handles() {
     let target = lingxi_kernel::toolcatalog::ToolTargetId::parse("tool:mcp:fixture:env_report");
     tokio::time::timeout(Duration::from_secs(15), async {
         loop {
-            let (status, state) = server
-                .local("GET", "/lingxi/v1/mcp/state", None)
-                .await;
+            let (status, state) = server.local("GET", "/lingxi/v1/mcp/state", None).await;
             assert_eq!(status, 200, "{state}");
             let connecting = state["config"]["connectors"]
                 .as_array()
@@ -295,7 +318,10 @@ async fn r07_t11_unload_invalidates_pinned_handles() {
         .await
         .expect("execute before unload succeeds through the real chain");
     assert!(
-        matches!(result.outcome, lingxi_kernel::ports::ToolOutcome::Success { .. }),
+        matches!(
+            result.outcome,
+            lingxi_kernel::ports::ToolOutcome::Success { .. }
+        ),
         "fixture executes before unload: {:?}",
         result.outcome
     );
@@ -305,7 +331,11 @@ async fn r07_t11_unload_invalidates_pinned_handles() {
 
     // 真实 HTTP 移除连接器（卸载）。
     let (status, body) = server
-        .local("POST", "/lingxi/v1/mcp/settings-action", Some(json!({"action":"mcp.connector.remove","payload":{"connectorId":"fixture"}})))
+        .local(
+            "POST",
+            "/lingxi/v1/mcp/settings-action",
+            Some(json!({"action":"mcp.connector.remove","payload":{"connectorId":"fixture"}})),
+        )
         .await;
     assert_eq!(status, 200, "remove connector: {body}");
 
@@ -349,7 +379,10 @@ async fn r07_t11_unload_invalidates_pinned_handles() {
         &call2,
         &request2,
     );
-    assert!(re_prepare.is_err(), "卸载后同名目标不得再解析: {re_prepare:?}");
+    assert!(
+        re_prepare.is_err(),
+        "卸载后同名目标不得再解析: {re_prepare:?}"
+    );
 
     server.stop().await;
 }
@@ -365,8 +398,11 @@ async fn r07_t11_extension_boundaries_hold() {
     std::fs::create_dir_all(legacy.join("commands")).expect("legacy plugin dir");
     std::fs::write(legacy.join("commands/legacy-cmd.js"), "module.exports = {}")
         .expect("legacy command handler");
-    std::fs::write(legacy.join("manifest.json"), json!({"name":"legacy-demo"}).to_string())
-        .expect("legacy manifest");
+    std::fs::write(
+        legacy.join("manifest.json"),
+        json!({"name":"legacy-demo"}).to_string(),
+    )
+    .expect("legacy manifest");
 
     // 提示的数据源如实报告残留；空目录与隐藏项不算。
     let names = lingxi_service::legacy_plugins::legacy_user_plugin_names(&home);
@@ -403,7 +439,10 @@ async fn r07_t11_extension_boundaries_hold() {
     assert_eq!(reply["results"][0]["type"], "slash_result");
     assert_eq!(reply["results"][0]["level"], "error");
     assert!(
-        reply["results"][0]["text"].as_str().unwrap_or("").contains("未知命令"),
+        reply["results"][0]["text"]
+            .as_str()
+            .unwrap_or("")
+            .contains("未知命令"),
         "legacy plugin command must stay unknown: {reply}"
     );
 

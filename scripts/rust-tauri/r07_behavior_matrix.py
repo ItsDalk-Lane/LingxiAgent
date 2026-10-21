@@ -32,9 +32,10 @@ def out_path(argv: list[str]) -> Path:
 
 def rust_routes() -> dict[str, str]:
     """静态提取服务注册路由及其注册来源文件；来源只限真实源码，不抄清单文档。
-    cfg(test) 段是测试夹具服务器（如 background_tasks 的供应商桩），剥掉后扫描。"""
+    cfg(test) 段是测试夹具服务器（如 background_tasks 的供应商桩），剥掉后扫描。
+    多行注册（.route( 与路径字面量分行）同样提取：\\s* 跨行吸收空白。"""
     routes: dict[str, str] = {}
-    pattern = re.compile(r'\.route\("(/[^"]*)"')
+    pattern = re.compile(r'\.route\(\s*"(/[^"]+)"')
     for path in SERVICE_SRC.glob("*.rs"):
         text = path.read_text(encoding="utf-8")
         cut = text.find("#[cfg(test)]")
@@ -67,9 +68,32 @@ MODULE_TASK = {
 }
 
 # lib.rs 主干路由按路径前缀归因（跨阶段责任如实标注，不冒充 R07 所有）。
+# 归因依据 = 同路径 handler 的实现模块（agents_admin/persona/preview/
+# filehistory/client_context/input_drafts/background_tasks/…与任务分工对齐）。
 PREFIX_TASK = {
     "/lingxi/v1/bridge/": "R07-T02", "/lingxi/v1/browser-host": "R07-T04",
     "/lingxi/v1/desk/": "R07-T05", "/lingxi/v1/checkpoints": "R07-T07",
+    "/lingxi/v1/agent-deletions": "R07-T08(助手删除清理)",
+    "/lingxi/v1/agents": "R07-T08(助手管理面)",
+    "/lingxi/v1/avatar": "R07-T08(助手人格面)",
+    "/lingxi/v1/automation": "R07-T01(自动化面)",
+    "/lingxi/v1/task": "R07-T01(后台任务面)",
+    "/lingxi/v1/cards": "R07-T08(卡片面)",
+    "/lingxi/v1/character-cards": "R07-T08(角色卡面)",
+    "/lingxi/v1/chat/models": "R07-T09(客户端上下文)",
+    "/lingxi/v1/conversation-map": "R07-T07(工作台对话图)",
+    "/lingxi/v1/current-status": "R07-T08(配置读回)",
+    "/lingxi/v1/experiments": "R07-T08(实验开关)",
+    "/lingxi/v1/file-history": "R07-T07(文件历史)",
+    "/lingxi/v1/resources": "R07-T07(工作台资源票券)",
+    "/lingxi/v1/input-drafts": "R07-T09(输入草稿)",
+    "/lingxi/v1/mobile": "R07-T09(mobile 客户端)",
+    "/lingxi/v1/preferences": "R07-T08(偏好设置)",
+    "/lingxi/v1/preview": "R07-T05(预览面)",
+    "/lingxi/v1/providers": "R07-T08(供应商面)",
+    "/lingxi/v1/session-collab": "R07-T03(跨会话协作)",
+    "/lingxi/v1/settings": "R07-T08(设置面)",
+    "/lingxi/v1/user-profile": "R07-T08(用户资料)",
     "/lingxi/v1/sessions/todos": "R06(待办面板)",
     "/lingxi/v1/sessions": "R06(会话管理主干)",
     "/lingxi/v1/session-projects": "R06(会话项目目录)",
@@ -174,6 +198,7 @@ def main() -> int:
         "generatedBy": "scripts/rust-tauri/r07_behavior_matrix.py",
         "baseScenarios": len(base),
         "leafCount": len(leaf_rows),
+        "routeCount": len(routes),
         "leaves": leaf_rows,
         "routes": route_rows,
         "holes": {"leavesWithGaps": holes, "unmappedRoutes": orphan_routes},
@@ -184,6 +209,16 @@ def main() -> int:
         json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"A23 map: {len(leaf_rows)} leaves ({len(holes)} with explicit gaps), "
           f"{len(routes)} routes ({len(orphan_routes)} unmapped)")
+    # 未归因路由 = 静默空洞，退出非 0（此前恒 0 掩盖扫描缺口）。
+    if orphan_routes:
+        print(f"A23 map FAILED: {len(orphan_routes)} routes have no requirement binding",
+              file=sys.stderr)
+        return 1
+    # 扫描完整性自检：路由面必须达到已证量级，显著缩水即扫描器回归。
+    if len(routes) < 300:
+        print(f"A23 map FAILED: route inventory implausibly small ({len(routes)} < 300); "
+              "scanner is likely missing registrations", file=sys.stderr)
+        return 1
     return 0
 
 

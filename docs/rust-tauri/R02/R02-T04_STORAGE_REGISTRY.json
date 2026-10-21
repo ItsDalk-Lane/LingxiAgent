@@ -213,6 +213,24 @@
           "name": "r07_media_gallery",
           "registered_by": "R07-T06：追加工作台媒体任务投影表（与媒体作业一一对应，运行时作业仍是唯一事实来源）；V1–V22 SQL与指纹保持不变，验证另记。",
           "fingerprint_sha256": "e2f684b93d2e3b373709345f74a088ce331464fd73dc8169778e3ad780d8de0d"
+        },
+        {
+          "version": 24,
+          "name": "r07_observability_legacy_trace",
+          "registered_by": "R07-T10：旧观测库导入映射表（原 trace/parent id 保留，多轮不分裂）；V1–V23 SQL与指纹不变。",
+          "fingerprint_sha256": "36e3c7502d6d09b78cad4a23f88050a101b82631126953100670fe7d58c073c9"
+        },
+        {
+          "version": 25,
+          "name": "r07_bridge_loop_deliveries",
+          "registered_by": "R07 收口 B：桥循环投递台账（/loop 作用于桥会话时回执/通知先落账，重启接力不丢、delivery_id 幂等）。",
+          "fingerprint_sha256": "a0ab64ddaa44db7ecefb0b78b284043d7b5e498b6c9d30bd1be2d18be7d252f1"
+        },
+        {
+          "version": 26,
+          "name": "r07_bridge_outbox_loop_source",
+          "registered_by": "R07 收口 B：outbox 重建增加 loop_delivery_id 来源列（循环通知第四种可审计来源；存量行走迁移拷贝，约束与索引保持）。",
+          "fingerprint_sha256": "8923899f64cb03d226344bfd08dcd40c2c3a9b8734c0ff4d367ffe4e225cafdb"
         }
       ],
       "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",

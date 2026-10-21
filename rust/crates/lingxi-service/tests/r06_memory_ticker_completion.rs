@@ -145,10 +145,7 @@ impl Fixture {
                 .as_object_mut()
                 .unwrap()
                 .remove("memory");
-            plane_json["models"]
-                .as_object_mut()
-                .unwrap()
-                .remove("chat");
+            plane_json["models"].as_object_mut().unwrap().remove("chat");
         }
         let plane = lingxi_adapters::models::config::ModelPlaneConfig::parse_and_validate(
             &plane_json.to_string(),

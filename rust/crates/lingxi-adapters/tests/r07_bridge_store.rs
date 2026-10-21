@@ -124,6 +124,7 @@ fn reply(inbox: &BridgeInbox, run: &str, id: &str) -> BridgeOutboxInput {
         inbox_id: Some(inbox.id.clone()),
         manual_action_id: None,
         run_id: Some(run.into()),
+        loop_delivery_id: None,
         payload_json: json!({"text":"合成回复"}).to_string(),
         attachments: vec![],
     }
@@ -831,6 +832,7 @@ async fn commands_use_durable_receipts_without_fake_runs_and_recover_unqueued_re
         inbox_id: Some(inbox.id.clone()),
         manual_action_id: None,
         run_id: None,
+        loop_delivery_id: None,
         payload_json: "{\"text\":\"实际命令答复\"}".into(),
         attachments: vec![],
     };

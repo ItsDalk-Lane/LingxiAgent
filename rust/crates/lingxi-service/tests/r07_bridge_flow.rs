@@ -27,6 +27,8 @@ use std::{
 struct Provider {
     calls: AtomicUsize,
     priors: Mutex<Vec<(String, String)>>,
+    /// 测试闸门：armed 时含「阻塞」的提交挂起，用于构造在跑的 run。
+    gate: Mutex<Option<Arc<tokio::sync::Notify>>>,
 }
 impl TurnProviderPort for Provider {
     fn descriptor(&self) -> ProviderDescriptor {
@@ -48,7 +50,13 @@ impl TurnProviderPort for Provider {
             .lock()
             .unwrap()
             .push((input.submission.clone(), format!("{:?}", input.prior)));
+        let gate = self.gate.lock().unwrap().clone();
         Box::pin(async move {
+            if let Some(gate) = &gate {
+                if input.submission.contains("阻塞") {
+                    let _ = tokio::time::timeout(Duration::from_secs(15), gate.notified()).await;
+                }
+            }
             if input.turn == 1 {
                 if let Ok(command) = serde_json::from_str::<Value>(&input.submission) {
                     if let Some(tool) = command["tool"].as_str() {
@@ -210,18 +218,21 @@ rl.on('line',line=>{{const command=JSON.parse(line);const emit=(body)=>process.s
         )
         .await;
     }
-    async fn sql(&self, sql: &str) -> String {
+    async fn sql_opt(&self, sql: &str) -> Option<String> {
         self.state
             .storage()
             .query_one_text(sql, vec![])
             .await
             .unwrap()
-            .unwrap()
+    }
+    async fn sql(&self, sql: &str) -> String {
+        self.sql_opt(sql).await.unwrap()
     }
     async fn wait(&self, sql: &str, expected: &str) {
         tokio::time::timeout(Duration::from_secs(15), async {
             loop {
-                if self.sql(sql).await == expected {
+                // 行尚未出现（None）继续轮询到超时，不当场 panic。
+                if self.sql_opt(sql).await.as_deref() == Some(expected) {
                     break;
                 }
                 tokio::time::sleep(Duration::from_millis(20)).await;
@@ -232,11 +243,28 @@ rl.on('line',line=>{{const command=JSON.parse(line);const emit=(body)=>process.s
     }
     async fn inbound(&self, id: &str, sender: &str, text: &str) {
         let message = json!({"kind":"message","messageId":id,"conversationId":"conversation-1","conversationKind":"dm","senderId":sender,"text":text,"attachments":[],"replyContext":{"isGroup":false,"targetChatId":sender,"contextToken":"synthetic-context-token"}});
-        std::fs::write(
-            self.home.join("next-platform-message.json"),
-            message.to_string(),
-        )
+        let path = self.home.join("next-platform-message.json");
+        std::fs::write(&path, message.to_string()).unwrap();
+        // 替身 20ms 轮询该文件；等它消费删除后再返回，连续投递不互相覆盖。
+        tokio::time::timeout(Duration::from_secs(10), async {
+            while path.exists() {
+                tokio::time::sleep(Duration::from_millis(5)).await;
+            }
+        })
+        .await
         .unwrap();
+    }
+    /// 真实外发记录（协议替身在 send 命令时落 jsonl）。
+    fn sends(&self) -> Vec<Value> {
+        let path = self.home.join("platform-sends.jsonl");
+        if !path.exists() {
+            return Vec::new();
+        }
+        std::fs::read_to_string(path)
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect()
     }
     async fn notify(&self, request: &str) -> String {
         if self
@@ -294,6 +322,9 @@ rl.on('line',line=>{{const command=JSON.parse(line);const emit=(body)=>process.s
         accepted.run_id
     }
     async fn close(self) -> PathBuf {
+        self.state.loop_services().stop_idle_listener();
+        self.state.loop_services().alarm.dispose();
+        self.state.loop_services().controller.dispose();
         self.state.bridge().stop();
         tokio::time::timeout(Duration::from_secs(12), self.state.bridge().wait_stopped())
             .await
@@ -695,5 +726,477 @@ async fn actual_owner_can_take_over_only_selected_desktop_session_and_exit_resto
         .since(0)
         .to_string()
         .contains("bridge_rc_detached"));
+    h.close().await;
+}
+
+// ── R07 收口 B 组：/loop 与 /stop 经 SDK/Bridge 真实输入链 ─────────────
+// 入口全部是协议替身送来的平台消息（非内部 API 直调）；回执经命令收据 →
+// outbox → 协议替身 send 落 jsonl。循环轮经真实调度链（origin=loop 循环
+// 根 run），回执由循环投递台账推进为真实外发。
+
+fn loop_state_file(home: &std::path::Path) -> Value {
+    serde_json::from_str(
+        &std::fs::read_to_string(home.join(".ephemeral").join("loop-state.json")).unwrap(),
+    )
+    .unwrap()
+}
+
+#[tokio::test]
+async fn bridge_loop_commands_run_the_full_lifecycle_over_the_real_inbound_chain() {
+    let h = Harness::boot(None, false).await;
+    h.enable("wechat").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
+        "1",
+    )
+    .await;
+    // 启动：命令收据文本逐字，kickoff 轮是循环根 run，回执走台账链。
+    h.inbound("loop-start", "sender-1", "/loop 每隔一会儿提醒我喝水")
+        .await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE command='loop' AND status='confirmed'",
+        "1",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 WHERE command='loop' ORDER BY rowid LIMIT 1 OFFSET 0").await,
+        "（循环已启动，/loop status 查看进度，/loop stop 终止）"
+    );
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM run_lineage WHERE origin='loop'",
+        "1",
+    )
+    .await;
+    h.wait(
+        "SELECT status FROM bridge_outbox_v1 WHERE delivery_id LIKE 'loop-reply:%'",
+        "confirmed",
+    )
+    .await;
+    let sid = h
+        .sql("SELECT current_session_id FROM bridge_conversations_v1")
+        .await;
+    assert_eq!(
+        h.sql("SELECT r.session_id FROM runs r JOIN run_lineage l ON l.run_id=r.run_id WHERE l.origin='loop'")
+            .await,
+        sid
+    );
+    assert_eq!(
+        h.sql("SELECT r.owner_kind FROM runs r JOIN run_lineage l ON l.run_id=r.run_id WHERE l.origin='loop'")
+            .await,
+        "local_user"
+    );
+    assert_eq!(
+        h.sql("SELECT l.parent_run_id IS NULL AND l.cause_id=r.session_id FROM runs r JOIN run_lineage l ON l.run_id=r.run_id WHERE l.origin='loop'")
+            .await,
+        "1"
+    );
+    let sends = h.sends();
+    assert!(
+        sends.iter().any(|row| row["deliveryId"]
+            .as_str()
+            .is_some_and(|id| id.starts_with("loop-reply:"))
+            && row["text"]
+                .as_str()
+                .is_some_and(|text| text.contains("实际回复"))),
+        "循环轮回执须真实外发：{sends:?}"
+    );
+    // 会话状态持久化：桥目标、绑定会话、运行中。
+    let stored = loop_state_file(&h.home);
+    assert_eq!(stored["loops"][0]["key"].as_str().unwrap(), sid);
+    assert_eq!(
+        stored["loops"][0]["target"]["kind"].as_str().unwrap(),
+        "bridge"
+    );
+    assert_eq!(stored["loops"][0]["status"].as_str().unwrap(), "running");
+    // 状态查询。
+    h.inbound("loop-status", "sender-1", "/loop status").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "2",
+    )
+    .await;
+    let status_text = h
+        .sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 1")
+        .await;
+    assert!(status_text.contains("循环状态：running"), "{status_text}");
+    assert!(
+        status_text.contains("每隔一会儿提醒我喝水"),
+        "{status_text}"
+    );
+    // 重复投递同一平台消息编号：不产生第二张收据、不产生第二条外发。
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
+        "4",
+    )
+    .await;
+    h.inbound("loop-status", "sender-1", "/loop status").await;
+    tokio::time::sleep(Duration::from_millis(500)).await;
+    assert_eq!(
+        h.sql("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1")
+            .await,
+        "2"
+    );
+    assert_eq!(
+        h.sql("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'")
+            .await,
+        "4"
+    );
+    // 暂停 → 恢复（恢复注入新一轮）→ 终止。
+    h.inbound("loop-pause", "sender-1", "/loop pause").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "3",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 2").await,
+        "（循环已暂停，/loop resume 恢复）"
+    );
+    assert_eq!(
+        loop_state_file(&h.home)["loops"][0]["status"]
+            .as_str()
+            .unwrap(),
+        "paused"
+    );
+    h.inbound("loop-resume", "sender-1", "/loop resume").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "4",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 3").await,
+        "（循环已恢复）"
+    );
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM run_lineage WHERE origin='loop'",
+        "2",
+    )
+    .await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE delivery_id LIKE 'loop-reply:%' AND status='confirmed'",
+        "2",
+    )
+    .await;
+    h.inbound("loop-stop", "sender-1", "/loop stop").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "5",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 4").await,
+        "（循环已终止）"
+    );
+    assert_eq!(
+        loop_state_file(&h.home)["loops"][0]["status"]
+            .as_str()
+            .unwrap(),
+        "stopped"
+    );
+    h.close().await;
+}
+
+#[tokio::test]
+async fn bridge_guest_slash_text_never_becomes_a_command() {
+    let h = Harness::boot(None, false).await;
+    h.enable("wechat").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
+        "1",
+    )
+    .await;
+    // owner 先起循环，坐实「有状态可偷」。
+    h.inbound("owner-loop", "sender-1", "/loop 主人循环").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE command='loop' AND status='confirmed'",
+        "1",
+    )
+    .await;
+    // 访客的 /loop 与 /stop 不是命令：无收据、无循环副作用，只产生
+    // 访客自己会话里的普通模型回复（现行桥边界：命令分类只认 owner 私聊）。
+    h.inbound("guest-loop", "sender-2", "/loop status").await;
+    h.inbound("guest-stop", "sender-2", "/stop").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_inbox_v1 WHERE role='guest' AND status='succeeded'",
+        "2",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1")
+            .await,
+        "1"
+    );
+    assert_eq!(
+        h.sql("SELECT DISTINCT role FROM bridge_inbox_v1 WHERE sender_id='sender-2'")
+            .await,
+        "guest"
+    );
+    let stored = loop_state_file(&h.home);
+    let loops = stored["loops"].as_array().unwrap();
+    assert_eq!(loops.len(), 1, "访客命令文本不得触碰循环状态：{stored}");
+    assert_eq!(loops[0]["status"].as_str().unwrap(), "running");
+    assert_eq!(
+        h.sql("SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE owner_kind='bridge' AND status='cancelled'")
+            .await,
+        "0"
+    );
+    h.close().await;
+}
+
+#[tokio::test]
+async fn bridge_stop_family_reports_idle_and_cancels_an_active_run() {
+    let h = Harness::boot(None, false).await;
+    h.enable("wechat").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
+        "1",
+    )
+    .await;
+    // 空闲停止与别名收据（收据名 = 实际词元）。
+    h.inbound("stop-idle", "sender-1", "/stop").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "1",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 0").await,
+        "已停止（当前无活动回复）"
+    );
+    h.inbound("halt-idle", "sender-1", "/halt").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "2",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT command FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 1")
+            .await,
+        "halt"
+    );
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 1").await,
+        "已停止（当前无活动回复）"
+    );
+    // 在跑的 run 被真实取消。
+    let gate = Arc::new(tokio::sync::Notify::new());
+    *h.provider.gate.lock().unwrap() = Some(gate.clone());
+    h.inbound("blocking", "sender-1", "请阻塞一会儿").await;
+    tokio::time::timeout(Duration::from_secs(10), async {
+        while h.provider.calls.load(Ordering::SeqCst) < 2 {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    })
+    .await
+    .unwrap();
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE status='running'",
+        "1",
+    )
+    .await;
+    h.inbound("stop-active", "sender-1", "/stop").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "3",
+    )
+    .await;
+    assert_eq!(
+        h.sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 2").await,
+        "正在停止当前回复"
+    );
+    gate.notify_waiters();
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM runs WHERE status='cancelled'",
+        "1",
+    )
+    .await;
+    h.close().await;
+}
+
+#[tokio::test]
+async fn bridge_loop_reply_ledger_survives_restart_and_reports_the_interrupted_turn() {
+    let h = Harness::boot(None, false).await;
+    h.enable("wechat").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
+        "1",
+    )
+    .await;
+    // kickoff 轮挂起在替身处：台账 queued 行已落账，回执文本尚未冻结。
+    let gate = Arc::new(tokio::sync::Notify::new());
+    *h.provider.gate.lock().unwrap() = Some(gate.clone());
+    h.inbound("loop-gated", "sender-1", "/loop 阻塞循环").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE command='loop' AND status='confirmed'",
+        "1",
+    )
+    .await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM run_lineage WHERE origin='loop'",
+        "1",
+    )
+    .await;
+    h.wait("SELECT status FROM bridge_loop_deliveries_v1", "queued")
+        .await;
+    let home = h.close().await;
+    // 重启：中断的轮被恢复标记终态，台账由 tick 推进为真实外发回执；
+    // 循环记录本身存活，可 status、可 stop。
+    let r = Harness::boot(Some(home), false).await;
+    r.wait(
+        "SELECT status FROM bridge_outbox_v1 WHERE delivery_id LIKE 'loop-reply:%'",
+        "confirmed",
+    )
+    .await;
+    assert!(
+        r.sends().iter().any(|row| row["deliveryId"]
+            .as_str()
+            .is_some_and(|id| id.starts_with("loop-reply:"))
+            && row["text"]
+                .as_str()
+                .is_some_and(|text| text.contains("暂时无法确认"))),
+        "中断轮的结果须如实外发：{:?}",
+        r.sends()
+    );
+    r.inbound("loop-status-after-restart", "sender-1", "/loop status")
+        .await;
+    // 同库重启：重启前的启动收据仍在，status 收据是第 2 条、stop 第 3 条。
+    r.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "2",
+    )
+    .await;
+    let text = r
+        .sql("SELECT json_extract(result_json,'$.text') FROM bridge_command_receipts_v1 ORDER BY rowid LIMIT 1 OFFSET 1")
+        .await;
+    assert!(text.contains("循环状态：running"), "{text}");
+    r.inbound("loop-stop-after-restart", "sender-1", "/loop stop")
+        .await;
+    r.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_command_receipts_v1 WHERE status='confirmed'",
+        "3",
+    )
+    .await;
+    assert_eq!(
+        loop_state_file(&r.home)["loops"][0]["status"]
+            .as_str()
+            .unwrap(),
+        "stopped"
+    );
+    r.close().await;
+}
+
+#[tokio::test]
+async fn bridge_loop_delivery_ledger_rejects_forged_or_guest_sources() {
+    let h = Harness::boot(None, false).await;
+    h.enable("wechat").await;
+    h.wait(
+        "SELECT CAST(COUNT(*) AS TEXT) FROM bridge_outbox_v1 WHERE status='confirmed'",
+        "1",
+    )
+    .await;
+    let conversation = h
+        .sql("SELECT conversation_id FROM bridge_conversations_v1")
+        .await;
+    let actor = h.sql("SELECT actor_id FROM bridge_conversations_v1").await;
+    let connector = h.sql("SELECT id FROM bridge_connectors_v1").await;
+    let generation: u64 = h
+        .sql("SELECT CAST(generation AS TEXT) FROM bridge_connectors_v1")
+        .await
+        .parse()
+        .unwrap();
+    let sid = h
+        .sql("SELECT current_session_id FROM bridge_conversations_v1")
+        .await;
+    let now = || h.state.clock().now_unix_ms();
+    use lingxi_adapters::storage::bridge as store;
+    // 通知腿：合法 owner 私聊通知入队成功，由 tick 真实外发。
+    store::enqueue_loop_delivery(
+        h.state.storage(),
+        &store::BridgeLoopDeliveryInput {
+            delivery_id: "loop-notice:test-1".into(),
+            connector_id: connector.clone(),
+            connector_generation: generation,
+            conversation_id: conversation.clone(),
+            sender_id: "sender-1".into(),
+            actor_id: actor.clone(),
+            session_id: sid.clone(),
+            run_id: None,
+            kind: "notice".into(),
+            text: Some("（合成通知：循环需要你回到灵犀查看）".into()),
+        },
+        now(),
+    )
+    .await
+    .expect("合法通知须入队");
+    h.wait(
+        "SELECT status FROM bridge_outbox_v1 WHERE delivery_id='loop-notice:test-1'",
+        "confirmed",
+    )
+    .await;
+    assert!(h.sends().iter().any(
+        |row| row["deliveryId"].as_str() == Some("loop-notice:test-1")
+            && row["text"]
+                .as_str()
+                .is_some_and(|text| text.contains("合成通知"))
+    ));
+    // 伪造来源逐一响亮拒绝：非 owner 发件人、非循环血统的 run、编造的 run。
+    let forged = |delivery_id: &str, sender: &str, run: Option<String>| {
+        let notice = run.is_none();
+        store::BridgeLoopDeliveryInput {
+            delivery_id: delivery_id.into(),
+            connector_id: connector.clone(),
+            connector_generation: generation,
+            conversation_id: conversation.clone(),
+            sender_id: sender.into(),
+            actor_id: actor.clone(),
+            session_id: sid.clone(),
+            run_id: run,
+            kind: if notice {
+                "notice".into()
+            } else {
+                "reply".into()
+            },
+            text: if notice {
+                Some("伪造通知".into())
+            } else {
+                None
+            },
+        }
+    };
+    let err = store::enqueue_loop_delivery(
+        h.state.storage(),
+        &forged("loop-notice:test-guest", "sender-2", None),
+        now(),
+    )
+    .await
+    .expect_err("访客发件人的通知须拒绝");
+    assert!(err.to_string().contains("conversation"), "{err}");
+    let real_run = h.sql("SELECT run_id FROM runs LIMIT 1").await;
+    let err = store::enqueue_loop_delivery(
+        h.state.storage(),
+        &forged("loop-reply:test-bridge-run", "sender-1", Some(real_run)),
+        now(),
+    )
+    .await
+    .expect_err("桥血统 run 冒充循环轮须拒绝");
+    assert!(err.to_string().contains("loop"), "{err}");
+    let err = store::enqueue_loop_delivery(
+        h.state.storage(),
+        &forged(
+            "loop-reply:test-missing-run",
+            "sender-1",
+            Some("run-不存在".into()),
+        ),
+        now(),
+    )
+    .await
+    .expect_err("编造 run 须拒绝");
+    assert!(err.to_string().contains("missing"), "{err}");
+    assert_eq!(
+        h.sql("SELECT CAST(COUNT(*) AS TEXT) FROM bridge_loop_deliveries_v1")
+            .await,
+        "1"
+    );
     h.close().await;
 }

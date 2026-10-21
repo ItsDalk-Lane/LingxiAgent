@@ -47,7 +47,10 @@ pub(crate) fn routes() -> Router<ServiceState> {
         .route("/mobile", get(|| async { Redirect::permanent("/mobile/") }))
         .route("/mobile/", get(mobile_index))
         .route("/mobile/{*path}", get(mobile_asset))
-        .route("/desktop", get(|| async { Redirect::permanent("/desktop/") }))
+        .route(
+            "/desktop",
+            get(|| async { Redirect::permanent("/desktop/") }),
+        )
         .route("/desktop/", get(desktop_index))
         .route("/desktop/{*path}", get(desktop_asset))
 }

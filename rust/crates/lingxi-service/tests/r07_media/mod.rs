@@ -459,6 +459,9 @@ impl Harness {
     }
     async fn stop(self) {
         self.external.release.add_permits(32);
+        self.state.loop_services().stop_idle_listener();
+        self.state.loop_services().alarm.dispose();
+        self.state.loop_services().controller.dispose();
         assert!(
             self.state
                 .media()
@@ -1133,4 +1136,169 @@ fn untrusted_media_arguments_cannot_choose_credentials_or_paths_or_drop_wrong_ty
     .unwrap();
     assert_eq!(image.count, Some(2));
     assert_eq!(image.ratio.as_deref(), Some("1:1"));
+}
+
+/// Loop 来源媒体任务：正式持久授权 = 落盘循环记录（活跃状态）。kickoff 经
+/// 真实调度链投递（execute_scheduled_for origin=loop），授权闸读同一记录
+/// 放行并完成真实生成/交付；执行 run 的 lineage 必须挂在循环根下。
+#[tokio::test]
+async fn loop_origin_media_job_is_authorized_by_the_persistent_loop_record() {
+    let h = Harness::new("image", false).await;
+    h.external
+        .args
+        .lock()
+        .unwrap()
+        .as_object_mut()
+        .unwrap()
+        .remove("externalVideoUrl");
+    let target = lingxi_service::loopx::LoopTarget::desktop("media-a");
+    let controller = h.state.loop_services().controller.clone();
+    let record = controller
+        .start(&target, "循环盯一下本地合成媒体")
+        .await
+        .expect("循环启动");
+    assert_eq!(record.status, lingxi_service::loopx::LoopStatus::Running);
+    // kickoff 轮驱动媒体工具链，批准该循环 run 的外部生成批准。
+    let approval = tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            if let Some(p) = h
+                .approvals
+                .pending_for_principal(&KernelPrincipal::LocalUser, "media-a")
+                .into_iter()
+                .next()
+            {
+                break p;
+            }
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+    })
+    .await
+    .expect("循环轮的媒体生成须先进入正式批准");
+    let loop_run = approval.run_id.clone();
+    assert!(h
+        .approvals
+        .answer_for_principal(
+            &KernelPrincipal::LocalUser,
+            "media-a",
+            &approval.approval_id,
+            Answer::Approve
+        )
+        .settled());
+    // 授权通过的证据：真实外部请求到达替身供应商。
+    h.wait_generated().await;
+    let completed = h.terminal_job().await;
+    assert_eq!(
+        completed.phase,
+        lingxi_adapters::storage::media::MediaPhase::Completed,
+        "{:?}",
+        completed.state
+    );
+    // 媒体来源 run 即循环 run，且其 lineage 是 origin=loop 的循环根。
+    assert_eq!(completed.source_run_id, loop_run);
+    let lineage = h
+        .state
+        .storage()
+        .load_run_lineage(&RunId::new(&loop_run))
+        .await
+        .unwrap()
+        .expect("循环 run 必须有 lineage");
+    assert_eq!(lineage.origin, lingxi_kernel::subagent::RunOrigin::Loop);
+    assert!(lineage.parent_run_id.is_none());
+    assert_eq!(lineage.cause_id.as_deref(), Some("media-a"));
+    // 交付真实发生：会话文件登记且字节与供应商一致。
+    let file_id = completed.state["files"][0]["fileId"].as_str().unwrap();
+    let file = h
+        .state
+        .session_files()
+        .get_file("media-a", file_id)
+        .await
+        .unwrap()
+        .unwrap();
+    assert_eq!(file.mime, "image/png");
+    // 落盘循环记录仍存在且活跃（授权锚点本体）。
+    let stored: Value = serde_json::from_str(
+        &std::fs::read_to_string(h.home.join(".ephemeral").join("loop-state.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(stored["loops"][0]["key"], "media-a");
+    assert_eq!(stored["loops"][0]["status"], "running");
+    controller.stop(&target).await.expect("停循环");
+    h.stop().await;
+}
+
+/// 撤权即停：循环停止后落盘记录写终态，媒体后台持续重查的下一拍拒绝，
+/// 已提交远端的结果不得交付为会话文件，也不谎称远端已撤销。
+#[tokio::test]
+async fn stopping_the_loop_revokes_media_authority_and_late_bytes_are_not_delivered() {
+    let h = Harness::new("image", true).await;
+    h.external
+        .args
+        .lock()
+        .unwrap()
+        .as_object_mut()
+        .unwrap()
+        .remove("externalVideoUrl");
+    let target = lingxi_service::loopx::LoopTarget::desktop("media-a");
+    let controller = h.state.loop_services().controller.clone();
+    controller
+        .start(&target, "循环盯一下本地合成媒体")
+        .await
+        .expect("循环启动");
+    let approval = tokio::time::timeout(Duration::from_secs(10), async {
+        loop {
+            if let Some(p) = h
+                .approvals
+                .pending_for_principal(&KernelPrincipal::LocalUser, "media-a")
+                .into_iter()
+                .next()
+            {
+                break p;
+            }
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+    })
+    .await
+    .expect("循环轮的媒体生成须先进入正式批准");
+    assert!(h
+        .approvals
+        .answer_for_principal(
+            &KernelPrincipal::LocalUser,
+            "media-a",
+            &approval.approval_id,
+            Answer::Approve
+        )
+        .settled());
+    // 远端请求已提交（闸门扣住响应），随后停止循环 = 撤权。
+    h.wait_generated().await;
+    let job = h.job().await;
+    controller.stop(&target).await.expect("停止循环即撤权");
+    let stored: Value = serde_json::from_str(
+        &std::fs::read_to_string(h.home.join(".ephemeral").join("loop-state.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(stored["loops"][0]["status"], "stopped");
+    // 放行远端迟到响应：授权重查必须拒绝，产物不得交付。
+    h.external.release.add_permits(1);
+    let settled = h.terminal_job().await;
+    assert_ne!(
+        settled.phase,
+        lingxi_adapters::storage::media::MediaPhase::Completed,
+        "撤权后迟到字节不得交付: {:?}",
+        settled.state
+    );
+    assert!(
+        settled.state["files"].is_null()
+            || settled.state["files"]
+                .as_array()
+                .is_some_and(|f| f.is_empty()),
+        "撤权后不得登记会话文件: {:?}",
+        settled.state
+    );
+    assert_eq!(settled.operation_id, job.operation_id);
+    assert_eq!(
+        h.external.generated.load(Ordering::SeqCst),
+        1,
+        "不得重复提交"
+    );
+    h.stop().await;
 }

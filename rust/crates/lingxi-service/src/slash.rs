@@ -250,22 +250,27 @@ impl SlashService {
         }
     }
     /// 宿主先凭此只读分类领取命令收据，再调用有副作用的派发。
+    /// 收据名 = 实际首词元：/abort、/halt 是 /stop 同族别名，
+    /// claim_command 要求收据名与冻结消息逐字对应。
     pub(crate) fn bridge_command_kind(
         &self,
         source: &str,
         text: &str,
         now: u64,
-    ) -> Result<Option<&'static str>, String> {
+    ) -> Result<Option<String>, String> {
         let command = text
             .split_whitespace()
             .next()
             .unwrap_or("")
             .to_ascii_lowercase();
+        if matches!(command.as_str(), "/loop" | "/stop" | "/abort" | "/halt") {
+            return Ok(Some(command.trim_start_matches('/').to_string()));
+        }
         if command == "/rc" {
-            return Ok(Some("rc"));
+            return Ok(Some("rc".into()));
         }
         if command == "/exitrc" {
-            return Ok(Some("exitrc"));
+            return Ok(Some("exitrc".into()));
         }
         if command.starts_with('/') {
             return Ok(None);
@@ -278,7 +283,7 @@ impl SlashService {
             .pending
             .get(source)
             .filter(|selection| now < selection.expires)
-            .map(|_| "rc"))
+            .map(|_| "rc".into()))
     }
     fn attachment(&self, bridge: &str) -> Result<Option<String>, String> {
         Ok(self
@@ -676,18 +681,123 @@ pub async fn dispatch(
                 Err(e) => send(&tx, id, id, "error", format!("清除失败：{e}")).await,
             }
         }
-        "/stop" | "/abort" | "/halt" => match state.storage().list_active_runs().await {
-            Err(e) => send(&tx, id, target, "error", format!("停止失败：{e}")).await,
-            Ok(rows) => {
-                let current: Vec<_> = rows
-                    .into_iter()
-                    .filter(|r| r.session_id == target)
-                    .collect();
-                if current.is_empty() {
-                    send(&tx, id, target, "success", "已停止（当前无活动回复）").await;
-                    return;
+        "/stop" | "/abort" | "/halt" => {
+            for (level, text) in stop_run_texts(state, principal, target).await {
+                send(&tx, id, target, level, text).await;
+            }
+        }
+        // 现役 core/slash-commands/bridge-commands.ts 的 /loop
+        // （permission:"owner"；bridge-commands.ts:249-284 逐字文本）。
+        "/loop" => {
+            if !principal.is_local_owner() {
+                send(&tx, id, target, "error", "管理循环任务需要本机所有者权限").await;
+                return;
+            }
+            // 桥会话未挂接桌面时循环跑在桥会话本体（回执经循环投递台账
+            // 走 outbox 链）；挂接态 target 已解析为桌面会话。
+            let loop_target = if bridge && attachment.is_none() {
+                crate::loopx::LoopTarget::bridge(target)
+            } else {
+                crate::loopx::LoopTarget::desktop(target)
+            };
+            let (level, text) = loop_command(state, &loop_target, args).await;
+            send(&tx, id, target, level, text).await;
+        }
+
+        _ => send(&tx, id, target, "error", format!("未知命令：{raw}")).await,
+    }
+}
+/// /loop 共享实现（HTTP 入口与桥命令入口同一文本，现役
+/// bridge-commands.ts:251-284 逐字同位；storage_error 段为 Rust 侧
+/// 持久化失败显式呈现，对全部入口一致）。
+async fn loop_command(
+    state: &ServiceState,
+    loop_target: &crate::loopx::LoopTarget,
+    args: &str,
+) -> (&'static str, String) {
+    let controller = &state.loop_services().controller;
+    let target = loop_target.session_id.as_str();
+    let args_trimmed = args.trim();
+    let first_token = args_trimmed
+        .split_whitespace()
+        .next()
+        .unwrap_or("")
+        .to_ascii_lowercase();
+    if args_trimmed.is_empty() || first_token == "status" {
+        return match controller.status_for_target(loop_target) {
+            Some(record) => (
+                if controller.storage_error(target).is_some() {
+                    "error"
+                } else {
+                    "success"
+                },
+                match controller.storage_error(target) {
+                    Some(error) => format!(
+                        "{}\n自动推进已停止，状态尚未保存；修复后用 /loop resume 重试。\n{error}",
+                        crate::loopsvc::render_loop_status(&record)
+                    ),
+                    None => crate::loopsvc::render_loop_status(&record),
+                },
+            ),
+            None => {
+                if args_trimmed.is_empty() {
+                    (
+                        "error",
+                        "用法：/loop <任务> | /loop stop | pause | resume | status".into(),
+                    )
+                } else {
+                    ("success", "（该会话没有循环）".into())
                 }
-                for row in current {
+            }
+        };
+    }
+    if first_token == "stop" {
+        return match controller.stop(loop_target).await {
+            Ok(_) => ("success", "（循环已终止）".into()),
+            Err(err) => ("error", err.message),
+        };
+    }
+    if first_token == "pause" {
+        return match controller.pause(loop_target, "user", None).await {
+            Ok(_) => ("success", "（循环已暂停，/loop resume 恢复）".into()),
+            Err(err) => ("error", err.message),
+        };
+    }
+    if first_token == "resume" {
+        return match controller.resume(loop_target).await {
+            Ok(_) => ("success", "（循环已恢复）".into()),
+            Err(err) => ("error", err.message),
+        };
+    }
+    // 现役 isStart：有参数且首词非子命令 → 以全部参数为任务启动。
+    match controller.start(loop_target, args_trimmed).await {
+        Ok(_) => (
+            "success",
+            "（循环已启动，/loop status 查看进度，/loop stop 终止）".into(),
+        ),
+        Err(err) => ("error", err.message),
+    }
+}
+/// /stop 逐 run 结果文本（HTTP 入口逐条发送；桥入口合并为单条回执，
+/// 文本逐字一致）。
+async fn stop_run_texts(
+    state: &ServiceState,
+    principal: &Principal,
+    target: &str,
+) -> Vec<(&'static str, String)> {
+    match state.storage().list_active_runs().await {
+        Err(e) => vec![("error", format!("停止失败：{e}"))],
+        Ok(rows) => {
+            let current: Vec<_> = rows
+                .into_iter()
+                .filter(|r| r.session_id == target)
+                .collect();
+            if current.is_empty() {
+                return vec![("success", "已停止（当前无活动回复）".into())];
+            }
+            let mut out = Vec::new();
+            for row in current {
+                out.push(
                     match state
                         .sessions
                         .cancel_run_for(
@@ -699,127 +809,18 @@ pub async fn dispatch(
                         .await
                     {
                         Ok(crate::sessions::CancelRunOutcome::Accepted { .. }) => {
-                            send(&tx, id, target, "success", "正在停止当前回复").await
+                            ("success", "正在停止当前回复".to_string())
                         }
                         Ok(crate::sessions::CancelRunOutcome::AlreadyTerminal { .. }) => {
-                            send(&tx, id, target, "success", "已停止（当前无活动回复）").await
+                            ("success", "已停止（当前无活动回复）".to_string())
                         }
-                        Ok(other) => {
-                            send(&tx, id, target, "error", format!("停止未完成：{other:?}")).await
-                        }
-                        Err(e) => send(&tx, id, target, "error", format!("停止失败：{e:?}")).await,
-                    }
-                }
+                        Ok(other) => ("error", format!("停止未完成：{other:?}")),
+                        Err(e) => ("error", format!("停止失败：{e:?}")),
+                    },
+                );
             }
-        },
-        // 现役 core/slash-commands/bridge-commands.ts 的 /loop
-        // （permission:"owner"；bridge-commands.ts:249-284 逐字文本）。
-        "/loop" => {
-            if !principal.is_local_owner() {
-                send(&tx, id, target, "error", "管理循环任务需要本机所有者权限").await;
-                return;
-            }
-            // 桥接未挂接会话的循环投递 Rust 侧无对应物（δ4 登记偏差）；
-            // 挂接态 target 已解析为桌面会话，不在此列。现役同位错误：
-            // "loop: bridge delivery is not available"。
-            if bridge && attachment.is_none() {
-                send(
-                    &tx,
-                    id,
-                    target,
-                    "error",
-                    "loop: bridge delivery is not available",
-                )
-                .await;
-                return;
-            }
-            let controller = &state.loop_services().controller;
-            let loop_target = crate::loopx::LoopTarget::desktop(target);
-            let args_trimmed = args.trim();
-            let first_token = args_trimmed
-                .split_whitespace()
-                .next()
-                .unwrap_or("")
-                .to_ascii_lowercase();
-            if args_trimmed.is_empty() || first_token == "status" {
-                match controller.status_for_target(&loop_target) {
-                    Some(record) => {
-                        send(
-                            &tx,
-                            id,
-                            target,
-                            if controller.storage_error(target).is_some() { "error" } else { "success" },
-                            match controller.storage_error(target) {
-                                Some(error)=>format!("{}\n自动推进已停止，状态尚未保存；修复后用 /loop resume 重试。\n{error}",crate::loopsvc::render_loop_status(&record)),
-                                None=>crate::loopsvc::render_loop_status(&record),
-                            },
-                        )
-                        .await
-                    }
-                    None => {
-                        if args_trimmed.is_empty() {
-                            send(
-                                &tx,
-                                id,
-                                target,
-                                "error",
-                                "用法：/loop <任务> | /loop stop | pause | resume | status",
-                            )
-                            .await;
-                        } else {
-                            send(&tx, id, target, "success", "（该会话没有循环）").await;
-                        }
-                    }
-                }
-                return;
-            }
-            if first_token == "stop" {
-                match controller.stop(&loop_target).await {
-                    Ok(_) => send(&tx, id, target, "success", "（循环已终止）").await,
-                    Err(err) => send(&tx, id, target, "error", err.message).await,
-                }
-                return;
-            }
-            if first_token == "pause" {
-                match controller.pause(&loop_target, "user", None).await {
-                    Ok(_) => {
-                        send(
-                            &tx,
-                            id,
-                            target,
-                            "success",
-                            "（循环已暂停，/loop resume 恢复）",
-                        )
-                        .await
-                    }
-                    Err(err) => send(&tx, id, target, "error", err.message).await,
-                }
-                return;
-            }
-            if first_token == "resume" {
-                match controller.resume(&loop_target).await {
-                    Ok(_) => send(&tx, id, target, "success", "（循环已恢复）").await,
-                    Err(err) => send(&tx, id, target, "error", err.message).await,
-                }
-                return;
-            }
-            // 现役 isStart：有参数且首词非子命令 → 以全部参数为任务启动。
-            match controller.start(&loop_target, args_trimmed).await {
-                Ok(_) => {
-                    send(
-                        &tx,
-                        id,
-                        target,
-                        "success",
-                        "（循环已启动，/loop status 查看进度，/loop stop 终止）",
-                    )
-                    .await
-                }
-                Err(err) => send(&tx, id, target, "error", err.message).await,
-            }
+            out
         }
-
-        _ => send(&tx, id, target, "error", format!("未知命令：{raw}")).await,
     }
 }
 async fn response_json(response: Response) -> Result<Value, String> {
@@ -1098,6 +1099,37 @@ pub(crate) async fn dispatch_bridge_message(
     if kind == "exitrc" {
         clear_bridge_takeover(state, source)?;
         return Ok(result("success", "已退出接管桌面会话".into(), source));
+    }
+    if kind == "loop" {
+        // 现役桥 /loop 不随接管改目标（_handleLoopCommand 直接用 bridge
+        // sessionRef）：循环恒跑在桥会话本体上。
+        let loop_target = crate::loopx::LoopTarget::bridge(source);
+        let (level, text) = loop_command(state, &loop_target, args).await;
+        return Ok(result(level, text, source));
+    }
+    if matches!(kind.as_str(), "stop" | "abort" | "halt") {
+        let takeover = resolve_takeover(state, inbox, source).await?;
+        let target = takeover.as_deref().unwrap_or(source);
+        // 接管态目标是桌面会话，与现役 sessionOps.abort(desktopRef) 同位，
+        // 以调度主体执行（owner 私聊 + 新鲜接管绑定即授权，/rc 列表臂同
+        // 先例）；未接管时桥主体只能停自己桥会话的 run。
+        let principal = if takeover.is_some() {
+            state.auth().scheduler_principal()
+        } else {
+            crate::auth::principal_for_bridge_inbox(inbox)?
+        };
+        let texts = stop_run_texts(state, &principal, target).await;
+        let level = if texts.iter().any(|(level, _)| *level == "error") {
+            "error"
+        } else {
+            "success"
+        };
+        let text = texts
+            .into_iter()
+            .map(|(_, text)| text)
+            .collect::<Vec<_>>()
+            .join("\n");
+        return Ok(result(level, text, target));
     }
     if command.eq_ignore_ascii_case("/rc") && args.trim().is_empty() {
         if resolve_takeover(state, inbox, source).await?.is_some() {

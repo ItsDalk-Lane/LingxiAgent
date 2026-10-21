@@ -125,6 +125,7 @@ pub mod memorytools;
 pub mod model_configuration;
 pub mod model_history;
 mod mood_trajectory;
+mod observability;
 pub mod office;
 mod office_pdf;
 pub mod office_routes;
@@ -173,7 +174,6 @@ pub mod shutdown;
 pub mod skills;
 pub mod slash;
 pub mod stagefiles;
-mod observability;
 mod static_web;
 pub mod streaming_norm;
 pub mod subagents;
@@ -8645,7 +8645,8 @@ pub fn build_router(state: ServiceState) -> Router {
         )
         .route(
             "/lingxi/v1/preferences/session-permission-default",
-            get(userprefs::session_permission_default_get_route),
+            get(userprefs::session_permission_default_get_route)
+                .put(userprefs::session_permission_default_put_route),
         )
         .route(
             "/lingxi/v1/preferences/quick-chat",

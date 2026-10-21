@@ -234,15 +234,30 @@ async fn bootstrap_and_models_project_real_context_without_secrets() {
     assert_eq!(bootstrap["agentName"], "助手甲");
     assert_eq!(bootstrap["permissionMode"], "auto");
     assert_eq!(bootstrap["modelState"], "ready");
-    assert_eq!(bootstrap["activeModel"], json!({"id":"chat-model","provider":"stub"}));
-    assert_eq!(bootstrap["currentModel"], json!({"id":"chat-model","provider":"stub"}));
-    let generation = bootstrap["modelGeneration"].as_str().expect("generation string");
-    assert!(generation.parse::<u64>().is_ok(), "decimal generation: {generation}");
+    assert_eq!(
+        bootstrap["activeModel"],
+        json!({"id":"chat-model","provider":"stub"})
+    );
+    assert_eq!(
+        bootstrap["currentModel"],
+        json!({"id":"chat-model","provider":"stub"})
+    );
+    let generation = bootstrap["modelGeneration"]
+        .as_str()
+        .expect("generation string");
+    assert!(
+        generation.parse::<u64>().is_ok(),
+        "decimal generation: {generation}"
+    );
     let agents = bootstrap["agents"].as_array().unwrap();
     assert_eq!(agents.len(), 2);
-    assert!(agents.iter().any(|a| a["id"] == "agentA" && a["isCurrent"] == true));
+    assert!(agents
+        .iter()
+        .any(|a| a["id"] == "agentA" && a["isCurrent"] == true));
     let models = bootstrap["models"].as_array().unwrap();
-    assert!(models.iter().any(|m| m["id"] == "chat-model" && m["isCurrent"] == true));
+    assert!(models
+        .iter()
+        .any(|m| m["id"] == "chat-model" && m["isCurrent"] == true));
     assert_no_secret_keys(&bootstrap, "$");
 
     let (status, body) = http(
@@ -256,12 +271,23 @@ async fn bootstrap_and_models_project_real_context_without_secrets() {
     assert_eq!(status, 200, "chat/models: {body}");
     let context: Value = serde_json::from_str(&body).unwrap();
     assert_eq!(context["modelState"], "ready");
-    assert_eq!(context["activeModel"], json!({"id":"chat-model","provider":"stub"}));
+    assert_eq!(
+        context["activeModel"],
+        json!({"id":"chat-model","provider":"stub"})
+    );
     let models = context["models"].as_array().unwrap();
     let chat_model = models.iter().find(|m| m["id"] == "chat-model").unwrap();
     assert_eq!(chat_model["isCurrent"], true);
-    assert!(chat_model["thinkingLevels"].as_array().unwrap().iter().any(|l| l == "medium"));
-    assert!(chat_model["input"].as_array().unwrap().iter().any(|i| i == "text"));
+    assert!(chat_model["thinkingLevels"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|l| l == "medium"));
+    assert!(chat_model["input"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|i| i == "text"));
     assert_no_secret_keys(&context, "$");
     fixture.stop().await;
 }
@@ -322,7 +348,10 @@ async fn credentials_and_scope_are_enforced() {
             Some("{}"),
         )
         .await;
-        assert!(matches!(status, 401 | 403 | 405), "POST must not be served for {path}: {status}");
+        assert!(
+            matches!(status, 401 | 403 | 405),
+            "POST must not be served for {path}: {status}"
+        );
     }
     fixture.stop().await;
 }
@@ -394,7 +423,10 @@ async fn explicit_agent_and_session_targets_are_validated() {
         None,
     )
     .await;
-    assert!(matches!(status, 403 | 404), "cross-owner must be refused: {status}");
+    assert!(
+        matches!(status, 403 | 404),
+        "cross-owner must be refused: {status}"
+    );
     // 不存在的会话：404。
     let (status, _) = http(
         fixture.addr,

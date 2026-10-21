@@ -1009,6 +1009,76 @@ CREATE TABLE observability_legacy_trace (
 CREATE INDEX idx_observability_legacy_trace_trace ON observability_legacy_trace(trace_id);
 "#;
 
+/// R07 收口：桥接循环投递台账（version 25）。/loop 作用于桥会话时，每一轮的
+/// 回复与系统通知先落此表（服务侧已核循环记录），连接器推进循环逐条接力成
+/// 正式 outbox；行持久化保证重启后接力不丢，delivery_id 幂等保证不重复外发。
+pub const V25_NAME: &str = "r07_bridge_loop_deliveries";
+pub const V25_SQL: &str = r#"
+CREATE TABLE bridge_loop_deliveries_v1 (
+    delivery_id TEXT PRIMARY KEY,
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    connector_generation INTEGER NOT NULL CHECK(connector_generation>0),
+    conversation_id TEXT NOT NULL,
+    sender_id TEXT NOT NULL,
+    actor_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    run_id TEXT,
+    kind TEXT NOT NULL CHECK(kind IN ('reply','notice')),
+    text TEXT,
+    status TEXT NOT NULL CHECK(status IN ('queued','enqueued','failed')),
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    CHECK(kind<>'reply' OR run_id IS NOT NULL),
+    CHECK(kind<>'notice' OR text IS NOT NULL)
+);
+CREATE INDEX idx_bridge_loop_deliveries_pending ON bridge_loop_deliveries_v1(status,connector_id);
+"#;
+
+/// R07 收口：outbox 增加循环投递台账来源列（version 26）。循环通知不锚
+/// inbox/run/manual action，但台账行本身即持久审计来源；重建表以扩展
+/// 来源 CHECK（四选一），其余约束与索引保持原样，存量行走迁移拷贝。
+pub const V26_NAME: &str = "r07_bridge_outbox_loop_source";
+pub const V26_SQL: &str = r#"
+CREATE TABLE bridge_outbox_rebuilt (
+    delivery_id TEXT PRIMARY KEY,
+    connector_id TEXT NOT NULL REFERENCES bridge_connectors_v1(id),
+    connector_generation INTEGER NOT NULL CHECK(connector_generation>0),
+    inbox_id TEXT REFERENCES bridge_inbox_v1(id),
+    manual_action_id TEXT UNIQUE REFERENCES bridge_manual_actions_v1(id),
+    run_id TEXT,
+    loop_delivery_id TEXT REFERENCES bridge_loop_deliveries_v1(delivery_id),
+    conversation_id TEXT NOT NULL,
+    conversation_kind TEXT NOT NULL CHECK(conversation_kind IN ('dm','group')),
+    target_inbox_id TEXT NOT NULL REFERENCES bridge_inbox_v1(id),
+    reply_context_json TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    attachments_json TEXT NOT NULL,
+    status TEXT NOT NULL CHECK(status IN ('queued','started','confirmed','unknown','failed')),
+    platform_receipt_json TEXT,
+    error TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    CHECK(inbox_id IS NOT NULL OR run_id IS NOT NULL OR manual_action_id IS NOT NULL OR loop_delivery_id IS NOT NULL),
+    CHECK(manual_action_id IS NULL OR (inbox_id IS NULL AND run_id IS NULL AND loop_delivery_id IS NULL)),
+    CHECK(loop_delivery_id IS NULL OR (inbox_id IS NULL AND manual_action_id IS NULL))
+);
+INSERT INTO bridge_outbox_rebuilt
+    (delivery_id,connector_id,connector_generation,inbox_id,manual_action_id,run_id,
+     loop_delivery_id,conversation_id,conversation_kind,target_inbox_id,reply_context_json,
+     payload_json,attachments_json,status,platform_receipt_json,error,created_at,updated_at)
+SELECT delivery_id,connector_id,connector_generation,inbox_id,manual_action_id,run_id,
+       NULL,conversation_id,conversation_kind,target_inbox_id,reply_context_json,
+       payload_json,attachments_json,status,platform_receipt_json,error,created_at,updated_at
+FROM bridge_outbox_v1;
+DROP TABLE bridge_outbox_v1;
+ALTER TABLE bridge_outbox_rebuilt RENAME TO bridge_outbox_v1;
+CREATE UNIQUE INDEX idx_bridge_outbox_command ON bridge_outbox_v1(inbox_id) WHERE run_id IS NULL AND manual_action_id IS NULL;
+CREATE INDEX idx_bridge_outbox_pending ON bridge_outbox_v1(status,created_at);
+CREATE INDEX idx_bridge_outbox_inbox ON bridge_outbox_v1(inbox_id);
+CREATE INDEX idx_bridge_outbox_loop ON bridge_outbox_v1(loop_delivery_id);
+"#;
+
 pub const MIGRATIONS: &[Migration] = &[
     Migration {
         version: 1,
@@ -1129,6 +1199,16 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 24,
         name: V24_NAME,
         sql: V24_SQL,
+    },
+    Migration {
+        version: 25,
+        name: V25_NAME,
+        sql: V25_SQL,
+    },
+    Migration {
+        version: 26,
+        name: V26_NAME,
+        sql: V26_SQL,
     },
 ];
 

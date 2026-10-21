@@ -146,6 +146,7 @@ async fn final_outbox(db: &RunDatabase, inbox: &BridgeInbox) -> BridgeOutbox {
             inbox_id: Some(inbox.id.clone()),
             run_id: Some("actual-run".into()),
             manual_action_id: None,
+            loop_delivery_id: None,
             payload_json: json!({"text":"真实最终答复"}).to_string(),
             attachments: vec![],
         },

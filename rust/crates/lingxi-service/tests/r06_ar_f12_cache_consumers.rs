@@ -232,7 +232,11 @@ async fn ingestion_case(upgrade: bool) {
             &ks::current_cache_profile_hash(&profile),
         );
         assert_eq!(
-            index.get_variant(&worker_variant_id).unwrap().unwrap().status,
+            index
+                .get_variant(&worker_variant_id)
+                .unwrap()
+                .unwrap()
+                .status,
             "ready"
         );
         assert!(!index

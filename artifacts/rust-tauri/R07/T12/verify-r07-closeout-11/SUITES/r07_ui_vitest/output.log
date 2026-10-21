@@ -1,0 +1,595 @@
+test channels-route.test::channels route membership contract rejects creating a group channel with fewer than two unique agent members ... ok
+test channels-route.test::channels route membership contract downloads only the selected group conversation ... ok
+test channels-route.test::channels route membership contract downloads only the selected DM conversation ... ok
+test channels-route.test::channels route membership contract rejects creating a channel with a missing agent member before writing the channel file ... ok
+test channels-route.test::channels route membership contract freezes channel and phone settings routes when channels are disabled ... ok
+test channels-route.test::channels route membership contract returns agent phone activities for a conversation ... ok
+test channels-route.test::channels route membership contract persists channel agent phone tool mode in channel metadata ... ok
+test channels-route.test::channels route membership contract persists DM agent phone tool mode in the owner agent's conversation projection (#1614 切换入口持久化) ... ok
+test channels-route.test::channels route membership contract aborts the removed member's running phone session when removing a channel member ... ok
+test channels-route.test::channels route membership contract reports an error instead of guessing a DM owner when no primary agent is configured ... ok
+test channels-route.test::channels route membership contract reads DM phone settings from the primary agent when focus is different ... ok
+test channels-route.test::channels route membership contract persists DM phone settings with the same setting surface as two-agent conversations ... ok
+test channels-route.test::channels route membership contract persists channel phone settings without the removed reply-scope field ... ok
+test channels-route.test::channels route membership contract returns default reminder and model override settings for legacy channel metadata ... ok
+test channels-route.test::channels route membership contract adds an agent member and creates its channel bookmark ... ok
+test channels-route.test::channels route membership contract removes an agent member but refuses to go below the group minimum ... ok
+test channels-route.test::channels route membership contract passes resolved @mentions as scheduling hints when the user posts a channel message ... ok
+test channels-route.test::channels route membership contract persists DM agent phone tool mode in the primary agent projection by default ... ok
+test cli-abort-contract.test::CLI abort stream identity contract builds abort only when sessionId, sessionPath, and streamId are all known ... ok
+test cli-abort-contract.test::CLI abort stream identity contract tracks the current stream and ignores a stale terminal status ... ok
+test cli-abort-contract.test::CLI abort stream identity contract does not adopt a stream event from another session ... ok
+test cli-agent-selection.test::CLI agent selection names the agent this terminal session is attached to ... ok
+test cli-agent-selection.test::CLI agent selection falls back to the primary agent, then to the first one ... ok
+test cli-agent-selection.test::CLI agent selection returns null rather than guessing when there is nothing to pick from ... ok
+test cli-agent-selection.test::CLI agent list marker marks the agent the server reports as current ... ok
+test cli-agent-selection.test::CLI agent list marker marks nothing when the server reports no current agent ... ok
+test cli-args.test::CLI args defaults to help when no command is provided ... ok
+test cli-args.test::CLI args parses chat connection options ... ok
+test cli-args.test::CLI args parses continue target as index or session path ... ok
+test cli-args.test::CLI args keeps server args after -- as passthrough ... ok
+test cli-args.test::CLI args rejects missing option values ... ok
+test cli-args.test::CLI args defaults allowDataDowngrade to false and flips it on --allow-data-downgrade ... ok
+test cli-args.test::CLI args defaults to Rust and keeps an explicit node fallback ... ok
+test cli-args.test::CLI args rejects options that would be ignored by their command ... ok
+test cli-bundle.test::CLI args: bundle command family parses bundle pull with the default channel ... ok
+test cli-bundle.test::CLI args: bundle command family parses bundle status with an explicit channel ... ok
+test cli-bundle.test::CLI args: bundle command family rejects a missing bundle subcommand ... ok
+test cli-bundle.test::CLI args: bundle command family rejects an unknown bundle subcommand ... ok
+test cli-bundle.test::CLI args: bundle command family rejects an unknown channel value ... ok
+test cli-bundle.test::CLI args: bundle command family rejects a missing --channel value ... ok
+test cli-bundle.test::CLI args: bundle command family mentions the bundle commands in the help text ... ok
+test cli-bundle.test::CLI bundle pull (mocked core download — the network pipeline is covered in artifact-ota tests) passes homeDir, channel, keyset, and serverProtocolVersion through to the core, without any devBypass ... ok
+test cli-bundle.test::CLI bundle pull (mocked core download — the network pipeline is covered in artifact-ota tests) prints the activated version and the restart hint on success ... ok
+test cli-bundle.test::CLI bundle pull (mocked core download — the network pipeline is covered in artifact-ota tests) prints an up-to-date line for an alreadyCurrent short-circuit ... ok
+test cli-bundle.test::CLI bundle pull (mocked core download — the network pipeline is covered in artifact-ota tests) prints the error and exits 1 on failure ... ok
+test cli-bundle.test::CLI bundle status points at bundle pull when nothing has been pulled yet ... ok
+test cli-bundle.test::CLI bundle status prints the activated version, train, last check time, and available version ... ok
+test cli-bundle.test::CLI bundle status reads the channel's own renderer pointer namespace ... ok
+test cli-chat-runtime.test::CLI chat real WebSocket boundary hides another session's stream frame and exits nonzero on an unexpected disconnect ... ok
+test cli-chat.test::CLI chat session helpers selects the latest session by default ... ok
+test cli-chat.test::CLI chat session helpers selects one-based session indices ... ok
+test cli-chat.test::CLI chat session helpers selects exact session paths ... ok
+test cli-chat.test::CLI chat session helpers formats recent session rows for terminal display ... ok
+test cli-chat.test::CLI status and list failure boundaries does not present a connection hint as authenticated identity ... ok
+test cli-chat.test::CLI status and list failure boundaries prints at most 20 sessions and preserves the empty-list message ... ok
+test cli-chat.test::standalone CLI session stream contract includes the immutable session identity in prompts ... ok
+test cli-chat.test::standalone CLI session stream contract only builds abort requests when sessionId, sessionPath, and streamId are all present ... ok
+test cli-chat.test::standalone CLI session stream contract keeps the active stream after abort_rejected and only clears it on a matching terminal event ... ok
+test cli-chat.test::standalone CLI session stream contract does not let another session mutate the tracked stream ... ok
+test cli-chat.test::standalone CLI session stream contract Ctrl+C targets only the active stream and waits for an unknown stream identity ... ok
+test cli-data.test::CLI args: data command family parses each data subcommand ... ok
+test cli-data.test::CLI args: data command family parses --confirm-token alongside restore ... ok
+test cli-data.test::CLI args: data command family rejects a missing data subcommand ... ok
+test cli-data.test::CLI args: data command family rejects an unknown data subcommand ... ok
+test cli-data.test::CLI args: data command family rejects data restore without a transitionId ... ok
+test cli-data.test::CLI args: data command family mentions the data commands in the help text ... ok
+test cli-data.test::hana data diagnose — read-only across three home states reports a clean, unstamped home ... ok
+test cli-data.test::hana data diagnose — read-only across three home states reports an in-progress transition journal with its continuation suggestion ... ok
+test cli-data.test::hana data diagnose — read-only across three home states reports an available checkpoint ... ok
+test cli-data.test::hana data diagnose — read-only across three home states never writes to the home directory across all three states ... ok
+test cli-data.test::hana data checkpoints prints a friendly message when nothing is available ... ok
+test cli-data.test::hana data checkpoints lists complete checkpoints with transitionId, epoch range, createdAt, store count, and size ... ok
+test cli-data.test::hana data checkpoints skips .tmp-* and .invalid-* directories and reports them as a count instead of listing them ... ok
+test cli-data.test::hana data restore — confirmation is never skippable aborts on a TTY when the retyped confirmation does not match, without calling restore ... ok
+test cli-data.test::hana data restore — confirmation is never skippable refuses on a non-TTY without --confirm-token, without calling restore ... ok
+test cli-data.test::hana data restore — confirmation is never skippable refuses on a non-TTY when --confirm-token does not exactly match, without calling restore ... ok
+test cli-data.test::hana data restore — confirmation is never skippable errors clearly when the transitionId has no checkpoint on disk ... ok
+test cli-data.test::hana data restore — confirmation is never skippable restores end-to-end with the exact confirm token on a non-TTY, using the real provider and restore transaction ... ok
+test cli-data.test::hana data restore — confirmation is never skippable prompts for confirmation on a TTY and restores when the retyped phrase matches exactly ... ok
+test cli-local-server.test::CLI local server discovery reports a missing server-info file explicitly ... ok
+test cli-local-server.test::CLI local server discovery builds a loopback connection from server-info ... ok
+test cli-local-server.test::CLI local server discovery uses explicit URL without allowing query-token transport by default ... ok
+test cli-local-server.test::CLI local server discovery A09 normal: a complete server-info.json resolves with explicit fields ... ok
+test cli-local-server.test::CLI local server discovery A09 missing field: server-info.json without token fails explicitly as incomplete ... ok
+test cli-local-server.test::CLI local server discovery A09 malformed: unparseable server-info.json fails explicitly as invalid ... ok
+test cli-local-server.test::CLI local server discovery A09 stale: a dead pid is reported as stale when process checks are on ... ok
+test cli-local-server.test::CLI local server discovery A11: resolveCliLingxiHome keeps legacy semantics on the shared authority ... ok
+test cli-rust-service.test::Rust CLI discovery binds a local token to the matching instance and home ... ok
+test cli-rust-service.test::Rust CLI discovery uses the recorded transport and rejects unknown transport values ... ok
+test cli-rust-service.test::Rust CLI discovery rejects a stale token, a different home, and a non-loopback address ... ok
+test cli-rust-service.test::Rust CLI discovery rejects credential-bearing explicit URLs ... ok
+test cli-rust-service.test::Rust CLI serve planning spawns only an explicit executable and preserves the selected data home ... ok
+test cli-rust-service.test::Rust CLI serve planning does not import a real-home renderer into Rust test mode ... ok
+test cli-rust-service.test::Rust CLI serve planning does not silently serve a different frontend when beta is unavailable ... ok
+test cli-rust-service.test::Rust CLI serve planning refuses a data-downgrade override instead of silently ignoring it ... ok
+test cli-rust-service.test::Rust CLI serve planning does not launch Rust beside an unreadable Node ownership record ... ok
+test cli-rust-service.test::Rust CLI service requests reads authenticated sessions and never sends a local token in the URL ... ok
+test cli-rust-service.test::Rust CLI service requests does not treat a different principal as the owner of a discovered local token ... ok
+test cli-rust-service.test::Rust CLI service requests surfaces unauthorized sessions and never prints another principal's sessions ... ok
+test cli-rust-service.test::Rust CLI service requests redacts the local token and terminal control bytes from remote errors and session titles ... ok
+test cli-rust-service.test::Rust CLI service requests shows a bounded list and the empty-list message from actual Rust responses ... ok
+test cli-rust-service.test::Rust CLI service requests shows health but fails status when identity fails without inventing an auth source ... ok
+test cli-rust-service.test::Rust CLI service requests prints authenticated health but leaves status failed until Agent and model exist ... ok
+test cli-rust-service.test::Rust CLI service requests returns a diagnostic failure when Rust service cannot be reached ... ok
+test cli-rust-service.test::Rust CLI service requests refuses to fake a model reply after identifying a real selected session ... ok
+test cli-server-runner.test::CLI server runner runs the source server entry in development ... ok
+test cli-server-runner.test::CLI server runner runs the packaged bootstrap entry when LINGXI_ROOT is available ... ok
+test cli-server-runner.test::CLI server runner injects LINGXI_RENDERER_DIST into the spawn env when a valid renderer pointer exists ... ok
+test cli-server-runner.test::guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判) does not block when no server-info.json exists ... ok
+test cli-server-runner.test::guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判) blocks when the probe reports alive-same-home, with a message naming ownerKind/version/pid ... ok
+test cli-server-runner.test::guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判) blocks when the probe reports alive-unauthorized ... ok
+test cli-server-runner.test::guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判) does not block when the probe reports not-hana or dead — self-cleaning cases ... ok
+test cli-server-runner.test::guardAgainstForeignServer (CLI pre-spawn 同宅互斥预判) ignores whether the recorded pid looks alive — the probe result is the sole source of truth ... ok
+test cli-server-runner.test::spawnServerForeground — blocked path never spawns exits 1 and never resolves resolveServerSpawnSpec/spawn when a foreign server is detected ... ok
+test cli-server-runner.test::buildServeSpawnEnv passes the env through unchanged and does not warn when allowDataDowngrade is false ... ok
+test cli-server-runner.test::buildServeSpawnEnv sets LINGXI_ALLOW_DATA_DOWNGRADE=1 and warns when allowDataDowngrade is true ... ok
+test cli-server-runner.test::resolveRendererDistPointer (CLI pointer resolution layer) pointer present and validated -> returns the versionDir, valid: true ... ok
+test cli-server-runner.test::resolveRendererDistPointer (CLI pointer resolution layer) no pointer at all (never bundle pull'd) -> returns null, caller must not set the env var ... ok
+test cli-server-runner.test::resolveRendererDistPointer (CLI pointer resolution layer) pointer present but its versionDir is missing/corrupted -> still returns the (invalid) versionDir, not null ... ok
+test cli-server-runner.test::resolveRendererDistPointer (CLI pointer resolution layer) channels are namespaced independently (a beta pointer does not satisfy a stable resolve) ... ok
+test jimeng-cli-adapter.test::Jimeng CLI command resolution uses DREAMINA_CLI_PATH before PATH lookup ... ok
+test jimeng-cli-adapter.test::Jimeng CLI command resolution accepts DREAMINA_CLI_PATH as an install directory ... ok
+test jimeng-cli-adapter.test::Jimeng CLI command resolution checks the official user install directory even when GUI app PATH is minimal ... ok
+test jimeng-cli-adapter.test::Jimeng CLI command resolution documents common GUI app lookup paths ... ok
+test jimeng-cli-adapter.test::Jimeng CLI command resolution uses target platform path rules instead of the host OS ... ok
+test jimeng-cli-adapter.test::Jimeng CLI command resolution returns null when dreamina is not installed ... ok
+test jimeng-cli-adapter.test::Jimeng CLI output parsing parses JSON task output ... ok
+test jimeng-cli-adapter.test::Jimeng CLI output parsing parses text task output ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters 外部凭证许可被拒绝时不会启动 CLI ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters 认证检查和轮询也要分别领取外部凭证许可 ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters submits text-to-image through dreamina without shell execution ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters creates the plugin-owned working directory before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters reports an unusable working directory separately from a missing CLI ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters reads image provider defaults from image config, not video config ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters uses the highest supported Jimeng image defaults when no explicit defaults are saved ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters rejects unsupported Jimeng image resolution before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters submits image-to-video when a reference image is present ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters uses budget-conscious Jimeng video defaults when no explicit options are provided ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters allows resolutions discovered for seedance2.0_vip ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters accepts a newly discovered Dreamina model without adapter source changes ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters rejects models absent from the current CLI snapshot ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters surfaces capability discovery failures before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters rejects unsupported Jimeng video resolution before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters rejects unsupported Jimeng video duration before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters rejects image-only video models for text-to-video before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters rejects mismatched explicit video mode before invoking dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters queries results and returns files downloaded by dreamina ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters reports a missing CLI as an auth failure ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters reports execFile ENOENT during auth as a missing CLI instead of unavailable CLI ... ok
+test jimeng-cli-adapter.test::Jimeng CLI adapters translates execFile ENOENT during video submit into actionable CLI guidance ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability parsing builds image provider models from the CLI model and mode intersections ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability parsing keeps video modes and per-model constraints aligned with each CLI command ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability parsing fails explicitly when capability output is empty or no longer parseable ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability parsing parses the structured CLI version and rejects opaque version text ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability discovery uses execFile-style commands and skips help subprocesses while the fingerprint is unchanged ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability discovery reports missing executables and command failures with stable error codes ... ok
+test jimeng-cli-capabilities.test::Dreamina CLI capability discovery resolves explicit install paths and the per-user CLI location without a shell ... ok
+test jimeng-cli-provider.test::Jimeng CLI provider contribution declares provider identity without a stale static media catalog ... ok
+test jimeng-cli-provider.test::Jimeng CLI provider contribution 只给所属插件签发无秘密的外部凭证许可 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 总开关关闭时拒绝沉淀 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 必填缺失时报空输入 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 非法名称（路径逃逸形状）拒绝且不触达 guard ... ok
+test learn-lesson-tool.test::learn_lesson 工具 同名技能已存在时拒绝、不覆盖、不烧 guard 调用 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 超过大小上限时拒绝 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 guard 未配置时 fail-closed 走风险确认 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 审查未通过 → 带 token 显式确认后落盘并标 riskOverride ... ok
+test learn-lesson-tool.test::learn_lesson 工具 无 token 的 risk_accepted 不能绕过审查 ... ok
+test learn-lesson-tool.test::learn_lesson 工具 审查通过：SKILL.md 落盘（frontmatter + 正文）、写经验索引、触发 onLearned ... ok
+test learn-lesson-tool.test::learn_lesson 工具 经验索引写入失败不吞掉技能已落盘的事实 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） status：逐语言可用性 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） definition：1-based 输入 → 0-based 协议 → 1-based 输出 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） references：多位置清单 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） hover：markdown 值摘录 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） symbols：含嵌套 children 的扁平轮廓 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） diagnostics：didOpen 推送收集 + 分级展示 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） rename：prepareRename 验证 → 编辑计算 → 写回 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） prepareRename 拒绝：如实拒绝不写 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） 服务器缺失：LSP_SERVER_MISSING + 环境页指引 ... ok
+test lsp-tool.test::lsp 工具（mock server 全动作） 权限契约：读类=read；rename=write ... ok
+test lsp-tool.test::lsp 辅助 文件扩展名路由语言 ... ok
+test lsp-tool.test::lsp 辅助 summarizeLocations 兼容 Location 与 LocationLink ... ok
+test viewer-window-resource-events.test::viewer ResourceEvent live reload matches resource.changed events for the current viewer file ... ok
+test viewer-window-resource-events.test::viewer ResourceEvent live reload subscribes through ResourceIO and notifies only matching viewer resource events ... ok
+test ast-tools.test::ast_grep 工具 参数校验：缺 pattern/language 直接说明，不起子进程 ... ok
+test ast-tools.test::ast_grep 工具 content 模式分页 + 诚实 footer ... ok
+test ast-tools.test::ast_grep 工具 files 模式：唯一文件 + 命中数 ... ok
+test ast-tools.test::ast_grep 工具 count 模式：总数 + 逐文件计数 ... ok
+test ast-tools.test::ast_grep 工具 超时：AST_GREP_TIMEOUT 如实报错 ... ok
+test ast-tools.test::ast_grep 工具 参数面：pattern/language 必填，globs/files 可选，翻页键齐全 ... ok
+test ast-tools.test::ast_grep 工具 权限契约：恒 read（计划模式可用） ... ok
+test ast-tools.test::ast_edit 工具 preview：不落 --update-all，正文声明未改文件 ... ok
+test ast-tools.test::ast_edit 工具 apply：过新鲜度守卫后重写并登记突变与日记 ... ok
+test ast-tools.test::ast_edit 工具 apply：读后被外部改动的文件被拒（FILE_STALE_SINCE_READ） ... ok
+test ast-tools.test::ast_edit 工具 apply：匹配扫描失败如实上抛 sg stderr ... ok
+test ast-tools.test::ast_edit 工具 权限契约：preview=read / apply=write ... ok
+test ast-tools.test::parseAstGrepJsonMatches / formatAstGrepContentPage 坏 JSON / 缺字段条目跳过，不猜 ... ok
+test ast-tools.test::parseAstGrepJsonMatches / formatAstGrepContentPage 末页无 footer，整页短文本原样 ... ok
+test ptc-tool.test::run_tools 工具契约 code 缺失时报错且不进沙箱 ... ok
+test ptc-tool.test::run_tools 工具契约 权限契约：execute 动作 + routine 档，能力名对齐工具名 ... ok
+test ptc-tool.test::run_tools 工具契约 绑定表未 attach 时如实报错 ... ok
+test ptc-tool.test::run_tools 绑定桥 直挂工具子调用：合成 ID/参数/ctx 原样透传，文本结果解包成字符串 ... ok
+test ptc-tool.test::run_tools 绑定桥 目录工具转发包装后的 mcp_call，并携带 {tool, arguments} ... ok
+test ptc-tool.test::run_tools 绑定桥 run_tools 不能调自己（防递归），错误可被程序捕获 ... ok
+test ptc-tool.test::run_tools 绑定桥 未知名且直挂面无该工具时走桥；桥也没有则 fail-closed ... ok
+test ptc-tool.test::run_tools 绑定桥 工具 isError → 程序内抛 ToolCallError（带 toolName），可 try/catch 继续 ... ok
+test ptc-tool.test::run_tools 绑定桥 execute 抛异常同样落成 ToolCallError ... ok
+test ptc-tool.test::run_tools 绑定桥 多工具顺序+并发混编：Promise.all 全部完成，subcalls 按序记录 ... ok
+test ptc-tool.test::run_tools 结果语义 子调用中间结果不进 content，只有 console + return 进 ... ok
+test ptc-tool.test::run_tools 结果语义 return 对象渲染为 JSON；无输出无返回时如实说明 ... ok
+test ptc-tool.test::run_tools 结果语义 正文超 50KB 截断（保头保尾） ... ok
+test ptc-tool.test::run_tools 结果语义 子调用记录携带完整实参与结果文本（子调用行展开用） ... ok
+test ptc-tool.test::run_tools 结果语义 子调用输出超单条/总预算时截断并如实标记 ... ok
+test ptc-tool.test::run_tools 结果语义 程序异常：isError + 异常消息 + 已捕获日志随附 ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 无 require/process/fetch，动态 import 被拒 ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 可擦除 TS 通过，非可擦除语法报 exception ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 墙钟超时 → timeout，且如实带已捕获日志 ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 输出超限 → output-limit ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 中止信号联动：abort → abort 类失败 ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 并发闸：在飞子调用不超过 maxConcurrent ... ok
+test ptc-tool.test::ptc-runtime 沙箱边界 返回函数等不可克隆值 → invalid-output ... ok
+test run-code-tool.test::run_code 工具 变量跨调用存活（同内核连续两次 run）+ 回显剥除 + 结果输出 ... ok
+test run-code-tool.test::run_code 工具 缺语言：RUN_CODE_LANGUAGE_MISSING + 安装指引 ... ok
+test run-code-tool.test::run_code 工具 内核死亡：如实报告 exit 与部分输出，指路 restart ... ok
+test run-code-tool.test::run_code 工具 run 中途死亡：RUN_CODE_KERNEL_EXITED + 部分输出 ... ok
+test run-code-tool.test::run_code 工具 restart 重建 + status 查询 ... ok
+test run-code-tool.test::run_code 工具 label 身份兜底：工具实例重建后不重复 start（按 label 找回内核） ... ok
+test run-code-tool.test::run_code 工具 未知语言直接拒绝 ... ok
+test run-code-tool.test::run_code 工具 权限契约：status=read；run/restart=write ... ok
+test security-scan-tool.test::secret-rules 规则表覆盖 critical/warning/info 三级 ... ok
+test security-scan-tool.test::secret-rules 命中各类密钥并给行号；同行同规则去重 ... ok
+test security-scan-tool.test::baseline-scanner 二进制（含 NUL）跳过并计数；空文本不算二进制 ... ok
+test security-scan-tool.test::baseline-scanner 排序按严重度优先，计数分级 ... ok
+test security-scan-tool.test::security_scan 工具 path 模式：扫目录、命中密钥、审计只进计数 ... ok
+test security-scan-tool.test::security_scan 工具 范围硬校验：path 指到授权文件夹之外直接拒绝 ... ok
+test security-scan-tool.test::security_scan 工具 授权文件夹内的目标放行 ... ok
+test security-scan-tool.test::security_scan 工具 changes 模式：非 git 目录如实说明并建议 path 模式 ... ok
+test security-scan-tool.test::security_scan 工具 外部扫描器未装：注明 baseline-only，不报错 ... ok
+test security-scan-tool.test::security_scan 工具 权限契约：read（计划模式可用） ... ok
+test app-init.test::initApp bridge indicator treats wechat as a connected bridge when bootstrapping the sidebar dot ... ok
+test app-init.test::initApp bridge indicator refreshes the HttpOnly device web session before opening WebSocket for a persisted LAN frontend ... ok
+test app-init.test::initApp bridge indicator stops startup explicitly when server identity cannot be loaded ... ok
+test app-init.test::initApp bridge indicator reconnects a saved Rust server through its own login and identity routes ... ok
+test app-init.test::initApp bridge indicator uses the cold local Rust identity and does not call legacy bootstrap endpoints ... ok
+test app-init.test::initApp bridge indicator keeps a failed remote connection selected and shows its failure without exposing its key ... ok
+test app-init.test::initApp bridge indicator initializes the pending workspace from agent home even when cwd history points elsewhere ... ok
+test app-init.test::initApp bridge indicator loads the studio workspace list during bootstrap so the default-workspace merge key is ready for the first session list ... ok
+test app-init.test::initApp bridge indicator hydrates the persisted permission default before showing the pending new-session draft ... ok
+test app-init.test::initApp bridge indicator refreshes local token and rebuilds websocket after server restart ... ok
+test app-init.test::initApp bridge indicator refreshes local restart credentials without stealing an active remote connection ... ok
+test app-init.test::initApp bridge indicator refreshes the desk default workspace when settings change the current agent workspace ... ok
+test app-init.test::initApp bridge indicator ignores workspace changes for non-current agents ... ok
+test app-init.test::initApp bridge indicator clears the previous default desk root when settings clear the current agent workspace ... ok
+test app-init.test::initApp bridge indicator configures context usage requests before settings and websocket handlers dispatch app events ... ok
+test app-init.test::initApp bridge indicator opens the in-window settings modal when main process requests settings ... ok
+test resource-desktop.test::picker_returns_paths_cancel_has_no_file_io ... ok
+test resource-desktop.test::viewer_renders_real_markdown_office_and_file_information ... ok
+test resource-desktop.test::viewer_consumes_resource_events_and_is_independent_readonly ... ok
+test resource-desktop.test::legacy_registration_remains_host_compatible_but_current_renderer_uses_resource_events ... ok
+test resource-desktop.test::saves_show_conflicts_and_cover_retries_only_once ... ok
+test resource-desktop.test::failure_results_never_register_copies_attachments_or_trash_success ... ok
+test AccessTab.test::AccessTab shows the stable mobile URL and saves LAN network settings ... ok
+test AccessTab.test::AccessTab uses snapshot access summary for the LAN switch before the refresh request settles ... ok
+test AccessTab.test::AccessTab keeps the phone URL on the runtime port and hides QR when a saved port change needs restart ... ok
+test AccessTab.test::AccessTab generates a mobile access key and keeps the returned secret visible once ... ok
+test AccessTab.test::AccessTab generates a desktop access key from the manual computer section ... ok
+test AccessTab.test::AccessTab connects to an existing LAN server from the client connection section ... ok
+test AccessTab.test::AccessTab renders remote connections as local-only management and can return to the local server ... ok
+test AccessTab.test::AccessTab saves the local owner profile and password from the account section ... ok
+test AccessTab.test::AccessTab revokes individual credentials without requiring whole-device revocation ... ok
+test AccessTab.test::AccessTab clears the local password from the password section ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials syncs an empty saved api key into the input when the provider summary is refreshed ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials sends the provider id when verifying saved credentials ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials reveals a masked saved api key through the explicit provider endpoint ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials keeps revealed saved api keys out of ordinary state and blocks copy ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials lets a revealed saved api key be replaced directly ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials does not persist the revealed secret when editing begins from transient text ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials persists edited Kimi API keys on input blur without requiring connection verification ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials persists an intentionally cleared API key instead of leaving the old provider secret active ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials preset setup only saves credentials with an explicit empty model list, never seeds or fetches models ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials lets a registry-only provider choose its API type and includes the draft in the initial save ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials keeps an edited API type in local draft state while saving an existing provider ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials shows the server rejection and preserves the API draft for retry ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials shows an actionable refresh failure after the server accepts an API type change ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials saves the key even when remote verification fails (preset setup must not deadlock) ... ok
+test ApiKeyCredentials.test::ApiKeyCredentials lets preset setup edit and save the Base URL immediately (gateway/proxy override) ... ok
+test BridgeTab.credentials.test::BridgeTab credential custody tests stored Telegram, Feishu, DingTalk, and QQ secrets without sending masked values ... ok
+test BridgeTab.credentials.test::BridgeTab credential custody sends dirty plaintext secrets directly and disables saved-credential lookup ... ok
+test BridgeTab.credentials.test::BridgeTab credential custody saves canonical platform fields while omitting unchanged stored secrets ... ok
+test BridgeTab.credentials.test::BridgeTab credential custody preserves dirty empty as an explicit clear when disabling a platform ... ok
+test BridgeTab.credentials.test::BridgeTab credential custody persists dirty empty as an explicit clear when credential fields lose focus ... ok
+test BridgeTab.credentials.test::PlatformSection stored secret presentation renders the stored placeholder with an empty clipboard source value ... ok
+test BridgeTab.credentials.test::PlatformSection stored secret presentation tests a candidate secret without firing the blur autosave first ... ok
+test BridgeTab.credentials.test::PlatformSection stored secret presentation does not autosave before a keyboard-activated credential test ... ok
+test BridgeTab.credentials.test::PlatformSection stored secret presentation does not autosave while focus moves to the secret visibility control ... ok
+test BridgeTab.permission-mode.test::BridgeTab permission mode renders bridge permission mode as a three-option select without ask mode ... ok
+test BridgeTab.permission-mode.test::BridgeTab permission mode saves the bridge receipt toggle through global bridge settings ... ok
+test BridgeTab.permission-mode.test::BridgeTab permission mode saves the rich streaming toggle through global bridge settings ... ok
+test BridgeTab.permission-mode.test::BridgeTab permission mode keeps bridge permission mode in loading state until backend truth arrives ... ok
+test BridgeTab.permission-mode.test::BridgeTab permission mode renders settings platforms in descriptor order including DingTalk ... ok
+test ModelWidget.test::ModelWidget closes the model menu on Escape from the custom input without submitting or closing its parent ... ok
+test ModelWidget.test::ModelWidget shows the provider icon in the closed selected trigger ... ok
+test ModelWidget.test::ModelWidget shows the followLabel in the trigger when value is null ... ok
+test ModelWidget.test::ModelWidget renders the follow option and calls onSelect(null) when clicked ... ok
+test ModelWidget.test::ModelWidget uses the shared runtime model catalog without a private fetch ... ok
+test ModelWidget.test::ModelWidget reacts to shared catalog additions and removals without remounting ... ok
+test ModelWidget.test::ModelWidget preserves the vision capability filter ... ok
+test ModelWidget.test::ModelWidget keeps duplicate model ids distinct by provider and returns a full reference ... ok
+test OAuthCredentials.test::OAuthCredentials requests the explicit browser login method and keeps the callback session local ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state does not carry an unsaved api key draft when switching providers ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state treats registry-only preset providers as setup entries after deletion ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state keeps registry-only non-preset providers visible as setup entries ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state saves registry-only non-preset providers through the initial setup payload ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state restores every persisted provider after unmount while selection only controls styling ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state keeps persisted providers when a draft is added, and drops only the draft after remount ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state removes an unsaved draft without touching persisted providers ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state removes a deleted configured provider from the list and keeps a built-in provider in the picker ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state keeps a configured provider and skips authoritative reload when deletion returns an error ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state offers api and search sub tabs instead of usage/models ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state switches to the search sub tab through navigateSettings and renders search config ... ok
+test ProvidersTab.test::ProvidersTab provider-scoped form state does not fetch the provider summary on mount (init pipeline owns the initial load) ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 状态读取失败保留已有状态并显示原因，HTTP 200 error也不能覆盖成空状态 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 保存、验证和清除主人均走原生路由，业务失败不能弹成功提示 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 令牌变化后丢弃同一助手的旧状态请求 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 联系人刷新失败保留列表并明确显示错误 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 会话详情读取原生权威历史，重置失败保留已读内容和会话 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 微信先停用保存，再绑定主人，最后启用；主人失败时保持停用并显示错误 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 微信完整绑定确实成功后才显示成功 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 扫码期间连接切换后不能把旧凭据写到新连接 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 Unknown与排队结果都不能当成功，重试保留同一个操作编号 ... ok
+test R07BridgeRustUI.test::R07 原生消息平台页面，真实UI与HTTP协议边界 真实文件菜单以fileId发原生请求，网络失败重试沿同一编号并查询平台回执 ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping shows the real Cookie policy restart impact beside the toggle in zh ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping shows the real Cookie policy restart impact beside the toggle in en ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping shows the real Cookie policy restart impact beside the toggle in ja ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping shows the real Cookie policy restart impact beside the toggle in ko ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping shows the real Cookie policy restart impact beside the toggle in zh-TW ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping also shows the policy impact for the bootstrapped local Rust connection ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping loads and saves preferences at the selected Rust service ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping does not treat malformed clear-cookie results as success ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping ignores old preferences after switching away and back ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping keeps controls unavailable after a malformed preference response ... ok
+test R07BrowserRustUI.test::Rust browser settings UI with actual HTTP mapping verifies the chosen provider through Rust and ignores late success after a connection switch ... ok
+test SettingsContent.test::SettingsContent title placement pins the active tab title beside the settings title in the modal header ... ok
+test SettingsContent.test::SettingsContent title placement keeps the tab title in the content area for the standalone settings window ... ok
+test SettingsContent.test::SettingsContent title placement resets the main scroll position when switching tabs ... ok
+test SettingsContent.test::SettingsContent title placement notifies the modal shell when the active settings tab changes ... ok
+test SettingsContent.test::SettingsContent title placement does not echo the initially rendered tab back to the modal shell ... ok
+test SettingsContent.test::SettingsContent title placement does not render a Computer Use tab and falls back to the agent tab for stale tab values ... ok
+test SettingsContent.test::SettingsContent title placement keeps activeServerConnection in sync when the settings window hears server restart ... ok
+test SettingsContent.test::SettingsContent title placement keeps the persisted remote Studio active instead of forcing settings back to local loopback ... ok
+test SettingsContent.test::SettingsContent title placement opens settings against a persisted remote Studio when no local platform server APIs exist ... ok
+test UsageTab.test::UsageTab settings page registration (Phase 9: Model Observatory) places the usage nav item strictly after providers and models ... ok
+test UsageTab.test::UsageTab settings page registration (Phase 9: Model Observatory) renders the usage tab content through SettingsContent when usage is active ... ok
+test UsageTab.test::UsageTab settings page registration (Phase 9: Model Observatory) drops the page heading, recording strip and settings button (settings is its own tab) ... ok
+test WorkTab.test::WorkTab workspace persistence renders the current agent desk settings from settingsConfig on the first paint ... ok
+test WorkTab.test::WorkTab workspace persistence saves the selected agent workspace without sending frontend business IPC ... ok
+test WorkTab.test::WorkTab workspace persistence clears the selected agent workspace without sending frontend business IPC ... ok
+test WorkTab.test::WorkTab workspace persistence shows 31 minutes when the agent config omits the patrol interval ... ok
+test WorkTab.test::WorkTab workspace persistence treats a missing per-agent heartbeat flag as off after loading the agent config ... ok
+test WorkTab.test::WorkTab workspace persistence warns that patrol mode can operate in the workspace ... ok
+test WorkTab.test::WorkTab workspace persistence keeps global work switches loading until settings config is ready ... ok
+test WorkTab.test::WorkTab workspace persistence uses automation.permissionMode and does not render the removed cron auto-approve row ... ok
+test WorkTab.test::WorkTab workspace persistence saves the selected agent AGENTS.md injection toggle ... ok
+test WorkTab.test::WorkTab workspace persistence saves the selected agent CLAUDE.md injection toggle ... ok
+test WorkTab.test::WorkTab workspace persistence saves the two project skill discovery switches independently ... ok
+test WorkTab.test::WorkTab workspace persistence rolls a project skill switch back when the Agent config save fails ... ok
+test WorkTab.test::WorkTab workspace persistence shows the freshly saved desk config after switching away from and back to the owner agent (#2192 Bug 1) ... ok
+test WorkTab.test::WorkTab workspace persistence does not refresh the settings snapshot when saving a non-owner agent config ... ok
+test WorkTab.test::WorkTab workspace persistence keeps the optimistic desk value and the saved toast when the settings refresh fails ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration uses snapshot bridge status before the status refresh request settles ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration keeps reconciling WeChat after QR confirmation until the selected Agent connects ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration cancels WeChat reconciliation when the selected Agent changes ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration keeps saved public agents md in the settings snapshot for remounts ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration applies owner status returned by setOwner without waiting for a later refresh ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration keeps a dirty secret when a stale masked status response arrives ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration keeps a dirty non-secret field when a status request started before the edit returns ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration clears the submitted plaintext after save, ignores the returned mask, and tests with saved credentials ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration marks a stored secret absent after an explicit empty submission succeeds ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration keeps connection-test state and results owned by the Agent and request generation ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration does not clear a newer secret revision when an earlier save finishes ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration does not reuse a revision after switching away and back while a save is in flight ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration ignores an older same-Agent status response after a newer refresh wins ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration does not replay an unchanged stale snapshot after a live status wins ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration hides the previous Agent status in the same render that changes selection ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration describes a DingTalk token-only success without claiming the Stream is connected ... ok
+test useBridgeState.snapshot.test::useBridgeState snapshot hydration drops plaintext drafts when the selected Agent changes ... ok
+test channel-actions.test::channel-actions loadChannels 加载频道和 DM 列表 ... ok
+test channel-actions.test::channel-actions loadChannels serverPort 为空时不请求 ... ok
+test channel-actions.test::channel-actions openChannel opens DM history with the stored owner agent id ... ok
+test channel-actions.test::channel-actions loadConversationAgentActivities loads and keys agent phone activities by conversation and agent ... ok
+test channel-actions.test::channel-actions DM phone settings owner loads DM phone settings with the stored owner agent id ... ok
+test channel-actions.test::channel-actions DM phone settings owner saves DM phone settings with the stored owner agent id ... ok
+test channel-actions.test::channel-actions setConversationAgentPhoneToolMode persists and updates the current conversation phone tool mode ... ok
+test channel-actions.test::channel-actions setConversationAgentPhoneToolMode persists reply range settings without changing API output budget ... ok
+test channel-actions.test::channel-actions channel member management adds a member and updates the current channel projection ... ok
+test channel-actions.test::channel-actions channel member management surfaces backend member removal errors without mutating local members ... ok
+test channel-actions.test::channel-actions sendChannelMessage 空消息不发送 ... ok
+test channel-actions.test::channel-actions sendChannelMessage 无当前频道不发送 ... ok
+test channel-actions.test::channel-actions sendChannelMessage 发送成功后追加消息到 store ... ok
+test channel-actions.test::channel-actions sendChannelMessage 发送成功后按发送开始时的频道同步消息 cache 和频道列表投影 ... ok
+test channel-actions.test::channel-actions exportCurrentConversation downloads the Markdown response using the server-provided filename ... ok
+test channel-actions.test::channel-actions exportCurrentConversation exports the current DM from its stored owner Agent ... ok
+test channel-actions.test::channel-actions appendChannelMessage 追加当前频道的新消息并刷新频道预览，不清空已有消息 ... ok
+test channel-actions.test::channel-actions appendChannelMessage updates the current channel body cache while chat tab is active without marking read ... ok
+test channel-actions.test::channel-actions appendChannelMessage does not mark the current channel as read when the document is hidden ... ok
+test channel-actions.test::channel-actions appendChannelMessage reloads the active channel when a message-less event marked its cache dirty ... ok
+test channel-actions.test::channel-actions createChannel reads backend JSON errors instead of losing them to the fetch wrapper ... ok
+test channel-actions.test::channel-actions toggleChannelsEnabled 未知频道开关状态时不猜测下一值 ... ok
+test channel-actions.test::channel-actions toggleChannelsEnabled 切换开关状态 ... ok
+test channel-actions.test::channel-actions toggleChannelsEnabled 打开频道开关时先启用后端，再加载频道列表 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 列表失败保留旧目录与未读数，并明确记录错误 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 缺少目录字段的响应不能伪装成空列表 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 切换currentAgentId后迟到的目录不覆盖新目录 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 切换serverPort后迟到的目录不覆盖新目录 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 两次目录读取乱序返回时保留最新请求 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 历史读取失败保留同会话缓存，初次失败也留下错误而不是空历史 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 旧频道历史返回后不覆盖新选择，也不继续读取旧频道设置 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 设置读取失败不会覆盖真实旧值为默认设置 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 设置保存迟到时不覆盖另一个频道的值 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 缺少真实活动身份的响应不能清掉已有动态 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 私聊即使绕过输入框调用也不会发送用户消息 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 频道发送失败交回调用方，不能添加假消息 ... ok
+test channel-actions.test::channel-actions 请求失败与切换保护 删除旧频道的响应不能清空后来选择的频道 ... ok
+test channel-actions.test::channel-actions 用户动作重试身份 未确认的同一消息复用requestId，成功后相同正文是新动作 ... ok
+test channel-actions.test::channel-actions 用户动作重试身份 不同正文和不同目标必须分配新requestId ... ok
+test channel-actions.test::channel-actions 用户动作重试身份 创建超时后同一输入重试复用requestId，成员变化则是新动作 ... ok
+test connection-slice.test::connection slice registry sets local server connection into the registry and active mirror together ... ok
+test connection-slice.test::connection slice registry refreshes local transport without losing stable identity in the registry ... ok
+test connection-slice.test::connection slice registry can select a non-local connection from the registry without touching legacy port fields ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches keeps the original copied projection when the clipboard API is absent ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches does not turn a failed access-summary request into an empty device list ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches shows an empty device list only after a successful empty summary ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches rejects a malformed device summary instead of showing an empty state ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches rejects a malformed credential summary instead of showing an empty state ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches rejects a malformed network summary instead of showing an empty state ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches mobile credential: successful one-time secret survives a failed summary refresh ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches desktop credential: successful one-time secret survives a failed summary refresh ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches mobile credential: malformed response and rejected generation do not report success ... ok
+test R02AccessCredentialLeaf.test::R02/R00 AccessTab credential UI branches desktop credential: malformed response and rejected generation do not report success ... ok
+test R02AccessRoute.test::R02 access settings route selected by actual connection identity rust connection sends access calls and QR image to its own route family ... ok
+test R02AccessRoute.test::R02 access settings route selected by actual connection identity legacy connection sends access calls and QR image to its own route family ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior renders the cold mask, then exposes the page after the actual loaders finish ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior keeps cached settings visible during background refresh ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior uses the 15-second escape hatch for an unresolved connection ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior logs init errors but unblocks the page; provider summary failure does not block ready ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior persists color and preview, defaults light, and throws without a false success on denied storage ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior persists width and preview, defaults mobile, and keeps the old UI on denied storage ... ok
+test R02SharingLeaf.test::R02/R00 sharing leaf: real component and storage behavior normalizes font and segment limit, persists both, then rejects denied writes without UI drift ... ok
+test SettingsContent.test::SettingsContent tab heading renders experiment copy as a tab-level description ... ok
+test SettingsContent.test::SettingsContent tab heading renders the built-in browser settings tab ... ok
+test SettingsContent.test::SettingsContent tab heading lists Connectors as a static tab with no plugin-contributed tabs present ... ok
+test SettingsContent.test::SettingsContent tab heading reloads the shared settings model catalog when models-changed arrives ... ok
+test SettingsContent.test::SettingsContent tab heading reloads the shared settings model catalog from a same-window models event ... ok
+test SettingsContent.test::SettingsContent tab heading passes tab ids through without aliasing ... ok
+test SettingsContent.test::SettingsContent tab heading shows a models nav item and hides the legacy media nav item ... ok
+test SettingsContent.test::SettingsContent tab heading loads the provider summary inside init, only after the server connection is ready ... ok
+test SettingsContent.test::SettingsContent tab heading clears foreign cached data and blocks settings when the Rust identity is incomplete ... ok
+test SettingsContent.test::SettingsContent tab heading loads the settings snapshot only after agents have resolved the agent id ... ok
+test SettingsContent.test::SettingsContent tab heading reopens without the loading mask when cached config exists (silent background refresh) ... ok
+test skill-scroll-contract.test::skill scroll CSS contract keeps the settings skill page and long skill lists scrollable inside fixed panels ... ok
+test skill-scroll-contract.test::skill scroll CSS contract keeps the skill viewer file tree and markdown preview scrollable ... ok
+test ObservabilityDateLine.test::date line chart geometry dot X follows real date proportions (8-day gap ≈ 8× 1-day gap) ... ok
+test ObservabilityDateLine.test::date line chart geometry ticks sit exactly under their dots and spread evenly (greedy min-gap) ... ok
+test ObservabilityDateLine.test::date line chart geometry single day renders one centered dot with one tick ... ok
+test ObservabilityDateLine.test::date line chart geometry hovering a date region shows its tooltip card; leaving hides it; hit zones cover their dots ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) renders exactly 10 metric cards (cost removed; activeDays/topModel/peakDay added) ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) insight cards: active days with streak, top model with calls and tokens ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) formats real values (avg duration, token totals; cost card removed 2026-09-17) ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) null cost/duration render em dash, never a fake zero (§三十三) ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) cache hit rate appears only when cacheObservedCount > 0 ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) overall=null renders 10 placeholder cards with em dashes ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) 部分覆盖和投影不可用明确提示，未知 token 保持破折号 ... ok
+test ObservabilityMetrics.test::ObservabilityMetrics (§五十三～五十七) 损坏的 usage 聚合显示 corrupt 告警，不显示伪造 token ... ok
+test ObservabilityPayloadCard.test::ObservabilityPayloadCard provenance 真值 semantic provenance JSON 损坏显示 corrupt，不显示 absent ... ok
+test ObservabilityTraceForest.test::buildTraceForest (§八十七～九十五) builds nested children from edges, not array order (§八十九) ... ok
+test ObservabilityTraceForest.test::buildTraceForest (§八十七～九十五) multiple roots stay siblings ... ok
+test ObservabilityTraceForest.test::buildTraceForest (§八十七～九十五) orphan edges produce a synthetic Missing parent node (§九十) ... ok
+test ObservabilityTraceForest.test::buildTraceForest (§八十七～九十五) orphan child that is already a root is not duplicated ... ok
+test ObservabilityTraceForest.test::buildTraceForest (§八十七～九十五) cycles are truncated with a cycle flag instead of infinite recursion (§九十二) ... ok
+test ObservabilityTraceForest.test::buildTraceForest (§八十七～九十五) calls not covered by roots/edges are surfaced as extra roots, never dropped ... ok
+test PayloadPlainText.test::payloadToReadableText 字符串直出、保留换行；短值行内、长值成块 ... ok
+test PayloadPlainText.test::payloadToReadableText 数组元素块间空行分隔；空对象/空数组给中文占位 ... ok
+test PayloadPlainText.test::payloadToReadableText null / 顶层字符串 / 顶层数组照实处理 ... ok
+test TraceConversationModel.test::resolveTraceSessionId 多数票选出 sessionId，忽略空值 ... ok
+test TraceConversationModel.test::resolveTraceSessionId 全部为空 → null ... ok
+test TraceConversationModel.test::buildTraceConversationModel — calls-only 降级 无会话数据：主链调用各占 Step，子调用按 parentCallId 嵌套为 subtool ... ok
+test TraceConversationModel.test::buildTraceConversationModel — calls-only 降级 error/aborted 调用标记 isError；请求编号 status=error ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 用户消息开轮、助手消息配对主链调用并挂 usage/timing ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 助手 toolCalls 投影 → tool 记录（成功带输出、失败带错误） ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 工具计时来自会话条目时间戳；无输出的成功工具是终态而非等待中 ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 轮内未配对侧线 → 额外 Step；轮后侧线 → Between turns 独立区段 ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 配对防抢：知识滚动调用不会抢走助手消息（最近结束原则） ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 新记录优先按持久调用编号精确归并，不再被九十秒时间猜测改配 ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 历史兼容归并不会把更近的辅助调用吞成助手正文 ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 时间窗锚定：窗口前的最近用户消息被拉入，窗口后的用户消息截断 ... ok
+test TraceConversationModel.test::buildTraceConversationModel — 会话 join 缺时间戳无法 join → calls-only 降级 ... ok
+test TraceConversationModel.test::parseSessionMessages 结构宽容：非数组 → null；坏行跳过、字段缺省安全 ... ok
+test TraceConversationModel.test::parseSessionMessages 解析助手消息的持久调用关联，但忽略空壳关联 ... ok
+test TraceConversationModel.test::移植纯函数核心断言 sequence 模式三泳道投影：user→0、message→1、tool→2 ... ok
+test TraceConversationModel.test::移植纯函数核心断言 duration 模式按记录耗时投影并压缩空隙 ... ok
+test TraceConversationModel.test::移植纯函数核心断言 区间聚焦：闭区间重叠的记录入选 ... ok
+test TraceConversationModel.test::移植纯函数核心断言 request-only 记录并入下一条内容行；终端分隔独立成行 ... ok
+test TraceConversationModel.test::SYSTEM 首记录 — 会话提示词快照装配 快照可用时 promptDetail 即刻携带系统提示词与工具目录 ... ok
+test TraceConversationModel.test::SYSTEM 首记录 — 会话提示词快照装配 缺 finalSystemPrompt 时回退 systemPrompt + appendSystemPrompt 拼接 ... ok
+test TraceConversationModel.test::SYSTEM 首记录 — 会话提示词快照装配 快照缺失 → promptDetail 留空（检查器走载荷懒加载/未捕获态） ... ok
+test TraceConversationModel.test::主链分类 — agent 多步轮（实盘回归 sess_0mti8f3we） 带 parent 的 session/reply 参与配对：每个助手都有观测载荷关联 ... ok
+test TraceConversationModel.test::主链分类 — agent 多步轮（实盘回归 sess_0mti8f3we） calls-only 模式：带 parent 的 reply 也各占 Step（不再折叠成 subtool） ... ok
+test TraceDetailOverlayRendering.test::TraceDetailOverlay 渲染验收 呈现 USER / ASSISTANT / TOOL 三类记录行 + SYSTEM 首记录 ... ok
+test TraceDetailOverlayRendering.test::TraceDetailOverlay 渲染验收 SYSTEM 首记录正文来自会话提示词快照（无需开载荷捕获） ... ok
+test TraceDetailOverlayRendering.test::TraceDetailOverlay 渲染验收 观测载荷 tab：打开即直出 TXT 阅读式正文，超长截断可展开 ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) health/settings/query hit the documented routes with the right verbs ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) 413 export_limit preserves matchedCalls / maxCalls (§一百一十八) ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) 400 invalid_query keeps the offending field ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) 403 denial without a code falls back to the kind as code (§十一) ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) HTTP 200 with embedded error body still throws ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) abort errors are detectable and re-thrown untouched (§十二: race belongs to caller) ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) blob probe is HEAD-only and parses content-length defensively ... ok
+test model-observability-actions.test::observability client (Phase 9 §十一 error contract) blob probe with missing/garbage headers yields nulls, not NaN ... ok
+test model-observability-contract.test::Model Observatory wire contract closed sets (Phase 9) locks terminal status / availability sets ... ok
+test model-observability-contract.test::Model Observatory wire contract closed sets (Phase 9) locks payload layer closed sets (kind/visibility/fidelity/sanitization) ... ok
+test model-observability-contract.test::Model Observatory wire contract closed sets (Phase 9) locks provenance / provider mapping closed sets ... ok
+test model-observability-contract.test::Model Observatory wire contract closed sets (Phase 9) locks pagination / group-by limits ... ok
+test model-observability-contract.test::Model Observatory wire contract closed sets (Phase 9) blob id pattern accepts well-formed ids and rejects traversal ... ok
+test model-observability-contract.test::Model Observatory wire contract closed sets (Phase 9) blob safe media majors are image/audio/video only ... ok
+test model-observability-filter.test::dateRangeForState (since inclusive / until exclusive, §四十四) default preset is all (no time bounds) ... ok
+test model-observability-filter.test::dateRangeForState (since inclusive / until exclusive, §四十四) presets produce since=now-duration and open-ended until ... ok
+test model-observability-filter.test::dateRangeForState (since inclusive / until exclusive, §四十四) all → no bounds; custom converts datetime-local to ISO ... ok
+test model-observability-filter.test::dateRangeForState (since inclusive / until exclusive, §四十四) custom invalid/empty input yields null rather than a guess ... ok
+test model-observability-filter.test::localUtcOffsetMinutes sign flip (§十六) is the negation of JS getTimezoneOffset for any environment TZ ... ok
+test model-observability-filter.test::localIanaTimeZone returns a browser-resolved, valid IANA zone ... ok
+test model-observability-filter.test::localIanaTimeZone fails closed for missing or invalid zones ... ok
+test model-observability-filter.test::buildCallFilterInput (empty dimension = omitted, §十三) empty filter ("all" preset) produces an empty wire object ... ok
+test model-observability-filter.test::buildCallFilterInput (empty dimension = omitted, §十三) maps multi UI keys to singular wire keys; categories alias subsystem (§十九) ... ok
+test model-observability-filter.test::buildCallFilterInput (empty dimension = omitted, §十三) exact ids trim and wrap into single-element arrays (§二十六) ... ok
+test model-observability-filter.test::buildCallFilterInput (empty dimension = omitted, §十三) tri-state flags only enter wire when explicitly set (§二十四) ... ok
+test model-observability-filter.test::dateBucketForGroupBy only present when groupBy contains date; prefers the browser IANA zone ... ok
+test model-observability-filter.test::dateBucketForGroupBy falls back to the current offset only when no valid IANA zone is available ... ok
+test model-observability-filter.test::filter chips (§二十五: individually removable + clear all) default filter produces no chips ... ok
+test model-observability-filter.test::filter chips (§二十五: individually removable + clear all) non-default date and every filter kind surface as chips ... ok
+test model-observability-filter.test::filter chips (§二十五: individually removable + clear all) removeFilterChip clears exactly one dimension per kind ... ok
+test model-observability-filter.test::filter chips (§二十五: individually removable + clear all) clearAllFilterChips returns the default (all) filter ... ok
+test model-observability-format.test::formatCost (null ≠ 0, §三十三) null/undefined → em dash, never a fake $0.00 ... ok
+test model-observability-format.test::formatCost (null ≠ 0, §三十三) real zero renders $0.00 ... ok
+test model-observability-format.test::formatCost (null ≠ 0, §三十三) sub-cent keeps 4 decimals ($0.0007, §一百五十三) ... ok
+test model-observability-format.test::formatCost (null ≠ 0, §三十三) normal amounts use 2 decimals ... ok
+test model-observability-format.test::formatDurationMs renders human tiers ... ok
+test model-observability-format.test::formatDurationMs null and negative → em dash ... ok
+test model-observability-format.test::numeric formatters formatNumber: exact grouping for tooltips ... ok
+test model-observability-format.test::numeric formatters formatCompactNumber tiers（中文数量级：万/亿/万亿） ... ok
+test model-observability-format.test::numeric formatters formatPercent: null → em dash, 0..1 → integer percent ... ok
+test model-observability-format.test::identifiers & timestamps shortId keeps first 8 chars with ellipsis beyond 9 ... ok
+test model-observability-format.test::identifiers & timestamps formatLocalDateTime: missing/invalid → em dash ... ok
+test model-observability-format.test::identifiers & timestamps isoTooltip passes the raw value through untouched ... ok
+test model-observability-labels.test::observabilityChipLabel maps every multi field to an existing singular filter label key ... ok
+test model-observability-labels.test::observabilityChipLabel closed-set values are translated through values.* (not raw wire words) ... ok
+test model-observability-labels.test::observabilityChipLabel subsystem/operation/attributionKind chip values go through values.* (not raw wire words) ... ok
+test model-observability-labels.test::observabilityChipLabel exact and flag chips use their own label keys; flag appends tri-state ... ok
+test model-observability-labels.test::observabilityChipLabel date chip label is just the date filter label ... ok
+test model-observability-vertical.test::UI vertical slice — Call Ledger（S34 §八十四） UI 日期分组经 action → route → query 发送浏览器 IANA 时区 ... ok
+test model-observability-vertical.test::UI vertical slice — Call Ledger（S34 §八十四） DOM 行 ≡ HTTP JSON ≡ Query DTO：model/status/tokens/attempts/payload 全一致 ... ok
+test observability-export-save.test::observabilityExportFileName (§一百一十七) is product name + timestamp only — never session/agent/prompt names ... ok
+test observability-export-save.test::observabilityExportFileName (§一百一十七) zero-pads month/day/hour/minute ... ok
+test observability-export-save.test::observabilityExportCapability prefers the electron bridge when all four IPC methods exist ... ok
+test observability-export-save.test::observabilityExportCapability falls back to File System Access API, then null ... ok
+test observability-export-save.test::observabilityExportCapability partial electron bridge (missing abort) is not treated as capable ... ok
+test observability-export-save.test::runObservabilityExport — electron channel streams chunk-by-chunk through the bridge and finishes with end (§一百一十五) ... ok
+test observability-export-save.test::runObservabilityExport — electron channel user cancel at the save dialog resolves to canceled without any stream request ... ok
+test observability-export-save.test::runObservabilityExport — electron channel abort mid-stream calls the abort IPC which deletes the partial file ... ok
+test observability-export-save.test::runObservabilityExport — file-system-access channel streams into the writable and closes ... ok
+test observability-export-save.test::runObservabilityExport — file-system-access channel abort cannot delete the partial file — outcome honestly reports partialLeft (§一百一十五) ... ok
+test observability-export-save.test::runObservabilityExport — file-system-access channel picker dismissal resolves to canceled ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator resolves a span inside a nested string (UTF-16 slice semantics) ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator resolves identity-root string with a full span (emoji surrogate pair safe) ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator null span → structural with honest value kind, never a body slice ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator null payload → root_missing (opaque/unavailable 前置) ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator missing root / missing path are reported, not guessed ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator span on a non-string target → not_text ... ok
+test observability-provenance-resolve.test::resolveSemanticLocator span out of range / malformed → span_out_of_range ... ok
+test observability-provenance-resolve.test::resolveProviderLocator (transport.body, same discipline) resolves a span through transport.body ... ok
+test observability-provenance-resolve.test::resolveProviderLocator (transport.body, same discipline) structural without span; unavailable when transport/body missing ... ok
+test observability-provenance-resolve.test::asSemanticInputProvenance guard accepts a well-shaped provenance and rejects garbage without throwing ... ok
+test observability-sub-tabs.test::ModelObservabilitySection sub-tabs renders three sub-tabs and lands on Token usage by default ... ok
+test observability-sub-tabs.test::ModelObservabilitySection sub-tabs switches panels via the settings store; ledger/traces queries fire on demand ... ok
+test observability-sub-tabs.test::ModelObservabilitySection sub-tabs keeps each sub-tab filter independent and surviving tab switches ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts renders the four resident chart cards (no fixed-dimension badges, no hints) ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts heat calendar switches 每日/每周/累计 and re-renders the same grid ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts metric toggle supports both-on and refuses turning off the last one ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts heat calendar hover shows the daily calls-and-tokens hint title ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts pie chart lists data days in the date select, latest by default ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts pie chart can switch to the all-days cumulative view ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts hides members with no data for the selected metrics (line chart) ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts pie side list hides categories that are zero on the selected day ... ok
+test observability-usage-charts.test::ObservabilityUsagePanel resident charts charts do not refetch when the first-row filter changes (metrics do) ... ok
+test use-observability-facets.test::useObservabilityFacetOptions signature stability millisecond-drifting since within one minute must not refetch ... ok
+test use-observability-facets.test::useObservabilityFacetOptions signature stability minute boundary crossing refetches (cache key includes minute precision) ... ok
+test use-observability-facets.test::useObservabilityFacetOptions signature stability logical filter change still invalidates cache ... ok

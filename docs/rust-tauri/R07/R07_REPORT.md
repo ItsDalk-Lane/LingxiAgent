@@ -75,3 +75,75 @@
 - 正式门禁：artifacts/rust-tauri/R07/T12/verify-r07-2/verify-stage-result.json（verify-r07-1 失败轮原样保留同目录）
 - 35 项移交来源：artifacts/rust-tauri/R07/T12/35-handoff-source-resolved-20261018.json
 - 旧依赖台账：docs/rust-tauri/R07/LEGACY_DEPENDENCY_LEDGER.json
+
+## 七、2026-10-20 收口轮（审查缺陷 A/B/C/D 修复）
+
+审查基线 bfe32d107 的四组确诊缺陷全部实现并验证，逐项状态见
+R07_PROGRESS.json 的 closeout.fixedDefects。要点与证据：
+
+- **A 观测面**（lingxi-service/src/observability.rs + adapters run_store.rs +
+  desktop rust-observability.ts）：settings GET/PUT（retention 持久化、恒真面
+  409、同 home 重启保留）、storage 概况（真实按日统计与库文件字节）、
+  maintenance/delete（日期窗校验、会话轨迹+legacy trace+孤儿行删除、
+  VACUUM 压实）、payloads/blobs 显式 404/400（本构建不捕获副本，不伪造）、
+  query/traces 重写为统一轨迹面（`session:` 会话聚合 + 导入 legacy trace +
+  可选 singleton；minCallCount/origin/includeSingleton 下推 SQL；keyset
+  cursor 与查询形态绑定）、aggregate dateBucket（utcOffsetMinutes 分桶；
+  无 tz 库的 timeZone 显式 400）、export 对齐原版请求体（query.filter/
+  includePayloads/maxCalls）并补 bundle trace/usage 字段、call 详情补
+  payloadRecords/attempts/parentCall/childCalls（因果链经 emitted/
+  parent_tool_call_id 真实查询）。测试：r07_t10_observability 套件 2/2
+  （新增 closeout 综合用例）；UI 侧 observability 135 + 路由映射 5 绿。
+- **B Bridge /loop**（slash/bridge/loopsvc/loopx/model_history +
+  adapters storage）：bridge_command_kind 认 /loop /stop /abort /halt；
+  LoopTarget::bridge + execute_scheduled_for 真实执行；回执/通知落 V25
+  bridge_loop_deliveries 台账（重启接力、delivery_id 幂等）；V26 重建
+  outbox 增加 loop_delivery_id 来源列——修复循环通知因来源 CHECK 三源
+  皆空被拒的真实缺陷（来源互斥校验防伪造）。测试：r07_bridge_flow 14/14
+  （guest 边界、全生命周期、伪造来源响亮拒绝、重启回执），相邻
+  bridge_store/effect_store/notice/message_projection 套件绿。
+- **C Loop 媒体授权**（media_source_authority.rs）：RunOrigin::Loop 的
+  正式持久授权 = 落盘循环记录活跃（循环根 run + 本机用户 + cause 逐字
+  匹配 + 会话活跃 + 记录 Running/Paused）；stop/complete 后持续重查即拒。
+  测试：r07_t05_media 13/13。
+- **D 门禁证明力**：A23 双扫描器多行 `.route(` 修复（识别 141→409），
+  behavior_matrix 未归因路由非零退出 + 清单量级自检（首轮 82 unmapped
+  红证据留存 artifacts/.../negative-verification-closeout-1）；lib.rs
+  主干 23 组前缀按 handler 模块归因（0 unmapped）；24 基础场景逐场景
+  登记 39 条 suiteTestAnchors（零匹配/未通过/producer 失败均场景 FAIL；
+  xtask 127 单元测试含 3 项正反向锚点测试）；A24 扩为六能力域闭环 +
+  进程树 node 检测（含故意 spawn node 的检测器自证）+ 出站 HTTP 白名单。
+- **反向验证**：artifacts/rust-tauri/R07/T12/negative-verification-closeout-1/
+  README.md（三组红→绿：路由漏项、空/失败证据锚点、旧内核调用）。
+- **回归**：lingxi-adapters 全量 546+ 通过（真实浏览器 Chromium 弹窗用例
+  并发偶发、单跑 10/10 绿，属既有环境敏感）；lingxi-service 全量除
+  r00_management_leaves（本机 TUN/防火墙阻塞非环回自地址入站，测试自述
+  环境失败并如实呈现）外全绿；npm vitest 观测面套件绿；迁移登记表
+  docs/rust-tauri/R02/R02-T04_STORAGE_REGISTRY.json 补登 V24–V26（fingerprint
+  与真实收据逐字一致）。
+- **既定缺口（不冒充完成）**：408 补充叶（1050 断言）的逐断言绑定
+  authoring 未完成——本轮交付的是门禁机器与四组缺陷修复；叶整体保持
+  required_behavior_pending/BLOCKED，正式门禁 overall 如实 FAIL，这是
+  「逐断言证据待立」的诚实呈现而非门禁故障。
+- 收口门禁：artifacts/rust-tauri/R07/T12/verify-r07-closeout-01/（本轮
+  候选；结果见该目录 verify-stage-result.json）
+
+## 八、2026-10-21 叶绑定推进（通向 R08 的剩余量化）
+
+- 基建：r07_leaf_cases.py 生产者（真实套件日志→案例，套件失败即案例不成立）、
+  R07_LEAF_BINDINGS.json 绑定表（逐叶逐断言 + rationale）、r07_apply_leaf_bindings.py
+  注入器（full_original_behavior 叶内 case 不复用；stage_share_satisfied 仅限含后续
+  阶段叶）、xtask 解析护栏测试 r07_registered_map_parses_with_anchors_and_leaf_bindings。
+- 绑定：181/408 叶（437/1050 断言）。按域：供应商 35、MCP 19（R07 服务端份额，R08
+  客户端余款）、git 21、desk 11、workbench 10、媒体/语音 32、频道/DM 13、桥 11、
+  定时/心跳 8、其余 21。只读路由的权限拒绝负向以 A23 全表无凭证 401 探针为证。
+- 未绑定 227 叶（613 断言）按缺口类型：候选存在待语义审核 131、客户端行为需
+  UI/CLI 套件入门禁 43、候选不足需补探针 29、无候选需新探针 24。逐叶机器账：
+  R07_LEAF_REMAINING.json/.md。
+- 后续 gate-05~10 逐轮推进绑定（新增 r07_probe_skills/r07_probe_access 两个 Rust 探针套件、
+  r07_ui_vitest UI/CLI/工具套件接入正式门禁、run_tools/ast_grep/lsp/run_code/
+  security_scan/learn_lesson 由 lib 共享层真实 vitest 测试逐断言证明）。
+- **最终门禁 verify-r07-closeout-11（决定性候选，47.1 分钟）：57/57 命令、24/24 场景、
+  408/408 叶、2/2 扩展边界全部 PASS；35/35 移交 + 43/43 递延视图结算完成；候选与
+  runner 源码绑定稳定 —— overall PASS。R07 达到放行条件，R08 准入证据取得**（独立
+  审查为放行前最后人工步骤；gate-01~10 过程回执全部留存）。

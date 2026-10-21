@@ -1,0 +1,18 @@
+
+running 10 tests
+test concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results ... ok
+test partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown ... ok
+test partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success ... ok
+test unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content ... ok
+test actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions ... ok
+test screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes ... ok
+test repeated_download_after_unknown_ack_reuses_actual_delivered_file_and_receipt ... ok
+test archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success ... ok
+test restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page ... ok
+test chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.16s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.49s
+     Running tests/r07_browser_routes.rs (rust/target/debug/deps/r07_browser_routes-3d12edf27b496757)

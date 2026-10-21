@@ -1,0 +1,1 @@
+{"schema":"lingxi.r07.flaky-retry-receipt.v1","suite":"r07_t08_mcp_settings","context":"verify-r07-closeout-02 中该套件因套件内限流 429 时序敏感失败（gate-01 同源码通过）；同源码孤立重跑 3 次全部 22/22 通过，回执在 run/ run2/ run3/。closeout-02 主回执原样保留不改写。","runs":3,"allPassed":true}

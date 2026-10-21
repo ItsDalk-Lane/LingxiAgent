@@ -26,11 +26,7 @@ use crate::ServiceState;
 
 /// 统一错误面：与聊天设置面相同的 `{ok:false,error}` 形状。
 fn failure(code: axum::http::StatusCode, message: impl Into<String>) -> Response {
-    (
-        code,
-        Json(json!({"ok":false,"error":message.into()})),
-    )
-        .into_response()
+    (code, Json(json!({"ok":false,"error":message.into()}))).into_response()
 }
 
 struct ContextTarget {
@@ -108,12 +104,14 @@ async fn resolve_target(
         if state
             .memory()
             .is_agent_deleted_checked(agent_id)
-            .map_err(|err| failure(axum::http::StatusCode::INTERNAL_SERVER_ERROR, err.to_string()))?
+            .map_err(|err| {
+                failure(
+                    axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    err.to_string(),
+                )
+            })?
         {
-            return Err(failure(
-                axum::http::StatusCode::CONFLICT,
-                "agent deleted",
-            ));
+            return Err(failure(axum::http::StatusCode::CONFLICT, "agent deleted"));
         }
         return Ok(ContextTarget {
             owner: owner_key,
@@ -178,10 +176,7 @@ const KNOWN_THINKING_LEVELS: [&str; 6] = ["off", "low", "medium", "high", "xhigh
 
 /// 现役 getModelThinkingLevels 口径：显式列表（过滤未知档位）优先；
 /// 否则支持 max 的模型在默认可见档位后追加 max。
-fn model_thinking_levels(
-    metadata: &serde_json::Map<String, Value>,
-    xhigh: bool,
-) -> Vec<String> {
+fn model_thinking_levels(metadata: &serde_json::Map<String, Value>, xhigh: bool) -> Vec<String> {
     if let Some(explicit) = metadata.get("thinkingLevels").and_then(Value::as_array) {
         let levels: Vec<String> = explicit
             .iter()
@@ -317,7 +312,10 @@ fn model_context(
         None,
     )
     .map_err(|err| failure(axum::http::StatusCode::INTERNAL_SERVER_ERROR, err))?;
-    let thinking_level = choice.thinking_level.clone().unwrap_or_else(|| "medium".into());
+    let thinking_level = choice
+        .thinking_level
+        .clone()
+        .unwrap_or_else(|| "medium".into());
     let mut models = Vec::new();
     for (provider, entries) in gateway.catalog_models() {
         for model in &entries {
@@ -336,10 +334,13 @@ fn model_context(
     let generation = gateway.upcoming_generation().saturating_sub(1);
     Ok(ClientModelContext {
         models,
-        active_model: choice.model.as_ref().map(|(provider, id)| ClientModelSelection {
-            id: id.clone(),
-            provider: provider.clone(),
-        }),
+        active_model: choice
+            .model
+            .as_ref()
+            .map(|(provider, id)| ClientModelSelection {
+                id: id.clone(),
+                provider: provider.clone(),
+            }),
         model_state,
         model_generation: generation.to_string(),
         thinking_level,
@@ -420,10 +421,12 @@ pub async fn mobile_bootstrap_route(
     // 历史再读。清理器真实失败不能伪装成已清理。
     if let Some(agent_id) = target.agent_id.as_deref() {
         if let Ok(agent_dir) = state.memory().agent_dir_checked(agent_id) {
-            if let Err(message) = crate::agents_admin::agent_config_readback::gc_workspace_persistence(
-                state.memory(),
-                &agent_dir,
-            ) {
+            if let Err(message) =
+                crate::agents_admin::agent_config_readback::gc_workspace_persistence(
+                    state.memory(),
+                    &agent_dir,
+                )
+            {
                 return failure(axum::http::StatusCode::INTERNAL_SERVER_ERROR, message);
             }
         }
@@ -432,7 +435,11 @@ pub async fn mobile_bootstrap_route(
         Ok(value) => value,
         Err(err) => return failure(axum::http::StatusCode::INTERNAL_SERVER_ERROR, err),
     };
-    let locale = preferences["locale"].as_str().unwrap_or("").trim().to_string();
+    let locale = preferences["locale"]
+        .as_str()
+        .unwrap_or("")
+        .trim()
+        .to_string();
     let locale = if locale.is_empty() {
         "zh-CN".to_string()
     } else {
@@ -489,9 +496,18 @@ pub async fn mobile_bootstrap_route(
                 .and_then(Value::as_str)
                 .unwrap_or("lingxi")
                 .to_string(),
-            is_primary: row.get("isPrimary").and_then(Value::as_bool).unwrap_or(false),
-            is_current: row.get("isCurrent").and_then(Value::as_bool).unwrap_or(false),
-            has_avatar: row.get("hasAvatar").and_then(Value::as_bool).unwrap_or(false),
+            is_primary: row
+                .get("isPrimary")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            is_current: row
+                .get("isCurrent")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
+            has_avatar: row
+                .get("hasAvatar")
+                .and_then(Value::as_bool)
+                .unwrap_or(false),
             home_folder: row
                 .get("homeFolder")
                 .and_then(Value::as_str)
@@ -515,15 +531,13 @@ pub async fn mobile_bootstrap_route(
         Some(agent) => (
             agent.name.clone(),
             agent.yuan.clone(),
-            agent.effective_home_folder.clone().or_else(|| agent.home_folder.clone()),
+            agent
+                .effective_home_folder
+                .clone()
+                .or_else(|| agent.home_folder.clone()),
             agent.memory_master_enabled,
         ),
-        None => (
-            "Lingxi".to_string(),
-            "lingxi".to_string(),
-            None,
-            true,
-        ),
+        None => ("Lingxi".to_string(), "lingxi".to_string(), None, true),
     };
 
     let context = match model_context(&state, &target) {
@@ -532,30 +546,41 @@ pub async fn mobile_bootstrap_route(
     };
     let active_model = context.active_model.clone();
 
-    Json(serde_json::to_value(MobileBootstrapResponse {
-        locale,
-        agent_name,
-        user_name,
-        current_agent_id: target.agent_id.clone(),
-        agent_yuan,
-        home_folder,
-        cwd_history,
-        memory_master_enabled,
-        memory_enabled,
-        thinking_level: context.thinking_level.clone(),
-        permission_mode,
-        // 只投影已知外观/排版/聊天布局键；其余偏好不公开给聊天面。
-        appearance: preferences.get("appearance").cloned().unwrap_or_else(|| json!({})),
-        editor: preferences.get("editor").cloned().unwrap_or_else(|| json!({})),
-        chat: preferences.get("chat").cloned().unwrap_or_else(|| json!({})),
-        avatars: avatar_availability(&state, target.agent_id.as_deref()),
-        agents,
-        models: context.models,
-        active_model: active_model.clone(),
-        current_model: active_model,
-        model_state: context.model_state,
-        model_generation: context.model_generation,
-    })
-    .unwrap_or_else(|_| json!({"ok":false,"error":"bootstrap serialization failed"})))
+    Json(
+        serde_json::to_value(MobileBootstrapResponse {
+            locale,
+            agent_name,
+            user_name,
+            current_agent_id: target.agent_id.clone(),
+            agent_yuan,
+            home_folder,
+            cwd_history,
+            memory_master_enabled,
+            memory_enabled,
+            thinking_level: context.thinking_level.clone(),
+            permission_mode,
+            // 只投影已知外观/排版/聊天布局键；其余偏好不公开给聊天面。
+            appearance: preferences
+                .get("appearance")
+                .cloned()
+                .unwrap_or_else(|| json!({})),
+            editor: preferences
+                .get("editor")
+                .cloned()
+                .unwrap_or_else(|| json!({})),
+            chat: preferences
+                .get("chat")
+                .cloned()
+                .unwrap_or_else(|| json!({})),
+            avatars: avatar_availability(&state, target.agent_id.as_deref()),
+            agents,
+            models: context.models,
+            active_model: active_model.clone(),
+            current_model: active_model,
+            model_state: context.model_state,
+            model_generation: context.model_generation,
+        })
+        .unwrap_or_else(|_| json!({"ok":false,"error":"bootstrap serialization failed"})),
+    )
     .into_response()
 }

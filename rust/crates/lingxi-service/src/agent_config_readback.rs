@@ -2862,7 +2862,10 @@ fn prune_missing_workspace_config(config: &Value) -> Option<Value> {
 /// 写入面，不重新归一化其余内容）。无变化不落盘。
 /// 过期工作区持久化的真实清理器（R07-T09 起 pub(crate)：mobile bootstrap
 /// 与配置读取共用同一清理路径；失败由调用方明确上抛，不虚报已清理）。
-pub(crate) fn gc_workspace_persistence(memory: &MemoryService, agent_dir: &Path) -> Result<(), String> {
+pub(crate) fn gc_workspace_persistence(
+    memory: &MemoryService,
+    agent_dir: &Path,
+) -> Result<(), String> {
     let config_path = agent_dir.join("config.yaml");
     let config = am::config::read_yaml_mapping_as_json(&config_path)
         .map_err(|err| format!("cannot read config.yaml: {err}"))?

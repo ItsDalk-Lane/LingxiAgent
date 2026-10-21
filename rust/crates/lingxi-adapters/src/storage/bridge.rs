@@ -106,6 +106,8 @@ pub struct BridgeOutboxInput {
     pub inbox_id: Option<String>,
     pub manual_action_id: Option<String>,
     pub run_id: Option<String>,
+    /// 循环投递台账来源：loop-reply/loop-notice 之外的投递必须为 None。
+    pub loop_delivery_id: Option<String>,
     pub payload_json: String,
     pub attachments: Vec<BridgeAttachment>,
 }
@@ -667,7 +669,7 @@ pub async fn recover_inbox(db: &RunDatabase, now: u64) -> Result<usize, StorageE
 })).await
 }
 
-const OUTBOX_COLUMNS:&str="delivery_id,connector_id,connector_generation,inbox_id,run_id,conversation_id,payload_json,attachments_json,status,platform_receipt_json,error,created_at,updated_at,conversation_kind,target_inbox_id,reply_context_json,manual_action_id";
+const OUTBOX_COLUMNS:&str="delivery_id,connector_id,connector_generation,inbox_id,run_id,conversation_id,payload_json,attachments_json,status,platform_receipt_json,error,created_at,updated_at,conversation_kind,target_inbox_id,reply_context_json,manual_action_id,loop_delivery_id";
 fn outbox_row(row: &Row<'_>) -> rusqlite::Result<BridgeOutbox> {
     Ok(BridgeOutbox {
         input: BridgeOutboxInput {
@@ -677,6 +679,7 @@ fn outbox_row(row: &Row<'_>) -> rusqlite::Result<BridgeOutbox> {
             inbox_id: row.get(3)?,
             manual_action_id: row.get(16)?,
             run_id: row.get(4)?,
+            loop_delivery_id: row.get(17)?,
             payload_json: row.get(6)?,
             attachments: from_json(row.get(7)?, 7)?,
         },
@@ -713,6 +716,65 @@ pub(crate) fn outbox_target(
     frozen_target: Option<&str>,
 ) -> Result<(BridgeConnector, BridgeInbox), StorageError> {
     let cfg = current(conn, &input.connector_id, input.connector_generation)?;
+    // 台账来源列专属循环投递；其他来源携带即伪造，响亮拒绝。
+    if !input.delivery_id.starts_with("loop-reply:")
+        && !input.delivery_id.starts_with("loop-notice:")
+        && input.loop_delivery_id.is_some()
+    {
+        return Err(conflict(
+            "loop delivery source is reserved for loop deliveries",
+        ));
+    }
+    // 桥循环投递两条腿（台账锚定；先于通用腿，防止被主动通知腿放宽接收）。
+    if let Some(run_id) = input.delivery_id.strip_prefix("loop-reply:") {
+        if input.manual_action_id.is_some()
+            || input.inbox_id.is_some()
+            || input.run_id.as_deref() != Some(run_id)
+            || input.loop_delivery_id.as_deref() != Some(input.delivery_id.as_str())
+        {
+            return Err(conflict("loop reply impersonates another source"));
+        }
+        let delivery = loop_delivery_conn(conn, &input.delivery_id)?
+            .ok_or_else(|| invalid("loop reply ledger missing"))?;
+        if delivery.input.kind != "reply"
+            || delivery.input.connector_id != input.connector_id
+            || delivery.input.connector_generation != input.connector_generation
+            || delivery.input.run_id.as_deref() != Some(run_id)
+        {
+            return Err(conflict("loop reply ledger mismatch"));
+        }
+        loop_turn_run_conn(
+            conn,
+            run_id,
+            &cfg.input.actor_id,
+            &delivery.input.session_id,
+        )?;
+        let (conversation, inbox) =
+            loop_delivery_target_conn(conn, &cfg, input, &delivery, frozen_target)?;
+        loop_reply_session_conn(conn, &conversation, &delivery.input.session_id)?;
+        return Ok((cfg, inbox));
+    }
+    if input.delivery_id.starts_with("loop-notice:") {
+        if input.manual_action_id.is_some()
+            || input.inbox_id.is_some()
+            || input.run_id.is_some()
+            || input.loop_delivery_id.as_deref() != Some(input.delivery_id.as_str())
+        {
+            return Err(conflict("loop notice impersonates another source"));
+        }
+        let delivery = loop_delivery_conn(conn, &input.delivery_id)?
+            .ok_or_else(|| invalid("loop notice ledger missing"))?;
+        if delivery.input.kind != "notice"
+            || delivery.input.run_id.is_some()
+            || delivery.input.connector_id != input.connector_id
+            || delivery.input.connector_generation != input.connector_generation
+        {
+            return Err(conflict("loop notice ledger mismatch"));
+        }
+        let (_conversation, inbox) =
+            loop_delivery_target_conn(conn, &cfg, input, &delivery, frozen_target)?;
+        return Ok((cfg, inbox));
+    }
     if let Some(id) = &input.manual_action_id {
         if input.run_id.is_some() || input.inbox_id.is_some() {
             return Err(conflict("manual action cannot impersonate inbox or Run"));
@@ -948,7 +1010,7 @@ fn enqueue_outbox_conn(
     let reply_context = reply_context(&target)?;
     let attachments =
         serde_json::to_string(&input.attachments).map_err(|e| invalid(e.to_string()))?;
-    conn.execute("INSERT INTO bridge_outbox_v1(delivery_id,connector_id,connector_generation,inbox_id,run_id,conversation_id,payload_json,attachments_json,status,created_at,updated_at,conversation_kind,target_inbox_id,reply_context_json,manual_action_id) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,'queued',?9,?9,?10,?11,?12,?13)",params![input.delivery_id,input.connector_id,generation(input.connector_generation)?,input.inbox_id,input.run_id,target.input.conversation_id,input.payload_json,attachments,now,wire(target.input.conversation_kind),target.id,reply_context,input.manual_action_id]).map_err(map_rusqlite)?;
+    conn.execute("INSERT INTO bridge_outbox_v1(delivery_id,connector_id,connector_generation,inbox_id,run_id,conversation_id,payload_json,attachments_json,status,created_at,updated_at,conversation_kind,target_inbox_id,reply_context_json,manual_action_id,loop_delivery_id) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,'queued',?9,?9,?10,?11,?12,?13,?14)",params![input.delivery_id,input.connector_id,generation(input.connector_generation)?,input.inbox_id,input.run_id,target.input.conversation_id,input.payload_json,attachments,now,wire(target.input.conversation_kind),target.id,reply_context,input.manual_action_id,input.loop_delivery_id]).map_err(map_rusqlite)?;
     Ok(BridgeOutboxClaim {
         claimed: true,
         outbox: outbox_conn(conn, &input.delivery_id)?
@@ -1048,6 +1110,339 @@ pub async fn settle_outbox(
 pub async fn recover_started_outbox(db: &RunDatabase, now: u64) -> Result<usize, StorageError> {
     let (now, busy) = (number(now)?, db.options().busy_timeout_ms);
     db.queue().submit(move|conn|with_write_txn(conn,busy,|conn|conn.execute("UPDATE bridge_outbox_v1 SET status='unknown',error='send result unknown after restart; do not resend',updated_at=?1 WHERE status='started'",[now]).map_err(map_rusqlite))).await
+}
+
+// ── 循环投递台账（V25 bridge_loop_deliveries_v1）───────────────────────
+// 桥循环的外发意图先落账：唤起轮次时写 reply 行（携带 run_id），循环事件
+// 写 notice 行（携带 text）；连接会话 tick 把 queued 行推进为真实 outbox
+// （载荷在 run 终态后才能冻结）。reply 的授权锚是 run 血统（origin='loop'、
+// cause=绑定会话、无父 run、本机调度主体）；notice 的循环记录核验在服务侧
+// （loop-state.json 非存储层可读），存储侧钉死连接器/会话挂接/owner 私聊
+// 目标。两侧都是持续重查：挂接或连接器代次变化即拒绝。
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct BridgeLoopDeliveryInput {
+    pub delivery_id: String,
+    pub connector_id: String,
+    pub connector_generation: u64,
+    pub conversation_id: String,
+    pub sender_id: String,
+    pub actor_id: String,
+    pub session_id: String,
+    /// reply 必填（循环轮真实 run）；notice 必须为空。
+    pub run_id: Option<String>,
+    /// reply | notice（与表 CHECK 一致）。
+    pub kind: String,
+    /// notice 必填；reply 必须为空（回复文本由 run 终态决定）。
+    pub text: Option<String>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BridgeLoopDelivery {
+    #[serde(flatten)]
+    pub input: BridgeLoopDeliveryInput,
+    /// queued | enqueued | failed
+    pub status: String,
+    pub error: Option<String>,
+    pub created_at: i64,
+    pub updated_at: i64,
+}
+const LOOP_DELIVERY_COLUMNS:&str="delivery_id,connector_id,connector_generation,conversation_id,sender_id,actor_id,session_id,run_id,kind,text,status,error,created_at,updated_at";
+fn loop_delivery_row(row: &Row<'_>) -> rusqlite::Result<BridgeLoopDelivery> {
+    Ok(BridgeLoopDelivery {
+        input: BridgeLoopDeliveryInput {
+            delivery_id: row.get(0)?,
+            connector_id: row.get(1)?,
+            connector_generation: u64_row(row, 2)?,
+            conversation_id: row.get(3)?,
+            sender_id: row.get(4)?,
+            actor_id: row.get(5)?,
+            session_id: row.get(6)?,
+            run_id: row.get(7)?,
+            kind: row.get(8)?,
+            text: row.get(9)?,
+        },
+        status: row.get(10)?,
+        error: row.get(11)?,
+        created_at: row.get(12)?,
+        updated_at: row.get(13)?,
+    })
+}
+fn loop_delivery_conn(
+    conn: &Connection,
+    id: &str,
+) -> Result<Option<BridgeLoopDelivery>, StorageError> {
+    conn.query_row(
+        &format!(
+            "SELECT {LOOP_DELIVERY_COLUMNS} FROM bridge_loop_deliveries_v1 WHERE delivery_id=?1"
+        ),
+        [id],
+        loop_delivery_row,
+    )
+    .optional()
+    .map_err(map_rusqlite)
+}
+/// 循环轮 run 的血统必须是绑定会话的循环根轮（无父 run、本机调度主体）。
+fn loop_turn_run_conn(
+    conn: &Connection,
+    run_id: &str,
+    actor: &str,
+    session_id: &str,
+) -> Result<(), StorageError> {
+    let (sid, _, kind, owner, _) = run_session(conn, run_id, actor)?;
+    let lineage: Option<(String, Option<String>, Option<String>)> = conn
+        .query_row(
+            "SELECT origin,cause_id,parent_run_id FROM run_lineage WHERE run_id=?1",
+            [run_id],
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+        )
+        .optional()
+        .map_err(map_rusqlite)?;
+    let (origin, cause, parent) =
+        lineage.ok_or_else(|| invalid("loop reply run lineage missing"))?;
+    if sid != session_id
+        || kind != "local_user"
+        || owner != LOCAL_OWNER_SUBJECT
+        || origin != "loop"
+        || cause.as_deref() != Some(session_id)
+        || parent.is_some()
+    {
+        return Err(conflict("loop reply run is not a local root loop turn"));
+    }
+    Ok(())
+}
+/// 台账行钉住的会话挂接与 owner 私聊目标；返回会话行与目标 inbox。
+/// 会话存续/属主校验不在此列：通知（如会话重置终止通告）必须能在会话
+/// 换代后继续送达，由回复腿单独补 session 校验。
+fn loop_delivery_target_conn(
+    conn: &Connection,
+    cfg: &BridgeConnector,
+    input: &BridgeOutboxInput,
+    delivery: &BridgeLoopDelivery,
+    frozen_target: Option<&str>,
+) -> Result<(BridgeConversation, BridgeInbox), StorageError> {
+    let conversation = conversation_conn(
+        conn,
+        &input.connector_id,
+        &delivery.input.conversation_id,
+        &delivery.input.sender_id,
+        &delivery.input.actor_id,
+    )?
+    .ok_or_else(|| invalid("loop conversation missing"))?;
+    if conversation.conversation_kind != ConversationKind::Dm
+        || cfg.input.owner_sender_id.as_deref() != Some(delivery.input.sender_id.as_str())
+        || cfg.input.actor_id != delivery.input.actor_id
+    {
+        return Err(conflict("loop delivery conversation authority changed"));
+    }
+    let target = match frozen_target {
+        Some(id) => id.to_string(),
+        None => conn
+            .query_row(
+                "SELECT id FROM bridge_inbox_v1 WHERE connector_id=?1 AND connector_generation=?2 AND conversation_id=?3 AND role='owner' AND conversation_kind='dm' AND sender_id=?4 ORDER BY created_at DESC,id DESC LIMIT 1",
+                params![
+                    input.connector_id,
+                    generation(input.connector_generation)?,
+                    delivery.input.conversation_id,
+                    delivery.input.sender_id
+                ],
+                |row| row.get(0),
+            )
+            .optional()
+            .map_err(map_rusqlite)?
+            .ok_or_else(|| invalid("loop delivery destination missing"))?,
+    };
+    let inbox = inbox_conn(conn, &target)?.ok_or_else(|| invalid("loop target inbox missing"))?;
+    if inbox.role != BridgeRole::Owner
+        || inbox.input.conversation_kind != ConversationKind::Dm
+        || inbox.input.connector_id != input.connector_id
+        || inbox.connector_generation != input.connector_generation
+        || inbox.input.conversation_id != delivery.input.conversation_id
+        || inbox.input.sender_id != delivery.input.sender_id
+    {
+        return Err(conflict("loop delivery target authority changed"));
+    }
+    Ok((conversation, inbox))
+}
+/// 回复腿的会话存续校验：回执必须仍属于挂接的当前活跃会话。
+fn loop_reply_session_conn(
+    conn: &Connection,
+    conversation: &BridgeConversation,
+    session_id: &str,
+) -> Result<(), StorageError> {
+    let session_ok: bool = conn
+        .query_row(
+            "SELECT EXISTS(SELECT 1 FROM sessions WHERE session_id=?1 AND owner_user_id=?2 AND lifecycle='active')",
+            params![session_id, conversation.subject],
+            |row| row.get(0),
+        )
+        .map_err(map_rusqlite)?;
+    if conversation.current_session_id.as_deref() != Some(session_id) || !session_ok {
+        return Err(conflict("loop reply session authority changed"));
+    }
+    Ok(())
+}
+pub async fn enqueue_loop_delivery(
+    db: &RunDatabase,
+    input: &BridgeLoopDeliveryInput,
+    now: u64,
+) -> Result<BridgeLoopDelivery, StorageError> {
+    for id in [
+        &input.delivery_id,
+        &input.connector_id,
+        &input.conversation_id,
+        &input.sender_id,
+        &input.actor_id,
+        &input.session_id,
+    ] {
+        text_id(id)?;
+    }
+    if let Some(run) = &input.run_id {
+        text_id(run)?;
+    }
+    generation(input.connector_generation)?;
+    match input.kind.as_str() {
+        "reply" if input.run_id.is_some() && input.text.is_none() => {}
+        "notice"
+            if input.run_id.is_none()
+                && input
+                    .text
+                    .as_deref()
+                    .is_some_and(|text| !text.trim().is_empty()) => {}
+        _ => return Err(invalid("loop delivery shape violates its kind")),
+    }
+    let (input, now, busy) = (input.clone(), number(now)?, db.options().busy_timeout_ms);
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                if let Some(old) = loop_delivery_conn(conn, &input.delivery_id)? {
+                    if old.input != input {
+                        return Err(conflict("loop delivery identity payload conflict"));
+                    }
+                    return Ok(old);
+                }
+                let cfg = current(conn, &input.connector_id, input.connector_generation)?;
+                let conversation = conversation_conn(
+                    conn,
+                    &input.connector_id,
+                    &input.conversation_id,
+                    &input.sender_id,
+                    &input.actor_id,
+                )?
+                .ok_or_else(|| invalid("loop conversation missing"))?;
+                if conversation.conversation_kind != ConversationKind::Dm
+                    || cfg.input.owner_sender_id.as_deref() != Some(input.sender_id.as_str())
+                    || cfg.input.actor_id != input.actor_id
+                {
+                    return Err(conflict("loop delivery requires the owner DM conversation"));
+                }
+                // 回复锚定当前挂接会话；通知（如重置终止通告）允许在会话
+                // 换代后继续送达，会话校验只属回复。
+                if input.kind == "reply" {
+                    if conversation.current_session_id.as_deref()
+                        != Some(input.session_id.as_str())
+                    {
+                        return Err(conflict("loop reply requires the current bound session"));
+                    }
+                    active_session(conn, &input.session_id)?;
+                    loop_turn_run_conn(
+                        conn,
+                        input.run_id.as_deref().expect("reply shape checked"),
+                        &input.actor_id,
+                        &input.session_id,
+                    )?;
+                }
+                conn.execute("INSERT INTO bridge_loop_deliveries_v1(delivery_id,connector_id,connector_generation,conversation_id,sender_id,actor_id,session_id,run_id,kind,text,status,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,'queued',?11,?11)",params![input.delivery_id,input.connector_id,generation(input.connector_generation)?,input.conversation_id,input.sender_id,input.actor_id,input.session_id,input.run_id,input.kind,input.text,now]).map_err(map_rusqlite)?;
+                loop_delivery_conn(conn, &input.delivery_id)?
+                    .ok_or_else(|| invalid("loop delivery missing after write"))
+            })
+        })
+        .await
+}
+/// 服务侧反查：桥循环目标会话 → 当前挂接的会话行。一行以上即挂接损坏，
+/// 响亮拒绝而不是猜一条。
+pub async fn loop_conversation_by_session(
+    db: &RunDatabase,
+    session_id: &str,
+) -> Result<Option<BridgeConversation>, StorageError> {
+    let session_id = session_id.to_string();
+    db.queue()
+        .submit(move |conn| {
+            let mut stmt = conn
+                .prepare(&format!("SELECT {CONVERSATION_COLUMNS} FROM bridge_conversations_v1 WHERE current_session_id=?1 ORDER BY created_at,conversation_id LIMIT 2"))
+                .map_err(map_rusqlite)?;
+            let rows = stmt
+                .query_map([session_id.as_str()], conversation_row)
+                .map_err(map_rusqlite)?
+                .collect::<Result<Vec<_>, _>>()
+                .map_err(map_rusqlite)?;
+            if rows.len() > 1 {
+                return Err(conflict("loop session bound by multiple conversations"));
+            }
+            Ok(rows.into_iter().next())
+        })
+        .await
+}
+pub async fn pending_loop_deliveries(
+    db: &RunDatabase,
+    connector_id: &str,
+) -> Result<Vec<BridgeLoopDelivery>, StorageError> {
+    let connector_id = connector_id.to_string();
+    db.queue()
+        .submit(move |conn| {
+            let mut stmt = conn
+                .prepare(&format!("SELECT {LOOP_DELIVERY_COLUMNS} FROM bridge_loop_deliveries_v1 WHERE status='queued' AND connector_id=?1 ORDER BY created_at,delivery_id"))
+                .map_err(map_rusqlite)?;
+            let rows = stmt
+                .query_map([connector_id.as_str()], loop_delivery_row)
+                .map_err(map_rusqlite)?;
+            rows.collect::<Result<Vec<_>, _>>().map_err(map_rusqlite)
+        })
+        .await
+}
+pub async fn settle_loop_delivery(
+    db: &RunDatabase,
+    id: &str,
+    status: &str,
+    error: Option<String>,
+    now: u64,
+) -> Result<BridgeLoopDelivery, StorageError> {
+    if !matches!(status, "enqueued" | "failed") {
+        return Err(invalid(
+            "loop delivery settlement must be enqueued or failed",
+        ));
+    }
+    if status == "enqueued" && error.is_some() {
+        return Err(invalid("enqueued loop delivery cannot carry an error"));
+    }
+    let (id, status, now, busy) = (
+        id.to_string(),
+        status.to_string(),
+        number(now)?,
+        db.options().busy_timeout_ms,
+    );
+    db.queue()
+        .submit(move |conn| {
+            with_write_txn(conn, busy, |conn| {
+                let row = loop_delivery_conn(conn, &id)?
+                    .ok_or_else(|| invalid("loop delivery missing"))?;
+                if row.status != "queued" {
+                    return if row.status == status && row.error == error {
+                        Ok(row)
+                    } else {
+                        Err(conflict("loop delivery not queued or result changed"))
+                    };
+                }
+                conn.execute(
+                    "UPDATE bridge_loop_deliveries_v1 SET status=?2,error=?3,updated_at=?4 WHERE delivery_id=?1 AND status='queued'",
+                    params![id, status, error, now],
+                )
+                .map_err(map_rusqlite)?;
+                loop_delivery_conn(conn, &id)?
+                    .ok_or_else(|| invalid("loop delivery missing"))
+            })
+        })
+        .await
 }
 
 fn validate_prepared_files(
@@ -1633,7 +2028,7 @@ pub async fn enqueue_manual_action(
         let cfg=current(conn,&input.connector_id,input.connector_generation)?;let(filename,mime,size,kind)=validate_manual_source(conn,&cfg,&input)?;
         conn.execute("INSERT INTO bridge_manual_actions_v1(id,connector_id,connector_generation,target_inbox_id,source_session_id,file_id,content_sha256,label,filename,mime,size_bytes,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)",params![input.id,input.connector_id,generation(input.connector_generation)?,input.target_inbox_id,input.source_session_id,input.file_id,input.content_sha256,input.label,filename,mime,number(size)?,now]).map_err(map_rusqlite)?;
         let kind=match kind.as_str(){"image"=>BridgeAttachmentKind::Image,"video"=>BridgeAttachmentKind::Video,"audio"=>BridgeAttachmentKind::Audio,_=>BridgeAttachmentKind::File};
-        let queued=enqueue_outbox_conn(conn,&BridgeOutboxInput{delivery_id:delivery,connector_id:input.connector_id.clone(),connector_generation:input.connector_generation,inbox_id:None,manual_action_id:Some(input.id.clone()),run_id:None,payload_json:serde_json::json!({"text":""}).to_string(),attachments:vec![BridgeAttachment{attachment_id:format!("manual:{}",input.id),kind,platform_ref:None,filename:Some(filename),mime:Some(mime),size_bytes:Some(u32::try_from(size).map_err(|_|invalid("manual file size exceeds protocol"))?)}]},now)?;
+        let queued=enqueue_outbox_conn(conn,&BridgeOutboxInput{delivery_id:delivery,connector_id:input.connector_id.clone(),connector_generation:input.connector_generation,inbox_id:None,manual_action_id:Some(input.id.clone()),run_id:None,loop_delivery_id:None,payload_json:serde_json::json!({"text":""}).to_string(),attachments:vec![BridgeAttachment{attachment_id:format!("manual:{}",input.id),kind,platform_ref:None,filename:Some(filename),mime:Some(mime),size_bytes:Some(u32::try_from(size).map_err(|_|invalid("manual file size exceeds protocol"))?)}]},now)?;
         Ok(BridgeManualActionClaim{created:true,action:manual_conn(conn,&input.id)?.ok_or_else(||invalid("manual action missing after write"))?,outbox:queued.outbox})
     })).await
 }

@@ -1,0 +1,44 @@
+
+running 36 tests
+test builtin_baidu_cloud_rejects_invalid_requests ... ok
+test builtin_moonshot_rejects_invalid_requests ... ok
+test builtin_perplexity_rejects_invalid_requests ... ok
+test builtin_fireworks_rejects_invalid_requests ... ok
+test builtin_opencode_go_rejects_invalid_requests ... ok
+test builtin_anthropic_rejects_invalid_requests ... ok
+test builtin_mimo_rejects_invalid_requests ... ok
+test builtin_openai_rejects_invalid_requests ... ok
+test builtin_deepseek_rejects_invalid_requests ... ok
+test builtin_deepseek_responses_rejects_invalid_requests ... ok
+test builtin_dashscope_rejects_invalid_requests ... ok
+test builtin_ollama_rejects_invalid_requests ... ok
+test builtin_mimo_token_plan_rejects_invalid_requests ... ok
+test builtin_agnes_rejects_invalid_requests ... ok
+test builtin_hunyuan_rejects_invalid_requests ... ok
+test builtin_minimax_token_plan_rejects_invalid_requests ... ok
+test builtin_minimax_rejects_invalid_requests ... ok
+test builtin_dashscope_coding_rejects_invalid_requests ... ok
+test builtin_gemini_rejects_invalid_requests ... ok
+test builtin_kimi_coding_rejects_invalid_requests ... ok
+test builtin_mistral_rejects_invalid_requests ... ok
+test builtin_groq_rejects_invalid_requests ... ok
+test builtin_modelscope_rejects_invalid_requests ... ok
+test builtin_baichuan_rejects_invalid_requests ... ok
+test builtin_openrouter_rejects_invalid_requests ... ok
+test builtin_opencode_rejects_invalid_requests ... ok
+test builtin_infini_rejects_invalid_requests ... ok
+test builtin_siliconflow_rejects_invalid_requests ... ok
+test builtin_stepfun_rejects_invalid_requests ... ok
+test builtin_volcengine_rejects_invalid_requests ... ok
+test builtin_zhipu_coding_rejects_invalid_requests ... ok
+test builtin_together_rejects_invalid_requests ... ok
+test builtin_volcengine_coding_rejects_invalid_requests ... ok
+test builtin_xai_rejects_invalid_requests ... ok
+test builtin_zhipu_rejects_invalid_requests ... ok
+test every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.47s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.51s
+     Running tests/r07_t08_provider_matrix.rs (rust/target/debug/deps/r07_t08_provider_matrix-8568e012c346b569)

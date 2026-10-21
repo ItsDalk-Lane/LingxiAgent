@@ -743,12 +743,20 @@ fn check_base_scenario_set(map: &StageMap, repo_root: &Path) -> Result<(), Strin
         )
     })?;
     let value: Value = serde_json::from_str(&text).map_err(|e| {
-        format!("R00 acceptance ledger {} is not valid JSON: {e}", path.display())
+        format!(
+            "R00 acceptance ledger {} is not valid JSON: {e}",
+            path.display()
+        )
     })?;
     let scenarios = value
         .get("scenarios")
         .and_then(Value::as_object)
-        .ok_or_else(|| format!("R00 acceptance ledger {} has no scenarios object", path.display()))?;
+        .ok_or_else(|| {
+            format!(
+                "R00 acceptance ledger {} has no scenarios object",
+                path.display()
+            )
+        })?;
     let mut expected: Vec<(&String, &Value)> = scenarios
         .iter()
         .filter(|(_, entry)| {
@@ -798,7 +806,10 @@ fn check_base_scenario_set(map: &StageMap, repo_root: &Path) -> Result<(), Strin
                 field_diffs.push(format!("{key}: map={actual:?} r00={wanted:?}"));
             }
         }
-        let wanted_status = entry.get("ledger_status").and_then(Value::as_str).unwrap_or("");
+        let wanted_status = entry
+            .get("ledger_status")
+            .and_then(Value::as_str)
+            .unwrap_or("");
         if wanted_status != mirror.ledger_status {
             field_diffs.push(format!(
                 "ledger_status: map={:?} r00={wanted_status:?}",
@@ -1955,6 +1966,13 @@ where
         }
     }
 
+    // R07 收口：案例聚合生产者必须最后运行（它消费本轮全部套件日志；
+    // 任何先于某套件运行都会让该套件案例缺失、依赖叶被误判 MISSING）。
+    if let Some(pos) = order.iter().position(|key| key == "r07_leaf_cases") {
+        let producer = order.remove(pos);
+        order.push(producer);
+    }
+
     let mut command_json = Vec::new();
     let mut outcomes = Vec::new();
     for key in &order {
@@ -2046,6 +2064,50 @@ where
                     entry["reason"] = json!(failures);
                 }
                 entry["assertionResults"] = json!(results);
+            }
+            // R07 收口 D：套件测试锚点——命令退出 0 之外，场景的关键测试
+            // 必须在本轮套件日志里真实出现并通过（`test <name> ... ok`）。
+            // 锚点未命中（零匹配/未执行/失败/被跳过）一律场景 FAIL。
+            if !scenario.suite_test_anchors.is_empty() {
+                let mut anchor_results = Vec::new();
+                for anchor in &scenario.suite_test_anchors {
+                    let producer_ok = outcomes
+                        .iter()
+                        .any(|o| o.key == anchor.command && o.passed());
+                    let log_path = evidence_root
+                        .join("SUITES")
+                        .join(&anchor.command)
+                        .join("output.log");
+                    let observed = if !producer_ok {
+                        None
+                    } else {
+                        std::fs::read_to_string(&log_path).ok().map(|text| {
+                            if text.lines().any(|line| {
+                                line.trim() == format!("test {} ... ok", anchor.test)
+                            }) {
+                                "ok"
+                            } else if text.contains(&format!("test {}", anchor.test)) {
+                                "not_ok"
+                            } else {
+                                "absent"
+                            }
+                        })
+                    };
+                    let verdict = observed == Some("ok");
+                    anchor_results.push(json!({
+                        "command": anchor.command,
+                        "test": anchor.test,
+                        "observed": observed,
+                        "passed": verdict,
+                    }));
+                    if !verdict {
+                        passed = false;
+                    }
+                }
+                entry["suiteTestAnchors"] = json!(anchor_results);
+                if !passed && entry.get("reason").is_none() {
+                    entry["reason"] = json!("suite test anchor not satisfied: the key test did not run green in this round's suite log");
+                }
             }
             entry["status"] = json!(if passed { "PASS" } else { "FAIL" });
             entry

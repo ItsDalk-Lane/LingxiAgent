@@ -683,7 +683,10 @@ async fn original_experiments_current_tauri_window_real_service() {
         .unwrap_or_else(|| {
             PathBuf::from("/Users/study_superior/.cache/lingxi-r06-builds/tauri-resources")
         });
-    assert!(native_target.is_dir(), "需要已保留的原生构建缓存；此证明不创建新target");
+    assert!(
+        native_target.is_dir(),
+        "需要已保留的原生构建缓存；此证明不创建新target"
+    );
     let output = tokio::process::Command::new("node")
         .arg(repo.join("desktop/src/react/settings/__tests__/run-experiments-live-ui.mjs"))
         .current_dir(&repo)

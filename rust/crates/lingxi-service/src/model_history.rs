@@ -1233,12 +1233,26 @@ impl ModelHistory {
             Origin::Loop => true,
             _ => false,
         };
+        // R07 收口 B：桥会话上的循环轮。Loop 轮由本机调度主体执行（现役
+        // 引擎全权同位），宿主会话属主却是桥主体；持久锚 = 桥会话绑定行
+        // （bridge_conversations_v1 由独立桥接收链写入，非本层可伪造）。
+        let owner_matches = owner == ctx.principal.storage_subject()
+            || (lineage.origin == Origin::Loop
+                && ctx.principal == Principal::LocalUser
+                && self
+                    .storage
+                    .query_one_text(
+                        "SELECT current_session_id FROM bridge_conversations_v1 WHERE current_session_id=?1 AND subject=?2",
+                        vec![ctx.session_id.to_string(), owner.clone()],
+                    )
+                    .await?
+                    .is_some());
         let actor_allowed = ctx.principal == Principal::LocalUser
             || (lineage.origin == Origin::SessionCollab
                 && matches!(ctx.principal, Principal::Device { .. }));
         if !actor_allowed
             || !causal_match
-            || owner != ctx.principal.storage_subject()
+            || !owner_matches
             || run.session_id != ctx.session_id
             || owned.is_none()
             || !matches!(

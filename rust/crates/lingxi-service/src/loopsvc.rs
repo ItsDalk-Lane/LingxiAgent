@@ -36,7 +36,9 @@
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-use lingxi_adapters::storage::{media, session_tree, subagent_threads, RunDatabase};
+use lingxi_adapters::storage::{
+    bridge as bridge_store, media, session_tree, subagent_threads, RunDatabase,
+};
 use lingxi_kernel::subagent::RunOrigin;
 use serde_json::json;
 
@@ -353,7 +355,69 @@ pub fn build_loop_services(
                         )
                         .await
                     {
-                        Ok(_) => Ok(Delivery::mode(DeliveryMode::TriggerTurn)),
+                        Ok(accepted) => {
+                            // 桥循环轮：回执意图落台账，连接会话 tick 在 run
+                            // 终态后冻结载荷走 outbox 链（重启不丢回执）。
+                            if target.kind == "bridge" {
+                                let conversation = bridge_store::loop_conversation_by_session(
+                                    &storage, session_id,
+                                )
+                                .await
+                                .map_err(|err| {
+                                    LoopError::new(
+                                        "deliver_failed",
+                                        format!("loop bridge conversation lookup failed: {err:?}"),
+                                    )
+                                })?
+                                .ok_or_else(|| {
+                                    LoopError::new(
+                                        "deliver_failed",
+                                        "loop bridge conversation missing".into(),
+                                    )
+                                })?;
+                                let connector = bridge_store::get_connector(
+                                    &storage,
+                                    &conversation.connector_id,
+                                )
+                                .await
+                                .map_err(|err| {
+                                    LoopError::new(
+                                        "deliver_failed",
+                                        format!("loop bridge connector lookup failed: {err:?}"),
+                                    )
+                                })?
+                                .ok_or_else(|| {
+                                    LoopError::new(
+                                        "deliver_failed",
+                                        "loop bridge connector missing".into(),
+                                    )
+                                })?;
+                                bridge_store::enqueue_loop_delivery(
+                                    &storage,
+                                    &bridge_store::BridgeLoopDeliveryInput {
+                                        delivery_id: format!("loop-reply:{}", accepted.run_id),
+                                        connector_id: conversation.connector_id.clone(),
+                                        connector_generation: connector.generation,
+                                        conversation_id: conversation.conversation_id.clone(),
+                                        sender_id: conversation.sender_id.clone(),
+                                        actor_id: conversation.actor_id.clone(),
+                                        session_id: session_id.to_string(),
+                                        run_id: Some(accepted.run_id.clone()),
+                                        kind: "reply".into(),
+                                        text: None,
+                                    },
+                                    now,
+                                )
+                                .await
+                                .map_err(|err| {
+                                    LoopError::new(
+                                        "deliver_failed",
+                                        format!("loop reply ledger refused: {err:?}"),
+                                    )
+                                })?;
+                            }
+                            Ok(Delivery::mode(DeliveryMode::TriggerTurn))
+                        }
                         // 受理闸的 Busy 回绝是 pre-check 之后的竞态背靠背。
                         Err(SessionExecuteError::Busy) => Ok(Delivery::mode(DeliveryMode::Busy)),
                         Err(SessionExecuteError::NotFound) => Err(LoopError::loop_target_reset()),
@@ -364,12 +428,53 @@ pub fn build_loop_services(
                     }
                 })
             });
-        // 通知面（转向收件箱；偏差登记见模块头）。
+        // 通知面（转向收件箱；偏差登记见模块头）。桥臂：通知落循环投递
+        // 台账，由连接会话 tick 外发；循环记录本体即调用方（控制器只对
+        // 在册记录发通知），存储侧钉连接器/会话挂接/owner 私聊目标。
         let notice_supervisor = Arc::clone(&supervisor);
+        let notice_storage = Arc::clone(storage);
+        let notice_clock = Arc::clone(clock);
         let record_notice: RecordOnly =
             Arc::new(move |target: LoopTarget, message: LoopMessage| {
                 let supervisor = Arc::clone(&notice_supervisor);
+                let storage = Arc::clone(&notice_storage);
+                let now = notice_clock.now_unix_ms();
                 Box::pin(async move {
+                    if target.kind == "bridge" {
+                        let conversation = bridge_store::loop_conversation_by_session(
+                            &storage,
+                            &target.session_id,
+                        )
+                        .await
+                        .map_err(|err| format!("loop bridge conversation lookup failed: {err:?}"))?
+                        .ok_or_else(|| "loop bridge conversation missing".to_string())?;
+                        let connector =
+                            bridge_store::get_connector(&storage, &conversation.connector_id)
+                                .await
+                                .map_err(|err| {
+                                    format!("loop bridge connector lookup failed: {err:?}")
+                                })?
+                                .ok_or_else(|| "loop bridge connector missing".to_string())?;
+                        bridge_store::enqueue_loop_delivery(
+                            &storage,
+                            &bridge_store::BridgeLoopDeliveryInput {
+                                delivery_id: format!("loop-notice:{}:{now}", target.session_id),
+                                connector_id: conversation.connector_id.clone(),
+                                connector_generation: connector.generation,
+                                conversation_id: conversation.conversation_id.clone(),
+                                sender_id: conversation.sender_id.clone(),
+                                actor_id: conversation.actor_id.clone(),
+                                session_id: target.session_id.clone(),
+                                run_id: None,
+                                kind: "notice".into(),
+                                text: Some(message.content.clone()),
+                            },
+                            now,
+                        )
+                        .await
+                        .map_err(|err| format!("loop notice ledger refused: {err:?}"))?;
+                        return Ok(());
+                    }
                     supervisor
                         .deliver_retained(&target.session_id, &message.content)
                         .map_err(|err| format!("{err:?}"))

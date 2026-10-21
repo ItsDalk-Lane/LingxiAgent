@@ -168,6 +168,7 @@ async fn delivery(
             inbox_id: None,
             manual_action_id: None,
             run_id: Some("actual-notify-run".into()),
+            loop_delivery_id: None,
             payload_json: json!({"text":"已到提醒时间","contextPolicy":policy}).to_string(),
             attachments: vec![],
         },

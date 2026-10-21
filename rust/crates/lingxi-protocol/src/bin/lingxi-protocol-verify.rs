@@ -302,7 +302,9 @@ fn main() -> ExitCode {
                 let field = check["field"].as_str().expect("check field");
                 match v.get(field) {
                     Some(Value::Null) => {}
-                    Some(_) => failures.push(format!("{file}: {field} must be null in this sample")),
+                    Some(_) => {
+                        failures.push(format!("{file}: {field} must be null in this sample"))
+                    }
                     None => failures.push(format!("{file}: {field} was dropped instead of null")),
                 }
             }
