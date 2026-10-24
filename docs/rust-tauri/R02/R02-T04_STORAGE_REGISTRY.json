@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "task_id": "R02-T04",
   "stage_id": "R02",
-  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte; V6/V7 registered by ZCode:RR2-WP-A (2026-10-06, F41 repair, branch codex/rust-tauri-migration @ ad5ec4e98): fingerprints taken verbatim from the lingxi-storage-inspect `migrations` output over a fresh service-created runs.db built from this candidate (userVersion=7; receipts and compiledIn agree exactly on version/name/fingerprint; V1–V5 receipts reproduced the previously registered values byte-for-byte), evidence artifacts/rust-tauri/R05/RR2/A-R2/fingerprint-extraction/.; R06-AR-F14 (2026-10-12): V8–V11 appended from current MIGRATIONS SQL bytes via the existing registry parser; this repair did not execute a database upgrade or inspector acceptance.; R06 收口（2026-10-13）：V12 appended from current MIGRATIONS SQL bytes via the same parser path, receipts/compiledIn equality enforced by tests/r06_ar_f14_migration_receipts.rs.",
+  "generated_by": "ZCode:R02-T04 (EXECUTOR-R02-T04, 2026-09-26); fingerprints = sha256 over the migration SQL text, cross-checked against the on-disk receipt produced by lingxi-storage-inspect in artifacts/rust-tauri/R02/T04/s4-migrations-round1.json; V2/V3/V4 fingerprints registered by ZCode:EXECUTOR-R03-T08-E01 (2026-09-29), independently recomputed on disk via lingxi-storage-inspect over a fresh service-created runs.db (userVersion=4, receipts==compiledIn), matching the T04/T05/T06 report prefixes; V1 kept byte-for-byte; V6/V7 registered by ZCode:RR2-WP-A (2026-10-06, F41 repair, branch codex/rust-tauri-migration @ ad5ec4e98): fingerprints taken verbatim from the lingxi-storage-inspect `migrations` output over a fresh service-created runs.db built from this candidate (userVersion=7; receipts and compiledIn agree exactly on version/name/fingerprint; V1–V5 receipts reproduced the previously registered values byte-for-byte), evidence artifacts/rust-tauri/R05/RR2/A-R2/fingerprint-extraction/.; R06-AR-F14 (2026-10-12): V8–V11 appended from current MIGRATIONS SQL bytes via the existing registry parser; this repair did not execute a database upgrade or inspector acceptance.; R06 收口（2026-10-13）：V12 appended from current MIGRATIONS SQL bytes via the same parser path, receipts/compiledIn equality enforced by tests/r06_ar_f14_migration_receipts.rs.; R08-T04 收口（2026-10-23, t02-core per Lead adjudication）：V27/V28 appended from current MIGRATIONS SQL bytes via the same parser path; fingerprints cross-checked on disk via lingxi-storage-inspect over the real import-product runs.db (userVersion=28, receipts==compiledIn), evidence artifacts/rust-tauri/R08/t05-registry-sync-01..04.; R08-T06（2026-10-23, t02-core per Lead adjudication ②，T05 评审后注册表修正）：storage 分类表修正——provider-state 类增补 pattern `models-store.json`（实现于 rust/crates/lingxi-adapters/src/storage/legacy_import/classes.rs）。定性：R00 STORES.json/R01 DATA_COMPATIBILITY_MATRIX 与 R08 STORAGE_READINESS.md 均未列该文件=审计漏网（三方 SDK @earendil-works/pi-coding-agent 的 FileModelsStore 经 ModelRuntime.create({modelsPath: <lingxiHome>/models.json}) 写到数据根顶层 dirname(modelsPath)/models-store.json，生产冷启动同写）；不修则 T07 真实旧根 legacy-import 必撞 Unclassified 响亮拒。本条不触 migrations 指纹区（28 条零改动）；夹具 v3 无此文件，封存锚 80a8d2c2… 经 t06-registry-amend-* 确定性双跑重证不变；R00/R01 原文件不动（保 STORAGE_READINESS 输入摘要表）。",
   "deterministic": "no timestamps/randomness; identical migration SQL produces identical fingerprints",
   "new_persistence_points": [
     {
@@ -231,6 +231,18 @@
           "name": "r07_bridge_outbox_loop_source",
           "registered_by": "R07 收口 B：outbox 重建增加 loop_delivery_id 来源列（循环通知第四种可审计来源；存量行走迁移拷贝，约束与索引保持）。",
           "fingerprint_sha256": "8923899f64cb03d226344bfd08dcd40c2c3a9b8734c0ff4d367ffe4e225cafdb"
+        },
+        {
+          "version": 27,
+          "name": "r08_legacy_import_bookkeeping",
+          "registered_by": "R08-T04 收口：LegacyImporter 簿记（A07/A08）——导入 run、批次与问题清单三表，纯追加新表，不改写任何既有表。",
+          "fingerprint_sha256": "1c317b4249efb63ceca729a9dd27050dc101c83d7d83b69f30dd2fd7b04cd654"
+        },
+        {
+          "version": 28,
+          "name": "r08_legacy_import_extensions_registry",
+          "registered_by": "R08-T04 收口 B3：legacy-import 扩展收据载体 import_run_extensions + 8 个运行态类键登记面 legacy_runtime_state_registry（登记≠消费）。",
+          "fingerprint_sha256": "a82dacc2305bdffbfc4d339aceb2673cea84e07de226cd7e0d6a186d9ac1eaf4"
         }
       ],
       "cutover_strategy": "switch-to-new-authority (new isolated database under the new rust data root; no incumbent store is written by this task)",

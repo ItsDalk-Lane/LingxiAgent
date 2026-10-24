@@ -2059,3 +2059,12 @@ M  desktop/src/react/__tests__/components/TodoPanel.test.tsx
 - 第11轮完整阶段独立 PASS，报告 docs/rust-tauri/R01/STAGE_HISTORY/R01_STAGE_REVIEW_R11.md；126件冻结候选指纹1917800317b41362c2c330b3f5c096c3c2891d2356481bee0b3803bc780f6be7。
 - 真实源码提交 0ed84e0b5e9821d217457e7013b4b579002ae095；真实证据提交/本次 VERIFIED_SOURCE_SHA `ab4f228155dd4246734e6c4c45d7288072361f3c`。绿色 typecheck/core-contracts/lint:boundary/lint/build:renderer 全 exit0、执行期间源码零漂移；round2/round3 source态真实重放 VERIFIED、分片逐片和总hash复核。命令记录见各家族 COMMAND_RESULTS.json 的 r01-formal-p2-* 标签。
 - 本次仅同步既有六审计坐标；完整正式终态四文件74/74与全量0失败尚待真实审计提交后执行，未提前记绿、未放行后续阶段。结果将追加于本台账。
+
+## 2026-10-23 R08-T03 批次 F 全量 vitest 意外收获登记（两条待办，Lead 指令落账）
+
+背景：R08-T03 批次 F 裸跑全量 `npx vitest run`（回执 `artifacts/rust-tauri/R08/t03-batchf-vitest-01`，1545 文件/15689 测试，22 文件 123 红）与 T02 时代 scoped 基线（`t02-batch-e-vitest-01`，argv `npx vitest run desktop/src/react/__tests__ --exclude **/r08-a04-*`，399 文件 2 红）口径不同；逐文件定性表见 `docs/rust-tauri/R08/PROGRESS-t03.md` 批次 F 节。其中两条登记为待办：
+
+1. **T04 开工前必查**：`tests/migration/network-guard-negative.test.ts`「blocks http.request through http.Agent -> net.createConnection (bypass class ②)」60s 超时红，**隔离复测仍红** = migration 域真红（非并行负载 flake）；T04 导入/T06 回滚必撞此面。
+2. **task-5 重绑时复验**：persistence 三件套红（persistence-schema-tripwire(4)/persistence-store-registry(5)/persistence-startup-receipt(1)，dangling persistence rule for store knowledge-indexes → `lib/knowledge/vector-search-backend-factory.ts`）——用 r07_stage_inputs 正装在册环境复验：staged 下绿 = 裸跑环境红（销账）；staged 下仍红 = R07 在途真漂移（升级裁决）。
+
+附：`desktop/src/react/__tests__/services/rust-conversation-events-http.test.ts` 全量运行下 ECONNRESET 红、隔离单跑 613ms 绿 = 并行负载 flake，记录在案不立项。

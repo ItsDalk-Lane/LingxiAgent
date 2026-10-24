@@ -2935,17 +2935,18 @@
     "R00-T02-LA-095E0402EEEC": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_scheduler"
+        "r07_automation_flow"
       ],
       "assertionCases": [
         [
-          "r07_scheduler::edits_preserve_unknown_fields_and_stale_revisions_are_rejected"
+          "r07_automation_flow::real_tool_suggestion_requires_apply_and_replays_after_expiry",
+          "r07_automation_flow::apply_suggestion_rejections_are_explicit_and_persist_nothing"
         ],
         [
-          "r07_scheduler::revoked_source_is_rejected_without_a_run"
+          "r07_automation_flow::apply_suggestion_rejections_are_explicit_and_persist_nothing"
         ]
       ],
-      "rationale": "A0 成功效果由该域真实套件测试证明；A1 拒绝/无效/越权由域内拒绝测试或 A23 全表无凭证 401 探针（只读路由，无持久化可错）证明。"
+      "rationale": "F02批次A重绑（错端点修复）：旧绑定 r07_scheduler 的普通 cron 修改/撤销测试根本没有走 apply_suggestion（F02范围审查确认错端点）。改绑真实建议应用链：a0 成功生效返回 job 由 real_tool_suggestion_requires_apply… 证明、其“过期/冲突拒绝”由新案例 apply_suggestion_rejections… 证明（未应用过期→automation_suggestion_expired、改目标Agent/不支持字段→显式冲突错误）；a1 拒绝路径全部错误可见且 list_jobs 全程为空（无越权或错误持久化）。已应用后幂等重放由 real_tool_suggestion… 同证。"
     },
     "R00-T02-LA-1FB3D8BC916D": {
       "basis": "full_original_behavior",
@@ -5423,10 +5424,10 @@
           "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
         ],
         [
-          "r07_t12_closure::r07_t12_a23_runtime_route_matrix"
+          "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
         ]
       ],
-      "rationale": "R07 收口新增 r07_probe_* 真实服务探针逐断言覆盖该路由正向与拒绝；A1 用 A23 全表无凭证 401 探针的为只读面权限拒绝。"
+      "rationale": "F02批次0重绑（批次0域审 FAIL 后修复）：断言1『字段缺省不改变原值；拒绝时目标状态不变』此前仅绑 A23 路由/鉴权外围（F02范围审查），首轮改绑的探针当时只断言 400 未回读、rich 只测默认方向 true（F02_BATCH0_DOMAIN_REVIEW 问题1/2）。现探针已按域审修复方向补强：两开关双向写入回读、非法权限模式 400 后经真实端点读回核对状态不变；A23 保留为附加路由证据（suiteRefs 保留 r07_t12_closure）。待域审复验。"
     },
     "R00-T02-LA-D5514BBDBF88": {
       "basis": "full_original_behavior",
@@ -5439,10 +5440,10 @@
           "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
         ],
         [
-          "r07_t12_closure::r07_t12_a23_runtime_route_matrix"
+          "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
         ]
       ],
-      "rationale": "R07 收口新增 r07_probe_* 真实服务探针逐断言覆盖该路由正向与拒绝；A1 用 A23 全表无凭证 401 探针的为只读面权限拒绝。"
+      "rationale": "F02批次0重绑（批次0域审 FAIL 后修复）：断言1『字段缺省不改变原值；拒绝时目标状态不变』此前仅绑 A23 路由/鉴权外围（F02范围审查），首轮改绑的探针当时只断言 400 未回读、rich 只测默认方向 true（F02_BATCH0_DOMAIN_REVIEW 问题1/2）。现探针已按域审修复方向补强：两开关双向写入回读、非法权限模式 400 后经真实端点读回核对状态不变；A23 保留为附加路由证据（suiteRefs 保留 r07_t12_closure）。待域审复验。"
     },
     "R00-T02-LA-01631175277C": {
       "basis": "full_original_behavior",
@@ -6772,17 +6773,17 @@
     "R00-T02-LA-5F394AA4C9A3": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_scheduler"
+        "r07_automation_flow"
       ],
       "assertionCases": [
         [
-          "r07_scheduler::edits_preserve_unknown_fields_and_stale_revisions_are_rejected"
+          "r07_automation_flow::slash_apply_uses_frozen_owned_suggestion"
         ],
         [
-          "r07_scheduler::cancellation_drops_pending_automatic_review_before_any_tool_dispatch"
+          "r07_automation_flow::slash_apply_missing_cross_session_and_repeat_never_duplicate_jobs"
         ]
       ],
-      "rationale": "R07 收口：调度建议→自动任务链既有真实测试逐断言对应。"
+      "rationale": "F02批次A重绑（错端点修复）：旧绑定 r07_scheduler 的取消自动审查与建议应用无关（F02范围审查确认错端点）。改绑真实 slash /apply 链：a0 由 slash_apply_uses_frozen_owned_suggestion 证明（建议写为自动任务并返回标题）；a1 由新案例证明找不到建议/跨会话（Studio身份不符）错误可见且不产生任务、已应用后重复 /apply 幂等不重复创建。"
     },
     "R00-T02-LA-75C0AE981505": {
       "basis": "stage_share_satisfied",
@@ -7026,125 +7027,140 @@
     "R00-T02-LA-0818574ABD43": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_ui_vitest"
+        "r08_admission_ptc",
+        "r08_admission_ptc_authority"
       ],
       "assertionCases": [
         [
-          "r07_ui_vitest::ptc-tool.test::run_tools 工具契约 权限契约：execute 动作 + routine 档，能力名对齐工具名"
+          "r08_admission_ptc::real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
+          "r08_admission_ptc_authority::actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch",
+          "r08_admission_ptc_authority::actual_registry_disable_while_child_waits_approval_refuses_old_approval",
+          "r08_admission_ptc_authority::actual_registry_schema_generation_change_refuses_old_approval"
         ],
         [
-          "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 子调用中间结果不进 content，只有 console + return 进"
+          "r08_admission_ptc::real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts"
         ],
         [
-          "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 程序异常：isError + 异常消息 + 已捕获日志随附"
+          "r08_admission_ptc::later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts"
         ],
         [
-          "r07_ui_vitest::ptc-tool.test::run_tools 绑定桥 run_tools 不能调自己（防递归），错误可被程序捕获"
+          "r08_admission_ptc::unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
+          "r08_admission_ptc::real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker",
+          "r08_admission_ptc::actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write"
         ]
       ],
-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
+      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 的旧 Pi wrapper 测试不能证明真实 Rust 驱动（F02范围审查：子调用独立授权绑外层静态 permission）。改绑真实父驱动/网关/授权/存储链，映射沿用独立准入复验 §3.2（子批准独立/撤权禁用换代拒绝、外层仅摘要、失败保留已执行子动作、未知·自调用·沙盒·vm逃逸·600秒超时拒绝不回滚）。"
     },
     "R00-T02-LA-196D50D8DD6E": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_ui_vitest"
+        "r08_admission_ast_lsp"
       ],
       "assertionCases": [
         [
-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 content 模式分页 + 诚实 footer"
+          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
         ],
         [
-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 files 模式：唯一文件 + 命中数"
+          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
         ],
         [
-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 参数校验：缺 pattern/language 直接说明，不起子进程"
+          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
         ]
       ],
-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
+      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 固定 execFile JSON 分页不能证明真实结构解析（F02范围审查）。该真实案例经官方 ast-grep CLI 语法树证明结构命中（同文字符串不误中）、无匹配不写文件、空结果与语言/解析失败/越权错误，一并覆盖三条原断言（独立准入复验 §3.3 同一案例逐断言映射）。"
     },
     "R00-T02-LA-2D896560381E": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_ui_vitest"
+        "r08_admission_ast_lsp"
       ],
       "assertionCases": [
         [
-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） definition：1-based 输入 → 0-based 协议 → 1-based 输出"
+          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"
         ],
         [
-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） references：多位置清单"
+          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"
         ],
         [
-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） rename：prepareRename 验证 → 编辑计算 → 写回"
+          "r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing"
         ],
         [
-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） 服务器缺失：LSP_SERVER_MISSING + 环境页指引"
+          "r08_admission_ast_lsp::r08_lsp_missing_and_crashed_server_are_explicit_errors",
+          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections",
+          "r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing"
         ]
       ],
-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
+      "rationale": "F02批次0重绑（批次0域审后补列）：旧绑定 r07_ui_vitest 把『不可写只预览』绑到 applied=true 实际写回（F02范围审查确认错绑）。改绑真实 clangd 链：位置一致与 rename 仅改返回范围由同一真实案例证明；只读授权预览不落盘；A3 组按域审意见补列错位 prepare 拒绝（不可重命名）与 LSP_WRITE_UNAVAILABLE（写能力缺失）所在案例及服务缺失/崩溃/空编辑显式错误案例（独立准入复验 §3.4 映射＋F02_BATCH0_DOMAIN_REVIEW 问题5）。"
     },
     "R00-T02-LA-C88F29B5114A": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_ui_vitest"
+        "r08_admission_run_code"
       ],
       "assertionCases": [
         [
-          "r07_ui_vitest::run-code-tool.test::run_code 工具 变量跨调用存活（同内核连续两次 run）+ 回显剥除 + 结果输出"
+          "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions"
         ],
         [
-          "r07_ui_vitest::run-code-tool.test::run_code 工具 缺语言：RUN_CODE_LANGUAGE_MISSING + 安装指引"
+          "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
+          "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
         ],
         [
-          "r07_ui_vitest::run-code-tool.test::run_code 工具 内核死亡：如实报告 exit 与部分输出，指路 restart"
+          "r08_admission_run_code::cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild"
         ],
         [
-          "r07_ui_vitest::run-code-tool.test::run_code 工具 未知语言直接拒绝"
+          "r08_admission_run_code::absent_real_interpreters_report_install_guidance_without_starting_kernel",
+          "r08_admission_run_code::output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
+          "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay",
+          "r08_admission_run_code::real_gateway_status_remains_read_only_and_code_never_inherits_service_secrets"
         ]
       ],
-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
+      "rationale": "F02批次0重绑（批次0域审后补列）：旧绑定 r07_ui_vitest 的 TS 适配器测试不能证明真实 Rust 工具面（F02范围审查）。改绑 R08 准入套件真实 Run/网关/解释器/监督器/存储链，逐断言映射沿用独立准入复验 ADMISSION_CANDIDATE_INDEPENDENT_REVIEW.md §3.1；A3 组按域审意见补列含 RUN_CODE_INVALID_LANGUAGE（未支持语言名）与无会话分支的真实案例。无会话分支为会话层先行拒绝，已如实披露（独审§3.1注）。"
     },
     "R00-T02-LA-CD5D7FC02D8E": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_ui_vitest"
+        "r08_admission_security"
       ],
       "assertionCases": [
         [
-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 path 模式：扫目录、命中密钥、审计只进计数"
+          "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
+          "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
         ],
         [
-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 范围硬校验：path 指到授权文件夹之外直接拒绝"
+          "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
         ],
         [
-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 changes 模式：非 git 目录如实说明并建议 path 模式"
+          "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged",
+          "r08_admission_security::r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child"
         ],
         [
-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 权限契约：read（计划模式可用）"
+          "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
+          "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged"
         ]
       ],
-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
+      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 的非 Git 提示/静态 permission 不能证明真实扫描范围与拒绝（F02范围审查）。改绑真实快照沙盒/git只读/基线扫描链（独立准入复验 §3.5 映射）；文件上限与引擎失败分支为机制级核对无直接样本，已在独审 §6 如实登记为 R08 跟踪缺口。"
     },
     "R00-T02-LA-771296A194E0": {
       "basis": "full_original_behavior",
       "suiteRefs": [
-        "r07_ui_vitest"
+        "r06_skills_completion"
       ],
       "assertionCases": [
         [
-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查通过：SKILL.md 落盘（frontmatter + 正文）、写经验索引、触发 onLearned"
+          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
         ],
         [
-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查未通过 → 带 token 显式确认后落盘并标 riskOverride"
+          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
         ],
         [
-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 同名技能已存在时拒绝、不覆盖、不烧 guard 调用"
+          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
         ],
         [
-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 无 token 的 risk_accepted 不能绕过审查"
+          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
         ]
       ],
-      "rationale": "R07 收口：learn_lesson 工具（lib 共享层实现，Rust skills_completion.rs 与旧内核同位）的落盘/风险确认 token/同名冲突/索引一致性由 tests/learn-lesson-tool 真实测试逐断言证明。"
+      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 旧 TS 适配器测试把『未确认不写』绑到已确认写（F02范围审查确认错绑）。改绑 R06 真实完成测试：真实 SKILL.md 落盘/风险未确认不写/token 正文绑定一次性/索引与Agent启用/其他Agent不变/同名·缺上下文·写失败，同一测试覆盖四条原断言（F02范围审查 reusableCandidates 第1条）。不重开 R06。"
     }
   }
 }

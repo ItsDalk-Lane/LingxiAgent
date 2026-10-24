@@ -1,0 +1,189 @@
+{
+  "schema": "lingxi.r08.admission-candidate-independent-review.v1",
+  "conclusion": "ADMISSION_PASS_WITH_SCOPE",
+  "reviewer": "independent admission reviewer (continuation of admission_evidence_review role; no business implementation involvement)",
+  "executedAtLocal": "2026-10-22 (Asia/Shanghai)",
+  "branch": "codex/rust-tauri-migration",
+  "head": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "candidateBinding": {
+    "expectedDiffSha256": "cc7f7052cda1b3d0636c1323575cae3a868163b3786ce7d671a56a470acdacdb",
+    "computedAtStart": "cc7f7052cda1b3d0636c1323575cae3a868163b3786ce7d671a56a470acdacdb",
+    "computedAtEnd": "cc7f7052cda1b3d0636c1323575cae3a868163b3786ce7d671a56a470acdacdb",
+    "candidateShifted": false,
+    "matchedPriorReceipts": [
+      "artifacts/rust-tauri/R08/security-real-candidate-01/receipt.json",
+      "artifacts/rust-tauri/R08/admission-public-build-01/receipt.json",
+      "artifacts/rust-tauri/R08/admission-authority-run-01/receipt.json",
+      "artifacts/rust-tauri/R08/admission-astlsp-current-01/receipt.json"
+    ]
+  },
+  "toolchain": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 (cargo/rustc 1.98.1); parallel-build check pgrep clean before each cargo run",
+  "commands": [
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/build-01",
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --test r08_admission_run_code --test r08_admission_ptc --test r08_admission_ptc_authority --test r08_admission_ast_lsp --test r08_admission_security --no-run",
+      "exitCode": 0,
+      "result": "five targets compiled in one no-run pass; no relink (sources fresh vs 00:51/09:00 artifacts)"
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/run-code-run-01",
+      "command": "rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455 --nocapture --test-threads=1",
+      "exitCode": 0,
+      "passed": 9, "failed": 0, "ignored": 0, "filtered": 0, "seconds": 33.52
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/astlsp-run-01",
+      "command": "env PATH=/private/tmp/lingxi-r08-ast-tools-0510/node_modules/.bin:$PATH rust/target/debug/deps/r08_admission_ast_lsp-a93a248840f19715 --nocapture --test-threads=1",
+      "exitCode": 0,
+      "passed": 4, "failed": 0, "ignored": 0, "filtered": 0, "seconds": 7.78
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/security-run-01",
+      "command": "rust/target/debug/deps/r08_admission_security-f2475c2f9d54239a --nocapture --test-threads=1",
+      "exitCode": 0,
+      "passed": 4, "failed": 0, "ignored": 0, "filtered": 0, "seconds": 1.71
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/ptc-authority-run-01",
+      "command": "rust/target/debug/deps/r08_admission_ptc_authority-23a9c64c6bcaacac --nocapture --test-threads=1",
+      "exitCode": 0,
+      "passed": 5, "failed": 0, "ignored": 0, "filtered": 0, "seconds": 1.03
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/ptc-functional-run-01",
+      "command": "rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6 --skip real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker --nocapture --test-threads=1",
+      "exitCode": 0,
+      "passed": 7, "failed": 0, "ignored": 0, "filtered": 1, "seconds": 1.98,
+      "note": "filtered item executed fully in ptc-default-timeout-run-01 (partition, not a skip)"
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/ptc-default-timeout-run-01",
+      "command": "env TEST_TIME_LIMIT_SEC=660 rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6 real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker --exact --nocapture",
+      "exitCode": 0,
+      "passed": 1, "failed": 0, "ignored": 0, "filtered": 7, "seconds": 600.25,
+      "note": "independent rerun of the real 10-minute default budget (not evidence-review-only)"
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/fence-unit-01",
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --lib fence_verdict_requires_identity_and_no_cancellation -- --exact --nocapture",
+      "exitCode": 0,
+      "passed": 0, "failed": 0, "filtered": 650,
+      "valid": false,
+      "note": "filter miss: --exact without module path ran zero tests; kept honestly, NOT counted as PASS"
+    },
+    {
+      "evidenceDir": "artifacts/rust-tauri/R08/admission-candidate-review-01/fence-unit-02",
+      "command": "/Users/study_superior/.cargo/bin/rustup run 1.98.1 cargo test --manifest-path rust/Cargo.toml -p lingxi-service --lib runs::tests::fence_verdict_requires_identity_and_no_cancellation -- --exact --nocapture",
+      "exitCode": 0,
+      "passed": 1, "failed": 0, "filtered": 649,
+      "valid": true
+    }
+  ],
+  "newEvidenceDirs": [
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/build-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/run-code-run-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/astlsp-run-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/security-run-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/ptc-authority-run-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/ptc-functional-run-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/ptc-default-timeout-run-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/fence-unit-01",
+    "artifacts/rust-tauri/R08/admission-candidate-review-01/fence-unit-02"
+  ],
+  "leafVerdicts": [
+    {
+      "leafId": "R00-T02-LA-C88F29B5114A",
+      "tool": "run_code",
+      "verdict": "PASS",
+      "assertions": [
+        {"text": "两次调用可共享变量", "verdict": "PASS", "evidence": "run-code-run-01 python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions (tests/r08_admission_run_code.rs:446-450; same kernelId, second call yields 42); default-composition-independent-01 INDEPENDENT_STATE_RESULT 42"},
+        {"text": "重启后旧变量消失", "verdict": "PASS", "evidence": "same test :478-483 (new kernelId, print(x) -> not defined); timeout test :707-710"},
+        {"text": "取消清理内核", "verdict": "PASS", "evidence": "cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild (:611-683; Run Cancelled, kernel+grandchild PIDs dead, supervisor empty)"},
+        {"text": "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态", "verdict": "PASS", "evidence": "RUN_CODE_INVALID_LANGUAGE :551; RUN_CODE_LANGUAGE_MISSING :396-399; RUN_CODE_KERNEL_EXITED/DEAD no silent respawn :590-606; real 30s RUN_CODE_TIMEOUT + restart no replay :700-710; subGap: RUN_CODE_NO_SESSION (coding_run_code.rs:279) source-level explicit only, no dedicated sample"}
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-0818574ABD43",
+      "tool": "run_tools",
+      "verdict": "PASS",
+      "assertions": [
+        {"text": "每个子调用独立权限判定", "verdict": "PASS", "evidence": "ptc-functional-run-01 real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing; ptc-authority-run-01 revocation/disable/schema-change dispatched=false persistent receipts"},
+        {"text": "外层只显示打印/返回值", "verdict": "PASS", "evidence": "real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts (outer text selected summary + 2; SECRET absent; model history exactly 1 ToolResult); default composition: PTC_PRIVATE_CHILD_DO_NOT_SEND never in model requests/history"},
+        {"text": "失败显示已执行子动作", "verdict": "PASS", "evidence": "later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts (retained.txt kept, subcalls[0].ok=true)"},
+        {"text": "未知工具、自调用、无权限、脚本超时或沙盒异常拒绝；已执行子动作不因外层失败自动回滚", "verdict": "PASS", "evidence": "unknown_recursive_and_sandbox_failures_are_explicit_and_catchable (unknown + run_tools recursion -> ToolCallError with 2 persistent ok=false receipts; RUN_TOOLS_EXCEPTION); ptc-default-timeout-run-01 real 600.25s RUN_TOOLS_TIMEOUT with completed action retained and worker reaped; actual_vm_escape... (EPERM/BLOCKED, zero side effects)"}
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-196D50D8DD6E",
+      "tool": "ast_grep",
+      "verdict": "PASS",
+      "assertions": [
+        {"text": "命中结构而非同文字符串", "verdict": "PASS", "evidence": "astlsp-run-01 r08_ast_structure_pagination_no_match_and_errors_use_real_run (file contains literal 'greet(99)' string; matchCount==2 real call sites only; real ast-grep CLI parse, no text fallback)"},
+        {"text": "无匹配不写文件", "verdict": "PASS", "evidence": "same test: example.js and hostile sgconfig.yml byte-identical after all operations"},
+        {"text": "无匹配为空结果；语言/解析失败或路径越权给错误", "verdict": "PASS", "evidence": "same test: no matches + matchCount 0; invalid-language Failed; 'Cannot parse query' Failed; ../outside.js Failed"}
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-2D896560381E",
+      "tool": "lsp",
+      "verdict": "PASS",
+      "assertions": [
+        {"text": "位置与源码一致", "verdict": "PASS", "evidence": "r08_lsp_real_clangd_positions_preview_rename_and_rejections (real clangd definition/hover/symbols/references; UTF-16 column computed with emoji on same line; broken.cpp diagnostics)"},
+        {"text": "rename仅改返回编辑范围", "verdict": "PASS", "evidence": "same test: rename -> exact old_name->new_name replacement, 1 receipt; wrong-position prepare rejected"},
+        {"text": "不可写时只预览不落盘", "verdict": "PASS", "evidence": "r08_lsp_read_grant_rename_returns_preview_without_writing (applied=false, LSP_WRITE_UNAVAILABLE, preview shown, file unchanged); preview:true branch"},
+        {"text": "服务缺失/崩溃、不可重命名或写入能力缺失明确报错；无编辑时文件不变", "verdict": "PASS", "evidence": "r08_lsp_missing_and_crashed_server_are_explicit_errors (missing->LSP_SERVER_MISSING, crash->exited, empty edit->changedFiles [] file unchanged, cancel->process tree reaped; only external LSP substituted)"}
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-CD5D7FC02D8E",
+      "tool": "security_scan",
+      "verdict": "PASS",
+      "assertions": [
+        {"text": "发现与实际文件对应", "verdict": "PASS", "evidence": "r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent (filesScanned==1 == modified tracked.ts); r08_security_real_baseline_never_returns_secret_and_audits_counts (findingCount>0 on credential.ts); source enforces SECURITY_FINDING_OUT_OF_SCOPE; default composition: real file + secret_api_key_literal + filesScanned=1 + audit count event"},
+        {"text": "范围不足明确", "verdict": "PASS", "evidence": "baseline test filesSkipped>=2 + skip note; per-engine statuses explicit; sub-root -> SECURITY_GIT_SCOPE_UNAVAILABLE suggesting mode=path"},
+        {"text": "无越权读取", "verdict": "PASS", "evidence": "r08_security_outside_root_and_symlink_refused_and_sources_unchanged; r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child (sandbox EPERM both ways, grandchild reaped); git sub-root never enumerates parent; .git/index byte-identical (--no-optional-locks, empty write roots); default composition: model projection carries no hit bodies"},
+        {"text": "非Git工作区、路径越权、文件上限或引擎失败标注范围/错误，不伪称全量通过", "verdict": "PASS", "evidence": "non-git and path-violation branches directly tested Failed; summary always carries skip counts, engine statuses, audit status; subGaps (mechanism-verified in source, no direct samples): file-cap annotation (coding_security.rs:154-158/205-208/304/322-324) and failing-engine status (r08-security-worker.mjs:65-83 missing/failed/completed; default composition engines=[baseline] honest)"}
+      ]
+    }
+  ],
+  "boundaryRulings": [
+    {"id": "PTC-A02-delegation", "verdict": "OUT_OF_ORIGINAL_SCOPE", "reason": "request_delegation matches only subagent|subagent_reply|subagent_close (subagents.rs:274-281); PTC children to those targets get explicit PTC_DELEGATION_REQUIRES_DIRECT_DRIVER (runs.rs:419-424); run_tools self-call denied earlier by PTC_RECURSION_FORBIDDEN with tested persistent receipt. Original leaf does not require delegation semantics; enabling it remains an R08 all-tools obligation. Gap recorded: no dedicated sample asserts the delegation-denial receipt."},
+    {"id": "RC-A02-directory-consistency", "verdict": "GAP_NON_BLOCKING", "reason": "coding_run_code.rs:513-521 re-authorizes kernel.cwd against the current gateway workspace per component; unauthorized old dir -> RUN_CODE_RESOURCE_DENIED explicit failure (no silent old-dir write). No equality check when old cwd is still authorized, and no workspace-switch arrival sample exists in the five suites. Not an original-leaf assertion; keep as registered R08 gap."},
+    {"id": "PTC-A03-phone-cron-heartbeat", "verdict": "MECHANISM_CLOSED_SAMPLE_GAP", "reason": "every child passes review_and_validate_from_request_pinned with permission context from authority.phone_scoped (runs.rs:292-301) plus per-child PHONE_SCOPE_FORBIDDEN (:403-407); generic per-child review proven by ptc_authority five tests. phone_scoped-specific identity samples still absent; authority-review extension, not an original-leaf requirement."},
+    {"id": "PTC-A05-cancel-fence", "verdict": "SUFFICIENT_FOR_LEAF", "reason": "fence_verdict/CancelledBeforeWrite/audit_late_result wired at runs.rs:517; unit test independently rerun and passed (fence-unit-02); biased selects (:300/:444) make cancel win races; real cancel test reaps worker+children; replay items prove idempotency. Direct end-to-end exact-race sample remains a non-blocking residual."},
+    {"id": "PTC-A07-crash-midpoint-replay", "verdict": "NOT_ORIGINAL_LEAF_REQUIREMENT", "reason": "default composition independently proved close-reopen does not re-execute; ptc_authority proves same-request replay idempotency (journal anti-replay PTC_PARENT_INACTIVE_OR_CHILD_REPLAY, runs.rs:170-178). Leaf only requires no auto-rollback of executed subactions (tested). Mid-point crash replay stays an R08 recovery obligation."},
+    {"id": "guard-660s-margin", "verdict": "ACCEPTED", "reason": "difference applies only to the test-process machine guard (lingxi-test-guard default 600s wall clock; 8GiB memory kept); the product 600s budget is asserted inside the test (elapsed>=600s, RUN_TOOLS_TIMEOUT) with no fake clock. 7+1 partition is full execution, not a skip. Independently rerun this round: exit 0, 600.25s (implementer logged 600.30s). No further rerun required."},
+    {"id": "F01-overall", "verdict": "CLOSED_FOR_ADMISSION", "reason": "default-composition independent PASS_LOCAL (five tools default-registered/resolved/prepared; run_code/run_tools/security_scan executed from the real default model entry with close-reopen readback) plus this round's five-suite independent rerun all green on cc7f7052 with per-assertion mapping. Note: ast_grep/lsp execution via the default model entry was not separately sampled (behavioral execution via real gateway/Run in the admission suite); this does not reopen F01 whose finding was TargetNotFound registration absence."}
+  ],
+  "f01F02Status": {
+    "F01_five_tool_registration_and_execution": "CLOSED_FOR_ADMISSION",
+    "F02_149_misbound_assertions": "OPEN — out of this review's scope; scope rebuild in ADMISSION_F02_SCOPE_REVIEW.md untouched; closure order to be decided by main integration after this review"
+  },
+  "releaseRecommendation": {
+    "R08_T01_T08": "PROCEED for business consuming the five-tool real execution plane; HOLD for any acceptance that treats the R07 408-leaf PASS ledger as wholesale trusted input until F02 closes",
+    "trackedNonBlockingGaps": [
+      "RC-A02 workspace-switch sample",
+      "phone_scoped per-child identity matrix sample",
+      "delegation-denial receipt dedicated sample",
+      "cancel-vs-late-result end-to-end race sample",
+      "crash mid-point replay sample",
+      "security file-cap and failing-engine direct samples",
+      "run_code no-session branch note"
+    ]
+  },
+  "sourceMechanismChecks": [
+    "runs.rs:188 refuse_child! records intent + persists tool event + child receipt (asserted by unknown/recursive test and ptc_authority assert_not_dispatched)",
+    "runs.rs:301 every child call through review_and_validate_from_request_pinned (biased cancel-first select)",
+    "runs.rs:400-424 recursion / PHONE_SCOPE_FORBIDDEN / workflow tool filter / PTC_DELEGATION_REQUIRES_DIRECT_DRIVER",
+    "runs.rs:2332-2348 fence_verdict with CancelledBeforeWrite; runs.rs:2359 audit_late_result; wired at runs.rs:517 for PTC child results",
+    "coding_run_code.rs:288-293 RUN_CODE_WORKFLOW_UNSUPPORTED for run/restart under real workflow_scope (asserted by workflow write-roots counter-test)",
+    "coding_security.rs changes-mode accepts only real .git inside authorized root; worker git uses --no-optional-locks with empty write roots; external scanners confined to snapshot/report roots",
+    "lib.rs default assembly registers run_code (:1735), run_tools (:2063), ast_grep+lsp (:2576), security_scan (:2588)"
+  ],
+  "honestyNotes": [
+    "fence-unit-01 executed zero tests (filter miss) and is kept as an invalid attempt, not counted as PASS",
+    "no test failures occurred in this round; conclusions are bound to cc7f7052 and must be re-verified if the candidate changes",
+    "not executed: real user data migration, non-macOS platforms, packaged builds, R08 T01-T08 business acceptance, F02 closure, formal verify-stage R08 gate",
+    "no product source/test/script/existing doc or historical receipt modified; no commit/push; synthetic temp roots only"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "lingxi.r08.feature-parity.v1",
+  "stage": "R08",
+  "generatedAt": "2026-10-23",
+  "basis": "R08-T07 A13 同界面换内核 A/B（r08_t07_ab_drill.mjs + r08-t07-kernel-ab.test.ts；同一 React 构建源、真实 Pi 格式会话数据、jsdom UI 绑定层驱动）；本文件是 R07/FEATURE_PARITY_RESULTS 的 R08 增量更新，不改动 R07 原账",
+  "fixedFactors": {
+    "uiBuild": "desktop/src/react 工作树源（jsdom 载入；两腿零差异）",
+    "data": "fixture v3 基座 + 会话面替换为真实 Pi SDK 格式 3 会话（agents/a1；合成 manifest 移除）",
+    "kernelA": "旧 Node 栈（scripts/launch.js server，准备集=控制探针同构）",
+    "kernelB": "lingxi-service（同一数据的 T05 迁移根）",
+    "modelStandin": "本任务集不触模型回合；模型链由 T03 a05 系与 T06 D1 桥接替身另证",
+    "driverLayer": "UI 绑定层（store action / lingxiFetch），非像素级 DOM；窗口形态由 T03 Electron 深度腿另证"
+  },
+  "finalRun": {
+    "evidence": "artifacts/rust-tauri/R08/t07-ab-drill-final-05",
+    "tasks": 15,
+    "parity": 12,
+    "differs": 0,
+    "recorded": 2,
+    "failedB": 1,
+    "verdictPerTask": {
+      "identity": "parity",
+      "sessions.list": "parity",
+      "sessions.switch": "recorded (D-3 A 腿无模型)",
+      "sessions.rename": "parity (修复 F-T07-2 后)",
+      "sessions.pin": "parity (修复 F-T07-2 后)",
+      "sessions.create": "recorded (D-2/D-5)",
+      "sessions.archive": "B-failed (D-4 未决差异)",
+      "sessions.maintenance": "parity",
+      "sessions.capabilities": "parity",
+      "sessions.todos": "parity (修复 F-T07-2 后)",
+      "permissions.default": "parity",
+      "preferences.appearance": "parity",
+      "error-path.unauthorized": "parity",
+      "error-path.not-found": "parity",
+      "drift-guard": "parity"
+    }
+  },
+  "fixesShipped": [
+    {
+      "id": "F-T07-1",
+      "layer": "兼容转换（legacy_import/session_jsonl.rs + convert_sessions.rs）",
+      "summary": "真实 Pi SDK 会话格式识别（头行/嵌套 role/ISO 时间/toolResult），content 嵌套提升；夹具行为零变化（t07-pi-fix-amend-proof-01：435/435/5206 + 双锚保持）",
+      "evidence": ["t07-real-format-probe-01/02（红）", "t07-real-format-probe-03（绿：conversational=3 unknownBlocks=0）", "t07-pi-fix-adapters-02（178/178）"]
+    },
+    {
+      "id": "F-T07-2",
+      "layer": "UI 绑定（use-hana-fetch.ts translateLegacySessionCall）",
+      "summary": "补 10 条会话管理写端口旧→Rust 翻译 + 翻译仅对 rust 连接生效的连接门（无门旧腿 404——drill-03 红）",
+      "evidence": ["t07-ab-drill-02（红：B 腿全拒）", "t07-ab-drill-03（红：连接门缺失）", "t07-ab-drill-04/05（rename/pin/todos 转平价）"]
+    }
+  ],
+  "openDifferences": [
+    { "id": "D-1", "summary": "无题会话标题投影：旧=null（UI 回退） vs 新=id 干", "disposition": "披露，post-R08 裁决" },
+    { "id": "D-2", "summary": "迁移根无 agent 名册（Register 不随迁）→ sessions/new 404；补偿=正式入口补建同 id agent", "disposition": "入 runbook/交接" },
+    { "id": "D-3", "summary": "A 腿无模型配置时旧栈拒会话切换（环境前置）", "disposition": "recorded；post-R08 补旧格式 models.json 注入扩腿" },
+    { "id": "D-4", "summary": "B 侧 rename 标题跨重载回落 + 任务序列会话数 3→2（archive B-failed）", "disposition": "未决差异，post-R08 定位（首疑 studio-list 标题计算与 rename 写入不一致）" },
+    { "id": "D-5", "summary": "双腿 create=false（A=D-3，B=D-2）", "disposition": "recorded" }
+  ],
+  "coverageHonesty": "本线束覆盖 D02 会话管理族约 20 叶入口通路 + D04 默认权限 + 设置编辑 + 2 错误路径；D01 聊天/WS、D03 MCP 操作、D13 terminal WS、D20 CLI 及 D02 其余叶未执行——叶级状态以 stage map 为准（required_behavior_pending），不以绿推定全量"
+}

@@ -1,0 +1,414 @@
+{
+  "schema": "lingxi.r08.f02-batch0-domain-review.v1",
+  "reviewer": "F02 批次0 域级独立审查者（未参与实现）",
+  "reviewedAt": "2026-10-22",
+  "scope": "F02_REPAIR_PLAN.md 批次0：8 叶重绑语义对应、复用规则放宽、证据链、D18 未重绑决定",
+  "conclusion": "FAIL",
+  "conclusionLine": "整体 FAIL：六叶通过（其中 run_code/lsp/security_scan 为 PASS_WITH_NOTES），D17 两叶（R00-T02-LA-09D567E99524、R00-T02-LA-D5514BBDBF88）不通过——断言1『拒绝时目标状态不变』的后半句未被所绑案例实际断言（探针在 400 拒绝后无任何状态回读），绑定 rationale 反而声称『非法权限模式拒绝后状态不变』，属 F02 要消除的超claim 错绑。",
+  "leaves": [
+    {
+      "leafId": "R00-T02-LA-C88F29B5114A",
+      "featureId": "F-D13-TOOL-TOOL-RUN-CODE-C88F29",
+      "verdict": "PASS_WITH_NOTES",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "两次调用可共享变量",
+          "boundCases": ["r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions"],
+          "testBodyAsserts": "tests/r08_admission_run_code.rs:426-486：python3/node 各自先 run 建立变量/函数/导入（x=40、plus、math / node:path），第二次独立调用算出 42（:446-450）；Node 顶层 await/动态 import 跨调用保留（:451-469）；跨会话/跨 Agent 不共享（:470-477）。真实断言共享变量。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 1,
+          "originalAssertion": "重启后旧变量消失",
+          "boundCases": [
+            "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
+            "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+          ],
+          "testBodyAsserts": ":478-483 restart 后 kernelId 变化且 print(x) → Failed『not defined』；real_thirty_second…:706-710 同证。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 2,
+          "originalAssertion": "取消清理内核",
+          "boundCases": ["r08_admission_run_code::cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild"],
+          "testBodyAsserts": ":610-684：真实取消 → Run Cancelled；内核与真实孙进程两个 PID 全灭（eventually !alive）；supervisor.live_handles() 为空。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 3,
+          "originalAssertion": "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态。",
+          "boundCases": [
+            "r08_admission_run_code::absent_real_interpreters_report_install_guidance_without_starting_kernel",
+            "r08_admission_run_code::output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
+            "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+          ],
+          "testBodyAsserts": "缺解释器 → RUN_CODE_LANGUAGE_MISSING＋安装指引＋不启内核（:362-403，独立空 PATH 子进程）；内核死亡 → RUN_CODE_KERNEL_EXITED/DEAD 不静默重建（:587-600）；真实 30 秒 RUN_CODE_TIMEOUT、busy 保持、restart 新内核 print(x)→not defined（:690-710）。",
+          "verdict": "PASS_WITH_NOTES",
+          "notes": [
+            "『语言无效』的未支持语言名分支（RUN_CODE_INVALID_LANGUAGE，ruby）在套件内有绿样本（real_gateway_status_remains_read_only_and_code_never_inherits_service_secrets :550-552，leaf-cases ok=true）但未绑入 A3；A3 的语言分支由缺解释器分支证明。绑定 rationale 未虚claim，属可选增强。",
+            "『无会话』工具级分支（coding_run_code.rs RUN_CODE_NO_SESSION）确无直接样本，rationale 已如实披露（独审 §3.1 同口径）；会话层对不存在会话的拒绝有未绑定绿样本（real_gateway_status… :553-567），可作补充。"
+          ]
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-0818574ABD43",
+      "featureId": "F-D03-TOOL-TOOL-RUN-TOOLS-081857",
+      "verdict": "PASS",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "每个子调用独立权限判定",
+          "boundCases": [
+            "r08_admission_ptc::real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
+            "r08_admission_ptc_authority::actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch",
+            "r08_admission_ptc_authority::actual_registry_disable_while_child_waits_approval_refuses_old_approval",
+            "r08_admission_ptc_authority::actual_registry_schema_generation_change_refuses_old_approval"
+          ],
+          "testBodyAsserts": "外层批准≠子批准 approvalId，子 write 拒绝后 denied.txt 不存在（ptc :356-405）；批准等待中撤真实文件授权/禁用注册项/schema 换代 → 均拒绝派发（assert_not_dispatched：journal Failed、持久 Failed 收据、dispatched=false）且目标未写（authority :55-195、:655-663）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 1,
+          "originalAssertion": "外层只显示打印/返回值",
+          "boundCases": ["r08_admission_ptc::real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts"],
+          "testBodyAsserts": ":322-355：外层正文只含 console.log『selected summary』与返回值 2，SECRET_CHILD 不入正文；模型历史恰 1 条 ToolResult 且无子内容；子输出只进 UI subcall 收据。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 2,
+          "originalAssertion": "失败显示已执行子动作",
+          "boundCases": ["r08_admission_ptc::later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts"],
+          "testBodyAsserts": ":406-418：外层 throw → Failed 含 outer failure；retained.txt 保留；subcalls[0].ok==true（已执行子动作在收据中可见）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 3,
+          "originalAssertion": "未知工具、自调用、无权限、脚本超时或沙盒异常拒绝；已执行子动作不因外层失败自动回滚。",
+          "boundCases": [
+            "r08_admission_ptc::unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
+            "r08_admission_ptc::real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker",
+            "r08_admission_ptc::actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write"
+          ],
+          "testBodyAsserts": "未知名与 run_tools 自调用 → ToolCallError＋2 条 ok=false 持久子回执；沙盒外访问 → RUN_TOOLS_EXCEPTION（:419-443）；vm 逃逸读/写 EPERM、本机 TCP BLOCKED、零副作用（:522-570）；真实 ≥600s 默认预算 RUN_TOOLS_TIMEOUT、前缀保留、已完成动作保留、worker 回收（:572-625）。无权限分支由 A0 组案例证；不回滚由 A2 组案例＋超时案例证。",
+          "verdict": "PASS"
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-196D50D8DD6E",
+      "featureId": "F-D13-TOOL-TOOL-AST-GREP-196D50",
+      "verdict": "PASS",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "命中结构而非同文字符串",
+          "boundCases": ["r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"],
+          "testBodyAsserts": "tests/r08_admission_ast_lsp.rs:367-450：example.js 内含同文字符串 'greet(99)'（文本搜索会多命中），greet($A) 断言 matchCount==2（:384-388，官方 ast-grep CLI 真实语法树，断言文案『真实 AST 不得命中字符串』）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 1,
+          "originalAssertion": "无匹配不写文件",
+          "boundCases": ["r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"],
+          "testBodyAsserts": "全部操作（含 missing($A) 无匹配、恶意 sgconfig）后 example.js 逐字节不变（:445-448）、sgconfig.yml 保持敌意原文未被消费（:403-406）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 2,
+          "originalAssertion": "无匹配为空结果；语言/解析失败或路径越权给错误。",
+          "boundCases": ["r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"],
+          "testBodyAsserts": "missing($A) → matchCount 0＋正文 no matches（:411-418）；invalid-language → Failed（:419-425）；多语句 pattern → Failed『Cannot parse query』且注明不得冒充无匹配（:426-436）；../outside.js → Failed（:438-444）。",
+          "verdict": "PASS"
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-2D896560381E",
+      "featureId": "F-D13-TOOL-TOOL-LSP-2D8965",
+      "verdict": "PASS_WITH_NOTES",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "位置与源码一致",
+          "boundCases": ["r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"],
+          "testBodyAsserts": ":452-549：参考列由源码 UTF-16 偏移（同行含 emoji 😀）计算；真实 clangd definition 命中声明位置（main.cpp line 0）、hover 返回 old_name、symbols 含 main、references≥2。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 1,
+          "originalAssertion": "rename仅改返回编辑范围",
+          "boundCases": ["r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"],
+          "testBodyAsserts": "rename applied 后文件恰为 old_name→new_name 全替换、收据恰 1 份（:519-525）；错位 prepare 拒绝 Failed（:526-530）；preview 分支 applied=false＋文件不变（:510-518）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 2,
+          "originalAssertion": "不可写时只预览不落盘",
+          "boundCases": ["r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing"],
+          "testBodyAsserts": ":551-565：只读授权下 rename → applied=false、errorCode LSP_WRITE_UNAVAILABLE、preview 含 new_name、文件逐字节不变。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 3,
+          "originalAssertion": "服务缺失/崩溃、不可重命名或写入能力缺失明确报错；无编辑时文件不变。",
+          "boundCases": ["r08_admission_ast_lsp::r08_lsp_missing_and_crashed_server_are_explicit_errors"],
+          "testBodyAsserts": ":567-674：missing → Failed LSP_SERVER_MISSING；crash → Failed『exited』；empty（空 WorkspaceEdit）→ applied=false、changedFiles==[]、文件不变；cancel → 真实进程树全回收；文件不变断言贯穿。",
+          "verdict": "PASS_WITH_NOTES",
+          "notes": [
+            "『不可重命名』分支（错位 prepare Failed，positions 测试 :526-530）与『写入能力缺失』分支（LSP_WRITE_UNAVAILABLE，read_grant 测试）由同叶 A1/A2 组案例实际断言，未列入 A3 自身案例组；批次0 规则本已允许同案例跨组复用，可零成本补列。叶内全覆盖，无虚claim。"
+          ]
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-CD5D7FC02D8E",
+      "featureId": "F-D04-TOOL-TOOL-SECURITY-SCAN-CD5D7F",
+      "verdict": "PASS_WITH_NOTES",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "发现与实际文件对应",
+          "boundCases": [
+            "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
+            "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
+          ],
+          "testBodyAsserts": "changes 模式 filesScanned==1 恰为被改的 tracked.ts（inc :74-85）；baseline 模式在唯一含密钥的 credential.ts 上 findingCount>0 且密钥不出现在结果/审计（inc :3-31）。",
+          "verdict": "PASS_WITH_NOTES",
+          "notes": [
+            "无直接断言 finding.path==credential.ts；『发现对应实际文件』由单密钥布置＋filesScanned 计数间接成立（准入独审 §3.5 已按此登记，源码另有 SECURITY_FINDING_OUT_OF_SCOPE 机制）。"
+          ]
+        },
+        {
+          "index": 1,
+          "originalAssertion": "范围不足明确",
+          "boundCases": ["r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"],
+          "testBodyAsserts": "binary/超限文件 filesSkipped>=2＋正文含 skip 说明（inc :20-23）；引擎状态逐项显式。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 2,
+          "originalAssertion": "无越权读取",
+          "boundCases": [
+            "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged",
+            "r08_admission_security::r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child"
+          ],
+          "testBodyAsserts": "根外路径与符号链接均拒（Failed）、扫描输出不含外部哨兵、外部文件不变（inc :32-53）；外部扫描器进程在快照沙盒内：外部读/写失败、孙进程被回收（inc :97-167）；changes 子根不枚举父（inc :87-94）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 3,
+          "originalAssertion": "非Git工作区、路径越权、文件上限或引擎失败标注范围/错误，不伪称全量通过。",
+          "boundCases": [
+            "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
+            "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged"
+          ],
+          "testBodyAsserts": "子根无 .git 的 changes 模式 → Failed SECURITY_GIT_SCOPE_UNAVAILABLE（inc :87-90）；路径越权 → Failed（inc :37-45）。",
+          "verdict": "PASS_WITH_NOTES",
+          "notes": [
+            "文件上限与引擎失败两分支无直接触发样本，仅机制级核对——绑定 rationale 已如实披露并登记 R08 跟踪缺口（准入独审 §3.5/§6 同口径），不构成虚claim。"
+          ]
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-771296A194E0",
+      "featureId": "F-D21-TOOL-TOOL-LEARN-LESSON-771296",
+      "verdict": "PASS",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "技能文件存在且内容可读",
+          "boundCases": ["r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"],
+          "testBodyAsserts": "tests/r06_skills_completion.rs:315-404：skills/learned-pitfall/SKILL.md 存在且正文含教训内容（:343-346）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 1,
+          "originalAssertion": "风险未确认时不写",
+          "boundCases": ["r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"],
+          "testBodyAsserts": "首次无 risk_accepted → requiresRiskConfirmation=true、目录不存在、config.yaml 不变（:321-327）；改内容＋旧 token → ok=false 且仍不写（:328-336）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 2,
+          "originalAssertion": "索引与Agent启用状态一致",
+          "boundCases": ["r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"],
+          "testBodyAsserts": "experienceIndexed=true；agentA config 含该技能、agentB 不含；ExperienceStore 索引含 learned-pitfall；GET /skills?runtime=1 目录中 enabled==true（:341-377）。",
+          "verdict": "PASS"
+        },
+        {
+          "index": 3,
+          "originalAssertion": "缺上下文、同名冲突或写入失败不生成伪课程；安全审核失败需用户明确接受和一次性token才可继续。",
+          "boundCases": ["r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"],
+          "testBodyAsserts": "同名重交 → err 且文件不变（:378-380）；missing Agent → err（:381）；路径逃逸 → err（:382-388）；skills 池被堵 → err 且无处落盘（:389-402）；token 一次性＋内容改变即作废、须重新明确接受（:328-339）。",
+          "verdict": "PASS"
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-09D567E99524",
+      "featureId": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-RECEIPT-TOGGLE-09D567",
+      "verdict": "FAIL",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "成功：切换回执后，receiptEnabled true/false 保存并返回实际值",
+          "boundCases": ["r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"],
+          "testBodyAsserts": "tests/r07_probe_access.rs:576-611：POST {receiptEnabled:false} → 200 且返回 false（:579-589）；后续无关字段提交后回读仍 false（:590-600，非默认值方向的保存＋持久真实成立）。",
+          "verdict": "PASS_WITH_NOTES",
+          "notes": [
+            "仅 exercised false 方向（恰为非默认方向，保存可证实）；receiptEnabled=true 方向无任何绑定案例直接断言（默认即 true，源 bridge_routes.rs:204）。"
+          ]
+        },
+        {
+          "index": 1,
+          "originalAssertion": "边界：字段缺省不改变原值；拒绝时目标状态不变",
+          "boundCases": ["r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"],
+          "testBodyAsserts": "前半句真实成立：只提交无关字段 permissionMode:auto → 200，回读 receiptEnabled=false、richStreamingEnabled=true 均保持（:590-600）。后半句不成立：非法 permissionMode:'god' 仅断言 status==400（:601-609），响应体被丢弃（let (status, _)），其后无任何回读/GET，未断言『拒绝后目标状态不变』。",
+          "verdict": "FAIL",
+          "notes": [
+            "绑定 rationale 声称该案例『同时断言 …非法权限模式拒绝后状态不变』——测试函数体无此断言，属超claim（F02 同类缺陷）。",
+            "『状态不变』目前只有源码机制保证（bridge_routes.rs settings_route 先校验后写，:486-498），无测试样本。",
+            "修复方向：批次A 在探针 400 后补一次读回（或改绑有该断言的案例）后此叶可复验。"
+          ]
+        }
+      ]
+    },
+    {
+      "leafId": "R00-T02-LA-D5514BBDBF88",
+      "featureId": "F-D17-SEMANTIC_EFFECT-SEMANTIC-EFFECT-BRIDGE-RICH-STREAMING-TOGGLE-D5514B",
+      "verdict": "FAIL",
+      "assertions": [
+        {
+          "index": 0,
+          "originalAssertion": "成功：切换富流式后，richStreamingEnabled true/false 保存并返回实际值",
+          "boundCases": ["r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"],
+          "testBodyAsserts": "POST {richStreamingEnabled:true} → 200 且返回 true（:579-589）；无关字段提交后回读仍 true（:590-600）。",
+          "verdict": "PASS_WITH_NOTES",
+          "notes": [
+            "仅 exercised true 方向，而 true 即源码默认（bridge_routes.rs:204：非显式 false 皆 true）——回读 true 无法区分『保存了 true』与『从未写过、默认 true』；非默认 false 方向无任何绑定案例断言。『true/false 保存』的证据强度显著弱于 receipt 叶。"
+          ]
+        },
+        {
+          "index": 1,
+          "originalAssertion": "边界：字段缺省不改变原值；拒绝时目标状态不变",
+          "boundCases": ["r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"],
+          "testBodyAsserts": "前半句成立（同 09D567：无关字段提交后回读保持）。后半句不成立：非法 permissionMode 仅断言 400，无拒后状态回读。",
+          "verdict": "FAIL",
+          "notes": [
+            "与 09D567 同一超claim：rationale 声称『拒绝后状态不变』被断言，函数体没有。",
+            "修复方向：批次A 补 rich=false 方向写入＋拒后读回（同一探针即可），或改绑覆盖该语义的案例。"
+          ]
+        }
+      ]
+    }
+  ],
+  "criterionChangeReview": {
+    "verdict": "PASS",
+    "checks": [
+      {
+        "item": "单断言组内重复仍禁",
+        "evidence": "r07_apply_leaf_bindings.py:102-104（len(set(group))!=len(group) → error）；stage_map.rs:1235-1240（names.contains → 『repeats case … within original assertion』）；改写后 xtask 测试第三段（stage_map.rs:1933-1941）断言组内重复仍报错。两处一致。"
+      },
+      {
+        "item": "pinned 案例全部必须被指派",
+        "evidence": "stage_map.rs:1243-1253：assigned=各组案例收集后 sort+dedup，len!=contract.cases.len() → 『has pinned cases not assigned』（双向闭合：引用必须在 pinned 内 :1225-1230，pinned 必须全部被指派）。apply 脚本 pinned= dict.fromkeys(flat)（:124）首现去重，与 xtask dedup 语义一致。"
+      },
+      {
+        "item": "空组/组数不符仍报错",
+        "evidence": "apply 脚本 :94-97（组数!=R00断言数）、:105-107（空组）；stage_map.rs:1188-1195、:1210-1215 同构。"
+      },
+      {
+        "item": "空证据/零匹配不可绕过",
+        "evidence": "verify.rs:470-480 生产者命令必须本轮通过（防旧证据回放）；:522-530 证据文件必须存在/合法 schema/有 cases 数组；stage_map.rs:601-607 cases 空数组即拒（『exit-0-only fake-green』）；verify.rs:536-553 全文件逐条案例 ok=true 且 actual==expect（含未钉住条目、重名拒绝）；:554-589 每个图钉案例必须在文件中记录且 actual==map expect==file expect，缺失即 MISSING。图钉 expect=1 下零匹配（actual=0）或未记录都无法过门禁。"
+      },
+      {
+        "item": "红绿证据如实",
+        "evidence": "f02-batch0-xtask-tests-01 exitCode 101：改写后测试因夹具不一致失败（错误为『pinned cases not assigned』，即测试自身钉了未指派案例，非校验器拒绝合法跨组复用）——与执行记录『首轮夹具错误』口径一致；-02 exitCode 0，128 passed。"
+      }
+    ],
+    "notes": [
+      "放宽仅限同叶跨断言组复用；每叶图钉集与指派集仍双向相等，不能借复用塞入不证明任何断言的案例。跨叶引用同一案例仍要求该案例在两个叶内都满足双向闭合，未引入新通道。"
+    ]
+  },
+  "evidenceChainReview": {
+    "verdict": "PASS",
+    "checks": [
+      {
+        "item": "suites-02 全绿且串行",
+        "evidence": "f02-batch0-suites-02/SUITES/{r06_skills_completion,r07_probe_access,r07_t12_closure,r08_admission_ast_lsp,r08_admission_ptc,r08_admission_ptc_authority,r08_admission_run_code,r08_admission_security}/result.json 全部 exitCode=0；8 份 output.log 的 sha256 与 result.json logSha256 逐一相符；r07_stage_inputs.py:101-107 对 r08_admission_* 设 RUST_TEST_THREADS=1、ptc 设 TEST_TIME_LIMIT_SEC=660、ast_lsp 注入 ast-grep 固定 PATH（:91-95）。"
+      },
+      {
+        "item": "leaf-cases 24 图钉全绿",
+        "evidence": "f02-batch0-suites-02/LEAF_CASES/leaf-cases.json：60 案例 0 未持有；8 叶去重后恰 24 个 pinned 案例，逐一在文件中 actual=1/ok=true/expect=1。绑定表与 stage_maps/R07.json 注入结果逐叶一致（groups 与 pinned 全等，mismatch=0）。"
+      },
+      {
+        "item": "绑定回执与候选差异",
+        "evidence": "f02-batch0-binding-check-01/receipt.json exitCode 0，candidateDiffSha256=d7fc8d13…；与准入候选 cc7f7052（admission-authority-run-01/candidate.diff 实测 sha 前缀吻合）逐文件比对：8 个共用文件的 hunk 逐字节相同，新增仅 docs/rust-tauri/R07/R07_LEAF_BINDINGS.json、rust/crates/xtask/src/stage_map.rs、rust/crates/xtask/src/stage_maps/R07.json、scripts/rust-tauri/r07_apply_leaf_bindings.py、scripts/rust-tauri/r07_stage_inputs.py——『lingxi-service 源未变』属实（测试文件亦未在任一 diff 中，本审查所读函数体即实跑版本）。"
+      },
+      {
+        "item": "suites-01 红证据与并行错配解释",
+        "evidence": "f02-batch0-suites-01/SUITES/r08_admission_ptc/result.json exitCode=101（601.061s）；output.log：cancelling_actual_program_reaps_its_real_node_process 于 r08_admission_ptc.rs:473 断言失败 left:3 right:1。函数体（:444-487）按 ppid==本测试进程＋args 含 r08-ptc-worker.mjs 过滤并断言恰 1 个外围进程——并行时兄弟测试的 worker 共享同一父 PID，必然≥2，『环境错配非产品缺陷』的解释成立；串行后同套件 602.326s 通过。红证据如实保留。"
+      },
+      {
+        "item": "xtask 回执",
+        "evidence": "f02-batch0-xtask-tests-02：128 passed / exitCode 0；-01 红证据如 criterionChangeReview 第 5 条。"
+      }
+    ]
+  },
+  "d18DecisionReview": {
+    "verdict": "CORRECT",
+    "leaves": ["R00-T02-LA-095E0402EEEC", "R00-T02-LA-5F394AA4C9A3"],
+    "reasoning": "r07_automation_flow.rs:302-340 real_tool_suggestion_requires_apply_and_replays_after_expiry 只证：建议不自行启用、apply→返回 job、同 body 过期后重放 200 同 id 幂等（1 job）；未证 095E A0 的『过期/冲突拒绝』（同 body 重放恰是 200 成功）与 095E A1 的拒绝可见性。:342-374 slash_apply_uses_frozen_owned_suggestion 只证 A0（写入自动任务＋返回标题＋恰 1 job）；未证 5F394 A1 的『找不到建议/Studio 身份缺失』拒绝。执行记录对两测试能力的描述与函数体一致。批次0 为纯重绑窗口（rust/ 冻结），补拒绝测试确须留批次A；只重绑 A0 会留下半真半错的完整行为声明，维持现状并由批次A 一次性补齐更诚实。",
+    "notes": [
+      "细节补正：『已应用时不创建重复任务』切片已由 cron 重放测试（同 body 重放不重复建 job）在 desk/cron 端点真实覆盖，批次A 实际只需补斜杠端点同语义与各拒绝分支。",
+      "批次顺序节（执行前文本）曾写批次0 重绑这两叶，执行记录如实记录了偏离及原因，口径无冲突。",
+      "在批次A 完成前这两叶仍是 WRONG_ENDPOINT 旧绑定，F02 对它们保持未闭合，不得计为批次0 成果——与执行记录一致。"
+    ]
+  },
+  "issues": [
+    {
+      "id": "F02-B0-1",
+      "severity": "FAIL",
+      "leafIds": ["R00-T02-LA-09D567E99524", "R00-T02-LA-D5514BBDBF88"],
+      "summary": "断言1『拒绝时目标状态不变』未被 bridge_settings_receipt_and_rich_streaming_toggles_persist 实际断言：非法 permissionMode 仅断言 400，响应体丢弃，其后无状态回读；绑定 rationale 声称『非法权限模式拒绝后状态不变』属超claim。"
+    },
+    {
+      "id": "F02-B0-2",
+      "severity": "MAJOR_NOTE",
+      "leafIds": ["R00-T02-LA-D5514BBDBF88"],
+      "summary": "A0 仅 exercised richStreamingEnabled=true，而 true 即源码默认——保存效果不可与默认区分；非默认 false 方向（该开关的实质切换）无绑定案例。"
+    },
+    {
+      "id": "F02-B0-3",
+      "severity": "NOTE",
+      "leafIds": ["R00-T02-LA-09D567E99524"],
+      "summary": "A0 仅 exercised receiptEnabled=false（非默认方向，成立）；true 方向无直接样本（默认即 true）。"
+    },
+    {
+      "id": "F02-B0-4",
+      "severity": "NOTE",
+      "leafIds": ["R00-T02-LA-C88F29B5114A"],
+      "summary": "A3 的未支持语言名分支（RUN_CODE_INVALID_LANGUAGE）与会话层无会话拒绝均有套件内绿样本（real_gateway_status… :550-567，leaf-cases ok）但未绑；rationale 仅按缺解释器分支立据并披露无会话无样本，无虚claim。"
+    },
+    {
+      "id": "F02-B0-5",
+      "severity": "NOTE",
+      "leafIds": ["R00-T02-LA-2D896560381E"],
+      "summary": "A3 的『不可重命名』『写入能力缺失』分支由同叶 A1/A2 组案例断言，未列入 A3 自身组；规则允许，可零成本补列。"
+    },
+    {
+      "id": "F02-B0-6",
+      "severity": "NOTE",
+      "leafIds": ["R00-T02-LA-CD5D7FC02D8E"],
+      "summary": "A0 无 finding.path==实际文件的直接断言（间接成立，准入独审已登记）；A3 文件上限/引擎失败无直接样本（rationale 如实披露，R08 跟踪项）。"
+    }
+  ],
+  "honesty": {
+    "executed": "只读审查：8 叶原断言逐条对照测试函数体（run_code/ptc/ptc_authority/ast_lsp/security(+inc)/r06_skills_completion/r07_probe_access/r07_automation_flow/bridge_routes.rs 源码）；apply 脚本与 xtask stage_map.rs/verify.rs 门禁通读；suites-01/02、leaf-cases、binding-check、xtask-tests-01/02 回执与日志哈希核验；候选 diff 与准入 cc7f7052 逐文件逐 hunk 比对。",
+    "notExecuted": "未运行 cargo/任何测试（按任务约束）；未复跑生产者；未审查批次0 之外 400 叶的既有绑定；平台边界沿用 macOS 实测声明。",
+    "bindingNote": "本审查结论绑定当前工作区（sourceSha 86840d17…、候选 d7fc8d13…）；候选变化后须重新复验，不得沿用。"
+  }
+}
