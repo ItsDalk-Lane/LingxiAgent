@@ -93,6 +93,7 @@ PREFIX_TASK = {
     "/lingxi/v1/providers": "R07-T08(供应商面)",
     "/lingxi/v1/session-collab": "R07-T03(跨会话协作)",
     "/lingxi/v1/settings": "R07-T08(设置面)",
+    "/lingxi/v1/system/env-deps": "R08-T01(env-deps)",
     "/lingxi/v1/user-profile": "R07-T08(用户资料)",
     "/lingxi/v1/sessions/todos": "R06(待办面板)",
     "/lingxi/v1/sessions": "R06(会话管理主干)",

@@ -88,6 +88,23 @@ def run_suite(suite: str, evidence: Path) -> int:
         path.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ)
     env.pop("ELECTRON_RUN_AS_NODE", None)  # 宿主污染不得进入测试链
+    if suite == "r08_admission_ast_lsp":
+        # 该套件依赖官方 ast-grep CLI（AST_LSP_IMPLEMENTATION.md 记录的固定
+        # 临时安装位置）；缺依赖时套件按自身断言诚实失败，不在此伪造。
+        ast_tools = "/private/tmp/lingxi-r08-ast-tools-0510/node_modules/.bin"
+        env["PATH"] = ast_tools + os.pathsep + env.get("PATH", "")
+    if suite == "r08_admission_ptc":
+        # 全量含真实 600 秒默认预算单项；lingxi-test-guard 的整进程墙钟需要
+        # 少量余量（独审 ADMISSION_CANDIDATE_INDEPENDENT_REVIEW.md §5.6 已接受
+        # 该差异；产品预算仍由测试内部断言，内存 8GiB 保护保留）。
+        env["TEST_TIME_LIMIT_SEC"] = "660"
+    if suite.startswith("r08_admission_"):
+        # 准入套件按串行验证设计（全部既有回执均单线程）：并行时多测试的
+        # Node 外围进程共享同一测试进程父 PID，会破坏 cancelling_* 测试
+        # "恰好一个外围进程"的真实断言（f02-batch0-suites-01 的
+        # r08_admission_ptc exit 101 红证据即该环境错配，非产品缺陷）。
+        # 经 libtest 原生 RUST_TEST_THREADS 环境变量串行化，不改变命令构造。
+        env["RUST_TEST_THREADS"] = "1"
     env.update({
         "LINGXI_HOME": str(home), "TMPDIR": str(temporary),
         "TMP": str(temporary), "TEMP": str(temporary),

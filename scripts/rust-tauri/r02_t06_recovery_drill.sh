@@ -418,13 +418,13 @@ record_home "$V4"
 run_probe "$V4" v4
 [ "$PROBE_READY" = "1" ] || fail "v4 healthy home must start (err: $(tail -2 "$EVIDENCE_DIR/v4.err"))"
 [ "$PROBE_EXIT" = "0" ] || fail "v4 healthy service must stop cleanly (exit 0), got $PROBE_EXIT"
-python3 - "$V4/data-epoch.json" <<'PYEOF' || fail "v4 stamp must be v2 epoch 1"
+python3 - "$V4/data-epoch.json" <<'PYEOF' || fail "v4 stamp must be v2 epoch 2 (R08_CUTOVER)"
 import json, sys
 stamp = json.load(open(sys.argv[1]))
 assert stamp["schemaVersion"] == 2, stamp
-assert stamp["minimumReaderEpoch"] == 1 and stamp["committedDataEpoch"] == 1, stamp
+assert stamp["minimumReaderEpoch"] == 2 and stamp["committedDataEpoch"] == 2, stamp
 PYEOF
-note "PASS v4 fresh home stamped (v2, epoch 1) and served; graceful stop exit 0"
+note "PASS v4 fresh home stamped (v2, epoch 2) and served; graceful stop exit 0"
 
 # ---- v5: garbage main db file -------------------------------------------------
 note "== v5 (A12): garbage main db file =="

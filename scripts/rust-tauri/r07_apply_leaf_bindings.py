@@ -8,7 +8,8 @@ rust/crates/xtask/src/stage_maps/R07.json：
 - 未绑定叶一律保持原样（required_behavior_pending），不批量改状态。
 
 校验（失败即退出 1，不写地图）：叶必须在地图中；assertionCases 组数 = R00
-原断言数；叶内 case 不重复；suiteRefs 必须是地图已注册的套件命令。
+原断言数；单条断言组内 case 不重复（同案例跨断言组复用按 F02 独立审查结论
+允许：一个真实测试可证明多条原断言）；suiteRefs 必须是地图已注册的套件命令。
 地图解析层（xtask stage_map.rs）随后还会做第二遍独立校验。
 """
 
@@ -49,6 +50,29 @@ def main() -> int:
                 "{EVIDENCE}/SUITES/" + suite + "/output.log",
             ],
         }
+    # F02 批次0：五工具原叶的真实执行证据在 R08 准入套件；learn_lesson 复用 R06
+    # 既有真实完成测试。按同一生产者执行注册，与 r07_probe_* 同构。
+    for suite in (
+        "r08_admission_run_code",
+        "r08_admission_ptc",
+        "r08_admission_ptc_authority",
+        "r08_admission_ast_lsp",
+        "r08_admission_security",
+        "r06_skills_completion",
+        # F02 批次A：D18 错端点两条的建议应用/拒绝链真实证据所在套件。
+        "r07_automation_flow",
+    ):
+        commands[suite] = {
+            "argv": [
+                "python3", "-B", "scripts/rust-tauri/r07_stage_inputs.py",
+                "--run-suite", suite, "--evidence", "{EVIDENCE}/SUITES/" + suite,
+            ],
+            "timeoutSecs": 3600,
+            "evidencePaths": [
+                "{EVIDENCE}/SUITES/" + suite + "/result.json",
+                "{EVIDENCE}/SUITES/" + suite + "/output.log",
+            ],
+        }
     commands["r07_ui_vitest"] = {
         "argv": [
             "python3", "-B", "scripts/rust-tauri/r07_ui_cases.py",
@@ -75,8 +99,10 @@ def main() -> int:
             )
             continue
         flat = [case for group in groups for case in group]
-        if len(set(flat)) != len(flat):
-            errors.append(f"{leaf_id}: duplicate case within leaf")
+        # F02 修复：一个真实测试可以同时证明同叶多条原断言（F02 独立范围审查结论）。
+        # 仍禁止单条断言组内重复引用；全部引用过的案例即该叶的 pinned 案例。
+        if any(len(set(group)) != len(group) for group in groups):
+            errors.append(f"{leaf_id}: duplicate case within one assertion")
             continue
         if any(not group for group in groups):
             errors.append(f"{leaf_id}: an assertion has no case")
@@ -96,7 +122,8 @@ def main() -> int:
         leaf["assertionContract"] = {
             "producerCommand": producer,
             "evidencePath": evidence_path,
-            "cases": [{"case": case, "expect": 1} for case in flat],
+            # 案例按首次出现去重：同一案例可服务多条断言，但只 pin 一次。
+            "cases": [{"case": case, "expect": 1} for case in dict.fromkeys(flat)],
         }
         if binding["basis"] == "full_original_behavior":
             leaf["originalAssertionCases"] = groups

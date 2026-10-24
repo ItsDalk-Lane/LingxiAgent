@@ -515,8 +515,8 @@ def main() -> int:
             newer = homes["home-newer"]
             fallback = homes["home-fallback"]
             stamp = newer / "data-epoch.json"
-            stamp.write_text(json.dumps({"schemaVersion": 2, "epoch": 2, "minimumReaderEpoch": 2,
-                "committedDataEpoch": 2, "lastVersion": "9.9.9", "updatedAt": "2026-09-26T08:00:00.000Z"}), encoding="utf-8")
+            stamp.write_text(json.dumps({"schemaVersion": 2, "epoch": 3, "minimumReaderEpoch": 3,
+                "committedDataEpoch": 3, "lastVersion": "9.9.9", "updatedAt": "2026-09-26T08:00:00.000Z"}), encoding="utf-8")
             before_stamp = sha256(stamp)
             fallback_before = snapshot(fallback)
             epoch_env = {**cli_env, "LINGXI_HOME": str(fallback), "HOME": str(fallback),

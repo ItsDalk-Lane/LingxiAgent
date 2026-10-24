@@ -59,7 +59,7 @@ def main():
             selected = originals.decode().splitlines()[0].split("  ", 1)[1].removesuffix("/data-epoch.json")
             assert f"effective_home={selected}" in err and f"source={source}" in err
             assert "LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked" in err
-            assert "epoch 2 or newer" in err
+            assert "epoch 3 or newer" in err
             assert "LINGXI_SERVICE_READY " not in (out / f"{tag}.stdout.log").read_text()
         rows.append({"outerRUST_LOG": level, "actual": len(cases), "failed": 0, "sources": ["cli", "env", "config-file"]})
     (evidence / "result.json").write_text(json.dumps(rows, indent=2))

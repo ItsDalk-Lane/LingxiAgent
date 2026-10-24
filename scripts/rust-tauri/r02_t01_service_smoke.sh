@@ -341,7 +341,8 @@ expected = {
     "serverKind": "lingxi-service",
     "wireProtocolMin": 1,
     "wireProtocolMax": 1,
-    "dataEpoch": 1,
+    # R08-T05 常量切换（R08_CUTOVER）：dataEpoch 1→2，见 t05-switch-smoke-green-02 红证据
+    "dataEpoch": 2,
 }
 for key, value in expected.items():
     assert body.get(key) == value, f"health field {key}: expected {value}, got {body.get(key)!r}"
@@ -434,9 +435,9 @@ seed_newer_home() {
   cat > "$selected/data-epoch.json" <<'JSON'
 {
   "schemaVersion": 2,
-  "epoch": 2,
-  "minimumReaderEpoch": 2,
-  "committedDataEpoch": 2,
+  "epoch": 3,
+  "minimumReaderEpoch": 3,
+  "committedDataEpoch": 3,
   "lastVersion": "9.9.9",
   "updatedAt": "2026-09-26T08:00:00.000Z"
 }
@@ -460,7 +461,7 @@ check_newer_refusal() {
   fi
   if grep -q 'LINGXI_DATA_EPOCH_BLOCKED reason=epoch-downgrade-blocked' \
        "$EVIDENCE_DIR/$tag.stderr.log" &&
-     grep -q 'epoch 2 or newer' "$EVIDENCE_DIR/$tag.stderr.log"; then
+     grep -q 'epoch 3 or newer' "$EVIDENCE_DIR/$tag.stderr.log"; then
     explicit_error=1
   fi
   # 诊断/锁文件允许出现在原 home；原数据和备用 home 必须完全不变。
