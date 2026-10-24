@@ -4,7 +4,7 @@ import type { SettingsConnectionOwner } from './connection-owner';
  * 独立于主窗口 store，设置窗口有自己的 BrowserWindow + JS context
  */
 import { create } from 'zustand';
-import type { ServerConnection, ServerConnectionRegistry } from '../services/server-connection';
+import type { ServerConnection, ServerConnectionRegistry } from '../services/service-client';
 import { createRemoteResource, type RemoteResource, type RemoteResourceStatus } from './resource-state';
 
 export interface Agent {

@@ -15,6 +15,7 @@ import type {
   ModelObservabilityTracePage,
 } from '../../../../../../shared/model-observability-api-contract.ts';
 import { useSettingsStore } from '../../../settings/store';
+import { useStore } from '../../../stores';
 import { TraceDetailOverlay } from '../../../settings/tabs/observability/trace-detail/TraceDetailOverlay';
 
 const T0 = Date.UTC(2026, 8, 1, 10, 0, 0);
@@ -116,6 +117,43 @@ const sessionMessages = [
   },
 ];
 
+/**
+ * R08-T01 后 fetchSessionMessages 在 Rust 拓扑走 canonical 历史
+ * （/lingxi/v1/sessions/:id/history）→ projectRustHistoryForTrace →
+ * parseSessionMessages。本夹具投影后必须与上方旧 messages 夹具同构：
+ * 同一用户消息、同一助手正文、同一 read_file 成功工具调用。
+ */
+const runRef = { state: 'known', runId: 'run-1' };
+const canonicalHistory = {
+  schemaVersion: 'lingxi.canonical-history.v1',
+  sessionId: 's-render',
+  revision: '1:1',
+  page: { hasMore: false, nextBefore: null },
+  items: [
+    {
+      kind: 'user_message', messageId: 'u1', seq: '1',
+      committedAtUnixMs: T0 - 5_000, text: '帮我总结这个项目', run: runRef,
+    },
+    {
+      kind: 'tool_call', toolCallId: 'run-1-tc1', run: runRef,
+      target: 'read_file', argsSummary: '{"path":"README.md"}',
+      status: 'success', firstSeq: '2',
+      result: {
+        status: 'success',
+        details: { output: '# Lingxi\n项目根目录文件' },
+        content: [], resourceRefs: [], truncated: false,
+      },
+    },
+    {
+      kind: 'final_message', messageId: 'run-1-final', seq: '3', run: runRef,
+      modelCallId: 'run-1:1',
+      content: [{ type: 'text', text: '这个项目分为三层。' }],
+      committedAtUnixMs: T0 + 3_000,
+    },
+    { kind: 'run_terminal', runId: 'run-1', status: 'completed', eventSeq: '4' },
+  ],
+};
+
 const tracePage: ModelObservabilityTracePage = { traces: [], nextCursor: null };
 
 function installFetchStub() {
@@ -151,6 +189,13 @@ function installFetchStub() {
     if (path.startsWith('/api/sessions/messages')) {
       return json({ messages: sessionMessages, hasMore: false, revision: '1:1' });
     }
+    if (/^\/lingxi\/v1\/sessions\/[^/]+\/history/.test(path)) {
+      // Rust 拓扑：readRustChatHistory 要求 revision 与 ETag 一致。
+      return new Response(JSON.stringify(canonicalHistory), {
+        status: 200,
+        headers: { 'content-type': 'application/json', etag: '1:1' },
+      });
+    }
     if (path.startsWith('/api/sessions/prompt-snapshot')) {
       return json({
         promptSnapshot: {
@@ -180,6 +225,11 @@ describe('TraceDetailOverlay 渲染验收', () => {
     (window as unknown as { t: unknown }).t = (key: string) => key;
     useSettingsStore.setState({
       serverPort: 1, serverToken: 'token', ready: true,
+    } as never);
+    // 会话叙事经 rust-chat-history 从聊天 store 解析连接；Rust 拓扑走 canonical 历史。
+    useStore.setState({
+      serverPort: 1, serverToken: 'token',
+      serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
     } as never);
 
     render(<TraceDetailOverlay traceId="mt_render" onClose={() => {}} />);
@@ -212,6 +262,11 @@ describe('TraceDetailOverlay 渲染验收', () => {
     useSettingsStore.setState({
       serverPort: 1, serverToken: 'token', ready: true,
     } as never);
+    // 会话叙事经 rust-chat-history 从聊天 store 解析连接；Rust 拓扑走 canonical 历史。
+    useStore.setState({
+      serverPort: 1, serverToken: 'token',
+      serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
+    } as never);
 
     render(<TraceDetailOverlay traceId="mt_render" onClose={() => {}} />);
 
@@ -238,6 +293,11 @@ describe('TraceDetailOverlay 渲染验收', () => {
     (window as unknown as { t: unknown }).t = (key: string) => key;
     useSettingsStore.setState({
       serverPort: 1, serverToken: 'token', ready: true,
+    } as never);
+    // 会话叙事经 rust-chat-history 从聊天 store 解析连接；Rust 拓扑走 canonical 历史。
+    useStore.setState({
+      serverPort: 1, serverToken: 'token',
+      serverNodeKind: 'lingxi-service', serverNodeTransport: 'http',
     } as never);
 
     render(<TraceDetailOverlay traceId="mt_render" onClose={() => {}} />);

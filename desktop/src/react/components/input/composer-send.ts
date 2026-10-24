@@ -15,7 +15,7 @@ import { sessionScopedValue } from '../../stores/session-slice';
 import type { AttachedFile, QuotedSelection } from '../../stores/input-slice';
 import { upsertOptimisticSessionFirstMessage } from '../../stores/session-actions';
 import { getWebSocket } from '../../services/websocket';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { renderMarkdown } from '../../utils/markdown';
 import { isImageFile, isVideoFile } from '../../utils/format';
 import { isAudioFileName } from '../../utils/file-kind';
@@ -66,6 +66,7 @@ import {
   isChatVideoBase64ContentCompatible,
   isChatVideoBase64WithinLimit,
 } from '../../../../../shared/video-mime.ts';
+import { usePlatform } from '../../hooks/use-platform';
 
 export type { ComposerSendBundle };
 
@@ -326,7 +327,7 @@ export async function prepareComposerSend(
 
   // 图片 / 视频读 base64。统一走 platform 层：Electron 里 platform 代理到 hana，
   // Web/PWA 里 platform 代理到 HTTP fallback。
-  const platform = window.platform;
+  const platform = usePlatform();
   const images: Array<{ type: 'image'; data?: string; fileId?: string; mimeType: string }> = [];
   const videos: Array<{ type: 'video'; data: string; mimeType: string }> = [];
   const audios: Array<{ type: 'audio'; data: string; mimeType: string }> = [];

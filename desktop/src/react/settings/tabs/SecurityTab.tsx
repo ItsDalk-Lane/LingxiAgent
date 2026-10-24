@@ -9,6 +9,7 @@ import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
 import { ExpandableRow } from '../components/ExpandableRow';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 interface Checkpoint {
   id: string;
@@ -115,7 +116,7 @@ export function SecurityTab() {
     const saved = await autoSaveConfig({ network_proxy: proxyDraft }, { silent: true });
     if (!saved) return;
     const latest = useSettingsStore.getState().settingsConfig?.network_proxy || proxyDraft;
-    window.platform?.settingsChanged?.('network-proxy-changed', { network_proxy: latest });
+    usePlatform()?.settingsChanged?.('network-proxy-changed', { network_proxy: latest });
     showToast(t('settings.autoSaved'), 'success');
     await loadSettingsConfig();
   }, [proxyDraft, showToast]);

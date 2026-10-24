@@ -1,7 +1,8 @@
 import type { PreviewItem } from '../types';
 import { useStore } from '../stores';
-import { resolveServerConnection, appendConnectionAuth, buildConnectionUrl } from '../services/server-connection';
+import { resolveServerConnection, appendConnectionAuth, buildConnectionUrl } from '../services/service-client';
 import { captureSessionConnection, ownsSessionConnection, subscribeSessionConnection } from '../services/session-connection-owner';
+import { usePlatform } from '../hooks/use-platform';
 
 /** 预览从当前 Rust 连接真实读取，旧窗口的迟到正文不能进入新连接的预览池。 */
 async function readRustPreview(filePath: string, previewType: string): Promise<PreviewReadResult | null | undefined> {
@@ -119,7 +120,7 @@ export interface PreviewReadResult {
 export async function readFileForPreviewType(filePath: string, previewType: string): Promise<PreviewReadResult | null> {
   const rust = await readRustPreview(filePath, previewType);
   if (rust !== undefined) return rust;
-  const p = window.platform;
+  const p = usePlatform();
   if (!p) return null;
   if (previewType === 'file-info') return { content: '' };
   if (previewType === 'docx') {

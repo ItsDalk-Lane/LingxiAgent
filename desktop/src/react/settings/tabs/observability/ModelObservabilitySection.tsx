@@ -23,7 +23,7 @@ import type {
 import { t } from '../../helpers';
 import { useSettingsStore } from '../../store';
 import { Button, Tooltip } from '../../../ui';
-import { isLocalOwnerConnection } from '../../../services/server-connection';
+import { isLocalOwnerConnection } from '../../../services/service-client';
 import styles from '../../Settings.module.css';
 import {
   isObservabilityAbortError,

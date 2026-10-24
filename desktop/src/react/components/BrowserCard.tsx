@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { currentRustBrowserConnection, openRustBrowserViewer, startRustBrowserConnectionObserver } from '../services/rust-browser';
+import { currentRustBrowserConnection, openRustBrowserViewer, startRustBrowserConnectionObserver } from '../services/service-client';
 import { useStore } from '../stores';
 import { captureConversationRequestScope } from '../services/conversation-request-scope';
 import {
@@ -20,6 +20,7 @@ import {
   type BrowserSessionState,
 } from '../stores/browser-slice';
 import { normalizeSessionPath } from '../stores/session-slice';
+import { usePlatform } from '../hooks/use-platform';
 
 interface DisplayBrowser {
   /** 浏览器归属的会话路径（可能不是当前会话） */
@@ -66,7 +67,7 @@ export function BrowserCard() {
       void openRustBrowserViewer(sessionPath).catch(cause => { if (scope.isCurrent()) setError(cause instanceof Error ? cause.message : String(cause)); }).finally(scope.dispose);
       return;
     }
-    window.platform?.openBrowserViewer?.(sessionPath ? { sessionPath } : undefined);
+    usePlatform()?.openBrowserViewer?.(sessionPath ? { sessionPath } : undefined);
   }, [display]);
 
   // 叉只收起卡片，不碰浏览器本身：agent 的操作不能被一次视觉整理打断。

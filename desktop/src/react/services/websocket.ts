@@ -31,7 +31,6 @@ import {
 import { AppError } from '../../../../shared/errors.ts';
 import { errorBus } from '../../../../shared/error-bus.ts';
 import { version as desktopVersion } from '../../../../package.json';
-import { DATA_EPOCH } from '../../../../shared/contract-versions.ts';
 import {
   configureTerminalClientWebSocketGetter,
   requestTerminalSnapshot,
@@ -53,6 +52,10 @@ let _rustSlashReady = false;
 let _wsConnectAttempt = 0;
 let _wsHandshakeTimer: ReturnType<typeof setTimeout> | null = null;
 const RUST_WIRE_PROTOCOL = 1;
+// R08 数据纪元切换（T05：Rust 侧 R08_CUTOVER 把 data_epoch 升到 2）：切换窗内
+// 客户端同时接受升级前(1)与升级后(2)的服务公告。显式枚举，禁区间通配（>=）；
+// 窗外纪元一律拒绝，方向（过旧/过新）由 rustWireHelloDataEpochDirection 区分。
+const RUST_ACCEPTED_DATA_EPOCHS: readonly number[] = [1, 2];
 const RUST_HANDSHAKE_TIMEOUT_MS = 10_000;
 
 // ── WS 重连状态 ──
@@ -126,13 +129,28 @@ export function isRustWireServerHello(value: unknown): boolean {
     && (hello.wireProtocolMin as number) <= RUST_WIRE_PROTOCOL
     && (hello.wireProtocolMax as number) >= RUST_WIRE_PROTOCOL
     && (hello.wireProtocolMax as number) >= (hello.wireProtocolMin as number)
-    && hello.dataEpoch === DATA_EPOCH
+    && RUST_ACCEPTED_DATA_EPOCHS.includes(hello.dataEpoch as number)
     && hello.serverKind === 'lingxi-service'
     && typeof hello.serverVersion === 'string'
     && hello.serverVersion.trim().length > 0
     && (hello.rejectedCaps === undefined
       || (Array.isArray(hello.rejectedCaps)
         && hello.rejectedCaps.every((cap) => typeof cap === 'string')));
+}
+
+/**
+ * 判定 hello.dataEpoch 被拒的方向：
+ * - 在接受集 {1, 2} 内 → null（未拒）；
+ * - 整数但低于接受集 → 'too_old'（服务数据目录落后于本客户端可写纪元）；
+ * - 整数但高于接受集 → 'too_new'（数据目录已被更新版本升级，应提示升级客户端
+ *   而不是继续写入，对应任务书 A11）；
+ * - 非整数/缺失 → null（不属于纪元方向问题，走通用不兼容理由）。
+ */
+export function rustWireHelloDataEpochDirection(value: unknown): 'too_old' | 'too_new' | null {
+  if (!Number.isInteger(value)) return null;
+  const epoch = value as number;
+  if (RUST_ACCEPTED_DATA_EPOCHS.includes(epoch)) return null;
+  return epoch < RUST_ACCEPTED_DATA_EPOCHS[0] ? 'too_old' : 'too_new';
 }
 
 function clearRustHandshakeTimer(): void {
@@ -378,7 +396,20 @@ async function openConnectionWebSocket(connection: ServerConnection, attempt: nu
       const msg = JSON.parse(event.data);
       if (isRustService && !rustHandshakeComplete) {
         if (!isRustWireServerHello(msg)) {
-          failRustSocket('status.wsHandshakeFailed', 4409, 'incompatible Rust wire handshake');
+          // 纪元不匹配仍是拒绝，但理由必须区分方向（任务书 A11 客户端侧）：
+          // 过新 = 数据目录已被更新版本升级，提示升级客户端而不是继续写入。
+          const epochDirection = rustWireHelloDataEpochDirection(
+            (msg as Record<string, unknown> | null)?.dataEpoch,
+          );
+          if (epochDirection === 'too_old') {
+            failRustSocket('status.wsHandshakeFailed', 4409,
+              'Rust data epoch too old for this client (accepted: 1,2)');
+          } else if (epochDirection === 'too_new') {
+            failRustSocket('status.wsHandshakeFailed', 4409,
+              'Rust data epoch too new for this client (accepted: 1,2); upgrade the client');
+          } else {
+            failRustSocket('status.wsHandshakeFailed', 4409, 'incompatible Rust wire handshake');
+          }
           return;
         }
         rustHandshakeComplete = true;

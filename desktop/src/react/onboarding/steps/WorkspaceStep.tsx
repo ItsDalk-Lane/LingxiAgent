@@ -11,6 +11,7 @@ import {
 } from '../onboarding-actions';
 import type { LingxiFetch, OnboardingVerificationPlan } from '../onboarding-actions';
 import { StepContainer, Multiline } from '../onboarding-ui';
+import { usePlatform } from '../../hooks/use-platform';
 
 const WorkspaceIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -54,7 +55,7 @@ export function WorkspaceStep({ preview, lingxiFetch, agentId, verificationPlan,
   }, [preview, lingxiFetch, showError]);
 
   const onBrowse = useCallback(async () => {
-    const folder = await window.platform?.selectFolder?.();
+    const folder = await usePlatform()?.selectFolder?.();
     if (folder) setSelectedPath(folder);
   }, []);
 

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useStore } from '../../stores';
 import { resourceWatchKey, retainResourceWatch, type ResourceRef } from '../../services/resource-events';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 
 function normalizeSubdir(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');

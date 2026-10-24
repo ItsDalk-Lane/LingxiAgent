@@ -9,7 +9,7 @@
 
 import { useStore } from './stores';
 import { openQuickChatSession } from './services/quick-chat-session-handoff';
-import { lingxiFetch } from './hooks/use-hana-fetch';
+import { lingxiFetch } from './services/service-client';
 import { applyAgentIdentity, loadAgents, loadAvatars } from './stores/agent-actions';
 import { loadPendingNewSessionPermissionDefault, loadSessions, pendingNewSessionIdentityPatch, sweepOrphanedWorkspaceSessions, switchSession } from './stores/session-actions';
 import { initSessionProjectCatalog } from './stores/session-project-actions';
@@ -43,10 +43,11 @@ import {
   validateRestartTransport,
   warnIfServerProtocolMismatch,
   type ServerConnection,
-} from './services/server-connection';
+} from './services/service-client';
 import { persistAppearancePreferences } from './services/appearance-sync';
 import { errorBus as _errorBus } from '../../../shared/error-bus.ts';
 import { AppError as _AppError } from '../../../shared/errors.ts';
+import { usePlatform } from './hooks/use-platform';
 
 declare const i18n: {
   locale: string;
@@ -88,7 +89,7 @@ window.addEventListener('unhandledrejection', (e) => {
 // ── 主初始化流程 ──
 
 export async function initApp(): Promise<void> {
-  const platform = window.platform;
+  const platform = usePlatform();
   initQuotedSelectionLifecycle();
   initInputDraftPersistence();
 
@@ -102,7 +103,7 @@ export async function initApp(): Promise<void> {
   configureWsMessageHandler({ requestContextUsage });
 
   let lastLocalIdentity: ServerConnection | null = null;
-  platform.onServerRestarted?.((data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null }) => {
+  platform.onServerRestarted?.((data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null; host?: string | null }) => {
     const storeState = useStore.getState();
     const priorToken = storeState.serverToken;
     const fromEvent = validateRestartTransport(data?.port, data?.token);
@@ -138,6 +139,7 @@ export async function initApp(): Promise<void> {
         serverToken: transport.token,
         serverNodeKind: data.serverNodeKind,
         serverNodeTransport: data.serverNodeTransport,
+        serverHost: data.host ?? null,
       });
       if (!verified) throw new Error('invalid restarted local server connection');
       const current = useStore.getState();
@@ -170,14 +172,19 @@ export async function initApp(): Promise<void> {
   // 1. 获取 server 连接信息并存入 Zustand
   const boot = platform.getServerConnectionInfo
     ? await platform.getServerConnectionInfo()
-    : { port: await platform.getServerPort(), token: await platform.getServerToken(), serverNodeKind: null, serverNodeTransport: 'http' };
+    : { port: await platform.getServerPort(), token: await platform.getServerToken(), serverNodeKind: null, serverNodeTransport: 'http', host: null };
   const serverPort = boot.port == null ? null : String(boot.port);
   const serverToken = boot.token;
   const localServerConnection = createLocalServerConnection({
     serverPort, serverToken,
     serverNodeKind: boot.serverNodeKind,
     serverNodeTransport: boot.serverNodeTransport,
+    serverHost: boot.host ?? null,
   });
+  // R08-T03：rust 预览模式窗口标题可见；远端形态按 host 区分（主进程窗口期标题见 main.cjs）。
+  if (boot.serverNodeKind === 'lingxi-service' && typeof document !== 'undefined') {
+    document.title = boot.host ? 'Lingxi · Rust 预览（远端）' : 'Lingxi · Rust 预览';
+  }
   const persistedConnections = readPersistedServerConnectionState();
   const initialRegistry = localServerConnection
     ? upsertServerConnection(persistedConnections.serverConnections, localServerConnection)
@@ -365,7 +372,7 @@ export async function initApp(): Promise<void> {
     'app.open-settings': () => openSettingsModal(),
     'app.new-session': () => createNewSession(),
     'app.toggle-sidebar': () => toggleSidebar(),
-    'app.restart': () => { void window.hana?.restartApp?.(); },
+    'app.restart': () => { void usePlatform()?.restartApp?.(); },
   });
 
   // 19. 设置变更监听
@@ -401,7 +408,7 @@ export async function initApp(): Promise<void> {
   platform.onQuickChatOpenSession?.(openQuickChatSession);
 
   // 21. Skill Viewer overlay（主进程 / 设置窗口 → 渲染进程）
-  window.hana?.onShowSkillViewer?.((data: any) => {
+  usePlatform()?.onShowSkillViewer?.((data: any) => {
     useStore.setState({ skillViewerData: data });
   });
 

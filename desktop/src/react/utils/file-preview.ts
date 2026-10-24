@@ -7,7 +7,7 @@
 import type { PreviewItem } from '../types';
 import type { FileRef } from '../types/file-ref';
 import { useStore } from '../stores';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 import { captureSessionConnection, ownsSessionConnection } from '../services/session-connection-owner';
 import { openPreview } from '../stores/preview-actions';
 import { inferKindByExt, isMediaKind } from './file-kind';
@@ -20,6 +20,7 @@ import {
   readFileForPreviewWithVersion,
 } from './preview-file-content';
 import { showError } from './ui-helpers';
+import { usePlatform } from '../hooks/use-platform';
 
 export { PREVIEWABLE_EXTS, BINARY_PREVIEW_TYPES, readFileForPreview };
 
@@ -81,7 +82,7 @@ export async function openFilePreview(
     if (normalizedExt === 'skill') {
       // .skill 文件可能是纯文本也可能是 zip，先尝试读取内容在预览面板展示
       const name = fileName.replace(/\.skill$/, '');
-      const content = await window.platform?.readFile?.(filePath);
+      const content = await usePlatform()?.readFile?.(filePath);
       if (content != null) {
         const body = content.replace(/^---\s*\n[\s\S]*?\n---\s*\n?/, '');
         const previewItem: PreviewItem = {
@@ -94,7 +95,7 @@ export async function openFilePreview(
         return;
       }
       // 读取失败（可能是 zip 格式），尝试 skill viewer
-      window.platform?.openSkillViewer?.({ skillPath: filePath });
+      usePlatform()?.openSkillViewer?.({ skillPath: filePath });
       return;
     }
 
@@ -191,12 +192,13 @@ export async function openSkillPreview(
       return;
     }
 
-    if (!window.platform?.openSkillViewer) {
+    const previewPlatform = usePlatform();
+    if (!previewPlatform?.openSkillViewer) {
       showError('skill viewer unavailable');
       return;
     }
 
-    window.platform.openSkillViewer({
+    previewPlatform.openSkillViewer({
       name: nonEmptyString(source?.skillName) || nonEmptyString(skillName) || 'Skill',
       baseDir,
       filePath: filePath || undefined,

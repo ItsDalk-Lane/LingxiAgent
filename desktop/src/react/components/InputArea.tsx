@@ -1,4 +1,4 @@
-import { chatFetch, captureChatUploadScope } from '../services/chat-client';
+import { chatFetch, captureChatUploadScope } from '../services/service-client';
 /**
  * InputArea — 聊天输入区域 React 组件
  *
@@ -18,7 +18,7 @@ import { getSessionCompactionMode, isSessionCompacting } from '../stores/context
 import { selectSessionFiles } from '../stores/selectors/file-refs';
 import { isImageFile, isVideoFile } from '../utils/format';
 import { isAudioFileName } from '../utils/file-kind';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 import type { AttachedFile } from '../stores/input-slice';
 import { useI18n } from '../hooks/use-i18n';
 import {
@@ -112,7 +112,7 @@ import {
 } from './input/slash-commands';
 import { attachFilesFromPaths } from '../MainContent';
 import { searchDeskFiles } from '../stores/desk-actions';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 import { VOICE_RECORD_TOGGLE_EVENT } from '../keybindings/useKeybindings';
 import type { DeskSearchResult } from '../types';
 import styles from './input/InputArea.module.css';
@@ -124,6 +124,7 @@ import {
   isChatVideoBase64ContentCompatible,
   isChatVideoBase64WithinLimit,
 } from '../../../../shared/video-mime.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 const EMPTY_FILE_REFS: readonly import('../types/file-ref').FileRef[] = Object.freeze([]);
 
@@ -1171,9 +1172,9 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
       browserFileInputRef.current?.click();
       return;
     }
-    if (typeof window.platform?.selectFiles === 'function') {
+    if (typeof usePlatform()?.selectFiles === 'function') {
       try {
-        const paths = await window.platform.selectFiles();
+        const paths = await usePlatform().selectFiles();
         if (paths && paths.length > 0) await attachFilesFromPaths(paths);
       } finally {
         restoreEditorFocus();
@@ -1636,7 +1637,7 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
         if (item.kind && item.kind !== 'file') continue;
         const file = item.getAsFile();
         if (!file) continue;
-        const filePath = window.platform?.getFilePath?.(file);
+        const filePath = usePlatform()?.getFilePath?.(file);
         if (!filePath) continue;
         pathItems.push(filePath);
         nameMap[filePath] = file.name;
@@ -2370,11 +2371,11 @@ function InputAreaInner({ surface, isScoped = false }: Required<Omit<InputAreaPr
 
   const handleSlashResultClick = useCallback(() => {
     if (slashResult?.filePath) {
-      window.platform?.showInFinder?.(slashResult.filePath);
+      usePlatform()?.showInFinder?.(slashResult.filePath);
       return;
     }
     if (!slashResult?.deskDir) return;
-    window.platform?.openFolder?.(slashResult.deskDir);
+    usePlatform()?.openFolder?.(slashResult.deskDir);
   }, [slashResult?.deskDir, slashResult?.filePath]);
 
   const handleContinueDeletedAgentSession = useCallback(async () => {

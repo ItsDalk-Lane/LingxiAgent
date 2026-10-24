@@ -7,6 +7,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { OnboardingApp } from '../OnboardingApp';
+import { getDesktopHost } from '../../host/desktop-host';
 
 type Deferred<T> = {
   promise: Promise<T>;
@@ -133,7 +134,7 @@ describe('OnboardingApp locale switching', () => {
   });
 
   it('shows Rust onboarding is unavailable instead of calling legacy setup routes', async () => {
-    (window.hana as unknown as Record<string, unknown>).getServerConnectionInfo = vi.fn(async () => ({
+    (getDesktopHost().api as unknown as Record<string, unknown>).getServerConnectionInfo = vi.fn(async () => ({
       port: 34001, token: 'rust-token', serverNodeKind: 'lingxi-service', serverNodeTransport: 'https',
     }));
     const fetchMock = vi.mocked(globalThis.fetch);
@@ -187,7 +188,7 @@ describe('OnboardingApp locale switching', () => {
     fireEvent.click(screen.getByRole('button', { name: '连接' }));
 
     await waitFor(() => {
-      expect(window.hana.onboardingComplete).toHaveBeenCalledTimes(1);
+      expect(getDesktopHost().api.onboardingComplete).toHaveBeenCalledTimes(1);
     });
     expect(fetchMock).toHaveBeenCalledWith('http://192.168.31.75:14500/api/web-auth/login', expect.objectContaining({
       credentials: 'include',

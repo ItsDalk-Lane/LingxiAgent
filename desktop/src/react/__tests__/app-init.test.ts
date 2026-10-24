@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getDesktopHost } from '../host/desktop-host';
 
 type MockState = Record<string, unknown>;
 
@@ -384,7 +385,7 @@ describe('initApp bridge indicator', () => {
     expect(mockSetStatus).toHaveBeenCalledWith('status.serverNotReady', false);
     expect(mockLoadModels).not.toHaveBeenCalled();
     expect(mockConnectWebSocket).not.toHaveBeenCalled();
-    expect((window.platform.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect((getDesktopHost().api.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
   });
 
   it('reconnects a saved Rust server through its own login and identity routes', async () => {
@@ -455,7 +456,7 @@ describe('initApp bridge indicator', () => {
     expect(mockConnectWebSocket).toHaveBeenCalledTimes(1);
     expect(mockLoadAgents).not.toHaveBeenCalled();
     expect(mockSetStatus).toHaveBeenCalledWith('status.rustCoreUnavailable', false);
-    expect((window.platform.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect((getDesktopHost().api.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
   });
 
   it('keeps a failed remote connection selected and shows its failure without exposing its key', async () => {
@@ -496,7 +497,7 @@ describe('initApp bridge indicator', () => {
     expect(mockSetStatus).toHaveBeenCalledWith('status.serverNotReady', false);
     expect(mockShowError).toHaveBeenCalledWith('status.serverNotReady: credential denied [redacted]');
     expect(mockConnectWebSocket).not.toHaveBeenCalled();
-    expect((window.platform.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
+    expect((getDesktopHost().api.appReady as ReturnType<typeof vi.fn>)).toHaveBeenCalledTimes(1);
   });
 
   it('initializes the pending workspace from agent home even when cwd history points elsewhere', async () => {

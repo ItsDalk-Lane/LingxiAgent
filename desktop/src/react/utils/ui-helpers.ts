@@ -5,9 +5,9 @@
  */
 
 import { useStore } from '../stores';
-import { chatFetch as lingxiFetch } from '../services/chat-client';
+import { chatFetch as lingxiFetch } from '../services/service-client';
 import { captureSessionConnection, ownsSessionConnection } from '../services/session-connection-owner';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 import { errorBus } from '../../../../shared/error-bus.ts';
 import { AppError } from '../../../../shared/errors.ts';
 

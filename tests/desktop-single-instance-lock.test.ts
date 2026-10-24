@@ -1,9 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import path from "path";
+import fs from "fs";
+import os from "os";
 
 import {
   configureClientSingleInstance,
   focusExistingWindow,
+  getClientUserDataPath,
 } from "../desktop/src/shared/single-instance-lock.cjs";
 
 function makeApp({ gotLock = true } = {}) {
@@ -25,6 +28,30 @@ function makeApp({ gotLock = true } = {}) {
 }
 
 describe("desktop client single instance lock", () => {
+  it("不同位置的同名副本不共用缓存或单实例空间，路径别名仍指向同一空间", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "r08-client-isolation-"));
+    try {
+      const a = path.join(root, "a", "copy");
+      const b = path.join(root, "b", "copy");
+      fs.mkdirSync(a, { recursive: true });
+      fs.mkdirSync(b, { recursive: true });
+      const alias = path.join(root, "alias");
+      fs.symlinkSync(a, alias, "junction");
+      const defaults = path.join(root, ".hanako");
+      const namespace = (home: string) => getClientUserDataPath(home, defaults, path.join(root, "appData"));
+      expect(namespace(a)).not.toBe(namespace(b));
+      expect(namespace(a)).toBe(namespace(alias));
+      expect(namespace(a)).toBe(path.join(fs.realpathSync(a), ".electron-user-data"));
+      const standard = path.join(root, ".lingxi-dev");
+      fs.mkdirSync(standard);
+      const standardAlias = path.join(root, "standard-alias");
+      fs.symlinkSync(standard, standardAlias, "junction");
+      expect(namespace(standardAlias)).toBe(namespace(standard));
+      expect(namespace(standard)).toBe(path.join(root, "appData", "Lingxi-dev"));
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
   it("sets the dev userData namespace before requesting the lock", () => {
     const { app } = makeApp();
     const defaultHome = path.join("C:", "Users", "me", ".hanako");

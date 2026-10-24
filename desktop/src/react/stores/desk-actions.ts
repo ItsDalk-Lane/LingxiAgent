@@ -26,6 +26,7 @@ import { mergeWorkspaceHistory, normalizeWorkspacePath, removeWorkspaceHistoryEn
 import { pendingNewSessionIdentityPatch } from './session-actions';
 import { rustWorkbenchRoute } from '../services/rust-workbench';
 import { persistLastProjectIdentity } from './last-project-identity';
+import { usePlatform } from '../hooks/use-platform';
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- store setState 回调及 IPC callback data */
 
@@ -1219,7 +1220,7 @@ export async function deskTrashTreeItems(items: DeskTreeMoveItem[]): Promise<boo
   if (shouldUseWorkbenchDeskAction(s)) {
     return deskSafeDeleteMobileWorkbenchItems(items);
   }
-  const trashItem = window.platform?.trashItem;
+  const trashItem = usePlatform()?.trashItem;
   if (!trashItem) {
     console.error('[desk] system trash is not available');
     return false;

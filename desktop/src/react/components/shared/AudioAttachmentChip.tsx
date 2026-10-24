@@ -8,6 +8,7 @@ import {
   resamplePeaksForDisplay,
 } from '../../utils/audio-waveform';
 import styles from './AudioAttachmentChip.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export interface AudioAttachmentFile {
   path: string;
@@ -240,7 +241,7 @@ function getAudioUrl(file: AudioAttachmentFile): string | null {
     return `data:${file.mimeType};base64,${file.base64Data}`;
   }
   if (typeof window === 'undefined') return null;
-  return window.platform?.getFileUrl?.(file.path) || null;
+  return usePlatform()?.getFileUrl?.(file.path) || null;
 }
 
 function PlayIcon() {

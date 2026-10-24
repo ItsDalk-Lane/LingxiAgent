@@ -7,6 +7,7 @@
 
 import type { MouseEvent } from 'react';
 import { useEffect, useState, useCallback } from 'react';
+import { usePlatform } from '../hooks/use-platform';
 
 export function WindowControls() {
   const t = window.t ?? ((p: string) => p);
@@ -14,7 +15,7 @@ export function WindowControls() {
   const [maximized, setMaximized] = useState(false);
 
   useEffect(() => {
-    const p = window.platform;
+    const p = usePlatform();
     if (!p?.getPlatform) return;
     p.getPlatform().then((plat: string) => {
       if (plat !== 'darwin' && plat !== 'web') setIsWin(true);
@@ -25,9 +26,9 @@ export function WindowControls() {
     p.windowIsMaximized?.().then((val: boolean) => setMaximized(val));
   }, []);
 
-  const minimize = useCallback(() => window.platform?.windowMinimize?.(), []);
-  const maximize = useCallback(() => window.platform?.windowMaximize?.(), []);
-  const close = useCallback(() => window.platform?.windowClose?.(), []);
+  const minimize = useCallback(() => usePlatform()?.windowMinimize?.(), []);
+  const maximize = useCallback(() => usePlatform()?.windowMaximize?.(), []);
+  const close = useCallback(() => usePlatform()?.windowClose?.(), []);
   const preventFocus = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   }, []);

@@ -12,7 +12,7 @@ import {
   refreshPreviewItemsFromRemoteWorkbenchTarget,
 } from './remote-file-preview';
 import { resolvedLocalPathAlias, type ResourceRef } from '../services/resource-events';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 
 export type PreviewDocumentTarget =
   | { kind: 'local-file'; filePath: string }

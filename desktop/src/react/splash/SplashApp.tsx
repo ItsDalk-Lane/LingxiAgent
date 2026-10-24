@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { getYuanVisual } from '../../../../shared/yuan-visuals.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 const DEFAULT_NAME = 'Lingxi';
 const DEFAULT_VISUAL = getYuanVisual('lingxi');
@@ -53,7 +54,7 @@ export function SplashApp() {
       let yuan = 'lingxi';
 
       try {
-        const hana = window.hana;
+        const hana = usePlatform();
         const [avatarResult, infoResult] = await Promise.allSettled([
           hana?.getAvatarPath?.('agent'),
           hana?.getSplashInfo?.(),
@@ -65,8 +66,9 @@ export function SplashApp() {
         }
 
         defaultAvatarRef.current = `assets/${getYuanVisual(splashInfo?.yuan).avatar}`;
-        if (avatarPath && window.platform?.getFileUrl) {
-          const base = window.platform.getFileUrl(avatarPath);
+        const platform = usePlatform();
+        if (avatarPath && platform?.getFileUrl) {
+          const base = platform.getFileUrl(avatarPath);
           if (base) {
             setAvatarSrc(`${base}?t=${Date.now()}`);
           } else {

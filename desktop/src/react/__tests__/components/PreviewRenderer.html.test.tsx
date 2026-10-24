@@ -8,6 +8,7 @@ import { PreviewRenderer } from '../../components/preview/PreviewRenderer';
 import { useStore } from '../../stores';
 import { clearAppFileDragPayload, writeAppFileDragPayload } from '../../utils/app-file-drag';
 import type { PreviewItem } from '../../types';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mocks = vi.hoisted(() => ({
   lingxiFetch: vi.fn(),
@@ -355,7 +356,7 @@ describe('PreviewRenderer HTML isolation', () => {
     fireEvent.click(screen.getByRole('button', { name: 'preview.cover.deleteCover' }));
 
     await waitFor(() => {
-      expect(window.platform?.writeFileIfUnchanged).toHaveBeenCalledWith(
+      expect(getDesktopHost().api?.writeFileIfUnchanged).toHaveBeenCalledWith(
         '/tmp/workspace/demo.md',
         [
           '---',

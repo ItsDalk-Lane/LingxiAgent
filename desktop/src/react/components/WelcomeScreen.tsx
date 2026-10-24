@@ -29,6 +29,7 @@ import { AgentAvatar, refreshAgentAvatarVersion, resolveAgentDisplayInfo, type A
 import { isSameWorkspacePath, resolveAgentWorkspace } from '../utils/agent-workspace';
 import styles from './Welcome.module.css';
 import { buildWorkspacePickerItems, normalizeWorkspacePath, workspaceDisplayName } from '../../../../shared/workspace-history.ts';
+import { usePlatform } from '../hooks/use-platform';
 
 export function refreshAvatarTs() { refreshAgentAvatarVersion(); }
 
@@ -279,7 +280,7 @@ function FolderPicker({
   }, []);
 
   const handleAddWorkspaceFolder = useCallback(async () => {
-    const folder = await window.platform?.selectFolder?.();
+    const folder = await usePlatform()?.selectFolder?.();
     if (!folder) return;
     addWorkspaceFolder(folder);
   }, []);

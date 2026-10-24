@@ -9,6 +9,7 @@ import { CompatPathDrawer } from './skills/CompatPathDrawer';
 import { AgentSelect } from './bridge/AgentSelect';
 import { SettingsSection } from '../components/SettingsSection';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 type BundleDialogState =
   | { type: 'create'; name: string }
@@ -186,7 +187,7 @@ export function SkillsTab() {
   };
 
   const installSkillFromFile = async (file: File) => {
-    const filePath = window.platform?.getFilePath?.(file) || (file as File & { path?: string })?.path;
+    const filePath = usePlatform()?.getFilePath?.(file) || (file as File & { path?: string })?.path;
     if (filePath) {
       await installSkillFromPath(filePath);
       return;
@@ -213,8 +214,8 @@ export function SkillsTab() {
   };
 
   const installSkill = async () => {
-    if (typeof window.platform?.selectSkill === 'function') {
-      const selectedPath = await window.platform.selectSkill();
+    if (typeof usePlatform()?.selectSkill === 'function') {
+      const selectedPath = await usePlatform().selectSkill();
       if (!selectedPath) return;
       await installSkillFromPath(selectedPath);
       return;
@@ -309,7 +310,7 @@ export function SkillsTab() {
         : t('settings.skills.exported', { fileName });
       showToast(msg, 'success');
       if (data.filePath) {
-        window.platform?.showInFinder?.(data.filePath);
+        usePlatform()?.showInFinder?.(data.filePath);
       }
     } catch (err: unknown) {
       showToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
@@ -498,7 +499,7 @@ export function SkillsTab() {
   };
 
   const addExternalPath = async () => {
-    const folder = await window.platform?.selectFolder?.();
+    const folder = await usePlatform()?.selectFolder?.();
     if (!folder) return;
     const newPaths = [...externalPathsData.configured, folder];
     try {

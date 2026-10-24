@@ -1,8 +1,9 @@
 import { openFilePreview } from './file-preview';
 import { extOfName } from './file-kind';
-import { currentRustBrowserConnection, openRustBrowserViewer } from '../services/rust-browser';
+import { currentRustBrowserConnection, openRustBrowserViewer } from '../services/service-client';
 import { captureConversationRequestScope } from '../services/conversation-request-scope';
 import { showError } from './ui-helpers';
+import { usePlatform } from '../hooks/use-platform';
 
 export type LinkTarget =
   | { kind: 'web'; url: string }
@@ -159,7 +160,7 @@ export async function openInternalLink(href: string, context: LinkOpenContext = 
   if (target.kind === 'anchor') return false;
 
   if (target.kind === 'web') {
-    if (hasDesktopBrowserViewer() && typeof window.platform?.openBrowserViewer === 'function') {
+    if (hasDesktopBrowserViewer() && typeof usePlatform()?.openBrowserViewer === 'function') {
       if (currentRustBrowserConnection()) {
         // 必须使用链接所属的明确会话，不从当前焦点猜测远端网页归属。
         const scope = captureConversationRequestScope();
@@ -170,12 +171,12 @@ export async function openInternalLink(href: string, context: LinkOpenContext = 
           return false;
         } finally { scope.dispose(); }
       } else {
-        await window.platform.openBrowserViewer(context.sessionPath
+        await usePlatform().openBrowserViewer(context.sessionPath
           ? { url: target.url, sessionPath: context.sessionPath }
           : target.url);
       }
     } else {
-      window.platform?.openExternal?.(target.url);
+      usePlatform()?.openExternal?.(target.url);
     }
     return true;
   }
@@ -191,7 +192,7 @@ export async function openInternalLink(href: string, context: LinkOpenContext = 
     return true;
   }
 
-  window.platform?.openExternal?.(target.href);
+  usePlatform()?.openExternal?.(target.href);
   return true;
 }
 
@@ -199,10 +200,10 @@ export function openExternalLink(href: string, context: LinkOpenContext = {}): b
   const target = resolveLinkTarget(href, context);
   if (target.kind === 'anchor') return false;
   if (target.kind === 'file') {
-    window.platform?.openFile?.(target.filePath);
+    usePlatform()?.openFile?.(target.filePath);
     return true;
   }
-  window.platform?.openExternal?.(target.kind === 'web' ? target.url : target.href);
+  usePlatform()?.openExternal?.(target.kind === 'web' ? target.url : target.href);
   return true;
 }
 

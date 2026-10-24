@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useRef, type WheelEvent } from 'react';
 import type { BrowserViewerTab, BrowserViewerUpdate, RustBrowserViewerContext } from '../types';
 import { RustBrowserViewer } from './RustBrowserViewer';
 import { initTheme } from '../bootstrap';
+import { usePlatform } from '../hooks/use-platform';
 
 declare function t(key: string): string;
 declare function setTheme(name: string): void;
@@ -50,7 +51,7 @@ export function BrowserViewerApp() {
   useEffect(() => {
     if (!nativeMode) return;
     let alive = true;
-    Promise.resolve(window.hana?.getBrowserViewerContext?.() ?? null)
+    Promise.resolve(usePlatform()?.getBrowserViewerContext?.() ?? null)
       .then(value => { if (!value) throw new Error('browser_connection_required'); if (alive) setContext(value); })
       .catch(cause => { if (alive) setError(cause instanceof Error ? cause.message : String(cause)); });
     return () => { alive = false; };
@@ -70,7 +71,7 @@ function LegacyBrowserViewer() {
   const tabListRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const hana = window.hana;
+    const hana = usePlatform();
 
     // 监听主题切换
     hana?.onSettingsChanged?.((type: string, data: unknown) => {
@@ -104,7 +105,7 @@ function LegacyBrowserViewer() {
     return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
   }, []);
 
-  const hana = window.hana;
+  const hana = usePlatform();
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.tabId === activeTabId) || tabs[0] || null,
     [tabs, activeTabId],

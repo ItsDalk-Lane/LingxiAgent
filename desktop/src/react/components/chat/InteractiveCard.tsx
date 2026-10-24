@@ -22,8 +22,9 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import s from './InteractiveCard.module.css';
 import type { InteractiveCardPut, InteractiveCardPutResponse } from '../../../../../contracts/generated/ts/lingxi-protocol';
 import { useStore } from '../../stores';
-import { buildConnectionUrl } from '../../services/server-connection';
+import { buildConnectionUrl } from '../../services/service-client';
 import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch } from '../../services/session-connection-owner';
+import { usePlatform } from '../../hooks/use-platform';
 
 // ── 宿主注入 iframe 的主题 CSS 变量 ──
 // 从 document root 的 computed style 中提取，随注册 PUT 给 server 注入到 iframe :root。
@@ -52,7 +53,7 @@ function collectThemeVars(): string {
 const HEIGHT_CAP = 900;
 
 function safeFrameHost(src: string): boolean {
-  if (window.hana?.cardFrameNavigationGuard === true) return true;
+  if (usePlatform()?.cardFrameNavigationGuard === true) return true;
   // 网页只有同源且父页面明确限制frame-src为self/blob时才开放脚本卡片。
   // Tauri现有静态策略无法加载HTTP卡片，因此在未接宿主导航保护前明确失败。
   if (new URL(src).origin !== window.location.origin) return false;

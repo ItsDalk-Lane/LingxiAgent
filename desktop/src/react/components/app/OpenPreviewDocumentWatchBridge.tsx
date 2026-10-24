@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useStore } from '../../stores';
 import { resourceWatchKey, retainResourceWatch } from '../../services/resource-events';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import {
   PREVIEW_DOCUMENT_CATCH_UP_REFRESH_OPTIONS,
   openPreviewDocumentWatchResources,

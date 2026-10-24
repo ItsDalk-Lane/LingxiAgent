@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react';
 import { describeOnboardingError, verifyOnboardingPersistence } from '../onboarding-actions';
 import type { LingxiFetch, OnboardingVerificationPlan } from '../onboarding-actions';
 import { StepContainer, Multiline } from '../onboarding-ui';
+import { usePlatform } from '../../hooks/use-platform';
 
 // ── SVG Icons ──
 
@@ -83,7 +84,7 @@ export function TutorialStep({ preview, lingxiFetch, agentId, verificationPlan, 
     setFinishing(true);
     try {
       await verifyOnboardingPersistence({ lingxiFetch, agentId, verificationPlan });
-      await window.hana.onboardingComplete?.();
+      await usePlatform().onboardingComplete?.();
     } catch (err) {
       console.error('[onboarding] complete failed:', err);
       showError(describeOnboardingError(err, t('onboarding.error')));

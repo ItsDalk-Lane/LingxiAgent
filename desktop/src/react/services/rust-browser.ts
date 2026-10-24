@@ -2,9 +2,10 @@ import { useStore } from '../stores';
 import { captureConversationRequestScope } from './conversation-request-scope';
 import { resolveServerConnection, type ServerConnection } from './server-connection';
 import type { BrowserViewerOpenTarget, RustBrowserViewerContext, RustBrowserWorkspace, RustBrowserAction } from '../types';
+import { usePlatform } from '../hooks/use-platform';
 
 export function rustBrowserRoute(connection: { serverNodeKind?: string }, path: string): string {
-  return connection.serverNodeKind === 'lingxi-service' && /^\/api\/(?:browser(?:[/?]|$)|preferences\/browser(?:[/?]|$)|search\/(?:verify|config)(?:[?]|$))/.test(path)
+  return connection.serverNodeKind === 'lingxi-service' && /^\/api\/(?:browser(?:[/?]|$)|preferences\/browser(?:[/?]|$)|search\/(?:verify|config)(?:[?]|$)|preview\/html(?:[?]|$))/.test(path)
     ? `/lingxi/v1${path.slice('/api'.length)}` : path;
 }
 export function currentRustBrowserConnection(): ServerConnection | null {
@@ -24,8 +25,9 @@ function syncConnection(): Promise<string | null> {
   connectionVersion += 1;
   if (changed) useStore.setState({ browserBySession: {} });
   const connection = currentRustBrowserConnection();
-  registration = window.platform?.setBrowserConnection
-    ? window.platform.setBrowserConnection(connection) : Promise.resolve(null);
+  const browserPlatform = usePlatform();
+  registration = browserPlatform?.setBrowserConnection
+    ? browserPlatform.setBrowserConnection(connection) : Promise.resolve(null);
   // 订阅回调不会留下未处理的拒绝；需要操作的调用方仍会收到原始错误。
   const pending = registration;
   void pending.catch(() => { if (registration === pending) registration = null; });
@@ -39,7 +41,7 @@ export function startRustBrowserConnectionObserver(): void {
 }
 export async function rustBrowserTarget(sessionPath: string): Promise<BrowserViewerOpenTarget> {
   if (!/^native:[^\s/?#\u0000-\u001f]{1,256}$/.test(sessionPath)) throw new Error('browser_native_session_required');
-  if (!window.platform?.setBrowserConnection) throw new Error('browser_desktop_unavailable');
+  if (!usePlatform()?.setBrowserConnection) throw new Error('browser_desktop_unavailable');
   startRustBrowserConnectionObserver();
   const connection = currentRustBrowserConnection();
   if (!connection) throw new Error('browser_connection_required');
@@ -57,17 +59,18 @@ export async function openRustBrowserViewer(sessionPath: string, restore = false
     const version = connectionVersion;
     const target = await preparing;
     if (version !== connectionVersion || !scope.isCurrent()) throw new Error('browser_connection_changed');
-    if (!window.platform?.openBrowserViewer) throw new Error('browser_desktop_unavailable');
+    if (!usePlatform()?.openBrowserViewer) throw new Error('browser_desktop_unavailable');
+    const requestPlatform = usePlatform();
     if (url !== undefined) {
-      if (!window.platform.rustBrowserRequest) throw new Error('browser_desktop_unavailable');
-      await window.platform.rustBrowserRequest(target, 'new_tab', { url });
+      if (!requestPlatform.rustBrowserRequest) throw new Error('browser_desktop_unavailable');
+      await requestPlatform.rustBrowserRequest(target, 'new_tab', { url });
     } else if (restore) {
-      if (!window.platform.rustBrowserRequest) throw new Error('browser_desktop_unavailable');
-      await window.platform.rustBrowserRequest(target, 'open');
+      if (!requestPlatform.rustBrowserRequest) throw new Error('browser_desktop_unavailable');
+      await requestPlatform.rustBrowserRequest(target, 'open');
     }
     if (version !== connectionVersion || !scope.isCurrent()) throw new Error('browser_connection_changed');
     // main 再次校验句柄，旧请求即使成功也不能打开别的连接的窗口。
-    await window.platform.openBrowserViewer(target);
+    await usePlatform().openBrowserViewer(target);
   } finally { scope.dispose(); }
 }
 export function parseRustBrowserWorkspaces(value: unknown, context: Pick<RustBrowserViewerContext, 'executionNode'>): RustBrowserWorkspace[] {
@@ -82,6 +85,7 @@ export function parseRustBrowserWorkspaces(value: unknown, context: Pick<RustBro
   });
 }
 export async function rustBrowserRequest(context: RustBrowserViewerContext, action: RustBrowserAction | 'workspaces' | 'stop', options?: { tabId?: string; url?: string }): Promise<unknown> {
-  if (!window.hana?.rustBrowserRequest) throw new Error('browser_desktop_unavailable');
-  return window.hana.rustBrowserRequest(context, action, options);
+  const platform = usePlatform();
+  if (!platform.rustBrowserRequest) throw new Error('browser_desktop_unavailable');
+  return platform.rustBrowserRequest(context, action, options);
 }

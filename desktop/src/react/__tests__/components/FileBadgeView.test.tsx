@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FileBadgeView } from '../../components/input/FileBadgeView';
+import { getDesktopHost, resetDesktopHostForTests } from '../../host/desktop-host';
 
 vi.mock('@tiptap/react', () => ({
   NodeViewWrapper: ({ as = 'div', className, children }: {
@@ -23,7 +24,7 @@ function renderBadge(attrs: Record<string, unknown>) {
 describe('FileBadgeView', () => {
   afterEach(() => {
     cleanup();
-    delete (window as unknown as { platform?: unknown }).platform;
+    resetDesktopHostForTests();
   });
 
   it('renders image references with a tiny thumbnail from platform.getFileUrl', () => {
@@ -45,7 +46,7 @@ describe('FileBadgeView', () => {
     const children = Array.from(container.firstElementChild?.children || []);
     expect(children[0]).toHaveTextContent('@');
     expect(children[1]).toBe(image);
-    expect(window.platform.getFileUrl).toHaveBeenCalledWith('/tmp/photo.png');
+    expect(getDesktopHost().api.getFileUrl).toHaveBeenCalledWith('/tmp/photo.png');
   });
 
   it('renders non-image references as lightweight at-name text', () => {
@@ -62,7 +63,7 @@ describe('FileBadgeView', () => {
     expect(screen.getByText('@')).toBeInTheDocument();
     expect(screen.getByText('notes.txt')).toBeInTheDocument();
     expect(container.querySelector('img')).toBeNull();
-    expect(window.platform.getFileUrl).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.getFileUrl).not.toHaveBeenCalled();
   });
 
   it('renders audio references with a static waveform marker', () => {
@@ -83,6 +84,6 @@ describe('FileBadgeView', () => {
     expect(children[0]).toHaveTextContent('@');
     expect(children[1]).toBe(screen.getByTestId('file-badge-audio-wave'));
     expect(container.querySelector('img')).toBeNull();
-    expect(window.platform.getFileUrl).not.toHaveBeenCalled();
+    expect(getDesktopHost().api.getFileUrl).not.toHaveBeenCalled();
   });
 });

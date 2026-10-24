@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useStore } from '../../stores';
 import { captureSessionConnection, ownsSessionConnection } from '../../services/session-connection-owner';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import type { MapDraft } from '../../stores/conversation-map-slice';
 import { useI18n } from '../../hooks/use-i18n';
 import { CARD_HEIGHT, CARD_WIDTH, type MapCard } from './conversation-map-layout';

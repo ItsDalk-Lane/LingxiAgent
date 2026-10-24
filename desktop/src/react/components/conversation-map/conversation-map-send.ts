@@ -7,7 +7,7 @@
 
 import { useStore } from '../../stores';
 import { captureSessionConnection, ownsSessionConnection, type SessionConnectionOwner } from '../../services/session-connection-owner';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import type { ComposerSendBundle } from '../../stores/chat-types';
 import type { MapDraft } from '../../stores/conversation-map-slice';
 import { forkSessionTurn } from '../../stores/message-turn-actions';

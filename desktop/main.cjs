@@ -112,6 +112,7 @@ const {
   resolveRustBinary,
   readOwnedRustConnection,
   readExistingRustConnection,
+  readRemoteRustConnection,
 } = require('./src/shared/rust-local-service.cjs');
 const {
   normalizeQuickChatPreferences,
@@ -705,6 +706,10 @@ let serverPort = null;
 let serverToken = null;
 let serverNodeKind = null;
 let serverNodeTransport = 'http';
+// R08-T03：远端模式下渲染层必须连真实 host；null 语义 = 127.0.0.1（node/本地路径不变）。
+let serverHost = null;
+// R08-T03：rust 连接形态（诊断/标题用）：'local-owned' | 'local-reused' | 'remote' | null。
+let rustConnectionMode = null;
 let isQuitting = false;  // 区分关窗口（hide）和真正退出（quit）
 let tray = null;
 let reusedServerPid = null; // 复用已有 server 时记录其 PID，用 owner 字段决定是否关闭
@@ -1333,6 +1338,8 @@ function publishRustDesktopConnection(connection) {
   serverToken = connection.token;
   serverNodeKind = 'lingxi-service';
   serverNodeTransport = connection.transport;
+  // 远端连接带真实 hostname；本地 owned/复用不带 host，保持 null = 127.0.0.1 语义。
+  serverHost = connection.host ?? null;
 }
 
 async function startRustServer() {
@@ -1343,6 +1350,26 @@ async function startRustServer() {
   // 不能偷偷再开一个同宅内核，也不能擅自删除另一进程的线索。
   if (fs.existsSync(path.join(lingxiHome, 'server-info.json'))) {
     throw new Error('RUST_DESKTOP_NODE_SERVER_INFO_PRESENT: resolve the existing Node server before starting Rust');
+  }
+  // R08-T03 远端模式：显式 REMOTE_URL 存在时，不解析/启动本地二进制、不读本地
+  // instance pid；身份与令牌校验原样保留，退出路径对远端零接触（结构性：
+  // serverProcess 与 reusedServerPid 均保持 null）。
+  const remote = readRemoteRustConnection();
+  if (remote) {
+    if (app.isPackaged) {
+      throw new Error('Rust remote desktop connection is a dev preview; packaged builds refuse it');
+    }
+    if (remote.transport === 'http' && remote.host !== '127.0.0.1'
+        && remote.host !== '[::1]' && remote.host !== 'localhost') {
+      console.warn('[desktop] Rust remote over cleartext http (drill-only opt-in): token is not encrypted in transit');
+    }
+    await verifyRustDesktopIdentity(remote);
+    publishRustDesktopConnection(remote);
+    rustConnectionMode = 'remote';
+    serverProcess = null;
+    reusedServerPid = null;
+    reusedServerOwned = false;
+    return;
   }
   const binary = resolveRustBinary({
     root: path.join(__dirname, '..'),
@@ -1370,6 +1397,7 @@ async function startRustServer() {
       throw new Error('RUST_DESKTOP_EXISTING_INSTANCE_UNVERIFIED: quit the existing Rust service before starting this installed app');
     }
     publishRustDesktopConnection(existing);
+    rustConnectionMode = 'local-reused';
     reusedServerPid = existing.pid;
     reusedServerOwned = false;
     serverProcess = null;
@@ -1459,6 +1487,7 @@ async function startRustServer() {
     const connection = readOwnedRustConnection({ home: lingxiHome, pid: child.pid, readyAddr, windowsReaderBinary: binary });
     await verifyRustDesktopIdentity(connection);
     publishRustDesktopConnection(connection);
+    rustConnectionMode = 'local-owned';
     child.unref();
   } catch (err) {
     try { child.kill('SIGTERM'); } catch {}
@@ -2292,11 +2321,11 @@ function monitorServer() {
         monitorServer(); // 重新挂监控
         // 通知前端重连
         if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken, serverNodeKind, serverNodeTransport });
+          mainWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken, serverNodeKind, serverNodeTransport, host: serverHost });
         }
         // 设置窗口也需要知道新端口（否则旧端口的 API 全部失败）
         if (settingsWindow && !settingsWindow.isDestroyed()) {
-          settingsWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken, serverNodeKind, serverNodeTransport });
+          settingsWindow.webContents.send("server-restarted", { port: serverPort, token: serverToken, serverNodeKind, serverNodeTransport, host: serverHost });
         }
       } catch (err) {
         console.error("[desktop] Server 重启失败:", err.message);
@@ -2414,6 +2443,9 @@ function buildServerCrashDiagnostics() {
     `better_sqlite3.node exists: ${fs.existsSync(sqlitePath)}`,
     `ELECTRON_RUN_AS_NODE: ${process.env.ELECTRON_RUN_AS_NODE || "unset"}`,
     `Node ABI: ${process.versions.modules || "unknown"}`,
+    // R08-T03：预览语义与连接形态进诊断（node 模式下为既有默认值的显式记录）。
+    `Server runtime: ${serverNodeKind === 'lingxi-service' ? 'rust (preview)' : 'node'}`,
+    `Rust connection mode: ${rustConnectionMode || 'n/a'}`,
   ];
 
   if (_lastServerSpawn) {
@@ -3108,7 +3140,9 @@ function createMainWindow() {
     height: saved?.height || 820,
     minWidth: 420,
     minHeight: 500,
-    title: "Lingxi",
+    // R08-T03：rust 预览模式标题可见（页面加载前的窗口期；加载后由 app-init
+    // 按 serverNodeKind/host 重设 document.title，远端形态在渲染侧区分）。
+    title: rustDesktopEnabled() ? "Lingxi · Rust 预览" : "Lingxi",
     ...titleBarOpts({ x: 16, y: 16 }),
     backgroundColor: getThemeBackgroundColor(initialTheme),
     show: false,
@@ -5616,6 +5650,8 @@ wrapIpcHandler("get-server-connection-info", () => ({
   token: serverToken,
   serverNodeKind,
   serverNodeTransport,
+  // R08-T03：远端模式下渲染层必须连真实 host；null = 127.0.0.1。
+  host: serverHost,
 }));
 wrapIpcHandler("run-edit-command", (event, command) => {
   const allowed = new Set(["cut", "copy", "paste", "selectAll"]);

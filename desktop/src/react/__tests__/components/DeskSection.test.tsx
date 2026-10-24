@@ -7,6 +7,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
 import type { DeskSearchResult } from '../../types';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mocks = vi.hoisted(() => ({
     loadDeskFiles: vi.fn(async () => {}),
@@ -539,7 +540,7 @@ describe('DeskSection workspace watching', () => {
     const rootFile = screen.getByRole('treeitem', { name: /root.md/ });
     fireEvent.dragStart(rootFile);
 
-    expect(window.platform?.startDrag).toHaveBeenCalledWith('/tmp/hana-desk/root.md');
+    expect(getDesktopHost().api?.startDrag).toHaveBeenCalledWith('/tmp/hana-desk/root.md');
     expect(getActiveAppFileDragPayload()).toEqual(expect.objectContaining({
       source: 'workspace',
       files: [{
@@ -601,7 +602,7 @@ describe('DeskSection workspace watching', () => {
     fireEvent.dragStart(screen.getByRole('treeitem', { name: /c.md/ }));
 
     expect(getActiveAppFileDragPayload()?.files.map(file => file.name)).toEqual(['a.md', 'c.md', 'd.md']);
-    expect(window.platform?.startDrag).toHaveBeenCalledWith([
+    expect(getDesktopHost().api?.startDrag).toHaveBeenCalledWith([
       '/tmp/hana-desk/a.md',
       '/tmp/hana-desk/c.md',
       '/tmp/hana-desk/d.md',

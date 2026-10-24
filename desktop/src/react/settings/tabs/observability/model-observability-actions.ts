@@ -17,8 +17,8 @@ import {
   appendConnectionAuth,
   buildConnectionUrl,
   requireServerConnection,
-} from '../../../services/server-connection';
-import { rustObservabilityRoute } from '../../../services/rust-observability';
+} from '../../../services/service-client';
+import { rustObservabilityRoute } from '../../../services/service-client';
 import { normalizeSessionRouteError } from '../../../../../../shared/error-user-messages.ts';
 import type {
   ModelObservabilityAggregateResult,

@@ -8,7 +8,8 @@ import { createLocalServerConnection } from '../../services/server-connection';
 import { readRustChatHistory } from '../../services/rust-chat-history';
 import { loadModels } from '../../utils/ui-helpers';
 import { sessionScopedValue, sessionScopedListIncludes } from '../../stores/session-slice';
-const info = await window.hana.getServerConnectionInfo!();
+import { getDesktopHost } from '../../host/desktop-host';
+const info = await getDesktopHost().api.getServerConnectionInfo!();
 const connection = createLocalServerConnection({ serverPort: info.port, serverToken: info.token, serverNodeKind: 'lingxi-service' })!;
 useStore.setState({activeServerConnection:connection,activeServerConnectionId:connection.connectionId,serverConnections:{[connection.connectionId]:connection},currentSessionId:null,currentSessionPath:null,currentAgentId:'lingxi',welcomeVisible:true,pendingNewSession:false,agents:[]});
 async function select(sessionId:string) {

@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } fr
 import { useStore } from '../stores';
 import { sessionScopedListIncludes, sessionScopedValue } from '../stores/session-slice';
 import { usePanel } from '../hooks/use-panel';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 import { formatSessionDate } from '../utils/format';
 import { renderMarkdown } from '../utils/markdown';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';

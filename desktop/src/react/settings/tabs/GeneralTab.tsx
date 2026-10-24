@@ -19,6 +19,7 @@ import {
   normalizeQuickChatPreferences,
 } from '../../../../../shared/quick-chat-preferences.ts';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 type ChatCompletionNotificationMode = 'never' | 'when_unfocused' | 'when_session_unfocused';
 type BackgroundCompletionNotificationMode = 'never' | 'when_unfocused' | 'always';
@@ -75,7 +76,7 @@ function normalizeNotificationPreferences(value: unknown): NotificationPreferenc
 }
 
 export function GeneralTab() {
-  const hana = window.hana;
+  const hana = usePlatform();
   const settingsConfig = useSettingsStore(s => s.settingsConfig);
   const snapshotQuickChat = useSettingsStore(s => s.settingsSnapshot.data?.preferences?.quickChat);
   const snapshotNotifications = useSettingsStore(s => s.settingsSnapshot.data?.preferences?.notifications);

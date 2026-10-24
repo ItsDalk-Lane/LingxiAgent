@@ -200,11 +200,14 @@ export function createLocalServerConnection({
   serverToken,
   serverNodeKind,
   serverNodeTransport,
+  serverHost,
 }: {
   serverPort: string | number | null | undefined;
   serverToken?: string | null;
   serverNodeKind?: string | null;
   serverNodeTransport?: string | null;
+  /** R08-T03：远端模式下由主进程下发的真实 host；缺省/loopback 保持既有 local 形态。 */
+  serverHost?: string | null;
 }): ServerConnection | null {
   const port = normalizePort(serverPort);
   if (!port) return null;
@@ -216,6 +219,38 @@ export function createLocalServerConnection({
   }
   const transport = serverNodeTransport || 'http';
   const wsTransport = transport === 'https' ? 'wss' : 'ws';
+
+  // R08-T03：远端 host 走手动连接形态（对齐 normalizeBrowser* 助手），
+  // 非 loopback 绝不再产出 local/loopback_token 语义。
+  if (serverHost && !isLoopbackHost(serverHost)) {
+    if (serverNodeKind !== 'lingxi-service') {
+      throw new Error('remote server host is only valid for the lingxi-service preview');
+    }
+    // 括号包裹的 IPv6 字面量是合法 host；其余含冒号形态视为端口/用户信息注入。
+    const bracketedIpv6 = /^\[[0-9a-fA-F:.]+\]$/.test(serverHost);
+    if (!bracketedIpv6 && (serverHost.includes(':') || serverHost.includes('@') || serverHost.includes('/'))) {
+      throw new Error(`invalid remote server host: ${serverHost}`);
+    }
+    const kind = normalizeBrowserConnectionKind(undefined, serverHost);
+    return {
+      connectionId: LOCAL_CONNECTION_ID,
+      kind,
+      serverId: `remote:${serverHost}`,
+      studioId: 'local',
+      label: `Rust 预览（远端）@${serverHost}`,
+      serverNodeKind,
+      serverNodeTransport: transport,
+      baseUrl: `${transport}://${serverHost}:${port}`,
+      wsUrl: `${wsTransport}://${serverHost}:${port}`,
+      token: normalizeToken(serverToken),
+      authState: 'paired',
+      trustState: normalizeBrowserTrustState(undefined, kind),
+      credentialKind: normalizeBrowserCredentialKind(undefined, kind),
+      platformAccountId: null,
+      officialServiceKind: null,
+      capabilities: [...LOCAL_CAPABILITIES],
+    };
+  }
 
   return {
     connectionId: LOCAL_CONNECTION_ID,

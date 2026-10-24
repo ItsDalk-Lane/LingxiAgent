@@ -13,11 +13,12 @@ import {
   persistServerConnectionSelection,
   upsertServerConnection,
   writePersistedServerConnectionState,
-} from '../../services/server-connection';
+} from '../../services/service-client';
 import { Toggle } from '@/ui';
 import { SettingsSection } from '../components/SettingsSection';
 import { SettingsRow } from '../components/SettingsRow';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 type AccessMode = 'loopback' | 'lan';
 
@@ -362,7 +363,7 @@ export function AccessTab() {
       });
       setRemoteServerKey('');
       showToast(t('settings.access.remoteServerConnected'), 'success');
-      window.hana?.reloadMainWindow?.();
+      usePlatform()?.reloadMainWindow?.();
     } catch (err: any) {
       showToast(`${t('settings.access.remoteServerFailed')}: ${err.message}`, 'error');
     } finally {
@@ -386,7 +387,7 @@ export function AccessTab() {
       activeServerConnectionId: null,
     });
     showToast(t('settings.access.returnedToLocal'), 'success');
-    window.hana?.reloadMainWindow?.();
+    usePlatform()?.reloadMainWindow?.();
   }, [showToast]);
 
   const saveAccount = useCallback(async () => {

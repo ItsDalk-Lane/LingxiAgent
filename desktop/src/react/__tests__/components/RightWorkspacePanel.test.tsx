@@ -13,6 +13,7 @@ import { openFilePreview } from '../../utils/file-preview';
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
 import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mockOpenFilePreview = vi.hoisted(() => vi.fn(async () => undefined));
 
@@ -384,10 +385,10 @@ describe('RightWorkspacePanel', () => {
     });
 
     fireEvent.click(screen.getByRole('button', { name: '打开 report.pdf' }));
-    expect(window.platform?.openFile).toHaveBeenCalledWith('/tmp/session-files/report.pdf');
+    expect(getDesktopHost().api?.openFile).toHaveBeenCalledWith('/tmp/session-files/report.pdf');
 
     fireEvent.click(screen.getByRole('button', { name: '定位 report.pdf' }));
-    expect(window.platform?.showInFinder).toHaveBeenCalledWith('/tmp/session-files/report.pdf');
+    expect(getDesktopHost().api?.showInFinder).toHaveBeenCalledWith('/tmp/session-files/report.pdf');
 
     fireEvent.click(screen.getByRole('button', { name: '复制路径 report.pdf' }));
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('/tmp/session-files/report.pdf');
@@ -753,7 +754,7 @@ describe('RightWorkspacePanel', () => {
     fireEvent.click(rows[1], { metaKey: true });
     fireEvent.dragStart(rows[1]);
 
-    expect(window.platform?.startDrag).toHaveBeenCalledWith(['/tmp/session-files/alpha.png', '/tmp/session-files/beta.pdf']);
+    expect(getDesktopHost().api?.startDrag).toHaveBeenCalledWith(['/tmp/session-files/alpha.png', '/tmp/session-files/beta.pdf']);
   });
 
   it('opens a right-click menu for session files without exposing paste/add actions', () => {

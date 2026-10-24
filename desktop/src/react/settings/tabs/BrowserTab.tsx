@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSettingsStore } from '../store';
 import { lingxiFetch } from '../api';
 import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from '../connection-owner';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { t } from '../helpers';
 import { updateSettingsSnapshot } from '../actions';
 import { SettingsSection } from '../components/SettingsSection';

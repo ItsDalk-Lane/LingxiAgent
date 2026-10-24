@@ -12,6 +12,7 @@ import { NumberInput } from '../components/NumberInput';
 import { readConfigBoolean } from '../resource-state';
 import styles from '../Settings.module.css';
 import { DEFAULT_HEARTBEAT_INTERVAL_MINUTES } from '../../../../../shared/default-workspace-constants.ts';
+import { usePlatform } from '../../hooks/use-platform';
 
 type AgentDeskConfig = {
   home_folder: string;
@@ -200,7 +201,7 @@ export function WorkTab() {
     const agentId = selectedAgentIdRef.current;
     if (!agentId) return;
     const previous = agentDesk;
-    const folder = await window.platform?.selectFolder?.();
+    const folder = await usePlatform()?.selectFolder?.();
     if (!folder) return;
     if (selectedAgentIdRef.current === agentId) {
       setAgentDesk({ ...agentDesk, home_folder: folder });

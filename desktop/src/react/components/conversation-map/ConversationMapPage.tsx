@@ -9,7 +9,7 @@
 
 import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { captureSessionConnection, ownsSessionConnection, subscribeSessionConnection, sessionConnectionRevision } from '../../services/session-connection-owner';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { useStore } from '../../stores';
 import { useI18n } from '../../hooks/use-i18n';
 import { switchSession } from '../../stores/session-actions';

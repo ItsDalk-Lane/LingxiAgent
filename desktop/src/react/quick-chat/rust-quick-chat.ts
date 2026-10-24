@@ -1,5 +1,5 @@
 /** 快捷窗复用正式聊天连接/发送器，只适配已有服务入口。 */
-import type { ServerConnection } from '../services/server-connection';
+import type { ServerConnection } from '../services/service-client';
 import { useStore } from '../stores';
 import { defaultComposerSendFlowDeps, sendWithLease, tryAcquireSendLease } from '../services/composer-send-coordinator';
 import type { AttachedFile } from '../stores/input-slice';

@@ -10,9 +10,10 @@ import {
   appendConnectionAuth,
   buildConnectionUrl,
   createLocalServerConnection,
-} from '../services/server-connection';
+} from '../services/service-client';
 import { userFallbackAvatar, yuanFallbackAvatar } from './agent-helpers';
 import { isMarkdownFileName } from './file-kind';
+import { usePlatform } from '../hooks/use-platform';
 
 function getErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
@@ -199,7 +200,7 @@ export async function takeScreenshot(targetMessageId: string, sessionPath: strin
   const theme = buildThemeName(color, width);
 
   const t = window.t ?? ((p: string) => p);
-  const hana = (window as any).hana;
+  const hana = usePlatform() as any;
   if (!hana?.screenshotRender) {
     dispatchInlineNotice(t('common.screenshotFailed'), 'error');
     return;
@@ -255,7 +256,7 @@ export async function takeArticleScreenshot(markdown: string, options: ArticleSc
   const theme = buildThemeName(color, width);
 
   const t = window.t ?? ((p: string) => p);
-  const hana = (window as any).hana;
+  const hana = usePlatform() as any;
   if (!hana?.screenshotRender) {
     dispatchInlineNotice(t('common.screenshotFailed'), 'error');
     return;
@@ -300,12 +301,12 @@ async function readMarkdownFileForScreenshot(filePath: string, fileName?: string
     throw new Error('not a Markdown file');
   }
 
-  const snapshot = await window.platform?.readFileSnapshot?.(filePath);
+  const snapshot = await usePlatform()?.readFileSnapshot?.(filePath);
   if (snapshot && typeof snapshot.content === 'string') {
     return snapshot.content;
   }
 
-  const content = await window.platform?.readFile?.(filePath);
+  const content = await usePlatform()?.readFile?.(filePath);
   if (typeof content === 'string') {
     return content;
   }
@@ -336,7 +337,7 @@ export async function takeMarkdownFileScreenshot(
 // ── 辅助：fetch 图片转 data URL ──
 
 async function fetchImageAsDataUrl(filePath: string): Promise<string> {
-  const url = window.platform?.getFileUrl?.(filePath) ?? '';
+  const url = usePlatform()?.getFileUrl?.(filePath) ?? '';
   return fetchUrlAsDataUrl(url);
 }
 
@@ -377,9 +378,16 @@ async function resolveAssistantFallbackAvatar(state: StoreSnapshot): Promise<str
 }
 
 async function fetchAvatarAsDataUrl(role: string, agentId: string | null): Promise<string | null> {
-  const port = await (window as any).hana?.getServerPort?.();
-  const token = await (window as any).hana?.getServerToken?.();
-  const connection = createLocalServerConnection({ serverPort: port, serverToken: token });
+  // R08-T03：远端 rust 预览下必须用真实 host；缺 connection-info 时回退 loopback 语义。
+  const platform = usePlatform();
+  const info = platform.getServerConnectionInfo
+    ? await platform.getServerConnectionInfo()
+    : { port: await platform.getServerPort(), token: await platform.getServerToken(), serverNodeKind: null, serverNodeTransport: 'http', host: null };
+  const connection = createLocalServerConnection({
+    serverPort: info.port, serverToken: info.token,
+    serverNodeKind: info.serverNodeKind, serverNodeTransport: info.serverNodeTransport,
+    serverHost: info.host ?? null,
+  });
   if (!connection || !connection.token) return null;
 
   const path = role === 'user'

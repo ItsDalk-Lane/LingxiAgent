@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../stores';
+import { getDesktopHost } from '../../host/desktop-host';
 
 // vi.hoisted: the mock factory below is hoisted above this file's imports, and
 // importing the store now reaches use-hana-fetch during that hoisted phase.
@@ -825,7 +826,7 @@ describe('desk-actions workspace roots', () => {
         fileVersion: { mtimeMs: 1, size: 10, sha256: 'hash' },
       }),
     ]);
-    expect(window.platform?.readFileSnapshot).toHaveBeenCalledWith('/workspace/src/react/App.tsx');
+    expect(getDesktopHost().api?.readFileSnapshot).toHaveBeenCalledWith('/workspace/src/react/App.tsx');
   });
 
   it('hydrates persisted preview metadata needed by PDF and HTML renderers', async () => {
@@ -865,7 +866,7 @@ describe('desk-actions workspace roots', () => {
 
     const items = await hydratePersistedPreviewItems('/workspace', persisted);
 
-    expect(window.platform?.getFileUrl).toHaveBeenCalledWith('/workspace/docs/report.pdf');
+    expect(getDesktopHost().api?.getFileUrl).toHaveBeenCalledWith('/workspace/docs/report.pdf');
     expect(items).toEqual([
       expect.objectContaining({
         id: 'file-docs/report.pdf',

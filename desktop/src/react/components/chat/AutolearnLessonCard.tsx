@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import { ChatResourceCard } from './ChatResourceCard';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useStore } from '../../stores';
 import styles from './Chat.module.css';
 

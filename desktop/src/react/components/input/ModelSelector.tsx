@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import { chatFetch as lingxiFetch } from '../../services/chat-client';
+import { chatFetch as lingxiFetch } from '../../services/service-client';
 import { useI18n } from '../../hooks/use-i18n';
 import type { Model } from '../../types';
 import type { SessionModel } from '../../stores/chat-types';
 import { SelectWidget, ProviderIcon, ProviderGroupHeader, selectWidgetStyles, type SelectOption } from '@/ui';
 import { settleModelSwitchResidue } from '../../services/model-switch-settlement';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { captureSessionConnection, ownsSessionConnection, sessionSelectionRevision, subscribeSessionConnection } from '../../services/session-connection-owner';
 import styles from './InputArea.module.css';
 

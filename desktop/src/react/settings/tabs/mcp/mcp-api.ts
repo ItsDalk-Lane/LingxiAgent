@@ -1,7 +1,7 @@
 import { lingxiFetch } from '../../api';
 import { useSettingsStore } from '../../store';
 import { captureSettingsConnection, ownsSettingsConnection } from '../../connection-owner';
-import { resolveServerConnection } from '../../../services/server-connection';
+import { resolveServerConnection } from '../../../services/service-client';
 import type { McpSettingsAction, McpSettingsRequest, McpSettingsResult, McpSettingsState, McpConnectorBulkResult, McpOAuthStartResponse, McpOAuthPollResponse, McpOAuthCancelResponse, McpOAuthLogoutResponse } from '../../../../../../contracts/generated/ts/lingxi-protocol';
 import type { McpBulkResult, McpConnectorInput, McpState, McpToolPermission } from './types';
 

@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installWindowTestT } from '../helpers/i18n-test-strings';
 import { useStore } from '../../stores';
 import { SkillsPanel } from '../../components/SkillsPanel';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 const fetchMock = vi.fn();
 vi.mock('../../hooks/use-hana-fetch', () => ({
@@ -47,7 +48,7 @@ describe('SkillsPanel', () => {
 
   afterEach(() => {
     cleanup();
-    delete (window as unknown as { platform?: unknown }).platform;
+    resetDesktopHostForTests();
   });
 
   it('installs dropped skills for the selected agent, returns to all skills, and highlights the installed row', async () => {

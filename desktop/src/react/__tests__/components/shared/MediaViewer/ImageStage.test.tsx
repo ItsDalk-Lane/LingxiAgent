@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, fireEvent, waitFor } from '@testing-library/react';
 import { ImageStage } from '../../../../components/shared/MediaViewer/ImageStage';
 import type { FileRef } from '../../../../types/file-ref';
+import { getDesktopHost, resetDesktopHostForTests } from '../../../../host/desktop-host';
 
 describe('ImageStage', () => {
   // 注意：prop 名必须是 `file` 不是 `ref`。React 会把 `ref` 当 forwardRef ref 截获，
@@ -17,7 +18,7 @@ describe('ImageStage', () => {
       getFileUrl: vi.fn((p: string) => `file:///MOCK${p}`),
     };
   });
-  afterEach(() => { cleanup(); delete (window as any).platform; });
+  afterEach(() => { cleanup(); resetDesktopHostForTests(); });
 
   it('渲染 img 并异步加载 src（走 getFileUrl 的 file:// URL）', async () => {
     const { container } = render(<ImageStage file={file} viewport={{ width: 800, height: 600 }} />);
@@ -26,7 +27,7 @@ describe('ImageStage', () => {
       expect(img).toBeTruthy();
       expect(img!.getAttribute('src')).toBe('file:///MOCK/a.png');
     });
-    expect((window as any).platform.getFileUrl).toHaveBeenCalledWith('/a.png');
+    expect((getDesktopHost().api as any).getFileUrl).toHaveBeenCalledWith('/a.png');
   });
 
   it('普通滚轮和触控板 ctrl+wheel 都触发图片缩放', async () => {
@@ -102,7 +103,7 @@ describe('ImageStage', () => {
   });
 
   it('loading 状态下显示 spinner（platform 缺失使 loadMediaSource 抛错 → src 保持 null）', () => {
-    delete (window as any).platform;
+    resetDesktopHostForTests();
     const { getByTestId } = render(<ImageStage file={file} viewport={{ width: 800, height: 600 }} />);
     expect(getByTestId('image-stage-spinner')).toBeTruthy();
   });
@@ -119,9 +120,9 @@ describe('ImageStage', () => {
     );
     await waitFor(() => {
       // 当前图 + 前 + 后 三次调用
-      expect((window as any).platform.getFileUrl).toHaveBeenCalledWith('/a.png');
-      expect((window as any).platform.getFileUrl).toHaveBeenCalledWith('/prev.png');
-      expect((window as any).platform.getFileUrl).toHaveBeenCalledWith('/next.png');
+      expect((getDesktopHost().api as any).getFileUrl).toHaveBeenCalledWith('/a.png');
+      expect((getDesktopHost().api as any).getFileUrl).toHaveBeenCalledWith('/prev.png');
+      expect((getDesktopHost().api as any).getFileUrl).toHaveBeenCalledWith('/next.png');
     });
   });
 });

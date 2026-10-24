@@ -21,6 +21,7 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { resetDesktopHostForTests } from '../../../host/desktop-host';
 
 // ─── Mocks (hoisted) ──────────────────────────────────────────────────────────
 
@@ -219,7 +220,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   delete (window as unknown as { i18n?: unknown }).i18n;
-  delete (window as unknown as { platform?: unknown }).platform;
+  resetDesktopHostForTests();
 });
 
 describe('SkillsTab — sticky skillsViewAgentId & toggleSkill race guard', () => {

@@ -7,7 +7,7 @@
 
 import { memo, useState, useCallback, useMemo } from 'react';
 import styles from './Chat.module.css';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useI18n } from '../../hooks/use-i18n';
 import registry from '../../../shared/theme-registry';
 

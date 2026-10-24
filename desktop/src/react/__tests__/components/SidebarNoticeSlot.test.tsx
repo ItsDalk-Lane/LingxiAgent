@@ -27,6 +27,7 @@ vi.mock('../../hooks/use-auto-update-state', () => ({
 }));
 
 import { SidebarNoticeSlot, SidebarUpdateNoticeCard } from '../../components/notices/SidebarNoticeSlot';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const labels: Record<string, string> = {
   'settings.about.trainStickerTitle': '有新版本可用',
@@ -546,7 +547,7 @@ describe('SidebarNoticeSlot (wired to the real hook)', () => {
     installHana({});
 
     const { container } = render(<SidebarNoticeSlot />);
-    await waitFor(() => expect(window.hana?.trainUpdateStatus).toHaveBeenCalled());
+    await waitFor(() => expect(getDesktopHost().api?.trainUpdateStatus).toHaveBeenCalled());
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -562,7 +563,7 @@ describe('SidebarNoticeSlot (wired to the real hook)', () => {
   it('applying the update calls trainUpdateApply via the hook', async () => {
     const trainUpdateApply = vi.fn().mockResolvedValue({ ok: true });
     installHana({ available: { train: 9, version: '0.400.0', serverSha256: 'a'.repeat(64), rendererSha256: 'b'.repeat(64), sizes: { server: 1, renderer: 1 }, recordedAt: '2026-07-11T00:00:00.000Z' } });
-    (window.hana as unknown as { trainUpdateApply: typeof trainUpdateApply }).trainUpdateApply = trainUpdateApply;
+    (getDesktopHost().api as unknown as { trainUpdateApply: typeof trainUpdateApply }).trainUpdateApply = trainUpdateApply;
 
     render(<SidebarNoticeSlot />);
     const card = await screen.findByText('有新版本可用');
@@ -574,7 +575,7 @@ describe('SidebarNoticeSlot (wired to the real hook)', () => {
   it('shows the blocked form and wires it to autoUpdateInstall when minShellBlocked is true', async () => {
     const autoUpdateInstall = vi.fn();
     installHana({ minShellBlocked: true });
-    (window.hana as unknown as { autoUpdateInstall: typeof autoUpdateInstall }).autoUpdateInstall = autoUpdateInstall;
+    (getDesktopHost().api as unknown as { autoUpdateInstall: typeof autoUpdateInstall }).autoUpdateInstall = autoUpdateInstall;
 
     render(<SidebarNoticeSlot />);
     const card = await screen.findByText('完成此更新后才能继续接收新版本');
@@ -587,13 +588,13 @@ describe('SidebarNoticeSlot (wired to the real hook)', () => {
     type AvailablePayload = { version: string; minShellBlocked: boolean };
     const box: { deliver: ((payload: AvailablePayload) => void) | null } = { deliver: null };
     installHana({});
-    (window.hana as unknown as { onTrainUpdateAvailable: (cb: (p: AvailablePayload) => void) => () => void }).onTrainUpdateAvailable = (cb) => {
+    (getDesktopHost().api as unknown as { onTrainUpdateAvailable: (cb: (p: AvailablePayload) => void) => () => void }).onTrainUpdateAvailable = (cb) => {
       box.deliver = cb;
       return () => { box.deliver = null; };
     };
 
     render(<SidebarNoticeSlot />);
-    await waitFor(() => expect(window.hana?.trainUpdateStatus).toHaveBeenCalled());
+    await waitFor(() => expect(getDesktopHost().api?.trainUpdateStatus).toHaveBeenCalled());
     expect(screen.queryByText('有新版本可用')).not.toBeInTheDocument();
     await waitFor(() => expect(box.deliver).not.toBeNull());
 
@@ -618,7 +619,7 @@ describe('SidebarNoticeSlot (wired to the real hook)', () => {
   it('acknowledging the fallback card via the real hook calls ackTrainFallbackNotice and the card disappears', async () => {
     const ackTrainFallbackNotice = vi.fn().mockResolvedValue({ ok: true });
     installHana({ fallbackNotice: { kind: 'renderer', fromVersion: '0.390.0', toVersion: '0.389.0', quarantinedTrain: null } });
-    (window.hana as unknown as { ackTrainFallbackNotice: typeof ackTrainFallbackNotice }).ackTrainFallbackNotice = ackTrainFallbackNotice;
+    (getDesktopHost().api as unknown as { ackTrainFallbackNotice: typeof ackTrainFallbackNotice }).ackTrainFallbackNotice = ackTrainFallbackNotice;
 
     const { container } = render(<SidebarNoticeSlot />);
     const ackButton = await screen.findByRole('button', { name: '知道了' });
@@ -632,13 +633,13 @@ describe('SidebarNoticeSlot (wired to the real hook)', () => {
     type FallbackPayload = { kind: 'server' | 'renderer'; fromVersion: string | null; toVersion: string | null; quarantinedTrain: number | null };
     const box: { deliver: ((payload: FallbackPayload) => void) | null } = { deliver: null };
     installHana({});
-    (window.hana as unknown as { onTrainFallbackNotice: (cb: (p: FallbackPayload) => void) => () => void }).onTrainFallbackNotice = (cb) => {
+    (getDesktopHost().api as unknown as { onTrainFallbackNotice: (cb: (p: FallbackPayload) => void) => () => void }).onTrainFallbackNotice = (cb) => {
       box.deliver = cb;
       return () => { box.deliver = null; };
     };
 
     render(<SidebarNoticeSlot />);
-    await waitFor(() => expect(window.hana?.trainUpdateStatus).toHaveBeenCalled());
+    await waitFor(() => expect(getDesktopHost().api?.trainUpdateStatus).toHaveBeenCalled());
     expect(screen.queryByText(/连续启动失败/)).not.toBeInTheDocument();
     await waitFor(() => expect(box.deliver).not.toBeNull());
 

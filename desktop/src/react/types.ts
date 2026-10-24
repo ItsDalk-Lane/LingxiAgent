@@ -549,7 +549,7 @@ export interface PlatformApi {
   cardFrameNavigationGuard?: boolean;
   getServerPort(): Promise<string>;
   getServerToken(): Promise<string>;
-  getServerConnectionInfo?(): Promise<{ port: number | null; token: string | null; serverNodeKind: string | null; serverNodeTransport: string }>;
+  getServerConnectionInfo?(): Promise<{ port: number | null; token: string | null; serverNodeKind: string | null; serverNodeTransport: string; host?: string | null }>;
   runEditCommand?(command: 'cut' | 'copy' | 'paste' | 'selectAll'): Promise<boolean>;
   openSettings(tab?: string): void;
   openBrowserViewer(target?: string | BrowserViewerOpenTarget): void | Promise<unknown>;

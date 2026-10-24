@@ -7,7 +7,7 @@ import {
   dispatchCoverNotice,
   requestMarkdownCoverGeneration,
 } from '../../utils/markdown-cover-generation';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useI18n } from '../../hooks/use-i18n';
 import { useStore } from '../../stores';
 import { Tooltip } from '../../ui';
@@ -24,6 +24,7 @@ import type {
   MarkdownCoverTargetInput,
   WorkbenchMarkdownCoverTarget,
 } from '../../utils/markdown-cover-generation';
+import { usePlatform } from '../../hooks/use-platform';
 
 interface Props {
   content: string;
@@ -306,8 +307,8 @@ export function FloatingActions({
   const handleUploadCover = useCallback(async () => {
     if (!coverTarget || contentType !== 'markdown') return;
     setCoverMenuOpen(false);
-    if (typeof window.platform?.selectFiles === 'function') {
-      const paths = await window.platform.selectFiles();
+    if (typeof usePlatform()?.selectFiles === 'function') {
+      const paths = await usePlatform().selectFiles();
       const imageFilePath = paths?.[0];
       if (!imageFilePath) return;
       const kind = inferKindByExt(extOfName(imageFilePath));
@@ -319,7 +320,7 @@ export function FloatingActions({
         await applySelectedCoverImage({ imageFilePath });
         return;
       }
-      const contentBase64 = await window.platform.readFileBase64?.(imageFilePath);
+      const contentBase64 = await usePlatform().readFileBase64?.(imageFilePath);
       if (!contentBase64) {
         dispatchCoverNotice(coverNotice('cover.notice.readImageFailed'), 'error');
         return;
@@ -408,7 +409,7 @@ export function FloatingActions({
   const agentGenerateStatus = coverStatus?.agentGenerate ?? {};
   const agentGenerateEnabled = Boolean(agentGenerateStatus.enabled ?? coverStatus?.enabled);
   const agentGenerateDisabledText = getAgentGenerateDisabledText(agentGenerateStatus);
-  const canSelectCoverFile = typeof window.platform?.selectFiles === 'function'
+  const canSelectCoverFile = typeof usePlatform()?.selectFiles === 'function'
     || typeof window.FileReader === 'function';
 
   const handleCoverGalleryImageError = useCallback((itemId: string) => {

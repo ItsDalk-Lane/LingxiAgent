@@ -8,9 +8,10 @@ import { type MouseEvent, useState } from 'react';
 import { Collapse } from '@/ui';
 import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import styles from './SessionStatusCard.module.css';
 import { workspaceDisplayName } from '../../../../../shared/workspace-history.ts';
+import { usePlatform } from '../../hooks/use-platform';
 
 const EMPTY_AUTHORIZED_FOLDERS: string[] = [];
 
@@ -70,14 +71,14 @@ export function SessionStatusCard() {
     : authorizedFolders.length === 1
       ? workspaceDisplayName(authorizedFolders[0], authorizedFolders[0])
       : `${workspaceDisplayName(authorizedFolders[0], authorizedFolders[0])} +${authorizedFolders.length - 1}`;
-  const canSelectAuthorizedFolder = typeof window.platform?.selectFolder === 'function';
+  const canSelectAuthorizedFolder = typeof usePlatform()?.selectFolder === 'function';
 
   async function handleAddAuthorizedFolder(event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     if (addingFolder) return;
     const currentSessionPath = sessionPath;
     if (!currentSessionPath) return;
-    const folder = await window.platform?.selectFolder?.();
+    const folder = await usePlatform()?.selectFolder?.();
     if (!folder) return;
     setAddingFolder(true);
     try {

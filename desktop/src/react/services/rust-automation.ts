@@ -15,6 +15,7 @@ import {
   resolveServerConnection,
   type ServerConnection,
 } from './server-connection';
+import { usePlatform } from '../hooks/use-platform';
 
 const NOTIFICATIONS_PATH = '/lingxi/v1/automation/notifications';
 const POLL_INTERVAL_MS = 5_000;
@@ -98,8 +99,8 @@ export function startRustAutomationNotifications(
   overrides: Partial<NotificationDependencies> = {},
 ): () => void {
   const show = overrides.showNotification
-    ?? (typeof window !== 'undefined' && window.hana?.showNotification
-      ? (title: string, body: string, agentId: string | null, options: DesktopNotificationOptions) => window.hana!.showNotification!(title, body, agentId, options)
+    ?? (typeof window !== 'undefined' && usePlatform()?.showNotification
+      ? (title: string, body: string, agentId: string | null, options: DesktopNotificationOptions) => usePlatform()!.showNotification!(title, body, agentId, options)
       : null);
   const notificationsAllowed = canDeliverRustAutomationNotifications(source) && !!show;
   if (source.serverNodeKind !== 'lingxi-service' || (!notificationsAllowed && !overrides.deliverEvent)) return () => {};

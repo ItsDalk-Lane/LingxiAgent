@@ -6,13 +6,14 @@ import { openInternalLink, resolveLinkTarget } from '../../utils/link-open';
 import { currentRustBrowserConnection, openRustBrowserViewer } from '../../services/rust-browser';
 import { showError } from '../../utils/ui-helpers';
 import { useStore } from '../../stores';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 vi.mock('../../services/rust-browser', () => ({ currentRustBrowserConnection: vi.fn(() => null), openRustBrowserViewer: vi.fn() }));
 vi.mock('../../utils/ui-helpers', () => ({ showError: vi.fn() }));
 
 afterEach(() => {
   document.documentElement.removeAttribute('data-platform');
-  delete (window as Partial<Window>).platform;
+  resetDesktopHostForTests();
   vi.mocked(currentRustBrowserConnection).mockReset().mockReturnValue(null);
   vi.mocked(openRustBrowserViewer).mockReset();
   vi.mocked(showError).mockReset();

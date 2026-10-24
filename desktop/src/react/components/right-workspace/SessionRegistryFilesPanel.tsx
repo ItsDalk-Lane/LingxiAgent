@@ -11,9 +11,9 @@ import {
   canUseFileRefNativePath,
   resolveFileRefNativePath,
 } from '../../services/resource-access';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { FileKindIcon } from '../shared/FileKindIcon';
 import {
   clearAppFileDragPayload,
@@ -22,6 +22,7 @@ import {
 import styles from './RightWorkspacePanel.module.css';
 import { bridgeConnectionKey, bridgeSessions, readBridgeResponse } from '../../services/bridge-response';
 import { bridgeMediaRequestId, bridgeMediaOutcome, finishBridgeMediaAction } from '../../services/bridge-media-action';
+import { usePlatform } from '../../hooks/use-platform';
 
 const EMPTY_FILES: readonly FileRef[] = Object.freeze([]);
 const SESSION_FILE_SORT_KEY = 'hana-session-file-sort';
@@ -214,13 +215,13 @@ function previewFile(file: FileRef, sessionPath: string | null): void {
 function openFile(file: FileRef): void {
   const nativePath = nativePathForFile(file, { requireAvailable: true });
   if (!nativePath) return;
-  window.platform?.openFile?.(nativePath);
+  usePlatform()?.openFile?.(nativePath);
 }
 
 function revealFile(file: FileRef): void {
   const nativePath = nativePathForFile(file, { requireAvailable: true });
   if (!nativePath) return;
-  window.platform?.showInFinder?.(nativePath);
+  usePlatform()?.showInFinder?.(nativePath);
 }
 
 function SortIcon() {
@@ -744,7 +745,7 @@ export function SessionRegistryFilesPanel() {
       .filter((path): path is string => !!path);
     if (paths.length > 0) {
       event.preventDefault();
-      window.platform?.startDrag?.(paths.length === 1 ? paths[0] : paths);
+      usePlatform()?.startDrag?.(paths.length === 1 ? paths[0] : paths);
     }
   }, [filesForAction]);
 

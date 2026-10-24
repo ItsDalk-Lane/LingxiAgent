@@ -3,6 +3,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PlatformApi, PreviewItem } from '../../types';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mockState: { previewItems: PreviewItem[]; openTabs: string[] } = { previewItems: [], openTabs: [] };
 const mockUpsertPreviewItem = vi.fn();
@@ -59,8 +60,8 @@ describe('refreshPreviewItemsFromFile', () => {
     __resetPreviewFileRefreshStateForTests();
     await refreshPreviewItemsFromFile('/tmp/report.docx');
 
-    expect(window.platform?.readDocxHtml).toHaveBeenCalledWith('/tmp/report.docx');
-    expect(window.platform?.readFileSnapshot).not.toHaveBeenCalled();
+    expect(getDesktopHost().api?.readDocxHtml).toHaveBeenCalledWith('/tmp/report.docx');
+    expect(getDesktopHost().api?.readFileSnapshot).not.toHaveBeenCalled();
     expect(mockUpsertPreviewItem).toHaveBeenCalledTimes(1);
     expect(mockUpsertPreviewItem).toHaveBeenCalledWith({
       ...mockState.previewItems[0],
@@ -86,8 +87,8 @@ describe('refreshPreviewItemsFromFile', () => {
     __resetPreviewFileRefreshStateForTests();
     await refreshPreviewItemsFromFile('/tmp/report.pdf');
 
-    expect(window.platform?.getFileUrl).toHaveBeenCalledWith('/tmp/report.pdf');
-    expect(window.platform?.readFileBase64).not.toHaveBeenCalled();
+    expect(getDesktopHost().api?.getFileUrl).toHaveBeenCalledWith('/tmp/report.pdf');
+    expect(getDesktopHost().api?.readFileBase64).not.toHaveBeenCalled();
     expect(mockUpsertPreviewItem).toHaveBeenCalledWith({
       ...mockState.previewItems[0],
       content: '',
@@ -114,7 +115,7 @@ describe('refreshPreviewItemsFromFile', () => {
     const oldRead = new Promise<{ content: string; version: typeof oldVersion }>((resolve) => {
       resolveOld = resolve;
     });
-    vi.mocked(window.platform!.readFileSnapshot!)
+    vi.mocked(getDesktopHost().api.readFileSnapshot!)
       .mockReturnValueOnce(oldRead)
       .mockResolvedValueOnce({
         content: 'new content',
@@ -159,7 +160,7 @@ describe('refreshPreviewItemsFromFile', () => {
       fileVersion: oldVersion,
     }];
 
-    vi.mocked(window.platform!.readFileSnapshot!)
+    vi.mocked(getDesktopHost().api.readFileSnapshot!)
       .mockResolvedValueOnce({
         content: 'old content',
         version: oldVersion,
@@ -180,7 +181,7 @@ describe('refreshPreviewItemsFromFile', () => {
       retryDelaysMs: [0],
     });
 
-    expect(window.platform?.readFileSnapshot).toHaveBeenCalledTimes(2);
+    expect(getDesktopHost().api?.readFileSnapshot).toHaveBeenCalledTimes(2);
     expect(mockUpsertPreviewItem).toHaveBeenCalledTimes(1);
     expect(mockUpsertPreviewItem).toHaveBeenCalledWith({
       ...mockState.previewItems[0],
@@ -201,13 +202,13 @@ describe('refreshPreviewItemsFromFile', () => {
       filePath: '/tmp/missing.md',
       ext: 'md',
     }];
-    vi.mocked(window.platform!.readFileSnapshot!)
+    vi.mocked(getDesktopHost().api.readFileSnapshot!)
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({
         content: 'fresh',
         version: newVersion,
       });
-    vi.mocked(window.platform!.readFile!).mockResolvedValueOnce(null);
+    vi.mocked(getDesktopHost().api.readFile!).mockResolvedValueOnce(null);
     const noticeSpy = vi.fn();
     window.addEventListener('hana-inline-notice', noticeSpy);
 
@@ -243,8 +244,8 @@ describe('refreshPreviewItemsFromFile', () => {
       filePath: '/tmp/missing.md',
       ext: 'md',
     }];
-    vi.mocked(window.platform!.readFileSnapshot!).mockResolvedValueOnce(null);
-    vi.mocked(window.platform!.readFile!).mockResolvedValueOnce(null);
+    vi.mocked(getDesktopHost().api.readFileSnapshot!).mockResolvedValueOnce(null);
+    vi.mocked(getDesktopHost().api.readFile!).mockResolvedValueOnce(null);
     window.t = ((key: string) => key) as typeof window.t;
     const noticeSpy = vi.fn();
     window.addEventListener('hana-inline-notice', noticeSpy);

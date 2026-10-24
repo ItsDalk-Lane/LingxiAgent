@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RustBrowserAction, RustBrowserViewerContext, RustBrowserWorkspace } from '../types';
-import { parseRustBrowserWorkspaces, rustBrowserRequest } from '../services/rust-browser';
+import { parseRustBrowserWorkspaces, rustBrowserRequest } from '../services/service-client';
+import { usePlatform } from '../hooks/use-platform';
 
 function tr(key: string, fallback: string): string { const value = window.t?.(key); return value && value !== key ? value : fallback; }
 /** 这里展示实际服务状态；真正网页仍在该服务控制的同一 Chromium 窗口中。 */
@@ -72,6 +73,6 @@ export function RustBrowserViewer({ context }: { context: RustBrowserViewerConte
         <button disabled={busy} onClick={() => void command('close_tab', tab.tabId)} aria-label={`${tr('browser.closeTab', '关闭标签页')} ${tab.title}`}>×</button>
       </li>)}</ul>
     </> : !error && <p role="status">{tr('browser.workspaceUnavailable', '此聊天没有可用的浏览器状态')}</p>}
-    <button onClick={() => window.hana?.closeBrowserViewer?.()}>{tr('browser.closeBtn', '关闭')}</button>
+    <button onClick={() => usePlatform()?.closeBrowserViewer?.()}>{tr('browser.closeBtn', '关闭')}</button>
   </main>;
 }

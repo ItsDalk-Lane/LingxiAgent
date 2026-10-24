@@ -14,7 +14,7 @@ export function rustWorkbenchRoute(connection: { serverNodeKind?: string }, path
   if (/^\/api\/mobile\/workbench\/(?:files|search|content|actions|upload)(?:\?|$)/.test(path)) {
     return `/lingxi/v1/workbench/${path.slice('/api/mobile/workbench/'.length)}`;
   }
-  if (/^\/api\/(?:git\/(?:status|worktree-info|worktrees|branches|log|log-stats|file-diff|checkout|create-branch|stash|stashes|unstash|discard|worktree-create|commit|push|pull|stage|unstage|amend|fetch|ai-commit-message)|workbench\/(?:files|search|content|actions|upload)|studio\/workspaces(?:\/[^/?]+(?:\/files)?)?|desk\/(?:path|files|search-files|jian|logs)|diary\/(?:write|list)|resource-io\/(?:stat|read|list|search|write|write-expected-version|rename|move|trash|subscribe|subscriptions\/[^/?]+|watch|watch\/[^/?]+|watch-diagnostics|events))(?:\?|$)/.test(path)) {
+  if (/^\/api\/(?:git\/(?:status|worktree-info|worktrees|branches|log|log-stats|file-diff|checkout|create-branch|stash|stashes|unstash|discard|worktree-create|commit|push|pull|stage|unstage|amend|fetch|ai-commit-message)|workbench\/(?:files|search|content|actions|upload)|studio\/workspaces(?:\/[^/?]+(?:\/files)?)?|desk\/(?:path|files|search-files|jian|logs|skills|install-skill|delete-skill)|diary\/(?:write|list)|resource-io\/(?:stat|read|list|search|write|write-expected-version|rename|move|trash|subscribe|subscriptions\/[^/?]+|watch|watch\/[^/?]+|watch-diagnostics|events))(?:\?|$)/.test(path)) {
     return `/lingxi/v1${path.slice('/api'.length)}`;
   }
   return path;

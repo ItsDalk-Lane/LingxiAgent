@@ -1,9 +1,9 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { ChatResourceCard } from './ChatResourceCard';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { useStore } from '../../stores';
 import { captureConversationRequestScope } from '../../services/conversation-request-scope';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display';
 import { SelectWidget, type SelectOption } from '@/ui';

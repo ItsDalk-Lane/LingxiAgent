@@ -1,11 +1,12 @@
 import type { UserAttachment } from '../stores/chat-types';
 import type { PlatformApi } from '../types';
+import { usePlatform } from '../hooks/use-platform';
 
 type FileUrlPlatform = Pick<PlatformApi, 'getFileUrl'> | null | undefined;
 
 export function getUserAttachmentImageSrc(
   attachment: Pick<UserAttachment, 'path' | 'base64Data' | 'mimeType'>,
-  platform: FileUrlPlatform = typeof window !== 'undefined' ? window.platform : undefined,
+  platform: FileUrlPlatform = typeof window !== 'undefined' ? usePlatform() : undefined,
 ): string | null {
   if (attachment.base64Data) {
     return `data:${attachment.mimeType || 'image/png'};base64,${attachment.base64Data}`;
@@ -23,7 +24,7 @@ export function getUserAttachmentImageSrc(
  */
 export function getUserAttachmentVideoPosterSrc(
   attachment: Pick<UserAttachment, 'path' | 'base64Data' | 'mimeType'>,
-  platform: FileUrlPlatform = typeof window !== 'undefined' ? window.platform : undefined,
+  platform: FileUrlPlatform = typeof window !== 'undefined' ? usePlatform() : undefined,
 ): string | null {
   if (attachment.base64Data) {
     return `data:${attachment.mimeType || 'video/mp4'};base64,${attachment.base64Data}`;

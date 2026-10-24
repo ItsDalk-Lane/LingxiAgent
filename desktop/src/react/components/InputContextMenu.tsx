@@ -10,6 +10,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ContextMenu, type ContextMenuItem } from '../ui';
 import { useStore } from '../stores';
+import { usePlatform } from '../hooks/use-platform';
 
 declare function t(key: string): string;
 
@@ -201,7 +202,7 @@ export function InputContextMenu() {
         label: t('ctx.copy'),
         disabled: !hasTextSelection,
         action: () => {
-          try { void window.platform?.runEditCommand?.('copy'); }
+          try { void usePlatform()?.runEditCommand?.('copy'); }
           catch { /* noop */ }
         },
       },
@@ -226,7 +227,7 @@ export function InputContextMenu() {
       restoreSelection(target, selectionSnapshot);
     }
     try {
-      await window.platform?.runEditCommand?.(command);
+      await usePlatform()?.runEditCommand?.(command);
     } catch (err) {
       console.warn('[InputContextMenu] edit command failed:', err);
     }
@@ -260,7 +261,7 @@ export function InputContextMenu() {
     items.push({
       label: t('ctx.selectAll'),
       action: () => {
-        if (window.platform?.runEditCommand) {
+        if (usePlatform()?.runEditCommand) {
           void runEditCommand('selectAll');
           return;
         }

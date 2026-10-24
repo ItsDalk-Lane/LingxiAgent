@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '../store';
 import { t } from '../helpers';
 import { captureSettingsConnection, ownsSettingsConnection } from '../connection-owner';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { SettingsSection } from '../components/SettingsSection';
 import { ConfirmDialog, Toggle } from '@/ui';
 import { ConnectorDetail } from './mcp/ConnectorDetail';
@@ -34,8 +34,9 @@ import type {
   McpToolPermission,
 } from './mcp/types';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
-const platform = window.platform;
+const platform = usePlatform();
 
 /** How long a browser OAuth round trip is waited on before it is given up as stale. */
 const OAUTH_POLL_INTERVAL_MS = 3000;

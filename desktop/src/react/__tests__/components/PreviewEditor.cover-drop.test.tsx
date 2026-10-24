@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PreviewEditor, type PreviewEditorHandle } from '../../components/PreviewEditor';
 import { clearAppFileDragPayload, writeAppFileDragPayload } from '../../utils/app-file-drag';
 import type { PlatformApi } from '../../types';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mocks = vi.hoisted(() => ({
   lingxiFetch: vi.fn(),
@@ -230,7 +231,7 @@ describe('PreviewEditor markdown cover drop', () => {
     });
 
     await waitFor(() => {
-      expect(window.platform?.copyFile).toHaveBeenCalled();
+      expect(getDesktopHost().api?.copyFile).toHaveBeenCalled();
     });
     expect(mocks.lingxiFetch).not.toHaveBeenCalled();
     expect(ref.current?.getView()?.state.doc.toString()).toContain('![cover-source](<文本附件/cover-source-');

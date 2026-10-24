@@ -12,8 +12,9 @@ import { openFilePreview } from '../../utils/file-preview';
 import { openSelectionInSideChat } from '../../stores/side-chat-actions';
 import { attachFilesFromPaths } from '../../MainContent';
 import { sessionScopedValue, sessionScopedListIncludes } from '../../stores/session-slice';
+import { getDesktopHost } from '../../host/desktop-host';
 initErrorBusBridge();
-const info = await window.hana.getServerConnectionInfo!();
+const info = await getDesktopHost().api.getServerConnectionInfo!();
 const connection = createLocalServerConnection({serverPort:info.port,serverToken:info.token,serverNodeKind:'lingxi-service'})!;
 useStore.setState({activeServerConnection:connection,activeServerConnectionId:connection.connectionId,serverConnections:{[connection.connectionId]:connection},currentTab:'chat',currentSessionId:null,currentSessionPath:null,currentAgentId:'lingxi',welcomeVisible:true,pendingNewSession:false,agents:[]});
 async function select(id:string){

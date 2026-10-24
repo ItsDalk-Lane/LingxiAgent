@@ -1,4 +1,4 @@
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 
 export type UserEditCheckpointReason = 'edit-start' | 'autosave-interval';
 

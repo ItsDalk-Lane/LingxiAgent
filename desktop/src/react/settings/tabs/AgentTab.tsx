@@ -20,6 +20,7 @@ import {
   type ExpCategory, parseExperience,
   ExperienceBlock, putExperience,
 } from './agent/AgentExperience';
+import { usePlatform } from '../../hooks/use-platform';
 
 export function AgentTab({ configurationReady = true }: { configurationReady?: boolean }) {
   useSettingsStore();
@@ -217,7 +218,7 @@ export function AgentTab({ configurationReady = true }: { configurationReady?: b
       setExportPlan(null);
       setExportMemory(false);
       if (typeof data.filePath === 'string' && data.filePath) {
-        window.platform?.showInFinder?.(data.filePath);
+        usePlatform()?.showInFinder?.(data.filePath);
       }
       showToast(t('settings.agent.exportedTo', { path: data.filePath }), 'success');
     } catch (err: unknown) {

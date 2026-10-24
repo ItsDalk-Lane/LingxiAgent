@@ -18,8 +18,7 @@ import {
   rustServiceContentDigest,
   verifyRustServiceDirectory,
   resolveRustBinary,
-  readOwnedRustConnection,
-  readExistingRustConnection,
+  readOwnedRustConnection, readExistingRustConnection, readRemoteRustConnection,
 } from '../desktop/src/shared/rust-local-service.cjs';
 import { createPrivateServerArtifactGuard } from '../desktop/src/shared/private-server-artifact.cjs';
 
@@ -251,4 +250,104 @@ test('只接受本轮进程、数据根、READY 地址和短令牌一致的 Rust
   instance.pid = process.pid;
   write();
   assert.equal(readExistingRustConnection({ home }).pid, process.pid);
+});
+
+// ── R08-T03 远端预览连接（batch B）──
+
+test('远端连接未配置时返回 null，配置但与运行时矛盾时拒绝', (ctx) => {
+  const t = nodeTestContextAdapter(ctx);
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'lingxi-r08-t03-remote-'));
+  t.after(() => fs.rmSync(home, { recursive: true, force: true }));
+  assert.equal(readRemoteRustConnection({ env: {} }), null);
+  assert.equal(readRemoteRustConnection({ env: { LINGXI_DESKTOP_SERVER_RUNTIME: 'rust' } }), null);
+  assert.throws(
+    () => readRemoteRustConnection({ env: { LINGXI_DESKTOP_RUST_REMOTE_URL: 'https://192.168.1.20:34001' } }),
+    /requires LINGXI_DESKTOP_SERVER_RUNTIME=rust/,
+  );
+});
+
+test('远端令牌文件必须绝对路径、owner-only 且形状固定', (ctx) => {
+  const t = nodeTestContextAdapter(ctx);
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'lingxi-r08-t03-remote-'));
+  t.after(() => fs.rmSync(home, { recursive: true, force: true }));
+  const base = { LINGXI_DESKTOP_SERVER_RUNTIME: 'rust', LINGXI_DESKTOP_RUST_REMOTE_URL: 'https://192.168.1.20:34001' };
+  assert.throws(
+    () => readRemoteRustConnection({ env: { ...base, LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE: 'relative/token.json' } }),
+    /absolute LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE/,
+  );
+  const tokenFile = path.join(home, 'remote-token.json');
+  const good = { token: 'd'.repeat(32) };
+  fs.writeFileSync(tokenFile, JSON.stringify(good), { mode: 0o600 });
+  if (process.platform !== 'win32') {
+    fs.chmodSync(tokenFile, 0o644);
+    assert.throws(
+      () => readRemoteRustConnection({ env: { ...base, LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE: tokenFile } }),
+      /owner only/,
+    );
+    fs.chmodSync(tokenFile, 0o600);
+  }
+  fs.writeFileSync(tokenFile, JSON.stringify({ token: 'not-hex-token' }), { mode: 0o600 });
+  assert.throws(
+    () => readRemoteRustConnection({ env: { ...base, LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE: tokenFile } }),
+    /32 lowercase hex/,
+  );
+  fs.writeFileSync(tokenFile, JSON.stringify(good), { mode: 0o600 });
+  const connection = readRemoteRustConnection({ env: { ...base, LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE: tokenFile } });
+  assert.deepEqual(connection, {
+    host: '192.168.1.20', port: 34001, transport: 'https',
+    baseUrl: 'https://192.168.1.20:34001', token: good.token, remote: true,
+  });
+});
+
+test('远端 URL 形状守卫：绝对 http(s)、显式端口、无用户/路径注入', (ctx) => {
+  const t = nodeTestContextAdapter(ctx);
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'lingxi-r08-t03-remote-'));
+  t.after(() => fs.rmSync(home, { recursive: true, force: true }));
+  const tokenFile = path.join(home, 'remote-token.json');
+  fs.writeFileSync(tokenFile, JSON.stringify({ token: 'e'.repeat(32) }), { mode: 0o600 });
+  const env = (url, extra = {}) => ({
+    LINGXI_DESKTOP_SERVER_RUNTIME: 'rust',
+    LINGXI_DESKTOP_RUST_REMOTE_URL: url,
+    LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE: tokenFile,
+    ...extra,
+  });
+  assert.throws(() => readRemoteRustConnection({ env: env('not-a-url') }), /not an absolute URL/);
+  assert.throws(() => readRemoteRustConnection({ env: env('ws://192.168.1.20:34001') }), /only http\(s\)/);
+  // 默认端口被 WHATWG 归一化为空串：必须显式端口。
+  assert.throws(() => readRemoteRustConnection({ env: env('https://192.168.1.20/') }), /explicit port/);
+  assert.throws(() => readRemoteRustConnection({ env: env('http://192.168.1.20:80/') }), /explicit port/);
+  assert.throws(() => readRemoteRustConnection({ env: env('https://user:pw@192.168.1.20:34001') }), /host\/port shape/);
+  assert.throws(() => readRemoteRustConnection({ env: env('https://192.168.1.20:34001/api') }), /host\/port shape/);
+  assert.throws(() => readRemoteRustConnection({ env: env('https://192.168.1.20:34001?x=1') }), /host\/port shape/);
+  assert.throws(() => readRemoteRustConnection({ env: env('https://192.168.1.20:0') }), /host\/port shape/);
+  // 端口 >65535 直接被 WHATWG 解析拒绝，落在 not-an-absolute-URL 分支。
+  assert.throws(() => readRemoteRustConnection({ env: env('https://192.168.1.20:70000') }), /not an absolute URL/);
+  assert.throws(() => readRemoteRustConnection({ env: env('https://:34001') }), /not an absolute URL|host\/port shape/);
+});
+
+test('非回环明文 http 必须显式 drill 门，回环与 https 不需要', (ctx) => {
+  const t = nodeTestContextAdapter(ctx);
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'lingxi-r08-t03-remote-'));
+  t.after(() => fs.rmSync(home, { recursive: true, force: true }));
+  const tokenFile = path.join(home, 'remote-token.json');
+  fs.writeFileSync(tokenFile, JSON.stringify({ token: 'f'.repeat(32) }), { mode: 0o600 });
+  const env = (url, extra = {}) => ({
+    LINGXI_DESKTOP_SERVER_RUNTIME: 'rust',
+    LINGXI_DESKTOP_RUST_REMOTE_URL: url,
+    LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE: tokenFile,
+    ...extra,
+  });
+  assert.throws(
+    () => readRemoteRustConnection({ env: env('http://192.168.1.20:34001') }),
+    /ALLOW_CLEARTEXT=1 \(drill only\)/,
+  );
+  const gated = readRemoteRustConnection({ env: env('http://192.168.1.20:34001', { LINGXI_DESKTOP_RUST_REMOTE_ALLOW_CLEARTEXT: '1' }) });
+  assert.equal(gated.transport, 'http');
+  assert.equal(gated.host, '192.168.1.20');
+  // https 非回环无需明文门。
+  assert.equal(readRemoteRustConnection({ env: env('https://192.168.1.20:34001') }).transport, 'https');
+  // 回环 http 无需明文门（A06 loopback 回退路径）。
+  const loopback = readRemoteRustConnection({ env: env('http://127.0.0.1:34001') });
+  assert.equal(loopback.host, '127.0.0.1');
+  assert.equal(loopback.remote, true);
 });

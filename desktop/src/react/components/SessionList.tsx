@@ -15,8 +15,8 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../stores';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
-import { currentRustBrowserConnection, openRustBrowserViewer } from '../services/rust-browser';
+import { lingxiFetch } from '../services/service-client';
+import { currentRustBrowserConnection, openRustBrowserViewer } from '../services/service-client';
 import { captureConversationRequestScope } from '../services/conversation-request-scope';
 import { useI18n } from '../hooks/use-i18n';
 import { formatSessionDate } from '../utils/format';
@@ -34,6 +34,7 @@ import { Overlay } from '../ui/Overlay';
 import { Button } from '../ui/Button';
 import { renderMarkdown } from '../utils/markdown';
 import styles from './SessionList.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 // 置顶区行拖拽 MIME：pinned 重排提交完整有序 sessionId 列表。
 const SESSION_DRAG_MIME = 'application/x-lingxi-session-path';
@@ -812,7 +813,7 @@ const SessionItem = memo(function SessionItem({ session: s, isActive, isPending,
     } catch (err) {
       console.warn('[browser] open session failed:', err);
     }
-    window.platform?.openBrowserViewer?.({ sessionPath: s.path });
+    usePlatform()?.openBrowserViewer?.({ sessionPath: s.path });
   }, [s.path]);
 
   const handleBrowserKeyDown = useCallback((e: React.KeyboardEvent) => {

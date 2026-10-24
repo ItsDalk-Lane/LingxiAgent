@@ -44,8 +44,9 @@ import {
 } from '../../../../../shared/sidebar-ui-state.ts';
 import styles from '../Settings.module.css';
 import registry from '../../../shared/theme-registry';
+import { usePlatform } from '../../hooks/use-platform';
 
-const platform = window.platform;
+const platform = usePlatform();
 const i18n = window.i18n;
 
 const THEME_NAME_KEYS: Record<string, string> = Object.fromEntries([
@@ -312,7 +313,7 @@ export function InterfaceTab() {
         detail: { type: 'sidebar-ui-changed', sidebarUi: saved },
       }));
       if (!ownsSettingsConnection(owner)) return;
-      window.platform?.settingsChanged?.('sidebar-ui-changed', { sidebarUi: saved });
+      usePlatform()?.settingsChanged?.('sidebar-ui-changed', { sidebarUi: saved });
     } catch (err: unknown) {
       if (!ownsSettingsConnection(owner)) return;
       setSidebarUiPrefs(previousPrefs);

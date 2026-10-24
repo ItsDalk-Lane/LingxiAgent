@@ -26,7 +26,7 @@ import {
   canUseNativeResourcePath,
   resolveWorkbenchNativePath,
 } from '../../services/resource-access';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { isWebRuntime, openWorkbenchFilePreview } from '../../utils/remote-file-preview';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
 import {
@@ -38,6 +38,7 @@ import type { DeskFile } from '../../types';
 import type { CtxMenuState, FileTypeFilter, SortMode } from './desk-types';
 import { ICONS, fileMatchesTypeFilters, getFileIcon, sortDeskFiles } from './desk-types';
 import s from './Desk.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 function childSubdir(parent: string, name: string): string {
   return parent ? `${parent}/${name}` : name;
@@ -458,7 +459,7 @@ function TreeNode({
               if (hasCachedChildren) scheduleBackgroundTreeRefresh(subdir, rootKey);
               else void loadDeskTreeFiles(subdir);
             } else {
-              if (nativePath && !isWebRuntime()) window.platform?.openFile?.(nativePath);
+              if (nativePath && !isWebRuntime()) usePlatform()?.openFile?.(nativePath);
               else previewFile();
             }
           },
@@ -468,7 +469,7 @@ function TreeNode({
           { label: t('desk.ctx.newFolder'), action: () => { void onStartCreate(subdir, 'folder'); } },
         ] : []),
         ...(!isWebRuntime() && nativePath ? [
-          { label: t('desk.ctx.openInFinder'), action: () => window.platform?.showInFinder?.(nativePath) },
+          { label: t('desk.ctx.openInFinder'), action: () => usePlatform()?.showInFinder?.(nativePath) },
         ] : []),
         ...(nativePath ? [
           { label: t('desk.ctx.copyPath'), action: () => navigator.clipboard.writeText(nativePath).catch(() => {}) },
@@ -493,7 +494,7 @@ function TreeNode({
         {
           label: deleteLabel,
           danger: true,
-          disabled: actionEntries.length === 0 || (canUseNativePath && !isWebRuntime() && !deskWorkspaceMountId && !window.platform?.trashItem),
+          disabled: actionEntries.length === 0 || (canUseNativePath && !isWebRuntime() && !deskWorkspaceMountId && !usePlatform()?.trashItem),
           action: async () => {
             const confirmed = window.confirm?.(
               actionEntries.length > 1
@@ -558,7 +559,7 @@ function TreeNode({
     e.preventDefault();
     const nativePaths = dragRows.map(row => row.nativePath).filter((path): path is string => !!path);
     if (nativePaths.length === dragRows.length && nativePaths.length > 0) {
-      window.platform?.startDrag?.(nativePaths.length === 1 ? nativePaths[0] : nativePaths);
+      usePlatform()?.startDrag?.(nativePaths.length === 1 ? nativePaths[0] : nativePaths);
     }
   }, [deskBasePath, deskWorkspaceMountId, getDragEntries, nativeRootDir, onSelect, selectedPaths, subdir]);
 
@@ -603,7 +604,7 @@ function TreeNode({
       }
       const paths: string[] = [];
       for (const f of Array.from(files)) {
-        const p = window.platform?.getFilePath?.(f);
+        const p = usePlatform()?.getFilePath?.(f);
         if (p) paths.push(p);
       }
       if (paths.length > 0) await deskUploadFilesToSubdir(paths, subdir);

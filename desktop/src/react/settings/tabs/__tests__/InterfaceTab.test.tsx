@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { InterfaceTab } from '../InterfaceTab';
 import { useSettingsStore } from '../../store';
 import registry from '../../../../shared/theme-registry';
+import { getDesktopHost } from '../../../host/desktop-host';
 
 const lingxiFetchMock = vi.fn();
 
@@ -285,7 +286,7 @@ describe('InterfaceTab appearance state', () => {
         method: 'PUT',
         body: JSON.stringify({ sessionList: { rowMode: 'single-line' } }),
       }));
-      expect(window.platform.settingsChanged).toHaveBeenCalledWith('sidebar-ui-changed', expect.objectContaining({
+      expect(getDesktopHost().api.settingsChanged).toHaveBeenCalledWith('sidebar-ui-changed', expect.objectContaining({
         sidebarUi: expect.objectContaining({
           sessionList: { rowMode: 'single-line' },
         }),

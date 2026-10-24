@@ -19,6 +19,7 @@ import {
   readMobileAuthSession,
   type MobilePrincipal,
 } from './mobile-init';
+import { usePlatform } from '../hooks/use-platform';
 
 type AuthState = 'checking' | 'login' | 'ready';
 type LoginMode = 'device' | 'password';
@@ -218,7 +219,7 @@ function MobileDesktopShell({
   }, [isNarrow]);
 
   useEffect(() => {
-    const unsubscribe = window.platform?.onOpenSettingsModal?.((tab?: string) => {
+    const unsubscribe = usePlatform()?.onOpenSettingsModal?.((tab?: string) => {
       openSettingsModal(tab);
     });
     return typeof unsubscribe === 'function' ? unsubscribe : undefined;

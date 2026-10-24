@@ -41,6 +41,7 @@ import { bumpMessageLiveVersion } from '../stores/message-live-version';
 import { terminalOutputStream } from './terminal-output-stream';
 import { handleBackgroundProcessControlResult } from './background-process-control';
 import { noteComposerServerAck, noteComposerRunEvent, noteComposerInputRejected, noteComposerUserAbort, extendComposerAckWindow, composerOriginConnectionKey, findSendRecordByClientMessageId } from './composer-send-coordinator';
+import { usePlatform } from '../hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string>): any;
 
@@ -966,15 +967,17 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       terminalOutputStream.handleChunks(msg);
       break;
 
-    case 'notification':
-      if (window.hana?.showNotification) {
+    case 'notification': {
+      const platform = usePlatform();
+      if (platform.showNotification) {
         // agentId 标识触发通知的助手，主进程据此读取该 agent 头像作为通知 icon。
         // 缺失时透传 null，主进程退回无 icon，禁止从当前焦点 agent 兜底。
-        window.hana.showNotification(msg.title, msg.body, msg.agentId ?? null, {
+        platform.showNotification(msg.title, msg.body, msg.agentId ?? null, {
           desktopFocusPolicy: resolveNotificationDesktopFocusPolicy(msg),
         });
       }
       break;
+    }
 
     case 'bridge_status':
       useStore.getState().triggerBridgeReload();
@@ -1401,7 +1404,7 @@ export function handleServerMessage(msg: any, originConnectionKey = composerOrig
       if (msg.key === 'theme') {
         window.applyTheme?.(msg.value);
         // 通知其他窗口（设置窗口等）同步主题
-        window.platform?.settingsChanged?.('theme-changed', { theme: msg.value });
+        usePlatform()?.settingsChanged?.('theme-changed', { theme: msg.value });
       }
       break;
     }

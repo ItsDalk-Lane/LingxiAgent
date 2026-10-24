@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSettingsStore, type ProviderSummary } from '../../store';
 import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from '../../connection-owner';
-import { resolveServerConnection } from '../../../services/server-connection';
+import { resolveServerConnection } from '../../../services/service-client';
 import { startOAuth, completeOAuth, pollOAuth, logoutOAuth, type OAuthAttempt } from './oauth-service';
 import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
+import { usePlatform } from '../../../hooks/use-platform';
 
 export function OAuthCredentials({ providerId, summary, onRefresh }: {
   providerId: string;
   summary: ProviderSummary;
   onRefresh: () => Promise<void>;
 }) {
-  const platform = window.platform;
+  const platform = usePlatform();
   const showToast = useSettingsStore(s => s.showToast);
   const [codeInput, setCodeInput] = useState('');
   const [showCodeInput, setShowCodeInput] = useState(false);

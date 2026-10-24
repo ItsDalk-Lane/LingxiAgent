@@ -6,8 +6,8 @@ export function rustSettingsRoute(connection: { serverNodeKind?: string }, path:
   }
   if (/^\/api\/(?:agents|memories|character-cards|cards|skills|experiments|models|providers|user-profile|agent-deletions|speech-recognition)(?:[/?]|$)/.test(path)
     || /^\/api\/media\/(?:image|video|speech)(?:[/?]|$)/.test(path)
-    || /^\/api\/preferences\/(?:models|goal|autolearn|computer-use|quick-chat|notifications|keybindings|sidebar-ui)(?:[/?]|$)/.test(path)
-    || /^\/api\/checkpoints(?:[?]|$)/.test(path)
+    || /^\/api\/preferences\/(?:models|goal|autolearn|computer-use|quick-chat|notifications|keybindings|sidebar-ui|session-permission-default)(?:[/?]|$)/.test(path)
+    || /^\/api\/checkpoints(?:[/?]|$)/.test(path)
     || /^\/api\/sessions\/workspace-rollback(?:[?]|$)/.test(path)
     || /^\/api\/settings\/(?:snapshot|export|import)(?:[/?]|$)/.test(path)) {
     return `/lingxi/v1${path.slice('/api'.length)}`;

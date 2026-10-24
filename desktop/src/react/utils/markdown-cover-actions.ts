@@ -3,6 +3,7 @@ import {
   type MarkdownCoverTargetInput,
   requestMarkdownCoverGeneration,
 } from './markdown-cover-generation';
+import { usePlatform } from '../hooks/use-platform';
 
 export function isExternalCoverImagePath(imagePath: string): boolean {
   return /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(imagePath);
@@ -23,9 +24,10 @@ export async function saveMarkdownCoverImage(imagePath: string | null | undefine
     dispatchCoverNotice('当前 cover 不是本地图片，无法直接保存。', 'error');
     return;
   }
-  const folder = await window.platform?.selectFolder?.();
-  if (!folder || !window.platform?.copyFile) return;
-  const ok = await window.platform.copyFile(imagePath, joinLocalPath(folder, localBasename(imagePath)));
+  const coverPlatform = usePlatform();
+  const folder = await coverPlatform?.selectFolder?.();
+  if (!folder || !coverPlatform?.copyFile) return;
+  const ok = await coverPlatform.copyFile(imagePath, joinLocalPath(folder, localBasename(imagePath)));
   dispatchCoverNotice(ok ? 'Cover 图片已保存。' : 'Cover 图片保存失败。', ok ? 'success' : 'error');
 }
 

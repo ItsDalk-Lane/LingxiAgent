@@ -5,7 +5,7 @@ import { lingxiFetch } from '../api';
 import { t } from '../helpers';
 import { loadSettingsConfig, loadAgents } from '../actions';
 import { loadRustAgents } from '../rust-agents';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { Overlay } from '../../ui';
 import styles from '../Settings.module.css';
 

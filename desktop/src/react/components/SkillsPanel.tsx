@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from '../stores';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 import { usePanel } from '../hooks/use-panel';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 import { AgentAvatar, resolveAgentDisplayInfo } from '../utils/agent-display';
 import { SkillBundleTree, type SkillBundleInfo } from '../settings/tabs/skills/SkillBundleTree';
 import { SkillRow } from '../settings/tabs/skills/SkillRow';
@@ -12,6 +12,7 @@ import fp from './FloatingPanels.module.css';
 import settingsStyles from '../settings/Settings.module.css';
 import automationStyles from './automation/AutomationPanel.module.css';
 import styles from './SkillsPanel.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 const ALL_SKILLS_TAB = '__all_skills__';
 const HIGHLIGHT_MS = 1800;
@@ -347,7 +348,7 @@ export function SkillsPanel() {
   }, [addToast, flashInstalled, installTargetAgentId, loadSkillsForAgent, t]);
 
   const installSkillFromFile = useCallback(async (file: File) => {
-    const filePath = window.platform?.getFilePath?.(file) || (file as File & { path?: string })?.path;
+    const filePath = usePlatform()?.getFilePath?.(file) || (file as File & { path?: string })?.path;
     if (filePath) {
       await installSkillFromPath(filePath);
       return;
@@ -385,8 +386,8 @@ export function SkillsPanel() {
   }, [addToast, flashInstalled, installSkillFromPath, installTargetAgentId, loadSkillsForAgent, t]);
 
   const installSkill = useCallback(async () => {
-    if (typeof window.platform?.selectSkill === 'function') {
-      const selectedPath = await window.platform.selectSkill();
+    if (typeof usePlatform()?.selectSkill === 'function') {
+      const selectedPath = await usePlatform().selectSkill();
       if (!selectedPath) return;
       await installSkillFromPath(selectedPath);
       return;
@@ -570,7 +571,7 @@ export function SkillsPanel() {
         : t('settings.skills.exported', { fileName });
       addToast(msg, 'success');
       const filePath = stringField(data.filePath);
-      if (filePath) window.platform?.showInFinder?.(filePath);
+      if (filePath) usePlatform()?.showInFinder?.(filePath);
     } catch (err) {
       addToast(t('settings.saveFailed') + ': ' + (err instanceof Error ? err.message : String(err)), 'error');
     }

@@ -76,6 +76,60 @@ describe('server connection helpers', () => {
     })).toThrow(/invalid local server transport/);
   });
 
+  it('R08-T03: remote rust preview keeps the real remote host in baseUrl/wsUrl (Lead 验收断言)', () => {
+    const remote = createLocalServerConnection({
+      serverPort: 34001,
+      serverToken: 'remote-token',
+      serverNodeKind: 'lingxi-service',
+      serverNodeTransport: 'https',
+      serverHost: '192.168.1.20',
+    })!;
+    // Lead-mandated：远端 host 必须出现在最终 baseUrl/wsUrl。
+    expect(remote.baseUrl).toBe('https://192.168.1.20:34001');
+    expect(remote.wsUrl).toBe('wss://192.168.1.20:34001');
+    expect(buildConnectionUrl(remote, '/lingxi/v1/server/identity'))
+      .toBe('https://192.168.1.20:34001/lingxi/v1/server/identity');
+    expect(buildConnectionWsUrl(remote, '/lingxi/v1/ws'))
+      .toContain('wss://192.168.1.20:34001/lingxi/v1/ws');
+    // 远端形态走手动连接归一化：绝不落在 local/loopback_token。
+    expect(remote.kind).toBe('lan');
+    expect(remote.kind).not.toBe('local');
+    expect(remote.credentialKind).toBe('device_credential');
+    expect(remote.credentialKind).not.toBe('loopback_token');
+    expect(remote.trustState).toBe('lan');
+    expect(remote.token).toBe('remote-token');
+    expect(remote.authState).toBe('paired');
+    expect(remote.serverId).toBe('remote:192.168.1.20');
+    expect(remote.serverNodeKind).toBe('lingxi-service');
+  });
+
+  it('R08-T03: remote host requires the rust preview runtime and a clean host shape', () => {
+    // 非 rust 运行时不接受远端 host（防 node 模式被指到远端）。
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: null, serverHost: '192.168.1.20',
+    })).toThrow(/only valid for the lingxi-service preview/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '192.168.1.20:34001',
+    })).toThrow(/invalid remote server host/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: 'user@192.168.1.20',
+    })).toThrow(/invalid remote server host/);
+    expect(() => createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '192.168.1.20/api',
+    })).toThrow(/invalid remote server host/);
+    // 括号 IPv6 合法；回环 host 仍回落本地形态。
+    const v6 = createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '[fd00::1]',
+    })!;
+    expect(v6.baseUrl).toBe('http://[fd00::1]:34001');
+    expect(v6.kind).toBe('lan');
+    const loopback = createLocalServerConnection({
+      serverPort: 34001, serverToken: 't', serverNodeKind: 'lingxi-service', serverHost: '127.0.0.1',
+    })!;
+    expect(loopback.kind).toBe('local');
+    expect(loopback.credentialKind).toBe('loopback_token');
+  });
+
   it('reports readiness from active connection while preserving legacy compatibility', () => {
     const active = createLocalServerConnection({
       serverPort: 4242,

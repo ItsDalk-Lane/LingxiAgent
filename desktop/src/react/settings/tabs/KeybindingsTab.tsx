@@ -27,6 +27,7 @@ import {
 } from '../../keybindings/commands';
 import { normalizeKeybindings } from '../../../../../shared/keybindings-preferences.ts';
 import styles from '../Settings.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 type StoredKeybindings = Record<string, string[]>;
 
@@ -87,7 +88,7 @@ function UndoIcon() {
 }
 
 export function KeybindingsTab() {
-  const hana = window.hana;
+  const hana = usePlatform();
   const connectionRevision = useSettingsStore(() => settingsConnectionRevision());
   const showToast = useSettingsStore(s => s.showToast);
   const snapshotKeybindings = useSettingsStore(s => s.settingsSnapshot.data?.preferences?.keybindings);

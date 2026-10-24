@@ -9,8 +9,8 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useStore } from './stores';
-import { lingxiFetch } from './hooks/use-hana-fetch';
-import { resolveServerConnection } from './services/server-connection';
+import { lingxiFetch } from './services/service-client';
+import { resolveServerConnection } from './services/service-client';
 import { captureSessionConnection, ownsSessionConnection, sessionSelectionRevision } from './services/session-connection-owner';
 import { sessionIdForPathFromLocatorState, sessionScopedValue } from './stores/session-slice';
 import { toSlash, baseName } from './utils/format';
@@ -26,6 +26,7 @@ import { deskNativeRootDir } from './stores/desk-actions';
 import { blockChatAttachmentOutsideChatTab } from './utils/attach-workbench-item';
 import { BrowserCard } from './components/BrowserCard';
 import { ComputerUseOverlay } from './components/ComputerUseOverlay';
+import { usePlatform } from './hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -78,13 +79,13 @@ function chatAudioMimeTypeForName(name: string): string {
 
 async function computeAudioWaveformsForPaths(srcPaths: string[]): Promise<Record<string, { waveform: AudioWaveform }>> {
   const out: Record<string, { waveform: AudioWaveform }> = {};
-  if (typeof window.platform?.readFileBase64 !== 'function') return out;
+  if (typeof usePlatform()?.readFileBase64 !== 'function') return out;
   for (const srcPath of srcPaths) {
     const name = baseName(srcPath);
     if (!isAudioFileName(name)) continue;
     try {
       const mimeType = chatAudioMimeTypeForName(name);
-      const base64 = await window.platform.readFileBase64(srcPath);
+      const base64 = await usePlatform().readFileBase64(srcPath);
       const waveform = base64 ? await buildWaveformFromBase64(base64, mimeType) : undefined;
       if (waveform) out[srcPath] = { waveform };
     } catch (err) {
@@ -261,7 +262,7 @@ async function handleDrop(e: React.DragEvent): Promise<void> {
   const nameMap: Record<string, string> = {};
   const srcPaths: string[] = [];
   for (const file of Array.from(files)) {
-    const filePath = window.platform?.getFilePath?.(file);
+    const filePath = usePlatform()?.getFilePath?.(file);
     if (filePath) {
       srcPaths.push(filePath);
       nameMap[filePath] = file.name;

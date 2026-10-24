@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { isMarkdownFileName } from '../../utils/file-kind';
 import { takeMarkdownFileScreenshot } from '../../utils/screenshot';
 import styles from './Chat.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 interface FileOutputActionsProps {
   filePath: string;
@@ -84,8 +85,8 @@ export function FileOutputActions({ filePath, displayName, downloadUrl, download
   const downloadLabel = window.t('chat.fileActions.downloadToDevice');
   const screenshotShareLabel = window.t('common.screenshotShare');
   const isWebRuntime = document.documentElement.getAttribute('data-platform') === 'web';
-  const canOpenLocalFile = !isWebRuntime && typeof window.platform?.openFile === 'function';
-  const canRevealLocalFile = !isWebRuntime && typeof window.platform?.showInFinder === 'function';
+  const canOpenLocalFile = !isWebRuntime && typeof usePlatform()?.openFile === 'function';
+  const canRevealLocalFile = !isWebRuntime && typeof usePlatform()?.showInFinder === 'function';
   const canScreenshotShare = !isWebRuntime && (isMarkdownFileName(displayName) || isMarkdownFileName(filePath));
   const resolvedDownloadName = downloadName || displayName;
 
@@ -93,7 +94,7 @@ export function FileOutputActions({ filePath, displayName, downloadUrl, download
 
   const handleOpen = useCallback((event: ReactMouseEvent) => {
     event.stopPropagation();
-    window.platform?.openFile?.(filePath);
+    usePlatform()?.openFile?.(filePath);
   }, [filePath]);
 
   const handleToggleMenu = useCallback((event: ReactMouseEvent) => {
@@ -102,7 +103,7 @@ export function FileOutputActions({ filePath, displayName, downloadUrl, download
   }, []);
 
   const revealFile = useCallback(() => {
-    window.platform?.showInFinder?.(filePath);
+    usePlatform()?.showInFinder?.(filePath);
   }, [filePath]);
 
   const copyPath = useCallback(() => {

@@ -4,9 +4,9 @@
  * 从 InputArea.tsx 提取，减少主组件体量。
  */
 
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { getWebSocket, sendRustSlash } from '../../services/websocket';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { useStore } from '../../stores';
 import { ensureSession, loadSessions } from '../../stores/session-actions';
 

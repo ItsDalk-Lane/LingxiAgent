@@ -5,7 +5,8 @@ import { useStore } from '../../stores';
 import { connectWebSocket } from '../../services/websocket';
 import { createLocalServerConnection } from '../../services/server-connection';
 import { executeSlashViaWs } from '../../components/input/slash-commands';
-const info = await window.hana.getServerConnectionInfo!();
+import { getDesktopHost } from '../../host/desktop-host';
+const info = await getDesktopHost().api.getServerConnectionInfo!();
 const connection = createLocalServerConnection({ serverPort: info.port, serverToken: info.token, serverNodeKind: 'lingxi-service' })!;
 useStore.setState({ activeServerConnection: connection, activeServerConnectionId: connection.connectionId,
   serverConnections: { [connection.connectionId]: connection }, currentSessionId: 'desktop', currentSessionPath: 'native:desktop', currentAgentId: 'lingxi',

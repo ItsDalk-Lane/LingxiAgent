@@ -2,6 +2,7 @@ import React from 'react';
 import type { SkillInfo } from '../../store';
 import { t } from '../../helpers';
 import styles from '../../Settings.module.css';
+import { usePlatform } from '../../../hooks/use-platform';
 
 function truncateDesc(raw: string): string {
   const cnMatch = raw.match(/[\u4e00-\u9fff].*$/s);
@@ -60,7 +61,7 @@ export function SkillRow({
       onDrop={onDrop}
       onClick={() => {
         if (skill.baseDir) {
-          window.platform?.openSkillViewer?.({
+          usePlatform()?.openSkillViewer?.({
             name: skill.name,
             baseDir: skill.baseDir,
             filePath: skill.filePath,

@@ -38,14 +38,14 @@ import { useStore } from '../../stores';
 import { sessionScopedValue } from '../../stores/session-slice';
 import { selectSessionFiles } from '../../stores/selectors/file-refs';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 import { openFilePreview, openSkillPreview } from '../../utils/file-preview';
 import { writeAppFileDragPayload, clearAppFileDragPayload } from '../../utils/app-file-drag';
 import { openMediaViewerForRef } from '../../utils/open-media-viewer';
 import { buildFileRefId, inferKindByExt, isImageOrSvgExt } from '../../utils/file-kind';
-import { resolveServerConnection } from '../../services/server-connection';
+import { resolveServerConnection } from '../../services/service-client';
 import { resolveFileRefUrl } from '../../services/resource-url';
-import { projectRustMediaItems } from '../../services/rust-media';
+import { cancelRustMediaJob, projectRustMediaItems } from '../../services/service-client';
 import type { FileRef } from '../../types/file-ref';
 import { openPreview } from '../../stores/preview-actions';
 import type { ForkedSessionHandler, SessionNodeTarget } from '../../stores/message-turn-actions';
@@ -74,6 +74,7 @@ import {
   asDeferredHistoryContent,
   useDeferredHistoryContent,
 } from '../../hooks/use-deferred-history-content';
+import { usePlatform } from '../../hooks/use-platform';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -524,7 +525,6 @@ const MediaGenerationBlock = memo(function MediaGenerationBlock({ block, session
               onClick={async () => {
                 setStopping(true); setRetryError('');
                 try {
-                  const { cancelRustMediaJob } = await import('../../services/rust-media');
                   await cancelRustMediaJob(sessionPath.slice(7), viewBlock.taskId);
                 } catch (error) { setRetryError(error instanceof Error ? error.message : t('chat.media.stopFailed')); }
                 finally { setStopping(false); }
@@ -575,7 +575,7 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
     try {
       return resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
-        platform: window.platform,
+        platform: usePlatform(),
         preferLocalFile: false,
       }).url;
     } catch {
@@ -605,7 +605,7 @@ const ImageOutputCard = memo(function ImageOutputCard({ fileId, filePath, label,
     event.currentTarget.addEventListener('dragend', () => clearAppFileDragPayload(payload.dragId), { once: true });
     if (filePath) {
       event.preventDefault();
-      window.platform?.startDrag?.(filePath);
+      usePlatform()?.startDrag?.(filePath);
     }
   }, [fileId, filePath, displayName]);
 
@@ -661,7 +661,7 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
     try {
       return resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
-        platform: window.platform,
+        platform: usePlatform(),
         preferLocalFile: false,
       }).url;
     } catch {
@@ -691,7 +691,7 @@ const VideoOutputCard = memo(function VideoOutputCard({ fileId, filePath, label,
     event.currentTarget.addEventListener('dragend', () => clearAppFileDragPayload(payload.dragId), { once: true });
     if (filePath) {
       event.preventDefault();
-      window.platform?.startDrag?.(filePath);
+      usePlatform()?.startDrag?.(filePath);
     }
   }, [fileId, filePath, displayName]);
 
@@ -863,7 +863,7 @@ function useSessionFileDownloadUrl({
     try {
       const resolved = resolveFileRefUrl(ref.resource || !resource ? ref : { ...ref, resource }, {
         connection: resolveServerConnection(state),
-        platform: typeof window !== 'undefined' ? window.platform : null,
+        platform: typeof window !== 'undefined' ? usePlatform() : null,
         preferLocalFile: false,
       });
       if (resolved.mode === 'local-file') return null;

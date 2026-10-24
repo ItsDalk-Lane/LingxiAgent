@@ -21,6 +21,7 @@ import type {
 } from '../../editor/markdown-block-handles';
 import { copyMarkdownSource } from '../../editor/markdown-block-selection';
 import { EditorFormatMenu } from './EditorFormatMenu';
+import { usePlatform } from '../../hooks/use-platform';
 
 function label(key: string, fallback: string): string {
   try {
@@ -235,7 +236,7 @@ export function EditorContextMenu({
     }
     view.focus();
     try {
-      await window.platform?.runEditCommand?.(command);
+      await usePlatform()?.runEditCommand?.(command);
     } catch (err) {
       console.warn('[EditorContextMenu] edit command failed:', err);
     }

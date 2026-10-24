@@ -12,7 +12,7 @@ import {
   validateRestartTransport,
   LOCAL_CONNECTION_ID,
   type ServerConnection,
-} from '../services/server-connection';
+} from '../services/service-client';
 import { t } from './helpers';
 import { loadAgents, loadAvatars, loadProvidersSummary, loadSettingsModels, loadSettingsSnapshot } from './actions';
 import { captureSettingsConnection, ownsSettingsConnection, type SettingsConnectionOwner } from './connection-owner';
@@ -50,6 +50,7 @@ import { WechatQrcodeOverlay } from './overlays/WechatQrcodeOverlay';
 import { InputContextMenu } from '../components/InputContextMenu';
 import { SettingsPage } from './components/SettingsPrimitives';
 import styles from './Settings.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   agent: AgentTab,
@@ -185,7 +186,7 @@ export function SettingsContent({
 
   useEffect(() => {
     if (!listenToWindowTabSwitch) return;
-    const platform = window.platform;
+    const platform = usePlatform();
     if (!platform?.onSwitchTab) return;
     const unsubscribe = platform.onSwitchTab((tab: string) => {
       const nextTab = normalizeSettingsTab(tab);
@@ -195,7 +196,7 @@ export function SettingsContent({
   }, [listenToWindowTabSwitch, set]);
 
   useEffect(() => {
-    const platform = window.platform;
+    const platform = usePlatform();
     if (!platform?.onSettingsChanged) return;
     const unsubscribe = platform.onSettingsChanged((type: string, data: unknown) => {
       if (type === 'bridge-status-changed') {
@@ -230,10 +231,10 @@ export function SettingsContent({
 
   // Server 重启后用新端口重新加载数据
   useEffect(() => {
-    const platform = window.platform;
+    const platform = usePlatform();
     if (!platform?.onServerRestarted) return;
     let lastLocalIdentity: ServerConnection | null = null;
-    const unsubscribe = platform.onServerRestarted((data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null }) => {
+    const unsubscribe = platform.onServerRestarted((data: { port: number; token?: string | null; serverNodeKind?: string | null; serverNodeTransport?: string | null; host?: string | null }) => {
       const store = useSettingsStore.getState();
       const priorToken = store.serverToken;
       const fromEvent = validateRestartTransport(data?.port, data?.token);
@@ -263,6 +264,7 @@ export function SettingsContent({
           serverToken: transport.token,
           serverNodeKind: data.serverNodeKind,
           serverNodeTransport: data.serverNodeTransport,
+          serverHost: data.host ?? null,
         });
         if (!verified) throw new Error('invalid restarted local server connection');
         const current = useSettingsStore.getState();
@@ -504,7 +506,7 @@ function initializeRustSettings(): Promise<void> {
 
 /** 初始化：连接三要素并行 → 连接就绪后全部数据加载并行（含供应商摘要） */
 async function initSettings() {
-  const platform = window.platform;
+  const platform = usePlatform();
   const store = useSettingsStore.getState();
   let requestedRust = false;
   // store 是模块级 singleton：重开设置时上次的完整数据还在。有缓存就静默后台
@@ -529,7 +531,7 @@ async function initSettings() {
         : Promise.all([
           typeof platform?.getServerPort === 'function' ? platform.getServerPort() : null,
           typeof platform?.getServerToken === 'function' ? platform.getServerToken() : null,
-        ]).then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http' })),
+        ]).then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http', host: null })),
       (async () => {
         try {
           return typeof platform?.getPlatform === 'function' ? await platform.getPlatform() : null;
@@ -548,6 +550,7 @@ async function initSettings() {
       serverPort, serverToken,
       serverNodeKind: connectionInfo.serverNodeKind,
       serverNodeTransport: connectionInfo.serverNodeTransport,
+      serverHost: connectionInfo.host ?? null,
     });
     store.set({
       serverPort,

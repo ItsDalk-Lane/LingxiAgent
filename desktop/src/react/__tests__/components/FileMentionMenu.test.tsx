@@ -5,11 +5,12 @@ import React from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FileMentionMenu } from '../../components/input/FileMentionMenu';
+import { resetDesktopHostForTests } from '../../host/desktop-host';
 
 describe('FileMentionMenu', () => {
   afterEach(() => {
     cleanup();
-    delete (window as unknown as { platform?: unknown }).platform;
+    resetDesktopHostForTests();
   });
 
   it('renders file candidates without a leading at sign and uses audio file icons', () => {

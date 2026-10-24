@@ -5,6 +5,7 @@ import { createLocalServerConnection } from '../../services/server-connection';
 import { chatFetch } from '../../services/chat-client';
 import { initializeMobileRuntime, invalidateMobileRuntime, loadMobileSessions, projectMobileRustSessions } from '../../mobile/mobile-init';
 import { installMobilePlatform } from '../../mobile/mobile-platform';
+import { getDesktopHost } from '../../host/desktop-host';
 
 const mocks = vi.hoisted(() => ({ fetch: vi.fn(), history: vi.fn(), desk: vi.fn(), connect: vi.fn(), getWebSocket: vi.fn(() => null) }));
 vi.mock('../../hooks/use-hana-fetch', () => ({ lingxiFetch: mocks.fetch, lingxiUrl: (path: string) => path }));
@@ -128,9 +129,9 @@ describe('Rust 手机使用正式聊天上下文', () => {
   it('正式资源URL可打开，本机路径和file地址不能落回浏览器', () => {
     installMobilePlatform();
     const resource = '/lingxi/v1/resources/resource_owned/content?ticket=synthetic';
-    expect(window.platform.getFileUrl?.(resource)).toBe(resource);
-    expect(window.platform.getFileUrl?.('/Users/private/file.txt')).toBe('');
-    expect(window.platform.getFileUrl?.('file:///Users/private/file.txt')).toBe('');
-    expect(window.platform.getFileUrl?.('/lingxi/v1/settings/export')).toBe('');
+    expect(getDesktopHost().api.getFileUrl?.(resource)).toBe(resource);
+    expect(getDesktopHost().api.getFileUrl?.('/Users/private/file.txt')).toBe('');
+    expect(getDesktopHost().api.getFileUrl?.('file:///Users/private/file.txt')).toBe('');
+    expect(getDesktopHost().api.getFileUrl?.('/lingxi/v1/settings/export')).toBe('');
   });
 });

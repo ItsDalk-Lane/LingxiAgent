@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { CrashFallbackNotice, TrainUpdateAvailable, TrainUpdateStatus } from '../types';
+import { usePlatform } from './use-platform';
 
 /**
  * 列车更新（OTA）状态 hook——表盘（左下角贴纸 + 设置页关于 tab）唯一的数据源。
@@ -106,7 +107,7 @@ function snapshotFromStatus(status: TrainUpdateStatus): StatusSnapshot {
 
 async function queryStatus(): Promise<TrainUpdateStatus | null> {
   try {
-    return (await window.hana?.trainUpdateStatus?.()) ?? null;
+    return (await usePlatform()?.trainUpdateStatus?.()) ?? null;
   } catch {
     return null;
   }
@@ -130,7 +131,7 @@ export function useTrainUpdateState(): UseTrainUpdateStateResult {
   // 后台自动检查（checkOnce）发现新列车时的实时广播：不用等用户下次手动
   // 检查或重新挂载组件，贴纸/设置页立刻点亮。
   useEffect(() => {
-    const unsubscribe = window.hana?.onTrainUpdateAvailable?.((payload) => {
+    const unsubscribe = usePlatform()?.onTrainUpdateAvailable?.((payload) => {
       setSnapshot((s) => ({
         ...s,
         available: { version: payload.version },
@@ -143,7 +144,7 @@ export function useTrainUpdateState(): UseTrainUpdateStateResult {
 
   // apply-now 下载/验证/激活阶段的进度推送，只发给发起这次调用的窗口。
   useEffect(() => {
-    const unsubscribe = window.hana?.onTrainUpdateProgress?.((p) => {
+    const unsubscribe = usePlatform()?.onTrainUpdateProgress?.((p) => {
       // downloading 与 verifying 都算"下载中"（进度条停在已到达的累计位置，
       // 不因为验签间隙而闪成"应用中"）；只有 activating 才是真的 applying。
       setPhase(p.phase === 'activating' ? 'applying' : 'downloading');
@@ -165,7 +166,7 @@ export function useTrainUpdateState(): UseTrainUpdateStateResult {
   // 走上面 queryStatus() 挂载时拉到的 status.fallbackNotice，这里只覆盖
   // "窗口已经在跑时才发生"的那一种。
   useEffect(() => {
-    const unsubscribe = window.hana?.onTrainFallbackNotice?.((payload) => {
+    const unsubscribe = usePlatform()?.onTrainFallbackNotice?.((payload) => {
       setSnapshot((s) => ({ ...s, fallbackNotice: payload }));
     });
     return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
@@ -174,7 +175,7 @@ export function useTrainUpdateState(): UseTrainUpdateStateResult {
   const checkNow = useCallback(async () => {
     setPhase('checking');
     try {
-      const result = await window.hana?.trainUpdateCheck?.();
+      const result = await usePlatform()?.trainUpdateCheck?.();
       if (result?.outcome === 'error') {
         setSnapshot((s) => ({ ...s, lastError: result.error || null }));
         return;
@@ -196,7 +197,7 @@ export function useTrainUpdateState(): UseTrainUpdateStateResult {
     setPhase('downloading');
     setProgress(null);
     try {
-      const result = await window.hana?.trainUpdateApply?.();
+      const result = await usePlatform()?.trainUpdateApply?.();
       if (result && !result.ok) {
         setSnapshot((s) => ({ ...s, lastError: result.error || null }));
       }
@@ -219,7 +220,7 @@ export function useTrainUpdateState(): UseTrainUpdateStateResult {
     // 顶多重新拉到同一条通知，不是数据丢失，不值得为此阻塞交互。
     setSnapshot((s) => ({ ...s, fallbackNotice: null }));
     try {
-      await window.hana?.ackTrainFallbackNotice?.();
+      await usePlatform()?.ackTrainFallbackNotice?.();
     } catch {
       // best-effort：主进程状态清空失败不影响本次会话里卡片已经消失的事实。
     }

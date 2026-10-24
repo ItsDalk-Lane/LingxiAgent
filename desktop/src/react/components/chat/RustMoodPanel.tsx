@@ -3,7 +3,7 @@ import { useStore } from '../../stores';
 import {
   appendConnectionAuth, buildConnectionUrl, buildConnectionWsUrl,
   requestConnectionWsTicket, resolveServerConnection, type ServerConnection,
-} from '../../services/server-connection';
+} from '../../services/service-client';
 import { isRustWireServerHello } from '../../services/websocket';
 import { version } from '../../../../../package.json';
 

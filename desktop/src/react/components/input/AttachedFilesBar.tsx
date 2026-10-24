@@ -4,6 +4,7 @@ import { AudioAttachmentChip } from '../shared/AudioAttachmentChip';
 import { FolderIcon } from '../shared/FolderIcon';
 import { kindOfFileName } from '../../utils/file-kind';
 import styles from './InputArea.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export const AttachedFilesBar = memo(function AttachedFilesBar({ files, onRemove }: {
   files: Array<{ path: string; name: string; isDirectory?: boolean; base64Data?: string; mimeType?: string }>;
@@ -87,7 +88,7 @@ function getMediaUrl(file: { path: string; base64Data?: string; mimeType?: strin
     return `data:${file.mimeType};base64,${file.base64Data}`;
   }
   if (typeof window === 'undefined') return null;
-  return window.platform?.getFileUrl?.(file.path) || null;
+  return usePlatform()?.getFileUrl?.(file.path) || null;
 }
 
 function ClipIcon() {

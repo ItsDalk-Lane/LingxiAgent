@@ -5,7 +5,7 @@ import {
   buildConnectionWsUrl,
   createLocalServerConnection,
   type ServerConnection,
-} from '../services/server-connection';
+} from '../services/service-client';
 import { PlanModeButton, type PermissionMode } from '../components/input/PlanModeButton';
 import { SendButton } from '../components/input/SendButton';
 import { AttachedFilesBar } from '../components/input/AttachedFilesBar';
@@ -39,6 +39,7 @@ import {
 } from './quick-chat-runtime';
 import { useQuickChatAutoScroll } from './use-quick-chat-auto-scroll';
 import styles from './QuickChatApp.module.css';
+import { usePlatform } from '../hooks/use-platform';
 
 interface AgentOption extends QuickChatRuntimeAgent {
   name: string;
@@ -321,15 +322,17 @@ export function QuickChatApp() {
     let cancelled = false;
     async function bootstrap() {
       try {
-        const info = window.hana?.getServerConnectionInfo
-          ? await window.hana.getServerConnectionInfo()
+        const platform = usePlatform();
+        const info = platform.getServerConnectionInfo
+          ? await platform.getServerConnectionInfo()
           : await Promise.all([
-            window.hana?.getServerPort?.(),
-            window.hana?.getServerToken?.(),
-          ]).then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http' }));
+            platform.getServerPort(),
+            platform.getServerToken(),
+          ]).then(([port, token]) => ({ port, token, serverNodeKind: null, serverNodeTransport: 'http', host: null }));
         const local = createLocalServerConnection({
           serverPort: info.port, serverToken: info.token,
           serverNodeKind: info.serverNodeKind, serverNodeTransport: info.serverNodeTransport,
+          serverHost: info.host ?? null,
         });
         if (!local) throw new Error('server connection unavailable');
         if (cancelled) return;
@@ -469,11 +472,11 @@ export function QuickChatApp() {
     setSending(false);
     setError(null);
     lastResizeRef.current = null;
-    window.hana?.quickChatResize?.('compact');
+    usePlatform()?.quickChatResize?.('compact');
   }, []);
 
   useEffect(() => {
-    const dispose = window.hana?.onQuickChatShown?.(() => {
+    const dispose = usePlatform()?.onQuickChatShown?.(() => {
       textareaRef.current?.focus();
       void (async () => {
         const runtime = await refreshQuickChatRuntimeState({
@@ -644,7 +647,7 @@ export function QuickChatApp() {
       })));
       if (connectionRef.current?.serverNodeKind === 'lingxi-service') {
         await sendQuickChatRustMessage(nextSessionPath,text,encodedAttachments.map(({item,data})=>({path:item.id,name:item.name,isDir:false,mimeType:item.mimeType,base64Data:data})));
-        setDraft('');setAttachments([]);setSending(false);window.hana?.quickChatResize?.('chat');
+        setDraft('');setAttachments([]);setSending(false);usePlatform()?.quickChatResize?.('chat');
         return;
       }
       const images = encodedAttachments.map(({ item, data }) => ({
@@ -654,7 +657,7 @@ export function QuickChatApp() {
       }));
       setDraft('');
       setAttachments([]);
-      window.hana?.quickChatResize?.('chat');
+      usePlatform()?.quickChatResize?.('chat');
 
       const ws = ensureSocket();
       const sendPayload = () => ws.send(JSON.stringify({
@@ -708,11 +711,12 @@ export function QuickChatApp() {
     openingFullSessionRef.current = true;
     setOpeningFullSession(true);
     try {
-      if (!window.hana?.quickChatOpenSession) throw Error('快捷聊天窗口接口不可用');
+      const platform = usePlatform();
+      if (!platform.quickChatOpenSession) throw Error('快捷聊天窗口接口不可用');
       const ownerKey = await quickChatOwnerKey(origin);
       if (connectionRef.current !== origin || sessionPathRef.current !== path) throw Error('会话来源已改变');
       const sid = path.startsWith('native:') ? path.slice(7) : useStore.getState().sessions.find(item => item.path === path)?.sessionId || null;
-      const result = await window.hana.quickChatOpenSession({ sessionPath: path, sessionId: sid, ownerKey });
+      const result = await platform.quickChatOpenSession({ sessionPath: path, sessionId: sid, ownerKey });
       if (!result?.ok) throw Error(result?.message || '主窗口未确认会话');
       markHidden();
     } catch (err) {
@@ -740,12 +744,12 @@ export function QuickChatApp() {
       agentName: agent?.name || null,
     });
     await loadMessages(forked.sessionPath);
-    window.hana?.quickChatResize?.('chat');
+    usePlatform()?.quickChatResize?.('chat');
   }, []);
 
   const closeQuickChat = useCallback(() => {
     markHidden();
-    window.hana?.quickChatHide?.();
+    usePlatform()?.quickChatHide?.();
   }, [markHidden]);
 
   const canSend = (!!draft.trim() || attachments.length > 0) && !openingFullSession && !sending && !isStreaming && !!connection;
@@ -769,7 +773,7 @@ export function QuickChatApp() {
     const previous = lastResizeRef.current;
     if (previous && previous.mode === mode && Math.abs(previous.height - height) < 2) return;
     lastResizeRef.current = { mode, height };
-    window.hana?.quickChatResize?.({ mode, height });
+    usePlatform()?.quickChatResize?.({ mode, height });
   }, [attachments.length, displayError, draft, expanded, sessionItems, isStreaming]);
 
   useQuickChatAutoScroll({

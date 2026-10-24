@@ -16,6 +16,7 @@ import {
 } from '../../utils/file-history-api';
 import { diffLines, type DiffLine } from '../../utils/line-diff';
 import styles from './FileHistoryModal.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export function FileHistoryModal() {
   const { t } = useI18n();
@@ -66,7 +67,7 @@ export function FileHistoryModal() {
       let current: string | null = null;
       if (nativeRoot && selectedPath) {
         const abs = `${nativeRoot.replace(/\/+$/, '')}/${selectedPath}`;
-        const snap = await window.platform?.readFileSnapshot?.(abs).catch(() => null);
+        const snap = await usePlatform()?.readFileSnapshot?.(abs).catch(() => null);
         current = snap?.content ?? null;
       }
       if (current == null) {

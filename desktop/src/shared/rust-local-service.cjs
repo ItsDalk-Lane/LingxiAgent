@@ -316,8 +316,66 @@ function readExistingRustConnection({ home, windowsReaderBinary }) {
   return { ...readOwnedRustConnection({ home, pid: record.pid, readyAddr: record.bindAddr, windowsReaderBinary }), pid: record.pid };
 }
 
+// ── R08-T03 远端模式 ──
+// 远端连接与本地 owned/reuse 路径并列独立：不读 instance pid、不强制 loopback，
+// 但 URL 形状、token 文件 owner-only、显式明文门一项不放宽。Windows 的私读走
+// 受信 Rust 读器且只认 lingxi-service 运行目录记录，本阶段不支持远端令牌文件。
+
+function isLoopbackRustHost(host) {
+  return host === '127.0.0.1' || host === '[::1]' || host === 'localhost';
+}
+
+function remoteAddress(rawUrl, allowCleartext) {
+  let url;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    throw new Error('invalid LINGXI_DESKTOP_RUST_REMOTE_URL: not an absolute URL');
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error('invalid LINGXI_DESKTOP_RUST_REMOTE_URL: only http(s) is allowed');
+  }
+  // 显式端口：默认端口（80/443）会被 URL 归一化为空串，直接拒绝。
+  if (!url.port || !/^\d+$/.test(url.port)) {
+    throw new Error('invalid LINGXI_DESKTOP_RUST_REMOTE_URL: an explicit port is required');
+  }
+  const port = Number(url.port);
+  if (port < 1 || port > 65535 || !url.hostname
+      || url.username || url.password || url.pathname !== '/' || url.search || url.hash) {
+    throw new Error('invalid LINGXI_DESKTOP_RUST_REMOTE_URL: host/port shape is not allowed');
+  }
+  const transport = url.protocol === 'https:' ? 'https' : 'http';
+  if (transport === 'http' && !isLoopbackRustHost(url.hostname) && !allowCleartext) {
+    throw new Error('Rust remote over cleartext http requires LINGXI_DESKTOP_RUST_REMOTE_ALLOW_CLEARTEXT=1 (drill only)');
+  }
+  return { host: url.hostname, port, transport, baseUrl: url.origin };
+}
+
+function readRemoteRustConnection({ env = process.env } = {}) {
+  const rawUrl = env.LINGXI_DESKTOP_RUST_REMOTE_URL;
+  if (!rawUrl) return null;
+  if (!rustDesktopEnabled(env)) {
+    throw new Error('LINGXI_DESKTOP_RUST_REMOTE_URL requires LINGXI_DESKTOP_SERVER_RUNTIME=rust');
+  }
+  if (process.platform === 'win32') {
+    throw new Error('Rust remote desktop connection is not supported on Windows in preview');
+  }
+  const tokenFile = env.LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE;
+  if (!tokenFile || !path.isAbsolute(tokenFile)) {
+    throw new Error('Rust remote requires an absolute LINGXI_DESKTOP_RUST_REMOTE_TOKEN_FILE');
+  }
+  // URL 形状先于令牌文件读取校验：坏 URL 不触发任何文件访问。
+  const address = remoteAddress(rawUrl, env.LINGXI_DESKTOP_RUST_REMOTE_ALLOW_CLEARTEXT === '1');
+  const credential = readPrivateJson(tokenFile, true);
+  if (!credential || typeof credential !== 'object'
+      || !/^[0-9a-f]{32}$/.test(credential.token || '')) {
+    throw new Error('Rust remote token file must contain a {"token":"<32 lowercase hex>"} record');
+  }
+  return { ...address, token: credential.token, remote: true };
+}
+
 module.exports = {
   rustDesktopEnabled, rustServicePlatformTag, rustServiceExecutable,
   rustServiceContentDigest, verifyRustServiceDirectory, resolveRustBinary,
-  readOwnedRustConnection, readExistingRustConnection,
+  readOwnedRustConnection, readExistingRustConnection, readRemoteRustConnection,
 };

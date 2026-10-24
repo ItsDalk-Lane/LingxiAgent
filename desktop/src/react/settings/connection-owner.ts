@@ -1,6 +1,6 @@
 import { useSettingsStore } from './store';
 import { createRemoteResource } from './resource-state';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 
 /** 与实际 fetch 使用完全相同的连接；计数锁存离开后又返回的变化。 */
 function identity(): string {

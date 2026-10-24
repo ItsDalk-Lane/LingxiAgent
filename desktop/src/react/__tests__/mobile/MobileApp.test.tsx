@@ -13,6 +13,7 @@ import registry from '../../../shared/theme-registry';
 // 用例偶发超时的主因）。静态引入把加载成本移到文件收集期，React.lazy 届时从模块
 // 缓存瞬时解析。
 import '../../components/app/WorkspaceCompanionRail';
+import { getDesktopHost } from '../../host/desktop-host';
 
 vi.mock('../../components/InputArea', async () => {
   const ReactModule = await import('react');
@@ -436,8 +437,8 @@ describe('MobileApp', () => {
 
   it('opens the settings modal from the mobile platform settings event', async () => {
     installMobilePlatform();
-    const onOpenSettingsModal = vi.fn(window.platform?.onOpenSettingsModal?.bind(window.platform));
-    window.platform!.onOpenSettingsModal = onOpenSettingsModal;
+    const onOpenSettingsModal = vi.fn(getDesktopHost().api?.onOpenSettingsModal?.bind(getDesktopHost().api));
+    getDesktopHost().api.onOpenSettingsModal = onOpenSettingsModal;
     fetchMock.mockImplementation((input: RequestInfo | URL, options?: RequestInit) => {
       const url = String(input);
       if (url.includes('/api/web-auth/session')) {
@@ -451,7 +452,7 @@ describe('MobileApp', () => {
     await waitFor(() => expect(onOpenSettingsModal).toHaveBeenCalled());
 
     act(() => {
-      window.platform?.openSettings?.('providers');
+      getDesktopHost().api?.openSettings?.('providers');
     });
 
     expect(await screen.findByTestId('mobile-settings-modal')).toHaveTextContent('providers');

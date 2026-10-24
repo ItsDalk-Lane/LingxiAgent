@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
+import { lingxiFetch } from '../../services/service-client';
 
 export interface SessionCacheRateQuery {
   sessionPath: string | null;

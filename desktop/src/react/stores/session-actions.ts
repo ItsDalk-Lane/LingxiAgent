@@ -16,6 +16,7 @@ import { readLoopRuntimeError, warnLoopRuntimeError } from '../services/loop-run
 import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from '../services/server-connection';
 import { sessionScopedKey, sessionScopedListIncludes, sessionScopedValue } from './session-slice';
 import { lingxiFetch, lingxiUrl } from '../hooks/use-hana-fetch';
+import { getDesktopHost } from '../host/desktop-host';
 import {
   conditionalMessagesFetch,
   hasMessagesValidationRecord,
@@ -258,7 +259,8 @@ function isAbortError(err: unknown): boolean {
 }
 
 function isDesktopShell(): boolean {
-  return typeof window !== 'undefined' && !!(window as unknown as { hana?: unknown }).hana;
+  // R08-T02：经宿主边界判断 Electron 壳（宿主 kind），不再直读 window.hana。
+  return typeof window !== 'undefined' && getDesktopHost().kind === 'electron';
 }
 
 function shouldRestoreInputFocus(path: string | null): boolean {

@@ -5,6 +5,7 @@ import { useTrainUpdateState } from '../../hooks/use-train-update-state';
 import type { TrainUpdatePhase, TrainUpdateProgressState } from '../../hooks/use-train-update-state';
 import type { CrashFallbackNotice, SessionMetaRecoveryStatus } from '../../types';
 import styles from './SidebarNoticeSlot.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 /**
  * 左下角更新贴纸默认使用“内容更新”语境；壳更新只在
@@ -352,7 +353,7 @@ export function SidebarNoticeSlot() {
       progress={progress}
       fallbackNotice={fallbackNotice}
       metaRecovery={metaRecovery}
-      onInstallShell={() => window.hana?.autoUpdateInstall?.()}
+      onInstallShell={() => usePlatform()?.autoUpdateInstall?.()}
       onApplyTrain={() => applyNow()}
       onAckFallback={() => ackFallbackNotice()}
     />

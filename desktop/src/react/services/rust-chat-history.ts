@@ -3,7 +3,7 @@ import type { ChatListItem, ChatMessage, ContentBlock, UserAttachment } from '..
 import type { LiveAssistantSegment } from '../stores/live-turn-store';
 import { renderMarkdown } from '../utils/markdown';
 import { projectAssistantTurn } from '../utils/turn-projector';
-import { appendConnectionAuth, buildConnectionUrl, resolveServerConnection, type ServerConnection } from './server-connection';
+import { appendConnectionAuth, buildConnectionUrl, requireServerConnection, resolveServerConnection, type ServerConnection } from './server-connection';
 import { useStore } from '../stores';
 import { conversationSuggestionFromDetails } from './conversation-suggestion';
 import { rustMediaBlocksFromDetails } from './rust-media';
@@ -241,4 +241,190 @@ async function boundedJson(response: Response): Promise<unknown> {
     for (;;) { const chunk = await reader.read(); if (chunk.done) break; bytes += chunk.value.byteLength; if (bytes > maxBytes) throw new Error('历史响应过大，请缩小分页范围'); text += decoder.decode(chunk.value, {stream:true}); }
     text += decoder.decode(); return JSON.parse(text) as unknown;
   } finally { await reader.cancel(); reader.releaseLock(); }
+}
+
+/* ── R08-T01：TraceDetailOverlay 会话叙事通道（canonical → 旧最小形状） ──
+ * 旧 GET /api/sessions/messages 在 Rust 拓扑下不存在；canonical 历史
+ * （/lingxi/v1/sessions/:id/history）形状不同。本段把 canonical 项投影为
+ * trace-conversation-model.parseSessionMessages 读取的旧子集，保住轨迹
+ * 详情的会话 join。端口决策（如实标注损失，不静默降级）：
+ * - 工具 args 只取 argsSummary：canonical 不存完整参数串（完整载荷属观测
+ *   调用侧，轨迹视图本就从观测载荷取）；
+ * - 工具 startedAt/endedAt 省略：canonical 只有 firstSeq；解析器允许缺省，
+ *   时间 join 回落到观测调用自身时间戳；
+ * - modelCallRef 只填 modelCallId（traceId/parentCallId 置 null——
+ *   modelCallId 是精确 join 键，观测侧据此反查）；
+ * - turnStatus 走现役外部词表 completed/failed/aborted：canonical
+ *   cancelled→aborted、interrupted_needs_attention→failed（需要注意的
+ *   终态如实标错，绝不显示为正常）；
+ * - 无 final 的 run：正文取 final_answer/commentary/unresolved 段、推理
+ *   取 reasoning 段；段无时间戳——诚实置 null（缺时间戳消息按相邻消息
+ *   归属轮次，解析器既有语义）；
+ * - Node 连接沿旧 URL 原样：旧字面量留在本 native 双分支文件。 */
+
+export type TraceSessionMessage = Record<string, unknown>;
+
+/** canonical run 终态 → 旧外部词表（transport 兼容映射，见 RunStatus 文档）。 */
+const LEGACY_TURN_STATUS: Readonly<Record<string, string>> = {
+  completed: 'completed',
+  failed: 'failed',
+  cancelled: 'aborted',
+  interrupted_needs_attention: 'failed',
+};
+
+/** canonical HistoryItem[] → 旧 /api/sessions/messages messages[] 最小形状（纯函数，供测试）。 */
+export function projectRustHistoryForTrace(items: unknown[]): TraceSessionMessage[] {
+  if (!Array.isArray(items)) throw new Error('历史输入无效');
+  interface TurnDraft {
+    key: string;
+    anchorIndex: number;
+    final?: Row;
+    segments: Row[];
+    toolCalls: TraceSessionMessage[];
+    turnStatus?: string;
+    hasTerminal: boolean;
+  }
+  const turns = new Map<string, TurnDraft>();
+  const turnFor = (key: string, index: number): TurnDraft => {
+    let draft = turns.get(key);
+    if (!draft) {
+      draft = { key, anchorIndex: index, segments: [], toolCalls: [], hasTerminal: false };
+      turns.set(key, draft);
+    }
+    return draft;
+  };
+  // 输出槽：user 直接落位；assistant 按 turn 聚合后落在锚点（final > 终态 > 首项）。
+  const userSlots: Array<{ index: number; entry: TraceSessionMessage }> = [];
+  items.forEach((value, index) => {
+    const row = record(value, 'item');
+    const kind = string(row.kind, 'kind');
+    switch (kind) {
+      case 'user_message': {
+        const legacy = row.legacyFields == null ? {} : record(row.legacyFields, 'legacyFields');
+        const entry: TraceSessionMessage = {
+          role: 'user',
+          entryId: string(row.messageId, 'messageId'),
+          content: string(row.text, 'text'),
+          timestamp: row.committedAtUnixMs,
+        };
+        if (typeof legacy.displayText === 'string') entry.displayText = legacy.displayText;
+        if (Array.isArray(legacy.images)) entry.images = legacy.images;
+        userSlots.push({ index, entry });
+        break;
+      }
+      case 'assistant_segment': {
+        const draft = turnFor(runId(row) ?? `unknown-segment:${string(row.segmentId, 'segmentId')}`, index);
+        draft.segments.push(row);
+        break;
+      }
+      case 'tool_call': {
+        const draft = turnFor(runId(row) ?? `unknown-tool:${string(row.toolCallId, 'toolCallId')}`, index);
+        const status = string(row.status, 'status');
+        const toolCall: TraceSessionMessage = {
+          id: string(row.toolCallId, 'toolCallId'),
+          name: string(row.target, 'target'),
+          status,
+          success: status === 'success',
+        };
+        if (typeof row.argsSummary === 'string') toolCall.args = row.argsSummary;
+        if (row.result != null) {
+          const result = record(row.result, 'tool result');
+          if (result.error != null) {
+            const error = record(result.error, 'tool error');
+            if (typeof error.message === 'string') toolCall.error = error.message;
+          }
+          if (result.details != null) toolCall.details = record(result.details, 'tool details');
+        }
+        draft.toolCalls.push(toolCall);
+        break;
+      }
+      case 'final_message': {
+        const draft = turnFor(runId(row) ?? `unknown-final:${string(row.messageId, 'messageId')}`, index);
+        draft.final = row;
+        draft.anchorIndex = index;
+        break;
+      }
+      case 'run_terminal': {
+        const status = string(row.status, 'status');
+        const draft = turnFor(string(row.runId, 'runId'), index);
+        draft.turnStatus = LEGACY_TURN_STATUS[status] ?? status;
+        draft.hasTerminal = true;
+        if (draft.final === undefined) draft.anchorIndex = index;
+        break;
+      }
+      // reset_marker / legacy_raw / 未来新增 kind：对轨迹叙事无对应物，
+      // 跳过（旧投影同样不产生 user/assistant 之外的条目）。
+      default: break;
+    }
+  });
+  const output: Array<{ index: number; entry: TraceSessionMessage }> = [...userSlots];
+  for (const draft of turns.values()) {
+    const entry: TraceSessionMessage = { role: 'assistant', entryId: '', content: '', timestamp: null };
+    let content = '';
+    let thinking = '';
+    if (draft.final !== undefined) {
+      entry.entryId = string(draft.final.messageId, 'messageId');
+      entry.timestamp = draft.final.committedAtUnixMs;
+      if (typeof draft.final.modelCallId === 'string' && draft.final.modelCallId !== '') {
+        entry.modelCallRef = { modelCallId: draft.final.modelCallId, traceId: null, parentCallId: null };
+      }
+      // final content 已过规范化 scanner：text/reasoning 块拼接；
+      // resource_ref/opaque 块不编造文本。
+      const blocks = Array.isArray(draft.final.content) ? draft.final.content : [];
+      for (const value of blocks) {
+        const block = record(value, 'content block');
+        const blockType = string(block.type, 'block.type');
+        if (blockType === 'text') content += string(block.text, 'block.text');
+        else if (blockType === 'reasoning') thinking += string(block.text, 'block.text');
+      }
+    } else {
+      entry.entryId = `${draft.key}-partial`;
+      for (const segment of draft.segments) {
+        const phase = string(segment.phase, 'phase');
+        const segmentKind = string(segment.segmentKind, 'segmentKind');
+        const text = string(segment.text, 'text');
+        if (segmentKind === 'reasoning' || phase === 'reasoning') thinking += text;
+        else content += text;
+      }
+    }
+    entry.content = content;
+    if (thinking !== '') entry.thinking = thinking;
+    if (draft.turnStatus !== undefined) entry.turnStatus = draft.turnStatus;
+    if (draft.toolCalls.length > 0) entry.toolCalls = draft.toolCalls;
+    output.push({ index: draft.anchorIndex, entry });
+  }
+  output.sort((a, b) => a.index - b.index);
+  return output.map(slot => slot.entry);
+}
+
+/**
+ * R08-T01：TraceDetailOverlay 的会话叙事读取（Node/Rust 双分支）。
+ * Rust：canonical 全量历史 → projectRustHistoryForTrace；Node：旧 URL 原样。
+ * 失败抛出——调用方既有语义是 catch → null → calls-only 降级并显式标注。
+ */
+export async function readTraceSessionMessages(
+  sessionId: string,
+  signal?: AbortSignal,
+): Promise<TraceSessionMessage[] | null> {
+  const connection = requireServerConnection(
+    useStore.getState(),
+    'trace session messages: server connection not ready',
+  );
+  if (connection.serverNodeKind === 'lingxi-service') {
+    const history = await readRustChatHistory(connection, sessionId, { all: true, signal });
+    // all:true 下服务禁止 304（readRustChatHistory 亦对此响亮失败）；运行期
+    // 不可达。tsconfig.test.json 关 strictNullChecks，判别联合收窄失效，
+    // 用显式 Exclude 取全量分支。
+    if (history.notModified) throw new Error('全量历史读取不得命中 304');
+    const full = history as Exclude<RustHistoryResult, { notModified: true }>;
+    return projectRustHistoryForTrace(full.rawItems);
+  }
+  const res = await fetch(
+    buildConnectionUrl(connection, `/api/sessions/messages?sessionId=${encodeURIComponent(sessionId)}&all=1`),
+    { headers: appendConnectionAuth(connection, undefined), signal },
+  );
+  if (!res.ok) throw new Error(`读取会话消息失败：${res.status}`);
+  const data: unknown = await res.json();
+  const messages = (data as { messages?: unknown } | null)?.messages;
+  return Array.isArray(messages) ? messages as TraceSessionMessage[] : null;
 }

@@ -30,6 +30,13 @@ describe("local startup contract", () => {
     expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/hana-node");
   });
 
+  it("保留显式演练目录并将同一绝对路径传给子进程", () => {
+    const env = applyDevEnvironment({ LINGXI_HOME: "/tmp/r08-copy/home" }, { nodeBin: "/tmp/test-node" });
+    expect(env.LINGXI_HOME).toBe("/tmp/r08-copy/home");
+    expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/test-node");
+    expect(applyDevEnvironment({}).LINGXI_HOME).toMatch(/\.lingxi-dev$/);
+  });
+
   it("server keeps Pi SDK runtime paths explicit and CLI stays server-first", () => {
     const cliSource = fs.readFileSync(path.join(ROOT, "index.js"), "utf-8");
     const cliEntrySource = fs.readFileSync(path.join(ROOT, "cli", "entry.ts"), "utf-8");

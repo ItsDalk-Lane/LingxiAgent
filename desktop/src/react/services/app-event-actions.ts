@@ -17,6 +17,7 @@ import { applyRustMediaJobs } from './rust-media';
 import { captureSessionConnection } from './session-connection-owner';
 import { sessionScopedKey, sessionScopedValue } from '../stores/session-slice';
 import { bumpMessageLiveVersion } from '../stores/message-live-version';
+import { usePlatform } from '../hooks/use-platform';
 
 declare const i18n: {
   locale: string;
@@ -197,7 +198,7 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
       useStore.getState().triggerBridgeReload();
       const connectionKey = bridgePublicConnectionKey(useStore.getState());
       window.dispatchEvent(new CustomEvent('hana-bridge-reload', { detail: { agentId: data.agentId, connectionKey } }));
-      if (options.source === 'server') window.platform?.settingsChanged?.('bridge-status-changed', { agentId: data.agentId, connectionKey });
+      if (options.source === 'server') usePlatform()?.settingsChanged?.('bridge-status-changed', { agentId: data.agentId, connectionKey });
       break;
     }
     case 'bridge_message': {
@@ -317,7 +318,7 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
       // 所以这里同时通知当前 renderer；独立设置窗口仍走既有 IPC 通道。
       window.dispatchEvent(new CustomEvent('hana-models-changed', { detail: data || {} }));
       if (options.source === 'server') {
-        window.platform?.settingsChanged?.('models-changed', data || {});
+        usePlatform()?.settingsChanged?.('models-changed', data || {});
       }
       // 模型配置变更可能改变 contextWindow（用户把 1M 模型改成 256k 等），
       // 主动补发一次 context_usage 让 ContextRing 立即吃到新分母。
@@ -333,7 +334,7 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
       }));
       window.dispatchEvent(new CustomEvent('hana-skills-changed', { detail: data || {} }));
       if (options.source === 'server') {
-        window.platform?.settingsChanged?.('skills-changed', data || {});
+        usePlatform()?.settingsChanged?.('skills-changed', data || {});
       }
       break;
     }
@@ -429,12 +430,12 @@ export function handleAppEvent(type: string, data: any = {}, options: AppEventOp
       break;
     case 'network-proxy-changed':
       if (options.source === 'server') {
-        window.platform?.settingsChanged?.('network-proxy-changed', data);
+        usePlatform()?.settingsChanged?.('network-proxy-changed', data);
       }
       break;
     case 'keep-awake-changed':
       if (options.source === 'server') {
-        window.platform?.settingsChanged?.('keep-awake-changed', data);
+        usePlatform()?.settingsChanged?.('keep-awake-changed', data);
       }
       break;
     case 'paper-texture-changed':

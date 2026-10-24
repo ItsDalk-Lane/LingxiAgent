@@ -8,8 +8,8 @@
 import type { Session } from '../../types';
 import { useStore } from '../../stores';
 import type { MapPendingTurn, MapTurn, MapTurnsEntry } from '../../stores/conversation-map-slice';
-import { lingxiFetch } from '../../hooks/use-hana-fetch';
-import { resolveServerConnection } from '../../services/server-connection';
+import { lingxiFetch } from '../../services/service-client';
+import { resolveServerConnection } from '../../services/service-client';
 import { captureSessionConnection, ownsSessionConnection, sessionOwnerFetch } from '../../services/session-connection-owner';
 import { sessionIdForPathFromLocatorState } from '../../stores/session-slice';
 import {

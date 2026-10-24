@@ -8,8 +8,8 @@
  *     usage 汇总 / 载荷完整度 / 会话 join 状态；
  *   - 检查器「观测载荷」tab（TrajectoryTable 内实现）。
  *
- * 正文双通道：会话消息按 calls 的 sessionId 多数票反查
- * GET /api/sessions/messages（失败 → calls-only 降级，界面显式标注）。
+ * 正文双通道：会话消息按 calls 的 sessionId 多数票反查（Node/Rust 双分支
+ * readTraceSessionMessages；失败 → calls-only 降级，界面显式标注）。
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -51,18 +51,28 @@ const tr = (key: string): string => t(`settings.observability.traceDetail.${key}
 const EMPTY_TURN_IDS: ReadonlySet<number> = new Set();
 const EMPTY_RECORD_IDS: ReadonlySet<string> = new Set();
 
-/* ── 会话消息拉取（观测连接面复用；失败 = calls-only 降级，不炸视图）──── */
+/* ── 会话消息拉取（Node/Rust 双分支；失败 = calls-only 降级，不炸视图）────
+ * R08-T01：Rust 拓扑下旧 GET /api/sessions/messages 不存在——
+ * readTraceSessionMessages 投影 canonical 历史为旧最小形状（投影损失在
+ * rust-chat-history.ts 如实标注）；Node 连接沿旧 URL 原样。旧 URL 字面量
+ * 随之移入该 native 双分支文件。 */
 
 async function fetchSessionMessages(
   sessionId: string,
   signal?: AbortSignal | null,
 ): Promise<unknown> {
-  const res = await observabilityRequest(
-    `/api/sessions/messages?sessionId=${encodeURIComponent(sessionId)}&all=1`,
-    { signal, timeout: 30_000 },
-  );
-  const data = await res.json() as { messages?: unknown };
-  return data?.messages ?? null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30_000);
+  if (signal) {
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener('abort', () => controller.abort(), { once: true });
+  }
+  try {
+    const { readTraceSessionMessages } = await import('../../../../services/rust-chat-history');
+    return await readTraceSessionMessages(sessionId, controller.signal);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 /**

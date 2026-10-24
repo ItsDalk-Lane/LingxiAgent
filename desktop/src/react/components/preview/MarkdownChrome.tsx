@@ -12,6 +12,7 @@ import {
 } from '../../utils/markdown-document';
 import { resolveLinkTarget } from '../../utils/link-open';
 import styles from './MarkdownChrome.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export { ClassicFindBox } from '../../ui/ClassicFindBox';
 
@@ -225,7 +226,7 @@ export function DocumentReferencesBlock({ previewItem }: { previewItem: PreviewI
         .slice(0, 120);
       const backlinks: DocumentReferencesSummary['backlinks'] = [];
       await Promise.all(candidates.map(async (filePath) => {
-        const snapshot = await window.platform?.readFileSnapshot?.(filePath).catch(() => null);
+        const snapshot = await usePlatform()?.readFileSnapshot?.(filePath).catch(() => null);
         const content = snapshot?.content;
         if (!content) return;
         const links = extractMarkdownLinks(content);

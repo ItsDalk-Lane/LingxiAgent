@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { VideoStage } from '../../../../components/shared/MediaViewer/VideoStage';
 import type { FileRef } from '../../../../types/file-ref';
+import { resetDesktopHostForTests } from '../../../../host/desktop-host';
 
 describe('VideoStage', () => {
   beforeEach(() => {
@@ -14,7 +15,7 @@ describe('VideoStage', () => {
   });
   afterEach(() => {
     cleanup();
-    delete (window as any).platform;
+    resetDesktopHostForTests();
   });
 
   it('解码失败时显示显式错误卡片并提供系统播放器逃生门', async () => {

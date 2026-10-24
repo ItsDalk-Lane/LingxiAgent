@@ -7,6 +7,7 @@ import { AgentAvatar, resolveAgentDisplayInfo } from '../../utils/agent-display'
 import { FileKindIcon } from '../shared/FileKindIcon';
 import { FolderIcon } from '../shared/FolderIcon';
 import styles from './InputArea.module.css';
+import { usePlatform } from '../../hooks/use-platform';
 
 export type MentionMenuItem = FileMentionItem | SessionMentionItem | AgentMentionItem;
 
@@ -137,7 +138,7 @@ function MentionItemIcon({ item, agents }: { item: MentionMenuItem; agents: Agen
   const file = item as FileMentionItem;
   const fileKind = kindOfFileName(file.name || file.path, file.mimeType);
   const thumbnailUrl = !file.isDirectory && (fileKind === 'image' || fileKind === 'svg') && file.path
-    ? window.platform?.getFileUrl?.(file.path)
+    ? usePlatform()?.getFileUrl?.(file.path)
     : null;
   if (thumbnailUrl) return <img className={styles['mention-thumbnail']} src={thumbnailUrl} alt="" />;
   if (file.isDirectory) return <FolderIcon size={18} />;

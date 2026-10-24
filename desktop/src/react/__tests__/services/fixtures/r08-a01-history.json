@@ -1,0 +1,199 @@
+{
+  "headRevision": "10",
+  "items": [
+    {
+      "committedAtUnixMs": 1792654967340,
+      "kind": "user_message",
+      "messageId": "user:run_000001a16290022c_000001",
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "seq": "1",
+      "text": "R08-A01-TOOLCHAIN"
+    },
+    {
+      "argsDigest": {
+        "algorithm": "sha256",
+        "canonicalization": "lingxi-canonical-json-v1",
+        "hex": "e9c9fb555fb0f47efb71aafbe5311603e2e87986f3b7f26a62eced9f58cec1f7"
+      },
+      "firstSeq": "5",
+      "kind": "tool_call",
+      "result": {
+        "content": [
+          {
+            "text": "A01-SEED-CONTENT\n",
+            "type": "text"
+          }
+        ],
+        "details": {
+          "format": "text-or-binary",
+          "source": {
+            "path": "a01-seed.txt",
+            "sha256": "a6b2f7817db0cd9daa47dcc7dd68fa58d1af5f2c5470de829c18b31c9eb7b793",
+            "sizeBytes": 17
+          }
+        },
+        "status": "success",
+        "truncated": false
+      },
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "status": "success",
+      "target": "tool:first-party:read",
+      "toolCallId": "run_000001a16290022c_000001-tc0001"
+    },
+    {
+      "argsDigest": {
+        "algorithm": "sha256",
+        "canonicalization": "lingxi-canonical-json-v1",
+        "hex": "8b6b107dc5fb64e9ad788d711c6834a5c3df8acac26517200258c2fd2d532620"
+      },
+      "firstSeq": "11",
+      "kind": "tool_call",
+      "result": {
+        "content": [
+          {
+            "text": "Successfully wrote to a01-written.txt",
+            "type": "text"
+          }
+        ],
+        "resourceRefs": [
+          {
+            "digest": {
+              "algorithm": "sha256",
+              "canonicalization": "raw-bytes",
+              "hex": "cd093e22e6d060c67e50131fcfd50aaeed743f921cd918fc4ac267e3c3c692a8"
+            },
+            "displayName": "a01-written.txt",
+            "kind": "artifact",
+            "resourceId": "file:/private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-50315-1792654963231/home/lingxi-r08-a01a02-a01-50380-1792654967086401000/a01-written.txt",
+            "sizeBytes": "15",
+            "uri": "file:///private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-50315-1792654963231/home/lingxi-r08-a01a02-a01-50380-1792654967086401000/a01-written.txt"
+          }
+        ],
+        "status": "success",
+        "truncated": false
+      },
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "status": "success",
+      "target": "tool:first-party:write",
+      "toolCallId": "run_000001a16290022c_000001-tc0002"
+    },
+    {
+      "argsDigest": {
+        "algorithm": "sha256",
+        "canonicalization": "lingxi-canonical-json-v1",
+        "hex": "2488ce3fbaf9e1b27344cec2069e5cf316465e008ff327d7cda5367156d41cf7"
+      },
+      "firstSeq": "17",
+      "kind": "tool_call",
+      "result": {
+        "content": [
+          {
+            "text": "Successfully replaced 1 block(s) in a01-written.txt.",
+            "type": "text"
+          }
+        ],
+        "resourceRefs": [
+          {
+            "digest": {
+              "algorithm": "sha256",
+              "canonicalization": "raw-bytes",
+              "hex": "55afaad046ab829a9de22c743dfebae43bb42d45392e7090beadd5934c351046"
+            },
+            "displayName": "a01-written.txt",
+            "kind": "artifact",
+            "resourceId": "file:/private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-50315-1792654963231/home/lingxi-r08-a01a02-a01-50380-1792654967086401000/a01-written.txt",
+            "sizeBytes": "15",
+            "uri": "file:///private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-50315-1792654963231/home/lingxi-r08-a01a02-a01-50380-1792654967086401000/a01-written.txt"
+          }
+        ],
+        "status": "success",
+        "truncated": false
+      },
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "status": "success",
+      "target": "tool:first-party:edit",
+      "toolCallId": "run_000001a16290022c_000001-tc0003"
+    },
+    {
+      "argsDigest": {
+        "algorithm": "sha256",
+        "canonicalization": "lingxi-canonical-json-v1",
+        "hex": "05fe10def1613c20a23e56528eeef59757621df5f7107d1aff987ef5a48192c9"
+      },
+      "firstSeq": "23",
+      "kind": "tool_call",
+      "result": {
+        "content": [
+          {
+            "text": "(no output)",
+            "type": "text"
+          }
+        ],
+        "status": "success",
+        "truncated": false
+      },
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "status": "success",
+      "target": "tool:first-party:exec_command",
+      "toolCallId": "run_000001a16290022c_000001-tc0004"
+    },
+    {
+      "complete": true,
+      "firstSeq": "28",
+      "kind": "assistant_segment",
+      "phase": "final_answer",
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "segmentId": "assistant:5:text:default",
+      "segmentKind": "text",
+      "text": "A01-FINAL-ANSWER"
+    },
+    {
+      "committedAtUnixMs": 1792654967517,
+      "content": [
+        {
+          "text": "A01-FINAL-ANSWER",
+          "type": "text"
+        }
+      ],
+      "kind": "final_message",
+      "messageId": "run_000001a16290022c_000001-final",
+      "modelCallId": "run_000001a16290022c_000001-mc0005",
+      "run": {
+        "runId": "run_000001a16290022c_000001",
+        "state": "known"
+      },
+      "seq": "11"
+    }
+  ],
+  "page": {
+    "hasMore": false,
+    "limit": 200
+  },
+  "revision": "\"r10-e34\"",
+  "schemaVersion": "lingxi.canonical-history.v1",
+  "sessionId": "a01",
+  "todoPanel": {
+    "dismissed": false,
+    "removed": true,
+    "todos": []
+  },
+  "todos": []
+}

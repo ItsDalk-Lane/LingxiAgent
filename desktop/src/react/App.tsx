@@ -37,6 +37,7 @@ import { ChatSearchOverlay } from './components/search/ChatSearchOverlay';
 // DeskSection 重载）。此前仅移动端 WorkspaceCompanionRail 挂载，桌面端没有任何
 // 订阅，文件树只能在切换工作台时刷新。
 import { WorkspaceFileChangeBridge } from './components/app/WorkspaceFileChangeBridge';
+import { usePlatform } from './hooks/use-platform';
 
 declare function t(key: string, vars?: Record<string, string | number>): string;
 
@@ -85,7 +86,7 @@ function App() {
         console.error('[init] 初始化异常:', err);
         console.error('[hana-launch] init-failed', err);
         console.info('[hana-launch] app-ready', JSON.stringify({ reason: 'init-failed' }));
-        window.platform?.appReady?.();
+        usePlatform()?.appReady?.();
       });
   }, []);
 

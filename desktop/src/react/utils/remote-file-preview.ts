@@ -6,10 +6,10 @@ import type {
 } from '../types';
 import type { DeskFile } from '../types';
 import type { FileRef } from '../types/file-ref';
-import { lingxiFetch } from '../hooks/use-hana-fetch';
+import { lingxiFetch } from '../services/service-client';
 import { openPreview, upsertPreviewItem } from '../stores/preview-actions';
 import { useStore } from '../stores';
-import { resolveServerConnection } from '../services/server-connection';
+import { resolveServerConnection } from '../services/service-client';
 import {
   encodeWorkbenchContentPath,
   resolveFileRefPreviewAccess,
@@ -21,6 +21,7 @@ import { extOfName, inferKindByExt, isMediaKind } from './file-kind';
 import { openMediaViewerForRef } from './open-media-viewer';
 import { showError } from './ui-helpers';
 import { isWebRuntime } from './platform-runtime';
+import { usePlatform } from '../hooks/use-platform';
 
 export { isWebRuntime };
 
@@ -434,7 +435,7 @@ export function fileRefDownloadUrl(file: FileRef): string | null {
   try {
     const resolved = resolveFileRefUrl(file, {
       connection: resolveServerConnection(useStore.getState()),
-      platform: typeof window !== 'undefined' ? window.platform : null,
+      platform: typeof window !== 'undefined' ? usePlatform() : null,
       preferLocalFile: false,
     });
     return resolved.mode === 'local-file' ? null : resolved.url;
