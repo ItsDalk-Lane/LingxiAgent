@@ -1,9 +1,0 @@
-{
-  "sourceEphemeral": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r05f27-f27-series-31868-1791711925417634000/f27-resource-series.json",
-  "evidence": "artifacts/rust-tauri/R06/AR/W01-E01/probes/workspace03-f27-full-resource-series.json",
-  "sha256": "fd9a3b8e32b756640f18feea57eb8f3501b2ac2d180f384ee4299af1470a0508",
-  "command": "workspace-final-03",
-  "test": "f27_sustained_cancel_error_worker_load_stays_bounded",
-  "actualResult": "ok",
-  "scope": "only synthetic raw business/resource time series; no credentials/home copied"
-}

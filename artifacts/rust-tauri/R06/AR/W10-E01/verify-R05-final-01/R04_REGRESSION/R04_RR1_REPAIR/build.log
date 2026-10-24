@@ -1,8 +1,0 @@
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.27s
-  Executable unittests src/lib.rs (rust/target/debug/deps/lingxi_service-a4f08e303f9d7fb0)
-  Executable tests/r04_rr1_f02_reaper_cleanup.rs (rust/target/debug/deps/r04_rr1_f02_reaper_cleanup-0212db2487b22bce)
-  Executable tests/r04_rr1_f03_stop_honesty.rs (rust/target/debug/deps/r04_rr1_f03_stop_honesty-8a07012a805fdb85)
-  Executable tests/r04_rr1_f04_pty_consumption.rs (rust/target/debug/deps/r04_rr1_f04_pty_consumption-140d42f3a11f4e77)
-  Executable tests/r04_rr1_f05_output_integrity.rs (rust/target/debug/deps/r04_rr1_f05_output_integrity-1709427eb8117464)
-  Executable tests/r04_rr1_f05_spill_failure.rs (rust/target/debug/deps/r04_rr1_f05_spill_failure-a5c25013481680d9)
-  Executable tests/r04_t05_registry_capacity.rs (rust/target/debug/deps/r04_t05_registry_capacity-ce863133eb8f2b30)

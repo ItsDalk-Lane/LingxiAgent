@@ -1,6 +1,0 @@
-{"status": "FAIL", "positive": "PASS_FIRST_RUN", "service_exit": 0}
-Traceback (most recent call last):
-  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/binary_c01.py", line 24, in <module>
-    assert sum(x.get('content')==first and x.get('role')=='user' for x in wire[1]['messages'])==1,'missing first user turn in actual second wire'
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-AssertionError: missing first user turn in actual second wire

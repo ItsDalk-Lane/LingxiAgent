@@ -1,1 +1,0 @@
-{"status":"INVALID_JSONL_FOR_ACCEPTANCE","reason":"Concurrent original emit_eval_record writes interleaved JSON fragments; test assertions passed but record audit cannot consume malformed lines; kept unchanged."}

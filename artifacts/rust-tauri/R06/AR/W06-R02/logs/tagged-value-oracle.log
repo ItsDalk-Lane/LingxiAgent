@@ -1,4 +1,0 @@
-{"command": ["node", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R02/tagged-value-oracle.mjs"], "start": 1791700964.4358468, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-tagged-value-oracle-aoo0nsw6", "guard": "8192MB/600s"}
-{"name":"unsupported-bool-tag","error":"unknown tag !<!custom> (1:31)\n\n 1 | memory: {enabled: !custom true}\n-----------------------------------^"}
-{"name":"unsupported-string-tag","error":"unknown tag !<!custom> (2:39)\n\n 1 |  ...  {enabled: false}\n 2 |  ... {name: !custom LITERAL-TAG-NAME}\n-----------------------------------------^"}
-{"name":"unsupported-section-tag","error":"unknown tag !<!custom> (1:32)\n\n 1 | memory: !custom {enabled: true}\n------------------------------------^"}

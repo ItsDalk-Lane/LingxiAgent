@@ -1,3 +1,0 @@
-GENERATED DRIFT DETECTED (1 problems):
-  - stale file on disk: ts/protocol.ts
-regenerate with: cargo run -p lingxi-protocol --bin lingxi-protocol-gen

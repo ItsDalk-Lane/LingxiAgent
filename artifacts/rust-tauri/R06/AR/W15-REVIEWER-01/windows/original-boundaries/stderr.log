@@ -1,8 +1,0 @@
-   Compiling serde_core v1.0.229
-   Compiling serde_json v1.0.151
-   Compiling memchr v2.8.3
-   Compiling digest v0.11.3
-   Compiling sha2 v0.11.0
-   Compiling xtask v0.1.0 (/private/tmp/lingxi-r06-w15-reviewer-01/rust/crates/xtask)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.50s
-     Running `/private/tmp/lingxi-w15-r01-runtime/target/debug/xtask check-boundaries`

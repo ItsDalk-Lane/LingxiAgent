@@ -1,6 +1,0 @@
-{
-  "status": "STALE_PREPARATION_FAILURE_NO_BUSINESS_RESULT",
-  "reason": "test SHA formatting compile failure, then normal close WAL regression fixed; preserve old patch/binding",
-  "patch_sha256": "e313ddee68d935163a6e71d5c7b6d85ee1ca687121e630bb0ba167d0be3e8810",
-  "superseded_by": "W12-CANDIDATE-04"
-}

@@ -1,9 +1,0 @@
-{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--no-run"], "start": 1791704611.192449, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-compile-node-02-lif3npfg", "guard": "8192MB/600s"}
-   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
-error: expected type, found keyword `static`
-   --> crates/lingxi-adapters/src/storage/agent_config.rs:141:55
-    |
-141 |     Scalar { key: Option<String>, merge: bool, kind: &static str },
-    |     ------ while parsing this struct                  ^^^^^^ expected type
-
-error: could not compile `lingxi-adapters` (lib) due to 1 previous error

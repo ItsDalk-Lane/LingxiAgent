@@ -1,6 +1,0 @@
-{"command": ["python3", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/extra-v2.py"], "start": 1791707442.0366201, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-extra-v2-rodcrr5n", "guard": "8192MB/600s"}
-scalar-schema-extra True 200 ('completed', 'completed.with_final')
-dual-merge-tag-extra True 200 ('completed', 'completed.with_final')
-unknown-null-bad-extra False 200 ('completed', 'completed.with_final')
-unknown-bool-bad-extra True 400 ('failed', 'failed.provider_error')
-redefined-anchor-extra True 200 ('completed', 'completed.with_final')

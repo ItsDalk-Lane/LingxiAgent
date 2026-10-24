@@ -1,6 +1,0 @@
-{
-  "new_owner_immediate_lock_acquisition": true,
-  "no_ready_published": true,
-  "original_worker_joined_before_return": true,
-  "return": "Err(Bind { addr: 127.0.0.1:49651, source: Os { code: 48, kind: AddrInUse, message: \"Address already in use\" } })"
-}

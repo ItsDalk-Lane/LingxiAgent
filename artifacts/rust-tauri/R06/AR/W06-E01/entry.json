@@ -1,8 +1,0 @@
-{
-  "head": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
-  "status": " M docs/rust-tauri/ORCHESTRATOR_PROGRESS.json\n M docs/rust-tauri/R06/R06_HANDOFF.json\n M docs/rust-tauri/R06/R06_PROGRESS.json\n M docs/rust-tauri/R06/R06_REPORT.md\n M lib/knowledge/vector-index-adapter.ts\n M rust/crates/lingxi-adapters/src/storage/knowledge.rs\n M rust/crates/lingxi-adapters/src/storage/session_tree.rs\n M rust/crates/lingxi-service/src/filetools.rs\n M rust/crates/lingxi-service/src/knowledge.rs\n M rust/crates/lingxi-service/src/lib.rs\n M rust/crates/lingxi-service/src/resourceio.rs\n M rust/crates/lingxi-service/src/session_tree.rs\n M rust/crates/lingxi-service/src/sessions.rs\n?? .vscode/\n?? artifacts/rust-tauri/R06/AR/\n?? docs/rust-tauri/R06/repair-current/\n?? rust/crates/lingxi-adapters/tests/r06_ar_f12_cache_preservation.rs\n?? rust/crates/lingxi-service/src/file_safety.rs\n?? rust/crates/lingxi-service/tests/r06_ar_f02_file_restore.rs\n?? rust/crates/lingxi-service/tests/r06_ar_f06_config.rs\n?? tests/r06-ar-f12-vector-cache-preservation.test.ts\n",
-  "settings_sha256": "0f72eb0a2549c95973c2aa8abe54c9aa44491fb9ca2a1c6e437404655d36b3d3",
-  "platform": "Darwin charles-gordondeMac-Studio.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:05:42 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6031 arm64\n",
-  "toolchain": "cargo 1.98.1 (797e8a9bc 2026-08-05)\n",
-  "started": 1791696753.313146
-}

@@ -1,6 +1,0 @@
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.22s
-     Running `rust/target/debug/examples/r06_gui_service_runner /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final/home --workspace /Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/STAGE-REVIEW-R06-AR-R1/gui-proof-final --idle-seconds 3600`
-
-thread 'main' (4513873) panicked at crates/lingxi-service/examples/r06_gui_service_runner.rs:52:13:
-home 已存在实例记录，拒绝静默顶替；请为本轮换新 home
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

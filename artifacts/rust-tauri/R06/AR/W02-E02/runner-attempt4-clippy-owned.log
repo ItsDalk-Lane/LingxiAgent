@@ -1,6 +1,0 @@
-COMMAND ["/Users/study_superior/.cargo/bin/cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--all-targets", "--", "-D", "warnings"]
-ISOLATED_LINGXI_HOME /tmp/lingxi-w02-e02-clippy-owned-5pgtmqlo
-START 2026-10-11T06:00:01.713338+00:00
-    Blocking waiting for file lock on build directory
-    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 58s

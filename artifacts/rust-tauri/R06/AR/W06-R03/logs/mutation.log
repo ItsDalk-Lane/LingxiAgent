@@ -1,9 +1,0 @@
-{"command": ["python3", "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation.py"], "start": 1791707689.531273, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-mutation-u68ghr2z", "guard": "8192MB/600s"}
-Traceback (most recent call last):
-  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation.py", line 16, in <module>
-    fp=F/'lingxi-service-7547adafbd47d443/lib-lingxi_service.json';args=deps(fp)
-                                                                        ~~~~^^^^
-  File "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/AR/W06-R03/mutation.py", line 13, in deps
-    assert len(choices)==1,(name,choices)
-           ^^^^^^^^^^^^^^^
-AssertionError: ('serde_json', [])

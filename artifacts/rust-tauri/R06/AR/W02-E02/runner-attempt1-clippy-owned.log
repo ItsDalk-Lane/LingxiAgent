@@ -1,4 +1,0 @@
-COMMAND ["/Users/study_superior/.cargo/bin/cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--all-targets", "--", "-D", "warnings"]
-ISOLATED_LINGXI_HOME /tmp/lingxi-w02-e02-clippy-owned-gkopuxq5
-START 2026-10-11T05:33:45.154912+00:00
-error: manifest path `rust/Cargo.toml` does not exist

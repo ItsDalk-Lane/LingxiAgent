@@ -1,8 +1,0 @@
-
-running 3 tests
-test usage_missing_measurement_must_not_be_reported_as_zero ... ok
-test usage_coverage_keeps_partial_unknown_real_zero_and_failed_rows_separate ... ok
-test usage_real_wire_unknown_partial_and_measured_zero_are_distinct ... ok
-
-test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 2.41s
-

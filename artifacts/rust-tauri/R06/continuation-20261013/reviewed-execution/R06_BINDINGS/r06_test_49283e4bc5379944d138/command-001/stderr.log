@@ -1,4 +1,0 @@
-   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.02s
-     Running tests/r04_t03_approval_service.rs (rust/target-r06-continuation/debug/deps/r04_t03_approval_service-da1cf2c9bf15fb74)
-error: test failed, to rerun pass `-p lingxi-service --test r04_t03_approval_service`

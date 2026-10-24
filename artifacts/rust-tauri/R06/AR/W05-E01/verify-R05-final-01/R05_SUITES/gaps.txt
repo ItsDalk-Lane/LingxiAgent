@@ -1,3 +1,0 @@
-run svc:r05_t07_rr1_usage_ledger: cargo test exit 101
-run svc:r05_t07_rr1_usage_ledger: passed 14 but the stage pin is 15
-run svc:r05_t07_rr1_usage_ledger: 1 failing tests

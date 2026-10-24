@@ -1,2 +1,0 @@
-SPIKE_SCHEMA_OK schema=ClientHello.schema.json positive=valid negative=rejected("one" is not of type "integer" at /protocolMin)
-exit=0

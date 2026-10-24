@@ -1,9 +1,0 @@
-{
-  "command": "python3 scripts/rust-tauri/r02_registry_consistency.py",
-  "start_time": "2026-10-11T05:11:08.881247+00:00",
-  "end_time": "2026-10-11T05:11:08.922768+00:00",
-  "exit_code": 1,
-  "status": "FAIL",
-  "candidate_sha": "2e1933d8f16d0f383b85ca92ff5bdf29e4732e6d",
-  "observed": "FAIL: count mismatch: migrations.rs MIGRATIONS has 9 entries, the registry has 7\nFAIL: v8 (r06_t03_session_tree) exists in migrations.rs MIGRATIONS but is MISSING from the registry\nFAIL: v9 (r06_t05_session_files_resources) exists in migrations.rs MIGRATIONS but is MISSING from the registry\nFAIL: registry consistency — migrations.rs MIGRATIONS and R02-T04_STORAGE_REGISTRY.json disagree (root=/Users/study_superior/Desktop/Code/LingxiAgent)\n"
-}

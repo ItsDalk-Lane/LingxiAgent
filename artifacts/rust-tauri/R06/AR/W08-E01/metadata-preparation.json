@@ -1,5 +1,0 @@
-{
-  "first_wire_summary": "未匹配envelope payload，发现raw列表空；未影响产品/测试。",
-  "second_wire_summary": "失败KeyError content，failed结果无content；未写文件。",
-  "final_wire_summary": "按实际payload及failed分支重生成，原wire/events未修改。"
-}

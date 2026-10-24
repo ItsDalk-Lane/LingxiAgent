@@ -1,3 +1,0 @@
-{"command": ["/Users/study_superior/.cargo/bin/cargo", "clippy", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "--workspace", "--all-targets", "--", "-D", "warnings"], "start": 1791705614.8723001, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-prefreeze-clippy-02-46beelwu", "guard": "8192MB/600s"}
-    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.97s

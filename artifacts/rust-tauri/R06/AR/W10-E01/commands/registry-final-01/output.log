@@ -1,4 +1,0 @@
-FAIL: count mismatch: migrations.rs MIGRATIONS has 9 entries, the registry has 7
-FAIL: v8 (r06_t03_session_tree) exists in migrations.rs MIGRATIONS but is MISSING from the registry
-FAIL: v9 (r06_t05_session_files_resources) exists in migrations.rs MIGRATIONS but is MISSING from the registry
-FAIL: registry consistency — migrations.rs MIGRATIONS and R02-T04_STORAGE_REGISTRY.json disagree (root=/Users/study_superior/.codex/worktrees/r06-w10-execution/LingxiAgent)

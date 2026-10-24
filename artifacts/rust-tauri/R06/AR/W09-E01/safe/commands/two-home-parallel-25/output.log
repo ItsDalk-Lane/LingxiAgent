@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "<W09_WORKSPACE>/artifacts/rust-tauri/R06/AR/W09-E01/LOCAL_ONLY_NEVER_GIT/two-home-proof.py", line 28, in <module>
-    threading.Thread(target=drain,args=(child.stdout,q),daemon=True).start();ready=q.get(timeout=20);assert f'home={home.resolve()}' in ready and 'source=env' in ready
-                                                                                   ~~~~~^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/queue.py", line 209, in get
-    raise Empty
-_queue.Empty

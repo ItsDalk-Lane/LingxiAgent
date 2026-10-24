@@ -1,6 +1,0 @@
-{
-  "status": "BEHAVIOR_RED_WITH_INCOMPLETE_EXTERNAL_PID_SAMPLING",
-  "testBinaryPeakRSS": null,
-  "testBinaryExternalLifetimeSeconds": null,
-  "reason": "Short-lived test executable was not sampled; cargo PID RSS cannot substitute for test binary; old assertion exit101 remains but lifecycle coverage gap retained."
-}

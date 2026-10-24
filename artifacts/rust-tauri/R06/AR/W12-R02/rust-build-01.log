@@ -1,7 +1,0 @@
-{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "knowledge_store_r06t07", "--test", "r06_ar_f12_cache_preservation", "-p", "lingxi-service", "--test", "r06_ar_f12_cache_consumers", "--test", "r06_t07_knowledge", "--test", "r06_t07_knowledge_tools", "--no-run"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-rust-build-01-97yp17zp", "start": 1791700851.722225}
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.25s
-  Executable tests/knowledge_store_r06t07.rs (rust/target/debug/deps/knowledge_store_r06t07-0cbb88bd577147fb)
-  Executable tests/r06_ar_f12_cache_preservation.rs (rust/target/debug/deps/r06_ar_f12_cache_preservation-0adeb7f2ac6b53e6)
-  Executable tests/r06_ar_f12_cache_consumers.rs (rust/target/debug/deps/r06_ar_f12_cache_consumers-b74a500b19beb910)
-  Executable tests/r06_t07_knowledge.rs (rust/target/debug/deps/r06_t07_knowledge-7ae0f9c2623b291a)
-  Executable tests/r06_t07_knowledge_tools.rs (rust/target/debug/deps/r06_t07_knowledge_tools-98f7b4f145bdffc7)

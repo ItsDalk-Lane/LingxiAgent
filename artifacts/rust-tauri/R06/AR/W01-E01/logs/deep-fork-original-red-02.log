@@ -1,8 +1,0 @@
-{"case": "deep_fork_controls", "status": "FAIL", "checks": [{"mode": "tool_pair", "status": 200, "targetCreated": true, "wireBefore": 2, "wireAfter": 2}, {"mode": "opaque_origin_missing", "status": 200, "targetCreated": true, "wireBefore": 1, "wireAfter": 1}, {"mode": "opaque_origin_forged", "status": 200, "targetCreated": true, "wireBefore": 1, "wireAfter": 1}, {"mode": "actor", "status": 200, "targetCreated": true, "wireBefore": 2, "wireAfter": 2}, "bad suffix outside boundary does not reject valid prefix", "source-deleted self-contained archive remains valid on next authorized fork"], "evidence": "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/probes/deep_fork_controls-F01-e26ccc37957e467e6bde343ce8c7c2fb-evidence.json"}
-Traceback (most recent call last):
-  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/deep-fork-probe.py", line 40, in <module>
-    exec(prefix+code+"\ntry:\n globals()[CASE]();status="+ending)
-    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<string>", line 252, in <module>
-  File "<string>", line 249, in deep_fork_controls
-AssertionError: [{'mode': 'tool_pair', 'status': 200, 'targetCreated': True, 'wireBefore': 2, 'wireAfter': 2}, {'mode': 'opaque_origin_missing', 'status': 200, 'targetCreated': True, 'wireBefore': 1, 'wireAfter': 1}, {'mode': 'opaque_origin_forged', 'status': 200, 'targetCreated': True, 'wireBefore': 1, 'wireAfter': 1}, {'mode': 'actor', 'status': 200, 'targetCreated': True, 'wireBefore': 2, 'wireAfter': 2}]

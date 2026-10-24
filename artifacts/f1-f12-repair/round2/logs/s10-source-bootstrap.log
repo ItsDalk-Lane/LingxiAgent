@@ -1,4 +1,0 @@
-
-> lingxi@0.1.35 typecheck
-> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
-

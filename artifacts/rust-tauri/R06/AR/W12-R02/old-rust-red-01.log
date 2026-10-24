@@ -1,8 +1,0 @@
-{"command": ["/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-binaries-ej517ojd/old-open"], "cwd": "/Users/study_superior/.codex/worktrees/r06-w12-review2/LingxiAgent", "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/w12-r02-old-rust-red-01-bg2ir0j2", "start": 1791701138.6695108}
-LINGXI_TEST_GUARD: armed (pid 69702, mem_limit=8192 MB, time_limit=600 s)
-cache=knowledge_index.db result=Ok(()) version=1 sentinel=Err(SqliteFailure(Error { code: Unknown, extended_code: 1 }, Some("no such table: sentinel"))) bytes_same=false
-cache=knowledge_vector.db result=Ok(()) version=1 sentinel=Err(SqliteFailure(Error { code: Unknown, extended_code: 1 }, Some("no such table: sentinel"))) bytes_same=false
-
-thread 'main' (2690510) panicked at <anon>:2661:2:
-future原件拒绝与保留契约必须满足
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

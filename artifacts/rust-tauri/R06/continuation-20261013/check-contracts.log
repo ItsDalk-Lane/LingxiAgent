@@ -1,6 +1,0 @@
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on package cache
-    Blocking waiting for file lock on build directory
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.72s
-     Running `rust/target-r06-continuation/debug/xtask check-contracts`
-error: stale xtask binary: source inventory differs; added=["stage_maps/R06.json", "stage_maps/R06_INPUTS.json"], missing=[]

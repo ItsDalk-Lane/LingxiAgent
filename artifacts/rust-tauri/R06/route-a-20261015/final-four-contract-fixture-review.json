@@ -1,9 +1,0 @@
-{
-  "reason": "After all279 mappings are READY, two negative tests had relied on real project always leaving a GAP. They now explicitly create one GAP only in their own temporary copy.",
-  "productionGateChanged": false,
-  "originalTestMethods": 20,
-  "allOriginalAssertionsAstIdentical": true,
-  "original279AssertionsAndThenUnchanged": true,
-  "firstActualFailureLog": "/private/tmp/r06-final-four-contract-r1.log",
-  "secondRunLog": "/private/tmp/r06-final-four-contract-r2.log"
-}

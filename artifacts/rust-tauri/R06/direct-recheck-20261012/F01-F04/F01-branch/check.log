@@ -1,8 +1,0 @@
-
-running 1 test
-{"case": "c02", "status": "PASS", "checks": ["C02 real ancestor tool executed once; fork mutually exclusive nonce/restart/rewind old suffix absent", "fork archive survives real source delete without source Run FK"], "evidence": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/direct-recheck-20261012/F01-F04/F01-branch/c02-F01-1d914dc464178d27865970d0cec92426-evidence.json"}
-
-test f01_c02_fork_restart_retry_rewind_source_delete ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 1.33s
-

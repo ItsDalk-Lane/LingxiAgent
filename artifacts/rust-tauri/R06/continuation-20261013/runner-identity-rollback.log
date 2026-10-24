@@ -1,9 +1,0 @@
-   Compiling xtask v0.1.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/xtask)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.78s
-     Running unittests src/main.rs (rust/target-r06-continuation/debug/deps/xtask-867339680434b6d3)
-
-running 1 test
-test runner_identity::tests::old_embedded_stage_map_rejects_new_disk_map ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 121 filtered out; finished in 0.20s
-

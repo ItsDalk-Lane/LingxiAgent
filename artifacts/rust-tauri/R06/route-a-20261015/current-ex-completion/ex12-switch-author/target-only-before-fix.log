@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/private/tmp/r06-ex12-switch-repair/switch-live.py", line 41, in <module>
-    switched=api('POST','/lingxi/v1/agents/switch',{'id':'switch-b','cwd':str(selected)})
-  File "/private/tmp/r06-ex12-switch-repair/switch-live.py", line 35, in api
-    data=json.loads(res.read());trace.append({'method':method,'path':path,'body':body,'status':res.status,'data':({**data,'secret':'[omitted]'} if isinstance(data,dict) and 'secret' in data else data)});assert res.status==status,(res.status,data);return data
-                                                                                                                                                                                                                  ^^^^^^^^^^^^^^^^^^
-AssertionError: (500, {'code': 'internal', 'details': {'causeId': 'internal', 'requestId': 'req-48b7c265a25ba81cc1bf72d15de3d271'}, 'message': 'no model route configured for operation chat (explicit unconfigured state — never a silent fallback)', 'retryable': False})

@@ -1,5 +1,0 @@
-{"command": ["/Users/study_superior/.cargo/bin/cargo", "build", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-service", "--bin", "lingxi-service"], "start": 1791708297.877422, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-service-build-502n2vq5", "guard": "8192MB/600s"}
-   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/crates/lingxi-kernel)
-   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/crates/lingxi-adapters)
-   Compiling lingxi-service v0.0.0 (/Users/study_superior/.codex/worktrees/r06-w06-review3/LingxiAgent/rust/crates/lingxi-service)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 27.21s

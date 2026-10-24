@@ -1,6 +1,0 @@
-{"status": "FAIL", "positive": null, "service_exit": 0}
-Traceback (most recent call last):
-  File "/Users/study_superior/.codex/worktrees/r06-w01-execution/LingxiAgent/artifacts/rust-tauri/R06/AR/W01-E01/binary_c01.py", line 20, in <module>
-    first='记住合成标记 '+nonce;second='刚才的合成标记是什么？';a=submit(first);assert len(wire)==1;assert sum(x.get('content')==first for x in wire[0]['messages'])==1;assert a['finish']['kind']=='completed_with_final',a
-                                                                                                                                                                               ~^^^^^^^^^^
-KeyError: 'finish'

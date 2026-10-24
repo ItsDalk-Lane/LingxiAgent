@@ -1,7 +1,0 @@
-{"name":"nonstring-root-key","yaml":"? [memory]\n: {enabled: false}\n","incumbent":{"memory":{"enabled":false}}}
-{"name":"nonstring-sensitive-key","yaml":"memory:\n  ? [enabled]\n  : false\n","incumbent":{"memory":{"enabled":false}}}
-{"name":"complex-agent-key","yaml":"? [agent]\n: {name: \"遗失姓名\"}\nmemory: {enabled: false}\n","incumbent":{"agent":{"name":"遗失姓名"},"memory":{"enabled":false}}}
-{"name":"complex-name-key","yaml":"agent:\n  ? [name]\n  : \"遗失姓名\"\nmemory: {enabled: false}\n","incumbent":{"agent":{"name":"遗失姓名"},"memory":{"enabled":false}}}
-{"name":"complex-discovery-key","yaml":"memory: {enabled: false}\nworkspace_context:\n  ? [discover_project_skills]\n  : false\n","incumbent":{"memory":{"enabled":false},"workspace_context":{"discover_project_skills":false}}}
-{"name":"complex-skills-peer","yaml":"skills:\n  ? [enabled]\n  : [shared-review]\n","incumbent":{"skills":{"enabled":["shared-review"]}}}
-{"name":"canonical-duplicate","yaml":"memory: {enabled: false}\n? [memory]\n: {enabled: true}\n","error":"duplicated mapping key (2:2)\n\n 1 | memory: {enabled: false}\n 2 | ? [memory]\n------^\n 3 | : {enabled: true}"}

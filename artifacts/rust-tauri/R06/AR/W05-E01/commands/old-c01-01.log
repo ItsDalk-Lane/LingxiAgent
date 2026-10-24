@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/probe.py", line 79, in <module>
-    p=argparse.ArgumentParser(); p.add_argument('name'); a=p.parse_args(); raise SystemExit(main(a.name))
-                                                                                            ~~~~^^^^^^^^
-  File "/Users/study_superior/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/probe.py", line 11, in main
-    class Provider(http.server.BaseHTTPRequestHandler):
-                   ^^^^
-UnboundLocalError: cannot access local variable 'http' where it is not associated with a value

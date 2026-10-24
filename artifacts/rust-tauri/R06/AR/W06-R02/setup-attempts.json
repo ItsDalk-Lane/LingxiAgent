@@ -1,1 +1,0 @@
-[{"attempt":"initial exact-old-scanner boundary extraction","status":"NOT_RUN","error":"AssertionError: extracted range included text beyond scan_agent_config","business_test_executed":false,"resolution":"verify exact existing scanner fragment is present verbatim in git-show base, then compile and run own old probe; compile-old and old-contract records are authoritative"}]

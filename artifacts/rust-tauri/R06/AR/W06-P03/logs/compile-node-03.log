@@ -1,4 +1,0 @@
-{"command": ["/Users/study_superior/.cargo/bin/cargo", "test", "--manifest-path", "rust/Cargo.toml", "--locked", "-j8", "-p", "lingxi-adapters", "--test", "r06_ar_f06_config_preservation", "--no-run"], "start": 1791704656.30596, "LINGXI_HOME": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-w06-compile-node-03-jxyv48zc", "guard": "8192MB/600s"}
-   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.71s
-  Executable tests/r06_ar_f06_config_preservation.rs (rust/target-w06-p03/debug/deps/r06_ar_f06_config_preservation-a8bbc7e8a51ad6ef)

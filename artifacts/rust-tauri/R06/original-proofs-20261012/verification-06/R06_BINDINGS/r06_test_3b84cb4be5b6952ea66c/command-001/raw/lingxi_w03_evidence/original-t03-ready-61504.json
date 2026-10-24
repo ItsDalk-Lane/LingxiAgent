@@ -1,8 +1,0 @@
-{
-  "actual_db": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/R06_BINDINGS/r06_test_3b84cb4be5b6952ea66c/command-001/runtime/tmp/lingxi-r06t03-svc-retry-rollback-27070-1791803834139333000/lingxi-service/data/runs.db",
-  "actual_home": "/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R06/original-proofs-20261012/verification-06/R06_BINDINGS/r06_test_3b84cb4be5b6952ea66c/command-001/runtime/tmp/lingxi-r06t03-svc-retry-rollback-27070-1791803834139333000",
-  "case_tag": "retry-rollback",
-  "home_source": "Cli",
-  "provider_boundary": "确定性响应替身；原生产 Run 与 SQLite 未替换",
-  "ready_address": "127.0.0.1:61504"
-}

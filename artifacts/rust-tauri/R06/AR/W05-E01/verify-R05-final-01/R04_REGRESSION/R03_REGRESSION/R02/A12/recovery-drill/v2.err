@@ -1,6 +1,0 @@
-LINGXI_DATA_EPOCH_TRANSITION_INCOMPLETE reason=corrupt-journal
-[data-epoch] The data safety gate refused startup (corrupt-journal): the transition journal file is unreadable (EOF while parsing a string at line 1 column 60); its epochs cannot be trusted, so startup is refused instead of guessing
-[data-epoch] 数据安全闸拒绝启动（corrupt-journal）：the transition journal file is unreadable (EOF while parsing a string at line 1 column 60); its epochs cannot be trusted, so startup is refused instead of guessing
-[data-epoch] 请保留现场文件，使用维护/恢复流程处理；不要删除未知状态后强行启动。
-
-2026-10-11T14:04:38.634303Z ERROR lingxi_service: data-epoch gate refused startup (exit 2) reason="corrupt-journal" home=/Users/[user]/.codex/r06-isolated-checkouts/w05-execution-source-01/artifacts/rust-tauri/R06/AR/W05-E01/local-only/tmp/lingxi-r02t06-drill.rNT2pP/v2-7196qB

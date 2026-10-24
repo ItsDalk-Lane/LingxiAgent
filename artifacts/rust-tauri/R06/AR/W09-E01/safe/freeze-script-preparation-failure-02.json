@@ -1,6 +1,0 @@
-{
-  "actual_exit": 1,
-  "kind": "PREPARATION_SYNTAX_FAILURE_NOT_RUN",
-  "cause": "stray +binding in here-doc; parser stopped before executing final binary collection or source checks",
-  "product_or_evidence_mutation_in_failed_script": "NONE"
-}
