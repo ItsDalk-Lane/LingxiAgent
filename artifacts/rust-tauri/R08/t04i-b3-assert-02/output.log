@@ -1,0 +1,22 @@
+PASS receipt.status=complete
+PASS receipt.pendingConvert=0
+PASS receipt.extensions 6 keys
+PASS migrations tip=28
+PASS legacyTrace.importedCalls=5
+PASS legacyTrace.failedStores=false
+PASS model_call_usage rows=5
+PASS trace parent-child preserved (observability_legacy_trace)
+PASS observability_legacy_trace rows=4
+PASS legacyCron.imported=3
+PASS legacyCron.blocked=0
+PASS automation_jobs_v1 rows=3
+PASS registry rows=10 across 8 classes
+PASS registry sha matches source AND archive byte-equal (10/10)
+PASS runtimeState ext label
+PASS epoch stamp=1
+PASS epoch ext written
+PASS legacyPlugins ext present
+PASS knowledgeDb ext present
+PASS receipt.sourceUnchanged=true
+
+B3-ASSERT ALL PASS: 20 pass, 0 fail

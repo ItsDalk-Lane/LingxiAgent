@@ -1,0 +1,392 @@
+{
+  "schema": "r08-t03-a05-verdict/v2",
+  "scenario": "R08-T03-A05 旧Electron壳 + Rust standalone：读腿端到端绿 + 写腿 BLOCKED(PPG-1)",
+  "verdict": "fail",
+  "legs": {
+    "read": {
+      "expect": "pass",
+      "result": "fail",
+      "failures": [
+        {
+          "step": "history-tools",
+          "message": "工具序 === [read]（实测 <none>）"
+        },
+        {
+          "step": "history-tools-status",
+          "message": "read 工具调用 success"
+        },
+        {
+          "step": "history-readback",
+          "message": "终结回答回显种子内容 LINGXI-A05-READ-7351（端到端真实往返证据）"
+        }
+      ]
+    },
+    "write": {
+      "expect": "blocked-PPG-1",
+      "result": "blocked-as-expected",
+      "failures": []
+    }
+  },
+  "ppg1": {
+    "id": "PPG-1",
+    "title": "预览启动路径无 workspace：核心写工具（write/edit）不注册",
+    "chain": "desktop/main.cjs:1437 仅传 --home（无 --config） → rust main.rs:455 workspace_root 唯一来源 = --config.workspace → lib.rs:1666 核心写工具仅 workspace_access=Some 分支注册 → 模型工具面（14 项）无 write/edit → 写任务 provider requested unknown tool → failed.provider_error",
+    "paradigm": "旧 Node = /api/fs/* 任意路径 HTTP 路由（T01 残账 DIRECT 6）；Rust = workspace 约束的工具注册，范式不同",
+    "status": "open — 桌面预览 workspace 策略（是否桌面生成 --config 指向默认书桌）属产品语义决策，登记 T04/T05 待裁决，不在 T03 现场发明",
+    "evidence": [
+      "surface-tools.json",
+      "stub-journal.jsonl",
+      "trace.jsonl",
+      "history.json"
+    ]
+  },
+  "failures": [
+    {
+      "step": "history-tools",
+      "message": "工具序 === [read]（实测 <none>）"
+    },
+    {
+      "step": "history-tools-status",
+      "message": "read 工具调用 success"
+    },
+    {
+      "step": "history-readback",
+      "message": "终结回答回显种子内容 LINGXI-A05-READ-7351（端到端真实往返证据）"
+    }
+  ],
+  "syntheticHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-q6FxiU",
+  "journal": [
+    {
+      "at": "2026-10-22T15:03:49.260Z",
+      "step": "freshness",
+      "name": "dist-renderer",
+      "artifactNewest": 1792674794761.1614,
+      "sourceNewest": 1792673308845.573,
+      "stale": false,
+      "rebuilt": false
+    },
+    {
+      "at": "2026-10-22T15:03:49.261Z",
+      "step": "freshness",
+      "name": "preload-bundle",
+      "artifactNewest": 1792674787203.406,
+      "sourceNewest": 1792418642659.3767,
+      "stale": false,
+      "rebuilt": false
+    },
+    {
+      "at": "2026-10-22T15:03:49.261Z",
+      "step": "home",
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-q6FxiU"
+    },
+    {
+      "at": "2026-10-22T15:03:49.465Z",
+      "step": "stub",
+      "pid": 73699,
+      "port": 52033
+    },
+    {
+      "at": "2026-10-22T15:03:49.676Z",
+      "step": "stamp",
+      "stamp": {
+        "committedDataEpoch": 1,
+        "epoch": 1,
+        "lastVersion": "0.0.0",
+        "minimumReaderEpoch": 1,
+        "schemaVersion": 2,
+        "updatedAt": "2026-10-22T15:03:49.478Z"
+      }
+    },
+    {
+      "at": "2026-10-22T15:03:49.677Z",
+      "step": "stamp",
+      "ok": "服务自盖章 data-epoch.json schemaVersion===2（实测 2）"
+    },
+    {
+      "at": "2026-10-22T15:03:49.677Z",
+      "step": "seed-read-note",
+      "path": "a05-drill/read-note.txt",
+      "content": "A05-READ-NOTE-v1\n秘密标记：LINGXI-A05-READ-7351\n"
+    },
+    {
+      "at": "2026-10-22T15:03:49.678Z",
+      "step": "electron",
+      "pid": 73701,
+      "cdpPort": 9921
+    },
+    {
+      "at": "2026-10-22T15:03:50.681Z",
+      "step": "rust-service",
+      "pid": 73920,
+      "port": 52061,
+      "baseUrl": "http://127.0.0.1:52061"
+    },
+    {
+      "at": "2026-10-22T15:03:50.681Z",
+      "step": "rust-service",
+      "ok": "rust service pid 73920 alive"
+    },
+    {
+      "at": "2026-10-22T15:03:53.693Z",
+      "step": "cdp-target",
+      "url": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"
+    },
+    {
+      "at": "2026-10-22T15:03:53.702Z",
+      "step": "conn-info",
+      "connInfo": {
+        "port": 52061,
+        "token": "<redacted>",
+        "serverNodeKind": "lingxi-service",
+        "serverNodeTransport": "http",
+        "host": null
+      }
+    },
+    {
+      "at": "2026-10-22T15:03:53.702Z",
+      "step": "conn-info",
+      "ok": "renderer connection host/port === 127.0.0.1:52061（local host:null 即回环；实测 host=null port=52061）"
+    },
+    {
+      "at": "2026-10-22T15:03:53.702Z",
+      "step": "conn-info-kind",
+      "ok": "renderer connection serverNodeKind === lingxi-service（实测 lingxi-service）"
+    },
+    {
+      "at": "2026-10-22T15:03:53.800Z",
+      "step": "tree-s1",
+      "ok": "node-kernel count 0 !== 0（硬断言）"
+    },
+    {
+      "at": "2026-10-22T15:03:53.800Z",
+      "step": "tree-s1",
+      "ok": "rust-kernel count 1 !== 1"
+    },
+    {
+      "at": "2026-10-22T15:03:53.800Z",
+      "step": "tree-s1",
+      "ok": "electron-ui count 7 < 1"
+    },
+    {
+      "at": "2026-10-22T15:03:53.800Z",
+      "step": "tree-s1-owned",
+      "ok": "rust kernel pid 73920 在 Electron 子树内（local-owned 证据）"
+    },
+    {
+      "at": "2026-10-22T15:03:53.802Z",
+      "step": "session-create",
+      "ok": "POST /lingxi/v1/sessions → 201（实测 201）"
+    },
+    {
+      "at": "2026-10-22T15:03:53.804Z",
+      "step": "handshake",
+      "ok": "WS handshake ack protocol=lingxi.wire"
+    },
+    {
+      "at": "2026-10-22T15:03:53.901Z",
+      "step": "tree-s2",
+      "ok": "node-kernel count 0 !== 0（硬断言）"
+    },
+    {
+      "at": "2026-10-22T15:03:53.901Z",
+      "step": "tree-s2",
+      "ok": "rust-kernel count 1 !== 1"
+    },
+    {
+      "at": "2026-10-22T15:03:55.345Z",
+      "step": "run-idle",
+      "ok": "读腿 run 结束后 status.isStreaming === false"
+    },
+    {
+      "at": "2026-10-22T15:03:55.350Z",
+      "step": "history",
+      "ok": "history → 200（实测 200）"
+    },
+    {
+      "at": "2026-10-22T15:03:55.350Z",
+      "step": "history-tools",
+      "fail": "工具序 === [read]（实测 <none>）"
+    },
+    {
+      "at": "2026-10-22T15:03:55.350Z",
+      "step": "history-tools-status",
+      "fail": "read 工具调用 success"
+    },
+    {
+      "at": "2026-10-22T15:03:55.350Z",
+      "step": "history-final",
+      "ok": "终结回答含 A05-FINAL-ANSWER"
+    },
+    {
+      "at": "2026-10-22T15:03:55.350Z",
+      "step": "history-readback",
+      "fail": "终结回答回显种子内容 LINGXI-A05-READ-7351（端到端真实往返证据）"
+    },
+    {
+      "at": "2026-10-22T15:03:55.350Z",
+      "step": "history-prompt",
+      "ok": "历史含读腿 prompt 标记"
+    },
+    {
+      "at": "2026-10-22T15:03:55.351Z",
+      "step": "seed-note-intact",
+      "ok": "种子文件内容未被改动"
+    },
+    {
+      "at": "2026-10-22T15:03:55.352Z",
+      "step": "write-session-create",
+      "ok": "写腿会话 POST → 201（实测 201）"
+    },
+    {
+      "at": "2026-10-22T15:03:55.855Z",
+      "step": "write-provider-error",
+      "line": "2026-10-22T15:03:55.372775Z  INFO lingxi_service::background: background drive settled through the single finalize path run_id=run_000001a16423e0db_000002 outcome=failed.provider_error"
+    },
+    {
+      "at": "2026-10-22T15:03:55.855Z",
+      "step": "write-leg-provider-error",
+      "ok": "服务日志出现 outcome=failed.provider_error（PPG-1 写腿红证据）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.358Z",
+      "step": "write-leg-run-end-failed",
+      "ok": "写腿唯一 run_end 且 reason=failed.provider_error（实测 failed.provider_error）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.358Z",
+      "step": "write-leg-error-frame",
+      "ok": "写腿 error 帧 run_failed/failed.provider_error（实测 error 帧 1）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.358Z",
+      "step": "write-leg-no-final-segment",
+      "ok": "写腿无 assistant_segment 伪终结回答（实测 0）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.358Z",
+      "step": "write-leg-no-file",
+      "ok": "a05-drill/write-note.txt 未落盘（写工具不存在，写腿按预期 BLOCKED）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "stub-chat-requests",
+      "ok": "桩记录 chat 请求 ≥3（读腿×2 + 写腿×1；实测 3）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "surface-tools",
+      "advertised": [
+        "automation",
+        "browser",
+        "channel",
+        "dm",
+        "jian_update_status",
+        "mcp_call",
+        "mcp_describe_tool",
+        "mcp_search_tools",
+        "notify",
+        "patrol_update_log",
+        "read",
+        "update_settings",
+        "web_fetch",
+        "web_search"
+      ]
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "surface-nonempty",
+      "ok": "seq-1 请求带工具面声明"
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "surface-has-read",
+      "ok": "工具面含已注册 read（读腿前提）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "surface-no-write-edit",
+      "ok": "工具面显式不含 write/edit（PPG-1 硬断言；实测面：automation,browser,channel,dm,jian_update_status,mcp_call,mcp_describe_tool,mcp_search_tools,notify,patrol_update_log,read,update_settings,web_fetch,web_search）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "write-attempt-recorded",
+      "ok": "桩记录恰好一次 write 请求（证明写调用到达供应商边界后被 Rust 拒绝；实测 1）"
+    },
+    {
+      "at": "2026-10-22T15:03:56.359Z",
+      "step": "read-act-recorded",
+      "ok": "桩记录恰好一次 read 调用（实测 1）"
+    },
+    {
+      "at": "2026-10-22T15:03:57.541Z",
+      "step": "row1-close",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-10-22T15:04:00.044Z",
+      "step": "row1-page-kept",
+      "ok": "hide 后主窗口 CDP 页面目标仍在（hide 非 destroy）"
+    },
+    {
+      "at": "2026-10-22T15:04:00.047Z",
+      "step": "row1-hide",
+      "ok": "Cmd+W 后 visibilityState=hidden（hide 实测；实测 hidden）"
+    },
+    {
+      "at": "2026-10-22T15:04:00.047Z",
+      "step": "row1-service-alive",
+      "ok": "hide 后 rust 服务仍存活"
+    },
+    {
+      "at": "2026-10-22T15:04:00.048Z",
+      "step": "row1-health",
+      "ok": "hide 后 /lingxi/v1/health → 200（实测 200）"
+    },
+    {
+      "at": "2026-10-22T15:04:01.094Z",
+      "step": "row3-quit",
+      "status": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "at": "2026-10-22T15:04:01.346Z",
+      "step": "electron-exit",
+      "code": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-10-22T15:04:01.595Z",
+      "step": "row3-electron-exit",
+      "ok": "Electron 主进程退出"
+    },
+    {
+      "at": "2026-10-22T15:04:01.595Z",
+      "step": "row3-rust-exit",
+      "ok": "owned rust pid 73920 收敛退出"
+    },
+    {
+      "at": "2026-10-22T15:04:01.702Z",
+      "step": "tree-s3",
+      "ok": "node-kernel count 0 !== 0（硬断言）"
+    },
+    {
+      "at": "2026-10-22T15:04:01.702Z",
+      "step": "tree-s3",
+      "ok": "rust-kernel count 0 !== 0"
+    },
+    {
+      "at": "2026-10-22T15:04:01.702Z",
+      "step": "tree-s3-lingering",
+      "ok": "退出后无携带合成 HOME 路径的残留进程（实测 0）"
+    },
+    {
+      "at": "2026-10-22T15:04:07.747Z",
+      "step": "cleanup",
+      "electronPid": 73701,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-q6FxiU"
+    }
+  ]
+}

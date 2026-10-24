@@ -1,0 +1,31 @@
+
+running 7 tests
+test edits_preserve_unknown_fields_and_stale_revisions_are_rejected ... ok
+test revoked_source_is_rejected_without_a_run ... ok
+test cancellation_drops_pending_automatic_review_before_any_tool_dispatch ... ok
+test one_shot_is_disabled_after_real_execution ... ok
+test unknown_claim_after_restart_is_not_reexecuted ... ok
+test real_management_dispatch_and_restart_keep_one_trigger_one_run ... ok
+test background_input_and_real_tool_results_reload_after_restart_without_user_messages ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.79s
+
+   Compiling dtor v0.3.0
+   Compiling yasna v0.6.0
+   Compiling pem v4.0.0
+   Compiling ring v0.17.14
+   Compiling rmcp v3.4.1
+   Compiling ctor v0.8.0
+   Compiling lingxi-test-guard v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-test-guard)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling rcgen v0.14.10
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (test "r07_scheduler") generated 1 warning
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 29s
+     Running tests/r07_scheduler.rs (rust/target/debug/deps/r07_scheduler-9ca765fb09a61faf)

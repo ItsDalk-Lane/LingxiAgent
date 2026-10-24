@@ -1,0 +1,33 @@
+
+running 2 tests
+test a02_reconnect_resume_replays_without_any_reexecution ... FAILED
+test a01_old_client_events_and_history_come_from_rust_single_source ... FAILED
+
+failures:
+
+---- a02_reconnect_resume_replays_without_any_reexecution stdout ----
+
+thread 'a02_reconnect_resume_replays_without_any_reexecution' (12728406) panicked at crates/lingxi-service/tests/r08_t01_a01_a02_ws.rs:758:5:
+assertion `left == right` failed
+  left: 0
+ right: 4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- a01_old_client_events_and_history_come_from_rust_single_source stdout ----
+
+thread 'a01_old_client_events_and_history_come_from_rust_single_source' (12728405) panicked at crates/lingxi-service/tests/r08_t01_a01_a02_ws.rs:653:5:
+assertion `left == right` failed: [Object {"args": Object {"summary": Null}, "id": String("run_000001a1627ace07_000001-tc0001"), "name": String("tool:first-party:read"), "seq": Number(5), "sessionId": String("a01"), "sessionPath": String("native:a01"), "sessionRefVersion": Number(2), "streamId": String("run_000001a1627ace07_000001"), "ts": Number(1792653577760), "turnId": String("run_000001a1627ace07_000001"), "type": String("tool_start")}, Object {"args": Object {"summary": Null}, "id": String("run_000001a1627ace07_000001-tc0002"), "name": String("tool:first-party:write"), "seq": Number(8), "sessionId": String("a01"), "sessionPath": String("native:a01"), "sessionRefVersion": Number(2), "streamId": String("run_000001a1627ace07_000001"), "ts": Number(1792653577784), "turnId": String("run_000001a1627ace07_000001"), "type": String("tool_start")}, Object {"args": Object {"summary": Null}, "id": String("run_000001a1627ace07_000001-tc0003"), "name": String("tool:first-party:edit"), "seq": Number(11), "sessionId": String("a01"), "sessionPath": String("native:a01"), "sessionRefVersion": Number(2), "streamId": String("run_000001a1627ace07_000001"), "ts": Number(1792653577843), "turnId": String("run_000001a1627ace07_000001"), "type": String("tool_start")}, Object {"args": Object {"summary": Null}, "id": String("run_000001a1627ace07_000001-tc0004"), "name": String("tool:first-party:exec_command"), "seq": Number(14), "sessionId": String("a01"), "sessionPath": String("native:a01"), "sessionRefVersion": Number(2), "streamId": String("run_000001a1627ace07_000001"), "ts": Number(1792653577904), "turnId": String("run_000001a1627ace07_000001"), "type": String("tool_start")}]
+  left: ["tool:first-party:read", "tool:first-party:write", "tool:first-party:edit", "tool:first-party:exec_command"]
+ right: ["read", "write", "edit", "exec_command"]
+
+
+failures:
+    a01_old_client_events_and_history_come_from_rust_single_source
+    a02_reconnect_resume_replays_without_any_reexecution
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.39s
+     Running tests/r08_t01_a01_a02_ws.rs (rust/target/debug/deps/r08_t01_a01_a02_ws-c469aa1aea753283)
+error: test failed, to rerun pass `-p lingxi-service --test r08_t01_a01_a02_ws`

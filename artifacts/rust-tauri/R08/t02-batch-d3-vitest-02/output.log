@@ -1,0 +1,98 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/settings/components/__tests__/SettingsSection.test.tsx (3 tests) 84ms
+ ✓ desktop/src/react/settings/tabs/mcp/__tests__/ConnectorList.test.tsx (15 tests) 104ms
+ ✓ desktop/src/react/settings/__tests__/Toast.test.tsx (2 tests) 138ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/ProviderMediaDefaults.test.tsx (4 tests) 145ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/AuxiliaryModelsSection.test.tsx (6 tests) 205ms
+ ✓ desktop/src/react/settings/hooks/__tests__/useMediaSettingsData.test.tsx (6 tests) 470ms
+ ✓ desktop/src/react/settings/__tests__/settings-primitives-contract.test.ts (5 tests) 89ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/ModelEditPanel.test.tsx (16 tests) 369ms
+ ✓ desktop/src/react/settings/tabs/mcp/__tests__/ConnectorForm.interaction.test.tsx (8 tests) 221ms
+ ✓ desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx (13 tests) 707ms
+ ✓ desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx (5 tests) 269ms
+ ✓ desktop/src/react/settings/tabs/__tests__/AboutTab.test.tsx (18 tests) 270ms
+stderr | desktop/src/react/settings/tabs/__tests__/ComputerUseSection.test.tsx > ComputerUseSection > reports a manual refresh result even when status is unchanged (success=false)
+[computer-use] load status failed: Error: offline
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/ComputerUseSection.test.tsx:73:17
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/SearchApiKeyConfig.test.tsx (3 tests) 319ms
+ ✓ desktop/src/react/settings/tabs/__tests__/ComputerUseSection.test.tsx (5 tests) 327ms
+ ✓ desktop/src/react/settings/tabs/skills/__tests__/SkillBundleTree.test.tsx (5 tests) 322ms
+     ✓ keeps bundle children collapsed by default  307ms
+ ✓ desktop/src/react/settings/tabs/__tests__/GeneralTab.test.tsx (6 tests) 394ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/OAuthCredentials.test.tsx (14 tests) 414ms
+ ✓ desktop/src/react/settings/__tests__/SettingsNav.search.test.tsx (3 tests) 424ms
+     ✓ switches from the tab list to iOS-style search results and opens the result tab  354ms
+ ✓ desktop/src/react/settings/tabs/agent/__tests__/DreamRevisionBrowser.test.tsx (7 tests) 544ms
+     ✓ opens the revision list with kind labels and switches the selected revision  368ms
+ ✓ desktop/src/react/settings/__tests__/skill-scroll-contract.test.ts (2 tests) 104ms
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+[settings] sidebar UI preferences load failed: Error: sidebar denied
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:67:27
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:15:40)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:182:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+ ✓ desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx (13 tests) 622ms
+ ✓ desktop/src/react/settings/tabs/__tests__/ExperimentsTab.test.tsx (5 tests) 316ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/provider-media-capabilities.test.ts (5 tests) 98ms
+ ✓ desktop/src/react/settings/tabs/mcp/mcp-config.test.ts (3 tests) 99ms
+ ✓ desktop/src/react/settings/__tests__/settings-search-index.test.ts (3 tests) 95ms
+ ✓ desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx (14 tests) 789ms
+     ✓ fetches stored keybindings and renders every registered command with its scope  348ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/ProviderModelList.test.tsx (41 tests) 997ms
+ ✓ desktop/src/react/settings/__tests__/settings-search-layout.test.ts (6 tests) 100ms
+ ✓ desktop/src/react/settings/tabs/mcp/__tests__/ConnectorImport.test.tsx (9 tests) 266ms
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > loads and saves the undo-file-changes-on-rollback preference
+[settings] sidebar UI preferences load failed: Error: invalid sidebar preferences
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:186:123
+
+ ↓ desktop/src/react/settings/__tests__/R06AgentSettingsElectronLive.test.ts (1 test | 1 skipped)
+ ✓ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx (12 tests) 575ms
+     ✓ shows the first sidebar read failure and retries before enabling the control  371ms
+ ✓ desktop/src/react/settings/__tests__/R02AccessCredentialLeaf.test.tsx (10 tests) 634ms
+ ✓ desktop/src/react/settings/tabs/agent/__tests__/AgentCardStack.test.tsx (1 test) 135ms
+ ✓ desktop/src/react/settings/tabs/mcp/__tests__/DeferSettings.test.tsx (3 tests) 209ms
+ ✓ desktop/src/react/settings/overlays/__tests__/CompiledMemoryViewer.test.tsx (2 tests) 191ms
+ ✓ desktop/src/react/settings/widgets/__tests__/Toggle.test.tsx (7 tests) 129ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/SearchProviderSection.test.tsx (2 tests) 142ms
+ ✓ desktop/src/react/settings/tabs/providers/__tests__/unified-models.test.ts (20 tests) 125ms
+ ✓ desktop/src/react/settings/tabs/mcp/__tests__/ConnectorForm.test.tsx (3 tests) 111ms
+ ✓ desktop/src/react/settings/tabs/agent/__tests__/AgentToolsSection.test.tsx (10 tests) 161ms
+ ✓ desktop/src/react/settings/__tests__/AgentDeleteInitialization.test.ts (3 tests) 85ms
+ ✓ desktop/src/react/settings/tabs/mcp/__tests__/ConnectorToolList.test.tsx (11 tests) 188ms
+ ✓ desktop/src/react/settings/tabs/agent/__tests__/YuanSelector.test.tsx (5 tests) 120ms
+ ✓ desktop/src/react/settings/overlays/__tests__/AgentCreateOverlay.yuan.test.tsx (6 tests) 119ms
+ ✓ desktop/src/react/settings/tabs/mcp/mcp-api.test.ts (5 tests) 47ms
+stderr | desktop/src/react/settings/__tests__/SettingsContent.test.tsx > SettingsContent tab heading > clears foreign cached data and blocks settings when the Rust identity is incomplete
+[settings] init failed: Error: Rust settings server identity does not match
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:463:15
+
+ ✓ desktop/src/react/settings/tabs/__tests__/SharingTab.test.tsx (1 test) 85ms
+ ✓ desktop/src/react/settings/__tests__/R02AccessRoute.test.tsx (2 tests) 84ms
+ ✓ desktop/src/react/settings/tabs/bridge/__tests__/BridgeWidgets.test.tsx (2 tests) 52ms
+stderr | desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx > R02/R00 sharing leaf: real component and storage behavior > uses the 15-second escape hatch for an unresolved connection
+[settings] init timeout (15s), forcing ready
+
+ ✓ desktop/src/react/settings/__tests__/SettingsContent.test.tsx (11 tests) 394ms
+ ✓ desktop/src/react/settings/__tests__/R02SharingLeaf.test.tsx (7 tests) 401ms
+ ↓ desktop/src/react/settings/__tests__/R06AgentDeleteRegistryReview.test.tsx (1 test | 1 skipped)
+ ↓ desktop/src/react/settings/__tests__/R06AgentDeleteConnectionReview.test.tsx (1 test | 1 skipped)
+ ✓ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx (17 tests) 1429ms
+     ✓ 旧连接打开浏览器的迟到拒绝不取消新连接的登录等待  471ms
+     ✓ refreshes only while the real manager says a background connector is still connecting  509ms
+
+ Test Files  50 passed | 3 skipped (53)
+      Tests  385 passed | 3 skipped (388)
+   Start at  19:43:44
+   Duration  4.11s (transform 13.42s, setup 817ms, import 32.13s, tests 14.72s, environment 40.53s)
+

@@ -1,0 +1,13 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/app-init.ts(12,29): error TS2307: Cannot find module 'services/service-client' or its corresponding type declarations.
+desktop/src/react/app-init.ts(46,8): error TS2307: Cannot find module 'services/service-client' or its corresponding type declarations.
+desktop/src/react/app-init.ts(75,12): error TS7006: Parameter 'err' implicitly has an 'any' type.
+desktop/src/react/app-init.ts(264,89): error TS7006: Parameter 'r' implicitly has an 'any' type.
+desktop/src/react/MainContent.tsx(12,29): error TS2307: Cannot find module 'services/service-client' or its corresponding type declarations.
+desktop/src/react/MainContent.tsx(13,41): error TS2307: Cannot find module 'services/service-client' or its corresponding type declarations.
+desktop/src/react/MainContent.tsx(138,15): error TS7022: 'response' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+desktop/src/react/MainContent.tsx(141,15): error TS7022: 'data' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.
+desktop/src/react/MainContent.tsx(144,15): error TS7022: 'file' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.

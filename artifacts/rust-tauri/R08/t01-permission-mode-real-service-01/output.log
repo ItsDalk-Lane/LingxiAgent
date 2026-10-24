@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/services/r08-session-permission-mode-real-service.test.ts (1 test) 3295ms
+     ✓ 旧 /api 调用经映射命中 Rust 路由并完成 GET/POST 全分支（无 LINGXI_R07_SERVICE_BIN 明确跳过）  3294ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  13:32:21
+   Duration  4.16s (transform 262ms, setup 23ms, import 331ms, tests 3.30s, environment 433ms)
+

@@ -1,0 +1,249 @@
+{
+  "schema": "r08-t03-a06-verdict/v1",
+  "scenario": "R08-T03-A06 双客户端 remote 共连同一 Rust 服务：退 B 后 A 继续任务，服务零接触",
+  "verdict": "two-client-remote-pass__zero-touch-quit-verified",
+  "deviation": {
+    "id": "A06-loopback-transport",
+    "ruling": "Lead batch-E 裁决 (a) 已复核：回环-remote 退路，核心验收语义全部硬断言不变",
+    "detail": "传输层为 127.0.0.1 回环而非真实 LAN。真 LAN e2e 双重阻断：环境层 macOS ALF 对 adhoc 签名 debug 二进制静默丢包（t03-a06-auth-probe-04 绿证）；产品层 PPG-3（设备凭证无客户端呈现通道 + 签发面 local_only）。"
+  },
+  "ppg3": {
+    "id": "PPG-3",
+    "title": "远端桌面 LAN 认证通道缺失：设备凭证无客户端呈现通道，签发面 local_only",
+    "chain": "transport.rs:201-206 非回环 → ConnectionKind::Lan → auth.rs:2558-2566 loopback token 在非 Local 连接恒 401 loopback_token_requires_local_transport → rust-local-service.cjs readRemoteRustConnection 仅接受 ^[0-9a-f]{32}$ 形状 → 设备凭证 \"hana_dev_\"+base64url(32)（auth.rs:81/:2019）被该正则拒绝 → 签发面 POST /lingxi/v1/devices/credentials（lib.rs:9037）挂 local_only，LAN 绑定下不可达",
+    "envLayer": "macOS ALF 对 adhoc/linker 签名 debug 二进制静默丢弃入站包（socketfilterfw --getappblocked 报 permitted 仍丢）；python3/nc 对照同口 200 = 非服务缺陷",
+    "status": "open — 登记 T04/T05/T08 MUST-ADJUDICATE，与 PPG-1/2 并列",
+    "evidence": [
+      "t03-a06-auth-probe-04/output.log",
+      "verdict.json"
+    ]
+  },
+  "quitMechanisms": {
+    "B": "sigterm-graceful",
+    "A": "sigterm-graceful"
+  },
+  "quitMechanismNote": "keyboard=AXRaise+frontmost 确认后 Cmd+Q（真实用户路径）；sigterm-graceful=键盘路径穷尽后 SIGTERM 兜底（Electron 捕获走正常退出链，exit 0；drill-01..04 红迹证明双同名实例前台激活竞态不可控）。替代显式记录，不静默。",
+  "failures": [],
+  "serviceHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-atz46b",
+  "serviceReapedByHarness": true,
+  "journal": [
+    {
+      "at": "2026-10-22T16:16:23.618Z",
+      "step": "svc-home",
+      "data": {
+        "svcHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-atz46b"
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:23.823Z",
+      "step": "stub",
+      "data": {
+        "pid": 99353,
+        "port": 59270
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:24.039Z",
+      "step": "stamp",
+      "data": {
+        "stamp": {
+          "committedDataEpoch": 1,
+          "epoch": 1,
+          "lastVersion": "0.0.0",
+          "minimumReaderEpoch": 1,
+          "schemaVersion": 2,
+          "updatedAt": "2026-10-22T16:16:23.844Z"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:24.041Z",
+      "step": "service-spawn",
+      "data": {
+        "pid": 99355
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:24.544Z",
+      "step": "rust-service",
+      "data": {
+        "pid": 99355,
+        "port": 59272,
+        "baseUrl": "http://127.0.0.1:59272"
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:24.550Z",
+      "step": "electron-A",
+      "data": {
+        "pid": 99356,
+        "cdpPort": 9575,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-POAXH4"
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:28.600Z",
+      "step": "conn-info-A",
+      "data": {
+        "connInfo": {
+          "port": 59272,
+          "token": "<redacted>",
+          "serverNodeKind": "lingxi-service",
+          "serverNodeTransport": "http",
+          "host": "127.0.0.1"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:28.601Z",
+      "step": "electron-B",
+      "data": {
+        "pid": 99577,
+        "cdpPort": 10075,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-tcjXG7"
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:32.636Z",
+      "step": "conn-info-B",
+      "data": {
+        "connInfo": {
+          "port": 59272,
+          "token": "<redacted>",
+          "serverNodeKind": "lingxi-service",
+          "serverNodeTransport": "http",
+          "host": "127.0.0.1"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:33.586Z",
+      "step": "leg-a1",
+      "data": {
+        "sessionId": "a06-clientA-leg1",
+        "frameCount": 10,
+        "runEnded": true,
+        "runEndReason": null,
+        "sawFinal": true,
+        "sawMarker": true
+      }
+    },
+    {
+      "at": "2026-10-22T16:16:38.210Z",
+      "step": "quit-b-keystroke-1",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "318:342: execution error: frontmost-not-achieved (-2700)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:17:02.928Z",
+      "step": "quit-b-keystroke-2",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "318:342: execution error: frontmost-not-achieved (-2700)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:17:23.007Z",
+      "step": "quit-b-sigterm",
+      "data": {
+        "pid": 99577,
+        "reason": "keyboard-path-exhausted"
+      }
+    },
+    {
+      "at": "2026-10-22T16:17:23.066Z",
+      "step": "electron-B-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T16:17:24.470Z",
+      "step": "leg-a2",
+      "data": {
+        "sessionId": "a06-clientA-leg2",
+        "frameCount": 10,
+        "runEnded": true,
+        "runEndReason": null,
+        "sawFinal": true,
+        "sawMarker": true
+      }
+    },
+    {
+      "at": "2026-10-22T16:17:29.127Z",
+      "step": "quit-a-keystroke-1",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "318:342: execution error: frontmost-not-achieved (-2700)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:17:53.861Z",
+      "step": "quit-a-keystroke-2",
+      "data": {
+        "status": 1,
+        "stdout": "",
+        "stderr": "318:342: execution error: frontmost-not-achieved (-2700)"
+      }
+    },
+    {
+      "at": "2026-10-22T16:18:13.934Z",
+      "step": "quit-a-sigterm",
+      "data": {
+        "pid": 99356,
+        "reason": "keyboard-path-exhausted"
+      }
+    },
+    {
+      "at": "2026-10-22T16:18:13.999Z",
+      "step": "electron-A-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T16:18:14.552Z",
+      "step": "reap-service",
+      "data": {
+        "pid": 99355,
+        "aliveAtReap": true
+      }
+    },
+    {
+      "at": "2026-10-22T16:18:14.557Z",
+      "step": "service-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T16:18:14.557Z",
+      "step": "reap-service-result",
+      "data": {
+        "exited": {
+          "code": 0,
+          "signal": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T16:18:20.725Z",
+      "step": "cleanup",
+      "data": {
+        "homes": [
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-atz46b",
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-POAXH4",
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-tcjXG7"
+        ]
+      }
+    }
+  ]
+}

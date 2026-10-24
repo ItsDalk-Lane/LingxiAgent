@@ -1,0 +1,25 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx [ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx ]
+TypeError: The URL must be of scheme file
+ ❯ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx:34:3
+     32| }
+     33| const fixture = JSON.parse(readFileSync(
+     34|   fileURLToPath(new URL('../services/fixtures/r08-a04-history.json', i…
+       |   ^
+     35|   'utf8',
+     36| )) as HistoryFixture;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  17:06:02
+   Duration  1.89s (transform 1.14s, setup 23ms, import 0ms, tests 0ms, environment 276ms)
+

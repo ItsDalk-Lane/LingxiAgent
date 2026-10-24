@@ -1,0 +1,22 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running tests/r06_agent_settings_live.rs (target/debug/deps/r06_agent_settings_live-50c0fd1748de7f24)
+
+running 14 tests
+test native_character_card_duplicate_skill_source_and_sparse_path_refuse_without_public_mutation ... ok
+test native_character_card_application_and_http_delete_never_recreate_deleted_directory ... ok
+test native_character_card_zip_roundtrip_real_materials_and_memory_choice ... ok
+test native_character_card_real_zip_refuses_escape_links_and_expansion_without_agents ... ok
+test native_agent_settings_current_electron_entry_smoke ... ok
+test native_settings_current_electron_real_io_failures_and_partial_writes ... ok
+test native_pending_reference_deletion_current_electron_shows_and_retries_truthfully ... ok
+test native_remaining_tenet_health_and_order_real_failures_and_pointer_cancel ... ok
+test native_settings_reads_keep_real_failures_and_paid_dream_consumption ... ok
+test native_pending_receipt_owner_switch_two_real_services_never_posts_to_other_service ... ok
+test native_character_card_owner_two_real_services_and_delayed_import_response ... ok
+test native_settings_current_electron_actual_read_permission_denied_is_error ... ok
+test native_initialization_cache_summary_and_real_fifteen_second_timeout ... ok
+test native_settings_nineteen_actions_actual_electron_and_service ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.36s
+
+CARGO_EXIT=0

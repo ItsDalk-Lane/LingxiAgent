@@ -1,0 +1,29 @@
+
+running 5 tests
+test in_flight_grant_cannot_land_after_real_archive_restore_completed ... ok
+test actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval ... ok
+test credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants ... ok
+test paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting ... ok
+test missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 34.96s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.11s
+     Running tests/r07_t08_mcp_session_permissions.rs (rust/target/debug/deps/r07_t08_mcp_session_permissions-466fa13d9d229605)

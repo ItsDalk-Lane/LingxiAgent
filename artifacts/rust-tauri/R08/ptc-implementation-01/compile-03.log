@@ -1,0 +1,18 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: unused variable: `ctx`
+   --> crates/lingxi-service/tests/r08_admission_run_code.rs:738:34
+    |
+738 |                     .find(|(run, ctx)| {
+    |                                  ^^^ help: if this is intentional, prefix it with an underscore: `_ctx`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r08_admission_run_code") generated 1 warning (run `cargo fix --test "r08_admission_run_code" -p lingxi-service` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.10s
+  Executable tests/r08_admission_ptc.rs (rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6)
+  Executable tests/r08_admission_run_code.rs (rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455)

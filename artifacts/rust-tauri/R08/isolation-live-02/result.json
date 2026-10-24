@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "status": "FAIL",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sandbox": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-DQPFMi",
+  "startedAt": "2026-10-21T13:45:20.182Z",
+  "tests": [],
+  "processes": [
+    {
+      "label": "a",
+      "launcherPid": 40943,
+      "requestedHome": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-DQPFMi/a/copy",
+      "exitCode": null,
+      "mainPid": 40944,
+      "actual": {
+        "pid": 40944,
+        "home": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-DQPFMi/a/copy",
+        "nodeBin": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "userData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-DQPFMi/a/copy/.electron-user-data",
+        "sessionData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-DQPFMi/a/copy/.electron-user-data",
+        "electron": "42.8.1",
+        "windows": []
+      }
+    }
+  ],
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "inputs": {
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "c63d2687dceb9ec1d81c4376449ace2bdb9ec7d1a226301283ebc28638942c54",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+  },
+  "error": "Error: 超时：真实 Rust 子进程\n    at until (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:32:9)\n    at async connect (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:90:16)\n    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:102:18",
+  "finishedAt": "2026-10-21T13:46:05.637Z"
+}

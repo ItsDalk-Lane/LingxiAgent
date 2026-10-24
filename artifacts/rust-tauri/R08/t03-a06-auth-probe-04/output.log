@@ -1,0 +1,7 @@
+PASS token-shape :: local-token.json token matches desktop regex shape (len=32)
+PASS p0a-loopback-health-200 :: GET health via 127.0.0.1 -> 200
+INFO p0b lan health via 192.168.3.96 -> status=0 (fetch error: The operation was aborted due to timeout)
+PASS p0c-python-control-lan-200 :: python3 listener via 192.168.3.96:55704 -> 200
+INFO p1/p2 skipped: LAN path env-blocked for adhoc-signed debug binary
+PASS p3-desktop-regex-rejects-device-secret :: desktop token regex rejects device secret sample "hana_dev_AAAAAAA..."
+verdict=env-blocked-lan-source-chain-stands checks=4 failed=0

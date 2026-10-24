@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "status": "FAIL",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sandbox": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo",
+  "startedAt": "2026-10-21T13:48:56.190Z",
+  "tests": [],
+  "processes": [
+    {
+      "label": "a",
+      "launcherPid": 42015,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/a/copy",
+      "exitCode": null,
+      "mainPid": 42016,
+      "actual": {
+        "pid": 42016,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/a/copy",
+        "nodeBin": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "userData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/a/copy/.electron-user-data",
+        "sessionData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/a/copy/.electron-user-data",
+        "electron": "42.8.1",
+        "windows": []
+      }
+    }
+  ],
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "inputs": {
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "d2a6925e15e450b7f50802ec15a9c4a32a64b3b02a8ae59b9db8fefc5aa66ff2",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+  },
+  "initializations": [
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/a/copy",
+      "pid": 42012,
+      "exitCode": 0,
+      "stampSha256": "d045c015e97b0daa1f1e6ed1eec45e94861ca85e9475375cd3d2dc4ddbcbcaa8"
+    },
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/b/copy",
+      "pid": 42013,
+      "exitCode": 0,
+      "stampSha256": "27eb6242c6a3ff4a168246e4aad7536008d29a99c61b896bbc478816c55a0662"
+    }
+  ],
+  "error": "Error: ENOENT: no such file or directory, lstat '/Users/study_superior/Desktop/Code/LingxiAgent/undefined'\n    at Object.realpathSync (node:fs:2787:29)\n    at connect (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:110:19)\n    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:125:18",
+  "forcedCleanup": [],
+  "finishedAt": "2026-10-21T13:48:58.252Z"
+}

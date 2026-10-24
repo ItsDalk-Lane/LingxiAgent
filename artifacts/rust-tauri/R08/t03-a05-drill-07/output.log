@@ -1,0 +1,7 @@
+[r08-t03-a05] verdict=fail failures=6 home=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j out=/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/t03-a05-drill-07
+  FAIL[history-tools] 工具序 === [read]（实测 <none>）
+  FAIL[history-tools-status] read 工具调用 success
+  FAIL[history-readback] 终结回答回显种子内容 LINGXI-A05-READ-7351（端到端真实往返证据）
+  FAIL[write-leg-no-run-end] 写腿无 assistant_run_end 帧（provider_error 静默落定；实测迟到帧 1）
+  FAIL[row1-hide] Cmd+W 后主窗口页面消失（hide 实测）
+  FAIL[row1-version] hide 后 /lingxi/v1/version → 200（实测 404）

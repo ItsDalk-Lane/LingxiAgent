@@ -1,0 +1,2 @@
+{"escape":"[\n  \"EPERM\",\n  \"EPERM\",\n  1\n]","network":"BLOCKED:EPERM"}
+{"status":"PASS_STRICT_OS_ADAPTER_ONLY","cases":["erasable_ts_log_return","node_globals_absent","real_output_limit","non_erasable_ts_refused","leader_alive_until_explicit_group_kill_and_reap"],"boundary":"No child-tool results were substituted; this checks the real pure runtime adapter, not Rust authorization or storage."}

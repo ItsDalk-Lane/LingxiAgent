@@ -1,0 +1,27 @@
+
+running 20 tests
+test workflow::invalid_meta_is_rejected_synchronously_at_dispatch ... ok
+test workflow::completed_workflow_wakes_running_idle_loop_once_after_cleanup ... ok
+test workflow::first_node_failure_cancels_parallel_blocked_sibling ... ok
+test workflow::actual_task_stop_route_joins_workflow_and_running_model ... ok
+test workflow::budget_tokens_stops_the_second_node ... ok
+test workflow::journal_write_failure_reports_unsafe_resume_and_unrelated_run_cannot_cancel ... ok
+test workflow::activity_receipt_failure_never_blocks_real_cancel_or_fabricates_task_status ... ok
+test workflow::fanout_dispatch_events_journal_and_completion_delivery ... ok
+test workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion ... ok
+test workflow::damaged_resume_journal_is_rejected_without_rerunning_nodes ... ok
+test workflow::nested_and_outer_nodes_share_unique_sequences_and_refuse_unsafe_resume ... ok
+test workflow::resume_requires_same_session_and_agent_before_reading_cached_results ... ok
+test workflow::node_write_folders_bind_actual_file_mutations_and_tool_filter ... ok
+test workflow::resume_reuses_unchanged_nodes_and_reruns_from_first_change ... ok
+test workflow::workflow_without_live_node_does_not_hold_session_admission ... ok
+test workflow::completed_journal_receipt_rejects_valid_prefix_truncation_and_same_bytes_replacement ... ok
+test workflow::writefolders_matrix_is_fail_closed ... ok
+test workflow::deleted_truncated_or_replaced_live_journal_refuses_resume_and_preserves_fault ... ok
+test workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier ... ok
+test workflow::actual_http_activity_snapshot_checks_owner_and_survives_same_home_restart ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.49s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_workflow.rs (rust/target/debug/deps/r07_workflow-cea3b632ada4ddbd)

@@ -1,0 +1,121 @@
+{
+  "headRevision": "4",
+  "items": [
+    {
+      "committedAtUnixMs": 1792659476114,
+      "kind": "user_message",
+      "messageId": "user:run_000001a162d4ce92_000001",
+      "run": {
+        "runId": "run_000001a162d4ce92_000001",
+        "state": "known"
+      },
+      "seq": "1",
+      "text": "R08-A04-NO-FINAL"
+    },
+    {
+      "complete": true,
+      "firstSeq": "4",
+      "kind": "assistant_segment",
+      "phase": "reasoning",
+      "run": {
+        "runId": "run_000001a162d4ce92_000001",
+        "state": "known"
+      },
+      "segmentId": "assistant:1:reasoning:default",
+      "segmentKind": "reasoning",
+      "text": "A04-THINKING-ALOUD"
+    },
+    {
+      "complete": true,
+      "firstSeq": "7",
+      "kind": "assistant_segment",
+      "phase": "unresolved",
+      "run": {
+        "runId": "run_000001a162d4ce92_000001",
+        "state": "known"
+      },
+      "segmentId": "assistant:1:text:default",
+      "segmentKind": "text",
+      "text": "A04-READING-SEED"
+    },
+    {
+      "argsDigest": {
+        "algorithm": "sha256",
+        "canonicalization": "lingxi-canonical-json-v1",
+        "hex": "213adf8a8cb914da52de571077c9c77f671507adbf53a9bd70e1551bc6a3043b"
+      },
+      "firstSeq": "13",
+      "kind": "tool_call",
+      "result": {
+        "content": [
+          {
+            "text": "A04-SEED-CONTENT\n",
+            "type": "text"
+          }
+        ],
+        "details": {
+          "format": "text-or-binary",
+          "source": {
+            "path": "a04-seed.txt",
+            "sha256": "88df02de4f85a3c0f5d74ad86a029565fe9e1f0cd4654eefe238f6e2090753ca",
+            "sizeBytes": 17
+          }
+        },
+        "status": "success",
+        "truncated": false
+      },
+      "run": {
+        "runId": "run_000001a162d4ce92_000001",
+        "state": "known"
+      },
+      "status": "success",
+      "target": "tool:first-party:read",
+      "toolCallId": "run_000001a162d4ce92_000001-tc0001"
+    },
+    {
+      "argsDigest": {
+        "algorithm": "sha256",
+        "canonicalization": "lingxi-canonical-json-v1",
+        "hex": "f7ddfbfe6e4492c4724e549bc9c162155cbf213017e74b164d3f4b2ec219a57d"
+      },
+      "firstSeq": "19",
+      "kind": "tool_call",
+      "result": {
+        "error": {
+          "code": "not_found",
+          "message": "Could not read file: a04-missing.txt. Error code: ENOENT.",
+          "retryable": false
+        },
+        "status": "failed",
+        "truncated": false
+      },
+      "run": {
+        "runId": "run_000001a162d4ce92_000001",
+        "state": "known"
+      },
+      "status": "failed",
+      "target": "tool:first-party:read",
+      "toolCallId": "run_000001a162d4ce92_000001-tc0002"
+    },
+    {
+      "eventSeq": "25",
+      "kind": "run_terminal",
+      "runId": "run_000001a162d4ce92_000001",
+      "status": "completed",
+      "terminalReason": "completed.no_final.tool_partial_failure"
+    }
+  ],
+  "page": {
+    "hasMore": false,
+    "limit": 200
+  },
+  "revision": "\"r4-e25\"",
+  "schemaVersion": "lingxi.canonical-history.v1",
+  "sessionId": "a04",
+  "todoPanel": {
+    "dismissed": false,
+    "removed": true,
+    "todos": []
+  },
+  "todos": []
+}

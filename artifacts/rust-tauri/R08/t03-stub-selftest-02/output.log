@@ -1,0 +1,33 @@
+A05_STUB_READY 34077
+--- act1 (0 tool msgs) ---
+data: {"id":"r08-t03-tool","choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":"a05-call-write","type":"function","function":{"name":"write","arguments":"{\"path\":\"a05-drill-note.txt\",\"content\":\"A05-WRITE-v1\\n\"}"}}]},"finish_reason":null}]}
+
+data: {"id":"r08-t03-tool","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: [DONE]
+
+--- act2 (1 tool msg) ---
+data: {"id":"r08-t03-tool","choices":[{"index":0,"delta":{"role":"assistant","tool_calls":[{"index":0,"id":"a05-call-read","type":"function","function":{"name":"read","arguments":"{\"path\":\"a05-drill-note.txt\"}"}}]},"finish_reason":null}]}
+
+data: {"id":"r08-t03-tool","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+
+data: [DONE]
+
+--- act3 final (2 tool msgs) ---
+data: {"id":"r08-t03-final","choices":[{"index":0,"delta":{"role":"assistant","content":"A05-FINAL-ANSWER"},"finish_reason":null}]}
+
+data: {"id":"r08-t03-final","choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}
+
+data: [DONE]
+
+--- title model ---
+data: {"id":"r08-t03-final","choices":[{"index":0,"delta":{"role":"assistant","content":"A05 演练会话"},"finish_reason":null}]}
+
+data: {"id":"r08-t03-final","choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}
+
+data: [DONE]
+
+--- non-stream final ---
+{"id":"r08-t03-final","object":"chat.completion","choices":[{"index":0,"message":{"role":"assistant","content":"A05-FINAL-ANSWER"},"finish_reason":"stop"}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}
+--- info ---
+{"schema":"r08-t03-stub-provider/v1","drillFile":"a05-drill-note.txt","drillContent":"A05-WRITE-v1\n","finalAnswer":"A05-FINAL-ANSWER","requests":5}

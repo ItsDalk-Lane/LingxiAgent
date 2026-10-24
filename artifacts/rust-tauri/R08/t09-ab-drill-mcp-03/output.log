@@ -1,0 +1,33 @@
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=55209
+PASS kernel B (rust) ready :: 127.0.0.1:55217
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=0
+PASS [identity] parity
+PASS [sessions.list] parity
+RECORD [sessions.switch] recorded :: {"A":{"focused":false,"messages":null},"B":{"focused":true,"messages":null}}
+FAIL [sessions.rename] differs :: {"A":{"ok":true,"persisted":true},"B":{"ok":false,"persisted":false}}
+FAIL [sessions.pin] differs :: {"A":{"pinA":true,"pinB":true,"pinnedCount":0,"reorder":false,"reorderedReversed":true,"unpinA":true,"unpinB":true,"pinnedFinal":0},"B":{"pinA":false,"pinB":false,"pinnedCount":0,"reorder":false,"reorderedReversed":false,"unpinA":false,"unpinB":false,"pinnedFi
+RECORD [sessions.create] recorded :: {"A":{"created":false,"delta":0},"B":{"created":false,"delta":0}}
+FAIL [sessions.archive] differs :: {"A":{"inArchive":true,"goneFromVisible":true,"restored":true,"backVisible":true,"deleted":"skipped-not-restorable","stillArchived":true},"B":{"inArchive":false,"goneFromVisible":false,"restored":false,"backVisible":false,"deleted":"skipped-no-target","stillAr
+PASS [sessions.maintenance] parity
+PASS [sessions.capabilities] parity
+FAIL [sessions.todos] differs :: {"A":{"complete":true,"cancel":true,"dismiss":true},"B":{"complete":false,"cancel":false,"dismiss":false}}
+PASS [permissions.default] parity
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+FAIL [drift-guard] differs :: {"A":{"count":2,"titles":["T07-AB-renamed",null]},"B":{"count":1,"titles":["ab-real-alpha"]}}
+PASS [leaf.rename.negative] parity
+PASS [leaf.pin.negative] parity
+PASS [leaf.todos.negative] parity
+FAIL [leaf.cleanup.boundary] differs :: {"A":{"keptDeletedIsNumber":true,"freshKept":true,"purgedOk":false,"expiringGone":false},"B":{"keptDeletedIsNumber":true,"freshKept":false,"purgedOk":true,"expiringGone":true}}
+PASS [leaf.list.fields] parity
+PASS [leaf.permissions.read-idempotent] parity
+PASS [leaf.mcp.state] parity
+PASS [leaf.mcp.state.unauthorized] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=23 parity=15 differs=6 recorded=2 failedA=0 failedB=0 out=/private/tmp/t09-ab-mcp-03/out
+T07 AB OK

@@ -1,0 +1,4 @@
+{"case": "a01-build-locked-offline", "expect": 1, "actual": 1, "ok": true}
+{"case": "a01-deptree-desktop-free", "expect": 1, "actual": 1, "ok": true}
+{"case": "a01-service-start-ready", "expect": 1, "actual": 1, "ok": true}
+{"case": "a01-health-200", "expect": 200, "actual": 200, "ok": true}

@@ -1,0 +1,143 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "cases": [
+  {
+   "case": "ab::permissions.default.parity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.list.count",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.list.parity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.maintenance.cleanup",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.maintenance.sweep",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin.pin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.pin.unpin",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename.ok",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.rename.persisted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.todos.cancel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.todos.complete",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "ab::sessions.todos.dismiss",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::cleanup.archived-delete-with-effect",
+   "expect": 1,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "case": "leaf::cleanup.fresh-archive-kept",
+   "expect": 1,
+   "actual": 0,
+   "ok": false
+  },
+  {
+   "case": "leaf::list.revision-field-present",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.summary-or-badge-present",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::list.unauthorized-rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::permissions.mode-nonnull",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::permissions.read-idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::pin.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::rename.empty-title.rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::rename.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  },
+  {
+   "case": "leaf::todos.invalid-session.explicit-error",
+   "expect": 1,
+   "actual": 1,
+   "ok": true
+  }
+ ]
+}

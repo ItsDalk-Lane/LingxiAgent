@@ -1,0 +1,19 @@
+
+running 5 tests
+test in_flight_grant_cannot_land_after_real_archive_restore_completed ... ok
+test actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval ... ok
+test credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants ... ok
+test paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting ... ok
+test missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.95s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_mcp_session_permissions") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.18s
+     Running tests/r07_t08_mcp_session_permissions.rs (rust/target/debug/deps/r07_t08_mcp_session_permissions-b43b2018bdf8cdfc)

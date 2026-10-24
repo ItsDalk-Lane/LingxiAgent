@@ -1,0 +1,40 @@
+ok   baseline: exit 0 stopped@pointer_switch
+Parse error in 2nd command line argument: no such column: category
+  SELECT category, severity, code, COUNT(*) FROM import_issues GROUP BY 1,2,3 OR
+         ^--- error here
+node:internal/errors:985
+  const err = new Error(message);
+              ^
+
+Error: Command failed: sqlite3 "/private/tmp/t05a09-matrix/a09-baseline-IRdP47/new-home/lingxi-service/data/runs.db" "SELECT category, severity, code, COUNT(*) FROM import_issues GROUP BY 1,2,3 ORDER BY 1,2,3"
+Parse error in 2nd command line argument: no such column: category
+  SELECT category, severity, code, COUNT(*) FROM import_issues GROUP BY 1,2,3 OR
+         ^--- error here
+
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execSync (node:child_process:997:15)
+    at sqlite (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:169:10)
+    at targetSnapshot (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:199:26)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:368:16
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    '',
+    'Parse error in 2nd command line argument: no such column: category\n' +
+      '  SELECT category, severity, code, COUNT(*) FROM import_issues GROUP BY 1,2,3 OR\n' +
+      '         ^--- error here\n'
+  ],
+  pid: 88287,
+  stdout: '',
+  stderr: 'Parse error in 2nd command line argument: no such column: category\n' +
+    '  SELECT category, severity, code, COUNT(*) FROM import_issues GROUP BY 1,2,3 OR\n' +
+    '         ^--- error here\n'
+}
+
+Node.js v24.16.0

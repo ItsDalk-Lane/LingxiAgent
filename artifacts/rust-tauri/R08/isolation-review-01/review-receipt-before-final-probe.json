@@ -1,0 +1,46 @@
+{
+  "schema": "lingxi.r08.independent-isolation-check.v1",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "probeCommand": [
+    "node",
+    "scripts/rust-tauri/r08_isolation_probe.mjs",
+    "artifacts/rust-tauri/R08/isolation-review-live-01"
+  ],
+  "probeExitCode": 0,
+  "probeStatus": "PASS",
+  "sourceInputsMatch": {
+    "scripts/launch.js": true,
+    "scripts/dev-env.js": true,
+    "desktop/bootstrap.cjs": true,
+    "desktop/main.cjs": true,
+    "desktop/src/shared/single-instance-lock.cjs": true,
+    "rust/Cargo.lock": true
+  },
+  "probeSha256": "f0c0ef841940374aa7063489995c875620c7aaf7b3c181c47624b22956053ad2",
+  "processTreeDescendantPids": [
+    43438,
+    43439,
+    43440,
+    43444,
+    43660,
+    43664,
+    43665,
+    43666,
+    43670,
+    43883
+  ],
+  "liveDescendantsAfterExit": [],
+  "unitCommand": [
+    "npx",
+    "vitest",
+    "run",
+    "tests/startup-contract.test.ts",
+    "tests/desktop-single-instance-lock.test.ts"
+  ],
+  "unitExitCode": 0,
+  "unitTestFiles": 2,
+  "unitTestCount": 20,
+  "unitLogSha256": "3f11d88265a8e2a85e35dc782bac8d1ec1584127a088c181c3399bc09c02734f",
+  "defaultAliasRegression": "after matches real home userData; original failure retained",
+  "scope": "任务0局部；未验R08全阶段或真实生产目录字节摘要"
+}

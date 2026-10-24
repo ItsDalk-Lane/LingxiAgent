@@ -1,0 +1,10 @@
+ROOT /private/tmp/t05sw.hoNo7q/lingxi-r02-t01-smoke-home.YulYGy/negative-newer-env-data
+DIR app-data
+FILE data-epoch.json d72a8b92e680dc80d93d6c0557b6433adacdcf4cd9a08ab990a9c73bcecc258c
+DIR lingxi-service
+FILE app-data/existing.bin c43fe175063ed3bec81dafcd0d914ec43e9e94bfee03dda38a6c35e79c054586
+FILE lingxi-service/instance.lock e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+DIR lingxi-service/logs
+DIR lingxi-service/tmp
+FILE lingxi-service/logs/service-000001.log c68a87ddfb3a3acbcd60ba2bed2c8110b940555c35eb79a2d357c588896475c9
+ROOT /private/tmp/t05sw.hoNo7q/lingxi-r02-t01-smoke-home.YulYGy/negative-fallback

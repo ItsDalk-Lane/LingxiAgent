@@ -1,0 +1,33 @@
+{
+  "schema": "lingxi.r08.task0-candidate.v1",
+  "status": "ISOLATION_VERIFIED_R07_ADMISSION_FAIL",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sources": {
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/src/shared/single-instance-lock.cjs": "d2a6925e15e450b7f50802ec15a9c4a32a64b3b02a8ae59b9db8fefc5aa66ff2",
+    "tests/startup-contract.test.ts": "521b6258e59c6104ab81478798da0353cdd11bc79cfa4e7a40e68e57a93a3b7a",
+    "tests/desktop-single-instance-lock.test.ts": "20052dc91290f09621d20f61ce0e2c7dfbb9a5daf43a54432b9148b4a3841bfd",
+    "scripts/rust-tauri/r08_isolation_probe.mjs": "ab32571bd6fa9294a51b1042cef9078161d7d310b18da71dac5b243ab0869c35"
+  },
+  "isolationResultSha256": "f4f158e01e0f530c5eb1f19aaa9d1aaf334c4d124073da45c5537c57715c0395",
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "productionDefault": "未改变默认 Node/Electron 选择；只对子进程显式设置Rust开关",
+  "realUserDataBoundary": "未以真实用户数据作为测试样本；未取得真实用户目录逐字节前后摘要，因此不把它写成已验证PASS",
+  "preconditions": [
+    "合成根由真实Rust服务正规采用并正常退出",
+    "使用真实路径，未修改全局HOME",
+    "不伪造印章、不删除journal"
+  ],
+  "notRun": [
+    "T01-T08场景及全量迁移/回滚/再次前滚",
+    "R08正式xtask门禁尚未接通，不用准备检查替代"
+  ],
+  "retainedFailures": [
+    "isolation-live-01 调试上下文过早连接",
+    "isolation-live-02 空白根在壳写入后未采用，服务拒启",
+    "isolation-live-03 /var非规范路径导致MCP只读目录拒绝",
+    "isolation-live-04 探针误用Rust实例字段名",
+    "isolation-wrong-root-01 正式负例exit1"
+  ],
+  "createdAt": "2026-10-21T13:53:22.596828+00:00"
+}

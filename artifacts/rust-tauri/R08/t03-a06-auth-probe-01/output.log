@@ -1,0 +1,11 @@
+file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_auth_probe.mjs:29
+const { spawn, execFileSync } = require('node:child_process');
+                                ^
+
+ReferenceError: require is not defined in ES module scope, you can use import instead
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_auth_probe.mjs:29:33
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.16.0

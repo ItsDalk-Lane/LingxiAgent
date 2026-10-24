@@ -1,0 +1,46 @@
+
+running 21 tests
+test access_summary_returns_network_devices_and_account ... ok
+test access_profile_save_and_validate ... ok
+test bridge_status_read_does_not_start_connectors ... ok
+test static_shells_serve_or_guide_without_fabricating ... ok
+test desk_activity_session_and_promote_reject_unknown_ids ... ok
+test ws_ticket_issued_for_authenticated_principal_only ... ok
+test thinking_level_session_scoped_write ... ok
+test device_credentials_issue_honest_transport_handling ... ok
+test channels_create_and_delete_roundtrip ... ok
+test access_network_save_updates_summary_and_rejects_bad_mode ... ok
+test desk_cron_lists_current_jobs ... ok
+test bridge_settings_receipt_and_rich_streaming_toggles_persist ... ok
+test desk_activities_and_logs_list_honestly ... ok
+test session_permission_default_read_and_write ... ok
+test thinking_level_read_and_default_set_without_touching_sessions ... ok
+test server_identity_projects_capabilities_by_principal ... ok
+test bridge_wechat_qrcode_create_reports_external_failure ... ok
+test access_password_set_and_remove_with_validation ... ok
+test bridge_test_reports_concrete_error_without_polling ... ok
+test mobile_credentials_and_qr_honest_states ... ok
+test pairing_session_create_approve_and_device_revoke ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.09s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: field `home` is never read
+  --> crates/lingxi-service/tests/r07_probe_access.rs:54:5
+   |
+48 | struct Server {
+   |        ------ field in this struct
+...
+54 |     home: PathBuf,
+   |     ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r07_probe_access") generated 2 warnings (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.65s
+     Running tests/r07_probe_access.rs (rust/target/debug/deps/r07_probe_access-a222f3263524ca16)

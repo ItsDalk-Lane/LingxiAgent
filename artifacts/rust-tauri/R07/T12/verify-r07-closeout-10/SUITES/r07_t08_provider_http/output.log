@@ -1,0 +1,14 @@
+
+running 7 tests
+test health_pins_catalog_model_and_anthropic_connection_have_real_usage ... ok
+test catalog_draft_mask_and_cache_never_publish_remote_models_or_count_usage ... ok
+test provider_edits_deletes_and_reload_notify_real_applied_state_even_when_projection_fails ... ok
+test model_patch_and_removal_preserve_other_settings_and_stop_new_dispatch ... ok
+test actual_local_run_settings_search_apply_target_agent_and_security_refusals ... ok
+test api_key_reveal_requires_both_scopes_and_discovery_secret_drafts_cannot_bypass ... ok
+test auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.07s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_t08_provider_http.rs (rust/target/debug/deps/r07_t08_provider_http-6e4fa4cda683bc3d)

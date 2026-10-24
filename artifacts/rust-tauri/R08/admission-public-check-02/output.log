@@ -1,0 +1,38 @@
+    Checking lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused imports: `ToolTargetRef` and `subagent::SessionPermissionMode`
+  --> crates/lingxi-service/tests/r08_admission_security.rs:9:5
+   |
+ 9 |     subagent::SessionPermissionMode,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 |     toolcatalog::{SchemaBudget, ToolRegistry, ToolTargetRef},
+   |                                               ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `AttemptId`, `SessionId`, and `ToolCallId`
+  --> crates/lingxi-service/tests/r08_admission_security.rs:14:5
+   |
+14 |     AttemptId, ContentBlock, ModelCallId, NormalizedMessage, RunId, RunStatus, SessionId,
+   |     ^^^^^^^^^                                                                  ^^^^^^^^^
+15 |     ToolCallId,
+   |     ^^^^^^^^^^
+
+warning: unused imports: `CallerSurface`, `InvocationPermissionContext`, `InvocationRequest`, and `PolicyVerdict`
+  --> crates/lingxi-service/tests/r08_admission_security.rs:23:9
+   |
+23 |         CallerSurface, InvocationPermissionContext, InvocationRequest, PolicyVerdict,
+   |         ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+warning: field `gateway` is never read
+   --> crates/lingxi-service/tests/r08_admission_security.rs:117:5
+    |
+113 | struct Harness {
+    |        ------- field in this struct
+...
+117 |     gateway: Arc<ToolInvocationGateway>,
+    |     ^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r08_admission_security") generated 4 warnings (run `cargo fix --test "r08_admission_security" -p lingxi-service` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.13s

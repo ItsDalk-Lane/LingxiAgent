@@ -1,0 +1,21 @@
+ok   cleanstop:preflight: exit 0 outcome=stopped
+ok   cleanstop:preflight: journal 相位==stop_write_probe（下一待执行相）
+ok   cleanstop:preflight(停后): 旧根逐字节零写
+ok   cleanstop:preflight: resume exit 0 且 stopped@pointer_switch
+ok   cleanstop:preflight: history ok 链覆盖 preflight..pointer_switch 且序单调（无跳相）
+ok   cleanstop:preflight: history 无 refused 条目
+ok   cleanstop:preflight: 指针目录无 .tmp-* 残渣
+ok   cleanstop:preflight: 指针完整 JSON 且语义回绑
+ok   cleanstop:preflight: 旧根逐字节零写
+ok   cleanstop:preflight: 无遗留 rust/target/debug/lingxi-service 进程
+ok   cleanstop:preflight: 重跑探针 exit 2（目标锁可获 + 门拒重跑 = 无双写者）
+ok   cleanstop:preflight: identity hash 对拍
+ok   cleanstop:preflight: staging sidecar 归一化对拍
+ok   cleanstop:preflight: runs.db 统计对拍
+ok   cleanstop:preflight: issues 多重集对拍
+FAIL cleanstop:preflight: migration receipt 归一化对拍
+ok   cleanstop:preflight: epoch stamp 归一化对拍
+FAIL cleanstop:preflight: epoch transition 归一化对拍
+FAIL cleanstop:preflight: adoption receipt 归一化对拍
+SCRATCH_KEPT /private/tmp/t05a09-matrix/a09-cleanstop_preflight-xAC7W3
+A09_RESULT {"verdict":"FAIL","scenario":"cleanstop:preflight","failures":["cleanstop:preflight: migration receipt 归一化对拍","cleanstop:preflight: epoch transition 归一化对拍","cleanstop:preflight: adoption receipt 归一化对拍"]}

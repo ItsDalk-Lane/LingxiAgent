@@ -1,0 +1,20 @@
+
+running 13 tests
+test undeclared_materialize_is_refused_without_dispatch_and_actual_run_finishes ... ok
+test external_unknown_effect_is_persisted_and_never_reported_as_success ... ok
+test actual_run_cancellation_reaches_external_cleanup_and_settles_both_records ... ok
+test actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url ... ok
+test page_change_and_foreign_tab_invalidate_approval_before_external_dispatch ... ok
+test actual_readonly_snapshot_persists_receipt_but_write_never_dispatches ... ok
+test new_actual_user_submission_releases_emergency_stop_with_a_new_epoch ... ok
+test actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork ... ok
+test screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions ... ok
+test unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown ... ok
+test actual_service_interleaving_keeps_new_http_emergency_over_earlier_accepted_steer ... ok
+test confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start ... ok
+test accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.43s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r07_browser_tools.rs (rust/target/debug/deps/r07_browser_tools-8d5039959380c397)

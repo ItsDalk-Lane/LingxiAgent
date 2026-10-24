@@ -1,0 +1,25 @@
+=== r02_t06_recovery_drill ===
+== building lingxi-service + lingxi-storage-inspect (rustup 1.98.1, /private/tmp/t05sw.ezfTWO/rust-target-r02-t06, --locked) ==
+PASS build (locked, offline)
+== v1 (R02-A12/drill): torn stamp + readable higher-epoch journal ==
+PASS v1 exit=2 reason=corrupt-stamp evidence 1→2 named; files byte-identical; no auth state written
+== v2: valid stamp + torn transition journal ==
+PASS v2 exit=2 reason=corrupt-journal; files byte-identical
+== v3 (headline fail-open shape): missing stamp + readable higher-epoch journal ==
+PASS v3 exit=2 reason=corrupt-transition evidence 1→2 named; no stamp invented; files byte-identical
+== v4: healthy control (fresh home starts) ==
+Traceback (most recent call last):
+  File "<stdin>", line 4, in <module>
+AssertionError: {'committedDataEpoch': 2, 'epoch': 2, 'lastVersion': '0.0.0', 'minimumReaderEpoch': 2, 'schemaVersion': 2, 'updatedAt': '2026-10-23T05:46:16.591Z'}
+FAIL: v4 stamp must be v2 epoch 1
+T06_EXIT=1
+=== r02_t01_service_smoke ===
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/5] build the service binary (locked, offline, isolated target dir)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 07s
+== [2/5] dependency-tree desktop proof (cargo metadata resolve graph)
+SMOKE_EXIT=101
+=== r02_cli_rust_matrix ===
+usage: r02_cli_rust_matrix.py NEW_EVIDENCE_DIR
+MATRIX_EXIT=2

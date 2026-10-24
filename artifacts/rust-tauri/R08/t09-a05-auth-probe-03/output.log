@@ -1,0 +1,4 @@
+agents create: 200
+session create: 201 {"ownerUserId":"user_local","sessionId":"a05-read-session"}
+DB read failed: no such column: authorized_folders
+A05_AUTH_PROBE_DONE

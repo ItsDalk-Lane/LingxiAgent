@@ -1,0 +1,12 @@
+
+running 5 tests
+test in_flight_grant_cannot_land_after_real_archive_restore_completed ... ok
+test actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval ... ok
+test credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants ... ok
+test paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting ... ok
+test missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 34.23s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_t08_mcp_session_permissions.rs (rust/target/debug/deps/r07_t08_mcp_session_permissions-466fa13d9d229605)

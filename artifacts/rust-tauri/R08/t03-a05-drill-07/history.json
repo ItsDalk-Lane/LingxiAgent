@@ -1,0 +1,87 @@
+{
+  "headers": {
+    "content-type": "application/json",
+    "etag": "\"r4-e15\"",
+    "content-length": "2563",
+    "date": "Thu, 22 Oct 2026 14:47:55 GMT"
+  },
+  "value": {
+    "headRevision": "4",
+    "items": [
+      {
+        "committedAtUnixMs": 1792680474219,
+        "kind": "user_message",
+        "messageId": "user:run_000001a16415366b_000001",
+        "run": {
+          "runId": "run_000001a16415366b_000001",
+          "state": "known"
+        },
+        "seq": "1",
+        "text": "请读取文件 a05-drill/read-note.txt 并原样复述其内容。（标记 A05-READ-TASK）"
+      },
+      {
+        "firstSeq": "5",
+        "kind": "tool_call",
+        "result": {
+          "error": {
+            "code": "forbidden",
+            "message": "tool resource scope refused: resource_scope_refused: resource_access_denied: read /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j/a05-drill/read-note.txt is not inside any authorized root (real target /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j/a05-drill/read-note.txt); the operation is refused with zero side effects",
+            "retryable": false
+          },
+          "status": "failed",
+          "truncated": false
+        },
+        "run": {
+          "runId": "run_000001a16415366b_000001",
+          "state": "known"
+        },
+        "status": "failed",
+        "target": "",
+        "toolCallId": "run_000001a16415366b_000001-tc0001"
+      },
+      {
+        "complete": true,
+        "firstSeq": "9",
+        "kind": "assistant_segment",
+        "phase": "final_answer",
+        "run": {
+          "runId": "run_000001a16415366b_000001",
+          "state": "known"
+        },
+        "segmentId": "assistant:2:text:default",
+        "segmentKind": "text",
+        "text": "A05-FINAL-ANSWER readback: tool error [forbidden]: tool resource scope refused: resource_scope_refused: resource_access_denied: read /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j/a05-drill/read-note.txt is not inside any authorized root (real target /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j/a05-drill/read-note.txt); the operation is refused with zero side effects"
+      },
+      {
+        "committedAtUnixMs": 1792680475754,
+        "content": [
+          {
+            "text": "A05-FINAL-ANSWER readback: tool error [forbidden]: tool resource scope refused: resource_scope_refused: resource_access_denied: read /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j/a05-drill/read-note.txt is not inside any authorized root (real target /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-w5Vj8j/a05-drill/read-note.txt); the operation is refused with zero side effects",
+            "type": "text"
+          }
+        ],
+        "kind": "final_message",
+        "messageId": "run_000001a16415366b_000001-final",
+        "modelCallId": "run_000001a16415366b_000001-mc0002",
+        "run": {
+          "runId": "run_000001a16415366b_000001",
+          "state": "known"
+        },
+        "seq": "5"
+      }
+    ],
+    "page": {
+      "hasMore": false,
+      "limit": 200
+    },
+    "revision": "\"r4-e15\"",
+    "schemaVersion": "lingxi.canonical-history.v1",
+    "sessionId": "a05-read-session",
+    "todoPanel": {
+      "dismissed": false,
+      "removed": true,
+      "todos": []
+    },
+    "todos": []
+  }
+}

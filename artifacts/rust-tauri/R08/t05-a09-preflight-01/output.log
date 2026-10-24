@@ -1,0 +1,33 @@
+JOURNAL_AT_KILL {"schemaVersion":1,"cutoverId":"cut-1792730496146-88775","createdAt":"2026-10-23T04:41:36.146Z","phase":"preflight","attempts":1,"history":[],"inputs":{"source":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/legacy-home","target":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/new-home","workDir":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/work","backupDir":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/backups","pointer":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/active-data-root.json","sourceManifestHash":null}}
+ok   kill9:preflight: 杀后 journal 相位==preflight
+ok   kill9:preflight: 杀后无 refused 终态
+ok   kill9:preflight(杀后): 指针目录无 .tmp-* 残渣
+ok   kill9:preflight(杀后): 指针缺席（合法：switch 前无指针）
+ok   kill9:preflight(杀后): 旧根逐字节零写
+FAIL kill9:preflight: resume exit 0 且 stopped@pointer_switch — status=2 stdout= stderr=error: migrate: journal: journal corrupt at /private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/work/journal.json: --resume "undefined" does not match journal cutoverId "cut-1792730496146-88775"
+JOURNAL_FINAL {"schemaVersion":1,"cutoverId":"cut-1792730496146-88775","createdAt":"2026-10-23T04:41:36.146Z","phase":"preflight","attempts":1,"history":[],"inputs":{"source":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/legacy-home","target":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/new-home","workDir":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/work","backupDir":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/backups","pointer":"/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/active-data-root.json","sourceManifestHash":null}}
+FAIL kill9:preflight: history ok 链覆盖 preflight..pointer_switch 且序单调（无跳相） — {"okFirst":{},"history":[]}
+ok   kill9:preflight: history 无 refused 条目
+ok   kill9:preflight: 指针目录无 .tmp-* 残渣
+FAIL kill9:preflight: 指针存在
+ok   kill9:preflight: 旧根逐字节零写
+ok   kill9:preflight: 无遗留 rust/target/debug/lingxi-service 进程
+FAIL kill9:preflight: 重跑探针 exit 2（目标锁可获 + 门拒重跑 = 无双写者） — status=0 stderr=
+node:fs:441
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/new-home/data-epoch-transition.json'
+    at readFileSync (node:fs:441:20)
+    at targetSnapshot (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:210:18)
+    at assertParity (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:278:16)
+    at fullLegAssertions (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:318:3)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:406:5
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/private/tmp/t05a09-matrix/a09-kill9_preflight-RbBv6f/new-home/data-epoch-transition.json'
+}
+
+Node.js v24.16.0

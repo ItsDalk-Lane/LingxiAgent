@@ -1,0 +1,23 @@
+PASS receipt.status=complete
+PASS receipt.pendingConvert=0
+PASS receipt.extensions 6 keys
+PASS migrations tip=28
+PASS legacyTrace.importedCalls=5
+PASS legacyTrace.failedStores=false
+PASS model_call_usage rows=5
+file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_b3_assert.mjs:32
+const one = (sql, ...args) => db.prepare(sql).get(...args);
+                                 ^
+
+Error: no such table: model_calls
+    at one (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_b3_assert.mjs:32:34)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t04_b3_assert.mjs:55:13
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  code: 'ERR_SQLITE_ERROR',
+  errcode: 1,
+  errstr: 'SQL logic error'
+}
+
+Node.js v24.16.0

@@ -1,0 +1,35 @@
+{
+  "schema": "lingxi.r08.command-receipt.v1",
+  "argv": [
+    "python3",
+    "scripts/rust-tauri/r08_leaf_map.py",
+    "--check"
+  ],
+  "cwd": "/Users/study_superior/Desktop/Code/LingxiAgent",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "candidateDiffSha256": "5bf29a0e4dab15efa08f9972c447365df6f70a3e3b1f0229200ab7295cd80935",
+  "sourceBindings": {
+    "package.json": "83767a9dd10f5cb7a15d8eb3af1a18fc25a8682182a6da8d1d3ff1febbe55c84",
+    "package-lock.json": "e54a16fe14f15b4797069106392040924a5dd616c69a73bd025729090505ac8b",
+    "rust-toolchain.toml": "eec3410410647a7d39f25371e73dda3ecfd5e7c10359090fff11e83053e11c37",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3",
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "d2a6925e15e450b7f50802ec15a9c4a32a64b3b02a8ae59b9db8fefc5aa66ff2",
+    "tests/startup-contract.test.ts": "521b6258e59c6104ab81478798da0353cdd11bc79cfa4e7a40e68e57a93a3b7a",
+    "tests/desktop-single-instance-lock.test.ts": "20052dc91290f09621d20f61ce0e2c7dfbb9a5daf43a54432b9148b4a3841bfd",
+    "scripts/rust-tauri/r08_isolation_probe.mjs": "ab32571bd6fa9294a51b1042cef9078161d7d310b18da71dac5b243ab0869c35",
+    "scripts/rust-tauri/r08_leaf_map.py": "47e68517495944f548fe3ec49390a4a14828b9d96428797c273692d4d09d9ef2",
+    "scripts/rust-tauri/r08_run.py": "5e60fae3105eaf6e112f23a5f75e5359cd3a9991a10733cad50494a74a1ad6b4"
+  },
+  "startedAt": "2026-10-21T13:53:22.309016+00:00",
+  "platform": "darwin",
+  "globalHomeUnchanged": "/Users/study_superior",
+  "evidenceBoundary": "命令回执，不等于逐断言验收；环境不含真实凭证输出",
+  "exitCode": 0,
+  "finishedAt": "2026-10-21T13:53:22.482592+00:00",
+  "logSha256": "34ebffc6cedfb7e977290f2b0ec4a47f7dbe76e7091978a0cc36593638e0a205",
+  "sourceBindingsStable": true
+}

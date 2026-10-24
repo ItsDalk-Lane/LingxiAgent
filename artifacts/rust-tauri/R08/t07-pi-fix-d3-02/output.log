@@ -1,0 +1,31 @@
+PASS fixture gen exit 0
+PASS migrate committed
+PASS agents create
+PASS sessions/new :: 200
+PASS attachments/local
+PASS preferences/appearance
+PASS bridge POST config
+PASS bridge POST owner
+PASS bridge POST config
+PASS sentinels exactly 3 (no queued) :: [["conv-t06-s3","started"],["conv-t06-s2","unknown"],["conv-t06-s1","confirmed"]]
+PASS external sends once per leg (gen) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS rollback committed
+PASS delta package dir exists :: /private/tmp/t07-pi-fix-d3-02/delta-out/rb-1792769890443-16469
+PASS reforward-B exit 0
+PASS reforward-B committed :: one":90,"batches_pending_convert":0,"issues":5,"status":"complete","interrupted":false,"receipt_path":"/private/tmp/t07-pi-fix-d3-02/recovered-root/legacy-import/migration-receipt.json"}
+REFORWARD_RESULT reforwardId=rf-1792769892972-16769 phase=committed outcome=committed detail=reforward committed
+
+PASS pointer → recovered root :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/t07-pi-fix-d3-02/recovered-root","cutoverId":"rf-1792769892972-16769","committedAt":"2026-10-23T15:38:14.182Z"}
+PASS reforward receipt present :: /private/tmp/t07-pi-fix-d3-02/rb-work/reforward-receipt.json
+PASS J4 secondImportZeroGrowth=true in receipt :: {"generatedAt":"2026-10-23T15:38:14.337Z","hashConvention":"manifest-domain sha256 values use the internal double-hash convention (same domain as T04/T05 manifests, comparison-only); delta package payload entries carry true content sha256 (shasum-verifiable)","lineage":{"deltaPackageSha256":"04079fa
+PASS A11 session/message counts equal (recovered root) :: {"sessions":12,"messages":835} → {"sessions":12,"messages":835}
+PASS A11 attachments: every original-new-root file byte-identical in recovered root (subset) :: []
+A11_REIMPORTED_LEGACY_FILES count=3 ["e1bcfbf68c6456df067aa1ad/legacy-file-broken-1-big.bin","e1bcfbf68c6456df067aa1ad/legacy-file-good-1-notes.md","e4e7c6710b86cbd718cfd22e/legacy-file-good-2-chart.json"]
+PASS A11 settings edit recovered
+PASS A12 S1 confirmed + receipt byte-identical (recovered) :: ["{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}"]
+PASS A12 S2 unknown unchanged (recovered) :: {"delivery_id":"reply:bridge-cc1081b37510fff64fb7e4a0acc625ea90af195f1c6caf3a5ef736bd481334f5","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}
+PASS A12 S3 settled unknown controlled (recovered) :: {"delivery_id":"reply:bridge-23061284b60c47cfb74d34debf09fb0b042d538c75bb33ff464bc66e1bb09260","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+PASS external sends frozen (counter 恒=1/腿 across rollback+reforward-B) :: {"s1":1,"s2":1,"s3":1,"other":0} → {"s1":1,"s2":1,"s3":1,"other":0}
+PASS original new root preserved (epoch stamp intact)
+D3_RESULT failures=0 legs={"s1":1,"s2":1,"s3":1,"other":0} counts={"sessions":12,"messages":835}
+D3 DRILL OK

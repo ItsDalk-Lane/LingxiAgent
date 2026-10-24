@@ -1,0 +1,23 @@
+
+running 15 tests
+test invalid_import_and_unknown_global_fields_never_write_any_preferences ... ok
+test corrupt_preferences_are_preserved_and_profile_writes_reject_symlinks ... ok
+test existing_machine_default_workspace_get_and_ensure_do_not_depend_on_service_home_or_modify_user_files ... ok
+test rejected_agent_provider_and_yuan_patches_do_not_save_global_values_first ... ok
+test user_profile_parent_directory_link_cannot_redirect_reads_or_writes ... ok
+test snapshots_and_default_exports_hide_all_saved_secret_shapes ... ok
+test partial_global_save_still_emits_only_the_changes_that_really_happened ... ok
+test saved_proxy_credentials_never_leave_read_or_export_and_new_unsupported_credentials_are_refused ... ok
+test applied_model_projection_error_still_notifies_current_model_consumers ... ok
+test deleting_one_recent_workspace_keeps_the_other_workspace_and_other_agent ... ok
+test partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers ... ok
+test export_import_roundtrip_preserves_masked_secrets_and_unmentioned_preferences ... ok
+test one_global_edit_and_masked_search_edit_preserve_other_values_and_restart ... ok
+test workspace_history_uses_explicit_agent_and_profile_survives_restart ... ok
+test remote_settings_scope_cannot_use_local_only_settings_archive ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.98s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.26s
+     Running tests/r07_t08_settings.rs (rust/target/debug/deps/r07_t08_settings-8172e96e226bca1b)

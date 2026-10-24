@@ -1,0 +1,30 @@
+
+running 6 tests
+test missing_agent_cannot_receive_a_workspace_scope_or_background_run ... ok
+test create_if_absent_never_overwrites_a_competing_resource ... ok
+test ordinary_chat_cannot_borrow_heartbeat_program_log_target ... ok
+test config_switch_off_cancels_real_inflight_patrol_and_does_not_write_log ... ok
+test separate_agents_run_together_but_same_agent_overlap_is_discarded ... ok
+test real_patrol_and_root_first_level_jian_use_gateway_fixed_logs ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.87s
+
+warning: fields `limit` and `cursor` are never read
+   --> crates/lingxi-service/src/observability.rs:676:5
+    |
+674 | struct QueryTracesInput {
+    |        ---------------- fields in this struct
+675 |     #[serde(default)]
+676 |     limit: Option<u32>,
+    |     ^^^^^
+677 |     #[serde(default)]
+678 |     cursor: Option<String>,
+    |     ^^^^^^
+    |
+    = note: `QueryTracesInput` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.54s
+     Running tests/r07_heartbeat_runtime.rs (rust/target/debug/deps/r07_heartbeat_runtime-7404258a777689ab)

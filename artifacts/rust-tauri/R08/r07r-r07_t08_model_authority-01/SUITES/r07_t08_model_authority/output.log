@@ -1,0 +1,19 @@
+
+running 5 tests
+test real_http_reload_revalidates_replaced_local_token_after_actual_mutation_queue ... ok
+test real_http_web_session_save_revalidates_logout_after_actual_mutation_queue ... ok
+test real_http_device_model_save_revalidates_again_at_filesafety_atomic_authorization ... ok
+test real_http_device_model_save_revalidates_revocation_after_actual_mutation_queue ... ok
+test real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.77s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_model_authority") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.19s
+     Running tests/r07_t08_model_authority.rs (rust/target/debug/deps/r07_t08_model_authority-191f84a59044874c)

@@ -1,0 +1,4 @@
+[r08-t03-a05] orchestrator crashed: Error: ws frame timeout
+    at Timeout._onTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a05_drill.mjs:307:14)
+    at listOnTimeout (node:internal/timers:605:17)
+    at process.processTimers (node:internal/timers:541:7)

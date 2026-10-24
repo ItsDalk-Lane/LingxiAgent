@@ -1,0 +1,9 @@
+
+running 2 tests
+test actual_stubborn_mcp_disconnect_reconnect_and_owner_drop_reap_process_groups ... ok
+test actual_mcp_initialization_cancellation_reaps_process_before_connection_exists ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running tests/r07_t08_mcp_process.rs (rust/target/debug/deps/r07_t08_mcp_process-2971ad4b7637288a)

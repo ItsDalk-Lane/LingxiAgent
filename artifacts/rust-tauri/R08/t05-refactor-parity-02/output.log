@@ -1,0 +1,21 @@
+PASS outcome.run_id shape :: import:40f42dc1:1792709547675
+PASS outcome.run_id shape :: import:40f42dc1:1792714739614
+PASS outcome normalized equal :: {"run_id":"import:40f42dc1:<MS>","resumed":false,"source_root_sha256":"40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e","source_unchanged":true,"batches_total":435,"batches_done":435,"batches_pending_convert":0,"issues":5206,"status":"complete","interrupted":false,"receipt_path":"<TARGET>/legacy-import/migration-receipt.json"}
+FAIL target file sets equal :: onlyBaseline=lingxi-service/data/runs.db-shm,lingxi-service/data/runs.db-wal onlyCandidate=
+FAIL non-run-bound files byte-identical :: legacy-import/SUMMARY.md
+FAIL receipt normalized deep-equal :: {"batches":{},"extensions":{},"generatedAtUnixMs":"<TS>","issues":{},"phase":"R08-T04 (LegacyImporter: sessionfiles/trace/cron/runtime-state/plugins/epoch/knowledge; T05 adoption consumes this receipt)","resumed":false,"runId":"import:40f42dc1:<MS>","schema":"lingxi.legacy-import-receipt/v1","sourceRootSha256":"40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e","sourceUnchanged":tru
+  receipt key diff: phase
+    baseline="R08-T04 B3 (slice A: sessionfiles convert; slice B: legacy trace + cron import; slice C: runtime-state registry; plugins/epoch/knowledge surfaces)"
+    candidate="R08-T04 (LegacyImporter: sessionfiles/trace/cron/runtime-state/plugins/epoch/knowledge; T05 adoption consumes this receipt)"
+PASS baseline batches 435/435 done :: 435/435
+PASS baseline issues 5206 :: 5206
+PASS baseline migrations tip 28 :: 28
+PASS baseline run state completed :: completed
+PASS baseline stamp semantic fields :: {"committedDataEpoch":1,"epoch":1,"lastVersion":"legacy-import","minimumReaderEpoch":1,"schemaVersion":2,"updatedAt":"2026-10-22T22:53:12.155Z"}
+PASS candidate batches 435/435 done :: 435/435
+PASS candidate issues 5206 :: 5206
+PASS candidate migrations tip 28 :: 28
+PASS candidate run state completed :: completed
+PASS candidate stamp semantic fields :: {"committedDataEpoch":1,"epoch":1,"lastVersion":"legacy-import","minimumReaderEpoch":1,"schemaVersion":2,"updatedAt":"2026-10-23T00:19:05.809Z"}
+PASS source root hash anchor 40f42dc1 :: 40f42dc1fdb7dc026ee1ce6444914a02a085c12c53b7598e70fc453fdb388c9e
+PARITY FAILURES: 3

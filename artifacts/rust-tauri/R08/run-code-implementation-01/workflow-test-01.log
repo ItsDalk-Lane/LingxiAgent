@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart' (11115751) panicked at crates/lingxi-service/tests/r08_admission_run_code.rs:751:10:
+真实工作流节点必须实际到达工具结果: Elapsed(())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart ... FAILED
+
+failures:
+
+failures:
+    real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 15.22s
+

@@ -1,0 +1,4 @@
+PASS import_batches total=35 matches baseline
+PASS messages PK unique (no duplicates)
+
+B4-ASSERT[resumed] FAILURES: 22 pass, 4 fail

@@ -1,0 +1,17 @@
+ok kill-selfcheck: selfcheck phase entered within deadline
+ok kill-selfcheck: no leftover process
+ok kill-selfcheck-resume: exit 0
+ok kill-selfcheck-resume: CUTOVER_RESULT present
+ok kill-selfcheck-resume: outcome=committed phase=committed
+ok kill-selfcheck-resume: journal.phase == committed
+ok kill-selfcheck-resume: nine phases ok in order + committed terminal state
+ok kill-selfcheck-resume: no refused entry
+ok kill-selfcheck-resume: pointer valid
+ok kill-selfcheck-resume: target stamp epoch 2 (R08_CUTOVER)
+ok kill-selfcheck-resume: ruling in work-dir
+ok kill-selfcheck-resume: ruling copy in target legacy-import/
+ok kill-selfcheck-resume: ruling copy byte-equal
+ok kill-selfcheck-resume: ruling fields (schema/cutoverId/strategy/sharedWrites/enforcement×3)
+ok kill-selfcheck-resume: legacy root byte-equal (zero-mutation red line)
+D2_RESULT {"verdict":"PASS","leg":"kill-selfcheck"}
+D2_EXIT=0

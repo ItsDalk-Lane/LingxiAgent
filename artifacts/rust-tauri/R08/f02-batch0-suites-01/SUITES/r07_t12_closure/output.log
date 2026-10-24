@@ -1,0 +1,17 @@
+
+running 3 tests
+test r07_t12_kernel_detector_catches_a_real_node_process ... ok
+test r07_t12_a24_closed_loop_without_legacy_kernel ... ok
+test r07_t12_a23_runtime_route_matrix ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t12_closure") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.73s
+     Running tests/r07_t12_closure.rs (rust/target/debug/deps/r07_t12_closure-ae839b3efef1c0e0)

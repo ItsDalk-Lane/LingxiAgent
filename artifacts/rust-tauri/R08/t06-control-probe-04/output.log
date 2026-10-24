@@ -1,0 +1,3 @@
+CONTROL_PROBE_FAIL stage=top detail=ReferenceError: stopped is not defined
+    at main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_control_probe.mjs:343:20)
+PROBE_EXIT=2

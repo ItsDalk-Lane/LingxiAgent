@@ -1,0 +1,11 @@
+
+running 4 tests
+test unwired_agent_get_marks_inactive_and_does_not_promote_legacy_only_catalog ... ok
+test missing_explicit_agent_is_not_recreated_or_redirected_to_focus_and_valid_target_is_private ... ok
+test agent_get_uses_published_models_after_projection_failure_instead_of_legacy_catalog ... ok
+test linked_agent_directory_agents_root_or_config_never_writes_outside_for_present_or_missing_targets ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.38s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s
+     Running tests/r07_t08_agent_target.rs (rust/target/debug/deps/r07_t08_agent_target-e33ab2ed13ca84a3)

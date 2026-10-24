@@ -1,0 +1,19 @@
+
+running 11 tests
+test actual_wechat_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_wechat_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_dingtalk_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_dingtalk_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_qq_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_telegram_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_feishu_sdk_factory_roundtrip_and_restart_are_idempotent ... ok
+test actual_feishu_sdk_guest_command_cannot_dispatch_registered_exec_or_write ... ok
+test actual_feishu_folded_preview_unknown_does_not_resend_content_as_a_new_final_reply ... ok
+test actual_dingtalk_adapter_recovers_from_a_transient_socket_error_without_reconfiguration ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.81s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.33s
+     Running tests/r07_bridge_sdk_platforms.rs (rust/target/debug/deps/r07_bridge_sdk_platforms-fb022e0f3f8e6032)

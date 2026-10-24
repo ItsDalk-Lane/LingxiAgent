@@ -1,0 +1,11 @@
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+warning: unused import: `ParsedEntry`
+  --> crates/lingxi-adapters/src/storage/legacy_import/convert_sessions.rs:26:49
+   |
+26 | use super::session_jsonl::{parse_session_jsonl, ParsedEntry};
+   |                                                 ^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-adapters` (lib) generated 1 warning (run `cargo fix --lib -p lingxi-adapters` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.27s

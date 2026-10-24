@@ -1,0 +1,48 @@
+{
+  "schema": "r08-t03-a06-auth-probe/v1",
+  "checks": [
+    {
+      "id": "token-shape",
+      "pass": true,
+      "detail": "local-token.json token matches desktop regex shape (len=32)"
+    },
+    {
+      "id": "p1-missing-credential",
+      "pass": false,
+      "detail": "GET identity no-auth via LAN -> 0 fetch error: The operation was aborted due to timeout"
+    },
+    {
+      "id": "p2-loopback-token-refused-on-lan",
+      "pass": false,
+      "detail": "GET identity Bearer loopback-token via LAN -> 0 fetch error: The operation was aborted due to timeout"
+    },
+    {
+      "id": "p3-desktop-regex-rejects-device-secret",
+      "pass": true,
+      "detail": "desktop token regex rejects device secret sample \"hana_dev_AAAAAAA...\""
+    }
+  ],
+  "probes": {
+    "p1_no_credential": {
+      "status": 0,
+      "body": "fetch error: The operation was aborted due to timeout"
+    },
+    "p2_loopback_token": {
+      "status": 0,
+      "body": "fetch error: The operation was aborted due to timeout"
+    }
+  },
+  "env": {
+    "lan": "192.168.3.96",
+    "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf",
+    "rustBin": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service"
+  },
+  "servicePid": 82965,
+  "ready": {
+    "addr": "192.168.3.96:54982",
+    "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf",
+    "source": "cli"
+  },
+  "stderrTail": "/lingxi-service/models.json\") providers=1\n2026-10-22T15:22:54.218881Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=34a279d1f89d5f0b pid=82965 entropy=\"os-random-device\" lock=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf/lingxi-service/instance.lock network_mode=lan\n2026-10-22T15:22:54.241356Z  INFO lingxi_service: data-epoch gate passed [token] decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 1, committed_data_epoch: 1, last_version: Some(\"0.0.0\") })\n2026-10-22T15:22:54.326979Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26] version=26\n2026-10-22T15:22:54.403448Z  INFO lingxi_service: auth service bootstrapped (per-start loopback token, owner-only); run database migrated and seeded local_token_file=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf/lingxi-service/local-token.json run_database=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf/lingxi-service/data/runs.db\n2026-10-22T15:22:54.419417Z  INFO lingxi_service: instance record published (atomic write) record=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-probe-3B0pAf/lingxi-service/instance.json bind_addr=192.168.3.96:54982\n2026-10-22T15:23:04.428756Z  INFO lingxi_service: shutdown signal: SIGTERM\n2026-10-22T15:23:04.444146Z  INFO lingxi_service::shutdown: run database closed (drained, WAL truncated) phase=storage_close\n2026-10-22T15:23:04.445600Z  INFO lingxi_service::shutdown: own instance record removed, lock released phase=record_cleanup\n2026-10-22T15:23:04.445670Z  INFO lingxi_service: lingxi-service stopped cleanly (run database closed, own record removed, lock released)\n",
+  "verdict": "probe-unexpected"
+}

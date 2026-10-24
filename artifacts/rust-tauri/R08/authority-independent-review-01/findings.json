@@ -1,0 +1,315 @@
+{
+  "schema": "lingxi.r08.independent-authority-review.v1",
+  "status": "FAIL_NOT_CLOSED",
+  "reviewer": "admission_evidence_review",
+  "reviewedAt": "2026-10-21T16:41:30.790036+00:00",
+  "baseSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "branch": "codex/rust-tauri-migration",
+  "inputs": "artifacts/rust-tauri/R08/authority-independent-review-01/inputs.json",
+  "scope": "run_code与PTC新增执行入口的授权/生命周期/持久事实；只读实现，不重开R06、不扩到R09。实现正并行变化，判断绑定本证据快照。",
+  "originalRequirements": {
+    "R00-T02-LA-C88F29B5114A": {
+      "id": "R00-T02-LA-C88F29B5114A",
+      "feature_id": "F-D13-TOOL-TOOL-RUN-CODE-C88F29",
+      "task_ids": [
+        "R04-T05"
+      ],
+      "given": "当前会话具备调用 run_code 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 run_code 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "run返回输出并保留同会话变量；restart清空内核状态；status如实报启动状态。",
+      "assertions": [
+        "两次调用可共享变量",
+        "重启后旧变量消失",
+        "取消清理内核",
+        "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A09",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“真实孙进程被清理且哨兵存活”的横向边界，可与本入口的在会话专属持续代码内核运行/重启/查询状态共同执行；仍未逐项断言该结果。"
+        },
+        {
+          "acceptance_id": "R04-A10",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“PTY交互不退化”的横向边界，可与本入口的在会话专属持续代码内核运行/重启/查询状态共同执行；仍未逐项断言该结果。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T05"
+      ],
+      "execution_owner": "Rust Process/Tool",
+      "execution_stage_ids": [
+        "R04",
+        "R07"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    },
+    "R00-T02-LA-0818574ABD43": {
+      "id": "R00-T02-LA-0818574ABD43",
+      "feature_id": "F-D03-TOOL-TOOL-RUN-TOOLS-081857",
+      "task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "given": "当前会话具备调用 run_tools 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 run_tools 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "脚本返回日志/结果与子调用摘要；每个子调用经原目标权限检查，子结果默认不直接进对话。",
+      "assertions": [
+        "每个子调用独立权限判定",
+        "外层只显示打印/返回值",
+        "失败显示已执行子动作",
+        "未知工具、自调用、无权限、脚本超时或沙盒异常拒绝；已执行子动作不因外层失败自动回滚。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A01",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“目录与执行同源”的横向边界，可与本入口的在隔离程序中组合调用当前会话工具共同执行；仍未逐项断言该结果。"
+        },
+        {
+          "acceptance_id": "R04-A02",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“陈旧目录拒绝错误目标”，未操作或核对本入口的在隔离程序中组合调用当前会话工具。"
+        },
+        {
+          "acceptance_id": "R04-A03",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“各入口权限不变”的横向边界，可与本入口的在隔离程序中组合调用当前会话工具共同执行；仍未逐项断言该结果。"
+        },
+        {
+          "acceptance_id": "R04-A04",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“伪造执行凭证失败”的横向边界，可与本入口的在隔离程序中组合调用当前会话工具共同执行；仍未逐项断言该结果。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "execution_owner": "Rust Registry/Gateway",
+      "execution_stage_ids": [
+        "R04",
+        "R07"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    }
+  },
+  "findings": [
+    {
+      "id": "RC-A01",
+      "status": "SOURCE_FIX_PRESENT_NOT_INDEPENDENTLY_VERIFIED",
+      "title": "工作流写根约束不能被持久解释器绕过",
+      "originalRequirement": "run_code经原工具权限；已生效工作流/终端范围不得因新入口扩大",
+      "source": "coding_run_code.rs::run / exectools.rs::run_exec_command",
+      "evidence": "旧候选直接spawn解释器，没有workflow_scope约束。当前快照已出现非status工作流拒绝RUN_CODE_WORKFLOW_UNSUPPORTED；新增真实workflow节点反向测试已在源码。原历史8测不包含该修复。",
+      "requiredIndependentChecks": [
+        "实际执行real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart；确认两个执行动作失败、状态读不启动、兄弟文件不存在、无进程残留",
+        "正式默认组合根和PTC转调均不得绕过这条限制"
+      ]
+    },
+    {
+      "id": "RC-A02",
+      "status": "REVIEW_QUESTION_AND_TEST_GAP",
+      "title": "持久内核旧目录与本次批准目录一致性",
+      "originalRequirement": "实际资源不得偏离网关准备时展示/冻结的范围",
+      "source": "coding_run_code.rs::run key/cwd/kernel.cwd",
+      "evidence": "槽位按主体/Agent/session/language，不含cwd；旧kernel.cwd只重新authorize，没有确认与本次cwd一致。尚未实测会话工作区切换到达路径，不作为已复现越权结论。",
+      "requiredIndependentChecks": [
+        "真实入口切换会话工作区后再run，确认旧目录不会在新批准描述下被静默写入；或明确拒绝并要求重启",
+        "准备与执行间换链接/撤目录权限后，文件效果为零且原kernel状态诚实"
+      ]
+    },
+    {
+      "id": "PTC-A01",
+      "status": "PARTIAL_SOURCE_FIX_NOT_CLOSED",
+      "title": "每个可信子调用，包括早期拒绝，都需独立持久事实",
+      "originalRequirement": "每子调用独立权限判定；未知、自调用、无权限拒绝可见",
+      "source": "runs.rs::execute_program_child / coding_ptc.rs::program",
+      "evidence": "当前已加unresolved请求+refuse_child宏，部分未知/目录说明/来源拒绝会写独立intent/receipt。但coding_ptc仍在name==run_tools时提前返回Err，未进入driver；无效大参数等?路径也需完整列举。伪造父身份本就不得生成合法子日志，不能混为该缺口。",
+      "requiredIndependentChecks": [
+        "合法父上下文中未知名称、直接自调用、别名自调用、无效schema、失效正式说明、来源撤权逐个得到dispatched=false的独立receipt和用户结果",
+        "不冒用真实target描述未知名称；同seq第二次不派发；未获可信父身份时零业务事实"
+      ]
+    },
+    {
+      "id": "PTC-A02",
+      "status": "OPEN_REQUIRED_BEHAVIOR",
+      "title": "当前显式拒绝delegation，all-tools语义尚未闭合",
+      "originalRequirement": "原run_tools可组合当前会话工具；每子调用沿原目标权限与专用驱动",
+      "source": "runs.rs::execute_program_child PTC_DELEGATION_REQUIRES_DIRECT_DRIVER",
+      "evidence": "拒绝避免把子任务专用事务伪装成普通executor，安全方向正确；但它不是与直接目标相同的完整行为，不能算all-tools通过。",
+      "requiredIndependentChecks": [
+        "复用原delegation驱动并验证父子谱系、独立权限、取消、子Run/收据不重复",
+        "不能以换成后续阶段、改原断言或永久隐藏工具来宣告关闭"
+      ]
+    },
+    {
+      "id": "PTC-A03",
+      "status": "OPEN_REQUIRED_BOUNDARY",
+      "title": "子调用缺少主入口的可取消自动审核与工具守卫",
+      "originalRequirement": "每个子调用经原目标权限检查，不弱化已接受安全边界",
+      "source": "runs.rs::execute_program_child vs main review_and_validate_from_request_pinned / hooks.on_tool_call",
+      "evidence": "新helper直接prepare；主入口此前先做可取消review_and_validate，且有on_tool_call守卫。自动化/手机Ask可审核动作可能直接拒绝，重复子调用也未沿用主链守卫。",
+      "requiredIndependentChecks": [
+        "Phone/Cron/Heartbeat Ask子动作分别审核允许/拒绝，取消审核不派发",
+        "每子目标当前schema/目标变代和禁用真实拒绝；循环/工具守卫不能只对外层run_tools触发一次"
+      ]
+    },
+    {
+      "id": "PTC-A04",
+      "status": "OPEN_REVOCATION_WINDOW",
+      "title": "Started落盘等待后需再次核来源撤权",
+      "originalRequirement": "子调用与原目标相同；已撤权不能因异步等待继续派发",
+      "source": "runs.rs::execute_program_child advance Started vs main gate_bridge_authority",
+      "evidence": "当前快照在Authorized后验证Bridge/phone/workflow，再await写Started，之后只查取消。主链在Started写后再次gate Bridge/phone。根代理正在修，尚未独立验收。",
+      "requiredIndependentChecks": [
+        "在Started持久化等待窗口撤销Bridge发送者/phone来源/workflow节点权限，释放写入后目标零派发，receipt与副作用一致",
+        "批准等待期间撤权、别名/目录桥包装不得绕过；guest永不执行"
+      ]
+    },
+    {
+      "id": "PTC-A05",
+      "status": "OPEN_RESULT_FENCE",
+      "title": "迟到结果需按取消先到核验并保留审计",
+      "originalRequirement": "取消/任务状态由Rust裁决；不把取消后的结果当成功",
+      "source": "runs.rs::execute_program_child result.fence vs fence_verdict/audit_late_result",
+      "evidence": "helper仅比较ResultFence相等；主链还判CancelledBeforeWrite并记录late-result。当前快照缺同等分支。",
+      "requiredIndependentChecks": [
+        "取消和真实结果同时ready、取消在结果写前先到，两种控制样本均不写成功状态",
+        "外部已执行但回执未确认如实Unknown，不假装未执行或再外发；晚结果单独审计"
+      ]
+    },
+    {
+      "id": "PTC-A06",
+      "status": "OPEN_QUOTA_AND_SETTLEMENT",
+      "title": "子调用应保留目标对应配额与取消收尾",
+      "originalRequirement": "每子调用沿原执行/安全边界；无双写且停写许可可信",
+      "source": "runs.rs::execute_program_child vs main Tool quota/spawn_linked_with_settlement",
+      "evidence": "子调用直接await gateway；无逐调用Tool quota、独立子scope和目标专属settle_call。外层run_tools按普通call可立即drop，browser/knowledge/web/html-to-pdf原有协作收尾可能丢失。",
+      "requiredIndependentChecks": [
+        "全局Tool配额1和并发8的真实场景不越额、不因父持permit而自锁；编排许可与实际目标许可关系明确",
+        "需协作结算的目标在取消后保留原清理期限和单写者许可，确认结束才释放；不能只等Node外围退出"
+      ]
+    },
+    {
+      "id": "PTC-A07",
+      "status": "REQUIRED_INDEPENDENT_TEST_GAP",
+      "title": "真实持久日志、重放与模型可见范围仍需验证",
+      "originalRequirement": "失败显示已执行子动作；子结果默认不直接进对话；副作用不重复",
+      "source": "r08_admission_ptc.rs / journal / actual model projection",
+      "evidence": "当前局部测试有真实文件、独立Ask拒绝、外层失败保留动作及ModelHistory一次外层结果；没有默认装配、guest/phone/workflow撤权、崩溃重开后同子seq重放的实际证据。",
+      "requiredIndependentChecks": [
+        "注入intent/authorized/started/外部效果后未收据各崩溃点，关库重开并从同入口恢复，不重复写/发送",
+        "原始子事件和有界details可供界面审阅，实际外部模型请求及历史投影只携带程序打印/返回；稳定父子ID不漂移"
+      ]
+    }
+  ],
+  "confirmedPositiveBoundaries": [
+    {
+      "id": "POS-RC-01",
+      "boundary": "原叶四条断言在实现者局部测试有真实对应",
+      "evidence": "Python/Node变量、import、函数跨调用与restart丢变量；真实Run取消Python和实际孙进程并检PID；非法语言/无会话/死亡/真实30秒超时",
+      "limit": "历史8项和1项定向复验，不覆盖后来授权修改；非本审查独立实测"
+    },
+    {
+      "id": "POS-RC-02",
+      "boundary": "身份与权限来自网关，解释器归属不取模型参数",
+      "evidence": "trusted_settings_context核ctx/call；kernel key含主体/Agent/session/language；status用Read，run/restart用Execute；显式环境白名单",
+      "limit": "实际Ask/remote/guest/phone和默认组合根尚未由该局部套件闭合"
+    },
+    {
+      "id": "POS-PTC-01",
+      "boundary": "可信父来源只能由真实父spawn注入",
+      "evidence": "PROGRAM_AUTHORITY私有，核RunContext和parent_call；父journal必须Started、同owner/attempt/generation；子序号已经存在时拒绝再派发",
+      "limit": "安全源码证据，不等于崩溃/重放动态验收"
+    },
+    {
+      "id": "POS-PTC-02",
+      "boundary": "实际目标解析后继续沿正式网关",
+      "evidence": "alias/目录桥归一后取prepared.local_name检查Phone/guest/workflow，非驻留目标消费本轮正式说明；execute_prepared复核代次、单用handle、资源、review和MCP临时授权",
+      "limit": "不抵消缺自动审核、来源复核窗口和监督收尾"
+    },
+    {
+      "id": "POS-PTC-03",
+      "boundary": "外层批准没有自动充当子动作批准",
+      "evidence": "真实Ask样本先批准run_tools，再出现不同approvalId的write批准；拒绝后文件不存在",
+      "limit": "未测子批准成功后撤权/改代；未替代缺失的各身份矩阵"
+    },
+    {
+      "id": "POS-PTC-04",
+      "boundary": "纯运行时之外另有实际OS隔离和自有外围回收",
+      "evidence": "未把vm当安全边界，保留escape反例；当前源码含严格外围封装、killpg+wait和停写许可保留",
+      "limit": "只认其具体被测文件/网络样本；本报告不扩审整个sandbox策略或授予全平台PASS"
+    }
+  ],
+  "retestPlan": [
+    {
+      "group": "run_code授权修复",
+      "tests": [
+        "real_workflow_write_roots_cannot_be_bypassed_by_persistent_interpreter_run_or_restart",
+        "real_gateway_status_remains_read_only_and_code_never_inherits_service_secrets"
+      ],
+      "additional": "默认组合根+实际模型入口；批准期间目标/目录变化；旧cwd范围；工作流经PTC也不能绕过"
+    },
+    {
+      "group": "run_code原叶",
+      "tests": [
+        "python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
+        "cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild",
+        "output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
+        "real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+      ],
+      "additional": "锁定候选新目录运行，原始日志/退出码/源码清单一同保存"
+    },
+    {
+      "group": "PTC原叶",
+      "tests": [
+        "real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts",
+        "real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
+        "later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts",
+        "unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
+        "real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker"
+      ],
+      "additional": "前述具名测试当前不含全部授权/撤权/重放义务，必须增加真实相应样本；10分钟入口未被历史7项运行覆盖"
+    }
+  ],
+  "independentBusinessExecution": "NOT_EXECUTED_AWAITING_COORDINATED_CARGO_WINDOW",
+  "nonFindings": [
+    "旧TypeBox外部schema也required code；已撤回将此当新缺陷的提醒。",
+    "普通交互解释器是否OS隔离沿原执行权限语义，本报告不凭缺OS沙盒本身扩大为全面阻断。",
+    "旧cwd项目前仅待证问题，未复现真实入口变化，不虚报已成功越权。"
+  ],
+  "historicalEvidence": {
+    "receiptSha256": "91307c01996f80e7e0549a7f48bab94bbbd320670e6276734f73b6b90404f10b",
+    "sourceCurrentMatches": {
+      "rust/crates/lingxi-service/src/coding_run_code.rs": false,
+      "rust/crates/lingxi-service/tests/r08_admission_run_code.rs": false
+    },
+    "logHashesMatch": {
+      "compile-01.log": true,
+      "test-01.log": true,
+      "test-02.log": true,
+      "test-03.log": true
+    },
+    "businessMeaning": "实现者历史局部测试，不构成本轮独立复验；当前授权修复已改变候选源码。"
+  }
+}

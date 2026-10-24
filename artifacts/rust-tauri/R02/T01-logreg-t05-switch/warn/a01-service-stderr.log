@@ -1,0 +1,7 @@
+2026-10-23T06:20:20.670339Z  INFO lingxi_service: data root resolved effective_home=/tmp/lingxi-r02-t01-smoke-home.p3DOMg source=cli ignored_sources=none
+2026-10-23T06:20:20.672283Z  INFO lingxi_service: data root prepared (canonicalized; runtime dir private 0700) canonical_home=/private/tmp/lingxi-r02-t01-smoke-home.p3DOMg runtime_dir=/private/tmp/lingxi-r02-t01-smoke-home.p3DOMg/lingxi-service
+2026-10-23T06:20:20.672536Z  INFO lingxi_service: model plane resolved (credentials never logged) model_plane_source=None providers=0
+2026-10-23T06:20:20.677039Z  INFO lingxi_service: single-writer lock acquired [token] start_nonce=cb9e8762fc0d3ecb pid=60001 entropy="os-random-device" lock=/private/tmp/lingxi-r02-t01-smoke-home.p3DOMg/lingxi-service/instance.lock network_mode=loopback
+2026-10-23T06:20:20.687374Z  INFO lingxi_service: data-epoch gate passed home=/private/tmp/lingxi-r02-t01-smoke-home.p3DOMg decision=ProceedStampedNew(EpochStamp { format: V2, minimum_reader_epoch: 2, committed_data_epoch: 2, last_version: Some("0.0.0") })
+2026-10-23T06:20:20.755859Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/tmp/lingxi-r02-t01-smoke-home.p3DOMg/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+error: run database bootstrap failed: illegal storage request: MCP 原始只读目录不可用

@@ -1,0 +1,25 @@
+PASS fixture gen exit 0
+PASS migrate committed
+PASS agents create
+PASS sessions/new :: 200
+PASS attachments/local
+PASS preferences/appearance
+PASS bridge POST config
+PASS bridge POST owner
+PASS bridge POST config
+PASS sentinels exactly 3 (no queued) :: [["conv-t06-s1","confirmed"],["conv-t06-s3","started"],["conv-t06-s2","unknown"]]
+PASS external sends once per leg (gen) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS rollback committed
+PASS delta package dir exists :: /private/tmp/t06-d3-drill-05/delta-out/rb-1792761523824-66972
+FAIL reforward-B exit 0 :: error: reforward: phase delta_import refused: apply db delta: delta conflict in session_files at identity ["file-broken-1"]: same identity, different content; immutable ledger not overwritten
+
+FAIL reforward-B committed :: 9929f8771497c524b12955b4621889b96fdf67eba7e237ab08645b99ec","source_unchanged":false,"batches_total":89,"batches_done":89,"batches_pending_convert":0,"issues":5,"status":"complete","interrupted":false,"receipt_path":"/private/tmp/t06-d3-drill-05/recovered-root/legacy-import/migration-receipt.json"}
+
+FAIL pointer → recovered root :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/t06-d3-drill-05/old-root","cutoverId":"rb-1792761523824-66972","committedAt":"2026-10-23T13:18:44.441Z"}
+FAIL reforward receipt present :: /private/tmp/t06-d3-drill-05/rb-work/reforward-receipt.json
+FAIL J4 secondImportZeroGrowth=true in receipt :: null
+FAIL A11 session/message counts equal (recovered root) :: {"sessions":12,"messages":835} → {"sessions":6,"messages":820}
+FAIL A11 attachment bytes equal (recovered root) :: 1 files
+D3_ABORT Error: ENOENT: no such file or directory, open '/private/tmp/t06-d3-drill-05/recovered-root/user/preferences.json'
+    at readFileSync (node:fs:441:20)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d3_drill.mjs:221:38

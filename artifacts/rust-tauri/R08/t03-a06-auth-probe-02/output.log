@@ -1,0 +1,4 @@
+Error: service exited 2 before READY; stderr tail: 
+    at ChildProcess.<anonymous> (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_auth_probe.mjs:70:38)
+    at ChildProcess.emit (node:events:509:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12)

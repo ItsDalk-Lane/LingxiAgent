@@ -1,0 +1,13 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/utils/screenshot.test.ts (12 tests) 54ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-export-save.test.ts (11 tests) 31ms
+ ✓ desktop/src/react/__tests__/settings/AccessTab.test.tsx (10 tests) 746ms
+     ✓ shows the stable mobile URL and saves LAN network settings  494ms
+
+ Test Files  3 passed (3)
+      Tests  33 passed (33)
+   Start at  19:15:14
+   Duration  1.23s (transform 702ms, setup 55ms, import 685ms, tests 832ms, environment 876ms)
+

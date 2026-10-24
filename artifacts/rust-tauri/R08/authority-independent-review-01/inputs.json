@@ -1,0 +1,196 @@
+{
+  "schema": "lingxi.r08.authority-independent-review-inputs.v1",
+  "generatedAt": "2026-10-21T16:41:30.790036+00:00",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "branch": "codex/rust-tauri-migration",
+  "reviewer": "admission_evidence_review",
+  "sourceBindings": {
+    "rust/crates/lingxi-service/src/runs.rs": {
+      "sha256": "0e739fe443f37ac59e46dba1ca3f74330151c7382f486267c078c88ef62de1eb",
+      "bytes": 348378,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/runs.rs"
+    },
+    "rust/crates/lingxi-service/src/coding_run_code.rs": {
+      "sha256": "f97771a4dbc2189712af2b5e1d84867db70a3638a40a71ac3248667d28618a85",
+      "bytes": 26339,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/coding_run_code.rs"
+    },
+    "rust/crates/lingxi-service/src/coding_ptc.rs": {
+      "sha256": "e16ba15a8bc4a748a157135bb864981f53a8cbbdff88bb1becf0000631aa098e",
+      "bytes": 22932,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/coding_ptc.rs"
+    },
+    "rust/crates/lingxi-service/src/toolgateway.rs": {
+      "sha256": "fd435fa0fc0bff0ecc80870c295b4c3521adddf81c82f695772cbeb2d2b8f197",
+      "bytes": 144074,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/toolgateway.rs"
+    },
+    "rust/crates/lingxi-service/src/task_supervisor.rs": {
+      "sha256": "5c79ec7d4acbf35c06ac2f6ccf1750fe8a7fdd4253731e536b187cbc8ff9181f",
+      "bytes": 71966,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/task_supervisor.rs"
+    },
+    "rust/crates/lingxi-service/src/exectools.rs": {
+      "sha256": "962c8fb8359dafc56f7dccb7f1e83f2874f2c88b29c8594bd83aed60c81a14de",
+      "bytes": 69073,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/exectools.rs"
+    },
+    "rust/crates/lingxi-service/src/toolcatalog_bridge.rs": {
+      "sha256": "26a43391d6e861bd660d6828ae02a2d6967071d7598cb9cd60bebf4fb35ea7ea",
+      "bytes": 10898,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/toolcatalog_bridge.rs"
+    },
+    "rust/crates/lingxi-service/src/lib.rs": {
+      "sha256": "dffb5b099d2eeb7a19fc907a9d8efd1978c49207c10912563fc61b031ac5e5b5",
+      "bytes": 428153,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/src/lib.rs"
+    },
+    "rust/crates/lingxi-kernel/src/toolcatalog.rs": {
+      "sha256": "63309d545e66fea8478e51f83605d717e87d8d5b1e7334d8cbe869c65f9c8861",
+      "bytes": 137728,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-kernel/src/toolcatalog.rs"
+    },
+    "rust/crates/lingxi-service/tests/r08_admission_run_code.rs": {
+      "sha256": "a2204cede937c770eb1a60fa96726c600d2337df7b337c923b0dd706f6cf8af0",
+      "bytes": 27870,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/tests/r08_admission_run_code.rs"
+    },
+    "rust/crates/lingxi-service/tests/r08_admission_ptc.rs": {
+      "sha256": "e82c3307d29089bb72b2631f753598d986e5e48c9b343005f5e14a3de003ce67",
+      "bytes": 24037,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/rust/crates/lingxi-service/tests/r08_admission_ptc.rs"
+    },
+    "scripts/rust-tauri/r08-ptc-worker.mjs": {
+      "sha256": "4e0775b4bf8532009727edfca9dee78d6c898b9873a3774ad235f5e7babc8cd0",
+      "bytes": 1971,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/scripts/rust-tauri/r08-ptc-worker.mjs"
+    },
+    "docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json": {
+      "sha256": "dde223382183c08fa4e2ef202ef20239dad98f7bfcac5d42288683965ce6e86d",
+      "bytes": 5943424,
+      "snapshotPath": "artifacts/rust-tauri/R08/authority-independent-review-01/source-snapshot/docs/rust-tauri/R00/FEATURE_STAGE_ACCEPTANCE.json"
+    }
+  },
+  "originalLeaves": {
+    "R00-T02-LA-C88F29B5114A": {
+      "id": "R00-T02-LA-C88F29B5114A",
+      "feature_id": "F-D13-TOOL-TOOL-RUN-CODE-C88F29",
+      "task_ids": [
+        "R04-T05"
+      ],
+      "given": "当前会话具备调用 run_code 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 run_code 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "run返回输出并保留同会话变量；restart清空内核状态；status如实报启动状态。",
+      "assertions": [
+        "两次调用可共享变量",
+        "重启后旧变量消失",
+        "取消清理内核",
+        "语言无效、无会话、内核死亡或超时显式失败；重启不声称保留旧状态。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A09",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“真实孙进程被清理且哨兵存活”的横向边界，可与本入口的在会话专属持续代码内核运行/重启/查询状态共同执行；仍未逐项断言该结果。"
+        },
+        {
+          "acceptance_id": "R04-A10",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“PTY交互不退化”的横向边界，可与本入口的在会话专属持续代码内核运行/重启/查询状态共同执行；仍未逐项断言该结果。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T05"
+      ],
+      "execution_owner": "Rust Process/Tool",
+      "execution_stage_ids": [
+        "R04",
+        "R07"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    },
+    "R00-T02-LA-0818574ABD43": {
+      "id": "R00-T02-LA-0818574ABD43",
+      "feature_id": "F-D03-TOOL-TOOL-RUN-TOOLS-081857",
+      "task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "given": "当前会话具备调用 run_tools 的权限，且准备有效对象与无效/拒绝样本",
+      "when": "分别调用 run_tools 的主要分支，并从会话、文件/状态或外部结果读回",
+      "then": "脚本返回日志/结果与子调用摘要；每个子调用经原目标权限检查，子结果默认不直接进对话。",
+      "assertions": [
+        "每个子调用独立权限判定",
+        "外层只显示打印/返回值",
+        "失败显示已执行子动作",
+        "未知工具、自调用、无权限、脚本超时或沙盒异常拒绝；已执行子动作不因外层失败自动回滚。"
+      ],
+      "existing_acceptance_relations": [
+        {
+          "acceptance_id": "R04-A01",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“目录与执行同源”的横向边界，可与本入口的在隔离程序中组合调用当前会话工具共同执行；仍未逐项断言该结果。"
+        },
+        {
+          "acceptance_id": "R04-A02",
+          "relation": "GAP",
+          "covers_leaf_result": false,
+          "reason": "旧场景检验“陈旧目录拒绝错误目标”，未操作或核对本入口的在隔离程序中组合调用当前会话工具。"
+        },
+        {
+          "acceptance_id": "R04-A03",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“各入口权限不变”的横向边界，可与本入口的在隔离程序中组合调用当前会话工具共同执行；仍未逐项断言该结果。"
+        },
+        {
+          "acceptance_id": "R04-A04",
+          "relation": "INDIRECT",
+          "covers_leaf_result": false,
+          "reason": "检验“伪造执行凭证失败”的横向边界，可与本入口的在隔离程序中组合调用当前会话工具共同执行；仍未逐项断言该结果。"
+        }
+      ],
+      "identity_decision": "INDEPENDENT",
+      "supported_feature_ids": [],
+      "supported_scenario_ids": [],
+      "variant_group": null,
+      "formalization_task_id": "R00-T07",
+      "execution_task_ids": [
+        "R04-T01",
+        "R04-T02"
+      ],
+      "execution_owner": "Rust Registry/Gateway",
+      "execution_stage_ids": [
+        "R04",
+        "R07"
+      ],
+      "due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+      "status": "SPECIFIED_NOT_EXECUTED"
+    }
+  },
+  "historicalRunCodeReceiptChecks": {
+    "receiptSha256": "91307c01996f80e7e0549a7f48bab94bbbd320670e6276734f73b6b90404f10b",
+    "sourceCurrentMatches": {
+      "rust/crates/lingxi-service/src/coding_run_code.rs": false,
+      "rust/crates/lingxi-service/tests/r08_admission_run_code.rs": false
+    },
+    "logHashesMatch": {
+      "compile-01.log": true,
+      "test-01.log": true,
+      "test-02.log": true,
+      "test-03.log": true
+    },
+    "businessMeaning": "实现者历史局部测试，不构成本轮独立复验；当前授权修复已改变候选源码。"
+  },
+  "independentBusinessTests": "NOT_EXECUTED_WAITING_CARGO_WINDOW",
+  "status": "FAIL_NOT_CLOSED"
+}

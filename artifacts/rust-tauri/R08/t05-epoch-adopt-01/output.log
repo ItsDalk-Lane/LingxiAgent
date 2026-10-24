@@ -1,0 +1,102 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: unused import: `self`
+  --> crates/lingxi-service/src/cutover/preflight.rs:16:57
+   |
+16 | use lingxi_adapters::storage::legacy_import::manifest::{self, Manifest};
+   |                                                         ^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (lib) generated 1 warning (run `cargo fix --lib -p lingxi-service` to apply 1 suggestion)
+warning: method `first_visible_skill` is never used
+   --> crates/lingxi-service/tests/r07_probe_skills.rs:156:14
+    |
+ 93 | impl Server {
+    | ----------- method in this implementation
+...
+156 |     async fn first_visible_skill(&self) -> String {
+    |              ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r07_probe_skills") generated 1 warning
+warning: field `home` is never read
+  --> crates/lingxi-service/tests/r07_probe_access.rs:54:5
+   |
+48 | struct Server {
+   |        ------ field in this struct
+...
+54 |     home: PathBuf,
+   |     ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `lingxi-service` (test "r07_probe_access") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 23s
+     Running unittests src/lib.rs (target/debug/deps/lingxi_service-c958cc074bec7feb)
+
+running 28 tests
+test epoch::tests::migration_registry_anchors ... ok
+test epoch::tests::timestamps_round_trip_and_validate ... ok
+test epoch::tests::adoption_refuses_missing_source_stamp ... ok
+test epoch::tests::corrupt_stamp_without_journal_refuses_without_claiming_absence ... ok
+test epoch::tests::stamp_write_failure_is_a_loud_refusal_without_partial_stamp ... ok
+test epoch::tests::interrupted_epoch_metadata_tmp_write_is_ambiguous ... ok
+test epoch::tests::symlink_in_unstamped_home_is_ambiguous ... ok
+test epoch::tests::higher_stamp_refuses_startup ... ok
+test epoch::tests::barrier_stamp_without_journal_is_inconsistent ... ok
+test epoch::tests::unstamped_home_with_foreign_data_refuses_without_stamping ... ok
+test epoch::tests::missing_stamp_with_prepared_higher_epoch_journal_refuses ... ok
+test epoch::tests::missing_stamp_with_readable_higher_epoch_journal_refuses_with_truthful_evidence ... ok
+test epoch::tests::startup_refusal_names_registered_migrations ... ok
+test epoch::tests::corrupt_stamp_with_readable_higher_epoch_journal_refuses_with_truthful_evidence ... ok
+test epoch::tests::corrupt_journal_refuses ... ok
+test epoch::tests::adoption_refuses_unknown_migration_id ... ok
+test epoch::tests::unstamped_home_with_own_runtime_scaffolding_is_provably_new ... ok
+test epoch::tests::adoption_refuses_corrupt_journal_without_repair ... ok
+test epoch::tests::committed_tail_is_cleaned_and_gate_continues ... ok
+test epoch::tests::adoption_fresh_run_commits_with_incumbent_byte_form ... FAILED
+test epoch::tests::adoption_resume_from_each_phase_preserves_created_at ... FAILED
+test epoch::tests::fresh_home_is_stamped_and_subsequent_run_is_steady ... ok
+test epoch::tests::adoption_verify_failure_halts_at_migrated_then_resumes ... FAILED
+test epoch::tests::adoption_refuses_transition_id_mismatch ... FAILED
+test epoch::tests::adoption_committed_journal_is_noop_tail_left_for_gate ... ok
+test epoch::tests::adoption_receipt_tamper_on_resume_refuses ... ok
+test epoch::tests::the_incumbent_lie_string_never_appears_in_rendered_refusals ... ok
+test epoch::tests::adoption_refuses_stamp_contradiction ... ok
+
+failures:
+
+---- epoch::tests::adoption_fresh_run_commits_with_incumbent_byte_form stdout ----
+
+thread 'epoch::tests::adoption_fresh_run_commits_with_incumbent_byte_form' (14840500) panicked at crates/lingxi-service/src/epoch.rs:2027:10:
+fresh adoption must succeed: "transition-failed: journal read-back after phase prepared disagrees: Corrupt { detail: \"prepared transition journal must not claim a completed checkpoint\" }"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- epoch::tests::adoption_resume_from_each_phase_preserves_created_at stdout ----
+
+thread 'epoch::tests::adoption_resume_from_each_phase_preserves_created_at' (14840507) panicked at crates/lingxi-service/src/epoch.rs:2012:90:
+called `Result::unwrap()` on an `Err` value: "transition-failed: journal read-back after phase prepared disagrees: Corrupt { detail: \"prepared transition journal must not claim a completed checkpoint\" }"
+
+---- epoch::tests::adoption_verify_failure_halts_at_migrated_then_resumes stdout ----
+
+thread 'epoch::tests::adoption_verify_failure_halts_at_migrated_then_resumes' (14840508) panicked at crates/lingxi-service/src/epoch.rs:2265:9:
+assertion `left == right` failed
+  left: (1, 1)
+ right: (2, 1)
+
+---- epoch::tests::adoption_refuses_transition_id_mismatch stdout ----
+
+thread 'epoch::tests::adoption_refuses_transition_id_mismatch' (14840505) panicked at crates/lingxi-service/src/epoch.rs:2012:90:
+called `Result::unwrap()` on an `Err` value: "transition-failed: journal read-back after phase prepared disagrees: Corrupt { detail: \"prepared transition journal must not claim a completed checkpoint\" }"
+
+
+failures:
+    epoch::tests::adoption_fresh_run_commits_with_incumbent_byte_form
+    epoch::tests::adoption_refuses_transition_id_mismatch
+    epoch::tests::adoption_resume_from_each_phase_preserves_created_at
+    epoch::tests::adoption_verify_failure_halts_at_migrated_then_resumes
+
+test result: FAILED. 24 passed; 4 failed; 0 ignored; 0 measured; 667 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

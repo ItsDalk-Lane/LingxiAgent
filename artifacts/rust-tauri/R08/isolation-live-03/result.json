@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "status": "FAIL",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sandbox": "/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-i4J8TK",
+  "startedAt": "2026-10-21T13:47:34.870Z",
+  "tests": [],
+  "processes": [],
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "inputs": {
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "d2a6925e15e450b7f50802ec15a9c4a32a64b3b02a8ae59b9db8fefc5aa66ff2",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+  },
+  "error": "Error: 副本正规初始化失败，见 a-initialize 日志\n    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:59:40\n    at until (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:28:26)\n    at async initializeHome (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:58:3)\n    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_isolation_probe.mjs:122:3",
+  "forcedCleanup": [],
+  "finishedAt": "2026-10-21T13:47:35.649Z"
+}

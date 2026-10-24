@@ -1,0 +1,473 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "generatedBy": "scripts/rust-tauri/r07_leaf_cases.py",
+ "stage": "R07",
+ "suites": {
+  "r06_skills_completion": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_automation_flow": {
+   "exitCode": 0,
+   "testsSeen": 13,
+   "testsPassed": 13,
+   "logPresent": true
+  },
+  "r07_bridge_diagnostic": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_flow": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_guest_context": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_native_flow": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_notice": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_permission": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_sdk_platforms": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_session_routes": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_bridge_worker": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_browser_routes": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_browser_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_conversation_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_daily_fresh_compact": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_desk_files": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_diary": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_git_panel": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_goal_loop": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_heartbeat_plan": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_heartbeat_runtime": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_media_admin": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_office_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_phone_runtime": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_probe_access": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_probe_skills": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_scheduler": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_session_collab": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t05_media": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_agent_target": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_card_previews": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_interface_preferences": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_process": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_remote": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_session_permissions": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_mcp_settings": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_media_source": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_metadata_redaction": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_model_authority": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_model_configuration": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_oauth_alias": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_provider_capabilities": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_provider_http": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_provider_matrix": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_search_clear": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_settings": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_skills_cards": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t08_speech_bindings": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t09_client_context": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t10_observability": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t11_dev_entry_and_unload": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_t12_closure": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_web_tools": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_workbench": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r07_workflow": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r08_admission_ast_lsp": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r08_admission_ptc": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r08_admission_ptc_authority": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r08_admission_run_code": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  },
+  "r08_admission_security": {
+   "exitCode": null,
+   "testsSeen": 0,
+   "testsPassed": 0,
+   "logPresent": false
+  }
+ },
+ "cases": [
+  {
+   "case": "r07_automation_flow::apply_suggestion_rejections_are_explicit_and_persist_nothing",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::completion_preference_only_queues_real_terminal_results_and_keeps_focus_policy",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::existing_global_switch_and_agent_setting_roundtrip_preserve_other_fields",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::management_preserves_minute_strings_and_millisecond_numbers_from_real_ui",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::notification_preference_updates_preserve_other_settings_and_reject_damage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::real_notify_tool_claim_and_receipt_survive_restart_without_resend",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::real_tool_suggestion_requires_apply_and_replays_after_expiry",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::restart_between_real_run_completion_and_receipt_settlement_catches_up_once",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::scheduled_reminder_keeps_trigger_run_and_confirmed_delivery_after_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::slash_apply_missing_cross_session_and_repeat_never_duplicate_jobs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::slash_apply_uses_frozen_owned_suggestion",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::started_display_with_no_receipt_becomes_unknown_without_resend",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_automation_flow::unsupported_future_schema_is_preserved_and_does_not_block_later_jobs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_automation_flow",
+   "suiteExitCode": 0
+  }
+ ]
+}

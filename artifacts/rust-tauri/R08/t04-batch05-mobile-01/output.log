@@ -1,0 +1,227 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/mobile/MobileEntrySplit.test.ts (6 tests) 39ms
+ ✓ desktop/src/react/__tests__/mobile/mobile-platform.test.ts (4 tests) 32ms
+ ✓ desktop/src/react/__tests__/mobile/R07RustMobileRuntime.test.ts (12 tests) 43ms
+ ✓ desktop/src/react/__tests__/mobile/R02MobileSessionResponse.test.ts (2 tests) 26ms
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > rejects an HTML response from the old session route without choosing a backend
+[mobile] bootstrap failed Error: mobile server returned non-JSON response for /api/web-auth/session
+    at mobileJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:208:11)
+    at readMobileAuthSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:176:27)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:69:21
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > rejects a legacy session server failure without silently trying Rust
+[mobile] bootstrap failed Error: mobile session request failed: 500 
+    at readMobileAuthSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:180:11)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:69:21
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > rejects an HTML Rust health response after the old route is absent
+[mobile] bootstrap failed Error: mobile server returned non-JSON response for /lingxi/v1/health
+    at mobileJson (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:208:11)
+    at readMobileAuthSession (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:189:26)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:69:21
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > can submit a username and password login without sending a device credential
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > logs in through the Rust auth routes and boots the formal mobile chat surface
+[workspace-ui-state] load failed: Error: unexpected mobile request: /lingxi/v1/preferences/workspace-ui-state?workspace=%2Fworkspace&surface=electron
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:267:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:145:23)
+    at loadPersistedWorkspaceUiState (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/workspace-ui-state-actions.ts:154:23)
+    at activateWorkspaceDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:491:29)
+    at activateMobileWelcomeDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:522:9)
+    at initializeMobileRuntime (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:335:5)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:87:5
+    at login (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:145:7)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > logs in through the Rust auth routes and boots the formal mobile chat surface
+[jian-desk] load failed: Error: unexpected mobile request: /lingxi/v1/desk/files?dir=%2Fworkspace
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:267:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at sessionOwnerFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:76:28)
+    at loadDeskFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:577:32)
+    at activateWorkspaceDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:522:9)
+    at activateMobileWelcomeDesk (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:522:3)
+    at async Promise.all (index 1)
+    at initializeMobileRuntime (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:333:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:87:5
+    at login (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:145:7)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > logs in through the Rust auth routes and boots the formal mobile chat surface
+Error: unexpected mobile request: /lingxi/v1/resource-io/subscribe
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:267:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at watchRequest (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:164:10)
+    at subscribeEntry (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:191:10)
+    at retainResourceWatch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:156:17)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx:93:41
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11) {
+  [stack]: [Getter/Setter],
+  [message]: 'unexpected mobile request: /lingxi/v1/resource-io/subscribe'
+}
+
+The above error occurred in the <WorkspaceFileChangeBridge> component.
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+
+[ErrorBoundary] Error: unexpected mobile request: /lingxi/v1/resource-io/subscribe
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:267:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at watchRequest (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:164:10)
+    at subscribeEntry (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:191:10)
+    at retainResourceWatch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/resource-events.ts:156:17)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx:93:41
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11) 
+    at WorkspaceFileChangeBridge (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceFileChangeBridge.tsx:51:58)
+    at WorkspaceCompanionRail (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/app/WorkspaceCompanionRail.tsx:13:54)
+    at Suspense (<anonymous>)
+    at div (<anonymous>)
+    at main (<anonymous>)
+    at MobileDesktopShell (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:194:3)
+    at ErrorBoundary (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ErrorBoundary.tsx:7:1)
+    at MobileApp (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:50:56)
+[workspace] load studio workspaces failed: Error: unexpected mobile request: /lingxi/v1/studio/workspaces
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:267:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:145:23)
+    at loadStudioWorkspaces (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:245:23)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/WelcomeScreen.tsx:259:10
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+[desk-tree] load failed: Error: unexpected mobile request: /lingxi/v1/desk/files?dir=%2Fworkspace
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/mobile/MobileApp.test.tsx:267:13
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at sessionOwnerFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/session-connection-owner.ts:76:28)
+    at loadDeskTreeFiles (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/stores/desk-actions.ts:743:32)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/desk/DeskTree.tsx:761:10
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at reconnectPassiveEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15832:11)
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > fails closed when the Rust bootstrap request fails after login
+[mobile] bootstrap failed Error: lingxiFetch /lingxi/v1/mobile/bootstrap: 500 Internal Server Error
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/hooks/use-hana-fetch.ts:151:13)
+    at initializeMobileRuntime (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/mobile-init.ts:272:24)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/mobile/MobileApp.tsx:87:5
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > loads chat sessions, desktop input surface, and workbench files for an authenticated phone
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > hydrates persisted mobile runtime configuration from bootstrap
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > opens the settings modal from the mobile platform settings event
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows a controlled reload action when the PWA has an update ready
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps a PWA update notice that arrives before the mobile shell is ready
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > starts authenticated phones on the welcome draft instead of auto-opening the first session
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > refreshes mobile sessions when the phone returns to the foreground
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-entry] targetPath= /hana/sessions/rc.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/rc.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Frc.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-entry] targetPath= /hana/sessions/rc.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/rc.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Frc.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > re-pulls the open session on foreground when its revision drifted while backgrounded (#1610)
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[lm-entry] targetPath= hana/sessions/idle.jsonl preloaded= false
+[cmf-entry] path= hana/sessions/idle.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Fidle.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > does not re-pull the open session on foreground when its revision is unchanged
+[has-dbg] called sessionPath= /hana/sessions/idle.jsonl sessionId= null
+[has-dbg] recordsSize= 0 limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > syncs the selected session permission mode from the mobile session list
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > syncs the selected session permission mode from the mobile session list
+[lm-entry] targetPath= /hana/sessions/one.jsonl preloaded= false
+[cmf-entry] path= /hana/sessions/one.jsonl records.size= 0
+[cmf-dbg] called size= 0 url= /api/sessions/messages?path=%2Fhana%2Fsessions%2Fone.jsonl
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > syncs the selected session permission mode from the mobile session list
+[lm-dbg] before save, etag= null proto= null
+[save-dbg] etag= null proto= null limit= 50
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > opens workbench files through the neutral workbench content route using the desktop preview panel
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > uses the desktop new-session draft flow on mobile instead of creating an empty session immediately
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps the currently displayed workspace and current agent for mobile global new chat
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps the currently displayed workspace and current agent for mobile global new chat
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace/mio' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > keeps the currently displayed workspace and current agent for mobile global new chat
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > renders server-broadcast user messages through the desktop websocket handler
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > shows server-created sessions from another LAN client without waiting for a refetch payload
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+stderr | desktop/src/react/__tests__/mobile/MobileApp.test.tsx > MobileApp > opens the workbench drawer from a right-edge swipe on narrow mobile
+[resource-events] watch failed: { kind: 'local-file', path: '/workspace' }
+
+ ✓ desktop/src/react/__tests__/mobile/MobileApp.test.tsx (29 tests) 742ms
+
+ Test Files  5 passed (5)
+      Tests  53 passed (53)
+   Start at  01:06:33
+   Duration  2.27s (transform 1.78s, setup 50ms, import 2.23s, tests 883ms, environment 1.12s)
+

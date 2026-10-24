@@ -1,0 +1,6 @@
+test storage::legacy_import::tests::rerun_without_resume_is_refused_fail_closed ... ok
+test storage::legacy_import::tests::resume_with_unknown_run_is_refused ... ok
+test storage::legacy_import::tests::resume_continues_same_run_without_duplicate_batches ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 127 filtered out; finished in 0.35s
+

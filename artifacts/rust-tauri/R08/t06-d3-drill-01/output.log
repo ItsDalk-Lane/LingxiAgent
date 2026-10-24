@@ -1,0 +1,22 @@
+PASS fixture gen exit 0
+PASS migrate committed
+PASS agents create
+PASS sessions/new :: 200
+PASS attachments/local
+PASS preferences/appearance
+PASS bridge POST config
+PASS bridge POST owner
+PASS bridge POST config
+PASS sentinels exactly 3 (no queued) :: [["conv-t06-s3","started"],["conv-t06-s2","unknown"],["conv-t06-s1","confirmed"]]
+PASS external sends once per leg (gen) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS rollback committed
+PASS delta package dir exists :: /private/tmp/t06-d3-drill-01/delta-out/rb-1792760381478-59861
+FAIL reforward-B exit 0 :: error: reforward: phase preflight refused: no rollback journal in /private/tmp/t06-d3-drill-01/rf-work (run rollback first)
+
+FAIL reforward-B committed
+FAIL pointer → recovered root :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/t06-d3-drill-01/old-root","cutoverId":"rb-1792760381478-59861","committedAt":"2026-10-23T12:59:42.128Z"}
+FAIL reforward receipt present :: /private/tmp/t06-d3-drill-01/rf-work/reforward-receipt.json
+FAIL J4 secondImportZeroGrowth=true in receipt :: null
+D3_ABORT Error: unable to open database file
+    at q (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d3_drill.mjs:142:14)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d3_drill.mjs:214:13

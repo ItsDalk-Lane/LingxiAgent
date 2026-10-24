@@ -1,0 +1,112 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/settings/helpers.test.ts (2 tests) 401ms
+     ✓ 保留 _identity/_agents/_publicAgents/_userProfile/_experience 下划线键  392ms
+ ✓ desktop/src/react/__tests__/settings/AgentCardStack.test.ts (14 tests) 162ms
+ ✓ desktop/src/react/__tests__/settings/useBridgeState.snapshot.test.tsx (17 tests) 303ms
+ ✓ desktop/src/react/__tests__/settings/switch-agent-error-boundary.test.ts (5 tests) 877ms
+     ✓ 把服务端 409 带的错误码翻成本地化文案，而不是把英文原文糊到 toast 上  849ms
+ ✓ desktop/src/react/__tests__/settings/ModelWidget.test.tsx (8 tests) 184ms
+ ✓ desktop/src/react/__tests__/settings/actions.test.ts (7 tests) 814ms
+     ✓ 旧的 loadSettingsConfig 响应晚到时，不覆盖新的 settings pane  772ms
+ ✓ desktop/src/react/__tests__/settings/AgentMemory.test.tsx (5 tests) 853ms
+     ✓ shows a memory failure notice in the Agent memory section  735ms
+ ✓ desktop/src/react/__tests__/settings/AgentTab.test.tsx (7 tests) 849ms
+     ✓ rerenders when browsing a different settings agent  725ms
+ ✓ desktop/src/react/__tests__/settings/OAuthCredentials.test.tsx (1 test) 197ms
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityMetrics.test.tsx (8 tests) 255ms
+ ✓ desktop/src/react/__tests__/settings/ApiKeyCredentials.test.tsx (15 tests) 436ms
+ ✓ desktop/src/react/__tests__/settings/BridgeTab.credentials.test.tsx (9 tests) 321ms
+ ✓ desktop/src/react/__tests__/settings/BridgeTab.permission-mode.test.tsx (5 tests) 333ms
+ ✓ desktop/src/react/__tests__/settings/ExperimentsTab.test.tsx (1 test) 1082ms
+     ✓ shows the memory section empty state when the API omits both retired experiments  1081ms
+ ✓ desktop/src/react/__tests__/settings/WorkTab.test.tsx (15 tests) 1201ms
+     ✓ renders the current agent desk settings from settingsConfig on the first paint  893ms
+ ✓ desktop/src/react/__tests__/settings/AgentDeleteOverlay.test.tsx (5 tests) 1057ms
+     ✓ uses the explicit event target instead of the selected settings agent  985ms
+ ✓ desktop/src/react/__tests__/settings/observability/use-observability-facets.test.tsx (3 tests) 129ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-vertical.test.tsx (2 tests) 151ms
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityPayloadCard.test.tsx (1 test) 102ms
+ ✓ desktop/src/react/__tests__/settings/R07BrowserRustUI.test.tsx (11 tests) 474ms
+ ✓ desktop/src/react/__tests__/settings/observability/PayloadPlainText.test.ts (3 tests) 131ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-contract.test.ts (6 tests) 130ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-format.test.ts (12 tests) 82ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-provenance-resolve.test.ts (10 tests) 74ms
+ ✓ desktop/src/react/__tests__/settings/R07McpRustAPI.test.ts (8 tests) 107ms
+ ✓ desktop/src/react/__tests__/settings/api-key-credentials.test.ts (3 tests) 73ms
+ ✓ desktop/src/react/__tests__/settings/AccessTab.test.tsx (10 tests) 1486ms
+     ✓ shows the stable mobile URL and saves LAN network settings  1202ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-filter.test.ts (17 tests) 76ms
+ ✓ desktop/src/react/__tests__/settings/MemoryViewerLayout.test.ts (2 tests) 45ms
+ ✓ desktop/src/react/__tests__/settings/observability/TraceConversationModel.test.ts (24 tests) 46ms
+ ✓ desktop/src/react/__tests__/settings/resource-state.test.ts (5 tests) 40ms
+ ✓ desktop/src/react/__tests__/settings/MeTab.test.tsx (2 tests) 64ms
+ ✓ desktop/src/react/__tests__/settings/observability/TraceDetailOverlayRendering.test.tsx (3 tests) 166ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-labels.test.ts (5 tests) 29ms
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityDateLine.test.tsx (4 tests) 63ms
+ ✓ desktop/src/react/__tests__/settings/ProvidersTab.test.tsx (12 tests) 543ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-export-save.test.ts (11 tests) 46ms
+ ✓ desktop/src/react/__tests__/settings/api.test.ts (2 tests) 40ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-sub-tabs.test.tsx (3 tests) 273ms
+ ✓ desktop/src/react/__tests__/settings/observability/ObservabilityTraceForest.test.ts (6 tests) 29ms
+ ✓ desktop/src/react/__tests__/settings/observability/observability-usage-charts.test.tsx (9 tests) 478ms
+ ✓ desktop/src/react/__tests__/settings/observability/model-observability-actions.test.ts (8 tests) 30ms
+ ✓ desktop/src/react/__tests__/settings/SettingsContent.test.tsx (9 tests) 1896ms
+     ✓ pins the active tab title beside the settings title in the modal header  1563ms
+ ✓ desktop/src/react/__tests__/settings/output-presets.test.ts (1 test) 24ms
+stderr | desktop/src/react/__tests__/settings/UsageTab.test.tsx > UsageTab settings page registration (Phase 9: Model Observatory) > renders the usage tab content through SettingsContent when usage is active
+[settings] init failed: Error: [vitest] No "loadProvidersSummary" export is defined on the "../../settings/actions" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+    at VitestMocker.createError (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:62:17)
+    at Object.get (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/vitest/dist/chunks/startVitestModuleRunner.DB-7oCpn.js:327:16)
+    at initSettings (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/SettingsContent.tsx:602:10)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  codeFrame: 'vi.mock(import("../../settings/actions"), async (importOriginal) => {\n' +
+    '  const actual = await importOriginal()\n' +
+    '  return {\n' +
+    '    ...actual,\n' +
+    '    // your mocked methods\n' +
+    '  }\n' +
+    '})'
+}
+
+ ✓ desktop/src/react/__tests__/settings/UsageTab.test.tsx (3 tests) 149ms
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 状态读取失败保留已有状态并显示原因，HTTP 200 error也不能覆盖成空状态
+[bridge] load status failed: Error: 平台暂时不可用
+    at readBridgeResponse (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/bridge-response.ts:19:46)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/bridge/useBridgeState.ts:289:20
+    at Object.loadStatus (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/bridge/useBridgeState.ts:319:5)
+
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 令牌变化后丢弃同一助手的旧状态请求
+[bridge] fetch public-agents-md failed: Error: unmapped Rust UI route: /lingxi/v1/agents/hana/public-agents-md
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:44:11
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/api.ts:65:23)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/bridge/useBridgeState.ts:247:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 联系人刷新失败保留列表并明确显示错误
+[bridge] load platform data failed: Error: 会话读取失败
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx:88:33
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx > R07 原生消息平台页面，真实UI与HTTP协议边界 > 会话详情读取原生权威历史，重置失败保留已读内容和会话
+[bridge] reset session failed: Error: 正在运行，不能重置
+    at readBridgeResponse (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/bridge-response.ts:19:46)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/BridgePanel.tsx:267:7
+
+ ✓ desktop/src/react/__tests__/settings/R07BridgeRustUI.test.tsx (10 tests) 927ms
+     ✓ 真实文件菜单以fileId发原生请求，网络失败重试沿同一编号并查询平台回执  594ms
+
+ Test Files  46 passed (46)
+      Tests  329 passed (329)
+   Start at  01:07:50
+   Duration  4.91s (transform 15.77s, setup 922ms, import 27.87s, tests 17.23s, environment 35.68s)
+

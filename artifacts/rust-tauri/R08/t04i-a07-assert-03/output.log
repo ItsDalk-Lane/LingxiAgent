@@ -1,0 +1,19 @@
+PASS 6 sessions no dups
+PASS fork edge child->parent + fork_point
+PASS unknown session 2 msgs run_id NULL
+PASS missing-run-boundary info issue
+PASS 2 legacy-unknown-block markers
+PASS 2 unknown-block quarantine raw
+PASS corrupt session 809 msgs preserved
+PASS corrupt tail quarantined non-empty
+PASS issues count 6
+PASS 3 session_files rows
+PASS file-good-1 available
+PASS file-good-2 available
+PASS file-broken-1 status broken (not masquerading)
+PASS bad-attachment warning issue
+PASS attachment link valid (bytes equal source)
+PASS broken payload byte-faithful (truncated preserved)
+PASS receipt pendingConvert 9
+PASS receipt sourceUnchanged
+A07_ASSERT pass=18 fail=0

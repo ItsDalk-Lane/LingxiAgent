@@ -1,0 +1,67 @@
+{
+  "headers": {
+    "content-type": "application/json",
+    "etag": "\"r2-e10\"",
+    "content-length": "1000",
+    "date": "Thu, 22 Oct 2026 15:56:02 GMT"
+  },
+  "value": {
+    "headRevision": "2",
+    "items": [
+      {
+        "committedAtUnixMs": 1792684561195,
+        "kind": "user_message",
+        "messageId": "user:run_000001a16453932b_000001",
+        "run": {
+          "runId": "run_000001a16453932b_000001",
+          "state": "known"
+        },
+        "seq": "1",
+        "text": "请回复标记。（标记 A06-CHAT-TASK leg-a1）"
+      },
+      {
+        "complete": true,
+        "firstSeq": "4",
+        "kind": "assistant_segment",
+        "phase": "final_answer",
+        "run": {
+          "runId": "run_000001a16453932b_000001",
+          "state": "known"
+        },
+        "segmentId": "assistant:1:text:default",
+        "segmentKind": "text",
+        "text": "A06-CHAT-FINAL leg-a1"
+      },
+      {
+        "committedAtUnixMs": 1792684562032,
+        "content": [
+          {
+            "text": "A06-CHAT-FINAL leg-a1",
+            "type": "text"
+          }
+        ],
+        "kind": "final_message",
+        "messageId": "run_000001a16453932b_000001-final",
+        "modelCallId": "run_000001a16453932b_000001-mc0001",
+        "run": {
+          "runId": "run_000001a16453932b_000001",
+          "state": "known"
+        },
+        "seq": "3"
+      }
+    ],
+    "page": {
+      "hasMore": false,
+      "limit": 200
+    },
+    "revision": "\"r2-e10\"",
+    "schemaVersion": "lingxi.canonical-history.v1",
+    "sessionId": "a06-clientA-leg1",
+    "todoPanel": {
+      "dismissed": false,
+      "removed": true,
+      "todos": []
+    },
+    "todos": []
+  }
+}

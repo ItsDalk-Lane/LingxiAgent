@@ -1,0 +1,6 @@
+test cutover::backup::tests::unclassified_file_is_loud_refusal ... ok
+test cutover::backup::tests::file_copy_backup_records_hash_and_reuses_idempotently ... ok
+test cutover::backup::tests::sqlite_backup_uses_online_backup_and_sidecars_fold_in ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 663 filtered out; finished in 0.33s
+

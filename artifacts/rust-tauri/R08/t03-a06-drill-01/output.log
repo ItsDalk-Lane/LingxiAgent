@@ -1,0 +1,54 @@
+[FAIL] freshness: dist-renderer/index.html 缺失 — 先构建渲染层再开演练
+[journal] svc-home {"svcHome":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-3rt2d4"}
+[journal] stub {"pid":94146,"port":57514}
+[journal] stamp {"stamp":{"committedDataEpoch":1,"epoch":1,"lastVersion":"0.0.0","minimumReaderEpoch":1,"schemaVersion":2,"updatedAt":"2026-10-22T15:52:50.675Z"}}
+[PASS] stamp: 服务自盖章 data-epoch.json schemaVersion===2（实测 2）
+[journal] service-spawn {"pid":94148}
+[journal] rust-service {"pid":94148,"port":57516,"baseUrl":"http://127.0.0.1:57516"}
+[PASS] rust-service: rust service pid 94148 alive
+[journal] electron-A {"pid":94149,"cdpPort":9368,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-NWuxIs"}
+[journal] title-A-red {"lastTitle":"Lingxi · Rust 预览（远端）","lastCdpError":null,"targetUrl":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"}
+[FAIL] title-A: document.title === Lingxi · Rust 预览（实测 "Lingxi · Rust 预览（远端）"，cdpError=null）
+[journal] conn-info-A {"connInfo":{"port":57516,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-A: 客户端 A GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":57516,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-A: 客户端 A HOME 下无 lingxi-service/instance.json（remote 零接触）
+[journal] electron-B {"pid":95826,"cdpPort":9868,"home":"/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-Qab6fw"}
+[journal] title-B-red {"lastTitle":"Lingxi · Rust 预览（远端）","lastCdpError":null,"targetUrl":"file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"}
+[FAIL] title-B: document.title === Lingxi · Rust 预览（实测 "Lingxi · Rust 预览（远端）"，cdpError=null）
+[journal] conn-info-B {"connInfo":{"port":57516,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}}
+[PASS] remote-mode-B: 客户端 B GSCI 确证 remote 分支（host/port/kind/transport；实测 {"port":57516,"token":"<redacted>","serverNodeKind":"lingxi-service","serverNodeTransport":"http","host":"127.0.0.1"}）
+[PASS] zero-touch-instance-B: 客户端 B HOME 下无 lingxi-service/instance.json（remote 零接触）
+[PASS] tree-s1: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s1: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s1: harness 子树 Electron 主进程 count 2 !== 2
+[PASS] tree-s1-rust-pid: 子树内唯一 rust-kernel = harness 服务 pid 94148（实测 94148）
+[journal] leg-a1 {"sessionId":"a06-clientA-leg1","frameCount":10,"runEndReason":null,"sawFinal":true,"sawMarker":true}
+[FAIL] leg-a1-run-end: 断言失败 — leg-a1 assistant_run_end reason=completed（实测 null）
+[PASS] leg-a1-final: leg-a1 帧含 A06-CHAT-FINAL leg-a1（任务真实完成）
+[PASS] history-leg-a1: leg-a1 服务侧历史含终结回答（status=200）
+[journal] quit-b-focus {"status":0,"stdout":"","stderr":""}
+[journal] quit-b-keystroke-q {"status":0,"stdout":"","stderr":""}
+[journal] electron-B-exit {"code":0,"signal":null}
+[PASS] quit-b-exit: 客户端 B 主进程退出
+[PASS] service-alive-after-b: 退 B 后服务 pid 94148 存活（对客户端退出零接触）
+[PASS] service-continuity: 服务实例连续（pid/instanceId 不变；实测 pid=94148）
+[PASS] health-after-b: 退 B 后 /lingxi/v1/health → 200（实测 200）
+[PASS] client-a-still-remote: 退 B 后客户端 A 连接面不变（remote；实测 host=127.0.0.1 port=57516）
+[PASS] tree-s2: harness 子树 node-kernel count 0 !== 0（硬断言）
+[PASS] tree-s2: harness 子树 rust-kernel count 1 !== 1
+[PASS] tree-s2: harness 子树 Electron 主进程 count 1 !== 1
+[journal] leg-a2 {"sessionId":"a06-clientA-leg2","frameCount":10,"runEndReason":null,"sawFinal":true,"sawMarker":true}
+[FAIL] leg-a2-run-end: 断言失败 — leg-a2 assistant_run_end reason=completed（实测 null）
+[PASS] leg-a2-final: leg-a2 帧含 A06-CHAT-FINAL leg-a2（退 B 后任务仍真实完成）
+[PASS] history-leg-a2: leg-a2 服务侧历史含终结回答（status=200）
+[journal] quit-a-focus {"status":0,"stdout":"","stderr":""}
+[journal] quit-a-keystroke-q {"status":0,"stdout":"","stderr":""}
+[journal] reap-service {"pid":94148,"aliveAtReap":true}
+[journal] service-exit {"code":0,"signal":null}
+[journal] reap-service-result {"exited":{"code":0,"signal":null}}
+[PASS] reap-service: harness 回收服务（SIGTERM 收敛；实测 {"code":0,"signal":null}）
+[journal] electron-A-exit {"code":0,"signal":null}
+[journal] cleanup {"homes":["/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-3rt2d4","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-NWuxIs","/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-Qab6fw"]}
+[r08-t03-a06] crash: Error: electron-a-exit: timeout after 45000ms
+    at waitFor (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:96:38)
+    at async main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:651:5)

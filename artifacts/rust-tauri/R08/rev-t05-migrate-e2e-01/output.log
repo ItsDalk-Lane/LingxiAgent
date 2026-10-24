@@ -1,0 +1,24 @@
+ok   fixture-gen exit 0
+ok   migrate exit 0
+ok   CUTOVER_RESULT line present
+ok   outcome=stopped at boundary (phase=selfcheck, detail names pointer_switch)
+ok   journal.json exists
+ok   journal.phase == selfcheck
+ok   eight phases ok in order
+ok   import bookmark completed
+ok   adopt bookmark committed
+ok   pointer file exists
+ok   pointer activeDataRoot == realpath(target)
+ok   pointer cutoverId matches journal
+ok   pointer schemaVersion == 1
+ok   legacy root byte-equal (zero-mutation red line)
+ok   target runs.db exists
+ok   user_version == 28
+ok   backup-manifest.json exists
+ok   no .tmp-* residue in work-dir
+ok   no .tmp-* residue in backup-dir
+ok   single-writer-ruling.json absent before committed
+ok   double-run guard exit 2
+ok   resume wrong id exit 2
+ok   journal phase unchanged after guards
+E2E_RESULT {"verdict":"PASS","variant":"happy"}

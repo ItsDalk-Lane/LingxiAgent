@@ -1,0 +1,10 @@
+
+> lingxi@0.1.43 typecheck
+> tsc --noEmit && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.test.json
+
+desktop/src/react/onboarding/OnboardingApp.tsx(103,19): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/quick-chat/QuickChatApp.tsx(326,19): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/quick-chat/QuickChatApp.tsx(716,28): error TS2532: Object is possibly 'undefined'.
+desktop/src/react/quick-chat/QuickChatApp.tsx(716,28): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/services/rust-browser.ts(87,10): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+desktop/src/react/services/ws-message-handler.ts(974,9): error TS2722: Cannot invoke an object which is possibly 'undefined'.

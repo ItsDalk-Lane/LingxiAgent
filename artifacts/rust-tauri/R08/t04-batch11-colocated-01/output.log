@@ -1,0 +1,49 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/onboarding/__tests__/onboarding-actions.test.ts (9 tests) 75ms
+ ✓ desktop/src/react/settings/tabs/__tests__/SecurityTab.test.tsx (5 tests) 211ms
+ ✓ desktop/src/react/settings/tabs/__tests__/AboutTab.test.tsx (18 tests) 212ms
+stderr | desktop/src/react/settings/tabs/__tests__/ComputerUseSection.test.tsx > ComputerUseSection > reports a manual refresh result even when status is unchanged (success=false)
+[computer-use] load status failed: Error: offline
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/ComputerUseSection.test.tsx:73:17
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx > OnboardingApp locale switching > shows Rust onboarding is unavailable instead of calling legacy setup routes
+[onboarding] init failed: Error: Rust onboarding is not migrated; the legacy setup API cannot be used
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/onboarding/OnboardingApp.tsx:114:17
+
+ ✓ desktop/src/react/settings/tabs/__tests__/ComputerUseSection.test.tsx (5 tests) 138ms
+ ✓ desktop/src/react/settings/tabs/__tests__/GeneralTab.test.tsx (6 tests) 194ms
+ ✓ desktop/src/react/settings/tabs/__tests__/SharingTab.test.tsx (1 test) 72ms
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > shows the first sidebar read failure and retries before enabling the control
+[settings] sidebar UI preferences load failed: Error: sidebar denied
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:68:27
+    at Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at lingxiFetch (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx:16:40)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:182:5
+    at Object.react_stack_bottom_frame (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+    at runWithFiberInDEV (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+    at commitHookEffectListMount (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+    at commitHookPassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+    at commitPassiveMountOnFiber (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+    at recursivelyTraversePassiveMountEffects (/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+
+ ✓ desktop/src/react/onboarding/__tests__/OnboardingApp.test.tsx (6 tests) 243ms
+ ✓ desktop/src/react/settings/tabs/__tests__/ModelsTab.test.tsx (13 tests) 596ms
+ ✓ desktop/src/react/settings/tabs/__tests__/ExperimentsTab.test.tsx (5 tests) 175ms
+ ✓ desktop/src/react/settings/tabs/__tests__/SkillsTab.test.tsx (13 tests) 338ms
+ ✓ desktop/src/react/settings/tabs/__tests__/KeybindingsTab.test.tsx (14 tests) 435ms
+stderr | desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx > InterfaceTab appearance state > loads and saves the undo-file-changes-on-rollback preference
+[settings] sidebar UI preferences load failed: Error: invalid sidebar preferences
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/settings/tabs/InterfaceTab.tsx:186:123
+
+ ✓ desktop/src/react/settings/tabs/__tests__/InterfaceTab.test.tsx (12 tests) 354ms
+ ✓ desktop/src/react/settings/tabs/__tests__/McpTab.test.tsx (17 tests) 1184ms
+     ✓ refreshes only while the real manager says a background connector is still connecting  512ms
+
+ Test Files  13 passed (13)
+      Tests  124 passed (124)
+   Start at  01:13:36
+   Duration  2.47s (transform 4.11s, setup 129ms, import 7.03s, tests 4.23s, environment 5.05s)
+

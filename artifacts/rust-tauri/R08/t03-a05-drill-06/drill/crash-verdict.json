@@ -1,0 +1,149 @@
+{
+  "schema": "r08-t03-a05-crash/v1",
+  "error": "Error: ws frame timeout\n    at Timeout._onTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a05_drill.mjs:307:14)\n    at listOnTimeout (node:internal/timers:605:17)\n    at process.processTimers (node:internal/timers:541:7)",
+  "syntheticHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-VDBDSg",
+  "journal": [
+    {
+      "at": "2026-10-22T13:58:29.749Z",
+      "step": "freshness",
+      "name": "dist-renderer",
+      "artifactNewest": 1792674794761.1614,
+      "sourceNewest": 1792673308845.573,
+      "stale": false,
+      "rebuilt": false
+    },
+    {
+      "at": "2026-10-22T13:58:29.749Z",
+      "step": "freshness",
+      "name": "preload-bundle",
+      "artifactNewest": 1792674787203.406,
+      "sourceNewest": 1792418642659.3767,
+      "stale": false,
+      "rebuilt": false
+    },
+    {
+      "at": "2026-10-22T13:58:29.750Z",
+      "step": "home",
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-VDBDSg"
+    },
+    {
+      "at": "2026-10-22T13:58:29.952Z",
+      "step": "stub",
+      "pid": 67937,
+      "port": 55624
+    },
+    {
+      "at": "2026-10-22T13:58:30.164Z",
+      "step": "stamp",
+      "stamp": {
+        "committedDataEpoch": 1,
+        "epoch": 1,
+        "lastVersion": "0.0.0",
+        "minimumReaderEpoch": 1,
+        "schemaVersion": 2,
+        "updatedAt": "2026-10-22T13:58:29.966Z"
+      }
+    },
+    {
+      "at": "2026-10-22T13:58:30.164Z",
+      "step": "stamp",
+      "ok": "服务自盖章 data-epoch.json schemaVersion===2（实测 2）"
+    },
+    {
+      "at": "2026-10-22T13:58:30.166Z",
+      "step": "electron",
+      "pid": 67939,
+      "cdpPort": 10159
+    },
+    {
+      "at": "2026-10-22T13:58:31.168Z",
+      "step": "rust-service",
+      "pid": 68157,
+      "port": 55644,
+      "baseUrl": "http://127.0.0.1:55644"
+    },
+    {
+      "at": "2026-10-22T13:58:31.168Z",
+      "step": "rust-service",
+      "ok": "rust service pid 68157 alive"
+    },
+    {
+      "at": "2026-10-22T13:58:34.180Z",
+      "step": "cdp-target",
+      "url": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"
+    },
+    {
+      "at": "2026-10-22T13:58:34.190Z",
+      "step": "conn-info",
+      "connInfo": {
+        "port": 55644,
+        "token": "<redacted>",
+        "serverNodeKind": "lingxi-service",
+        "serverNodeTransport": "http",
+        "host": null
+      }
+    },
+    {
+      "at": "2026-10-22T13:58:34.190Z",
+      "step": "conn-info",
+      "fail": "renderer connection host/port === 127.0.0.1:55644（实测 null:55644）"
+    },
+    {
+      "at": "2026-10-22T13:58:34.190Z",
+      "step": "conn-info-kind",
+      "fail": "renderer connection kind === lingxi-service（实测 undefined）"
+    },
+    {
+      "at": "2026-10-22T13:58:34.288Z",
+      "step": "tree-s1",
+      "ok": "node-kernel count 0 !== 0（硬断言）"
+    },
+    {
+      "at": "2026-10-22T13:58:34.288Z",
+      "step": "tree-s1",
+      "fail": "rust-kernel count 0 !== 1"
+    },
+    {
+      "at": "2026-10-22T13:58:34.288Z",
+      "step": "tree-s1",
+      "fail": "electron-ui count 0 < 1"
+    },
+    {
+      "at": "2026-10-22T13:58:34.288Z",
+      "step": "tree-s1-owned",
+      "fail": "rust kernel pid 68157 在 Electron 子树内（local-owned 证据）"
+    },
+    {
+      "at": "2026-10-22T13:58:34.290Z",
+      "step": "session-create",
+      "ok": "POST /lingxi/v1/sessions → 201（实测 201）"
+    },
+    {
+      "at": "2026-10-22T13:58:34.292Z",
+      "step": "handshake",
+      "ok": "WS handshake ack protocol=lingxi.wire"
+    },
+    {
+      "at": "2026-10-22T13:58:34.386Z",
+      "step": "tree-s2",
+      "ok": "node-kernel count 0 !== 0（硬断言）"
+    },
+    {
+      "at": "2026-10-22T13:58:34.386Z",
+      "step": "tree-s2",
+      "fail": "rust-kernel count 0 !== 1"
+    },
+    {
+      "at": "2026-10-22T14:01:04.631Z",
+      "step": "electron-exit",
+      "code": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-10-22T14:01:10.464Z",
+      "step": "cleanup",
+      "electronPid": 67939,
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a05-VDBDSg"
+    }
+  ]
+}

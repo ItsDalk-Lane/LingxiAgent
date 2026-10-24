@@ -1,0 +1,6 @@
+test cutover_orchestrator::tests::double_run_guard_refuses_without_resume ... ok
+test cutover_orchestrator::tests::resume_with_wrong_id_is_loud ... ok
+test cutover_orchestrator::tests::stop_after_phase_threads_each_boundary ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+

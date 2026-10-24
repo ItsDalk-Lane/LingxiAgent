@@ -1,0 +1,5 @@
+{"seed":20261023,"out":"/tmp/t04i-fixture-01","fileCount":32,"rootHash":"bbfd51859aef56565bcf2de94a668e1969e98686f017c3a20c19f3d222768d7d"}
+
+thread 'main' (14230033) panicked at crates/lingxi-adapters/src/storage/legacy_import/convert_sessions.rs:666:10:
+Cannot start a runtime from within a runtime. This happens because a function (like `block_on`) attempted to block the current thread while the thread is being used to drive asynchronous tasks.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

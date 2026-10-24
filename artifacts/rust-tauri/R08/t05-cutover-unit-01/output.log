@@ -1,0 +1,30 @@
+
+failures:
+
+---- background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products stdout ----
+2026-10-23T00:55:27.420609Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r06-owned-media-058c325cffcd000ca5f53af7/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+
+thread 'background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products' (14682026) panicked at crates/lingxi-service/src/background_tasks.rs:435:10:
+called `Result::unwrap()` on an `Err` value: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- memorytools::github_tests::github_registered_real_driver_requires_review_rejects_readonly_and_never_fetches_before_approval stdout ----
+2026-10-23T00:55:31.049806Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-github-install-ad39aa75201d2279/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+
+thread 'memorytools::github_tests::github_registered_real_driver_requires_review_rejects_readonly_and_never_fetches_before_approval' (14684642) panicked at crates/lingxi-service/src/skills_github_tests.rs:548:6:
+called `Result::unwrap()` on an `Err` value: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- sessiontools::receipt_tests::concurrent_atomic_receipts_never_expose_a_partial_or_changed_snapshot stdout ----
+2026-10-23T00:55:31.248968Z  INFO lingxi_adapters::storage::run_store: run database migrated db=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/r06-receipt-io-6f584e915ae3bbfd7ae8563a/lingxi-service/data/runs.db applied=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] version=28
+
+thread 'sessiontools::receipt_tests::concurrent_atomic_receipts_never_expose_a_partial_or_changed_snapshot' (14684865) panicked at crates/lingxi-service/src/sessiontools.rs:679:10:
+called `Result::unwrap()` on an `Err` value: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+
+failures:
+    background_tasks::tests::owned_media_query_and_cancel_use_actual_supplier_and_fence_late_products
+    memorytools::github_tests::github_registered_real_driver_requires_review_rejects_readonly_and_never_fetches_before_approval
+    sessiontools::receipt_tests::concurrent_atomic_receipts_never_expose_a_partial_or_changed_snapshot
+
+test result: FAILED. 680 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.53s
+
+error: test failed, to rerun pass `-p lingxi-service --lib`

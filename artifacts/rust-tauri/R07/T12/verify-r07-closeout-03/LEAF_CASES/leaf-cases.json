@@ -1,0 +1,3675 @@
+{
+ "schema": "lingxi.leaf-case-results.v1",
+ "generatedBy": "scripts/rust-tauri/r07_leaf_cases.py",
+ "stage": "R07",
+ "suites": {
+  "r07_bridge_diagnostic": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_bridge_flow": {
+   "exitCode": 0,
+   "testsSeen": 13,
+   "testsPassed": 13,
+   "logPresent": true
+  },
+  "r07_bridge_guest_context": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_bridge_native_flow": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  },
+  "r07_bridge_notice": {
+   "exitCode": 0,
+   "testsSeen": 3,
+   "testsPassed": 3,
+   "logPresent": true
+  },
+  "r07_bridge_permission": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_bridge_sdk_platforms": {
+   "exitCode": 0,
+   "testsSeen": 11,
+   "testsPassed": 11,
+   "logPresent": true
+  },
+  "r07_bridge_session_routes": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  },
+  "r07_bridge_worker": {
+   "exitCode": 0,
+   "testsSeen": 5,
+   "testsPassed": 5,
+   "logPresent": true
+  },
+  "r07_browser_routes": {
+   "exitCode": 0,
+   "testsSeen": 10,
+   "testsPassed": 10,
+   "logPresent": true
+  },
+  "r07_browser_tools": {
+   "exitCode": 0,
+   "testsSeen": 13,
+   "testsPassed": 13,
+   "logPresent": true
+  },
+  "r07_conversation_tools": {
+   "exitCode": 0,
+   "testsSeen": 7,
+   "testsPassed": 7,
+   "logPresent": true
+  },
+  "r07_daily_fresh_compact": {
+   "exitCode": 0,
+   "testsSeen": 6,
+   "testsPassed": 6,
+   "logPresent": true
+  },
+  "r07_desk_files": {
+   "exitCode": 0,
+   "testsSeen": 8,
+   "testsPassed": 8,
+   "logPresent": true
+  },
+  "r07_diary": {
+   "exitCode": 0,
+   "testsSeen": 16,
+   "testsPassed": 16,
+   "logPresent": true
+  },
+  "r07_git_panel": {
+   "exitCode": 0,
+   "testsSeen": 25,
+   "testsPassed": 25,
+   "logPresent": true
+  },
+  "r07_goal_loop": {
+   "exitCode": 0,
+   "testsSeen": 11,
+   "testsPassed": 11,
+   "logPresent": true
+  },
+  "r07_heartbeat_plan": {
+   "exitCode": 0,
+   "testsSeen": 10,
+   "testsPassed": 10,
+   "logPresent": true
+  },
+  "r07_heartbeat_runtime": {
+   "exitCode": 0,
+   "testsSeen": 6,
+   "testsPassed": 6,
+   "logPresent": true
+  },
+  "r07_media_admin": {
+   "exitCode": 0,
+   "testsSeen": 10,
+   "testsPassed": 10,
+   "logPresent": true
+  },
+  "r07_office_tools": {
+   "exitCode": 0,
+   "testsSeen": 15,
+   "testsPassed": 15,
+   "logPresent": true
+  },
+  "r07_phone_runtime": {
+   "exitCode": 0,
+   "testsSeen": 15,
+   "testsPassed": 15,
+   "logPresent": true
+  },
+  "r07_scheduler": {
+   "exitCode": 0,
+   "testsSeen": 7,
+   "testsPassed": 7,
+   "logPresent": true
+  },
+  "r07_session_collab": {
+   "exitCode": 0,
+   "testsSeen": 9,
+   "testsPassed": 9,
+   "logPresent": true
+  },
+  "r07_t05_media": {
+   "exitCode": 0,
+   "testsSeen": 13,
+   "testsPassed": 13,
+   "logPresent": true
+  },
+  "r07_t08_agent_target": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  },
+  "r07_t08_card_previews": {
+   "exitCode": 0,
+   "testsSeen": 3,
+   "testsPassed": 3,
+   "logPresent": true
+  },
+  "r07_t08_interface_preferences": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  },
+  "r07_t08_mcp_process": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_t08_mcp_remote": {
+   "exitCode": 0,
+   "testsSeen": 7,
+   "testsPassed": 7,
+   "logPresent": true
+  },
+  "r07_t08_mcp_session_permissions": {
+   "exitCode": 0,
+   "testsSeen": 5,
+   "testsPassed": 5,
+   "logPresent": true
+  },
+  "r07_t08_mcp_settings": {
+   "exitCode": 0,
+   "testsSeen": 22,
+   "testsPassed": 22,
+   "logPresent": true
+  },
+  "r07_t08_media_source": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_t08_metadata_redaction": {
+   "exitCode": 0,
+   "testsSeen": 3,
+   "testsPassed": 3,
+   "logPresent": true
+  },
+  "r07_t08_model_authority": {
+   "exitCode": 0,
+   "testsSeen": 5,
+   "testsPassed": 5,
+   "logPresent": true
+  },
+  "r07_t08_model_configuration": {
+   "exitCode": 0,
+   "testsSeen": 10,
+   "testsPassed": 10,
+   "logPresent": true
+  },
+  "r07_t08_oauth_alias": {
+   "exitCode": 0,
+   "testsSeen": 1,
+   "testsPassed": 1,
+   "logPresent": true
+  },
+  "r07_t08_provider_capabilities": {
+   "exitCode": 0,
+   "testsSeen": 1,
+   "testsPassed": 1,
+   "logPresent": true
+  },
+  "r07_t08_provider_http": {
+   "exitCode": 0,
+   "testsSeen": 7,
+   "testsPassed": 7,
+   "logPresent": true
+  },
+  "r07_t08_provider_matrix": {
+   "exitCode": 0,
+   "testsSeen": 36,
+   "testsPassed": 36,
+   "logPresent": true
+  },
+  "r07_t08_search_clear": {
+   "exitCode": 0,
+   "testsSeen": 5,
+   "testsPassed": 5,
+   "logPresent": true
+  },
+  "r07_t08_settings": {
+   "exitCode": 0,
+   "testsSeen": 15,
+   "testsPassed": 15,
+   "logPresent": true
+  },
+  "r07_t08_skills_cards": {
+   "exitCode": 0,
+   "testsSeen": 5,
+   "testsPassed": 5,
+   "logPresent": true
+  },
+  "r07_t08_speech_bindings": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_t09_client_context": {
+   "exitCode": 0,
+   "testsSeen": 4,
+   "testsPassed": 4,
+   "logPresent": true
+  },
+  "r07_t10_observability": {
+   "exitCode": 0,
+   "testsSeen": 2,
+   "testsPassed": 2,
+   "logPresent": true
+  },
+  "r07_t11_dev_entry_and_unload": {
+   "exitCode": 0,
+   "testsSeen": 3,
+   "testsPassed": 3,
+   "logPresent": true
+  },
+  "r07_t12_closure": {
+   "exitCode": 0,
+   "testsSeen": 3,
+   "testsPassed": 3,
+   "logPresent": true
+  },
+  "r07_web_tools": {
+   "exitCode": 0,
+   "testsSeen": 8,
+   "testsPassed": 8,
+   "logPresent": true
+  },
+  "r07_workbench": {
+   "exitCode": 0,
+   "testsSeen": 14,
+   "testsPassed": 14,
+   "logPresent": true
+  },
+  "r07_workflow": {
+   "exitCode": 0,
+   "testsSeen": 20,
+   "testsPassed": 20,
+   "logPresent": true
+  }
+ },
+ "cases": [
+  {
+   "case": "r07_bridge_diagnostic::concurrent_diagnostics_cannot_register_a_process_after_shutdown_returns",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_diagnostic",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_diagnostic::normal_qrcode_long_poll_can_exceed_twenty_seconds_and_is_reaped",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_diagnostic",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::actual_owner_can_take_over_only_selected_desktop_session_and_exit_restores_bridge",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::all_five_platforms_use_real_runs_and_stable_reply_receipts",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::bridge_guest_slash_text_never_becomes_a_command",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::bridge_loop_commands_run_the_full_lifecycle_over_the_real_inbound_chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::bridge_loop_delivery_ledger_rejects_forged_or_guest_sources",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::bridge_loop_reply_ledger_survives_restart_and_reports_the_interrupted_turn",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::bridge_stop_family_reports_idle_and_cancels_an_active_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::clearing_owner_changes_new_messages_to_guest_without_replaying_old_owner_task",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::delivered_owner_notice_is_context_only_after_real_receipt_and_survives_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::manual_file_delivery_uses_actual_managed_bytes_and_retry_keeps_one_send",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::sent_without_receipt_becomes_unknown_on_restart_and_is_not_sent_again",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::stopping_immediately_after_start_does_not_lose_shutdown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_flow::unknown_owner_notice_never_claims_delivery_or_enters_context",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_guest_context::damaged_public_material_is_a_visible_error_and_cannot_fall_back_to_private_files",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_guest_context",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_guest_context::guest_reads_only_public_persona_and_never_private_preferences_or_memory",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_guest_context",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_native_flow::actual_platform_document_bytes_are_extracted_into_the_real_model_submission",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_native_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_native_flow::actual_sdk_native_receipt_rich_draft_and_final_have_separate_durable_proofs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_native_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_native_flow::actual_settings_disable_waiting_receipt_and_choose_plain_native_draft",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_native_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_native_flow::disabling_connector_cancels_actual_run_and_cleans_the_original_native_draft",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_native_flow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_notice::forged_or_changed_notice_material_is_refused_instead_of_becoming_user_text",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_notice",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_notice::notice_is_retained_at_the_fork_boundary_and_receipt_does_not_replay_after_clear",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_notice",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_notice::only_confirmed_delivery_becomes_a_distinct_notice_and_survives_restart_once",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_notice",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_permission::guest_has_no_tools_and_owner_keeps_read_only_and_no_human_approval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_permission",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_permission::real_gateway_bans_gui_before_an_allowing_policy_and_rejects_identity_context_mismatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_permission",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_dingtalk_adapter_recovers_from_a_transient_socket_error_without_reconfiguration",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_dingtalk_sdk_factory_roundtrip_and_restart_are_idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_dingtalk_sdk_guest_command_cannot_dispatch_registered_exec_or_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_feishu_folded_preview_unknown_does_not_resend_content_as_a_new_final_reply",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_feishu_sdk_factory_roundtrip_and_restart_are_idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_feishu_sdk_guest_command_cannot_dispatch_registered_exec_or_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_qq_sdk_factory_roundtrip_and_restart_are_idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_qq_sdk_guest_command_cannot_dispatch_registered_exec_or_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_telegram_sdk_guest_command_cannot_dispatch_registered_exec_or_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_wechat_sdk_factory_roundtrip_and_restart_are_idempotent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_sdk_platforms::actual_wechat_sdk_guest_command_cannot_dispatch_registered_exec_or_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_sdk_platforms",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_session_routes::bridge_document_bytes_are_owned_and_invalid_names_mimes_or_sessions_create_no_file_fact",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_session_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_session_routes::history_uses_canonical_final_and_reset_obeys_live_lease_then_starts_new_context",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_session_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_session_routes::manual_media_accepts_safe_bytes_above_old_snapshot_cap_and_refuses_qq_group_documents",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_session_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_session_routes::manual_send_queues_real_file_without_fake_run_and_http_retries_return_same_fact",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_session_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_worker::cancelled_read_preserves_partial_frame",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_worker",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_worker::command_limit_refuses_dispatch_and_existing_worker_remains_stoppable",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_worker",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_worker::incomplete_frame_and_malformed_output_never_become_messages",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_worker",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_worker::oversized_output_is_bounded_and_worker_is_reaped",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_worker",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_bridge_worker::worker_uses_real_pipe_and_does_not_inherit_service_secrets",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_bridge_worker",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::actual_http_command_replay_changed_input_and_emergency_receipt_never_repeat_external_actions",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::archive_and_permanent_delete_reclaim_only_the_actual_session_browser_before_success",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::chat_device_reads_state_but_only_explicit_remote_admin_controls_the_actual_service_node",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::concurrent_and_repeated_shutdown_waiters_preserve_failure_and_panic_results",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::partial_external_configuration_is_rolled_back_and_unconfirmed_rollback_is_explicit_unknown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::partial_preferences_preserve_unknown_fields_and_external_cookie_failure_is_not_success",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::repeated_download_after_unknown_ack_reuses_actual_delivered_file_and_receipt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::restart_restores_cold_metadata_and_confirmed_receipt_without_automatically_opening_a_page",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::screenshot_registers_a_real_png_session_file_and_http_content_preserves_its_type_and_bytes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_routes::unknown_external_revoke_receipt_never_repeats_the_stop_or_reopens_content",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_routes",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::accepted_real_websocket_steer_reauthorizes_only_current_run_and_old_request_never_lifts_later_stop",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::actual_model_and_tool_echo_foreign_file_marker_without_pinning_or_blocking_fork",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::actual_navigation_waits_for_approval_and_dispatches_exact_reviewed_url",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::actual_readonly_snapshot_persists_receipt_but_write_never_dispatches",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::actual_run_cancellation_reaches_external_cleanup_and_settles_both_records",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::actual_service_interleaving_keeps_new_http_emergency_over_earlier_accepted_steer",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::confirmed_http_emergency_persists_empty_cold_state_across_restart_and_new_user_start",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::external_unknown_effect_is_persisted_and_never_reported_as_success",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::new_actual_user_submission_releases_emergency_stop_with_a_new_epoch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::page_change_and_foreign_tab_invalidate_approval_before_external_dispatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::screenshot_owned_file_materializes_into_exact_read_pixels_without_granting_other_sessions",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::unconfirmed_http_emergency_keeps_last_page_and_live_process_explicitly_unknown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_browser_tools::undeclared_materialize_is_refused_without_dispatch_and_actual_run_finishes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_browser_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::dynamic_channel_contract_preserves_read_review_and_inherited_read_only",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::executor_rechecks_real_run_generation_attempt_and_owner",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::membership_revoked_during_real_approval_cannot_publish",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::real_channel_post_waits_for_approval_and_records_actual_actor_and_source",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::real_create_adds_actual_actor_and_keeps_a_durable_source_receipt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::real_dm_confirmation_writes_both_histories_once_as_session_actor",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_conversation_tools::real_read_run_is_member_scoped_and_ambiguous_names_list_ids",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_conversation_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_daily_fresh_compact::actual_bridge_only_compacts_once_then_replays_day_receipt_after_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_daily_fresh_compact",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_daily_fresh_compact::busy_bridge_is_remaining_work_without_claiming_or_interrupting_it",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_daily_fresh_compact",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_daily_fresh_compact::known_failure_waits_an_hour_and_retries_with_new_attempt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_daily_fresh_compact",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_daily_fresh_compact::logical_day_changes_at_local_four_am",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_daily_fresh_compact",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_daily_fresh_compact::permission_change_during_real_summary_cancels_and_keeps_unknown_receipt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_daily_fresh_compact",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_daily_fresh_compact::started_unknown_and_closed_intake_never_replay_or_claim_next_day",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_daily_fresh_compact",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::create_and_actions_flow",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::files_listing_and_subdir_guards",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::jian_cycle_and_locale",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::no_workspace_fallbacks",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::path_default_override_and_approval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::scope_gates",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::search_files_flow",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_desk_files::r07_desk_files::upload_gate_and_flow",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_desk_files",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::diary_includes_same_agent_real_cron_activity_but_excludes_promoted_activity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::diary_routes_require_local_owner",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::list_missing_dir_then_utf16_descending",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::list_uses_locale_diary_dir_label",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_for_yesterday_ignores_todays_session",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_llm_failure_maps_400_with_localized_message",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_memory_and_chat_both_unconfigured_maps_500",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_memory_slot_unconfigured_falls_back_to_chat",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_session_without_summary_uses_temporary_material",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_stale_summary_appends_supplement_with_previous",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_strips_mood_blocks_and_fallback_title",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_temporary_failure_surfaces_warning_envelope",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_title_date_prefix_and_illegal_chars_shape_filename",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_with_summary_material_produces_diary_file",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_zero_materials_english_when_locale_en",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_diary::r07_diary::write_zero_materials_localized_and_target_date_fallback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_diary",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::activity_summary_actual_http_uses_summarize_slot_and_records_success_and_failure",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::activity_summary_empty_missing_and_device_permission_are_honest",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::activity_summary_revocation_cancels_call_records_unknown_usage_and_releases_permit",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::ai_commit_message_chat_fallback",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::ai_commit_message_failure_envelopes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::ai_commit_message_happy_path_sanitizes_and_records_usage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::amend_flow",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::auth_scope_gates",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::branches_current_detached_and_checked_out_elsewhere",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::checkout_matrix",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::commit_flow",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::create_branch_matrix",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::discard_flows",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::file_diff_tracked_untracked_binary_and_invalid",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::gate_query_403_body_400_studio_mount_and_agent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::log_clamps_limit_and_parses_refs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::log_stats_batch_whitelist_and_merge_first_parent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::push_pull_fetch_buckets",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::stage_unstage_flows",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::stash_full_flow",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::status_ahead_behind_pushable_with_bare_remote",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::status_detached_head_reports_short_hash",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::status_reports_totals_states_and_placeholders",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::worktree_create_matrix",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_git_panel::r07_git_panel::worktree_info_and_list_main_and_linked",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_git_panel",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::actual_loop_cancel_settles_once_and_next_user_run_cannot_borrow_old_active_mark",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::goal_corrupt_sidecar_is_tool_failure_through_real_run_and_never_replaced",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::goal_preferences_read_is_pure_and_single_edit_preserves_budget_and_unknown_settings",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::goal_six_actions_close_loop_and_over_budget_fires_exactly_once",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::goal_write_fault_is_tool_failure_and_no_budget_notification_through_real_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::loop_slash_lifecycle_alarm_wakeup_and_loop_control",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::real_composition_releases_loop_workflow_and_gateway_after_stop",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::real_database_lock_stop_supersedes_http_loop_start_without_new_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::real_db_admission_waiting_injection_cannot_claim_replacement_loop",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::real_wal_registered_before_started_cannot_borrow_new_loop_identity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_goal_loop::goal_loop::same_home_restart_recovers_overdue_loop_without_replaying_kickoff",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_goal_loop",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::auto_heartbeat_requires_explicit_agent_opt_in_and_master_gate",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::daily_boundaries_are_local_and_failures_or_remaining_work_retry_after_one_hour",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::deeper_hidden_unknown_and_duplicate_jian_roots_are_refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::jian_status_keeps_concurrent_user_body_and_program_owned_start_snapshot",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::output_segments_preserve_current_locale_labels_and_cannot_traverse",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::patrol_log_is_utf8_and_display_is_limited_without_modifying_original_material",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::patrol_plan_excludes_own_outputs_and_includes_both_root_and_first_level_jian",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::real_resource_listing_shape_is_strict_and_no_bad_entry_becomes_an_empty_scan",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::slots_are_unix_aligned_and_manual_requests_have_independent_cooldown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_plan::unchanged_jian_is_still_planned_so_model_can_continue_or_skip_using_saved_state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_plan",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_runtime::config_switch_off_cancels_real_inflight_patrol_and_does_not_write_log",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_runtime::create_if_absent_never_overwrites_a_competing_resource",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_runtime::missing_agent_cannot_receive_a_workspace_scope_or_background_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_runtime::ordinary_chat_cannot_borrow_heartbeat_program_log_target",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_runtime::real_patrol_and_root_first_level_jian_use_gateway_fixed_logs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_heartbeat_runtime::separate_agents_run_together_but_same_agent_overlap_is_discarded",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_heartbeat_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::admin_models_config_and_asr_preferences_roundtrip",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::ask_mode_waits_for_real_decision_and_blocks_concurrent_admission",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::asr_transcribe_roundtrip_events_and_failure_honesty",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::direct_media_action_waiting_for_approval_honors_cancel_and_live_plugin_revocation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::failed_image_task_retries_into_new_task_with_attempt_continuity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::http_image_generate_acceptance_then_gallery_done_and_real_bytes_served",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::http_video_generate_acceptance_then_gallery_done_and_real_bytes_served",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::read_only_session_generate_is_forbidden_without_dispatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::speech_response_delivery_waits_for_terminal_and_returns_real_files",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_media_admin::r07_media_admin::unified_generate_dispatch_accepts_kind_vocabulary_and_rejects_unknown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_media_admin",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::actual_http_apply_preserves_old_shape_and_refuses_self_reported_identity",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::apply_cover_candidate_target_applies_existing_image_through_real_approval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::background_cover_fixed_actions_honor_live_revocation_and_cancel_before_apply",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::background_cover_job_completes_with_real_media_and_applies_frozen_write",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::background_cover_job_refuses_to_apply_after_document_changed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::bundled_preset_apply_uses_real_gallery_bytes_and_rejects_unknown_presets",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::cancelled_pdf_waits_for_actual_external_cleanup_and_never_registers_a_file",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::capabilities_and_cover_style_guide_deliver_real_catalog_content",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::cover_requires_confirmation_and_preserves_markdown_and_actual_image",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::guide_state_is_owned_by_the_actual_session_and_plugin_toggle_is_effective",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::pdf_collects_authorized_assets_and_three_bundled_fonts_then_registers_real_file",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::pdf_private_asset_is_refused_before_any_external_renderer_call",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::read_only_and_live_toggle_revocation_prevent_cover_writes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::real_document_worker_reads_docx_xlsx_and_paged_pdf_without_changing_inputs",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_office_tools::office::remote_cover_clients_cannot_turn_absolute_paths_into_local_owner_authority",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_office_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_archived_phone_session_rotates_and_does_not_block_independent_channel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_channel_pass_records_decision_without_publishing_ordinary_final",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_channel_recursive_replies_share_one_guard_budget_and_restart_does_not_reopen_it",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_completed_run_before_activity_restart_waits_full_interval_from_terminal_time",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_dm_chain_shares_three_run_budget_across_both_directions_and_cooldown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_dm_stop_marker_stops_chain_and_new_user_action_waits_for_direction_cooldown",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_dm_stop_marker_variants_strip_public_text_and_never_start_reverse_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_http_channel_management_and_dm_read_surfaces_preserve_real_state",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_http_phone_only_explicit_reply_is_public_request_retry_and_restart_do_not_repeat",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_legacy_markdown_first_discovery_external_append_and_restart_keep_one_cause",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_member_removal_cancels_waiting_models_before_any_publication",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_phone_sessions_reuse_within_30_minutes_and_rotate_at_idle_expiry",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_proactive_31_minutes_obeys_disable_enable_and_restart_slot_receipt",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_read_only_phone_rejects_native_write_and_hides_recursive_tools",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_phone_runtime::actual_same_second_dm_reset_hides_old_history_without_replaying_or_losing_new_action",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_phone_runtime",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::background_input_and_real_tool_results_reload_after_restart_without_user_messages",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::cancellation_drops_pending_automatic_review_before_any_tool_dispatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::edits_preserve_unknown_fields_and_stale_revisions_are_rejected",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::one_shot_is_disabled_after_real_execution",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::real_management_dispatch_and_restart_keep_one_trigger_one_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::revoked_source_is_rejected_without_a_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_scheduler::unknown_claim_after_restart_is_not_reexecuted",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_scheduler",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::create_apply_is_single_target_and_survives_restart_without_replay",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::current_phone_authority_still_allows_queued_collaboration_after_root_completed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::disabling_channels_blocks_a_previously_confirmed_busy_collaboration_queue",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::narrowing_phone_mode_blocks_queued_collaboration_before_any_target_run_is_created",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::phone_ticker_distinguishes_claims_actual_runs_and_the_persisted_reminder_slot",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::registered_tool_only_cards_then_busy_queue_accepts_one_causal_run_and_records_edits",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::reject_expiry_readonly_and_spoofed_source_are_checked_by_real_records",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::removing_phone_member_blocks_a_previously_confirmed_busy_collaboration_queue",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_session_collab::unconfirmed_started_create_recovers_existing_target_but_never_resends",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_session_collab",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::confirmed_supplier_failure_remains_failed_and_finishes_the_actual_execution_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::describe_options_uses_actual_config_and_existing_provider_modes_without_submitting",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::disabling_the_plugin_after_parent_completion_cancels_real_background_and_blocks_delivery",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::duplicate_user_request_reuses_real_run_and_does_not_create_another_generation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::image_approval_starts_a_distinct_real_run_and_delivers_owned_session_file",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::jimeng_image_and_video_use_real_supervised_cli_and_current_sdk_with_owned_delivery",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::loop_origin_media_job_is_authorized_by_the_persistent_loop_record",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::restart_reopens_real_storage_and_queries_known_remote_without_resubmitting",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::speech_delivers_real_audio_bytes_and_keeps_the_media_job_causal_run",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::stopping_a_submitted_job_does_not_claim_remote_cancellation_or_deliver_late_bytes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::stopping_the_loop_revokes_media_authority_and_late_bytes_are_not_delivered",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::untrusted_media_arguments_cannot_choose_credentials_or_paths_or_drop_wrong_typed_overrides",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t05_media::r07_media::video_uses_real_submit_query_download_and_session_delivery_stages",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t05_media",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_agent_target::agent_get_uses_published_models_after_projection_failure_instead_of_legacy_catalog",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_agent_target",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_agent_target::linked_agent_directory_agents_root_or_config_never_writes_outside_for_present_or_missing_targets",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_agent_target",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_agent_target::missing_explicit_agent_is_not_recreated_or_redirected_to_focus_and_valid_target_is_private",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_agent_target",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_agent_target::unwired_agent_get_marks_inactive_and_does_not_promote_legacy_only_catalog",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_agent_target",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_card_previews::export_plan_alias_matches_preview_without_package_write_then_real_export_and_asset",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_card_previews",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_card_previews::oversized_theme_variables_clear_by_utf8_bytes_while_valid_card_still_registers",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_card_previews",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_card_previews::plan_assets_read_real_bytes_and_refuse_missing_invalid_and_escape_without_mutation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_card_previews",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_interface_preferences::actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_interface_preferences",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_interface_preferences::actual_http_global_archives_return_only_existing_metadata_and_reject_corrupt_or_unsafe_files",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_interface_preferences",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_interface_preferences::actual_http_keybindings_full_replace_sidebar_partial_merge_scopes_and_same_home_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_interface_preferences",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_interface_preferences::actual_http_preferences_match_shared_pure_normalizers_for_every_command_and_partial_sidebar",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_interface_preferences",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_process::actual_mcp_initialization_cancellation_reaps_process_before_connection_exists",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_process",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_process::actual_stubborn_mcp_disconnect_reconnect_and_owner_drop_reap_process_groups",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_process",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::actual_http_apps_visibility_launch_input_resources_and_generation_cancellation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::actual_oauth_pkce_dcr_private_source_refresh_restart_resources_and_logout",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::actual_session_run_http_404_never_replays_the_posted_mcp_tool_call",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::cancelled_browser_flows_release_pending_capacity_without_erasing_saved_facts",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::oauth_cancel_changed_configuration_revoked_owner_and_shutdown_never_resurrect_credentials",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::old_official_sdk_refresh_cannot_overwrite_a_new_browser_login_committed_to_source",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_remote::settings_content_mcp_oauth_page_consumes_the_same_owned_sdk_and_private_source",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_remote",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_session_permissions::actual_ws_prompt_reuses_session_capability_for_second_different_arguments_without_approval",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_session_permissions",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_session_permissions::credential_revocation_and_same_home_real_restart_do_not_restore_temporary_grants",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_session_permissions",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_session_permissions::in_flight_grant_cannot_land_after_real_archive_restore_completed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_session_permissions",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_session_permissions::missing_scope_foreign_session_and_damaged_payload_never_grant_and_connector_restart_invalidates",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_session_permissions",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_session_permissions::paired_scope_grants_same_session_exact_capability_across_arguments_without_persisting",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_session_permissions",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::a_real_pending_settings_approval_does_not_survive_local_credential_replacement",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::editing_a_queued_connector_cleans_old_generation_before_new_sdk_start",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::http_bulk_pending_start_does_not_block_other_saves_and_stop_disable_reap_real_groups",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::http_saved_start_is_immediate_and_duplicate_start_uses_one_actual_sdk_connection",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::management_rejects_other_identities_corrupt_files_links_and_replaced_parent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::queued_original_authority_revocation_and_shutdown_cancel_and_reap_owned_sdk_start",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::rejected_update_must_not_cancel_an_accepted_background_sdk_start",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_mcp_settings::stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_mcp_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_media_source::media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_media_source",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_media_source::media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_media_source",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_metadata_redaction::auth_header_mask_refills_only_same_header_and_plain_metadata_value_stays_literal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_metadata_redaction",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_metadata_redaction::metadata_reads_mask_known_nested_secrets_and_masked_model_lists_refill_only_same_id",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_metadata_redaction",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_metadata_redaction::providers_manage_without_secrets_write_cannot_replace_or_clear_model_extension_credentials",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_metadata_redaction",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_authority::real_http_device_model_save_revalidates_again_at_filesafety_atomic_authorization",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_authority::real_http_device_model_save_revalidates_revocation_after_actual_mutation_queue",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_authority::real_http_probe_and_saved_key_revalidate_revoked_devices_after_actual_queue",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_authority::real_http_reload_revalidates_replaced_local_token_after_actual_mutation_queue",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_authority::real_http_web_session_save_revalidates_logout_after_actual_mutation_queue",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_authority",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::compatibility_projection_failure_reports_applied_snapshot_and_reload_can_confirm_it",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::embedded_source_preserves_envelope_rejects_secret_metadata_before_write_and_reload_recovers",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::existing_embedded_and_models_file_sources_and_retained_originals_become_private_when_saving_first_key",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::explicit_codex_display_alias_edits_one_source_and_login_state_comes_from_credentials",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::first_save_activates_shared_catalog_credentials_and_independent_knowledge_without_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::headers_null_clears_only_headers_and_deleted_catalog_cannot_borrow_old_binding_or_credentials",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::legacy_custom_provider_omitted_protocol_first_save_dispatches_openai_and_explicit_invalid_never_falls_back",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::malformed_headers_never_clear_saved_settings_or_publish_a_generation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::malformed_provider_endpoint_is_rejected_without_falling_back_to_saved_address",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_model_configuration::operation_catalog_tags_select_independent_dialects_and_invalid_metadata_never_publishes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_model_configuration",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_oauth_alias::oauth_display_alias_reaches_pkce_device_registry_logout_revoke_and_actual_model_without_renaming_source",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_oauth_alias",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_capabilities::all_builtin_summary_media_bindings_exactly_preserve_original_declarations_and_lanes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_capabilities",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::actual_local_run_settings_search_apply_target_agent_and_security_refusals",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::api_key_reveal_requires_both_scopes_and_discovery_secret_drafts_cannot_bypass",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::auxiliary_vision_http_tracks_same_gateway_catalog_binding_and_preferences_without_generation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::catalog_draft_mask_and_cache_never_publish_remote_models_or_count_usage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::health_pins_catalog_model_and_anthropic_connection_have_real_usage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::model_patch_and_removal_preserve_other_settings_and_stop_new_dispatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_http::provider_edits_deletes_and_reload_notify_real_applied_state_even_when_projection_fails",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_http",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_agnes_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_anthropic_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_baichuan_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_baidu_cloud_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_dashscope_coding_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_dashscope_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_deepseek_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_deepseek_responses_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_fireworks_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_gemini_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_groq_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_hunyuan_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_infini_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_kimi_coding_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_mimo_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_mimo_token_plan_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_minimax_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_minimax_token_plan_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_mistral_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_modelscope_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_moonshot_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_ollama_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_openai_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_opencode_go_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_opencode_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_openrouter_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_perplexity_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_siliconflow_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_stepfun_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_together_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_volcengine_coding_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_volcengine_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_xai_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_zhipu_coding_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::builtin_zhipu_rejects_invalid_requests",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_provider_matrix::every_builtin_chat_identity_dispatches_its_own_protocol_credentials_model_and_usage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_provider_matrix",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_search_clear::legacy_search_api_key_empty_and_null_clear_only_the_selected_provider_and_survive_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_search_clear",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_search_clear::mixed_models_search_projection_failure_keeps_applied_model_and_unapplied_search_after_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_search_clear",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_search_clear::mixed_models_search_validation_failure_reads_both_sections_and_unchanged_runtime",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_search_clear",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_search_clear::per_provider_search_clear_empty_and_null_remove_the_selected_key_without_legacy_resurrection",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_search_clear",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_search_clear::per_provider_search_clear_of_inactive_key_preserves_active_key_and_never_borrows_it_after_switch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_search_clear",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::applied_model_projection_error_still_notifies_current_model_consumers",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::corrupt_preferences_are_preserved_and_profile_writes_reject_symlinks",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::deleting_one_recent_workspace_keeps_the_other_workspace_and_other_agent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::existing_machine_default_workspace_get_and_ensure_do_not_depend_on_service_home_or_modify_user_files",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::export_import_roundtrip_preserves_masked_secrets_and_unmentioned_preferences",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::invalid_import_and_unknown_global_fields_never_write_any_preferences",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::one_global_edit_and_masked_search_edit_preserve_other_values_and_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::partial_global_save_still_emits_only_the_changes_that_really_happened",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::partial_proxy_and_editor_updates_publish_complete_saved_values_for_desktop_consumers",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::rejected_agent_provider_and_yuan_patches_do_not_save_global_values_first",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::remote_settings_scope_cannot_use_local_only_settings_archive",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::saved_proxy_credentials_never_leave_read_or_export_and_new_unsupported_credentials_are_refused",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::snapshots_and_default_exports_hide_all_saved_secret_shapes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::user_profile_parent_directory_link_cannot_redirect_reads_or_writes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_settings::workspace_history_uses_explicit_agent_and_profile_survives_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_settings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_skills_cards::card_http_is_bounded_local_only_sandboxed_and_rebuilt_after_real_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_skills_cards",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_skills_cards::character_card_default_zip_contains_no_configuration_secrets_and_bad_zip_creates_no_agent",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_skills_cards",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_skills_cards::external_paths_and_other_preferences_share_real_read_merge_write_and_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_skills_cards",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_skills_cards::external_skill_paths_reject_bad_input_and_corrupt_preferences_without_mutation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_skills_cards",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_skills_cards::real_run_show_card_reaches_real_component_registration_and_http_document",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_skills_cards",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_speech_bindings::http_publish_system_speech_reaches_same_operation_real_say_product_zero_transport_and_recognition_refusal",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_speech_bindings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t08_speech_bindings::http_publish_volcengine_speech_reaches_same_operation_actual_bigasr_credentials_and_usage",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t08_speech_bindings",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t09_client_context::bootstrap_and_models_project_real_context_without_secrets",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t09_client_context",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t09_client_context::credentials_and_scope_are_enforced",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t09_client_context",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t09_client_context::explicit_agent_and_session_targets_are_validated",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t09_client_context",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t09_client_context::unconfigured_plane_reports_empty_catalog_honestly",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t09_client_context",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t10_observability::r07_t10_closeout_settings_traces_storage_and_maintenance",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t10_observability",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t10_observability::r07_t10_query_page_aggregate_detail_export_import",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t10_observability",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t11_dev_entry_and_unload::r07_t11_dev_entry_matrix_rejects_every_caller",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t11_dev_entry_and_unload",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t11_dev_entry_and_unload::r07_t11_extension_boundaries_hold",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t11_dev_entry_and_unload",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t11_dev_entry_and_unload::r07_t11_unload_invalidates_pinned_handles",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t11_dev_entry_and_unload",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t12_closure::r07_t12_a23_runtime_route_matrix",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t12_closure",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t12_closure::r07_t12_a24_closed_loop_without_legacy_kernel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t12_closure",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_t12_closure::r07_t12_kernel_detector_catches_a_real_node_process",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_t12_closure",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::actual_search_cancel_waits_for_auxiliary_cleanup_and_stops_fallback_chain",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::all_five_http_providers_use_real_gateway_and_distinct_authentication",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::auto_all_failed_is_explicit_and_fixed_provider_never_silently_falls_back",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::auto_records_each_real_http_attempt_then_all_three_browser_page_diagnostics",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::provider_auth_redirect_and_rate_limit_keep_real_error_diagnostics",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::public_fetch_keeps_five_hop_guard_and_registers_readable_full_session_file",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::public_fetch_proxy_pin_limitation_is_explicit_without_sending_any_request",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_web_tools::verification_real_http_masks_same_provider_and_only_persists_after_success",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_web_tools",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::coverage::nondefault_mount_actions_upload_and_content_change_real_files",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::coverage::search_default_limit_with_more_than_eighty_real_matches",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::lease_settlement_failure_reports_landed_action_and_upload_without_fake_success",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::legacy_experiment_map_survives_snapshot_single_edit_and_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::mount_disable_retires_watch_and_subscription_before_returning",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::remote_writes_refuse_corrupt_or_unreadable_lease_registry_without_file_changes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::remote_writes_refuse_unwritable_lease_registry_before_mutation",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::resource_watch_shutdown_releases_resources_with_live_state_reference",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::workbench_actions_full_cycle",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::workbench_files_search_projection_and_guards",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::workbench_on_mount_root_end_to_end",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::workbench_scope_gate_and_remote_write_lease",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::workbench_upload_and_content",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workbench::r07_workbench::workspaces_list_create_disable_cycle",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workbench",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::activity_receipt_failure_never_blocks_real_cancel_or_fabricates_task_status",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::actual_http_activity_snapshot_checks_owner_and_survives_same_home_restart",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::actual_task_stop_route_joins_workflow_and_running_model",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::budget_tokens_stops_the_second_node",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::completed_journal_receipt_rejects_valid_prefix_truncation_and_same_bytes_replacement",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::completed_workflow_wakes_running_idle_loop_once_after_cleanup",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::damaged_resume_journal_is_rejected_without_rerunning_nodes",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::deleted_truncated_or_replaced_live_journal_refuses_resume_and_preserves_fault",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::fanout_dispatch_events_journal_and_completion_delivery",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::first_node_failure_cancels_parallel_blocked_sibling",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::invalid_meta_is_rejected_synchronously_at_dispatch",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::journal_write_failure_reports_unsafe_resume_and_unrelated_run_cannot_cancel",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::loop_parent_is_counted_only_after_its_real_terminal_not_child_completion",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::nested_and_outer_nodes_share_unique_sequences_and_refuse_unsafe_resume",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::node_write_folders_bind_actual_file_mutations_and_tool_filter",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::real_atomic_prompt_snapshot_writes_do_not_collide_under_os_thread_barrier",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::resume_requires_same_session_and_agent_before_reading_cached_results",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::resume_reuses_unchanged_nodes_and_reruns_from_first_change",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::workflow_without_live_node_does_not_hold_session_admission",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  },
+  {
+   "case": "r07_workflow::workflow::writefolders_matrix_is_fail_closed",
+   "expect": 1,
+   "actual": 1,
+   "ok": true,
+   "suite": "r07_workflow",
+   "suiteExitCode": 0
+  }
+ ]
+}

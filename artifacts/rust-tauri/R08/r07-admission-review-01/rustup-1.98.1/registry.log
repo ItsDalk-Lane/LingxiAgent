@@ -1,0 +1,53 @@
+
+running 1 test
+ADMISSION_TOOL_MISSING run_tools TargetNotFound { reference: "name \"run_tools\"" }
+ADMISSION_TOOL_MISSING run_code TargetNotFound { reference: "name \"run_code\"" }
+ADMISSION_TOOL_MISSING ast_grep TargetNotFound { reference: "name \"ast_grep\"" }
+ADMISSION_TOOL_MISSING lsp TargetNotFound { reference: "name \"lsp\"" }
+ADMISSION_TOOL_MISSING security_scan TargetNotFound { reference: "name \"security_scan\"" }
+test r07_t12_a24_closed_loop_without_legacy_kernel ... FAILED
+
+failures:
+
+failures:
+    r07_t12_a24_closed_loop_without_legacy_kernel
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+   Compiling lingxi-protocol v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-protocol)
+   Compiling lingxi-kernel v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-kernel)
+   Compiling lingxi-adapters v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-adapters)
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+   Compiling r08-admission-review v0.0.0 (/private/tmp/r08-r07-registry-review-198-4xn5v034)
+warning: method `json` is never used
+  --> tests/admission.rs:81:14
+   |
+47 | impl Server {
+   | ----------- method in this implementation
+...
+81 |     async fn json(&self, method: &str, path: &str, body: Option<Value>) -> (u16, Value) {
+   |              ^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `paths` is never read
+   --> tests/admission.rs:271:5
+    |
+269 | struct Stub {
+    |        ---- field in this struct
+270 |     addr: SocketAddr,
+271 |     paths: Arc<Mutex<Vec<String>>>,
+    |     ^^^^^
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `r08-admission-review` (test "admission") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 47s
+     Running tests/admission.rs (rust/target/debug/deps/admission-fab787ddabe37d80)
+
+thread 'r07_t12_a24_closed_loop_without_legacy_kernel' (10879191) panicked at tests/admission.rs:404:5:
+R07 claimed full-original tools missing from actual production registry: ["run_tools", "run_code", "ast_grep", "lsp", "security_scan"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `--test admission`

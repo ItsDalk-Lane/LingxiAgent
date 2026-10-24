@@ -1,0 +1,1 @@
+{"status":"PASS","tests":[{"name":"不同路径同名副本独立运行、真实数据根和子进程正确","status":"PASS"},{"name":"同根重复启动未开启第二服务，其他副本仍存活","status":"PASS"},{"name":"真实 Electron 路径别名与原根共用单实例锁","status":"PASS"},{"name":"正常退出清理各自服务、无残留写者","status":"PASS"}],"evidence":"/Users/study_superior/Desktop/Code/LingxiAgent/artifacts/rust-tauri/R08/isolation-review-live-01"}

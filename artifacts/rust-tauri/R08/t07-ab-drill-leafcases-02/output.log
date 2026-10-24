@@ -1,0 +1,31 @@
+PASS fixture gen
+PASS root-a prepared (knowledge integrity ok) :: ok
+PASS root-b migrated (T05 path)
+PASS kernel A (node) ready :: port=51861
+PASS kernel B (rust) ready :: 127.0.0.1:51893
+PASS suite ran on A (observations present) :: vitest exit=0
+PASS suite ran on B (observations present) :: vitest exit=1
+PASS [identity] parity
+PASS [sessions.list] parity
+RECORD [sessions.switch] recorded :: {"A":{"focused":false,"messages":null},"B":{"focused":true,"messages":null}}
+PASS [sessions.rename] parity
+PASS [sessions.pin] parity
+RECORD [sessions.create] recorded :: {"A":{"created":false,"delta":0},"B":{"created":false,"delta":0}}
+FAIL [sessions.archive] B-failed :: {"A":{"inArchive":true,"goneFromVisible":true,"restored":true,"backVisible":true,"deleted":true,"stillArchived":false},"B":"Cannot read properties of undefined (reading 'path')"}
+PASS [sessions.maintenance] parity
+PASS [sessions.capabilities] parity
+PASS [sessions.todos] parity
+PASS [permissions.default] parity
+PASS [preferences.appearance] parity
+PASS [error-path.unauthorized] parity
+PASS [error-path.not-found] parity
+FAIL [drift-guard] differs :: {"A":{"count":0,"titles":[]},"B":{"count":2,"titles":["ab-real-alpha","ab-real-beta"]}}
+FAIL [leaf.rename.negative] differs :: {"A":{"emptyRejected":true,"emptyStatus":400,"invalidRejected":true,"invalidStatus":403},"B":{"emptyRejected":false,"invalidRejected":false,"skipped":true}}
+PASS [leaf.pin.negative] parity
+PASS [leaf.todos.negative] parity
+FAIL [leaf.cleanup.boundary] differs :: {"A":{"keptDeletedIsNumber":true,"freshKept":true,"purgedOk":false,"expiringGone":false},"B":{"freshKept":false,"purgedAtLeastOne":false,"expiringGone":false,"skipped":true}}
+FAIL [leaf.list.fields] differs :: {"A":{"hasKeys":false,"hasRevision":false,"hasOwner":false,"keys":[]},"B":{"hasKeys":true,"hasRevision":true,"hasOwner":true,"keys":["activeRuns","agentId","agentName","authorizedFolders","cwd","forkedFrom","hasDisplayMessages","hasSummary","loopStatus","memor
+PASS [leaf.permissions.read-idempotent] parity
+PASS harness integrity: both suites produced observations
+AB_RESULT tasks=21 parity=14 differs=4 recorded=2 failedA=0 failedB=1 out=/private/tmp/t07-ab-leafcases-02/out
+T07 AB OK

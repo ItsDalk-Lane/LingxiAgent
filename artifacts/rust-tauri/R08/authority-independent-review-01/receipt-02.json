@@ -1,0 +1,13 @@
+{
+  "status": "FAIL_NOT_CLOSED",
+  "clarifiedAt": "2026-10-21T16:47:41.064669+00:00",
+  "reason": "2026-10-22：严格区分源码样本与具名旧日志；不将无完整来源绑定的旧PTC日志认证为当前候选；超时沿原预算入口，不新增每轮等满10分钟判据。",
+  "strictPtcBoundaryPresentInBoundSnapshot": true,
+  "independentBusinessTests": "NOT_EXECUTED_WAITING_CARGO_WINDOW",
+  "files": {
+    "docs/rust-tauri/R08/ADMISSION_AUTHORITY_INDEPENDENT_REVIEW.md": "43a3c543a2214fb7f6b6a189cbc9cf0e0f0c46875e0fea3baf6ec1d03a106f74",
+    "docs/rust-tauri/R08/ADMISSION_AUTHORITY_INDEPENDENT_REVIEW.json": "45b10b5f14712bd060b0cfc15f976f9f23c932ae313151f4f6a608e5fc105d77",
+    "artifacts/rust-tauri/R08/authority-independent-review-01/findings-clarified.json": "45b10b5f14712bd060b0cfc15f976f9f23c932ae313151f4f6a608e5fc105d77",
+    "artifacts/rust-tauri/R08/authority-independent-review-01/review-before-clarification.md": "e53af7ecf4b9113d5f13e0f360b8307fab67256e83f8d64f61437a9cebc2000a"
+  }
+}

@@ -1,0 +1,14 @@
+ok full: exit 0
+ok full: CUTOVER_RESULT present
+ok full: outcome=committed phase=committed
+ok full: journal.phase == committed
+ok full: nine phases ok in order + committed terminal state
+ok full: no refused entry
+ok full: pointer valid
+ok full: target stamp epoch 2 (R08_CUTOVER)
+ok full: ruling in work-dir
+ok full: ruling copy in target legacy-import/
+ok full: ruling copy byte-equal
+ok full: ruling fields (schema/cutoverId/strategy/sharedWrites/enforcement×3)
+ok full: legacy root byte-equal (zero-mutation red line)
+D2_RESULT {"verdict":"PASS","leg":"full"}

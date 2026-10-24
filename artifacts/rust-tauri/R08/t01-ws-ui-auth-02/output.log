@@ -1,0 +1,189 @@
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "auth_matrix") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.50s
+     Running tests/auth_matrix.rs (rust/target/debug/deps/auth_matrix-4259d784f9d21350)
+
+running 25 tests
+test a05_loopback_mode_refuses_non_loopback_bind_at_config_layer ... ok
+test r00_account_password_web_cookie_and_logout_have_real_state ... FAILED
+test a05_ws_late_client_write_after_server_close_keeps_frames_intact ... FAILED
+test a05_forged_and_unknown_session_ids ... FAILED
+test a06_cli_shape_full_business_roundtrip ... FAILED
+test device_registry_failure_is_not_reported_as_bad_credentials ... FAILED
+test a05_no_credential_is_rejected_without_side_effects ... FAILED
+test limits_body_size_and_rate_and_ws_ceiling ... FAILED
+test a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer ... FAILED
+test a06_origin_matrix_http ... FAILED
+test agent_config_get_requires_settings_read_scope_without_side_effects ... FAILED
+test a05_live_device_status_and_expiry_changes_take_effect ... FAILED
+test a06_invalid_ws_upgrade_keeps_its_protocol_status ... FAILED
+test r00_access_devices_pairing_thinking_qr_and_static_boundaries ... FAILED
+test a07_closed_storage_returns_http_error_without_run_or_completion_event ... FAILED
+test a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects ... FAILED
+test a05_forged_principal_fields_are_ignored_not_trusted ... FAILED
+test a06_unmasked_client_frame_closes_with_protocol_error ... FAILED
+test a06_expired_and_replayed_ws_tickets_are_rejected ... FAILED
+test a06_trailing_slashes_do_not_inherit_registered_route_permissions ... FAILED
+test a05_cross_principal_session_misuse_is_forbidden_without_side_effects ... FAILED
+test a06_ws_origin_and_host_matrix ... FAILED
+test a05_ws_ticket_and_live_socket_observe_external_revocation ... FAILED
+test a06_host_header_tampering_is_rejected ... FAILED
+test a05_unreadable_registry_fails_closed_and_recovers ... FAILED
+
+failures:
+
+---- r00_account_password_web_cookie_and_logout_have_real_state stdout ----
+
+thread 'r00_account_password_web_cookie_and_logout_have_real_state' (12710830) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_ws_late_client_write_after_server_close_keeps_frames_intact stdout ----
+
+thread 'a05_ws_late_client_write_after_server_close_keeps_frames_intact' (12710815) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_forged_and_unknown_session_ids stdout ----
+
+thread 'a05_forged_and_unknown_session_ids' (12710808) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_cli_shape_full_business_roundtrip stdout ----
+
+thread 'a06_cli_shape_full_business_roundtrip' (12710817) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- device_registry_failure_is_not_reported_as_bad_credentials stdout ----
+
+thread 'device_registry_failure_is_not_reported_as_bad_credentials' (12710827) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_no_credential_is_rejected_without_side_effects stdout ----
+
+thread 'a05_no_credential_is_rejected_without_side_effects' (12710813) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- limits_body_size_and_rate_and_ws_ceiling stdout ----
+
+thread 'limits_body_size_and_rate_and_ws_ceiling' (12710828) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer stdout ----
+
+thread 'a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer' (12710812) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- a06_origin_matrix_http stdout ----
+
+thread 'a06_origin_matrix_http' (12710821) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- agent_config_get_requires_settings_read_scope_without_side_effects stdout ----
+
+thread 'agent_config_get_requires_settings_read_scope_without_side_effects' (12710826) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_live_device_status_and_expiry_changes_take_effect stdout ----
+
+thread 'a05_live_device_status_and_expiry_changes_take_effect' (12710810) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_invalid_ws_upgrade_keeps_its_protocol_status stdout ----
+
+thread 'a06_invalid_ws_upgrade_keeps_its_protocol_status' (12710820) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- r00_access_devices_pairing_thinking_qr_and_static_boundaries stdout ----
+
+thread 'r00_access_devices_pairing_thinking_qr_and_static_boundaries' (12710829) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a07_closed_storage_returns_http_error_without_run_or_completion_event stdout ----
+
+thread 'a07_closed_storage_returns_http_error_without_run_or_completion_event' (12710825) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects stdout ----
+
+thread 'a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects' (12710807) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_forged_principal_fields_are_ignored_not_trusted stdout ----
+
+thread 'a05_forged_principal_fields_are_ignored_not_trusted' (12710809) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_unmasked_client_frame_closes_with_protocol_error stdout ----
+
+thread 'a06_unmasked_client_frame_closes_with_protocol_error' (12710823) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_expired_and_replayed_ws_tickets_are_rejected stdout ----
+
+thread 'a06_expired_and_replayed_ws_tickets_are_rejected' (12710818) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_trailing_slashes_do_not_inherit_registered_route_permissions stdout ----
+
+thread 'a06_trailing_slashes_do_not_inherit_registered_route_permissions' (12710822) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_cross_principal_session_misuse_is_forbidden_without_side_effects stdout ----
+
+thread 'a05_cross_principal_session_misuse_is_forbidden_without_side_effects' (12710806) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_ws_origin_and_host_matrix stdout ----
+
+thread 'a06_ws_origin_and_host_matrix' (12710824) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_ws_ticket_and_live_socket_observe_external_revocation stdout ----
+
+thread 'a05_ws_ticket_and_live_socket_observe_external_revocation' (12710816) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a06_host_header_tampering_is_rejected stdout ----
+
+thread 'a06_host_header_tampering_is_rejected' (12710819) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+---- a05_unreadable_registry_fails_closed_and_recovers stdout ----
+
+thread 'a05_unreadable_registry_fails_closed_and_recovers' (12710814) panicked at crates/lingxi-service/tests/auth_matrix.rs:94:6:
+bootstrap: Storage(InvalidRequest { detail: "MCP 原始只读目录不可用" })
+
+
+failures:
+    a05_cross_principal_session_misuse_is_forbidden_without_side_effects
+    a05_expired_and_revoked_device_credentials_are_rejected_without_side_effects
+    a05_forged_and_unknown_session_ids
+    a05_forged_principal_fields_are_ignored_not_trusted
+    a05_live_device_status_and_expiry_changes_take_effect
+    a05_loopback_token_over_nonlocal_transport_is_denied_at_policy_layer
+    a05_no_credential_is_rejected_without_side_effects
+    a05_unreadable_registry_fails_closed_and_recovers
+    a05_ws_late_client_write_after_server_close_keeps_frames_intact
+    a05_ws_ticket_and_live_socket_observe_external_revocation
+    a06_cli_shape_full_business_roundtrip
+    a06_expired_and_replayed_ws_tickets_are_rejected
+    a06_host_header_tampering_is_rejected
+    a06_invalid_ws_upgrade_keeps_its_protocol_status
+    a06_origin_matrix_http
+    a06_trailing_slashes_do_not_inherit_registered_route_permissions
+    a06_unmasked_client_frame_closes_with_protocol_error
+    a06_ws_origin_and_host_matrix
+    a07_closed_storage_returns_http_error_without_run_or_completion_event
+    agent_config_get_requires_settings_read_scope_without_side_effects
+    device_registry_failure_is_not_reported_as_bad_credentials
+    limits_body_size_and_rate_and_ws_ceiling
+    r00_access_devices_pairing_thinking_qr_and_static_boundaries
+    r00_account_password_web_cookie_and_logout_have_real_state
+
+test result: FAILED. 1 passed; 24 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.93s
+
+error: test failed, to rerun pass `-p lingxi-service --test auth_matrix`

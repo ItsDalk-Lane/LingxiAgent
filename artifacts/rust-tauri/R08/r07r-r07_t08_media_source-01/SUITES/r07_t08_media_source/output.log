@@ -1,0 +1,16 @@
+
+running 2 tests
+test media_http_source_crud_same_operations_actual_generation_restart_and_projection_corruption ... ok
+test media_source_queued_revocation_and_stale_edit_cannot_resurrect_deleted_model ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.76s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t08_media_source") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running tests/r07_t08_media_source.rs (rust/target/debug/deps/r07_t08_media_source-2027305e6e790a3b)

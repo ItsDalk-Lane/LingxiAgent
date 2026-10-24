@@ -1,0 +1,29 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/r06_ar_f03_operations.rs (target/debug/deps/r06_ar_f03_operations-ff5696a185d09fa0)
+
+running 21 tests
+test real_http_disconnect_cancels_only_its_drive_and_reclaims_provider_socket ... ok
+test actual_native_write_cancel_retains_admission_until_blocking_exit ... ok
+test actual_child_keeps_parent_admission_until_exit ... ok
+test real_gateway_cooperative_cancel_releases_after_actual_task_exit ... ok
+test subagent_exact_parent_scope_and_settled_parent_are_enforced ... ok
+test actual_native_edit_cancel_retains_admission_until_blocking_exit ... ok
+test same_database_constructor_and_instance_contract ... ok
+test actual_different_agent_child_keeps_exact_parent_permit ... ok
+test public_direct_drive_obeys_actual_same_database_admission ... ok
+test direct_driver_fake_agent_and_child_have_zero_effects ... ok
+test slow_model_does_not_block_independent_session_or_metadata ... ok
+test actual_resourceio_owned_write_cancel_retains_until_fifo_exit ... ok
+test direct_driver_independent_database_reentry_and_release ... ok
+test positive_and_fork_event_atomicity ... ok
+test public_borrowed_submission_rejects_mixed_real_database_before_effects ... ok
+test retired_seed_identity_stays_deleted_and_no_journal_reuse_is_preserved ... ok
+test local_owner_cross_session_owner_child_and_foreign_before_busy_are_preserved ... ok
+test authenticated_barrier_rewind_execute_and_cancelled_waiter ... ok
+test completed_fork_replay_conflict_and_recovered_event_are_consistent ... ok
+test latest_permission_and_lifecycle_are_rechecked_before_commit ... ok
+test unknown_file_effect_survives_storage_failure_restart_and_replay ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.86s
+
+CARGO_EXIT=0

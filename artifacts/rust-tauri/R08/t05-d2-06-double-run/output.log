@@ -1,0 +1,19 @@
+ok double-run:first: exit 0
+ok double-run:first: CUTOVER_RESULT present
+ok double-run:first: outcome=committed phase=committed
+ok double-run:first: journal.phase == committed
+ok double-run:first: nine phases ok in order + committed terminal state
+ok double-run:first: no refused entry
+ok double-run:first: pointer valid
+ok double-run:first: target stamp epoch 2 (R08_CUTOVER)
+ok double-run:first: ruling in work-dir
+ok double-run:first: ruling copy in target legacy-import/
+ok double-run:first: ruling copy byte-equal
+ok double-run:first: ruling fields (schema/cutoverId/strategy/sharedWrites/enforcement×3)
+ok double-run:first: legacy root byte-equal (zero-mutation red line)
+FAIL double-run: rerun exit 0 (committed idempotent) :: status=2 stderr=error: migrate: journal /private/tmp/t05d2-matrix/d2-double-run-VRItEH/work/journal.json already exists (cutoverId "cut-1792737721750-65128", phase "committed"); pass --resume <cutoverId> to continue (double-run guard)
+FAIL double-run: rerun outcome=committed :: 
+ok double-run: target tree unchanged after rerun
+SCRATCH_KEPT /private/tmp/t05d2-matrix/d2-double-run-VRItEH
+D2_RESULT {"verdict":"FAIL","leg":"double-run","failures":["double-run: rerun exit 0 (committed idempotent)","double-run: rerun outcome=committed"]}
+D2_EXIT=1

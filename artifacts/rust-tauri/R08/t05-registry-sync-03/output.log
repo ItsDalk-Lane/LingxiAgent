@@ -1,0 +1,5 @@
+code-side V27: name=r08_legacy_import_bookkeeping sha256(SQL)=1c317b4249efb63ceca729a9dd27050dc101c83d7d83b69f30dd2fd7b04cd654
+code-side V28: name=r08_legacy_import_extensions_registry sha256(SQL)=a82dacc2305bdffbfc4d339aceb2673cea84e07de226cd7e0d6a186d9ac1eaf4
+on-disk receipt v27: name=r08_legacy_import_bookkeeping fingerprint=1c317b4249efb63ceca729a9dd27050dc101c83d7d83b69f30dd2fd7b04cd654
+on-disk receipt v28: name=r08_legacy_import_extensions_registry fingerprint=a82dacc2305bdffbfc4d339aceb2673cea84e07de226cd7e0d6a186d9ac1eaf4
+userVersion 28 receipts==compiledIn: True

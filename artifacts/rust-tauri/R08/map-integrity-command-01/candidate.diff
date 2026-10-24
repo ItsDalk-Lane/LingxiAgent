@@ -1,0 +1,142 @@
+diff --git a/desktop/src/shared/single-instance-lock.cjs b/desktop/src/shared/single-instance-lock.cjs
+index 8bf4f7fbe..2173d05ac 100644
+--- a/desktop/src/shared/single-instance-lock.cjs
++++ b/desktop/src/shared/single-instance-lock.cjs
+@@ -7,6 +7,32 @@
+  * redirected to the first client.
+  */
+ const path = require("path");
++const fs = require("fs");
++
++function canonicalHome(home) {
++  let existing = path.resolve(home);
++  const missing = [];
++  while (!fs.existsSync(existing)) {
++    missing.unshift(path.basename(existing));
++    const parent = path.dirname(existing);
++    if (parent === existing) throw new Error("无法确认桌面数据目录的真实位置");
++    existing = parent;
++  }
++  return path.join(fs.realpathSync(existing), ...missing);
++}
++
++function getClientUserDataPath(lingxiHome, defaultHome, appData) {
++  const resolved = path.resolve(lingxiHome);
++  const parent = path.dirname(path.resolve(defaultHome));
++  const standardHomes = [defaultHome, ...[".lingxi", ".lingxi-dev", ".hanako-dev"].map(name => path.join(parent, name))];
++  const actualHome = canonicalHome(resolved);
++  const standardHome = standardHomes.find(home => normalizeForCompare(canonicalHome(home)) === normalizeForCompare(actualHome));
++  // 默认安装和默认开发目录延续原缓存位置；显式副本的缓存也留在副本内。
++  if (standardHome) {
++    return path.join(appData, getUserDataAppName(standardHome, defaultHome));
++  }
++  return path.join(actualHome, ".electron-user-data");
++}
+ 
+ function normalizeForCompare(filePath) {
+   const resolved = path.resolve(filePath);
+@@ -40,10 +66,7 @@ function focusExistingWindow(win) {
+ 
+ function configureClientSingleInstance(app, opts) {
+   const { lingxiHome, defaultHome, onSecondInstance } = opts;
+-  const appName = getUserDataAppName(lingxiHome, defaultHome);
+-  if (appName) {
+-    app.setPath("userData", path.join(app.getPath("appData"), appName));
+-  }
++  app.setPath("userData", getClientUserDataPath(lingxiHome, defaultHome, app.getPath("appData")));
+ 
+   const gotLock = app.requestSingleInstanceLock({ lingxiHome });
+   if (!gotLock) {
+@@ -61,4 +84,5 @@ module.exports = {
+   configureClientSingleInstance,
+   focusExistingWindow,
+   getUserDataAppName,
++  getClientUserDataPath,
+ };
+diff --git a/scripts/dev-env.js b/scripts/dev-env.js
+index 82c6072a9..769ba83ed 100644
+--- a/scripts/dev-env.js
++++ b/scripts/dev-env.js
+@@ -1,5 +1,6 @@
+ import { homedir } from "node:os";
+ import { join } from "node:path";
++import runtimePaths from "../shared/hana-runtime-paths.cjs";
+ 
+ export function defaultDevLingxiHome() {
+   return join(homedir(), ".lingxi-dev");
+@@ -8,7 +9,8 @@ export function defaultDevLingxiHome() {
+ export function applyDevEnvironment(env = process.env, {
+   nodeBin = process.execPath,
+ } = {}) {
+-  env.LINGXI_HOME = defaultDevLingxiHome();
++  // 显式指定的演练副本优先；只有未指定时才使用原开发目录。
++  env.LINGXI_HOME = runtimePaths.resolveLingxiHome(env.LINGXI_HOME || defaultDevLingxiHome());
+   env.LINGXI_DEV_NODE_BIN = nodeBin;
+   return env;
+ }
+diff --git a/tests/desktop-single-instance-lock.test.ts b/tests/desktop-single-instance-lock.test.ts
+index d8da55128..8ebad765d 100644
+--- a/tests/desktop-single-instance-lock.test.ts
++++ b/tests/desktop-single-instance-lock.test.ts
+@@ -1,9 +1,12 @@
+ import { describe, expect, it, vi } from "vitest";
+ import path from "path";
++import fs from "fs";
++import os from "os";
+ 
+ import {
+   configureClientSingleInstance,
+   focusExistingWindow,
++  getClientUserDataPath,
+ } from "../desktop/src/shared/single-instance-lock.cjs";
+ 
+ function makeApp({ gotLock = true } = {}) {
+@@ -25,6 +28,30 @@ function makeApp({ gotLock = true } = {}) {
+ }
+ 
+ describe("desktop client single instance lock", () => {
++  it("不同位置的同名副本不共用缓存或单实例空间，路径别名仍指向同一空间", () => {
++    const root = fs.mkdtempSync(path.join(os.tmpdir(), "r08-client-isolation-"));
++    try {
++      const a = path.join(root, "a", "copy");
++      const b = path.join(root, "b", "copy");
++      fs.mkdirSync(a, { recursive: true });
++      fs.mkdirSync(b, { recursive: true });
++      const alias = path.join(root, "alias");
++      fs.symlinkSync(a, alias, "junction");
++      const defaults = path.join(root, ".hanako");
++      const namespace = (home: string) => getClientUserDataPath(home, defaults, path.join(root, "appData"));
++      expect(namespace(a)).not.toBe(namespace(b));
++      expect(namespace(a)).toBe(namespace(alias));
++      expect(namespace(a)).toBe(path.join(fs.realpathSync(a), ".electron-user-data"));
++      const standard = path.join(root, ".lingxi-dev");
++      fs.mkdirSync(standard);
++      const standardAlias = path.join(root, "standard-alias");
++      fs.symlinkSync(standard, standardAlias, "junction");
++      expect(namespace(standardAlias)).toBe(namespace(standard));
++      expect(namespace(standard)).toBe(path.join(root, "appData", "Lingxi-dev"));
++    } finally {
++      fs.rmSync(root, { recursive: true, force: true });
++    }
++  });
+   it("sets the dev userData namespace before requesting the lock", () => {
+     const { app } = makeApp();
+     const defaultHome = path.join("C:", "Users", "me", ".hanako");
+diff --git a/tests/startup-contract.test.ts b/tests/startup-contract.test.ts
+index a0718df14..a956ad987 100644
+--- a/tests/startup-contract.test.ts
++++ b/tests/startup-contract.test.ts
+@@ -30,6 +30,13 @@ describe("local startup contract", () => {
+     expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/hana-node");
+   });
+ 
++  it("保留显式演练目录并将同一绝对路径传给子进程", () => {
++    const env = applyDevEnvironment({ LINGXI_HOME: "/tmp/r08-copy/home" }, { nodeBin: "/tmp/test-node" });
++    expect(env.LINGXI_HOME).toBe("/tmp/r08-copy/home");
++    expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/test-node");
++    expect(applyDevEnvironment({}).LINGXI_HOME).toMatch(/\.lingxi-dev$/);
++  });
++
+   it("server keeps Pi SDK runtime paths explicit and CLI stays server-first", () => {
+     const cliSource = fs.readFileSync(path.join(ROOT, "index.js"), "utf-8");
+     const cliEntrySource = fs.readFileSync(path.join(ROOT, "cli", "entry.ts"), "utf-8");

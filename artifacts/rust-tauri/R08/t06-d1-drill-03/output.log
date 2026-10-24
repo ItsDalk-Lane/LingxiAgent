@@ -1,0 +1,16 @@
+PASS fixture gen exit 0
+PASS migrate exit 0 :: CUTOVER_RESULT cutoverId=cut-1792757527755-45846 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/t06-d1-drill-03/rollback-work/single-writer-ruling.json
+
+PASS migrate committed :: CUTOVER_RESULT cutoverId=cut-1792757527755-45846 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/t06-d1-drill-03/rollback-work/single-writer-ruling.json
+
+PASS standin worker emitted
+FAIL sessions/new 2xx :: 404 {"error":"agent not found or unsafe configuration path: a1"}
+FAIL sessionId present :: {"error":"agent not found or unsafe configuration path: a1"}
+FAIL attachments/local 2xx :: 404 {"code":"not_found","details":{"causeId":"resource.not_found","requestId":"req-e76bef3a2ae2175bb7ef05850ff61a94"},"message":"resource not found","retryable":false}
+PASS preferences/appearance PUT 2xx :: 200 {"appearance":{"theme":"t06-d1-edit"},"ok":true}
+FAIL bridge config 2xx :: 400 {"error":"agent not found or unsafe configuration path: a1","ok":false}
+FAIL bridge owner 2xx :: 400 {"error":"agent not found or unsafe configuration path: a1","ok":false}
+FAIL bridge config 2xx :: 400 {"error":"agent not found or unsafe configuration path: a1","ok":false}
+D1_ABORT Error: timeout: sentinel rows settled (confirmed/unknown/started)
+    at until (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d1_drill.mjs:55:9)
+    at async file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t06_d1_drill.mjs:179:1

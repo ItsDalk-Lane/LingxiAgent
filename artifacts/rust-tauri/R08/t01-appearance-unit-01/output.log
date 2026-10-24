@@ -1,0 +1,33 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts [ desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts ]
+Error: Transform failed with 1 error:
+/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts:416:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/hooks/use-hana-fetch.test.ts:416:0
+  
+  Unexpected end of file
+  414 |    });
+  415 |  });
+  416 |  
+      |  ^
+  
+ ❯ failureErrorWithLog node_modules/esbuild/lib/main.js:1748:15
+ ❯ node_modules/esbuild/lib/main.js:1017:50
+ ❯ responseCallbacks.<computed> node_modules/esbuild/lib/main.js:884:9
+ ❯ handleIncomingPacket node_modules/esbuild/lib/main.js:939:12
+ ❯ Socket.readFromStdout node_modules/esbuild/lib/main.js:862:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  13:59:59
+   Duration  122ms (transform 20ms, setup 25ms, import 0ms, tests 0ms, environment 0ms)
+

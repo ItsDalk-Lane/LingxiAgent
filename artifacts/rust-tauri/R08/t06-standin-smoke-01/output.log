@@ -1,0 +1,17 @@
+STANDIN_READY port=47613 scratch=/private/tmp/t06-standin-smoke-01
+STANDIN_WORKER /private/tmp/t06-standin-smoke-01/t06-standin-worker.cjs
+STANDIN_COUNTER_RESUMED count=0
+{"ok":true,"port":47613}
+{"ok":true,"messageId":"t06-standin-1"}
+{"ok":true,"messageId":null}
+{"platformSendCount":2,"receiptCounter":1}
+{"id":"t06-standin-chatcmpl","object":"chat.completion","created":0,"model":"m","choices":[{"index":0,"message":{"role":"assistant","content":"T06 确定性回信：已收到「你好」。本回复�
+{"ok":true}--- restart: counter persists ---
+STANDIN_READY port=47613 scratch=/private/tmp/t06-standin-smoke-01
+STANDIN_WORKER /private/tmp/t06-standin-smoke-01/t06-standin-worker.cjs
+STANDIN_COUNTER_RESUMED count=2
+{"platformSendCount":2,"receiptCounter":1}
+standin-journal.jsonl
+standin-state.json
+t06-standin-worker.cjs
+{"ok":true}STANDIN_SMOKE_DONE

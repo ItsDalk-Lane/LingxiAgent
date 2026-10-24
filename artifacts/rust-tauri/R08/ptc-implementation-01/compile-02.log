@@ -1,0 +1,9 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.18s
+  Executable tests/r08_admission_ptc.rs (rust/target/debug/deps/r08_admission_ptc-5d41adb521f581e6)
+  Executable tests/r08_admission_run_code.rs (rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455)

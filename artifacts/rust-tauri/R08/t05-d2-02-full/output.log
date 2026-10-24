@@ -1,0 +1,16 @@
+ok full: exit 0
+ok full: CUTOVER_RESULT present
+ok full: outcome=committed phase=committed
+ok full: journal.phase == committed
+FAIL full: ten phases ok in order :: ["preflight","stop_write_probe","quiesce_snapshot","backup","import","import_verify","epoch_adopt","pointer_switch","selfcheck"]
+ok full: no refused entry
+ok full: pointer valid
+ok full: target stamp epoch 2 (R08_CUTOVER)
+ok full: ruling in work-dir
+ok full: ruling copy in target legacy-import/
+ok full: ruling copy byte-equal
+ok full: ruling fields (schema/cutoverId/strategy/sharedWrites/enforcement×3)
+ok full: legacy root byte-equal (zero-mutation red line)
+SCRATCH_KEPT /private/tmp/t05d2-matrix/d2-full-CieUn8
+D2_RESULT {"verdict":"FAIL","leg":"full","failures":["full: ten phases ok in order"]}
+D2_EXIT=1

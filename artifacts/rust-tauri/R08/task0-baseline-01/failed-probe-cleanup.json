@@ -1,0 +1,17 @@
+[
+  {
+    "pid": 40944,
+    "kind": "electron",
+    "round": "02",
+    "action": "SIGKILL",
+    "reason": "此前失败探针正常终止未完成；仅本轮已记录进程"
+  },
+  {
+    "pid": 42242,
+    "kind": "rust",
+    "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-1kwioo/a/copy",
+    "round": "04",
+    "action": "SIGKILL",
+    "reason": "此前失败探针正常终止未完成；仅本轮已记录进程"
+  }
+]

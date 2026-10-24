@@ -1,0 +1,372 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ✓ desktop/src/react/__tests__/components/slash-apply-completion.test.ts (7 tests) 1915ms
+ ✓ desktop/src/react/__tests__/components/slash-submit-selection.test.ts (7 tests) 1894ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-diary.test.ts (3 tests) 1976ms
+     ✓ runs diary writing in the background and reports progress through toast  1923ms
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ ✓ desktop/src/react/__tests__/components/TerminalCard.test.tsx (5 tests) 578ms
+     ✓ 默认展开直接见运行中的终端，点击可折叠  430ms
+ ✓ desktop/src/react/__tests__/components/thinking-level-button.test.tsx (6 tests) 420ms
+Not implemented: Window's scrollTo() method
+ ✓ desktop/src/react/__tests__/components/WelcomeScreen.test.tsx (17 tests) 692ms
+     ✓ groups primary workspace selection before extra folders  304ms
+ ✓ desktop/src/react/__tests__/components/GitChangesModal.test.tsx (16 tests) 481ms
+stderr | desktop/src/react/__tests__/components/ToolGroupBlock.test.tsx > ToolGroupBlock > 别名与面板标题维持现状：exec_command / write_stdin 叫 Bash，清单工具叫任务
+[todo-compat] 丢弃损坏的 todo item: { content: '读 spec', status: 'in_progress' }
+
+ ✓ desktop/src/react/__tests__/components/SkillsPanel.test.tsx (7 tests) 563ms
+     ✓ installs dropped skills for the selected agent, returns to all skills, and highlights the installed row  333ms
+ ✓ desktop/src/react/__tests__/components/ToolGroupBlock.test.tsx (42 tests) 531ms
+ ✓ desktop/src/react/__tests__/components/MessageActivity.test.tsx (21 tests) 514ms
+ ✓ desktop/src/react/__tests__/components/SessionListContextMenu.test.tsx (29 tests) 684ms
+stderr | desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > keeps the send alive as file-only when reading image bytes fails (#1647)
+[input] failed to read image attachment Error: failed to read image attachment: /tmp/hana/session-files/pasted.png
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:355:17)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2110:7
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2150:5
+
+ ✓ desktop/src/react/__tests__/components/RuntimeInfoCapsule.test.tsx (4 tests) 690ms
+     ✓ expands into one unified container holding jian, terminal, workflow, agent, status and git env (todo list moved above the input)  381ms
+ ✓ desktop/src/react/__tests__/components/PreviewEditor.block-handles.test.tsx (32 tests) 716ms
+     ✓ opens the shared menu with the clicked top-level block as its target  342ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:442:49)
+    at Object.Mock [as readFileBase64] (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:400:40)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:448:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:442:49)
+    at Object.Mock [as readFileBase64] (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:372:40)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:469:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/PreviewEditor.file-sync.test.tsx (23 tests) 604ms
+stderr | desktop/src/react/__tests__/components/InputArea.media-send.test.tsx > InputArea media send > rejects spoofed video content before WebSocket send
+[input] failed to read video attachment Error: unsupported or oversized video: clip.mp4
+    at prepareComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:406:19)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2110:7
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/InputArea.tsx:2150:5
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:618:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:584:8)
+    at Module.sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:619:20
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:660:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:584:8)
+    at Module.sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:663:20
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:751:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:584:8)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:754:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/ArchivedSessionsModal.test.tsx (25 tests) 939ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:912:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/composer-send.ts:584:8)
+    at sendWithLease (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at Module.flushQueuedHeadNow (/Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:915:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ✓ desktop/src/react/__tests__/components/KnowledgePage.test.tsx (10 tests) 915ms
+     ✓ opens a source action menu and previews original blocks from it  349ms
+ ✓ desktop/src/react/__tests__/components/InputArea.media-send.test.tsx (18 tests) 408ms
+ ✓ desktop/src/react/__tests__/components/GitGraphPanel.test.tsx (20 tests) 858ms
+ ✓ desktop/src/react/__tests__/components/InputArea.paste-and-slash.test.tsx (18 tests) 507ms
+ ✓ desktop/src/react/__tests__/components/ChatSearchOverlay.test.tsx (6 tests) 1223ms
+     ✓ routes title hits through switchSession and content hits through locateSearchHit  471ms
+ ✓ desktop/src/react/__tests__/components/RightWorkspacePanel.test.tsx (25 tests) 538ms
+ ✓ desktop/src/react/__tests__/components/DeskSection.test.tsx (29 tests) 1646ms
+     ✓ watches the workspace root plus expanded folders and reloads visible dirty tree keys from workspace events  952ms
+     ✓ marks the right workspace card with the Jian drawer state for overlay layout  306ms
+ ✓ desktop/src/react/__tests__/components/FloatingActions.cover-gallery.test.tsx (11 tests) 1057ms
+     ✓ does not start Agent generation when the generation menu item is disabled  546ms
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts (23 tests | 1 failed) 871ms
+     × Rust wire 只有握手时拒绝旧聊天帧且不清空输入 96ms
+     ✓ S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 30ms
+     ✓ S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 5ms
+     ✓ S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+     ✓ S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 26ms
+     ✓ S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 7ms
+     ✓ S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 66ms
+     ✓ S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 3ms
+     ✓ S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 2ms
+     ✓ S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 2ms
+     ✓ S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 4ms
+     ✓ S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 3ms
+     ✓ S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 4ms
+     ✓ S13：带首行空格与末尾换行的输入，快照逐字符保留 16ms
+     ✓ S14：首页 ensureSession 期间重复点击，只创建/提交一次 21ms
+     ✓ S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 2ms
+     ✓ P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 7ms
+     ✓ P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 13ms
+     ✓ P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 10ms
+     ✓ R03-03：点击编辑同步取消慢附件，保存后仅提交新正文  415ms
+     ✓ R03-05：点击取消保留原 blocked 状态与正文 28ms
+   ✓ R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 34ms
+   ✓ R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 76ms
+ ✓ desktop/src/react/__tests__/components/context-ring.test.tsx (17 tests) 1403ms
+     ✓ identifies instant simple compaction in the ring tooltip  515ms
+     ✓ shows a tooltip for the update action  508ms
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+stderr | desktop/src/react/__tests__/components/ModelSelector.test.tsx > ModelSelector > surfaces the model-switch response body when the server rejects an unavailable provider model
+[model] switch failed: Error: Model not found: minimax-token-plan/MiniMax-M2.7
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/input/ModelSelector.tsx:116:28
+
+ ✓ desktop/src/react/__tests__/components/ModelSelector.test.tsx (9 tests) 425ms
+Not implemented: Window's scrollTo() method
+ ✓ desktop/src/react/__tests__/components/KnowledgeRetrievalFold.test.tsx (26 tests) 489ms
+Not implemented: Window's scrollTo() method
+ ✓ desktop/src/react/__tests__/components/ProcessFoldBlock.test.tsx (5 tests) 479ms
+ ✓ desktop/src/react/__tests__/components/SessionCollabDraftCard.test.tsx (23 tests) 510ms
+ ✓ desktop/src/react/__tests__/components/computer-app-approval-prompt.test.ts (12 tests) 1193ms
+     ✓ shows full tool action parameters in a tooltip outside the clipped confirmation card  509ms
+ ✓ desktop/src/react/__tests__/components/PreviewEditor.cover-drop.test.tsx (4 tests) 361ms
+     ✓ replaces an existing editor cover when a workspace image is dropped on it  314ms
+ ✓ desktop/src/react/__tests__/components/DeskCwdSkills.test.tsx (2 tests) 318ms
+     ✓ shows loaded, shadowed, and policy-disabled candidates without hiding management entries  315ms
+ ✓ desktop/src/react/__tests__/components/mcp-tool-approval-prompt.test.tsx (8 tests) 401ms
+ ✓ desktop/src/react/__tests__/components/InterludeBlock.loop.test.tsx (12 tests) 383ms
+ ✓ desktop/src/react/__tests__/components/WorkspaceSwitcher.test.tsx (6 tests) 411ms
+     ✓ lists mounts and history folders in one menu, hides the default row and dedupes mount roots  320ms
+ ✓ desktop/src/react/__tests__/components/ChatTranscript.turn-time.test.tsx (10 tests) 443ms
+Not implemented: Window's scrollTo() method
+ ✓ desktop/src/react/__tests__/components/InputArea.file-mention.test.tsx (1 test) 372ms
+     ✓ searches desk files when @ mention menu opens with a query and shows workspace results  372ms
+ ✓ desktop/src/react/__tests__/components/GitHistoryModal.test.tsx (10 tests) 453ms
+ ✓ desktop/src/react/__tests__/components/EditorContextMenu.test.tsx (5 tests) 444ms
+     ✓ reuses the complete format menu for block targets  356ms
+ ✓ desktop/src/react/__tests__/components/NotebookSettingsDialog.test.tsx (4 tests) 412ms
+     ✓ 模型下拉无全局继承选项；分块尺寸可设置并提示当前默认值  320ms
+stderr | desktop/src/react/__tests__/components/ActivityPanel.test.tsx > ActivityPanel > keeps the previous activity list and reports malformed or failed reads
+[activity] fetch activities failed: Error: activity request failed
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ActivityPanel.tsx:134:42
+
+stderr | desktop/src/react/__tests__/components/ActivityPanel.test.tsx > ActivityPanel > keeps the previous activity list and reports malformed or failed reads
+[activity] fetch activities failed: Error: invalid activity list
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/components/ActivityPanel.tsx:136:52
+
+ ✓ desktop/src/react/__tests__/components/ActivityPanel.test.tsx (6 tests) 432ms
+     ✓ leaves loading state and renders the background session transcript after expansion  357ms
+ ✓ desktop/src/react/__tests__/components/rust-mcp-session-permissions.test.tsx (6 tests) 342ms
+ ✓ desktop/src/react/__tests__/components/InputArea.focus-surface.test.tsx (5 tests) 392ms
+ ✓ desktop/src/react/__tests__/components/KnowledgeReference.test.tsx (7 tests) 278ms
+ ✓ desktop/src/react/__tests__/components/SideChatPanel.test.tsx (6 tests) 347ms
+ ✓ desktop/src/react/__tests__/components/InputArea.status-stack.test.tsx (7 tests) 315ms
+stderr | desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx > 频道读取错误与重试界面 > 电话会话历史读取失败明确提示，重试完成后结束加载状态
+[channels] load phone session failed: Error: history offline
+    at /Users/study_superior/Desktop/Code/LingxiAgent/desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx:105:51
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+ ✓ desktop/src/react/__tests__/components/ChannelsPanel.requests.test.tsx (8 tests) 381ms
+ ✓ desktop/src/react/__tests__/components/AssistantMessage.automation-suggestion.test.tsx (5 tests) 449ms
+     ✓ keeps a suggestion card clickable with a first-line view tail and no status badge  315ms
+ ✓ desktop/src/react/__tests__/components/AutomationPanel.test.tsx (3 tests) 316ms
+ ✓ desktop/src/react/__tests__/components/ChannelCreateOverlay.test.tsx (2 tests) 356ms
+     ✓ keeps create disabled until a name and at least two agent members are selected  334ms
+ ✓ desktop/src/react/__tests__/components/subagent-preview-interaction.test.tsx (10 tests) 372ms
+ ✓ desktop/src/react/__tests__/components/KnowledgeCitationMarker.test.tsx (12 tests) 420ms
+   ✓ 引用外的 ( ) 去除后仅显示数字，悬停仍显示原文  350ms
+ ✓ desktop/src/react/__tests__/components/UserMessageVideoAttachment.test.tsx (5 tests) 359ms
+     ✓ renders a poster video with a play badge instead of a dead file chip  332ms
+ ✓ desktop/src/react/__tests__/components/PreviewRenderer.html.test.tsx (9 tests) 438ms
+ ✓ desktop/src/react/__tests__/components/GitBranchPicker.test.tsx (8 tests) 414ms
+ ✓ desktop/src/react/__tests__/components/AgentTabScroller.test.tsx (4 tests) 264ms
+ ✓ desktop/src/react/__tests__/components/AgentReviewCards.test.tsx (2 tests) 318ms
+ ✓ desktop/src/react/__tests__/components/SelectionQuoteActionSurface.test.tsx (6 tests) 330ms
+stderr | desktop/src/react/__tests__/components/RegionalErrorBoundary.test.tsx
+[ErrorBus][undefined][undefined] RENDER_CRASH {}
+
+ ✓ desktop/src/react/__tests__/components/RegionalErrorBoundary.test.tsx (2 tests) 299ms
+ ✓ desktop/src/react/__tests__/components/ChatTimelineNavigator.hover.test.tsx (2 tests) 331ms
+     ✓ opens from the short rail but stays open while the pointer moves inside the expanded card  329ms
+ ✓ desktop/src/react/__tests__/components/input-editor-extensions.test.ts (7 tests) 342ms
+ ✓ desktop/src/react/__tests__/components/InputArea.draft-sync.test.tsx (6 tests) 324ms
+ ✓ desktop/src/react/__tests__/components/plan-mode-button.test.tsx (6 tests) 370ms
+     ✓ opens a menu and marks permission changes from the pending new-session surface explicitly  338ms
+ ✓ desktop/src/react/__tests__/components/DeskToolbar.open-button.test.tsx (5 tests) 327ms
+     ✓ opens the plain folder workspace through the native path  311ms
+ ✓ desktop/src/react/__tests__/components/InteractiveCard.test.tsx (6 tests) 376ms
+     ✓ 使用捕获连接登记并加载sandbox iframe  319ms
+ ✓ desktop/src/react/__tests__/components/AutoUpdateStatus.test.tsx (5 tests) 340ms
+ ✓ desktop/src/react/__tests__/components/chat/ChatFindBar.test.tsx (13 tests) 364ms
+ ✓ desktop/src/react/__tests__/components/StreamingMarkdownContent.test.tsx (26 tests) 434ms
+ ✓ desktop/src/react/__tests__/components/AssistantMessage.media-generation.test.tsx (10 tests) 309ms
+ ✓ desktop/src/react/__tests__/components/mcp-elicitation-prompt.test.tsx (10 tests) 310ms
+ ✓ desktop/src/react/__tests__/components/TerminalPreview.test.tsx (5 tests) 313ms
+ ✓ desktop/src/react/__tests__/components/chat/ChatMessageSurface.locate.test.tsx (8 tests) 316ms
+ ✓ desktop/src/react/__tests__/components/TodoPanel.test.tsx (12 tests) 366ms
+ ✓ desktop/src/react/__tests__/components/AutolearnLessonCard.test.tsx (6 tests) 319ms
+ ✓ desktop/src/react/__tests__/components/subagent-preview-session-binding.test.tsx (13 tests) 353ms
+ ✓ desktop/src/react/__tests__/components/InputStatusBars.test.tsx (8 tests) 337ms
+ ✓ desktop/src/react/__tests__/components/Tooltip.test.tsx (3 tests) 311ms
+     ✓ uses the unified 500ms default delay before showing  302ms
+ ✓ desktop/src/react/__tests__/components/ChannelWarningModal.test.tsx (2 tests) 296ms
+ ✓ desktop/src/react/__tests__/components/MarkdownChrome.layout.test.tsx (4 tests) 294ms
+ ✓ desktop/src/react/__tests__/components/FileOutputActions.screenshot-share.test.tsx (2 tests) 330ms
+     ✓ adds screenshot share to Markdown file menus and invokes the article screenshot pipeline  317ms
+ ✓ desktop/src/react/__tests__/components/MainContent.drag.test.tsx (6 tests) 341ms
+ ✓ desktop/src/react/__tests__/components/GitChangesButton.test.tsx (5 tests) 298ms
+ ✓ desktop/src/react/__tests__/components/KnowledgeCitationPreview.test.tsx (2 tests) 271ms
+ ✓ desktop/src/react/__tests__/components/ChatSidebar.test.tsx (7 tests) 299ms
+ ✓ desktop/src/react/__tests__/components/RustBrowserCard.test.tsx (5 tests) 337ms
+ ✓ desktop/src/react/__tests__/components/AssistantMessageCompletionActions.test.tsx (5 tests) 311ms
+ ✓ desktop/src/react/__tests__/components/PreviewTabBar.test.tsx (3 tests) 283ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/ImageStage.test.tsx (6 tests) 258ms
+ ✓ desktop/src/react/__tests__/components/SettingsModalShell.test.tsx (9 tests) 357ms
+ ✓ desktop/src/react/__tests__/components/R02StatusBar.test.tsx (3 tests) 293ms
+ ✓ desktop/src/react/__tests__/components/SessionListForkLineage.test.tsx (6 tests) 339ms
+ ✓ desktop/src/react/__tests__/components/ChatResourceCard.test.tsx (5 tests) 288ms
+ ✓ desktop/src/react/__tests__/components/SidebarNoticeSlot.test.tsx (27 tests) 437ms
+ ✓ desktop/src/react/__tests__/components/MentionMenu.test.tsx (1 test) 286ms
+ ✓ desktop/src/react/__tests__/components/chat/SessionRollback.test.tsx (7 tests) 267ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/MediaViewer.test.tsx (18 tests) 305ms
+ ✓ desktop/src/react/__tests__/components/UserMessageActions.test.tsx (9 tests) 381ms
+ ✓ desktop/src/react/__tests__/components/FloatingInput.test.tsx (3 tests) 339ms
+ ✓ desktop/src/react/__tests__/components/AppTitlebar.test.tsx (7 tests) 289ms
+ ✓ desktop/src/react/__tests__/components/InputArea.welcome-placeholder.test.tsx (2 tests) 300ms
+ ✓ desktop/src/react/__tests__/components/ThinkingBlock.test.tsx (1 test) 341ms
+     ✓ 只在展开历史思考时读取完整内容  340ms
+ ✓ desktop/src/react/__tests__/components/DeskTree.mention.test.tsx (7 tests) 302ms
+ ✓ desktop/src/react/__tests__/components/QuotedSelectionCard.test.tsx (1 test) 277ms
+ ✓ desktop/src/react/__tests__/components/ChannelMessages.scroll.test.tsx (3 tests) 299ms
+ ✓ desktop/src/react/__tests__/components/WindowControls.test.tsx (1 test) 264ms
+ ✓ desktop/src/react/__tests__/components/ChannelInput.focus.test.tsx (2 tests) 299ms
+ ✓ desktop/src/react/__tests__/components/InputArea.system-dictation.test.tsx (2 tests) 308ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-ws.test.ts (7 tests) 197ms
+ ✓ desktop/src/react/__tests__/components/session-sections.test.ts (24 tests) 129ms
+ ✓ desktop/src/react/__tests__/components/ComposerToolbar.test.tsx (8 tests) 284ms
+ ✓ desktop/src/react/__tests__/components/InputArea.pending-identity.test.tsx (2 tests) 289ms
+ ✓ desktop/src/react/__tests__/components/chat-timeline-anchors.test.ts (6 tests) 159ms
+ ✓ desktop/src/react/__tests__/components/ChatArea.continuous-scroll.test.tsx (6 tests) 294ms
+ ✓ desktop/src/react/__tests__/components/FileMentionMenu.test.tsx (1 test) 252ms
+ ✓ desktop/src/react/__tests__/components/computer-use-overlay.test.tsx (6 tests) 255ms
+ ✓ desktop/src/react/__tests__/components/AttachedFilesBar.media.test.tsx (2 tests) 257ms
+ ✓ desktop/src/react/__tests__/components/chat/ChatMessageSurface.typing-indicator.test.tsx (7 tests) 252ms
+ ✓ desktop/src/react/__tests__/components/SessionSearchItem.test.tsx (2 tests) 221ms
+ ✓ desktop/src/react/__tests__/components/App.selection-floating-input.test.ts (1 test) 106ms
+ ✓ desktop/src/react/__tests__/components/selection-toolbar-layout.test.ts (3 tests) 114ms
+ ✓ desktop/src/react/__tests__/components/ask-user-prompt.test.tsx (4 tests) 240ms
+ ✓ desktop/src/react/__tests__/components/ConversationEventCard.layout.test.ts (1 test) 122ms
+ ✓ desktop/src/react/__tests__/components/FileBadgeView.test.tsx (3 tests) 229ms
+ ✓ desktop/src/react/__tests__/components/ask-user-schema.test.ts (7 tests) 127ms
+ ✓ desktop/src/react/__tests__/components/input-context-chip-layout.test.ts (3 tests) 136ms
+ ✓ desktop/src/react/__tests__/components/session-file-expired.test.tsx (11 tests) 322ms
+ ✓ desktop/src/react/__tests__/components/BrowserCard.test.tsx (8 tests) 228ms
+ ✓ desktop/src/react/__tests__/components/card-frame-navigation.test.ts (2 tests) 136ms
+ ✓ desktop/src/react/__tests__/components/PreviewPanel.status.test.tsx (8 tests) 285ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/media-source.test.ts (11 tests) 210ms
+ ✓ desktop/src/react/__tests__/components/desk-types.test.ts (2 tests) 128ms
+ ✓ desktop/src/react/__tests__/components/conversation-map/conversation-map.test.ts (25 tests) 135ms
+ ✓ desktop/src/react/__tests__/components/mcp-approval-actions.test.ts (9 tests) 126ms
+ ✓ desktop/src/react/__tests__/components/ChatResourceCard.layout.test.ts (5 tests) 128ms
+ ✓ desktop/src/react/__tests__/components/AssistantMessage.skill-block.test.tsx (1 test) 289ms
+ ✓ desktop/src/react/__tests__/components/context-ring-visibility.test.ts (2 tests) 125ms
+ ✓ desktop/src/react/__tests__/components/MessageActions.test.tsx (2 tests) 263ms
+ ✓ desktop/src/react/__tests__/components/chat/locate-step.test.ts (10 tests) 128ms
+ ✓ desktop/src/react/__tests__/components/elicitation-schema.test.ts (13 tests) 123ms
+ ✓ desktop/src/react/__tests__/components/FileHistoryModal.test.tsx (2 tests) 320ms
+ ✓ desktop/src/react/__tests__/components/DeskTree.drag.test.tsx (7 tests) 302ms
+ ✓ desktop/src/react/__tests__/components/UserMessageKnowledgeMeta.test.tsx (7 tests) 248ms
+ ✓ desktop/src/react/__tests__/components/markdown-editor-selection-style.test.ts (1 test) 127ms
+ ✓ desktop/src/react/__tests__/components/InputArea.layout.test.ts (8 tests) 133ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/use-media-transform.test.ts (11 tests) 129ms
+ ✓ desktop/src/react/__tests__/components/AgentOriginMessage.test.tsx (4 tests) 236ms
+ ✓ desktop/src/react/__tests__/components/MessageActions.layout.test.ts (5 tests) 128ms
+ ✓ desktop/src/react/__tests__/components/ChatTimelineNavigator.layout.test.ts (4 tests) 125ms
+ ✓ desktop/src/react/__tests__/components/floating-input-position.test.ts (5 tests) 116ms
+ ↓ desktop/src/react/__tests__/components/r07-t08-card-real-service.test.tsx (1 test | 1 skipped)
+ ✓ desktop/src/react/__tests__/components/ChatTranscript.agent-avatar.test.tsx (1 test) 149ms
+ ✓ desktop/src/react/__tests__/components/InputArea.composer-layout.test.tsx (2 tests) 156ms
+ ✓ desktop/src/react/__tests__/components/ChatTranscript.agent-origin.test.tsx (2 tests) 124ms
+ ✓ desktop/src/react/__tests__/components/StreamingSelectionPreservation.test.tsx (3 tests) 113ms
+ ✓ desktop/src/react/__tests__/components/ChatTimelineNavigator.resize-loop.test.tsx (2 tests) 91ms
+ ✓ desktop/src/react/__tests__/components/process-fold.test.ts (27 tests) 77ms
+ ✓ desktop/src/react/__tests__/components/SettingsUpdateCard.test.tsx (1 test) 124ms
+ ✓ desktop/src/react/__tests__/components/use-session-cache-rate.test.ts (5 tests) 100ms
+ ✓ desktop/src/react/__tests__/components/slash-commands-compact.test.ts (3 tests) 101ms
+ ✓ desktop/src/react/__tests__/components/AppPages.test.tsx (3 tests) 131ms
+ ✓ desktop/src/react/__tests__/components/AssistantMessage.interlude.test.tsx (3 tests) 139ms
+ ✓ desktop/src/react/__tests__/components/MentionBadgeView.test.tsx (2 tests) 112ms
+ ✓ desktop/src/react/__tests__/components/shared/MediaViewer/VideoStage.test.tsx (2 tests) 109ms
+ ✓ desktop/src/react/__tests__/components/BridgeChatTranscript.continuous-scroll.test.tsx (1 test) 53ms
+ ✓ desktop/src/react/__tests__/components/AgentPhoneSessionPreview.test.tsx (3 tests) 51ms
+ ✓ desktop/src/react/__tests__/components/PreviewPanel.chapter-rail-hover.test.tsx (5 tests) 27ms
+ ✓ desktop/src/react/__tests__/components/InputContextMenu.test.tsx (9 tests) 74ms
+ ✓ desktop/src/react/__tests__/components/chat/block-renderers.test.tsx (1 test) 24ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > Rust wire 只有握手时拒绝旧聊天帧且不清空输入
+AssertionError: expected { kind: 'transport_submitted', …(1) } to deeply equal { kind: 'blocked', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "code": "rust_core_unavailable",
+-   "kind": "blocked",
+-   "retryable": false,
++   "clientMessageId": "client-user-55983314-ac9b-49ba-83d1-3b395c779670",
++   "kind": "transport_submitted",
+  }
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:403:20
+    401|     useStore.setState({ activeServerConnection: { serverNodeKind: 'lin…
+    402|     const result = await dispatchComposerSend(makeBundle('仍在输入框的文字'), …
+    403|     expect(result).toEqual({ kind: 'blocked', code: 'rust_core_unavail…
+       |                    ^
+    404|     expect(wsMocks.current!.send).not.toHaveBeenCalled();
+    405|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 166 passed | 1 skipped (168)
+      Tests  1 failed | 1313 passed | 1 skipped (1315)
+   Start at  19:50:39
+   Duration  12.05s (transform 27.00s, setup 2.75s, import 104.05s, tests 61.87s, environment 116.75s)
+

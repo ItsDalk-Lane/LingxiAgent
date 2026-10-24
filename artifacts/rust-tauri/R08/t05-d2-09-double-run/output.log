@@ -1,0 +1,19 @@
+ok double-run:first: exit 0
+ok double-run:first: CUTOVER_RESULT present
+ok double-run:first: outcome=committed phase=committed
+ok double-run:first: journal.phase == committed
+ok double-run:first: nine phases ok in order + committed terminal state
+ok double-run:first: no refused entry
+ok double-run:first: pointer valid
+ok double-run:first: target stamp epoch 2 (R08_CUTOVER)
+ok double-run:first: ruling in work-dir
+ok double-run:first: ruling copy in target legacy-import/
+ok double-run:first: ruling copy byte-equal
+ok double-run:first: ruling fields (schema/cutoverId/strategy/sharedWrites/enforcement×3)
+ok double-run:first: legacy root byte-equal (zero-mutation red line)
+ok double-run: rerun without --resume loudly refused (§113)
+ok double-run: --resume rerun exit 0 (already-committed idempotent, §114)
+ok double-run: --resume rerun outcome=already-committed
+ok double-run: target tree unchanged after reruns
+D2_RESULT {"verdict":"PASS","leg":"double-run"}
+D2_EXIT=0

@@ -1,0 +1,179 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx (3 tests | 2 failed) 143ms
+     × 夹具即服务捕获：无最终回复、失败工具与诚实终态逐字段可查 35ms
+     ✓ 真实投影：过程块成卡、缺最终回复结果块上答案面 1ms
+     × 展开汇总区再逐卡点击：错误/思考/产物全部可查，收折不退化 107ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx > R08-A04 卡片展开不退化 > 夹具即服务捕获：无最终回复、失败工具与诚实终态逐字段可查
+AssertionError: expected 'run_000001a162d4ce92_000001-tc0001' to match /^run_[0-9a-f]{16}_\d{7}-tc000[12]$/
+
+- Expected:
+/^run_[0-9a-f]{16}_\d{7}-tc000[12]$/
+
++ Received:
+"run_000001a162d4ce92_000001-tc0001"
+
+ ❯ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx:144:39
+    142|     for (const tool of tools) {
+    143|       expect(tool.target).toBe('tool:first-party:read');
+    144|       expect(String(tool.toolCallId)).toMatch(/^run_[0-9a-f]{16}_\d{7}…
+       |                                       ^
+    145|       const digest = tool.argsDigest as Record<string, unknown>;
+    146|       expect(digest.algorithm).toBe('sha256');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx > R08-A04 卡片展开不退化 > 展开汇总区再逐卡点击：错误/思考/产物全部可查，收折不退化
+AssertionError: expected <div class="_activity_ee952a" …(4)>…(3)</div> to be null
+
+- Expected:
+null
+
++ Received:
+<div
+  class="_activity_ee952a"
+  data-done="true"
+  data-status="succeeded"
+  data-tool="tool:first-party:read"
+  data-tool-call-id="run_000001a162d4ce92_000001-tc0001"
+>
+  <div
+    aria-expanded="true"
+    aria-label="messageActivity.labels.tool"
+    class="_row_ee952a "
+    role="button"
+    tabindex="0"
+    title="tool:first-party:read"
+  >
+    <svg
+      aria-hidden="true"
+      class="_icon_ee952a"
+      data-activity-family="grid"
+      data-activity-icon="tool:first-party:read"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="1.5"
+      viewBox="0 0 24 24"
+    >
+      <rect
+        height="7"
+        rx="2"
+        width="7"
+        x="3"
+        y="3"
+      />
+      <rect
+        height="7"
+        rx="2"
+        width="7"
+        x="14"
+        y="3"
+      />
+      <rect
+        height="7"
+        rx="2"
+        width="7"
+        x="3"
+        y="14"
+      />
+      <rect
+        height="7"
+        rx="2"
+        width="7"
+        x="14"
+        y="14"
+      />
+    </svg>
+    <span
+      class="_label_ee952a"
+      data-label="messageActivity.labels.tool"
+    >
+      messageActivity.labels.tool
+    </span>
+  </div>
+  <div
+    class="_panel_ee952a"
+  >
+    <div
+      class="_header_ee952a"
+    >
+      <span
+        class="_title_ee952a"
+      >
+        tool:first-party:read
+      </span>
+      <button
+        class="_action_ee952a"
+        disabled=""
+        type="button"
+      >
+        messageActivity.copy
+      </button>
+    </div>
+    <div
+      class="_body_ee952a"
+    >
+      <h4
+        class="_section_ee952a"
+      >
+        messageActivity.input
+      </h4>
+      <div
+        class="_lines_ee952a"
+      >
+        <div
+          class="_line_ee952a "
+        >
+          <span>
+            messageActivity.unavailable
+          </span>
+        </div>
+      </div>
+      <h4
+        class="_section_ee952a"
+      >
+        messageActivity.output
+      </h4>
+      <div
+        class="_lines_ee952a"
+      >
+        <div
+          class="_line_ee952a "
+        >
+          <span>
+            messageActivity.unavailable
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    class="_view_ee952a"
+    type="button"
+  >
+    messageActivity.view
+  </button>
+</div>
+
+ ❯ desktop/src/react/__tests__/components/r08-a04-card-expansion.test.tsx:263:59
+    261|     fireEvent.click(summary);
+    262|     expect(summary).toHaveAttribute('aria-expanded', 'false');
+    263|     expect(document.querySelector('[data-tool-call-id]')).toBeNull();
+       |                                                           ^
+    264|     expect(screen.queryByText('A04-THINKING-ALOUD')).not.toBeInTheDocu…
+    265|     // 结果块始终在位，不随收折丢失。
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  17:06:52
+   Duration  1.78s (transform 974ms, setup 22ms, import 1.29s, tests 143ms, environment 249ms)
+

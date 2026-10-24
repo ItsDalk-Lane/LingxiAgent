@@ -1,0 +1,16 @@
+
+running 2 tests
+test r07_t10_query_page_aggregate_detail_export_import ... ok
+test r07_t10_closeout_settings_traces_storage_and_maintenance ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+warning: linker stderr: ld: __eh_frame section too large (max 16MB) to encode dwarf unwind offsets in compact unwind table, performance of exception handling might be affected
+  |
+  = note: `#[warn(linker_messages)]` on by default
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+warning: `lingxi-service` (test "r07_t10_observability") generated 1 warning (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.62s
+     Running tests/r07_t10_observability.rs (rust/target/debug/deps/r07_t10_observability-6c7e6183c0005d95)

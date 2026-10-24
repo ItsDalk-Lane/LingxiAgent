@@ -1,0 +1,50 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx (5 tests | 2 failed) 58ms
+     × 宿主惰性解析为 web，受限能力逐一可解释，且全程无 Electron 桥 37ms
+     ✓ 截图链：无 screenshotRender 能力时给出显式内联提示而非 TypeError 1ms
+     × 会话链：lingxiFetch 经 ServiceClient 路由到 /lingxi/v1 会话读端口，无需 Electron 桥 2ms
+     ✓ 设置链：GeneralTab 在无桥环境渲染，getAutoLaunchStatus 缺席显式可解释 17ms
+     ✓ 文件预览链：HTTP 读取 404→null 显式未找到，其余非 ok 抛带状态错误 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx > R08-A03：无 Electron API 的 Web 宿主链 > 宿主惰性解析为 web，受限能力逐一可解释，且全程无 Electron 桥
+AssertionError: expected '浏览器无系统目录选择器，显式返回空' to contain 'Web'
+
+Expected: "Web"
+Received: "浏览器无系统目录选择器，显式返回空"
+
+ ❯ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx:104:26
+    102|     const selectReason = explainHostCapability('selectFolder');
+    103|     expect(selectReason).toBeTruthy();
+    104|     expect(selectReason).toContain('Web');
+       |                          ^
+    105|     // 宿主未提供的可选成员：宿主级可解释说明，而非 undefined 直接爆雷。
+    106|     const screenshotReason = explainHostCapability('screenshotRender');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx > R08-A03：无 Electron API 的 Web 宿主链 > 会话链：lingxiFetch 经 ServiceClient 路由到 /lingxi/v1 会话读端口，无需 Electron 桥
+AssertionError: expected 'http://127.0.0.1:3210/api/sessions/se…' to contain '/lingxi/v1/sessions/search'
+
+Expected: "/lingxi/v1/sessions/search"
+Received: "http://127.0.0.1:3210/api/sessions/search"
+
+ ❯ desktop/src/react/__tests__/host/r08-a03-web-desktop-host.test.tsx:160:17
+    158|     expect(fetchMock).toHaveBeenCalledTimes(1);
+    159|     const [url, init] = fetchMock.mock.calls[0] as [string, RequestIni…
+    160|     expect(url).toContain('/lingxi/v1/sessions/search');
+       |                 ^
+    161|     expect(url).toContain('token=a03-token');
+    162|     expect(String((init?.headers as Record<string, string>)?.Authoriza…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  19:31:03
+   Duration  805ms (transform 273ms, setup 19ms, import 413ms, tests 58ms, environment 241ms)
+

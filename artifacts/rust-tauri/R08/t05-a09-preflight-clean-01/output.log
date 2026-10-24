@@ -1,0 +1,31 @@
+ok   cleanstop:preflight: exit 0 outcome=stopped
+ok   cleanstop:preflight: journal 相位==stop_write_probe（下一待执行相）
+ok   cleanstop:preflight(停后): 旧根逐字节零写
+FAIL cleanstop:preflight: resume exit 0 且 stopped@pointer_switch — status=2 stdout= stderr=error: migrate: journal: journal corrupt at /private/tmp/t05a09-matrix/a09-cleanstop_preflight-M2UKY8/work/journal.json: --resume "undefined" does not match journal cutoverId "cut-1792730497807-88813"
+FAIL cleanstop:preflight: history ok 链覆盖 preflight..pointer_switch 且序单调（无跳相） — {"okFirst":{"preflight":0},"history":["preflight:ok","stop_write_probe:stopped"]}
+ok   cleanstop:preflight: history 无 refused 条目
+ok   cleanstop:preflight: 指针目录无 .tmp-* 残渣
+FAIL cleanstop:preflight: 指针存在
+ok   cleanstop:preflight: 旧根逐字节零写
+ok   cleanstop:preflight: 无遗留 rust/target/debug/lingxi-service 进程
+FAIL cleanstop:preflight: 重跑探针 exit 2（目标锁可获 + 门拒重跑 = 无双写者） — status=0 stderr=
+node:fs:441
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '/private/tmp/t05a09-matrix/a09-cleanstop_preflight-M2UKY8/new-home/data-epoch-transition.json'
+    at readFileSync (node:fs:441:20)
+    at targetSnapshot (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:210:18)
+    at assertParity (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:278:16)
+    at fullLegAssertions (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:318:3)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t05_a09_kill_matrix.mjs:388:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:633:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/private/tmp/t05a09-matrix/a09-cleanstop_preflight-M2UKY8/new-home/data-epoch-transition.json'
+}
+
+Node.js v24.16.0

@@ -1,0 +1,263 @@
+{
+  "etag": "\"r4-e25\"",
+  "events": [
+    {
+      "clientMessageId": null,
+      "message": {
+        "attachments": [],
+        "clientMessageId": null,
+        "hasImages": false,
+        "id": "user:run_000001a162d4ce92_000001",
+        "quotedText": null,
+        "sessionRefs": null,
+        "snapshotVersion": null,
+        "sourceEntryId": "user:run_000001a162d4ce92_000001",
+        "text": "R08-A04-NO-FINAL",
+        "timestamp": 1792659476117
+      },
+      "seq": 1,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "snapshotVersion": null,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476117,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "session_user_message"
+    },
+    {
+      "isStreaming": true,
+      "seq": 2,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476117,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "status"
+    },
+    {
+      "runId": "run_000001a162d4ce92_000001",
+      "seq": 3,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476117,
+      "turnId": "run_000001a162d4ce92_000001",
+      "turnInputEntryId": "user:run_000001a162d4ce92_000001",
+      "type": "assistant_run_start"
+    },
+    {
+      "modelCallId": "run_000001a162d4ce92_000001-mc0001",
+      "phase": "model",
+      "seq": 4,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476131,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "stage"
+    },
+    {
+      "kind": "reasoning",
+      "segmentId": "assistant:1:reasoning:default",
+      "semanticPhase": "reasoning",
+      "seq": 5,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "assistant_segment_start"
+    },
+    {
+      "delta": "A04-THINKING-ALOUD",
+      "segmentId": "assistant:1:reasoning:default",
+      "semanticPhase": "reasoning",
+      "seq": 6,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "kind": "text",
+      "segmentId": "assistant:1:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 7,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "assistant_segment_start"
+    },
+    {
+      "delta": "A04-READING-SEED",
+      "segmentId": "assistant:1:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 8,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "segmentId": "assistant:1:reasoning:default",
+      "semanticPhase": "reasoning",
+      "seq": 9,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "assistant_segment_end"
+    },
+    {
+      "segmentId": "assistant:1:text:default",
+      "semanticPhase": "unresolved",
+      "seq": 10,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "assistant_segment_end"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "run_000001a162d4ce92_000001-tc0001",
+      "name": "tool:first-party:read",
+      "seq": 11,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "A04-SEED-CONTENT\n",
+          "type": "text"
+        }
+      ],
+      "details": {
+        "format": "text-or-binary",
+        "source": {
+          "path": "a04-seed.txt",
+          "sha256": "88df02de4f85a3c0f5d74ad86a029565fe9e1f0cd4654eefe238f6e2090753ca",
+          "sizeBytes": 17
+        }
+      },
+      "error": null,
+      "id": "run_000001a162d4ce92_000001-tc0001",
+      "name": "tool:first-party:read",
+      "seq": 12,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "run_000001a162d4ce92_000001",
+      "success": true,
+      "ts": 1792659476140,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "run_000001a162d4ce92_000001-mc0002",
+      "phase": "model",
+      "seq": 13,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476165,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "run_000001a162d4ce92_000001-tc0002",
+      "name": "tool:first-party:read",
+      "seq": 14,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476165,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "tool_start"
+    },
+    {
+      "content": null,
+      "details": null,
+      "error": "Could not read file: a04-missing.txt. Error code: ENOENT.",
+      "id": "run_000001a162d4ce92_000001-tc0002",
+      "name": "tool:first-party:read",
+      "seq": 15,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "status": "failed",
+      "streamId": "run_000001a162d4ce92_000001",
+      "success": false,
+      "ts": 1792659476165,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "run_000001a162d4ce92_000001-mc0003",
+      "phase": "model",
+      "seq": 16,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476172,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "stage"
+    },
+    {
+      "runId": "run_000001a162d4ce92_000001",
+      "seq": 17,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476179,
+      "turnId": "run_000001a162d4ce92_000001",
+      "turnInputEntryId": "user:run_000001a162d4ce92_000001",
+      "type": "assistant_run_end"
+    },
+    {
+      "isStreaming": false,
+      "seq": 18,
+      "sessionId": "a04",
+      "sessionPath": "native:a04",
+      "sessionRefVersion": 2,
+      "streamId": "run_000001a162d4ce92_000001",
+      "ts": 1792659476179,
+      "turnId": "run_000001a162d4ce92_000001",
+      "type": "status"
+    }
+  ]
+}

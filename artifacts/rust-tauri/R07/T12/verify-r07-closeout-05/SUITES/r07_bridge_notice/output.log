@@ -1,0 +1,11 @@
+
+running 3 tests
+test forged_or_changed_notice_material_is_refused_instead_of_becoming_user_text ... ok
+test notice_is_retained_at_the_fork_boundary_and_receipt_does_not_replay_after_clear ... ok
+test only_confirmed_delivery_becomes_a_distinct_notice_and_survives_restart_once ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.99s
+     Running tests/r07_bridge_notice.rs (rust/target/debug/deps/r07_bridge_notice-ccd7b1e2edb06913)

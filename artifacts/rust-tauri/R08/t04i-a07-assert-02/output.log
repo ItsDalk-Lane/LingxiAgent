@@ -1,0 +1,25 @@
+PASS 6 sessions no dups
+Parse error in 2nd command line argument: no such column: forked_from_session_id
+  SELECT COUNT(*) FROM sessions WHERE forked_from_session_id='sess-parent-0001';
+                        error here ---^
+bash: line 4: [: -ge: unary operator expected
+FAIL fork edge exists
+Parse error in 2nd command line argument: no such column: id
+  SELECT COUNT(*) FROM sessions WHERE id='sess-unknown-0003' AND run_id IS NULL;
+                        error here ---^
+bash: line 4: [: -eq: unary operator expected
+FAIL unknown run_id NULL
+PASS 2 legacy-unknown-block markers
+FAIL 2 quarantine raw files
+PASS corrupt session 809 msgs
+PASS corrupt tail quarantined
+PASS issues count 6
+PASS 3 session_files rows
+PASS file-good-1 available
+PASS file-broken-1 broken not masquerading
+PASS bad-attachment issue row
+PASS attachment link valid (bytes equal source)
+PASS broken payload copied byte-faithful (truncated bytes preserved)
+PASS receipt pendingConvert 9 (B3 remainder)
+bash: -c: line 24: syntax error near unexpected token `0'
+bash: -c: line 24: `chk "receipt sourceUnchanged true" "python3 -c "import json,sys;sys.exit(0 if json.load(open('/tmp/t04i-target-04/legacy-import/migration-receipt.json'))['sourceUnchanged'] else 1)""'

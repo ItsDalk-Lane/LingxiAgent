@@ -1,0 +1,1966 @@
+diff --git a/desktop/src/shared/single-instance-lock.cjs b/desktop/src/shared/single-instance-lock.cjs
+index 8bf4f7fbe..2173d05ac 100644
+--- a/desktop/src/shared/single-instance-lock.cjs
++++ b/desktop/src/shared/single-instance-lock.cjs
+@@ -7,6 +7,32 @@
+  * redirected to the first client.
+  */
+ const path = require("path");
++const fs = require("fs");
++
++function canonicalHome(home) {
++  let existing = path.resolve(home);
++  const missing = [];
++  while (!fs.existsSync(existing)) {
++    missing.unshift(path.basename(existing));
++    const parent = path.dirname(existing);
++    if (parent === existing) throw new Error("无法确认桌面数据目录的真实位置");
++    existing = parent;
++  }
++  return path.join(fs.realpathSync(existing), ...missing);
++}
++
++function getClientUserDataPath(lingxiHome, defaultHome, appData) {
++  const resolved = path.resolve(lingxiHome);
++  const parent = path.dirname(path.resolve(defaultHome));
++  const standardHomes = [defaultHome, ...[".lingxi", ".lingxi-dev", ".hanako-dev"].map(name => path.join(parent, name))];
++  const actualHome = canonicalHome(resolved);
++  const standardHome = standardHomes.find(home => normalizeForCompare(canonicalHome(home)) === normalizeForCompare(actualHome));
++  // 默认安装和默认开发目录延续原缓存位置；显式副本的缓存也留在副本内。
++  if (standardHome) {
++    return path.join(appData, getUserDataAppName(standardHome, defaultHome));
++  }
++  return path.join(actualHome, ".electron-user-data");
++}
+ 
+ function normalizeForCompare(filePath) {
+   const resolved = path.resolve(filePath);
+@@ -40,10 +66,7 @@ function focusExistingWindow(win) {
+ 
+ function configureClientSingleInstance(app, opts) {
+   const { lingxiHome, defaultHome, onSecondInstance } = opts;
+-  const appName = getUserDataAppName(lingxiHome, defaultHome);
+-  if (appName) {
+-    app.setPath("userData", path.join(app.getPath("appData"), appName));
+-  }
++  app.setPath("userData", getClientUserDataPath(lingxiHome, defaultHome, app.getPath("appData")));
+ 
+   const gotLock = app.requestSingleInstanceLock({ lingxiHome });
+   if (!gotLock) {
+@@ -61,4 +84,5 @@ module.exports = {
+   configureClientSingleInstance,
+   focusExistingWindow,
+   getUserDataAppName,
++  getClientUserDataPath,
+ };
+diff --git a/docs/rust-tauri/R07/R07_LEAF_BINDINGS.json b/docs/rust-tauri/R07/R07_LEAF_BINDINGS.json
+index 877cb3372..a26f28671 100644
+--- a/docs/rust-tauri/R07/R07_LEAF_BINDINGS.json
++++ b/docs/rust-tauri/R07/R07_LEAF_BINDINGS.json
+@@ -5423,10 +5423,10 @@
+           "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ],
+         [
+-          "r07_t12_closure::r07_t12_a23_runtime_route_matrix"
++          "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ]
+       ],
+-      "rationale": "R07 收口新增 r07_probe_* 真实服务探针逐断言覆盖该路由正向与拒绝；A1 用 A23 全表无凭证 401 探针的为只读面权限拒绝。"
++      "rationale": "F02批次0重绑：断言1『字段缺省不改变原值；拒绝时目标状态不变』此前仅绑 A23 路由/鉴权外围（F02范围审查 INSUFFICIENT_A23_ASSERTION_PROOF）。该真实探针案例同时断言 true/false 保存、无关字段缺省不动原值、非法权限模式拒绝后状态不变，覆盖两条原断言；A23 保留为附加路由证据（suiteRefs 保留 r07_t12_closure）。"
+     },
+     "R00-T02-LA-D5514BBDBF88": {
+       "basis": "full_original_behavior",
+@@ -5439,10 +5439,10 @@
+           "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ],
+         [
+-          "r07_t12_closure::r07_t12_a23_runtime_route_matrix"
++          "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ]
+       ],
+-      "rationale": "R07 收口新增 r07_probe_* 真实服务探针逐断言覆盖该路由正向与拒绝；A1 用 A23 全表无凭证 401 探针的为只读面权限拒绝。"
++      "rationale": "F02批次0重绑：断言1『字段缺省不改变原值；拒绝时目标状态不变』此前仅绑 A23 路由/鉴权外围（F02范围审查 INSUFFICIENT_A23_ASSERTION_PROOF）。该真实探针案例同时断言 true/false 保存、无关字段缺省不动原值、非法权限模式拒绝后状态不变，覆盖两条原断言；A23 保留为附加路由证据（suiteRefs 保留 r07_t12_closure）。"
+     },
+     "R00-T02-LA-01631175277C": {
+       "basis": "full_original_behavior",
+@@ -7026,125 +7026,137 @@
+     "R00-T02-LA-0818574ABD43": {
+       "basis": "full_original_behavior",
+       "suiteRefs": [
+-        "r07_ui_vitest"
++        "r08_admission_ptc",
++        "r08_admission_ptc_authority"
+       ],
+       "assertionCases": [
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 工具契约 权限契约：execute 动作 + routine 档，能力名对齐工具名"
++          "r08_admission_ptc::real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
++          "r08_admission_ptc_authority::actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch",
++          "r08_admission_ptc_authority::actual_registry_disable_while_child_waits_approval_refuses_old_approval",
++          "r08_admission_ptc_authority::actual_registry_schema_generation_change_refuses_old_approval"
+         ],
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 子调用中间结果不进 content，只有 console + return 进"
++          "r08_admission_ptc::real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts"
+         ],
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 程序异常：isError + 异常消息 + 已捕获日志随附"
++          "r08_admission_ptc::later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts"
+         ],
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 绑定桥 run_tools 不能调自己（防递归），错误可被程序捕获"
++          "r08_admission_ptc::unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
++          "r08_admission_ptc::real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker",
++          "r08_admission_ptc::actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write"
+         ]
+       ],
+-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
++      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 的旧 Pi wrapper 测试不能证明真实 Rust 驱动（F02范围审查：子调用独立授权绑外层静态 permission）。改绑真实父驱动/网关/授权/存储链，映射沿用独立准入复验 §3.2（子批准独立/撤权禁用换代拒绝、外层仅摘要、失败保留已执行子动作、未知·自调用·沙盒·vm逃逸·600秒超时拒绝不回滚）。"
+     },
+     "R00-T02-LA-196D50D8DD6E": {
+       "basis": "full_original_behavior",
+       "suiteRefs": [
+-        "r07_ui_vitest"
++        "r08_admission_ast_lsp"
+       ],
+       "assertionCases": [
+         [
+-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 content 模式分页 + 诚实 footer"
++          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
+         ],
+         [
+-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 files 模式：唯一文件 + 命中数"
++          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
+         ],
+         [
+-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 参数校验：缺 pattern/language 直接说明，不起子进程"
++          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
+         ]
+       ],
+-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
++      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 固定 execFile JSON 分页不能证明真实结构解析（F02范围审查）。该真实案例经官方 ast-grep CLI 语法树证明结构命中（同文字符串不误中）、无匹配不写文件、空结果与语言/解析失败/越权错误，一并覆盖三条原断言（独立准入复验 §3.3 同一案例逐断言映射）。"
+     },
+     "R00-T02-LA-2D896560381E": {
+       "basis": "full_original_behavior",
+       "suiteRefs": [
+-        "r07_ui_vitest"
++        "r08_admission_ast_lsp"
+       ],
+       "assertionCases": [
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） definition：1-based 输入 → 0-based 协议 → 1-based 输出"
++          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"
+         ],
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） references：多位置清单"
++          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"
+         ],
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） rename：prepareRename 验证 → 编辑计算 → 写回"
++          "r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing"
+         ],
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） 服务器缺失：LSP_SERVER_MISSING + 环境页指引"
++          "r08_admission_ast_lsp::r08_lsp_missing_and_crashed_server_are_explicit_errors"
+         ]
+       ],
+-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
++      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 把『不可写只预览』绑到 applied=true 实际写回（F02范围审查确认错绑）。改绑真实 clangd 链：位置一致与 rename 仅改返回范围由同一真实案例证明；只读授权预览不落盘、服务缺失/崩溃/空编辑显式错误分别有独立真实案例（独立准入复验 §3.4 映射）。"
+     },
+     "R00-T02-LA-C88F29B5114A": {
+       "basis": "full_original_behavior",
+       "suiteRefs": [
+-        "r07_ui_vitest"
++        "r08_admission_run_code"
+       ],
+       "assertionCases": [
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 变量跨调用存活（同内核连续两次 run）+ 回显剥除 + 结果输出"
++          "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions"
+         ],
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 缺语言：RUN_CODE_LANGUAGE_MISSING + 安装指引"
++          "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
++          "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+         ],
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 内核死亡：如实报告 exit 与部分输出，指路 restart"
++          "r08_admission_run_code::cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild"
+         ],
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 未知语言直接拒绝"
++          "r08_admission_run_code::absent_real_interpreters_report_install_guidance_without_starting_kernel",
++          "r08_admission_run_code::output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
++          "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+         ]
+       ],
+-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
++      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 的 TS 适配器测试不能证明真实 Rust 工具面（F02范围审查）。改绑 R08 准入套件真实 Run/网关/解释器/监督器/存储链，逐断言映射沿用独立准入复验 ADMISSION_CANDIDATE_INDEPENDENT_REVIEW.md §3.1（变量共享/重启清空/取消回收/缺语言·死亡·30秒超时显式失败）。无会话分支为源码级拒绝，无独立样本（独审已如实记录）。"
+     },
+     "R00-T02-LA-CD5D7FC02D8E": {
+       "basis": "full_original_behavior",
+       "suiteRefs": [
+-        "r07_ui_vitest"
++        "r08_admission_security"
+       ],
+       "assertionCases": [
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 path 模式：扫目录、命中密钥、审计只进计数"
++          "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
++          "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
+         ],
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 范围硬校验：path 指到授权文件夹之外直接拒绝"
++          "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
+         ],
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 changes 模式：非 git 目录如实说明并建议 path 模式"
++          "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged",
++          "r08_admission_security::r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child"
+         ],
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 权限契约：read（计划模式可用）"
++          "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
++          "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged"
+         ]
+       ],
+-      "rationale": "R07 收口：该对话工具（run_tools/ptc 沙箱/ast_grep/lsp/run_code/security_scan）的工具契约、权限矩阵与沙箱边界由 lib/tools、lib/sandbox 与 tests/lsp-tool 的真实 vitest 测试逐断言证明（工具实现在 lib/ 共享层，Rust 服务与旧内核共用同一工具面）。"
++      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 的非 Git 提示/静态 permission 不能证明真实扫描范围与拒绝（F02范围审查）。改绑真实快照沙盒/git只读/基线扫描链（独立准入复验 §3.5 映射）；文件上限与引擎失败分支为机制级核对无直接样本，已在独审 §6 如实登记为 R08 跟踪缺口。"
+     },
+     "R00-T02-LA-771296A194E0": {
+       "basis": "full_original_behavior",
+       "suiteRefs": [
+-        "r07_ui_vitest"
++        "r06_skills_completion"
+       ],
+       "assertionCases": [
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查通过：SKILL.md 落盘（frontmatter + 正文）、写经验索引、触发 onLearned"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ],
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查未通过 → 带 token 显式确认后落盘并标 riskOverride"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ],
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 同名技能已存在时拒绝、不覆盖、不烧 guard 调用"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ],
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 无 token 的 risk_accepted 不能绕过审查"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ]
+       ],
+-      "rationale": "R07 收口：learn_lesson 工具（lib 共享层实现，Rust skills_completion.rs 与旧内核同位）的落盘/风险确认 token/同名冲突/索引一致性由 tests/learn-lesson-tool 真实测试逐断言证明。"
++      "rationale": "F02批次0重绑：旧绑定 r07_ui_vitest 旧 TS 适配器测试把『未确认不写』绑到已确认写（F02范围审查确认错绑）。改绑 R06 真实完成测试：真实 SKILL.md 落盘/风险未确认不写/token 正文绑定一次性/索引与Agent启用/其他Agent不变/同名·缺上下文·写失败，同一测试覆盖四条原断言（F02范围审查 reusableCandidates 第1条）。不重开 R06。"
+     }
+   }
+ }
+diff --git a/rust/crates/lingxi-kernel/src/toolcatalog.rs b/rust/crates/lingxi-kernel/src/toolcatalog.rs
+index 790d2c9ae..9c7016799 100644
+--- a/rust/crates/lingxi-kernel/src/toolcatalog.rs
++++ b/rust/crates/lingxi-kernel/src/toolcatalog.rs
+@@ -444,6 +444,10 @@ pub enum PermissionKind {
+     ArgumentAwareGoal,
+     /// 设置查询只读；实际修改必须按具体参数复核。
+     ArgumentAwareSettings,
++    /// 代码内核的状态只读，执行和重启仍是执行权限。
++    ArgumentAwareRunCode,
++    /// 语言服务查询/预览只读，实际重命名写入使用执行权限。
++    ArgumentAwareLsp,
+ }
+ 
+ impl PermissionKind {
+@@ -459,6 +463,8 @@ impl PermissionKind {
+             PermissionKind::ArgumentAwareBrowser => "browser",
+             PermissionKind::ArgumentAwareGoal => "goal",
+             PermissionKind::ArgumentAwareSettings => "update-settings",
++            PermissionKind::ArgumentAwareRunCode => "run-code",
++            PermissionKind::ArgumentAwareLsp => "lsp",
+         }
+     }
+ }
+@@ -2167,6 +2173,29 @@ impl ToolRegistry {
+             };
+             permission.capability_base = format!("update_settings.{action}");
+         }
++        if permission.kind == PermissionKind::ArgumentAwareRunCode {
++            let action = effective.as_value()["action"].as_str().unwrap_or("run");
++            permission.kind = if action == "status" {
++                PermissionKind::Read
++            } else {
++                PermissionKind::Execute
++            };
++            permission.capability_base = format!("run_code.{action}");
++        }
++        if permission.kind == PermissionKind::ArgumentAwareLsp {
++            let action = effective.as_value()["action"].as_str().unwrap_or("status");
++            let preview = effective.as_value()["preview"].as_bool() == Some(true);
++            permission.kind = if matches!(
++                action,
++                "status" | "diagnostics" | "definition" | "references" | "hover" | "symbols"
++            ) || (action == "rename" && preview)
++            {
++                PermissionKind::Read
++            } else {
++                PermissionKind::Execute
++            };
++            permission.capability_base = format!("lsp.{action}");
++        }
+         let prepared = PreparedToolCall {
+             target_id,
+             origin: tool.manifest.origin.clone(),
+diff --git a/rust/crates/lingxi-service/src/lib.rs b/rust/crates/lingxi-service/src/lib.rs
+index d67948f48..77a8035b3 100644
+--- a/rust/crates/lingxi-service/src/lib.rs
++++ b/rust/crates/lingxi-service/src/lib.rs
+@@ -62,6 +62,10 @@ pub mod chat_settings;
+ pub mod chat_wire;
+ pub mod checkpoint_store;
+ pub mod client_context;
++pub mod coding_ast_lsp;
++pub mod coding_ptc;
++pub mod coding_run_code;
++pub mod coding_security;
+ pub mod compaction;
+ pub mod computer_use_settings;
+ pub mod config;
+@@ -600,6 +604,7 @@ pub struct ServiceState {
+     /// Run lifecycle supervisor (R03-T01): drives every execute through
+     /// the real queued→running→…→single-finalize chain.
+     runs: Arc<runs::RunSupervisor>,
++    native_processes: Option<Arc<procsupervisor::ProcessSupervisor>>,
+     /// R06-T03: the session tree service (fork / retry / rewind /
+     /// checkpoints / branch index) over the same storage + events.
+     session_tree: Arc<session_tree::SessionService>,
+@@ -1594,6 +1599,7 @@ impl ServiceState {
+         );
+         let mut tool_plane: Option<ToolPlaneHandles> = None;
+         let mut read_file_tools = None;
++        let mut native_processes = None;
+         let mut approval_service_handle = None;
+         if let Some(model_gateway) = model_gateway_for_wiring {
+             // R05-T02 (C01): the production chain dispatches through the
+@@ -1719,13 +1725,26 @@ impl ServiceState {
+                 let _core_process_tools = exectools::register_process_tools(
+                     &registry,
+                     gateway.as_ref(),
+-                    exec_supervisor,
++                    exec_supervisor.clone(),
+                     Arc::clone(&access),
+                     workspace.clone(),
+                     None,
+                     Arc::clone(&deps.clock),
+                     &budget,
+                 );
++                coding_run_code::register(
++                    &registry,
++                    gateway.as_ref(),
++                    access.clone(),
++                    workspace.clone(),
++                    exec_supervisor.clone(),
++                    deps.clock.clone(),
++                    &budget,
++                )
++                .map_err(|detail| {
++                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
++                })?;
++                native_processes = Some(exec_supervisor);
+                 // R06-T06: the memory/skill model-side tools. Each executor is
+                 // BOUND to one agent at registration (the resolved primary
+                 // agent) — there is no cross-agent handle (A11). Registration
+@@ -2039,6 +2058,22 @@ impl ServiceState {
+             Arc::clone(&storage),
+         ))));
+         let runs = Arc::new(runs.with_knowledge(Arc::clone(&knowledge_service)));
++        if wired_real_model_chain {
++            if let Some(gateway) = deps.tool_gateway.as_ref() {
++                coding_ptc::register(
++                    gateway.registry(),
++                    gateway,
++                    Arc::downgrade(&runs),
++                    storage.clone(),
++                    events.clone(),
++                    deps.clock.clone(),
++                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
++                )
++                .map_err(|detail| {
++                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
++                })?;
++            }
++        }
+         let session_tools = Arc::new(
+             sessiontools::SessionTools::new(sessiontools::Dependencies {
+                 storage: Arc::clone(&storage),
+@@ -2537,6 +2572,34 @@ impl ServiceState {
+         if let (Some(gateway), Some((access, cwd))) =
+             (deps.tool_gateway.as_ref(), workspace_access.as_ref())
+         {
++            if wired_real_model_chain {
++                coding_ast_lsp::register(
++                    gateway.registry(),
++                    gateway,
++                    access.clone(),
++                    cwd.clone(),
++                    resource_io.clone(),
++                    None,
++                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
++                )
++                .map_err(|detail| {
++                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
++                })?;
++                coding_security::register(
++                    gateway.registry(),
++                    gateway,
++                    access.clone(),
++                    cwd.clone(),
++                    data_home.clone(),
++                    resource_io.clone(),
++                    None,
++                    deps.clock.clone(),
++                    &lingxi_kernel::toolcatalog::SchemaBudget::default(),
++                )
++                .map_err(|detail| {
++                    ServiceStartupError::Storage(StorageError::InvalidRequest { detail })
++                })?;
++            }
+             resource_tools::register(
+                 gateway.registry(),
+                 gateway,
+@@ -2700,6 +2763,7 @@ impl ServiceState {
+         mcp_settings.attach_tasks(runs.task_supervisor());
+         mcp_settings.attach_network(deps.network_plane.as_ref());
+         let state = Self {
++            native_processes,
+             _knowledge_worker_owner: Arc::new(KnowledgeWorkerOwner(knowledge_service.clone())),
+             config: Arc::new(config),
+             auth,
+@@ -9197,6 +9261,7 @@ where
+     let dream_stop_at = Arc::new(std::sync::Mutex::new(None::<std::time::Instant>));
+     let dream_signal_at = Arc::clone(&dream_stop_at);
+     let workflows = Arc::clone(state.workflows());
++    let native_processes = state.native_processes.clone();
+     let state_on_signal = state.clone();
+     let router = build_router(state);
+     // The graceful-shutdown future consumes the stop signal and records the
+@@ -9258,6 +9323,27 @@ where
+             }
+         }
+     };
++    if let Some(processes) = native_processes {
++        let remaining = dream_stop_at
++            .lock()
++            .unwrap()
++            .map(|at| dream_budget.saturating_sub(at.elapsed()))
++            .unwrap_or(dream_budget);
++        match tokio::time::timeout(remaining, processes.shutdown_all()).await {
++            Ok(receipts)
++                if receipts.iter().all(|receipt| {
++                    !matches!(
++                        receipt.outcome,
++                        procsupervisor::TerminationOutcome::CleanupTimedOut
++                    )
++                }) => {}
++            _ => {
++                return outcome.map(|_| ServeOutcome {
++                    drain_timed_out: true,
++                })
++            }
++        }
++    }
+     knowledge_worker
+         .wait_worker_stopped()
+         .await
+diff --git a/rust/crates/lingxi-service/src/runs.rs b/rust/crates/lingxi-service/src/runs.rs
+index 6e9cab947..11f2e4927 100644
+--- a/rust/crates/lingxi-service/src/runs.rs
++++ b/rust/crates/lingxi-service/src/runs.rs
+@@ -87,6 +87,548 @@ use crate::session_supervisor::SteeringInbox;
+ use crate::streaming_norm::{DeltaNormalizer, NormEvent};
+ use crate::task_supervisor::{TaskExit, TaskSupervisor};
+ 
++/// 仅真实父工具驱动建立；程序实参不能指定来源、Agent、权限或工作流范围。
++#[derive(Clone)]
++struct ProgramAuthority {
++    ctx: lingxi_kernel::RunContext,
++    parent_call: ToolCallId,
++    authorization: DriveAuthorization,
++    agent_id: String,
++    phone_scoped: bool,
++    admitted_parentless_subagent: bool,
++    quota_lane: String,
++    hooks: Option<Arc<std::sync::Mutex<crate::hooks::ExtensionHooks>>>,
++}
++impl ProgramAuthority {
++    fn new(
++        ctx: lingxi_kernel::RunContext,
++        parent_call: ToolCallId,
++        authorization: DriveAuthorization,
++        agent_id: String,
++        phone_scoped: bool,
++        admitted_parentless_subagent: bool,
++        quota_lane: String,
++        hooks: Option<Arc<std::sync::Mutex<crate::hooks::ExtensionHooks>>>,
++    ) -> Self {
++        Self {
++            ctx,
++            parent_call,
++            authorization,
++            agent_id,
++            phone_scoped,
++            admitted_parentless_subagent,
++            quota_lane,
++            hooks,
++        }
++    }
++}
++tokio::task_local! { static PROGRAM_AUTHORITY: ProgramAuthority; }
++
++impl RunSupervisor {
++    /// 程序子调用沿同一受信驱动准备、批准、持久回执；不创建第二个任务终态。
++    #[allow(clippy::too_many_arguments)]
++    pub(crate) async fn execute_program_child(
++        self: &Arc<Self>,
++        db: &Arc<lingxi_adapters::storage::RunDatabase>,
++        events: &Arc<EventService>,
++        ctx: &lingxi_kernel::RunContext,
++        parent_call: &ToolCallId,
++        seq: u64,
++        name: &str,
++        args: serde_json::Value,
++        now_ms: u64,
++    ) -> Result<ToolOutcome, String> {
++        use crate::toolgateway::{self, CallerSurface, PolicyVerdict};
++        use lingxi_kernel::toolcatalog::{PermissionKind, SchemaBudget, ToolOrigin, ToolTargetRef};
++        let authority = PROGRAM_AUTHORITY
++            .try_with(Clone::clone)
++            .map_err(|_| "PTC_TRUSTED_PARENT_REQUIRED")?;
++        if &authority.ctx != ctx || &authority.parent_call != parent_call || seq == 0 {
++            return Err("PTC_PARENT_CONTEXT_MISMATCH".into());
++        }
++        let lifetime = toolgateway::TOOL_LIFETIME
++            .try_with(Clone::clone)
++            .map_err(|_| "PTC_LIFETIME_REQUIRED")?;
++        let call = ToolCallId::new(format!("{}:ptc:{seq}", parent_call.as_str()));
++        let fail = |message: String| ToolOutcome::Failed {
++            error: ProtocolError::new(ErrorCode::Forbidden, message, false),
++        };
++        let gateway = self
++            .tool_gateway
++            .as_ref()
++            .ok_or("PTC_GATEWAY_UNAVAILABLE")?;
++        let entries = db
++            .load_invocation_journal(&ctx.run_id)
++            .await
++            .map_err(|e| e.to_string())?;
++        let parent = entries
++            .iter()
++            .find(|row| row.journal_id == parent_call.as_str())
++            .ok_or("PTC_PARENT_JOURNAL_MISSING")?;
++        if parent.target != "tool:first-party:run_tools"
++            || parent.phase != InvocationPhase::Started
++            || parent.attempt != ctx.attempt.as_str()
++            || parent.generation != ctx.generation
++            || parent.owner_kind != ctx.principal.storage_kind()
++            || parent.owner_subject != ctx.principal.storage_subject()
++            || entries.iter().any(|row| row.journal_id == call.as_str())
++        {
++            // 重复序号或重启后的已知/未知回执均不重派发副作用。
++            return Err("PTC_PARENT_INACTIVE_OR_CHILD_REPLAY".into());
++        }
++        let unresolved = ToolRequest::from_effective_arguments(
++            format!(
++                "ptc:unresolved:{}",
++                name.chars().take(256).collect::<String>()
++            ),
++            args.clone(),
++            &SchemaBudget::default(),
++        )
++        .ok_or("PTC_ARGUMENTS_INVALID")?;
++        macro_rules! refuse_child {
++            ($request:expr,$message:expr) => {{
++                let request: &ToolRequest = $request;
++                let outcome = fail($message);
++                db.record_invocation_intent(
++                    ctx,
++                    InvocationIntent {
++                        journal_id: call.clone(),
++                        target: request.target.clone(),
++                        args_digest: request.args_digest.hex.clone(),
++                        args_summary: request.args_summary.clone(),
++                        idempotency_key: Some(call.to_string()),
++                    },
++                    now_ms,
++                )
++                .await
++                .map_err(|e| e.to_string())?;
++                self.persist_tool_event(
++                    db.as_ref(),
++                    events.as_ref(),
++                    ctx,
++                    &call,
++                    request,
++                    None,
++                    now_ms,
++                )
++                .await
++                .map_err(|e| e.to_string())?;
++                self.close_program_child(db, events, ctx, &call, request, &outcome, false, now_ms)
++                    .await?;
++                return Ok(outcome);
++            }};
++        }
++        let target = match gateway
++            .registry()
++            .resolve(&ToolTargetRef::ByName { name: name.into() })
++        {
++            Ok(target) => target,
++            Err(error) => refuse_child!(&unresolved, error.to_string()),
++        };
++        let listing = match gateway.registry().describe(&target) {
++            Ok(listing) => listing,
++            Err(error) => refuse_child!(&unresolved, error.to_string()),
++        };
++        let local = listing.local_name.as_str();
++        if local == "run_tools" {
++            refuse_child!(&unresolved, "PTC_RECURSION_FORBIDDEN".into());
++        }
++        // 与直接模型入口相同：非驻留目标经目录桥，正式说明的代次不能由程序伪造。
++        let request = if gateway.has_catalog_definitions()
++            && !crate::toolcatalog_bridge::RESIDENT_NAMES.contains(&local)
++        {
++            ToolRequest::from_effective_arguments(
++                "tool:first-party:mcp_call",
++                serde_json::json!({"tool":name,"arguments":args}),
++                &SchemaBudget::default(),
++            )
++        } else {
++            ToolRequest::from_effective_arguments(
++                target.to_string(),
++                args,
++                &SchemaBudget::default(),
++            )
++        }
++        .ok_or("PTC_ARGUMENTS_INVALID")?;
++        let (request, pin) = match gateway.normalize_model_request(ctx, &request, None) {
++            Ok(result) => result,
++            Err(error) => refuse_child!(&request, error.to_string()),
++        };
++        // 每次重验可撤销来源；继承的授权只表示上限，不替代当前授权事实。
++        if let Err(reason) = self.validate_program_authority(&authority, ctx).await {
++            refuse_child!(&request, reason);
++        }
++        if lifetime.cancel.is_cancelled() {
++            refuse_child!(&request, "PTC_CANCELLED_BEFORE_PREPARE".into());
++        }
++        if let Some(hooks) = authority.hooks.as_ref() {
++            let decision = hooks
++                .lock()
++                .unwrap_or_else(|p| p.into_inner())
++                .on_tool_call(
++                    request.target.rsplit(':').next().unwrap_or(local),
++                    call.as_str(),
++                    request.arguments.as_value(),
++                );
++            if let lingxi_kernel::memory::GuardDecision::Block(reason) = decision {
++                refuse_child!(&request, format!("PTC_TOOL_CALL_GUARD: {reason}"));
++            }
++        }
++        let _tool_permit = match self
++            .acquire_or_break(
++                &QuotaResource::Tool,
++                &authority.agent_id,
++                &authority.quota_lane,
++                &ctx.run_id,
++                &lifetime.cancel,
++                None,
++            )
++            .await
++        {
++            Ok(Some(permit)) => permit,
++            Ok(None) => refuse_child!(&request, "PTC_TOOL_QUOTA_EXHAUSTED".into()),
++            Err(()) => refuse_child!(&request, "PTC_CANCELLED_DURING_QUOTA".into()),
++        };
++        let surface = if matches!(authority.authorization.grant, RunGrant::Subagent { .. }) {
++            CallerSurface::SubagentRun
++        } else {
++            CallerSurface::UserRun
++        };
++        let permission = authority
++            .authorization
++            .scoped_invocation_permission_context(authority.phone_scoped);
++        let review = tokio::select! {biased; _=lifetime.cancel.cancelled()=>None,
++        result=gateway.review_and_validate_from_request_pinned(ctx,surface,&authority.agent_id,permission,&call,&request,pin,&[],None)=>Some(result)};
++        match review {
++            None => refuse_child!(&request, "PTC_CANCELLED_DURING_REVIEW".into()),
++            Some(Err(error)) => refuse_child!(&request, error.to_string()),
++            Some(Ok(_)) => {}
++        }
++        let prepared = toolgateway::with_settings_principal(
++            authority.authorization.settings_principal.clone(),
++            || {
++                toolgateway::with_mcp_foreground(
++                    authority.authorization.foreground_mcp_session_permissions,
++                    || {
++                        toolgateway::with_workflow_scope(
++                            authority.authorization.workflow_scope.clone(),
++                            || {
++                                toolgateway::with_workspace(lifetime.workspace.clone(), || {
++                                    gateway.prepare_from_request_pinned(
++                                        ctx,
++                                        surface,
++                                        &authority.agent_id,
++                                        authority
++                                            .authorization
++                                            .scoped_invocation_permission_context(
++                                                authority.phone_scoped,
++                                            ),
++                                        &call,
++                                        &request,
++                                        pin,
++                                    )
++                                })
++                            },
++                        )
++                    },
++                )
++            },
++        );
++        let cleanup_handle = prepared
++            .as_ref()
++            .ok()
++            .map(|prepared| prepared.handle.clone());
++        let _cleanup = cleanup_handle.as_ref().map(|handle| PreparedCallCleanup {
++            gateway,
++            ctx,
++            call: &call,
++            handle,
++        });
++        db.record_invocation_intent(
++            ctx,
++            InvocationIntent {
++                journal_id: call.clone(),
++                target: request.target.clone(),
++                args_digest: request.args_digest.hex.clone(),
++                args_summary: request.args_summary.clone(),
++                idempotency_key: Some(call.to_string()),
++            },
++            now_ms,
++        )
++        .await
++        .map_err(|e| e.to_string())?;
++        self.persist_tool_event(
++            db.as_ref(),
++            events.as_ref(),
++            ctx,
++            &call,
++            &request,
++            None,
++            now_ms,
++        )
++        .await
++        .map_err(|e| e.to_string())?;
++        let outcome = match prepared {
++            Err(error) => {
++                let outcome = fail(error.to_string());
++                self.close_program_child(db, events, ctx, &call, &request, &outcome, false, now_ms)
++                    .await?;
++                return Ok(outcome);
++            }
++            Ok(prepared) => {
++                let local = prepared.local_name.as_str();
++                let mut denied = match authority.authorization.grant {
++                    RunGrant::Phone if crate::phone_settings::forbidden_tool(local) => {
++                        Some("PHONE_TOOL_FORBIDDEN".to_string())
++                    }
++                    RunGrant::Bridge { role }
++                        if role == lingxi_protocol::BridgeRole::Guest
++                            || toolgateway::bridge_forbidden_tool(local, "") =>
++                    {
++                        Some("BRIDGE_TOOL_FORBIDDEN".into())
++                    }
++                    RunGrant::Subagent { tier } => {
++                        match authorize_child_tool_with_registry_id(tier, local, &request.target) {
++                            ToolAuthorization::Denied { code, message, .. } => {
++                                Some(format!("{code}: {message}"))
++                            }
++                            _ => None,
++                        }
++                    }
++                    _ => None,
++                };
++                if local == "run_tools" {
++                    denied = Some("PTC_RECURSION_FORBIDDEN".into());
++                }
++                if (authority.phone_scoped && crate::phone_settings::forbidden_tool(local))
++                    || (!authority.phone_scoped && crate::phone_settings::control_tool(local))
++                {
++                    denied = Some("PHONE_SCOPE_FORBIDDEN".into());
++                }
++                if authority
++                    .authorization
++                    .workflow_scope
++                    .as_ref()
++                    .and_then(|s| s.tool_filter.as_ref())
++                    .is_some_and(|filter| {
++                        !filter.iter().any(|n| n == local || n == &request.target)
++                    })
++                {
++                    denied = Some("WORKFLOW_TOOL_FILTER".into());
++                }
++                // 这些入口必须由任务驱动建立专用事务，不能伪装成普通 executor 调用。
++                if matches!(prepared.origin, ToolOrigin::FirstParty)
++                    && crate::subagents::request_delegation(&request).is_some()
++                {
++                    denied = Some("PTC_DELEGATION_REQUIRES_DIRECT_DRIVER".into());
++                }
++                if let Some(reason) = denied {
++                    fail(reason)
++                } else {
++                    let approved = match &prepared.policy {
++                        PolicyVerdict::NeedsApproval { .. } => match self.approval.as_ref() {
++                            Some(gate) => {
++                                let approval = ApprovalRequest {
++                                    requires_scope_review: prepared.permission_kind
++                                        == PermissionKind::Review,
++                                    tool_call_id: call.clone(),
++                                    target: request.target.clone(),
++                                    args_digest: request.args_digest.hex.clone(),
++                                    args_summary: prepared.review_summary.clone().or_else(|| {
++                                        Some(lingxi_kernel::toolcatalog::summarize_arguments(
++                                            &request.arguments,
++                                        ))
++                                    }),
++                                    resources: prepared.resources.clone(),
++                                };
++                                tokio::select! {biased; _=lifetime.cancel.cancelled()=>false, decision=gate.request(ctx,&approval)=>matches!(decision,ApprovalDecision::Approved)}
++                            }
++                            None => false,
++                        },
++                        _ => true,
++                    };
++                    if !approved {
++                        fail("PTC_APPROVAL_REJECTED_OR_UNAVAILABLE".into())
++                    } else {
++                        db.advance_invocation(ctx, &call, InvocationPhase::Authorized, now_ms)
++                            .await
++                            .map_err(|e| e.to_string())?;
++                        if let Err(reason) = self.validate_program_authority(&authority, ctx).await
++                        {
++                            let outcome = fail(reason);
++                            self.close_program_child(
++                                db, events, ctx, &call, &request, &outcome, false, now_ms,
++                            )
++                            .await?;
++                            return Ok(outcome);
++                        }
++                        if lifetime.cancel.is_cancelled() {
++                            fail("PTC_CANCELLED_BEFORE_DISPATCH".into())
++                        } else {
++                            db.advance_invocation(ctx, &call, InvocationPhase::Started, now_ms)
++                                .await
++                                .map_err(|e| e.to_string())?;
++                            // 与直接入口相同：Started写入也是等待点，之后必须再查实时撤权。
++                            if let Err(reason) =
++                                self.validate_program_authority(&authority, ctx).await
++                            {
++                                let outcome = fail(reason);
++                                self.close_program_child(
++                                    db, events, ctx, &call, &request, &outcome, false, now_ms,
++                                )
++                                .await?;
++                                return Ok(outcome);
++                            }
++                            if lifetime.cancel.is_cancelled() {
++                                ToolOutcome::Unknown {
++                                    reason: "cancelled after durable start; not redispatched"
++                                        .into(),
++                                }
++                            } else {
++                                let scope = lifetime.cancel.child(
++                                    format!("tool_call:{}", call.as_str()),
++                                    crate::cancel::ScopeKind::ToolCall,
++                                );
++                                let owner = self.clone();
++                                let db = db.clone();
++                                let events = events.clone();
++                                let ctx = ctx.clone();
++                                let call = call.clone();
++                                let request = request.clone();
++                                let handle = prepared.handle.clone();
++                                let gateway = gateway.clone();
++                                let mut child_lifetime = lifetime.clone();
++                                child_lifetime.cancel = scope.clone();
++                                let workflow = authority.authorization.workflow_scope.clone();
++                                let settle = matches!(prepared.origin, ToolOrigin::FirstParty)
++                                    && matches!(
++                                        local,
++                                        "knowledge_search" | "browser" | "web_search" | "web_fetch"
++                                    )
++                                    || (local == "html-to-pdf"
++                                        && matches!(&prepared.origin,ToolOrigin::Plugin{plugin_id}if plugin_id=="office"));
++                                let child_run = ctx.run_id.to_string();
++                                let child=self.tasks.spawn_linked_with_settlement(&child_run,&scope,format!("tool_call:{}",call.as_str()),settle,async move {
++                                    // 实际I/O、协作收尾和持久回执全程持同一配额；父编排取消不抢先释放。
++                                    let _permit=_tool_permit;
++                                    let result=toolgateway::WORKFLOW_SCOPE.scope(workflow,toolgateway::TOOL_LIFETIME.scope(child_lifetime.clone(),gateway.execute_prepared(&ctx,&call,&handle))).await;
++                                    let (outcome,dispatched)=match result{
++                                        Err(error)=>(ToolOutcome::Failed{error:error.to_tool_error()},false),
++                                        Ok(result)=>{let outcome=match owner.fence_verdict(&child_lifetime.cancel,&result.fence,&ctx){FenceVerdict::Current=>result.outcome,FenceVerdict::Stale(reason)=>{owner.audit_late_result(db.as_ref(),&ctx,&result.fence,reason,vec!["ptc_tool_call_result".into()],now_ms).await;ToolOutcome::Unknown{reason:"PTC stale/cancelled result refused for state".into()}}};(outcome,true)}
++                                    };
++                                    owner.close_program_child(db.as_ref(),events.as_ref(),&ctx,&call,&request,&outcome,dispatched,now_ms).await?;
++                                    Ok::<ToolOutcome,String>(guard_program_result(authority.hooks.as_ref(),&request,&call,outcome))
++                                }).map_err(|error|error.to_string())?;
++                                return match child.wait().await {
++                                    Ok(result) => result,
++                                    Err(exit) => Ok(ToolOutcome::Unknown {
++                                        reason: unobserved_tool_exit_reason(&exit),
++                                    }),
++                                };
++                            }
++                        }
++                    }
++                }
++            }
++        };
++        self.close_program_child(db, events, ctx, &call, &request, &outcome, false, now_ms)
++            .await?;
++        Ok(outcome)
++    }
++    async fn validate_program_authority(
++        &self,
++        authority: &ProgramAuthority,
++        ctx: &lingxi_kernel::RunContext,
++    ) -> Result<(), String> {
++        crate::bridge_run_authority::validate(
++            self.context_session_store.as_deref(),
++            &authority.authorization,
++            ctx,
++            &authority.agent_id,
++            self.chat_settings_home.as_deref(),
++        )
++        .await?;
++        crate::phone_run_authority::validate(
++            self.context_session_store.as_deref(),
++            &authority.authorization,
++            ctx,
++            self.chat_settings_home.as_deref(),
++            authority.admitted_parentless_subagent,
++        )
++        .await?;
++        if let Some(scope) = authority.authorization.workflow_scope.as_ref() {
++            crate::workflow::validate_node_authority(
++                self.context_session_store
++                    .as_deref()
++                    .ok_or("PTC_WORKFLOW_STORE_MISSING")?,
++                ctx.session_id.as_str(),
++                scope,
++                authority.authorization.session_mode,
++            )
++            .await?;
++        }
++        Ok(())
++    }
++    #[allow(clippy::too_many_arguments)]
++    async fn close_program_child(
++        &self,
++        db: &lingxi_adapters::storage::RunDatabase,
++        events: &EventService,
++        ctx: &lingxi_kernel::RunContext,
++        call: &ToolCallId,
++        request: &ToolRequest,
++        outcome: &ToolOutcome,
++        dispatched: bool,
++        now: u64,
++    ) -> Result<(), String> {
++        let mut receipt = journal_receipt_of(outcome);
++        receipt.dispatched = dispatched;
++        db.record_invocation_receipt(ctx, call, receipt, now)
++            .await
++            .map_err(|e| e.to_string())?;
++        self.persist_tool_event(db, events, ctx, call, request, Some(outcome), now)
++            .await
++            .map_err(|e| e.to_string())?;
++        // 父编排内的零派发拒绝也更新同一失败/循环守卫；独立子任务在回执后投影。
++        if let Ok(hooks) = PROGRAM_AUTHORITY.try_with(|authority| authority.hooks.clone()) {
++            let _ = guard_program_result(hooks.as_ref(), request, call, outcome.clone());
++        }
++        Ok(())
++    }
++}
++
++fn guard_program_result(
++    hooks: Option<&Arc<std::sync::Mutex<crate::hooks::ExtensionHooks>>>,
++    request: &ToolRequest,
++    call: &ToolCallId,
++    mut outcome: ToolOutcome,
++) -> ToolOutcome {
++    if let Some(hooks) = hooks {
++        let mut hooks = hooks.lock().unwrap_or_else(|p| p.into_inner());
++        let content = match &outcome {
++            ToolOutcome::Success { result } => result.content.clone(),
++            _ => vec![],
++        };
++        let (warnings, guarded, truncated) = crate::hooks::tool_result_guard(
++            &mut hooks,
++            request.target.rsplit(':').next().unwrap_or(&request.target),
++            call.as_str(),
++            matches!(outcome, ToolOutcome::Failed { .. }),
++            &content,
++        );
++        match &mut outcome {
++            ToolOutcome::Success { result } => {
++                outcome = crate::hooks::project_tool_success(result, &warnings, guarded, truncated)
++            }
++            ToolOutcome::Failed { error } if !warnings.is_empty() => {
++                error.message = format!("{}\n{}", warnings.join("\n"), error.message)
++            }
++            _ => {}
++        }
++    }
++    outcome
++}
++
+ /// 明确用户封面动作仅允许这两个固定步骤，不接受任意目标或准备句柄。
+ #[derive(Clone, Copy)]
+ pub(crate) enum CoverAction {
+@@ -2764,8 +3306,10 @@ impl RunSupervisor {
+         // R06-T06: the Pi extension hooks state (fresh per run — the
+         // incumbent resets on session_start/agent_start; one run IS one
+         // agent start). `None` = the pre-T06 shape, byte-identical paths.
+-        let mut t06_hooks = if self.extension_hooks {
+-            Some(crate::hooks::ExtensionHooks::new())
++        let t06_hooks = if self.extension_hooks {
++            Some(Arc::new(std::sync::Mutex::new(
++                crate::hooks::ExtensionHooks::new(),
++            )))
+         } else {
+             None
+         };
+@@ -2777,7 +3321,8 @@ impl RunSupervisor {
+                 // to the tool_result hook. Warnings prepend as ONE text
+                 // block (incumbent prependWarnings).
+                 let mut outcome: ToolOutcome = $outcome.clone();
+-                if let Some(hooks) = t06_hooks.as_mut() {
++                if let Some(hooks) = t06_hooks.as_ref() {
++                    let mut hooks = hooks.lock().unwrap_or_else(|p| p.into_inner());
+                     let is_error = matches!(outcome, ToolOutcome::Failed { .. });
+                     let content_ref: Vec<ContentBlock> = match &outcome {
+                         ToolOutcome::Success { result } => result.content.clone(),
+@@ -2793,7 +3338,7 @@ impl RunSupervisor {
+                         .unwrap_or($request.target.as_str());
+                     let (warnings, guarded_content, any_truncated) =
+                         crate::hooks::tool_result_guard(
+-                            hooks,
++                            &mut hooks,
+                             local_name,
+                             $call_id.as_str(),
+                             is_error,
+@@ -4109,7 +4654,8 @@ impl RunSupervisor {
+                             // The guard is name-keyed (the incumbent sees
+                             // tool NAMES like "read") — derive the local
+                             // name from the registry target id.
+-                            if let Some(hooks) = t06_hooks.as_mut() {
++                            if let Some(hooks) = t06_hooks.as_ref() {
++                                let mut hooks = hooks.lock().unwrap_or_else(|p| p.into_inner());
+                                 let local_name = request
+                                     .target
+                                     .rsplit(':')
+@@ -4285,46 +4831,48 @@ impl RunSupervisor {
+                         // call, held across the approval wait AND the tool
+                         // I/O (the incumbent registers the execution for
+                         // its whole lifetime, approval wait included).
+-                        let tool_permit = match self
+-                            .acquire_or_break(
+-                                &QuotaResource::Tool,
+-                                agent_id,
+-                                quota_session_lane,
+-                                &run_id,
+-                                &root,
+-                                // The tool lane has no model-call budget;
+-                                // its queue wait is cancellation-bounded
+-                                // (R03-T03 semantics, unchanged).
+-                                None,
+-                            )
+-                            .await
+-                        {
+-                            Ok(Some(permit)) => permit,
+-                            Ok(None) => {
+-                                break 'turns RunFinish::Failed {
+-                                    cause: FailureCause::QuotaExhausted {
+-                                        resource: QuotaResource::Tool,
+-                                    },
+-                                };
+-                            }
+-                            Err(()) => {
+-                                let reason =
+-                                    root.reason().unwrap_or_else(|| "cancelled".to_string());
+-                                let finish = self
+-                                    .settle_cancellation(
+-                                        port,
+-                                        events,
+-                                        &ctx,
+-                                        &entry,
+-                                        live_status,
+-                                        reason,
+-                                        now_ms,
+-                                    )
+-                                    .await?;
+-                                guard.disarm();
+-                                return Ok(finish);
+-                            }
+-                        };
++                        let mut tool_permit = Some(
++                            match self
++                                .acquire_or_break(
++                                    &QuotaResource::Tool,
++                                    agent_id,
++                                    quota_session_lane,
++                                    &run_id,
++                                    &root,
++                                    // The tool lane has no model-call budget;
++                                    // its queue wait is cancellation-bounded
++                                    // (R03-T03 semantics, unchanged).
++                                    None,
++                                )
++                                .await
++                            {
++                                Ok(Some(permit)) => permit,
++                                Ok(None) => {
++                                    break 'turns RunFinish::Failed {
++                                        cause: FailureCause::QuotaExhausted {
++                                            resource: QuotaResource::Tool,
++                                        },
++                                    };
++                                }
++                                Err(()) => {
++                                    let reason =
++                                        root.reason().unwrap_or_else(|| "cancelled".to_string());
++                                    let finish = self
++                                        .settle_cancellation(
++                                            port,
++                                            events,
++                                            &ctx,
++                                            &entry,
++                                            live_status,
++                                            reason,
++                                            now_ms,
++                                        )
++                                        .await?;
++                                    guard.disarm();
++                                    return Ok(finish);
++                                }
++                            },
++                        );
+                         // F03-C04: re-check after the admission wait — a
+                         // cancellation accepted while queued for the tool
+                         // permit must not write a new invocation intent.
+@@ -5247,6 +5795,16 @@ impl RunSupervisor {
+                         // journal entry stays at `started`; recovery
+                         // classifies it as unobserved).
+                         gate_bridge_authority!();
++                        // 编排本身不占实际 I/O 槽；子调用逐个使用同一全局配额，cap=1也不自锁。
++                        if prepared.as_ref().is_some_and(|plan| {
++                            plan.local_name == "run_tools"
++                                && matches!(
++                                    plan.origin,
++                                    lingxi_kernel::toolcatalog::ToolOrigin::FirstParty
++                                )
++                        }) {
++                            drop(tool_permit.take());
++                        }
+                         // ── supervised tool execution ──
+                         // R04-T02: on the gateway wiring the dispatch is
+                         // the gateway's re-verified, single-use
+@@ -5283,6 +5841,16 @@ impl RunSupervisor {
+                             Some(gateway) => {
+                                 let gateway = Arc::clone(gateway);
+                                 let workflow_scope = authorization.workflow_scope.clone();
++                                let program_authority = ProgramAuthority::new(
++                                    tool_ctx.clone(),
++                                    exec_call_id.clone(),
++                                    authorization.clone(),
++                                    agent_id.to_string(),
++                                    phone_scoped,
++                                    admitted_parentless_subagent,
++                                    quota_session_lane.to_string(),
++                                    t06_hooks.clone(),
++                                );
+                                 let handle = prepared
+                                     .as_ref()
+                                     .expect("the gateway wiring prepared this call")
+@@ -5309,7 +5877,7 @@ impl RunSupervisor {
+                                             ))
+                                         }),
+                                         async move {
+-                                            crate::toolgateway::WORKFLOW_SCOPE.scope(workflow_scope, crate::toolgateway::TOOL_LIFETIME
++                                            PROGRAM_AUTHORITY.scope(program_authority, crate::toolgateway::WORKFLOW_SCOPE.scope(workflow_scope, crate::toolgateway::TOOL_LIFETIME
+                                                 .scope(
+                                                     trusted_lifetime,
+                                                     gateway.execute_prepared(
+@@ -5317,7 +5885,7 @@ impl RunSupervisor {
+                                                         &exec_call_id,
+                                                         &handle,
+                                                     ),
+-                                                )).await
++                                                ))).await
+                                         },
+                                     )
+                                     .map_err(|rejected| DriveError::Storage(rejected.into()))?
+diff --git a/rust/crates/lingxi-service/src/toolgateway.rs b/rust/crates/lingxi-service/src/toolgateway.rs
+index 677b9a4d1..96ff1f4a4 100644
+--- a/rust/crates/lingxi-service/src/toolgateway.rs
++++ b/rust/crates/lingxi-service/src/toolgateway.rs
+@@ -605,7 +605,9 @@ impl ToolPolicyPort for FailClosedPolicy {
+             | PermissionKind::ArgumentAwareChannel
+             | PermissionKind::ArgumentAwareBrowser
+             | PermissionKind::ArgumentAwareGoal
+-            | PermissionKind::ArgumentAwareSettings => PolicyVerdict::NeedsApproval {
++            | PermissionKind::ArgumentAwareSettings
++            | PermissionKind::ArgumentAwareRunCode
++            | PermissionKind::ArgumentAwareLsp => PolicyVerdict::NeedsApproval {
+                 reason: format!(
+                     "no tool policy service is configured; the gateway cannot safely \
+                      adjudicate an execution-class invocation of {} ({}) and never \
+diff --git a/rust/crates/xtask/src/stage_map.rs b/rust/crates/xtask/src/stage_map.rs
+index e86ac3849..027817a6b 100644
+--- a/rust/crates/xtask/src/stage_map.rs
++++ b/rust/crates/xtask/src/stage_map.rs
+@@ -1198,7 +1198,7 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                                 "supplemental leaf {id:?} complete behavior has no assertionContract"
+                             ))
+                         })?;
+-                        let mut seen = Vec::new();
++                        let mut assigned = Vec::new();
+                         let mut coverage = Vec::with_capacity(groups.len());
+                         for (assertion_index, group) in groups.iter().enumerate() {
+                             let refs = group.as_array().ok_or_else(|| {
+@@ -1228,18 +1228,24 @@ pub fn parse_stage_map(text: &str) -> Result<StageMap, String> {
+                                          #{assertion_index} references unpinned case {name:?}"
+                                     )));
+                                 }
+-                                if seen.contains(&name) {
++                                // F02 repair: a single real test may prove several
++                                // original assertions, so reuse across groups is
++                                // legitimate. Repeating a case inside ONE assertion
++                                // group is still meaningless and stays an error.
++                                if names.contains(&name) {
+                                     return Err(err(&format!(
+-                                        "supplemental leaf {id:?} reuses original-behavior \
+-                                         case {name:?} across assertions"
++                                        "supplemental leaf {id:?} repeats case {name:?} \
++                                         within original assertion #{assertion_index}"
+                                     )));
+                                 }
+-                                seen.push(name.clone());
+-                                names.push(name);
++                                names.push(name.clone());
+                             }
++                            assigned.extend(names.iter().cloned());
+                             coverage.push(names);
+                         }
+-                        if seen.len() != contract.cases.len() {
++                        assigned.sort();
++                        assigned.dedup();
++                        if assigned.len() != contract.cases.len() {
+                             return Err(err(&format!(
+                                 "supplemental leaf {id:?} has pinned cases not assigned \
+                                  to an original R00 assertion"
+@@ -1910,10 +1916,29 @@ mod map_tests {
+             "{missing}"
+         );
+ 
++        // F02 repair: a real test may prove several original assertions, so the
++        // same case across two assertion groups is legitimate coverage now.
++        // The leaf then pins exactly that one case (nothing unassigned).
++        value["supplementalLeafScenarios"][0]["assertionContract"]["cases"] =
++            serde_json::json!([{"case":"positive","expect":200}]);
+         value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
+             serde_json::json!([["positive"], ["positive"]]);
+-        let reused = parse_stage_map(&value.to_string()).unwrap_err();
+-        assert!(reused.contains("reuses original-behavior case"), "{reused}");
++        let parsed = parse_stage_map(&value.to_string())
++            .expect("one real case may cover two original assertions");
++        assert_eq!(
++            parsed.supplemental_leaves[0].original_assertion_cases.len(),
++            2
++        );
++
++        // Repeating a case inside ONE assertion group stays meaningless.
++        value["supplementalLeafScenarios"][0]["assertionContract"]["cases"] = serde_json::json!([
++            {"case":"positive","expect":200},
++            {"case":"negative","expect":403}
++        ]);
++        value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
++            serde_json::json!([["positive", "positive"], ["negative"]]);
++        let repeated = parse_stage_map(&value.to_string()).unwrap_err();
++        assert!(repeated.contains("repeats case"), "{repeated}");
+ 
+         value["supplementalLeafScenarios"][0]["originalAssertionCases"] =
+             serde_json::json!([["positive"], ["negative"]]);
+diff --git a/rust/crates/xtask/src/stage_maps/R07.json b/rust/crates/xtask/src/stage_maps/R07.json
+index 4b7ea3c92..c7c3511b0 100644
+--- a/rust/crates/xtask/src/stage_maps/R07.json
++++ b/rust/crates/xtask/src/stage_maps/R07.json
+@@ -907,6 +907,102 @@
+         "{EVIDENCE}/SUITES/r07_probe_access/result.json",
+         "{EVIDENCE}/SUITES/r07_probe_access/output.log"
+       ]
++    },
++    "r08_admission_run_code": {
++      "argv": [
++        "python3",
++        "-B",
++        "scripts/rust-tauri/r07_stage_inputs.py",
++        "--run-suite",
++        "r08_admission_run_code",
++        "--evidence",
++        "{EVIDENCE}/SUITES/r08_admission_run_code"
++      ],
++      "timeoutSecs": 3600,
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_admission_run_code/result.json",
++        "{EVIDENCE}/SUITES/r08_admission_run_code/output.log"
++      ]
++    },
++    "r08_admission_ptc": {
++      "argv": [
++        "python3",
++        "-B",
++        "scripts/rust-tauri/r07_stage_inputs.py",
++        "--run-suite",
++        "r08_admission_ptc",
++        "--evidence",
++        "{EVIDENCE}/SUITES/r08_admission_ptc"
++      ],
++      "timeoutSecs": 3600,
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_admission_ptc/result.json",
++        "{EVIDENCE}/SUITES/r08_admission_ptc/output.log"
++      ]
++    },
++    "r08_admission_ptc_authority": {
++      "argv": [
++        "python3",
++        "-B",
++        "scripts/rust-tauri/r07_stage_inputs.py",
++        "--run-suite",
++        "r08_admission_ptc_authority",
++        "--evidence",
++        "{EVIDENCE}/SUITES/r08_admission_ptc_authority"
++      ],
++      "timeoutSecs": 3600,
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_admission_ptc_authority/result.json",
++        "{EVIDENCE}/SUITES/r08_admission_ptc_authority/output.log"
++      ]
++    },
++    "r08_admission_ast_lsp": {
++      "argv": [
++        "python3",
++        "-B",
++        "scripts/rust-tauri/r07_stage_inputs.py",
++        "--run-suite",
++        "r08_admission_ast_lsp",
++        "--evidence",
++        "{EVIDENCE}/SUITES/r08_admission_ast_lsp"
++      ],
++      "timeoutSecs": 3600,
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_admission_ast_lsp/result.json",
++        "{EVIDENCE}/SUITES/r08_admission_ast_lsp/output.log"
++      ]
++    },
++    "r08_admission_security": {
++      "argv": [
++        "python3",
++        "-B",
++        "scripts/rust-tauri/r07_stage_inputs.py",
++        "--run-suite",
++        "r08_admission_security",
++        "--evidence",
++        "{EVIDENCE}/SUITES/r08_admission_security"
++      ],
++      "timeoutSecs": 3600,
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r08_admission_security/result.json",
++        "{EVIDENCE}/SUITES/r08_admission_security/output.log"
++      ]
++    },
++    "r06_skills_completion": {
++      "argv": [
++        "python3",
++        "-B",
++        "scripts/rust-tauri/r07_stage_inputs.py",
++        "--run-suite",
++        "r06_skills_completion",
++        "--evidence",
++        "{EVIDENCE}/SUITES/r06_skills_completion"
++      ],
++      "timeoutSecs": 3600,
++      "evidencePaths": [
++        "{EVIDENCE}/SUITES/r06_skills_completion/result.json",
++        "{EVIDENCE}/SUITES/r06_skills_completion/output.log"
++      ]
+     }
+   },
+   "scenarios": [
+@@ -3456,7 +3552,8 @@
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [
+-        "r07_ui_vitest",
++        "r08_admission_ptc",
++        "r08_admission_ptc_authority",
+         "r07_leaf_cases"
+       ],
+       "evidencePaths": [
+@@ -3468,35 +3565,60 @@
+         "evidencePath": "{EVIDENCE}/LEAF_CASES/leaf-cases.json",
+         "cases": [
+           {
+-            "case": "r07_ui_vitest::ptc-tool.test::run_tools 工具契约 权限契约：execute 动作 + routine 档，能力名对齐工具名",
++            "case": "r08_admission_ptc::real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
++            "expect": 1
++          },
++          {
++            "case": "r08_admission_ptc_authority::actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch",
++            "expect": 1
++          },
++          {
++            "case": "r08_admission_ptc_authority::actual_registry_disable_while_child_waits_approval_refuses_old_approval",
++            "expect": 1
++          },
++          {
++            "case": "r08_admission_ptc_authority::actual_registry_schema_generation_change_refuses_old_approval",
++            "expect": 1
++          },
++          {
++            "case": "r08_admission_ptc::real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 子调用中间结果不进 content，只有 console + return 进",
++            "case": "r08_admission_ptc::later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 程序异常：isError + 异常消息 + 已捕获日志随附",
++            "case": "r08_admission_ptc::unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::ptc-tool.test::run_tools 绑定桥 run_tools 不能调自己（防递归），错误可被程序捕获",
++            "case": "r08_admission_ptc::real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker",
++            "expect": 1
++          },
++          {
++            "case": "r08_admission_ptc::actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write",
+             "expect": 1
+           }
+         ]
+       },
+       "originalAssertionCases": [
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 工具契约 权限契约：execute 动作 + routine 档，能力名对齐工具名"
++          "r08_admission_ptc::real_child_approval_is_separate_from_outer_approval_and_denial_writes_nothing",
++          "r08_admission_ptc_authority::actual_resource_grant_revoked_while_child_waits_approval_refuses_dispatch",
++          "r08_admission_ptc_authority::actual_registry_disable_while_child_waits_approval_refuses_old_approval",
++          "r08_admission_ptc_authority::actual_registry_schema_generation_change_refuses_old_approval"
+         ],
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 子调用中间结果不进 content，只有 console + return 进"
++          "r08_admission_ptc::real_parallel_children_only_return_selected_summary_and_keep_bounded_ui_receipts"
+         ],
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 结果语义 程序异常：isError + 异常消息 + 已捕获日志随附"
++          "r08_admission_ptc::later_program_failure_keeps_real_completed_effect_and_exposes_it_in_receipts"
+         ],
+         [
+-          "r07_ui_vitest::ptc-tool.test::run_tools 绑定桥 run_tools 不能调自己（防递归），错误可被程序捕获"
++          "r08_admission_ptc::unknown_recursive_and_sandbox_failures_are_explicit_and_catchable",
++          "r08_admission_ptc::real_default_ten_minute_timeout_keeps_completed_action_and_reaps_worker",
++          "r08_admission_ptc::actual_vm_escape_cannot_read_write_connect_or_delegate_a_host_write"
+         ]
+       ]
+     },
+@@ -3863,10 +3985,6 @@
+           {
+             "case": "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist",
+             "expect": 1
+-          },
+-          {
+-            "case": "r07_t12_closure::r07_t12_a23_runtime_route_matrix",
+-            "expect": 1
+           }
+         ]
+       },
+@@ -3875,7 +3993,7 @@
+           "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ],
+         [
+-          "r07_t12_closure::r07_t12_a23_runtime_route_matrix"
++          "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ]
+       ]
+     },
+@@ -5308,7 +5426,7 @@
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [
+-        "r07_ui_vitest",
++        "r08_admission_ast_lsp",
+         "r07_leaf_cases"
+       ],
+       "evidencePaths": [
+@@ -5320,28 +5438,20 @@
+         "evidencePath": "{EVIDENCE}/LEAF_CASES/leaf-cases.json",
+         "cases": [
+           {
+-            "case": "r07_ui_vitest::ast-tools.test::ast_grep 工具 content 模式分页 + 诚实 footer",
+-            "expect": 1
+-          },
+-          {
+-            "case": "r07_ui_vitest::ast-tools.test::ast_grep 工具 files 模式：唯一文件 + 命中数",
+-            "expect": 1
+-          },
+-          {
+-            "case": "r07_ui_vitest::ast-tools.test::ast_grep 工具 参数校验：缺 pattern/language 直接说明，不起子进程",
++            "case": "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run",
+             "expect": 1
+           }
+         ]
+       },
+       "originalAssertionCases": [
+         [
+-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 content 模式分页 + 诚实 footer"
++          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
+         ],
+         [
+-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 files 模式：唯一文件 + 命中数"
++          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
+         ],
+         [
+-          "r07_ui_vitest::ast-tools.test::ast_grep 工具 参数校验：缺 pattern/language 直接说明，不起子进程"
++          "r08_admission_ast_lsp::r08_ast_structure_pagination_no_match_and_errors_use_real_run"
+         ]
+       ]
+     },
+@@ -7600,7 +7710,7 @@
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [
+-        "r07_ui_vitest",
++        "r08_admission_ast_lsp",
+         "r07_leaf_cases"
+       ],
+       "evidencePaths": [
+@@ -7612,35 +7722,31 @@
+         "evidencePath": "{EVIDENCE}/LEAF_CASES/leaf-cases.json",
+         "cases": [
+           {
+-            "case": "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） definition：1-based 输入 → 0-based 协议 → 1-based 输出",
++            "case": "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） references：多位置清单",
++            "case": "r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） rename：prepareRename 验证 → 编辑计算 → 写回",
+-            "expect": 1
+-          },
+-          {
+-            "case": "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） 服务器缺失：LSP_SERVER_MISSING + 环境页指引",
++            "case": "r08_admission_ast_lsp::r08_lsp_missing_and_crashed_server_are_explicit_errors",
+             "expect": 1
+           }
+         ]
+       },
+       "originalAssertionCases": [
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） definition：1-based 输入 → 0-based 协议 → 1-based 输出"
++          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"
+         ],
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） references：多位置清单"
++          "r08_admission_ast_lsp::r08_lsp_real_clangd_positions_preview_rename_and_rejections"
+         ],
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） rename：prepareRename 验证 → 编辑计算 → 写回"
++          "r08_admission_ast_lsp::r08_lsp_read_grant_rename_returns_preview_without_writing"
+         ],
+         [
+-          "r07_ui_vitest::lsp-tool.test::lsp 工具（mock server 全动作） 服务器缺失：LSP_SERVER_MISSING + 环境页指引"
++          "r08_admission_ast_lsp::r08_lsp_missing_and_crashed_server_are_explicit_errors"
+         ]
+       ]
+     },
+@@ -13750,7 +13856,7 @@
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [
+-        "r07_ui_vitest",
++        "r06_skills_completion",
+         "r07_leaf_cases"
+       ],
+       "evidencePaths": [
+@@ -13762,35 +13868,23 @@
+         "evidencePath": "{EVIDENCE}/LEAF_CASES/leaf-cases.json",
+         "cases": [
+           {
+-            "case": "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查通过：SKILL.md 落盘（frontmatter + 正文）、写经验索引、触发 onLearned",
+-            "expect": 1
+-          },
+-          {
+-            "case": "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查未通过 → 带 token 显式确认后落盘并标 riskOverride",
+-            "expect": 1
+-          },
+-          {
+-            "case": "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 同名技能已存在时拒绝、不覆盖、不烧 guard 调用",
+-            "expect": 1
+-          },
+-          {
+-            "case": "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 无 token 的 risk_accepted 不能绕过审查",
++            "case": "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval",
+             "expect": 1
+           }
+         ]
+       },
+       "originalAssertionCases": [
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查通过：SKILL.md 落盘（frontmatter + 正文）、写经验索引、触发 onLearned"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ],
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 审查未通过 → 带 token 显式确认后落盘并标 riskOverride"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ],
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 同名技能已存在时拒绝、不覆盖、不烧 guard 调用"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ],
+         [
+-          "r07_ui_vitest::learn-lesson-tool.test::learn_lesson 工具 无 token 的 risk_accepted 不能绕过审查"
++          "r06_skills_completion::original_lesson_review_one_shot_content_binding_conflict_and_real_retrieval"
+         ]
+       ]
+     },
+@@ -20731,7 +20825,7 @@
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [
+-        "r07_ui_vitest",
++        "r08_admission_run_code",
+         "r07_leaf_cases"
+       ],
+       "evidencePaths": [
+@@ -20743,35 +20837,42 @@
+         "evidencePath": "{EVIDENCE}/LEAF_CASES/leaf-cases.json",
+         "cases": [
+           {
+-            "case": "r07_ui_vitest::run-code-tool.test::run_code 工具 变量跨调用存活（同内核连续两次 run）+ 回显剥除 + 结果输出",
++            "case": "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
++            "expect": 1
++          },
++          {
++            "case": "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::run-code-tool.test::run_code 工具 缺语言：RUN_CODE_LANGUAGE_MISSING + 安装指引",
++            "case": "r08_admission_run_code::cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::run-code-tool.test::run_code 工具 内核死亡：如实报告 exit 与部分输出，指路 restart",
++            "case": "r08_admission_run_code::absent_real_interpreters_report_install_guidance_without_starting_kernel",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::run-code-tool.test::run_code 工具 未知语言直接拒绝",
++            "case": "r08_admission_run_code::output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
+             "expect": 1
+           }
+         ]
+       },
+       "originalAssertionCases": [
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 变量跨调用存活（同内核连续两次 run）+ 回显剥除 + 结果输出"
++          "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions"
+         ],
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 缺语言：RUN_CODE_LANGUAGE_MISSING + 安装指引"
++          "r08_admission_run_code::python_and_node_real_kernels_preserve_variables_functions_imports_and_isolate_agent_sessions",
++          "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+         ],
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 内核死亡：如实报告 exit 与部分输出，指路 restart"
++          "r08_admission_run_code::cancelling_real_run_stops_persistent_python_kernel_and_its_actual_grandchild"
+         ],
+         [
+-          "r07_ui_vitest::run-code-tool.test::run_code 工具 未知语言直接拒绝"
++          "r08_admission_run_code::absent_real_interpreters_report_install_guidance_without_starting_kernel",
++          "r08_admission_run_code::output_is_real_bounded_head_tail_utf8_and_dead_kernel_requires_explicit_restart",
++          "r08_admission_run_code::real_thirty_second_cap_reports_timeout_keeps_busy_state_and_restart_ends_it_without_replay"
+         ]
+       ]
+     },
+@@ -21151,7 +21252,7 @@
+       ],
+       "r00Due": "R00-T07 建立正式账本时登记；最迟在所列实施 Task 的阶段验收前完成并执行",
+       "evidenceCommandRefs": [
+-        "r07_ui_vitest",
++        "r08_admission_security",
+         "r07_leaf_cases"
+       ],
+       "evidencePaths": [
+@@ -21163,35 +21264,38 @@
+         "evidencePath": "{EVIDENCE}/LEAF_CASES/leaf-cases.json",
+         "cases": [
+           {
+-            "case": "r07_ui_vitest::security-scan-tool.test::security_scan 工具 path 模式：扫目录、命中密钥、审计只进计数",
++            "case": "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::security-scan-tool.test::security_scan 工具 范围硬校验：path 指到授权文件夹之外直接拒绝",
++            "case": "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::security-scan-tool.test::security_scan 工具 changes 模式：非 git 目录如实说明并建议 path 模式",
++            "case": "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged",
+             "expect": 1
+           },
+           {
+-            "case": "r07_ui_vitest::security-scan-tool.test::security_scan 工具 权限契约：read（计划模式可用）",
++            "case": "r08_admission_security::r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child",
+             "expect": 1
+           }
+         ]
+       },
+       "originalAssertionCases": [
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 path 模式：扫目录、命中密钥、审计只进计数"
++          "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
++          "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
+         ],
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 范围硬校验：path 指到授权文件夹之外直接拒绝"
++          "r08_admission_security::r08_security_real_baseline_never_returns_secret_and_audits_counts"
+         ],
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 changes 模式：非 git 目录如实说明并建议 path 模式"
++          "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged",
++          "r08_admission_security::r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child"
+         ],
+         [
+-          "r07_ui_vitest::security-scan-tool.test::security_scan 工具 权限契约：read（计划模式可用）"
++          "r08_admission_security::r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent",
++          "r08_admission_security::r08_security_outside_root_and_symlink_refused_and_sources_unchanged"
+         ]
+       ]
+     },
+@@ -21989,10 +22093,6 @@
+           {
+             "case": "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist",
+             "expect": 1
+-          },
+-          {
+-            "case": "r07_t12_closure::r07_t12_a23_runtime_route_matrix",
+-            "expect": 1
+           }
+         ]
+       },
+@@ -22001,7 +22101,7 @@
+           "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ],
+         [
+-          "r07_t12_closure::r07_t12_a23_runtime_route_matrix"
++          "r07_probe_access::bridge_settings_receipt_and_rich_streaming_toggles_persist"
+         ]
+       ]
+     },
+diff --git a/scripts/dev-env.js b/scripts/dev-env.js
+index 82c6072a9..769ba83ed 100644
+--- a/scripts/dev-env.js
++++ b/scripts/dev-env.js
+@@ -1,5 +1,6 @@
+ import { homedir } from "node:os";
+ import { join } from "node:path";
++import runtimePaths from "../shared/hana-runtime-paths.cjs";
+ 
+ export function defaultDevLingxiHome() {
+   return join(homedir(), ".lingxi-dev");
+@@ -8,7 +9,8 @@ export function defaultDevLingxiHome() {
+ export function applyDevEnvironment(env = process.env, {
+   nodeBin = process.execPath,
+ } = {}) {
+-  env.LINGXI_HOME = defaultDevLingxiHome();
++  // 显式指定的演练副本优先；只有未指定时才使用原开发目录。
++  env.LINGXI_HOME = runtimePaths.resolveLingxiHome(env.LINGXI_HOME || defaultDevLingxiHome());
+   env.LINGXI_DEV_NODE_BIN = nodeBin;
+   return env;
+ }
+diff --git a/scripts/rust-tauri/r07_apply_leaf_bindings.py b/scripts/rust-tauri/r07_apply_leaf_bindings.py
+index 852e3e3b0..9935431b0 100644
+--- a/scripts/rust-tauri/r07_apply_leaf_bindings.py
++++ b/scripts/rust-tauri/r07_apply_leaf_bindings.py
+@@ -8,7 +8,8 @@ rust/crates/xtask/src/stage_maps/R07.json：
+ - 未绑定叶一律保持原样（required_behavior_pending），不批量改状态。
+ 
+ 校验（失败即退出 1，不写地图）：叶必须在地图中；assertionCases 组数 = R00
+-原断言数；叶内 case 不重复；suiteRefs 必须是地图已注册的套件命令。
++原断言数；单条断言组内 case 不重复（同案例跨断言组复用按 F02 独立审查结论
++允许：一个真实测试可证明多条原断言）；suiteRefs 必须是地图已注册的套件命令。
+ 地图解析层（xtask stage_map.rs）随后还会做第二遍独立校验。
+ """
+ 
+@@ -49,6 +50,27 @@ def main() -> int:
+                 "{EVIDENCE}/SUITES/" + suite + "/output.log",
+             ],
+         }
++    # F02 批次0：五工具原叶的真实执行证据在 R08 准入套件；learn_lesson 复用 R06
++    # 既有真实完成测试。按同一生产者执行注册，与 r07_probe_* 同构。
++    for suite in (
++        "r08_admission_run_code",
++        "r08_admission_ptc",
++        "r08_admission_ptc_authority",
++        "r08_admission_ast_lsp",
++        "r08_admission_security",
++        "r06_skills_completion",
++    ):
++        commands[suite] = {
++            "argv": [
++                "python3", "-B", "scripts/rust-tauri/r07_stage_inputs.py",
++                "--run-suite", suite, "--evidence", "{EVIDENCE}/SUITES/" + suite,
++            ],
++            "timeoutSecs": 3600,
++            "evidencePaths": [
++                "{EVIDENCE}/SUITES/" + suite + "/result.json",
++                "{EVIDENCE}/SUITES/" + suite + "/output.log",
++            ],
++        }
+     commands["r07_ui_vitest"] = {
+         "argv": [
+             "python3", "-B", "scripts/rust-tauri/r07_ui_cases.py",
+@@ -75,8 +97,10 @@ def main() -> int:
+             )
+             continue
+         flat = [case for group in groups for case in group]
+-        if len(set(flat)) != len(flat):
+-            errors.append(f"{leaf_id}: duplicate case within leaf")
++        # F02 修复：一个真实测试可以同时证明同叶多条原断言（F02 独立范围审查结论）。
++        # 仍禁止单条断言组内重复引用；全部引用过的案例即该叶的 pinned 案例。
++        if any(len(set(group)) != len(group) for group in groups):
++            errors.append(f"{leaf_id}: duplicate case within one assertion")
+             continue
+         if any(not group for group in groups):
+             errors.append(f"{leaf_id}: an assertion has no case")
+@@ -96,7 +120,8 @@ def main() -> int:
+         leaf["assertionContract"] = {
+             "producerCommand": producer,
+             "evidencePath": evidence_path,
+-            "cases": [{"case": case, "expect": 1} for case in flat],
++            # 案例按首次出现去重：同一案例可服务多条断言，但只 pin 一次。
++            "cases": [{"case": case, "expect": 1} for case in dict.fromkeys(flat)],
+         }
+         if binding["basis"] == "full_original_behavior":
+             leaf["originalAssertionCases"] = groups
+diff --git a/scripts/rust-tauri/r07_stage_inputs.py b/scripts/rust-tauri/r07_stage_inputs.py
+index 614a3d04d..bebeb8b27 100644
+--- a/scripts/rust-tauri/r07_stage_inputs.py
++++ b/scripts/rust-tauri/r07_stage_inputs.py
+@@ -88,6 +88,23 @@ def run_suite(suite: str, evidence: Path) -> int:
+         path.mkdir(parents=True, exist_ok=True)
+     env = dict(os.environ)
+     env.pop("ELECTRON_RUN_AS_NODE", None)  # 宿主污染不得进入测试链
++    if suite == "r08_admission_ast_lsp":
++        # 该套件依赖官方 ast-grep CLI（AST_LSP_IMPLEMENTATION.md 记录的固定
++        # 临时安装位置）；缺依赖时套件按自身断言诚实失败，不在此伪造。
++        ast_tools = "/private/tmp/lingxi-r08-ast-tools-0510/node_modules/.bin"
++        env["PATH"] = ast_tools + os.pathsep + env.get("PATH", "")
++    if suite == "r08_admission_ptc":
++        # 全量含真实 600 秒默认预算单项；lingxi-test-guard 的整进程墙钟需要
++        # 少量余量（独审 ADMISSION_CANDIDATE_INDEPENDENT_REVIEW.md §5.6 已接受
++        # 该差异；产品预算仍由测试内部断言，内存 8GiB 保护保留）。
++        env["TEST_TIME_LIMIT_SEC"] = "660"
++    if suite.startswith("r08_admission_"):
++        # 准入套件按串行验证设计（全部既有回执均单线程）：并行时多测试的
++        # Node 外围进程共享同一测试进程父 PID，会破坏 cancelling_* 测试
++        # "恰好一个外围进程"的真实断言（f02-batch0-suites-01 的
++        # r08_admission_ptc exit 101 红证据即该环境错配，非产品缺陷）。
++        # 经 libtest 原生 RUST_TEST_THREADS 环境变量串行化，不改变命令构造。
++        env["RUST_TEST_THREADS"] = "1"
+     env.update({
+         "LINGXI_HOME": str(home), "TMPDIR": str(temporary),
+         "TMP": str(temporary), "TEMP": str(temporary),
+diff --git a/tests/desktop-single-instance-lock.test.ts b/tests/desktop-single-instance-lock.test.ts
+index d8da55128..8ebad765d 100644
+--- a/tests/desktop-single-instance-lock.test.ts
++++ b/tests/desktop-single-instance-lock.test.ts
+@@ -1,9 +1,12 @@
+ import { describe, expect, it, vi } from "vitest";
+ import path from "path";
++import fs from "fs";
++import os from "os";
+ 
+ import {
+   configureClientSingleInstance,
+   focusExistingWindow,
++  getClientUserDataPath,
+ } from "../desktop/src/shared/single-instance-lock.cjs";
+ 
+ function makeApp({ gotLock = true } = {}) {
+@@ -25,6 +28,30 @@ function makeApp({ gotLock = true } = {}) {
+ }
+ 
+ describe("desktop client single instance lock", () => {
++  it("不同位置的同名副本不共用缓存或单实例空间，路径别名仍指向同一空间", () => {
++    const root = fs.mkdtempSync(path.join(os.tmpdir(), "r08-client-isolation-"));
++    try {
++      const a = path.join(root, "a", "copy");
++      const b = path.join(root, "b", "copy");
++      fs.mkdirSync(a, { recursive: true });
++      fs.mkdirSync(b, { recursive: true });
++      const alias = path.join(root, "alias");
++      fs.symlinkSync(a, alias, "junction");
++      const defaults = path.join(root, ".hanako");
++      const namespace = (home: string) => getClientUserDataPath(home, defaults, path.join(root, "appData"));
++      expect(namespace(a)).not.toBe(namespace(b));
++      expect(namespace(a)).toBe(namespace(alias));
++      expect(namespace(a)).toBe(path.join(fs.realpathSync(a), ".electron-user-data"));
++      const standard = path.join(root, ".lingxi-dev");
++      fs.mkdirSync(standard);
++      const standardAlias = path.join(root, "standard-alias");
++      fs.symlinkSync(standard, standardAlias, "junction");
++      expect(namespace(standardAlias)).toBe(namespace(standard));
++      expect(namespace(standard)).toBe(path.join(root, "appData", "Lingxi-dev"));
++    } finally {
++      fs.rmSync(root, { recursive: true, force: true });
++    }
++  });
+   it("sets the dev userData namespace before requesting the lock", () => {
+     const { app } = makeApp();
+     const defaultHome = path.join("C:", "Users", "me", ".hanako");
+diff --git a/tests/startup-contract.test.ts b/tests/startup-contract.test.ts
+index a0718df14..a956ad987 100644
+--- a/tests/startup-contract.test.ts
++++ b/tests/startup-contract.test.ts
+@@ -30,6 +30,13 @@ describe("local startup contract", () => {
+     expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/hana-node");
+   });
+ 
++  it("保留显式演练目录并将同一绝对路径传给子进程", () => {
++    const env = applyDevEnvironment({ LINGXI_HOME: "/tmp/r08-copy/home" }, { nodeBin: "/tmp/test-node" });
++    expect(env.LINGXI_HOME).toBe("/tmp/r08-copy/home");
++    expect(env.LINGXI_DEV_NODE_BIN).toBe("/tmp/test-node");
++    expect(applyDevEnvironment({}).LINGXI_HOME).toMatch(/\.lingxi-dev$/);
++  });
++
+   it("server keeps Pi SDK runtime paths explicit and CLI stays server-first", () => {
+     const cliSource = fs.readFileSync(path.join(ROOT, "index.js"), "utf-8");
+     const cliEntrySource = fs.readFileSync(path.join(ROOT, "cli", "entry.ts"), "utf-8");

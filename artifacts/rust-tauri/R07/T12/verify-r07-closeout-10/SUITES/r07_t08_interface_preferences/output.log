@@ -1,0 +1,11 @@
+
+running 4 tests
+test actual_http_preferences_match_shared_pure_normalizers_for_every_command_and_partial_sidebar ... ok
+test actual_http_corrupt_preferences_are_explicit_and_authorized_writer_refuses_revocation_at_commit ... ok
+test actual_http_global_archives_return_only_existing_metadata_and_reject_corrupt_or_unsafe_files ... ok
+test actual_http_keybindings_full_replace_sidebar_partial_merge_scopes_and_same_home_restart ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 23.40s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_t08_interface_preferences.rs (rust/target/debug/deps/r07_t08_interface_preferences-7e99f08fdc2fc85a)

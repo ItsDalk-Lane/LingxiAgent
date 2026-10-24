@@ -1,0 +1,15 @@
+
+running 7 tests
+test dynamic_channel_contract_preserves_read_review_and_inherited_read_only ... ok
+test executor_rechecks_real_run_generation_attempt_and_owner ... ok
+test real_dm_confirmation_writes_both_histories_once_as_session_actor ... ok
+test real_create_adds_actual_actor_and_keeps_a_durable_source_receipt ... ok
+test membership_revoked_during_real_approval_cannot_publish ... ok
+test real_channel_post_waits_for_approval_and_records_actual_actor_and_source ... ok
+test real_read_run_is_member_scoped_and_ambiguous_names_list_ids ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.27s
+     Running tests/r07_conversation_tools.rs (rust/target/debug/deps/r07_conversation_tools-c2024235744bac6e)

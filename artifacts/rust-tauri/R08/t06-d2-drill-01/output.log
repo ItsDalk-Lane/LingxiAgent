@@ -1,0 +1,32 @@
+PASS [leg-a] fixture gen
+PASS [leg-a] migrate committed
+PASS [leg-a] stop-after delta_export exit 0
+PASS [leg-a] package manifest exists
+PASS [leg-a] resume refused (non-zero) :: status=2
+PASS [leg-a] refusal names export_verify :: error: rollback: phase export_verify refused: new root seal broken: 66797d4aca71ae2feae10126465eb8ca1d5cddf7f2d05394876260b1947f5db4 → 9f8977f1a997f6d6ea5370ffea76f53077809f1137f6fe02ca76f5928f7dd399
+
+FAIL [leg-a] journal terminal refused :: export_verify
+PASS [leg-a] pointer unchanged (→ new root) :: /private/tmp/t06-d2-drill-01/leg-a/new-root
+PASS [leg-a] old root untouched (zero-touch)
+PASS [leg-a] new root intact
+PASS [leg-b] ram disk attached :: /dev/disk4
+PASS [leg-b] tiny volume mounted at /Volumes/T06D2TINY :: /Volumes/T06D2TINY fmt=0 mnt=0
+PASS [leg-b] fixture gen
+PASS [leg-b] migrate committed
+PASS [leg-b] preflight refused (non-zero) :: status=2
+PASS [leg-b] refusal names insufficient space :: error: rollback: phase preflight refused: insufficient space on backup volume: need 271802182 bytes (2×tree+slack), available 32751616
+
+PASS [leg-b] pointer unchanged (→ new root) :: /private/tmp/t06-d2-drill-01/leg-b/new-root
+PASS [leg-b] old root untouched (zero-touch)
+PASS [leg-b] old stamp untouched (still fixture {epoch:7})
+PASS [leg-c] fixture gen
+PASS [leg-c] migrate committed
+PASS [leg-c] rollback refused (non-zero) :: status=2
+FAIL [leg-c] refusal names old stack probe :: error: rollback: phase export_verify refused: new root seal broken: c91c3a23ac05c2e1dafcb719d7140754b8875e84378fe59eec7f3eabb0194a4f → e942909c79661440bf2ac09981f12bce8a26b5c162743462d4b04d07cefd018c
+
+PASS [leg-c] J6: pointer restored to new root :: /private/tmp/t06-d2-drill-01/leg-c/new-root
+FAIL [leg-c] journal terminal refused :: export_verify
+FAIL [leg-c] receipt records repairAction (修复模式)
+PASS [leg-c] both sides preserved
+D2 DRILL FAILURES: 4
+D2_RESULT failures=4

@@ -1,0 +1,20 @@
+ok   cleanstop:backup: exit 0 outcome=stopped
+ok   cleanstop:backup: journal 相位==import（下一待执行相）
+ok   cleanstop:backup(停后): 旧根逐字节零写
+ok   cleanstop:backup: resume exit 0 且 stopped@pointer_switch
+ok   cleanstop:backup: history ok 链覆盖 preflight..pointer_switch 且序单调（无跳相）
+ok   cleanstop:backup: history 无 refused 条目
+ok   cleanstop:backup: 指针目录无 .tmp-* 残渣
+ok   cleanstop:backup: 指针完整 JSON 且语义回绑
+ok   cleanstop:backup: 旧根逐字节零写
+ok   cleanstop:backup: 无遗留 rust/target/debug/lingxi-service 进程
+ok   cleanstop:backup: 重跑探针 exit 2（目标锁可获 + 门拒重跑 = 无双写者）
+ok   cleanstop:backup: identity hash 对拍
+ok   cleanstop:backup: staging sidecar 归一化对拍
+ok   cleanstop:backup: runs.db 统计对拍
+ok   cleanstop:backup: issues 多重集对拍
+ok   cleanstop:backup: migration receipt 归一化对拍
+ok   cleanstop:backup: epoch stamp 归一化对拍
+ok   cleanstop:backup: epoch transition 归一化对拍
+ok   cleanstop:backup: adoption receipt 归一化对拍
+A09_RESULT {"verdict":"PASS","scenario":"cleanstop:backup"}

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sandbox": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz",
+  "startedAt": "2026-10-21T13:50:48.065Z",
+  "tests": [
+    {
+      "name": "不同路径同名副本独立运行、真实数据根和子进程正确",
+      "status": "PASS"
+    },
+    {
+      "name": "同根重复启动未开启第二服务，其他副本仍存活",
+      "status": "PASS"
+    },
+    {
+      "name": "真实 Electron 路径别名与原根共用单实例锁",
+      "status": "PASS"
+    },
+    {
+      "name": "正常退出清理各自服务、无残留写者",
+      "status": "PASS"
+    }
+  ],
+  "processes": [
+    {
+      "label": "a",
+      "launcherPid": 43437,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy",
+      "exitCode": 0,
+      "mainPid": 43438,
+      "actual": {
+        "pid": 43438,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy",
+        "nodeBin": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "userData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy/.electron-user-data",
+        "sessionData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy/.electron-user-data",
+        "electron": "42.8.1",
+        "windows": []
+      },
+      "servicePid": 43660,
+      "instance": {
+        "pid": 43660,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy",
+        "address": "127.0.0.1:52241"
+      }
+    },
+    {
+      "label": "b",
+      "launcherPid": 43662,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/b/copy",
+      "exitCode": 0,
+      "mainPid": 43664,
+      "actual": {
+        "pid": 43664,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/b/copy",
+        "nodeBin": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "userData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/b/copy/.electron-user-data",
+        "sessionData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/b/copy/.electron-user-data",
+        "electron": "42.8.1",
+        "windows": []
+      },
+      "servicePid": 43883,
+      "instance": {
+        "pid": 43883,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/b/copy",
+        "address": "127.0.0.1:52245"
+      }
+    },
+    {
+      "label": "duplicate",
+      "launcherPid": 43884,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy",
+      "exitCode": 0
+    },
+    {
+      "label": "alias-duplicate",
+      "launcherPid": 43903,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/alias",
+      "exitCode": 0
+    }
+  ],
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "inputs": {
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "d2a6925e15e450b7f50802ec15a9c4a32a64b3b02a8ae59b9db8fefc5aa66ff2",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+  },
+  "initializations": [
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/a/copy",
+      "pid": 43435,
+      "exitCode": 0,
+      "stampSha256": "0de69b3e2d142016387a600361d5ce8dafebcc25a05ca0956eb7ef2179f5c77f"
+    },
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-Ll7Lmz/b/copy",
+      "pid": 43436,
+      "exitCode": 0,
+      "stampSha256": "ed0a763b8b5d9743262353a44a1c788faf288056f7cd419f4b284a6890640d10"
+    }
+  ],
+  "forcedCleanup": [],
+  "finishedAt": "2026-10-21T13:50:51.862Z"
+}

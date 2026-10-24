@@ -1,0 +1,229 @@
+{
+  "schema": "r08-t03-a06-crash/v1",
+  "error": "Error: electron-a-exit: timeout after 45000ms\n    at waitFor (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:96:38)\n    at async main (file:///Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r08_t03_a06_drill.mjs:651:5)",
+  "homes": [
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-3rt2d4",
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-NWuxIs",
+    "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-Qab6fw"
+  ],
+  "journal": [
+    {
+      "at": "2026-10-22T15:52:50.461Z",
+      "step": "svc-home",
+      "data": {
+        "svcHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-3rt2d4"
+      }
+    },
+    {
+      "at": "2026-10-22T15:52:50.665Z",
+      "step": "stub",
+      "data": {
+        "pid": 94146,
+        "port": 57514
+      }
+    },
+    {
+      "at": "2026-10-22T15:52:50.876Z",
+      "step": "stamp",
+      "data": {
+        "stamp": {
+          "committedDataEpoch": 1,
+          "epoch": 1,
+          "lastVersion": "0.0.0",
+          "minimumReaderEpoch": 1,
+          "schemaVersion": 2,
+          "updatedAt": "2026-10-22T15:52:50.675Z"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T15:52:50.877Z",
+      "step": "service-spawn",
+      "data": {
+        "pid": 94148
+      }
+    },
+    {
+      "at": "2026-10-22T15:52:51.380Z",
+      "step": "rust-service",
+      "data": {
+        "pid": 94148,
+        "port": 57516,
+        "baseUrl": "http://127.0.0.1:57516"
+      }
+    },
+    {
+      "at": "2026-10-22T15:52:51.385Z",
+      "step": "electron-A",
+      "data": {
+        "pid": 94149,
+        "cdpPort": 9368,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-NWuxIs"
+      }
+    },
+    {
+      "at": "2026-10-22T15:54:26.706Z",
+      "step": "title-A-red",
+      "data": {
+        "lastTitle": "Lingxi · Rust 预览（远端）",
+        "lastCdpError": null,
+        "targetUrl": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"
+      }
+    },
+    {
+      "at": "2026-10-22T15:54:26.716Z",
+      "step": "conn-info-A",
+      "data": {
+        "connInfo": {
+          "port": 57516,
+          "token": "<redacted>",
+          "serverNodeKind": "lingxi-service",
+          "serverNodeTransport": "http",
+          "host": "127.0.0.1"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T15:54:26.734Z",
+      "step": "electron-B",
+      "data": {
+        "pid": 95826,
+        "cdpPort": 9868,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-Qab6fw"
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:01.067Z",
+      "step": "title-B-red",
+      "data": {
+        "lastTitle": "Lingxi · Rust 预览（远端）",
+        "lastCdpError": null,
+        "targetUrl": "file:///Users/study_superior/Desktop/Code/LingxiAgent/desktop/dist-renderer/index.html"
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:01.073Z",
+      "step": "conn-info-B",
+      "data": {
+        "connInfo": {
+          "port": 57516,
+          "token": "<redacted>",
+          "serverNodeKind": "lingxi-service",
+          "serverNodeTransport": "http",
+          "host": "127.0.0.1"
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:02.043Z",
+      "step": "leg-a1",
+      "data": {
+        "sessionId": "a06-clientA-leg1",
+        "frameCount": 10,
+        "runEndReason": null,
+        "sawFinal": true,
+        "sawMarker": true
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:02.366Z",
+      "step": "quit-b-focus",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:03.417Z",
+      "step": "quit-b-keystroke-q",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:03.568Z",
+      "step": "electron-B-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:04.868Z",
+      "step": "leg-a2",
+      "data": {
+        "sessionId": "a06-clientA-leg2",
+        "frameCount": 10,
+        "runEndReason": null,
+        "sawFinal": true,
+        "sawMarker": true
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:05.036Z",
+      "step": "quit-a-focus",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:06.068Z",
+      "step": "quit-a-keystroke-q",
+      "data": {
+        "status": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:51.182Z",
+      "step": "reap-service",
+      "data": {
+        "pid": 94148,
+        "aliveAtReap": true
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:51.196Z",
+      "step": "service-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:51.196Z",
+      "step": "reap-service-result",
+      "data": {
+        "exited": {
+          "code": 0,
+          "signal": null
+        }
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:51.238Z",
+      "step": "electron-A-exit",
+      "data": {
+        "code": 0,
+        "signal": null
+      }
+    },
+    {
+      "at": "2026-10-22T15:56:57.351Z",
+      "step": "cleanup",
+      "data": {
+        "homes": [
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-svc-3rt2d4",
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliA-NWuxIs",
+          "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-t03-a06-cliB-Qab6fw"
+        ]
+      }
+    }
+  ]
+}

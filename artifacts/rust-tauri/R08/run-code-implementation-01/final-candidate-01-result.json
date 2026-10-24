@@ -1,0 +1,23 @@
+{
+  "status": "LOCAL_SELF_TESTS_PASS_PENDING_INDEPENDENT_REVIEW",
+  "sourceAndBinaryStable": true,
+  "runCodeCommand": {
+    "command": "rust/target/debug/deps/r08_admission_run_code-465a18f4152e0455 --nocapture --test-threads=1",
+    "exitCode": 0,
+    "log": "artifacts/rust-tauri/R08/run-code-implementation-01/test-final-candidate-01.log",
+    "passed": 9,
+    "failed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "seconds": 33.83
+  },
+  "sharedReceipt": "artifacts/rust-tauri/R08/ptc-implementation-01/final-candidate-01-result.json",
+  "limits": [
+    "独立审查仍FAIL未关闭",
+    "默认组合根与完整权限/自动审核/quota/settlement等公共driver独审不由本域自测代领",
+    "关库重开历史尚未执行",
+    "本机macOS实测；Linux严格bwrap仅实现未实测；Windows明确拒绝",
+    "F02证据绑定与R08 T01—T08迁移/回滚/再次前滚/UI/最终入口未完成",
+    "根主任务当前因宿主内容风险标记errored，未接管公共实现或宣布整体完成"
+  ]
+}

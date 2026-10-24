@@ -1,0 +1,9 @@
+
+running 4 tests
+test r08_security_changes_git_readonly_and_subdirectory_never_enumerates_parent ... ok
+test r08_security_external_scanner_cannot_read_or_write_outside_snapshots_and_leaves_no_child ... ok
+test r08_security_outside_root_and_symlink_refused_and_sources_unchanged ... ok
+test r08_security_real_baseline_never_returns_secret_and_audits_counts ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.71s
+

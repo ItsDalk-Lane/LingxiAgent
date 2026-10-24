@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 /Users/study_superior/Desktop/Code/LingxiAgent
+
+ ❯ desktop/src/react/__tests__/services/r08-trace-session-messages.test.ts (9 tests | 1 failed) 94ms
+     ✓ user_message 透传 legacyFields 的 displayText/images，时间戳取 committedAtUnixMs 80ms
+     ✓ 完整 turn：final 正文/推理块拼接、modelCallRef 只填 modelCallId、工具与终态归位 1ms
+     ✓ 无 final 的取消 run：正文/推理来自段、turnStatus 映射 aborted、时间戳诚实置 null 0ms
+     ✓ interrupted_needs_attention 如实标为 failed，绝不显示为正常 0ms
+     ✓ 多 turn 与 user 消息保持时间线顺序 0ms
+     ✓ reset_marker / legacy_raw 跳过；非数组输入响亮失败 0ms
+     ✓ Node 连接：沿旧 /api/sessions/messages URL 原样返回 messages 2ms
+     × Rust 连接：读 canonical 历史并投影为旧最小形状 9ms
+     ✓ Node 分支非 2xx 响亮失败（调用方既有语义：catch → calls-only 降级） 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/services/r08-trace-session-messages.test.ts > readTraceSessionMessages（Node/Rust 双分支） > Rust 连接：读 canonical 历史并投影为旧最小形状
+TypeError: useStore.subscribe is not a function
+ ❯ observe desktop/src/react/services/session-connection-owner.ts:25:12
+     23|   if (installed) return;
+     24|   installed = true; key = identity(); selectedSession = useStore.getSt…
+     25|   useStore.subscribe(() => {
+       |            ^
+     26|     const next = identity();
+     27|     const target = useStore.getState().currentSessionId;
+ ❯ captureSessionConnection desktop/src/react/services/session-connection-owner.ts:60:3
+ ❯ readRustChatHistory desktop/src/react/services/rust-chat-history.ts:194:17
+ ❯ Module.readTraceSessionMessages desktop/src/react/services/rust-chat-history.ts:414:27
+ ❯ desktop/src/react/__tests__/services/r08-trace-session-messages.test.ts:174:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  14:32:30
+   Duration  580ms (transform 293ms, setup 26ms, import 357ms, tests 94ms, environment 0ms)
+

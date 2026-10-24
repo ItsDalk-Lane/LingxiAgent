@@ -1,0 +1,53 @@
+PASS fixture gen exit 0
+PASS migrate exit 0 :: CUTOVER_RESULT cutoverId=cut-1792791383275-82331 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/rollback-work/single-writer-ruling.json
+
+PASS migrate committed :: rId=cut-1792791383275-82331 phase=committed outcome=committed detail=cutover committed; ruling at /private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/rollback-work/single-writer-ruling.json
+
+PASS standin worker emitted
+PASS agents create 2xx :: 200 {"id":"t06d1","name":"T06-D1","ok":true}
+PASS sessions/new 2xx :: 200 {"accessMode":"operate","agentId":"t06d1","agentName":"T06-D1","authorizedFolders":[],"currentModelId":"t06-standin-model","currentModelName":"t06-standin-model","currentModelProvider":"t06-standin","
+PASS sessionId present :: {"accessMode":"operate","agentId":"t06d1","agentName":"T06-D1","authorizedFolders":[],"currentModelId":"t06-standin-model","currentModelName":"t06-standin-model","currentModelProvider":"t06-standin","
+PASS attachments/local 2xx :: 201 {"file":{"createdAtMs":1792791384759,"fileId":"sf_92bd502d0b94b65d","filePath":"/private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/new-root/session-files/ce55a3fcd4afc1315134e59d/t06-attach-payload_mvlhp9rr_b27be40a.txt","filename":"t06-at
+PASS preferences/appearance PUT 2xx :: 200 {"appearance":{"theme":"t06-d1-edit"},"ok":true}
+PASS bridge config 2xx :: 200 {"ok":true,"status":{"agentId":"t06d1","bridgeError":null,"bridgeInitializing":false,"bridgeReady":true,"dingtalk":{"agentId":"t06d1","configured":false,"enabled":false,"error":null,"status":"disconne
+PASS bridge owner 2xx :: 200 {"ok":true,"status":{"agentId":"t06d1","bridgeError":null,"bridgeInitializing":false,"bridgeReady":true,"dingtalk":{"agentId":"t06d1","configured":false,"enabled":false,"error":null,"status":"disconne
+PASS bridge config 2xx :: 200 {"ok":true,"status":{"agentId":"t06d1","bridgeError":null,"bridgeInitializing":false,"bridgeReady":true,"dingtalk":{"agentId":"t06d1","configured":false,"enabled":false,"error":null,"status":"disconne
+PASS sentinel rows exactly 3 (no queued) :: [["conv-t06-s3","started"],["conv-t06-s1","confirmed"],["conv-t06-s2","unknown"]]
+PASS S1 confirmed with platform receipt :: {"delivery_id":"reply:bridge-c5e468adbb5dca054df2fa7fa560592fed5f157bf9ce317548800c83ce12e591","conversation_id":"conv-t06-s1","status":"confirmed","platform_receipt_json":"{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","error":null}
+PASS S2 unknown :: {"delivery_id":"reply:bridge-eeeb81527252132a280af4731492593963dddfc1b18dcb4afdbddf91cb52e357","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}
+PASS S3 started :: {"delivery_id":"reply:bridge-64f5eb10335a201d6a23f56ec9ae2c404fd9c8e8d109a5f074a02a311b2ed151","conversation_id":"conv-t06-s3","status":"started","platform_receipt_json":null,"error":null}
+PASS external sends exactly once per leg (gen phase) :: {"s1":1,"s2":1,"s3":1,"other":0}
+PASS settings edit landed :: {
+  "appearance": {
+    "theme": "t06-d1-edit"
+  },
+  "current_agent_id": "t06d1",
+  "current_session_id": "session-211e
+PASS service clean exit 0 :: exitCode=0
+PASS S3 at shutdown: started-or-controlled-unknown :: {"delivery_id":"reply:bridge-64f5eb10335a201d6a23f56ec9ae2c404fd9c8e8d109a5f074a02a311b2ed151","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+S3_SETTLE_PATH_AT_SHUTDOWN graceful-shutdown-settle
+PASS rollback exit 0 :: ROLLBACK_RESULT rollbackId=rb-1792791385630-82338 phase=committed outcome=committed detail=rollback committed; receipt /private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/rollback-work/rollback-receipt.json
+
+PASS rollback committed :: ROLLBACK_RESULT rollbackId=rb-1792791385630-82338 phase=committed outcome=committed detail=rollback committed; receipt /private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/rollback-work/rollback-receipt.json
+
+PASS pointer → old root after rollback :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/old-root","cutoverId":"rb-1792791385630-82338","committedAt":"2026-10-23T21:36:26.240Z"}
+PASS old root stamp v2{1,1,1} :: {"schemaVersion":2,"epoch":1,"minimumReaderEpoch":1,"committedDataEpoch":1,"lastVersion":"0.1.43","updatedAt":"2026-10-23T21:36:27.554Z"}
+PASS old root leases empty registry :: {"createdAt":"2026-10-23T21:36:26.202Z","leases":[],"schemaVersion":1,"updatedAt":"2026-10-23T21:36:26.202Z"}
+PASS old root a1 config.yaml created
+PASS knowledge synthetic tables renamed with rows preserved :: [["fixture_synthetic_documents",8],["fixture_synthetic_processing_artifacts",8]]
+PASS knowledge prod documents absent; prod processing_artifacts empty (chain-built) :: prodDocuments=0 prodArtifacts=0
+PASS reforward-A exit 0 :: REFORWARD_RESULT reforwardId=rf-1792791388199-82618 phase=committed outcome=committed detail=reforward committed
+
+PASS reforward-A committed :: REFORWARD_RESULT reforwardId=rf-1792791388199-82618 phase=committed outcome=committed detail=reforward committed
+
+PASS pointer → new root after reforward :: {"schemaVersion":1,"activeDataRoot":"/private/tmp/lingxi-r08-verify/r08_t06_d1-82328-1792791380726/new-root","cutoverId":"rf-1792791388199-82618","committedAt":"2026-10-23T21:36:28.251Z"}
+PASS S1 confirmed + receipt byte-identical after round trip :: ["{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}","{\"platform\":\"telegram\",\"messageIds\":[\"t06-standin-1\"],\"rawJson\":null}"]
+PASS S2 unchanged after round trip :: [{"delivery_id":"reply:bridge-eeeb81527252132a280af4731492593963dddfc1b18dcb4afdbddf91cb52e357","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"},{"delivery_id":"reply:bridge-eeeb81527252132a280af4731492593963dddfc1b18dcb4afdbddf91cb52e357","conversation_id":"conv-t06-s2","status":"unknown","platform_receipt_json":null,"error":"platform_returned_no_message_id"}]
+PASS S3 settled unknown via controlled path (no resend) :: {"delivery_id":"reply:bridge-64f5eb10335a201d6a23f56ec9ae2c404fd9c8e8d109a5f074a02a311b2ed151","conversation_id":"conv-t06-s3","status":"unknown","platform_receipt_json":null,"error":"worker stopped before a confirmed receipt"}
+S3_SETTLE_PATH_FINAL graceful-shutdown-settle
+PASS external sends frozen across rollback+reforward (counter 恒=1/腿) :: {"s1":1,"s2":1,"s3":1,"other":0} → {"s1":1,"s2":1,"s3":1,"other":0}
+PASS new attachment bytes unchanged (A11 往返附件摘要) :: 1 files
+PASS session/message/run counts unchanged (A11 新增数据可恢复且不重复) :: {"sessions":12,"messages":835,"runs":10} → {"sessions":12,"messages":835,"runs":10}
+PASS settings edit preserved
+D1_RESULT failures=0 legs={"s1":1,"s2":1,"s3":1,"other":0} counts={"sessions":12,"messages":835,"runs":10}
+D1 DRILL OK

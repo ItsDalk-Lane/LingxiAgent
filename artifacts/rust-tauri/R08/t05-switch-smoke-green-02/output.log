@@ -1,0 +1,24 @@
+== toolchain: rustup run 1.98.1 (rustc 1.98.1 (48a229cea 2026-09-01))
+== [1/5] build the service binary (locked, offline, isolated target dir)
+warning: `lingxi-service` (bin "lingxi-service") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 08s
+== [2/5] dependency-tree desktop proof (cargo metadata resolve graph)
+workspace members (8): ['lingxi-adapters', 'lingxi-browser-spike', 'lingxi-kernel', 'lingxi-protocol', 'lingxi-service', 'lingxi-spike', 'lingxi-test-guard', 'xtask']
+resolve-graph packages: 475
+desktop dependency scan: 0 hits for patterns ['tauri', 'electron', 'tao', 'wry', 'webkit2gtk', 'winit', 'webview']
+== [3/5] start real service process (synthetic /tmp home, loopback, ephemeral port)
+service ready: pid=51477 addr=127.0.0.1:55113 home=/private/tmp/t05sw.tKiVQr/lingxi-r02-t01-smoke-home.LarnC0
+== [4/5] health check
+Traceback (most recent call last):
+  File "<stdin>", line 12, in <module>
+AssertionError: health field dataEpoch: expected 1, got 2
+SMOKE_EXIT=1
+Traceback (most recent call last):
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_log_level_regression.py", line 70, in <module>
+    main()
+    ~~~~^^
+  File "/Users/study_superior/Desktop/Code/LingxiAgent/scripts/rust-tauri/r02_t01_log_level_regression.py", line 48, in main
+    assert result.returncode == 0, f"{level} 完整正式脚本失败，详见原始输出"
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: warn 完整正式脚本失败，详见原始输出
+LOGREG_EXIT=1

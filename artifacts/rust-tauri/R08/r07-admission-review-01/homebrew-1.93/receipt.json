@@ -1,0 +1,19 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--manifest-path",
+    "/private/tmp/r08-r07-registry-review-midvkf04/Cargo.toml",
+    "--offline",
+    "--test",
+    "admission",
+    "r07_t12_a24_closed_loop_without_legacy_kernel",
+    "--",
+    "--exact",
+    "--nocapture"
+  ],
+  "exitCode": 101,
+  "durationSecs": 204.98670887947083,
+  "logSha256": "495d0fda1903f787fcd2d9fb503d02153a368c845d05d102d6ecb58181fef4f6",
+  "runtime": "/private/tmp/r08-r07-registry-review-midvkf04"
+}

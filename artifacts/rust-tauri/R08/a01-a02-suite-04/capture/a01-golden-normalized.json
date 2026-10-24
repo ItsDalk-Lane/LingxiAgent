@@ -1,0 +1,532 @@
+{
+  "etag": "<etag>",
+  "events": [
+    {
+      "clientMessageId": null,
+      "message": {
+        "attachments": [],
+        "clientMessageId": null,
+        "hasImages": false,
+        "id": "<id>",
+        "quotedText": null,
+        "sessionRefs": null,
+        "snapshotVersion": null,
+        "sourceEntryId": "user:run_000001a16287b316_000001",
+        "text": "R08-A01-TOOLCHAIN",
+        "timestamp": "<timestamp>"
+      },
+      "seq": 1,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "snapshotVersion": null,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "session_user_message"
+    },
+    {
+      "isStreaming": true,
+      "seq": 2,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "status"
+    },
+    {
+      "runId": "<runId>",
+      "seq": 3,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "turnInputEntryId": "<turnInputEntryId>",
+      "type": "assistant_run_start"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 4,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "<id>",
+      "name": "tool:first-party:read",
+      "seq": 5,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "A01-SEED-CONTENT\n",
+          "type": "text"
+        }
+      ],
+      "details": {
+        "format": "text-or-binary",
+        "source": {
+          "path": "a01-seed.txt",
+          "sha256": "a6b2f7817db0cd9daa47dcc7dd68fa58d1af5f2c5470de829c18b31c9eb7b793",
+          "sizeBytes": 17
+        }
+      },
+      "error": null,
+      "id": "<id>",
+      "name": "tool:first-party:read",
+      "seq": 6,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "<streamId>",
+      "success": true,
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 7,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "<id>",
+      "name": "tool:first-party:write",
+      "seq": 8,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "Successfully wrote to a01-written.txt",
+          "type": "text"
+        }
+      ],
+      "details": null,
+      "error": null,
+      "id": "<id>",
+      "name": "tool:first-party:write",
+      "seq": 9,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "<streamId>",
+      "success": true,
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 10,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "<id>",
+      "name": "tool:first-party:edit",
+      "seq": 11,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "Successfully replaced 1 block(s) in a01-written.txt.",
+          "type": "text"
+        }
+      ],
+      "details": null,
+      "error": null,
+      "id": "<id>",
+      "name": "tool:first-party:edit",
+      "seq": 12,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "<streamId>",
+      "success": true,
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 13,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "args": {
+        "summary": null
+      },
+      "id": "<id>",
+      "name": "tool:first-party:exec_command",
+      "seq": 14,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_start"
+    },
+    {
+      "content": [
+        {
+          "text": "(no output)",
+          "type": "text"
+        }
+      ],
+      "details": null,
+      "error": null,
+      "id": "<id>",
+      "name": "tool:first-party:exec_command",
+      "seq": 15,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "status": "succeeded",
+      "streamId": "<streamId>",
+      "success": true,
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "tool_end"
+    },
+    {
+      "modelCallId": "<modelCallId>",
+      "phase": "model",
+      "seq": 16,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "stage"
+    },
+    {
+      "kind": "text",
+      "segmentId": "<segmentId>",
+      "semanticPhase": "unresolved",
+      "seq": 17,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_start"
+    },
+    {
+      "delta": "A01-FINAL-ANSWER",
+      "segmentId": "<segmentId>",
+      "semanticPhase": "unresolved",
+      "seq": 18,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_delta"
+    },
+    {
+      "segmentId": "<segmentId>",
+      "semanticPhase": "final_answer",
+      "seq": 19,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "assistant_segment_end"
+    },
+    {
+      "runId": "<runId>",
+      "seq": 20,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "turnInputEntryId": "<turnInputEntryId>",
+      "type": "assistant_run_end"
+    },
+    {
+      "isStreaming": false,
+      "seq": 21,
+      "sessionId": "a01",
+      "sessionPath": "native:a01",
+      "sessionRefVersion": 2,
+      "streamId": "<streamId>",
+      "ts": "<ts>",
+      "turnId": "<turnId>",
+      "type": "status"
+    }
+  ],
+  "files": {
+    "a01-written.txt": "A01-WRITTEN-v2\n",
+    "exec-marker.txt": "A01-EXEC-MARKER\n"
+  },
+  "history": {
+    "headRevision": "10",
+    "items": [
+      {
+        "committedAtUnixMs": "<committedAtUnixMs>",
+        "kind": "user_message",
+        "messageId": "<messageId>",
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "seq": "1",
+        "text": "R08-A01-TOOLCHAIN"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "e9c9fb555fb0f47efb71aafbe5311603e2e87986f3b7f26a62eced9f58cec1f7"
+        },
+        "firstSeq": "5",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "A01-SEED-CONTENT\n",
+              "type": "text"
+            }
+          ],
+          "details": {
+            "format": "text-or-binary",
+            "source": {
+              "path": "a01-seed.txt",
+              "sha256": "a6b2f7817db0cd9daa47dcc7dd68fa58d1af5f2c5470de829c18b31c9eb7b793",
+              "sizeBytes": 17
+            }
+          },
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:read",
+        "toolCallId": "run_000001a16287b316_000001-tc0001"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "8b6b107dc5fb64e9ad788d711c6834a5c3df8acac26517200258c2fd2d532620"
+        },
+        "firstSeq": "11",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "Successfully wrote to a01-written.txt",
+              "type": "text"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "cd093e22e6d060c67e50131fcfd50aaeed743f921cd918fc4ac267e3c3c692a8"
+              },
+              "displayName": "a01-written.txt",
+              "kind": "artifact",
+              "resourceId": "file:/private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-49397-1792654418651/home/lingxi-r08-a01a02-a01-49462-1792654422521636000/a01-written.txt",
+              "sizeBytes": "15",
+              "uri": "file:///private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-49397-1792654418651/home/lingxi-r08-a01a02-a01-49462-1792654422521636000/a01-written.txt"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:write",
+        "toolCallId": "run_000001a16287b316_000001-tc0002"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "2488ce3fbaf9e1b27344cec2069e5cf316465e008ff327d7cda5367156d41cf7"
+        },
+        "firstSeq": "17",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "Successfully replaced 1 block(s) in a01-written.txt.",
+              "type": "text"
+            }
+          ],
+          "resourceRefs": [
+            {
+              "digest": {
+                "algorithm": "sha256",
+                "canonicalization": "raw-bytes",
+                "hex": "55afaad046ab829a9de22c743dfebae43bb42d45392e7090beadd5934c351046"
+              },
+              "displayName": "a01-written.txt",
+              "kind": "artifact",
+              "resourceId": "file:/private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-49397-1792654418651/home/lingxi-r08-a01a02-a01-49462-1792654422521636000/a01-written.txt",
+              "sizeBytes": "15",
+              "uri": "file:///private/tmp/lingxi-r07-verify/r08_t01_a01_a02_ws-49397-1792654418651/home/lingxi-r08-a01a02-a01-49462-1792654422521636000/a01-written.txt"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:edit",
+        "toolCallId": "run_000001a16287b316_000001-tc0003"
+      },
+      {
+        "argsDigest": {
+          "algorithm": "sha256",
+          "canonicalization": "lingxi-canonical-json-v1",
+          "hex": "05fe10def1613c20a23e56528eeef59757621df5f7107d1aff987ef5a48192c9"
+        },
+        "firstSeq": "23",
+        "kind": "tool_call",
+        "result": {
+          "content": [
+            {
+              "text": "(no output)",
+              "type": "text"
+            }
+          ],
+          "status": "success",
+          "truncated": false
+        },
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "status": "success",
+        "target": "tool:first-party:exec_command",
+        "toolCallId": "run_000001a16287b316_000001-tc0004"
+      },
+      {
+        "complete": true,
+        "firstSeq": "28",
+        "kind": "assistant_segment",
+        "phase": "final_answer",
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "segmentId": "<segmentId>",
+        "segmentKind": "text",
+        "text": "A01-FINAL-ANSWER"
+      },
+      {
+        "committedAtUnixMs": "<committedAtUnixMs>",
+        "content": [
+          {
+            "text": "A01-FINAL-ANSWER",
+            "type": "text"
+          }
+        ],
+        "kind": "final_message",
+        "messageId": "<messageId>",
+        "modelCallId": "<modelCallId>",
+        "run": {
+          "runId": "<runId>",
+          "state": "known"
+        },
+        "seq": "11"
+      }
+    ],
+    "page": {
+      "hasMore": false,
+      "limit": 200
+    },
+    "revision": "<revision>",
+    "schemaVersion": "lingxi.canonical-history.v1",
+    "sessionId": "a01",
+    "todoPanel": {
+      "dismissed": false,
+      "removed": true,
+      "todos": []
+    },
+    "todos": []
+  },
+  "providerChatRequests": 5
+}

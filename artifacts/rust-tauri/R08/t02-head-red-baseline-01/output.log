@@ -1,0 +1,184 @@
+
+ RUN  v4.1.10 /private/tmp/lingxi-head-baseline
+
+stderr | desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > stays offline until the Rust wire handshake succeeds and never opens the Node chat composer
+[ws] message parse error: TypeError: __vite_ssr_import_0__.useStore.subscribe is not a function
+    at observe (/private/tmp/lingxi-head-baseline/desktop/src/react/services/session-connection-owner.ts:25:12)
+    at captureSessionConnection (/private/tmp/lingxi-head-baseline/desktop/src/react/services/session-connection-owner.ts:60:3)
+    at startRustMediaPolling (/private/tmp/lingxi-head-baseline/desktop/src/react/services/rust-media.ts:148:17)
+    at markConnectionReady (/private/tmp/lingxi-head-baseline/desktop/src/react/services/websocket.ts:301:31)
+    at FakeSocket._ws.onmessage (/private/tmp/lingxi-head-baseline/desktop/src/react/services/websocket.ts:386:9)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:81:12
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > does not open a WebSocket when ticket issuance fails
+[ws] connection setup failed: Error: websocket ticket response missing ticket
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:102:49
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+[ErrorBus][WS_DISCONNECTED][75e7f1b4] WS_DISCONNECTED {}
+
+stderr | desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > never reuses stored local transport when an explicit port or token is invalid
+[ws] connection setup failed: Error: local server token missing
+    at openConnectionWebSocket (/private/tmp/lingxi-head-baseline/desktop/src/react/services/websocket.ts:254:11)
+    at Module.connectWebSocket (/private/tmp/lingxi-head-baseline/desktop/src/react/services/websocket.ts:221:8)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:141:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+
+ ❯ desktop/src/react/__tests__/services/R02RustWebSocket.test.ts (6 tests | 1 failed) 299ms
+     × stays offline until the Rust wire handshake succeeds and never opens the Node chat composer 91ms
+     ✓ rejects an incompatible handshake without showing a connected state 53ms
+     ✓ does not open a WebSocket when ticket issuance fails 51ms
+     ✓ rejects a partial success hello instead of showing a false connected state 51ms
+     ✓ times out a socket that never returns ServerHello 52ms
+     ✓ never reuses stored local transport when an explicit port or token is invalid 1ms
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read video attachment Error: disk gone
+    at Object.<anonymous> (/private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:442:49)
+    at Object.Mock [as readFileBase64] (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (/private/tmp/lingxi-head-baseline/desktop/src/react/components/input/composer-send.ts:399:40)
+    at sendWithLease (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at Module.flushQueuedHeadNow (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:448:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send
+[input] failed to read audio attachment Error: disk gone
+    at Object.<anonymous> (/private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:442:49)
+    at Object.Mock [as readFileBase64] (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at prepareComposerSend (/private/tmp/lingxi-head-baseline/desktop/src/react/components/input/composer-send.ts:371:40)
+    at sendWithLease (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1012:12)
+    at Module.flushQueuedHeadNow (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:469:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:618:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/private/tmp/lingxi-head-baseline/desktop/src/react/components/input/composer-send.ts:583:8)
+    at Module.sendWithLease (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:619:20
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试
+[input] websocket send failed Error: socket exploded
+    at Object.<anonymous> (/private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:660:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/private/tmp/lingxi-head-baseline/desktop/src/react/components/input/composer-send.ts:583:8)
+    at Module.sendWithLease (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:663:20
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:751:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/private/tmp/lingxi-head-baseline/desktop/src/react/components/input/composer-send.ts:583:8)
+    at sendWithLease (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at Module.flushQueuedHeadNow (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:754:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+stderr | desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文
+[input] websocket send failed Error: boom
+    at Object.<anonymous> (/private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:912:64)
+    at Object.Mock (file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/spy/dist/index.js:332:34)
+    at commitPreparedComposerSend (/private/tmp/lingxi-head-baseline/desktop/src/react/components/input/composer-send.ts:583:8)
+    at sendWithLease (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1039:24)
+    at Module.flushQueuedHeadNow (/private/tmp/lingxi-head-baseline/desktop/src/react/services/composer-send-coordinator.ts:1120:3)
+    at /private/tmp/lingxi-head-baseline/desktop/src/react/__tests__/components/composer-send.transaction.test.ts:915:5
+    at file:///Users/study_superior/Desktop/Code/LingxiAgent/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts (23 tests | 1 failed) 757ms
+     × Rust wire 只有握手时拒绝旧聊天帧且不清空输入 34ms
+     ✓ S01：普通发送视频预检失败，编辑器、草稿、附件与引用全部保留 25ms
+     ✓ S02：排队项视频/音频读取失败，队列项原位保留、错误可见、无 ws.send 4ms
+     ✓ S03：视频数超限与格式错误都是明确 blocked，不冒充成功 1ms
+     ✓ S04：ws 不存在 / CONNECTING / CLOSING / CLOSED，明确结果、不清输入、不发消息 26ms
+     ✓ S05：读文件期间会话删除/定位器变化/模型变更，重新验证后旧目标不误发 5ms
+     ✓ S06：准备期间用户继续输入，原快照独立、新草稿不被清除或覆盖 64ms
+     ✓ S07：文字+文件+skill+agent+quote+notebook 组合，失败与重试保留所有字段 3ms
+     ✓ S08：图片按既有规则退化为文件引用，提示保留、文件身份不丢 1ms
+     ✓ S09：ws.send 同步抛错，正确标失败、完整快照可按同一记录重试 2ms
+     ✓ S10：提交后断线无回执与回执超时，都标 delivery_unknown 且不自动重发 4ms
+     ✓ S11：重连后经恢复/历史找到原 clientMessageId，合并不重复追加 3ms
+     ✓ S12：明确失败后重试，仍是一条逻辑记录、内容与上下文一致 4ms
+     ✓ S13：带首行空格与末尾换行的输入，快照逐字符保留 10ms
+     ✓ S14：首页 ensureSession 期间重复点击，只创建/提交一次 10ms
+     ✓ S15：入队后改变界面选中的笔记本，已排队消息仍使用入队快照范围 1ms
+     ✓ P07：全空白正文（无其他内容维度）不发，且不做破坏性清空 5ms
+     ✓ P08：全空白正文但有附件 → 按已有内容维度发送，wire 保真、附件身份保留 8ms
+     ✓ P10：排队 → 编辑 → 失败 → 重试 → wire，每次都不 trim 正文 2ms
+     ✓ R03-03：点击编辑同步取消慢附件，保存后仅提交新正文  418ms
+     ✓ R03-05：点击取消保留原 blocked 状态与正文 34ms
+   ✓ R03-09：真实 InputArea StrictMode 卸载撤销 timer，重挂只发一次 25ms
+   ✓ R03-12：InputArea A 慢附件时切 B 可发送，A 完成不再清 B 编辑器 67ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  desktop/src/react/__tests__/components/composer-send.transaction.test.ts > composer-send 显式结果与快照（S01–S15） > Rust wire 只有握手时拒绝旧聊天帧且不清空输入
+AssertionError: expected { kind: 'transport_submitted', …(1) } to deeply equal { kind: 'blocked', …(2) }
+
+- Expected
++ Received
+
+  {
+-   "code": "rust_core_unavailable",
+-   "kind": "blocked",
+-   "retryable": false,
++   "clientMessageId": "client-user-002a9e55-969a-4337-8e82-6a5bf5fa280a",
++   "kind": "transport_submitted",
+  }
+
+ ❯ desktop/src/react/__tests__/components/composer-send.transaction.test.ts:403:20
+    401|     useStore.setState({ activeServerConnection: { serverNodeKind: 'lin…
+    402|     const result = await dispatchComposerSend(makeBundle('仍在输入框的文字'), …
+    403|     expect(result).toEqual({ kind: 'blocked', code: 'rust_core_unavail…
+       |                    ^
+    404|     expect(wsMocks.current!.send).not.toHaveBeenCalled();
+    405|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  desktop/src/react/__tests__/services/R02RustWebSocket.test.ts > Rust desktop WebSocket connection > stays offline until the Rust wire handshake succeeds and never opens the Node chat composer
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array []
+
+
+Number of calls: 1
+
+ ❯ desktop/src/react/__tests__/services/R02RustWebSocket.test.ts:85:40
+     83|       serverKind: 'lingxi-service', serverVersion: '0.1.0' }) });
+     84|     expect(fixture.state.wsState).toBe('connected');
+     85|     expect(fixture.composerOpened).not.toHaveBeenCalled();
+       |                                        ^
+     86|   });
+     87|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 27 passed (29)
+   Start at  19:27:52
+   Duration  1.81s (transform 926ms, setup 26ms, import 1.24s, tests 1.06s, environment 254ms)
+

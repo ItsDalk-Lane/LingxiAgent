@@ -1,0 +1,2 @@
+http.request(example.com) with guard-style patch → {"threw":false}
+lib/net reaches patched dns.lookup: true

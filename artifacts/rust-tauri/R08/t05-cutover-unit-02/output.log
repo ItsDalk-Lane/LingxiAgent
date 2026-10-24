@@ -1,0 +1,25 @@
+running 2 tests
+test actual_new_publication_waits_until_commit_fence_releases ... FAILED
+test nested_writers_refuse_commit_until_all_publications_finish ... FAILED
+
+failures:
+
+---- actual_new_publication_waits_until_commit_fence_releases stdout ----
+
+thread 'actual_new_publication_waits_until_commit_fence_releases' (14686455) panicked at crates/lingxi-adapters/tests/context_material_commit_r06ex01.rs:8:70:
+合成HOME: NotPresent
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- nested_writers_refuse_commit_until_all_publications_finish stdout ----
+
+thread 'nested_writers_refuse_commit_until_all_publications_finish' (14686456) panicked at crates/lingxi-adapters/tests/context_material_commit_r06ex01.rs:8:70:
+合成HOME: NotPresent
+
+
+failures:
+    actual_new_publication_waits_until_commit_fence_releases
+    nested_writers_refuse_commit_until_all_publications_finish
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p lingxi-adapters --test context_material_commit_r06ex01`

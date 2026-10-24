@@ -1,0 +1,17 @@
+{
+  "status": "PREPARED_NOT_COMPILED_NOT_EXECUTED",
+  "checks": [
+    "Python runner syntax parsed without executing",
+    "No manual registrar/registry/gateway/turn-provider injection in harness source",
+    "Only external OpenAI SSE provider is replaced",
+    "rustfmt1.98.1 parsed/formatted harness Rust; no compilation or Cargo run"
+  ],
+  "files": {
+    "run_review.py": "ac36050c4584e111a9f9dc698125e2efdba495236698a55d374c94355c162359",
+    "README.md": "2bd037cea051459ba5a9a1147322ede6f864389ea3cd71b6d063c4fd726211c6",
+    "harness/Cargo.toml": "3690fc8f2c990ee4467cac4688c1cc4d453c4841e21ea0b16c593944155753df",
+    "harness/Cargo.lock": "754517f828f899ffeee5077973129502d7449c37bb83690fed437f876bf39120",
+    "harness/tests/default_plane.rs": "e0fe4ad326d361d5d485a7058027e77b8f4900fc3cf8467f4faa2b8519173332"
+  },
+  "runnerAmendment": "run-01后补全纯TS运行时与规则文件前后摘要、实际Rustc/Node/Python版本；不修改原业务断言。"
+}

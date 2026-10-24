@@ -1,0 +1,4 @@
+ok   control: 首跑 exit 0 且 interrupted
+FAIL control: runId 可解析 — undefined
+SCRATCH_KEPT /private/tmp/t05a09-matrix/a09-control_stop-after-batch-7jRsnJ
+A09_RESULT {"verdict":"FAIL","scenario":"control:stop-after-batch","failures":["control: runId 可解析 — undefined"]}

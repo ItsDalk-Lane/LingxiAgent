@@ -1,0 +1,9 @@
+
+running 4 tests
+test r08_ast_structure_pagination_no_match_and_errors_use_real_run ... ok
+test r08_lsp_missing_and_crashed_server_are_explicit_errors ... ok
+test r08_lsp_read_grant_rename_returns_preview_without_writing ... ok
+test r08_lsp_real_clangd_positions_preview_rename_and_rejections ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.40s
+

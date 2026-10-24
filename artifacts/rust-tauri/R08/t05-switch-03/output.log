@@ -1,0 +1,31 @@
+   Compiling lingxi-service v0.0.0 (/Users/study_superior/Desktop/Code/LingxiAgent/rust/crates/lingxi-service)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.26s
+     Running tests/service_health.rs (target/debug/deps/service_health-9035b5926b85c17d)
+
+running 7 tests
+test prepare_data_home_creates_and_is_idempotent ... ok
+test prepare_data_home_rejects_file_as_home ... ok
+test locked_instance_and_local_token_share_one_start_identity ... ok
+test browser_cors_preflight_and_response_keep_origin_boundary ... ok
+test unknown_route_is_not_found_for_owner_but_closed_for_strangers ... ok
+test health_check_over_real_loopback ... FAILED
+test help_and_version_do_not_hide_invalid_arguments ... ok
+
+failures:
+
+---- health_check_over_real_loopback stdout ----
+
+thread 'health_check_over_real_loopback' (15682302) panicked at crates/lingxi-service/tests/service_health.rs:220:5:
+assertion `left == right` failed: health payload must be exactly minimal
+  left: Object {"dataEpoch": Number(2), "serverKind": String("lingxi-service"), "serverVersion": String("0.0.0"), "status": String("ok"), "wireProtocolMax": Number(1), "wireProtocolMin": Number(1)}
+ right: Object {"dataEpoch": Number(1), "serverKind": String("lingxi-service"), "serverVersion": String("0.0.0"), "status": String("ok"), "wireProtocolMax": Number(1), "wireProtocolMin": Number(1)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    health_check_over_real_loopback
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.86s
+
+error: test failed, to rerun pass `-p lingxi-service --test service_health`
+CARGO_EXIT=101

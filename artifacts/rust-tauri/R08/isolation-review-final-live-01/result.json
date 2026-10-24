@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "sourceSha": "86840d1700397d3dd620a41f2b884df4cddd5cc2",
+  "sandbox": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p",
+  "startedAt": "2026-10-21T13:52:48.065Z",
+  "tests": [
+    {
+      "name": "不同路径同名副本独立运行、真实数据根和子进程正确",
+      "status": "PASS"
+    },
+    {
+      "name": "同根重复启动未开启第二服务，其他副本仍存活",
+      "status": "PASS"
+    },
+    {
+      "name": "真实 Electron 路径别名与原根共用单实例锁",
+      "status": "PASS"
+    },
+    {
+      "name": "正常退出清理各自服务、无残留写者",
+      "status": "PASS"
+    }
+  ],
+  "processes": [
+    {
+      "label": "a",
+      "launcherPid": 44898,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy",
+      "exitCode": 0,
+      "mainPid": 44899,
+      "actual": {
+        "pid": 44899,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy",
+        "nodeBin": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "userData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy/.electron-user-data",
+        "sessionData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy/.electron-user-data",
+        "electron": "42.8.1",
+        "windows": []
+      },
+      "servicePid": 45126,
+      "instance": {
+        "pid": 45126,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy",
+        "address": "127.0.0.1:52458"
+      }
+    },
+    {
+      "label": "b",
+      "launcherPid": 45129,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy",
+      "exitCode": 0,
+      "mainPid": 45130,
+      "actual": {
+        "pid": 45130,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy",
+        "nodeBin": "/Users/study_superior/.nvm/versions/node/v24.16.0/bin/node",
+        "userData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy/.electron-user-data",
+        "sessionData": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy/.electron-user-data",
+        "electron": "42.8.1",
+        "windows": []
+      },
+      "servicePid": 45351,
+      "instance": {
+        "pid": 45351,
+        "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy",
+        "address": "127.0.0.1:52462"
+      }
+    },
+    {
+      "label": "duplicate",
+      "launcherPid": 45357,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy",
+      "exitCode": 0
+    },
+    {
+      "label": "alias-duplicate",
+      "launcherPid": 45377,
+      "requestedHome": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/alias",
+      "exitCode": 0
+    }
+  ],
+  "negativeControl": null,
+  "binarySha256": "d61c7165e41bfe17ed6af4ae56842389e74e97f430b37bc6371698a7bcba6d9c",
+  "inputs": {
+    "scripts/launch.js": "34762c7f688f45de36540fcca9e6d45237865ed7a08e7453fdd0d9a996bed35d",
+    "scripts/dev-env.js": "bdee2d81e2f4077044d85e20527d0c05f3969dadc2457246167f2003d6a70e78",
+    "desktop/bootstrap.cjs": "52cc65f701272c59cbd97bbfb8bd581d38144ab43525fddb8ae9faa625ecced9",
+    "desktop/main.cjs": "bc8afa8a2f0894863b264e6a950f0430afca4dc6cb44184646b98741f2feafcf",
+    "desktop/src/shared/single-instance-lock.cjs": "d2a6925e15e450b7f50802ec15a9c4a32a64b3b02a8ae59b9db8fefc5aa66ff2",
+    "rust/Cargo.lock": "ae9ac557310fcaba768ebc55973c97cfcf18bf57b20d78e665e8fc65aac1b4a3"
+  },
+  "initializations": [
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy",
+      "pid": 44893,
+      "exitCode": 0,
+      "stampSha256": "12e5086c105e0c5a6bb5edb81f57655e522f27c0f3e361093a9ebea90d3233b9"
+    },
+    {
+      "home": "/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy",
+      "pid": 44894,
+      "exitCode": 0,
+      "stampSha256": "b72848ad44ae38214083e1e99a5e9dc1a540ddcbe16129d7b9d2d95082791b3d"
+    }
+  ],
+  "ownedProcessTree": [
+    {
+      "pid": 44899,
+      "parentPid": 44898,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron . --dev --inspect=127.0.0.1:0"
+    },
+    {
+      "pid": 44902,
+      "parentPid": 44899,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper --type=gpu-process --user-data-dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy/.electron-user-data --gpu-preferences=SAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAAAwAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --field-trial-handle=1718379636,r,12002926246880189817,18100600364143852588,262144 --enable-features=PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1935764596,r,16263172587048830746,16590890263158799762,4 --trace-process-track-uuid=3190708988185955192 --seatbelt-client=32"
+    },
+    {
+      "pid": 44903,
+      "parentPid": 44899,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=zh-CN --service-sandbox-type=network --user-data-dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy/.electron-user-data --shared-files --field-trial-handle=1718379636,r,12002926246880189817,18100600364143852588,262144 --enable-features=PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1935764596,r,16263172587048830746,16590890263158799762,4 --trace-process-track-uuid=3190708989122997041 --seatbelt-client=32"
+    },
+    {
+      "pid": 44907,
+      "parentPid": 44899,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/MacOS/Electron Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy/.electron-user-data --app-path=/Users/study_superior/Desktop/Code/LingxiAgent --enable-sandbox --lang=zh-CN --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=4 --time-ticks-at-unix-epoch=-1792239084867391 --launch-time-ticks=351684115399 --shared-files --field-trial-handle=1718379636,r,12002926246880189817,18100600364143852588,262144 --enable-features=PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1935764596,r,16263172587048830746,16590890263158799762,4 --trace-process-track-uuid=3190708990060038890 --seatbelt-client=58"
+    },
+    {
+      "pid": 45126,
+      "parentPid": 44899,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/a/copy"
+    },
+    {
+      "pid": 45130,
+      "parentPid": 45129,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron . --dev --inspect=127.0.0.1:0"
+    },
+    {
+      "pid": 45132,
+      "parentPid": 45130,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper --type=gpu-process --user-data-dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy/.electron-user-data --gpu-preferences=SAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAAAwAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --field-trial-handle=1718379636,r,10377885539185319027,1751824872924187699,262144 --enable-features=PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1935764596,r,13478945158778131597,13002893194761482927,4 --trace-process-track-uuid=3190708988185955192 --seatbelt-client=30"
+    },
+    {
+      "pid": 45133,
+      "parentPid": 45130,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=zh-CN --service-sandbox-type=network --user-data-dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy/.electron-user-data --shared-files --field-trial-handle=1718379636,r,10377885539185319027,1751824872924187699,262144 --enable-features=PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1935764596,r,13478945158778131597,13002893194761482927,4 --trace-process-track-uuid=3190708989122997041 --seatbelt-client=30"
+    },
+    {
+      "pid": 45138,
+      "parentPid": 45130,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/node_modules/electron/dist/Electron.app/Contents/Frameworks/Electron Helper (Renderer).app/Contents/MacOS/Electron Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy/.electron-user-data --app-path=/Users/study_superior/Desktop/Code/LingxiAgent --enable-sandbox --lang=zh-CN --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=4 --time-ticks-at-unix-epoch=-1792239084867397 --launch-time-ticks=351685002536 --shared-files --field-trial-handle=1718379636,r,10377885539185319027,1751824872924187699,262144 --enable-features=PdfUseShowSaveFilePicker,ScreenCaptureKitPickerScreen,ScreenCaptureKitStreamPickerSonoma --disable-features=DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TimeoutHangingVideoCaptureStarts,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=1935764596,r,13478945158778131597,13002893194761482927,4 --trace-process-track-uuid=3190708990060038890 --seatbelt-client=62"
+    },
+    {
+      "pid": 45351,
+      "parentPid": 45130,
+      "command": "/Users/study_superior/Desktop/Code/LingxiAgent/rust/target/debug/lingxi-service --home /private/var/folders/5r/wq54gtms21gfjgr5v94ynfyh0000gn/T/lingxi-r08-isolation-JnRl2p/b/copy"
+    }
+  ],
+  "residue": [],
+  "forcedCleanup": [],
+  "finishedAt": "2026-10-21T13:52:52.098Z"
+}

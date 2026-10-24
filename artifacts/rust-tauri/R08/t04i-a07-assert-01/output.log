@@ -1,0 +1,27 @@
+=== A07-1 fork lineage ===
+sess-child-0002|sess-parent-0001|as-000007-74151740|1
+fork_point_exists_in_parent: as-000007-74151740
+=== A07-2 no duplicate sessions ===
+       0
+=== A07-3 legacy_unknown run_id NULL ===
+2|2
+=== A07-4 unknown-block quarantine ===
+2
+       2
+=== A07-5 corrupt-tail prefix ===
+809
+     163 /tmp/t04i-target-02/legacy-import/quarantine/corrupt-tails/sess-corrupt-0005/tail-812.raw
+=== A07-6 titles/archived from sidecars ===
+sess-archived-0006|归档会话|archived
+sess-blocks-0004|未知块会话|active
+sess-child-0002|子会话（fork）|active
+sess-corrupt-0005|损坏尾行会话|active
+sess-parent-0001|父会话|active
+sess-unknown-0003|无边界会话|active
+=== A07-7 receipt status ===
+status partial runId import:0fba1f91:1792696774810 sourceUnchanged True
+batches total 31 done 22 pendingConvert 9 failed 0 skipped 0
+issues None
+byStrategy {}
+=== A07-8 unknown-block marker content opaque ===
+{"content":[{"data":{"line":4,"originalEntryType":"quantumEntangler","quarantinePath":"legacy-import/quarantine/unknown-blocks/sess-blocks-0004/4.raw","sha256":

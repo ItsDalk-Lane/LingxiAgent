@@ -1,0 +1,29 @@
+
+running 22 tests
+test an_unconfigured_mcp_read_and_restore_do_not_create_directories_or_block_the_service ... ok
+test an_authenticated_http_request_waiting_for_the_real_media_lock_cannot_use_a_replaced_owner_credential ... ok
+test invalid_provided_connector_shapes_never_write_and_schema_corruption_blocks_restore ... ok
+test rejected_update_must_not_cancel_an_accepted_background_sdk_start ... ok
+test explicit_start_revalidates_original_owner_while_real_sdk_initialize_is_waiting ... ok
+test http_saved_start_is_immediate_and_duplicate_start_uses_one_actual_sdk_connection ... ok
+test http_bulk_preflights_all_rows_and_keeps_saved_partial_runtime_failures ... ok
+test concurrent_registration_never_exposes_a_bare_executor_to_disabled_agent ... ok
+test restoring_lazy_lifecycle_keeps_saved_intent_without_starting_external_processes ... ok
+test editing_a_queued_connector_cleans_old_generation_before_new_sdk_start ... ok
+test global_disable_rejects_new_queued_start_while_old_sdk_cleanup_is_draining ... ok
+test http_bulk_pending_start_does_not_block_other_saves_and_stop_disable_reap_real_groups ... ok
+test occupied_listen_port_cleans_restored_mcp_and_knowledge_while_external_state_is_retained ... ok
+test actual_mcp_catalog_crosses_the_shared_defer_threshold_without_losing_other_sources ... ok
+test http_page_state_keeps_real_tools_agent_defaults_defer_and_private_edit_material ... ok
+test a_real_pending_settings_approval_does_not_survive_local_credential_replacement ... ok
+test cancelling_a_real_settings_run_interrupts_initialization_and_preserves_saved_intent ... ok
+test stopping_an_actual_inflight_mcp_call_records_unknown_without_replay_and_reaps_group ... ok
+test queued_original_authority_revocation_and_shutdown_cancel_and_reap_owned_sdk_start ... ok
+test real_run_nine_mcp_settings_actions_persist_and_gate_actual_sdk_consumers ... ok
+test a_real_web_login_cannot_gain_local_settings_authority_through_an_approved_model_tool ... ok
+test management_rejects_other_identities_corrupt_files_links_and_replaced_parent ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.47s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/r07_t08_mcp_settings.rs (rust/target/debug/deps/r07_t08_mcp_settings-a50fff7551e0a960)
